@@ -26,7 +26,7 @@ const menuItems = [
 ];
 
 const ProfileScreen = () => {
-  const { name, email, lifeStage, role, reset } = useUserStore();
+  const { name, email, lifeStage, role, logout } = useUserStore();
   const { toast } = useToast();
   const [partnerCode] = useState('ANACAN-8X92K7');
 
@@ -234,7 +234,7 @@ const ProfileScreen = () => {
 
       {/* Logout */}
       <motion.button
-        onClick={reset}
+        onClick={logout}
         className="w-full mt-6 p-4 rounded-2xl bg-destructive/10 text-destructive font-bold flex items-center justify-center gap-2"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
