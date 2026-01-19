@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Users, Package, TrendingUp, Activity, ArrowUp, ArrowDown } from 'lucide-react';
+import { Users, Package, TrendingUp, Activity, ArrowUp, ArrowDown, UserPlus } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import { formatDistanceToNow } from 'date-fns';
+import { az } from 'date-fns/locale';
 
 interface Stats {
   totalUsers: number;
@@ -24,6 +26,14 @@ interface LifeStageStats {
   color: string;
 }
 
+interface RecentUser {
+  id: string;
+  name: string;
+  email: string | null;
+  life_stage: string | null;
+  created_at: string;
+}
+
 const AdminDashboard = () => {
   const [stats, setStats] = useState<Stats>({
     totalUsers: 0,
@@ -34,12 +44,29 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [dailyStats, setDailyStats] = useState<DailyStats[]>([]);
   const [lifeStageStats, setLifeStageStats] = useState<LifeStageStats[]>([]);
+  const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
 
   useEffect(() => {
     fetchStats();
     fetchDailyStats();
     fetchLifeStageStats();
+    fetchRecentUsers();
   }, []);
+
+  const fetchRecentUsers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, name, email, life_stage, created_at')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (error) throw error;
+      setRecentUsers(data || []);
+    } catch (error) {
+      console.error('Error fetching recent users:', error);
+    }
+  };
 
   const fetchStats = async () => {
     try {
@@ -363,17 +390,41 @@ const AdminDashboard = () => {
         <Card className="p-5">
           <h3 className="text-lg font-semibold mb-4">Son Qeydiyyatlar</h3>
           <div className="space-y-3">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-primary" />
+            {recentUsers.length > 0 ? (
+              recentUsers.map((user) => (
+                <div key={user.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <UserPlus className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">{user.name}</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">{user.email}</span>
+                      {user.life_stage && (
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${
+                          user.life_stage === 'flow' ? 'bg-pink-500/10 text-pink-500' :
+                          user.life_stage === 'bump' ? 'bg-orange-500/10 text-orange-500' :
+                          user.life_stage === 'mommy' ? 'bg-purple-500/10 text-purple-500' :
+                          'bg-blue-500/10 text-blue-500'
+                        }`}>
+                          {user.life_stage === 'flow' ? 'Flow' :
+                           user.life_stage === 'bump' ? 'Bump' :
+                           user.life_stage === 'mommy' ? 'Mommy' : 'Partner'}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {formatDistanceToNow(new Date(user.created_at), { addSuffix: true, locale: az })}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="font-medium text-sm">Yeni istifadəçi qeydiyyatdan keçdi</p>
-                  <p className="text-xs text-muted-foreground">{i} saat əvvəl</p>
-                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <Users className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">Hələ qeydiyyat yoxdur</p>
               </div>
-            ))}
+            )}
           </div>
         </Card>
 
