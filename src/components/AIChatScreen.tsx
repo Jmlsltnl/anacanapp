@@ -13,6 +13,7 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  isStreaming?: boolean;
 }
 
 const AIChatScreen = () => {
@@ -66,7 +67,16 @@ const AIChatScreen = () => {
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const assistantMessageId = `assistant-${Date.now()}`;
+    
+    setMessages(prev => [...prev, userMessage, {
+      id: assistantMessageId,
+      role: 'assistant',
+      content: '',
+      timestamp: new Date(),
+      isStreaming: true
+    }]);
+    
     setInput('');
     setIsLoading(true);
 
@@ -83,25 +93,69 @@ const AIChatScreen = () => {
         content: userMessage.content
       });
 
-      const { data, error } = await supabase.functions.invoke('dr-anacan-chat', {
+      const response = await supabase.functions.invoke('dr-anacan-chat', {
         body: {
           messages: conversationHistory,
           lifeStage: lifeStage || 'bump',
           pregnancyWeek: pregnancyData?.currentWeek,
-          isPartner: false
+          isPartner: false,
+          stream: true
         }
       });
 
-      if (error) throw error;
+      if (response.error) throw response.error;
 
-      const assistantMessage: Message = {
-        id: `assistant-${Date.now()}`,
-        role: 'assistant',
-        content: data.message || 'Bağışlayın, cavab ala bilmədim.',
-        timestamp: new Date()
-      };
+      // Handle streaming response
+      const reader = response.data?.getReader?.();
+      
+      if (reader) {
+        const decoder = new TextDecoder();
+        let fullContent = '';
 
-      setMessages(prev => [...prev, assistantMessage]);
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6);
+              if (data === '[DONE]') continue;
+
+              try {
+                const parsed = JSON.parse(data);
+                const content = parsed.choices?.[0]?.delta?.content || '';
+                fullContent += content;
+
+                setMessages(prev => prev.map(m => 
+                  m.id === assistantMessageId 
+                    ? { ...m, content: fullContent }
+                    : m
+                ));
+              } catch {
+                // Skip invalid JSON
+              }
+            }
+          }
+        }
+
+        // Mark streaming as complete
+        setMessages(prev => prev.map(m => 
+          m.id === assistantMessageId 
+            ? { ...m, isStreaming: false, content: fullContent || 'Bağışlayın, cavab ala bilmədim.' }
+            : m
+        ));
+      } else {
+        // Fallback to non-streaming response
+        const data = response.data;
+        setMessages(prev => prev.map(m => 
+          m.id === assistantMessageId 
+            ? { ...m, isStreaming: false, content: data.message || 'Bağışlayın, cavab ala bilmədim.' }
+            : m
+        ));
+      }
     } catch (error) {
       console.error('Chat error:', error);
       toast({
@@ -110,12 +164,11 @@ const AIChatScreen = () => {
         variant: 'destructive'
       });
       
-      setMessages(prev => [...prev, {
-        id: `error-${Date.now()}`,
-        role: 'assistant',
-        content: 'Bağışlayın, texniki xəta baş verdi. Zəhmət olmasa yenidən cəhd edin. 🙏',
-        timestamp: new Date()
-      }]);
+      setMessages(prev => prev.map(m => 
+        m.id === assistantMessageId 
+          ? { ...m, isStreaming: false, content: 'Bağışlayın, texniki xəta baş verdi. Zəhmət olmasa yenidən cəhd edin. 🙏' }
+          : m
+      ));
     } finally {
       setIsLoading(false);
     }
@@ -210,32 +263,25 @@ const AIChatScreen = () => {
                     ? 'bg-primary text-primary-foreground rounded-br-md'
                     : 'bg-card border border-border shadow-sm rounded-bl-md'
                 }`}>
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                  <span className="text-[10px] opacity-60 mt-2 block">
-                    {message.timestamp.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
-                  </span>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                    {message.content}
+                    {message.isStreaming && (
+                      <motion.span
+                        className="inline-block w-2 h-4 bg-primary ml-1"
+                        animate={{ opacity: [1, 0] }}
+                        transition={{ duration: 0.5, repeat: Infinity }}
+                      />
+                    )}
+                  </p>
+                  {!message.isStreaming && (
+                    <span className="text-[10px] opacity-60 mt-2 block">
+                      {message.timestamp.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  )}
                 </div>
               </motion.div>
             ))}
           </AnimatePresence>
-
-          {isLoading && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex gap-3"
-            >
-              <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center">
-                <Bot className="w-5 h-5 text-white" />
-              </div>
-              <div className="bg-card border border-border p-4 rounded-2xl rounded-bl-md shadow-sm">
-                <div className="flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                  <span className="text-sm text-muted-foreground">Yazır...</span>
-                </div>
-              </div>
-            </motion.div>
-          )}
         </div>
 
         {/* Suggested Questions */}

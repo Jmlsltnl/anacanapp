@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, User, ArrowRight, Users, Eye, EyeOff, Sparkles } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Users, Eye, EyeOff, Sparkles, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
-type AuthMode = 'login' | 'register' | 'partner';
+type AuthMode = 'login' | 'register' | 'partner' | 'forgot-password';
 
 const AuthScreen = () => {
   const [mode, setMode] = useState<AuthMode>('login');
@@ -25,7 +26,36 @@ const AuthScreen = () => {
     setIsLoading(true);
 
     try {
-      if (mode === 'partner') {
+      if (mode === 'forgot-password') {
+        if (!email) {
+          toast({
+            title: 'E-mail tələb olunur',
+            description: 'Zəhmət olmasa e-mail ünvanınızı daxil edin.',
+            variant: 'destructive',
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+
+        if (error) {
+          toast({
+            title: 'Xəta baş verdi',
+            description: 'Şifrə bərpa linki göndərilə bilmədi.',
+            variant: 'destructive',
+          });
+        } else {
+          toast({
+            title: 'Link göndərildi! 📧',
+            description: 'E-mail ünvanınıza şifrə bərpa linki göndərildi.',
+          });
+          setMode('login');
+          setEmail('');
+        }
+      } else if (mode === 'partner') {
         if (!partnerCode.startsWith('ANACAN-') || partnerCode.length < 10) {
           toast({
             title: 'Kod yanlışdır',
@@ -255,7 +285,39 @@ const AuthScreen = () => {
               onSubmit={handleSubmit}
               className="space-y-4"
             >
-              {mode === 'partner' ? (
+              {mode === 'forgot-password' ? (
+                <>
+                  <motion.div variants={itemVariants} className="text-center mb-6">
+                    <button
+                      type="button"
+                      onClick={() => setMode('login')}
+                      className="absolute left-0 top-0 p-2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <ArrowLeft className="w-5 h-5" />
+                    </button>
+                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                      <Lock className="w-8 h-8 text-primary" />
+                    </div>
+                    <h2 className="text-xl font-bold text-foreground">Şifrəni Bərpa Et</h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      E-mail ünvanınıza bərpa linki göndəriləcək
+                    </p>
+                  </motion.div>
+
+                  <motion.div variants={itemVariants}>
+                    <div className="relative group">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                      <Input
+                        type="email"
+                        placeholder="E-mail"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all"
+                      />
+                    </div>
+                  </motion.div>
+                </>
+              ) : mode === 'partner' ? (
                 <>
                   <motion.div variants={itemVariants} className="text-center mb-6">
                     <div className="w-16 h-16 rounded-full bg-partner/10 flex items-center justify-center mx-auto mb-4">
@@ -378,7 +440,11 @@ const AuthScreen = () => {
 
                   {mode === 'login' && (
                     <motion.div variants={itemVariants} className="text-right">
-                      <button type="button" className="text-sm text-primary font-medium hover:underline">
+                      <button 
+                        type="button" 
+                        onClick={() => setMode('forgot-password')}
+                        className="text-sm text-primary font-medium hover:underline"
+                      >
                         Şifrəni unutdunuz?
                       </button>
                     </motion.div>
@@ -400,7 +466,7 @@ const AuthScreen = () => {
                     />
                   ) : (
                     <span className="flex items-center gap-2">
-                      {mode === 'login' ? 'Daxil ol' : mode === 'register' ? 'Qeydiyyatdan keç' : 'Qoşul'}
+                      {mode === 'login' ? 'Daxil ol' : mode === 'register' ? 'Qeydiyyatdan keç' : mode === 'forgot-password' ? 'Link göndər' : 'Qoşul'}
                       <ArrowRight className="w-5 h-5" />
                     </span>
                   )}

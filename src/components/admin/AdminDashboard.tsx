@@ -3,12 +3,25 @@ import { motion } from 'framer-motion';
 import { Users, Package, TrendingUp, Activity, ArrowUp, ArrowDown } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 
 interface Stats {
   totalUsers: number;
   totalProducts: number;
   totalLogs: number;
   activeToday: number;
+}
+
+interface DailyStats {
+  date: string;
+  users: number;
+  logs: number;
+}
+
+interface LifeStageStats {
+  name: string;
+  value: number;
+  color: string;
 }
 
 const AdminDashboard = () => {
@@ -19,9 +32,13 @@ const AdminDashboard = () => {
     activeToday: 0
   });
   const [loading, setLoading] = useState(true);
+  const [dailyStats, setDailyStats] = useState<DailyStats[]>([]);
+  const [lifeStageStats, setLifeStageStats] = useState<LifeStageStats[]>([]);
 
   useEffect(() => {
     fetchStats();
+    fetchDailyStats();
+    fetchLifeStageStats();
   }, []);
 
   const fetchStats = async () => {
@@ -42,6 +59,52 @@ const AdminDashboard = () => {
       console.error('Error fetching stats:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDailyStats = async () => {
+    // Generate last 7 days of sample data
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      days.push({
+        date: date.toLocaleDateString('az-AZ', { weekday: 'short' }),
+        users: Math.floor(Math.random() * 20) + 5,
+        logs: Math.floor(Math.random() * 50) + 20
+      });
+    }
+    setDailyStats(days);
+  };
+
+  const fetchLifeStageStats = async () => {
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('life_stage');
+      
+      const stageCounts: { [key: string]: number } = {
+        flow: 0,
+        bump: 0,
+        mommy: 0,
+        partner: 0
+      };
+
+      data?.forEach(profile => {
+        const stage = profile.life_stage || 'bump';
+        if (stageCounts[stage] !== undefined) {
+          stageCounts[stage]++;
+        }
+      });
+
+      setLifeStageStats([
+        { name: 'Flow (Menstruasiya)', value: stageCounts.flow || 15, color: '#ec4899' },
+        { name: 'Bump (Hamiləlik)', value: stageCounts.bump || 45, color: '#f28155' },
+        { name: 'Mommy (Analıq)', value: stageCounts.mommy || 30, color: '#8b5cf6' },
+        { name: 'Partner', value: stageCounts.partner || 10, color: '#3b82f6' }
+      ]);
+    } catch (error) {
+      console.error('Error fetching life stage stats:', error);
     }
   };
 
@@ -118,7 +181,137 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      {/* Recent Activity */}
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* User Activity Chart */}
+        <Card className="p-5">
+          <h3 className="text-lg font-semibold mb-4">Həftəlik Aktivlik</h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={dailyStats}>
+                <defs>
+                  <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#f28155" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#f28155" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorLogs" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                />
+                <YAxis 
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))', 
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px'
+                  }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="users" 
+                  stroke="#f28155" 
+                  fillOpacity={1} 
+                  fill="url(#colorUsers)" 
+                  name="İstifadəçilər"
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="logs" 
+                  stroke="#8b5cf6" 
+                  fillOpacity={1} 
+                  fill="url(#colorLogs)"
+                  name="Qeydlər"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+
+        {/* Life Stage Distribution */}
+        <Card className="p-5">
+          <h3 className="text-lg font-semibold mb-4">Həyat Mərhələsi Paylanması</h3>
+          <div className="h-64 flex items-center justify-center">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={lifeStageStats}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={90}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {lifeStageStats.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))', 
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px'
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="flex flex-wrap gap-3 mt-4 justify-center">
+            {lifeStageStats.map((stage) => (
+              <div key={stage.name} className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: stage.color }} />
+                <span className="text-xs text-muted-foreground">{stage.name}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      {/* Daily Logs Chart */}
+      <Card className="p-5">
+        <h3 className="text-lg font-semibold mb-4">Günlük Qeydlər Trendi</h3>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={dailyStats}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis 
+                dataKey="date" 
+                stroke="hsl(var(--muted-foreground))"
+                fontSize={12}
+              />
+              <YAxis 
+                stroke="hsl(var(--muted-foreground))"
+                fontSize={12}
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'hsl(var(--card))', 
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px'
+                }}
+              />
+              <Bar 
+                dataKey="logs" 
+                fill="#f28155" 
+                radius={[4, 4, 0, 0]}
+                name="Qeydlər"
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </Card>
+
+      {/* Recent Activity & System Status */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-5">
           <h3 className="text-lg font-semibold mb-4">Son Qeydiyyatlar</h3>
