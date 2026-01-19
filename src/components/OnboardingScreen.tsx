@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Check, Calendar, Baby, Heart } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check, Calendar, Baby, Heart, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useUserStore } from '@/store/userStore';
@@ -13,8 +13,9 @@ const stages = [
     subtitle: 'Menstruasiya təqvimi',
     description: 'Dövrünüzü izləyin, ovulyasiyanı proqnozlaşdırın',
     icon: Calendar,
+    emoji: '🌸',
     color: 'flow',
-    gradient: 'gradient-flow',
+    bgGradient: 'from-rose-500 to-pink-600',
   },
   {
     id: 'bump' as LifeStage,
@@ -22,8 +23,9 @@ const stages = [
     subtitle: 'Hamiləlik izləyicisi',
     description: 'Körpənizin inkişafını həftə-həftə izləyin',
     icon: Heart,
+    emoji: '🤰',
     color: 'bump',
-    gradient: 'gradient-bump',
+    bgGradient: 'from-violet-500 to-purple-600',
   },
   {
     id: 'mommy' as LifeStage,
@@ -31,8 +33,9 @@ const stages = [
     subtitle: 'Analıq yardımçısı',
     description: 'Körpənizin qidalanma, yuxu və inkişafını izləyin',
     icon: Baby,
+    emoji: '👶',
     color: 'mommy',
-    gradient: 'gradient-mommy',
+    bgGradient: 'from-emerald-500 to-teal-600',
   },
 ];
 
@@ -75,130 +78,201 @@ const OnboardingScreen = () => {
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0, x: 50 },
-    visible: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -50 }
+  const pageVariants = {
+    initial: { opacity: 0, x: 100 },
+    animate: { opacity: 1, x: 0, transition: { type: "spring" as const, stiffness: 300, damping: 30 } },
+    exit: { opacity: 0, x: -100 }
+  };
+
+  const staggerChildren = {
+    animate: { transition: { staggerChildren: 0.1 } }
+  };
+
+  const childVariants = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background safe-top safe-bottom">
+    <div className="min-h-screen flex flex-col bg-background safe-top safe-bottom overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-32 -right-32 w-64 h-64 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute bottom-1/4 -left-20 w-48 h-48 rounded-full bg-accent/5 blur-3xl" />
+      </div>
+
       {/* Header */}
-      <div className="px-6 py-4 flex items-center justify-between">
+      <div className="relative px-5 py-5 flex items-center justify-between">
         {step > 0 ? (
-          <button onClick={handleBack} className="p-2 -ml-2">
-            <ArrowLeft className="w-6 h-6 text-foreground" />
-          </button>
+          <motion.button 
+            onClick={handleBack} 
+            className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <ArrowLeft className="w-5 h-5 text-foreground" />
+          </motion.button>
         ) : (
-          <div className="w-10" />
+          <div className="w-12" />
         )}
+        
+        {/* Progress indicators */}
         <div className="flex gap-2">
           {[0, 1].map((i) => (
-            <div
+            <motion.div
               key={i}
-              className={`w-8 h-1.5 rounded-full transition-colors ${
-                i <= step ? 'bg-primary' : 'bg-muted'
+              className={`h-2 rounded-full transition-all duration-500 ${
+                i <= step ? 'bg-primary w-8' : 'bg-muted w-2'
               }`}
+              layout
             />
           ))}
         </div>
-        <div className="w-10" />
+        
+        <div className="w-12" />
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-6 py-4">
+      <div className="flex-1 px-5 py-4 relative">
         <AnimatePresence mode="wait">
           {step === 0 && (
             <motion.div
               key="step-0"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
+              variants={pageVariants}
+              initial="initial"
+              animate="animate"
               exit="exit"
-              className="space-y-6"
+              className="h-full flex flex-col"
             >
-              <div className="text-center mb-8">
-                <h1 className="text-2xl font-bold text-foreground">Sizə xoş gəldiniz!</h1>
-                <p className="text-muted-foreground mt-2">
+              {/* Header Content */}
+              <motion.div 
+                className="text-center mb-8"
+                variants={staggerChildren}
+                initial="initial"
+                animate="animate"
+              >
+                <motion.div variants={childVariants} className="flex justify-center mb-4">
+                  <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center shadow-button">
+                    <Sparkles className="w-8 h-8 text-white" />
+                  </div>
+                </motion.div>
+                <motion.h1 variants={childVariants} className="text-3xl font-black text-foreground">
+                  Xoş gəldiniz! 
+                </motion.h1>
+                <motion.p variants={childVariants} className="text-muted-foreground mt-2 text-lg">
                   Hansı mərhələdəsiniz?
-                </p>
-              </div>
+                </motion.p>
+              </motion.div>
 
-              <div className="space-y-4">
-                {stages.map((stage) => {
+              {/* Stage Selection */}
+              <motion.div 
+                className="space-y-4 flex-1"
+                variants={staggerChildren}
+                initial="initial"
+                animate="animate"
+              >
+                {stages.map((stage, index) => {
                   const Icon = stage.icon;
                   const isSelected = selectedStage === stage.id;
                   
                   return (
                     <motion.button
                       key={stage.id}
+                      variants={childVariants}
                       onClick={() => handleStageSelect(stage.id)}
-                      className={`w-full p-5 rounded-2xl text-left transition-all ${
+                      className={`w-full p-5 rounded-3xl text-left transition-all duration-300 relative overflow-hidden ${
                         isSelected
-                          ? `${stage.gradient} text-white shadow-lg`
-                          : 'bg-card border-2 border-border hover:border-primary/30'
+                          ? `bg-gradient-to-r ${stage.bgGradient} text-white shadow-elevated`
+                          : 'bg-card border-2 border-border hover:border-primary/20 hover:shadow-card'
                       }`}
+                      whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      <div className="flex items-center gap-4">
-                        <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${
-                          isSelected ? 'bg-white/20' : `bg-${stage.color}-light`
+                      {isSelected && (
+                        <motion.div
+                          className="absolute inset-0 bg-white/10"
+                          initial={{ x: '-100%' }}
+                          animate={{ x: '100%' }}
+                          transition={{ duration: 1, repeat: Infinity, repeatDelay: 1 }}
+                        />
+                      )}
+                      
+                      <div className="flex items-center gap-4 relative z-10">
+                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl ${
+                          isSelected ? 'bg-white/20' : 'bg-muted'
                         }`}>
-                          <Icon className={`w-7 h-7 ${isSelected ? 'text-white' : `text-${stage.color}`}`} />
+                          {stage.emoji}
                         </div>
                         <div className="flex-1">
                           <h3 className={`font-bold text-lg ${isSelected ? 'text-white' : 'text-foreground'}`}>
                             {stage.title}
                           </h3>
-                          <p className={`text-sm ${isSelected ? 'text-white/80' : 'text-muted-foreground'}`}>
+                          <p className={`text-sm mt-0.5 ${isSelected ? 'text-white/80' : 'text-muted-foreground'}`}>
                             {stage.description}
                           </p>
                         </div>
                         {isSelected && (
                           <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"
+                            initial={{ scale: 0, rotate: -180 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            className="w-10 h-10 rounded-xl bg-white/25 flex items-center justify-center"
                           >
-                            <Check className="w-5 h-5 text-white" />
+                            <Check className="w-6 h-6 text-white" strokeWidth={3} />
                           </motion.div>
                         )}
                       </div>
                     </motion.button>
                   );
                 })}
-              </div>
+              </motion.div>
             </motion.div>
           )}
 
           {step === 1 && selectedStage && (
             <motion.div
               key="step-1"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
+              variants={pageVariants}
+              initial="initial"
+              animate="animate"
               exit="exit"
-              className="space-y-6"
+              className="h-full flex flex-col"
             >
-              <div className="text-center mb-8">
-                <h1 className="text-2xl font-bold text-foreground">
+              <motion.div 
+                className="text-center mb-8"
+                variants={staggerChildren}
+                initial="initial"
+                animate="animate"
+              >
+                <motion.div variants={childVariants} className="flex justify-center mb-4">
+                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${
+                    stages.find(s => s.id === selectedStage)?.bgGradient
+                  } flex items-center justify-center text-3xl shadow-button`}>
+                    {stages.find(s => s.id === selectedStage)?.emoji}
+                  </div>
+                </motion.div>
+                <motion.h1 variants={childVariants} className="text-2xl font-black text-foreground">
                   {selectedStage === 'mommy' ? 'Körpəniz haqqında' : 'Son dövr tarixi'}
-                </h1>
-                <p className="text-muted-foreground mt-2">
+                </motion.h1>
+                <motion.p variants={childVariants} className="text-muted-foreground mt-2">
                   {selectedStage === 'mommy' 
                     ? 'Körpənizin məlumatlarını daxil edin'
                     : selectedStage === 'bump'
                     ? 'Son menstruasiya tarixinizi daxil edin'
                     : 'Son dövrünüz nə vaxt başladı?'
                   }
-                </p>
-              </div>
+                </motion.p>
+              </motion.div>
 
-              <div className="space-y-4">
+              <motion.div 
+                className="space-y-5 flex-1"
+                variants={staggerChildren}
+                initial="initial"
+                animate="animate"
+              >
                 {selectedStage === 'mommy' && (
                   <>
-                    <div>
-                      <label className="text-sm font-medium text-foreground mb-2 block">
+                    <motion.div variants={childVariants}>
+                      <label className="text-sm font-bold text-foreground mb-3 block">
                         Körpənizin adı
                       </label>
                       <Input
@@ -206,60 +280,59 @@ const OnboardingScreen = () => {
                         placeholder="Ad"
                         value={babyName}
                         onChange={(e) => setBabyName(e.target.value)}
-                        className="h-14 rounded-2xl bg-muted border-0 text-base"
+                        className="h-16 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-lg px-5"
                       />
-                    </div>
+                    </motion.div>
 
-                    <div>
-                      <label className="text-sm font-medium text-foreground mb-2 block">
+                    <motion.div variants={childVariants}>
+                      <label className="text-sm font-bold text-foreground mb-3 block">
                         Cinsi
                       </label>
-                      <div className="flex gap-3">
-                        <button
-                          onClick={() => setBabyGender('boy')}
-                          className={`flex-1 p-4 rounded-2xl font-medium transition-all ${
-                            babyGender === 'boy'
-                              ? 'bg-partner text-white'
-                              : 'bg-muted text-muted-foreground'
-                          }`}
-                        >
-                          👦 Oğlan
-                        </button>
-                        <button
-                          onClick={() => setBabyGender('girl')}
-                          className={`flex-1 p-4 rounded-2xl font-medium transition-all ${
-                            babyGender === 'girl'
-                              ? 'bg-primary text-white'
-                              : 'bg-muted text-muted-foreground'
-                          }`}
-                        >
-                          👧 Qız
-                        </button>
+                      <div className="flex gap-4">
+                        {[
+                          { id: 'boy', label: 'Oğlan', emoji: '👦', gradient: 'from-blue-500 to-indigo-600' },
+                          { id: 'girl', label: 'Qız', emoji: '👧', gradient: 'from-pink-500 to-rose-600' },
+                        ].map((g) => (
+                          <motion.button
+                            key={g.id}
+                            onClick={() => setBabyGender(g.id as 'boy' | 'girl')}
+                            className={`flex-1 p-5 rounded-2xl font-bold transition-all flex flex-col items-center gap-2 ${
+                              babyGender === g.id
+                                ? `bg-gradient-to-r ${g.gradient} text-white shadow-elevated`
+                                : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                            }`}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                          >
+                            <span className="text-3xl">{g.emoji}</span>
+                            <span>{g.label}</span>
+                          </motion.button>
+                        ))}
                       </div>
-                    </div>
+                    </motion.div>
                   </>
                 )}
 
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">
+                <motion.div variants={childVariants}>
+                  <label className="text-sm font-bold text-foreground mb-3 block">
                     {selectedStage === 'mommy' ? 'Doğum tarixi' : 'Tarix'}
                   </label>
                   <Input
                     type="date"
                     value={dateInput}
                     onChange={(e) => setDateInput(e.target.value)}
-                    className="h-14 rounded-2xl bg-muted border-0 text-base"
+                    className="h-16 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-lg px-5"
                     max={new Date().toISOString().split('T')[0]}
                   />
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
       {/* Footer */}
-      <div className="px-6 pb-8">
+      <div className="px-5 pb-8 pt-4">
         <Button
           onClick={handleNext}
           disabled={
@@ -267,10 +340,17 @@ const OnboardingScreen = () => {
             (step === 1 && !dateInput) ||
             (step === 1 && selectedStage === 'mommy' && (!babyName || !babyGender))
           }
-          className="w-full h-14 rounded-2xl gradient-primary text-white font-semibold text-base shadow-button hover:opacity-90 transition-opacity disabled:opacity-50"
+          className="w-full h-16 rounded-2xl gradient-primary text-white font-bold text-lg shadow-button hover:shadow-glow transition-all duration-300 disabled:opacity-50 disabled:shadow-none"
         >
-          {step === 1 ? 'Başla' : 'Davam et'}
-          <ArrowRight className="w-5 h-5 ml-2" />
+          <span className="flex items-center gap-2">
+            {step === 1 ? 'Başla' : 'Davam et'}
+            <motion.div
+              animate={{ x: [0, 5, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              <ArrowRight className="w-6 h-6" />
+            </motion.div>
+          </span>
         </Button>
       </div>
     </div>

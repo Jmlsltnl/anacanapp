@@ -2,120 +2,132 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
 
 @layer base {
   :root {
-    /* Anacan Color Palette - Soft, Feminine, Calming */
-    --background: 330 30% 98%;
-    --foreground: 330 25% 15%;
+    /* Anacan Color Palette - Warm Orange Theme */
+    --background: 30 40% 98%;
+    --foreground: 20 25% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 330 25% 15%;
+    --card-foreground: 20 25% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 330 25% 15%;
+    --popover-foreground: 20 25% 15%;
 
-    /* Primary - Soft Rose */
-    --primary: 340 65% 65%;
+    /* Primary - Vibrant Orange */
+    --primary: 24 95% 55%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Lavender */
-    --secondary: 270 35% 92%;
-    --secondary-foreground: 270 40% 35%;
+    /* Secondary - Warm Peach */
+    --secondary: 30 60% 95%;
+    --secondary-foreground: 24 80% 40%;
 
-    /* Muted - Soft Gray with Pink undertone */
-    --muted: 330 20% 94%;
-    --muted-foreground: 330 15% 45%;
+    /* Muted - Soft Cream */
+    --muted: 30 30% 94%;
+    --muted-foreground: 20 15% 45%;
 
-    /* Accent - Soft Mint */
-    --accent: 160 40% 90%;
-    --accent-foreground: 160 45% 30%;
+    /* Accent - Coral */
+    --accent: 15 85% 60%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 60%;
+    --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 330 20% 90%;
-    --input: 330 20% 90%;
-    --ring: 340 65% 65%;
+    --border: 30 25% 90%;
+    --input: 30 25% 92%;
+    --ring: 24 95% 55%;
 
     --radius: 1rem;
 
-    /* Custom Anacan Colors */
-    --flow: 340 70% 60%;
-    --flow-light: 340 70% 95%;
-    --bump: 270 50% 65%;
-    --bump-light: 270 50% 95%;
-    --mommy: 160 50% 55%;
-    --mommy-light: 160 50% 95%;
-    --partner: 210 60% 55%;
-    --partner-light: 210 60% 95%;
+    /* Custom Anacan Colors - Life Stages */
+    --flow: 350 75% 55%;
+    --flow-light: 350 80% 95%;
+    --flow-dark: 350 70% 45%;
+    
+    --bump: 280 60% 60%;
+    --bump-light: 280 65% 95%;
+    --bump-dark: 280 55% 50%;
+    
+    --mommy: 165 55% 50%;
+    --mommy-light: 165 60% 95%;
+    --mommy-dark: 165 50% 40%;
+    
+    --partner: 215 70% 55%;
+    --partner-light: 215 75% 95%;
+    --partner-dark: 215 65% 45%;
 
     /* Gradients */
-    --gradient-flow: linear-gradient(135deg, hsl(340, 70%, 60%) 0%, hsl(320, 60%, 70%) 100%);
-    --gradient-bump: linear-gradient(135deg, hsl(270, 50%, 65%) 0%, hsl(290, 45%, 75%) 100%);
-    --gradient-mommy: linear-gradient(135deg, hsl(160, 50%, 55%) 0%, hsl(180, 45%, 65%) 100%);
-    --gradient-partner: linear-gradient(135deg, hsl(210, 60%, 55%) 0%, hsl(230, 55%, 65%) 100%);
-    --gradient-primary: linear-gradient(135deg, hsl(340, 65%, 65%) 0%, hsl(320, 55%, 75%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(24, 95%, 55%) 0%, hsl(35, 90%, 60%) 50%, hsl(15, 90%, 55%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(30, 60%, 95%) 0%, hsl(35, 70%, 90%) 100%);
+    --gradient-flow: linear-gradient(135deg, hsl(350, 75%, 55%) 0%, hsl(330, 70%, 60%) 50%, hsl(340, 65%, 65%) 100%);
+    --gradient-bump: linear-gradient(135deg, hsl(280, 60%, 60%) 0%, hsl(300, 55%, 65%) 50%, hsl(260, 50%, 65%) 100%);
+    --gradient-mommy: linear-gradient(135deg, hsl(165, 55%, 50%) 0%, hsl(180, 50%, 55%) 50%, hsl(150, 50%, 55%) 100%);
+    --gradient-partner: linear-gradient(135deg, hsl(215, 70%, 55%) 0%, hsl(230, 65%, 60%) 50%, hsl(200, 65%, 55%) 100%);
+    --gradient-sunset: linear-gradient(135deg, hsl(24, 95%, 55%) 0%, hsl(350, 75%, 55%) 100%);
+    --gradient-warm: linear-gradient(180deg, hsl(30, 40%, 98%) 0%, hsl(35, 50%, 96%) 100%);
 
-    /* Shadows */
-    --shadow-soft: 0 4px 20px -4px hsl(340 65% 65% / 0.15);
-    --shadow-card: 0 8px 30px -8px hsl(330 25% 15% / 0.1);
-    --shadow-button: 0 4px 15px -3px hsl(340 65% 65% / 0.3);
+    /* Enhanced Shadows */
+    --shadow-soft: 0 4px 20px -4px hsl(24 95% 55% / 0.15);
+    --shadow-card: 0 8px 30px -8px hsl(20 25% 15% / 0.08);
+    --shadow-button: 0 8px 25px -5px hsl(24 95% 55% / 0.35);
+    --shadow-glow: 0 0 40px -10px hsl(24 95% 55% / 0.4);
+    --shadow-elevated: 0 20px 40px -10px hsl(20 25% 15% / 0.15);
 
     /* Sidebar */
-    --sidebar-background: 330 30% 98%;
-    --sidebar-foreground: 330 25% 15%;
-    --sidebar-primary: 340 65% 65%;
+    --sidebar-background: 30 40% 98%;
+    --sidebar-foreground: 20 25% 15%;
+    --sidebar-primary: 24 95% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 160 40% 90%;
-    --sidebar-accent-foreground: 160 45% 30%;
-    --sidebar-border: 330 20% 90%;
-    --sidebar-ring: 340 65% 65%;
+    --sidebar-accent: 30 60% 95%;
+    --sidebar-accent-foreground: 24 80% 40%;
+    --sidebar-border: 30 25% 90%;
+    --sidebar-ring: 24 95% 55%;
   }
 
   .dark {
-    --background: 330 25% 8%;
-    --foreground: 330 20% 95%;
+    --background: 20 20% 7%;
+    --foreground: 30 20% 95%;
 
-    --card: 330 25% 12%;
-    --card-foreground: 330 20% 95%;
+    --card: 20 20% 10%;
+    --card-foreground: 30 20% 95%;
 
-    --popover: 330 25% 12%;
-    --popover-foreground: 330 20% 95%;
+    --popover: 20 20% 10%;
+    --popover-foreground: 30 20% 95%;
 
-    --primary: 340 65% 65%;
+    --primary: 24 95% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 270 30% 20%;
-    --secondary-foreground: 270 35% 85%;
+    --secondary: 20 25% 18%;
+    --secondary-foreground: 30 50% 85%;
 
-    --muted: 330 20% 18%;
-    --muted-foreground: 330 15% 65%;
+    --muted: 20 20% 15%;
+    --muted-foreground: 30 15% 60%;
 
-    --accent: 160 35% 20%;
-    --accent-foreground: 160 40% 85%;
+    --accent: 15 85% 55%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 330 20% 20%;
-    --input: 330 20% 20%;
-    --ring: 340 65% 65%;
+    --border: 20 20% 18%;
+    --input: 20 20% 18%;
+    --ring: 24 95% 55%;
 
-    --flow-light: 340 70% 15%;
-    --bump-light: 270 50% 15%;
-    --mommy-light: 160 50% 15%;
-    --partner-light: 210 60% 15%;
+    --flow-light: 350 70% 15%;
+    --bump-light: 280 55% 15%;
+    --mommy-light: 165 50% 15%;
+    --partner-light: 215 65% 15%;
 
-    --sidebar-background: 330 25% 8%;
-    --sidebar-foreground: 330 20% 95%;
-    --sidebar-primary: 340 65% 65%;
+    --sidebar-background: 20 20% 7%;
+    --sidebar-foreground: 30 20% 95%;
+    --sidebar-primary: 24 95% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 160 35% 20%;
-    --sidebar-accent-foreground: 160 40% 85%;
-    --sidebar-border: 330 20% 20%;
-    --sidebar-ring: 340 65% 65%;
+    --sidebar-accent: 20 25% 18%;
+    --sidebar-accent-foreground: 30 50% 85%;
+    --sidebar-border: 20 20% 18%;
+    --sidebar-ring: 24 95% 55%;
   }
 }
 
@@ -134,6 +146,15 @@
 }
 
 @layer utilities {
+  /* Gradients */
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-secondary {
+    background: var(--gradient-secondary);
+  }
+  
   .gradient-flow {
     background: var(--gradient-flow);
   }
@@ -150,10 +171,15 @@
     background: var(--gradient-partner);
   }
   
-  .gradient-primary {
-    background: var(--gradient-primary);
+  .gradient-sunset {
+    background: var(--gradient-sunset);
+  }
+  
+  .gradient-warm {
+    background: var(--gradient-warm);
   }
 
+  /* Shadows */
   .shadow-soft {
     box-shadow: var(--shadow-soft);
   }
@@ -166,11 +192,40 @@
     box-shadow: var(--shadow-button);
   }
 
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+
+  /* Text Gradient */
   .text-gradient {
     background: var(--gradient-primary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  .text-gradient-flow {
+    background: var(--gradient-flow);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Glass Effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .glass-dark {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
 
   /* Safe area for mobile */
@@ -189,24 +244,95 @@
   .safe-right {
     padding-right: env(safe-area-inset-right);
   }
+
+  /* Shimmer Animation */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--muted));
-  border-radius: 3px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--primary) / 0.3);
-  border-radius: 3px;
+  background: hsl(var(--primary) / 0.2);
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.5);
+  background: hsl(var(--primary) / 0.4);
+}
+
+/* Hide scrollbar but keep functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Animated gradient border */
+.gradient-border {
+  position: relative;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: var(--gradient-primary);
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Pulsing ring animation */
+.pulse-ring {
+  position: relative;
+}
+
+.pulse-ring::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: var(--gradient-primary);
+  opacity: 0;
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.1);
+    opacity: 0;
+  }
 }
