@@ -1,0 +1,185 @@
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Users, Package, Settings, BarChart3, Shield, 
+  ChevronLeft, Menu, LogOut, Bell, Search,
+  Database, Key, MessageSquare, Home
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useAuth } from '@/hooks/useAuth';
+
+interface AdminLayoutProps {
+  children: React.ReactNode;
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+  onExit: () => void;
+}
+
+const menuItems = [
+  { id: 'dashboard', label: 'Dashboard', icon: Home },
+  { id: 'users', label: 'İstifadəçilər', icon: Users },
+  { id: 'products', label: 'Məhsullar', icon: Package },
+  { id: 'data', label: 'Məlumatlar', icon: Database },
+  { id: 'messages', label: 'Mesajlar', icon: MessageSquare },
+  { id: 'settings', label: 'Tənzimləmələr', icon: Settings },
+  { id: 'security', label: 'Təhlükəsizlik', icon: Shield },
+];
+
+const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutProps) => {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { profile, signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    onExit();
+  };
+
+  return (
+    <div className="min-h-screen bg-background flex">
+      {/* Sidebar */}
+      <motion.aside
+        initial={false}
+        animate={{ width: sidebarOpen ? 280 : 80 }}
+        className="bg-card border-r border-border flex flex-col fixed h-full z-50"
+      >
+        {/* Header */}
+        <div className="p-4 border-b border-border flex items-center justify-between">
+          <AnimatePresence>
+            {sidebarOpen && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="flex items-center gap-3"
+              >
+                <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="font-bold text-foreground">Admin Panel</h1>
+                  <p className="text-xs text-muted-foreground">Anacan</p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="shrink-0"
+          >
+            {sidebarOpen ? <ChevronLeft className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </Button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+          {menuItems.map((item) => (
+            <motion.button
+              key={item.id}
+              onClick={() => onTabChange(item.id)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                activeTab === item.id
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              }`}
+              whileHover={{ x: 4 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <item.icon className="w-5 h-5 shrink-0" />
+              <AnimatePresence>
+                {sidebarOpen && (
+                  <motion.span
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: 'auto' }}
+                    exit={{ opacity: 0, width: 0 }}
+                    className="font-medium whitespace-nowrap"
+                  >
+                    {item.label}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.button>
+          ))}
+        </nav>
+
+        {/* User Section */}
+        <div className="p-4 border-t border-border">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <span className="text-primary font-bold">
+                {profile?.name?.charAt(0).toUpperCase() || 'A'}
+              </span>
+            </div>
+            <AnimatePresence>
+              {sidebarOpen && (
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="flex-1 min-w-0"
+                >
+                  <p className="font-medium text-foreground truncate">{profile?.name || 'Admin'}</p>
+                  <p className="text-xs text-muted-foreground truncate">{profile?.email}</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+          
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size={sidebarOpen ? "default" : "icon"}
+              onClick={onExit}
+              className="flex-1"
+            >
+              <Home className="w-4 h-4" />
+              {sidebarOpen && <span className="ml-2">Tətbiqə qayıt</span>}
+            </Button>
+          </div>
+          
+          <Button
+            variant="ghost"
+            size={sidebarOpen ? "default" : "icon"}
+            onClick={handleLogout}
+            className="w-full mt-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+          >
+            <LogOut className="w-4 h-4" />
+            {sidebarOpen && <span className="ml-2">Çıxış</span>}
+          </Button>
+        </div>
+      </motion.aside>
+
+      {/* Main Content */}
+      <main className={`flex-1 ${sidebarOpen ? 'ml-[280px]' : 'ml-[80px]'} transition-all duration-300`}>
+        {/* Top Bar */}
+        <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40 flex items-center justify-between px-6">
+          <div className="flex items-center gap-4 flex-1 max-w-md">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Axtar..."
+                className="pl-10 bg-muted/50 border-0"
+              />
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />
+            </Button>
+          </div>
+        </header>
+
+        {/* Page Content */}
+        <div className="p-6">
+          {children}
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default AdminLayout;
