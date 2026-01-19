@@ -81,6 +81,11 @@ export default {
           light: "hsl(var(--partner-light))",
           dark: "hsl(var(--partner-dark))",
         },
+        beige: {
+          DEFAULT: "hsl(var(--beige))",
+          light: "hsl(var(--beige-light))",
+          dark: "hsl(var(--beige-dark))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
