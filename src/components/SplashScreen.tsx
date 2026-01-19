@@ -1,41 +1,69 @@
 import { motion } from 'framer-motion';
-import { Heart } from 'lucide-react';
+import { useEffect } from 'react';
 
 interface SplashScreenProps {
   onComplete: () => void;
 }
 
 const SplashScreen = ({ onComplete }: SplashScreenProps) => {
+  useEffect(() => {
+    const timer = setTimeout(onComplete, 2500);
+    return () => clearTimeout(timer);
+  }, [onComplete]);
+
   return (
     <motion.div
-      className="fixed inset-0 flex flex-col items-center justify-center gradient-primary safe-top safe-bottom"
+      className="fixed inset-0 flex flex-col items-center justify-center gradient-primary safe-top safe-bottom overflow-hidden"
       initial={{ opacity: 1 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      exit={{ opacity: 0, scale: 1.1 }}
       transition={{ duration: 0.5 }}
-      onAnimationComplete={() => {
-        setTimeout(onComplete, 2000);
-      }}
     >
-      {/* Animated background circles */}
+      {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
+        {/* Large floating circles */}
         <motion.div
-          className="absolute -top-20 -left-20 w-64 h-64 rounded-full bg-white/10"
+          className="absolute -top-32 -left-32 w-80 h-80 rounded-full bg-white/10"
           animate={{
-            scale: [1, 1.2, 1],
+            scale: [1, 1.3, 1],
             opacity: [0.1, 0.2, 0.1],
+            rotate: [0, 90, 0],
           }}
           transition={{
-            duration: 4,
+            duration: 8,
             repeat: Infinity,
             ease: "easeInOut",
           }}
         />
         <motion.div
-          className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-white/10"
+          className="absolute top-1/4 -right-20 w-56 h-56 rounded-full bg-white/5"
+          animate={{
+            scale: [1.2, 1, 1.2],
+            x: [0, -20, 0],
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+        <motion.div
+          className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-white/10"
           animate={{
             scale: [1.2, 1, 1.2],
             opacity: [0.15, 0.1, 0.15],
+            rotate: [0, -90, 0],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+        <motion.div
+          className="absolute bottom-1/3 -left-16 w-40 h-40 rounded-full bg-white/5"
+          animate={{
+            y: [0, -30, 0],
+            scale: [1, 1.1, 1],
           }}
           transition={{
             duration: 5,
@@ -43,68 +71,140 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
             ease: "easeInOut",
           }}
         />
+
+        {/* Floating particles */}
+        {[...Array(8)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 rounded-full bg-white/30"
+            style={{
+              left: `${15 + i * 10}%`,
+              top: `${20 + (i % 3) * 25}%`,
+            }}
+            animate={{
+              y: [0, -40, 0],
+              opacity: [0.3, 0.7, 0.3],
+              scale: [1, 1.5, 1],
+            }}
+            transition={{
+              duration: 3 + i * 0.5,
+              repeat: Infinity,
+              delay: i * 0.3,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
       </div>
 
-      {/* Logo */}
+      {/* Main Logo Content */}
       <motion.div
         className="relative z-10 flex flex-col items-center"
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
+        initial={{ scale: 0.5, opacity: 0, y: 30 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       >
+        {/* Logo Container with glow */}
         <motion.div
-          className="w-28 h-28 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mb-6 shadow-2xl"
+          className="relative mb-8"
           animate={{ 
-            boxShadow: [
-              "0 0 0 0 rgba(255,255,255,0.4)",
-              "0 0 0 20px rgba(255,255,255,0)",
-            ]
+            scale: [1, 1.02, 1],
           }}
           transition={{
-            duration: 1.5,
+            duration: 2,
             repeat: Infinity,
-            ease: "easeOut",
+            ease: "easeInOut",
           }}
         >
-          <Heart className="w-14 h-14 text-white fill-white/30" strokeWidth={1.5} />
+          {/* Outer glow ring */}
+          <motion.div
+            className="absolute inset-0 rounded-full bg-white/20"
+            animate={{
+              scale: [1, 1.4, 1],
+              opacity: [0.3, 0, 0.3],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeOut",
+            }}
+          />
+          
+          {/* Logo circle */}
+          <div className="relative w-32 h-32 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center shadow-2xl border border-white/30">
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.3, duration: 0.6, type: "spring", stiffness: 200 }}
+            >
+              {/* Custom A logo */}
+              <svg viewBox="0 0 60 60" className="w-16 h-16">
+                <motion.path
+                  d="M30 8 L48 52 L42 52 L38 42 L22 42 L18 52 L12 52 L30 8Z M30 20 L24 36 L36 36 L30 20Z"
+                  fill="white"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 1, ease: "easeOut" }}
+                />
+                <motion.circle
+                  cx="30"
+                  cy="18"
+                  r="4"
+                  fill="white"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 1.2, duration: 0.3, type: "spring" }}
+                />
+              </svg>
+            </motion.div>
+          </div>
         </motion.div>
 
+        {/* Brand Name */}
         <motion.h1
-          className="text-5xl font-bold text-white tracking-tight"
-          initial={{ y: 20, opacity: 0 }}
+          className="text-5xl font-black text-white tracking-tight mb-3"
+          initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
         >
           Anacan
         </motion.h1>
 
+        {/* Tagline */}
         <motion.p
-          className="text-white/80 text-lg mt-3 font-medium"
+          className="text-white/90 text-lg font-medium tracking-wide"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
+          transition={{ delay: 0.7, duration: 0.5 }}
         >
           Bədəninlə harmoniyada ol
         </motion.p>
+
+        {/* Decorative line */}
+        <motion.div
+          className="mt-6 h-1 bg-white/40 rounded-full"
+          initial={{ width: 0 }}
+          animate={{ width: 80 }}
+          transition={{ delay: 0.9, duration: 0.6, ease: "easeOut" }}
+        />
       </motion.div>
 
       {/* Loading indicator */}
       <motion.div
-        className="absolute bottom-20 flex gap-2"
+        className="absolute bottom-16 flex gap-3"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
+        transition={{ delay: 1.2 }}
       >
         {[0, 1, 2].map((i) => (
           <motion.div
             key={i}
-            className="w-2 h-2 rounded-full bg-white/60"
+            className="w-3 h-3 rounded-full bg-white/70"
             animate={{
-              scale: [1, 1.5, 1],
-              opacity: [0.6, 1, 0.6],
+              scale: [1, 1.4, 1],
+              opacity: [0.5, 1, 0.5],
             }}
             transition={{
-              duration: 1,
+              duration: 1.2,
               repeat: Infinity,
               delay: i * 0.2,
               ease: "easeInOut",
