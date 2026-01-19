@@ -39,6 +39,14 @@ const Index = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Handle admin screen navigation
+  useEffect(() => {
+    if (activeScreen === 'admin' && isAdmin) {
+      setShowAdmin(true);
+      setActiveScreen(null);
+    }
+  }, [activeScreen, isAdmin]);
+
   if (showSplash) {
     return <SplashScreen onComplete={() => setShowSplash(false)} />;
   }
@@ -77,13 +85,6 @@ const Index = () => {
   if (activeScreen === 'report') {
     return <DoctorReportScreen onBack={() => setActiveScreen(null)} />;
   }
-  // Handle admin screen navigation
-  useEffect(() => {
-    if (activeScreen === 'admin' && isAdmin) {
-      setShowAdmin(true);
-      setActiveScreen(null);
-    }
-  }, [activeScreen, isAdmin]);
 
   const renderContent = () => {
     if (role === 'partner') {
