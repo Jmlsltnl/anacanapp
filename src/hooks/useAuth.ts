@@ -53,14 +53,21 @@ export const useAuth = () => {
 
   const fetchUserRole = async (userId: string) => {
     try {
+      // Fetch all roles and prioritize admin > moderator > user
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', userId)
-        .maybeSingle();
+        .eq('user_id', userId);
 
       if (error) throw error;
-      return data as UserRole | null;
+      
+      if (!data || data.length === 0) return null;
+      
+      // Prioritize roles: admin > moderator > user
+      const rolesPriority = ['admin', 'moderator', 'user'];
+      const highestRole = rolesPriority.find(r => data.some(d => d.role === r));
+      
+      return highestRole ? { role: highestRole as UserRole['role'] } : null;
     } catch (error) {
       console.error('Error fetching user role:', error);
       return null;

@@ -77,11 +77,13 @@ const Index = () => {
   if (activeScreen === 'report') {
     return <DoctorReportScreen onBack={() => setActiveScreen(null)} />;
   }
-  if (activeScreen === 'admin' && isAdmin) {
-    setShowAdmin(true);
-    setActiveScreen(null);
-    return null;
-  }
+  // Handle admin screen navigation
+  useEffect(() => {
+    if (activeScreen === 'admin' && isAdmin) {
+      setShowAdmin(true);
+      setActiveScreen(null);
+    }
+  }, [activeScreen, isAdmin]);
 
   const renderContent = () => {
     if (role === 'partner') {
