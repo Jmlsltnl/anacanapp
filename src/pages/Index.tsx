@@ -15,8 +15,10 @@ import NotificationsScreen from '@/components/NotificationsScreen';
 import SettingsScreen from '@/components/SettingsScreen';
 import CalendarScreen from '@/components/CalendarScreen';
 import DoctorReportScreen from '@/components/DoctorReportScreen';
+import AdminPanel from '@/components/AdminPanel';
 import BottomNav from '@/components/BottomNav';
 import { useUserStore } from '@/store/userStore';
+import { useAuth } from '@/hooks/useAuth';
 
 const pageVariants = {
   initial: { opacity: 0, y: 10 },
@@ -28,7 +30,9 @@ const Index = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [activeTab, setActiveTab] = useState('home');
   const [activeScreen, setActiveScreen] = useState<string | null>(null);
+  const [showAdmin, setShowAdmin] = useState(false);
   const { isAuthenticated, isOnboarded, role } = useUserStore();
+  const { isAdmin, loading } = useAuth();
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 2500);
@@ -39,6 +43,14 @@ const Index = () => {
     return <SplashScreen onComplete={() => setShowSplash(false)} />;
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return <AuthScreen />;
   }
@@ -47,7 +59,12 @@ const Index = () => {
     return <OnboardingScreen />;
   }
 
-  // Handle sub-screens from profile menu
+  // Show Admin Panel
+  if (showAdmin && isAdmin) {
+    return <AdminPanel onExit={() => setShowAdmin(false)} />;
+  }
+
+  // Handle sub-screens
   if (activeScreen === 'notifications') {
     return <NotificationsScreen onBack={() => setActiveScreen(null)} />;
   }
@@ -60,9 +77,13 @@ const Index = () => {
   if (activeScreen === 'report') {
     return <DoctorReportScreen onBack={() => setActiveScreen(null)} />;
   }
+  if (activeScreen === 'admin' && isAdmin) {
+    setShowAdmin(true);
+    setActiveScreen(null);
+    return null;
+  }
 
   const renderContent = () => {
-    // Partner role shows Partner Dashboard with partner-specific screens
     if (role === 'partner') {
       switch (activeTab) {
         case 'home':
@@ -94,7 +115,6 @@ const Index = () => {
       }
     }
 
-    // Woman role shows full navigation
     switch (activeTab) {
       case 'home':
         return (
