@@ -1,0 +1,9 @@
+{
+  "appId": "app.lovable.e07ee1f93d5848fea7a0068ecf028173",
+  "appName": "anacanapp",
+  "webDir": "dist",
+  "server": {
+    "url": "https://e07ee1f9-3d58-48fe-a7a0-068ecf028173.lovableproject.com?forceHideBadge=true",
+    "cleartext": true
+  }
+}
