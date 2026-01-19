@@ -3,9 +3,10 @@ import { motion } from 'framer-motion';
 import { 
   User, Settings, Bell, Shield, HelpCircle, LogOut, 
   ChevronRight, Crown, Copy, Share2, FileText, Award,
-  Heart, Calendar, Moon, Palette
+  Heart, Calendar, Moon, Palette, ShieldCheck
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
+import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 
 const achievements = [
@@ -16,28 +17,39 @@ const achievements = [
   { id: '5', name: 'Super Ana', emoji: '👑', unlocked: false },
 ];
 
-const menuItems = [
-  { id: 'notifications', icon: Bell, label: 'Bildirişlər', badge: '3' },
-  { id: 'appearance', icon: Palette, label: 'Görünüş' },
-  { id: 'calendar', icon: Calendar, label: 'Təqvim Ayarları' },
-  { id: 'privacy', icon: Shield, label: 'Gizlilik' },
-  { id: 'report', icon: FileText, label: 'Həkim Hesabatı' },
-  { id: 'help', icon: HelpCircle, label: 'Yardım' },
-];
 interface ProfileScreenProps {
   onNavigate?: (screen: string) => void;
 }
 
 const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
-  const { name, email, lifeStage, role, logout } = useUserStore();
+  const { name, email, lifeStage, role } = useUserStore();
+  const { signOut, profile, isAdmin } = useAuth();
   const { toast } = useToast();
-  const [partnerCode] = useState('ANACAN-8X92K7');
+  const [partnerCode] = useState(profile?.partner_code || 'ANACAN-XXXX');
+
+  const menuItems = [
+    { id: 'notifications', icon: Bell, label: 'Bildirişlər', badge: '3' },
+    { id: 'appearance', icon: Palette, label: 'Görünüş' },
+    { id: 'calendar', icon: Calendar, label: 'Təqvim Ayarları' },
+    { id: 'privacy', icon: Shield, label: 'Gizlilik' },
+    { id: 'report', icon: FileText, label: 'Həkim Hesabatı' },
+    { id: 'help', icon: HelpCircle, label: 'Yardım' },
+    ...(isAdmin ? [{ id: 'admin', icon: ShieldCheck, label: 'Admin Panel', badge: 'Admin' }] : []),
+  ];
 
   const copyPartnerCode = () => {
     navigator.clipboard.writeText(partnerCode);
     toast({
       title: 'Kopyalandı!',
       description: 'Partnyor kodu buferə kopyalandı.',
+    });
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    toast({
+      title: 'Çıxış edildi',
+      description: 'Uğurla çıxış etdiniz.',
     });
   };
 
@@ -98,10 +110,17 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
             {stageInfo.emoji}
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-black text-white">{name || 'İstifadəçi'}</h2>
-            <p className="text-white/80 font-medium">{email || 'email@example.com'}</p>
-            <div className="mt-2 inline-flex items-center px-3 py-1 bg-white/20 rounded-full text-white text-xs font-bold">
-              {stageInfo.name}
+            <h2 className="text-2xl font-black text-white">{profile?.name || name || 'İstifadəçi'}</h2>
+            <p className="text-white/80 font-medium">{profile?.email || email || 'email@example.com'}</p>
+            <div className="mt-2 flex gap-2">
+              <span className="inline-flex items-center px-3 py-1 bg-white/20 rounded-full text-white text-xs font-bold">
+                {stageInfo.name}
+              </span>
+              {isAdmin && (
+                <span className="inline-flex items-center px-3 py-1 bg-amber-500/80 rounded-full text-white text-xs font-bold">
+                  👑 Admin
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -221,12 +240,18 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
                 index !== menuItems.length - 1 ? 'border-b border-border/50' : ''
               }`}
             >
-              <div className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center">
-                <Icon className="w-5 h-5 text-muted-foreground" />
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${
+                item.id === 'admin' ? 'bg-amber-100' : 'bg-muted'
+              }`}>
+                <Icon className={`w-5 h-5 ${item.id === 'admin' ? 'text-amber-600' : 'text-muted-foreground'}`} />
               </div>
               <span className="flex-1 text-left font-medium text-foreground">{item.label}</span>
               {item.badge && (
-                <span className="px-2.5 py-1 bg-destructive rounded-full text-[10px] font-bold text-white">
+                <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                  item.id === 'admin' 
+                    ? 'bg-amber-100 text-amber-700' 
+                    : 'bg-destructive text-white'
+                }`}>
                   {item.badge}
                 </span>
               )}
@@ -238,7 +263,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
 
       {/* Logout */}
       <motion.button
-        onClick={logout}
+        onClick={handleLogout}
         className="w-full mt-6 p-4 rounded-2xl bg-destructive/10 text-destructive font-bold flex items-center justify-center gap-2"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
