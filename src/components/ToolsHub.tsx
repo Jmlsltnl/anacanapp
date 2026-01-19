@@ -13,6 +13,9 @@ import WeightTracker from './tools/WeightTracker';
 import WhiteNoise from './tools/WhiteNoise';
 import BabyNames from './tools/BabyNames';
 import HospitalBag from './tools/HospitalBag';
+import Nutrition from './tools/Nutrition';
+import Exercises from './tools/Exercises';
+import MoodDiary from './tools/MoodDiary';
 
 interface Tool {
   id: string;
@@ -53,6 +56,9 @@ const ToolsHub = () => {
   if (activeTool === 'whitenoise') return <WhiteNoise onBack={() => setActiveTool(null)} />;
   if (activeTool === 'names') return <BabyNames onBack={() => setActiveTool(null)} />;
   if (activeTool === 'hospital') return <HospitalBag onBack={() => setActiveTool(null)} />;
+  if (activeTool === 'nutrition') return <Nutrition onBack={() => setActiveTool(null)} />;
+  if (activeTool === 'exercise') return <Exercises onBack={() => setActiveTool(null)} />;
+  if (activeTool === 'mood') return <MoodDiary onBack={() => setActiveTool(null)} />;
 
   return (
     <div className="pb-28 pt-2 px-5">
