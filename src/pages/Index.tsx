@@ -39,52 +39,12 @@ const Index = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Handle admin screen navigation
   useEffect(() => {
     if (activeScreen === 'admin' && isAdmin) {
       setShowAdmin(true);
       setActiveScreen(null);
     }
   }, [activeScreen, isAdmin]);
-
-  if (showSplash) {
-    return <SplashScreen onComplete={() => setShowSplash(false)} />;
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <AuthScreen />;
-  }
-
-  if (!isOnboarded && role === 'woman') {
-    return <OnboardingScreen />;
-  }
-
-  // Show Admin Panel
-  if (showAdmin && isAdmin) {
-    return <AdminPanel onExit={() => setShowAdmin(false)} />;
-  }
-
-  // Handle sub-screens
-  if (activeScreen === 'notifications') {
-    return <NotificationsScreen onBack={() => setActiveScreen(null)} />;
-  }
-  if (activeScreen === 'settings') {
-    return <SettingsScreen onBack={() => setActiveScreen(null)} />;
-  }
-  if (activeScreen === 'calendar') {
-    return <CalendarScreen onBack={() => setActiveScreen(null)} />;
-  }
-  if (activeScreen === 'report') {
-    return <DoctorReportScreen onBack={() => setActiveScreen(null)} />;
-  }
 
   const renderContent = () => {
     if (role === 'partner') {
@@ -153,6 +113,49 @@ const Index = () => {
         return null;
     }
   };
+
+  // Splash screen
+  if (showSplash) {
+    return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  }
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Auth screen
+  if (!isAuthenticated) {
+    return <AuthScreen />;
+  }
+
+  // Onboarding
+  if (!isOnboarded && role === 'woman') {
+    return <OnboardingScreen />;
+  }
+
+  // Admin Panel
+  if (showAdmin && isAdmin) {
+    return <AdminPanel onExit={() => setShowAdmin(false)} />;
+  }
+
+  // Sub-screens
+  if (activeScreen === 'notifications') {
+    return <NotificationsScreen onBack={() => setActiveScreen(null)} />;
+  }
+  if (activeScreen === 'settings') {
+    return <SettingsScreen onBack={() => setActiveScreen(null)} />;
+  }
+  if (activeScreen === 'calendar') {
+    return <CalendarScreen onBack={() => setActiveScreen(null)} />;
+  }
+  if (activeScreen === 'report') {
+    return <DoctorReportScreen onBack={() => setActiveScreen(null)} />;
+  }
 
   return (
     <div className="min-h-screen bg-background safe-top overflow-x-hidden">
