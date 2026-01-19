@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Heart, Bell, ShoppingCart, MessageCircle, 
@@ -10,6 +10,8 @@ import {
 import { useUserStore } from '@/store/userStore';
 import { hapticFeedback } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
+import { useShoppingItems } from '@/hooks/useShoppingItems';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Mission {
   id: string;
@@ -71,6 +73,8 @@ const ProgressRing = ({ progress, size = 80, strokeWidth = 6 }: {
 const PartnerDashboard = () => {
   const { partnerWomanData, name } = useUserStore();
   const { toast } = useToast();
+  const { profile } = useAuth();
+  const { items: shoppingItems, addItem, toggleItem, loading: shoppingLoading } = useShoppingItems();
   const [activeTab, setActiveTab] = useState<'home' | 'missions' | 'shopping'>('home');
   const [missions, setMissions] = useState<Mission[]>([
     { id: '1', title: 'Səhər çay hazırla', description: 'Zəncəfilli çay ürəkbulanmaya kömək edir', icon: Coffee, points: 10, isCompleted: false, category: 'care', difficulty: 'easy' },
@@ -79,21 +83,23 @@ const PartnerDashboard = () => {
     { id: '4', title: 'Həkim vizitinə götür', description: 'Bu həftəki USG randevusu', icon: Stethoscope, points: 25, isCompleted: false, category: 'support', difficulty: 'hard' },
     { id: '5', title: 'Körpə otağını hazırla', description: 'Mebel yığmaqda kömək et', icon: Baby, points: 30, isCompleted: false, category: 'support', difficulty: 'hard' },
   ]);
-  
-  const [shoppingList, setShoppingList] = useState<ShoppingItem[]>([
-    { id: '1', name: 'Süd', quantity: 2, isChecked: false, addedBy: 'woman', priority: 'high' },
-    { id: '2', name: 'Meyvələr', quantity: 1, isChecked: true, addedBy: 'woman', priority: 'medium' },
-    { id: '3', name: 'Vitaminlər', quantity: 1, isChecked: false, addedBy: 'partner', priority: 'high' },
-    { id: '4', name: 'Krem', quantity: 1, isChecked: false, addedBy: 'woman', priority: 'low' },
-    { id: '5', name: 'Körpə paltarları', quantity: 3, isChecked: false, addedBy: 'woman', priority: 'medium' },
-  ]);
 
   const [newItem, setNewItem] = useState('');
   const [loveMessage, setLoveMessage] = useState('');
 
+  // Convert shopping items from DB to local format
+  const shoppingList = shoppingItems.map(item => ({
+    id: item.id,
+    name: item.name,
+    quantity: item.quantity,
+    isChecked: item.is_checked,
+    addedBy: (item.added_by || 'woman') as 'partner' | 'woman',
+    priority: item.priority as 'low' | 'medium' | 'high'
+  }));
+
   // Mock partner's woman data
   const womanData = partnerWomanData || {
-    name: 'Leyla',
+    name: profile?.name || 'Leyla',
     lifeStage: 'bump' as const,
     mood: 4,
     symptoms: ['tired', 'happy'],
@@ -123,21 +129,12 @@ const PartnerDashboard = () => {
 
   const toggleShoppingItem = async (id: string) => {
     await hapticFeedback.light();
-    setShoppingList(shoppingList.map(item =>
-      item.id === id ? { ...item, isChecked: !item.isChecked } : item
-    ));
+    await toggleItem(id);
   };
 
-  const addShoppingItem = () => {
+  const addShoppingItem = async () => {
     if (newItem.trim()) {
-      setShoppingList([...shoppingList, {
-        id: Date.now().toString(),
-        name: newItem,
-        quantity: 1,
-        isChecked: false,
-        addedBy: 'partner',
-        priority: 'medium'
-      }]);
+      await addItem({ name: newItem, quantity: 1, priority: 'medium' });
       setNewItem('');
       toast({
         title: 'Məhsul əlavə edildi! 🛒',

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Droplets, Moon, Utensils, Activity, Plus, TrendingUp, Heart, Sparkles, 
@@ -9,6 +9,8 @@ import { useUserStore } from '@/store/userStore';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { hapticFeedback } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
+import { useDailyLogs } from '@/hooks/useDailyLogs';
+import { useBabyLogs } from '@/hooks/useBabyLogs';
 
 interface QuickActionProps {
   icon: any;
@@ -79,9 +81,12 @@ const ProgressRing = ({ progress, size = 100, strokeWidth = 8, color = "stroke-p
 const FlowDashboard = () => {
   const { getCycleData, name } = useUserStore();
   const { toast } = useToast();
+  const { todayLog, updateWaterIntake, updateSymptoms, loading: logsLoading } = useDailyLogs();
   const cycleData = getCycleData();
-  const [waterCount, setWaterCount] = useState(4);
-  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>(['Yorğunluq']);
+  
+  // Use data from DB or defaults
+  const waterCount = todayLog?.water_intake || 0;
+  const selectedSymptoms = todayLog?.symptoms || [];
 
   if (!cycleData) return null;
 
@@ -126,16 +131,15 @@ const FlowDashboard = () => {
 
   const toggleSymptom = async (symptomId: string) => {
     await hapticFeedback.light();
-    setSelectedSymptoms(prev => 
-      prev.includes(symptomId) 
-        ? prev.filter(s => s !== symptomId)
-        : [...prev, symptomId]
-    );
+    const newSymptoms = selectedSymptoms.includes(symptomId) 
+      ? selectedSymptoms.filter(s => s !== symptomId)
+      : [...selectedSymptoms, symptomId];
+    await updateSymptoms(newSymptoms);
   };
 
   const addWater = async () => {
     await hapticFeedback.medium();
-    setWaterCount(prev => Math.min(prev + 1, 10));
+    await updateWaterIntake(1);
     toast({
       title: "Su əlavə edildi! 💧",
       description: `${waterCount + 1}/8 stəkan`,

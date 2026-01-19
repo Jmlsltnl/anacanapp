@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, ShoppingCart, Heart, Star, ChevronRight, Filter } from 'lucide-react';
+import { Search, ShoppingCart, Heart, Star, ChevronRight, Filter, Loader2 } from 'lucide-react';
+import { useProducts } from '@/hooks/useProducts';
 
-interface Product {
+interface DisplayProduct {
   id: string;
   name: string;
   price: number;
@@ -14,70 +15,19 @@ interface Product {
   badge?: string;
 }
 
-const products: Product[] = [
-  {
-    id: '1',
-    name: 'Prenatal Vitamin Kompleks',
-    price: 45,
-    originalPrice: 55,
-    image: '💊',
-    rating: 4.8,
-    reviews: 234,
-    category: 'vitamins',
-    badge: 'Ən çox satılan',
-  },
-  {
-    id: '2',
-    name: 'Hamiləlik Yastığı',
-    price: 89,
-    image: '🛋️',
-    rating: 4.9,
-    reviews: 189,
-    category: 'comfort',
-  },
-  {
-    id: '3',
-    name: 'Stretch Mark Kremi',
-    price: 32,
-    originalPrice: 40,
-    image: '🧴',
-    rating: 4.7,
-    reviews: 567,
-    category: 'skincare',
-    badge: 'Yeni',
-  },
-  {
-    id: '4',
-    name: 'Körpə Paltarları Dəsti',
-    price: 65,
-    image: '👶',
-    rating: 4.6,
-    reviews: 123,
-    category: 'baby',
-  },
-  {
-    id: '5',
-    name: 'Süd Pompası Electric',
-    price: 159,
-    originalPrice: 199,
-    image: '🍼',
-    rating: 4.8,
-    reviews: 456,
-    category: 'feeding',
-    badge: '-20%',
-  },
-  {
-    id: '6',
-    name: 'Qidalandırıcı Ana Çayı',
-    price: 18,
-    image: '🍵',
-    rating: 4.5,
-    reviews: 89,
-    category: 'nutrition',
-  },
-];
+// Emoji mapping for categories
+const categoryEmojis: Record<string, string> = {
+  vitamins: '💊',
+  skincare: '🧴',
+  comfort: '🛋️',
+  baby: '👶',
+  feeding: '🍼',
+  nutrition: '🍵',
+  clothing: '👕',
+  default: '🛍️'
+};
 
-const categories = [
+const defaultCategories = [
   { id: 'all', name: 'Hamısı', emoji: '✨' },
   { id: 'vitamins', name: 'Vitaminlər', emoji: '💊' },
   { id: 'skincare', name: 'Dəri Qulluğu', emoji: '🧴' },
@@ -87,9 +37,34 @@ const categories = [
 ];
 
 const ShopScreen = () => {
+  const { products: dbProducts, loading } = useProducts();
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [cartCount, setCartCount] = useState(0);
+
+  // Transform DB products to display format
+  const products: DisplayProduct[] = useMemo(() => {
+    return dbProducts.map(p => ({
+      id: p.id,
+      name: p.name,
+      price: Number(p.price),
+      image: categoryEmojis[p.category] || categoryEmojis.default,
+      rating: p.rating || 4.5,
+      reviews: Math.floor(Math.random() * 500) + 50, // Placeholder until we have reviews table
+      category: p.category,
+    }));
+  }, [dbProducts]);
+
+  // Get unique categories from products
+  const categories = useMemo(() => {
+    const uniqueCategories = [...new Set(dbProducts.map(p => p.category))];
+    const mappedCategories = uniqueCategories.map(cat => ({
+      id: cat,
+      name: cat.charAt(0).toUpperCase() + cat.slice(1),
+      emoji: categoryEmojis[cat] || categoryEmojis.default
+    }));
+    return [{ id: 'all', name: 'Hamısı', emoji: '✨' }, ...mappedCategories];
+  }, [dbProducts]);
 
   const filteredProducts = products.filter(product => {
     const matchesCategory = activeCategory === 'all' || product.category === activeCategory;
@@ -109,6 +84,14 @@ const ShopScreen = () => {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
   };
+
+  if (loading) {
+    return (
+      <div className="pb-28 pt-2 px-5 flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="pb-28 pt-2 px-5">
