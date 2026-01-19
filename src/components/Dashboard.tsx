@@ -532,9 +532,25 @@ const MommyDashboard = () => {
   const { getBabyData } = useUserStore();
   const { toast } = useToast();
   const babyData = getBabyData();
-  const [sleepHours, setSleepHours] = useState(8.5);
-  const [feedCount, setFeedCount] = useState(6);
-  const [diaperCount, setDiaperCount] = useState(4);
+  
+  // Sleep tracking
+  const [sleepLogs, setSleepLogs] = useState<Array<{id: string; startTime: Date; endTime?: Date}>>([]);
+  const [isSleeping, setIsSleeping] = useState(false);
+  const [totalSleepHours, setTotalSleepHours] = useState(8.5);
+  
+  // Feeding tracking with types
+  const [feedingLogs, setFeedingLogs] = useState<Array<{id: string; type: 'left' | 'right' | 'formula' | 'solid'; time: Date; duration?: number}>>([
+    { id: '1', type: 'left', time: new Date(Date.now() - 3600000), duration: 15 },
+    { id: '2', type: 'right', time: new Date(Date.now() - 7200000), duration: 12 },
+  ]);
+  const [showFeedingModal, setShowFeedingModal] = useState(false);
+  
+  // Diaper tracking with types
+  const [diaperLogs, setDiaperLogs] = useState<Array<{id: string; type: 'wet' | 'dirty' | 'both'; time: Date}>>([
+    { id: '1', type: 'wet', time: new Date(Date.now() - 1800000) },
+    { id: '2', type: 'both', time: new Date(Date.now() - 5400000) },
+  ]);
+  const [showDiaperModal, setShowDiaperModal] = useState(false);
 
   if (!babyData) return null;
 
@@ -546,21 +562,69 @@ const MommyDashboard = () => {
     { week: 16, label: 'Dönür', emoji: '🔄', achieved: babyData.ageInDays >= 112 },
   ];
 
-  const addSleep = async () => {
-    await hapticFeedback.light();
-    toast({ title: "Yuxu qeyd edildi! 😴" });
+  const toggleSleep = async () => {
+    await hapticFeedback.medium();
+    if (isSleeping) {
+      // End sleep
+      setIsSleeping(false);
+      toast({ title: "Yuxu bitdi! ☀️", description: "Yuxu müddəti qeyd edildi" });
+    } else {
+      // Start sleep
+      setIsSleeping(true);
+      setSleepLogs(prev => [...prev, { id: Date.now().toString(), startTime: new Date() }]);
+      toast({ title: "Yuxu başladı! 😴", description: "Bitirmək üçün yenidən basın" });
+    }
   };
 
-  const addFeed = async () => {
-    await hapticFeedback.light();
-    setFeedCount(prev => prev + 1);
-    toast({ title: "Qidalanma qeyd edildi! 🍼" });
+  const addFeeding = async (type: 'left' | 'right' | 'formula' | 'solid') => {
+    await hapticFeedback.medium();
+    setFeedingLogs(prev => [...prev, { 
+      id: Date.now().toString(), 
+      type, 
+      time: new Date(),
+      duration: type === 'formula' || type === 'solid' ? undefined : 0
+    }]);
+    setShowFeedingModal(false);
+    
+    const typeLabels = {
+      left: 'Sol sinə 🤱',
+      right: 'Sağ sinə 🤱',
+      formula: 'Süd əvəzedicisi 🍼',
+      solid: 'Əlavə qida 🥣'
+    };
+    toast({ title: `${typeLabels[type]} qeyd edildi!` });
   };
 
-  const addDiaper = async () => {
-    await hapticFeedback.light();
-    setDiaperCount(prev => prev + 1);
-    toast({ title: "Bez dəyişmə qeyd edildi! 👶" });
+  const addDiaper = async (type: 'wet' | 'dirty' | 'both') => {
+    await hapticFeedback.medium();
+    setDiaperLogs(prev => [...prev, { id: Date.now().toString(), type, time: new Date() }]);
+    setShowDiaperModal(false);
+    
+    const typeLabels = {
+      wet: 'Sidik 💧',
+      dirty: 'Nəcis 💩',
+      both: 'Hər ikisi 💧💩'
+    };
+    toast({ title: `Bez dəyişmə: ${typeLabels[type]}` });
+  };
+
+  const getFeedingIcon = (type: string) => {
+    switch (type) {
+      case 'left': return '🤱L';
+      case 'right': return '🤱R';
+      case 'formula': return '🍼';
+      case 'solid': return '🥣';
+      default: return '🍼';
+    }
+  };
+
+  const getDiaperIcon = (type: string) => {
+    switch (type) {
+      case 'wet': return '💧';
+      case 'dirty': return '💩';
+      case 'both': return '💧💩';
+      default: return '👶';
+    }
   };
 
   return (
@@ -597,47 +661,215 @@ const MommyDashboard = () => {
         </div>
       </motion.div>
 
-      {/* Quick Trackers */}
-      <div className="grid grid-cols-3 gap-3">
-        <motion.button
-          onClick={addSleep}
-          className="bg-gradient-to-br from-violet-400 to-purple-600 rounded-2xl p-4 text-white text-center"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Moon className="w-8 h-8 mx-auto mb-2" />
-          <p className="text-2xl font-black">{sleepHours}</p>
-          <p className="text-[10px] text-white/80">saat yuxu</p>
-        </motion.button>
+      {/* Sleep Tracker */}
+      <motion.div
+        className="bg-card rounded-3xl p-5 shadow-card border border-border/50"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.1 }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center">
+              <Moon className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="font-bold text-foreground">Yuxu İzləmə</h3>
+              <p className="text-sm text-muted-foreground">Bu gün: {totalSleepHours} saat</p>
+            </div>
+          </div>
+          <motion.button
+            onClick={toggleSleep}
+            className={`px-5 py-3 rounded-2xl font-bold text-sm ${
+              isSleeping 
+                ? 'bg-amber-500 text-white' 
+                : 'bg-violet-100 text-violet-700'
+            }`}
+            whileTap={{ scale: 0.95 }}
+            animate={isSleeping ? { scale: [1, 1.05, 1] } : {}}
+            transition={{ duration: 1, repeat: isSleeping ? Infinity : 0 }}
+          >
+            {isSleeping ? '☀️ Oyandı' : '😴 Yatdı'}
+          </motion.button>
+        </div>
+        
+        {isSleeping && (
+          <motion.div 
+            className="bg-violet-50 rounded-xl p-3 flex items-center gap-3"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+          >
+            <div className="w-3 h-3 rounded-full bg-violet-500 animate-pulse" />
+            <span className="text-sm text-violet-700 font-medium">Yuxu davam edir...</span>
+          </motion.div>
+        )}
+      </motion.div>
 
-        <motion.button
-          onClick={addFeed}
-          className="bg-gradient-to-br from-amber-400 to-orange-600 rounded-2xl p-4 text-white text-center"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.15 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Baby className="w-8 h-8 mx-auto mb-2" />
-          <p className="text-2xl font-black">{feedCount}</p>
-          <p className="text-[10px] text-white/80">qidalanma</p>
-        </motion.button>
+      {/* Feeding Tracker */}
+      <motion.div
+        className="bg-card rounded-3xl p-5 shadow-card border border-border/50"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.15 }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center">
+              <Baby className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="font-bold text-foreground">Qidalanma</h3>
+              <p className="text-sm text-muted-foreground">Bu gün: {feedingLogs.length} dəfə</p>
+            </div>
+          </div>
+          <motion.button
+            onClick={() => setShowFeedingModal(true)}
+            className="px-5 py-3 rounded-2xl bg-amber-100 text-amber-700 font-bold text-sm"
+            whileTap={{ scale: 0.95 }}
+          >
+            + Əlavə et
+          </motion.button>
+        </div>
+        
+        {/* Feeding Type Buttons */}
+        <AnimatePresence>
+          {showFeedingModal && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="grid grid-cols-2 gap-2 mb-4"
+            >
+              <motion.button
+                onClick={() => addFeeding('left')}
+                className="p-4 rounded-2xl bg-pink-50 border-2 border-pink-200 flex flex-col items-center gap-2"
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="text-2xl">🤱</span>
+                <span className="text-sm font-medium text-pink-700">Sol Sinə</span>
+              </motion.button>
+              <motion.button
+                onClick={() => addFeeding('right')}
+                className="p-4 rounded-2xl bg-pink-50 border-2 border-pink-200 flex flex-col items-center gap-2"
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="text-2xl">🤱</span>
+                <span className="text-sm font-medium text-pink-700">Sağ Sinə</span>
+              </motion.button>
+              <motion.button
+                onClick={() => addFeeding('formula')}
+                className="p-4 rounded-2xl bg-blue-50 border-2 border-blue-200 flex flex-col items-center gap-2"
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="text-2xl">🍼</span>
+                <span className="text-sm font-medium text-blue-700">Süd Əvəzedicisi</span>
+              </motion.button>
+              <motion.button
+                onClick={() => addFeeding('solid')}
+                className="p-4 rounded-2xl bg-orange-50 border-2 border-orange-200 flex flex-col items-center gap-2"
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="text-2xl">🥣</span>
+                <span className="text-sm font-medium text-orange-700">Əlavə Qida</span>
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
+        {/* Recent Feedings */}
+        <div className="flex gap-2 overflow-x-auto hide-scrollbar">
+          {feedingLogs.slice(-5).reverse().map((log) => (
+            <div 
+              key={log.id}
+              className="flex-shrink-0 px-3 py-2 rounded-xl bg-muted/50 flex items-center gap-2"
+            >
+              <span className="text-lg">{getFeedingIcon(log.type)}</span>
+              <span className="text-xs text-muted-foreground">
+                {log.time.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </div>
+          ))}
+        </div>
+      </motion.div>
 
-        <motion.button
-          onClick={addDiaper}
-          className="bg-gradient-to-br from-emerald-400 to-teal-600 rounded-2xl p-4 text-white text-center"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Clock className="w-8 h-8 mx-auto mb-2" />
-          <p className="text-2xl font-black">{diaperCount}</p>
-          <p className="text-[10px] text-white/80">bez dəyişmə</p>
-        </motion.button>
-      </div>
+      {/* Diaper Tracker */}
+      <motion.div
+        className="bg-card rounded-3xl p-5 shadow-card border border-border/50"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center">
+              <Clock className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="font-bold text-foreground">Bez Dəyişmə</h3>
+              <p className="text-sm text-muted-foreground">Bu gün: {diaperLogs.length} dəfə</p>
+            </div>
+          </div>
+          <motion.button
+            onClick={() => setShowDiaperModal(true)}
+            className="px-5 py-3 rounded-2xl bg-emerald-100 text-emerald-700 font-bold text-sm"
+            whileTap={{ scale: 0.95 }}
+          >
+            + Əlavə et
+          </motion.button>
+        </div>
+        
+        {/* Diaper Type Buttons */}
+        <AnimatePresence>
+          {showDiaperModal && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="grid grid-cols-3 gap-2 mb-4"
+            >
+              <motion.button
+                onClick={() => addDiaper('wet')}
+                className="p-4 rounded-2xl bg-blue-50 border-2 border-blue-200 flex flex-col items-center gap-2"
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="text-2xl">💧</span>
+                <span className="text-sm font-medium text-blue-700">Sidik</span>
+              </motion.button>
+              <motion.button
+                onClick={() => addDiaper('dirty')}
+                className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-200 flex flex-col items-center gap-2"
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="text-2xl">💩</span>
+                <span className="text-sm font-medium text-amber-700">Nəcis</span>
+              </motion.button>
+              <motion.button
+                onClick={() => addDiaper('both')}
+                className="p-4 rounded-2xl bg-purple-50 border-2 border-purple-200 flex flex-col items-center gap-2"
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="text-2xl">💧💩</span>
+                <span className="text-sm font-medium text-purple-700">Hər İkisi</span>
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
+        {/* Recent Diapers */}
+        <div className="flex gap-2 overflow-x-auto hide-scrollbar">
+          {diaperLogs.slice(-5).reverse().map((log) => (
+            <div 
+              key={log.id}
+              className="flex-shrink-0 px-3 py-2 rounded-xl bg-muted/50 flex items-center gap-2"
+            >
+              <span className="text-lg">{getDiaperIcon(log.type)}</span>
+              <span className="text-xs text-muted-foreground">
+                {log.time.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </div>
+          ))}
+        </div>
+      </motion.div>
 
       {/* Milestones */}
       <motion.div 
@@ -683,7 +915,7 @@ const MommyDashboard = () => {
         className="bg-card rounded-3xl p-5 shadow-card border border-border/50"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.35 }}
+        transition={{ delay: 0.3 }}
       >
         <h3 className="text-lg font-bold text-foreground mb-4">Bugünkü xülasə</h3>
         <div className="space-y-3">
@@ -692,21 +924,35 @@ const MommyDashboard = () => {
               <Moon className="w-5 h-5 text-violet-600" />
               <span className="text-sm font-medium text-foreground">Yuxu</span>
             </div>
-            <span className="text-sm font-bold text-violet-600">{sleepHours} saat</span>
+            <span className="text-sm font-bold text-violet-600">{totalSleepHours} saat</span>
           </div>
           <div className="flex items-center justify-between p-3 bg-amber-50 rounded-2xl">
             <div className="flex items-center gap-3">
               <Baby className="w-5 h-5 text-amber-600" />
               <span className="text-sm font-medium text-foreground">Qidalanma</span>
             </div>
-            <span className="text-sm font-bold text-amber-600">{feedCount} dəfə</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">
+                🤱{feedingLogs.filter(f => f.type === 'left' || f.type === 'right').length}
+                🍼{feedingLogs.filter(f => f.type === 'formula').length}
+                🥣{feedingLogs.filter(f => f.type === 'solid').length}
+              </span>
+              <span className="text-sm font-bold text-amber-600">{feedingLogs.length} dəfə</span>
+            </div>
           </div>
           <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-2xl">
             <div className="flex items-center gap-3">
               <Clock className="w-5 h-5 text-emerald-600" />
               <span className="text-sm font-medium text-foreground">Bez dəyişmə</span>
             </div>
-            <span className="text-sm font-bold text-emerald-600">{diaperCount} dəfə</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">
+                💧{diaperLogs.filter(d => d.type === 'wet').length}
+                💩{diaperLogs.filter(d => d.type === 'dirty').length}
+                💧💩{diaperLogs.filter(d => d.type === 'both').length}
+              </span>
+              <span className="text-sm font-bold text-emerald-600">{diaperLogs.length} dəfə</span>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -716,7 +962,7 @@ const MommyDashboard = () => {
         className="bg-gradient-to-r from-teal-50 to-emerald-50 rounded-3xl p-5 border border-teal-100"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.4 }}
+        transition={{ delay: 0.35 }}
       >
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-2xl bg-mommy/20 flex items-center justify-center text-2xl">

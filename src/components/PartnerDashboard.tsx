@@ -332,6 +332,7 @@ const PartnerDashboard = () => {
                 </div>
                 <div className="flex gap-2">
                   <input
+                    id="quick-message-input"
                     type="text"
                     value={loveMessage}
                     onChange={(e) => setLoveMessage(e.target.value)}
@@ -383,7 +384,7 @@ const PartnerDashboard = () => {
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { icon: Heart, label: 'Sevgi göndər', color: 'bg-gradient-to-br from-pink-400 to-rose-500', textColor: 'text-white', action: sendLove },
-                  { icon: Calendar, label: 'Randevu yarat', color: 'bg-gradient-to-br from-violet-400 to-purple-500', textColor: 'text-white' },
+                  { icon: MessageCircle, label: 'Mesaj yaz', color: 'bg-gradient-to-br from-blue-400 to-indigo-500', textColor: 'text-white', action: () => document.getElementById('quick-message-input')?.focus() },
                   { icon: Gift, label: 'Sürpriz planla', color: 'bg-gradient-to-br from-amber-400 to-orange-500', textColor: 'text-white' },
                   { icon: Smile, label: 'Əhval yoxla', color: 'bg-gradient-to-br from-emerald-400 to-teal-500', textColor: 'text-white' },
                 ].map((action, index) => {
