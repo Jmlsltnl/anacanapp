@@ -18,6 +18,16 @@ const tabs = [
 const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
   const { lifeStage } = useUserStore();
   
+  const getActiveColor = () => {
+    switch (lifeStage) {
+      case 'flow': return 'text-flow';
+      case 'bump': return 'text-bump';
+      case 'mommy': return 'text-mommy';
+      case 'partner': return 'text-partner';
+      default: return 'text-primary';
+    }
+  };
+
   const getGradientClass = () => {
     switch (lifeStage) {
       case 'flow': return 'gradient-flow';
@@ -29,37 +39,65 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border safe-bottom z-50">
-      <div className="flex items-center justify-around py-2 px-4">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          
-          return (
-            <button
-              key={tab.id}
-              onClick={() => onTabChange(tab.id)}
-              className="flex flex-col items-center gap-1 py-2 px-3 relative"
-            >
-              {isActive && (
+    <nav className="fixed bottom-0 left-0 right-0 z-50">
+      {/* Glass background */}
+      <div className="absolute inset-0 bg-card/80 backdrop-blur-xl border-t border-border/50" />
+      
+      <div className="relative safe-bottom">
+        <div className="flex items-center justify-around py-2 px-2">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            
+            return (
+              <motion.button
+                key={tab.id}
+                onClick={() => onTabChange(tab.id)}
+                className="flex flex-col items-center gap-1 py-2 px-4 relative"
+                whileTap={{ scale: 0.9 }}
+              >
+                {/* Active indicator */}
+                {isActive && (
+                  <motion.div
+                    layoutId="activeTabIndicator"
+                    className={`absolute -top-1 w-12 h-1 rounded-full ${getGradientClass()}`}
+                    transition={{ type: "spring" as const, stiffness: 400, damping: 30 }}
+                  />
+                )}
+                
+                {/* Icon container */}
                 <motion.div
-                  layoutId="activeTab"
-                  className={`absolute -top-2 left-1/2 -translate-x-1/2 w-12 h-1 rounded-full ${getGradientClass()}`}
-                />
-              )}
-              <Icon 
-                className={`w-6 h-6 transition-colors ${
-                  isActive ? 'text-primary' : 'text-muted-foreground'
-                }`} 
-              />
-              <span className={`text-xs font-medium ${
-                isActive ? 'text-primary' : 'text-muted-foreground'
-              }`}>
-                {tab.label}
-              </span>
-            </button>
-          );
-        })}
+                  className={`relative ${isActive ? '' : ''}`}
+                  animate={isActive ? { scale: 1.1 } : { scale: 1 }}
+                  transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
+                >
+                  {isActive && (
+                    <motion.div
+                      className={`absolute inset-0 rounded-full ${getGradientClass()} opacity-20 blur-lg`}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 2 }}
+                    />
+                  )}
+                  <Icon 
+                    className={`w-6 h-6 relative z-10 transition-colors duration-200 ${
+                      isActive ? getActiveColor() : 'text-muted-foreground'
+                    }`}
+                    strokeWidth={isActive ? 2.5 : 2}
+                  />
+                </motion.div>
+                
+                <motion.span 
+                  className={`text-[10px] font-bold transition-colors duration-200 ${
+                    isActive ? getActiveColor() : 'text-muted-foreground'
+                  }`}
+                  animate={isActive ? { scale: 1.05 } : { scale: 1 }}
+                >
+                  {tab.label}
+                </motion.span>
+              </motion.button>
+            );
+          })}
+        </div>
       </div>
     </nav>
   );
