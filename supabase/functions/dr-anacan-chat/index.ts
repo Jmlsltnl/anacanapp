@@ -16,6 +16,7 @@ interface ChatRequest {
   pregnancyWeek?: number;
   isPartner?: boolean;
   language?: string;
+  stream?: boolean;
 }
 
 const getSystemPrompt = (lifeStage: string, pregnancyWeek?: number, isPartner?: boolean) => {
@@ -89,7 +90,7 @@ Deno.serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    const { messages, lifeStage, pregnancyWeek, isPartner, language } = await req.json() as ChatRequest;
+    const { messages, lifeStage, pregnancyWeek, isPartner, stream = false } = await req.json() as ChatRequest;
 
     if (!messages || !Array.isArray(messages)) {
       throw new Error('Invalid messages format');
@@ -102,6 +103,41 @@ Deno.serve(async (req) => {
       ...messages
     ];
 
+    // Streaming response
+    if (stream) {
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-3-pro-preview',
+          messages: fullMessages,
+          max_tokens: 1024,
+          temperature: 0.7,
+          stream: true,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('AI Gateway error:', errorData);
+        throw new Error(`AI Gateway error: ${response.status}`);
+      }
+
+      // Return streaming response
+      return new Response(response.body, {
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+        },
+      });
+    }
+
+    // Non-streaming response
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
