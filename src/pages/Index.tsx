@@ -7,8 +7,10 @@ import Dashboard from '@/components/Dashboard';
 import PartnerDashboard from '@/components/PartnerDashboard';
 import ToolsHub from '@/components/ToolsHub';
 import AIChatScreen from '@/components/AIChatScreen';
+import PartnerAIChatScreen from '@/components/PartnerAIChatScreen';
 import ShopScreen from '@/components/ShopScreen';
 import ProfileScreen from '@/components/ProfileScreen';
+import PartnerProfileScreen from '@/components/PartnerProfileScreen';
 import NotificationsScreen from '@/components/NotificationsScreen';
 import SettingsScreen from '@/components/SettingsScreen';
 import CalendarScreen from '@/components/CalendarScreen';
@@ -60,7 +62,7 @@ const Index = () => {
   }
 
   const renderContent = () => {
-    // Partner role shows Partner Dashboard
+    // Partner role shows Partner Dashboard with partner-specific screens
     if (role === 'partner') {
       switch (activeTab) {
         case 'home':
@@ -71,8 +73,8 @@ const Index = () => {
           );
         case 'ai':
           return (
-            <motion.div key="ai" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full">
-              <AIChatScreen />
+            <motion.div key="partner-ai" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full">
+              <PartnerAIChatScreen />
             </motion.div>
           );
         case 'shop':
@@ -83,8 +85,8 @@ const Index = () => {
           );
         case 'profile':
           return (
-            <motion.div key="profile" variants={pageVariants} initial="initial" animate="animate" exit="exit">
-              <ProfileScreen onNavigate={setActiveScreen} />
+            <motion.div key="partner-profile" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+              <PartnerProfileScreen onNavigate={setActiveScreen} />
             </motion.div>
           );
         default:
