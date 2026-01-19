@@ -1,13 +1,14 @@
 import { motion } from 'framer-motion';
-import { Home, Compass, MessageCircle, ShoppingBag, User } from 'lucide-react';
+import { Home, Compass, MessageCircle, ShoppingBag, User, Heart } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 
 interface BottomNavProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  isPartner?: boolean;
 }
 
-const tabs = [
+const womanTabs = [
   { id: 'home', label: 'Ana səhifə', icon: Home },
   { id: 'tools', label: 'Alətlər', icon: Compass },
   { id: 'ai', label: 'Dr. Anacan', icon: MessageCircle },
@@ -15,7 +16,14 @@ const tabs = [
   { id: 'profile', label: 'Profil', icon: User },
 ];
 
-const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
+const partnerTabs = [
+  { id: 'home', label: 'Əsas', icon: Home },
+  { id: 'ai', label: 'Məsləhət', icon: MessageCircle },
+  { id: 'shop', label: 'Mağaza', icon: ShoppingBag },
+  { id: 'profile', label: 'Profil', icon: User },
+];
+
+const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps) => {
   const { lifeStage } = useUserStore();
   
   const getActiveColor = () => {
@@ -45,7 +53,7 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
       
       <div className="relative safe-bottom">
         <div className="flex items-center justify-around py-2 px-2">
-          {tabs.map((tab) => {
+          {(isPartner ? partnerTabs : womanTabs).map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             

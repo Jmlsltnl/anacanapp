@@ -24,8 +24,11 @@ const menuItems = [
   { id: 'report', icon: FileText, label: 'Həkim Hesabatı' },
   { id: 'help', icon: HelpCircle, label: 'Yardım' },
 ];
+interface ProfileScreenProps {
+  onNavigate?: (screen: string) => void;
+}
 
-const ProfileScreen = () => {
+const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   const { name, email, lifeStage, role, logout } = useUserStore();
   const { toast } = useToast();
   const [partnerCode] = useState('ANACAN-8X92K7');
@@ -213,6 +216,7 @@ const ProfileScreen = () => {
             <motion.button
               key={item.id}
               variants={itemVariants}
+              onClick={() => onNavigate?.(item.id)}
               className={`w-full flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors ${
                 index !== menuItems.length - 1 ? 'border-b border-border/50' : ''
               }`}
