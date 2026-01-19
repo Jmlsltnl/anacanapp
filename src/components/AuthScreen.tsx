@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, User, ArrowRight, Users, Eye, EyeOff, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useUserStore } from '@/store/userStore';
+import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 
 type AuthMode = 'login' | 'register' | 'partner';
@@ -17,41 +17,133 @@ const AuthScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
-  const { setAuth, setRole } = useUserStore();
+  const { signIn, signUp, signInWithGoogle, linkPartner } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    await new Promise(resolve => setTimeout(resolve, 1200));
-
-    if (mode === 'partner') {
-      if (partnerCode.startsWith('ANACAN-') && partnerCode.length >= 10) {
-        setRole('partner');
-        setAuth(true, 'partner-1', '', name || 'Partner');
-        toast({
-          title: 'Uğurla bağlandınız! 🎉',
-          description: 'Xanımınızın profilinə qoşuldunuz.',
-        });
+    try {
+      if (mode === 'partner') {
+        if (!partnerCode.startsWith('ANACAN-') || partnerCode.length < 10) {
+          toast({
+            title: 'Kod yanlışdır',
+            description: 'Zəhmət olmasa düzgün partnyor kodu daxil edin.',
+            variant: 'destructive',
+          });
+          setIsLoading(false);
+          return;
+        }
+        
+        // First login/register, then link partner
+        if (email && password) {
+          const { error: authError } = await signIn(email, password);
+          if (authError) {
+            // Try to register if login fails
+            const { error: registerError } = await signUp(email, password, name || 'Partner');
+            if (registerError) {
+              toast({
+                title: 'Xəta baş verdi',
+                description: 'Giriş və ya qeydiyyat alınmadı.',
+                variant: 'destructive',
+              });
+              setIsLoading(false);
+              return;
+            }
+          }
+          
+          // Link partner
+          const { error: linkError } = await linkPartner(partnerCode);
+          if (linkError) {
+            toast({
+              title: 'Partnyor tapılmadı',
+              description: 'Bu kodla partnyor tapılmadı.',
+              variant: 'destructive',
+            });
+          } else {
+            toast({
+              title: 'Uğurla bağlandınız! 🎉',
+              description: 'Xanımınızın profilinə qoşuldunuz.',
+            });
+          }
+        }
+      } else if (mode === 'login') {
+        if (!email || !password) {
+          toast({
+            title: 'Məlumat tələb olunur',
+            description: 'E-mail və şifrə daxil edin.',
+            variant: 'destructive',
+          });
+          setIsLoading(false);
+          return;
+        }
+        
+        const { error } = await signIn(email, password);
+        if (error) {
+          toast({
+            title: 'Giriş alınmadı',
+            description: 'E-mail və ya şifrə yanlışdır.',
+            variant: 'destructive',
+          });
+        } else {
+          toast({
+            title: 'Xoş gəldiniz! 👋',
+            description: 'Anacan-a xoş gəldiniz!',
+          });
+        }
       } else {
+        // Register
+        if (!email || !password) {
+          toast({
+            title: 'Məlumat tələb olunur',
+            description: 'E-mail və şifrə daxil edin.',
+            variant: 'destructive',
+          });
+          setIsLoading(false);
+          return;
+        }
+        
+        const { error } = await signUp(email, password, name || email.split('@')[0]);
+        if (error) {
+          toast({
+            title: 'Qeydiyyat alınmadı',
+            description: 'Bu e-mail artıq qeydiyyatdan keçib.',
+            variant: 'destructive',
+          });
+        } else {
+          toast({
+            title: 'Qeydiyyat uğurludur! 🎉',
+            description: 'Anacan-a xoş gəldiniz!',
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Auth error:', error);
+      toast({
+        title: 'Xəta baş verdi',
+        description: 'Yenidən cəhd edin.',
+        variant: 'destructive',
+      });
+    }
+    
+    setIsLoading(false);
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await signInWithGoogle();
+      if (error) {
         toast({
-          title: 'Kod yanlışdır',
-          description: 'Zəhmət olmasa düzgün partnyor kodu daxil edin.',
+          title: 'Google ilə giriş alınmadı',
+          description: 'Yenidən cəhd edin.',
           variant: 'destructive',
         });
       }
-    } else {
-      if (email && password) {
-        setRole('woman');
-        setAuth(true, 'user-1', email, name || email.split('@')[0]);
-        toast({
-          title: mode === 'login' ? 'Xoş gəldiniz! 👋' : 'Qeydiyyat uğurludur! 🎉',
-          description: 'Anacan-a xoş gəldiniz!',
-        });
-      }
+    } catch (error) {
+      console.error('Google auth error:', error);
     }
-    
     setIsLoading(false);
   };
 
@@ -190,6 +282,39 @@ const AuthScreen = () => {
 
                   <motion.div variants={itemVariants}>
                     <div className="relative group">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                      <Input
+                        type="email"
+                        placeholder="E-mail"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all"
+                      />
+                    </div>
+                  </motion.div>
+
+                  <motion.div variants={itemVariants}>
+                    <div className="relative group">
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                      <Input
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Şifrə"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="pl-12 pr-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
+                  </motion.div>
+
+                  <motion.div variants={itemVariants}>
+                    <div className="relative group">
                       <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
                       <Input
                         type="text"
@@ -302,11 +427,9 @@ const AuthScreen = () => {
                 <Button
                   type="button"
                   variant="outline"
+                  disabled={isLoading}
                   className="flex-1 h-14 rounded-2xl border-2 hover:bg-muted/50 transition-all"
-                  onClick={() => {
-                    setRole('woman');
-                    setAuth(true, 'user-google', 'user@gmail.com', 'Google User');
-                  }}
+                  onClick={handleGoogleLogin}
                 >
                   <svg className="w-6 h-6" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -318,10 +441,13 @@ const AuthScreen = () => {
                 <Button
                   type="button"
                   variant="outline"
+                  disabled={isLoading}
                   className="flex-1 h-14 rounded-2xl border-2 hover:bg-muted/50 transition-all"
                   onClick={() => {
-                    setRole('woman');
-                    setAuth(true, 'user-apple', 'user@icloud.com', 'Apple User');
+                    toast({
+                      title: 'Tezliklə',
+                      description: 'Apple ilə giriş tezliklə əlavə olunacaq.',
+                    });
                   }}
                 >
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
