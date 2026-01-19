@@ -210,36 +210,44 @@ export const useAuth = () => {
   useEffect(() => {
     // Set up auth state listener BEFORE getting session
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+      console.log('Auth state changed:', event, currentSession?.user?.email);
+      
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
 
       if (currentSession?.user) {
-        // Use setTimeout to avoid potential race conditions
-        setTimeout(async () => {
-          const [profileData, roleData] = await Promise.all([
-            fetchProfile(currentSession.user.id),
-            fetchUserRole(currentSession.user.id)
-          ]);
+        // Fetch profile and role data
+        const [profileData, roleData] = await Promise.all([
+          fetchProfile(currentSession.user.id),
+          fetchUserRole(currentSession.user.id)
+        ]);
 
-          setProfile(profileData);
-          setUserRole(roleData);
+        setProfile(profileData);
+        setUserRole(roleData);
 
-          if (profileData) {
-            setAuth(true, currentSession.user.id, currentSession.user.email || '', profileData.name);
-            if (profileData.life_stage === 'partner') {
-              setRole('partner');
-            } else {
-              setRole('woman');
-            }
-            if (profileData.life_stage) {
-              setLifeStage(profileData.life_stage as any);
-              setOnboarded(true);
-            }
+        // Always set auth even if profile doesn't exist yet (new user)
+        setAuth(
+          true, 
+          currentSession.user.id, 
+          currentSession.user.email || '', 
+          profileData?.name || currentSession.user.user_metadata?.name || 'İstifadəçi'
+        );
+        
+        if (profileData) {
+          if (profileData.life_stage === 'partner') {
+            setRole('partner');
+          } else {
+            setRole('woman');
           }
-        }, 0);
+          if (profileData.life_stage) {
+            setLifeStage(profileData.life_stage as any);
+            setOnboarded(true);
+          }
+        }
       } else {
         setProfile(null);
         setUserRole(null);
+        storeLogout();
       }
 
       setLoading(false);
