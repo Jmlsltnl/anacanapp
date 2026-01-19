@@ -1,0 +1,277 @@
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
+import type { User, Session } from '@supabase/supabase-js';
+
+export interface Profile {
+  id: string;
+  user_id: string;
+  name: string;
+  email: string | null;
+  life_stage: 'flow' | 'bump' | 'mommy' | 'partner' | null;
+  partner_code: string | null;
+  linked_partner_id: string | null;
+  avatar_url: string | null;
+  cycle_length: number;
+  period_length: number;
+  last_period_date: string | null;
+  due_date: string | null;
+  baby_birth_date: string | null;
+  baby_name: string | null;
+  baby_gender: 'boy' | 'girl' | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserRole {
+  role: 'admin' | 'user' | 'moderator';
+}
+
+export const useAuth = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { setAuth, setRole, setLifeStage, setOnboarded, logout: storeLogout } = useUserStore();
+
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data as Profile | null;
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      return null;
+    }
+  };
+
+  const fetchUserRole = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data as UserRole | null;
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+      return null;
+    }
+  };
+
+  const updateProfile = async (updates: Partial<Profile>) => {
+    if (!user) return { error: 'No user logged in' };
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      setProfile(data as Profile);
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      return { data: null, error };
+    }
+  };
+
+  const signUp = async (email: string, password: string, name: string) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: { name }
+        }
+      });
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Sign up error:', error);
+      return { data: null, error };
+    }
+  };
+
+  const signIn = async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Sign in error:', error);
+      return { data: null, error };
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Google sign in error:', error);
+      return { data: null, error };
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      setUserRole(null);
+      storeLogout();
+      
+      return { error: null };
+    } catch (error) {
+      console.error('Sign out error:', error);
+      return { error };
+    }
+  };
+
+  const linkPartner = async (partnerCode: string) => {
+    if (!user) return { error: 'No user logged in' };
+
+    try {
+      // Find partner by code
+      const { data: partnerProfile, error: findError } = await supabase
+        .from('profiles')
+        .select('id, user_id')
+        .eq('partner_code', partnerCode)
+        .maybeSingle();
+
+      if (findError || !partnerProfile) {
+        return { error: 'Partner code not found' };
+      }
+
+      // Update current user's profile to link to partner
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ 
+          linked_partner_id: partnerProfile.id,
+          life_stage: 'partner' as const
+        })
+        .eq('user_id', user.id);
+
+      if (updateError) throw updateError;
+
+      // Update partner's profile to link back
+      const { data: myProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (myProfile) {
+        await supabase
+          .from('profiles')
+          .update({ linked_partner_id: myProfile.id })
+          .eq('user_id', partnerProfile.user_id);
+      }
+
+      // Refresh profile
+      const newProfile = await fetchProfile(user.id);
+      setProfile(newProfile);
+
+      return { error: null };
+    } catch (error) {
+      console.error('Link partner error:', error);
+      return { error };
+    }
+  };
+
+  useEffect(() => {
+    // Set up auth state listener BEFORE getting session
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+
+      if (currentSession?.user) {
+        // Use setTimeout to avoid potential race conditions
+        setTimeout(async () => {
+          const [profileData, roleData] = await Promise.all([
+            fetchProfile(currentSession.user.id),
+            fetchUserRole(currentSession.user.id)
+          ]);
+
+          setProfile(profileData);
+          setUserRole(roleData);
+
+          if (profileData) {
+            setAuth(true, currentSession.user.id, currentSession.user.email || '', profileData.name);
+            if (profileData.life_stage === 'partner') {
+              setRole('partner');
+            } else {
+              setRole('woman');
+            }
+            if (profileData.life_stage) {
+              setLifeStage(profileData.life_stage as any);
+              setOnboarded(true);
+            }
+          }
+        }, 0);
+      } else {
+        setProfile(null);
+        setUserRole(null);
+      }
+
+      setLoading(false);
+    });
+
+    // Then get initial session
+    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      // The onAuthStateChange will handle this
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const isAdmin = userRole?.role === 'admin';
+  const isModerator = userRole?.role === 'moderator' || isAdmin;
+
+  return {
+    user,
+    session,
+    profile,
+    userRole,
+    loading,
+    isAdmin,
+    isModerator,
+    signUp,
+    signIn,
+    signInWithGoogle,
+    signOut,
+    updateProfile,
+    linkPartner,
+    fetchProfile
+  };
+};
