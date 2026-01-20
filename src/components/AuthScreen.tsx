@@ -18,7 +18,7 @@ const AuthScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
-  const { signIn, signUp, signInWithGoogle, linkPartner } = useAuth();
+  const { signIn, signUp, signInWithGoogle } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -66,8 +66,26 @@ const AuthScreen = () => {
           return;
         }
         
-        // First login/register, then link partner
+        // First verify the partner code exists BEFORE registering
+        const { data: partnerProfile, error: findError } = await supabase
+          .from('profiles')
+          .select('id, user_id, name')
+          .eq('partner_code', partnerCode)
+          .maybeSingle();
+
+        if (findError || !partnerProfile) {
+          toast({
+            title: 'Partnyor tapılmadı',
+            description: 'Bu kodla partnyor tapılmadı. Kodu yoxlayın.',
+            variant: 'destructive',
+          });
+          setIsLoading(false);
+          return;
+        }
+        
+        // Now login or register
         if (email && password) {
+          // Try to login first
           const { error: authError } = await signIn(email, password);
           if (authError) {
             // Try to register if login fails
@@ -83,20 +101,73 @@ const AuthScreen = () => {
             }
           }
           
-          // Link partner
-          const { error: linkError } = await linkPartner(partnerCode);
-          if (linkError) {
+          // Wait for profile to be created (trigger may take a moment)
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+          // Get current user session
+          const { data: sessionData } = await supabase.auth.getSession();
+          const currentUserId = sessionData?.session?.user?.id;
+          
+          if (!currentUserId) {
             toast({
-              title: 'Partnyor tapılmadı',
-              description: 'Bu kodla partnyor tapılmadı.',
+              title: 'Xəta baş verdi',
+              description: 'Sessiya tapılmadı. Yenidən cəhd edin.',
               variant: 'destructive',
             });
-          } else {
-            toast({
-              title: 'Uğurla bağlandınız! 🎉',
-              description: 'Xanımınızın profilinə qoşuldunuz.',
-            });
+            setIsLoading(false);
+            return;
           }
+          
+          // Get my profile
+          const { data: myProfile, error: profileError } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('user_id', currentUserId)
+            .maybeSingle();
+          
+          if (profileError || !myProfile) {
+            toast({
+              title: 'Profil xətası',
+              description: 'Profiliniz yaradılarkən xəta baş verdi. Yenidən cəhd edin.',
+              variant: 'destructive',
+            });
+            setIsLoading(false);
+            return;
+          }
+          
+          // Update my profile to link to partner and set life_stage to partner
+          const { error: updateMyError } = await supabase
+            .from('profiles')
+            .update({ 
+              linked_partner_id: partnerProfile.id,
+              life_stage: 'partner'
+            })
+            .eq('user_id', currentUserId);
+          
+          if (updateMyError) {
+            console.error('Error updating my profile:', updateMyError);
+            toast({
+              title: 'Bağlantı xətası',
+              description: 'Partnyor ilə bağlantı qurula bilmədi.',
+              variant: 'destructive',
+            });
+            setIsLoading(false);
+            return;
+          }
+          
+          // Update partner's profile to link back to me
+          await supabase
+            .from('profiles')
+            .update({ linked_partner_id: myProfile.id })
+            .eq('user_id', partnerProfile.user_id);
+          
+          toast({
+            title: 'Uğurla bağlandınız! 🎉',
+            description: `${partnerProfile.name} ilə əlaqələndirildiniz.`,
+          });
+          
+          // Force page refresh to update auth state
+          window.location.reload();
         }
       } else if (mode === 'login') {
         if (!email || !password) {
