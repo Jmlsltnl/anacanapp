@@ -4,6 +4,8 @@ import { ArrowRight, ArrowLeft, Check, Calendar, Baby, Heart, Sparkles } from 'l
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useUserStore } from '@/store/userStore';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import type { LifeStage } from '@/types/anacan';
 
 const stages = [
@@ -45,29 +47,116 @@ const OnboardingScreen = () => {
   const [dateInput, setDateInput] = useState('');
   const [babyName, setBabyName] = useState('');
   const [babyGender, setBabyGender] = useState<'boy' | 'girl' | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   
-  const { setLifeStage, setLastPeriodDate, setBabyData, setOnboarded } = useUserStore();
+  const { setLifeStage, setLastPeriodDate, setBabyData, setOnboarded, setDueDate } = useUserStore();
+  const { updateProfile } = useAuth();
+  const { toast } = useToast();
 
   const handleStageSelect = (stage: LifeStage) => {
     setSelectedStage(stage);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step === 0 && selectedStage) {
       setStep(1);
     } else if (step === 1) {
-      if (selectedStage === 'mommy') {
-        if (dateInput && babyName && babyGender) {
-          setBabyData(new Date(dateInput), babyName, babyGender);
-          setLifeStage(selectedStage);
-          setOnboarded(true);
+      setIsSaving(true);
+      
+      try {
+        if (selectedStage === 'mommy') {
+          if (dateInput && babyName && babyGender) {
+            // Save to Supabase
+            const { error } = await updateProfile({
+              life_stage: selectedStage,
+              baby_birth_date: dateInput,
+              baby_name: babyName,
+              baby_gender: babyGender,
+            });
+
+            if (error) {
+              toast({
+                title: 'Xəta baş verdi',
+                description: 'Məlumatlar saxlanıla bilmədi',
+                variant: 'destructive',
+              });
+              setIsSaving(false);
+              return;
+            }
+
+            // Update local store
+            setBabyData(new Date(dateInput), babyName, babyGender);
+            setLifeStage(selectedStage);
+            setOnboarded(true);
+          }
+        } else if (selectedStage === 'bump') {
+          if (dateInput) {
+            // Calculate due date (280 days from LMP)
+            const lastPeriod = new Date(dateInput);
+            const dueDate = new Date(lastPeriod.getTime() + 280 * 24 * 60 * 60 * 1000);
+            
+            // Save to Supabase
+            const { error } = await updateProfile({
+              life_stage: selectedStage,
+              last_period_date: dateInput,
+              due_date: dueDate.toISOString().split('T')[0],
+            });
+
+            if (error) {
+              toast({
+                title: 'Xəta baş verdi',
+                description: 'Məlumatlar saxlanıla bilmədi',
+                variant: 'destructive',
+              });
+              setIsSaving(false);
+              return;
+            }
+
+            // Update local store
+            setLastPeriodDate(new Date(dateInput));
+            setDueDate(dueDate);
+            setLifeStage(selectedStage);
+            setOnboarded(true);
+          }
+        } else {
+          // Flow stage
+          if (dateInput) {
+            // Save to Supabase
+            const { error } = await updateProfile({
+              life_stage: selectedStage,
+              last_period_date: dateInput,
+            });
+
+            if (error) {
+              toast({
+                title: 'Xəta baş verdi',
+                description: 'Məlumatlar saxlanıla bilmədi',
+                variant: 'destructive',
+              });
+              setIsSaving(false);
+              return;
+            }
+
+            // Update local store
+            setLastPeriodDate(new Date(dateInput));
+            setLifeStage(selectedStage!);
+            setOnboarded(true);
+          }
         }
-      } else {
-        if (dateInput) {
-          setLastPeriodDate(new Date(dateInput));
-          setLifeStage(selectedStage!);
-          setOnboarded(true);
-        }
+
+        toast({
+          title: 'Uğurla saxlanıldı! 🎉',
+          description: 'Profiliniz hazırdır',
+        });
+      } catch (err) {
+        console.error('Onboarding error:', err);
+        toast({
+          title: 'Xəta baş verdi',
+          description: 'Bir xəta baş verdi',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsSaving(false);
       }
     }
   };
@@ -336,6 +425,7 @@ const OnboardingScreen = () => {
         <Button
           onClick={handleNext}
           disabled={
+            isSaving ||
             (step === 0 && !selectedStage) ||
             (step === 1 && !dateInput) ||
             (step === 1 && selectedStage === 'mommy' && (!babyName || !babyGender))
@@ -343,13 +433,19 @@ const OnboardingScreen = () => {
           className="w-full h-16 rounded-2xl gradient-primary text-white font-bold text-lg shadow-button hover:shadow-glow transition-all duration-300 disabled:opacity-50 disabled:shadow-none"
         >
           <span className="flex items-center gap-2">
-            {step === 1 ? 'Başla' : 'Davam et'}
-            <motion.div
-              animate={{ x: [0, 5, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            >
-              <ArrowRight className="w-6 h-6" />
-            </motion.div>
+            {isSaving ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <>
+                {step === 1 ? 'Başla' : 'Davam et'}
+                <motion.div
+                  animate={{ x: [0, 5, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  <ArrowRight className="w-6 h-6" />
+                </motion.div>
+              </>
+            )}
           </span>
         </Button>
       </div>

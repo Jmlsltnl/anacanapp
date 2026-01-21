@@ -12,6 +12,9 @@ import { hapticFeedback } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
 import { useShoppingItems } from '@/hooks/useShoppingItems';
 import { useAuth } from '@/hooks/useAuth';
+import { usePartnerData } from '@/hooks/usePartnerData';
+import { supabase } from '@/integrations/supabase/client';
+import { FRUIT_SIZES } from '@/types/anacan';
 
 interface Mission {
   id: string;
@@ -71,9 +74,10 @@ const ProgressRing = ({ progress, size = 80, strokeWidth = 6 }: {
 };
 
 const PartnerDashboard = () => {
-  const { partnerWomanData, name } = useUserStore();
+  const { name } = useUserStore();
   const { toast } = useToast();
   const { profile } = useAuth();
+  const { partnerProfile, partnerDailyLog, loading: partnerLoading, getPregnancyWeek, getDaysUntilDue } = usePartnerData();
   const { items: shoppingItems, addItem, toggleItem, loading: shoppingLoading } = useShoppingItems();
   const [activeTab, setActiveTab] = useState<'home' | 'missions' | 'shopping'>('home');
   const [missions, setMissions] = useState<Mission[]>([
@@ -97,16 +101,19 @@ const PartnerDashboard = () => {
     priority: item.priority as 'low' | 'medium' | 'high'
   }));
 
-  // Mock partner's woman data
-  const womanData = partnerWomanData || {
-    name: profile?.name || 'Leyla',
-    lifeStage: 'bump' as const,
-    mood: 4,
-    symptoms: ['tired', 'happy'],
-  };
-
-  const currentWeek = 24;
-  const daysUntilDue = 112;
+  // Use real partner data or fallback
+  const womanName = partnerProfile?.name || 'Partner';
+  const womanMood = partnerDailyLog?.mood || 4;
+  const womanSymptoms = partnerDailyLog?.symptoms || [];
+  const lifeStage = partnerProfile?.life_stage || 'bump';
+  
+  // Calculate pregnancy week from real data
+  const currentWeek = getPregnancyWeek() || 24;
+  const daysUntilDue = getDaysUntilDue() || 112;
+  
+  // Get fruit emoji for current week
+  const weekData = FRUIT_SIZES[currentWeek] || FRUIT_SIZES[24];
+  
   const totalPoints = missions.filter(m => m.isCompleted).reduce((sum, m) => sum + m.points, 0);
   const level = Math.floor(totalPoints / 50) + 1;
   const pointsToNextLevel = 50 - (totalPoints % 50);
@@ -144,15 +151,45 @@ const PartnerDashboard = () => {
 
   const sendLove = async () => {
     await hapticFeedback.heavy();
+    
+    // Save to Supabase partner_messages table
+    if (profile && partnerProfile) {
+      try {
+        await supabase.from('partner_messages').insert({
+          sender_id: profile.user_id,
+          receiver_id: partnerProfile.user_id,
+          message_type: 'love',
+          content: '❤️',
+        });
+      } catch (err) {
+        console.error('Error sending love:', err);
+      }
+    }
+    
     toast({
       title: '💕 Sevgi göndərildi!',
-      description: `${womanData.name} bildiriş alacaq`,
+      description: `${womanName} bildiriş alacaq`,
     });
   };
 
   const sendMessage = async () => {
     if (loveMessage.trim()) {
       await hapticFeedback.medium();
+      
+      // Save to Supabase partner_messages table
+      if (profile && partnerProfile) {
+        try {
+          await supabase.from('partner_messages').insert({
+            sender_id: profile.user_id,
+            receiver_id: partnerProfile.user_id,
+            message_type: 'text',
+            content: loveMessage,
+          });
+        } catch (err) {
+          console.error('Error sending message:', err);
+        }
+      }
+      
       toast({
         title: '💌 Mesaj göndərildi!',
         description: loveMessage,
@@ -234,10 +271,10 @@ const PartnerDashboard = () => {
                 🤰
               </motion.div>
               <div className="flex-1">
-                <h2 className="text-white font-bold text-lg">{womanData.name}</h2>
+                <h2 className="text-white font-bold text-lg">{womanName}</h2>
                 <p className="text-white/70">Hamiləlik: {currentWeek}. həftə</p>
                 <div className="flex items-center gap-2 mt-1">
-                  <div className={`w-3 h-3 rounded-full ${getMoodColor(womanData.mood || 4)}`} />
+                  <div className={`w-3 h-3 rounded-full ${getMoodColor(womanMood)}`} />
                   <span className="text-white/60 text-xs">Əhvalı yaxşıdır</span>
                 </div>
               </div>
@@ -247,7 +284,7 @@ const PartnerDashboard = () => {
                   animate={{ rotate: [0, 10, -10, 0] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  {getMoodEmoji(womanData.mood || 4)}
+                  {getMoodEmoji(womanMood)}
                 </motion.p>
               </div>
             </div>
@@ -260,8 +297,8 @@ const PartnerDashboard = () => {
               </div>
               <div className="bg-white/10 rounded-xl p-3 text-center">
                 <Baby className="w-5 h-5 text-white/70 mx-auto mb-1" />
-                <p className="text-white font-bold text-xl">🥭</p>
-                <p className="text-white/60 text-xs">Körpə ölçüsü</p>
+                <p className="text-white font-bold text-xl">{weekData?.emoji || '🥭'}</p>
+                <p className="text-white/60 text-xs">{weekData?.fruit || 'Körpə'}</p>
               </div>
               <div className="bg-white/10 rounded-xl p-3 text-center relative">
                 <div className="absolute -top-2 -right-2">
@@ -371,7 +408,7 @@ const PartnerDashboard = () => {
                 <div>
                   <h3 className="font-bold text-amber-800">Bugünkü xatırlatma</h3>
                   <p className="text-sm text-amber-700">
-                    {womanData.name} bu gün yorğunluq hiss edir. Ayaq masajı etmək əla olar! 💆‍♀️
+                    {womanName} bu gün yorğunluq hiss edir. Ayaq masajı etmək əla olar! 💆‍♀️
                   </p>
                 </div>
               </motion.div>
@@ -616,7 +653,7 @@ const PartnerDashboard = () => {
                         {item.name}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {item.addedBy === 'woman' ? `${womanData.name} əlavə etdi` : 'Sən əlavə etdin'}
+                        {item.addedBy === 'woman' ? `${womanName} əlavə etdi` : 'Sən əlavə etdin'}
                       </p>
                     </div>
                     <span className="text-sm font-bold text-muted-foreground bg-muted px-2 py-1 rounded-lg">
