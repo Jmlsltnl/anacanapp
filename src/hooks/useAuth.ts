@@ -277,9 +277,60 @@ export const useAuth = () => {
   };
 
   useEffect(() => {
-    // Set up auth state listener BEFORE getting session
+    let mounted = true;
+
+    const initializeAuth = async () => {
+      try {
+        // Get initial session first
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        
+        if (!mounted) return;
+        
+        if (initialSession?.user) {
+          setSession(initialSession);
+          setUser(initialSession.user);
+          
+          // Fetch profile and role data
+          const [profileData, roleData] = await Promise.all([
+            fetchProfile(initialSession.user.id),
+            fetchUserRole(initialSession.user.id)
+          ]);
+
+          if (!mounted) return;
+
+          setProfile(profileData);
+          setUserRole(roleData);
+
+          // Always set auth even if profile doesn't exist yet (new user)
+          setAuth(
+            true, 
+            initialSession.user.id, 
+            initialSession.user.email || '', 
+            profileData?.name || initialSession.user.user_metadata?.name || 'İstifadəçi'
+          );
+          
+          // Sync all profile data to store
+          syncProfileToStore(profileData);
+        } else {
+          storeLogout();
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    // Initialize auth
+    initializeAuth();
+
+    // Set up auth state listener for subsequent changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       console.log('Auth state changed:', event, currentSession?.user?.email);
+      
+      if (!mounted) return;
       
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
@@ -290,6 +341,8 @@ export const useAuth = () => {
           fetchProfile(currentSession.user.id),
           fetchUserRole(currentSession.user.id)
         ]);
+
+        if (!mounted) return;
 
         setProfile(profileData);
         setUserRole(roleData);
@@ -313,12 +366,8 @@ export const useAuth = () => {
       setLoading(false);
     });
 
-    // Then get initial session
-    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
-      // The onAuthStateChange will handle this
-    });
-
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
