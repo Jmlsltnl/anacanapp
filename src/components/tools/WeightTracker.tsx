@@ -2,31 +2,26 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Plus, TrendingUp, TrendingDown, Minus, Scale } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-
-interface WeightEntry {
-  id: string;
-  weight: number;
-  date: Date;
-}
+import { useWeightEntries } from '@/hooks/useWeightEntries';
+import { useUserStore } from '@/store/userStore';
 
 interface WeightTrackerProps {
   onBack: () => void;
 }
 
 const WeightTracker = ({ onBack }: WeightTrackerProps) => {
-  const [entries, setEntries] = useState<WeightEntry[]>([
-    { id: '1', weight: 62, date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
-    { id: '2', weight: 62.5, date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) },
-    { id: '3', weight: 63, date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) },
-  ]);
+  const { entries, loading, addEntry, getStats } = useWeightEntries();
+  const { getPregnancyData } = useUserStore();
   const [newWeight, setNewWeight] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
 
-  const startWeight = 60; // kg
-  const currentWeek = 20; // Simulated pregnancy week
+  const pregData = getPregnancyData();
+  const currentWeek = pregData?.currentWeek || 20;
+  const stats = getStats();
   
-  const currentWeight = entries.length > 0 ? entries[entries.length - 1].weight : startWeight;
-  const totalGain = currentWeight - startWeight;
+  const startWeight = stats?.startWeight || 60;
+  const currentWeight = stats?.currentWeight || startWeight;
+  const totalGain = stats?.totalGain || 0;
   
   // Recommended weight gain based on week
   const getRecommendedGain = (week: number) => {
@@ -45,15 +40,11 @@ const WeightTracker = ({ onBack }: WeightTrackerProps) => {
 
   const status = getStatus();
 
-  const handleAddWeight = () => {
+  const handleAddWeight = async () => {
     if (newWeight) {
       const weight = parseFloat(newWeight);
       if (!isNaN(weight) && weight > 0) {
-        setEntries(prev => [...prev, {
-          id: Date.now().toString(),
-          weight,
-          date: new Date(),
-        }]);
+        await addEntry(weight);
         setNewWeight('');
         setShowAddForm(false);
       }
@@ -169,65 +160,71 @@ const WeightTracker = ({ onBack }: WeightTrackerProps) => {
         </motion.div>
 
         {/* Progress Chart */}
-        <motion.div
-          className="bg-card rounded-3xl p-5 shadow-card border border-border/50 mb-6"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
-        >
-          <h3 className="font-bold text-foreground mb-4">Çəki qrafiki</h3>
-          <div className="h-32 flex items-end gap-2">
-            {entries.map((entry, index) => {
-              const maxWeight = Math.max(...entries.map(e => e.weight));
-              const minWeight = Math.min(...entries.map(e => e.weight));
-              const range = maxWeight - minWeight || 1;
-              const height = ((entry.weight - minWeight) / range * 60) + 40;
-              
-              return (
-                <motion.div
-                  key={entry.id}
-                  className="flex-1 gradient-primary rounded-t-lg"
-                  initial={{ height: 0 }}
-                  animate={{ height: `${height}%` }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
-                />
-              );
-            })}
-          </div>
-          <div className="flex justify-between mt-2">
-            {entries.slice(-5).map((entry) => (
-              <span key={entry.id} className="text-xs text-muted-foreground">
-                {entry.date.toLocaleDateString('az-AZ', { day: 'numeric', month: 'short' })}
-              </span>
-            ))}
-          </div>
-        </motion.div>
+        {entries.length > 0 && (
+          <motion.div
+            className="bg-card rounded-3xl p-5 shadow-card border border-border/50 mb-6"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            <h3 className="font-bold text-foreground mb-4">Çəki qrafiki</h3>
+            <div className="h-32 flex items-end gap-2">
+              {entries.slice(0, 7).reverse().map((entry, index) => {
+                const maxWeight = Math.max(...entries.slice(0, 7).map(e => e.weight));
+                const minWeight = Math.min(...entries.slice(0, 7).map(e => e.weight));
+                const range = maxWeight - minWeight || 1;
+                const height = ((entry.weight - minWeight) / range * 60) + 40;
+                
+                return (
+                  <motion.div
+                    key={entry.id}
+                    className="flex-1 gradient-primary rounded-t-lg"
+                    initial={{ height: 0 }}
+                    animate={{ height: `${height}%` }}
+                    transition={{ delay: 0.5 + index * 0.1 }}
+                  />
+                );
+              })}
+            </div>
+            <div className="flex justify-between mt-2">
+              {entries.slice(0, 7).reverse().map((entry) => (
+                <span key={entry.id} className="text-xs text-muted-foreground">
+                  {new Date(entry.entry_date).toLocaleDateString('az-AZ', { day: 'numeric', month: 'short' })}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {/* History */}
-        <h3 className="font-bold text-foreground mb-4">Tarixçə</h3>
-        <div className="space-y-3 pb-8">
-          {[...entries].reverse().map((entry, index) => (
-            <motion.div
-              key={entry.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 * index }}
-              className="bg-card rounded-2xl p-4 shadow-card border border-border/50 flex items-center justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Scale className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-bold text-foreground">{entry.weight} kg</p>
-                  <p className="text-xs text-muted-foreground">
-                    {entry.date.toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' })}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        {entries.length > 0 && (
+          <>
+            <h3 className="font-bold text-foreground mb-4">Tarixçə</h3>
+            <div className="space-y-3 pb-8">
+              {entries.slice(0, 10).map((entry, index) => (
+                <motion.div
+                  key={entry.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 * index }}
+                  className="bg-card rounded-2xl p-4 shadow-card border border-border/50 flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <Scale className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-foreground">{entry.weight} kg</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(entry.entry_date).toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' })}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Add Weight Modal */}

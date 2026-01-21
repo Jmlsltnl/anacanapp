@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Play, Pause, RotateCcw, Footprints } from 'lucide-react';
+import { useKickSessions } from '@/hooks/useKickSessions';
+import { hapticFeedback } from '@/lib/native';
 
 interface KickCounterProps {
   onBack: () => void;
@@ -10,8 +12,9 @@ const KickCounter = ({ onBack }: KickCounterProps) => {
   const [kicks, setKicks] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [time, setTime] = useState(0);
-  const [sessions, setSessions] = useState<{ kicks: number; duration: number; date: Date }[]>([]);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  
+  const { sessions, addSession, getTodayStats, loading } = useKickSessions();
 
   useEffect(() => {
     if (isActive) {
@@ -36,17 +39,18 @@ const KickCounter = ({ onBack }: KickCounterProps) => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleKick = () => {
+  const handleKick = async () => {
+    await hapticFeedback.medium();
     if (!isActive) {
       setIsActive(true);
     }
     setKicks(prev => prev + 1);
   };
 
-  const handleStop = () => {
+  const handleStop = async () => {
     setIsActive(false);
     if (kicks > 0) {
-      setSessions(prev => [...prev, { kicks, duration: time, date: new Date() }]);
+      await addSession(kicks, time);
     }
   };
 
@@ -62,6 +66,8 @@ const KickCounter = ({ onBack }: KickCounterProps) => {
     if (kicks < 10) return 'Əla gedir! Körpəniz aktivdir 💪';
     return 'Super! 10 təpikə çatdınız! 🎉';
   };
+
+  const todayStats = getTodayStats();
 
   return (
     <div className="min-h-screen bg-background">
@@ -154,7 +160,7 @@ const KickCounter = ({ onBack }: KickCounterProps) => {
           </div>
         </motion.div>
 
-        {/* Goal Progress */}
+        {/* Today's Stats */}
         <motion.div
           className="bg-beige-light rounded-3xl p-5 mb-6 border border-beige"
           initial={{ y: 20, opacity: 0 }}
@@ -162,14 +168,14 @@ const KickCounter = ({ onBack }: KickCounterProps) => {
           transition={{ delay: 0.1 }}
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="font-bold text-foreground">Gündəlik hədəf</span>
-            <span className="text-primary font-bold">{kicks}/10 təpik</span>
+            <span className="font-bold text-foreground">Bugünkü ümumi</span>
+            <span className="text-primary font-bold">{todayStats.totalKicks}/10 təpik</span>
           </div>
           <div className="h-3 bg-beige rounded-full overflow-hidden">
             <motion.div
               className="h-full gradient-primary rounded-full"
               initial={{ width: 0 }}
-              animate={{ width: `${Math.min(kicks / 10 * 100, 100)}%` }}
+              animate={{ width: `${Math.min(todayStats.totalKicks / 10 * 100, 100)}%` }}
               transition={{ duration: 0.5 }}
             />
           </div>
@@ -183,11 +189,12 @@ const KickCounter = ({ onBack }: KickCounterProps) => {
           <div>
             <h3 className="font-bold text-foreground mb-4">Son sessiyalar</h3>
             <div className="space-y-3 pb-8">
-              {sessions.slice(-5).reverse().map((session, index) => (
+              {sessions.slice(0, 5).map((session, index) => (
                 <motion.div
-                  key={index}
+                  key={session.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
                   className="bg-card rounded-2xl p-4 shadow-card border border-border/50 flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3">
@@ -195,14 +202,14 @@ const KickCounter = ({ onBack }: KickCounterProps) => {
                       <Footprints className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <p className="font-bold text-foreground">{session.kicks} təpik</p>
+                      <p className="font-bold text-foreground">{session.kick_count} təpik</p>
                       <p className="text-xs text-muted-foreground">
-                        {session.date.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(session.created_at).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
                   </div>
                   <span className="text-sm text-muted-foreground font-mono">
-                    {formatTime(session.duration)}
+                    {formatTime(session.duration_seconds)}
                   </span>
                 </motion.div>
               ))}

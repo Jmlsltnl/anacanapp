@@ -41,6 +41,42 @@ export type Database = {
         }
         Relationships: []
       }
+      appointments: {
+        Row: {
+          created_at: string
+          description: string | null
+          event_date: string
+          event_time: string | null
+          event_type: string
+          id: string
+          reminder_enabled: boolean | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          event_date: string
+          event_time?: string | null
+          event_type?: string
+          id?: string
+          reminder_enabled?: boolean | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          event_time?: string | null
+          event_type?: string
+          id?: string
+          reminder_enabled?: boolean | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       baby_logs: {
         Row: {
           created_at: string
@@ -72,6 +108,33 @@ export type Database = {
           id?: string
           log_type?: string
           notes?: string | null
+          start_time?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      contractions: {
+        Row: {
+          created_at: string
+          duration_seconds: number
+          id: string
+          interval_seconds: number | null
+          start_time: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number
+          id?: string
+          interval_seconds?: number | null
+          start_time?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number
+          id?: string
+          interval_seconds?: number | null
           start_time?: string
           user_id?: string
         }
@@ -113,6 +176,63 @@ export type Database = {
           temperature?: number | null
           user_id?: string
           water_intake?: number | null
+        }
+        Relationships: []
+      }
+      kick_sessions: {
+        Row: {
+          created_at: string
+          duration_seconds: number
+          id: string
+          kick_count: number
+          session_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number
+          id?: string
+          kick_count?: number
+          session_date?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number
+          id?: string
+          kick_count?: number
+          session_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean | null
+          message: string
+          notification_type: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message: string
+          notification_type?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          notification_type?: string
+          title?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -206,6 +326,7 @@ export type Database = {
           partner_code: string | null
           period_length: number | null
           role: Database["public"]["Enums"]["app_role"]
+          start_weight: number | null
           updated_at: string
           user_id: string
         }
@@ -226,6 +347,7 @@ export type Database = {
           partner_code?: string | null
           period_length?: number | null
           role?: Database["public"]["Enums"]["app_role"]
+          start_weight?: number | null
           updated_at?: string
           user_id: string
         }
@@ -246,6 +368,7 @@ export type Database = {
           partner_code?: string | null
           period_length?: number | null
           role?: Database["public"]["Enums"]["app_role"]
+          start_weight?: number | null
           updated_at?: string
           user_id?: string
         }
@@ -310,6 +433,33 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      weight_entries: {
+        Row: {
+          created_at: string
+          entry_date: string
+          id: string
+          notes: string | null
+          user_id: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          entry_date?: string
+          id?: string
+          notes?: string | null
+          user_id: string
+          weight: number
+        }
+        Update: {
+          created_at?: string
+          entry_date?: string
+          id?: string
+          notes?: string | null
+          user_id?: string
+          weight?: number
         }
         Relationships: []
       }

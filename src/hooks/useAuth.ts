@@ -19,6 +19,7 @@ export interface Profile {
   baby_birth_date: string | null;
   baby_name: string | null;
   baby_gender: 'boy' | 'girl' | null;
+  start_weight: number | null;
   created_at: string;
   updated_at: string;
 }
