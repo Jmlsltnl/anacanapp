@@ -1,14 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Camera, Sparkles, Download, Trash2, 
-  Image as ImageIcon, Loader2, RefreshCw, Share2
+  Image as ImageIcon, Loader2, Share2, Upload, X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { useUserStore } from '@/store/userStore';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 interface BabyPhotoshootProps {
@@ -41,10 +40,12 @@ const BabyPhotoshoot = ({ onBack }: BabyPhotoshootProps) => {
   const [photos, setPhotos] = useState<GeneratedPhoto[]>([]);
   const [loadingPhotos, setLoadingPhotos] = useState(true);
   const [viewingPhoto, setViewingPhoto] = useState<GeneratedPhoto | null>(null);
+  const [sourceImage, setSourceImage] = useState<string | null>(null);
+  const [sourceImagePreview, setSourceImagePreview] = useState<string | null>(null);
   
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-  const { user, profile } = useAuth();
-  const { babyName, babyGender } = useUserStore();
+  const { user } = useAuth();
 
   // Fetch existing photos
   useEffect(() => {
@@ -78,6 +79,47 @@ const BabyPhotoshoot = ({ onBack }: BabyPhotoshootProps) => {
     fetchPhotos();
   }, [user]);
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: 'Fayl çox böyükdür',
+        description: 'Maksimum 5MB şəkil yükləyə bilərsiniz',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: 'Yanlış fayl tipi',
+        description: 'Yalnız şəkil faylları yükləyə bilərsiniz',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result as string;
+      setSourceImage(base64);
+      setSourceImagePreview(base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = () => {
+    setSourceImage(null);
+    setSourceImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleGenerate = async () => {
     if (!selectedBackground) {
       toast({
@@ -88,8 +130,14 @@ const BabyPhotoshoot = ({ onBack }: BabyPhotoshootProps) => {
       return;
     }
 
-    const name = babyName || profile?.baby_name || 'Körpə';
-    const gender = babyGender || profile?.baby_gender || 'girl';
+    if (!sourceImage) {
+      toast({
+        title: 'Şəkil yükləyin',
+        description: 'Zəhmət olmasa körpənin şəklini yükləyin',
+        variant: 'destructive',
+      });
+      return;
+    }
 
     setIsGenerating(true);
 
@@ -100,9 +148,8 @@ const BabyPhotoshoot = ({ onBack }: BabyPhotoshootProps) => {
     try {
       const { data, error } = await supabase.functions.invoke('generate-baby-photo', {
         body: {
-          babyName: name,
-          babyGender: gender,
           backgroundTheme: selectedBackground,
+          sourceImageBase64: sourceImage,
         },
       });
 
@@ -142,7 +189,6 @@ const BabyPhotoshoot = ({ onBack }: BabyPhotoshootProps) => {
       const photo = photos.find(p => p.id === photoId);
       if (!photo) return;
 
-      // Delete from database (storage will cascade or can be cleaned separately)
       const { error } = await supabase
         .from('baby_photos')
         .delete()
@@ -225,7 +271,7 @@ const BabyPhotoshoot = ({ onBack }: BabyPhotoshootProps) => {
           </motion.button>
           <div>
             <h1 className="text-2xl font-bold text-white">Körpə Fotosessiyası</h1>
-            <p className="text-white/80 text-sm">AI ilə sehrli fotolar yaradın</p>
+            <p className="text-white/80 text-sm">Körpənin şəklini sehrli fonlara yerləşdirin</p>
           </div>
         </div>
 
@@ -242,12 +288,67 @@ const BabyPhotoshoot = ({ onBack }: BabyPhotoshootProps) => {
         </div>
       </div>
 
-      <div className="px-5 -mt-4">
-        {/* Background Selection */}
+      <div className="px-5 -mt-4 space-y-6">
+        {/* Image Upload Section */}
         <motion.div 
-          className="bg-card rounded-3xl p-5 shadow-elevated mb-6"
+          className="bg-card rounded-3xl p-5 shadow-elevated"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Upload className="w-5 h-5 text-primary" />
+            <h2 className="font-bold text-foreground">Körpənin Şəklini Yükləyin</h2>
+          </div>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageSelect}
+            className="hidden"
+          />
+
+          {sourceImagePreview ? (
+            <div className="relative">
+              <img
+                src={sourceImagePreview}
+                alt="Yüklənmiş şəkil"
+                className="w-full h-48 object-cover rounded-2xl"
+              />
+              <motion.button
+                onClick={handleRemoveImage}
+                className="absolute top-2 right-2 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center shadow-lg"
+                whileTap={{ scale: 0.9 }}
+              >
+                <X className="w-4 h-4 text-white" />
+              </motion.button>
+              <div className="absolute bottom-2 left-2 bg-black/60 px-3 py-1 rounded-lg">
+                <span className="text-white text-xs">Üz dəyişməyəcək ✓</span>
+              </div>
+            </div>
+          ) : (
+            <motion.button
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full h-48 border-2 border-dashed border-muted-foreground/30 rounded-2xl flex flex-col items-center justify-center gap-3 hover:border-primary/50 hover:bg-primary/5 transition-colors"
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                <Camera className="w-8 h-8 text-primary" />
+              </div>
+              <div className="text-center">
+                <p className="font-medium text-foreground">Şəkil yükləyin</p>
+                <p className="text-sm text-muted-foreground">Körpənin üzü dəyişməyəcək</p>
+              </div>
+            </motion.button>
+          )}
+        </motion.div>
+
+        {/* Background Selection */}
+        <motion.div 
+          className="bg-card rounded-3xl p-5 shadow-elevated"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.1 }}
         >
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="w-5 h-5 text-primary" />
@@ -277,7 +378,7 @@ const BabyPhotoshoot = ({ onBack }: BabyPhotoshootProps) => {
           {/* Generate Button */}
           <Button
             onClick={handleGenerate}
-            disabled={isGenerating || !selectedBackground}
+            disabled={isGenerating || !selectedBackground || !sourceImage}
             className="w-full mt-5 h-14 rounded-2xl gradient-primary text-white font-bold text-lg shadow-button"
           >
             {isGenerating ? (
@@ -287,18 +388,24 @@ const BabyPhotoshoot = ({ onBack }: BabyPhotoshootProps) => {
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Camera className="w-5 h-5" />
-                <span>Foto Yarat</span>
+                <Sparkles className="w-5 h-5" />
+                <span>Fonu Dəyiş</span>
               </div>
             )}
           </Button>
+
+          {!sourceImage && selectedBackground && (
+            <p className="text-center text-sm text-muted-foreground mt-3">
+              Əvvəlcə körpənin şəklini yükləyin
+            </p>
+          )}
         </motion.div>
 
         {/* Photo Gallery */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.2 }}
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-bold text-foreground flex items-center gap-2">
@@ -321,7 +428,7 @@ const BabyPhotoshoot = ({ onBack }: BabyPhotoshootProps) => {
               </div>
               <h3 className="font-bold text-foreground mb-2">Hələ foto yoxdur</h3>
               <p className="text-muted-foreground text-sm">
-                Fon seçin və ilk fotonu yaradın!
+                Şəkil yükləyin və fon seçin!
               </p>
             </div>
           ) : (

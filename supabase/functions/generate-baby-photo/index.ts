@@ -10,19 +10,20 @@ interface RequestBody {
   babyName: string;
   babyGender: "boy" | "girl";
   backgroundTheme: string;
+  sourceImageBase64?: string; // Base64 encoded source image
 }
 
 const backgroundPrompts: Record<string, string> = {
-  garden: "in a beautiful magical garden with colorful flowers, butterflies, and soft sunlight filtering through trees",
-  clouds: "floating on fluffy white clouds in a dreamy pastel sky with golden sunshine",
-  forest: "in an enchanted forest with fairy lights, mushrooms, and gentle woodland creatures",
-  beach: "on a beautiful sandy beach at golden hour with gentle waves and seashells",
-  stars: "surrounded by twinkling stars and galaxies in a magical night sky with a crescent moon",
-  flowers: "in a field of blooming lavender and wildflowers with soft bokeh background",
-  balloons: "with colorful balloons floating around in a bright sunny day celebration",
-  rainbow: "under a magical rainbow with cotton candy clouds and sparkles",
-  castle: "in a fairytale castle setting with royal decorations and soft pink lighting",
-  toys: "surrounded by adorable plush toys, teddy bears, and playful decorations",
+  garden: "a beautiful magical garden with colorful flowers, butterflies, and soft sunlight filtering through trees",
+  clouds: "fluffy white clouds in a dreamy pastel sky with golden sunshine",
+  forest: "an enchanted forest with fairy lights, mushrooms, and gentle woodland creatures",
+  beach: "a beautiful sandy beach at golden hour with gentle waves and seashells",
+  stars: "twinkling stars and galaxies in a magical night sky with a crescent moon",
+  flowers: "a field of blooming lavender and wildflowers with soft bokeh",
+  balloons: "colorful balloons floating around in a bright sunny celebration",
+  rainbow: "a magical rainbow with cotton candy clouds and sparkles",
+  castle: "a fairytale castle setting with royal decorations and soft lighting",
+  toys: "adorable plush toys, teddy bears, and playful decorations",
 };
 
 serve(async (req) => {
@@ -55,23 +56,30 @@ serve(async (req) => {
       });
     }
 
-    const { babyName, babyGender, backgroundTheme }: RequestBody = await req.json();
+    const { babyName, babyGender, backgroundTheme, sourceImageBase64 }: RequestBody = await req.json();
 
-    if (!babyName || !babyGender || !backgroundTheme) {
+    if (!backgroundTheme) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
+    if (!sourceImageBase64) {
+      return new Response(JSON.stringify({ error: "Source image is required" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const backgroundDescription = backgroundPrompts[backgroundTheme] || backgroundPrompts.garden;
-    const genderDescription = babyGender === "boy" ? "baby boy" : "baby girl";
     
-    const prompt = `A professional studio photograph of an adorable happy ${genderDescription} named ${babyName}, ${backgroundDescription}. The baby is smiling sweetly, wearing cute ${babyGender === "boy" ? "blue" : "pink"} outfit. Ultra high quality, soft lighting, professional baby photography, 8k, detailed, warm tones, artistic portrait style.`;
+    // Image editing prompt - preserve the baby's face exactly
+    const editPrompt = `Edit this photo: Keep the baby's face, expression, and features EXACTLY the same - do not modify the face at all. Only change the background to ${backgroundDescription}. Make it look like a professional baby photoshoot with beautiful lighting. The baby should remain in the exact same position and pose. Create a seamless, natural-looking composite.`;
 
-    console.log("Generating image with prompt:", prompt);
+    console.log("Editing image with prompt:", editPrompt);
 
-    // Call Gemini API directly for image generation
+    // Call Gemini API for image editing
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     if (!GEMINI_API_KEY) {
       return new Response(JSON.stringify({ error: "AI service not configured" }), {
@@ -80,9 +88,22 @@ serve(async (req) => {
       });
     }
 
-    // Use Gemini's Imagen model for image generation
+    // Use Gemini's image editing model
     const model = "gemini-2.0-flash-exp-image-generation";
     const baseUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+
+    // Clean base64 string (remove data URL prefix if present)
+    let cleanBase64 = sourceImageBase64;
+    let mimeType = "image/jpeg";
+    
+    if (sourceImageBase64.includes(",")) {
+      const parts = sourceImageBase64.split(",");
+      cleanBase64 = parts[1];
+      const mimeMatch = parts[0].match(/data:([^;]+);/);
+      if (mimeMatch) {
+        mimeType = mimeMatch[1];
+      }
+    }
 
     const aiResponse = await fetch(`${baseUrl}?key=${GEMINI_API_KEY}`, {
       method: "POST",
@@ -92,7 +113,15 @@ serve(async (req) => {
       body: JSON.stringify({
         contents: [
           {
-            parts: [{ text: prompt }],
+            parts: [
+              {
+                inlineData: {
+                  mimeType: mimeType,
+                  data: cleanBase64,
+                },
+              },
+              { text: editPrompt },
+            ],
           },
         ],
         generationConfig: {
@@ -112,7 +141,7 @@ serve(async (req) => {
         });
       }
       
-      return new Response(JSON.stringify({ error: "Failed to generate image" }), {
+      return new Response(JSON.stringify({ error: "Failed to edit image" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -174,7 +203,7 @@ serve(async (req) => {
       .insert({
         user_id: user.id,
         storage_path: fileName,
-        prompt: prompt,
+        prompt: editPrompt,
         background_theme: backgroundTheme,
       })
       .select()
