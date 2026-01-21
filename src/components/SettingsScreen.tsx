@@ -1,33 +1,31 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeft, Bell, Moon, Sun, Globe, Lock, 
   Smartphone, Database, Trash2, ChevronRight,
-  Volume2, Vibrate, Clock, Calendar
+  Volume2, Vibrate, Clock, Calendar, Droplets, Dumbbell, Pill
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import { useNotificationSettings } from '@/hooks/useNotificationSettings';
+import { toast } from 'sonner';
 
 interface SettingsScreenProps {
   onBack: () => void;
 }
 
 const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
-  const [settings, setSettings] = useState({
-    darkMode: false,
-    notifications: true,
-    sound: true,
-    vibration: true,
-    reminderWater: true,
-    reminderPills: true,
-    reminderExercise: false,
-    language: 'az',
-    cycleLength: 28,
-    periodLength: 5,
-  });
+  const { 
+    settings, 
+    loading, 
+    updateSetting, 
+    initializeReminders,
+    isNative 
+  } = useNotificationSettings();
 
-  const updateSetting = (key: string, value: any) => {
-    setSettings({ ...settings, [key]: value });
-  };
+  // Initialize reminders on mount
+  useEffect(() => {
+    initializeReminders();
+  }, []);
 
   const SettingRow = ({ 
     icon: Icon, 
@@ -64,6 +62,14 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
     </motion.div>
   );
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background pb-28">
       {/* Header */}
@@ -81,21 +87,22 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
       </div>
 
       <div className="px-5 pt-4 space-y-4">
-        {/* Appearance */}
-        <div className="bg-card rounded-3xl overflow-hidden shadow-card border border-border/50">
-          <div className="px-4 pt-4 pb-2">
-            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Görünüş</h2>
-          </div>
-          <SettingRow icon={settings.darkMode ? Moon : Sun} label="Qaranlıq rejim" description="Gecə görünüşü aktivləşdirin">
-            <Switch 
-              checked={settings.darkMode} 
-              onCheckedChange={(checked) => updateSetting('darkMode', checked)} 
-            />
-          </SettingRow>
-          <SettingRow icon={Globe} label="Dil" description="Azərbaycan dili" onClick={() => {}}>
-            <ChevronRight className="w-5 h-5 text-muted-foreground" />
-          </SettingRow>
-        </div>
+        {/* Native App Indicator */}
+        {!isNative && (
+          <motion.div 
+            className="bg-amber-50 border border-amber-200 rounded-2xl p-4"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="flex items-center gap-3">
+              <Smartphone className="w-5 h-5 text-amber-600" />
+              <div>
+                <p className="text-sm font-medium text-amber-800">Web rejimində çalışırsınız</p>
+                <p className="text-xs text-amber-600">Bildirişlər yalnız mobil tətbiqdə işləyir</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* Notifications */}
         <div className="bg-card rounded-3xl overflow-hidden shadow-card border border-border/50">
@@ -104,20 +111,22 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
           </div>
           <SettingRow icon={Bell} label="Bildirişlər" description="Bütün bildirişləri aktivləşdirin">
             <Switch 
-              checked={settings.notifications} 
-              onCheckedChange={(checked) => updateSetting('notifications', checked)} 
+              checked={settings.notifications_enabled} 
+              onCheckedChange={(checked) => updateSetting('notifications_enabled', checked)} 
             />
           </SettingRow>
           <SettingRow icon={Volume2} label="Səs" description="Bildiriş səsləri">
             <Switch 
-              checked={settings.sound} 
-              onCheckedChange={(checked) => updateSetting('sound', checked)} 
+              checked={settings.sound_enabled} 
+              onCheckedChange={(checked) => updateSetting('sound_enabled', checked)} 
+              disabled={!settings.notifications_enabled}
             />
           </SettingRow>
           <SettingRow icon={Vibrate} label="Titrəmə" description="Titrəmə bildirişləri">
             <Switch 
-              checked={settings.vibration} 
-              onCheckedChange={(checked) => updateSetting('vibration', checked)} 
+              checked={settings.vibration_enabled} 
+              onCheckedChange={(checked) => updateSetting('vibration_enabled', checked)} 
+              disabled={!settings.notifications_enabled}
             />
           </SettingRow>
         </div>
@@ -127,35 +136,35 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
           <div className="px-4 pt-4 pb-2">
             <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Xatırlatmalar</h2>
           </div>
-          <SettingRow icon={Clock} label="Su xatırlatması" description="Hər 2 saatda bir">
+          <SettingRow icon={Droplets} label="Su xatırlatması" description="Hər 2 saatda bir (08:00-20:00)">
             <Switch 
-              checked={settings.reminderWater} 
-              onCheckedChange={(checked) => updateSetting('reminderWater', checked)} 
+              checked={settings.water_reminder} 
+              onCheckedChange={(checked) => updateSetting('water_reminder', checked)} 
+              disabled={!settings.notifications_enabled}
             />
           </SettingRow>
-          <SettingRow icon={Clock} label="Vitamin xatırlatması" description="Hər gün səhər">
+          <SettingRow icon={Pill} label="Vitamin xatırlatması" description={`Hər gün saat ${settings.vitamin_time}`}>
             <Switch 
-              checked={settings.reminderPills} 
-              onCheckedChange={(checked) => updateSetting('reminderPills', checked)} 
+              checked={settings.vitamin_reminder} 
+              onCheckedChange={(checked) => updateSetting('vitamin_reminder', checked)} 
+              disabled={!settings.notifications_enabled}
             />
           </SettingRow>
-          <SettingRow icon={Clock} label="Məşq xatırlatması" description="Həftədə 3 dəfə">
+          <SettingRow icon={Dumbbell} label="Məşq xatırlatması" description="B.e., Ç., C. günləri saat 10:00">
             <Switch 
-              checked={settings.reminderExercise} 
-              onCheckedChange={(checked) => updateSetting('reminderExercise', checked)} 
+              checked={settings.exercise_reminder} 
+              onCheckedChange={(checked) => updateSetting('exercise_reminder', checked)} 
+              disabled={!settings.notifications_enabled}
             />
           </SettingRow>
         </div>
 
-        {/* Cycle Settings */}
+        {/* Appearance */}
         <div className="bg-card rounded-3xl overflow-hidden shadow-card border border-border/50">
           <div className="px-4 pt-4 pb-2">
-            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Dövrə Ayarları</h2>
+            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Görünüş</h2>
           </div>
-          <SettingRow icon={Calendar} label="Dövrə uzunluğu" description={`${settings.cycleLength} gün`} onClick={() => {}}>
-            <ChevronRight className="w-5 h-5 text-muted-foreground" />
-          </SettingRow>
-          <SettingRow icon={Calendar} label="Menstruasiya uzunluğu" description={`${settings.periodLength} gün`} onClick={() => {}}>
+          <SettingRow icon={Globe} label="Dil" description="Azərbaycan dili" onClick={() => toast.info('Tezliklə digər dillər əlavə olunacaq')}>
             <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </SettingRow>
         </div>
@@ -165,17 +174,17 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
           <div className="px-4 pt-4 pb-2">
             <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Məxfilik</h2>
           </div>
-          <SettingRow icon={Lock} label="Şifrə ilə qoruma" description="Tətbiqi qoruyun" onClick={() => {}}>
+          <SettingRow icon={Lock} label="Şifrə ilə qoruma" description="Tətbiqi qoruyun" onClick={() => toast.info('Tezliklə əlavə olunacaq')}>
             <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </SettingRow>
-          <SettingRow icon={Database} label="Məlumat ixracı" description="Bütün məlumatlarınızı yükləyin" onClick={() => {}}>
+          <SettingRow icon={Database} label="Məlumat ixracı" description="Bütün məlumatlarınızı yükləyin" onClick={() => toast.info('Tezliklə əlavə olunacaq')}>
             <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </SettingRow>
           <SettingRow 
             icon={Trash2} 
             label="Hesabı sil" 
             description="Bütün məlumatları silin" 
-            onClick={() => {}}
+            onClick={() => toast.error('Bu əməliyyat geri qaytarıla bilməz!')}
             danger
           >
             <ChevronRight className="w-5 h-5 text-destructive" />
