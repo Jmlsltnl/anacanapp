@@ -2,16 +2,19 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeft, ChevronLeft, ChevronRight, Plus,
-  Droplets, Heart, Baby, Pill, Calendar as CalendarIcon
+  Droplets, Heart, Baby, Pill
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
+import { useAppointments } from '@/hooks/useAppointments';
+import { useDailyLogs } from '@/hooks/useDailyLogs';
+import { Input } from '@/components/ui/input';
 
 interface CalendarScreenProps {
   onBack: () => void;
 }
 
 interface DayEvent {
-  type: 'period' | 'fertile' | 'ovulation' | 'appointment' | 'pill';
+  type: 'period' | 'fertile' | 'ovulation' | 'appointment' | 'pill' | 'mood';
   label: string;
 }
 
@@ -19,7 +22,12 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
   const { lifeStage, getCycleData, getPregnancyData } = useUserStore();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newEventTitle, setNewEventTitle] = useState('');
+  const [newEventType, setNewEventType] = useState('appointment');
 
+  const { appointments, addAppointment, deleteAppointment, getByDate } = useAppointments();
+  const { logs } = useDailyLogs();
   const cycleData = getCycleData();
   const pregData = getPregnancyData();
 
@@ -40,12 +48,10 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
 
     const days: (number | null)[] = [];
     
-    // Add empty cells for days before the first day of the month
     for (let i = 0; i < startingDay; i++) {
       days.push(null);
     }
     
-    // Add days of the month
     for (let i = 1; i <= daysInMonth; i++) {
       days.push(i);
     }
@@ -58,16 +64,27 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
     
     const events: DayEvent[] = [];
     const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    const checkDateStr = checkDate.toISOString().split('T')[0];
     
+    // Check for appointments from DB
+    const dayAppointments = appointments.filter(apt => apt.event_date === checkDateStr);
+    dayAppointments.forEach(apt => {
+      events.push({ type: 'appointment', label: apt.title });
+    });
+
+    // Check for mood logs
+    const dayLog = logs.find(l => l.log_date === checkDateStr);
+    if (dayLog?.mood) {
+      events.push({ type: 'mood', label: 'Əhval qeyd' });
+    }
+
     if (lifeStage === 'flow' && cycleData) {
-      // Check if this day is in period
       const dayOfCycle = Math.floor((checkDate.getTime() - new Date(cycleData.lastPeriodDate).getTime()) / (1000 * 60 * 60 * 24)) % cycleData.cycleLength;
       
       if (dayOfCycle >= 0 && dayOfCycle < cycleData.periodLength) {
         events.push({ type: 'period', label: 'Menstruasiya' });
       }
       
-      // Check fertile window
       const ovulationDay = cycleData.cycleLength - 14;
       if (dayOfCycle >= ovulationDay - 5 && dayOfCycle <= ovulationDay + 1) {
         if (dayOfCycle === ovulationDay) {
@@ -78,22 +95,11 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
       }
     }
 
-    if (lifeStage === 'bump' && pregData) {
-      // Add due date
-      if (pregData.dueDate) {
-        const dueDate = new Date(pregData.dueDate);
-        if (checkDate.toDateString() === dueDate.toDateString()) {
-          events.push({ type: 'appointment', label: 'Doğuş tarixi' });
-        }
+    if (lifeStage === 'bump' && pregData?.dueDate) {
+      const dueDate = new Date(pregData.dueDate);
+      if (checkDate.toDateString() === dueDate.toDateString()) {
+        events.push({ type: 'appointment', label: 'Doğuş tarixi' });
       }
-    }
-
-    // Mock appointments
-    if (day === 15) {
-      events.push({ type: 'appointment', label: 'Həkim' });
-    }
-    if (day === 8 || day === 22) {
-      events.push({ type: 'pill', label: 'Vitamin' });
     }
 
     return events;
@@ -106,12 +112,26 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
       case 'ovulation': return 'bg-amber-500';
       case 'appointment': return 'bg-violet-500';
       case 'pill': return 'bg-blue-500';
+      case 'mood': return 'bg-fuchsia-500';
       default: return 'bg-gray-500';
     }
   };
 
   const navigateMonth = (direction: number) => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + direction, 1));
+  };
+
+  const handleAddEvent = async () => {
+    if (!newEventTitle || !selectedDate) return;
+
+    await addAppointment({
+      title: newEventTitle,
+      event_date: selectedDate.toISOString().split('T')[0],
+      event_type: newEventType,
+    });
+
+    setNewEventTitle('');
+    setShowAddForm(false);
   };
 
   const days = getDaysInMonth(currentDate);
@@ -125,6 +145,11 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
       today.getFullYear() === currentDate.getFullYear()
     );
   };
+
+  const selectedDateEvents = selectedDate ? getDayEvents(selectedDate.getDate()) : [];
+  const selectedDateAppointments = selectedDate 
+    ? appointments.filter(apt => apt.event_date === selectedDate.toISOString().split('T')[0])
+    : [];
 
   return (
     <div className="min-h-screen bg-background pb-28">
@@ -140,9 +165,14 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
           </motion.button>
           <div className="flex-1">
             <h1 className="text-xl font-bold text-white">Təqvim</h1>
-            <p className="text-white/80 text-sm">Dövrənizi izləyin</p>
+            <p className="text-white/80 text-sm">Dövrənizi və randevularınızı izləyin</p>
           </div>
           <motion.button
+            onClick={() => {
+              if (selectedDate) {
+                setShowAddForm(true);
+              }
+            }}
             className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
             whileTap={{ scale: 0.95 }}
           >
@@ -269,15 +299,40 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
           >
-            <h3 className="font-bold mb-3">
-              {selectedDate.getDate()} {monthNames[selectedDate.getMonth()]}
-            </h3>
-            {getDayEvents(selectedDate.getDate()).length > 0 ? (
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold">
+                {selectedDate.getDate()} {monthNames[selectedDate.getMonth()]}
+              </h3>
+              <motion.button
+                onClick={() => setShowAddForm(true)}
+                className="px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-full flex items-center gap-1"
+                whileTap={{ scale: 0.95 }}
+              >
+                <Plus className="w-4 h-4" />
+                Əlavə et
+              </motion.button>
+            </div>
+            {selectedDateEvents.length > 0 || selectedDateAppointments.length > 0 ? (
               <div className="space-y-2">
-                {getDayEvents(selectedDate.getDate()).map((event, i) => (
+                {selectedDateEvents.map((event, i) => (
                   <div key={i} className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
                     <div className={`w-3 h-3 rounded-full ${getEventColor(event.type)}`} />
                     <span className="text-sm font-medium">{event.label}</span>
+                  </div>
+                ))}
+                {selectedDateAppointments.map((apt) => (
+                  <div key={apt.id} className="flex items-center justify-between gap-3 p-3 bg-muted/50 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 rounded-full bg-violet-500" />
+                      <span className="text-sm font-medium">{apt.title}</span>
+                    </div>
+                    <motion.button
+                      onClick={() => deleteAppointment(apt.id)}
+                      className="text-destructive text-xs"
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Sil
+                    </motion.button>
                   </div>
                 ))}
               </div>
@@ -287,6 +342,70 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
           </motion.div>
         )}
       </div>
+
+      {/* Add Event Modal */}
+      {showAddForm && selectedDate && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 bg-black/50 z-50 flex items-end"
+          onClick={() => setShowAddForm(false)}
+        >
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            transition={{ type: 'spring', damping: 25 }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full bg-card rounded-t-3xl p-6 safe-bottom"
+          >
+            <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6" />
+            <h2 className="text-xl font-bold text-foreground mb-4">
+              {selectedDate.getDate()} {monthNames[selectedDate.getMonth()]} - Randevu əlavə et
+            </h2>
+            
+            <div className="mb-4">
+              <label className="text-sm font-medium text-foreground mb-2 block">Başlıq</label>
+              <Input
+                placeholder="Həkim müayinəsi"
+                value={newEventTitle}
+                onChange={(e) => setNewEventTitle(e.target.value)}
+                className="h-12 rounded-xl"
+              />
+            </div>
+
+            <div className="mb-6">
+              <label className="text-sm font-medium text-foreground mb-2 block">Növ</label>
+              <div className="flex gap-2">
+                {[
+                  { id: 'appointment', label: 'Randevu', icon: '📅' },
+                  { id: 'pill', label: 'Dərman', icon: '💊' },
+                  { id: 'reminder', label: 'Xatırlatma', icon: '🔔' },
+                ].map(type => (
+                  <button
+                    key={type.id}
+                    onClick={() => setNewEventType(type.id)}
+                    className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
+                      newEventType === type.id
+                        ? 'bg-primary text-white'
+                        : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    {type.icon} {type.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={handleAddEvent}
+              disabled={!newEventTitle}
+              className="w-full h-14 rounded-2xl gradient-primary text-white font-bold shadow-button disabled:opacity-50"
+            >
+              Yadda saxla
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 };

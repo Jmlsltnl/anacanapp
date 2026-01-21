@@ -1,13 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Play, Square, Timer, AlertCircle, CheckCircle } from 'lucide-react';
-
-interface Contraction {
-  id: string;
-  startTime: Date;
-  duration: number;
-  interval?: number;
-}
+import { ArrowLeft, Play, Square, Timer, AlertCircle, Trash2 } from 'lucide-react';
+import { useContractions } from '@/hooks/useContractions';
+import { hapticFeedback } from '@/lib/native';
 
 interface ContractionTimerProps {
   onBack: () => void;
@@ -16,9 +11,10 @@ interface ContractionTimerProps {
 const ContractionTimer = ({ onBack }: ContractionTimerProps) => {
   const [isActive, setIsActive] = useState(false);
   const [currentDuration, setCurrentDuration] = useState(0);
-  const [contractions, setContractions] = useState<Contraction[]>([]);
   const [lastEndTime, setLastEndTime] = useState<Date | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  
+  const { contractions, addContraction, getStats, clearAll, loading } = useContractions();
 
   useEffect(() => {
     if (isActive) {
@@ -43,12 +39,14 @@ const ContractionTimer = ({ onBack }: ContractionTimerProps) => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleStart = () => {
+  const handleStart = async () => {
+    await hapticFeedback.medium();
     setIsActive(true);
     setCurrentDuration(0);
   };
 
-  const handleStop = () => {
+  const handleStop = async () => {
+    await hapticFeedback.heavy();
     setIsActive(false);
     const now = new Date();
     
@@ -56,34 +54,17 @@ const ContractionTimer = ({ onBack }: ContractionTimerProps) => {
       ? Math.floor((now.getTime() - lastEndTime.getTime()) / 1000 - currentDuration)
       : undefined;
 
-    const newContraction: Contraction = {
-      id: Date.now().toString(),
-      startTime: new Date(now.getTime() - currentDuration * 1000),
-      duration: currentDuration,
-      interval,
-    };
-
-    setContractions(prev => [newContraction, ...prev]);
+    await addContraction(currentDuration, interval);
     setLastEndTime(now);
     setCurrentDuration(0);
   };
 
-  // Calculate averages
-  const recentContractions = contractions.slice(0, 5);
-  const avgDuration = recentContractions.length > 0
-    ? Math.round(recentContractions.reduce((sum, c) => sum + c.duration, 0) / recentContractions.length)
-    : 0;
-  const avgInterval = recentContractions.filter(c => c.interval).length > 0
-    ? Math.round(recentContractions.filter(c => c.interval).reduce((sum, c) => sum + (c.interval || 0), 0) / recentContractions.filter(c => c.interval).length)
-    : 0;
-
-  // 5-1-1 Rule check
-  const is511 = avgInterval <= 300 && avgInterval > 0 && avgDuration >= 60 && recentContractions.length >= 3;
+  const stats = getStats();
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className={`${is511 ? 'bg-gradient-to-r from-red-500 to-rose-600' : 'gradient-primary'} px-5 pt-4 pb-10 safe-top transition-colors`}>
+      <div className={`${stats.is511 ? 'bg-gradient-to-r from-red-500 to-rose-600' : 'gradient-primary'} px-5 pt-4 pb-10 safe-top transition-colors`}>
         <div className="flex items-center gap-4">
           <motion.button
             onClick={onBack}
@@ -97,13 +78,23 @@ const ContractionTimer = ({ onBack }: ContractionTimerProps) => {
             <h1 className="text-xl font-bold text-white">Sancı Ölçən</h1>
             <p className="text-white/80 text-sm">5-1-1 qaydası ilə izləyin</p>
           </div>
+          {contractions.length > 0 && (
+            <motion.button
+              onClick={clearAll}
+              className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Trash2 className="w-5 h-5 text-white" />
+            </motion.button>
+          )}
         </div>
       </div>
 
       <div className="px-5 -mt-6">
         {/* 5-1-1 Alert */}
         <AnimatePresence>
-          {is511 && (
+          {stats.is511 && (
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -176,7 +167,7 @@ const ContractionTimer = ({ onBack }: ContractionTimerProps) => {
             transition={{ delay: 0.1 }}
           >
             <p className="text-sm text-muted-foreground mb-1">Ort. Müddət</p>
-            <p className="text-2xl font-black text-foreground">{formatTime(avgDuration)}</p>
+            <p className="text-2xl font-black text-foreground">{formatTime(stats.avgDuration)}</p>
             <p className="text-xs text-muted-foreground mt-1">Hədəf: ~1 dəq</p>
           </motion.div>
 
@@ -187,7 +178,7 @@ const ContractionTimer = ({ onBack }: ContractionTimerProps) => {
             transition={{ delay: 0.2 }}
           >
             <p className="text-sm text-muted-foreground mb-1">Ort. Aralıq</p>
-            <p className="text-2xl font-black text-foreground">{formatTime(avgInterval)}</p>
+            <p className="text-2xl font-black text-foreground">{formatTime(stats.avgInterval)}</p>
             <p className="text-xs text-muted-foreground mt-1">Hədəf: ~5 dəq</p>
           </motion.div>
         </div>
@@ -213,11 +204,12 @@ const ContractionTimer = ({ onBack }: ContractionTimerProps) => {
           <div>
             <h3 className="font-bold text-foreground mb-4">Sancılar ({contractions.length})</h3>
             <div className="space-y-3 pb-8">
-              {contractions.map((contraction, index) => (
+              {contractions.slice(0, 10).map((contraction, index) => (
                 <motion.div
                   key={contraction.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
                   className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
                 >
                   <div className="flex items-center justify-between">
@@ -226,15 +218,15 @@ const ContractionTimer = ({ onBack }: ContractionTimerProps) => {
                         <span className="text-lg font-bold text-primary">{contractions.length - index}</span>
                       </div>
                       <div>
-                        <p className="font-bold text-foreground">{formatTime(contraction.duration)} müddət</p>
+                        <p className="font-bold text-foreground">{formatTime(contraction.duration_seconds)} müddət</p>
                         <p className="text-xs text-muted-foreground">
-                          {contraction.startTime.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
+                          {new Date(contraction.start_time).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
                     </div>
-                    {contraction.interval && (
+                    {contraction.interval_seconds && (
                       <div className="text-right">
-                        <p className="text-sm font-bold text-muted-foreground">{formatTime(contraction.interval)}</p>
+                        <p className="text-sm font-bold text-muted-foreground">{formatTime(contraction.interval_seconds)}</p>
                         <p className="text-xs text-muted-foreground">aralıq</p>
                       </div>
                     )}

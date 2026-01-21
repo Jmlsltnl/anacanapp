@@ -1,100 +1,48 @@
-import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Bell, Check, Trash2, Calendar, 
-  Heart, Pill, Baby, MessageCircle, Gift
+  Heart, Pill, Gift
 } from 'lucide-react';
+import { useNotifications } from '@/hooks/useNotifications';
 
 interface NotificationsScreenProps {
   onBack: () => void;
 }
 
-interface Notification {
-  id: string;
-  type: 'reminder' | 'tip' | 'appointment' | 'partner' | 'achievement';
-  title: string;
-  message: string;
-  time: string;
-  isRead: boolean;
-  icon: any;
-  color: string;
-}
-
-const mockNotifications: Notification[] = [
-  {
-    id: '1',
-    type: 'reminder',
-    title: 'Su içmək vaxtı! 💧',
-    message: 'Bu gün hələ 4 stəkan su içmisiniz. Hədəf: 8 stəkan.',
-    time: '10 dəq əvvəl',
-    isRead: false,
-    icon: Bell,
-    color: 'bg-blue-100 text-blue-600'
-  },
-  {
-    id: '2',
-    type: 'appointment',
-    title: 'Həkim randevusu',
-    message: 'Sabah saat 10:00-da USG müayinəsi.',
-    time: '1 saat əvvəl',
-    isRead: false,
-    icon: Calendar,
-    color: 'bg-violet-100 text-violet-600'
-  },
-  {
-    id: '3',
-    type: 'tip',
-    title: 'Günün məsləhəti',
-    message: 'Fol turşusu qəbul etməyi unutmayın!',
-    time: '3 saat əvvəl',
-    isRead: false,
-    icon: Pill,
-    color: 'bg-emerald-100 text-emerald-600'
-  },
-  {
-    id: '4',
-    type: 'partner',
-    title: 'Partnyor mesajı ❤️',
-    message: 'Əhməd sizə sevgi göndərdi!',
-    time: '5 saat əvvəl',
-    isRead: true,
-    icon: Heart,
-    color: 'bg-pink-100 text-pink-600'
-  },
-  {
-    id: '5',
-    type: 'achievement',
-    title: 'Yeni nailiyyət!',
-    message: '7 gün ardıcıl log etdiniz! 🎉',
-    time: 'Dünən',
-    isRead: true,
-    icon: Gift,
-    color: 'bg-amber-100 text-amber-600'
-  },
-];
-
 const NotificationsScreen = ({ onBack }: NotificationsScreenProps) => {
-  const [notifications, setNotifications] = useState(mockNotifications);
-  const [activeFilter, setActiveFilter] = useState<'all' | 'unread'>('all');
+  const { 
+    notifications, 
+    loading, 
+    unreadCount, 
+    markAsRead, 
+    markAllAsRead, 
+    deleteNotification 
+  } = useNotifications();
 
-  const filteredNotifications = notifications.filter(n => 
-    activeFilter === 'all' || !n.isRead
-  );
-
-  const unreadCount = notifications.filter(n => !n.isRead).length;
-
-  const markAsRead = (id: string) => {
-    setNotifications(notifications.map(n => 
-      n.id === id ? { ...n, isRead: true } : n
-    ));
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'reminder': return { icon: Bell, color: 'bg-blue-100 text-blue-600' };
+      case 'appointment': return { icon: Calendar, color: 'bg-violet-100 text-violet-600' };
+      case 'tip': return { icon: Pill, color: 'bg-emerald-100 text-emerald-600' };
+      case 'partner': return { icon: Heart, color: 'bg-pink-100 text-pink-600' };
+      case 'achievement': return { icon: Gift, color: 'bg-amber-100 text-amber-600' };
+      default: return { icon: Bell, color: 'bg-gray-100 text-gray-600' };
+    }
   };
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, isRead: true })));
-  };
+  const formatTime = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-  const deleteNotification = (id: string) => {
-    setNotifications(notifications.filter(n => n.id !== id));
+    if (diffMins < 1) return 'İndicə';
+    if (diffMins < 60) return `${diffMins} dəq əvvəl`;
+    if (diffHours < 24) return `${diffHours} saat əvvəl`;
+    if (diffDays === 1) return 'Dünən';
+    return date.toLocaleDateString('az-AZ', { day: 'numeric', month: 'short' });
   };
 
   return (
@@ -123,36 +71,16 @@ const NotificationsScreen = ({ onBack }: NotificationsScreenProps) => {
             </motion.button>
           )}
         </div>
-
-        {/* Filter Tabs */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => setActiveFilter('all')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              activeFilter === 'all'
-                ? 'bg-white text-primary'
-                : 'bg-white/20 text-white'
-            }`}
-          >
-            Hamısı
-          </button>
-          <button
-            onClick={() => setActiveFilter('unread')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              activeFilter === 'unread'
-                ? 'bg-white text-primary'
-                : 'bg-white/20 text-white'
-            }`}
-          >
-            Oxunmamış ({unreadCount})
-          </button>
-        </div>
       </div>
 
       {/* Notifications List */}
       <div className="px-5 pt-4">
         <AnimatePresence>
-          {filteredNotifications.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+            </div>
+          ) : notifications.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -165,8 +93,8 @@ const NotificationsScreen = ({ onBack }: NotificationsScreenProps) => {
             </motion.div>
           ) : (
             <div className="space-y-3">
-              {filteredNotifications.map((notification, index) => {
-                const Icon = notification.icon;
+              {notifications.map((notification, index) => {
+                const { icon: Icon, color } = getNotificationIcon(notification.notification_type);
                 return (
                   <motion.div
                     key={notification.id}
@@ -175,27 +103,27 @@ const NotificationsScreen = ({ onBack }: NotificationsScreenProps) => {
                     exit={{ opacity: 0, x: 20 }}
                     transition={{ delay: index * 0.05 }}
                     className={`bg-card rounded-2xl p-4 shadow-card border ${
-                      notification.isRead ? 'border-border/50' : 'border-primary/30 bg-primary/5'
+                      notification.is_read ? 'border-border/50' : 'border-primary/30 bg-primary/5'
                     }`}
                   >
                     <div className="flex items-start gap-4">
-                      <div className={`w-12 h-12 rounded-xl ${notification.color} flex items-center justify-center flex-shrink-0`}>
+                      <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center flex-shrink-0`}>
                         <Icon className="w-6 h-6" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
-                          <h3 className={`font-semibold ${notification.isRead ? 'text-foreground' : 'text-primary'}`}>
+                          <h3 className={`font-semibold ${notification.is_read ? 'text-foreground' : 'text-primary'}`}>
                             {notification.title}
                           </h3>
                           <span className="text-xs text-muted-foreground whitespace-nowrap">
-                            {notification.time}
+                            {formatTime(notification.created_at)}
                           </span>
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
                         
                         {/* Actions */}
                         <div className="flex gap-2 mt-3">
-                          {!notification.isRead && (
+                          {!notification.is_read && (
                             <motion.button
                               onClick={() => markAsRead(notification.id)}
                               className="flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary text-xs font-medium rounded-full"

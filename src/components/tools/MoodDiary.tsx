@@ -1,21 +1,14 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ArrowLeft, Heart, Calendar, Plus, ChevronLeft, 
-  ChevronRight, Sparkles, TrendingUp, MessageCircle
+  ArrowLeft, Heart, Calendar, Plus, 
+  Sparkles, TrendingUp
 } from 'lucide-react';
+import { useDailyLogs } from '@/hooks/useDailyLogs';
+import { hapticFeedback } from '@/lib/native';
 
 interface MoodDiaryProps {
   onBack: () => void;
-}
-
-interface MoodEntry {
-  id: string;
-  date: Date;
-  mood: number;
-  emoji: string;
-  notes: string;
-  symptoms: string[];
 }
 
 const moodEmojis = [
@@ -37,20 +30,25 @@ const symptomOptions = [
   { id: 'calm', label: 'Sakit', emoji: '😌' },
 ];
 
-const mockEntries: MoodEntry[] = [
-  { id: '1', date: new Date(Date.now() - 86400000), mood: 4, emoji: '🙂', notes: 'Gözəl gün idi', symptoms: ['happy', 'energetic'] },
-  { id: '2', date: new Date(Date.now() - 172800000), mood: 3, emoji: '😐', notes: 'Normal keçdi', symptoms: ['tired'] },
-  { id: '3', date: new Date(Date.now() - 259200000), mood: 5, emoji: '😊', notes: 'Körpənin ilk təpiyini hiss etdim!', symptoms: ['happy', 'emotional'] },
-];
-
 const MoodDiary = ({ onBack }: MoodDiaryProps) => {
   const [activeTab, setActiveTab] = useState<'log' | 'history' | 'insights'>('log');
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
-  const [entries, setEntries] = useState<MoodEntry[]>(mockEntries);
+  
+  const { logs, todayLog, loading, addLog } = useDailyLogs();
 
-  const toggleSymptom = (symptomId: string) => {
+  // Initialize from today's log if exists
+  useState(() => {
+    if (todayLog) {
+      setSelectedMood(todayLog.mood || null);
+      setSelectedSymptoms(todayLog.symptoms || []);
+      setNotes(todayLog.notes || '');
+    }
+  });
+
+  const toggleSymptom = async (symptomId: string) => {
+    await hapticFeedback.light();
     setSelectedSymptoms(prev => 
       prev.includes(symptomId) 
         ? prev.filter(s => s !== symptomId)
@@ -58,28 +56,22 @@ const MoodDiary = ({ onBack }: MoodDiaryProps) => {
     );
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (selectedMood === null) return;
     
-    const moodData = moodEmojis.find(m => m.value === selectedMood);
-    const newEntry: MoodEntry = {
-      id: Date.now().toString(),
-      date: new Date(),
+    await hapticFeedback.medium();
+    await addLog({
+      log_date: new Date().toISOString().split('T')[0],
       mood: selectedMood,
-      emoji: moodData?.emoji || '😐',
-      notes,
       symptoms: selectedSymptoms,
-    };
+      notes: notes || null,
+    });
     
-    setEntries([newEntry, ...entries]);
-    setSelectedMood(null);
-    setSelectedSymptoms([]);
-    setNotes('');
     setActiveTab('history');
   };
 
-  const averageMood = entries.length > 0 
-    ? (entries.reduce((sum, e) => sum + e.mood, 0) / entries.length).toFixed(1)
+  const averageMood = logs.length > 0 
+    ? (logs.reduce((sum, e) => sum + (e.mood || 0), 0) / logs.filter(l => l.mood).length).toFixed(1)
     : 0;
 
   return (
@@ -110,13 +102,13 @@ const MoodDiary = ({ onBack }: MoodDiaryProps) => {
             <div>
               <p className="text-white/70 text-sm">Ortalama əhval</p>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-3xl">{entries[0]?.emoji || '😊'}</span>
+                <span className="text-3xl">{logs[0]?.mood ? moodEmojis.find(m => m.value === logs[0].mood)?.emoji : '😊'}</span>
                 <span className="text-2xl font-bold text-white">{averageMood}</span>
               </div>
             </div>
             <div className="text-right">
               <p className="text-white/70 text-sm">Bu həftə</p>
-              <p className="text-xl font-bold text-white">{entries.length} qeyd</p>
+              <p className="text-xl font-bold text-white">{logs.length} qeyd</p>
             </div>
           </div>
         </motion.div>
@@ -246,49 +238,57 @@ const MoodDiary = ({ onBack }: MoodDiaryProps) => {
               className="space-y-4"
             >
               <h2 className="font-bold text-lg">Son qeydlər</h2>
-              {entries.map((entry, index) => (
-                <motion.div
-                  key={entry.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 rounded-xl bg-fuchsia-50 flex items-center justify-center text-2xl">
-                      {entry.emoji}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="font-semibold">
-                          {entry.date.toLocaleDateString('az-AZ', { weekday: 'long', day: 'numeric', month: 'short' })}
-                        </p>
-                        <div className="flex">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Heart 
-                              key={i}
-                              className={`w-4 h-4 ${i < entry.mood ? 'text-fuchsia-500 fill-current' : 'text-gray-200'}`}
-                            />
-                          ))}
+              {loading ? (
+                <div className="text-center py-8">
+                  <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+                </div>
+              ) : logs.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">Hələ qeyd yoxdur</p>
+              ) : (
+                logs.slice(0, 10).map((entry, index) => (
+                  <motion.div
+                    key={entry.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-14 h-14 rounded-xl bg-fuchsia-50 flex items-center justify-center text-2xl">
+                        {entry.mood ? moodEmojis.find(m => m.value === entry.mood)?.emoji : '😐'}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="font-semibold">
+                            {new Date(entry.log_date).toLocaleDateString('az-AZ', { weekday: 'long', day: 'numeric', month: 'short' })}
+                          </p>
+                          <div className="flex">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Heart 
+                                key={i}
+                                className={`w-4 h-4 ${i < (entry.mood || 0) ? 'text-fuchsia-500 fill-current' : 'text-gray-200'}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        {entry.notes && (
+                          <p className="text-sm text-muted-foreground mb-2">{entry.notes}</p>
+                        )}
+                        <div className="flex flex-wrap gap-1">
+                          {(entry.symptoms || []).map(s => {
+                            const symptom = symptomOptions.find(opt => opt.id === s);
+                            return symptom ? (
+                              <span key={s} className="text-xs bg-fuchsia-50 text-fuchsia-600 px-2 py-0.5 rounded-full">
+                                {symptom.emoji} {symptom.label}
+                              </span>
+                            ) : null;
+                          })}
                         </div>
                       </div>
-                      {entry.notes && (
-                        <p className="text-sm text-muted-foreground mb-2">{entry.notes}</p>
-                      )}
-                      <div className="flex flex-wrap gap-1">
-                        {entry.symptoms.map(s => {
-                          const symptom = symptomOptions.find(opt => opt.id === s);
-                          return symptom ? (
-                            <span key={s} className="text-xs bg-fuchsia-50 text-fuchsia-600 px-2 py-0.5 rounded-full">
-                              {symptom.emoji} {symptom.label}
-                            </span>
-                          ) : null;
-                        })}
-                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))
+              )}
             </motion.div>
           )}
 
@@ -306,7 +306,7 @@ const MoodDiary = ({ onBack }: MoodDiaryProps) => {
                   <h2 className="font-bold text-lg">AI Analizi</h2>
                 </div>
                 <p className="text-muted-foreground mb-4">
-                  Son bir həftədə əhvalınız ümumiyyətlə yaxşı olub. Ən çox "Xoşbəxtlik" və "Enerjili" simptomları qeyd etmisiniz.
+                  Son bir həftədə əhvalınız ümumiyyətlə yaxşı olub. Ən çox qeyd etdiyiniz simptomları izləyin.
                 </p>
                 <div className="bg-fuchsia-50 rounded-2xl p-4 border border-fuchsia-100">
                   <p className="text-fuchsia-800 text-sm">
@@ -315,12 +315,14 @@ const MoodDiary = ({ onBack }: MoodDiaryProps) => {
                 </div>
               </div>
 
-              {/* Weekly Mood Chart Placeholder */}
+              {/* Weekly Mood Chart */}
               <div className="bg-card rounded-3xl p-6 shadow-card border border-border/50">
                 <h3 className="font-bold mb-4">Həftəlik əhval trendi</h3>
                 <div className="flex items-end justify-between h-32 px-2">
                   {['B.e.', 'Ç.a.', 'Ç.', 'C.a.', 'C.', 'Ş.', 'B.'].map((day, i) => {
-                    const height = [60, 75, 50, 80, 90, 70, 85][i];
+                    // Use actual log data if available
+                    const dayLog = logs.find(l => new Date(l.log_date).getDay() === (i + 1) % 7);
+                    const height = dayLog?.mood ? (dayLog.mood / 5) * 100 : 50;
                     return (
                       <div key={day} className="flex flex-col items-center gap-2">
                         <motion.div
