@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { usePartnerNotifications } from './usePartnerNotifications';
 
 export interface DailyLog {
   id: string;
@@ -17,6 +18,7 @@ export interface DailyLog {
 
 export const useDailyLogs = () => {
   const { user } = useAuth();
+  const { notifyMoodUpdate, notifyWaterGoal } = usePartnerNotifications();
   const [logs, setLogs] = useState<DailyLog[]>([]);
   const [todayLog, setTodayLog] = useState<DailyLog | null>(null);
   const [loading, setLoading] = useState(true);
@@ -76,22 +78,30 @@ export const useDailyLogs = () => {
   const updateWaterIntake = async (amount: number) => {
     const today = new Date().toISOString().split('T')[0];
     const currentIntake = todayLog?.water_intake || 0;
+    const newIntake = currentIntake + amount;
     
-    return addLog({
+    const result = await addLog({
       log_date: today,
-      water_intake: currentIntake + amount,
+      water_intake: newIntake,
       mood: todayLog?.mood || null,
       symptoms: todayLog?.symptoms || null,
       temperature: todayLog?.temperature || null,
       bleeding: todayLog?.bleeding || null,
       notes: todayLog?.notes || null
     });
+
+    // Notify partner when water goal reached (8 glasses = 2000ml)
+    if (newIntake >= 2000 && currentIntake < 2000) {
+      notifyWaterGoal();
+    }
+
+    return result;
   };
 
-  const updateMood = async (mood: number) => {
+  const updateMood = useCallback(async (mood: number) => {
     const today = new Date().toISOString().split('T')[0];
     
-    return addLog({
+    const result = await addLog({
       log_date: today,
       mood,
       water_intake: todayLog?.water_intake || 0,
@@ -100,7 +110,14 @@ export const useDailyLogs = () => {
       bleeding: todayLog?.bleeding || null,
       notes: todayLog?.notes || null
     });
-  };
+
+    // Notify partner about mood update
+    if (result.data) {
+      notifyMoodUpdate(mood);
+    }
+
+    return result;
+  }, [todayLog, addLog, notifyMoodUpdate]);
 
   const updateSymptoms = async (symptoms: string[]) => {
     const today = new Date().toISOString().split('T')[0];
