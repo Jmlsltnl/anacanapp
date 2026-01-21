@@ -113,6 +113,33 @@ export type Database = {
         }
         Relationships: []
       }
+      baby_photos: {
+        Row: {
+          background_theme: string
+          created_at: string
+          id: string
+          prompt: string
+          storage_path: string
+          user_id: string
+        }
+        Insert: {
+          background_theme: string
+          created_at?: string
+          id?: string
+          prompt: string
+          storage_path: string
+          user_id: string
+        }
+        Update: {
+          background_theme?: string
+          created_at?: string
+          id?: string
+          prompt?: string
+          storage_path?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       contractions: {
         Row: {
           created_at: string
