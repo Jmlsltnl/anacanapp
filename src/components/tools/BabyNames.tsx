@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Search, Heart, Shuffle, ChevronRight, Star } from 'lucide-react';
+import { ArrowLeft, Search, Heart, Shuffle, Star } from 'lucide-react';
+import { useFavoriteNames } from '@/hooks/useFavoriteNames';
 
 interface Name {
   name: string;
@@ -40,8 +41,8 @@ interface BabyNamesProps {
 const BabyNames = ({ onBack }: BabyNamesProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [genderFilter, setGenderFilter] = useState<'all' | 'boy' | 'girl'>('all');
-  const [favorites, setFavorites] = useState<string[]>([]);
   const [selectedName, setSelectedName] = useState<Name | null>(null);
+  const { favorites, loading, toggleFavorite, isFavorite } = useFavoriteNames();
 
   const filteredNames = names.filter(name => {
     const matchesSearch = name.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -50,10 +51,8 @@ const BabyNames = ({ onBack }: BabyNamesProps) => {
     return matchesSearch && matchesGender;
   }).sort((a, b) => b.popularity - a.popularity);
 
-  const toggleFavorite = (name: string) => {
-    setFavorites(prev => 
-      prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name]
-    );
+  const handleToggleFavorite = (name: Name) => {
+    toggleFavorite(name.name, name.gender, name.meaning, name.origin);
   };
 
   const getRandomName = () => {
@@ -61,6 +60,14 @@ const BabyNames = ({ onBack }: BabyNamesProps) => {
     const random = filtered[Math.floor(Math.random() * filtered.length)];
     setSelectedName(random);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -137,12 +144,12 @@ const BabyNames = ({ onBack }: BabyNamesProps) => {
               Seçilmişlər ({favorites.length})
             </h3>
             <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
-              {favorites.map((name) => (
+              {favorites.map((fav) => (
                 <span
-                  key={name}
+                  key={fav.id}
                   className="px-4 py-2 rounded-full bg-primary/10 text-primary font-bold text-sm whitespace-nowrap"
                 >
-                  {name}
+                  {fav.name}
                 </span>
               ))}
             </div>
@@ -180,12 +187,12 @@ const BabyNames = ({ onBack }: BabyNamesProps) => {
               <motion.button
                 onClick={(e) => {
                   e.stopPropagation();
-                  toggleFavorite(name.name);
+                  handleToggleFavorite(name);
                 }}
                 className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
                 whileTap={{ scale: 0.8 }}
               >
-                <Heart className={`w-5 h-5 ${favorites.includes(name.name) ? 'text-primary fill-primary' : 'text-muted-foreground'}`} />
+                <Heart className={`w-5 h-5 ${isFavorite(name.name) ? 'text-primary fill-primary' : 'text-muted-foreground'}`} />
               </motion.button>
             </motion.button>
           ))}
@@ -251,17 +258,17 @@ const BabyNames = ({ onBack }: BabyNamesProps) => {
 
               <button
                 onClick={() => {
-                  toggleFavorite(selectedName.name);
+                  handleToggleFavorite(selectedName);
                   setSelectedName(null);
                 }}
                 className={`w-full h-14 rounded-2xl font-bold flex items-center justify-center gap-2 ${
-                  favorites.includes(selectedName.name)
+                  isFavorite(selectedName.name)
                     ? 'bg-muted text-muted-foreground'
                     : 'gradient-primary text-white shadow-button'
                 }`}
               >
-                <Heart className={`w-5 h-5 ${favorites.includes(selectedName.name) ? '' : 'fill-current'}`} />
-                {favorites.includes(selectedName.name) ? 'Seçilmişlərdən çıxar' : 'Seçilmişlərə əlavə et'}
+                <Heart className={`w-5 h-5 ${isFavorite(selectedName.name) ? '' : 'fill-current'}`} />
+                {isFavorite(selectedName.name) ? 'Seçilmişlərdən çıxar' : 'Seçilmişlərə əlavə et'}
               </button>
             </motion.div>
           </motion.div>

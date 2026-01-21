@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ArrowLeft, Activity, Play, Pause, Clock, 
+  ArrowLeft, Clock, 
   Heart, Flame, Check, ChevronRight, Star,
-  RefreshCw, Award
+  Award
 } from 'lucide-react';
+import { useExerciseLogs } from '@/hooks/useExerciseLogs';
+import { useUserStore } from '@/store/userStore';
 
 interface ExercisesProps {
   onBack: () => void;
@@ -93,25 +95,37 @@ const exercises: Exercise[] = [
 
 const Exercises = ({ onBack }: ExercisesProps) => {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
-  const [completedToday, setCompletedToday] = useState<string[]>(['1']);
-  const currentTrimester = 2;
+  const { loading, addLog, isCompletedToday, getTodayStats, getStreak } = useExerciseLogs();
+  const { getPregnancyData } = useUserStore();
+  
+  const pregnancyData = getPregnancyData();
+  const currentTrimester = pregnancyData?.trimester || 2;
 
   const filteredExercises = exercises.filter(e => e.trimester.includes(currentTrimester));
-  const totalCaloriesBurned = completedToday.reduce((sum, id) => {
-    const exercise = exercises.find(e => e.id === id);
-    return sum + (exercise?.calories || 0);
-  }, 0);
+  const todayStats = getTodayStats();
+  const streak = getStreak();
 
-  const handleComplete = () => {
-    if (selectedExercise && !completedToday.includes(selectedExercise.id)) {
-      setCompletedToday([...completedToday, selectedExercise.id]);
+  const handleComplete = async () => {
+    if (selectedExercise) {
+      await addLog(
+        selectedExercise.id,
+        selectedExercise.name,
+        selectedExercise.duration,
+        selectedExercise.calories
+      );
     }
     setSelectedExercise(null);
     setCurrentStep(0);
-    setIsPlaying(false);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-background pb-28">
@@ -142,21 +156,21 @@ const Exercises = ({ onBack }: ExercisesProps) => {
               <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-2">
                 <Check className="w-6 h-6 text-white" />
               </div>
-              <p className="text-2xl font-bold text-white">{completedToday.length}</p>
+              <p className="text-2xl font-bold text-white">{todayStats.completedCount}</p>
               <p className="text-white/70 text-xs">Tamamlandı</p>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-2">
                 <Flame className="w-6 h-6 text-white" />
               </div>
-              <p className="text-2xl font-bold text-white">{totalCaloriesBurned}</p>
+              <p className="text-2xl font-bold text-white">{todayStats.totalCalories}</p>
               <p className="text-white/70 text-xs">Kalori</p>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-2">
                 <Award className="w-6 h-6 text-white" />
               </div>
-              <p className="text-2xl font-bold text-white">3</p>
+              <p className="text-2xl font-bold text-white">{streak}</p>
               <p className="text-white/70 text-xs">Günlük zolaq</p>
             </div>
           </div>
@@ -191,7 +205,7 @@ const Exercises = ({ onBack }: ExercisesProps) => {
               {/* Exercise List */}
               <h2 className="font-bold text-lg pt-2">Sizin üçün məşqlər</h2>
               {filteredExercises.map((exercise, index) => {
-                const isCompleted = completedToday.includes(exercise.id);
+                const isCompleted = isCompletedToday(exercise.id);
                 return (
                   <motion.button
                     key={exercise.id}

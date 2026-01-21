@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, Pause, Volume2, VolumeX } from 'lucide-react';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 interface Sound {
   id: string;
@@ -29,11 +30,27 @@ interface WhiteNoiseProps {
 }
 
 const WhiteNoise = ({ onBack }: WhiteNoiseProps) => {
+  const { preferences, loading, updateWhiteNoiseVolume, updateWhiteNoiseTimer, updateLastWhiteNoiseSound } = useUserPreferences();
+  
   const [activeSound, setActiveSound] = useState<string | null>(null);
   const [volume, setVolume] = useState(70);
   const [isMuted, setIsMuted] = useState(false);
   const [timer, setTimer] = useState<number | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+
+  // Initialize from preferences
+  useEffect(() => {
+    if (preferences) {
+      setVolume(preferences.white_noise_volume || 70);
+      setTimer(preferences.white_noise_timer);
+      if (preferences.last_white_noise_sound) {
+        setActiveSound(preferences.last_white_noise_sound);
+        if (preferences.white_noise_timer) {
+          setTimeRemaining(preferences.white_noise_timer * 60);
+        }
+      }
+    }
+  }, [preferences]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -43,6 +60,7 @@ const WhiteNoise = ({ onBack }: WhiteNoiseProps) => {
         setTimeRemaining(prev => {
           if (prev === null || prev <= 1) {
             setActiveSound(null);
+            updateLastWhiteNoiseSound(null);
             return null;
           }
           return prev - 1;
@@ -55,15 +73,33 @@ const WhiteNoise = ({ onBack }: WhiteNoiseProps) => {
     };
   }, [timeRemaining]);
 
-  const handleSoundToggle = (soundId: string) => {
+  const handleSoundToggle = async (soundId: string) => {
     if (activeSound === soundId) {
       setActiveSound(null);
       setTimeRemaining(null);
+      await updateLastWhiteNoiseSound(null);
     } else {
       setActiveSound(soundId);
+      await updateLastWhiteNoiseSound(soundId);
       if (timer) {
         setTimeRemaining(timer * 60);
       }
+    }
+  };
+
+  const handleVolumeChange = async (newVolume: number) => {
+    setVolume(newVolume);
+    setIsMuted(false);
+    await updateWhiteNoiseVolume(newVolume);
+  };
+
+  const handleTimerChange = async (newTimer: number | null) => {
+    setTimer(newTimer);
+    await updateWhiteNoiseTimer(newTimer);
+    if (activeSound && newTimer) {
+      setTimeRemaining(newTimer * 60);
+    } else {
+      setTimeRemaining(null);
     }
   };
 
@@ -79,6 +115,14 @@ const WhiteNoise = ({ onBack }: WhiteNoiseProps) => {
     { value: 30, label: '30 dəq' },
     { value: 60, label: '1 saat' },
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -153,7 +197,7 @@ const WhiteNoise = ({ onBack }: WhiteNoiseProps) => {
                 </motion.button>
                 
                 <motion.button
-                  onClick={() => setActiveSound(null)}
+                  onClick={() => handleSoundToggle(activeSound)}
                   className="w-16 h-16 rounded-full bg-white flex items-center justify-center"
                   whileTap={{ scale: 0.9 }}
                 >
@@ -179,10 +223,7 @@ const WhiteNoise = ({ onBack }: WhiteNoiseProps) => {
               min="0"
               max="100"
               value={isMuted ? 0 : volume}
-              onChange={(e) => {
-                setVolume(parseInt(e.target.value));
-                setIsMuted(false);
-              }}
+              onChange={(e) => handleVolumeChange(parseInt(e.target.value))}
               className="flex-1 h-2 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
             />
             <Volume2 className="w-5 h-5 text-muted-foreground" />
@@ -196,14 +237,7 @@ const WhiteNoise = ({ onBack }: WhiteNoiseProps) => {
             {timerOptions.map((option) => (
               <button
                 key={option.label}
-                onClick={() => {
-                  setTimer(option.value);
-                  if (activeSound && option.value) {
-                    setTimeRemaining(option.value * 60);
-                  } else {
-                    setTimeRemaining(null);
-                  }
-                }}
+                onClick={() => handleTimerChange(option.value)}
                 className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all ${
                   timer === option.value
                     ? 'gradient-primary text-white shadow-button'
