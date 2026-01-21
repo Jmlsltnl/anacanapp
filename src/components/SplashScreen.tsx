@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion';
-import { useEffect } from 'react';
+import { useEffect, forwardRef } from 'react';
 
 interface SplashScreenProps {
   onComplete: () => void;
 }
 
-const SplashScreen = ({ onComplete }: SplashScreenProps) => {
+const SplashScreen = forwardRef<HTMLDivElement, SplashScreenProps>(({ onComplete }, ref) => {
   useEffect(() => {
     const timer = setTimeout(onComplete, 2500);
     return () => clearTimeout(timer);
@@ -13,6 +13,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
 
   return (
     <motion.div
+      ref={ref}
       className="fixed inset-0 flex flex-col items-center justify-center gradient-primary safe-top safe-bottom overflow-hidden"
       initial={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 1.1 }}
@@ -214,6 +215,8 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       </motion.div>
     </motion.div>
   );
-};
+});
+
+SplashScreen.displayName = 'SplashScreen';
 
 export default SplashScreen;
