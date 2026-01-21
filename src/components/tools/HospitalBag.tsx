@@ -1,59 +1,14 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Check, Briefcase, Baby, User, Share2 } from 'lucide-react';
-
-interface ChecklistItem {
-  id: string;
-  name: string;
-  category: 'mom' | 'baby' | 'documents';
-  checked: boolean;
-}
-
-const initialChecklist: ChecklistItem[] = [
-  // Ana üçün
-  { id: '1', name: 'Gecə köynəyi (2-3 ədəd)', category: 'mom', checked: false },
-  { id: '2', name: 'Xalat', category: 'mom', checked: false },
-  { id: '3', name: 'Ayaqqabı (terlik)', category: 'mom', checked: false },
-  { id: '4', name: 'Diş fırçası və pasta', category: 'mom', checked: false },
-  { id: '5', name: 'Şampun və sabun', category: 'mom', checked: false },
-  { id: '6', name: 'Əmzirmə südqəbi (2-3 ədəd)', category: 'mom', checked: false },
-  { id: '7', name: 'Doğuşdan sonra gigiyenik bezlər', category: 'mom', checked: false },
-  { id: '8', name: 'Rahat alt paltarları', category: 'mom', checked: false },
-  { id: '9', name: 'Dodaq balzamı', category: 'mom', checked: false },
-  { id: '10', name: 'Telefon şarj cihazı', category: 'mom', checked: false },
-  
-  // Körpə üçün
-  { id: '11', name: 'Körpə paltarları (3-4 dəst)', category: 'baby', checked: false },
-  { id: '12', name: 'Corablar', category: 'baby', checked: false },
-  { id: '13', name: 'Papaq', category: 'baby', checked: false },
-  { id: '14', name: 'Əlcəklər', category: 'baby', checked: false },
-  { id: '15', name: 'Bezlər (yenidoğulmuş ölçüsü)', category: 'baby', checked: false },
-  { id: '16', name: 'Yaş salfetlər', category: 'baby', checked: false },
-  { id: '17', name: 'Körpə yağı/losyonu', category: 'baby', checked: false },
-  { id: '18', name: 'Körpə yorğanı', category: 'baby', checked: false },
-  { id: '19', name: 'Avtomobil oturacağı', category: 'baby', checked: false },
-  
-  // Sənədlər
-  { id: '20', name: 'Şəxsiyyət vəsiqəsi', category: 'documents', checked: false },
-  { id: '21', name: 'Tibbi sığorta kartı', category: 'documents', checked: false },
-  { id: '22', name: 'Doğuş planı', category: 'documents', checked: false },
-  { id: '23', name: 'Həkim kontaktları', category: 'documents', checked: false },
-  { id: '24', name: 'Xəstəxana qeydiyyatı', category: 'documents', checked: false },
-];
+import { useHospitalBag } from '@/hooks/useHospitalBag';
 
 interface HospitalBagProps {
   onBack: () => void;
 }
 
 const HospitalBag = ({ onBack }: HospitalBagProps) => {
-  const [checklist, setChecklist] = useState(initialChecklist);
+  const { items, loading, toggleItem, getProgress, checkedCount, totalCount } = useHospitalBag();
   const [activeCategory, setActiveCategory] = useState<'all' | 'mom' | 'baby' | 'documents'>('all');
-
-  const toggleItem = (id: string) => {
-    setChecklist(prev => prev.map(item => 
-      item.id === id ? { ...item, checked: !item.checked } : item
-    ));
-  };
 
   const categories = [
     { id: 'all', label: 'Hamısı', icon: Briefcase, emoji: '👜' },
@@ -63,11 +18,18 @@ const HospitalBag = ({ onBack }: HospitalBagProps) => {
   ];
 
   const filteredItems = activeCategory === 'all' 
-    ? checklist 
-    : checklist.filter(item => item.category === activeCategory);
+    ? items 
+    : items.filter(item => item.category === activeCategory);
 
-  const checkedCount = checklist.filter(item => item.checked).length;
-  const progress = (checkedCount / checklist.length) * 100;
+  const progress = getProgress();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -99,7 +61,7 @@ const HospitalBag = ({ onBack }: HospitalBagProps) => {
         <div className="bg-white/20 rounded-2xl p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-white/90 font-medium">Hazırlıq</span>
-            <span className="text-white font-bold">{checkedCount}/{checklist.length}</span>
+            <span className="text-white font-bold">{checkedCount}/{totalCount}</span>
           </div>
           <div className="h-3 bg-white/20 rounded-full overflow-hidden">
             <motion.div 
@@ -139,25 +101,25 @@ const HospitalBag = ({ onBack }: HospitalBagProps) => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.03 }}
-              onClick={() => toggleItem(item.id)}
+              onClick={() => toggleItem(item.item_id)}
               className={`w-full p-4 rounded-2xl text-left flex items-center gap-4 transition-all ${
-                item.checked
+                item.is_checked
                   ? 'bg-primary/10 border-2 border-primary/30'
                   : 'bg-card border-2 border-border/50 shadow-card'
               }`}
             >
               <motion.div
                 className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
-                  item.checked ? 'gradient-primary' : 'bg-muted'
+                  item.is_checked ? 'gradient-primary' : 'bg-muted'
                 }`}
-                animate={item.checked ? { scale: [1, 1.2, 1] } : {}}
+                animate={item.is_checked ? { scale: [1, 1.2, 1] } : {}}
               >
-                {item.checked && <Check className="w-5 h-5 text-white" />}
+                {item.is_checked && <Check className="w-5 h-5 text-white" />}
               </motion.div>
               <span className={`flex-1 font-medium transition-all ${
-                item.checked ? 'text-primary line-through' : 'text-foreground'
+                item.is_checked ? 'text-primary line-through' : 'text-foreground'
               }`}>
-                {item.name}
+                {item.item_name}
               </span>
               <span className={`text-xs px-2 py-1 rounded-full ${
                 item.category === 'mom' ? 'bg-pink-100 text-pink-700' :
@@ -187,4 +149,5 @@ const HospitalBag = ({ onBack }: HospitalBagProps) => {
   );
 };
 
+import { useState } from 'react';
 export default HospitalBag;

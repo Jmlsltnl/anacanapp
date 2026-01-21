@@ -206,6 +206,99 @@ export type Database = {
         }
         Relationships: []
       }
+      exercise_logs: {
+        Row: {
+          calories_burned: number
+          completed_at: string
+          duration_minutes: number
+          exercise_id: string
+          exercise_name: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          calories_burned: number
+          completed_at?: string
+          duration_minutes: number
+          exercise_id: string
+          exercise_name: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          calories_burned?: number
+          completed_at?: string
+          duration_minutes?: number
+          exercise_id?: string
+          exercise_name?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      favorite_names: {
+        Row: {
+          created_at: string
+          gender: string
+          id: string
+          meaning: string | null
+          name: string
+          origin: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          gender: string
+          id?: string
+          meaning?: string | null
+          name: string
+          origin?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          gender?: string
+          id?: string
+          meaning?: string | null
+          name?: string
+          origin?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      hospital_bag_items: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          is_checked: boolean
+          item_id: string
+          item_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          is_checked?: boolean
+          item_id: string
+          item_name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_checked?: boolean
+          item_id?: string
+          item_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       kick_sessions: {
         Row: {
           created_at: string
@@ -442,6 +535,36 @@ export type Database = {
           priority?: string | null
           quantity?: number | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          last_white_noise_sound: string | null
+          updated_at: string
+          user_id: string
+          white_noise_timer: number | null
+          white_noise_volume: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_white_noise_sound?: string | null
+          updated_at?: string
+          user_id: string
+          white_noise_timer?: number | null
+          white_noise_volume?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_white_noise_sound?: string | null
+          updated_at?: string
+          user_id?: string
+          white_noise_timer?: number | null
+          white_noise_volume?: number | null
         }
         Relationships: []
       }

@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Utensils, Apple, Coffee, Droplets, 
-  Plus, Check, Star, Leaf, Fish, Milk, Wheat,
-  AlertTriangle, ChevronRight
+  Plus, Star
 } from 'lucide-react';
+import { useDailyLogs } from '@/hooks/useDailyLogs';
 
 interface NutritionProps {
   onBack: () => void;
@@ -18,13 +18,6 @@ interface FoodItem {
   icon: string;
   benefits: string[];
   isSafe: boolean;
-}
-
-interface MealLog {
-  id: string;
-  type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
-  foods: string[];
-  time: Date;
 }
 
 const recommendedFoods: FoodItem[] = [
@@ -47,17 +40,27 @@ const mealTypes = [
 
 const Nutrition = ({ onBack }: NutritionProps) => {
   const [activeTab, setActiveTab] = useState<'log' | 'foods' | 'water'>('log');
-  const [waterGlasses, setWaterGlasses] = useState(3);
   const [selectedMeal, setSelectedMeal] = useState<string | null>(null);
-  const [todayCalories, setTodayCalories] = useState(1250);
+  const { todayLog, loading, updateWaterIntake } = useDailyLogs();
+  
+  const waterGlasses = todayLog?.water_intake || 0;
+  const todayCalories = 1250; // This could be calculated from meal logs in future
   const targetCalories = 2200;
   const targetWater = 8;
 
-  const addWater = () => {
+  const addWater = async () => {
     if (waterGlasses < 12) {
-      setWaterGlasses(prev => prev + 1);
+      await updateWaterIntake(waterGlasses + 1);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-background pb-28">
