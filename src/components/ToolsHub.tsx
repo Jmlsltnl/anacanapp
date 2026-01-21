@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Shield, Timer, Scale, Baby, Briefcase, 
   Volume2, Heart, Footprints, ChevronRight,
-  Utensils, Activity, ArrowLeft
+  Utensils, Activity, ArrowLeft, Camera
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import SafetyLookup from './tools/SafetyLookup';
@@ -16,6 +16,7 @@ import HospitalBag from './tools/HospitalBag';
 import Nutrition from './tools/Nutrition';
 import Exercises from './tools/Exercises';
 import MoodDiary from './tools/MoodDiary';
+import BabyPhotoshoot from './tools/BabyPhotoshoot';
 
 interface Tool {
   id: string;
@@ -27,6 +28,7 @@ interface Tool {
 }
 
 const tools: Tool[] = [
+  { id: 'photoshoot', name: 'Fotosessiya', description: 'AI körpə fotoları', icon: Camera, color: 'text-rose-600', bgColor: 'bg-rose-50' },
   { id: 'safety', name: 'Təhlükəsizlik', description: 'Qida və fəaliyyət yoxlayın', icon: Shield, color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
   { id: 'kick', name: 'Təpik Sayğacı', description: 'Körpə hərəkətlərini izləyin', icon: Footprints, color: 'text-pink-600', bgColor: 'bg-pink-50' },
   { id: 'contraction', name: 'Sancı Ölçən', description: '5-1-1 qaydası ilə izləyin', icon: Timer, color: 'text-violet-600', bgColor: 'bg-violet-50' },
@@ -49,6 +51,7 @@ const ToolsHub = () => {
   );
 
   // Render active tool
+  if (activeTool === 'photoshoot') return <BabyPhotoshoot onBack={() => setActiveTool(null)} />;
   if (activeTool === 'safety') return <SafetyLookup onBack={() => setActiveTool(null)} />;
   if (activeTool === 'kick') return <KickCounter onBack={() => setActiveTool(null)} />;
   if (activeTool === 'contraction') return <ContractionTimer onBack={() => setActiveTool(null)} />;
@@ -80,10 +83,10 @@ const ToolsHub = () => {
         />
       </motion.div>
 
-      {/* Featured Tool */}
+      {/* Featured Tool - Photoshoot */}
       <motion.button
-        onClick={() => setActiveTool('safety')}
-        className="w-full relative overflow-hidden rounded-3xl gradient-primary p-5 mb-6 shadow-elevated text-left"
+        onClick={() => setActiveTool('photoshoot')}
+        className="w-full relative overflow-hidden rounded-3xl bg-gradient-to-r from-rose-500 to-pink-600 p-5 mb-6 shadow-elevated text-left"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         whileHover={{ scale: 1.01 }}
@@ -92,11 +95,11 @@ const ToolsHub = () => {
         <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 blur-xl" />
         <div className="relative z-10 flex items-center gap-4">
           <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center">
-            <Shield className="w-8 h-8 text-white" />
+            <Camera className="w-8 h-8 text-white" />
           </div>
           <div className="flex-1">
-            <h3 className="text-white font-bold text-lg">Təhlükəsizlik Sorğusu</h3>
-            <p className="text-white/80 text-sm">Qida və fəaliyyətlərin təhlükəsizliyini yoxlayın</p>
+            <h3 className="text-white font-bold text-lg">Körpə Fotosessiyası</h3>
+            <p className="text-white/80 text-sm">AI ilə sehrli körpə fotoları yaradın</p>
           </div>
           <ChevronRight className="w-6 h-6 text-white/60" />
         </div>

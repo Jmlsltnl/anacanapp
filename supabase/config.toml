@@ -1,1 +1,7 @@
 project_id = "tntbjulojatnrqmylorp"
+
+[functions.dr-anacan-chat]
+verify_jwt = false
+
+[functions.generate-baby-photo]
+verify_jwt = false
