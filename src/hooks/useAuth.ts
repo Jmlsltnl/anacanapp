@@ -230,7 +230,11 @@ export const useAuth = () => {
 
   // Sync profile data to Zustand store
   const syncProfileToStore = (profileData: Profile | null) => {
-    if (!profileData) return;
+    if (!profileData) {
+      // No profile = not onboarded
+      setOnboarded(false);
+      return;
+    }
 
     // Set partner code from profile
     if (profileData.partner_code) {
@@ -269,10 +273,13 @@ export const useAuth = () => {
       setRole('woman');
     }
 
-    // Set life stage and onboarded status
+    // Set life stage and onboarded status based on life_stage value
     if (profileData.life_stage) {
       setLifeStage(profileData.life_stage as any);
       setOnboarded(true);
+    } else {
+      // Profile exists but no life_stage means not yet onboarded
+      setOnboarded(false);
     }
   };
 
