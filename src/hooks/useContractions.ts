@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
+import { usePartnerNotifications } from './usePartnerNotifications';
 
 export interface Contraction {
   id: string;
@@ -17,6 +18,8 @@ export const useContractions = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { notifyContractionStarted, notifyContraction511 } = usePartnerNotifications();
+  const has511Notified = useRef(false);
 
   const fetchContractions = async () => {
     if (!user) return;
@@ -54,6 +57,9 @@ export const useContractions = () => {
 
       if (error) throw error;
 
+      // Notify partner about contraction
+      notifyContractionStarted(durationSeconds, intervalSeconds);
+
       await fetchContractions();
       return data;
     } catch (error: any) {
@@ -69,7 +75,7 @@ export const useContractions = () => {
 
   const getStats = () => {
     const recent = contractions.slice(0, 5);
-    if (recent.length === 0) return { avgDuration: 0, avgInterval: 0 };
+    if (recent.length === 0) return { avgDuration: 0, avgInterval: 0, is511: false, count: 0 };
 
     const avgDuration = Math.round(
       recent.reduce((sum, c) => sum + c.duration_seconds, 0) / recent.length
@@ -82,6 +88,12 @@ export const useContractions = () => {
 
     // 5-1-1 Rule: contractions 5 min apart, 1 min duration, for 1 hour
     const is511 = avgInterval > 0 && avgInterval <= 300 && avgDuration >= 60 && recent.length >= 3;
+
+    // Notify partner if 5-1-1 rule triggered and not already notified
+    if (is511 && !has511Notified.current) {
+      has511Notified.current = true;
+      notifyContraction511();
+    }
 
     return { avgDuration, avgInterval, is511, count: contractions.length };
   };

@@ -149,12 +149,66 @@ export const usePartnerMessages = () => {
         },
         (payload) => {
           fetchMessages();
-          // Show toast for new love messages
-          if (payload.new && (payload.new as any).message_type === 'love') {
-            toast({
-              title: 'Sevgi aldınız! ❤️',
-              description: 'Partnyorunuz sizə sevgi göndərdi',
-            });
+          const newMessage = payload.new as any;
+          
+          if (newMessage) {
+            // Parse notification content if available
+            let notificationData: any = null;
+            try {
+              if (newMessage.content) {
+                notificationData = JSON.parse(newMessage.content);
+              }
+            } catch {
+              // Content is not JSON, use as-is
+            }
+
+            // Show appropriate toast based on message type
+            switch (newMessage.message_type) {
+              case 'love':
+                toast({
+                  title: 'Sevgi aldınız! ❤️',
+                  description: 'Partnyorunuz sizə sevgi göndərdi',
+                });
+                break;
+              case 'mood_update':
+                toast({
+                  title: notificationData?.title || 'Əhval yeniləndi 💭',
+                  description: notificationData?.body || 'Partnyorunuz əhvalını qeyd etdi',
+                });
+                break;
+              case 'contraction_started':
+                toast({
+                  title: notificationData?.title || 'Sancı başladı! ⏱️',
+                  description: notificationData?.body || 'Partnyorunuz sancı qeyd etdi',
+                });
+                break;
+              case 'contraction_511':
+                toast({
+                  title: '⚠️ 5-1-1 Qaydası!',
+                  description: 'Xəstəxanaya getmə vaxtı ola bilər!',
+                  // Use destructive variant for urgent notifications
+                });
+                break;
+              case 'kick_session':
+                toast({
+                  title: notificationData?.title || 'Körpə təpik atdı! 👶',
+                  description: notificationData?.body,
+                });
+                break;
+              case 'water_goal':
+                toast({
+                  title: notificationData?.title || 'Su hədəfinə çatdı! 💧',
+                  description: 'Partnyorunuz gündəlik su hədəfinə çatdı!',
+                });
+                break;
+              default:
+                if (notificationData?.title) {
+                  toast({
+                    title: notificationData.title,
+                    description: notificationData.body,
+                  });
+                }
+            }
           }
         }
       )
@@ -163,7 +217,7 @@ export const usePartnerMessages = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, toast]);
 
   return {
     messages,
