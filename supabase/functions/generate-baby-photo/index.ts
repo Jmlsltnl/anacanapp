@@ -71,46 +71,43 @@ serve(async (req) => {
 
     console.log("Generating image with prompt:", prompt);
 
-    // Call Lovable AI Gateway for image generation
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
+    // Call Gemini API directly for image generation
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) {
       return new Response(JSON.stringify({ error: "AI service not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    // Use Gemini's Imagen model for image generation
+    const model = "gemini-2.0-flash-exp-image-generation";
+    const baseUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+
+    const aiResponse = await fetch(`${baseUrl}?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image-preview",
-        messages: [
+        contents: [
           {
-            role: "user",
-            content: prompt,
+            parts: [{ text: prompt }],
           },
         ],
-        modalities: ["image", "text"],
+        generationConfig: {
+          responseModalities: ["TEXT", "IMAGE"],
+        },
       }),
     });
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
-      console.error("AI Gateway error:", aiResponse.status, errorText);
+      console.error("Gemini API error:", aiResponse.status, errorText);
       
       if (aiResponse.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later." }), {
           status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (aiResponse.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted. Please add credits." }), {
-          status: 402,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
@@ -122,9 +119,21 @@ serve(async (req) => {
     }
 
     const aiData = await aiResponse.json();
-    console.log("AI Response received");
+    console.log("Gemini Response received");
 
-    const imageData = aiData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    // Extract image from Gemini response
+    const parts = aiData.candidates?.[0]?.content?.parts || [];
+    let imageData: string | null = null;
+    let imageFormat = "png";
+
+    for (const part of parts) {
+      if (part.inlineData) {
+        imageData = part.inlineData.data;
+        imageFormat = part.inlineData.mimeType?.split("/")?.[1] || "png";
+        break;
+      }
+    }
+
     if (!imageData) {
       console.error("No image in response:", JSON.stringify(aiData));
       return new Response(JSON.stringify({ error: "No image generated" }), {
@@ -133,18 +142,8 @@ serve(async (req) => {
       });
     }
 
-    // Extract base64 data
-    const base64Match = imageData.match(/^data:image\/(\w+);base64,(.+)$/);
-    if (!base64Match) {
-      return new Response(JSON.stringify({ error: "Invalid image format" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const imageFormat = base64Match[1];
-    const base64Data = base64Match[2];
-    const binaryData = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
+    // Convert base64 to binary
+    const binaryData = Uint8Array.from(atob(imageData), (c) => c.charCodeAt(0));
 
     // Upload to Supabase Storage
     const fileName = `${user.id}/${Date.now()}-${backgroundTheme}.${imageFormat}`;

@@ -79,15 +79,40 @@ Partnyor üçün tövsiyələr:
   }
 };
 
+// Convert messages to Gemini format
+const convertToGeminiFormat = (messages: ChatMessage[], systemPrompt: string) => {
+  const contents: { role: string; parts: { text: string }[] }[] = [];
+  
+  // Add system prompt as first user message for context
+  contents.push({
+    role: 'user',
+    parts: [{ text: `System instructions: ${systemPrompt}` }]
+  });
+  contents.push({
+    role: 'model',
+    parts: [{ text: 'Başa düşdüm. Sizə Azərbaycan dilində kömək etməyə hazıram. 🌸' }]
+  });
+
+  // Add conversation messages
+  for (const msg of messages) {
+    contents.push({
+      role: msg.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: msg.content }]
+    });
+  }
+
+  return contents;
+};
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const apiKey = Deno.env.get('LOVABLE_API_KEY');
+    const apiKey = Deno.env.get('GEMINI_API_KEY');
     if (!apiKey) {
-      throw new Error('LOVABLE_API_KEY not configured');
+      throw new Error('GEMINI_API_KEY not configured');
     }
 
     const { messages, lifeStage, pregnancyWeek, isPartner, stream = false } = await req.json() as ChatRequest;
@@ -97,37 +122,78 @@ Deno.serve(async (req) => {
     }
 
     const systemPrompt = getSystemPrompt(lifeStage || 'bump', pregnancyWeek, isPartner);
+    const contents = convertToGeminiFormat(messages, systemPrompt);
 
-    const fullMessages = [
-      { role: 'system', content: systemPrompt },
-      ...messages
-    ];
+    const model = 'gemini-2.0-flash';
+    const baseUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}`;
 
     // Streaming response
     if (stream) {
-      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      const response = await fetch(`${baseUrl}:streamGenerateContent?key=${apiKey}&alt=sse`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: 'google/gemini-3-pro-preview',
-          messages: fullMessages,
-          max_tokens: 1024,
-          temperature: 0.7,
-          stream: true,
+          contents,
+          generationConfig: {
+            maxOutputTokens: 1024,
+            temperature: 0.7,
+          },
+          safetySettings: [
+            { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+            { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+            { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+            { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' },
+          ],
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.text();
-        console.error('AI Gateway error:', errorData);
-        throw new Error(`AI Gateway error: ${response.status}`);
+        console.error('Gemini API error:', errorData);
+        throw new Error(`Gemini API error: ${response.status}`);
       }
 
-      // Return streaming response
-      return new Response(response.body, {
+      // Transform Gemini SSE format to OpenAI-compatible format
+      const transformStream = new TransformStream({
+        transform(chunk, controller) {
+          const text = new TextDecoder().decode(chunk);
+          const lines = text.split('\n');
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const jsonStr = line.slice(6);
+              if (jsonStr.trim() === '[DONE]') {
+                controller.enqueue(new TextEncoder().encode('data: [DONE]\n\n'));
+                continue;
+              }
+              
+              try {
+                const data = JSON.parse(jsonStr);
+                const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                
+                if (content) {
+                  const openAIFormat = {
+                    choices: [{
+                      delta: { content },
+                      index: 0,
+                      finish_reason: null,
+                    }],
+                  };
+                  controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify(openAIFormat)}\n\n`));
+                }
+              } catch {
+                // Skip malformed JSON
+              }
+            }
+          }
+        },
+      });
+
+      const transformedStream = response.body?.pipeThrough(transformStream);
+
+      return new Response(transformedStream, {
         headers: {
           ...corsHeaders,
           'Content-Type': 'text/event-stream',
@@ -138,28 +204,34 @@ Deno.serve(async (req) => {
     }
 
     // Non-streaming response
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch(`${baseUrl}:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'google/gemini-3-pro-preview',
-        messages: fullMessages,
-        max_tokens: 1024,
-        temperature: 0.7,
+        contents,
+        generationConfig: {
+          maxOutputTokens: 1024,
+          temperature: 0.7,
+        },
+        safetySettings: [
+          { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+          { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+          { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+          { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' },
+        ],
       }),
     });
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error('AI Gateway error:', errorData);
-      throw new Error(`AI Gateway error: ${response.status}`);
+      console.error('Gemini API error:', errorData);
+      throw new Error(`Gemini API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const assistantMessage = data.choices?.[0]?.message?.content || 'Bağışlayın, cavab ala bilmədim. Yenidən cəhd edin.';
+    const assistantMessage = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Bağışlayın, cavab ala bilmədim. Yenidən cəhd edin.';
 
     return new Response(
       JSON.stringify({ 

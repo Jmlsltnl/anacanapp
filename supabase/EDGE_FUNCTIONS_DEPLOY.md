@@ -10,7 +10,7 @@ Bu sənəd Anacan tətbiqi üçün Supabase Edge Functions-ların siyahısını 
 **Fayl yolu:** `supabase/functions/dr-anacan-chat/index.ts`
 
 **Tələb olunan sirlər:**
-- `LOVABLE_API_KEY` - Lovable AI Gateway üçün (avtomatik mövcuddur)
+- `GEMINI_API_KEY` - Google Gemini API açarı
 
 **Endpoint:** `POST /functions/v1/dr-anacan-chat`
 
@@ -33,7 +33,7 @@ Bu sənəd Anacan tətbiqi üçün Supabase Edge Functions-ların siyahısını 
 **Fayl yolu:** `supabase/functions/generate-baby-photo/index.ts`
 
 **Tələb olunan sirlər:**
-- `LOVABLE_API_KEY` - Lovable AI Gateway üçün (avtomatik mövcuddur)
+- `GEMINI_API_KEY` - Google Gemini API açarı
 
 **Endpoint:** `POST /functions/v1/generate-baby-photo`
 
@@ -64,7 +64,7 @@ supabase functions deploy dr-anacan-chat
 supabase functions deploy generate-baby-photo
 
 # Sirləri əlavə et
-supabase secrets set LOVABLE_API_KEY=your_api_key_here
+supabase secrets set GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
 ### Sirlər (Secrets)
@@ -73,7 +73,7 @@ Aşağıdakı sirləri Supabase Dashboard → Edge Functions → Secrets bölmə
 
 | Sirr Adı | Təsviri | Tələb olunur |
 |----------|---------|--------------|
-| `LOVABLE_API_KEY` | Lovable AI Gateway API açarı | ✅ |
+| `GEMINI_API_KEY` | Google Gemini API açarı | ✅ |
 
 ---
 
