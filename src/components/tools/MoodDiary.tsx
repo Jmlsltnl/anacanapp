@@ -65,6 +65,9 @@ const MoodDiary = ({ onBack }: MoodDiaryProps) => {
       mood: selectedMood,
       symptoms: selectedSymptoms,
       notes: notes || null,
+      water_intake: todayLog?.water_intake || null,
+      temperature: todayLog?.temperature || null,
+      bleeding: todayLog?.bleeding || null,
     });
     
     setActiveTab('history');
