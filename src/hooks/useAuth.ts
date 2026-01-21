@@ -33,7 +33,19 @@ export const useAuth = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
-  const { setAuth, setRole, setLifeStage, setOnboarded, logout: storeLogout } = useUserStore();
+  const { 
+    setAuth, 
+    setRole, 
+    setLifeStage, 
+    setOnboarded, 
+    setLastPeriodDate,
+    setCycleLength,
+    setPeriodLength,
+    setDueDate,
+    setBabyData,
+    setPartnerCode,
+    logout: storeLogout 
+  } = useUserStore();
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -214,6 +226,55 @@ export const useAuth = () => {
     }
   };
 
+
+  // Sync profile data to Zustand store
+  const syncProfileToStore = (profileData: Profile | null) => {
+    if (!profileData) return;
+
+    // Set partner code from profile
+    if (profileData.partner_code) {
+      setPartnerCode(profileData.partner_code);
+    }
+
+    // Sync life stage specific data
+    if (profileData.last_period_date) {
+      setLastPeriodDate(new Date(profileData.last_period_date));
+    }
+    
+    if (profileData.cycle_length) {
+      setCycleLength(profileData.cycle_length);
+    }
+    
+    if (profileData.period_length) {
+      setPeriodLength(profileData.period_length);
+    }
+
+    if (profileData.due_date) {
+      setDueDate(new Date(profileData.due_date));
+    }
+
+    if (profileData.baby_birth_date && profileData.baby_name && profileData.baby_gender) {
+      setBabyData(
+        new Date(profileData.baby_birth_date),
+        profileData.baby_name,
+        profileData.baby_gender
+      );
+    }
+
+    // Set role based on life_stage
+    if (profileData.life_stage === 'partner') {
+      setRole('partner');
+    } else {
+      setRole('woman');
+    }
+
+    // Set life stage and onboarded status
+    if (profileData.life_stage) {
+      setLifeStage(profileData.life_stage as any);
+      setOnboarded(true);
+    }
+  };
+
   useEffect(() => {
     // Set up auth state listener BEFORE getting session
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
@@ -240,17 +301,8 @@ export const useAuth = () => {
           profileData?.name || currentSession.user.user_metadata?.name || 'İstifadəçi'
         );
         
-        if (profileData) {
-          if (profileData.life_stage === 'partner') {
-            setRole('partner');
-          } else {
-            setRole('woman');
-          }
-          if (profileData.life_stage) {
-            setLifeStage(profileData.life_stage as any);
-            setOnboarded(true);
-          }
-        }
+        // Sync all profile data to store
+        syncProfileToStore(profileData);
       } else {
         setProfile(null);
         setUserRole(null);
