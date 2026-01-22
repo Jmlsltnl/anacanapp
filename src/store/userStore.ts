@@ -22,6 +22,8 @@ interface UserState {
   babyBirthDate: Date | null;
   babyName: string | null;
   babyGender: 'boy' | 'girl' | null;
+  babyCount: number;
+  multiplesType: 'single' | 'twins' | 'triplets' | 'quadruplets' | null;
   
   // Partner's woman data (for partner mode)
   partnerWomanData: {
@@ -40,9 +42,10 @@ interface UserState {
   setCycleLength: (length: number) => void;
   setPeriodLength: (length: number) => void;
   setDueDate: (date: Date) => void;
-  setBabyData: (birthDate: Date, name: string, gender: 'boy' | 'girl') => void;
+  setBabyData: (birthDate: Date, name: string, gender: 'boy' | 'girl', babyCount?: number, multiplesType?: 'single' | 'twins' | 'triplets' | 'quadruplets') => void;
   setPartnerCode: (code: string) => void;
   setPartnerWomanData: (data: UserState['partnerWomanData']) => void;
+  setMultiplesData: (babyCount: number, multiplesType: 'single' | 'twins' | 'triplets' | 'quadruplets') => void;
   logout: () => void;
   
   // Computed
@@ -79,6 +82,8 @@ export const useUserStore = create<UserState>()(
       babyBirthDate: null,
       babyName: null,
       babyGender: null,
+      babyCount: 1,
+      multiplesType: null,
       partnerWomanData: null,
 
       setAuth: (isAuth, userId, email, name) => set({
@@ -103,11 +108,15 @@ export const useUserStore = create<UserState>()(
 
       setDueDate: (date) => set({ dueDate: date }),
 
-      setBabyData: (birthDate, name, gender) => set({
+      setBabyData: (birthDate, name, gender, babyCount = 1, multiplesType = 'single') => set({
         babyBirthDate: birthDate,
         babyName: name,
         babyGender: gender,
+        babyCount,
+        multiplesType,
       }),
+
+      setMultiplesData: (babyCount, multiplesType) => set({ babyCount, multiplesType }),
 
       setPartnerCode: (code) => set({ partnerCode: code }),
 
@@ -128,6 +137,8 @@ export const useUserStore = create<UserState>()(
         babyBirthDate: null,
         babyName: null,
         babyGender: null,
+        babyCount: 1,
+        multiplesType: null,
         partnerWomanData: null,
       }),
 
@@ -250,6 +261,8 @@ export const useUserStore = create<UserState>()(
         babyBirthDate: state.babyBirthDate,
         babyName: state.babyName,
         babyGender: state.babyGender,
+        babyCount: state.babyCount,
+        multiplesType: state.multiplesType,
       }),
     }
   )

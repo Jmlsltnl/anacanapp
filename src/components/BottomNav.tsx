@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Home, Compass, MessageCircle, ShoppingBag, User, Heart } from 'lucide-react';
+import { Home, Compass, MessageCircle, ShoppingBag, User, Users } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 
@@ -10,17 +10,17 @@ interface BottomNavProps {
 }
 
 const womanTabs = [
-  { id: 'home', label: 'Ana səhifə', icon: Home },
+  { id: 'home', label: 'Əsas', icon: Home },
   { id: 'tools', label: 'Alətlər', icon: Compass },
+  { id: 'community', label: 'Cəmiyyət', icon: Users },
   { id: 'ai', label: 'Dr. Anacan', icon: MessageCircle },
-  { id: 'shop', label: 'Mağaza', icon: ShoppingBag },
   { id: 'profile', label: 'Profil', icon: User },
 ];
 
 const partnerTabs = [
   { id: 'home', label: 'Əsas', icon: Home },
+  { id: 'community', label: 'Cəmiyyət', icon: Users },
   { id: 'ai', label: 'Məsləhət', icon: MessageCircle },
-  { id: 'shop', label: 'Mağaza', icon: ShoppingBag },
   { id: 'profile', label: 'Profil', icon: User },
 ];
 

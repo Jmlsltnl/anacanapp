@@ -18,6 +18,7 @@ import DoctorReportScreen from '@/components/DoctorReportScreen';
 import AdminPanel from '@/components/AdminPanel';
 import BottomNav from '@/components/BottomNav';
 import MotherChatScreen from '@/components/MotherChatScreen';
+import CommunityScreen from '@/components/community/CommunityScreen';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -57,16 +58,16 @@ const Index = () => {
               <PartnerDashboard />
             </motion.div>
           );
+        case 'community':
+          return (
+            <motion.div key="partner-community" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+              <CommunityScreen />
+            </motion.div>
+          );
         case 'ai':
           return (
             <motion.div key="partner-ai" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full">
               <PartnerAIChatScreen />
-            </motion.div>
-          );
-        case 'shop':
-          return (
-            <motion.div key="shop" variants={pageVariants} initial="initial" animate="animate" exit="exit">
-              <ShopScreen />
             </motion.div>
           );
         case 'profile':
@@ -93,16 +94,16 @@ const Index = () => {
             <ToolsHub />
           </motion.div>
         );
+      case 'community':
+        return (
+          <motion.div key="community" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+            <CommunityScreen />
+          </motion.div>
+        );
       case 'ai':
         return (
           <motion.div key="ai" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full">
             <AIChatScreen />
-          </motion.div>
-        );
-      case 'shop':
-        return (
-          <motion.div key="shop" variants={pageVariants} initial="initial" animate="animate" exit="exit">
-            <ShopScreen />
           </motion.div>
         );
       case 'profile':

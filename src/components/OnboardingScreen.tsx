@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Check, Calendar, Baby, Heart, Sparkles } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check, Calendar, Baby, Heart, Sparkles, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useAutoJoinGroups } from '@/hooks/useCommunity';
 import type { LifeStage } from '@/types/anacan';
 
 const stages = [
@@ -41,20 +42,35 @@ const stages = [
   },
 ];
 
+const multiplesOptions = [
+  { id: 'single', label: 'Tək uşaq', emoji: '👶', count: 1 },
+  { id: 'twins', label: 'Əkiz', emoji: '👶👶', count: 2 },
+  { id: 'triplets', label: 'Üçüz', emoji: '👶👶👶', count: 3 },
+  { id: 'quadruplets', label: 'Dördüz', emoji: '👶👶👶👶', count: 4 },
+];
+
 const OnboardingScreen = () => {
   const [step, setStep] = useState(0);
   const [selectedStage, setSelectedStage] = useState<LifeStage | null>(null);
   const [dateInput, setDateInput] = useState('');
   const [babyName, setBabyName] = useState('');
   const [babyGender, setBabyGender] = useState<'boy' | 'girl' | null>(null);
+  const [multiplesType, setMultiplesType] = useState<'single' | 'twins' | 'triplets' | 'quadruplets'>('single');
+  const [babyCount, setBabyCount] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
   
-  const { setLifeStage, setLastPeriodDate, setBabyData, setOnboarded, setDueDate } = useUserStore();
+  const { setLifeStage, setLastPeriodDate, setBabyData, setOnboarded, setDueDate, setMultiplesData } = useUserStore();
   const { updateProfile } = useAuth();
   const { toast } = useToast();
+  const { autoJoin } = useAutoJoinGroups();
 
   const handleStageSelect = (stage: LifeStage) => {
     setSelectedStage(stage);
+  };
+
+  const handleMultiplesSelect = (type: 'single' | 'twins' | 'triplets' | 'quadruplets', count: number) => {
+    setMultiplesType(type);
+    setBabyCount(count);
   };
 
   const handleNext = async () => {
@@ -72,6 +88,8 @@ const OnboardingScreen = () => {
               baby_birth_date: dateInput,
               baby_name: babyName,
               baby_gender: babyGender,
+              baby_count: babyCount,
+              multiples_type: multiplesType,
             });
 
             if (error) {
@@ -85,9 +103,18 @@ const OnboardingScreen = () => {
             }
 
             // Update local store
-            setBabyData(new Date(dateInput), babyName, babyGender);
+            setBabyData(new Date(dateInput), babyName, babyGender, babyCount, multiplesType);
+            setMultiplesData(babyCount, multiplesType);
             setLifeStage(selectedStage);
             setOnboarded(true);
+
+            // Auto-join relevant community groups
+            await autoJoin({
+              life_stage: selectedStage,
+              baby_birth_date: dateInput,
+              baby_gender: babyGender,
+              multiples_type: multiplesType,
+            });
           }
         } else if (selectedStage === 'bump') {
           if (dateInput) {
@@ -100,6 +127,8 @@ const OnboardingScreen = () => {
               life_stage: selectedStage,
               last_period_date: dateInput,
               due_date: dueDate.toISOString().split('T')[0],
+              baby_count: babyCount,
+              multiples_type: multiplesType,
             });
 
             if (error) {
@@ -115,8 +144,16 @@ const OnboardingScreen = () => {
             // Update local store
             setLastPeriodDate(new Date(dateInput));
             setDueDate(dueDate);
+            setMultiplesData(babyCount, multiplesType);
             setLifeStage(selectedStage);
             setOnboarded(true);
+
+            // Auto-join relevant community groups
+            await autoJoin({
+              life_stage: selectedStage,
+              due_date: dueDate.toISOString().split('T')[0],
+              multiples_type: multiplesType,
+            });
           }
         } else {
           // Flow stage
@@ -141,6 +178,9 @@ const OnboardingScreen = () => {
             setLastPeriodDate(new Date(dateInput));
             setLifeStage(selectedStage!);
             setOnboarded(true);
+
+            // Auto-join general groups
+            await autoJoin({ life_stage: selectedStage });
           }
         }
 
@@ -222,7 +262,7 @@ const OnboardingScreen = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-5 py-4 relative">
+      <div className="flex-1 px-5 py-4 relative overflow-y-auto">
         <AnimatePresence mode="wait">
           {step === 0 && (
             <motion.div
@@ -327,7 +367,7 @@ const OnboardingScreen = () => {
               className="h-full flex flex-col"
             >
               <motion.div 
-                className="text-center mb-8"
+                className="text-center mb-6"
                 variants={staggerChildren}
                 initial="initial"
                 animate="animate"
@@ -340,13 +380,13 @@ const OnboardingScreen = () => {
                   </div>
                 </motion.div>
                 <motion.h1 variants={childVariants} className="text-2xl font-black text-foreground">
-                  {selectedStage === 'mommy' ? 'Körpəniz haqqında' : 'Son dövr tarixi'}
+                  {selectedStage === 'mommy' ? 'Körpəniz haqqında' : selectedStage === 'bump' ? 'Hamiləlik məlumatları' : 'Son dövr tarixi'}
                 </motion.h1>
                 <motion.p variants={childVariants} className="text-muted-foreground mt-2">
                   {selectedStage === 'mommy' 
                     ? 'Körpənizin məlumatlarını daxil edin'
                     : selectedStage === 'bump'
-                    ? 'Son menstruasiya tarixinizi daxil edin'
+                    ? 'Hamiləlik məlumatlarınızı daxil edin'
                     : 'Son dövrünüz nə vaxt başladı?'
                   }
                 </motion.p>
@@ -358,18 +398,46 @@ const OnboardingScreen = () => {
                 initial="initial"
                 animate="animate"
               >
+                {/* Multiples selection for bump and mommy stages */}
+                {(selectedStage === 'bump' || selectedStage === 'mommy') && (
+                  <motion.div variants={childVariants}>
+                    <label className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      Uşaq sayı
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {multiplesOptions.map((option) => (
+                        <motion.button
+                          key={option.id}
+                          onClick={() => handleMultiplesSelect(option.id as any, option.count)}
+                          className={`p-4 rounded-2xl font-bold transition-all flex flex-col items-center gap-2 ${
+                            multiplesType === option.id
+                              ? 'bg-primary text-primary-foreground shadow-elevated'
+                              : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                          }`}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <span className="text-2xl">{option.emoji}</span>
+                          <span className="text-sm">{option.label}</span>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
                 {selectedStage === 'mommy' && (
                   <>
                     <motion.div variants={childVariants}>
                       <label className="text-sm font-bold text-foreground mb-3 block">
-                        Körpənizin adı
+                        {babyCount > 1 ? 'Körpələrinizin adları (vergüllə ayırın)' : 'Körpənizin adı'}
                       </label>
                       <Input
                         type="text"
-                        placeholder="Ad"
+                        placeholder={babyCount > 1 ? 'Əli, Vəli' : 'Ad'}
                         value={babyName}
                         onChange={(e) => setBabyName(e.target.value)}
-                        className="h-16 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-lg px-5"
+                        className="h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-lg px-5"
                       />
                     </motion.div>
 
@@ -385,7 +453,7 @@ const OnboardingScreen = () => {
                           <motion.button
                             key={g.id}
                             onClick={() => setBabyGender(g.id as 'boy' | 'girl')}
-                            className={`flex-1 p-5 rounded-2xl font-bold transition-all flex flex-col items-center gap-2 ${
+                            className={`flex-1 p-4 rounded-2xl font-bold transition-all flex flex-col items-center gap-2 ${
                               babyGender === g.id
                                 ? `bg-gradient-to-r ${g.gradient} text-white shadow-elevated`
                                 : 'bg-muted text-muted-foreground hover:bg-muted/80'
@@ -404,13 +472,13 @@ const OnboardingScreen = () => {
 
                 <motion.div variants={childVariants}>
                   <label className="text-sm font-bold text-foreground mb-3 block">
-                    {selectedStage === 'mommy' ? 'Doğum tarixi' : 'Tarix'}
+                    {selectedStage === 'mommy' ? 'Doğum tarixi' : selectedStage === 'bump' ? 'Son menstruasiya tarixi' : 'Son dövr tarixi'}
                   </label>
                   <Input
                     type="date"
                     value={dateInput}
                     onChange={(e) => setDateInput(e.target.value)}
-                    className="h-16 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-lg px-5"
+                    className="h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-lg px-5"
                     max={new Date().toISOString().split('T')[0]}
                   />
                 </motion.div>
