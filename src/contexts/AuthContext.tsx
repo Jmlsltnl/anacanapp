@@ -322,33 +322,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('Auth state changed:', event, currentSession?.user?.email);
       if (!mounted) return;
 
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
+      try {
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
 
-      if (currentSession?.user) {
-        const [profileData, roleData] = await Promise.all([
-          fetchProfile(currentSession.user.id),
-          fetchUserRole(currentSession.user.id),
-        ]);
+        if (currentSession?.user) {
+          const [profileData, roleData] = await Promise.all([
+            fetchProfile(currentSession.user.id),
+            fetchUserRole(currentSession.user.id),
+          ]);
 
-        if (!mounted) return;
+          if (!mounted) return;
 
-        setProfile(profileData);
-        setUserRole(roleData);
-        setAuth(
-          true,
-          currentSession.user.id,
-          currentSession.user.email || '',
-          profileData?.name || currentSession.user.user_metadata?.name || 'İstifadəçi'
-        );
-        syncProfileToStore(profileData);
-      } else {
-        setProfile(null);
-        setUserRole(null);
-        storeLogout();
+          setProfile(profileData);
+          setUserRole(roleData);
+          setAuth(
+            true,
+            currentSession.user.id,
+            currentSession.user.email || '',
+            profileData?.name || currentSession.user.user_metadata?.name || 'İstifadəçi'
+          );
+          syncProfileToStore(profileData);
+        } else {
+          setProfile(null);
+          setUserRole(null);
+          storeLogout();
+        }
+      } catch (error) {
+        console.error('Error handling auth state change:', error);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     });
 
     return () => {
