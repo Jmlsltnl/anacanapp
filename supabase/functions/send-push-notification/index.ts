@@ -1,4 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.4';
+import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -127,12 +127,13 @@ Deno.serve(async (req) => {
             console.log(`Removed invalid token: ${token.substring(0, 20)}...`);
           }
         }
-      } catch (error) {
+      } catch (err) {
         failureCount++;
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
         results.push({ 
           token: token.substring(0, 20) + '...', 
           success: false, 
-          error: error.message 
+          error: errorMessage 
         });
       }
     }
@@ -149,10 +150,11 @@ Deno.serve(async (req) => {
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
-    console.error('Error in send-push-notification:', error);
+  } catch (err) {
+    console.error('Error in send-push-notification:', err);
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
