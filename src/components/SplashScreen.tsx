@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, forwardRef, useRef } from 'react';
+import logoImage from '@/assets/logo.png';
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -138,31 +139,17 @@ const SplashScreen = forwardRef<HTMLDivElement, SplashScreenProps>(({ onComplete
           />
           
           {/* Logo circle */}
-          <div className="relative w-32 h-32 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center shadow-2xl border border-white/30">
+          <div className="relative w-32 h-32 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center shadow-2xl border border-white/30 overflow-hidden">
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.3, duration: 0.6, type: "spring", stiffness: 200 }}
             >
-              {/* Custom A logo */}
-              <svg viewBox="0 0 60 60" className="w-16 h-16">
-                <motion.path
-                  d="M30 8 L48 52 L42 52 L38 42 L22 42 L18 52 L12 52 L30 8Z M30 20 L24 36 L36 36 L30 20Z"
-                  fill="white"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 1, ease: "easeOut" }}
-                />
-                <motion.circle
-                  cx="30"
-                  cy="18"
-                  r="4"
-                  fill="white"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 1.2, duration: 0.3, type: "spring" }}
-                />
-              </svg>
+              <img 
+                src={logoImage} 
+                alt="Anacan Logo" 
+                className="w-24 h-24 object-contain"
+              />
             </motion.div>
           </div>
         </motion.div>
