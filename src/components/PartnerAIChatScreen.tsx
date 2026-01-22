@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Sparkles, User, Bot, Loader2, RefreshCw, Heart } from 'lucide-react';
+import { Send, User, Bot, Loader2, RefreshCw, Heart, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -13,9 +13,10 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  isStreaming?: boolean;
 }
 
-const PartnerAIChatScreen = () => {
+const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +29,7 @@ const PartnerAIChatScreen = () => {
       setMessages([{
         id: 'welcome',
         role: 'assistant',
-        content: `Salam! 👋 Mən Dr. Anacan, sizin partnyor köməkçinizəm. ${partnerWomanData?.name ? `${partnerWomanData.name}` : 'Xanımınız'} hamiləlik dövründə ona necə dəstək ola biləcəyiniz barədə sizə kömək edəcəyəm. 💪\n\nEmosional dəstək, ev işləri, tibbi görüşlər və ya hər hansı digər mövzuda suallarınız varsa, buradayam!`,
+        content: `Salam! 👋 Mən Anacan.AI, sizin partnyor rəfiqənizəm. ${partnerWomanData?.name ? `${partnerWomanData.name}` : 'Xanımınız'} hamiləlik dövründə ona necə dəstək ola biləcəyiniz barədə sizə kömək edəcəyəm. 💪\n\nEmosional dəstək, ev işləri, tibbi görüşlər və ya hər hansı digər mövzuda suallarınız varsa, buradayam!`,
         timestamp: new Date()
       }]);
     }
@@ -50,7 +51,16 @@ const PartnerAIChatScreen = () => {
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const assistantMessageId = `assistant-${Date.now()}`;
+
+    setMessages(prev => [...prev, userMessage, {
+      id: assistantMessageId,
+      role: 'assistant',
+      content: '',
+      timestamp: new Date(),
+      isStreaming: true
+    }]);
+    
     setInput('');
     setIsLoading(true);
 
@@ -67,24 +77,69 @@ const PartnerAIChatScreen = () => {
         content: userMessage.content
       });
 
-      const { data, error } = await supabase.functions.invoke('dr-anacan-chat', {
+      const response = await supabase.functions.invoke('dr-anacan-chat', {
         body: {
           messages: conversationHistory,
           lifeStage: partnerWomanData?.lifeStage || 'bump',
-          isPartner: true
+          isPartner: true,
+          stream: true,
+          userProfile: partnerWomanData ? {
+            name: partnerWomanData.name
+          } : undefined
         }
       });
 
-      if (error) throw error;
+      if (response.error) throw response.error;
 
-      const assistantMessage: Message = {
-        id: `assistant-${Date.now()}`,
-        role: 'assistant',
-        content: data.message || 'Bağışlayın, cavab ala bilmədim.',
-        timestamp: new Date()
-      };
+      // Handle streaming response
+      const reader = response.data?.getReader?.();
+      
+      if (reader) {
+        const decoder = new TextDecoder();
+        let fullContent = '';
 
-      setMessages(prev => [...prev, assistantMessage]);
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6);
+              if (data === '[DONE]') continue;
+
+              try {
+                const parsed = JSON.parse(data);
+                const content = parsed.choices?.[0]?.delta?.content || '';
+                fullContent += content;
+
+                setMessages(prev => prev.map(m => 
+                  m.id === assistantMessageId 
+                    ? { ...m, content: fullContent }
+                    : m
+                ));
+              } catch {
+                // Skip invalid JSON
+              }
+            }
+          }
+        }
+
+        setMessages(prev => prev.map(m => 
+          m.id === assistantMessageId 
+            ? { ...m, isStreaming: false, content: fullContent || 'Bağışlayın, cavab ala bilmədim.' }
+            : m
+        ));
+      } else {
+        const data = response.data;
+        setMessages(prev => prev.map(m => 
+          m.id === assistantMessageId 
+            ? { ...m, isStreaming: false, content: data.message || 'Bağışlayın, cavab ala bilmədim.' }
+            : m
+        ));
+      }
     } catch (error) {
       console.error('Chat error:', error);
       toast({
@@ -93,12 +148,11 @@ const PartnerAIChatScreen = () => {
         variant: 'destructive'
       });
       
-      setMessages(prev => [...prev, {
-        id: `error-${Date.now()}`,
-        role: 'assistant',
-        content: 'Bağışlayın, texniki xəta baş verdi. Zəhmət olmasa yenidən cəhd edin. 🙏',
-        timestamp: new Date()
-      }]);
+      setMessages(prev => prev.map(m => 
+        m.id === assistantMessageId 
+          ? { ...m, isStreaming: false, content: 'Bağışlayın, texniki xəta baş verdi. Zəhmət olmasa yenidən cəhd edin. 🙏' }
+          : m
+      ));
     } finally {
       setIsLoading(false);
     }
@@ -115,7 +169,7 @@ const PartnerAIChatScreen = () => {
     setMessages([{
       id: 'welcome',
       role: 'assistant',
-      content: `Salam! 👋 Mən Dr. Anacan, sizin partnyor köməkçinizəm. Xanımınızı necə dəstəkləyə biləcəyiniz barədə sizə kömək edəcəyəm! 💪`,
+      content: `Salam! 👋 Mən Anacan.AI, sizin partnyor rəfiqənizəm. Xanımınızı necə dəstəkləyə biləcəyiniz barədə sizə kömək edəcəyəm! 💪`,
       timestamp: new Date()
     }]);
   };
@@ -128,7 +182,7 @@ const PartnerAIChatScreen = () => {
   ];
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-partner/5 to-background">
+    <div ref={ref} className="flex flex-col h-full bg-gradient-to-b from-partner/5 to-background">
       {/* Header */}
       <div className="px-5 py-4 border-b border-border bg-card/50 backdrop-blur-sm">
         <div className="flex items-center justify-between">
@@ -141,16 +195,24 @@ const PartnerAIChatScreen = () => {
               <Heart className="w-6 h-6 text-white" />
             </motion.div>
             <div>
-              <h1 className="font-bold text-lg text-foreground">Dr. Anacan</h1>
+              <h1 className="font-bold text-lg text-foreground">Anacan.AI</h1>
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-xs text-muted-foreground">Partnyor Köməkçisi</span>
+                <span className="text-xs text-muted-foreground">Partnyor Rəfiqəsi</span>
               </div>
             </div>
           </div>
           <Button variant="ghost" size="icon" onClick={clearChat}>
             <RefreshCw className="w-5 h-5" />
           </Button>
+        </div>
+      </div>
+
+      {/* Disclaimer Banner */}
+      <div className="px-4 py-2 bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800">
+        <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400">
+          <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
+          <span>Tibbi məsləhətlər yalnız həkim tərəfindən təsdiqlənməlidir</span>
         </div>
       </div>
 
@@ -182,16 +244,27 @@ const PartnerAIChatScreen = () => {
                     ? 'bg-partner text-white rounded-br-md'
                     : 'bg-card border border-border shadow-sm rounded-bl-md'
                 }`}>
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                  <span className="text-[10px] opacity-60 mt-2 block">
-                    {message.timestamp.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
-                  </span>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                    {message.content}
+                    {message.isStreaming && (
+                      <motion.span
+                        className="inline-block w-2 h-4 bg-partner ml-1"
+                        animate={{ opacity: [1, 0] }}
+                        transition={{ duration: 0.5, repeat: Infinity }}
+                      />
+                    )}
+                  </p>
+                  {!message.isStreaming && (
+                    <span className="text-[10px] opacity-60 mt-2 block">
+                      {message.timestamp.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  )}
                 </div>
               </motion.div>
             ))}
           </AnimatePresence>
 
-          {isLoading && (
+          {isLoading && messages[messages.length - 1]?.content === '' && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -242,7 +315,7 @@ const PartnerAIChatScreen = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Dr. Anacan-a sualınızı yazın..."
+              placeholder="Anacan.AI-yə sualınızı yazın..."
               className="min-h-[48px] max-h-[120px] pr-4 resize-none rounded-2xl border-2 focus:border-partner/50"
               disabled={isLoading}
             />
@@ -263,6 +336,8 @@ const PartnerAIChatScreen = () => {
       </div>
     </div>
   );
-};
+});
+
+PartnerAIChatScreen.displayName = 'PartnerAIChatScreen';
 
 export default PartnerAIChatScreen;
