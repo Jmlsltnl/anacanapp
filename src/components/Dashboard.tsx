@@ -19,6 +19,7 @@ import { useWeightEntries } from '@/hooks/useWeightEntries';
 import { useBabyMilestones, MILESTONES } from '@/hooks/useBabyMilestones';
 import { useAchievements } from '@/hooks/useAchievements';
 import { useWeeklyTips } from '@/hooks/useDynamicContent';
+import { usePregnancyContent } from '@/hooks/usePregnancyContent';
 
 interface QuickActionProps {
   icon: any;
@@ -318,7 +319,11 @@ const BumpDashboard = () => {
   
   // Fetch weekly tip from database
   const { data: weeklyTips = [] } = useWeeklyTips(pregData?.currentWeek, 'bump');
-  const currentWeekTip = weeklyTips[0]; // Get the first tip for this week
+  const currentWeekTip = weeklyTips[0];
+  
+  // Fetch dynamic pregnancy content
+  const { data: pregnancyContent = [] } = usePregnancyContent(pregData?.currentWeek);
+  const weekContent = pregnancyContent[0];
   
   const todayStats = getTodayStats();
   const kickCount = todayStats.totalKicks;
@@ -331,20 +336,21 @@ const BumpDashboard = () => {
 
   if (!pregData) return null;
 
-  const weekData = FRUIT_SIZES[pregData.currentWeek] || FRUIT_SIZES[12];
+  // Use dynamic content if available, fallback to static
+  const weekData = weekContent ? {
+    fruit: weekContent.baby_size_fruit || FRUIT_SIZES[pregData.currentWeek]?.fruit || 'Meyvə',
+    emoji: '🍎',
+    lengthCm: weekContent.baby_size_cm || FRUIT_SIZES[pregData.currentWeek]?.lengthCm || 0,
+    weightG: weekContent.baby_weight_gram || FRUIT_SIZES[pregData.currentWeek]?.weightG || 0,
+  } : FRUIT_SIZES[pregData.currentWeek] || FRUIT_SIZES[12];
+  
   const daysLeft = pregData.dueDate ? Math.ceil((pregData.dueDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
   const totalDays = 280;
   const daysElapsed = totalDays - daysLeft;
   const progressPercent = (daysElapsed / totalDays) * 100;
 
-  const babyMessages = [
-    "Salam ana! Bu gün çox böyüdüm. Səsini eşidirəm! 💕",
-    "Ana, səni hiss edirəm. Toxunuşların çox rahatdır! 🥰",
-    "Bu gün yeni hərəkətlər öyrəndim. Gözləyirəm! ✨",
-    "Səni sevirəm ana! Tezliklə görüşəcəyik! 💖"
-  ];
-
-  const randomMessage = babyMessages[pregData.currentWeek % babyMessages.length];
+  // Dynamic baby message from database
+  const babyMessage = weekContent?.baby_message || "Salam ana! Bu gün çox böyüdüm. 💕";
 
   const weeklyDevelopment = {
     eyes: pregData.currentWeek >= 8,
@@ -531,9 +537,9 @@ const BumpDashboard = () => {
         </motion.div>
       )}
 
-      {/* Baby Message */}
+      {/* Baby Message - Dynamic */}
       <motion.div 
-        className="relative overflow-hidden bg-gradient-to-r from-violet-50 to-purple-50 rounded-3xl p-5 border border-violet-100"
+        className="relative overflow-hidden bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/30 rounded-3xl p-5 border border-violet-100 dark:border-violet-800"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.35 }}
@@ -541,8 +547,32 @@ const BumpDashboard = () => {
         <div className="absolute -right-4 -top-4 text-6xl opacity-20">💬</div>
         <p className="text-xs text-bump font-bold uppercase tracking-wider mb-2">Körpədən mesaj</p>
         <p className="text-foreground font-medium italic text-lg leading-relaxed">
-          "{randomMessage}"
+          "{babyMessage}"
         </p>
+        
+        {/* Additional weekly info */}
+        {weekContent && (
+          <div className="mt-4 pt-4 border-t border-violet-100 dark:border-violet-800 space-y-3">
+            {weekContent.baby_development && (
+              <div className="flex items-start gap-2">
+                <span className="text-lg">👶</span>
+                <p className="text-sm text-foreground/80">{weekContent.baby_development}</p>
+              </div>
+            )}
+            {weekContent.mother_tips && (
+              <div className="flex items-start gap-2">
+                <span className="text-lg">💡</span>
+                <p className="text-sm text-foreground/80">{weekContent.mother_tips}</p>
+              </div>
+            )}
+            {weekContent.nutrition_tip && (
+              <div className="flex items-start gap-2">
+                <span className="text-lg">🍎</span>
+                <p className="text-sm text-foreground/80">{weekContent.nutrition_tip}</p>
+              </div>
+            )}
+          </div>
+        )}
       </motion.div>
 
       {/* Quick Actions */}

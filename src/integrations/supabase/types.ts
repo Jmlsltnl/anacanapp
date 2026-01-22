@@ -932,6 +932,90 @@ export type Database = {
           },
         ]
       }
+      pregnancy_daily_content: {
+        Row: {
+          baby_development: string | null
+          baby_message: string | null
+          baby_size_cm: number | null
+          baby_size_fruit: string | null
+          baby_weight_gram: number | null
+          created_at: string
+          day_number: number | null
+          doctor_visit_tip: string | null
+          emotional_tip: string | null
+          exercise_tip: string | null
+          foods_to_avoid: string[] | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          mother_symptoms: string[] | null
+          mother_tips: string | null
+          mother_warnings: string | null
+          nutrition_tip: string | null
+          partner_tip: string | null
+          recommended_exercises: string[] | null
+          recommended_foods: string[] | null
+          tests_to_do: string[] | null
+          updated_at: string
+          video_url: string | null
+          week_number: number
+        }
+        Insert: {
+          baby_development?: string | null
+          baby_message?: string | null
+          baby_size_cm?: number | null
+          baby_size_fruit?: string | null
+          baby_weight_gram?: number | null
+          created_at?: string
+          day_number?: number | null
+          doctor_visit_tip?: string | null
+          emotional_tip?: string | null
+          exercise_tip?: string | null
+          foods_to_avoid?: string[] | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          mother_symptoms?: string[] | null
+          mother_tips?: string | null
+          mother_warnings?: string | null
+          nutrition_tip?: string | null
+          partner_tip?: string | null
+          recommended_exercises?: string[] | null
+          recommended_foods?: string[] | null
+          tests_to_do?: string[] | null
+          updated_at?: string
+          video_url?: string | null
+          week_number: number
+        }
+        Update: {
+          baby_development?: string | null
+          baby_message?: string | null
+          baby_size_cm?: number | null
+          baby_size_fruit?: string | null
+          baby_weight_gram?: number | null
+          created_at?: string
+          day_number?: number | null
+          doctor_visit_tip?: string | null
+          emotional_tip?: string | null
+          exercise_tip?: string | null
+          foods_to_avoid?: string[] | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          mother_symptoms?: string[] | null
+          mother_tips?: string | null
+          mother_warnings?: string | null
+          nutrition_tip?: string | null
+          partner_tip?: string | null
+          recommended_exercises?: string[] | null
+          recommended_foods?: string[] | null
+          tests_to_do?: string[] | null
+          updated_at?: string
+          video_url?: string | null
+          week_number?: number
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category: string
