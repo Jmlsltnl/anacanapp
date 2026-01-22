@@ -126,11 +126,14 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
       </motion.div>
 
       {/* Premium Banner */}
-      <motion.div
-        className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-3xl p-5 mb-6 border border-amber-100"
+      <motion.button
+        onClick={() => onNavigate?.('premium')}
+        className="w-full bg-gradient-to-r from-amber-50 to-orange-50 rounded-3xl p-5 mb-6 border border-amber-100 text-left"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
       >
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
@@ -142,7 +145,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
           </div>
           <ChevronRight className="w-5 h-5 text-muted-foreground" />
         </div>
-      </motion.div>
+      </motion.button>
 
       {/* Partner Code */}
       {role === 'woman' && (

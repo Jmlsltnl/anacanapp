@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_recipes: {
+        Row: {
+          category: string
+          cook_time: number | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          ingredients: Json
+          instructions: Json
+          is_active: boolean | null
+          prep_time: number | null
+          servings: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          cook_time?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          ingredients?: Json
+          instructions?: Json
+          is_active?: boolean | null
+          prep_time?: number | null
+          servings?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          cook_time?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          ingredients?: Json
+          instructions?: Json
+          is_active?: boolean | null
+          prep_time?: number | null
+          servings?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           created_at: string
@@ -137,6 +185,42 @@ export type Database = {
           milestone_id?: string
           notes?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      baby_names_db: {
+        Row: {
+          created_at: string
+          gender: string
+          id: string
+          is_active: boolean | null
+          meaning: string | null
+          meaning_az: string | null
+          name: string
+          origin: string | null
+          popularity: number | null
+        }
+        Insert: {
+          created_at?: string
+          gender?: string
+          id?: string
+          is_active?: boolean | null
+          meaning?: string | null
+          meaning_az?: string | null
+          name: string
+          origin?: string | null
+          popularity?: number | null
+        }
+        Update: {
+          created_at?: string
+          gender?: string
+          id?: string
+          is_active?: boolean | null
+          meaning?: string | null
+          meaning_az?: string | null
+          name?: string
+          origin?: string | null
+          popularity?: number | null
         }
         Relationships: []
       }
@@ -562,6 +646,42 @@ export type Database = {
         }
         Relationships: []
       }
+      hospital_bag_templates: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          is_essential: boolean | null
+          item_name: string
+          item_name_az: string | null
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          is_essential?: boolean | null
+          item_name: string
+          item_name_az?: string | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          is_essential?: boolean | null
+          item_name?: string
+          item_name_az?: string | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       kick_sessions: {
         Row: {
           created_at: string
@@ -616,6 +736,45 @@ export type Database = {
           notification_type?: string
           title?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      nutrition_tips: {
+        Row: {
+          calories: number | null
+          category: string
+          content: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          nutrients: Json | null
+          title: string
+          trimester: number | null
+          updated_at: string
+        }
+        Insert: {
+          calories?: number | null
+          category?: string
+          content: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          nutrients?: Json | null
+          title: string
+          trimester?: number | null
+          updated_at?: string
+        }
+        Update: {
+          calories?: number | null
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          nutrients?: Json | null
+          title?: string
+          trimester?: number | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -778,11 +937,13 @@ export type Database = {
           baby_count: number | null
           baby_gender: string | null
           baby_name: string | null
+          badge_type: string | null
           created_at: string
           cycle_length: number | null
           due_date: string | null
           email: string | null
           id: string
+          is_premium: boolean | null
           last_period_date: string | null
           life_stage: string | null
           linked_partner_id: string | null
@@ -790,6 +951,7 @@ export type Database = {
           name: string
           partner_code: string | null
           period_length: number | null
+          premium_until: string | null
           role: Database["public"]["Enums"]["app_role"]
           start_weight: number | null
           updated_at: string
@@ -801,11 +963,13 @@ export type Database = {
           baby_count?: number | null
           baby_gender?: string | null
           baby_name?: string | null
+          badge_type?: string | null
           created_at?: string
           cycle_length?: number | null
           due_date?: string | null
           email?: string | null
           id?: string
+          is_premium?: boolean | null
           last_period_date?: string | null
           life_stage?: string | null
           linked_partner_id?: string | null
@@ -813,6 +977,7 @@ export type Database = {
           name: string
           partner_code?: string | null
           period_length?: number | null
+          premium_until?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           start_weight?: number | null
           updated_at?: string
@@ -824,11 +989,13 @@ export type Database = {
           baby_count?: number | null
           baby_gender?: string | null
           baby_name?: string | null
+          badge_type?: string | null
           created_at?: string
           cycle_length?: number | null
           due_date?: string | null
           email?: string | null
           id?: string
+          is_premium?: boolean | null
           last_period_date?: string | null
           life_stage?: string | null
           linked_partner_id?: string | null
@@ -836,6 +1003,7 @@ export type Database = {
           name?: string
           partner_code?: string | null
           period_length?: number | null
+          premium_until?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           start_weight?: number | null
           updated_at?: string
@@ -850,6 +1018,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      safety_items: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          description_az: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          name_az: string | null
+          notes: string | null
+          safety_level: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          description_az?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          name_az?: string | null
+          notes?: string | null
+          safety_level?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          description_az?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          name_az?: string | null
+          notes?: string | null
+          safety_level?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       shopping_items: {
         Row: {
@@ -1012,6 +1222,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_blocks: {
+        Row: {
+          block_type: string
+          blocked_by: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          block_type?: string
+          blocked_by: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          block_type?: string
+          blocked_by?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_preferences: {
         Row: {
           created_at: string
@@ -1072,6 +1315,45 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      weekly_tips: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          life_stage: string
+          tips: Json | null
+          title: string
+          updated_at: string
+          week_number: number
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          life_stage?: string
+          tips?: Json | null
+          title: string
+          updated_at?: string
+          week_number: number
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          life_stage?: string
+          tips?: Json | null
+          title?: string
+          updated_at?: string
+          week_number?: number
         }
         Relationships: []
       }

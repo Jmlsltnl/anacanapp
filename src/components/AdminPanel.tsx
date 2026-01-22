@@ -8,6 +8,9 @@ import AdminData from './admin/AdminData';
 import AdminMessages from './admin/AdminMessages';
 import AdminSecurity from './admin/AdminSecurity';
 import AdminCommunity from './admin/AdminCommunity';
+import AdminContentManager from './admin/AdminContentManager';
+import AdminSubscriptions from './admin/AdminSubscriptions';
+import AdminModeration from './admin/AdminModeration';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -26,6 +29,12 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminProducts />;
       case 'community':
         return <AdminCommunity />;
+      case 'content':
+        return <AdminContentManager />;
+      case 'subscriptions':
+        return <AdminSubscriptions />;
+      case 'moderation':
+        return <AdminModeration />;
       case 'data':
         return <AdminData />;
       case 'messages':
