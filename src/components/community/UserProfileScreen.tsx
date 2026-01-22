@@ -48,64 +48,74 @@ const UserProfileScreen = ({ userId, onBack }: UserProfileScreenProps) => {
   const fetchUserData = async () => {
     setLoading(true);
 
-    // Check if current user
-    const { data: { user: currentUser } } = await supabase.auth.getUser();
-    setIsCurrentUser(currentUser?.id === userId);
+    try {
+      // Check if current user
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      setIsCurrentUser(currentUser?.id === userId);
 
-    // Fetch profile
-    const { data: profileData } = await supabase
-      .from('profiles')
-      .select('user_id, name, avatar_url, life_stage, is_premium, badge_type, created_at')
-      .eq('user_id', userId)
-      .single();
+      // Fetch profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('user_id, name, avatar_url, life_stage, is_premium, badge_type, created_at')
+        .eq('user_id', userId)
+        .single();
 
-    if (profileData) {
-      setProfile(profileData as unknown as UserProfile);
+      if (profileError) {
+        console.error('Profile fetch error:', profileError);
+        setLoading(false);
+        return;
+      }
+
+      if (profileData) {
+        setProfile(profileData as unknown as UserProfile);
+      }
+
+      // Fetch posts
+      const { data: postsData } = await supabase
+        .from('community_posts')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      if (postsData && profileData) {
+        // Add author info to posts
+        const postsWithAuthor = postsData.map(post => ({
+          ...post,
+          author: {
+            name: profileData?.name || 'İstifadəçi',
+            avatar_url: profileData?.avatar_url || null,
+            badge_type: profileData?.badge_type || null
+          },
+          is_liked: false
+        }));
+        setPosts(postsWithAuthor as CommunityPost[]);
+      }
+
+      // Fetch stories - community_stories doesn't have is_active column
+      const { data: storiesData } = await supabase
+        .from('community_stories')
+        .select('id, media_url, media_type, created_at')
+        .eq('user_id', userId)
+        .gte('expires_at', new Date().toISOString()) // Only show non-expired stories
+        .order('created_at', { ascending: false });
+
+      if (storiesData) {
+        setStories(storiesData as UserStory[]);
+      }
+
+      // Calculate stats
+      const totalLikes = postsData?.reduce((sum, post) => sum + (post.likes_count || 0), 0) || 0;
+      setStats({
+        postsCount: postsData?.length || 0,
+        storiesCount: storiesData?.length || 0,
+        likesCount: totalLikes
+      });
+    } catch (err) {
+      console.error('Error fetching user data:', err);
+    } finally {
+      setLoading(false);
     }
-
-    // Fetch posts
-    const { data: postsData } = await supabase
-      .from('community_posts')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('is_active', true)
-      .order('created_at', { ascending: false });
-
-    if (postsData) {
-      // Add author info to posts
-      const postsWithAuthor = postsData.map(post => ({
-        ...post,
-        author: {
-          name: profileData?.name || 'İstifadəçi',
-          avatar_url: profileData?.avatar_url || null,
-          badge_type: profileData?.badge_type || null
-        },
-        is_liked: false
-      }));
-      setPosts(postsWithAuthor as CommunityPost[]);
-    }
-
-    // Fetch stories
-    const { data: storiesData } = await (supabase as any)
-      .from('community_stories')
-      .select('id, media_url, media_type, created_at')
-      .eq('user_id', userId)
-      .eq('is_active', true)
-      .order('created_at', { ascending: false });
-
-    if (storiesData) {
-      setStories(storiesData as UserStory[]);
-    }
-
-    // Calculate stats
-    const totalLikes = postsData?.reduce((sum, post) => sum + (post.likes_count || 0), 0) || 0;
-    setStats({
-      postsCount: postsData?.length || 0,
-      storiesCount: storiesData?.length || 0,
-      likesCount: totalLikes
-    });
-
-    setLoading(false);
   };
 
   const getBadgeLabel = (type: string | null) => {

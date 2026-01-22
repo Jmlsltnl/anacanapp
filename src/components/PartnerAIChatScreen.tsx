@@ -77,8 +77,15 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
         content: userMessage.content
       });
 
-      const response = await supabase.functions.invoke('dr-anacan-chat', {
-        body: {
+      // Use fetch for streaming support
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dr-anacan-chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+        body: JSON.stringify({
           messages: conversationHistory,
           lifeStage: partnerWomanData?.lifeStage || 'bump',
           isPartner: true,
@@ -86,40 +93,47 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
           userProfile: partnerWomanData ? {
             name: partnerWomanData.name
           } : undefined
-        }
+        })
       });
 
-      if (response.error) throw response.error;
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'API xətası');
+      }
 
       // Handle streaming response
-      const reader = response.data?.getReader?.();
+      const reader = response.body?.getReader();
       
       if (reader) {
         const decoder = new TextDecoder();
         let fullContent = '';
+        let buffer = '';
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
 
-          const chunk = decoder.decode(value);
-          const lines = chunk.split('\n');
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
 
           for (const line of lines) {
             if (line.startsWith('data: ')) {
-              const data = line.slice(6);
+              const data = line.slice(6).trim();
               if (data === '[DONE]') continue;
+              if (!data) continue;
 
               try {
                 const parsed = JSON.parse(data);
                 const content = parsed.choices?.[0]?.delta?.content || '';
-                fullContent += content;
-
-                setMessages(prev => prev.map(m => 
-                  m.id === assistantMessageId 
-                    ? { ...m, content: fullContent }
-                    : m
-                ));
+                if (content) {
+                  fullContent += content;
+                  setMessages(prev => prev.map(m => 
+                    m.id === assistantMessageId 
+                      ? { ...m, content: fullContent }
+                      : m
+                  ));
+                }
               } catch {
                 // Skip invalid JSON
               }
@@ -133,7 +147,7 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
             : m
         ));
       } else {
-        const data = response.data;
+        const data = await response.json();
         setMessages(prev => prev.map(m => 
           m.id === assistantMessageId 
             ? { ...m, isStreaming: false, content: data.message || 'Bağışlayın, cavab ala bilmədim.' }
