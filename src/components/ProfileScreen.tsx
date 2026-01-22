@@ -3,12 +3,13 @@ import { motion } from 'framer-motion';
 import { 
   Settings, Bell, Shield, HelpCircle, LogOut, 
   ChevronRight, Crown, Copy, Share2,
-  Heart, Calendar, Palette, ShieldCheck, Edit
+  Heart, Calendar, Palette, ShieldCheck, Edit, CreditCard
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useNotifications } from '@/hooks/useNotifications';
+import { PremiumModal } from '@/components/PremiumModal';
 
 interface ProfileScreenProps {
   onNavigate?: (screen: string) => void;
@@ -20,8 +21,10 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   const { toast } = useToast();
   const { unreadCount } = useNotifications();
   const [partnerCode] = useState(profile?.partner_code || 'ANACAN-XXXX');
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   const menuItems = [
+    { id: 'billing', icon: CreditCard, label: 'Abunəliyim' },
     { id: 'notifications', icon: Bell, label: 'Bildirişlər', badge: unreadCount > 0 ? String(unreadCount) : undefined },
     { id: 'appearance', icon: Palette, label: 'Görünüş' },
     { id: 'calendar', icon: Calendar, label: 'Təqvim Ayarları' },
@@ -128,9 +131,9 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
         </div>
       </motion.div>
 
-      {/* Premium Banner */}
+      {/* Premium Banner - opens modal */}
       <motion.button
-        onClick={() => onNavigate?.('premium')}
+        onClick={() => setShowPremiumModal(true)}
         className="w-full bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-3xl p-5 mb-6 border border-amber-100 dark:border-amber-900/50 text-left"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -211,9 +214,13 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
               }`}
             >
               <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${
-                item.id === 'admin' ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-muted'
+                item.id === 'admin' ? 'bg-amber-100 dark:bg-amber-900/30' : 
+                item.id === 'billing' ? 'bg-green-100 dark:bg-green-900/30' : 'bg-muted'
               }`}>
-                <Icon className={`w-5 h-5 ${item.id === 'admin' ? 'text-amber-600' : 'text-muted-foreground'}`} />
+                <Icon className={`w-5 h-5 ${
+                  item.id === 'admin' ? 'text-amber-600' : 
+                  item.id === 'billing' ? 'text-green-600' : 'text-muted-foreground'
+                }`} />
               </div>
               <span className="flex-1 text-left font-medium text-foreground">{item.label}</span>
               {item.badge && (
@@ -249,6 +256,12 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
       <p className="text-center text-xs text-muted-foreground mt-6">
         Anacan v1.0.0 • Azərbaycan 🇦🇿
       </p>
+
+      {/* Premium Modal */}
+      <PremiumModal 
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+      />
     </div>
   );
 };
