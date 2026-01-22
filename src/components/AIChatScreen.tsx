@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Sparkles, User, Bot, Loader2, RefreshCw } from 'lucide-react';
+import { Send, Sparkles, User, Bot, Loader2, RefreshCw, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -16,15 +16,25 @@ interface Message {
   isStreaming?: boolean;
 }
 
-const AIChatScreen = () => {
+const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { lifeStage, getPregnancyData } = useUserStore();
+  const { lifeStage, getPregnancyData, name, dueDate, babyName, babyBirthDate, lastPeriodDate, cycleLength } = useUserStore();
   const { toast } = useToast();
   
   const pregnancyData = getPregnancyData();
+  
+  // Create profile object from store data
+  const userProfile = {
+    name: name || undefined,
+    due_date: dueDate ? new Date(dueDate).toISOString().split('T')[0] : undefined,
+    baby_name: babyName || undefined,
+    baby_birth_date: babyBirthDate ? new Date(babyBirthDate).toISOString().split('T')[0] : undefined,
+    last_period_date: lastPeriodDate ? new Date(lastPeriodDate).toISOString().split('T')[0] : undefined,
+    cycle_length: cycleLength
+  };
 
   useEffect(() => {
     if (messages.length === 0) {
@@ -45,15 +55,17 @@ const AIChatScreen = () => {
   }, [messages]);
 
   const getWelcomeMessage = () => {
+    const userName = name ? `, ${name}` : '';
+    
     switch (lifeStage) {
       case 'flow':
-        return 'Salam! 👋 Mən Dr. Anacan, sizin sağlamlıq köməkçinizəm. Menstrual sikliniz, simptomlarınız və ya ümumi sağlamlığınız haqqında suallarınız varsa, kömək etməkdən məmnun olaram! 💜';
+        return `Salam${userName}! 👋 Mən Anacan.AI, sizin sağlamlıq rəfiqənizəm. Menstrual sikliniz, simptomlarınız və ya ümumi sağlamlığınız haqqında suallarınız varsa, kömək etməkdən məmnun olaram! 💜`;
       case 'bump':
-        return `Salam, əziz ana! 🤰 Mən Dr. Anacan. ${pregnancyData ? `Hamiləliyin ${pregnancyData.currentWeek}-ci həftəsindəsiniz - körpəniz ${pregnancyData.babySize.fruit} böyüklüyündədir! ` : ''}Hamiləliyiniz haqqında hər hansı sualınız varsa, buradayam! 🌸`;
+        return `Salam, əziz ana${userName}! 🤰 Mən Anacan.AI. ${pregnancyData ? `Hamiləliyin ${pregnancyData.currentWeek}-ci həftəsindəsiniz - körpəniz ${pregnancyData.babySize.fruit} böyüklüyündədir! ` : ''}Hamiləliyiniz haqqında hər hansı sualınız varsa, buradayam! 🌸`;
       case 'mommy':
-        return 'Salam, əziz ana! 👶 Mən Dr. Anacan. Körpə baxımı, əmizdirmə, yuxu qaydaları və ya doğuşdan sonra bərpa haqqında suallarınız varsa, sizə kömək etməyə hazıram! 💕';
+        return `Salam, əziz ana${userName}! 👶 Mən Anacan.AI. Körpə baxımı, əmizdirmə, yuxu qaydaları və ya doğuşdan sonra bərpa haqqında suallarınız varsa, sizə kömək etməyə hazıram! 💕`;
       default:
-        return 'Salam! 👋 Mən Dr. Anacan, sizin AI sağlamlıq köməkçinizəm. Sizə necə kömək edə bilərəm?';
+        return `Salam${userName}! 👋 Mən Anacan.AI, sizin AI rəfiqənizəm. Sizə necə kömək edə bilərəm?`;
     }
   };
 
@@ -99,7 +111,15 @@ const AIChatScreen = () => {
           lifeStage: lifeStage || 'bump',
           pregnancyWeek: pregnancyData?.currentWeek,
           isPartner: false,
-          stream: true
+          stream: true,
+          userProfile: {
+            name: userProfile.name,
+            dueDate: userProfile.due_date,
+            babyName: userProfile.baby_name,
+            babyBirthDate: userProfile.baby_birth_date,
+            lastPeriodDate: userProfile.last_period_date,
+            cycleLength: userProfile.cycle_length
+          }
         }
       });
 
@@ -209,7 +229,7 @@ const AIChatScreen = () => {
       ];
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-background to-muted/20">
+    <div ref={ref} className="flex flex-col h-full bg-gradient-to-b from-background to-muted/20">
       {/* Header */}
       <div className="px-5 py-4 border-b border-border bg-card/50 backdrop-blur-sm">
         <div className="flex items-center justify-between">
@@ -222,16 +242,24 @@ const AIChatScreen = () => {
               <Sparkles className="w-6 h-6 text-white" />
             </motion.div>
             <div>
-              <h1 className="font-bold text-lg text-foreground">Dr. Anacan</h1>
+              <h1 className="font-bold text-lg text-foreground">Anacan.AI</h1>
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-xs text-muted-foreground">AI Powered by Gemini 3.0 Pro</span>
+                <span className="text-xs text-muted-foreground">AI Rəfiqəniz</span>
               </div>
             </div>
           </div>
           <Button variant="ghost" size="icon" onClick={clearChat}>
             <RefreshCw className="w-5 h-5" />
           </Button>
+        </div>
+      </div>
+
+      {/* Disclaimer Banner */}
+      <div className="px-4 py-2 bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800">
+        <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400">
+          <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
+          <span>Tibbi məsləhətlər yalnız həkim tərəfindən təsdiqlənməlidir</span>
         </div>
       </div>
 
@@ -316,7 +344,7 @@ const AIChatScreen = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Dr. Anacan-a sualınızı yazın..."
+              placeholder="Anacan.AI-yə sualınızı yazın..."
               className="min-h-[48px] max-h-[120px] pr-4 resize-none rounded-2xl border-2 focus:border-primary/50"
               disabled={isLoading}
             />
@@ -337,6 +365,8 @@ const AIChatScreen = () => {
       </div>
     </div>
   );
-};
+});
+
+AIChatScreen.displayName = 'AIChatScreen';
 
 export default AIChatScreen;

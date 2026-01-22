@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Image, Video, Send, Loader2 } from 'lucide-react';
+import { X, Image, Video, Send, Loader2, Play } from 'lucide-react';
 import { CommunityGroup, useCreatePost } from '@/hooks/useCommunity';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/native';
+import { useToast } from '@/hooks/use-toast';
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -21,13 +22,34 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<{ url: string; type: 'image' | 'video' }[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const createPost = useCreatePost();
+  const { toast } = useToast();
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video') => {
     const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    
     if (files.length + mediaFiles.length > 4) {
-      alert('Maximum 4 fayl yükləyə bilərsiniz');
+      toast({
+        title: 'Limit aşıldı',
+        description: 'Maximum 4 fayl yükləyə bilərsiniz',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    // Validate file sizes (max 50MB for videos, 10MB for images)
+    const maxSize = type === 'video' ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+    const oversizedFiles = files.filter(f => f.size > maxSize);
+    if (oversizedFiles.length > 0) {
+      toast({
+        title: 'Fayl çox böyükdür',
+        description: type === 'video' ? 'Video maksimum 50MB ola bilər' : 'Şəkil maksimum 10MB ola bilər',
+        variant: 'destructive'
+      });
       return;
     }
 
@@ -39,6 +61,11 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
       type: type,
     }));
     setMediaPreviews(prev => [...prev, ...newPreviews]);
+
+    // Reset input
+    if (e.target) {
+      e.target.value = '';
+    }
   };
 
   const uploadMedia = async (): Promise<string[]> => {
@@ -50,12 +77,20 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
     const urls: string[] = [];
 
     for (const file of mediaFiles) {
-      const fileName = `${user.id}/${Date.now()}-${file.name}`;
+      const fileExt = file.name.split('.').pop() || 'jpg';
+      const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      
       const { error } = await supabase.storage
         .from('community-media')
-        .upload(fileName, file);
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Upload error:', error);
+        throw new Error(`Fayl yüklənə bilmədi: ${error.message}`);
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from('community-media')
@@ -68,7 +103,14 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
   };
 
   const handleSubmit = async () => {
-    if (!content.trim()) return;
+    if (!content.trim() && mediaFiles.length === 0) {
+      toast({
+        title: 'Boş paylaşım',
+        description: 'Zəhmət olmasa mətn yazın və ya media əlavə edin',
+        variant: 'destructive'
+      });
+      return;
+    }
 
     hapticFeedback.medium();
     setIsUploading(true);
@@ -77,24 +119,41 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
       const mediaUrls = await uploadMedia();
       await createPost.mutateAsync({
         groupId: selectedGroupId,
-        content: content.trim(),
+        content: content.trim() || '📷',
         mediaUrls,
       });
 
+      // Cleanup
+      mediaPreviews.forEach(p => URL.revokeObjectURL(p.url));
       setContent('');
       setMediaFiles([]);
       setMediaPreviews([]);
       onClose();
     } catch (error) {
       console.error('Error creating post:', error);
+      toast({
+        title: 'Xəta baş verdi',
+        description: error instanceof Error ? error.message : 'Paylaşım yaradıla bilmədi',
+        variant: 'destructive'
+      });
     } finally {
       setIsUploading(false);
     }
   };
 
   const removeMedia = (index: number) => {
+    URL.revokeObjectURL(mediaPreviews[index].url);
     setMediaFiles(prev => prev.filter((_, i) => i !== index));
     setMediaPreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleClose = () => {
+    // Cleanup URLs on close
+    mediaPreviews.forEach(p => URL.revokeObjectURL(p.url));
+    setContent('');
+    setMediaFiles([]);
+    setMediaPreviews([]);
+    onClose();
   };
 
   return (
@@ -107,7 +166,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 z-50"
-            onClick={onClose}
+            onClick={handleClose}
           />
 
           {/* Modal */}
@@ -122,7 +181,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-black text-foreground">Yeni Paylaşım</h2>
                 <button
-                  onClick={onClose}
+                  onClick={handleClose}
                   className="w-10 h-10 rounded-full bg-muted flex items-center justify-center"
                 >
                   <X className="w-5 h-5" />
@@ -145,7 +204,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
                     <SelectItem value="public">🌍 Ümumi (Hamı görə bilər)</SelectItem>
                     {groups.map((group) => (
                       <SelectItem key={group.id} value={group.id}>
-                        {group.icon_emoji} {group.name}
+                        {group.icon_emoji || '👥'} {group.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -156,35 +215,42 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
               <Textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="Nə düşünürsünüz?"
-                className="min-h-[120px] rounded-xl resize-none mb-4"
+                placeholder="Nə düşünürsünüz? ✨"
+                className="min-h-[120px] rounded-xl resize-none mb-4 text-base"
               />
 
               {/* Media Previews */}
               {mediaPreviews.length > 0 && (
                 <div className="grid grid-cols-2 gap-2 mb-4">
                   {mediaPreviews.map((preview, index) => (
-                    <div key={index} className="relative">
+                    <div key={index} className="relative aspect-square rounded-xl overflow-hidden bg-muted">
                       {preview.type === 'video' ? (
-                        <video
-                          src={preview.url}
-                          className="w-full h-24 object-cover rounded-xl"
-                        />
+                        <div className="relative w-full h-full">
+                          <video
+                            src={preview.url}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                            <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
+                              <Play className="w-5 h-5 text-foreground ml-0.5" />
+                            </div>
+                          </div>
+                        </div>
                       ) : (
                         <img
                           src={preview.url}
                           alt=""
-                          className="w-full h-24 object-cover rounded-xl"
+                          className="w-full h-full object-cover"
                         />
                       )}
                       <button
                         onClick={() => removeMedia(index)}
-                        className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/50 flex items-center justify-center"
+                        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-colors"
                       >
                         <X className="w-4 h-4 text-white" />
                       </button>
                       {preview.type === 'video' && (
-                        <div className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/50 rounded text-white text-xs">
+                        <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-black/60 rounded text-white text-xs">
                           Video
                         </div>
                       )}
@@ -193,38 +259,53 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
                 </div>
               )}
 
+              {/* Hidden file inputs */}
+              <input
+                ref={imageInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={(e) => handleFileSelect(e, 'image')}
+              />
+              <input
+                ref={videoInputRef}
+                type="file"
+                accept="video/*"
+                className="hidden"
+                onChange={(e) => handleFileSelect(e, 'video')}
+              />
+
               {/* Actions */}
               <div className="flex items-center gap-3">
                 {/* Image upload */}
-                <label className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors">
+                <button
+                  onClick={() => imageInputRef.current?.click()}
+                  disabled={mediaFiles.length >= 4 || isUploading}
+                  className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                   <Image className="w-5 h-5 text-muted-foreground" />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    onChange={(e) => handleFileSelect(e, 'image')}
-                  />
-                </label>
+                </button>
 
                 {/* Video upload */}
-                <label className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors">
+                <button
+                  onClick={() => videoInputRef.current?.click()}
+                  disabled={mediaFiles.length >= 4 || isUploading}
+                  className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                   <Video className="w-5 h-5 text-muted-foreground" />
-                  <input
-                    type="file"
-                    accept="video/*"
-                    className="hidden"
-                    onChange={(e) => handleFileSelect(e, 'video')}
-                  />
-                </label>
+                </button>
 
                 <Button
                   onClick={handleSubmit}
-                  disabled={!content.trim() || isUploading || createPost.isPending}
+                  disabled={(!content.trim() && mediaFiles.length === 0) || isUploading || createPost.isPending}
                   className="flex-1 h-12 rounded-xl gradient-primary font-bold"
                 >
                   {isUploading || createPost.isPending ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>Yüklənir...</span>
+                    </div>
                   ) : (
                     <>
                       <Send className="w-5 h-5 mr-2" />
@@ -233,6 +314,13 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
                   )}
                 </Button>
               </div>
+
+              {/* Media count indicator */}
+              {mediaFiles.length > 0 && (
+                <p className="text-xs text-muted-foreground text-center mt-3">
+                  {mediaFiles.length}/4 media əlavə edildi
+                </p>
+              )}
             </div>
           </motion.div>
         </>
