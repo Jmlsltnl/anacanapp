@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  User, Settings, Bell, Shield, HelpCircle, LogOut, 
-  ChevronRight, Crown, Copy, Share2, FileText, Award,
-  Heart, Calendar, Moon, Palette, ShieldCheck
+  Settings, Bell, Shield, HelpCircle, LogOut, 
+  ChevronRight, Crown, Copy, Share2, Award,
+  Heart, Calendar, Palette, ShieldCheck
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
@@ -32,7 +32,6 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
     { id: 'appearance', icon: Palette, label: 'Görünüş' },
     { id: 'calendar', icon: Calendar, label: 'Təqvim Ayarları' },
     { id: 'privacy', icon: Shield, label: 'Gizlilik' },
-    { id: 'report', icon: FileText, label: 'Həkim Hesabatı' },
     { id: 'help', icon: HelpCircle, label: 'Yardım' },
     ...(isAdmin ? [{ id: 'admin', icon: ShieldCheck, label: 'Admin Panel', badge: 'Admin' }] : []),
   ];

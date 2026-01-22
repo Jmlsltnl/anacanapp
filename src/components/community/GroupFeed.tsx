@@ -1,8 +1,10 @@
 import { forwardRef } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, Users, Loader2 } from 'lucide-react';
+import { ArrowLeft, Plus, Users } from 'lucide-react';
 import { CommunityGroup, useGroupPosts } from '@/hooks/useCommunity';
+import { useGroupPresence } from '@/hooks/useGroupPresence';
 import PostCard from './PostCard';
+import GroupPresenceBar from './GroupPresenceBar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -15,6 +17,7 @@ interface GroupFeedProps {
 
 const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, onCreatePost, isEmbedded = false }, ref) => {
   const { data: posts = [], isLoading } = useGroupPosts(group?.id || null);
+  const { onlineCount, onlineUsers, typingUsers } = useGroupPresence(group?.id || null);
 
   if (isEmbedded) {
     // Embedded view for general feed
@@ -89,6 +92,15 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
             </Button>
           </div>
         </div>
+
+        {/* Presence Bar */}
+        {group && (
+          <GroupPresenceBar
+            onlineCount={onlineCount}
+            onlineUsers={onlineUsers}
+            typingUsers={typingUsers}
+          />
+        )}
       </div>
 
       {/* Feed */}

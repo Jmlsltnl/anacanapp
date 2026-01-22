@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Image, Send, Loader2 } from 'lucide-react';
+import { X, Image, Video, Send, Loader2 } from 'lucide-react';
 import { CommunityGroup, useCreatePost } from '@/hooks/useCommunity';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -19,21 +19,26 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
   const [content, setContent] = useState('');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(groupId);
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
-  const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
+  const [mediaPreviews, setMediaPreviews] = useState<{ url: string; type: 'image' | 'video' }[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
   const createPost = useCreatePost();
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video') => {
     const files = Array.from(e.target.files || []);
-    if (files.length > 4) {
-      alert('Maximum 4 şəkil yükləyə bilərsiniz');
+    if (files.length + mediaFiles.length > 4) {
+      alert('Maximum 4 fayl yükləyə bilərsiniz');
       return;
     }
 
-    setMediaFiles(files);
-    const previews = files.map(file => URL.createObjectURL(file));
-    setMediaPreviews(previews);
+    const newFiles = [...mediaFiles, ...files];
+    setMediaFiles(newFiles);
+    
+    const newPreviews = files.map(file => ({
+      url: URL.createObjectURL(file),
+      type: type,
+    }));
+    setMediaPreviews(prev => [...prev, ...newPreviews]);
   };
 
   const uploadMedia = async (): Promise<string[]> => {
@@ -160,17 +165,29 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
                 <div className="grid grid-cols-2 gap-2 mb-4">
                   {mediaPreviews.map((preview, index) => (
                     <div key={index} className="relative">
-                      <img
-                        src={preview}
-                        alt=""
-                        className="w-full h-24 object-cover rounded-xl"
-                      />
+                      {preview.type === 'video' ? (
+                        <video
+                          src={preview.url}
+                          className="w-full h-24 object-cover rounded-xl"
+                        />
+                      ) : (
+                        <img
+                          src={preview.url}
+                          alt=""
+                          className="w-full h-24 object-cover rounded-xl"
+                        />
+                      )}
                       <button
                         onClick={() => removeMedia(index)}
                         className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/50 flex items-center justify-center"
                       >
                         <X className="w-4 h-4 text-white" />
                       </button>
+                      {preview.type === 'video' && (
+                        <div className="absolute bottom-1 left-1 px-2 py-0.5 bg-black/50 rounded text-white text-xs">
+                          Video
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -178,6 +195,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
 
               {/* Actions */}
               <div className="flex items-center gap-3">
+                {/* Image upload */}
                 <label className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors">
                   <Image className="w-5 h-5 text-muted-foreground" />
                   <input
@@ -185,9 +203,21 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
                     accept="image/*"
                     multiple
                     className="hidden"
-                    onChange={handleFileSelect}
+                    onChange={(e) => handleFileSelect(e, 'image')}
                   />
                 </label>
+
+                {/* Video upload */}
+                <label className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors">
+                  <Video className="w-5 h-5 text-muted-foreground" />
+                  <input
+                    type="file"
+                    accept="video/*"
+                    className="hidden"
+                    onChange={(e) => handleFileSelect(e, 'video')}
+                  />
+                </label>
+
                 <Button
                   onClick={handleSubmit}
                   disabled={!content.trim() || isUploading || createPost.isPending}

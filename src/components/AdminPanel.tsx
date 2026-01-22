@@ -7,6 +7,7 @@ import AdminSettings from './admin/AdminSettings';
 import AdminData from './admin/AdminData';
 import AdminMessages from './admin/AdminMessages';
 import AdminSecurity from './admin/AdminSecurity';
+import AdminCommunity from './admin/AdminCommunity';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -23,6 +24,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminUsers />;
       case 'products':
         return <AdminProducts />;
+      case 'community':
+        return <AdminCommunity />;
       case 'data':
         return <AdminData />;
       case 'messages':

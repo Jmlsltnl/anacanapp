@@ -14,7 +14,6 @@ import PartnerProfileScreen from '@/components/PartnerProfileScreen';
 import NotificationsScreen from '@/components/NotificationsScreen';
 import SettingsScreen from '@/components/SettingsScreen';
 import CalendarScreen from '@/components/CalendarScreen';
-import DoctorReportScreen from '@/components/DoctorReportScreen';
 import AdminPanel from '@/components/AdminPanel';
 import BottomNav from '@/components/BottomNav';
 import MotherChatScreen from '@/components/MotherChatScreen';
@@ -155,9 +154,6 @@ const Index = () => {
   }
   if (activeScreen === 'calendar') {
     return <CalendarScreen onBack={() => setActiveScreen(null)} />;
-  }
-  if (activeScreen === 'report') {
-    return <DoctorReportScreen onBack={() => setActiveScreen(null)} />;
   }
 
   // Mother chat overlay (for woman role)
