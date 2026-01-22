@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Shield, Timer, Scale, Baby, Briefcase, 
   Volume2, Heart, Footprints, ChevronRight,
-  Utensils, Activity, ArrowLeft, Camera
+  Utensils, Activity, ArrowLeft, Camera, ChefHat
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import SafetyLookup from './tools/SafetyLookup';
@@ -17,6 +17,7 @@ import Nutrition from './tools/Nutrition';
 import Exercises from './tools/Exercises';
 import MoodDiary from './tools/MoodDiary';
 import BabyPhotoshoot from './tools/BabyPhotoshoot';
+import Recipes from './tools/Recipes';
 
 interface Tool {
   id: string;
@@ -29,6 +30,7 @@ interface Tool {
 
 const tools: Tool[] = [
   { id: 'photoshoot', name: 'Fotosessiya', description: 'AI körpə fotoları', icon: Camera, color: 'text-rose-600', bgColor: 'bg-rose-50' },
+  { id: 'recipes', name: 'Sağlam Reseptlər', description: 'Hamiləlik reseptləri', icon: ChefHat, color: 'text-green-600', bgColor: 'bg-green-50' },
   { id: 'safety', name: 'Təhlükəsizlik', description: 'Qida və fəaliyyət yoxlayın', icon: Shield, color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
   { id: 'kick', name: 'Təpik Sayğacı', description: 'Körpə hərəkətlərini izləyin', icon: Footprints, color: 'text-pink-600', bgColor: 'bg-pink-50' },
   { id: 'contraction', name: 'Sancı Ölçən', description: '5-1-1 qaydası ilə izləyin', icon: Timer, color: 'text-violet-600', bgColor: 'bg-violet-50' },
@@ -52,6 +54,7 @@ const ToolsHub = () => {
 
   // Render active tool
   if (activeTool === 'photoshoot') return <BabyPhotoshoot onBack={() => setActiveTool(null)} />;
+  if (activeTool === 'recipes') return <Recipes onBack={() => setActiveTool(null)} />;
   if (activeTool === 'safety') return <SafetyLookup onBack={() => setActiveTool(null)} />;
   if (activeTool === 'kick') return <KickCounter onBack={() => setActiveTool(null)} />;
   if (activeTool === 'contraction') return <ContractionTimer onBack={() => setActiveTool(null)} />;

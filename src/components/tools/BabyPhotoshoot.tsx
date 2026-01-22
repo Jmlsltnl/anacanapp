@@ -397,9 +397,9 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
   const canProceed = () => {
     switch (step) {
-      case 0: return !!sourceImage;
+      case 0: return !!sourceImage && !!customization.gender;
       case 1: return !!customization.background;
-      case 2: return true;
+      case 2: return !!customization.background && !!sourceImage;
       default: return false;
     }
   };
@@ -794,7 +794,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
       {/* Fixed Bottom Buttons */}
       {step < 3 && (
-        <div className="flex-shrink-0 px-5 py-4 bg-background border-t border-border safe-bottom">
+        <div className="flex-shrink-0 px-5 py-4 pb-8 bg-background border-t border-border">
           <div className="flex gap-3">
             {step > 0 && (
               <Button
@@ -827,7 +827,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                 ) : (
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-5 h-5" />
-                    <span>Foto Yarat</span>
+                    <span>Şəkil Yarat</span>
                   </div>
                 )}
               </Button>
@@ -837,7 +837,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
       )}
 
       {step === 3 && (
-        <div className="flex-shrink-0 px-5 py-4 bg-background border-t border-border safe-bottom">
+        <div className="flex-shrink-0 px-5 py-4 pb-8 bg-background border-t border-border">
           <Button
             onClick={() => setStep(0)}
             className="w-full h-14 rounded-2xl gradient-primary text-white font-bold"
