@@ -2,20 +2,13 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Settings, Bell, Shield, HelpCircle, LogOut, 
-  ChevronRight, Crown, Copy, Share2, Award,
-  Heart, Calendar, Palette, ShieldCheck
+  ChevronRight, Crown, Copy, Share2,
+  Heart, Calendar, Palette, ShieldCheck, Edit
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-
-const achievements = [
-  { id: '1', name: 'İlk Giriş', emoji: '🌟', unlocked: true },
-  { id: '2', name: 'İlk Log', emoji: '📝', unlocked: true },
-  { id: '3', name: '7 Gün Seriya', emoji: '🔥', unlocked: false },
-  { id: '4', name: 'Su Qəhrəmanı', emoji: '💧', unlocked: false },
-  { id: '5', name: 'Super Ana', emoji: '👑', unlocked: false },
-];
+import { useNotifications } from '@/hooks/useNotifications';
 
 interface ProfileScreenProps {
   onNavigate?: (screen: string) => void;
@@ -25,10 +18,11 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   const { name, email, lifeStage, role } = useUserStore();
   const { signOut, profile, isAdmin } = useAuth();
   const { toast } = useToast();
+  const { unreadCount } = useNotifications();
   const [partnerCode] = useState(profile?.partner_code || 'ANACAN-XXXX');
 
   const menuItems = [
-    { id: 'notifications', icon: Bell, label: 'Bildirişlər', badge: '3' },
+    { id: 'notifications', icon: Bell, label: 'Bildirişlər', badge: unreadCount > 0 ? String(unreadCount) : undefined },
     { id: 'appearance', icon: Palette, label: 'Görünüş' },
     { id: 'calendar', icon: Calendar, label: 'Təqvim Ayarları' },
     { id: 'privacy', icon: Shield, label: 'Gizlilik' },
@@ -86,6 +80,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
       >
         <h1 className="text-2xl font-black text-foreground">Profil</h1>
         <motion.button 
+          onClick={() => onNavigate?.('settings')}
           className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -122,13 +117,21 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
               )}
             </div>
           </div>
+          <motion.button
+            onClick={() => onNavigate?.('edit-profile')}
+            className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <Edit className="w-5 h-5 text-white" />
+          </motion.button>
         </div>
       </motion.div>
 
       {/* Premium Banner */}
       <motion.button
         onClick={() => onNavigate?.('premium')}
-        className="w-full bg-gradient-to-r from-amber-50 to-orange-50 rounded-3xl p-5 mb-6 border border-amber-100 text-left"
+        className="w-full bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-3xl p-5 mb-6 border border-amber-100 dark:border-amber-900/50 text-left"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
@@ -189,41 +192,6 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
         </motion.div>
       )}
 
-      {/* Achievements */}
-      <motion.div
-        className="mb-6"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3 }}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-foreground">Nailiyyətlər</h3>
-          <button className="text-primary text-sm font-semibold flex items-center gap-1">
-            Hamısı <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-        <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-2">
-          {achievements.map((achievement) => (
-            <motion.div
-              key={achievement.id}
-              className={`flex-shrink-0 w-20 text-center ${
-                achievement.unlocked ? '' : 'opacity-40'
-              }`}
-              whileHover={{ scale: 1.05 }}
-            >
-              <div className={`w-16 h-16 mx-auto rounded-2xl ${
-                achievement.unlocked 
-                  ? 'bg-gradient-to-r from-amber-100 to-orange-100 border-2 border-amber-200' 
-                  : 'bg-muted'
-              } flex items-center justify-center text-3xl mb-2`}>
-                {achievement.emoji}
-              </div>
-              <p className="text-[10px] font-medium text-muted-foreground">{achievement.name}</p>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
-
       {/* Menu Items */}
       <motion.div
         className="bg-card rounded-3xl overflow-hidden shadow-card border border-border/50"
@@ -243,7 +211,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
               }`}
             >
               <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${
-                item.id === 'admin' ? 'bg-amber-100' : 'bg-muted'
+                item.id === 'admin' ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-muted'
               }`}>
                 <Icon className={`w-5 h-5 ${item.id === 'admin' ? 'text-amber-600' : 'text-muted-foreground'}`} />
               </div>
@@ -251,7 +219,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
               {item.badge && (
                 <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
                   item.id === 'admin' 
-                    ? 'bg-amber-100 text-amber-700' 
+                    ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' 
                     : 'bg-destructive text-white'
                 }`}>
                   {item.badge}

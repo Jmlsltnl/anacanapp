@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Camera, Save, User, Mail, Calendar, Baby, Loader2 } from 'lucide-react';
+import { ArrowLeft, Camera, Save, User, Calendar, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserStore } from '@/store/userStore';
@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import type { LifeStage } from '@/types/anacan';
 
 interface ProfileEditScreenProps {
   onBack: () => void;
@@ -17,7 +18,7 @@ interface ProfileEditScreenProps {
 
 const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
   const { user, profile, updateProfile } = useAuth();
-  const { lifeStage, babyName, dueDate, lastPeriodDate, cycleLength } = useUserStore();
+  const { lifeStage, babyName, dueDate, lastPeriodDate, cycleLength, setLifeStage, setDueDate, setLastPeriodDate, setCycleLength, setBabyData, babyGender, babyBirthDate } = useUserStore();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -27,7 +28,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
     name: profile?.name || '',
     bio: '',
     avatar_url: profile?.avatar_url || '',
-    life_stage: lifeStage || 'bump',
+    life_stage: (lifeStage || 'bump') as LifeStage,
     baby_name: babyName || '',
     due_date: dueDate ? new Date(dueDate).toISOString().split('T')[0] : '',
     last_period_date: lastPeriodDate ? new Date(lastPeriodDate).toISOString().split('T')[0] : '',
@@ -43,8 +44,8 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
         .select('bio')
         .eq('user_id', user.id)
         .single();
-      if (data?.bio) {
-        setFormData(prev => ({ ...prev, bio: data.bio }));
+      if (data && 'bio' in data && data.bio) {
+        setFormData(prev => ({ ...prev, bio: data.bio as string }));
       }
     };
     loadBio();
@@ -101,14 +102,14 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
 
       if (error) throw error;
 
-      // Update local store
-      const store = useUserStore.getState();
-      store.setName(formData.name);
-      store.setLifeStage(formData.life_stage as any);
-      if (formData.baby_name) store.setBabyName(formData.baby_name);
-      if (formData.due_date) store.setDueDate(new Date(formData.due_date));
-      if (formData.last_period_date) store.setLastPeriodDate(new Date(formData.last_period_date));
-      if (formData.cycle_length) store.setCycleLength(formData.cycle_length);
+      // Update local store using existing actions
+      setLifeStage(formData.life_stage);
+      if (formData.due_date) setDueDate(new Date(formData.due_date));
+      if (formData.last_period_date) setLastPeriodDate(new Date(formData.last_period_date));
+      if (formData.cycle_length) setCycleLength(formData.cycle_length);
+      if (formData.baby_name && babyBirthDate && babyGender) {
+        setBabyData(new Date(babyBirthDate), formData.baby_name, babyGender);
+      }
 
       // Refresh auth profile
       await updateProfile({ name: formData.name });
@@ -120,6 +121,10 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLifeStageChange = (value: string) => {
+    setFormData(prev => ({ ...prev, life_stage: value as LifeStage }));
   };
 
   return (
@@ -218,7 +223,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
             <label className="text-sm font-medium text-muted-foreground">Mərhələ</label>
             <Select
               value={formData.life_stage}
-              onValueChange={(v) => setFormData(prev => ({ ...prev, life_stage: v }))}
+              onValueChange={handleLifeStageChange}
             >
               <SelectTrigger>
                 <SelectValue />
