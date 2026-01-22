@@ -6,7 +6,7 @@ import {
   Sparkles, Baby, Clock, AlertCircle, Home,
   Coffee, Flower2, Stethoscope, Star, Trophy,
   TrendingUp, Target, Zap, Send, Smile,
-  Footprints, Droplets, Activity
+  Footprints, Droplets, Activity, BarChart3
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { hapticFeedback } from '@/lib/native';
@@ -17,6 +17,9 @@ import { usePartnerData } from '@/hooks/usePartnerData';
 import { usePartnerMessages } from '@/hooks/usePartnerMessages';
 import { supabase } from '@/integrations/supabase/client';
 import { FRUIT_SIZES } from '@/types/anacan';
+import PartnerChatScreen from './partner/PartnerChatScreen';
+import WeeklyStatsTab from './partner/WeeklyStatsTab';
+import NotificationsTab from './partner/NotificationsTab';
 
 interface Mission {
   id: string;
@@ -82,7 +85,8 @@ const PartnerDashboard = () => {
   const { partnerProfile, partnerDailyLog, loading: partnerLoading, getPregnancyWeek, getDaysUntilDue } = usePartnerData();
   const { items: shoppingItems, addItem, toggleItem, loading: shoppingLoading } = useShoppingItems();
   const { messages, markAsRead, getUnreadCount } = usePartnerMessages();
-  const [activeTab, setActiveTab] = useState<'home' | 'missions' | 'shopping' | 'notifications'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'missions' | 'shopping' | 'notifications' | 'stats'>('home');
+  const [showChat, setShowChat] = useState(false);
   const [missions, setMissions] = useState<Mission[]>([
     { id: '1', title: 'Səhər çay hazırla', description: 'Zəncəfilli çay ürəkbulanmaya kömək edir', icon: Coffee, points: 10, isCompleted: false, category: 'care', difficulty: 'easy' },
     { id: '2', title: 'Ayaq masajı et', description: 'Axşam 15 dəqiqə rahatlatıcı masaj', icon: Heart, points: 20, isCompleted: true, category: 'care', difficulty: 'medium' },
@@ -229,6 +233,11 @@ const PartnerDashboard = () => {
     }
   };
 
+  // Show chat screen if active
+  if (showChat) {
+    return <PartnerChatScreen onBack={() => setShowChat(false)} />;
+  }
+
   return (
     <div className="min-h-screen pb-28 bg-gradient-to-b from-indigo-50 to-background">
       {/* Header */}
@@ -327,11 +336,12 @@ const PartnerDashboard = () => {
 
       {/* Tabs */}
       <div className="px-5 -mt-6">
-        <div className="bg-card rounded-2xl p-1.5 flex gap-1 shadow-lg">
+        <div className="bg-card rounded-2xl p-1.5 flex gap-1 shadow-lg overflow-x-auto scrollbar-hide">
           {[
             { id: 'home', label: 'Əsas', icon: Home },
-            { id: 'notifications', label: 'Bildirişlər', icon: Bell, badge: getUnreadCount() },
-            { id: 'missions', label: 'Tapşırıqlar', icon: Target },
+            { id: 'notifications', label: 'Bildiriş', icon: Bell, badge: getUnreadCount() },
+            { id: 'stats', label: 'Statistika', icon: BarChart3 },
+            { id: 'missions', label: 'Tapşırıq', icon: Target },
             { id: 'shopping', label: 'Alış-veriş', icon: ShoppingCart },
           ].map(tab => {
             const Icon = tab.icon;
@@ -429,14 +439,13 @@ const PartnerDashboard = () => {
                 </div>
               </motion.div>
 
-              {/* Quick Actions */}
               <h2 className="font-bold text-lg pt-2">Sürətli Hərəkətlər</h2>
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { icon: Heart, label: 'Sevgi göndər', color: 'bg-gradient-to-br from-pink-400 to-rose-500', textColor: 'text-white', action: sendLove },
-                  { icon: MessageCircle, label: 'Mesaj yaz', color: 'bg-gradient-to-br from-blue-400 to-indigo-500', textColor: 'text-white', action: () => document.getElementById('quick-message-input')?.focus() },
+                  { icon: MessageCircle, label: 'Canlı chat', color: 'bg-gradient-to-br from-blue-400 to-indigo-500', textColor: 'text-white', action: () => setShowChat(true) },
                   { icon: Gift, label: 'Sürpriz planla', color: 'bg-gradient-to-br from-amber-400 to-orange-500', textColor: 'text-white' },
-                  { icon: Smile, label: 'Əhval yoxla', color: 'bg-gradient-to-br from-emerald-400 to-teal-500', textColor: 'text-white' },
+                  { icon: BarChart3, label: 'Statistika', color: 'bg-gradient-to-br from-emerald-400 to-teal-500', textColor: 'text-white', action: () => setActiveTab('stats') },
                 ].map((action, index) => {
                   const Icon = action.icon;
                   return (
@@ -504,167 +513,10 @@ const PartnerDashboard = () => {
             </motion.div>
           )}
 
-          {activeTab === 'notifications' && (
-            <motion.div
-              key="notifications"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              className="space-y-4"
-            >
-              <div className="flex items-center justify-between">
-                <h2 className="font-bold text-lg">Bildiriş Tarixçəsi</h2>
-                <span className="text-sm text-muted-foreground">
-                  {messages.length} bildiriş
-                </span>
-              </div>
+          {activeTab === 'notifications' && <NotificationsTab />}
 
-              {messages.length === 0 ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-center py-12"
-                >
-                  <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-                    <Bell className="w-10 h-10 text-muted-foreground" />
-                  </div>
-                  <p className="text-muted-foreground">Hələ bildiriş yoxdur</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Partnyorunuz əhvalını qeyd etdikdə burada görəcəksiniz
-                  </p>
-                </motion.div>
-              ) : (
-                <div className="relative">
-                  {/* Timeline line */}
-                  <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border" />
-                  
-                  <div className="space-y-4">
-                    {messages.map((message, index) => {
-                      const getMessageDetails = (msg: typeof message) => {
-                        let parsedContent: any = null;
-                        try {
-                          if (msg.content) {
-                            parsedContent = JSON.parse(msg.content);
-                          }
-                        } catch {
-                          parsedContent = { body: msg.content };
-                        }
+          {activeTab === 'stats' && <WeeklyStatsTab />}
 
-                        switch (msg.message_type) {
-                          case 'love':
-                            return { 
-                              icon: Heart, 
-                              color: 'bg-pink-100 text-pink-600',
-                              title: 'Sevgi göndərdi ❤️',
-                              body: 'Partnyorunuz sizə sevgi göndərdi'
-                            };
-                          case 'mood_update':
-                            return { 
-                              icon: Smile, 
-                              color: 'bg-violet-100 text-violet-600',
-                              title: parsedContent?.title || 'Əhval yeniləndi',
-                              body: parsedContent?.body || 'Partnyorunuz əhvalını qeyd etdi'
-                            };
-                          case 'contraction_started':
-                            return { 
-                              icon: Activity, 
-                              color: 'bg-amber-100 text-amber-600',
-                              title: parsedContent?.title || 'Sancı başladı! ⏱️',
-                              body: parsedContent?.body || 'Partnyorunuz sancı qeyd etdi'
-                            };
-                          case 'contraction_511':
-                            return { 
-                              icon: AlertCircle, 
-                              color: 'bg-red-100 text-red-600',
-                              title: '⚠️ 5-1-1 Qaydası!',
-                              body: 'Xəstəxanaya getmə vaxtı ola bilər!'
-                            };
-                          case 'kick_session':
-                            return { 
-                              icon: Footprints, 
-                              color: 'bg-blue-100 text-blue-600',
-                              title: parsedContent?.title || 'Körpə təpik atdı! 👶',
-                              body: parsedContent?.body || 'Körpə aktiv idi'
-                            };
-                          case 'water_goal':
-                            return { 
-                              icon: Droplets, 
-                              color: 'bg-cyan-100 text-cyan-600',
-                              title: parsedContent?.title || 'Su hədəfinə çatdı! 💧',
-                              body: 'Gündəlik su hədəfinə çatdı'
-                            };
-                          case 'text':
-                            return { 
-                              icon: MessageCircle, 
-                              color: 'bg-emerald-100 text-emerald-600',
-                              title: 'Mesaj',
-                              body: msg.content || ''
-                            };
-                          default:
-                            return { 
-                              icon: Bell, 
-                              color: 'bg-gray-100 text-gray-600',
-                              title: parsedContent?.title || 'Bildiriş',
-                              body: parsedContent?.body || msg.content || ''
-                            };
-                        }
-                      };
-
-                      const details = getMessageDetails(message);
-                      const Icon = details.icon;
-                      const date = new Date(message.created_at);
-                      const isToday = new Date().toDateString() === date.toDateString();
-                      const timeStr = date.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' });
-                      const dateStr = isToday ? 'Bu gün' : date.toLocaleDateString('az-AZ', { day: 'numeric', month: 'short' });
-
-                      return (
-                        <motion.div
-                          key={message.id}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="relative pl-14"
-                          onClick={() => !message.is_read && markAsRead(message.id)}
-                        >
-                          {/* Timeline dot */}
-                          <div className={`absolute left-4 top-4 w-5 h-5 rounded-full border-2 border-background ${details.color} flex items-center justify-center z-10`}>
-                            <div className={`w-2 h-2 rounded-full ${message.is_read ? 'bg-current opacity-50' : 'bg-current'}`} />
-                          </div>
-
-                          <div className={`bg-card rounded-2xl p-4 shadow-card border-2 ${
-                            message.is_read ? 'border-border/50' : 'border-primary/30 bg-primary/5'
-                          }`}>
-                            <div className="flex items-start gap-3">
-                              <div className={`w-10 h-10 rounded-xl ${details.color} flex items-center justify-center flex-shrink-0`}>
-                                <Icon className="w-5 h-5" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between gap-2">
-                                  <h3 className={`font-semibold text-sm ${message.is_read ? 'text-foreground' : 'text-primary'}`}>
-                                    {details.title}
-                                  </h3>
-                                  <div className="text-right flex-shrink-0">
-                                    <p className="text-[10px] text-muted-foreground">{dateStr}</p>
-                                    <p className="text-xs font-medium text-muted-foreground">{timeStr}</p>
-                                  </div>
-                                </div>
-                                <p className="text-sm text-muted-foreground mt-1">{details.body}</p>
-                                {!message.is_read && (
-                                  <span className="inline-block mt-2 px-2 py-0.5 bg-primary/20 text-primary text-[10px] font-medium rounded-full">
-                                    Yeni
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          )}
 
           {activeTab === 'missions' && (
             <motion.div
