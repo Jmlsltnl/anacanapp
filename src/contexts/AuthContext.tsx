@@ -276,6 +276,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let mounted = true;
 
+    // Failsafe: never let the app stay stuck behind a global loading spinner.
+    const bootstrapTimeout = setTimeout(() => {
+      if (!mounted) return;
+      console.warn('Auth bootstrap timeout - forcing loading=false');
+      setLoading(false);
+    }, 8000);
+
+    const hydrateUser = async (u: User) => {
+      try {
+        const [profileRes, roleRes] = await Promise.allSettled([
+          fetchProfile(u.id),
+          fetchUserRole(u.id),
+        ]);
+
+        if (!mounted) return;
+
+        const profileData = profileRes.status === 'fulfilled' ? profileRes.value : null;
+        const roleData = roleRes.status === 'fulfilled' ? roleRes.value : null;
+
+        setProfile(profileData);
+        setUserRole(roleData);
+
+        // Re-sync store with better name if profile is available.
+        setAuth(
+          true,
+          u.id,
+          u.email || '',
+          profileData?.name || u.user_metadata?.name || 'İstifadəçi'
+        );
+        syncProfileToStore(profileData);
+      } catch (error) {
+        console.error('Error hydrating user:', error);
+      }
+    };
+
     const initializeAuth = async () => {
       try {
         const {
@@ -288,24 +323,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setSession(initialSession);
           setUser(initialSession.user);
 
-          const [profileData, roleData] = await Promise.all([
-            fetchProfile(initialSession.user.id),
-            fetchUserRole(initialSession.user.id),
-          ]);
-
-          if (!mounted) return;
-
-          setProfile(profileData);
-          setUserRole(roleData);
+          // Unblock UI immediately; hydrate profile/role in background.
           setAuth(
             true,
             initialSession.user.id,
             initialSession.user.email || '',
-            profileData?.name || initialSession.user.user_metadata?.name || 'İstifadəçi'
+            initialSession.user.user_metadata?.name || 'İstifadəçi'
           );
-          syncProfileToStore(profileData);
+          setLoading(false);
+          void hydrateUser(initialSession.user);
         } else {
           storeLogout();
+          setLoading(false);
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
@@ -327,26 +356,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(currentSession?.user ?? null);
 
         if (currentSession?.user) {
-          const [profileData, roleData] = await Promise.all([
-            fetchProfile(currentSession.user.id),
-            fetchUserRole(currentSession.user.id),
-          ]);
-
-          if (!mounted) return;
-
-          setProfile(profileData);
-          setUserRole(roleData);
           setAuth(
             true,
             currentSession.user.id,
             currentSession.user.email || '',
-            profileData?.name || currentSession.user.user_metadata?.name || 'İstifadəçi'
+            currentSession.user.user_metadata?.name || 'İstifadəçi'
           );
-          syncProfileToStore(profileData);
+          setLoading(false);
+          void hydrateUser(currentSession.user);
         } else {
           setProfile(null);
           setUserRole(null);
           storeLogout();
+          setLoading(false);
         }
       } catch (error) {
         console.error('Error handling auth state change:', error);
@@ -357,6 +379,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => {
       mounted = false;
+      clearTimeout(bootstrapTimeout);
       subscription.unsubscribe();
     };
   }, [fetchProfile, fetchUserRole, setAuth, syncProfileToStore, storeLogout]);
