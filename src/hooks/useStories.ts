@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
+import { getPublicProfileCards } from '@/lib/public-profile-cards';
 
 export interface Story {
   id: string;
@@ -51,14 +52,12 @@ export const useStories = (groupId?: string | null) => {
       const { data, error } = await query;
       if (error) throw error;
 
+      const authorMap = await getPublicProfileCards((data || []).map((s: any) => s.user_id));
+
       // Fetch author details and view status
       const storiesWithDetails = await Promise.all(
         (data || []).map(async (story: any) => {
-          const { data: authorData } = await supabase
-            .from('profiles')
-            .select('name, avatar_url')
-            .eq('user_id', story.user_id)
-            .single();
+          const authorData = authorMap[story.user_id];
 
           let isViewed = false;
           if (user) {
@@ -73,7 +72,9 @@ export const useStories = (groupId?: string | null) => {
 
           return {
             ...story,
-            author: authorData || { name: 'İstifadəçi', avatar_url: null },
+            author: authorData
+              ? { name: authorData.name || 'İstifadəçi', avatar_url: authorData.avatar_url || null }
+              : { name: 'İstifadəçi', avatar_url: null },
             is_viewed: isViewed,
           };
         })
