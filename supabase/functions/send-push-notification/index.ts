@@ -12,6 +12,12 @@ interface PushPayload {
   data?: Record<string, unknown>;
 }
 
+interface FCMResponse {
+  success?: number;
+  failure?: number;
+  results?: Array<{ message_id?: string; error?: string }>;
+}
+
 Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -54,50 +60,92 @@ Deno.serve(async (req) => {
       );
     }
 
-    // For now, we'll log the push notification request
-    // In production, you would integrate with:
-    // - Firebase Cloud Messaging (FCM) for Android
-    // - Apple Push Notification Service (APNs) for iOS
-    // This requires additional setup with FCM/APNs credentials
-
-    console.log(`Push notification request for user ${userId}:`);
-    console.log(`Title: ${title}`);
-    console.log(`Body: ${body}`);
-    console.log(`Tokens: ${tokens.length}`);
-    tokens.forEach((t) => {
-      console.log(`  - Platform: ${t.platform}, Token: ${t.token.substring(0, 20)}...`);
-    });
-
-    // Placeholder for actual push implementation
-    // You would need to:
-    // 1. Set up FCM project and get server key
-    // 2. Add FCM_SERVER_KEY as a secret
-    // 3. Send HTTP request to FCM API
+    // Get FCM server key
+    const fcmKey = Deno.env.get('FCM_SERVER_KEY');
     
-    // Example FCM request (requires FCM_SERVER_KEY secret):
-    // const fcmKey = Deno.env.get('FCM_SERVER_KEY');
-    // if (fcmKey) {
-    //   for (const { token, platform } of tokens) {
-    //     await fetch('https://fcm.googleapis.com/fcm/send', {
-    //       method: 'POST',
-    //       headers: {
-    //         'Authorization': `key=${fcmKey}`,
-    //         'Content-Type': 'application/json',
-    //       },
-    //       body: JSON.stringify({
-    //         to: token,
-    //         notification: { title, body },
-    //         data: data || {},
-    //       }),
-    //     });
-    //   }
-    // }
+    if (!fcmKey) {
+      console.log('FCM_SERVER_KEY not configured, logging push request only');
+      console.log(`Push notification request for user ${userId}:`);
+      console.log(`Title: ${title}, Body: ${body}, Tokens: ${tokens.length}`);
+      
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: `FCM not configured. Push notification logged for ${tokens.length} device(s)`,
+          sent: 0,
+          logged: tokens.length,
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Send push notifications via FCM
+    let successCount = 0;
+    let failureCount = 0;
+    const results: Array<{ token: string; success: boolean; error?: string }> = [];
+
+    for (const { token, platform } of tokens) {
+      try {
+        const fcmResponse = await fetch('https://fcm.googleapis.com/fcm/send', {
+          method: 'POST',
+          headers: {
+            'Authorization': `key=${fcmKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            to: token,
+            notification: {
+              title,
+              body,
+              sound: 'default',
+              badge: 1,
+            },
+            data: {
+              ...data,
+              click_action: 'FLUTTER_NOTIFICATION_CLICK',
+            },
+            priority: 'high',
+          }),
+        });
+
+        const fcmResult: FCMResponse = await fcmResponse.json();
+        
+        if (fcmResult.success && fcmResult.success > 0) {
+          successCount++;
+          results.push({ token: token.substring(0, 20) + '...', success: true });
+        } else {
+          failureCount++;
+          const errorMsg = fcmResult.results?.[0]?.error || 'Unknown error';
+          results.push({ token: token.substring(0, 20) + '...', success: false, error: errorMsg });
+          
+          // If token is invalid, remove it from database
+          if (['InvalidRegistration', 'NotRegistered'].includes(errorMsg)) {
+            await supabase
+              .from('device_tokens')
+              .delete()
+              .eq('token', token);
+            console.log(`Removed invalid token: ${token.substring(0, 20)}...`);
+          }
+        }
+      } catch (error) {
+        failureCount++;
+        results.push({ 
+          token: token.substring(0, 20) + '...', 
+          success: false, 
+          error: error.message 
+        });
+      }
+    }
+
+    console.log(`Push notification sent: ${successCount} success, ${failureCount} failed`);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: `Push notification queued for ${tokens.length} device(s)`,
-        sent: tokens.length,
+        message: `Push notification sent to ${successCount}/${tokens.length} device(s)`,
+        sent: successCount,
+        failed: failureCount,
+        results,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

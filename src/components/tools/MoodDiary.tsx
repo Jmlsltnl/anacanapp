@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Heart, Calendar, Plus, 
@@ -30,7 +30,7 @@ const symptomOptions = [
   { id: 'calm', label: 'Sakit', emoji: '😌' },
 ];
 
-const MoodDiary = ({ onBack }: MoodDiaryProps) => {
+const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) => {
   const [activeTab, setActiveTab] = useState<'log' | 'history' | 'insights'>('log');
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
@@ -346,6 +346,8 @@ const MoodDiary = ({ onBack }: MoodDiaryProps) => {
       </div>
     </div>
   );
-};
+});
+
+MoodDiary.displayName = 'MoodDiary';
 
 export default MoodDiary;

@@ -179,6 +179,8 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
       console.error('Error sending media:', error);
     }
   };
+
+  const quickMessages = [
     'Səni sevirəm! ❤️',
     'Necəsən?',
     'Evə gəl 🏠',
@@ -292,7 +294,6 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
 
               {group.messages.map((msg, msgIdx) => {
                 const isMe = msg.sender_id === user?.id;
-                const isLove = msg.message_type === 'love';
 
                 return (
                   <motion.div
@@ -302,28 +303,7 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
                     transition={{ delay: msgIdx * 0.02 }}
                     className={`flex ${isMe ? 'justify-end' : 'justify-start'} mb-2`}
                   >
-                    {isLove ? (
-                      <motion.div
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 0.5 }}
-                        className="text-4xl"
-                      >
-                        ❤️
-                      </motion.div>
-                    ) : (
-                      <div
-                        className={`max-w-[75%] px-4 py-2.5 rounded-2xl ${
-                          isMe
-                            ? 'bg-primary text-white rounded-br-md'
-                            : 'bg-muted text-foreground rounded-bl-md'
-                        }`}
-                      >
-                        <p className="text-sm">{msg.content}</p>
-                        <p className={`text-[10px] mt-1 ${isMe ? 'text-white/70' : 'text-muted-foreground'}`}>
-                          {formatTime(msg.created_at)}
-                        </p>
-                      </div>
-                    )}
+                    <ChatMessageBubble message={msg} isMe={isMe} />
                   </motion.div>
                 );
               })}
@@ -349,7 +329,8 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
 
       {/* Input */}
       <div className="p-4 bg-card border-t border-border safe-bottom">
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
+          <ChatMediaUpload onUpload={sendMediaMessage} />
           <input
             type="text"
             value={newMessage}

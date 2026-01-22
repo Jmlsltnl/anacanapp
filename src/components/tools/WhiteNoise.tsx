@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Pause, Volume2, VolumeX } from 'lucide-react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -29,7 +29,7 @@ interface WhiteNoiseProps {
   onBack: () => void;
 }
 
-const WhiteNoise = ({ onBack }: WhiteNoiseProps) => {
+const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref) => {
   const { preferences, loading, updateWhiteNoiseVolume, updateWhiteNoiseTimer, updateLastWhiteNoiseSound } = useUserPreferences();
   
   const [activeSound, setActiveSound] = useState<string | null>(null);
@@ -295,6 +295,8 @@ const WhiteNoise = ({ onBack }: WhiteNoiseProps) => {
       </div>
     </div>
   );
-};
+});
+
+WhiteNoise.displayName = 'WhiteNoise';
 
 export default WhiteNoise;

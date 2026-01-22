@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Utensils, Apple, Coffee, Droplets, 
@@ -38,7 +38,7 @@ const mealTypes = [
   { id: 'snack', name: 'Qəlyanaltı', icon: Apple, time: 'İstənilən vaxt' },
 ];
 
-const Nutrition = ({ onBack }: NutritionProps) => {
+const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) => {
   const [activeTab, setActiveTab] = useState<'log' | 'foods' | 'water'>('log');
   const [selectedMeal, setSelectedMeal] = useState<string | null>(null);
   const { todayLog, loading, updateWaterIntake } = useDailyLogs();
@@ -269,6 +269,8 @@ const Nutrition = ({ onBack }: NutritionProps) => {
       </div>
     </div>
   );
-};
+});
+
+Nutrition.displayName = 'Nutrition';
 
 export default Nutrition;
