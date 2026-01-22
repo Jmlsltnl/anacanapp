@@ -25,6 +25,10 @@ export interface Profile {
   baby_count: number | null;
   multiples_type: 'single' | 'twins' | 'triplets' | 'quadruplets' | null;
   start_weight: number | null;
+  is_premium: boolean | null;
+  premium_until: string | null;
+  badge_type: string | null;
+  bio: string | null;
   created_at: string;
   updated_at: string;
 }

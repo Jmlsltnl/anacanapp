@@ -42,7 +42,10 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
   };
 
   const getPlanDetails = () => {
-    if (!subscription || subscription.plan_type === 'free') {
+    // Check if premium via profile OR subscription
+    const hasPremiumSubscription = subscription && (subscription.plan_type === 'premium' || subscription.plan_type === 'premium_plus');
+    
+    if (!hasPremiumSubscription && !isPremium) {
       return {
         name: 'Pulsuz Plan',
         price: '₼0',
@@ -60,7 +63,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
     }
 
     // Premium or Premium Plus
-    const isPremiumPlus = subscription.plan_type === 'premium_plus';
+    const isPremiumPlus = subscription?.plan_type === 'premium_plus';
     return {
       name: isPremiumPlus ? 'Premium Plus' : 'Premium',
       price: isPremiumPlus ? '₼79.99' : '₼9.99',
