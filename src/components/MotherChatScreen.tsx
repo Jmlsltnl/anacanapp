@@ -4,6 +4,8 @@ import { ArrowLeft, Send, Heart, Smile } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/native';
+import ChatMediaUpload from '@/components/chat/ChatMediaUpload';
+import ChatMessageBubble from '@/components/chat/ChatMessageBubble';
 
 interface ChatMessage {
   id: string;
@@ -57,7 +59,7 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
         .from('partner_messages')
         .select('*')
         .or(`and(sender_id.eq.${user.id},receiver_id.eq.${partnerProfile.user_id}),and(sender_id.eq.${partnerProfile.user_id},receiver_id.eq.${user.id})`)
-        .in('message_type', ['text', 'love'])
+        .in('message_type', ['text', 'love', 'image', 'audio'])
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -107,7 +109,7 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
             (newMsg.sender_id === user.id && newMsg.receiver_id === partnerProfile.user_id) ||
             (newMsg.sender_id === partnerProfile.user_id && newMsg.receiver_id === user.id)
           ) {
-            if (['text', 'love'].includes(newMsg.message_type)) {
+            if (['text', 'love', 'image', 'audio'].includes(newMsg.message_type)) {
               setMessages(prev => [...prev, newMsg]);
               if (newMsg.receiver_id === user.id) {
                 supabase
@@ -161,7 +163,22 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
     }
   };
 
-  const quickMessages = [
+  const sendMediaMessage = async (type: 'image' | 'audio', url: string) => {
+    if (!user || !partnerProfile) return;
+
+    await hapticFeedback.medium();
+
+    try {
+      await supabase.from('partner_messages').insert({
+        sender_id: user.id,
+        receiver_id: partnerProfile.user_id,
+        message_type: type,
+        content: url,
+      });
+    } catch (error) {
+      console.error('Error sending media:', error);
+    }
+  };
     'Səni sevirəm! ❤️',
     'Necəsən?',
     'Evə gəl 🏠',
