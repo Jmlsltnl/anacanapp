@@ -40,44 +40,56 @@ const backgroundCategories = {
     { id: 'studio_white', name: 'Ağ studiya', category: 'Realist', premium: false, emoji: '⬜', color: 'from-gray-100 to-white', description: 'Professional white studio background with soft lighting' },
     { id: 'nursery_blue', name: 'Uşaq otağı', category: 'Realist', premium: false, emoji: '🛏️', color: 'from-blue-200 to-sky-300', description: 'Cozy nursery room with soft blue tones and wooden crib' },
     { id: 'garden_natural', name: 'Təbii bağça', category: 'Realist', premium: false, emoji: '🌿', color: 'from-green-300 to-emerald-400', description: 'Natural garden setting with green grass and soft sunlight' },
+    { id: 'beach_sand', name: 'Çimərlik', category: 'Realist', premium: false, emoji: '🏖️', color: 'from-amber-200 to-blue-300', description: 'Sandy beach with gentle waves and sunset' },
     
     // Aesthetic fonlar
     { id: 'boho_neutral', name: 'Boho neutral', category: 'Aesthetic', premium: false, emoji: '🪶', color: 'from-amber-100 to-stone-200', description: 'Bohemian style with dried pampas grass, macrame, and neutral earth tones' },
     { id: 'minimalist_cream', name: 'Minimalist krem', category: 'Aesthetic', premium: true, emoji: '🤍', color: 'from-orange-50 to-amber-100', description: 'Clean minimalist setup with cream blankets and simple wooden elements' },
     { id: 'vintage_rustic', name: 'Vintage rustik', category: 'Aesthetic', premium: true, emoji: '🪵', color: 'from-amber-200 to-orange-300', description: 'Rustic vintage setting with wooden crates, burlap, and warm lighting' },
+    { id: 'scandinavian', name: 'Skandinaviya', category: 'Aesthetic', premium: true, emoji: '🏠', color: 'from-gray-100 to-slate-200', description: 'Nordic minimalist with white wood and soft textures' },
     
     // Fantastik fonlar
     { id: 'adventure_explorer', name: 'Səyyah', category: 'Fantastik', premium: false, emoji: '🧭', color: 'from-emerald-400 to-teal-500', description: 'Adventure explorer theme with vintage maps, compass, and safari elements' },
     { id: 'space_astronaut', name: 'Astronavt', category: 'Fantastik', premium: true, emoji: '🚀', color: 'from-indigo-500 to-purple-600', description: 'Space theme with stars, planets, rockets, and astronaut props' },
     { id: 'superhero', name: 'Supergəhrəman', category: 'Fantastik', premium: true, emoji: '🦸', color: 'from-red-500 to-blue-600', description: 'Superhero theme with cape, cityscape background, and dynamic lighting' },
     { id: 'pirate_ship', name: 'Pirat gəmisi', category: 'Fantastik', premium: true, emoji: '🏴‍☠️', color: 'from-amber-600 to-amber-800', description: 'Pirate adventure with wooden ship deck, treasure chest, and ocean view' },
+    { id: 'jungle_safari', name: 'Cəngəllik', category: 'Fantastik', premium: true, emoji: '🦁', color: 'from-green-500 to-amber-500', description: 'Wild jungle safari with exotic animals and tropical plants' },
+    { id: 'dinosaur', name: 'Dinozavr', category: 'Fantastik', premium: true, emoji: '🦕', color: 'from-emerald-500 to-green-700', description: 'Prehistoric world with friendly dinosaurs' },
     
     // Mövsümi fonlar
     { id: 'autumn_leaves', name: 'Payız yarpaqları', category: 'Mövsümi', premium: false, emoji: '🍂', color: 'from-orange-400 to-red-500', description: 'Autumn setting with colorful fallen leaves and warm golden lighting' },
     { id: 'winter_snow', name: 'Qış qarı', category: 'Mövsümi', premium: true, emoji: '❄️', color: 'from-blue-100 to-cyan-200', description: 'Winter wonderland with soft snow, pine trees, and cozy blankets' },
     { id: 'spring_flowers', name: 'Bahar çiçəkləri', category: 'Mövsümi', premium: true, emoji: '🌸', color: 'from-pink-300 to-rose-400', description: 'Spring garden with blooming flowers, butterflies, and soft pastel colors' },
+    { id: 'christmas', name: 'Yeni il', category: 'Mövsümi', premium: true, emoji: '🎄', color: 'from-red-500 to-green-600', description: 'Festive Christmas setting with tree, presents, and snow' },
+    { id: 'easter', name: 'Pasxa', category: 'Mövsümi', premium: true, emoji: '🐰', color: 'from-pink-200 to-yellow-200', description: 'Easter theme with colorful eggs and spring flowers' },
   ],
   girl: [
     // Realist fonlar
     { id: 'studio_white', name: 'Ağ studiya', category: 'Realist', premium: false, emoji: '⬜', color: 'from-gray-100 to-white', description: 'Professional white studio background with soft lighting' },
     { id: 'nursery_pink', name: 'Uşaq otağı', category: 'Realist', premium: false, emoji: '🛏️', color: 'from-pink-200 to-rose-300', description: 'Cozy nursery room with soft pink tones and elegant decor' },
     { id: 'garden_flowers', name: 'Çiçəkli bağça', category: 'Realist', premium: false, emoji: '🌷', color: 'from-rose-300 to-pink-400', description: 'Beautiful flower garden with roses, peonies, and butterflies' },
+    { id: 'lavender_field', name: 'Lavanda tarlası', category: 'Realist', premium: false, emoji: '💜', color: 'from-violet-300 to-purple-400', description: 'Dreamy lavender field at golden hour' },
     
     // Aesthetic fonlar
     { id: 'boho_floral', name: 'Boho çiçəkli', category: 'Aesthetic', premium: false, emoji: '🌺', color: 'from-pink-100 to-rose-200', description: 'Bohemian style with dried flowers, lace, and soft pink tones' },
     { id: 'blush_dreamy', name: 'Xəyali çəhrayı', category: 'Aesthetic', premium: true, emoji: '💗', color: 'from-rose-100 to-pink-200', description: 'Dreamy blush pink setup with tulle, pearls, and soft lighting' },
     { id: 'vintage_lace', name: 'Vintage krujeva', category: 'Aesthetic', premium: true, emoji: '🎀', color: 'from-amber-100 to-rose-100', description: 'Vintage setup with lace blankets, antique props, and warm sepia tones' },
+    { id: 'parisian', name: 'Paris', category: 'Aesthetic', premium: true, emoji: '🗼', color: 'from-rose-200 to-gray-300', description: 'Parisian chic with Eiffel Tower backdrop' },
     
     // Fantastik fonlar
     { id: 'princess_castle', name: 'Şahzadə sarayı', category: 'Fantastik', premium: false, emoji: '👑', color: 'from-purple-400 to-pink-500', description: 'Fairy tale castle with royal decorations, golden throne, and sparkles' },
     { id: 'fairy_garden', name: 'Pəri bağçası', category: 'Fantastik', premium: true, emoji: '🧚', color: 'from-violet-400 to-fuchsia-500', description: 'Enchanted fairy garden with mushrooms, fairy lights, and magical flowers' },
     { id: 'mermaid_ocean', name: 'Dəniz pərisi', category: 'Fantastik', premium: true, emoji: '🧜‍♀️', color: 'from-teal-400 to-cyan-500', description: 'Underwater mermaid theme with seashells, pearls, and coral reef' },
     { id: 'unicorn_rainbow', name: 'Təkbuynuz', category: 'Fantastik', premium: true, emoji: '🦄', color: 'from-pink-400 to-purple-500', description: 'Magical unicorn theme with rainbow, clouds, and sparkly decorations' },
+    { id: 'butterfly_garden', name: 'Kəpənək bağı', category: 'Fantastik', premium: true, emoji: '🦋', color: 'from-pink-300 to-cyan-400', description: 'Magical garden full of colorful butterflies' },
+    { id: 'swan_lake', name: 'Qu gölü', category: 'Fantastik', premium: true, emoji: '🦢', color: 'from-white to-blue-200', description: 'Elegant swan lake with soft lighting' },
     
     // Mövsümi fonlar
     { id: 'autumn_leaves', name: 'Payız yarpaqları', category: 'Mövsümi', premium: false, emoji: '🍂', color: 'from-orange-400 to-red-500', description: 'Autumn setting with colorful fallen leaves and warm golden lighting' },
     { id: 'winter_snow', name: 'Qış qarı', category: 'Mövsümi', premium: true, emoji: '❄️', color: 'from-blue-100 to-cyan-200', description: 'Winter wonderland with soft snow, pine trees, and cozy blankets' },
     { id: 'cherry_blossom', name: 'Albalı çiçəyi', category: 'Mövsümi', premium: true, emoji: '🌸', color: 'from-pink-300 to-rose-400', description: 'Japanese cherry blossom garden with soft petals falling' },
+    { id: 'christmas', name: 'Yeni il', category: 'Mövsümi', premium: true, emoji: '🎄', color: 'from-red-500 to-green-600', description: 'Festive Christmas setting with tree, presents, and snow' },
+    { id: 'valentines', name: 'Sevgililər günü', category: 'Mövsümi', premium: true, emoji: '💕', color: 'from-red-400 to-pink-500', description: 'Romantic setting with hearts and roses' },
   ],
 };
 
@@ -88,6 +100,7 @@ const eyeColorOptions = [
   { id: 'brown', name: 'Qəhvəyi', color: 'bg-gradient-to-r from-amber-600 to-amber-800' },
   { id: 'hazel', name: 'Fındıq', color: 'bg-gradient-to-r from-amber-400 to-green-500' },
   { id: 'gray', name: 'Boz', color: 'bg-gradient-to-r from-slate-400 to-slate-600' },
+  { id: 'amber', name: 'Kəhrəba', color: 'bg-gradient-to-r from-amber-400 to-orange-500' },
 ];
 
 const hairColorOptions = [
@@ -96,6 +109,8 @@ const hairColorOptions = [
   { id: 'brown', name: 'Şabalıdı', color: 'bg-gradient-to-r from-amber-700 to-amber-900' },
   { id: 'black', name: 'Qara', color: 'bg-gradient-to-r from-gray-800 to-black' },
   { id: 'red', name: 'Qırmızı', color: 'bg-gradient-to-r from-orange-500 to-red-600' },
+  { id: 'strawberry', name: 'Çiyələk', color: 'bg-gradient-to-r from-rose-400 to-orange-400' },
+  { id: 'platinum', name: 'Platin', color: 'bg-gradient-to-r from-gray-200 to-yellow-100' },
 ];
 
 const hairStyleOptions = [
@@ -103,6 +118,9 @@ const hairStyleOptions = [
   { id: 'curly', name: 'Buruq', emoji: '🌀' },
   { id: 'straight', name: 'Düz', emoji: '📏' },
   { id: 'wavy', name: 'Dalğalı', emoji: '🌊' },
+  { id: 'spiky', name: 'Dikdik', emoji: '⬆️' },
+  { id: 'fluffy', name: 'Qabarıq', emoji: '☁️' },
+  { id: 'thin', name: 'Nazik', emoji: '〰️' },
 ];
 
 const outfitsByGender = {
@@ -111,20 +129,32 @@ const outfitsByGender = {
     { id: 'theme', name: 'Mövzuya uyğun', emoji: '🎨', premium: false },
     { id: 'gentleman', name: 'Centlmen', emoji: '🤵', premium: false },
     { id: 'sailor', name: 'Dənizçi', emoji: '⚓', premium: false },
+    { id: 'casual', name: 'Gündəlik', emoji: '👶', premium: false },
     { id: 'prince', name: 'Şahzadə', emoji: '🤴', premium: true },
     { id: 'pilot', name: 'Pilot', emoji: '✈️', premium: true },
     { id: 'cowboy', name: 'Kovboy', emoji: '🤠', premium: true },
     { id: 'sports', name: 'İdmançı', emoji: '⚽', premium: true },
+    { id: 'chef', name: 'Aşpaz', emoji: '👨‍🍳', premium: true },
+    { id: 'astronaut', name: 'Astronavt', emoji: '👨‍🚀', premium: true },
+    { id: 'doctor', name: 'Həkim', emoji: '👨‍⚕️', premium: true },
+    { id: 'firefighter', name: 'Yanğınsöndürən', emoji: '🧑‍🚒', premium: true },
+    { id: 'teddy', name: 'Ayı kostyumu', emoji: '🧸', premium: true },
   ],
   girl: [
     { id: 'keep', name: 'Olduğu kimi', emoji: '👗', premium: false },
     { id: 'theme', name: 'Mövzuya uyğun', emoji: '🎨', premium: false },
     { id: 'princess', name: 'Şahzadə', emoji: '👸', premium: false },
     { id: 'flower', name: 'Çiçəkli', emoji: '🌸', premium: false },
+    { id: 'casual', name: 'Gündəlik', emoji: '👶', premium: false },
     { id: 'ballerina', name: 'Balerina', emoji: '🩰', premium: true },
     { id: 'fairy', name: 'Pəri', emoji: '🧚', premium: true },
     { id: 'angel', name: 'Mələk', emoji: '👼', premium: true },
     { id: 'vintage', name: 'Vintage', emoji: '🎀', premium: true },
+    { id: 'mermaid', name: 'Dəniz pərisi', emoji: '🧜‍♀️', premium: true },
+    { id: 'butterfly', name: 'Kəpənək', emoji: '🦋', premium: true },
+    { id: 'ladybug', name: 'Uğurböcəyi', emoji: '🐞', premium: true },
+    { id: 'bunny', name: 'Dovşan', emoji: '🐰', premium: true },
+    { id: 'unicorn', name: 'Unicorn', emoji: '🦄', premium: true },
   ],
 };
 
@@ -794,7 +824,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
       {/* Fixed Bottom Buttons */}
       {step < 3 && (
-        <div className="flex-shrink-0 px-5 py-4 pb-8 bg-background border-t border-border">
+        <div className="flex-shrink-0 px-5 py-4 pb-safe bg-background border-t border-border" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
           <div className="flex gap-3">
             {step > 0 && (
               <Button
@@ -837,7 +867,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
       )}
 
       {step === 3 && (
-        <div className="flex-shrink-0 px-5 py-4 pb-8 bg-background border-t border-border">
+        <div className="flex-shrink-0 px-5 py-4 pb-safe bg-background border-t border-border" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
           <Button
             onClick={() => setStep(0)}
             className="w-full h-14 rounded-2xl gradient-primary text-white font-bold"
