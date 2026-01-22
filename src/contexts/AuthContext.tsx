@@ -275,12 +275,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // ─────────────────────────────────────────
   useEffect(() => {
     let mounted = true;
+    let bootstrapTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    const clearBootstrapTimeout = () => {
+      if (bootstrapTimeoutId) {
+        clearTimeout(bootstrapTimeoutId);
+        bootstrapTimeoutId = null;
+      }
+    };
+
+    const finishLoading = () => {
+      if (!mounted) return;
+      clearBootstrapTimeout();
+      setLoading(false);
+    };
 
     // Failsafe: never let the app stay stuck behind a global loading spinner.
-    const bootstrapTimeout = setTimeout(() => {
+    bootstrapTimeoutId = setTimeout(() => {
       if (!mounted) return;
       console.warn('Auth bootstrap timeout - forcing loading=false');
-      setLoading(false);
+      finishLoading();
     }, 8000);
 
     const hydrateUser = async (u: User) => {
@@ -330,16 +344,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             initialSession.user.email || '',
             initialSession.user.user_metadata?.name || 'İstifadəçi'
           );
-          setLoading(false);
+          finishLoading();
           void hydrateUser(initialSession.user);
         } else {
           storeLogout();
-          setLoading(false);
+          finishLoading();
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
       } finally {
-        if (mounted) setLoading(false);
+        finishLoading();
       }
     };
 
@@ -362,24 +376,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             currentSession.user.email || '',
             currentSession.user.user_metadata?.name || 'İstifadəçi'
           );
-          setLoading(false);
+          finishLoading();
           void hydrateUser(currentSession.user);
         } else {
           setProfile(null);
           setUserRole(null);
           storeLogout();
-          setLoading(false);
+          finishLoading();
         }
       } catch (error) {
         console.error('Error handling auth state change:', error);
       } finally {
-        setLoading(false);
+        finishLoading();
       }
     });
 
     return () => {
       mounted = false;
-      clearTimeout(bootstrapTimeout);
+      clearBootstrapTimeout();
       subscription.unsubscribe();
     };
   }, [fetchProfile, fetchUserRole, setAuth, syncProfileToStore, storeLogout]);
