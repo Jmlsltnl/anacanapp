@@ -153,8 +153,8 @@ const Index = () => {
     return <AuthScreen />;
   }
 
-  // Onboarding
-  if (!isOnboarded && role === 'woman') {
+  // Onboarding - Partners skip onboarding (they don't need phase selection)
+  if (!isOnboarded && role !== 'partner') {
     return <OnboardingScreen />;
   }
 
