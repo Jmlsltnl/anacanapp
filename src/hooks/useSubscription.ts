@@ -27,7 +27,7 @@ const FREE_LIMITS = {
 };
 
 export function useSubscription() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [usage, setUsage] = useState<UsageTracking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,7 +87,11 @@ export function useSubscription() {
     fetchSubscription();
   }, [fetchSubscription]);
 
-  const isPremium = subscription?.plan_type === 'premium' || subscription?.plan_type === 'premium_plus';
+  // Check both subscription table AND profile.is_premium flag
+  const isPremium = 
+    subscription?.plan_type === 'premium' || 
+    subscription?.plan_type === 'premium_plus' ||
+    profile?.is_premium === true;
 
   const getUsageForFeature = (featureType: 'white_noise' | 'baby_photoshoot'): UsageTracking | undefined => {
     return usage.find(u => u.feature_type === featureType);
