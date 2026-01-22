@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Plus, TrendingUp, TrendingDown, Minus, Scale } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,7 @@ interface WeightTrackerProps {
   onBack: () => void;
 }
 
-const WeightTracker = ({ onBack }: WeightTrackerProps) => {
+const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }, ref) => {
   const { entries, loading, addEntry, getStats } = useWeightEntries();
   const { getPregnancyData } = useUserStore();
   const [newWeight, setNewWeight] = useState('');
@@ -268,6 +268,8 @@ const WeightTracker = ({ onBack }: WeightTrackerProps) => {
       )}
     </div>
   );
-};
+});
+
+WeightTracker.displayName = 'WeightTracker';
 
 export default WeightTracker;

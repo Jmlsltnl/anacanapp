@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Search, Heart, Shuffle, Star } from 'lucide-react';
 import { useFavoriteNames } from '@/hooks/useFavoriteNames';
@@ -38,7 +38,7 @@ interface BabyNamesProps {
   onBack: () => void;
 }
 
-const BabyNames = ({ onBack }: BabyNamesProps) => {
+const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [genderFilter, setGenderFilter] = useState<'all' | 'boy' | 'girl'>('all');
   const [selectedName, setSelectedName] = useState<Name | null>(null);
@@ -276,6 +276,8 @@ const BabyNames = ({ onBack }: BabyNamesProps) => {
       </AnimatePresence>
     </div>
   );
-};
+});
+
+BabyNames.displayName = 'BabyNames';
 
 export default BabyNames;

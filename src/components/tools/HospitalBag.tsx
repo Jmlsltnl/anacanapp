@@ -1,3 +1,4 @@
+import { useState, forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Check, Briefcase, Baby, User, Share2 } from 'lucide-react';
 import { useHospitalBag } from '@/hooks/useHospitalBag';
@@ -6,7 +7,7 @@ interface HospitalBagProps {
   onBack: () => void;
 }
 
-const HospitalBag = ({ onBack }: HospitalBagProps) => {
+const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, ref) => {
   const { items, loading, toggleItem, getProgress, checkedCount, totalCount } = useHospitalBag();
   const [activeCategory, setActiveCategory] = useState<'all' | 'mom' | 'baby' | 'documents'>('all');
 
@@ -147,7 +148,8 @@ const HospitalBag = ({ onBack }: HospitalBagProps) => {
       </div>
     </div>
   );
-};
+});
 
-import { useState } from 'react';
+HospitalBag.displayName = 'HospitalBag';
+
 export default HospitalBag;

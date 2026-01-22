@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Clock, 
@@ -93,7 +93,7 @@ const exercises: Exercise[] = [
   },
 ];
 
-const Exercises = ({ onBack }: ExercisesProps) => {
+const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) => {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const { loading, addLog, isCompletedToday, getTodayStats, getStreak } = useExerciseLogs();
@@ -323,6 +323,8 @@ const Exercises = ({ onBack }: ExercisesProps) => {
       </div>
     </div>
   );
-};
+});
+
+Exercises.displayName = 'Exercises';
 
 export default Exercises;

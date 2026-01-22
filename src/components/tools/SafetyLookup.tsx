@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Search, Check, AlertTriangle, X, Sparkles } from 'lucide-react';
 
@@ -36,7 +36,7 @@ interface SafetyLookupProps {
   onBack: () => void;
 }
 
-const SafetyLookup = ({ onBack }: SafetyLookupProps) => {
+const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, ref) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedItem, setSelectedItem] = useState<SafetyItem | null>(null);
@@ -220,6 +220,8 @@ const SafetyLookup = ({ onBack }: SafetyLookupProps) => {
       </AnimatePresence>
     </div>
   );
-};
+});
+
+SafetyLookup.displayName = 'SafetyLookup';
 
 export default SafetyLookup;

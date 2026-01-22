@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Camera, Sparkles, Download, Trash2, 
@@ -34,7 +34,7 @@ const backgrounds = [
   { id: 'toys', name: 'Oyuncaqlar', emoji: '🧸', color: 'from-amber-400 to-yellow-500' },
 ];
 
-const BabyPhotoshoot = ({ onBack }: BabyPhotoshootProps) => {
+const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack }, ref) => {
   const [selectedBackground, setSelectedBackground] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [photos, setPhotos] = useState<GeneratedPhoto[]>([]);
@@ -511,6 +511,8 @@ const BabyPhotoshoot = ({ onBack }: BabyPhotoshootProps) => {
       </AnimatePresence>
     </div>
   );
-};
+});
+
+BabyPhotoshoot.displayName = 'BabyPhotoshoot';
 
 export default BabyPhotoshoot;

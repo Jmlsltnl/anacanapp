@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Play, Pause, RotateCcw, Footprints } from 'lucide-react';
 import { useKickSessions } from '@/hooks/useKickSessions';
@@ -8,7 +8,7 @@ interface KickCounterProps {
   onBack: () => void;
 }
 
-const KickCounter = ({ onBack }: KickCounterProps) => {
+const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, ref) => {
   const [kicks, setKicks] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [time, setTime] = useState(0);
@@ -219,6 +219,8 @@ const KickCounter = ({ onBack }: KickCounterProps) => {
       </div>
     </div>
   );
-};
+});
+
+KickCounter.displayName = 'KickCounter';
 
 export default KickCounter;

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Play, Square, Timer, AlertCircle, Trash2 } from 'lucide-react';
 import { useContractions } from '@/hooks/useContractions';
@@ -8,7 +8,7 @@ interface ContractionTimerProps {
   onBack: () => void;
 }
 
-const ContractionTimer = ({ onBack }: ContractionTimerProps) => {
+const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ onBack }, ref) => {
   const [isActive, setIsActive] = useState(false);
   const [currentDuration, setCurrentDuration] = useState(0);
   const [lastEndTime, setLastEndTime] = useState<Date | null>(null);
@@ -239,6 +239,8 @@ const ContractionTimer = ({ onBack }: ContractionTimerProps) => {
       </div>
     </div>
   );
-};
+});
+
+ContractionTimer.displayName = 'ContractionTimer';
 
 export default ContractionTimer;
