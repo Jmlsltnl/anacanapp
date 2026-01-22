@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, User, Bot, Loader2, RefreshCw, Heart, AlertTriangle } from 'lucide-react';
+import { Send, User, Bot, Loader2, RefreshCw, Heart, AlertTriangle, Sparkles, Baby, Home, Gift, Calendar, Stethoscope } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useUserStore } from '@/store/userStore';
+import { usePartnerData } from '@/hooks/usePartnerData';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -16,30 +17,94 @@ interface Message {
   isStreaming?: boolean;
 }
 
+interface QuickQuestion {
+  id: string;
+  icon: any;
+  title: string;
+  question: string;
+  color: string;
+}
+
 const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showQuickQuestions, setShowQuickQuestions] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { partnerWomanData } = useUserStore();
+  const { name } = useUserStore();
+  const { partnerProfile, getPregnancyWeek } = usePartnerData();
   const { toast } = useToast();
+  
+  const pregnancyWeek = getPregnancyWeek();
+  const partnerName = partnerProfile?.name || 'Həyat yoldaşın';
+
+  // Quick questions for partners
+  const quickQuestions: QuickQuestion[] = [
+    {
+      id: '1',
+      icon: Heart,
+      title: 'Emosional dəstək',
+      question: `${partnerName} bu gün əhvalı pisdirsə, onu necə dəstəkləyə bilərəm?`,
+      color: 'from-pink-500 to-rose-600'
+    },
+    {
+      id: '2',
+      icon: Home,
+      title: 'Ev işləri',
+      question: 'Hamiləlik dövründə hansı ev işlərini mən öhdəmə götürməliyəm?',
+      color: 'from-blue-500 to-indigo-600'
+    },
+    {
+      id: '3',
+      icon: Stethoscope,
+      title: 'Həkim vizitləri',
+      question: 'Həkim görüşlərində mən necə faydalı ola bilərəm? Hansı sualları verməliyəm?',
+      color: 'from-emerald-500 to-teal-600'
+    },
+    {
+      id: '4',
+      icon: Gift,
+      title: 'Sürprizlər',
+      question: `${partnerName}ı sevindirmək üçün hansı kiçik sürprizlər edə bilərəm?`,
+      color: 'from-amber-500 to-orange-600'
+    },
+    {
+      id: '5',
+      icon: Baby,
+      title: 'Doğuşa hazırlıq',
+      question: 'Doğuş günü üçün necə hazırlaşmalıyam? Nələr etməliyəm?',
+      color: 'from-violet-500 to-purple-600'
+    },
+    {
+      id: '6',
+      icon: Calendar,
+      title: `${pregnancyWeek}. həftə`,
+      question: `Hamiləliyin ${pregnancyWeek || 24}. həftəsində körpə necə inkişaf edir və mən nə edə bilərəm?`,
+      color: 'from-cyan-500 to-blue-600'
+    }
+  ];
 
   useEffect(() => {
     if (messages.length === 0) {
       setMessages([{
         id: 'welcome',
         role: 'assistant',
-        content: `Salam! 👋 Mən Anacan.AI, sizin partnyor rəfiqənizəm. ${partnerWomanData?.name ? `${partnerWomanData.name}` : 'Xanımınız'} hamiləlik dövründə ona necə dəstək ola biləcəyiniz barədə sizə kömək edəcəyəm. 💪\n\nEmosional dəstək, ev işləri, tibbi görüşlər və ya hər hansı digər mövzuda suallarınız varsa, buradayam!`,
+        content: `Salam, ${name || 'qardaş'}! 👋\n\nMən Anacan.AI - sənin partnyor məsləhətçinəm. ${partnerName}${partnerProfile?.life_stage === 'bump' ? `ın hamiləliyinin ${pregnancyWeek || ''}. həftəsində` : ''} ona necə dəstək ola biləcəyin barədə sənə kömək edəcəyəm. 💪\n\nAşağıdakı suallardan birini seç və ya öz sualını yaz!`,
         timestamp: new Date()
       }]);
     }
-  }, []);
+  }, [name, partnerName, pregnancyWeek]);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  const handleQuickQuestion = (question: string) => {
+    setInput(question);
+    setShowQuickQuestions(false);
+  };
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -63,6 +128,7 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     
     setInput('');
     setIsLoading(true);
+    setShowQuickQuestions(false);
 
     try {
       const conversationHistory = messages
@@ -77,7 +143,6 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
         content: userMessage.content
       });
 
-      // Use fetch for streaming support
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dr-anacan-chat`, {
         method: 'POST',
         headers: {
@@ -87,12 +152,14 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
         },
         body: JSON.stringify({
           messages: conversationHistory,
-          lifeStage: partnerWomanData?.lifeStage || 'bump',
+          lifeStage: partnerProfile?.life_stage || 'bump',
           isPartner: true,
           stream: true,
-          userProfile: partnerWomanData ? {
-            name: partnerWomanData.name
-          } : undefined
+          userProfile: {
+            name: name,
+            partnerName: partnerName,
+            pregnancyWeek: pregnancyWeek
+          }
         })
       });
 
@@ -101,7 +168,6 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
         throw new Error(errorData.error || 'API xətası');
       }
 
-      // Handle streaming response
       const reader = response.body?.getReader();
       
       if (reader) {
@@ -143,14 +209,7 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
 
         setMessages(prev => prev.map(m => 
           m.id === assistantMessageId 
-            ? { ...m, isStreaming: false, content: fullContent || 'Bağışlayın, cavab ala bilmədim.' }
-            : m
-        ));
-      } else {
-        const data = await response.json();
-        setMessages(prev => prev.map(m => 
-          m.id === assistantMessageId 
-            ? { ...m, isStreaming: false, content: data.message || 'Bağışlayın, cavab ala bilmədim.' }
+            ? { ...m, isStreaming: false, content: fullContent || 'Bağışla, cavab ala bilmədim.' }
             : m
         ));
       }
@@ -158,13 +217,13 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       console.error('Chat error:', error);
       toast({
         title: 'Xəta',
-        description: 'Mesaj göndərilə bilmədi. Yenidən cəhd edin.',
+        description: 'Mesaj göndərilə bilmədi. Yenidən cəhd et.',
         variant: 'destructive'
       });
       
       setMessages(prev => prev.map(m => 
         m.id === assistantMessageId 
-          ? { ...m, isStreaming: false, content: 'Bağışlayın, texniki xəta baş verdi. Zəhmət olmasa yenidən cəhd edin. 🙏' }
+          ? { ...m, isStreaming: false, content: 'Bağışla, texniki xəta baş verdi. Zəhmət olmasa yenidən cəhd et. 🙏' }
           : m
       ));
     } finally {
@@ -183,46 +242,40 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     setMessages([{
       id: 'welcome',
       role: 'assistant',
-      content: `Salam! 👋 Mən Anacan.AI, sizin partnyor rəfiqənizəm. Xanımınızı necə dəstəkləyə biləcəyiniz barədə sizə kömək edəcəyəm! 💪`,
+      content: `Salam, ${name || 'qardaş'}! 👋\n\nMən Anacan.AI - sənin partnyor məsləhətçinəm. Suallarını cavablandırmağa hazıram! 💪`,
       timestamp: new Date()
     }]);
+    setShowQuickQuestions(true);
   };
-
-  const suggestedQuestions = [
-    'Xanımımın əhvalı pisdirsə, nə edə bilərəm?',
-    'Hamiləlik dövründə hansı ev işlərində kömək etməliyəm?',
-    'Doğuş günü üçün necə hazırlaşmalıyam?',
-    'Xanımım üçün hansı sürprizlər edə bilərəm?'
-  ];
 
   return (
     <div ref={ref} className="flex flex-col h-full bg-gradient-to-b from-partner/5 to-background">
       {/* Header */}
-      <div className="px-5 py-4 border-b border-border bg-card/50 backdrop-blur-sm">
+      <div className="px-5 py-4 border-b border-border bg-card/50 backdrop-blur-sm safe-top">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <motion.div 
-              className="w-12 h-12 rounded-2xl bg-partner flex items-center justify-center shadow-lg"
+              className="w-12 h-12 rounded-2xl bg-gradient-to-br from-partner to-indigo-600 flex items-center justify-center shadow-lg"
               animate={{ scale: [1, 1.05, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              <Heart className="w-6 h-6 text-white" />
+              <Sparkles className="w-6 h-6 text-white" />
             </motion.div>
             <div>
               <h1 className="font-bold text-lg text-foreground">Anacan.AI</h1>
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-xs text-muted-foreground">Partnyor Rəfiqəsi</span>
+                <span className="text-xs text-muted-foreground">Partnyor Məsləhətçisi</span>
               </div>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={clearChat}>
+          <Button variant="ghost" size="icon" onClick={clearChat} className="rounded-xl">
             <RefreshCw className="w-5 h-5" />
           </Button>
         </div>
       </div>
 
-      {/* Disclaimer Banner */}
+      {/* Disclaimer */}
       <div className="px-4 py-2 bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800">
         <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400">
           <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
@@ -246,11 +299,11 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
                 <div className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center ${
                   message.role === 'user' 
                     ? 'bg-partner/10' 
-                    : 'bg-partner'
+                    : 'bg-gradient-to-br from-partner to-indigo-600'
                 }`}>
                   {message.role === 'user' 
                     ? <User className="w-5 h-5 text-partner" />
-                    : <Bot className="w-5 h-5 text-white" />
+                    : <Sparkles className="w-5 h-5 text-white" />
                   }
                 </div>
                 <div className={`max-w-[80%] p-4 rounded-2xl ${
@@ -284,8 +337,8 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
               animate={{ opacity: 1, y: 0 }}
               className="flex gap-3"
             >
-              <div className="w-9 h-9 rounded-xl bg-partner flex items-center justify-center">
-                <Bot className="w-5 h-5 text-white" />
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-partner to-indigo-600 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div className="bg-card border border-border p-4 rounded-2xl rounded-bl-md shadow-sm">
                 <div className="flex items-center gap-2">
@@ -297,26 +350,37 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
           )}
         </div>
 
-        {/* Suggested Questions */}
-        {messages.length <= 1 && (
+        {/* Quick Questions Grid */}
+        {showQuickQuestions && messages.length <= 1 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="space-y-2 mt-4"
+            className="mt-4"
           >
-            <p className="text-xs text-muted-foreground text-center mb-3">Sizə uyğun sual seçin:</p>
-            {suggestedQuestions.map((question, index) => (
-              <motion.button
-                key={index}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setInput(question)}
-                className="w-full p-3 text-left text-sm bg-card border border-border rounded-xl hover:border-partner/50 hover:bg-partner/5 transition-all"
-              >
-                {question}
-              </motion.button>
-            ))}
+            <p className="text-sm text-muted-foreground text-center mb-4">Sual seç və ya öz sualını yaz:</p>
+            <div className="grid grid-cols-2 gap-3">
+              {quickQuestions.map((q, index) => {
+                const Icon = q.icon;
+                return (
+                  <motion.button
+                    key={q.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 + index * 0.05 }}
+                    onClick={() => handleQuickQuestion(q.question)}
+                    className={`p-4 rounded-2xl bg-gradient-to-br ${q.color} text-white text-left shadow-lg`}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-2">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <h3 className="font-bold text-sm">{q.title}</h3>
+                  </motion.button>
+                );
+              })}
+            </div>
           </motion.div>
         )}
       </ScrollArea>
@@ -329,7 +393,7 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Anacan.AI-yə sualınızı yazın..."
+              placeholder="Sualını yaz..."
               className="min-h-[48px] max-h-[120px] pr-4 resize-none rounded-2xl border-2 focus:border-partner/50"
               disabled={isLoading}
             />
