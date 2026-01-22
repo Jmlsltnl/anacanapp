@@ -1,12 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeft, Bell, Moon, Sun, Globe, Lock, 
   Smartphone, Database, Trash2, ChevronRight,
-  Volume2, Vibrate, Clock, Calendar, Droplets, Dumbbell, Pill
+  Volume2, Vibrate, Clock, Calendar, Droplets, Dumbbell, Pill,
+  BellOff
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { useNotificationSettings } from '@/hooks/useNotificationSettings';
+import { useSilentHours } from '@/hooks/useSilentHours';
 import { toast } from 'sonner';
 
 interface SettingsScreenProps {
@@ -21,6 +23,9 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
     initializeReminders,
     isNative 
   } = useNotificationSettings();
+  
+  const { settings: silentSettings, updateSettings: updateSilentSettings } = useSilentHours();
+  const [showTimeEdit, setShowTimeEdit] = useState(false);
 
   // Initialize reminders on mount
   useEffect(() => {
@@ -129,6 +134,64 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
               disabled={!settings.notifications_enabled}
             />
           </SettingRow>
+        </div>
+
+        {/* Silent Hours */}
+        <div className="bg-card rounded-3xl overflow-hidden shadow-card border border-border/50">
+          <div className="px-4 pt-4 pb-2">
+            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Sakit saatlar</h2>
+          </div>
+          <SettingRow 
+            icon={BellOff} 
+            label="Sakit rejim" 
+            description={silentSettings.enabled ? `${silentSettings.startTime} - ${silentSettings.endTime} arası bildiriş yoxdur` : "Gecə saatlarında bildirişləri söndür"}
+          >
+            <Switch 
+              checked={silentSettings.enabled} 
+              onCheckedChange={(checked) => {
+                updateSilentSettings({ enabled: checked });
+                toast.success(checked ? 'Sakit saatlar aktivləşdirildi' : 'Sakit saatlar deaktiv edildi');
+              }} 
+              disabled={!settings.notifications_enabled}
+            />
+          </SettingRow>
+          {silentSettings.enabled && (
+            <>
+              <SettingRow 
+                icon={Moon} 
+                label="Başlama vaxtı" 
+                description="Bildirişlər susacaq"
+                onClick={() => setShowTimeEdit(true)}
+              >
+                <div className="flex items-center gap-2">
+                  <input
+                    type="time"
+                    value={silentSettings.startTime}
+                    onChange={(e) => {
+                      updateSilentSettings({ startTime: e.target.value });
+                    }}
+                    className="bg-muted rounded-lg px-2 py-1 text-sm font-medium"
+                  />
+                </div>
+              </SettingRow>
+              <SettingRow 
+                icon={Sun} 
+                label="Bitmə vaxtı" 
+                description="Bildirişlər yenidən başlayacaq"
+              >
+                <div className="flex items-center gap-2">
+                  <input
+                    type="time"
+                    value={silentSettings.endTime}
+                    onChange={(e) => {
+                      updateSilentSettings({ endTime: e.target.value });
+                    }}
+                    className="bg-muted rounded-lg px-2 py-1 text-sm font-medium"
+                  />
+                </div>
+              </SettingRow>
+            </>
+          )}
         </div>
 
         {/* Reminders */}

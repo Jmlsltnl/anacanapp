@@ -169,7 +169,7 @@ export const usePartnerMessages = () => {
               const body = newMessage.message_type === 'love'
                 ? 'Partnyorunuz sizə sevgi göndərdi'
                 : (typeof newMessage.content === 'string' ? newMessage.content.slice(0, 60) : 'Mesaj gəldi');
-              void notifyIncomingChatMessage({ title, body, idSeed: Date.now() });
+              void notifyIncomingChatMessage({ title, body, idSeed: Date.now(), userId: user?.id });
             }
 
             // Show appropriate toast based on message type

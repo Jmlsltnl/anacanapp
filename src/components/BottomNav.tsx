@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Home, Compass, MessageCircle, ShoppingBag, User, Heart } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
+import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 
 interface BottomNavProps {
   activeTab: string;
@@ -25,6 +26,7 @@ const partnerTabs = [
 
 const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps) => {
   const { lifeStage } = useUserStore();
+  const { unreadCount } = useUnreadMessages();
   
   const getActiveColor = () => {
     switch (lifeStage) {
@@ -56,6 +58,8 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
           {(isPartner ? partnerTabs : womanTabs).map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
+            // Show badge on profile tab for unread messages
+            const showBadge = tab.id === 'profile' && unreadCount > 0;
             
             return (
               <motion.button
@@ -92,6 +96,16 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
                     }`}
                     strokeWidth={isActive ? 2.5 : 2}
                   />
+                  {/* Unread badge */}
+                  {showBadge && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[9px] font-bold text-white flex items-center justify-center z-20"
+                    >
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </motion.span>
+                  )}
                 </motion.div>
                 
                 <motion.span 
