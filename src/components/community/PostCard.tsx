@@ -8,11 +8,19 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { hapticFeedback } from '@/lib/native';
+import MediaCarousel from './MediaCarousel';
 
 interface PostCardProps {
   post: CommunityPost;
   groupId: string | null;
 }
+
+// Helper to detect media type from URL
+const getMediaType = (url: string): 'image' | 'video' => {
+  const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
+  const lowerUrl = url.toLowerCase();
+  return videoExtensions.some(ext => lowerUrl.includes(ext)) ? 'video' : 'image';
+};
 
 const PostCard = ({ post, groupId }: PostCardProps) => {
   const [showComments, setShowComments] = useState(false);
@@ -39,6 +47,12 @@ const PostCard = ({ post, groupId }: PostCardProps) => {
     locale: az,
   });
 
+  // Convert media_urls to MediaItems with type detection
+  const mediaItems = (post.media_urls || []).map(url => ({
+    url,
+    type: getMediaType(url),
+  }));
+
   return (
     <div className="bg-card rounded-2xl border border-border/50 overflow-hidden">
       {/* Header */}
@@ -63,17 +77,10 @@ const PostCard = ({ post, groupId }: PostCardProps) => {
         <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
       </div>
 
-      {/* Media */}
-      {post.media_urls && post.media_urls.length > 0 && (
-        <div className={`grid gap-1 ${post.media_urls.length === 1 ? '' : 'grid-cols-2'}`}>
-          {post.media_urls.map((url, i) => (
-            <img
-              key={i}
-              src={url}
-              alt=""
-              className="w-full h-48 object-cover"
-            />
-          ))}
+      {/* Media Carousel */}
+      {mediaItems.length > 0 && (
+        <div className="px-4 pb-3">
+          <MediaCarousel media={mediaItems} />
         </div>
       )}
 
