@@ -6,7 +6,6 @@ import GroupsList from './GroupsList';
 import GroupFeed from './GroupFeed';
 import CreatePostModal from './CreatePostModal';
 import StoriesBar from './StoriesBar';
-import { Button } from '@/components/ui/button';
 
 interface CommunityScreenProps {
   onBack?: () => void;
@@ -38,9 +37,9 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   }
 
   return (
-    <div ref={ref} className="min-h-screen pb-28">
+    <div ref={ref} className="min-h-screen pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/50">
+      <div className="sticky top-0 z-40 bg-background border-b border-border/50">
         <div className="px-5 py-4">
           <div className="flex items-center gap-4 mb-4">
             {onBack && (
@@ -56,12 +55,6 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
               <h1 className="text-2xl font-black text-foreground">Cəmiyyət</h1>
               <p className="text-sm text-muted-foreground">Digər analar ilə əlaqədə olun</p>
             </div>
-            <Button
-              onClick={() => setShowCreatePost(true)}
-              className="w-10 h-10 rounded-xl gradient-primary p-0"
-            >
-              <Plus className="w-5 h-5 text-white" />
-            </Button>
           </div>
 
           {/* Search */}
@@ -161,9 +154,13 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
                   <p className="text-sm text-muted-foreground mb-4">
                     Digər analar ilə əlaqə qurmaq üçün qruplara qoşulun
                   </p>
-                  <Button onClick={() => setActiveTab('groups')}>
+                  <motion.button 
+                    onClick={() => setActiveTab('groups')}
+                    className="px-6 py-3 rounded-xl gradient-primary text-white font-bold"
+                    whileTap={{ scale: 0.98 }}
+                  >
                     Qrupları kəşf et
-                  </Button>
+                  </motion.button>
                 </div>
               ) : (
                 <GroupsList
@@ -178,6 +175,19 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
           )}
         </AnimatePresence>
       </div>
+
+      {/* Floating Action Button for Create Post */}
+      <motion.button
+        onClick={() => setShowCreatePost(true)}
+        className="fixed bottom-24 right-5 w-14 h-14 rounded-full gradient-primary shadow-elevated flex items-center justify-center z-40"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+      >
+        <Plus className="w-6 h-6 text-white" />
+      </motion.button>
 
       {/* Create Post Modal */}
       <CreatePostModal

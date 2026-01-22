@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Home, Compass, MessageCircle, ShoppingBag, User, Users } from 'lucide-react';
+import { Home, Compass, MessageCircle, User, Users } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 
@@ -13,7 +13,7 @@ const womanTabs = [
   { id: 'home', label: 'Əsas', icon: Home },
   { id: 'tools', label: 'Alətlər', icon: Compass },
   { id: 'community', label: 'Cəmiyyət', icon: Users },
-  { id: 'ai', label: 'Dr. Anacan', icon: MessageCircle },
+  { id: 'ai', label: 'Anacan.AI', icon: MessageCircle },
   { id: 'profile', label: 'Profil', icon: User },
 ];
 
@@ -50,8 +50,8 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50">
-      {/* Glass background */}
-      <div className="absolute inset-0 bg-card/80 backdrop-blur-xl border-t border-border/50" />
+      {/* Solid background to prevent content showing through */}
+      <div className="absolute inset-0 bg-card border-t border-border/50" />
       
       <div className="relative safe-bottom">
         <div className="flex items-center justify-around py-2 px-2">
