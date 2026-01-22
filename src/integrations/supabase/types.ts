@@ -113,6 +113,33 @@ export type Database = {
         }
         Relationships: []
       }
+      baby_milestones: {
+        Row: {
+          achieved_at: string
+          created_at: string
+          id: string
+          milestone_id: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          achieved_at?: string
+          created_at?: string
+          id?: string
+          milestone_id: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          achieved_at?: string
+          created_at?: string
+          id?: string
+          milestone_id?: string
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       baby_photos: {
         Row: {
           background_theme: string
@@ -951,6 +978,36 @@ export type Database = {
           usage_count?: number
           usage_date?: string
           usage_seconds?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_achievements: {
+        Row: {
+          achieved_at: string
+          achievement_id: string
+          achievement_type: string
+          created_at: string
+          id: string
+          notified: boolean | null
+          user_id: string
+        }
+        Insert: {
+          achieved_at?: string
+          achievement_id: string
+          achievement_type: string
+          created_at?: string
+          id?: string
+          notified?: boolean | null
+          user_id: string
+        }
+        Update: {
+          achieved_at?: string
+          achievement_id?: string
+          achievement_type?: string
+          created_at?: string
+          id?: string
+          notified?: boolean | null
           user_id?: string
         }
         Relationships: []

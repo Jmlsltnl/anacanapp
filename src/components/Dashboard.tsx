@@ -4,9 +4,10 @@ import {
   Droplets, Moon, Utensils, Activity, Plus, TrendingUp, Heart, Sparkles, 
   Bell, ChevronRight, Flame, Target, Calendar, Zap, Sun, Cloud, Wind,
   ThermometerSun, Pill, Baby, Footprints, Scale, Clock, Star, Award,
-  MessageCircle
+  MessageCircle, Check
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
+import { useTimerStore } from '@/store/timerStore';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { hapticFeedback } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
@@ -15,6 +16,8 @@ import { useBabyLogs } from '@/hooks/useBabyLogs';
 import { useAuth } from '@/hooks/useAuth';
 import { useKickSessions } from '@/hooks/useKickSessions';
 import { useWeightEntries } from '@/hooks/useWeightEntries';
+import { useBabyMilestones, MILESTONES } from '@/hooks/useBabyMilestones';
+import { useAchievements } from '@/hooks/useAchievements';
 
 interface QuickActionProps {
   icon: any;
@@ -560,18 +563,25 @@ const MommyDashboard = () => {
   const { getBabyData } = useUserStore();
   const { toast } = useToast();
   const babyData = getBabyData();
+  const { isMilestoneAchieved, toggleMilestone, getMilestoneDate } = useBabyMilestones();
+  const { unlockAchievement, getTotalPoints } = useAchievements();
+  const { activeTimers, startTimer, stopTimer, getElapsedSeconds, getActiveTimer } = useTimerStore();
+  
+  // Current time for timer display
+  const [, setTick] = useState(0);
   
   // Sleep tracking
-  const [sleepLogs, setSleepLogs] = useState<Array<{id: string; startTime: Date; endTime?: Date}>>([]);
-  const [isSleeping, setIsSleeping] = useState(false);
   const [totalSleepHours, setTotalSleepHours] = useState(8.5);
+  const sleepTimer = getActiveTimer('sleep');
   
-  // Feeding tracking with types
-  const [feedingLogs, setFeedingLogs] = useState<Array<{id: string; type: 'left' | 'right' | 'formula' | 'solid'; time: Date; duration?: number}>>([
-    { id: '1', type: 'left', time: new Date(Date.now() - 3600000), duration: 15 },
-    { id: '2', type: 'right', time: new Date(Date.now() - 7200000), duration: 12 },
+  // Feeding tracking with live timer
+  const [feedingLogs, setFeedingLogs] = useState<Array<{id: string; type: 'left' | 'right' | 'formula' | 'solid'; time: Date; durationSeconds?: number}>>([
+    { id: '1', type: 'left', time: new Date(Date.now() - 3600000), durationSeconds: 900 },
+    { id: '2', type: 'right', time: new Date(Date.now() - 7200000), durationSeconds: 720 },
   ]);
   const [showFeedingModal, setShowFeedingModal] = useState(false);
+  const leftFeedTimer = getActiveTimer('feeding', 'left');
+  const rightFeedTimer = getActiveTimer('feeding', 'right');
   
   // Diaper tracking with types
   const [diaperLogs, setDiaperLogs] = useState<Array<{id: string; type: 'wet' | 'dirty' | 'both'; time: Date}>>([
@@ -580,43 +590,85 @@ const MommyDashboard = () => {
   ]);
   const [showDiaperModal, setShowDiaperModal] = useState(false);
 
+  // Update timer display every second
+  useEffect(() => {
+    const interval = setInterval(() => setTick(t => t + 1), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   if (!babyData) return null;
 
-  const milestones = [
-    { week: 1, label: 'İlk təbəssüm', emoji: '😊', achieved: babyData.ageInDays >= 7 },
-    { week: 4, label: 'Başını tutur', emoji: '👶', achieved: babyData.ageInDays >= 28 },
-    { week: 8, label: 'Gülür', emoji: '😄', achieved: babyData.ageInDays >= 56 },
-    { week: 12, label: 'Əl uzadır', emoji: '🤲', achieved: babyData.ageInDays >= 84 },
-    { week: 16, label: 'Dönür', emoji: '🔄', achieved: babyData.ageInDays >= 112 },
-  ];
+  // Use dynamic milestones from hook
+  const displayMilestones = MILESTONES.slice(0, 5).map(m => ({
+    ...m,
+    achieved: isMilestoneAchieved(m.id),
+    achievedDate: getMilestoneDate(m.id),
+  }));
+
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const toggleSleep = async () => {
     await hapticFeedback.medium();
-    if (isSleeping) {
+    if (sleepTimer) {
       // End sleep
-      setIsSleeping(false);
-      toast({ title: "Yuxu bitdi! ☀️", description: "Yuxu müddəti qeyd edildi" });
+      const result = stopTimer(sleepTimer.id);
+      if (result) {
+        const hours = result.durationSeconds / 3600;
+        setTotalSleepHours(prev => prev + hours);
+        toast({ title: "Yuxu bitdi! ☀️", description: `${formatDuration(result.durationSeconds)} yatdı` });
+      }
     } else {
       // Start sleep
-      setIsSleeping(true);
-      setSleepLogs(prev => [...prev, { id: Date.now().toString(), startTime: new Date() }]);
+      startTimer('sleep');
       toast({ title: "Yuxu başladı! 😴", description: "Bitirmək üçün yenidən basın" });
     }
   };
 
-  const addFeeding = async (type: 'left' | 'right' | 'formula' | 'solid') => {
+  const toggleFeeding = async (type: 'left' | 'right') => {
+    await hapticFeedback.medium();
+    const activeTimer = type === 'left' ? leftFeedTimer : rightFeedTimer;
+    
+    if (activeTimer) {
+      // Stop feeding
+      const result = stopTimer(activeTimer.id);
+      if (result) {
+        setFeedingLogs(prev => [...prev, { 
+          id: Date.now().toString(), 
+          type, 
+          time: new Date(),
+          durationSeconds: result.durationSeconds
+        }]);
+        toast({ 
+          title: `${type === 'left' ? 'Sol' : 'Sağ'} sinə bitti!`, 
+          description: `Müddət: ${formatDuration(result.durationSeconds)}` 
+        });
+        
+        // Check for achievement
+        if (feedingLogs.length >= 99) {
+          unlockAchievement('feeding_pro', 'mommy');
+        }
+      }
+    } else {
+      // Start feeding
+      startTimer('feeding', type);
+      setShowFeedingModal(false);
+    }
+  };
+
+  const addFeeding = async (type: 'formula' | 'solid') => {
     await hapticFeedback.medium();
     setFeedingLogs(prev => [...prev, { 
       id: Date.now().toString(), 
       type, 
       time: new Date(),
-      duration: type === 'formula' || type === 'solid' ? undefined : 0
     }]);
     setShowFeedingModal(false);
     
     const typeLabels = {
-      left: 'Sol sinə 🤱',
-      right: 'Sağ sinə 🤱',
       formula: 'Süd əvəzedicisi 🍼',
       solid: 'Əlavə qida 🥣'
     };
@@ -628,12 +680,17 @@ const MommyDashboard = () => {
     setDiaperLogs(prev => [...prev, { id: Date.now().toString(), type, time: new Date() }]);
     setShowDiaperModal(false);
     
-    const typeLabels = {
-      wet: 'Sidik 💧',
-      dirty: 'Nəcis 💩',
-      both: 'Hər ikisi 💧💩'
+    const typeEmojis = {
+      wet: '💧',
+      dirty: '💩',
+      both: '💧💩'
     };
-    toast({ title: `Bez dəyişmə: ${typeLabels[type]}` });
+    toast({ title: `Bez dəyişmə: ${typeEmojis[type]}` });
+    
+    // Check for achievement
+    if (diaperLogs.length >= 99) {
+      unlockAchievement('diaper_hero', 'mommy');
+    }
   };
 
   const getFeedingIcon = (type: string) => {
@@ -652,6 +709,19 @@ const MommyDashboard = () => {
       case 'dirty': return '💩';
       case 'both': return '💧💩';
       default: return '👶';
+    }
+  };
+
+  const handleMilestoneClick = async (milestoneId: string) => {
+    await hapticFeedback.medium();
+    await toggleMilestone(milestoneId);
+    
+    // Check for milestone achievements
+    const achievedCount = displayMilestones.filter(m => isMilestoneAchieved(m.id)).length;
+    if (achievedCount === 0) {
+      unlockAchievement('milestone_first', 'mommy');
+    } else if (achievedCount >= 4) {
+      unlockAchievement('milestone_5', 'mommy');
     }
   };
 
@@ -709,26 +779,28 @@ const MommyDashboard = () => {
           <motion.button
             onClick={toggleSleep}
             className={`px-5 py-3 rounded-2xl font-bold text-sm ${
-              isSleeping 
+              sleepTimer 
                 ? 'bg-amber-500 text-white' 
                 : 'bg-violet-100 text-violet-700'
             }`}
             whileTap={{ scale: 0.95 }}
-            animate={isSleeping ? { scale: [1, 1.05, 1] } : {}}
-            transition={{ duration: 1, repeat: isSleeping ? Infinity : 0 }}
+            animate={sleepTimer ? { scale: [1, 1.05, 1] } : {}}
+            transition={{ duration: 1, repeat: sleepTimer ? Infinity : 0 }}
           >
-            {isSleeping ? '☀️ Oyandı' : '😴 Yatdı'}
+            {sleepTimer ? `☀️ ${formatDuration(getElapsedSeconds(sleepTimer.id))}` : '😴 Yatdı'}
           </motion.button>
         </div>
         
-        {isSleeping && (
+        {sleepTimer && (
           <motion.div 
             className="bg-violet-50 rounded-xl p-3 flex items-center gap-3"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
           >
             <div className="w-3 h-3 rounded-full bg-violet-500 animate-pulse" />
-            <span className="text-sm text-violet-700 font-medium">Yuxu davam edir...</span>
+            <span className="text-sm text-violet-700 font-medium">
+              Yuxu davam edir: {formatDuration(getElapsedSeconds(sleepTimer.id))}
+            </span>
           </motion.div>
         )}
       </motion.div>
@@ -769,20 +841,32 @@ const MommyDashboard = () => {
               className="grid grid-cols-2 gap-2 mb-4"
             >
               <motion.button
-                onClick={() => addFeeding('left')}
-                className="p-4 rounded-2xl bg-pink-50 border-2 border-pink-200 flex flex-col items-center gap-2"
+                onClick={() => toggleFeeding('left')}
+                className={`p-4 rounded-2xl flex flex-col items-center gap-2 ${
+                  leftFeedTimer 
+                    ? 'bg-pink-500 border-2 border-pink-600 text-white' 
+                    : 'bg-pink-50 border-2 border-pink-200'
+                }`}
                 whileTap={{ scale: 0.95 }}
               >
                 <span className="text-2xl">🤱</span>
-                <span className="text-sm font-medium text-pink-700">Sol Sinə</span>
+                <span className={`text-sm font-medium ${leftFeedTimer ? 'text-white' : 'text-pink-700'}`}>
+                  {leftFeedTimer ? formatDuration(getElapsedSeconds(leftFeedTimer.id)) : 'Sol Sinə'}
+                </span>
               </motion.button>
               <motion.button
-                onClick={() => addFeeding('right')}
-                className="p-4 rounded-2xl bg-pink-50 border-2 border-pink-200 flex flex-col items-center gap-2"
+                onClick={() => toggleFeeding('right')}
+                className={`p-4 rounded-2xl flex flex-col items-center gap-2 ${
+                  rightFeedTimer 
+                    ? 'bg-pink-500 border-2 border-pink-600 text-white' 
+                    : 'bg-pink-50 border-2 border-pink-200'
+                }`}
                 whileTap={{ scale: 0.95 }}
               >
                 <span className="text-2xl">🤱</span>
-                <span className="text-sm font-medium text-pink-700">Sağ Sinə</span>
+                <span className={`text-sm font-medium ${rightFeedTimer ? 'text-white' : 'text-pink-700'}`}>
+                  {rightFeedTimer ? formatDuration(getElapsedSeconds(rightFeedTimer.id)) : 'Sağ Sinə'}
+                </span>
               </motion.button>
               <motion.button
                 onClick={() => addFeeding('formula')}
@@ -804,20 +888,28 @@ const MommyDashboard = () => {
           )}
         </AnimatePresence>
         
-        {/* Recent Feedings */}
-        <div className="flex gap-2 overflow-x-auto hide-scrollbar">
-          {feedingLogs.slice(-5).reverse().map((log) => (
-            <div 
-              key={log.id}
-              className="flex-shrink-0 px-3 py-2 rounded-xl bg-muted/50 flex items-center gap-2"
-            >
-              <span className="text-lg">{getFeedingIcon(log.type)}</span>
-              <span className="text-xs text-muted-foreground">
-                {log.time.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
+        {/* Active feeding timer indicator */}
+        {(leftFeedTimer || rightFeedTimer) && !showFeedingModal && (
+          <motion.div 
+            className="bg-pink-50 rounded-xl p-3 flex items-center justify-between mb-3"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 rounded-full bg-pink-500 animate-pulse" />
+              <span className="text-sm text-pink-700 font-medium">
+                {leftFeedTimer ? 'Sol sinə' : 'Sağ sinə'}: {formatDuration(getElapsedSeconds((leftFeedTimer || rightFeedTimer)!.id))}
               </span>
             </div>
-          ))}
-        </div>
+            <motion.button
+              onClick={() => toggleFeeding(leftFeedTimer ? 'left' : 'right')}
+              className="px-3 py-1 bg-pink-500 text-white rounded-lg text-sm font-medium"
+              whileTap={{ scale: 0.95 }}
+            >
+              Bitir
+            </motion.button>
+          </motion.div>
+        )}
       </motion.div>
 
       {/* Diaper Tracker */}
@@ -857,27 +949,24 @@ const MommyDashboard = () => {
             >
               <motion.button
                 onClick={() => addDiaper('wet')}
-                className="p-4 rounded-2xl bg-blue-50 border-2 border-blue-200 flex flex-col items-center gap-2"
+                className="p-4 rounded-2xl bg-blue-50 border-2 border-blue-200 flex items-center justify-center"
                 whileTap={{ scale: 0.95 }}
               >
-                <span className="text-2xl">💧</span>
-                <span className="text-sm font-medium text-blue-700">Sidik</span>
+                <span className="text-3xl">💧</span>
               </motion.button>
               <motion.button
                 onClick={() => addDiaper('dirty')}
-                className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-200 flex flex-col items-center gap-2"
+                className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-200 flex items-center justify-center"
                 whileTap={{ scale: 0.95 }}
               >
-                <span className="text-2xl">💩</span>
-                <span className="text-sm font-medium text-amber-700">Nəcis</span>
+                <span className="text-3xl">💩</span>
               </motion.button>
               <motion.button
                 onClick={() => addDiaper('both')}
-                className="p-4 rounded-2xl bg-purple-50 border-2 border-purple-200 flex flex-col items-center gap-2"
+                className="p-4 rounded-2xl bg-purple-50 border-2 border-purple-200 flex items-center justify-center"
                 whileTap={{ scale: 0.95 }}
               >
                 <span className="text-2xl">💧💩</span>
-                <span className="text-sm font-medium text-purple-700">Hər İkisi</span>
               </motion.button>
             </motion.div>
           )}
@@ -909,31 +998,38 @@ const MommyDashboard = () => {
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-foreground">İnkişaf mərhələləri</h3>
           <span className="text-xs text-primary font-bold">
-            {milestones.filter(m => m.achieved).length}/{milestones.length}
+            {displayMilestones.filter(m => m.achieved).length}/{displayMilestones.length}
           </span>
         </div>
         <div className="flex justify-between">
-          {milestones.map((milestone, index) => (
-            <motion.div 
-              key={milestone.label}
+          {displayMilestones.map((milestone, index) => (
+            <motion.button 
+              key={milestone.id}
+              onClick={() => handleMilestoneClick(milestone.id)}
               className="text-center"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.3 + index * 0.1 }}
+              whileTap={{ scale: 0.9 }}
             >
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl mb-1 ${
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl mb-1 relative ${
                 milestone.achieved 
                   ? 'bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg' 
-                  : 'bg-muted opacity-40'
+                  : 'bg-muted opacity-60'
               }`}>
                 {milestone.emoji}
+                {milestone.achieved && (
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                    <Check className="w-2.5 h-2.5 text-white" />
+                  </div>
+                )}
               </div>
               <span className={`text-[10px] ${
                 milestone.achieved ? 'text-foreground font-medium' : 'text-muted-foreground'
               }`}>
                 {milestone.label}
               </span>
-            </motion.div>
+            </motion.button>
           ))}
         </div>
       </motion.div>
