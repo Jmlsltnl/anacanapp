@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { getPublicProfileCards } from '@/lib/public-profile-cards';
 
 export interface CommunityGroup {
   id: string;
@@ -159,15 +160,12 @@ export const useGroupPosts = (groupId: string | null) => {
       const { data: posts, error } = await query;
       if (error) throw error;
 
-      // Fetch author details and like status for each post
+      const authorMap = await getPublicProfileCards((posts || []).map((p: any) => p.user_id));
+
+      // Fetch like status for each post (author info is now batched)
       const postsWithDetails = await Promise.all(
-        (posts || []).map(async (post) => {
-          // Get author with badge_type
-          const { data: authorData } = await supabase
-            .from('profiles')
-            .select('name, avatar_url, badge_type')
-            .eq('user_id', post.user_id)
-            .single();
+        (posts || []).map(async (post: any) => {
+          const authorData = authorMap[post.user_id];
 
           // Check if user liked this post
           let isLiked = false;
@@ -183,7 +181,9 @@ export const useGroupPosts = (groupId: string | null) => {
 
           return {
             ...post,
-            author: authorData || { name: 'İstifadəçi', avatar_url: null, badge_type: null },
+            author: authorData
+              ? { name: authorData.name || 'İstifadəçi', avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null }
+              : { name: 'İstifadəçi', avatar_url: null, badge_type: null },
             is_liked: isLiked,
           };
         })
@@ -266,13 +266,11 @@ export const usePostComments = (postId: string) => {
 
       if (error) throw error;
 
+      const authorMap = await getPublicProfileCards((comments || []).map((c: any) => c.user_id));
+
       const commentsWithDetails = await Promise.all(
-        (comments || []).map(async (comment) => {
-          const { data: authorData } = await supabase
-            .from('profiles')
-            .select('name, avatar_url, badge_type')
-            .eq('user_id', comment.user_id)
-            .single();
+        (comments || []).map(async (comment: any) => {
+          const authorData = authorMap[comment.user_id];
 
           let isLiked = false;
           if (user) {
@@ -287,7 +285,9 @@ export const usePostComments = (postId: string) => {
 
           return {
             ...comment,
-            author: authorData || { name: 'İstifadəçi', avatar_url: null, badge_type: null },
+            author: authorData
+              ? { name: authorData.name || 'İstifadəçi', avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null }
+              : { name: 'İstifadəçi', avatar_url: null, badge_type: null },
             is_liked: isLiked,
           };
         })

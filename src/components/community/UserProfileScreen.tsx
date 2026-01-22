@@ -53,12 +53,12 @@ const UserProfileScreen = ({ userId, onBack }: UserProfileScreenProps) => {
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       setIsCurrentUser(currentUser?.id === userId);
 
-      // Fetch profile
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
+      // Fetch profile (public-safe projection for Community)
+      const { data: profileData, error: profileError } = await (supabase as any)
+        .from('public_profile_cards')
         .select('user_id, name, avatar_url, life_stage, is_premium, badge_type, created_at')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       if (profileError) {
         console.error('Profile fetch error:', profileError);
