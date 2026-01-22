@@ -1,10 +1,10 @@
 import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { X, Image, Video, Send, Loader2, Play } from 'lucide-react';
 import { CommunityGroup, useCreatePost } from '@/hooks/useCommunity';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
@@ -157,175 +157,157 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50"
-            onClick={handleClose}
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+      <DialogContent className="sm:max-w-md max-w-[95vw] max-h-[85vh] overflow-y-auto rounded-2xl p-0">
+        {/* Header */}
+        <DialogHeader className="p-5 pb-0">
+          <DialogTitle className="text-xl font-black text-foreground text-center">
+            Yeni Paylaşım
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="p-5 pt-4 space-y-4">
+          {/* Group Selector */}
+          <div>
+            <label className="text-sm font-medium text-muted-foreground mb-2 block">
+              Paylaşım yeri
+            </label>
+            <Select
+              value={selectedGroupId || 'public'}
+              onValueChange={(value) => setSelectedGroupId(value === 'public' ? null : value)}
+            >
+              <SelectTrigger className="w-full h-12 rounded-xl bg-muted/50 border-border">
+                <SelectValue placeholder="Qrup seçin" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border-border z-[100]">
+                <SelectItem value="public">🌍 Ümumi (Hamı görə bilər)</SelectItem>
+                {groups.map((group) => (
+                  <SelectItem key={group.id} value={group.id}>
+                    {group.icon_emoji || '👥'} {group.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Content */}
+          <Textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Nə düşünürsünüz? ✨"
+            className="min-h-[120px] rounded-xl resize-none text-base bg-muted/50 border-border focus:border-primary"
           />
 
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 100 }}
-            className="fixed inset-x-0 bottom-0 z-50 bg-card rounded-t-3xl max-h-[90vh] overflow-hidden"
-          >
-            <div className="p-5">
-              {/* Header */}
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-black text-foreground">Yeni Paylaşım</h2>
-                <button
-                  onClick={handleClose}
-                  className="w-10 h-10 rounded-full bg-muted flex items-center justify-center"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Group Selector */}
-              <div className="mb-4">
-                <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                  Paylaşım yeri
-                </label>
-                <Select
-                  value={selectedGroupId || 'public'}
-                  onValueChange={(value) => setSelectedGroupId(value === 'public' ? null : value)}
-                >
-                  <SelectTrigger className="w-full h-12 rounded-xl">
-                    <SelectValue placeholder="Qrup seçin" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="public">🌍 Ümumi (Hamı görə bilər)</SelectItem>
-                    {groups.map((group) => (
-                      <SelectItem key={group.id} value={group.id}>
-                        {group.icon_emoji || '👥'} {group.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Content */}
-              <Textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Nə düşünürsünüz? ✨"
-                className="min-h-[120px] rounded-xl resize-none mb-4 text-base"
-              />
-
-              {/* Media Previews */}
-              {mediaPreviews.length > 0 && (
-                <div className="grid grid-cols-2 gap-2 mb-4">
-                  {mediaPreviews.map((preview, index) => (
-                    <div key={index} className="relative aspect-square rounded-xl overflow-hidden bg-muted">
-                      {preview.type === 'video' ? (
-                        <div className="relative w-full h-full">
-                          <video
-                            src={preview.url}
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                            <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
-                              <Play className="w-5 h-5 text-foreground ml-0.5" />
-                            </div>
-                          </div>
+          {/* Media Previews */}
+          {mediaPreviews.length > 0 && (
+            <div className="grid grid-cols-2 gap-2">
+              {mediaPreviews.map((preview, index) => (
+                <div key={index} className="relative aspect-square rounded-xl overflow-hidden bg-muted">
+                  {preview.type === 'video' ? (
+                    <div className="relative w-full h-full">
+                      <video
+                        src={preview.url}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                        <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
+                          <Play className="w-5 h-5 text-foreground ml-0.5" />
                         </div>
-                      ) : (
-                        <img
-                          src={preview.url}
-                          alt=""
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                      <button
-                        onClick={() => removeMedia(index)}
-                        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-colors"
-                      >
-                        <X className="w-4 h-4 text-white" />
-                      </button>
-                      {preview.type === 'video' && (
-                        <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-black/60 rounded text-white text-xs">
-                          Video
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Hidden file inputs */}
-              <input
-                ref={imageInputRef}
-                type="file"
-                accept="image/*"
-                multiple
-                className="hidden"
-                onChange={(e) => handleFileSelect(e, 'image')}
-              />
-              <input
-                ref={videoInputRef}
-                type="file"
-                accept="video/*"
-                className="hidden"
-                onChange={(e) => handleFileSelect(e, 'video')}
-              />
-
-              {/* Actions */}
-              <div className="flex items-center gap-3">
-                {/* Image upload */}
-                <button
-                  onClick={() => imageInputRef.current?.click()}
-                  disabled={mediaFiles.length >= 4 || isUploading}
-                  className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Image className="w-5 h-5 text-muted-foreground" />
-                </button>
-
-                {/* Video upload */}
-                <button
-                  onClick={() => videoInputRef.current?.click()}
-                  disabled={mediaFiles.length >= 4 || isUploading}
-                  className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Video className="w-5 h-5 text-muted-foreground" />
-                </button>
-
-                <Button
-                  onClick={handleSubmit}
-                  disabled={(!content.trim() && mediaFiles.length === 0) || isUploading || createPost.isPending}
-                  className="flex-1 h-12 rounded-xl gradient-primary font-bold"
-                >
-                  {isUploading || createPost.isPending ? (
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>Yüklənir...</span>
+                      </div>
                     </div>
                   ) : (
-                    <>
-                      <Send className="w-5 h-5 mr-2" />
-                      Paylaş
-                    </>
+                    <img
+                      src={preview.url}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
                   )}
-                </Button>
-              </div>
-
-              {/* Media count indicator */}
-              {mediaFiles.length > 0 && (
-                <p className="text-xs text-muted-foreground text-center mt-3">
-                  {mediaFiles.length}/4 media əlavə edildi
-                </p>
-              )}
+                  <button
+                    onClick={() => removeMedia(index)}
+                    className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-colors"
+                  >
+                    <X className="w-4 h-4 text-white" />
+                  </button>
+                  {preview.type === 'video' && (
+                    <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-black/60 rounded text-white text-xs">
+                      Video
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+          )}
+
+          {/* Hidden file inputs */}
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={(e) => handleFileSelect(e, 'image')}
+          />
+          <input
+            ref={videoInputRef}
+            type="file"
+            accept="video/*"
+            className="hidden"
+            onChange={(e) => handleFileSelect(e, 'video')}
+          />
+
+          {/* Media Actions */}
+          <div className="flex items-center gap-3 py-2 border-y border-border">
+            <span className="text-sm text-muted-foreground">Əlavə et:</span>
+            
+            {/* Image upload */}
+            <button
+              onClick={() => imageInputRef.current?.click()}
+              disabled={mediaFiles.length >= 4 || isUploading}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted hover:bg-muted/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Image className="w-5 h-5 text-primary" />
+              <span className="text-sm font-medium">Şəkil</span>
+            </button>
+
+            {/* Video upload */}
+            <button
+              onClick={() => videoInputRef.current?.click()}
+              disabled={mediaFiles.length >= 4 || isUploading}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted hover:bg-muted/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Video className="w-5 h-5 text-primary" />
+              <span className="text-sm font-medium">Video</span>
+            </button>
+          </div>
+
+          {/* Media count indicator */}
+          {mediaFiles.length > 0 && (
+            <p className="text-xs text-muted-foreground text-center">
+              {mediaFiles.length}/4 media əlavə edildi
+            </p>
+          )}
+
+          {/* Submit Button */}
+          <Button
+            onClick={handleSubmit}
+            disabled={(!content.trim() && mediaFiles.length === 0) || isUploading || createPost.isPending}
+            className="w-full h-12 rounded-xl gradient-primary font-bold text-base"
+          >
+            {isUploading || createPost.isPending ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>Yüklənir...</span>
+              </div>
+            ) : (
+              <>
+                <Send className="w-5 h-5 mr-2" />
+                Paylaş
+              </>
+            )}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
