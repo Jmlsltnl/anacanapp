@@ -19,8 +19,8 @@ const womanTabs = [
 
 const partnerTabs = [
   { id: 'home', label: 'Əsas', icon: Home },
-  { id: 'community', label: 'Cəmiyyət', icon: Users },
-  { id: 'ai', label: 'Məsləhət', icon: MessageCircle },
+  { id: 'chat', label: 'Mesajlar', icon: MessageCircle },
+  { id: 'ai', label: 'Məsləhət', icon: Compass },
   { id: 'profile', label: 'Profil', icon: User },
 ];
 
