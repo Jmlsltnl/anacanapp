@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Shield, Timer, Scale, Baby, Briefcase, 
@@ -43,28 +43,48 @@ const tools: Tool[] = [
   { id: 'mood', name: 'Əhval Gündəliyi', description: 'Emosiyalarınızı izləyin', icon: Heart, color: 'text-fuchsia-600', bgColor: 'bg-fuchsia-50' },
 ];
 
-const ToolsHub = () => {
+interface ToolsHubProps {
+  initialTool?: string | null;
+  onBack?: () => void;
+}
+
+const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTool, setActiveTool] = useState<string | null>(null);
+  const [activeTool, setActiveTool] = useState<string | null>(initialTool);
+
+  // Effect to set initial tool from props
+  useEffect(() => {
+    if (initialTool) {
+      setActiveTool(initialTool);
+    }
+  }, [initialTool]);
 
   const filteredTools = tools.filter(tool => 
     tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     tool.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleBack = () => {
+    if (activeTool) {
+      setActiveTool(null);
+    } else if (onBack) {
+      onBack();
+    }
+  };
+
   // Render active tool
-  if (activeTool === 'photoshoot') return <BabyPhotoshoot onBack={() => setActiveTool(null)} />;
-  if (activeTool === 'recipes') return <Recipes onBack={() => setActiveTool(null)} />;
-  if (activeTool === 'safety') return <SafetyLookup onBack={() => setActiveTool(null)} />;
-  if (activeTool === 'kick') return <KickCounter onBack={() => setActiveTool(null)} />;
-  if (activeTool === 'contraction') return <ContractionTimer onBack={() => setActiveTool(null)} />;
-  if (activeTool === 'weight') return <WeightTracker onBack={() => setActiveTool(null)} />;
-  if (activeTool === 'whitenoise') return <WhiteNoise onBack={() => setActiveTool(null)} />;
-  if (activeTool === 'names') return <BabyNames onBack={() => setActiveTool(null)} />;
-  if (activeTool === 'hospital') return <HospitalBag onBack={() => setActiveTool(null)} />;
-  if (activeTool === 'nutrition') return <Nutrition onBack={() => setActiveTool(null)} />;
-  if (activeTool === 'exercise') return <Exercises onBack={() => setActiveTool(null)} />;
-  if (activeTool === 'mood') return <MoodDiary onBack={() => setActiveTool(null)} />;
+  if (activeTool === 'photoshoot') return <BabyPhotoshoot onBack={handleBack} />;
+  if (activeTool === 'recipes') return <Recipes onBack={handleBack} />;
+  if (activeTool === 'safety') return <SafetyLookup onBack={handleBack} />;
+  if (activeTool === 'kick') return <KickCounter onBack={handleBack} />;
+  if (activeTool === 'contraction') return <ContractionTimer onBack={handleBack} />;
+  if (activeTool === 'weight') return <WeightTracker onBack={handleBack} />;
+  if (activeTool === 'whitenoise') return <WhiteNoise onBack={handleBack} />;
+  if (activeTool === 'names') return <BabyNames onBack={handleBack} />;
+  if (activeTool === 'hospital') return <HospitalBag onBack={handleBack} />;
+  if (activeTool === 'nutrition') return <Nutrition onBack={handleBack} />;
+  if (activeTool === 'exercise' || activeTool === 'exercises') return <Exercises onBack={handleBack} />;
+  if (activeTool === 'mood' || activeTool === 'mood-diary') return <MoodDiary onBack={handleBack} />;
 
   return (
     <div className="pb-28 pt-2 px-5">

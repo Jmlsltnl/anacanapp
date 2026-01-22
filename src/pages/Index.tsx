@@ -39,6 +39,7 @@ const Index = () => {
   const [showAdmin, setShowAdmin] = useState(false);
   const [showMotherChat, setShowMotherChat] = useState(false);
   const [viewingUserId, setViewingUserId] = useState<string | null>(null);
+  const [activeTool, setActiveTool] = useState<string | null>(null);
   const { isAuthenticated, isOnboarded, role } = useUserStore();
   const { isAdmin, loading } = useAuth();
 
@@ -46,6 +47,12 @@ const Index = () => {
     const timer = setTimeout(() => setShowSplash(false), 2500);
     return () => clearTimeout(timer);
   }, []);
+
+  // Handle tool navigation from Dashboard
+  const handleNavigateToTool = (tool: string) => {
+    setActiveTool(tool);
+    setActiveTab('tools');
+  };
 
   useEffect(() => {
     if (activeScreen === 'admin' && isAdmin) {
@@ -94,13 +101,13 @@ const Index = () => {
       case 'home':
         return (
           <motion.div key="home" variants={pageVariants} initial="initial" animate="animate" exit="exit">
-            <Dashboard onOpenChat={() => setShowMotherChat(true)} />
+            <Dashboard onOpenChat={() => setShowMotherChat(true)} onNavigateToTool={handleNavigateToTool} />
           </motion.div>
         );
       case 'tools':
         return (
           <motion.div key="tools" variants={pageVariants} initial="initial" animate="animate" exit="exit">
-            <ToolsHub />
+            <ToolsHub initialTool={activeTool} onBack={() => setActiveTool(null)} />
           </motion.div>
         );
       case 'community':
