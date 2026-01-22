@@ -1,15 +1,22 @@
 import { motion } from 'framer-motion';
-import { useEffect, forwardRef } from 'react';
+import { useEffect, forwardRef, useRef } from 'react';
 
 interface SplashScreenProps {
   onComplete: () => void;
 }
 
 const SplashScreen = forwardRef<HTMLDivElement, SplashScreenProps>(({ onComplete }, ref) => {
+  // Keep the splash auto-close timer stable even if parent re-renders.
+  const onCompleteRef = useRef(onComplete);
+
   useEffect(() => {
-    const timer = setTimeout(onComplete, 2500);
-    return () => clearTimeout(timer);
+    onCompleteRef.current = onComplete;
   }, [onComplete]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => onCompleteRef.current(), 2500);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <motion.div
