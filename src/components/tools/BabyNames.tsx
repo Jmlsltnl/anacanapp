@@ -2,37 +2,7 @@ import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Search, Heart, Shuffle, Star } from 'lucide-react';
 import { useFavoriteNames } from '@/hooks/useFavoriteNames';
-
-interface Name {
-  name: string;
-  meaning: string;
-  origin: string;
-  gender: 'boy' | 'girl' | 'unisex';
-  popularity: number;
-}
-
-const names: Name[] = [
-  { name: 'Aysel', meaning: 'Ay kimi gözəl', origin: 'Türk', gender: 'girl', popularity: 95 },
-  { name: 'Elvin', meaning: 'Xalqın dostu', origin: 'Türk', gender: 'boy', popularity: 88 },
-  { name: 'Nigar', meaning: 'Şəkil, rəsm', origin: 'Fars', gender: 'girl', popularity: 82 },
-  { name: 'Orxan', meaning: 'Böyük xan', origin: 'Türk', gender: 'boy', popularity: 90 },
-  { name: 'Ləman', meaning: 'Parıltılı', origin: 'Ərəb', gender: 'girl', popularity: 75 },
-  { name: 'Murad', meaning: 'Arzu, istək', origin: 'Ərəb', gender: 'boy', popularity: 85 },
-  { name: 'Günel', meaning: 'Günəş kimi', origin: 'Türk', gender: 'girl', popularity: 92 },
-  { name: 'Tural', meaning: 'Ölməz', origin: 'Türk', gender: 'boy', popularity: 78 },
-  { name: 'Aytən', meaning: 'Ay bədənli', origin: 'Türk', gender: 'girl', popularity: 70 },
-  { name: 'Rəşad', meaning: 'Doğru yolda gedən', origin: 'Ərəb', gender: 'boy', popularity: 80 },
-  { name: 'Sevinc', meaning: 'Xoşbəxtlik', origin: 'Türk', gender: 'girl', popularity: 88 },
-  { name: 'Fərid', meaning: 'Tək, bənzərsiz', origin: 'Ərəb', gender: 'boy', popularity: 75 },
-  { name: 'Nərmin', meaning: 'Zərif, incə', origin: 'Fars', gender: 'girl', popularity: 85 },
-  { name: 'Cavid', meaning: 'Əbədi', origin: 'Fars', gender: 'boy', popularity: 72 },
-  { name: 'Lalə', meaning: 'Lalə çiçəyi', origin: 'Türk', gender: 'girl', popularity: 90 },
-  { name: 'Kamran', meaning: 'Uğurlu', origin: 'Fars', gender: 'boy', popularity: 83 },
-  { name: 'Fatimə', meaning: 'Süddən kəsilmiş', origin: 'Ərəb', gender: 'girl', popularity: 95 },
-  { name: 'Əli', meaning: 'Yüksək, uca', origin: 'Ərəb', gender: 'boy', popularity: 98 },
-  { name: 'Zəhra', meaning: 'Parlaq, gözəl', origin: 'Ərəb', gender: 'girl', popularity: 93 },
-  { name: 'Həsən', meaning: 'Gözəl', origin: 'Ərəb', gender: 'boy', popularity: 92 },
-];
+import { useBabyNames } from '@/hooks/useDynamicContent';
 
 interface BabyNamesProps {
   onBack: () => void;
@@ -41,27 +11,28 @@ interface BabyNamesProps {
 const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [genderFilter, setGenderFilter] = useState<'all' | 'boy' | 'girl'>('all');
-  const [selectedName, setSelectedName] = useState<Name | null>(null);
-  const { favorites, loading, toggleFavorite, isFavorite } = useFavoriteNames();
+  const [selectedName, setSelectedName] = useState<any | null>(null);
+  const { favorites, loading: favsLoading, toggleFavorite, isFavorite } = useFavoriteNames();
+  const { data: names = [], isLoading } = useBabyNames();
 
   const filteredNames = names.filter(name => {
     const matchesSearch = name.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          name.meaning.toLowerCase().includes(searchQuery.toLowerCase());
+                          (name.meaning_az || name.meaning || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchesGender = genderFilter === 'all' || name.gender === genderFilter || name.gender === 'unisex';
     return matchesSearch && matchesGender;
-  }).sort((a, b) => b.popularity - a.popularity);
+  }).sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
 
-  const handleToggleFavorite = (name: Name) => {
-    toggleFavorite(name.name, name.gender, name.meaning, name.origin);
+  const handleToggleFavorite = (name: any) => {
+    toggleFavorite(name.name, name.gender, name.meaning_az || name.meaning, name.origin);
   };
 
   const getRandomName = () => {
     const filtered = genderFilter === 'all' ? names : names.filter(n => n.gender === genderFilter || n.gender === 'unisex');
     const random = filtered[Math.floor(Math.random() * filtered.length)];
-    setSelectedName(random);
+    if (random) setSelectedName(random);
   };
 
-  if (loading) {
+  if (isLoading || favsLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
@@ -70,8 +41,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
+    <div ref={ref} className="min-h-screen bg-background">
       <div className="gradient-primary px-5 pt-4 pb-8 safe-top">
         <div className="flex items-center gap-4 mb-6">
           <motion.button
@@ -96,7 +66,6 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
           </motion.button>
         </div>
 
-        {/* Search */}
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
           <input
@@ -110,7 +79,6 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
       </div>
 
       <div className="px-5 -mt-4">
-        {/* Gender Filter */}
         <div className="flex gap-2 mb-6">
           {[
             { id: 'all', label: 'Hamısı', emoji: '✨' },
@@ -132,7 +100,6 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
           ))}
         </div>
 
-        {/* Favorites Section */}
         {favorites.length > 0 && (
           <motion.div
             className="mb-6"
@@ -156,11 +123,10 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
           </motion.div>
         )}
 
-        {/* Names List */}
         <div className="space-y-3 pb-8">
           {filteredNames.map((name, index) => (
             <motion.button
-              key={name.name}
+              key={name.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.03 }}
@@ -179,10 +145,10 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
                   <h3 className="font-bold text-foreground text-lg">{name.name}</h3>
                   <div className="flex items-center gap-1">
                     <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                    <span className="text-xs text-muted-foreground">{name.popularity}%</span>
+                    <span className="text-xs text-muted-foreground">{name.popularity || 0}%</span>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground">{name.meaning}</p>
+                <p className="text-sm text-muted-foreground">{name.meaning_az || name.meaning}</p>
               </div>
               <motion.button
                 onClick={(e) => {
@@ -196,10 +162,17 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
               </motion.button>
             </motion.button>
           ))}
+
+          {filteredNames.length === 0 && (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">👶</div>
+              <p className="text-muted-foreground">Ad tapılmadı</p>
+              <p className="text-sm text-muted-foreground mt-1">Admin paneldən ad əlavə edin</p>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Name Detail Modal */}
       <AnimatePresence>
         {selectedName && (
           <motion.div
@@ -234,13 +207,13 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
                   {selectedName.gender === 'boy' ? 'Oğlan' : 'Qız'}
                 </span>
                 <span className="px-3 py-1 rounded-full bg-muted text-muted-foreground text-xs font-bold">
-                  {selectedName.origin}
+                  {selectedName.origin || 'Naməlum'}
                 </span>
               </div>
 
               <div className="bg-beige-light rounded-2xl p-4 mb-6">
                 <p className="text-sm text-muted-foreground mb-1">Mənası</p>
-                <p className="text-lg font-bold text-foreground">{selectedName.meaning}</p>
+                <p className="text-lg font-bold text-foreground">{selectedName.meaning_az || selectedName.meaning || 'Məlumat yoxdur'}</p>
               </div>
 
               <div className="flex items-center justify-between mb-6">
@@ -249,10 +222,10 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
                   <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
                     <div 
                       className="h-full gradient-primary rounded-full" 
-                      style={{ width: `${selectedName.popularity}%` }}
+                      style={{ width: `${selectedName.popularity || 0}%` }}
                     />
                   </div>
-                  <span className="font-bold text-foreground">{selectedName.popularity}%</span>
+                  <span className="font-bold text-foreground">{selectedName.popularity || 0}%</span>
                 </div>
               </div>
 

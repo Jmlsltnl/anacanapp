@@ -5,31 +5,11 @@ import {
   Plus, Star
 } from 'lucide-react';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
+import { useNutritionTips } from '@/hooks/useDynamicContent';
 
 interface NutritionProps {
   onBack: () => void;
 }
-
-interface FoodItem {
-  id: string;
-  name: string;
-  category: string;
-  calories: number;
-  icon: string;
-  benefits: string[];
-  isSafe: boolean;
-}
-
-const recommendedFoods: FoodItem[] = [
-  { id: '1', name: 'Avokado', category: 'Meyvə', calories: 160, icon: '🥑', benefits: ['Fol turşusu', 'Sağlam yağlar'], isSafe: true },
-  { id: '2', name: 'Qatıq', category: 'Süd', calories: 100, icon: '🥛', benefits: ['Kalsium', 'Probiotiklər'], isSafe: true },
-  { id: '3', name: 'Losos', category: 'Balıq', calories: 200, icon: '🐟', benefits: ['Omega-3', 'Protein'], isSafe: true },
-  { id: '4', name: 'İspanaq', category: 'Tərəvəz', calories: 23, icon: '🥬', benefits: ['Dəmir', 'Fol turşusu'], isSafe: true },
-  { id: '5', name: 'Yumurta', category: 'Protein', calories: 78, icon: '🥚', benefits: ['Protein', 'Xolin'], isSafe: true },
-  { id: '6', name: 'Badəm', category: 'Quru meyvə', calories: 164, icon: '🥜', benefits: ['Vitamin E', 'Maqnezium'], isSafe: true },
-  { id: '7', name: 'Portağal', category: 'Meyvə', calories: 62, icon: '🍊', benefits: ['Vitamin C', 'Fiber'], isSafe: true },
-  { id: '8', name: 'Toyuq əti', category: 'Protein', calories: 165, icon: '🍗', benefits: ['Protein', 'B vitaminləri'], isSafe: true },
-];
 
 const mealTypes = [
   { id: 'breakfast', name: 'Səhər yeməyi', icon: Coffee, time: '07:00 - 09:00' },
@@ -41,10 +21,11 @@ const mealTypes = [
 const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) => {
   const [activeTab, setActiveTab] = useState<'log' | 'foods' | 'water'>('log');
   const [selectedMeal, setSelectedMeal] = useState<string | null>(null);
-  const { todayLog, loading, updateWaterIntake } = useDailyLogs();
+  const { todayLog, loading: logsLoading, updateWaterIntake } = useDailyLogs();
+  const { data: nutritionTips = [], isLoading: tipsLoading } = useNutritionTips();
   
   const waterGlasses = todayLog?.water_intake || 0;
-  const todayCalories = 1250; // This could be calculated from meal logs in future
+  const todayCalories = 1250;
   const targetCalories = 2200;
   const targetWater = 8;
 
@@ -53,6 +34,8 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
       await updateWaterIntake(waterGlasses + 1);
     }
   };
+
+  const loading = logsLoading || tipsLoading;
 
   if (loading) {
     return (
@@ -63,8 +46,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-background pb-28">
-      {/* Header */}
+    <div ref={ref} className="min-h-screen bg-gradient-to-b from-orange-50 to-background pb-28">
       <div className="gradient-primary px-5 pt-4 pb-8">
         <div className="flex items-center gap-3 mb-6">
           <motion.button
@@ -80,7 +62,6 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
           </div>
         </div>
 
-        {/* Daily Summary Card */}
         <motion.div 
           className="bg-white/10 backdrop-blur-md rounded-3xl p-5 border border-white/20"
           initial={{ y: 20, opacity: 0 }}
@@ -106,7 +87,6 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
         </motion.div>
       </div>
 
-      {/* Tabs */}
       <div className="px-5 -mt-4">
         <div className="bg-card rounded-2xl p-1.5 flex gap-1 shadow-lg">
           {[
@@ -181,31 +161,39 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
               </div>
               <p className="text-sm text-muted-foreground mb-4">Hamiləlik dövründə faydalı qidalar</p>
               
-              <div className="grid grid-cols-2 gap-3">
-                {recommendedFoods.map((food, index) => (
-                  <motion.div
-                    key={food.id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
-                  >
-                    <div className="text-3xl mb-3">{food.icon}</div>
-                    <h3 className="font-bold mb-1">{food.name}</h3>
-                    <p className="text-xs text-muted-foreground mb-2">{food.calories} kal</p>
-                    <div className="flex flex-wrap gap-1">
-                      {food.benefits.map(benefit => (
-                        <span 
-                          key={benefit}
-                          className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full"
-                        >
-                          {benefit}
-                        </span>
-                      ))}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+              {nutritionTips.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="text-6xl mb-4">🥗</div>
+                  <p className="text-muted-foreground">Tövsiyə tapılmadı</p>
+                  <p className="text-sm text-muted-foreground mt-1">Admin paneldən tövsiyə əlavə edin</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  {nutritionTips.map((tip, index) => (
+                    <motion.div
+                      key={tip.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
+                    >
+                      <div className="text-3xl mb-3">{tip.emoji || '🍎'}</div>
+                      <h3 className="font-bold mb-1">{tip.title}</h3>
+                      <p className="text-xs text-muted-foreground mb-2">{tip.calories || 0} kal</p>
+                      <div className="flex flex-wrap gap-1">
+                        {(tip.benefits || []).map(benefit => (
+                          <span 
+                            key={benefit}
+                            className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full"
+                          >
+                            {benefit}
+                          </span>
+                        ))}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           )}
 
@@ -217,7 +205,6 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
               exit={{ opacity: 0, x: 20 }}
               className="space-y-6"
             >
-              {/* Water Progress */}
               <div className="bg-card rounded-3xl p-6 shadow-card border border-border/50 text-center">
                 <Droplets className="w-12 h-12 text-blue-500 mx-auto mb-4" />
                 <h2 className="text-4xl font-black text-foreground mb-2">
@@ -225,7 +212,6 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                 </h2>
                 <p className="text-muted-foreground mb-6">stəkan su içdiniz</p>
                 
-                {/* Water Glasses Visual */}
                 <div className="flex flex-wrap justify-center gap-2 mb-6">
                   {Array.from({ length: targetWater }).map((_, i) => (
                     <motion.div
@@ -255,7 +241,6 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                 </motion.button>
               </div>
 
-              {/* Tips */}
               <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100">
                 <h3 className="font-bold text-blue-800 mb-2">💡 Məsləhət</h3>
                 <p className="text-sm text-blue-700">
