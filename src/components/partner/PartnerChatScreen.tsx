@@ -5,6 +5,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { usePartnerData } from '@/hooks/usePartnerData';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/native';
+import ChatMediaUpload from '@/components/chat/ChatMediaUpload';
+import ChatMessageBubble from '@/components/chat/ChatMessageBubble';
 
 interface ChatMessage {
   id: string;
@@ -40,7 +42,7 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
         .from('partner_messages')
         .select('*')
         .or(`and(sender_id.eq.${user.id},receiver_id.eq.${partnerProfile.user_id}),and(sender_id.eq.${partnerProfile.user_id},receiver_id.eq.${user.id})`)
-        .in('message_type', ['text', 'love'])
+        .in('message_type', ['text', 'love', 'image', 'audio'])
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -88,7 +90,7 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
             (newMsg.sender_id === user.id && newMsg.receiver_id === partnerProfile.user_id) ||
             (newMsg.sender_id === partnerProfile.user_id && newMsg.receiver_id === user.id)
           ) {
-            if (['text', 'love'].includes(newMsg.message_type)) {
+            if (['text', 'love', 'image', 'audio'].includes(newMsg.message_type)) {
               setMessages(prev => [...prev, newMsg]);
               // Auto-mark as read if we're receiving
               if (newMsg.receiver_id === user.id) {
@@ -140,6 +142,23 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
       });
     } catch (error) {
       console.error('Error sending love:', error);
+    }
+  };
+
+  const sendMediaMessage = async (type: 'image' | 'audio', url: string) => {
+    if (!user || !partnerProfile) return;
+
+    await hapticFeedback.medium();
+
+    try {
+      await supabase.from('partner_messages').insert({
+        sender_id: user.id,
+        receiver_id: partnerProfile.user_id,
+        message_type: type,
+        content: url,
+      });
+    } catch (error) {
+      console.error('Error sending media:', error);
     }
   };
 
@@ -238,7 +257,6 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
               {/* Messages for this date */}
               {group.messages.map((msg, msgIdx) => {
                 const isMe = msg.sender_id === user?.id;
-                const isLove = msg.message_type === 'love';
 
                 return (
                   <motion.div
@@ -248,28 +266,7 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
                     transition={{ delay: msgIdx * 0.02 }}
                     className={`flex ${isMe ? 'justify-end' : 'justify-start'} mb-2`}
                   >
-                    {isLove ? (
-                      <motion.div
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 0.5 }}
-                        className="text-4xl"
-                      >
-                        ❤️
-                      </motion.div>
-                    ) : (
-                      <div
-                        className={`max-w-[75%] px-4 py-2.5 rounded-2xl ${
-                          isMe
-                            ? 'bg-primary text-white rounded-br-md'
-                            : 'bg-muted text-foreground rounded-bl-md'
-                        }`}
-                      >
-                        <p className="text-sm">{msg.content}</p>
-                        <p className={`text-[10px] mt-1 ${isMe ? 'text-white/70' : 'text-muted-foreground'}`}>
-                          {formatTime(msg.created_at)}
-                        </p>
-                      </div>
-                    )}
+                    <ChatMessageBubble message={msg} isMe={isMe} />
                   </motion.div>
                 );
               })}
@@ -295,7 +292,8 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
 
       {/* Input */}
       <div className="p-4 bg-card border-t border-border safe-bottom">
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
+          <ChatMediaUpload onUpload={sendMediaMessage} />
           <input
             type="text"
             value={newMessage}
