@@ -113,11 +113,28 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
       return;
     }
 
-    // In a real app, you would send this to a reports table
-    // For now, we'll just show a success toast
-    toast({ title: 'Şikayət göndərildi', description: 'Şikayətiniz yoxlanılacaq' });
-    setShowReportDialog(false);
-    setReportReason('');
+    if (!user) {
+      toast({ title: 'Xəta', description: 'Giriş etməlisiniz', variant: 'destructive' });
+      return;
+    }
+
+    // Use type assertion for new table not yet in types
+    const { error } = await (supabase as any)
+      .from('post_reports')
+      .insert({
+        post_id: post.id,
+        reporter_id: user.id,
+        reason: reportReason,
+        status: 'pending'
+      });
+
+    if (error) {
+      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Şikayət göndərildi', description: 'Şikayətiniz yoxlanılacaq' });
+      setShowReportDialog(false);
+      setReportReason('');
+    }
   };
 
   // Generate post link
@@ -231,9 +248,26 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
           </DropdownMenu>
         </div>
 
-        {/* Content */}
+        {/* Content with styled hashtags and mentions */}
         <div className="px-4 pb-3">
-          <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
+          <p className="text-foreground whitespace-pre-wrap">
+            {post.content.split(/(\s+)/).map((word, index) => {
+              if (word.startsWith('#')) {
+                return (
+                  <span key={index} className="text-primary font-medium cursor-pointer hover:underline">
+                    {word}
+                  </span>
+                );
+              } else if (word.startsWith('@')) {
+                return (
+                  <span key={index} className="text-blue-500 font-medium cursor-pointer hover:underline">
+                    {word}
+                  </span>
+                );
+              }
+              return word;
+            })}
+          </p>
         </div>
 
         {/* Media Carousel */}
