@@ -309,11 +309,11 @@ const FlowDashboard = () => {
   );
 };
 
-const BumpDashboard = () => {
+const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string) => void }) => {
   const { getPregnancyData } = useUserStore();
   const { toast } = useToast();
   const pregData = getPregnancyData();
-  const { todayLog, updateWaterIntake } = useDailyLogs();
+  const { todayLog, updateWaterIntake, updateMood } = useDailyLogs();
   const { getTodayStats, addSession } = useKickSessions();
   const { entries: weightEntries } = useWeightEntries();
   
@@ -332,6 +332,7 @@ const BumpDashboard = () => {
   const todayStats = getTodayStats();
   const kickCount = todayStats.totalKicks;
   const waterCount = todayLog?.water_intake || 0;
+  const currentMood = todayLog?.mood || 0;
   
   // Calculate weight gain from first entry
   const latestWeight = weightEntries[0]?.weight;
@@ -339,6 +340,15 @@ const BumpDashboard = () => {
   const weightGain = latestWeight && firstWeight ? (latestWeight - firstWeight).toFixed(1) : '0';
 
   if (!pregData) return null;
+  
+  // Get mood emoji
+  const getMoodEmoji = (mood: number) => {
+    if (mood >= 4) return '😊';
+    if (mood >= 3) return '🙂';
+    if (mood >= 2) return '😐';
+    if (mood >= 1) return '😔';
+    return '❓';
+  };
 
   // Use dynamic content if available, fallback to static
   const weekData = dayContent ? {
@@ -484,7 +494,7 @@ const BumpDashboard = () => {
         </motion.div>
       </div>
 
-      {/* Baby Development */}
+      {/* Baby Development - Static Icons */}
       <motion.div 
         className="bg-card rounded-3xl p-5 shadow-card border border-border/50"
         initial={{ y: 20, opacity: 0 }}
@@ -520,20 +530,112 @@ const BumpDashboard = () => {
         </div>
       </motion.div>
 
+      {/* Daily Content Cards - Separated */}
+      {dayContent && (
+        <div className="space-y-4">
+          {/* Baby Message Card */}
+          {dayContent.baby_message && (
+            <motion.div 
+              className="relative overflow-hidden bg-gradient-to-br from-violet-100 via-purple-50 to-pink-50 dark:from-violet-950/50 dark:via-purple-950/30 dark:to-pink-950/20 rounded-3xl p-5 border border-violet-200/50 dark:border-violet-700/50"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <div className="absolute -right-6 -top-6 text-8xl opacity-10">💬</div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-10 h-10 rounded-full bg-violet-500/20 flex items-center justify-center">
+                  <span className="text-xl">👶</span>
+                </div>
+                <div>
+                  <p className="text-xs text-violet-600 dark:text-violet-400 font-bold uppercase tracking-wider">Körpədən Mesaj</p>
+                  <p className="text-[10px] text-muted-foreground">Gün {pregnancyDay} / 280</p>
+                </div>
+              </div>
+              <p className="text-foreground font-medium italic text-base leading-relaxed">
+                "{dayContent.baby_message}"
+              </p>
+            </motion.div>
+          )}
+
+          {/* Body Changes Card */}
+          {dayContent.body_changes && (
+            <motion.div 
+              className="relative overflow-hidden bg-gradient-to-br from-rose-100 via-pink-50 to-orange-50 dark:from-rose-950/50 dark:via-pink-950/30 dark:to-orange-950/20 rounded-3xl p-5 border border-rose-200/50 dark:border-rose-700/50"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.35 }}
+            >
+              <div className="absolute -right-6 -top-6 text-8xl opacity-10">🤰</div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-10 h-10 rounded-full bg-rose-500/20 flex items-center justify-center">
+                  <span className="text-xl">🤰</span>
+                </div>
+                <p className="text-xs text-rose-600 dark:text-rose-400 font-bold uppercase tracking-wider">Bədəndəki Dəyişikliklər</p>
+              </div>
+              <p className="text-sm text-foreground/90 leading-relaxed">
+                {dayContent.body_changes}
+              </p>
+            </motion.div>
+          )}
+
+          {/* Baby Development Card */}
+          {dayContent.baby_development && (
+            <motion.div 
+              className="relative overflow-hidden bg-gradient-to-br from-blue-100 via-cyan-50 to-teal-50 dark:from-blue-950/50 dark:via-cyan-950/30 dark:to-teal-950/20 rounded-3xl p-5 border border-blue-200/50 dark:border-blue-700/50"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+            >
+              <div className="absolute -right-6 -top-6 text-8xl opacity-10">🌱</div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
+                  <span className="text-xl">🌱</span>
+                </div>
+                <p className="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider">Körpənin İnkişafı</p>
+              </div>
+              <p className="text-sm text-foreground/90 leading-relaxed">
+                {dayContent.baby_development}
+              </p>
+            </motion.div>
+          )}
+
+          {/* Daily Tip Card */}
+          {dayContent.daily_tip && (
+            <motion.div 
+              className="relative overflow-hidden bg-gradient-to-br from-amber-100 via-yellow-50 to-orange-50 dark:from-amber-950/50 dark:via-yellow-950/30 dark:to-orange-950/20 rounded-3xl p-5 border border-amber-200/50 dark:border-amber-700/50"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.45 }}
+            >
+              <div className="absolute -right-6 -top-6 text-8xl opacity-10">💡</div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center">
+                  <span className="text-xl">💡</span>
+                </div>
+                <p className="text-xs text-amber-600 dark:text-amber-400 font-bold uppercase tracking-wider">Günün Tövsiyəsi</p>
+              </div>
+              <p className="text-sm text-foreground/90 leading-relaxed">
+                {dayContent.daily_tip}
+              </p>
+            </motion.div>
+          )}
+        </div>
+      )}
+
       {/* Weekly Tip from Database */}
       {currentWeekTip && (
         <motion.div 
-          className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-3xl p-5 border border-amber-100"
+          className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-3xl p-5 border border-amber-100 dark:border-amber-800"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.32 }}
+          transition={{ delay: 0.5 }}
         >
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
-              <Lightbulb className="w-4 h-4 text-amber-600" />
+            <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
+              <Lightbulb className="w-4 h-4 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <p className="text-xs text-amber-600 font-bold uppercase tracking-wider">Həftə {pregData?.currentWeek} Tövsiyəsi</p>
+              <p className="text-xs text-amber-600 dark:text-amber-400 font-bold uppercase tracking-wider">Həftə {pregData?.currentWeek} Tövsiyəsi</p>
               <h4 className="font-bold text-foreground">{currentWeekTip.title}</h4>
             </div>
           </div>
@@ -541,80 +643,45 @@ const BumpDashboard = () => {
         </motion.div>
       )}
 
-      {/* Baby Message - Dynamic */}
-      <motion.div 
-        className="relative overflow-hidden bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/30 rounded-3xl p-5 border border-violet-100 dark:border-violet-800"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.35 }}
-      >
-        <div className="absolute -right-4 -top-4 text-6xl opacity-20">💬</div>
-        <p className="text-xs text-bump font-bold uppercase tracking-wider mb-2">Körpədən mesaj</p>
-        <p className="text-foreground font-medium italic text-lg leading-relaxed">
-          "{babyMessage}"
-        </p>
-        
-        {/* Additional daily info */}
-        {dayContent && (
-          <div className="mt-4 pt-4 border-t border-violet-100 dark:border-violet-800 space-y-3">
-            {dayContent.baby_development && (
-              <div className="flex items-start gap-2">
-                <span className="text-lg">👶</span>
-                <p className="text-sm text-foreground/80">{dayContent.baby_development}</p>
-              </div>
-            )}
-            {dayContent.body_changes && (
-              <div className="flex items-start gap-2">
-                <span className="text-lg">🤰</span>
-                <p className="text-sm text-foreground/80">{dayContent.body_changes}</p>
-              </div>
-            )}
-            {dayContent.daily_tip && (
-              <div className="flex items-start gap-2">
-                <span className="text-lg">💡</span>
-                <p className="text-sm text-foreground/80">{dayContent.daily_tip}</p>
-              </div>
-            )}
-          </div>
-        )}
-      </motion.div>
-
-      {/* Quick Actions */}
+      {/* Quick Actions Grid */}
       <div className="grid grid-cols-4 gap-3">
         <QuickActionButton 
           icon={Droplets} 
           label="Su" 
-          color="bg-blue-50 text-blue-600" 
+          color="bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400" 
           value={`${waterCount}/8`}
           onClick={addWater}
         />
-        <QuickActionButton icon={Pill} label="Vitamin" color="bg-emerald-50 text-emerald-600" />
-        <QuickActionButton icon={Activity} label="Məşq" color="bg-amber-50 text-amber-600" />
-        <QuickActionButton icon={Heart} label="Əhval" color="bg-pink-50 text-pink-600" />
+        <QuickActionButton 
+          icon={Pill} 
+          label="Vitamin" 
+          color="bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400" 
+          onClick={() => {
+            toast({
+              title: "Vitamin Xatırlatması 💊",
+              description: "Prenatal vitamininizi günlük qəbul etməyi unutmayın. Folat, D vitamini və dəmir vacibdir!",
+            });
+            if (onNavigateToTool) onNavigateToTool('nutrition');
+          }}
+        />
+        <QuickActionButton 
+          icon={Activity} 
+          label="Məşq" 
+          color="bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400" 
+          onClick={() => {
+            if (onNavigateToTool) onNavigateToTool('exercises');
+          }}
+        />
+        <QuickActionButton 
+          icon={Heart} 
+          label="Əhval" 
+          color="bg-pink-50 dark:bg-pink-950/50 text-pink-600 dark:text-pink-400" 
+          value={currentMood ? getMoodEmoji(currentMood) : undefined}
+          onClick={() => {
+            if (onNavigateToTool) onNavigateToTool('mood-diary');
+          }}
+        />
       </div>
-
-      {/* Upcoming Appointments */}
-      <motion.div 
-        className="bg-card rounded-3xl p-5 shadow-card border border-border/50"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.4 }}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-foreground">Növbəti randevu</h3>
-          <ChevronRight className="w-5 h-5 text-muted-foreground" />
-        </div>
-        <div className="flex items-center gap-4 p-4 bg-violet-50 rounded-2xl">
-          <div className="w-14 h-14 rounded-2xl bg-violet-500 text-white flex flex-col items-center justify-center">
-            <span className="text-lg font-black">25</span>
-            <span className="text-[10px]">YAN</span>
-          </div>
-          <div>
-            <p className="font-bold text-foreground">USG Müayinəsi</p>
-            <p className="text-sm text-muted-foreground">Dr. Aydın Əliyev • 10:00</p>
-          </div>
-        </div>
-      </motion.div>
     </div>
   );
 };
@@ -1168,9 +1235,10 @@ const MommyDashboard = () => {
 
 interface DashboardProps {
   onOpenChat?: () => void;
+  onNavigateToTool?: (tool: string) => void;
 }
 
-const Dashboard = ({ onOpenChat }: DashboardProps) => {
+const Dashboard = ({ onOpenChat, onNavigateToTool }: DashboardProps) => {
   const { lifeStage, name } = useUserStore();
   const { profile } = useAuth();
 
@@ -1220,7 +1288,7 @@ const Dashboard = ({ onOpenChat }: DashboardProps) => {
       </motion.div>
 
       {lifeStage === 'flow' && <FlowDashboard />}
-      {lifeStage === 'bump' && <BumpDashboard />}
+      {lifeStage === 'bump' && <BumpDashboard onNavigateToTool={onNavigateToTool} />}
       {lifeStage === 'mommy' && <MommyDashboard />}
     </div>
   );
