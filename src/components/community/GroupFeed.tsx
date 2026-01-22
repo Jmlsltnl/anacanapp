@@ -5,6 +5,7 @@ import { CommunityGroup, useGroupPosts } from '@/hooks/useCommunity';
 import { useGroupPresence } from '@/hooks/useGroupPresence';
 import PostCard from './PostCard';
 import GroupPresenceBar from './GroupPresenceBar';
+import StoriesBar from './StoriesBar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -100,6 +101,13 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
             onlineUsers={onlineUsers}
             typingUsers={typingUsers}
           />
+        )}
+        
+        {/* Stories */}
+        {group && (
+          <div className="px-5 pb-2 border-b border-border/50">
+            <StoriesBar groupId={group.id} />
+          </div>
         )}
       </div>
 

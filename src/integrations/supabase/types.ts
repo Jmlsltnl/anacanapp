@@ -267,6 +267,53 @@ export type Database = {
           },
         ]
       }
+      community_stories: {
+        Row: {
+          background_color: string | null
+          created_at: string
+          expires_at: string
+          group_id: string | null
+          id: string
+          media_type: string
+          media_url: string
+          text_overlay: string | null
+          user_id: string
+          view_count: number | null
+        }
+        Insert: {
+          background_color?: string | null
+          created_at?: string
+          expires_at?: string
+          group_id?: string | null
+          id?: string
+          media_type?: string
+          media_url: string
+          text_overlay?: string | null
+          user_id: string
+          view_count?: number | null
+        }
+        Update: {
+          background_color?: string | null
+          created_at?: string
+          expires_at?: string
+          group_id?: string | null
+          id?: string
+          media_type?: string
+          media_url?: string
+          text_overlay?: string | null
+          user_id?: string
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_stories_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "community_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contractions: {
         Row: {
           created_at: string
@@ -813,11 +860,45 @@ export type Database = {
         }
         Relationships: []
       }
+      story_views: {
+        Row: {
+          id: string
+          story_id: string
+          user_id: string
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          story_id: string
+          user_id: string
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          story_id?: string
+          user_id?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_views_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "community_stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_preferences: {
         Row: {
           created_at: string
           id: string
           last_white_noise_sound: string | null
+          push_comments: boolean | null
+          push_community: boolean | null
+          push_enabled: boolean | null
+          push_likes: boolean | null
+          push_messages: boolean | null
           updated_at: string
           user_id: string
           white_noise_timer: number | null
@@ -827,6 +908,11 @@ export type Database = {
           created_at?: string
           id?: string
           last_white_noise_sound?: string | null
+          push_comments?: boolean | null
+          push_community?: boolean | null
+          push_enabled?: boolean | null
+          push_likes?: boolean | null
+          push_messages?: boolean | null
           updated_at?: string
           user_id: string
           white_noise_timer?: number | null
@@ -836,6 +922,11 @@ export type Database = {
           created_at?: string
           id?: string
           last_white_noise_sound?: string | null
+          push_comments?: boolean | null
+          push_community?: boolean | null
+          push_enabled?: boolean | null
+          push_likes?: boolean | null
+          push_messages?: boolean | null
           updated_at?: string
           user_id?: string
           white_noise_timer?: number | null

@@ -4,11 +4,12 @@ import {
   ArrowLeft, Bell, Moon, Sun, Globe, Lock, 
   Smartphone, Database, Trash2, ChevronRight,
   Volume2, Vibrate, Clock, Calendar, Droplets, Dumbbell, Pill,
-  BellOff
+  BellOff, Heart, MessageCircle, Users
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { useNotificationSettings } from '@/hooks/useNotificationSettings';
 import { useSilentHours } from '@/hooks/useSilentHours';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { toast } from 'sonner';
 
 interface SettingsScreenProps {
@@ -25,6 +26,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   } = useNotificationSettings();
   
   const { settings: silentSettings, updateSettings: updateSilentSettings } = useSilentHours();
+  const { settings: pushSettings, updateSetting: updatePushSetting, loading: pushLoading } = usePushNotifications();
   const [showTimeEdit, setShowTimeEdit] = useState(false);
 
   // Initialize reminders on mount
@@ -218,6 +220,50 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
               checked={settings.exercise_reminder} 
               onCheckedChange={(checked) => updateSetting('exercise_reminder', checked)} 
               disabled={!settings.notifications_enabled}
+            />
+          </SettingRow>
+        </div>
+
+        {/* Push Notification Settings */}
+        <div className="bg-card rounded-3xl overflow-hidden shadow-card border border-border/50">
+          <div className="px-4 pt-4 pb-2">
+            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Push Bildirişləri</h2>
+          </div>
+          <SettingRow icon={Bell} label="Push bildirişlər" description="Tətbiq bağlı olsa belə bildiriş alın">
+            <Switch 
+              checked={pushSettings.push_enabled} 
+              onCheckedChange={(checked) => {
+                updatePushSetting('push_enabled', checked);
+                toast.success(checked ? 'Push bildirişlər aktivləşdirildi' : 'Push bildirişlər deaktiv edildi');
+              }}
+            />
+          </SettingRow>
+          <SettingRow icon={MessageCircle} label="Mesaj bildirişləri" description="Yeni mesajlar üçün bildiriş">
+            <Switch 
+              checked={pushSettings.push_messages} 
+              onCheckedChange={(checked) => updatePushSetting('push_messages', checked)} 
+              disabled={!pushSettings.push_enabled}
+            />
+          </SettingRow>
+          <SettingRow icon={Heart} label="Bəyənmə bildirişləri" description="Paylaşımlarınıza bəyənmə">
+            <Switch 
+              checked={pushSettings.push_likes} 
+              onCheckedChange={(checked) => updatePushSetting('push_likes', checked)} 
+              disabled={!pushSettings.push_enabled}
+            />
+          </SettingRow>
+          <SettingRow icon={MessageCircle} label="Şərh bildirişləri" description="Paylaşımlarınıza şərhlər">
+            <Switch 
+              checked={pushSettings.push_comments} 
+              onCheckedChange={(checked) => updatePushSetting('push_comments', checked)} 
+              disabled={!pushSettings.push_enabled}
+            />
+          </SettingRow>
+          <SettingRow icon={Users} label="Cəmiyyət bildirişləri" description="Qrup fəaliyyətləri">
+            <Switch 
+              checked={pushSettings.push_community} 
+              onCheckedChange={(checked) => updatePushSetting('push_community', checked)} 
+              disabled={!pushSettings.push_enabled}
             />
           </SettingRow>
         </div>

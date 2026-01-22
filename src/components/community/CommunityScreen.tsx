@@ -5,6 +5,7 @@ import { useCommunityGroups, useUserMemberships } from '@/hooks/useCommunity';
 import GroupsList from './GroupsList';
 import GroupFeed from './GroupFeed';
 import CreatePostModal from './CreatePostModal';
+import StoriesBar from './StoriesBar';
 import { Button } from '@/components/ui/button';
 
 interface CommunityScreenProps {
@@ -101,6 +102,11 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
             })}
           </div>
         </div>
+      </div>
+
+      {/* Stories Bar */}
+      <div className="px-5 pt-4 border-b border-border/50 pb-4">
+        <StoriesBar groupId={null} />
       </div>
 
       {/* Content */}
