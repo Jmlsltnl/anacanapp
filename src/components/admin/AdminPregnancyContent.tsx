@@ -40,12 +40,16 @@ const AdminPregnancyContent = () => {
   const [importing, setImporting] = useState(false);
   
   const [formData, setFormData] = useState<Partial<PregnancyContent>>({
+    pregnancy_day: 1,
     week_number: 1,
+    days_until_birth: 279,
     baby_size_fruit: '',
     baby_size_cm: 0,
     baby_weight_gram: 0,
     baby_development: '',
     baby_message: '',
+    body_changes: '',
+    daily_tip: '',
     mother_symptoms: [],
     mother_tips: '',
     nutrition_tip: '',
@@ -56,9 +60,11 @@ const AdminPregnancyContent = () => {
   });
 
   const filteredContent = content.filter(item => 
+    item.pregnancy_day?.toString().includes(search) ||
     item.week_number.toString().includes(search) ||
     item.baby_size_fruit?.toLowerCase().includes(search.toLowerCase()) ||
-    item.baby_development?.toLowerCase().includes(search.toLowerCase())
+    item.baby_development?.toLowerCase().includes(search.toLowerCase()) ||
+    item.baby_message?.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleSelectAll = () => {
@@ -78,12 +84,16 @@ const AdminPregnancyContent = () => {
   const openCreateModal = () => {
     setEditingItem(null);
     setFormData({
+      pregnancy_day: 1,
       week_number: 1,
+      days_until_birth: 279,
       baby_size_fruit: '',
       baby_size_cm: 0,
       baby_weight_gram: 0,
       baby_development: '',
       baby_message: '',
+      body_changes: '',
+      daily_tip: '',
       mother_symptoms: [],
       mother_tips: '',
       nutrition_tip: '',
@@ -138,34 +148,48 @@ const AdminPregnancyContent = () => {
   };
 
   const downloadTemplate = () => {
+    // Template matching user's Excel structure
     const template = [
       {
-        week_number: 1,
-        baby_size_fruit: 'Xaşxaş toxumu',
-        baby_size_cm: 0.1,
+        pregnancy_day: 1,
+        days_until_birth: 279,
         baby_weight_gram: 0.01,
-        baby_development: 'Mayalanma baş verir',
-        baby_message: 'Salam ana! Mən indicə yarandım! 🌟',
-        mother_symptoms: 'Heç bir simptom olmaya bilər',
-        mother_tips: 'Folik turşusu qəbul etməyə başlayın',
-        nutrition_tip: 'Folik turşusu zəngin qidalar yeyin',
-        recommended_foods: 'Ispanaq, Brokkoli, Portağal',
-        emotional_tip: 'Hamiləlik testi müsbət çıxsa sevinc yaşamaq normaldır',
-        partner_tip: 'Partnyorunuza dəstək olun',
-        is_active: true
+        baby_size_cm: 0.1,
+        baby_size_fruit: 'Xaşxaş toxumu',
+        baby_message: 'Salam ana! Mən indicə mayalandım! 🌟',
+        body_changes: 'Hələ heç bir fiziki dəyişiklik hiss etməyə bilərsiniz.',
+        baby_development: 'Yumurta hüceyrəsi sperma ilə birləşdi.',
+        daily_tip: 'Folik turşusu qəbuluna başlayın.'
+      },
+      {
+        pregnancy_day: 2,
+        days_until_birth: 278,
+        baby_weight_gram: 0.01,
+        baby_size_cm: 0.1,
+        baby_size_fruit: 'Xaşxaş toxumu',
+        baby_message: 'Ana, mən bölünürəm! 💕',
+        body_changes: 'Daxildə möcüzə başlayır.',
+        baby_development: 'Mayalanmış yumurta 2 hüceyrəyə bölünür.',
+        daily_tip: 'Bol su için.'
       }
     ];
 
-    // Create CSV content
-    const headers = Object.keys(template[0]).join(',');
-    const rows = template.map(row => Object.values(row).join(','));
-    const csv = [headers, ...rows].join('\n');
+    // Create CSV content with proper encoding
+    const headers = [
+      'pregnancy_day', 'days_until_birth', 'baby_weight_gram', 'baby_size_cm', 
+      'baby_size_fruit', 'baby_message', 'body_changes', 'baby_development', 'daily_tip'
+    ];
+    const headerRow = headers.join(',');
+    const rows = template.map(row => 
+      headers.map(h => `"${(row as any)[h] || ''}"`).join(',')
+    );
+    const csv = '\uFEFF' + [headerRow, ...rows].join('\n'); // BOM for Excel
     
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'pregnancy_content_template.csv';
+    link.download = 'hamiləlik_kontent_şablon.csv';
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -185,25 +209,70 @@ const AdminPregnancyContent = () => {
         data = JSON.parse(text);
       } else if (file.name.endsWith('.csv')) {
         const lines = text.split('\n');
-        const headers = lines[0].split(',').map(h => h.trim());
+        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+        
+        // Map user's Excel headers to database fields
+        const headerMap: Record<string, string> = {
+          'Hamiləliyinizin neçənci günüdür': 'pregnancy_day',
+          'Doğuma neçə gün qaldı': 'days_until_birth',
+          'Təxmini çəki': 'baby_weight_gram',
+          'Təxmini boy': 'baby_size_cm',
+          'Təxmini ölçüsündə olduğu meyvə / obyekt': 'baby_size_fruit',
+          'Körpənizdən sizə mesaj var...': 'baby_message',
+          'Bədəninizdə nələr baş verir...': 'body_changes',
+          'Körpənin inkişafında nələr baş verir...': 'baby_development',
+          'Günün Məsləhəti': 'daily_tip',
+          // Also support English headers
+          'pregnancy_day': 'pregnancy_day',
+          'days_until_birth': 'days_until_birth',
+          'baby_weight_gram': 'baby_weight_gram',
+          'baby_size_cm': 'baby_size_cm',
+          'baby_size_fruit': 'baby_size_fruit',
+          'baby_message': 'baby_message',
+          'body_changes': 'body_changes',
+          'baby_development': 'baby_development',
+          'daily_tip': 'daily_tip'
+        };
         
         for (let i = 1; i < lines.length; i++) {
           if (!lines[i].trim()) continue;
-          const values = lines[i].split(',');
-          const row: any = {};
-          headers.forEach((header, idx) => {
-            let value = values[idx]?.trim();
-            if (header === 'week_number' || header === 'baby_size_cm' || header === 'baby_weight_gram') {
-              row[header] = parseFloat(value) || 0;
-            } else if (header === 'is_active') {
-              row[header] = value === 'true';
-            } else if (header === 'mother_symptoms' || header === 'recommended_foods') {
-              row[header] = value ? value.split(';').map((s: string) => s.trim()) : [];
+          
+          // Parse CSV properly handling quoted values
+          const values: string[] = [];
+          let current = '';
+          let inQuotes = false;
+          for (const char of lines[i]) {
+            if (char === '"') {
+              inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+              values.push(current.trim());
+              current = '';
             } else {
-              row[header] = value;
+              current += char;
+            }
+          }
+          values.push(current.trim());
+          
+          const row: any = { is_active: true };
+          headers.forEach((header, idx) => {
+            const dbField = headerMap[header] || header;
+            let value = values[idx]?.replace(/"/g, '').trim();
+            
+            if (dbField === 'pregnancy_day' || dbField === 'days_until_birth') {
+              row[dbField] = parseInt(value) || 0;
+              if (dbField === 'pregnancy_day') {
+                row.week_number = Math.ceil((parseInt(value) || 1) / 7);
+              }
+            } else if (dbField === 'baby_size_cm' || dbField === 'baby_weight_gram') {
+              row[dbField] = parseFloat(value) || 0;
+            } else {
+              row[dbField] = value;
             }
           });
-          data.push(row);
+          
+          if (row.pregnancy_day) {
+            data.push(row);
+          }
           setImportProgress((i / lines.length) * 50);
         }
       }
@@ -352,12 +421,13 @@ const AdminPregnancyContent = () => {
                     onCheckedChange={handleSelectAll}
                   />
                 </TableHead>
-                <TableHead className="w-20">Həftə</TableHead>
+                <TableHead className="w-16">Gün</TableHead>
+                <TableHead className="w-16">Həftə</TableHead>
                 <TableHead>Meyvə</TableHead>
                 <TableHead>Ölçü</TableHead>
-                <TableHead>Çəki</TableHead>
-                <TableHead className="max-w-[200px]">Körpə inkişafı</TableHead>
-                <TableHead className="max-w-[200px]">Körpə mesajı</TableHead>
+                <TableHead className="max-w-[180px]">Körpə mesajı</TableHead>
+                <TableHead className="max-w-[180px]">Bədən dəyişikliyi</TableHead>
+                <TableHead className="max-w-[150px]">Günün tövsiyəsi</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="w-24">Əməliyyat</TableHead>
               </TableRow>
@@ -371,12 +441,13 @@ const AdminPregnancyContent = () => {
                       onCheckedChange={() => handleSelect(item.id)}
                     />
                   </TableCell>
-                  <TableCell className="font-bold text-lg">{item.week_number}</TableCell>
+                  <TableCell className="font-bold text-primary">{item.pregnancy_day || '-'}</TableCell>
+                  <TableCell>{item.week_number}</TableCell>
                   <TableCell>{item.baby_size_fruit || '-'}</TableCell>
-                  <TableCell>{item.baby_size_cm} sm</TableCell>
-                  <TableCell>{item.baby_weight_gram}g</TableCell>
-                  <TableCell className="max-w-[200px] truncate">{item.baby_development || '-'}</TableCell>
-                  <TableCell className="max-w-[200px] truncate">{item.baby_message || '-'}</TableCell>
+                  <TableCell>{item.baby_size_cm} sm / {item.baby_weight_gram}g</TableCell>
+                  <TableCell className="max-w-[180px] truncate text-sm">{item.baby_message || '-'}</TableCell>
+                  <TableCell className="max-w-[180px] truncate text-sm">{item.body_changes || '-'}</TableCell>
+                  <TableCell className="max-w-[150px] truncate text-sm">{item.daily_tip || '-'}</TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       item.is_active ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
@@ -414,7 +485,25 @@ const AdminPregnancyContent = () => {
               <h4 className="font-semibold flex items-center gap-2">
                 <Baby className="w-4 h-4" /> Əsas məlumatlar
               </h4>
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-5 gap-3">
+                <div>
+                  <Label>Gün (1-280)</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={280}
+                    value={formData.pregnancy_day || 1}
+                    onChange={(e) => {
+                      const day = parseInt(e.target.value);
+                      setFormData({ 
+                        ...formData, 
+                        pregnancy_day: day,
+                        week_number: Math.ceil(day / 7),
+                        days_until_birth: 280 - day
+                      });
+                    }}
+                  />
+                </div>
                 <div>
                   <Label>Həftə</Label>
                   <Input
@@ -454,9 +543,20 @@ const AdminPregnancyContent = () => {
               </div>
             </div>
 
+            {/* Baby Message */}
+            <div className="space-y-2">
+              <Label>Körpədən mesaj 💬</Label>
+              <Textarea
+                value={formData.baby_message || ''}
+                onChange={(e) => setFormData({ ...formData, baby_message: e.target.value })}
+                placeholder="Salam ana! 💕"
+                rows={3}
+              />
+            </div>
+
             {/* Baby Development */}
             <div className="space-y-2">
-              <Label>Körpə inkişafı</Label>
+              <Label>Körpə inkişafı 👶</Label>
               <Textarea
                 value={formData.baby_development || ''}
                 onChange={(e) => setFormData({ ...formData, baby_development: e.target.value })}
@@ -465,13 +565,24 @@ const AdminPregnancyContent = () => {
               />
             </div>
 
-            {/* Baby Message */}
+            {/* Body Changes */}
             <div className="space-y-2">
-              <Label>Körpədən mesaj 💬</Label>
+              <Label>Bədəninizdə nələr baş verir 🤰</Label>
               <Textarea
-                value={formData.baby_message || ''}
-                onChange={(e) => setFormData({ ...formData, baby_message: e.target.value })}
-                placeholder="Salam ana! 💕"
+                value={formData.body_changes || ''}
+                onChange={(e) => setFormData({ ...formData, body_changes: e.target.value })}
+                placeholder="Ürəkbulanma başlaya bilər..."
+                rows={3}
+              />
+            </div>
+
+            {/* Daily Tip */}
+            <div className="space-y-2">
+              <Label>Günün Məsləhəti 💡</Label>
+              <Textarea
+                value={formData.daily_tip || ''}
+                onChange={(e) => setFormData({ ...formData, daily_tip: e.target.value })}
+                placeholder="Folik turşusu qəbul edin..."
                 rows={3}
               />
             </div>
