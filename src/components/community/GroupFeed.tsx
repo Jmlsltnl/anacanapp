@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { useState, forwardRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Plus, Users } from 'lucide-react';
 import { CommunityGroup, useGroupPosts } from '@/hooks/useCommunity';
@@ -6,6 +6,7 @@ import { useGroupPresence } from '@/hooks/useGroupPresence';
 import PostCard from './PostCard';
 import GroupPresenceBar from './GroupPresenceBar';
 import StoriesBar from './StoriesBar';
+import PostSearchFilter from './PostSearchFilter';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -19,33 +20,72 @@ interface GroupFeedProps {
 const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, onCreatePost, isEmbedded = false }, ref) => {
   const { data: posts = [], isLoading } = useGroupPosts(group?.id || null);
   const { onlineCount, onlineUsers, typingUsers } = useGroupPresence(group?.id || null);
+  
+  // Search and filter state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'recent' | 'popular'>('recent');
+
+  // Filter and sort posts
+  const filteredPosts = useMemo(() => {
+    let result = [...posts];
+
+    // Filter by search query
+    if (searchQuery) {
+      const lowerQuery = searchQuery.toLowerCase();
+      result = result.filter(post => 
+        post.content.toLowerCase().includes(lowerQuery) ||
+        post.author?.name?.toLowerCase().includes(lowerQuery)
+      );
+    }
+
+    // Sort
+    if (sortBy === 'popular') {
+      result.sort((a, b) => (b.likes_count + b.comments_count) - (a.likes_count + a.comments_count));
+    } else {
+      result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+
+    return result;
+  }, [posts, searchQuery, sortBy]);
 
   if (isEmbedded) {
     // Embedded view for general feed
     return (
       <div ref={ref} className="space-y-4">
+        {/* Search & Filter */}
+        <PostSearchFilter
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+        />
+
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-48 rounded-2xl" />
             ))}
           </div>
-        ) : posts.length === 0 ? (
+        ) : filteredPosts.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
               <Users className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h3 className="font-bold text-foreground mb-2">Hələ paylaşım yoxdur</h3>
+            <h3 className="font-bold text-foreground mb-2">
+              {searchQuery ? 'Nəticə tapılmadı' : 'Hələ paylaşım yoxdur'}
+            </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              İlk paylaşımı siz edin!
+              {searchQuery ? 'Başqa axtarış sözləri sınayın' : 'İlk paylaşımı siz edin!'}
             </p>
-            <Button onClick={onCreatePost} className="gradient-primary">
-              <Plus className="w-4 h-4 mr-2" />
-              Paylaşım yarat
-            </Button>
+            {!searchQuery && (
+              <Button onClick={onCreatePost} className="gradient-primary">
+                <Plus className="w-4 h-4 mr-2" />
+                Paylaşım yarat
+              </Button>
+            )}
           </div>
         ) : (
-          posts.map((post, index) => (
+          filteredPosts.map((post, index) => (
             <motion.div
               key={post.id}
               initial={{ opacity: 0, y: 20 }}
@@ -111,6 +151,16 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
         )}
       </div>
 
+      {/* Search & Filter */}
+      <div className="px-5 pt-4">
+        <PostSearchFilter
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+        />
+      </div>
+
       {/* Feed */}
       <div className="px-5 pt-4 space-y-4">
         {isLoading ? (
@@ -119,22 +169,26 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
               <Skeleton key={i} className="h-48 rounded-2xl" />
             ))}
           </div>
-        ) : posts.length === 0 ? (
+        ) : filteredPosts.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
               <Users className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h3 className="font-bold text-foreground mb-2">Hələ paylaşım yoxdur</h3>
+            <h3 className="font-bold text-foreground mb-2">
+              {searchQuery ? 'Nəticə tapılmadı' : 'Hələ paylaşım yoxdur'}
+            </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Bu qrupda ilk paylaşımı siz edin!
+              {searchQuery ? 'Başqa axtarış sözləri sınayın' : 'Bu qrupda ilk paylaşımı siz edin!'}
             </p>
-            <Button onClick={onCreatePost} className="gradient-primary">
-              <Plus className="w-4 h-4 mr-2" />
-              Paylaşım yarat
-            </Button>
+            {!searchQuery && (
+              <Button onClick={onCreatePost} className="gradient-primary">
+                <Plus className="w-4 h-4 mr-2" />
+                Paylaşım yarat
+              </Button>
+            )}
           </div>
         ) : (
-          posts.map((post, index) => (
+          filteredPosts.map((post, index) => (
             <motion.div
               key={post.id}
               initial={{ opacity: 0, y: 20 }}

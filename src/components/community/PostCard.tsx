@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, MessageCircle, Share2, MoreHorizontal, ChevronDown, ChevronUp, Send, Trash2, Ban, Crown, Shield } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal, ChevronDown, ChevronUp, Send, Trash2, Crown, Shield } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { CommunityPost, useToggleLike, usePostComments, useCreateComment } from '@/hooks/useCommunity';
@@ -12,6 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import MediaCarousel from './MediaCarousel';
+import CommentReply from './CommentReply';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -89,23 +90,6 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
       toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
     } else {
       toast({ title: 'Uğurlu', description: 'Post silindi' });
-      // The parent component should refetch posts
-    }
-  };
-
-  const handleDeleteComment = async (commentId: string) => {
-    if (!confirm('Bu şərhi silmək istəyirsiniz?')) return;
-    
-    const { error } = await supabase
-      .from('post_comments')
-      .delete()
-      .eq('id', commentId);
-
-    if (error) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
-    } else {
-      toast({ title: 'Uğurlu', description: 'Şərh silindi' });
-      refetchComments();
     }
   };
 
@@ -128,6 +112,9 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
       onUserClick(post.user_id);
     }
   };
+
+  // Filter top-level comments (no parent)
+  const topLevelComments = comments.filter(c => !c.parent_comment_id);
 
   return (
     <div className="bg-card rounded-2xl border border-border/50 overflow-hidden">
@@ -160,14 +147,12 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
               <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="bg-popover border-border z-50">
             {isAdmin && (
-              <>
-                <DropdownMenuItem onClick={handleDeletePost} className="text-red-600">
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Postu Sil
-                </DropdownMenuItem>
-              </>
+              <DropdownMenuItem onClick={handleDeletePost} className="text-red-600">
+                <Trash2 className="w-4 h-4 mr-2" />
+                Postu Sil
+              </DropdownMenuItem>
             )}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -221,7 +206,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
         </motion.button>
       </div>
 
-      {/* Comments Section */}
+      {/* Comments Section with Reply System */}
       <AnimatePresence>
         {showComments && (
           <motion.div
@@ -249,46 +234,25 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
                 </Button>
               </div>
 
-              {/* Comments List */}
+              {/* Comments List with Reply Support */}
               {commentsLoading ? (
                 <div className="text-center py-4">
                   <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
                 </div>
-              ) : comments.length === 0 ? (
+              ) : topLevelComments.length === 0 ? (
                 <p className="text-center text-sm text-muted-foreground py-2">
                   Hələ şərh yoxdur
                 </p>
               ) : (
                 <div className="space-y-3">
-                  {comments.map((comment) => (
-                    <div key={comment.id} className="flex gap-3">
-                      <Avatar className="w-8 h-8">
-                        <AvatarImage src={comment.author?.avatar_url || undefined} />
-                        <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
-                          {comment.author?.name?.charAt(0) || 'İ'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 bg-muted rounded-xl p-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <p className="text-xs font-bold text-foreground">{comment.author?.name}</p>
-                            <UserBadge type={comment.author?.badge_type as any} />
-                          </div>
-                          {isAdmin && (
-                            <button
-                              onClick={() => handleDeleteComment(comment.id)}
-                              className="text-red-500 hover:text-red-600"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </button>
-                          )}
-                        </div>
-                        <p className="text-sm text-foreground mt-1">{comment.content}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: az })}
-                        </p>
-                      </div>
-                    </div>
+                  {topLevelComments.map((comment) => (
+                    <CommentReply
+                      key={comment.id}
+                      comment={comment}
+                      postId={post.id}
+                      allComments={comments}
+                      onRefetch={refetchComments}
+                    />
                   ))}
                 </div>
               )}
