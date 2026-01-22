@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, MessageSquare, Ban, Trash2, AlertTriangle, Check, Flag, XCircle, CheckCircle } from 'lucide-react';
+import { Search, MessageSquare, Ban, Trash2, AlertTriangle, Check, Flag, XCircle, CheckCircle, Image, Video } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { formatDistanceToNow } from 'date-fns';
 import { az } from 'date-fns/locale';
+import { getPublicProfileCards } from '@/lib/public-profile-cards';
 
 interface Post {
   id: string;
@@ -25,7 +26,8 @@ interface Post {
   is_active: boolean;
   likes_count: number;
   comments_count: number;
-  author?: { name: string; email: string };
+  media_urls?: string[] | null;
+  author?: { name: string; avatar_url?: string | null };
 }
 
 interface Comment {
@@ -35,7 +37,7 @@ interface Comment {
   post_id: string;
   created_at: string;
   is_active: boolean;
-  author?: { name: string; email: string };
+  author?: { name: string; avatar_url?: string | null };
 }
 
 interface BlockedUser {
@@ -47,7 +49,7 @@ interface BlockedUser {
   is_active: boolean;
   created_at: string;
   expires_at: string | null;
-  user?: { name: string; email: string };
+  user?: { name: string; avatar_url?: string | null };
 }
 
 interface Report {
@@ -58,8 +60,9 @@ interface Report {
   description: string | null;
   status: string;
   created_at: string;
-  post?: { content: string; user_id: string };
-  reporter?: { name: string };
+  post?: { content: string; user_id: string; media_urls?: string[] | null };
+  reporter?: { name: string; avatar_url?: string | null };
+  postAuthor?: { name: string; avatar_url?: string | null };
 }
 
 const AdminModeration = () => {
@@ -84,20 +87,31 @@ const AdminModeration = () => {
       .order('created_at', { ascending: false });
 
     if (!error && data) {
-      // Fetch post info and reporter names
+      // Fetch post info including media_urls
       const postIds = [...new Set(data.map((r: any) => r.post_id))];
       const reporterIds = [...new Set(data.map((r: any) => r.reporter_id))];
 
-      const [postsResult, reportersResult] = await Promise.all([
-        supabase.from('community_posts').select('id, content, user_id').in('id', postIds as string[]),
-        supabase.from('profiles').select('user_id, name').in('user_id', reporterIds as string[])
-      ]);
+      const { data: postsData } = await supabase
+        .from('community_posts')
+        .select('id, content, user_id, media_urls')
+        .in('id', postIds as string[]);
 
-      const reportsWithData = data.map((report: any) => ({
-        ...report,
-        post: postsResult.data?.find((p: any) => p.id === report.post_id),
-        reporter: reportersResult.data?.find((r: any) => r.user_id === report.reporter_id)
-      }));
+      // Get all user IDs (reporters + post authors)
+      const postAuthorIds = (postsData || []).map((p: any) => p.user_id);
+      const allUserIds = [...new Set([...reporterIds, ...postAuthorIds])] as string[];
+      
+      // Fetch from public_profile_cards (bypasses RLS)
+      const profileMap = await getPublicProfileCards(allUserIds);
+
+      const reportsWithData = data.map((report: any) => {
+        const post = postsData?.find((p: any) => p.id === report.post_id);
+        return {
+          ...report,
+          post,
+          reporter: profileMap[report.reporter_id] || null,
+          postAuthor: post ? (profileMap[post.user_id] || null) : null
+        };
+      });
       setReports(reportsWithData);
     }
   };
@@ -105,30 +119,36 @@ const AdminModeration = () => {
   const fetchPosts = async () => {
     const { data, error } = await supabase
       .from('community_posts')
-      .select(`
-        *,
-        author:profiles!community_posts_user_id_fkey(name, email)
-      `)
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(100);
 
     if (!error && data) {
-      setPosts(data.map(p => ({ ...p, author: Array.isArray(p.author) ? p.author[0] : p.author })));
+      const userIds = [...new Set(data.map(p => p.user_id))];
+      const profileMap = await getPublicProfileCards(userIds);
+      
+      setPosts(data.map(p => ({ 
+        ...p, 
+        author: profileMap[p.user_id] || { name: 'İstifadəçi', avatar_url: null }
+      })));
     }
   };
 
   const fetchComments = async () => {
     const { data, error } = await supabase
       .from('post_comments')
-      .select(`
-        *,
-        author:profiles!post_comments_user_id_fkey(name, email)
-      `)
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(100);
 
     if (!error && data) {
-      setComments(data.map(c => ({ ...c, author: Array.isArray(c.author) ? c.author[0] : c.author })));
+      const userIds = [...new Set(data.map(c => c.user_id))];
+      const profileMap = await getPublicProfileCards(userIds);
+      
+      setComments(data.map(c => ({ 
+        ...c, 
+        author: profileMap[c.user_id] || { name: 'İstifadəçi', avatar_url: null }
+      })));
     }
   };
 
@@ -140,14 +160,11 @@ const AdminModeration = () => {
 
     if (!error && data) {
       const userIds = data.map(b => b.user_id);
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('user_id, name, email')
-        .in('user_id', userIds);
+      const profileMap = await getPublicProfileCards(userIds);
 
       const blocksWithUsers = data.map(block => ({
         ...block,
-        user: profiles?.find(p => p.user_id === block.user_id),
+        user: profileMap[block.user_id] || { name: 'İstifadəçi', avatar_url: null },
       }));
       setBlocks(blocksWithUsers);
     }
@@ -361,7 +378,7 @@ const AdminModeration = () => {
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
                         report.status === 'pending' 
                           ? 'bg-amber-100 text-amber-600' 
                           : report.status === 'reviewed' 
@@ -371,7 +388,7 @@ const AdminModeration = () => {
                         <Flag className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
                           <Badge variant={
                             report.status === 'pending' ? 'default' : 
                             report.status === 'reviewed' ? 'secondary' : 'outline'
@@ -384,17 +401,82 @@ const AdminModeration = () => {
                             {formatDistanceToNow(new Date(report.created_at), { addSuffix: true, locale: az })}
                           </span>
                         </div>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          <span className="font-medium">{report.reporter?.name || 'İstifadəçi'}</span> tərəfindən şikayət edildi
-                        </p>
+
+                        {/* Reporter info */}
+                        <div className="flex items-center gap-2 mb-3 p-2 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                            {report.reporter?.avatar_url ? (
+                              <img src={report.reporter.avatar_url} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <span className="text-blue-600 font-bold text-sm">
+                                {report.reporter?.name?.charAt(0) || 'İ'}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-sm">
+                            <span className="text-muted-foreground">Şikayət edən: </span>
+                            <span className="font-medium">{report.reporter?.name || 'İstifadəçi'}</span>
+                          </div>
+                        </div>
+                        
+                        {/* Post and author info */}
                         {report.post && (
-                          <div className="bg-muted/50 rounded-lg p-3 mt-2">
-                            <p className="text-sm line-clamp-3">{report.post.content}</p>
+                          <div className="bg-muted/50 rounded-lg p-4 border border-border">
+                            {/* Post author */}
+                            <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border">
+                              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                {report.postAuthor?.avatar_url ? (
+                                  <img src={report.postAuthor.avatar_url} alt="" className="w-full h-full object-cover" />
+                                ) : (
+                                  <span className="text-primary font-bold text-sm">
+                                    {report.postAuthor?.name?.charAt(0) || 'İ'}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-sm">
+                                <span className="text-muted-foreground">Post müəllifi: </span>
+                                <span className="font-medium">{report.postAuthor?.name || 'İstifadəçi'}</span>
+                              </div>
+                            </div>
+                            
+                            {/* Post content - full display */}
+                            <p className="text-sm whitespace-pre-wrap mb-3">{report.post.content}</p>
+                            
+                            {/* Post media */}
+                            {report.post.media_urls && report.post.media_urls.length > 0 && (
+                              <div className="grid grid-cols-2 gap-2 mt-3">
+                                {report.post.media_urls.map((url, idx) => {
+                                  const isVideo = url.includes('.mp4') || url.includes('.mov') || url.includes('.webm');
+                                  return (
+                                    <div key={idx} className="relative aspect-video rounded-lg overflow-hidden bg-muted">
+                                      {isVideo ? (
+                                        <div className="w-full h-full flex items-center justify-center">
+                                          <video src={url} className="w-full h-full object-cover" />
+                                          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                            <Video className="w-8 h-8 text-white" />
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <img src={url} alt="" className="w-full h-full object-cover" />
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Report description if any */}
+                        {report.description && (
+                          <div className="mt-3 p-2 bg-amber-50 dark:bg-amber-950/30 rounded-lg">
+                            <p className="text-xs text-muted-foreground mb-1">Əlavə qeyd:</p>
+                            <p className="text-sm">{report.description}</p>
                           </div>
                         )}
                       </div>
                       {report.status === 'pending' && (
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-col items-center gap-2 flex-shrink-0">
                           <Button 
                             variant="ghost" 
                             size="icon"
@@ -430,8 +512,12 @@ const AdminModeration = () => {
                   className="bg-card rounded-xl p-4 border border-border"
                 >
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">
-                      {post.author?.name?.charAt(0) || 'İ'}
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {post.author?.avatar_url ? (
+                        <img src={post.author.avatar_url} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="font-bold text-primary">{post.author?.name?.charAt(0) || 'İ'}</span>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -440,13 +526,42 @@ const AdminModeration = () => {
                           {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: az })}
                         </span>
                       </div>
-                      <p className="text-sm text-foreground mb-2 line-clamp-3">{post.content}</p>
+                      <p className="text-sm text-foreground mb-2 whitespace-pre-wrap">{post.content}</p>
+                      
+                      {/* Post media */}
+                      {post.media_urls && post.media_urls.length > 0 && (
+                        <div className="grid grid-cols-2 gap-2 mb-2">
+                          {post.media_urls.slice(0, 4).map((url, idx) => {
+                            const isVideo = url.includes('.mp4') || url.includes('.mov') || url.includes('.webm');
+                            return (
+                              <div key={idx} className="relative aspect-video rounded-lg overflow-hidden bg-muted">
+                                {isVideo ? (
+                                  <div className="w-full h-full flex items-center justify-center">
+                                    <video src={url} className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                      <Video className="w-6 h-6 text-white" />
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <img src={url} alt="" className="w-full h-full object-cover" />
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                      
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        <span>❤️ {post.likes_count}</span>
-                        <span>💬 {post.comments_count}</span>
+                        <span>❤️ {post.likes_count || 0}</span>
+                        <span>💬 {post.comments_count || 0}</span>
+                        {post.media_urls && post.media_urls.length > 0 && (
+                          <span className="flex items-center gap-1">
+                            <Image className="w-3 h-3" /> {post.media_urls.length}
+                          </span>
+                        )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       <Button 
                         variant="ghost" 
                         size="icon"
@@ -531,7 +646,7 @@ const AdminModeration = () => {
                         </Badge>
                         <Badge variant="outline">{block.block_type}</Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground">{block.user?.email}</p>
+                      <p className="text-xs text-muted-foreground">ID: {block.user_id.substring(0, 8)}...</p>
                       <p className="text-sm text-red-600 mt-1">Səbəb: {block.reason}</p>
                     </div>
                     {block.is_active && (
