@@ -178,20 +178,53 @@ export const usePregnancyContentAdmin = () => {
     mutationFn: async (contents: Partial<PregnancyContent>[]) => {
       const results = { success: 0, failed: 0, errors: [] as string[] };
 
-      for (const content of contents) {
-        // Try upsert based on week_number
-        const { error } = await (supabase as any)
-          .from('pregnancy_daily_content')
-          .upsert(content, { 
-            onConflict: 'week_number',
-            ignoreDuplicates: false 
-          });
+      // Process in batches for better performance
+      const batchSize = 50;
+      for (let i = 0; i < contents.length; i += batchSize) {
+        const batch = contents.slice(i, i + batchSize);
+        
+        for (const content of batch) {
+          try {
+            // Check if record exists for this pregnancy_day
+            const { data: existing } = await (supabase as any)
+              .from('pregnancy_daily_content')
+              .select('id')
+              .eq('pregnancy_day', content.pregnancy_day)
+              .maybeSingle();
 
-        if (error) {
-          results.failed++;
-          results.errors.push(`Həftə ${content.week_number}: ${error.message}`);
-        } else {
-          results.success++;
+            if (existing) {
+              // Update existing record
+              const { error } = await (supabase as any)
+                .from('pregnancy_daily_content')
+                .update({
+                  ...content,
+                  updated_at: new Date().toISOString()
+                })
+                .eq('id', existing.id);
+
+              if (error) {
+                results.failed++;
+                results.errors.push(`Gün ${content.pregnancy_day}: ${error.message}`);
+              } else {
+                results.success++;
+              }
+            } else {
+              // Insert new record
+              const { error } = await (supabase as any)
+                .from('pregnancy_daily_content')
+                .insert(content);
+
+              if (error) {
+                results.failed++;
+                results.errors.push(`Gün ${content.pregnancy_day}: ${error.message}`);
+              } else {
+                results.success++;
+              }
+            }
+          } catch (err: any) {
+            results.failed++;
+            results.errors.push(`Gün ${content.pregnancy_day}: ${err.message}`);
+          }
         }
       }
 
@@ -200,6 +233,7 @@ export const usePregnancyContentAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pregnancy_content_admin'] });
       queryClient.invalidateQueries({ queryKey: ['pregnancy_content'] });
+      queryClient.invalidateQueries({ queryKey: ['pregnancy_content_day'] });
     },
   });
 
