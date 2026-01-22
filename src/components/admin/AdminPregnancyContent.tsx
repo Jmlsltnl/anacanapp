@@ -258,18 +258,34 @@ const AdminPregnancyContent = () => {
             const dbField = headerMap[header] || header;
             let value = values[idx]?.replace(/"/g, '').trim();
             
-            if (dbField === 'days_until_birth') {
-              const daysUntil = parseInt(value) || 0;
-              row.days_until_birth = daysUntil;
-              // Calculate pregnancy_day from days_until_birth (280 - days = pregnancy_day)
-              row.pregnancy_day = 280 - daysUntil;
-              row.week_number = Math.ceil(row.pregnancy_day / 7);
-            } else if (dbField === 'pregnancy_day') {
-              row.pregnancy_day = parseInt(value) || 0;
-              row.week_number = Math.ceil((parseInt(value) || 1) / 7);
+            // Skip empty values or "-" placeholders
+            if (!value || value === '-' || value === '') {
+              return;
+            }
+            
+            if (dbField === 'pregnancy_day') {
+              const pDay = parseInt(value);
+              if (!isNaN(pDay) && pDay > 0) {
+                row.pregnancy_day = pDay;
+                row.week_number = Math.ceil(pDay / 7);
+                row.days_until_birth = 280 - pDay;
+              }
+            } else if (dbField === 'days_until_birth') {
+              const daysUntil = parseInt(value);
+              if (!isNaN(daysUntil)) {
+                row.days_until_birth = daysUntil;
+                // Only set pregnancy_day if not already set
+                if (!row.pregnancy_day) {
+                  row.pregnancy_day = 280 - daysUntil;
+                  row.week_number = Math.ceil(row.pregnancy_day / 7);
+                }
+              }
             } else if (dbField === 'baby_size_cm' || dbField === 'baby_weight_gram') {
-              // Handle both comma and dot as decimal separator
-              row[dbField] = parseFloat(value?.replace(',', '.')) || 0;
+              // Handle both comma and dot as decimal separator, ignore non-numeric
+              const numValue = parseFloat(value?.replace(',', '.'));
+              if (!isNaN(numValue)) {
+                row[dbField] = numValue;
+              }
             } else {
               row[dbField] = value;
             }
