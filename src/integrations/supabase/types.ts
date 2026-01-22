@@ -1565,6 +1565,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      find_partner_by_code: {
+        Args: { p_partner_code: string }
+        Returns: {
+          id: string
+          name: string
+          user_id: string
+        }[]
+      }
       get_user_linked_partner_id: {
         Args: { _user_id: string }
         Returns: string

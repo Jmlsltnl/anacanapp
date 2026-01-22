@@ -67,11 +67,11 @@ const AuthScreen = () => {
         }
         
         // First verify the partner code exists BEFORE registering
-        const { data: partnerProfile, error: findError } = await supabase
-          .from('profiles')
-          .select('id, user_id, name')
-          .eq('partner_code', partnerCode)
-          .maybeSingle();
+        // Use the security definer function that bypasses RLS
+        const { data: partnerProfiles, error: findError } = await supabase
+          .rpc('find_partner_by_code', { p_partner_code: partnerCode });
+
+        const partnerProfile = partnerProfiles?.[0];
 
         if (findError || !partnerProfile) {
           toast({
