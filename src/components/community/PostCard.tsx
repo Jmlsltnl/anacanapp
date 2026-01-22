@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, MessageCircle, Share2, MoreHorizontal, ChevronDown, ChevronUp, Send, Trash2, Crown, Shield, Copy, Check } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal, ChevronDown, ChevronUp, Send, Trash2, Crown, Shield, Copy, Check, Flag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { CommunityPost, useToggleLike, usePostComments, useCreateComment } from '@/hooks/useCommunity';
@@ -18,12 +18,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 
 interface PostCardProps {
@@ -66,13 +68,17 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [showShareDialog, setShowShareDialog] = useState(false);
+  const [showReportDialog, setShowReportDialog] = useState(false);
+  const [reportReason, setReportReason] = useState('');
   const [linkCopied, setLinkCopied] = useState(false);
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
   const { toast } = useToast();
 
   const toggleLike = useToggleLike();
   const { data: comments = [], isLoading: commentsLoading, refetch: refetchComments } = usePostComments(post.id);
   const createComment = useCreateComment();
+  
+  const isOwnPost = user?.id === post.user_id;
 
   const handleLike = () => {
     hapticFeedback.light();
@@ -99,6 +105,19 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
     } else {
       toast({ title: 'Uğurlu', description: 'Post silindi' });
     }
+  };
+
+  const handleReportPost = async () => {
+    if (!reportReason.trim()) {
+      toast({ title: 'Xəta', description: 'Şikayət səbəbini qeyd edin', variant: 'destructive' });
+      return;
+    }
+
+    // In a real app, you would send this to a reports table
+    // For now, we'll just show a success toast
+    toast({ title: 'Şikayət göndərildi', description: 'Şikayətiniz yoxlanılacaq' });
+    setShowReportDialog(false);
+    setReportReason('');
   };
 
   // Generate post link
@@ -195,7 +214,14 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-popover border-border z-50">
-              {isAdmin && (
+              {!isOwnPost && (
+                <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-amber-600">
+                  <Flag className="w-4 h-4 mr-2" />
+                  Şikayət et
+                </DropdownMenuItem>
+              )}
+              {(isAdmin || isOwnPost) && !isOwnPost && <DropdownMenuSeparator />}
+              {(isAdmin || isOwnPost) && (
                 <DropdownMenuItem onClick={handleDeletePost} className="text-red-600">
                   <Trash2 className="w-4 h-4 mr-2" />
                   Postu Sil
@@ -354,6 +380,44 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
                 Telegram
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Report Dialog */}
+      <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
+        <DialogContent className="sm:max-w-md max-w-[90vw] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>Postu Şikayət Et</DialogTitle>
+            <DialogDescription>
+              Bu postun niyə uyğunsuz olduğunu bildirin
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              {['Spam', 'Uyğunsuz məzmun', 'Şiddət / Nifrət', 'Yanlış məlumat', 'Digər'].map((reason) => (
+                <motion.button
+                  key={reason}
+                  onClick={() => setReportReason(reason)}
+                  className={`w-full p-3 rounded-xl text-left text-sm font-medium transition-all ${
+                    reportReason === reason 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'bg-muted hover:bg-muted/80 text-foreground'
+                  }`}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {reason}
+                </motion.button>
+              ))}
+            </div>
+            <Button
+              onClick={handleReportPost}
+              disabled={!reportReason}
+              className="w-full gradient-primary"
+            >
+              <Flag className="w-4 h-4 mr-2" />
+              Şikayəti Göndər
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

@@ -15,9 +15,10 @@ interface GroupFeedProps {
   onBack: () => void;
   onCreatePost: () => void;
   isEmbedded?: boolean;
+  onUserClick?: (userId: string) => void;
 }
 
-const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, onCreatePost, isEmbedded = false }, ref) => {
+const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, onCreatePost, isEmbedded = false, onUserClick }, ref) => {
   const { data: posts = [], isLoading } = useGroupPosts(group?.id || null);
   const { onlineCount, onlineUsers, typingUsers } = useGroupPresence(group?.id || null);
   
@@ -92,7 +93,7 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
             >
-              <PostCard post={post} groupId={group?.id || null} />
+              <PostCard post={post} groupId={group?.id || null} onUserClick={onUserClick} />
             </motion.div>
           ))
         )}
@@ -195,7 +196,7 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
             >
-              <PostCard post={post} groupId={group?.id || null} />
+              <PostCard post={post} groupId={group?.id || null} onUserClick={onUserClick} />
             </motion.div>
           ))
         )}
