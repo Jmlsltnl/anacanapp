@@ -137,19 +137,30 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
     }
   };
 
-  // Generate post link
-  const postLink = `${window.location.origin}/community/post/${post.id}`;
+  // Generate deep link for app
+  const appScheme = 'anacan://';
+  const webFallbackUrl = `${window.location.origin}/community/post/${post.id}`;
+  const appStoreUrl = 'https://apps.apple.com/app/anacan/id123456789'; // Replace with actual App Store ID
+  const playStoreUrl = 'https://play.google.com/store/apps/details?id=app.lovable.e07ee1f93d5848fea7a0068ecf028173';
+  
+  // Deep link that tries app first, then falls back to store
+  const deepLink = `${appScheme}community/post/${post.id}`;
+  const universalLink = webFallbackUrl; // For iOS Universal Links
 
   const handleShare = async () => {
     hapticFeedback.light();
+    
+    // Use universal link for sharing (works with deep linking)
+    const shareUrl = webFallbackUrl;
+    const shareText = `${post.author?.name || 'İstifadəçi'} paylaşdı: ${post.content.substring(0, 100)}${post.content.length > 100 ? '...' : ''}`;
     
     // Check if native share is available
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${post.author?.name || 'İstifadəçi'} paylaşdı`,
-          text: post.content.substring(0, 100) + (post.content.length > 100 ? '...' : ''),
-          url: postLink,
+          title: 'Anacan - Paylaşım',
+          text: shareText,
+          url: shareUrl,
         });
       } catch (err) {
         // User cancelled or share failed, show dialog instead
@@ -165,7 +176,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(postLink);
+      await navigator.clipboard.writeText(webFallbackUrl);
       setLinkCopied(true);
       hapticFeedback.medium();
       toast({ title: 'Link kopyalandı!' });
@@ -173,6 +184,22 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
     } catch (err) {
       toast({ title: 'Xəta', description: 'Link kopyalana bilmədi', variant: 'destructive' });
     }
+  };
+
+  // Try to open in app, fallback to store
+  const handleOpenInApp = () => {
+    // Try deep link first
+    const timeout = setTimeout(() => {
+      // If app didn't open after 1.5s, redirect to store
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      window.location.href = isIOS ? appStoreUrl : playStoreUrl;
+    }, 1500);
+
+    // Try to open app
+    window.location.href = deepLink;
+    
+    // Clear timeout if page is hidden (app opened)
+    window.addEventListener('pagehide', () => clearTimeout(timeout), { once: true });
   };
 
   const timeAgo = formatDistanceToNow(new Date(post.created_at), {
@@ -360,6 +387,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
                         postId={post.id}
                         allComments={comments}
                         onRefetch={refetchComments}
+                        onUserClick={onUserClick}
                       />
                     ))}
                   </div>
@@ -380,7 +408,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
             {/* Copy Link */}
             <div className="flex items-center gap-2">
               <Input
-                value={postLink}
+                value={webFallbackUrl}
                 readOnly
                 className="flex-1 text-sm"
               />
@@ -397,18 +425,26 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
               </Button>
             </div>
 
+            {/* Open in App button */}
+            <Button
+              onClick={handleOpenInApp}
+              className="w-full gradient-primary"
+            >
+              📱 Tətbiqdə Aç
+            </Button>
+
             {/* Social Share Buttons */}
             <div className="flex justify-center gap-3">
               <Button
                 variant="outline"
-                onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(post.content.substring(0, 50) + '... ' + postLink)}`, '_blank')}
+                onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(post.content.substring(0, 50) + '... ' + webFallbackUrl)}`, '_blank')}
                 className="flex-1"
               >
                 WhatsApp
               </Button>
               <Button
                 variant="outline"
-                onClick={() => window.open(`https://t.me/share/url?url=${encodeURIComponent(postLink)}&text=${encodeURIComponent(post.content.substring(0, 50))}`, '_blank')}
+                onClick={() => window.open(`https://t.me/share/url?url=${encodeURIComponent(webFallbackUrl)}&text=${encodeURIComponent(post.content.substring(0, 50))}`, '_blank')}
                 className="flex-1"
               >
                 Telegram

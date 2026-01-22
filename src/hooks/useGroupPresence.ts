@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { RealtimeChannel } from '@supabase/supabase-js';
+import { getPublicProfileCard } from '@/lib/public-profile-cards';
 
 interface PresenceState {
   onlineCount: number;
@@ -35,12 +36,8 @@ export const useGroupPresence = (groupId: string | null) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Get user profile
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('name, avatar_url')
-        .eq('user_id', user.id)
-        .single();
+      // Get user profile from public_profile_cards (bypasses RLS)
+      const profile = await getPublicProfileCard(user.id);
 
       const channelName = `group_presence:${groupId}`;
       const channel = supabase.channel(channelName, {
@@ -117,11 +114,8 @@ export const useGroupPresence = (groupId: string | null) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('name, avatar_url')
-      .eq('user_id', user.id)
-      .single();
+    // Get user profile from public_profile_cards
+    const profile = await getPublicProfileCard(user.id);
 
     await channelRef.current.track({
       name: profile?.name || 'İstifadəçi',

@@ -11,12 +11,14 @@ import { hapticFeedback } from '@/lib/native';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface CommentReplyProps {
   comment: PostComment;
   postId: string;
   allComments: PostComment[];
   onRefetch: () => void;
+  onUserClick?: (userId: string) => void;
   level?: number;
 }
 
@@ -43,16 +45,51 @@ const UserBadge = ({ type }: { type: 'admin' | 'premium' | 'moderator' | null })
   );
 };
 
-const CommentReply = ({ comment, postId, allComments, onRefetch, level = 0 }: CommentReplyProps) => {
+const CommentReply = ({ comment, postId, allComments, onRefetch, onUserClick, level = 0 }: CommentReplyProps) => {
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [showReplies, setShowReplies] = useState(level === 0);
   const [replyText, setReplyText] = useState('');
-  const { isAdmin } = useAuth();
+  const [isLiking, setIsLiking] = useState(false);
+  const { isAdmin, user } = useAuth();
   const { toast } = useToast();
   const createComment = useCreateComment();
+  const queryClient = useQueryClient();
 
   // Get replies to this comment
   const replies = allComments.filter(c => c.parent_comment_id === comment.id);
+
+  const handleLikeComment = async () => {
+    if (!user || isLiking) return;
+    
+    hapticFeedback.light();
+    setIsLiking(true);
+
+    try {
+      if (comment.is_liked) {
+        // Unlike
+        await supabase
+          .from('comment_likes')
+          .delete()
+          .eq('comment_id', comment.id)
+          .eq('user_id', user.id);
+      } else {
+        // Like
+        await supabase
+          .from('comment_likes')
+          .insert({
+            comment_id: comment.id,
+            user_id: user.id,
+          });
+      }
+      
+      // Refetch comments to update like status
+      onRefetch();
+    } catch (error) {
+      console.error('Like error:', error);
+    } finally {
+      setIsLiking(false);
+    }
+  };
 
   const handleReply = async () => {
     if (!replyText.trim()) return;
@@ -95,6 +132,12 @@ const CommentReply = ({ comment, postId, allComments, onRefetch, level = 0 }: Co
     }
   };
 
+  const handleAvatarClick = () => {
+    if (comment.user_id && onUserClick) {
+      onUserClick(comment.user_id);
+    }
+  };
+
   const timeAgo = formatDistanceToNow(new Date(comment.created_at), {
     addSuffix: true,
     locale: az,
@@ -106,17 +149,29 @@ const CommentReply = ({ comment, postId, allComments, onRefetch, level = 0 }: Co
   return (
     <div className={`${level > 0 ? 'ml-8 mt-2' : ''}`}>
       <div className="flex gap-3">
-        <Avatar className={level === 0 ? 'w-8 h-8' : 'w-6 h-6'}>
-          <AvatarImage src={comment.author?.avatar_url || undefined} />
-          <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
-            {comment.author?.name?.charAt(0) || 'İ'}
-          </AvatarFallback>
-        </Avatar>
+        <motion.button 
+          onClick={handleAvatarClick}
+          whileTap={{ scale: 0.95 }}
+          className="flex-shrink-0"
+        >
+          <Avatar className={`${level === 0 ? 'w-8 h-8' : 'w-6 h-6'} cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all`}>
+            <AvatarImage src={comment.author?.avatar_url || undefined} />
+            <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
+              {comment.author?.name?.charAt(0) || 'İ'}
+            </AvatarFallback>
+          </Avatar>
+        </motion.button>
         <div className="flex-1">
           <div className="bg-muted rounded-xl p-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-bold text-foreground">{comment.author?.name}</span>
+                <motion.button
+                  onClick={handleAvatarClick}
+                  className="text-xs font-bold text-foreground hover:text-primary transition-colors"
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {comment.author?.name || 'İstifadəçi'}
+                </motion.button>
                 <UserBadge type={comment.author?.badge_type as any} />
                 <span className="text-xs text-muted-foreground">· {timeAgo}</span>
               </div>
@@ -134,10 +189,19 @@ const CommentReply = ({ comment, postId, allComments, onRefetch, level = 0 }: Co
 
           {/* Actions */}
           <div className="flex items-center gap-3 mt-1 ml-1">
-            <button className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors">
-              <Heart className="w-3 h-3" />
+            <motion.button 
+              onClick={handleLikeComment}
+              disabled={isLiking}
+              className={`flex items-center gap-1 text-xs transition-colors ${
+                comment.is_liked 
+                  ? 'text-rose-500' 
+                  : 'text-muted-foreground hover:text-rose-500'
+              }`}
+              whileTap={{ scale: 0.9 }}
+            >
+              <Heart className={`w-3 h-3 ${comment.is_liked ? 'fill-current' : ''}`} />
               <span>{comment.likes_count || 0}</span>
-            </button>
+            </motion.button>
             {canReply && (
               <button
                 onClick={() => setShowReplyInput(!showReplyInput)}
@@ -213,6 +277,7 @@ const CommentReply = ({ comment, postId, allComments, onRefetch, level = 0 }: Co
                       postId={postId}
                       allComments={allComments}
                       onRefetch={onRefetch}
+                      onUserClick={onUserClick}
                       level={level + 1}
                     />
                   ))}
