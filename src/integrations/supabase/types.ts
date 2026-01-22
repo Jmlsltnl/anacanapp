@@ -939,8 +939,11 @@ export type Database = {
           baby_size_cm: number | null
           baby_size_fruit: string | null
           baby_weight_gram: number | null
+          body_changes: string | null
           created_at: string
+          daily_tip: string | null
           day_number: number | null
+          days_until_birth: number | null
           doctor_visit_tip: string | null
           emotional_tip: string | null
           exercise_tip: string | null
@@ -953,6 +956,7 @@ export type Database = {
           mother_warnings: string | null
           nutrition_tip: string | null
           partner_tip: string | null
+          pregnancy_day: number | null
           recommended_exercises: string[] | null
           recommended_foods: string[] | null
           tests_to_do: string[] | null
@@ -966,8 +970,11 @@ export type Database = {
           baby_size_cm?: number | null
           baby_size_fruit?: string | null
           baby_weight_gram?: number | null
+          body_changes?: string | null
           created_at?: string
+          daily_tip?: string | null
           day_number?: number | null
+          days_until_birth?: number | null
           doctor_visit_tip?: string | null
           emotional_tip?: string | null
           exercise_tip?: string | null
@@ -980,6 +987,7 @@ export type Database = {
           mother_warnings?: string | null
           nutrition_tip?: string | null
           partner_tip?: string | null
+          pregnancy_day?: number | null
           recommended_exercises?: string[] | null
           recommended_foods?: string[] | null
           tests_to_do?: string[] | null
@@ -993,8 +1001,11 @@ export type Database = {
           baby_size_cm?: number | null
           baby_size_fruit?: string | null
           baby_weight_gram?: number | null
+          body_changes?: string | null
           created_at?: string
+          daily_tip?: string | null
           day_number?: number | null
+          days_until_birth?: number | null
           doctor_visit_tip?: string | null
           emotional_tip?: string | null
           exercise_tip?: string | null
@@ -1007,6 +1018,7 @@ export type Database = {
           mother_warnings?: string | null
           nutrition_tip?: string | null
           partner_tip?: string | null
+          pregnancy_day?: number | null
           recommended_exercises?: string[] | null
           recommended_foods?: string[] | null
           tests_to_do?: string[] | null
