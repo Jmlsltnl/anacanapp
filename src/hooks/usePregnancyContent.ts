@@ -178,52 +178,90 @@ export const usePregnancyContentAdmin = () => {
     mutationFn: async (contents: Partial<PregnancyContent>[]) => {
       const results = { success: 0, failed: 0, errors: [] as string[] };
 
-      // Process in batches for better performance
-      const batchSize = 50;
-      for (let i = 0; i < contents.length; i += batchSize) {
-        const batch = contents.slice(i, i + batchSize);
+      // First, get all existing pregnancy_days to know which to update vs insert
+      const { data: existingRows } = await (supabase as any)
+        .from('pregnancy_daily_content')
+        .select('id, pregnancy_day');
+      
+      const existingMap = new Map<number, string>();
+      (existingRows || []).forEach((row: any) => {
+        if (row.pregnancy_day) {
+          existingMap.set(row.pregnancy_day, row.id);
+        }
+      });
+
+      // Prepare records with proper defaults for empty values
+      const toInsert: any[] = [];
+      const toUpdate: { id: string; data: any }[] = [];
+
+      for (const content of contents) {
+        // Apply defaults for empty/missing values
+        const cleanedContent = {
+          pregnancy_day: content.pregnancy_day,
+          week_number: content.week_number || Math.ceil((content.pregnancy_day || 1) / 7),
+          days_until_birth: content.days_until_birth ?? (280 - (content.pregnancy_day || 1)),
+          baby_size_fruit: content.baby_size_fruit || null,
+          baby_size_cm: content.baby_size_cm ?? 0,
+          baby_weight_gram: content.baby_weight_gram ?? 0,
+          baby_development: content.baby_development || null,
+          baby_message: content.baby_message || null,
+          body_changes: content.body_changes || null,
+          daily_tip: content.daily_tip || null,
+          mother_symptoms: content.mother_symptoms || null,
+          mother_tips: content.mother_tips || null,
+          nutrition_tip: content.nutrition_tip || null,
+          recommended_foods: content.recommended_foods || null,
+          emotional_tip: content.emotional_tip || null,
+          partner_tip: content.partner_tip || null,
+          is_active: content.is_active !== false,
+        };
+
+        const existingId = existingMap.get(content.pregnancy_day!);
+        if (existingId) {
+          toUpdate.push({ id: existingId, data: cleanedContent });
+        } else {
+          toInsert.push(cleanedContent);
+        }
+      }
+
+      // Batch insert new records (chunks of 50)
+      const insertBatchSize = 50;
+      for (let i = 0; i < toInsert.length; i += insertBatchSize) {
+        const batch = toInsert.slice(i, i + insertBatchSize);
+        const { error } = await (supabase as any)
+          .from('pregnancy_daily_content')
+          .insert(batch);
         
-        for (const content of batch) {
-          try {
-            // Check if record exists for this pregnancy_day
-            const { data: existing } = await (supabase as any)
-              .from('pregnancy_daily_content')
-              .select('id')
-              .eq('pregnancy_day', content.pregnancy_day)
-              .maybeSingle();
+        if (error) {
+          results.failed += batch.length;
+          results.errors.push(`Insert batch ${i / insertBatchSize + 1}: ${error.message}`);
+        } else {
+          results.success += batch.length;
+        }
+      }
 
-            if (existing) {
-              // Update existing record
-              const { error } = await (supabase as any)
-                .from('pregnancy_daily_content')
-                .update({
-                  ...content,
-                  updated_at: new Date().toISOString()
-                })
-                .eq('id', existing.id);
+      // Batch update existing records (chunks of 20 for updates)
+      const updateBatchSize = 20;
+      for (let i = 0; i < toUpdate.length; i += updateBatchSize) {
+        const batch = toUpdate.slice(i, i + updateBatchSize);
+        
+        // Use Promise.all for parallel updates within batch
+        const updatePromises = batch.map(async ({ id, data }) => {
+          const { error } = await (supabase as any)
+            .from('pregnancy_daily_content')
+            .update({ ...data, updated_at: new Date().toISOString() })
+            .eq('id', id);
+          return { error, pregnancy_day: data.pregnancy_day };
+        });
 
-              if (error) {
-                results.failed++;
-                results.errors.push(`Gün ${content.pregnancy_day}: ${error.message}`);
-              } else {
-                results.success++;
-              }
-            } else {
-              // Insert new record
-              const { error } = await (supabase as any)
-                .from('pregnancy_daily_content')
-                .insert(content);
-
-              if (error) {
-                results.failed++;
-                results.errors.push(`Gün ${content.pregnancy_day}: ${error.message}`);
-              } else {
-                results.success++;
-              }
-            }
-          } catch (err: any) {
+        const updateResults = await Promise.all(updatePromises);
+        
+        for (const result of updateResults) {
+          if (result.error) {
             results.failed++;
-            results.errors.push(`Gün ${content.pregnancy_day}: ${err.message}`);
+            results.errors.push(`Gün ${result.pregnancy_day}: ${result.error.message}`);
+          } else {
+            results.success++;
           }
         }
       }
