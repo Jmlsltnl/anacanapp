@@ -5,24 +5,74 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+interface CustomizationOptions {
+  gender: "boy" | "girl" | "keep";
+  eyeColor: string;
+  hairColor: string;
+  hairStyle: string;
+  outfit: string;
+}
+
 interface RequestBody {
-  babyName: string;
-  babyGender: "boy" | "girl";
   backgroundTheme: string;
-  sourceImageBase64?: string;
+  sourceImageBase64: string;
+  customization: CustomizationOptions;
 }
 
 const backgroundPrompts: Record<string, string> = {
-  garden: "a beautiful magical garden with colorful flowers, butterflies, and soft sunlight filtering through trees",
-  clouds: "fluffy white clouds in a dreamy pastel sky with golden sunshine",
-  forest: "an enchanted forest with fairy lights, mushrooms, and gentle woodland creatures",
-  beach: "a beautiful sandy beach at golden hour with gentle waves and seashells",
-  stars: "twinkling stars and galaxies in a magical night sky with a crescent moon",
-  flowers: "a field of blooming lavender and wildflowers with soft bokeh",
-  balloons: "colorful balloons floating around in a bright sunny celebration",
-  rainbow: "a magical rainbow with cotton candy clouds and sparkles",
-  castle: "a fairytale castle setting with royal decorations and soft lighting",
-  toys: "adorable plush toys, teddy bears, and playful decorations",
+  garden: "a magical enchanted garden with blooming pink and white cherry blossoms, colorful butterflies dancing in the air, soft golden sunlight filtering through leaves, dewdrops on flower petals, a dreamy fairy-tale atmosphere",
+  clouds: "a heavenly scene floating among fluffy cotton-candy clouds in a pastel pink and blue sky, golden sunshine rays, tiny stars twinkling, an ethereal angelic atmosphere",
+  forest: "an enchanted mystical forest with bioluminescent mushrooms, fairy lights hanging from ancient trees, gentle woodland creatures (rabbits, deer), magical fireflies, soft misty atmosphere",
+  beach: "a pristine tropical beach at golden sunset, crystal clear turquoise water, soft white sand, beautiful seashells and starfish arranged around, palm trees swaying gently, warm golden hour lighting",
+  stars: "a magical cosmic scene with swirling galaxies, glittering stars of various colors, a crescent moon with a gentle glow, shooting stars, nebula clouds in purple and blue, a dreamy celestial atmosphere",
+  flowers: "a stunning field of lavender, sunflowers, and wildflowers in full bloom, soft bokeh background, butterflies and bumblebees, warm summer lighting, impressionist painting style",
+  balloons: "a joyful celebration scene with dozens of colorful helium balloons (pink, blue, yellow, purple, gold) floating around, confetti in the air, a bright sunny sky, festive and happy atmosphere",
+  rainbow: "a magical scene with a vibrant rainbow arching across the sky, cotton candy clouds in pastel colors, sparkles and glitter floating in the air, unicorn-inspired magical elements",
+  castle: "a magnificent fairy-tale castle interior with royal purple and gold decorations, crystal chandeliers, velvet curtains, golden throne elements, magical sparkles, regal and majestic atmosphere",
+  toys: "a cozy nursery scene surrounded by adorable plush teddy bears, soft toys, colorful building blocks, a beautiful wooden rocking horse, soft pastel blankets, warm and comforting lighting",
+};
+
+const eyeColorPrompts: Record<string, string> = {
+  keep: "",
+  blue: "bright sparkling blue eyes",
+  green: "beautiful emerald green eyes",
+  brown: "warm chocolate brown eyes",
+  hazel: "captivating hazel eyes with golden flecks",
+  gray: "striking silver-gray eyes",
+  amber: "stunning amber-colored eyes",
+};
+
+const hairColorPrompts: Record<string, string> = {
+  keep: "",
+  blonde: "silky golden blonde hair",
+  brown: "soft chestnut brown hair",
+  black: "shiny jet black hair",
+  red: "beautiful auburn red hair",
+  strawberry: "lovely strawberry blonde hair",
+  white: "adorable platinum white-blonde hair",
+};
+
+const hairStylePrompts: Record<string, string> = {
+  keep: "",
+  curly: "with adorable bouncy curls",
+  straight: "with smooth straight hair",
+  wavy: "with gentle soft waves",
+  pixie: "in a cute short pixie style",
+  ponytail: "styled in a cute ponytail with a ribbon",
+  braids: "with sweet little braids",
+};
+
+const outfitPrompts: Record<string, string> = {
+  keep: "",
+  theme: "wearing an outfit that perfectly matches the theme",
+  princess: "wearing a beautiful sparkly princess dress with a tiny tiara",
+  prince: "wearing a charming royal prince outfit with a little crown",
+  fairy: "wearing a magical fairy costume with delicate wings",
+  angel: "wearing a pure white angel outfit with fluffy wings and a halo",
+  flower: "wearing an adorable outfit decorated with flowers",
+  sailor: "wearing a cute classic sailor outfit",
+  casual: "wearing comfortable cute casual clothes",
+  festive: "wearing festive celebration clothes",
 };
 
 Deno.serve(async (req) => {
@@ -53,17 +103,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { babyName, babyGender, backgroundTheme, sourceImageBase64 }: RequestBody = await req.json();
+    const { backgroundTheme, sourceImageBase64, customization }: RequestBody = await req.json();
 
-    if (!backgroundTheme) {
+    if (!backgroundTheme || !sourceImageBase64) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    if (!sourceImageBase64) {
-      return new Response(JSON.stringify({ error: "Source image is required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -71,11 +114,90 @@ Deno.serve(async (req) => {
 
     const backgroundDescription = backgroundPrompts[backgroundTheme] || backgroundPrompts.garden;
     
-    const editPrompt = `Edit this photo: Keep the baby's face, expression, and features EXACTLY the same - do not modify the face at all. Only change the background to ${backgroundDescription}. Make it look like a professional baby photoshoot with beautiful lighting. The baby should remain in the exact same position and pose. Create a seamless, natural-looking composite.`;
+    // Build customization parts
+    const customizationParts: string[] = [];
+    
+    // Gender-specific styling
+    const genderText = customization.gender === "boy" 
+      ? "a baby boy" 
+      : customization.gender === "girl" 
+        ? "a baby girl" 
+        : "the baby";
+    
+    // Eye color
+    if (customization.eyeColor && customization.eyeColor !== "keep") {
+      const eyeDesc = eyeColorPrompts[customization.eyeColor];
+      if (eyeDesc) customizationParts.push(`with ${eyeDesc}`);
+    }
+    
+    // Hair color
+    if (customization.hairColor && customization.hairColor !== "keep") {
+      const hairColorDesc = hairColorPrompts[customization.hairColor];
+      if (hairColorDesc) customizationParts.push(hairColorDesc);
+    }
+    
+    // Hair style
+    if (customization.hairStyle && customization.hairStyle !== "keep") {
+      const hairStyleDesc = hairStylePrompts[customization.hairStyle];
+      if (hairStyleDesc) customizationParts.push(hairStyleDesc);
+    }
+    
+    // Outfit
+    if (customization.outfit && customization.outfit !== "keep") {
+      const outfitDesc = outfitPrompts[customization.outfit];
+      if (outfitDesc) customizationParts.push(outfitDesc);
+    }
+    
+    const customizationText = customizationParts.length > 0 
+      ? `, ${customizationParts.join(", ")}` 
+      : "";
+    
+    // Create the ultimate prompt for face preservation
+    const editPrompt = `
+CRITICAL INSTRUCTIONS - READ CAREFULLY:
 
-    console.log("Editing image with prompt:", editPrompt);
+You are creating a professional baby photoshoot image. Your task is to edit this photo following these EXACT rules:
 
-    // Use Lovable AI Gateway for image editing
+1. FACE PRESERVATION (MOST IMPORTANT):
+   - Keep the baby's face EXACTLY as it appears in the original photo
+   - Do NOT change: facial structure, nose shape, lip shape, face proportions, skin texture, skin tone, birthmarks, dimples
+   - The face must be IDENTICAL to the source - this is non-negotiable
+   - Eye expression and gaze direction must remain the same
+   - Any subtle facial details must be preserved perfectly
+
+2. BODY AND POSE:
+   - Keep the baby's body position and pose EXACTLY the same
+   - The baby should be in the EXACT same angle and position
+   - Hand positions and body gestures must remain unchanged
+
+3. BACKGROUND TRANSFORMATION:
+   - Replace ONLY the background with: ${backgroundDescription}
+   - The new background should seamlessly blend with the baby
+   - Add beautiful, soft, professional studio lighting
+   - Create depth with subtle bokeh effect in the background
+   - The lighting should be warm and flattering
+
+4. ALLOWED MODIFICATIONS (only if specified):
+   ${customization.gender !== "keep" ? `- Present ${genderText} styling` : "- Keep original gender presentation"}
+   ${customization.eyeColor !== "keep" ? `- Enhance eyes to be ${eyeColorPrompts[customization.eyeColor]}` : "- Keep original eye color exactly"}
+   ${customization.hairColor !== "keep" ? `- Style hair to be ${hairColorPrompts[customization.hairColor]}` : "- Keep original hair color exactly"}
+   ${customization.hairStyle !== "keep" ? `- Style hair ${hairStylePrompts[customization.hairStyle]}` : "- Keep original hair style exactly"}
+   ${customization.outfit !== "keep" ? `- Show baby ${outfitPrompts[customization.outfit]}` : "- Keep original clothing exactly"}
+
+5. QUALITY REQUIREMENTS:
+   - Professional photography quality
+   - 8K resolution appearance
+   - Perfect color grading suitable for baby photography
+   - Soft, flattering shadows
+   - No artifacts or distortions
+   - Magazine-quality final result
+
+The final image should look like it was taken in a professional photography studio with ${backgroundDescription}. The baby${customizationText} should look natural and beautiful while maintaining their unique facial identity.
+`.trim();
+
+    console.log("Editing image with enhanced prompt");
+
+    // Use Lovable AI Gateway with gemini-3-pro-image-preview
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       return new Response(JSON.stringify({ error: "AI service not configured" }), {
@@ -97,7 +219,7 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image-preview",
+        model: "google/gemini-3-pro-image-preview",
         messages: [
           {
             role: "user",
@@ -194,7 +316,7 @@ Deno.serve(async (req) => {
       .insert({
         user_id: user.id,
         storage_path: fileName,
-        prompt: editPrompt,
+        prompt: `Theme: ${backgroundTheme}, Customization: ${JSON.stringify(customization)}`,
         background_theme: backgroundTheme,
       })
       .select()
