@@ -1,0 +1,412 @@
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Plus, Search, Edit, Trash2, ChefHat, Lightbulb, Shield, Baby, Briefcase, Apple, X } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { useToast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+type ContentType = 'recipes' | 'tips' | 'safety' | 'names' | 'hospital' | 'nutrition';
+
+interface ContentItem {
+  id: string;
+  title?: string;
+  name?: string;
+  description?: string;
+  content?: string;
+  category?: string;
+  is_active?: boolean;
+  [key: string]: any;
+}
+
+const AdminContentManager = () => {
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState<ContentType>('recipes');
+  const [items, setItems] = useState<ContentItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
+  const [formData, setFormData] = useState<any>({});
+
+  const contentConfig = {
+    recipes: {
+      table: 'admin_recipes',
+      title: 'Reseptlər',
+      icon: ChefHat,
+      fields: ['title', 'description', 'category', 'prep_time', 'cook_time', 'servings', 'is_active'],
+      categories: ['pregnancy', 'breastfeeding', 'baby_food', 'healthy'],
+    },
+    tips: {
+      table: 'weekly_tips',
+      title: 'Həftəlik Tövsiyələr',
+      icon: Lightbulb,
+      fields: ['week_number', 'life_stage', 'title', 'content', 'is_active'],
+      categories: ['pregnancy', 'postpartum', 'baby'],
+    },
+    safety: {
+      table: 'safety_items',
+      title: 'Təhlükəsizlik',
+      icon: Shield,
+      fields: ['name', 'name_az', 'category', 'safety_level', 'description', 'description_az', 'is_active'],
+      categories: ['food', 'drink', 'activity', 'beauty', 'medicine'],
+    },
+    names: {
+      table: 'baby_names_db',
+      title: 'Körpə Adları',
+      icon: Baby,
+      fields: ['name', 'gender', 'origin', 'meaning', 'meaning_az', 'popularity', 'is_active'],
+      categories: ['boy', 'girl', 'unisex'],
+    },
+    hospital: {
+      table: 'hospital_bag_templates',
+      title: 'Xəstəxana Çantası',
+      icon: Briefcase,
+      fields: ['item_name', 'item_name_az', 'category', 'is_essential', 'sort_order', 'is_active'],
+      categories: ['mom', 'baby', 'documents'],
+    },
+    nutrition: {
+      table: 'nutrition_tips',
+      title: 'Qidalanma Tövsiyələri',
+      icon: Apple,
+      fields: ['title', 'content', 'category', 'trimester', 'calories', 'is_active'],
+      categories: ['pregnancy', 'breastfeeding', 'baby'],
+    },
+  };
+
+  const fetchItems = async () => {
+    setLoading(true);
+    const config = contentConfig[activeTab];
+    
+    const { data, error } = await supabase
+      .from(config.table as any)
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+    } else {
+      setItems((data as unknown as ContentItem[]) || []);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchItems();
+  }, [activeTab]);
+
+  const handleSave = async () => {
+    const config = contentConfig[activeTab];
+    
+    try {
+      if (editingItem?.id) {
+        const { error } = await supabase
+          .from(config.table as any)
+          .update(formData)
+          .eq('id', editingItem.id);
+        
+        if (error) throw error;
+        toast({ title: 'Uğurlu', description: 'Məlumat yeniləndi' });
+      } else {
+        const { error } = await supabase
+          .from(config.table as any)
+          .insert(formData);
+        
+        if (error) throw error;
+        toast({ title: 'Uğurlu', description: 'Yeni məlumat əlavə edildi' });
+      }
+      
+      setShowModal(false);
+      setEditingItem(null);
+      setFormData({});
+      fetchItems();
+    } catch (error: any) {
+      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Silmək istədiyinizdən əminsiniz?')) return;
+    
+    const config = contentConfig[activeTab];
+    
+    const { error } = await supabase
+      .from(config.table as any)
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Uğurlu', description: 'Məlumat silindi' });
+      fetchItems();
+    }
+  };
+
+  const openCreateModal = () => {
+    setEditingItem(null);
+    setFormData({ is_active: true });
+    setShowModal(true);
+  };
+
+  const openEditModal = (item: ContentItem) => {
+    setEditingItem(item);
+    setFormData(item);
+    setShowModal(true);
+  };
+
+  const filteredItems = items.filter(item => {
+    const searchLower = search.toLowerCase();
+    return (
+      item.title?.toLowerCase().includes(searchLower) ||
+      item.name?.toLowerCase().includes(searchLower) ||
+      item.description?.toLowerCase().includes(searchLower) ||
+      item.content?.toLowerCase().includes(searchLower)
+    );
+  });
+
+  const config = contentConfig[activeTab];
+  const Icon = config.icon;
+
+  const renderFormField = (field: string) => {
+    switch (field) {
+      case 'category':
+      case 'life_stage':
+      case 'gender':
+      case 'safety_level':
+        const options = field === 'safety_level' 
+          ? ['safe', 'warning', 'danger']
+          : field === 'gender'
+          ? ['boy', 'girl', 'unisex']
+          : config.categories;
+        return (
+          <Select value={formData[field] || ''} onValueChange={(v) => setFormData({ ...formData, [field]: v })}>
+            <SelectTrigger>
+              <SelectValue placeholder={`${field} seçin`} />
+            </SelectTrigger>
+            <SelectContent>
+              {options.map(opt => (
+                <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      case 'is_active':
+      case 'is_essential':
+        return (
+          <div className="flex items-center gap-2">
+            <Switch 
+              checked={formData[field] || false} 
+              onCheckedChange={(v) => setFormData({ ...formData, [field]: v })}
+            />
+            <span className="text-sm">{field === 'is_active' ? 'Aktiv' : 'Vacib'}</span>
+          </div>
+        );
+      case 'description':
+      case 'content':
+      case 'description_az':
+        return (
+          <Textarea 
+            value={formData[field] || ''} 
+            onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
+            placeholder={field}
+            rows={4}
+          />
+        );
+      case 'week_number':
+      case 'prep_time':
+      case 'cook_time':
+      case 'servings':
+      case 'trimester':
+      case 'calories':
+      case 'popularity':
+      case 'sort_order':
+        return (
+          <Input 
+            type="number"
+            value={formData[field] || ''} 
+            onChange={(e) => setFormData({ ...formData, [field]: parseInt(e.target.value) || 0 })}
+            placeholder={field}
+          />
+        );
+      default:
+        return (
+          <Input 
+            value={formData[field] || ''} 
+            onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
+            placeholder={field}
+          />
+        );
+    }
+  };
+
+  const getFieldLabel = (field: string) => {
+    const labels: Record<string, string> = {
+      title: 'Başlıq',
+      name: 'Ad',
+      name_az: 'Ad (AZ)',
+      description: 'Təsvir',
+      description_az: 'Təsvir (AZ)',
+      content: 'Məzmun',
+      category: 'Kateqoriya',
+      life_stage: 'Həyat Mərhələsi',
+      week_number: 'Həftə Nömrəsi',
+      gender: 'Cins',
+      origin: 'Mənşə',
+      meaning: 'Məna',
+      meaning_az: 'Məna (AZ)',
+      popularity: 'Populyarlıq',
+      safety_level: 'Təhlükəsizlik Səviyyəsi',
+      item_name: 'Element Adı',
+      item_name_az: 'Element Adı (AZ)',
+      is_essential: 'Vacib',
+      sort_order: 'Sıralama',
+      prep_time: 'Hazırlıq Vaxtı (dəq)',
+      cook_time: 'Bişirmə Vaxtı (dəq)',
+      servings: 'Porsiya',
+      trimester: 'Trimester',
+      calories: 'Kalori',
+      is_active: 'Aktiv',
+    };
+    return labels[field] || field;
+  };
+
+  return (
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Icon className="w-6 h-6 text-primary" />
+          <h1 className="text-2xl font-bold">Kontent İdarəetməsi</h1>
+        </div>
+        <Button onClick={openCreateModal} className="gradient-primary">
+          <Plus className="w-4 h-4 mr-2" />
+          Yeni Əlavə Et
+        </Button>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ContentType)}>
+        <TabsList className="grid grid-cols-6 w-full mb-6">
+          <TabsTrigger value="recipes" className="flex items-center gap-1">
+            <ChefHat className="w-4 h-4" />
+            <span className="hidden md:inline">Reseptlər</span>
+          </TabsTrigger>
+          <TabsTrigger value="tips" className="flex items-center gap-1">
+            <Lightbulb className="w-4 h-4" />
+            <span className="hidden md:inline">Tövsiyələr</span>
+          </TabsTrigger>
+          <TabsTrigger value="safety" className="flex items-center gap-1">
+            <Shield className="w-4 h-4" />
+            <span className="hidden md:inline">Təhlükəsizlik</span>
+          </TabsTrigger>
+          <TabsTrigger value="names" className="flex items-center gap-1">
+            <Baby className="w-4 h-4" />
+            <span className="hidden md:inline">Adlar</span>
+          </TabsTrigger>
+          <TabsTrigger value="hospital" className="flex items-center gap-1">
+            <Briefcase className="w-4 h-4" />
+            <span className="hidden md:inline">Çanta</span>
+          </TabsTrigger>
+          <TabsTrigger value="nutrition" className="flex items-center gap-1">
+            <Apple className="w-4 h-4" />
+            <span className="hidden md:inline">Qidalanma</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <div className="mb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Axtar..."
+              className="pl-10"
+            />
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filteredItems.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <Icon className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>Heç bir məlumat tapılmadı</p>
+              </div>
+            ) : (
+              filteredItems.map((item) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-card rounded-xl p-4 border border-border flex items-center gap-4"
+                >
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                    item.is_active ? 'bg-emerald-100 text-emerald-600' : 'bg-muted text-muted-foreground'
+                  }`}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold truncate">{item.title || item.name || item.item_name}</h3>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {item.description || item.content || item.meaning || item.category}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      item.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+                    }`}>
+                      {item.is_active ? 'Aktiv' : 'Deaktiv'}
+                    </span>
+                    <Button variant="ghost" size="icon" onClick={() => openEditModal(item)}>
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}>
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                    </Button>
+                  </div>
+                </motion.div>
+              ))
+            )}
+          </div>
+        )}
+      </Tabs>
+
+      {/* Edit/Create Modal */}
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {editingItem ? 'Redaktə et' : 'Yeni əlavə et'} - {config.title}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            {config.fields.map(field => (
+              <div key={field} className="space-y-2">
+                <label className="text-sm font-medium">{getFieldLabel(field)}</label>
+                {renderFormField(field)}
+              </div>
+            ))}
+            <div className="flex gap-3 pt-4">
+              <Button variant="outline" onClick={() => setShowModal(false)} className="flex-1">
+                Ləğv et
+              </Button>
+              <Button onClick={handleSave} className="flex-1 gradient-primary">
+                Yadda saxla
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default AdminContentManager;

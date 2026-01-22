@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Package, Settings, BarChart3, Shield, 
   ChevronLeft, Menu, LogOut, Bell, Search,
-  Database, Key, MessageSquare, Home
+  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +20,9 @@ const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: Home },
   { id: 'users', label: 'İstifadəçilər', icon: Users },
   { id: 'community', label: 'Cəmiyyət', icon: MessageSquare },
+  { id: 'moderation', label: 'Moderasiya', icon: AlertTriangle },
+  { id: 'subscriptions', label: 'Abunəliklər', icon: Crown },
+  { id: 'content', label: 'Kontent', icon: FileText },
   { id: 'products', label: 'Məhsullar', icon: Package },
   { id: 'data', label: 'Məlumatlar', icon: Database },
   { id: 'messages', label: 'Mesajlar', icon: Key },

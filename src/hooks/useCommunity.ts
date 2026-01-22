@@ -30,6 +30,7 @@ export interface CommunityPost {
   author?: {
     name: string;
     avatar_url: string | null;
+    badge_type?: string;
   };
   is_liked?: boolean;
 }
@@ -45,6 +46,7 @@ export interface PostComment {
   author?: {
     name: string;
     avatar_url: string | null;
+    badge_type?: string;
   };
   is_liked?: boolean;
 }

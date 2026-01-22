@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, MessageCircle, Share2, MoreHorizontal, ChevronDown, ChevronUp, Send } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal, ChevronDown, ChevronUp, Send, Trash2, Ban, Crown, Shield } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { CommunityPost, useToggleLike, usePostComments, useCreateComment } from '@/hooks/useCommunity';
@@ -8,7 +8,16 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { hapticFeedback } from '@/lib/native';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import MediaCarousel from './MediaCarousel';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface PostCardProps {
   post: CommunityPost;
@@ -22,12 +31,37 @@ const getMediaType = (url: string): 'image' | 'video' => {
   return videoExtensions.some(ext => lowerUrl.includes(ext)) ? 'video' : 'image';
 };
 
+// Badge component for user types
+const UserBadge = ({ type }: { type: 'admin' | 'premium' | 'moderator' | null }) => {
+  if (!type) return null;
+  
+  const config = {
+    admin: { label: 'Admin', icon: Shield, className: 'bg-gradient-to-r from-red-500 to-orange-500 text-white' },
+    premium: { label: 'Premium', icon: Crown, className: 'bg-gradient-to-r from-amber-400 to-amber-600 text-white' },
+    moderator: { label: 'Mod', icon: Shield, className: 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' },
+  };
+
+  const badgeConfig = config[type];
+  if (!badgeConfig) return null;
+
+  const Icon = badgeConfig.icon;
+
+  return (
+    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${badgeConfig.className}`}>
+      <Icon className="w-2.5 h-2.5" />
+      {badgeConfig.label}
+    </span>
+  );
+};
+
 const PostCard = ({ post, groupId }: PostCardProps) => {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
+  const { isAdmin } = useAuth();
+  const { toast } = useToast();
 
   const toggleLike = useToggleLike();
-  const { data: comments = [], isLoading: commentsLoading } = usePostComments(post.id);
+  const { data: comments = [], isLoading: commentsLoading, refetch: refetchComments } = usePostComments(post.id);
   const createComment = useCreateComment();
 
   const handleLike = () => {
@@ -42,6 +76,38 @@ const PostCard = ({ post, groupId }: PostCardProps) => {
     setCommentText('');
   };
 
+  const handleDeletePost = async () => {
+    if (!confirm('Bu postu silmək istəyirsiniz?')) return;
+    
+    const { error } = await supabase
+      .from('community_posts')
+      .delete()
+      .eq('id', post.id);
+
+    if (error) {
+      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Uğurlu', description: 'Post silindi' });
+      // The parent component should refetch posts
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!confirm('Bu şərhi silmək istəyirsiniz?')) return;
+    
+    const { error } = await supabase
+      .from('post_comments')
+      .delete()
+      .eq('id', commentId);
+
+    if (error) {
+      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Uğurlu', description: 'Şərh silindi' });
+      refetchComments();
+    }
+  };
+
   const timeAgo = formatDistanceToNow(new Date(post.created_at), {
     addSuffix: true,
     locale: az,
@@ -52,6 +118,9 @@ const PostCard = ({ post, groupId }: PostCardProps) => {
     url,
     type: getMediaType(url),
   }));
+
+  // Determine user badge type
+  const authorBadge = post.author?.badge_type as 'admin' | 'premium' | 'moderator' | null;
 
   return (
     <div className="bg-card rounded-2xl border border-border/50 overflow-hidden">
@@ -64,12 +133,29 @@ const PostCard = ({ post, groupId }: PostCardProps) => {
           </AvatarFallback>
         </Avatar>
         <div className="flex-1">
-          <h4 className="font-bold text-foreground text-sm">{post.author?.name || 'İstifadəçi'}</h4>
+          <div className="flex items-center gap-2">
+            <h4 className="font-bold text-foreground text-sm">{post.author?.name || 'İstifadəçi'}</h4>
+            <UserBadge type={authorBadge} />
+          </div>
           <p className="text-xs text-muted-foreground">{timeAgo}</p>
         </div>
-        <button className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center">
-          <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
-        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center">
+              <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {isAdmin && (
+              <>
+                <DropdownMenuItem onClick={handleDeletePost} className="text-red-600">
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Postu Sil
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Content */}
@@ -168,7 +254,20 @@ const PostCard = ({ post, groupId }: PostCardProps) => {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 bg-muted rounded-xl p-3">
-                        <p className="text-xs font-bold text-foreground">{comment.author?.name}</p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <p className="text-xs font-bold text-foreground">{comment.author?.name}</p>
+                            <UserBadge type={comment.author?.badge_type as any} />
+                          </div>
+                          {isAdmin && (
+                            <button
+                              onClick={() => handleDeleteComment(comment.id)}
+                              className="text-red-500 hover:text-red-600"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
                         <p className="text-sm text-foreground mt-1">{comment.content}</p>
                         <p className="text-xs text-muted-foreground mt-1">
                           {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: az })}
