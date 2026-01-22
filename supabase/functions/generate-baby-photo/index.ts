@@ -19,12 +19,38 @@ interface RequestBody {
   customization: CustomizationOptions;
 }
 
+// Pinterest-style aesthetic background prompts
 const backgroundPrompts: Record<string, string> = {
-  garden: "a magical enchanted garden with blooming pink and white cherry blossoms, colorful butterflies dancing in the air, soft golden sunlight filtering through leaves, dewdrops on flower petals, a dreamy fairy-tale atmosphere",
-  clouds: "a heavenly scene floating among fluffy cotton-candy clouds in a pastel pink and blue sky, golden sunshine rays, tiny stars twinkling, an ethereal angelic atmosphere",
-  forest: "an enchanted mystical forest with bioluminescent mushrooms, fairy lights hanging from ancient trees, gentle woodland creatures (rabbits, deer), magical fireflies, soft misty atmosphere",
-  beach: "a pristine tropical beach at golden sunset, crystal clear turquoise water, soft white sand, beautiful seashells and starfish arranged around, palm trees swaying gently, warm golden hour lighting",
-  stars: "a magical cosmic scene with swirling galaxies, glittering stars of various colors, a crescent moon with a gentle glow, shooting stars, nebula clouds in purple and blue, a dreamy celestial atmosphere",
+  // Realist backgrounds
+  studio_white: "a professional photography studio with pure white seamless backdrop, soft diffused lighting from multiple sources, clean and minimalist setup, professional baby portrait style",
+  nursery_blue: "a cozy baby nursery room with soft blue painted walls, white wooden crib in background, plush toys arranged neatly, natural window light streaming in, warm and comforting atmosphere",
+  nursery_pink: "a beautiful baby nursery with soft pink walls, elegant white furniture, tulle canopy, rose gold accents, soft plush toys, dreamy natural lighting",
+  garden_natural: "a natural outdoor garden setting with lush green grass, soft dappled sunlight filtering through trees, gentle bokeh background, peaceful spring atmosphere",
+  garden_flowers: "a stunning flower garden with blooming roses and peonies, butterflies floating, soft pink and white petals, romantic natural lighting, impressionist style",
+  
+  // Aesthetic backgrounds  
+  boho_neutral: "a bohemian style setup with dried pampas grass arrangement, macrame wall hanging, cream and beige linen blankets, natural woven basket, soft earth-toned color palette, warm diffused lighting",
+  boho_floral: "a bohemian aesthetic with dried flower arrangements in blush pink, delicate lace fabric, soft rose gold accents, warm peachy lighting, dreamy and romantic atmosphere",
+  minimalist_cream: "a clean minimalist setup with cream-colored organic cotton blanket, simple wooden elements, neutral color palette, soft natural lighting, Scandinavian aesthetic",
+  blush_dreamy: "a dreamy blush pink setup with flowing tulle fabric, scattered pearl beads, soft pink rose petals, ethereal backlighting, romantic and whimsical atmosphere",
+  vintage_rustic: "a rustic vintage setting with weathered wooden crates, burlap and lace textiles, antique brass props, warm sepia-toned lighting, nostalgic farmhouse atmosphere",
+  vintage_lace: "an elegant vintage setup with delicate antique lace blankets, soft ivory and cream fabrics, vintage pearl accessories, warm golden hour lighting, timeless aesthetic",
+  
+  // Fantasy backgrounds
+  adventure_explorer: "an adventure explorer theme with vintage world map backdrop, antique compass, safari pith helmet, adventure books, warm earthy tones, expedition aesthetic",
+  space_astronaut: "a magical space theme with twinkling stars and colorful nebulas, planet props, silver rocket ship, cosmic purple and blue colors, astronaut adventure setting",
+  superhero: "a dynamic superhero theme with cityscape silhouette backdrop, dramatic lighting, bold primary colors, heroic pose setup, comic book inspired aesthetic",
+  pirate_ship: "a pirate adventure setting on wooden ship deck, treasure chest with gold coins, nautical rope and anchor, ocean horizon backdrop, warm sunset lighting",
+  princess_castle: "a fairy tale castle interior with royal purple and gold decorations, crystal chandelier, velvet throne cushions, magical sparkles, regal princess aesthetic",
+  fairy_garden: "an enchanted fairy garden with glowing mushrooms, tiny fairy lights, magical flowers, soft purple and pink mist, whimsical woodland atmosphere",
+  mermaid_ocean: "an underwater mermaid paradise with iridescent seashells, pearl strings, coral reef colors, teal and turquoise tones, magical ocean lighting",
+  unicorn_rainbow: "a magical unicorn theme with rainbow arch, cotton candy clouds, sparkly stars, pastel pink and purple colors, glittery magical atmosphere",
+  
+  // Seasonal backgrounds
+  autumn_leaves: "an autumn setting with colorful fallen maple leaves in orange, red and gold, pumpkin decorations, cozy knit blanket, warm golden hour lighting",
+  winter_snow: "a winter wonderland with soft white snow, pine tree branches, cozy cream knit blanket, silver and white decorations, magical snowflake bokeh",
+  spring_flowers: "a spring garden with blooming tulips and daffodils, fresh green grass, butterflies, soft pastel colors, cheerful natural lighting",
+  cherry_blossom: "a Japanese cherry blossom garden with delicate pink sakura petals falling, soft focus background, ethereal pink mist, serene and peaceful atmosphere",
   flowers: "a stunning field of lavender, sunflowers, and wildflowers in full bloom, soft bokeh background, butterflies and bumblebees, warm summer lighting, impressionist painting style",
   balloons: "a joyful celebration scene with dozens of colorful helium balloons (pink, blue, yellow, purple, gold) floating around, confetti in the air, a bright sunny sky, festive and happy atmosphere",
   rainbow: "a magical scene with a vibrant rainbow arching across the sky, cotton candy clouds in pastel colors, sparkles and glitter floating in the air, unicorn-inspired magical elements",

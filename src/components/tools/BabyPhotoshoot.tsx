@@ -3,13 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Camera, Sparkles, Download, Trash2, 
   Image as ImageIcon, Loader2, Share2, Upload, X,
-  Palette, Shirt, Eye, User, Scissors
+  Palette, Shirt, Eye, Scissors, Crown, Lock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { useSubscription } from '@/hooks/useSubscription';
+import { PremiumModal } from '@/components/PremiumModal';
 
 interface BabyPhotoshootProps {
   onBack: () => void;
@@ -23,31 +25,61 @@ interface GeneratedPhoto {
 }
 
 interface CustomizationOptions {
-  gender: "boy" | "girl" | "keep";
+  gender: "boy" | "girl";
   eyeColor: string;
   hairColor: string;
   hairStyle: string;
   outfit: string;
+  background: string;
 }
 
-const backgrounds = [
-  { id: 'garden', name: 'Bağça', emoji: '🌸', color: 'from-green-400 to-emerald-500' },
-  { id: 'clouds', name: 'Buludlar', emoji: '☁️', color: 'from-sky-300 to-blue-400' },
-  { id: 'forest', name: 'Meşə', emoji: '🌲', color: 'from-emerald-500 to-green-600' },
-  { id: 'beach', name: 'Sahil', emoji: '🏖️', color: 'from-amber-300 to-orange-400' },
-  { id: 'stars', name: 'Ulduzlar', emoji: '✨', color: 'from-indigo-500 to-purple-600' },
-  { id: 'flowers', name: 'Çiçəklər', emoji: '🌷', color: 'from-pink-400 to-rose-500' },
-  { id: 'balloons', name: 'Şarlar', emoji: '🎈', color: 'from-red-400 to-pink-500' },
-  { id: 'rainbow', name: 'Göy qurşağı', emoji: '🌈', color: 'from-violet-400 to-fuchsia-500' },
-  { id: 'castle', name: 'Saray', emoji: '🏰', color: 'from-purple-400 to-indigo-500' },
-  { id: 'toys', name: 'Oyuncaqlar', emoji: '🧸', color: 'from-amber-400 to-yellow-500' },
-];
-
-const genderOptions = [
-  { id: 'keep', name: 'Olduğu kimi', emoji: '👶' },
-  { id: 'boy', name: 'Oğlan', emoji: '👦' },
-  { id: 'girl', name: 'Qız', emoji: '👧' },
-];
+// Pinterest-style aesthetic categories
+const backgroundCategories = {
+  boy: [
+    // Realist fonlar
+    { id: 'studio_white', name: 'Ağ studiya', category: 'Realist', premium: false, emoji: '⬜', color: 'from-gray-100 to-white', description: 'Professional white studio background with soft lighting' },
+    { id: 'nursery_blue', name: 'Uşaq otağı', category: 'Realist', premium: false, emoji: '🛏️', color: 'from-blue-200 to-sky-300', description: 'Cozy nursery room with soft blue tones and wooden crib' },
+    { id: 'garden_natural', name: 'Təbii bağça', category: 'Realist', premium: false, emoji: '🌿', color: 'from-green-300 to-emerald-400', description: 'Natural garden setting with green grass and soft sunlight' },
+    
+    // Aesthetic fonlar
+    { id: 'boho_neutral', name: 'Boho neutral', category: 'Aesthetic', premium: false, emoji: '🪶', color: 'from-amber-100 to-stone-200', description: 'Bohemian style with dried pampas grass, macrame, and neutral earth tones' },
+    { id: 'minimalist_cream', name: 'Minimalist krem', category: 'Aesthetic', premium: true, emoji: '🤍', color: 'from-orange-50 to-amber-100', description: 'Clean minimalist setup with cream blankets and simple wooden elements' },
+    { id: 'vintage_rustic', name: 'Vintage rustik', category: 'Aesthetic', premium: true, emoji: '🪵', color: 'from-amber-200 to-orange-300', description: 'Rustic vintage setting with wooden crates, burlap, and warm lighting' },
+    
+    // Fantastik fonlar
+    { id: 'adventure_explorer', name: 'Səyyah', category: 'Fantastik', premium: false, emoji: '🧭', color: 'from-emerald-400 to-teal-500', description: 'Adventure explorer theme with vintage maps, compass, and safari elements' },
+    { id: 'space_astronaut', name: 'Astronavt', category: 'Fantastik', premium: true, emoji: '🚀', color: 'from-indigo-500 to-purple-600', description: 'Space theme with stars, planets, rockets, and astronaut props' },
+    { id: 'superhero', name: 'Supergəhrəman', category: 'Fantastik', premium: true, emoji: '🦸', color: 'from-red-500 to-blue-600', description: 'Superhero theme with cape, cityscape background, and dynamic lighting' },
+    { id: 'pirate_ship', name: 'Pirat gəmisi', category: 'Fantastik', premium: true, emoji: '🏴‍☠️', color: 'from-amber-600 to-amber-800', description: 'Pirate adventure with wooden ship deck, treasure chest, and ocean view' },
+    
+    // Mövsümi fonlar
+    { id: 'autumn_leaves', name: 'Payız yarpaqları', category: 'Mövsümi', premium: false, emoji: '🍂', color: 'from-orange-400 to-red-500', description: 'Autumn setting with colorful fallen leaves and warm golden lighting' },
+    { id: 'winter_snow', name: 'Qış qarı', category: 'Mövsümi', premium: true, emoji: '❄️', color: 'from-blue-100 to-cyan-200', description: 'Winter wonderland with soft snow, pine trees, and cozy blankets' },
+    { id: 'spring_flowers', name: 'Bahar çiçəkləri', category: 'Mövsümi', premium: true, emoji: '🌸', color: 'from-pink-300 to-rose-400', description: 'Spring garden with blooming flowers, butterflies, and soft pastel colors' },
+  ],
+  girl: [
+    // Realist fonlar
+    { id: 'studio_white', name: 'Ağ studiya', category: 'Realist', premium: false, emoji: '⬜', color: 'from-gray-100 to-white', description: 'Professional white studio background with soft lighting' },
+    { id: 'nursery_pink', name: 'Uşaq otağı', category: 'Realist', premium: false, emoji: '🛏️', color: 'from-pink-200 to-rose-300', description: 'Cozy nursery room with soft pink tones and elegant decor' },
+    { id: 'garden_flowers', name: 'Çiçəkli bağça', category: 'Realist', premium: false, emoji: '🌷', color: 'from-rose-300 to-pink-400', description: 'Beautiful flower garden with roses, peonies, and butterflies' },
+    
+    // Aesthetic fonlar
+    { id: 'boho_floral', name: 'Boho çiçəkli', category: 'Aesthetic', premium: false, emoji: '🌺', color: 'from-pink-100 to-rose-200', description: 'Bohemian style with dried flowers, lace, and soft pink tones' },
+    { id: 'blush_dreamy', name: 'Xəyali çəhrayı', category: 'Aesthetic', premium: true, emoji: '💗', color: 'from-rose-100 to-pink-200', description: 'Dreamy blush pink setup with tulle, pearls, and soft lighting' },
+    { id: 'vintage_lace', name: 'Vintage krujeva', category: 'Aesthetic', premium: true, emoji: '🎀', color: 'from-amber-100 to-rose-100', description: 'Vintage setup with lace blankets, antique props, and warm sepia tones' },
+    
+    // Fantastik fonlar
+    { id: 'princess_castle', name: 'Şahzadə sarayı', category: 'Fantastik', premium: false, emoji: '👑', color: 'from-purple-400 to-pink-500', description: 'Fairy tale castle with royal decorations, golden throne, and sparkles' },
+    { id: 'fairy_garden', name: 'Pəri bağçası', category: 'Fantastik', premium: true, emoji: '🧚', color: 'from-violet-400 to-fuchsia-500', description: 'Enchanted fairy garden with mushrooms, fairy lights, and magical flowers' },
+    { id: 'mermaid_ocean', name: 'Dəniz pərisi', category: 'Fantastik', premium: true, emoji: '🧜‍♀️', color: 'from-teal-400 to-cyan-500', description: 'Underwater mermaid theme with seashells, pearls, and coral reef' },
+    { id: 'unicorn_rainbow', name: 'Təkbuynuz', category: 'Fantastik', premium: true, emoji: '🦄', color: 'from-pink-400 to-purple-500', description: 'Magical unicorn theme with rainbow, clouds, and sparkly decorations' },
+    
+    // Mövsümi fonlar
+    { id: 'autumn_leaves', name: 'Payız yarpaqları', category: 'Mövsümi', premium: false, emoji: '🍂', color: 'from-orange-400 to-red-500', description: 'Autumn setting with colorful fallen leaves and warm golden lighting' },
+    { id: 'winter_snow', name: 'Qış qarı', category: 'Mövsümi', premium: true, emoji: '❄️', color: 'from-blue-100 to-cyan-200', description: 'Winter wonderland with soft snow, pine trees, and cozy blankets' },
+    { id: 'cherry_blossom', name: 'Albalı çiçəyi', category: 'Mövsümi', premium: true, emoji: '🌸', color: 'from-pink-300 to-rose-400', description: 'Japanese cherry blossom garden with soft petals falling' },
+  ],
+};
 
 const eyeColorOptions = [
   { id: 'keep', name: 'Olduğu kimi', color: 'bg-gradient-to-r from-gray-300 to-gray-400' },
@@ -56,7 +88,6 @@ const eyeColorOptions = [
   { id: 'brown', name: 'Qəhvəyi', color: 'bg-gradient-to-r from-amber-600 to-amber-800' },
   { id: 'hazel', name: 'Fındıq', color: 'bg-gradient-to-r from-amber-400 to-green-500' },
   { id: 'gray', name: 'Boz', color: 'bg-gradient-to-r from-slate-400 to-slate-600' },
-  { id: 'amber', name: 'Kəhrəba', color: 'bg-gradient-to-r from-amber-400 to-orange-500' },
 ];
 
 const hairColorOptions = [
@@ -65,8 +96,6 @@ const hairColorOptions = [
   { id: 'brown', name: 'Şabalıdı', color: 'bg-gradient-to-r from-amber-700 to-amber-900' },
   { id: 'black', name: 'Qara', color: 'bg-gradient-to-r from-gray-800 to-black' },
   { id: 'red', name: 'Qırmızı', color: 'bg-gradient-to-r from-orange-500 to-red-600' },
-  { id: 'strawberry', name: 'Çiyələk sarışın', color: 'bg-gradient-to-r from-orange-300 to-rose-400' },
-  { id: 'white', name: 'Ağ-sarı', color: 'bg-gradient-to-r from-gray-100 to-yellow-100' },
 ];
 
 const hairStyleOptions = [
@@ -74,33 +103,40 @@ const hairStyleOptions = [
   { id: 'curly', name: 'Buruq', emoji: '🌀' },
   { id: 'straight', name: 'Düz', emoji: '📏' },
   { id: 'wavy', name: 'Dalğalı', emoji: '🌊' },
-  { id: 'pixie', name: 'Qısa', emoji: '✂️' },
-  { id: 'ponytail', name: 'At quyruğu', emoji: '🎀' },
-  { id: 'braids', name: 'Hörük', emoji: '🪢' },
 ];
 
-const outfitOptions = [
-  { id: 'keep', name: 'Olduğu kimi', emoji: '👕', color: 'from-gray-300 to-gray-400' },
-  { id: 'theme', name: 'Mövzuya uyğun', emoji: '🎨', color: 'from-purple-400 to-pink-400' },
-  { id: 'princess', name: 'Şahzadə', emoji: '👸', color: 'from-pink-400 to-rose-500' },
-  { id: 'prince', name: 'Şahzadə (oğlan)', emoji: '🤴', color: 'from-blue-400 to-indigo-500' },
-  { id: 'fairy', name: 'Pəri', emoji: '🧚', color: 'from-violet-400 to-purple-500' },
-  { id: 'angel', name: 'Mələk', emoji: '👼', color: 'from-white to-sky-200' },
-  { id: 'flower', name: 'Çiçəkli', emoji: '🌺', color: 'from-pink-300 to-rose-400' },
-  { id: 'sailor', name: 'Dənizçi', emoji: '⚓', color: 'from-blue-500 to-blue-700' },
-  { id: 'casual', name: 'Gündəlik', emoji: '👶', color: 'from-amber-300 to-orange-400' },
-  { id: 'festive', name: 'Bayram', emoji: '🎉', color: 'from-red-400 to-pink-500' },
-];
+const outfitsByGender = {
+  boy: [
+    { id: 'keep', name: 'Olduğu kimi', emoji: '👕', premium: false },
+    { id: 'theme', name: 'Mövzuya uyğun', emoji: '🎨', premium: false },
+    { id: 'gentleman', name: 'Centlmen', emoji: '🤵', premium: false },
+    { id: 'sailor', name: 'Dənizçi', emoji: '⚓', premium: false },
+    { id: 'prince', name: 'Şahzadə', emoji: '🤴', premium: true },
+    { id: 'pilot', name: 'Pilot', emoji: '✈️', premium: true },
+    { id: 'cowboy', name: 'Kovboy', emoji: '🤠', premium: true },
+    { id: 'sports', name: 'İdmançı', emoji: '⚽', premium: true },
+  ],
+  girl: [
+    { id: 'keep', name: 'Olduğu kimi', emoji: '👗', premium: false },
+    { id: 'theme', name: 'Mövzuya uyğun', emoji: '🎨', premium: false },
+    { id: 'princess', name: 'Şahzadə', emoji: '👸', premium: false },
+    { id: 'flower', name: 'Çiçəkli', emoji: '🌸', premium: false },
+    { id: 'ballerina', name: 'Balerina', emoji: '🩰', premium: true },
+    { id: 'fairy', name: 'Pəri', emoji: '🧚', premium: true },
+    { id: 'angel', name: 'Mələk', emoji: '👼', premium: true },
+    { id: 'vintage', name: 'Vintage', emoji: '🎀', premium: true },
+  ],
+};
 
 const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack }, ref) => {
   const [step, setStep] = useState(0);
-  const [selectedBackground, setSelectedBackground] = useState<string | null>(null);
   const [customization, setCustomization] = useState<CustomizationOptions>({
-    gender: 'keep',
+    gender: 'girl',
     eyeColor: 'keep',
     hairColor: 'keep',
     hairStyle: 'keep',
     outfit: 'keep',
+    background: '',
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [photos, setPhotos] = useState<GeneratedPhoto[]>([]);
@@ -108,12 +144,17 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
   const [viewingPhoto, setViewingPhoto] = useState<GeneratedPhoto | null>(null);
   const [sourceImage, setSourceImage] = useState<string | null>(null);
   const [sourceImagePreview, setSourceImagePreview] = useState<string | null>(null);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [premiumFeature, setPremiumFeature] = useState('');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { isPremium, canUseBabyPhotoshoot, freeLimits } = useSubscription();
 
-  // Fetch existing photos
+  const currentBackgrounds = backgroundCategories[customization.gender];
+  const currentOutfits = outfitsByGender[customization.gender];
+
   useEffect(() => {
     const fetchPhotos = async () => {
       if (!user) return;
@@ -184,8 +225,26 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     }
   };
 
+  const handleSelectBackground = (bgId: string, isPremiumBg: boolean) => {
+    if (isPremiumBg && !isPremium) {
+      setPremiumFeature('Premium fonlar');
+      setShowPremiumModal(true);
+      return;
+    }
+    setCustomization(prev => ({ ...prev, background: bgId }));
+  };
+
+  const handleSelectOutfit = (outfitId: string, isPremiumOutfit: boolean) => {
+    if (isPremiumOutfit && !isPremium) {
+      setPremiumFeature('Premium geyimlər');
+      setShowPremiumModal(true);
+      return;
+    }
+    setCustomization(prev => ({ ...prev, outfit: outfitId }));
+  };
+
   const handleGenerate = async () => {
-    if (!selectedBackground) {
+    if (!customization.background) {
       toast({
         title: 'Fon seçin',
         description: 'Zəhmət olmasa bir fon seçin',
@@ -203,6 +262,14 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
       return;
     }
 
+    // Check free tier limits
+    const { allowed, remainingCount } = await canUseBabyPhotoshoot();
+    if (!allowed) {
+      setPremiumFeature('Daha çox foto yaratmaq');
+      setShowPremiumModal(true);
+      return;
+    }
+
     setIsGenerating(true);
 
     try {
@@ -212,9 +279,15 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     try {
       const { data, error } = await supabase.functions.invoke('generate-baby-photo', {
         body: {
-          backgroundTheme: selectedBackground,
+          backgroundTheme: customization.background,
           sourceImageBase64: sourceImage,
-          customization,
+          customization: {
+            gender: customization.gender,
+            eyeColor: customization.eyeColor,
+            hairColor: customization.hairColor,
+            hairStyle: customization.hairStyle,
+            outfit: customization.outfit,
+          },
         },
       });
 
@@ -251,9 +324,6 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
   const handleDeletePhoto = async (photoId: string) => {
     try {
-      const photo = photos.find(p => p.id === photoId);
-      if (!photo) return;
-
       const { error } = await supabase
         .from('baby_photos')
         .delete()
@@ -328,11 +398,17 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
   const canProceed = () => {
     switch (step) {
       case 0: return !!sourceImage;
-      case 1: return true; // Customization is optional
-      case 2: return !!selectedBackground;
+      case 1: return !!customization.background;
+      case 2: return true;
       default: return false;
     }
   };
+
+  const groupedBackgrounds = currentBackgrounds.reduce((acc, bg) => {
+    if (!acc[bg.category]) acc[bg.category] = [];
+    acc[bg.category].push(bg);
+    return acc;
+  }, {} as Record<string, typeof currentBackgrounds>);
 
   const renderStepContent = () => {
     switch (step) {
@@ -342,9 +418,9 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="space-y-6"
+            className="space-y-5"
           >
-            {/* Image Upload Section */}
+            {/* Image Upload */}
             <div className="bg-card rounded-3xl p-5 shadow-elevated">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -369,7 +445,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                   <img
                     src={sourceImagePreview}
                     alt="Yüklənmiş şəkil"
-                    className="w-full h-64 object-cover rounded-2xl"
+                    className="w-full h-56 object-cover rounded-2xl"
                   />
                   <motion.button
                     onClick={handleRemoveImage}
@@ -378,36 +454,63 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                   >
                     <X className="w-5 h-5 text-white" />
                   </motion.button>
-                  <div className="absolute bottom-3 left-3 bg-black/70 px-4 py-2 rounded-xl backdrop-blur-sm">
-                    <span className="text-white text-sm font-medium">✓ Şəkil hazırdır</span>
-                  </div>
                 </div>
               ) : (
                 <motion.button
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full h-64 border-2 border-dashed border-primary/30 rounded-2xl flex flex-col items-center justify-center gap-4 hover:border-primary/50 hover:bg-primary/5 transition-all"
+                  className="w-full h-56 border-2 border-dashed border-primary/30 rounded-2xl flex flex-col items-center justify-center gap-4 hover:border-primary/50 hover:bg-primary/5 transition-all"
                   whileTap={{ scale: 0.98 }}
                 >
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-                    <Camera className="w-10 h-10 text-primary" />
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                    <Camera className="w-8 h-8 text-primary" />
                   </div>
                   <div className="text-center">
-                    <p className="font-bold text-foreground text-lg">Şəkil seçin</p>
-                    <p className="text-sm text-muted-foreground mt-1">Maksimum 5MB • JPG, PNG</p>
+                    <p className="font-bold text-foreground">Şəkil seçin</p>
+                    <p className="text-sm text-muted-foreground mt-1">Maksimum 5MB</p>
                   </div>
                 </motion.button>
               )}
             </div>
 
-            {/* Tips */}
-            <div className="bg-primary/5 rounded-2xl p-4">
-              <h3 className="font-semibold text-foreground mb-2">💡 Məsləhətlər</h3>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Üzü tam görünən şəkil seçin</li>
-                <li>• Yaxşı işıqlanmış foto daha yaxşı nəticə verir</li>
-                <li>• Aydın və keyfiyyətli şəkil istifadə edin</li>
-              </ul>
+            {/* Gender Selection */}
+            <div className="bg-card rounded-3xl p-5 shadow-elevated">
+              <h2 className="font-bold text-foreground mb-4">Cinsiyyət Seçin</h2>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { id: 'boy', name: 'Oğlan', emoji: '👦', color: 'from-blue-400 to-blue-600' },
+                  { id: 'girl', name: 'Qız', emoji: '👧', color: 'from-pink-400 to-rose-500' },
+                ].map((option) => (
+                  <motion.button
+                    key={option.id}
+                    onClick={() => setCustomization(prev => ({ ...prev, gender: option.id as any, background: '', outfit: 'keep' }))}
+                    className={`p-5 rounded-2xl flex flex-col items-center gap-2 transition-all ${
+                      customization.gender === option.id
+                        ? `bg-gradient-to-br ${option.color} text-white shadow-lg scale-105`
+                        : 'bg-muted hover:bg-muted/80'
+                    }`}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span className="text-4xl">{option.emoji}</span>
+                    <span className="font-bold">{option.name}</span>
+                  </motion.button>
+                ))}
+              </div>
             </div>
+
+            {/* Free tier info */}
+            {!isPremium && (
+              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-4 flex items-start gap-3">
+                <Crown className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                    Pulsuz: ilk {freeLimits.baby_photoshoot_count} foto
+                  </p>
+                  <p className="text-xs text-amber-600 dark:text-amber-300 mt-1">
+                    Limitsiz foto üçün Premium-a keçin
+                  </p>
+                </div>
+              </div>
+            )}
           </motion.div>
         );
 
@@ -419,53 +522,63 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             exit={{ opacity: 0, x: -20 }}
             className="space-y-5"
           >
-            {/* Gender Selection */}
-            <div className="bg-card rounded-3xl p-5 shadow-elevated">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-pink-500/10 flex items-center justify-center">
-                  <User className="w-5 h-5 text-pink-500" />
-                </div>
-                <div>
-                  <h2 className="font-bold text-foreground">Cins</h2>
-                  <p className="text-xs text-muted-foreground">Olduğu kimi saxla və ya dəyiş</p>
+            {/* Background Selection by Category */}
+            {Object.entries(groupedBackgrounds).map(([category, backgrounds]) => (
+              <div key={category} className="bg-card rounded-3xl p-5 shadow-elevated">
+                <h3 className="font-bold text-foreground mb-3 flex items-center gap-2">
+                  {category === 'Realist' && '📷'}
+                  {category === 'Aesthetic' && '✨'}
+                  {category === 'Fantastik' && '🎭'}
+                  {category === 'Mövsümi' && '🌈'}
+                  {category}
+                </h3>
+                <div className="grid grid-cols-3 gap-2">
+                  {backgrounds.map((bg) => (
+                    <motion.button
+                      key={bg.id}
+                      onClick={() => handleSelectBackground(bg.id, bg.premium)}
+                      className={`relative p-3 rounded-xl flex flex-col items-center gap-1 transition-all ${
+                        customization.background === bg.id
+                          ? `bg-gradient-to-br ${bg.color} text-white shadow-lg scale-105`
+                          : 'bg-muted hover:bg-muted/80'
+                      }`}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      {bg.premium && !isPremium && (
+                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center">
+                          <Lock className="w-3 h-3 text-white" />
+                        </div>
+                      )}
+                      <span className="text-2xl">{bg.emoji}</span>
+                      <span className="text-[10px] font-medium text-center leading-tight">{bg.name}</span>
+                    </motion.button>
+                  ))}
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
-                {genderOptions.map((option) => (
-                  <motion.button
-                    key={option.id}
-                    onClick={() => setCustomization(prev => ({ ...prev, gender: option.id as any }))}
-                    className={`p-4 rounded-2xl flex flex-col items-center gap-2 transition-all ${
-                      customization.gender === option.id
-                        ? 'bg-primary text-primary-foreground shadow-lg scale-105'
-                        : 'bg-muted hover:bg-muted/80'
-                    }`}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <span className="text-2xl">{option.emoji}</span>
-                    <span className="text-xs font-medium">{option.name}</span>
-                  </motion.button>
-                ))}
-              </div>
-            </div>
+            ))}
+          </motion.div>
+        );
 
+      case 2:
+        return (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-4"
+          >
             {/* Eye Color */}
-            <div className="bg-card rounded-3xl p-5 shadow-elevated">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                  <Eye className="w-5 h-5 text-blue-500" />
-                </div>
-                <div>
-                  <h2 className="font-bold text-foreground">Göz Rəngi</h2>
-                  <p className="text-xs text-muted-foreground">Olduğu kimi və ya istədiyiniz rəng</p>
-                </div>
+            <div className="bg-card rounded-3xl p-4 shadow-elevated">
+              <div className="flex items-center gap-2 mb-3">
+                <Eye className="w-5 h-5 text-blue-500" />
+                <h2 className="font-bold text-foreground text-sm">Göz Rəngi</h2>
               </div>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="flex gap-2 overflow-x-auto pb-1">
                 {eyeColorOptions.map((option) => (
                   <motion.button
                     key={option.id}
                     onClick={() => setCustomization(prev => ({ ...prev, eyeColor: option.id }))}
-                    className={`p-3 rounded-xl flex flex-col items-center gap-2 transition-all ${
+                    className={`flex-shrink-0 p-2 rounded-xl flex flex-col items-center gap-1 transition-all ${
                       customization.eyeColor === option.id
                         ? 'ring-2 ring-primary ring-offset-2 scale-105'
                         : ''
@@ -473,29 +586,24 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                     whileTap={{ scale: 0.95 }}
                   >
                     <div className={`w-8 h-8 rounded-full ${option.color}`} />
-                    <span className="text-[10px] font-medium text-foreground">{option.name}</span>
+                    <span className="text-[9px] font-medium text-foreground">{option.name}</span>
                   </motion.button>
                 ))}
               </div>
             </div>
 
             {/* Hair Color */}
-            <div className="bg-card rounded-3xl p-5 shadow-elevated">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                  <Palette className="w-5 h-5 text-amber-500" />
-                </div>
-                <div>
-                  <h2 className="font-bold text-foreground">Saç Rəngi</h2>
-                  <p className="text-xs text-muted-foreground">Olduğu kimi və ya istədiyiniz rəng</p>
-                </div>
+            <div className="bg-card rounded-3xl p-4 shadow-elevated">
+              <div className="flex items-center gap-2 mb-3">
+                <Palette className="w-5 h-5 text-amber-500" />
+                <h2 className="font-bold text-foreground text-sm">Saç Rəngi</h2>
               </div>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="flex gap-2 overflow-x-auto pb-1">
                 {hairColorOptions.map((option) => (
                   <motion.button
                     key={option.id}
                     onClick={() => setCustomization(prev => ({ ...prev, hairColor: option.id }))}
-                    className={`p-3 rounded-xl flex flex-col items-center gap-2 transition-all ${
+                    className={`flex-shrink-0 p-2 rounded-xl flex flex-col items-center gap-1 transition-all ${
                       customization.hairColor === option.id
                         ? 'ring-2 ring-primary ring-offset-2 scale-105'
                         : ''
@@ -503,29 +611,24 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                     whileTap={{ scale: 0.95 }}
                   >
                     <div className={`w-8 h-8 rounded-full ${option.color}`} />
-                    <span className="text-[10px] font-medium text-foreground">{option.name}</span>
+                    <span className="text-[9px] font-medium text-foreground">{option.name}</span>
                   </motion.button>
                 ))}
               </div>
             </div>
 
             {/* Hair Style */}
-            <div className="bg-card rounded-3xl p-5 shadow-elevated">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                  <Scissors className="w-5 h-5 text-purple-500" />
-                </div>
-                <div>
-                  <h2 className="font-bold text-foreground">Saç Forması</h2>
-                  <p className="text-xs text-muted-foreground">Olduğu kimi və ya istədiyiniz forma</p>
-                </div>
+            <div className="bg-card rounded-3xl p-4 shadow-elevated">
+              <div className="flex items-center gap-2 mb-3">
+                <Scissors className="w-5 h-5 text-purple-500" />
+                <h2 className="font-bold text-foreground text-sm">Saç Forması</h2>
               </div>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="flex gap-2">
                 {hairStyleOptions.map((option) => (
                   <motion.button
                     key={option.id}
                     onClick={() => setCustomization(prev => ({ ...prev, hairStyle: option.id }))}
-                    className={`p-3 rounded-xl flex flex-col items-center gap-2 transition-all ${
+                    className={`flex-1 p-3 rounded-xl flex flex-col items-center gap-1 transition-all ${
                       customization.hairStyle === option.id
                         ? 'bg-primary text-primary-foreground shadow-lg'
                         : 'bg-muted hover:bg-muted/80'
@@ -540,106 +643,32 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             </div>
 
             {/* Outfit */}
-            <div className="bg-card rounded-3xl p-5 shadow-elevated">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center">
-                  <Shirt className="w-5 h-5 text-rose-500" />
-                </div>
-                <div>
-                  <h2 className="font-bold text-foreground">Geyim</h2>
-                  <p className="text-xs text-muted-foreground">Olduğu kimi və ya stil seçin</p>
-                </div>
+            <div className="bg-card rounded-3xl p-4 shadow-elevated">
+              <div className="flex items-center gap-2 mb-3">
+                <Shirt className="w-5 h-5 text-rose-500" />
+                <h2 className="font-bold text-foreground text-sm">Geyim</h2>
               </div>
-              <div className="grid grid-cols-5 gap-2">
-                {outfitOptions.map((option) => (
+              <div className="grid grid-cols-4 gap-2">
+                {currentOutfits.map((outfit) => (
                   <motion.button
-                    key={option.id}
-                    onClick={() => setCustomization(prev => ({ ...prev, outfit: option.id }))}
-                    className={`p-3 rounded-xl flex flex-col items-center gap-1 transition-all ${
-                      customization.outfit === option.id
-                        ? `bg-gradient-to-br ${option.color} text-white shadow-lg scale-105`
+                    key={outfit.id}
+                    onClick={() => handleSelectOutfit(outfit.id, outfit.premium)}
+                    className={`relative p-3 rounded-xl flex flex-col items-center gap-1 transition-all ${
+                      customization.outfit === outfit.id
+                        ? 'bg-primary text-primary-foreground shadow-lg'
                         : 'bg-muted hover:bg-muted/80'
                     }`}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <span className="text-xl">{option.emoji}</span>
-                    <span className="text-[9px] font-medium leading-tight text-center">{option.name}</span>
-                  </motion.button>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        );
-
-      case 2:
-        return (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="space-y-6"
-          >
-            {/* Background Selection */}
-            <div className="bg-card rounded-3xl p-5 shadow-elevated">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h2 className="font-bold text-foreground">Fon Seçin</h2>
-                  <p className="text-xs text-muted-foreground">Sehrli fotosessiya mövzusu</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-5 gap-3">
-                {backgrounds.map((bg) => (
-                  <motion.button
-                    key={bg.id}
-                    onClick={() => setSelectedBackground(bg.id)}
-                    className={`aspect-square rounded-2xl flex flex-col items-center justify-center transition-all ${
-                      selectedBackground === bg.id
-                        ? `bg-gradient-to-br ${bg.color} shadow-lg scale-110`
-                        : 'bg-muted hover:bg-muted/80'
-                    }`}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <span className="text-2xl">{bg.emoji}</span>
-                    {selectedBackground === bg.id && (
-                      <span className="text-[8px] text-white font-bold mt-1">{bg.name}</span>
+                    {outfit.premium && !isPremium && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center">
+                        <Lock className="w-2.5 h-2.5 text-white" />
+                      </div>
                     )}
+                    <span className="text-xl">{outfit.emoji}</span>
+                    <span className="text-[9px] font-medium leading-tight text-center">{outfit.name}</span>
                   </motion.button>
                 ))}
-              </div>
-            </div>
-
-            {/* Preview Summary */}
-            <div className="bg-gradient-to-br from-primary/10 to-purple-500/10 rounded-3xl p-5">
-              <h3 className="font-bold text-foreground mb-4">📋 Tənzimləmələr</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Cins:</span>
-                  <span className="font-medium">{genderOptions.find(g => g.id === customization.gender)?.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Göz rəngi:</span>
-                  <span className="font-medium">{eyeColorOptions.find(e => e.id === customization.eyeColor)?.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Saç rəngi:</span>
-                  <span className="font-medium">{hairColorOptions.find(h => h.id === customization.hairColor)?.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Saç forması:</span>
-                  <span className="font-medium">{hairStyleOptions.find(h => h.id === customization.hairStyle)?.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Geyim:</span>
-                  <span className="font-medium">{outfitOptions.find(o => o.id === customization.outfit)?.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Fon:</span>
-                  <span className="font-medium">{backgrounds.find(b => b.id === selectedBackground)?.name || 'Seçilməyib'}</span>
-                </div>
               </div>
             </div>
           </motion.div>
@@ -652,7 +681,6 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
           >
-            {/* Photo Gallery */}
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-bold text-foreground flex items-center gap-2">
                 <ImageIcon className="w-5 h-5 text-muted-foreground" />
@@ -694,11 +722,6 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                       className="w-full h-full object-cover transition-transform group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="absolute bottom-2 left-2 right-2 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="text-white text-xs bg-black/40 px-2 py-1 rounded-lg">
-                        {backgrounds.find(b => b.id === photo.theme)?.emoji}
-                      </span>
-                    </div>
                   </motion.div>
                 ))}
               </div>
@@ -711,12 +734,12 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     }
   };
 
-  const stepTitles = ['Şəkil', 'Tənzimləmə', 'Fon', 'Qalereya'];
+  const stepTitles = ['Şəkil', 'Fon', 'Detallar', 'Qalereya'];
 
   return (
-    <div className="min-h-screen bg-background pb-8">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="gradient-primary px-5 pt-14 pb-8 rounded-b-[2rem]">
+      <div className="gradient-primary px-5 pt-14 pb-8 rounded-b-[2rem] flex-shrink-0">
         <div className="flex items-center gap-4 mb-4">
           <motion.button
             onClick={onBack}
@@ -725,14 +748,20 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
           >
             <ArrowLeft className="w-5 h-5 text-white" />
           </motion.button>
-          <div>
-            <h1 className="text-2xl font-bold text-white">Körpə Fotosessiyası</h1>
-            <p className="text-white/80 text-sm">AI ilə sehrli fotolar yaradın</p>
+          <div className="flex-1">
+            <h1 className="text-xl font-bold text-white">Körpə Fotosessiyası</h1>
+            <p className="text-white/80 text-sm">AI ilə sehrli fotolar</p>
           </div>
+          {isPremium && (
+            <div className="bg-amber-400 text-amber-900 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+              <Crown className="w-3 h-3" />
+              Premium
+            </div>
+          )}
         </div>
 
         {/* Step Indicator */}
-        <div className="flex items-center justify-between mt-6">
+        <div className="flex items-center justify-between mt-4">
           {stepTitles.map((title, index) => (
             <motion.button
               key={index}
@@ -756,14 +785,17 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
         </div>
       </div>
 
-      <div className="px-5 -mt-4">
+      {/* Content - Scrollable */}
+      <div className="flex-1 overflow-y-auto px-5 py-4 -mt-4">
         <AnimatePresence mode="wait">
           {renderStepContent()}
         </AnimatePresence>
+      </div>
 
-        {/* Navigation Buttons */}
-        {step < 3 && (
-          <div className="flex gap-3 mt-6">
+      {/* Fixed Bottom Buttons */}
+      {step < 3 && (
+        <div className="flex-shrink-0 px-5 py-4 bg-background border-t border-border safe-bottom">
+          <div className="flex gap-3">
             {step > 0 && (
               <Button
                 variant="outline"
@@ -784,7 +816,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             ) : (
               <Button
                 onClick={handleGenerate}
-                disabled={isGenerating || !selectedBackground || !sourceImage}
+                disabled={isGenerating || !customization.background || !sourceImage}
                 className="flex-1 h-14 rounded-2xl gradient-primary text-white font-bold text-lg shadow-button"
               >
                 {isGenerating ? (
@@ -801,18 +833,20 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
               </Button>
             )}
           </div>
-        )}
+        </div>
+      )}
 
-        {step === 3 && (
+      {step === 3 && (
+        <div className="flex-shrink-0 px-5 py-4 bg-background border-t border-border safe-bottom">
           <Button
             onClick={() => setStep(0)}
-            className="w-full h-14 rounded-2xl gradient-primary text-white font-bold mt-6"
+            className="w-full h-14 rounded-2xl gradient-primary text-white font-bold"
           >
             <Sparkles className="w-5 h-5 mr-2" />
             Yeni Foto Yarat
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Photo Viewer Modal */}
       <AnimatePresence>
@@ -835,7 +869,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
               />
             </div>
 
-            <div className="p-5 flex justify-center gap-4" onClick={(e) => e.stopPropagation()}>
+            <div className="p-5 flex justify-center gap-4 safe-bottom" onClick={(e) => e.stopPropagation()}>
               <Button
                 variant="outline"
                 className="flex-1 h-14 rounded-2xl bg-white/10 border-white/20 text-white"
@@ -863,6 +897,13 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Premium Modal */}
+      <PremiumModal 
+        isOpen={showPremiumModal} 
+        onClose={() => setShowPremiumModal(false)}
+        feature={premiumFeature}
+      />
     </div>
   );
 });
