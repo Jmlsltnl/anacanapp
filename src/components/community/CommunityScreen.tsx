@@ -6,6 +6,7 @@ import GroupsList from './GroupsList';
 import GroupFeed from './GroupFeed';
 import CreatePostModal from './CreatePostModal';
 import StoriesBar from './StoriesBar';
+import UserProfileScreen from './UserProfileScreen';
 
 interface CommunityScreenProps {
   onBack?: () => void;
@@ -16,6 +17,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   const { data: groups = [], isLoading: groupsLoading } = useCommunityGroups();
   const { data: memberships = [] } = useUserMemberships();
@@ -25,6 +27,20 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
 
   const selectedGroup = groups.find(g => g.id === selectedGroupId);
 
+  const handleUserClick = (userId: string) => {
+    setSelectedUserId(userId);
+  };
+
+  // If viewing a user profile
+  if (selectedUserId) {
+    return (
+      <UserProfileScreen
+        userId={selectedUserId}
+        onBack={() => setSelectedUserId(null)}
+      />
+    );
+  }
+
   // If a group is selected, show its feed
   if (selectedGroupId && selectedGroup) {
     return (
@@ -32,6 +48,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
         group={selectedGroup}
         onBack={() => setSelectedGroupId(null)}
         onCreatePost={() => setShowCreatePost(true)}
+        onUserClick={handleUserClick}
       />
     );
   }
@@ -117,6 +134,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
                 onBack={() => {}}
                 onCreatePost={() => setShowCreatePost(true)}
                 isEmbedded
+                onUserClick={handleUserClick}
               />
             </motion.div>
           )}

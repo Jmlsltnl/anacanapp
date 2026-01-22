@@ -162,10 +162,10 @@ export const useGroupPosts = (groupId: string | null) => {
       // Fetch author details and like status for each post
       const postsWithDetails = await Promise.all(
         (posts || []).map(async (post) => {
-          // Get author
+          // Get author with badge_type
           const { data: authorData } = await supabase
             .from('profiles')
-            .select('name, avatar_url')
+            .select('name, avatar_url, badge_type')
             .eq('user_id', post.user_id)
             .single();
 
@@ -183,7 +183,7 @@ export const useGroupPosts = (groupId: string | null) => {
 
           return {
             ...post,
-            author: authorData || { name: 'İstifadəçi', avatar_url: null },
+            author: authorData || { name: 'İstifadəçi', avatar_url: null, badge_type: null },
             is_liked: isLiked,
           };
         })
@@ -270,7 +270,7 @@ export const usePostComments = (postId: string) => {
         (comments || []).map(async (comment) => {
           const { data: authorData } = await supabase
             .from('profiles')
-            .select('name, avatar_url')
+            .select('name, avatar_url, badge_type')
             .eq('user_id', comment.user_id)
             .single();
 
@@ -287,7 +287,7 @@ export const usePostComments = (postId: string) => {
 
           return {
             ...comment,
-            author: authorData || { name: 'İstifadəçi', avatar_url: null },
+            author: authorData || { name: 'İstifadəçi', avatar_url: null, badge_type: null },
             is_liked: isLiked,
           };
         })
