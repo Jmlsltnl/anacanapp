@@ -56,20 +56,20 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
   const { toast } = useToast();
   const { theme } = useTheme();
 
-  // Search for users
+  // Search for users using public_profile_cards (bypasses RLS)
   const searchUsers = useCallback(async (term: string) => {
     if (!term) return [];
     
     const { data } = await supabase
-      .from('profiles')
+      .from('public_profile_cards')
       .select('user_id, name, avatar_url')
       .ilike('name', `%${term}%`)
       .limit(5);
 
     return (data || []).map(user => ({
       type: 'user' as const,
-      value: user.name,
-      display: user.name,
+      value: user.name || 'İstifadəçi',
+      display: user.name || 'İstifadəçi',
       avatar: user.avatar_url,
     }));
   }, []);
