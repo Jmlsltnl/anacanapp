@@ -44,6 +44,7 @@ interface UserState {
   setDueDate: (date: Date) => void;
   setBabyData: (birthDate: Date, name: string, gender: 'boy' | 'girl', babyCount?: number, multiplesType?: 'single' | 'twins' | 'triplets' | 'quadruplets') => void;
   setPartnerCode: (code: string) => void;
+  setLinkedPartnerId: (id: string | null) => void;
   setPartnerWomanData: (data: UserState['partnerWomanData']) => void;
   setMultiplesData: (babyCount: number, multiplesType: 'single' | 'twins' | 'triplets' | 'quadruplets') => void;
   logout: () => void;
@@ -119,6 +120,8 @@ export const useUserStore = create<UserState>()(
       setMultiplesData: (babyCount, multiplesType) => set({ babyCount, multiplesType }),
 
       setPartnerCode: (code) => set({ partnerCode: code }),
+
+      setLinkedPartnerId: (id) => set({ linkedPartnerId: id }),
 
       setPartnerWomanData: (data) => set({ partnerWomanData: data }),
 
@@ -254,6 +257,7 @@ export const useUserStore = create<UserState>()(
         role: state.role,
         lifeStage: state.lifeStage,
         partnerCode: state.partnerCode,
+        linkedPartnerId: state.linkedPartnerId,
         lastPeriodDate: state.lastPeriodDate,
         cycleLength: state.cycleLength,
         periodLength: state.periodLength,
