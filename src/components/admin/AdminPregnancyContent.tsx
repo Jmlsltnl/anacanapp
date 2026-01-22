@@ -208,21 +208,34 @@ const AdminPregnancyContent = () => {
       if (file.name.endsWith('.json')) {
         data = JSON.parse(text);
       } else if (file.name.endsWith('.csv')) {
-        const lines = text.split('\n');
-        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+        // Split by newlines, handling both \r\n and \n
+        const lines = text.split(/\r?\n/).filter(line => line.trim());
+        if (lines.length < 2) {
+          throw new Error('CSV faylı boşdur və ya yalnız başlıq var');
+        }
         
-        // Map user's Excel headers to database fields
+        // Parse header row - handle quoted headers
+        const rawHeaders = parseCSVLine(lines[0]);
+        console.log('Parsed headers:', rawHeaders);
+        
+        // Map user's Excel headers to database fields (comprehensive mapping)
         const headerMap: Record<string, string> = {
-          // Azerbaijani headers from user's Excel
+          // Azerbaijani headers from user's Excel (exact matches)
           'Doğuma neçə gün qaldı': 'days_until_birth',
           'Təxmini çəki': 'baby_weight_gram',
           'Təxmini boy': 'baby_size_cm',
           'Təxmini ölçüsündə olduğu meyvə / obyekt': 'baby_size_fruit',
+          'Təxmini ölçüsündəolduğu meyvə / obyekt': 'baby_size_fruit',
+          'Təxmini ölçüsündə olduğu meyvə': 'baby_size_fruit',
           'Körpənizdən sizə mesaj var...': 'baby_message',
+          'Körpənizdən sizə mesaj var': 'baby_message',
           'Bədəninizdə nələr baş verir...': 'body_changes',
+          'Bədəninizdə nələr baş verir': 'body_changes',
           'Körpənin inkişafında nələr baş verir...': 'baby_development',
+          'Körpənin inkişafında nələr baş verir': 'baby_development',
           'Günün Məsləhəti': 'daily_tip',
-          // Also support English headers
+          'Günün məsləhəti': 'daily_tip',
+          // English headers
           'pregnancy_day': 'pregnancy_day',
           'days_until_birth': 'days_until_birth',
           'baby_weight_gram': 'baby_weight_gram',
@@ -231,71 +244,84 @@ const AdminPregnancyContent = () => {
           'baby_message': 'baby_message',
           'body_changes': 'body_changes',
           'baby_development': 'baby_development',
-          'daily_tip': 'daily_tip'
+          'daily_tip': 'daily_tip',
+          'week_number': 'week_number'
         };
         
+        // Find which headers map to which columns
+        const mappedHeaders = rawHeaders.map(h => {
+          const trimmed = h.trim();
+          return headerMap[trimmed] || trimmed.toLowerCase().replace(/\s+/g, '_');
+        });
+        console.log('Mapped headers:', mappedHeaders);
+        
+        // Parse each data row
         for (let i = 1; i < lines.length; i++) {
           if (!lines[i].trim()) continue;
           
-          // Parse CSV properly handling quoted values
-          const values: string[] = [];
-          let current = '';
-          let inQuotes = false;
-          for (const char of lines[i]) {
-            if (char === '"') {
-              inQuotes = !inQuotes;
-            } else if (char === ',' && !inQuotes) {
-              values.push(current.trim());
-              current = '';
-            } else {
-              current += char;
-            }
-          }
-          values.push(current.trim());
-          
+          const values = parseCSVLine(lines[i]);
           const row: any = { is_active: true };
-          headers.forEach((header, idx) => {
-            const dbField = headerMap[header] || header;
-            let value = values[idx]?.replace(/"/g, '').trim();
+          
+          mappedHeaders.forEach((dbField, idx) => {
+            let value = values[idx]?.trim() || '';
             
-            // Skip empty values or "-" placeholders
-            if (!value || value === '-' || value === '') {
+            // Skip empty values or placeholders
+            if (!value || value === '-' || value === '–' || value === '—') {
               return;
             }
             
             if (dbField === 'pregnancy_day') {
               const pDay = parseInt(value);
-              if (!isNaN(pDay) && pDay > 0) {
+              if (!isNaN(pDay) && pDay > 0 && pDay <= 280) {
                 row.pregnancy_day = pDay;
                 row.week_number = Math.ceil(pDay / 7);
                 row.days_until_birth = 280 - pDay;
               }
             } else if (dbField === 'days_until_birth') {
               const daysUntil = parseInt(value);
-              if (!isNaN(daysUntil)) {
+              if (!isNaN(daysUntil) && daysUntil >= 0 && daysUntil < 280) {
                 row.days_until_birth = daysUntil;
-                // Only set pregnancy_day if not already set
+                // Calculate pregnancy_day from days_until_birth
                 if (!row.pregnancy_day) {
                   row.pregnancy_day = 280 - daysUntil;
                   row.week_number = Math.ceil(row.pregnancy_day / 7);
                 }
               }
             } else if (dbField === 'baby_size_cm' || dbField === 'baby_weight_gram') {
-              // Handle both comma and dot as decimal separator, ignore non-numeric
-              const numValue = parseFloat(value?.replace(',', '.'));
-              if (!isNaN(numValue)) {
+              // Handle decimal values with comma or dot separator
+              const cleanValue = value.replace(',', '.').replace(/[^\d.]/g, '');
+              const numValue = parseFloat(cleanValue);
+              if (!isNaN(numValue) && numValue >= 0) {
                 row[dbField] = numValue;
               }
+            } else if (dbField === 'week_number') {
+              const weekNum = parseInt(value);
+              if (!isNaN(weekNum) && weekNum > 0 && weekNum <= 40) {
+                row.week_number = weekNum;
+              }
             } else {
-              row[dbField] = value;
+              // Text fields - clean up any extra quotes
+              row[dbField] = value.replace(/^["']|["']$/g, '');
             }
           });
           
-          if (row.pregnancy_day && row.pregnancy_day > 0) {
+          // Ensure we have valid pregnancy_day
+          if (row.pregnancy_day && row.pregnancy_day > 0 && row.pregnancy_day <= 280) {
+            // Ensure week_number is set
+            if (!row.week_number) {
+              row.week_number = Math.ceil(row.pregnancy_day / 7);
+            }
             data.push(row);
           }
-          setImportProgress((i / lines.length) * 50);
+          
+          setImportProgress(Math.round((i / lines.length) * 50));
         }
+        
+        console.log(`Parsed ${data.length} valid rows from CSV`);
+      }
+
+      if (data.length === 0) {
+        throw new Error('Heç bir etibarlı məlumat tapılmadı. CSV formatını yoxlayın.');
       }
 
       // Process and import data
@@ -304,18 +330,50 @@ const AdminPregnancyContent = () => {
 
       toast({
         title: 'İmport tamamlandı!',
-        description: `${results.success} uğurlu, ${results.failed} uğursuz`,
+        description: `${results.success} uğurlu, ${results.failed} uğursuz${results.errors?.length ? ` - İlk xəta: ${results.errors[0]}` : ''}`,
       });
 
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
     } catch (error: any) {
+      console.error('Import error:', error);
       toast({ title: 'İmport xətası', description: error.message, variant: 'destructive' });
     } finally {
       setImporting(false);
       setImportModalOpen(false);
     }
+  };
+
+  // Helper function to parse CSV line properly handling quoted values
+  const parseCSVLine = (line: string): string[] => {
+    const values: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      const nextChar = line[i + 1];
+      
+      if (char === '"') {
+        if (inQuotes && nextChar === '"') {
+          // Escaped quote
+          current += '"';
+          i++;
+        } else {
+          // Toggle quote state
+          inQuotes = !inQuotes;
+        }
+      } else if (char === ',' && !inQuotes) {
+        values.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    values.push(current.trim());
+    
+    return values;
   };
 
   const downloadExcel = () => {
