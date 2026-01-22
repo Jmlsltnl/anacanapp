@@ -213,7 +213,7 @@ const AdminPregnancyContent = () => {
         
         // Map user's Excel headers to database fields
         const headerMap: Record<string, string> = {
-          'Hamiləliyinizin neçənci günüdür': 'pregnancy_day',
+          // Azerbaijani headers from user's Excel
           'Doğuma neçə gün qaldı': 'days_until_birth',
           'Təxmini çəki': 'baby_weight_gram',
           'Təxmini boy': 'baby_size_cm',
@@ -258,19 +258,24 @@ const AdminPregnancyContent = () => {
             const dbField = headerMap[header] || header;
             let value = values[idx]?.replace(/"/g, '').trim();
             
-            if (dbField === 'pregnancy_day' || dbField === 'days_until_birth') {
-              row[dbField] = parseInt(value) || 0;
-              if (dbField === 'pregnancy_day') {
-                row.week_number = Math.ceil((parseInt(value) || 1) / 7);
-              }
+            if (dbField === 'days_until_birth') {
+              const daysUntil = parseInt(value) || 0;
+              row.days_until_birth = daysUntil;
+              // Calculate pregnancy_day from days_until_birth (280 - days = pregnancy_day)
+              row.pregnancy_day = 280 - daysUntil;
+              row.week_number = Math.ceil(row.pregnancy_day / 7);
+            } else if (dbField === 'pregnancy_day') {
+              row.pregnancy_day = parseInt(value) || 0;
+              row.week_number = Math.ceil((parseInt(value) || 1) / 7);
             } else if (dbField === 'baby_size_cm' || dbField === 'baby_weight_gram') {
-              row[dbField] = parseFloat(value) || 0;
+              // Handle both comma and dot as decimal separator
+              row[dbField] = parseFloat(value?.replace(',', '.')) || 0;
             } else {
               row[dbField] = value;
             }
           });
           
-          if (row.pregnancy_day) {
+          if (row.pregnancy_day && row.pregnancy_day > 0) {
             data.push(row);
           }
           setImportProgress((i / lines.length) * 50);
