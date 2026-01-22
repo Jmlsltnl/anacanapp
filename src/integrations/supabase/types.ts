@@ -140,6 +140,133 @@ export type Database = {
         }
         Relationships: []
       }
+      comment_likes: {
+        Row: {
+          comment_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_likes_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "post_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_groups: {
+        Row: {
+          auto_join_criteria: Json | null
+          cover_image_url: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          group_type: string
+          icon_emoji: string | null
+          id: string
+          is_active: boolean | null
+          is_auto_join: boolean | null
+          member_count: number | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          auto_join_criteria?: Json | null
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          group_type?: string
+          icon_emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_auto_join?: boolean | null
+          member_count?: number | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          auto_join_criteria?: Json | null
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          group_type?: string
+          icon_emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_auto_join?: boolean | null
+          member_count?: number | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      community_posts: {
+        Row: {
+          comments_count: number | null
+          content: string
+          created_at: string
+          group_id: string | null
+          id: string
+          is_active: boolean | null
+          is_pinned: boolean | null
+          likes_count: number | null
+          media_urls: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comments_count?: number | null
+          content: string
+          created_at?: string
+          group_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_pinned?: boolean | null
+          likes_count?: number | null
+          media_urls?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comments_count?: number | null
+          content?: string
+          created_at?: string
+          group_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_pinned?: boolean | null
+          likes_count?: number | null
+          media_urls?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_posts_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "community_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contractions: {
         Row: {
           created_at: string
@@ -296,6 +423,38 @@ export type Database = {
         }
         Relationships: []
       }
+      group_memberships: {
+        Row: {
+          group_id: string
+          id: string
+          joined_at: string
+          role: string | null
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          joined_at?: string
+          role?: string | null
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          joined_at?: string
+          role?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_memberships_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "community_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hospital_bag_items: {
         Row: {
           category: string
@@ -416,6 +575,86 @@ export type Database = {
         }
         Relationships: []
       }
+      post_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          likes_count: number | null
+          parent_comment_id: string | null
+          post_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          likes_count?: number | null
+          parent_comment_id?: string | null
+          post_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          likes_count?: number | null
+          parent_comment_id?: string | null
+          post_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "post_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_likes: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category: string
@@ -462,6 +701,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           baby_birth_date: string | null
+          baby_count: number | null
           baby_gender: string | null
           baby_name: string | null
           created_at: string
@@ -472,6 +712,7 @@ export type Database = {
           last_period_date: string | null
           life_stage: string | null
           linked_partner_id: string | null
+          multiples_type: string | null
           name: string
           partner_code: string | null
           period_length: number | null
@@ -483,6 +724,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           baby_birth_date?: string | null
+          baby_count?: number | null
           baby_gender?: string | null
           baby_name?: string | null
           created_at?: string
@@ -493,6 +735,7 @@ export type Database = {
           last_period_date?: string | null
           life_stage?: string | null
           linked_partner_id?: string | null
+          multiples_type?: string | null
           name: string
           partner_code?: string | null
           period_length?: number | null
@@ -504,6 +747,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           baby_birth_date?: string | null
+          baby_count?: number | null
           baby_gender?: string | null
           baby_name?: string | null
           created_at?: string
@@ -514,6 +758,7 @@ export type Database = {
           last_period_date?: string | null
           life_stage?: string | null
           linked_partner_id?: string | null
+          multiples_type?: string | null
           name?: string
           partner_code?: string | null
           period_length?: number | null
