@@ -117,9 +117,9 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      console.error('LOVABLE_API_KEY not configured');
+    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+    if (!GEMINI_API_KEY) {
+      console.error('GEMINI_API_KEY not configured');
       throw new Error('AI service not configured');
     }
 
@@ -131,32 +131,45 @@ Deno.serve(async (req) => {
 
     const systemPrompt = getSystemPrompt(lifeStage || 'bump', pregnancyWeek, isPartner, userProfile);
 
-    // Prepare messages for Lovable AI Gateway
-    const formattedMessages = [
-      { role: 'system', content: systemPrompt },
-      ...messages.map(m => ({
-        role: m.role === 'assistant' ? 'assistant' : 'user',
-        content: m.content
-      }))
-    ];
+    // Prepare contents for Gemini API format
+    const contents = messages.map(m => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    }));
 
-    // Call Lovable AI Gateway
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const geminiModel = 'gemini-2.0-flash';
+    const endpoint = stream 
+      ? `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:streamGenerateContent?key=${GEMINI_API_KEY}&alt=sse`
+      : `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${GEMINI_API_KEY}`;
+
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: formattedMessages,
-        stream: stream,
+        contents: contents,
+        systemInstruction: {
+          parts: [{ text: systemPrompt }]
+        },
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 2048,
+        },
+        safetySettings: [
+          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+        ],
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Lovable AI error:', response.status, errorText);
+      console.error('Gemini API error:', response.status, errorText);
       
       if (response.status === 429) {
         return new Response(JSON.stringify({ 
@@ -168,22 +181,59 @@ Deno.serve(async (req) => {
         });
       }
       
-      if (response.status === 402) {
+      if (response.status === 403) {
         return new Response(JSON.stringify({ 
-          error: "Payment required. Please add credits.",
+          error: "API key invalid or quota exceeded.",
           success: false 
         }), {
-          status: 402,
+          status: 403,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
       
-      throw new Error(`AI gateway error: ${response.status}`);
+      throw new Error(`Gemini API error: ${response.status}`);
     }
 
-    // Handle streaming response
+    // Handle streaming response - convert Gemini SSE to OpenAI-compatible SSE
     if (stream) {
-      return new Response(response.body, {
+      const transformStream = new TransformStream({
+        async transform(chunk, controller) {
+          const text = new TextDecoder().decode(chunk);
+          const lines = text.split('\n');
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const jsonStr = line.slice(6);
+              if (jsonStr.trim() === '') continue;
+              
+              try {
+                const data = JSON.parse(jsonStr);
+                const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                
+                if (content) {
+                  // Convert to OpenAI-compatible format
+                  const openAIChunk = {
+                    choices: [{
+                      delta: { content },
+                      index: 0,
+                    }]
+                  };
+                  controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify(openAIChunk)}\n\n`));
+                }
+                
+                // Check if this is the final chunk
+                if (data.candidates?.[0]?.finishReason) {
+                  controller.enqueue(new TextEncoder().encode('data: [DONE]\n\n'));
+                }
+              } catch {
+                // Skip invalid JSON
+              }
+            }
+          }
+        }
+      });
+
+      return new Response(response.body?.pipeThrough(transformStream), {
         headers: {
           ...corsHeaders,
           'Content-Type': 'text/event-stream',
@@ -195,7 +245,7 @@ Deno.serve(async (req) => {
 
     // Non-streaming response
     const data = await response.json();
-    const assistantMessage = data.choices?.[0]?.message?.content || 'Bağışlayın, cavab ala bilmədim. Yenidən cəhd edin.';
+    const assistantMessage = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Bağışlayın, cavab ala bilmədim. Yenidən cəhd edin.';
 
     return new Response(
       JSON.stringify({ 
