@@ -815,16 +815,19 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
         </div>
       </div>
 
-      {/* Content - Scrollable */}
-      <div className="flex-1 overflow-y-auto px-5 py-4 -mt-4">
+      {/* Content - Scrollable with space for fixed buttons */}
+      <div className="flex-1 overflow-y-auto px-5 py-4 -mt-4 pb-36">
         <AnimatePresence mode="wait">
           {renderStepContent()}
         </AnimatePresence>
       </div>
 
-      {/* Fixed Bottom Buttons */}
+      {/* Fixed Bottom Buttons - positioned above BottomNav */}
       {step < 3 && (
-        <div className="flex-shrink-0 px-5 py-4 pb-safe bg-background border-t border-border" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+        <div 
+          className="fixed bottom-0 left-0 right-0 z-40 px-5 py-4 bg-background border-t border-border"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 80px)' }}
+        >
           <div className="flex gap-3">
             {step > 0 && (
               <Button
@@ -867,7 +870,10 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
       )}
 
       {step === 3 && (
-        <div className="flex-shrink-0 px-5 py-4 pb-safe bg-background border-t border-border" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+        <div 
+          className="fixed bottom-0 left-0 right-0 z-40 px-5 py-4 bg-background border-t border-border"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 80px)' }}
+        >
           <Button
             onClick={() => setStep(0)}
             className="w-full h-14 rounded-2xl gradient-primary text-white font-bold"
