@@ -938,6 +938,7 @@ export type Database = {
           baby_gender: string | null
           baby_name: string | null
           badge_type: string | null
+          bio: string | null
           created_at: string
           cycle_length: number | null
           due_date: string | null
@@ -964,6 +965,7 @@ export type Database = {
           baby_gender?: string | null
           baby_name?: string | null
           badge_type?: string | null
+          bio?: string | null
           created_at?: string
           cycle_length?: number | null
           due_date?: string | null
@@ -990,6 +992,7 @@ export type Database = {
           baby_gender?: string | null
           baby_name?: string | null
           badge_type?: string | null
+          bio?: string | null
           created_at?: string
           cycle_length?: number | null
           due_date?: string | null

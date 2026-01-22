@@ -18,6 +18,11 @@ import AdminPanel from '@/components/AdminPanel';
 import BottomNav from '@/components/BottomNav';
 import MotherChatScreen from '@/components/MotherChatScreen';
 import CommunityScreen from '@/components/community/CommunityScreen';
+import ProfileEditScreen from '@/components/ProfileEditScreen';
+import HelpScreen from '@/components/HelpScreen';
+import PrivacyScreen from '@/components/PrivacyScreen';
+import AppearanceScreen from '@/components/AppearanceScreen';
+import UserProfileScreen from '@/components/community/UserProfileScreen';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -33,6 +38,7 @@ const Index = () => {
   const [activeScreen, setActiveScreen] = useState<string | null>(null);
   const [showAdmin, setShowAdmin] = useState(false);
   const [showMotherChat, setShowMotherChat] = useState(false);
+  const [viewingUserId, setViewingUserId] = useState<string | null>(null);
   const { isAuthenticated, isOnboarded, role } = useUserStore();
   const { isAdmin, loading } = useAuth();
 
@@ -47,6 +53,10 @@ const Index = () => {
       setActiveScreen(null);
     }
   }, [activeScreen, isAdmin]);
+
+  const handleUserClick = (userId: string) => {
+    setViewingUserId(userId);
+  };
 
   const renderContent = () => {
     if (role === 'partner') {
@@ -145,6 +155,11 @@ const Index = () => {
     return <AdminPanel onExit={() => setShowAdmin(false)} />;
   }
 
+  // User Profile View (Community)
+  if (viewingUserId) {
+    return <UserProfileScreen userId={viewingUserId} onBack={() => setViewingUserId(null)} />;
+  }
+
   // Sub-screens
   if (activeScreen === 'notifications') {
     return <NotificationsScreen onBack={() => setActiveScreen(null)} />;
@@ -154,6 +169,18 @@ const Index = () => {
   }
   if (activeScreen === 'calendar') {
     return <CalendarScreen onBack={() => setActiveScreen(null)} />;
+  }
+  if (activeScreen === 'edit-profile') {
+    return <ProfileEditScreen onBack={() => setActiveScreen(null)} />;
+  }
+  if (activeScreen === 'help') {
+    return <HelpScreen onBack={() => setActiveScreen(null)} />;
+  }
+  if (activeScreen === 'privacy') {
+    return <PrivacyScreen onBack={() => setActiveScreen(null)} />;
+  }
+  if (activeScreen === 'appearance') {
+    return <AppearanceScreen onBack={() => setActiveScreen(null)} />;
   }
 
   // Mother chat overlay (for woman role)

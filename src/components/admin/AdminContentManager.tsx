@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Search, Edit, Trash2, ChefHat, Lightbulb, Shield, Baby, Briefcase, Apple, X, Upload, Image } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, ChefHat, Lightbulb, Shield, Baby, Briefcase, Apple, X, Upload, Image, FileUp } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import BulkTipsImport from './BulkTipsImport';
 
 type ContentType = 'recipes' | 'tips' | 'safety' | 'names' | 'hospital' | 'nutrition';
 
@@ -35,6 +36,7 @@ const AdminContentManager = () => {
   const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
   const [formData, setFormData] = useState<any>({});
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [showBulkImport, setShowBulkImport] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const contentConfig = {
@@ -367,10 +369,18 @@ const AdminContentManager = () => {
           <Icon className="w-6 h-6 text-primary" />
           <h1 className="text-2xl font-bold">Kontent İdarəetməsi</h1>
         </div>
-        <Button onClick={openCreateModal} className="gradient-primary">
-          <Plus className="w-4 h-4 mr-2" />
-          Yeni Əlavə Et
-        </Button>
+        <div className="flex gap-2">
+          {activeTab === 'tips' && (
+            <Button onClick={() => setShowBulkImport(true)} variant="outline" className="gap-2">
+              <FileUp className="w-4 h-4" />
+              Toplu İmport
+            </Button>
+          )}
+          <Button onClick={openCreateModal} className="gradient-primary">
+            <Plus className="w-4 h-4 mr-2" />
+            Yeni Əlavə Et
+          </Button>
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ContentType)}>
@@ -500,6 +510,13 @@ const AdminContentManager = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Bulk Tips Import Modal */}
+      <BulkTipsImport
+        isOpen={showBulkImport}
+        onClose={() => setShowBulkImport(false)}
+        onSuccess={fetchItems}
+      />
     </div>
   );
 };

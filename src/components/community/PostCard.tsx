@@ -22,6 +22,7 @@ import {
 interface PostCardProps {
   post: CommunityPost;
   groupId: string | null;
+  onUserClick?: (userId: string) => void;
 }
 
 // Helper to detect media type from URL
@@ -54,7 +55,7 @@ const UserBadge = ({ type }: { type: 'admin' | 'premium' | 'moderator' | null })
   );
 };
 
-const PostCard = ({ post, groupId }: PostCardProps) => {
+const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
   const { isAdmin } = useAuth();
@@ -122,19 +123,33 @@ const PostCard = ({ post, groupId }: PostCardProps) => {
   // Determine user badge type
   const authorBadge = post.author?.badge_type as 'admin' | 'premium' | 'moderator' | null;
 
+  const handleAvatarClick = () => {
+    if (post.user_id && onUserClick) {
+      onUserClick(post.user_id);
+    }
+  };
+
   return (
     <div className="bg-card rounded-2xl border border-border/50 overflow-hidden">
       {/* Header */}
       <div className="p-4 flex items-center gap-3">
-        <Avatar className="w-10 h-10">
-          <AvatarImage src={post.author?.avatar_url || undefined} />
-          <AvatarFallback className="bg-primary/10 text-primary font-bold">
-            {post.author?.name?.charAt(0) || 'İ'}
-          </AvatarFallback>
-        </Avatar>
+        <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.95 }}>
+          <Avatar className="w-10 h-10 cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all">
+            <AvatarImage src={post.author?.avatar_url || undefined} />
+            <AvatarFallback className="bg-primary/10 text-primary font-bold">
+              {post.author?.name?.charAt(0) || 'İ'}
+            </AvatarFallback>
+          </Avatar>
+        </motion.button>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <h4 className="font-bold text-foreground text-sm">{post.author?.name || 'İstifadəçi'}</h4>
+            <motion.button 
+              onClick={handleAvatarClick}
+              className="font-bold text-foreground text-sm hover:text-primary transition-colors"
+              whileTap={{ scale: 0.98 }}
+            >
+              {post.author?.name || 'İstifadəçi'}
+            </motion.button>
             <UserBadge type={authorBadge} />
           </div>
           <p className="text-xs text-muted-foreground">{timeAgo}</p>
