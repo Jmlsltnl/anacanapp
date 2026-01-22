@@ -4,7 +4,7 @@ import {
   Droplets, Moon, Utensils, Activity, Plus, TrendingUp, Heart, Sparkles, 
   Bell, ChevronRight, Flame, Target, Calendar, Zap, Sun, Cloud, Wind,
   ThermometerSun, Pill, Baby, Footprints, Scale, Clock, Star, Award,
-  MessageCircle, Check
+  MessageCircle, Check, Lightbulb
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useTimerStore } from '@/store/timerStore';
@@ -18,6 +18,7 @@ import { useKickSessions } from '@/hooks/useKickSessions';
 import { useWeightEntries } from '@/hooks/useWeightEntries';
 import { useBabyMilestones, MILESTONES } from '@/hooks/useBabyMilestones';
 import { useAchievements } from '@/hooks/useAchievements';
+import { useWeeklyTips } from '@/hooks/useDynamicContent';
 
 interface QuickActionProps {
   icon: any;
@@ -315,6 +316,10 @@ const BumpDashboard = () => {
   const { getTodayStats, addSession } = useKickSessions();
   const { entries: weightEntries } = useWeightEntries();
   
+  // Fetch weekly tip from database
+  const { data: weeklyTips = [] } = useWeeklyTips(pregData?.currentWeek, 'bump');
+  const currentWeekTip = weeklyTips[0]; // Get the first tip for this week
+  
   const todayStats = getTodayStats();
   const kickCount = todayStats.totalKicks;
   const waterCount = todayLog?.water_intake || 0;
@@ -504,6 +509,27 @@ const BumpDashboard = () => {
           ))}
         </div>
       </motion.div>
+
+      {/* Weekly Tip from Database */}
+      {currentWeekTip && (
+        <motion.div 
+          className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-3xl p-5 border border-amber-100"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.32 }}
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+              <Lightbulb className="w-4 h-4 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-xs text-amber-600 font-bold uppercase tracking-wider">Həftə {pregData?.currentWeek} Tövsiyəsi</p>
+              <h4 className="font-bold text-foreground">{currentWeekTip.title}</h4>
+            </div>
+          </div>
+          <p className="text-sm text-foreground/80 leading-relaxed">{currentWeekTip.content}</p>
+        </motion.div>
+      )}
 
       {/* Baby Message */}
       <motion.div 

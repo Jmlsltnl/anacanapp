@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Search, Edit, Trash2, ChefHat, Lightbulb, Shield, Baby, Briefcase, Apple, X } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, ChefHat, Lightbulb, Shield, Baby, Briefcase, Apple, X, Upload, Image } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +21,7 @@ interface ContentItem {
   content?: string;
   category?: string;
   is_active?: boolean;
+  image_url?: string;
   [key: string]: any;
 }
 
@@ -33,14 +34,17 @@ const AdminContentManager = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
   const [formData, setFormData] = useState<any>({});
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const contentConfig = {
     recipes: {
       table: 'admin_recipes',
       title: 'Reseptlər',
       icon: ChefHat,
-      fields: ['title', 'description', 'category', 'prep_time', 'cook_time', 'servings', 'is_active'],
+      fields: ['title', 'description', 'category', 'prep_time', 'cook_time', 'servings', 'image_url', 'is_active'],
       categories: ['pregnancy', 'breastfeeding', 'baby_food', 'healthy'],
+      hasImage: true,
     },
     tips: {
       table: 'weekly_tips',
@@ -48,6 +52,7 @@ const AdminContentManager = () => {
       icon: Lightbulb,
       fields: ['week_number', 'life_stage', 'title', 'content', 'is_active'],
       categories: ['pregnancy', 'postpartum', 'baby'],
+      hasImage: false,
     },
     safety: {
       table: 'safety_items',
@@ -55,6 +60,7 @@ const AdminContentManager = () => {
       icon: Shield,
       fields: ['name', 'name_az', 'category', 'safety_level', 'description', 'description_az', 'is_active'],
       categories: ['food', 'drink', 'activity', 'beauty', 'medicine'],
+      hasImage: false,
     },
     names: {
       table: 'baby_names_db',
@@ -62,6 +68,7 @@ const AdminContentManager = () => {
       icon: Baby,
       fields: ['name', 'gender', 'origin', 'meaning', 'meaning_az', 'popularity', 'is_active'],
       categories: ['boy', 'girl', 'unisex'],
+      hasImage: false,
     },
     hospital: {
       table: 'hospital_bag_templates',
@@ -69,6 +76,7 @@ const AdminContentManager = () => {
       icon: Briefcase,
       fields: ['item_name', 'item_name_az', 'category', 'is_essential', 'sort_order', 'is_active'],
       categories: ['mom', 'baby', 'documents'],
+      hasImage: false,
     },
     nutrition: {
       table: 'nutrition_tips',
@@ -76,7 +84,36 @@ const AdminContentManager = () => {
       icon: Apple,
       fields: ['title', 'content', 'category', 'trimester', 'calories', 'is_active'],
       categories: ['pregnancy', 'breastfeeding', 'baby'],
+      hasImage: false,
     },
+  };
+
+  const handleImageUpload = async (file: File) => {
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `recipe-${Date.now()}.${fileExt}`;
+      const filePath = `recipes/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('community-media')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('community-media')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, image_url: urlData.publicUrl });
+      toast({ title: 'Şəkil yükləndi!' });
+    } catch (error: any) {
+      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const fetchItems = async () => {
@@ -175,6 +212,52 @@ const AdminContentManager = () => {
 
   const renderFormField = (field: string) => {
     switch (field) {
+      case 'image_url':
+        return (
+          <div className="space-y-3">
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0])}
+              className="hidden"
+            />
+            {formData.image_url ? (
+              <div className="relative">
+                <img 
+                  src={formData.image_url} 
+                  alt="Preview" 
+                  className="w-full h-40 object-cover rounded-xl"
+                />
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-2 right-2"
+                  onClick={() => setFormData({ ...formData, image_url: '' })}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-24 border-dashed"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingImage}
+              >
+                {uploadingImage ? (
+                  <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <div className="flex flex-col items-center gap-2">
+                    <Upload className="w-6 h-6" />
+                    <span className="text-sm">Şəkil yüklə</span>
+                  </div>
+                )}
+              </Button>
+            )}
+          </div>
+        );
       case 'category':
       case 'life_stage':
       case 'gender':
@@ -272,6 +355,7 @@ const AdminContentManager = () => {
       trimester: 'Trimester',
       calories: 'Kalori',
       is_active: 'Aktiv',
+      image_url: 'Şəkil',
     };
     return labels[field] || field;
   };
@@ -348,11 +432,22 @@ const AdminContentManager = () => {
                   animate={{ opacity: 1, y: 0 }}
                   className="bg-card rounded-xl p-4 border border-border flex items-center gap-4"
                 >
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    item.is_active ? 'bg-emerald-100 text-emerald-600' : 'bg-muted text-muted-foreground'
-                  }`}>
-                    <Icon className="w-5 h-5" />
-                  </div>
+                  {/* Show image if available (for recipes) */}
+                  {item.image_url ? (
+                    <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+                      <img 
+                        src={item.image_url} 
+                        alt={item.title || 'Şəkil'} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      item.is_active ? 'bg-emerald-100 text-emerald-600' : 'bg-muted text-muted-foreground'
+                    }`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold truncate">{item.title || item.name || item.item_name}</h3>
                     <p className="text-sm text-muted-foreground truncate">
