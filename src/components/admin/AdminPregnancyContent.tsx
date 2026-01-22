@@ -314,7 +314,7 @@ const AdminPregnancyContent = () => {
             data.push(row);
           }
           
-          setImportProgress(Math.round((i / lines.length) * 50));
+          setImportProgress(Math.round((i / lines.length) * 40));
         }
         
         console.log(`Parsed ${data.length} valid rows from CSV`);
@@ -324,7 +324,12 @@ const AdminPregnancyContent = () => {
         throw new Error('Heç bir etibarlı məlumat tapılmadı. CSV formatını yoxlayın.');
       }
 
+      // Show parsing complete
+      setImportProgress(45);
+      toast({ title: 'CSV oxundu', description: `${data.length} sətir tapıldı. Bazaya yazılır...` });
+
       // Process and import data
+      setImportProgress(50);
       const results = await bulkImport.mutateAsync(data);
       setImportProgress(100);
 
