@@ -1162,6 +1162,39 @@ export type Database = {
           },
         ]
       }
+      public_profile_cards: {
+        Row: {
+          avatar_url: string | null
+          badge_type: string | null
+          created_at: string
+          is_premium: boolean
+          life_stage: string | null
+          name: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          badge_type?: string | null
+          created_at?: string
+          is_premium?: boolean
+          life_stage?: string | null
+          name?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          badge_type?: string | null
+          created_at?: string
+          is_premium?: boolean
+          life_stage?: string | null
+          name?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       safety_items: {
         Row: {
           category: string
