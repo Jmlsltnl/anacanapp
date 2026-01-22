@@ -1,5 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,7 +9,7 @@ interface RequestBody {
   babyName: string;
   babyGender: "boy" | "girl";
   backgroundTheme: string;
-  sourceImageBase64?: string; // Base64 encoded source image
+  sourceImageBase64?: string;
 }
 
 const backgroundPrompts: Record<string, string> = {
@@ -26,7 +25,7 @@ const backgroundPrompts: Record<string, string> = {
   toys: "adorable plush toys, teddy bears, and playful decorations",
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -40,14 +39,12 @@ serve(async (req) => {
       });
     }
 
-    // Create Supabase client with user's auth
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey, {
       global: { headers: { Authorization: authHeader } },
     });
 
-    // Get user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -74,12 +71,10 @@ serve(async (req) => {
 
     const backgroundDescription = backgroundPrompts[backgroundTheme] || backgroundPrompts.garden;
     
-    // Image editing prompt - preserve the baby's face exactly
     const editPrompt = `Edit this photo: Keep the baby's face, expression, and features EXACTLY the same - do not modify the face at all. Only change the background to ${backgroundDescription}. Make it look like a professional baby photoshoot with beautiful lighting. The baby should remain in the exact same position and pose. Create a seamless, natural-looking composite.`;
 
     console.log("Editing image with prompt:", editPrompt);
 
-    // Call Gemini API for image editing
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     if (!GEMINI_API_KEY) {
       return new Response(JSON.stringify({ error: "AI service not configured" }), {
@@ -88,11 +83,10 @@ serve(async (req) => {
       });
     }
 
-    // Use Gemini's image editing model
-    const model = "gemini-2.0-flash-exp-image-generation";
-    const baseUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+    // Use imagen-3.0-generate-002 for image generation
+    const model = "imagen-3.0-generate-002";
+    const baseUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:predict`;
 
-    // Clean base64 string (remove data URL prefix if present)
     let cleanBase64 = sourceImageBase64;
     let mimeType = "image/jpeg";
     
@@ -105,7 +99,11 @@ serve(async (req) => {
       }
     }
 
-    const aiResponse = await fetch(`${baseUrl}?key=${GEMINI_API_KEY}`, {
+    // For image editing, use gemini-2.0-flash with native image generation
+    const editModel = "gemini-2.0-flash";
+    const editUrl = `https://generativelanguage.googleapis.com/v1beta/models/${editModel}:generateContent`;
+
+    const aiResponse = await fetch(`${editUrl}?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -126,6 +124,7 @@ serve(async (req) => {
         ],
         generationConfig: {
           responseModalities: ["TEXT", "IMAGE"],
+          responseMimeType: "image/png",
         },
       }),
     });
@@ -150,7 +149,6 @@ serve(async (req) => {
     const aiData = await aiResponse.json();
     console.log("Gemini Response received");
 
-    // Extract image from Gemini response
     const parts = aiData.candidates?.[0]?.content?.parts || [];
     let imageData: string | null = null;
     let imageFormat = "png";
@@ -171,10 +169,8 @@ serve(async (req) => {
       });
     }
 
-    // Convert base64 to binary
     const binaryData = Uint8Array.from(atob(imageData), (c) => c.charCodeAt(0));
 
-    // Upload to Supabase Storage
     const fileName = `${user.id}/${Date.now()}-${backgroundTheme}.${imageFormat}`;
     
     const { data: uploadData, error: uploadError } = await supabase.storage
@@ -192,12 +188,10 @@ serve(async (req) => {
       });
     }
 
-    // Get public URL
     const { data: urlData } = supabase.storage
       .from("baby-photos")
       .getPublicUrl(fileName);
 
-    // Save to database
     const { data: photoRecord, error: dbError } = await supabase
       .from("baby_photos")
       .insert({
@@ -225,10 +219,11 @@ serve(async (req) => {
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error) {
-    console.error("Error:", error);
+  } catch (err) {
+    console.error("Error:", err);
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
