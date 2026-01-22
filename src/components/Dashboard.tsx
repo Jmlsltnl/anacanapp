@@ -19,7 +19,7 @@ import { useWeightEntries } from '@/hooks/useWeightEntries';
 import { useBabyMilestones, MILESTONES } from '@/hooks/useBabyMilestones';
 import { useAchievements } from '@/hooks/useAchievements';
 import { useWeeklyTips } from '@/hooks/useDynamicContent';
-import { usePregnancyContent } from '@/hooks/usePregnancyContent';
+import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 
 interface QuickActionProps {
   icon: any;
@@ -317,13 +317,17 @@ const BumpDashboard = () => {
   const { getTodayStats, addSession } = useKickSessions();
   const { entries: weightEntries } = useWeightEntries();
   
+  // Calculate current pregnancy day (1-280)
+  const pregnancyDay = pregData?.dueDate 
+    ? Math.max(1, 280 - Math.ceil((pregData.dueDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : 1;
+  
   // Fetch weekly tip from database
   const { data: weeklyTips = [] } = useWeeklyTips(pregData?.currentWeek, 'bump');
   const currentWeekTip = weeklyTips[0];
   
-  // Fetch dynamic pregnancy content
-  const { data: pregnancyContent = [] } = usePregnancyContent(pregData?.currentWeek);
-  const weekContent = pregnancyContent[0];
+  // Fetch dynamic pregnancy content by day
+  const { data: dayContent } = usePregnancyContentByDay(pregnancyDay);
   
   const todayStats = getTodayStats();
   const kickCount = todayStats.totalKicks;
@@ -337,20 +341,20 @@ const BumpDashboard = () => {
   if (!pregData) return null;
 
   // Use dynamic content if available, fallback to static
-  const weekData = weekContent ? {
-    fruit: weekContent.baby_size_fruit || FRUIT_SIZES[pregData.currentWeek]?.fruit || 'Meyvə',
+  const weekData = dayContent ? {
+    fruit: dayContent.baby_size_fruit || FRUIT_SIZES[pregData.currentWeek]?.fruit || 'Meyvə',
     emoji: '🍎',
-    lengthCm: weekContent.baby_size_cm || FRUIT_SIZES[pregData.currentWeek]?.lengthCm || 0,
-    weightG: weekContent.baby_weight_gram || FRUIT_SIZES[pregData.currentWeek]?.weightG || 0,
+    lengthCm: dayContent.baby_size_cm || FRUIT_SIZES[pregData.currentWeek]?.lengthCm || 0,
+    weightG: dayContent.baby_weight_gram || FRUIT_SIZES[pregData.currentWeek]?.weightG || 0,
   } : FRUIT_SIZES[pregData.currentWeek] || FRUIT_SIZES[12];
   
-  const daysLeft = pregData.dueDate ? Math.ceil((pregData.dueDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
+  const daysLeft = dayContent?.days_until_birth ?? (pregData.dueDate ? Math.ceil((pregData.dueDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : 0);
   const totalDays = 280;
   const daysElapsed = totalDays - daysLeft;
   const progressPercent = (daysElapsed / totalDays) * 100;
 
   // Dynamic baby message from database
-  const babyMessage = weekContent?.baby_message || "Salam ana! Bu gün çox böyüdüm. 💕";
+  const babyMessage = dayContent?.baby_message || "Salam ana! Bu gün çox böyüdüm. 💕";
 
   const weeklyDevelopment = {
     eyes: pregData.currentWeek >= 8,
@@ -550,25 +554,25 @@ const BumpDashboard = () => {
           "{babyMessage}"
         </p>
         
-        {/* Additional weekly info */}
-        {weekContent && (
+        {/* Additional daily info */}
+        {dayContent && (
           <div className="mt-4 pt-4 border-t border-violet-100 dark:border-violet-800 space-y-3">
-            {weekContent.baby_development && (
+            {dayContent.baby_development && (
               <div className="flex items-start gap-2">
                 <span className="text-lg">👶</span>
-                <p className="text-sm text-foreground/80">{weekContent.baby_development}</p>
+                <p className="text-sm text-foreground/80">{dayContent.baby_development}</p>
               </div>
             )}
-            {weekContent.mother_tips && (
+            {dayContent.body_changes && (
+              <div className="flex items-start gap-2">
+                <span className="text-lg">🤰</span>
+                <p className="text-sm text-foreground/80">{dayContent.body_changes}</p>
+              </div>
+            )}
+            {dayContent.daily_tip && (
               <div className="flex items-start gap-2">
                 <span className="text-lg">💡</span>
-                <p className="text-sm text-foreground/80">{weekContent.mother_tips}</p>
-              </div>
-            )}
-            {weekContent.nutrition_tip && (
-              <div className="flex items-start gap-2">
-                <span className="text-lg">🍎</span>
-                <p className="text-sm text-foreground/80">{weekContent.nutrition_tip}</p>
+                <p className="text-sm text-foreground/80">{dayContent.daily_tip}</p>
               </div>
             )}
           </div>
