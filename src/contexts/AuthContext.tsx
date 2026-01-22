@@ -78,6 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setDueDate,
     setBabyData,
     setPartnerCode,
+    setLinkedPartnerId,
     logout: storeLogout,
   } = useUserStore();
 
@@ -132,6 +133,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (profileData.period_length) setPeriodLength(profileData.period_length);
       if (profileData.due_date) setDueDate(new Date(profileData.due_date));
 
+      // Sync linked partner ID
+      setLinkedPartnerId(profileData.linked_partner_id);
+
       if (profileData.baby_birth_date && profileData.baby_name && profileData.baby_gender) {
         setBabyData(new Date(profileData.baby_birth_date), profileData.baby_name, profileData.baby_gender);
       }
@@ -149,7 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setOnboarded(false);
       }
     },
-    [setOnboarded, setPartnerCode, setLastPeriodDate, setCycleLength, setPeriodLength, setDueDate, setBabyData, setRole, setLifeStage]
+    [setOnboarded, setPartnerCode, setLastPeriodDate, setCycleLength, setPeriodLength, setDueDate, setBabyData, setRole, setLifeStage, setLinkedPartnerId]
   );
 
   // ─────────────────────────────────────────
