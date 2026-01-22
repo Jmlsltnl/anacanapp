@@ -17,6 +17,7 @@ import CalendarScreen from '@/components/CalendarScreen';
 import DoctorReportScreen from '@/components/DoctorReportScreen';
 import AdminPanel from '@/components/AdminPanel';
 import BottomNav from '@/components/BottomNav';
+import MotherChatScreen from '@/components/MotherChatScreen';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -31,6 +32,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [activeScreen, setActiveScreen] = useState<string | null>(null);
   const [showAdmin, setShowAdmin] = useState(false);
+  const [showMotherChat, setShowMotherChat] = useState(false);
   const { isAuthenticated, isOnboarded, role } = useUserStore();
   const { isAdmin, loading } = useAuth();
 
@@ -82,7 +84,7 @@ const Index = () => {
       case 'home':
         return (
           <motion.div key="home" variants={pageVariants} initial="initial" animate="animate" exit="exit">
-            <Dashboard />
+            <Dashboard onOpenChat={() => setShowMotherChat(true)} />
           </motion.div>
         );
       case 'tools':
@@ -155,6 +157,11 @@ const Index = () => {
   }
   if (activeScreen === 'report') {
     return <DoctorReportScreen onBack={() => setActiveScreen(null)} />;
+  }
+
+  // Mother chat overlay (for woman role)
+  if (showMotherChat && role === 'woman') {
+    return <MotherChatScreen onBack={() => setShowMotherChat(false)} />;
   }
 
   return (

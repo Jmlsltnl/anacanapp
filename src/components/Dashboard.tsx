@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Droplets, Moon, Utensils, Activity, Plus, TrendingUp, Heart, Sparkles, 
   Bell, ChevronRight, Flame, Target, Calendar, Zap, Sun, Cloud, Wind,
-  ThermometerSun, Pill, Baby, Footprints, Scale, Clock, Star, Award
+  ThermometerSun, Pill, Baby, Footprints, Scale, Clock, Star, Award,
+  MessageCircle
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { FRUIT_SIZES } from '@/types/anacan';
@@ -11,6 +12,7 @@ import { hapticFeedback } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useBabyLogs } from '@/hooks/useBabyLogs';
+import { useAuth } from '@/hooks/useAuth';
 
 interface QuickActionProps {
   icon: any;
@@ -986,8 +988,13 @@ const MommyDashboard = () => {
   );
 };
 
-const Dashboard = () => {
+interface DashboardProps {
+  onOpenChat?: () => void;
+}
+
+const Dashboard = ({ onOpenChat }: DashboardProps) => {
   const { lifeStage, name } = useUserStore();
+  const { profile } = useAuth();
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -995,6 +1002,8 @@ const Dashboard = () => {
     if (hour < 18) return 'Günortanız xeyir';
     return 'Axşamınız xeyir';
   };
+
+  const hasPartner = !!profile?.linked_partner_id;
 
   return (
     <div className="pb-28 pt-2 px-5">
@@ -1008,16 +1017,28 @@ const Dashboard = () => {
           <p className="text-muted-foreground font-medium">{getGreeting()}</p>
           <h1 className="text-2xl font-black text-foreground">{name || 'Xanım'} 👋</h1>
         </div>
-        <motion.button 
-          className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center relative"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Bell className="w-6 h-6 text-primary" />
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive rounded-full text-[10px] font-bold text-white flex items-center justify-center">
-            3
-          </span>
-        </motion.button>
+        <div className="flex items-center gap-2">
+          {hasPartner && (
+            <motion.button 
+              onClick={onOpenChat}
+              className="w-12 h-12 rounded-2xl bg-partner/10 flex items-center justify-center relative"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <MessageCircle className="w-6 h-6 text-partner" />
+            </motion.button>
+          )}
+          <motion.button 
+            className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center relative"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Bell className="w-6 h-6 text-primary" />
+            <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive rounded-full text-[10px] font-bold text-white flex items-center justify-center">
+              3
+            </span>
+          </motion.button>
+        </div>
       </motion.div>
 
       {lifeStage === 'flow' && <FlowDashboard />}

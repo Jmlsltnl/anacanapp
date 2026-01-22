@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
+import { notifyIncomingChatMessage } from '@/lib/chat-notifications';
 
 export interface PartnerMessage {
   id: string;
@@ -160,6 +161,15 @@ export const usePartnerMessages = () => {
               }
             } catch {
               // Content is not JSON, use as-is
+            }
+
+            // Trigger native phone notification for text/love messages
+            if (['text', 'love'].includes(newMessage.message_type)) {
+              const title = newMessage.message_type === 'love' ? 'Sevgi aldınız! ❤️' : 'Yeni mesaj 💬';
+              const body = newMessage.message_type === 'love'
+                ? 'Partnyorunuz sizə sevgi göndərdi'
+                : (typeof newMessage.content === 'string' ? newMessage.content.slice(0, 60) : 'Mesaj gəldi');
+              void notifyIncomingChatMessage({ title, body, idSeed: Date.now() });
             }
 
             // Show appropriate toast based on message type
