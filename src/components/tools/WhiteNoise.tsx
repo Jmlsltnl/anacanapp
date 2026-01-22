@@ -1,7 +1,9 @@
-import { useState, useEffect, forwardRef } from 'react';
+import { useState, useEffect, useRef, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Pause, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, Pause, Volume2, VolumeX, Crown, Lock } from 'lucide-react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useSubscription } from '@/hooks/useSubscription';
+import { PremiumModal } from '@/components/PremiumModal';
 
 interface Sound {
   id: string;
@@ -31,12 +33,24 @@ interface WhiteNoiseProps {
 
 const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref) => {
   const { preferences, loading, updateWhiteNoiseVolume, updateWhiteNoiseTimer, updateLastWhiteNoiseSound } = useUserPreferences();
+  const { isPremium, canUseWhiteNoise, trackWhiteNoiseUsage, freeLimits } = useSubscription();
   
   const [activeSound, setActiveSound] = useState<string | null>(null);
   const [volume, setVolume] = useState(70);
   const [isMuted, setIsMuted] = useState(false);
   const [timer, setTimer] = useState<number | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [usageInfo, setUsageInfo] = useState<{ allowed: boolean; remainingSeconds: number }>({ allowed: true, remainingSeconds: Infinity });
+  
+  const trackingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const lastTrackTimeRef = useRef<number>(Date.now());
+
+  // Check usage limits
+  useEffect(() => {
+    const info = canUseWhiteNoise();
+    setUsageInfo(info);
+  }, [canUseWhiteNoise]);
 
   // Initialize from preferences
   useEffect(() => {
@@ -44,18 +58,23 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
       setVolume(preferences.white_noise_volume || 70);
       setTimer(preferences.white_noise_timer);
       if (preferences.last_white_noise_sound) {
-        setActiveSound(preferences.last_white_noise_sound);
-        if (preferences.white_noise_timer) {
-          setTimeRemaining(preferences.white_noise_timer * 60);
+        // Check if user can still use
+        const { allowed } = canUseWhiteNoise();
+        if (allowed || isPremium) {
+          setActiveSound(preferences.last_white_noise_sound);
+          if (preferences.white_noise_timer) {
+            setTimeRemaining(preferences.white_noise_timer * 60);
+          }
         }
       }
     }
-  }, [preferences]);
+  }, [preferences, isPremium]);
 
+  // Timer countdown and usage tracking
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
     
-    if (timeRemaining !== null && timeRemaining > 0) {
+    if (activeSound && timeRemaining !== null && timeRemaining > 0) {
       interval = setInterval(() => {
         setTimeRemaining(prev => {
           if (prev === null || prev <= 1) {
@@ -66,23 +85,85 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
           return prev - 1;
         });
       }, 1000);
+    } else if (activeSound && timeRemaining === null) {
+      // No timer set, still count down for free users based on remaining time
+      if (!isPremium) {
+        interval = setInterval(() => {
+          const info = canUseWhiteNoise();
+          setUsageInfo(info);
+          
+          if (!info.allowed) {
+            setActiveSound(null);
+            updateLastWhiteNoiseSound(null);
+            setShowPremiumModal(true);
+          }
+        }, 1000);
+      }
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [timeRemaining]);
+  }, [activeSound, timeRemaining, isPremium]);
+
+  // Track usage every 10 seconds for free users
+  useEffect(() => {
+    if (activeSound && !isPremium) {
+      trackingIntervalRef.current = setInterval(() => {
+        const now = Date.now();
+        const elapsed = Math.floor((now - lastTrackTimeRef.current) / 1000);
+        if (elapsed >= 10) {
+          trackWhiteNoiseUsage(10);
+          lastTrackTimeRef.current = now;
+        }
+      }, 10000);
+
+      return () => {
+        if (trackingIntervalRef.current) {
+          clearInterval(trackingIntervalRef.current);
+          // Track remaining time when stopping
+          const now = Date.now();
+          const elapsed = Math.floor((now - lastTrackTimeRef.current) / 1000);
+          if (elapsed > 0) {
+            trackWhiteNoiseUsage(elapsed);
+          }
+        }
+      };
+    }
+  }, [activeSound, isPremium]);
 
   const handleSoundToggle = async (soundId: string) => {
     if (activeSound === soundId) {
+      // Stop playing
+      const now = Date.now();
+      const elapsed = Math.floor((now - lastTrackTimeRef.current) / 1000);
+      if (elapsed > 0 && !isPremium) {
+        await trackWhiteNoiseUsage(elapsed);
+      }
+      
       setActiveSound(null);
       setTimeRemaining(null);
       await updateLastWhiteNoiseSound(null);
     } else {
+      // Check if user can use
+      const { allowed } = canUseWhiteNoise();
+      if (!allowed && !isPremium) {
+        setShowPremiumModal(true);
+        return;
+      }
+      
+      lastTrackTimeRef.current = Date.now();
       setActiveSound(soundId);
       await updateLastWhiteNoiseSound(soundId);
+      
       if (timer) {
         setTimeRemaining(timer * 60);
+      } else if (!isPremium) {
+        // For free users without timer, set remaining time as the limit
+        const info = canUseWhiteNoise();
+        if (info.remainingSeconds < Infinity) {
+          setTimeRemaining(info.remainingSeconds);
+        }
       }
     }
   };
@@ -98,6 +179,9 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
     await updateWhiteNoiseTimer(newTimer);
     if (activeSound && newTimer) {
       setTimeRemaining(newTimer * 60);
+    } else if (!isPremium && activeSound) {
+      const info = canUseWhiteNoise();
+      setTimeRemaining(info.remainingSeconds < Infinity ? info.remainingSeconds : null);
     } else {
       setTimeRemaining(null);
     }
@@ -109,12 +193,18 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const timerOptions = [
-    { value: null, label: 'Bitməz' },
-    { value: 15, label: '15 dəq' },
-    { value: 30, label: '30 dəq' },
-    { value: 60, label: '1 saat' },
-  ];
+  const timerOptions = isPremium 
+    ? [
+        { value: null, label: 'Bitməz' },
+        { value: 15, label: '15 dəq' },
+        { value: 30, label: '30 dəq' },
+        { value: 60, label: '1 saat' },
+      ]
+    : [
+        { value: 10, label: '10 dəq' },
+        { value: 15, label: '15 dəq' },
+        { value: 20, label: '20 dəq' },
+      ];
 
   if (loading) {
     return (
@@ -124,10 +214,12 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
     );
   }
 
+  const remainingMinutes = Math.floor(usageInfo.remainingSeconds / 60);
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="gradient-primary px-5 pt-4 pb-10 safe-top">
+      <div className="gradient-primary px-5 pt-14 pb-10 rounded-b-[2rem] flex-shrink-0">
         <div className="flex items-center gap-4">
           <motion.button
             onClick={onBack}
@@ -141,10 +233,59 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
             <h1 className="text-xl font-bold text-white">Bəyaz Küylər</h1>
             <p className="text-white/80 text-sm">Körpəni sakitləşdirin</p>
           </div>
+          {isPremium && (
+            <div className="bg-amber-400 text-amber-900 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+              <Crown className="w-3 h-3" />
+              Premium
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="px-5 -mt-6">
+      {/* Content - Scrollable */}
+      <div className="flex-1 overflow-y-auto px-5 -mt-6">
+        {/* Free tier usage info */}
+        {!isPremium && (
+          <motion.div
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className={`rounded-2xl p-4 mb-4 flex items-center gap-3 ${
+              usageInfo.remainingSeconds < 300 
+                ? 'bg-red-50 dark:bg-red-900/20' 
+                : 'bg-amber-50 dark:bg-amber-900/20'
+            }`}
+          >
+            {usageInfo.remainingSeconds < 300 ? (
+              <Lock className="w-5 h-5 text-red-500 flex-shrink-0" />
+            ) : (
+              <Crown className="w-5 h-5 text-amber-500 flex-shrink-0" />
+            )}
+            <div className="flex-1">
+              <p className={`text-sm font-medium ${
+                usageInfo.remainingSeconds < 300 
+                  ? 'text-red-800 dark:text-red-200'
+                  : 'text-amber-800 dark:text-amber-200'
+              }`}>
+                Bu gün qalan: {remainingMinutes} dəqiqə
+              </p>
+              <p className={`text-xs mt-0.5 ${
+                usageInfo.remainingSeconds < 300 
+                  ? 'text-red-600 dark:text-red-300'
+                  : 'text-amber-600 dark:text-amber-300'
+              }`}>
+                Limitsiz istifadə üçün Premium-a keçin
+              </p>
+            </div>
+            <motion.button
+              onClick={() => setShowPremiumModal(true)}
+              className="bg-amber-400 text-amber-900 px-3 py-1.5 rounded-xl text-xs font-bold"
+              whileTap={{ scale: 0.95 }}
+            >
+              Premium
+            </motion.button>
+          </motion.div>
+        )}
+
         {/* Now Playing Card */}
         <AnimatePresence>
           {activeSound && (
@@ -248,11 +389,16 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
               </button>
             ))}
           </div>
+          {!isPremium && (
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              Limitsiz taymer üçün Premium-a keçin
+            </p>
+          )}
         </div>
 
         {/* Sounds Grid */}
         <h3 className="font-bold text-foreground mb-4">Səslər</h3>
-        <div className="grid grid-cols-3 gap-3 pb-8">
+        <div className="grid grid-cols-3 gap-3 pb-24">
           {sounds.map((sound, index) => {
             const isActive = activeSound === sound.id;
             return (
@@ -293,6 +439,13 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
           })}
         </div>
       </div>
+
+      {/* Premium Modal */}
+      <PremiumModal 
+        isOpen={showPremiumModal} 
+        onClose={() => setShowPremiumModal(false)}
+        feature="Limitsiz bəyaz küy"
+      />
     </div>
   );
 });
