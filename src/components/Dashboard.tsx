@@ -13,6 +13,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useBabyLogs } from '@/hooks/useBabyLogs';
 import { useAuth } from '@/hooks/useAuth';
+import { useKickSessions } from '@/hooks/useKickSessions';
+import { useWeightEntries } from '@/hooks/useWeightEntries';
 
 interface QuickActionProps {
   icon: any;
@@ -306,8 +308,18 @@ const BumpDashboard = () => {
   const { getPregnancyData } = useUserStore();
   const { toast } = useToast();
   const pregData = getPregnancyData();
-  const [kickCount, setKickCount] = useState(8);
-  const [waterCount, setWaterCount] = useState(5);
+  const { todayLog, updateWaterIntake } = useDailyLogs();
+  const { getTodayStats, addSession } = useKickSessions();
+  const { entries: weightEntries } = useWeightEntries();
+  
+  const todayStats = getTodayStats();
+  const kickCount = todayStats.totalKicks;
+  const waterCount = todayLog?.water_intake || 0;
+  
+  // Calculate weight gain from first entry
+  const latestWeight = weightEntries[0]?.weight;
+  const firstWeight = weightEntries[weightEntries.length - 1]?.weight;
+  const weightGain = latestWeight && firstWeight ? (latestWeight - firstWeight).toFixed(1) : '0';
 
   if (!pregData) return null;
 
@@ -336,10 +348,20 @@ const BumpDashboard = () => {
 
   const addKick = async () => {
     await hapticFeedback.medium();
-    setKickCount(prev => prev + 1);
+    // Add a quick single-kick session for tracking
+    await addSession(1, 0);
     toast({
       title: "Təpik qeyd edildi! 👶",
       description: `Bu gün ${kickCount + 1} təpik`,
+    });
+  };
+
+  const addWater = async () => {
+    await hapticFeedback.light();
+    await updateWaterIntake(1);
+    toast({
+      title: "Su əlavə edildi! 💧",
+      description: `${waterCount + 1}/8 stəkan`,
     });
   };
 
@@ -439,7 +461,7 @@ const BumpDashboard = () => {
           transition={{ delay: 0.2 }}
         >
           <Scale className="w-6 h-6 text-emerald-500 mx-auto mb-2" />
-          <p className="text-2xl font-black text-foreground">+8.5</p>
+          <p className="text-2xl font-black text-foreground">+{weightGain}</p>
           <p className="text-xs text-muted-foreground">kq çəki</p>
         </motion.div>
       </div>
@@ -501,7 +523,7 @@ const BumpDashboard = () => {
           label="Su" 
           color="bg-blue-50 text-blue-600" 
           value={`${waterCount}/8`}
-          onClick={() => setWaterCount(prev => Math.min(prev + 1, 10))}
+          onClick={addWater}
         />
         <QuickActionButton icon={Pill} label="Vitamin" color="bg-emerald-50 text-emerald-600" />
         <QuickActionButton icon={Activity} label="Məşq" color="bg-amber-50 text-amber-600" />
