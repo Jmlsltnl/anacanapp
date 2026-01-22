@@ -75,67 +75,59 @@ Deno.serve(async (req) => {
 
     console.log("Editing image with prompt:", editPrompt);
 
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) {
+    // Use Lovable AI Gateway for image editing
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
       return new Response(JSON.stringify({ error: "AI service not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Use imagen-3.0-generate-002 for image generation
-    const model = "imagen-3.0-generate-002";
-    const baseUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:predict`;
-
-    let cleanBase64 = sourceImageBase64;
-    let mimeType = "image/jpeg";
-    
-    if (sourceImageBase64.includes(",")) {
-      const parts = sourceImageBase64.split(",");
-      cleanBase64 = parts[1];
-      const mimeMatch = parts[0].match(/data:([^;]+);/);
-      if (mimeMatch) {
-        mimeType = mimeMatch[1];
-      }
+    // Format image URL for Lovable AI
+    let imageUrl = sourceImageBase64;
+    if (!sourceImageBase64.startsWith("data:")) {
+      imageUrl = `data:image/jpeg;base64,${sourceImageBase64}`;
     }
 
-    // For image editing, use gemini-2.0-flash with native image generation
-    const editModel = "gemini-2.0-flash";
-    const editUrl = `https://generativelanguage.googleapis.com/v1beta/models/${editModel}:generateContent`;
-
-    const aiResponse = await fetch(`${editUrl}?key=${GEMINI_API_KEY}`, {
+    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        contents: [
+        model: "google/gemini-2.5-flash-image-preview",
+        messages: [
           {
-            parts: [
+            role: "user",
+            content: [
+              { type: "text", text: editPrompt },
               {
-                inlineData: {
-                  mimeType: mimeType,
-                  data: cleanBase64,
-                },
-              },
-              { text: editPrompt },
-            ],
-          },
+                type: "image_url",
+                image_url: { url: imageUrl }
+              }
+            ]
+          }
         ],
-        generationConfig: {
-          responseModalities: ["TEXT", "IMAGE"],
-          responseMimeType: "image/png",
-        },
+        modalities: ["image", "text"]
       }),
     });
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
-      console.error("Gemini API error:", aiResponse.status, errorText);
+      console.error("Lovable AI error:", aiResponse.status, errorText);
       
       if (aiResponse.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later." }), {
           status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      
+      if (aiResponse.status === 402) {
+        return new Response(JSON.stringify({ error: "Payment required. Please add credits to continue." }), {
+          status: 402,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
@@ -147,21 +139,12 @@ Deno.serve(async (req) => {
     }
 
     const aiData = await aiResponse.json();
-    console.log("Gemini Response received");
+    console.log("Lovable AI Response received");
 
-    const parts = aiData.candidates?.[0]?.content?.parts || [];
-    let imageData: string | null = null;
-    let imageFormat = "png";
-
-    for (const part of parts) {
-      if (part.inlineData) {
-        imageData = part.inlineData.data;
-        imageFormat = part.inlineData.mimeType?.split("/")?.[1] || "png";
-        break;
-      }
-    }
-
-    if (!imageData) {
+    // Extract image from response
+    const generatedImage = aiData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    
+    if (!generatedImage) {
       console.error("No image in response:", JSON.stringify(aiData));
       return new Response(JSON.stringify({ error: "No image generated" }), {
         status: 500,
@@ -169,6 +152,20 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Extract base64 data from data URL
+    const base64Match = generatedImage.match(/^data:image\/(\w+);base64,(.+)$/);
+    if (!base64Match) {
+      console.error("Invalid image format");
+      return new Response(JSON.stringify({ error: "Invalid image format" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const imageFormat = base64Match[1];
+    const imageData = base64Match[2];
+    
+    // Convert base64 to binary
     const binaryData = Uint8Array.from(atob(imageData), (c) => c.charCodeAt(0));
 
     const fileName = `${user.id}/${Date.now()}-${backgroundTheme}.${imageFormat}`;
