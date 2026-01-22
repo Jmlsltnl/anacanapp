@@ -1,13 +1,16 @@
 import { useState, useRef } from 'react';
-import { X, Image, Video, Send, Loader2, Play } from 'lucide-react';
+import { X, Image, Video, Send, Loader2, Play, Smile } from 'lucide-react';
+import EmojiPicker, { EmojiClickData, Theme } from 'emoji-picker-react';
 import { CommunityGroup, useCreatePost } from '@/hooks/useCommunity';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
+import { useTheme } from 'next-themes';
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -22,11 +25,34 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<{ url: string; type: 'image' | 'video' }[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const createPost = useCreatePost();
   const { toast } = useToast();
+  const { theme } = useTheme();
+
+  const handleEmojiSelect = (emojiData: EmojiClickData) => {
+    const emoji = emojiData.emoji;
+    const textarea = textareaRef.current;
+    
+    if (textarea) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const newContent = content.substring(0, start) + emoji + content.substring(end);
+      setContent(newContent);
+      
+      // Reset cursor position after emoji
+      setTimeout(() => {
+        textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+        textarea.focus();
+      }, 0);
+    } else {
+      setContent(prev => prev + emoji);
+    }
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video') => {
     const files = Array.from(e.target.files || []);
@@ -153,6 +179,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
     setContent('');
     setMediaFiles([]);
     setMediaPreviews([]);
+    setShowEmojiPicker(false);
     onClose();
   };
 
@@ -190,13 +217,36 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
             </Select>
           </div>
 
-          {/* Content */}
-          <Textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Nə düşünürsünüz? ✨"
-            className="min-h-[120px] rounded-xl resize-none text-base bg-muted/50 border-border focus:border-primary"
-          />
+          {/* Content with Emoji Picker */}
+          <div className="relative">
+            <Textarea
+              ref={textareaRef}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Nə düşünürsünüz? ✨"
+              className="min-h-[120px] rounded-xl resize-none text-base bg-muted/50 border-border focus:border-primary pr-12"
+            />
+            <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="absolute right-3 top-3 w-8 h-8 rounded-lg bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
+                >
+                  <Smile className="w-5 h-5 text-muted-foreground" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 border-0" align="end" side="top">
+                <EmojiPicker
+                  onEmojiClick={handleEmojiSelect}
+                  theme={theme === 'dark' ? Theme.DARK : Theme.LIGHT}
+                  width={300}
+                  height={350}
+                  searchPlaceholder="Emoji axtar..."
+                  previewConfig={{ showPreview: false }}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
 
           {/* Media Previews */}
           {mediaPreviews.length > 0 && (
