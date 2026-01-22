@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
-
+import { usePartnerNotifications } from './usePartnerNotifications';
 export interface KickSession {
   id: string;
   user_id: string;
@@ -18,7 +18,8 @@ export const useKickSessions = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
-
+  const { notifyKickSession } = usePartnerNotifications();
+  const notifiedForTenKicks = useRef(false);
   const fetchSessions = async () => {
     if (!user) return;
     
@@ -65,6 +66,16 @@ export const useKickSessions = () => {
         description: `${kickCount} təpik, ${Math.floor(durationSeconds / 60)} dəqiqə`,
       });
 
+      // Calculate total kicks today including new session
+      const today = new Date().toISOString().split('T')[0];
+      const todayTotal = todaySessions.reduce((sum, s) => sum + s.kick_count, 0) + kickCount;
+      
+      // Notify partner when reaching 10 kicks (only once per day)
+      if (todayTotal >= 10 && !notifiedForTenKicks.current) {
+        notifiedForTenKicks.current = true;
+        await notifyKickSession(todayTotal, durationSeconds);
+      }
+
       await fetchSessions();
       return data;
     } catch (error: any) {
@@ -77,6 +88,21 @@ export const useKickSessions = () => {
       return null;
     }
   };
+
+  // Reset notification flag at midnight
+  useEffect(() => {
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    const msUntilMidnight = tomorrow.getTime() - now.getTime();
+
+    const timeout = setTimeout(() => {
+      notifiedForTenKicks.current = false;
+    }, msUntilMidnight);
+
+    return () => clearTimeout(timeout);
+  }, []);
 
   const getTodayStats = () => {
     const totalKicks = todaySessions.reduce((sum, s) => sum + s.kick_count, 0);
