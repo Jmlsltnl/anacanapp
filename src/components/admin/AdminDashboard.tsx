@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Users, Package, TrendingUp, Activity, ArrowUp, ArrowDown, UserPlus } from 'lucide-react';
+import { Users, Package, TrendingUp, Activity, ArrowUp, ArrowDown, UserPlus, Crown, CreditCard } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
-import { formatDistanceToNow } from 'date-fns';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { formatDistanceToNow, subDays, format } from 'date-fns';
 import { az } from 'date-fns/locale';
 
 interface Stats {
@@ -12,12 +12,15 @@ interface Stats {
   totalProducts: number;
   totalLogs: number;
   activeToday: number;
+  premiumUsers: number;
+  newUsersThisWeek: number;
 }
 
 interface DailyStats {
   date: string;
   users: number;
   logs: number;
+  premium: number;
 }
 
 interface LifeStageStats {
@@ -32,6 +35,7 @@ interface RecentUser {
   email: string | null;
   life_stage: string | null;
   created_at: string;
+  is_premium: boolean;
 }
 
 const AdminDashboard = () => {
@@ -39,7 +43,9 @@ const AdminDashboard = () => {
     totalUsers: 0,
     totalProducts: 0,
     totalLogs: 0,
-    activeToday: 0
+    activeToday: 0,
+    premiumUsers: 0,
+    newUsersThisWeek: 0
   });
   const [loading, setLoading] = useState(true);
   const [dailyStats, setDailyStats] = useState<DailyStats[]>([]);
@@ -57,12 +63,12 @@ const AdminDashboard = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, name, email, life_stage, created_at')
+        .select('id, name, email, life_stage, created_at, is_premium')
         .order('created_at', { ascending: false })
         .limit(5);
 
       if (error) throw error;
-      setRecentUsers(data || []);
+      setRecentUsers((data || []) as RecentUser[]);
     } catch (error) {
       console.error('Error fetching recent users:', error);
     }
@@ -70,17 +76,27 @@ const AdminDashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const [profilesRes, productsRes, logsRes] = await Promise.all([
+      // Get all counts in parallel
+      const [profilesRes, productsRes, logsRes, premiumRes, weeklyRes, todayLogsRes] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact', head: true }),
         supabase.from('products').select('id', { count: 'exact', head: true }),
-        supabase.from('daily_logs').select('id', { count: 'exact', head: true })
+        supabase.from('daily_logs').select('id', { count: 'exact', head: true }),
+        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('is_premium', true),
+        supabase.from('profiles')
+          .select('id', { count: 'exact', head: true })
+          .gte('created_at', subDays(new Date(), 7).toISOString()),
+        supabase.from('daily_logs')
+          .select('user_id', { count: 'exact', head: true })
+          .eq('log_date', new Date().toISOString().split('T')[0])
       ]);
 
       setStats({
         totalUsers: profilesRes.count || 0,
         totalProducts: productsRes.count || 0,
         totalLogs: logsRes.count || 0,
-        activeToday: Math.floor(Math.random() * 50) + 10
+        activeToday: todayLogsRes.count || 0,
+        premiumUsers: premiumRes.count || 0,
+        newUsersThisWeek: weeklyRes.count || 0
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -91,63 +107,50 @@ const AdminDashboard = () => {
 
   const fetchDailyStats = async () => {
     try {
-      // Try to get real data from daily_logs
-      const { data: logsData } = await supabase
-        .from('daily_logs')
-        .select('log_date')
-        .gte('log_date', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
-        .order('log_date', { ascending: true });
-
-      // Group logs by date
-      const logsByDate: { [key: string]: number } = {};
-      logsData?.forEach(log => {
-        const date = log.log_date;
-        logsByDate[date] = (logsByDate[date] || 0) + 1;
-      });
-
-      // Get user registrations from profiles
-      const { data: profilesData } = await supabase
-        .from('profiles')
-        .select('created_at')
-        .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
-        .order('created_at', { ascending: true });
-
-      // Group users by date
-      const usersByDate: { [key: string]: number } = {};
-      profilesData?.forEach(profile => {
-        const date = new Date(profile.created_at).toISOString().split('T')[0];
-        usersByDate[date] = (usersByDate[date] || 0) + 1;
-      });
-
-      // Generate last 7 days with real or fallback data
       const days = [];
+      
       for (let i = 6; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const dateStr = date.toISOString().split('T')[0];
-        const hasRealData = (logsByDate[dateStr] || 0) + (usersByDate[dateStr] || 0) > 0;
+        const date = subDays(new Date(), i);
+        const dateStr = format(date, 'yyyy-MM-dd');
         
+        // Get logs for this day
+        const { count: logsCount } = await supabase
+          .from('daily_logs')
+          .select('id', { count: 'exact', head: true })
+          .eq('log_date', dateStr);
+
+        // Get new users for this day
+        const startOfDay = new Date(date);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(date);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        const { count: usersCount } = await supabase
+          .from('profiles')
+          .select('id', { count: 'exact', head: true })
+          .gte('created_at', startOfDay.toISOString())
+          .lte('created_at', endOfDay.toISOString());
+
+        // Get new premium subscriptions
+        const { count: premiumCount } = await supabase
+          .from('subscriptions')
+          .select('id', { count: 'exact', head: true })
+          .gte('created_at', startOfDay.toISOString())
+          .lte('created_at', endOfDay.toISOString());
+
         days.push({
-          date: date.toLocaleDateString('az-AZ', { weekday: 'short' }),
-          users: usersByDate[dateStr] || (hasRealData ? 0 : Math.floor(Math.random() * 15) + 3),
-          logs: logsByDate[dateStr] || (hasRealData ? 0 : Math.floor(Math.random() * 40) + 10)
+          date: format(date, 'EEE', { locale: az }),
+          users: usersCount || 0,
+          logs: logsCount || 0,
+          premium: premiumCount || 0
         });
       }
+      
       setDailyStats(days);
     } catch (error) {
       console.error('Error fetching daily stats:', error);
-      // Fallback to sample data
-      const days = [];
-      for (let i = 6; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        days.push({
-          date: date.toLocaleDateString('az-AZ', { weekday: 'short' }),
-          users: Math.floor(Math.random() * 20) + 5,
-          logs: Math.floor(Math.random() * 50) + 20
-        });
-      }
-      setDailyStats(days);
+      // Fallback to empty data
+      setDailyStats([]);
     }
   };
 
@@ -188,32 +191,32 @@ const AdminDashboard = () => {
       value: stats.totalUsers, 
       icon: Users, 
       color: 'bg-blue-500',
-      trend: '+12%',
-      trendUp: true
+      trend: stats.newUsersThisWeek > 0 ? `+${stats.newUsersThisWeek}` : '0',
+      trendUp: stats.newUsersThisWeek > 0
     },
     { 
-      label: 'Məhsullar', 
-      value: stats.totalProducts, 
-      icon: Package, 
-      color: 'bg-green-500',
-      trend: '+5%',
-      trendUp: true
-    },
-    { 
-      label: 'Günlük Qeydlər', 
-      value: stats.totalLogs, 
-      icon: Activity, 
-      color: 'bg-purple-500',
-      trend: '+23%',
+      label: 'Premium İstifadəçilər', 
+      value: stats.premiumUsers, 
+      icon: Crown, 
+      color: 'bg-amber-500',
+      trend: stats.premiumUsers > 0 ? `${Math.round((stats.premiumUsers / Math.max(stats.totalUsers, 1)) * 100)}%` : '0%',
       trendUp: true
     },
     { 
       label: 'Bu gün aktiv', 
       value: stats.activeToday, 
-      icon: TrendingUp, 
-      color: 'bg-orange-500',
-      trend: '-3%',
-      trendUp: false
+      icon: Activity, 
+      color: 'bg-emerald-500',
+      trend: stats.activeToday > 0 ? 'aktiv' : 'gözləyirik',
+      trendUp: stats.activeToday > 0
+    },
+    { 
+      label: 'Bu həftə yeni', 
+      value: stats.newUsersThisWeek, 
+      icon: UserPlus, 
+      color: 'bg-purple-500',
+      trend: 'son 7 gün',
+      trendUp: true
     },
   ];
 
