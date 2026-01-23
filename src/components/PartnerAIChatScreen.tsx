@@ -6,6 +6,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useUserStore } from '@/store/userStore';
 import { usePartnerData } from '@/hooks/usePartnerData';
+import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
+import { useFruitImages } from '@/hooks/useFruitImages';
+import { FRUIT_SIZES } from '@/types/anacan';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -37,6 +40,27 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   
   const pregnancyWeek = getPregnancyWeek();
   const partnerName = partnerProfile?.name || 'Həyat yoldaşın';
+  
+  // Calculate pregnancy day for dynamic content
+  const pregnancyDay = partnerProfile?.last_period_date 
+    ? Math.floor((Date.now() - new Date(partnerProfile.last_period_date).getTime()) / (1000 * 60 * 60 * 24)) + 1
+    : 0;
+  
+  // Fetch dynamic pregnancy content (same as woman's dashboard)
+  const { data: dayContent } = usePregnancyContentByDay(pregnancyDay > 0 ? pregnancyDay : undefined);
+  const { data: fruitImages = [] } = useFruitImages();
+  
+  // Get dynamic fruit data
+  const getDynamicFruitName = () => {
+    if (pregnancyWeek <= 0) return null;
+    
+    const dbData = fruitImages.find(f => f.week_number === pregnancyWeek);
+    const staticData = FRUIT_SIZES[pregnancyWeek];
+    
+    return dayContent?.baby_size_fruit || dbData?.fruit_name || staticData?.fruit || null;
+  };
+  
+  const dynamicFruit = getDynamicFruitName();
 
   // Quick questions for partners
   const quickQuestions: QuickQuestion[] = [
@@ -86,14 +110,15 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
 
   useEffect(() => {
     if (messages.length === 0) {
+      const fruitInfo = dynamicFruit ? ` Körpəniz hazırda ${dynamicFruit} böyüklüyündədir!` : '';
       setMessages([{
         id: 'welcome',
         role: 'assistant',
-        content: `Salam, ${name || 'qardaş'}! 👋\n\nMən Anacan.AI - sənin partnyor məsləhətçinəm. ${partnerName}${partnerProfile?.life_stage === 'bump' ? `ın hamiləliyinin ${pregnancyWeek || ''}. həftəsində` : ''} ona necə dəstək ola biləcəyin barədə sənə kömək edəcəyəm. 💪\n\nAşağıdakı suallardan birini seç və ya öz sualını yaz!`,
+        content: `Salam, ${name || 'qardaş'}! 👋\n\nMən Anacan.AI - sənin partnyor məsləhətçinəm. ${partnerName}${partnerProfile?.life_stage === 'bump' ? `ın hamiləliyinin ${pregnancyWeek || ''}. həftəsində` : ''} ona necə dəstək ola biləcəyin barədə sənə kömək edəcəyəm.${fruitInfo} 💪\n\nAşağıdakı suallardan birini seç və ya öz sualını yaz!`,
         timestamp: new Date()
       }]);
     }
-  }, [name, partnerName, pregnancyWeek]);
+  }, [name, partnerName, pregnancyWeek, dynamicFruit]);
 
   useEffect(() => {
     if (scrollRef.current) {

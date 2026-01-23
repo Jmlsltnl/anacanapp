@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useUserStore } from '@/store/userStore';
+import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
+import { useFruitImages } from '@/hooks/useFruitImages';
+import { FRUIT_SIZES } from '@/types/anacan';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -25,6 +28,26 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const { toast } = useToast();
   
   const pregnancyData = getPregnancyData();
+  
+  // Calculate pregnancy day for dynamic content
+  const pregnancyDay = lastPeriodDate 
+    ? Math.floor((Date.now() - new Date(lastPeriodDate).getTime()) / (1000 * 60 * 60 * 24)) + 1
+    : 0;
+  
+  // Fetch dynamic pregnancy content
+  const { data: dayContent } = usePregnancyContentByDay(pregnancyDay > 0 && lifeStage === 'bump' ? pregnancyDay : undefined);
+  const { data: fruitImages = [] } = useFruitImages();
+  
+  // Get dynamic fruit data
+  const getDynamicFruitName = () => {
+    if (!pregnancyData || lifeStage !== 'bump') return null;
+    
+    const currentWeek = pregnancyData.currentWeek;
+    const dbData = fruitImages.find(f => f.week_number === currentWeek);
+    const staticData = FRUIT_SIZES[currentWeek];
+    
+    return dayContent?.baby_size_fruit || dbData?.fruit_name || staticData?.fruit || pregnancyData.babySize.fruit;
+  };
   
   // Create profile object from store data
   const userProfile = {
@@ -56,12 +79,13 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
 
   const getWelcomeMessage = () => {
     const userName = name ? `, ${name}` : '';
+    const dynamicFruit = getDynamicFruitName();
     
     switch (lifeStage) {
       case 'flow':
         return `Salam${userName}! 👋 Mən Anacan.AI, sizin sağlamlıq rəfiqənizəm. Menstrual sikliniz, simptomlarınız və ya ümumi sağlamlığınız haqqında suallarınız varsa, kömək etməkdən məmnun olaram! 💜`;
       case 'bump':
-        return `Salam, əziz ana${userName}! 🤰 Mən Anacan.AI. ${pregnancyData ? `Hamiləliyin ${pregnancyData.currentWeek}-ci həftəsindəsiniz - körpəniz ${pregnancyData.babySize.fruit} böyüklüyündədir! ` : ''}Hamiləliyiniz haqqında hər hansı sualınız varsa, buradayam! 🌸`;
+        return `Salam, əziz ana${userName}! 🤰 Mən Anacan.AI. ${pregnancyData ? `Hamiləliyin ${pregnancyData.currentWeek}-ci həftəsindəsiniz - körpəniz ${dynamicFruit || pregnancyData.babySize.fruit} böyüklüyündədir! ` : ''}Hamiləliyiniz haqqında hər hansı sualınız varsa, buradayam! 🌸`;
       case 'mommy':
         return `Salam, əziz ana${userName}! 👶 Mən Anacan.AI. Körpə baxımı, əmizdirmə, yuxu qaydaları və ya doğuşdan sonra bərpa haqqında suallarınız varsa, sizə kömək etməyə hazıram! 💕`;
       default:
