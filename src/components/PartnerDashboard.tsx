@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Heart, Bell, ShoppingCart, MessageCircle, 
@@ -6,7 +6,7 @@ import {
   Sparkles, Baby, Clock, AlertCircle, Home,
   Coffee, Flower2, Stethoscope, Star, Trophy,
   Target, Zap, Send, Droplets, Activity, BarChart3,
-  Moon, Smile, Frown, Meh, User, Timer
+  Moon, Smile, Frown, Meh, User, Timer, RefreshCw
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { hapticFeedback } from '@/lib/native';
@@ -16,6 +16,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { usePartnerData } from '@/hooks/usePartnerData';
 import { usePartnerMessages } from '@/hooks/usePartnerMessages';
 import { usePartnerMissions } from '@/hooks/usePartnerMissions';
+import { useDailyMissions } from '@/hooks/useDailyMissions';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useFruitImages } from '@/hooks/useFruitImages';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,22 +24,8 @@ import { FRUIT_SIZES } from '@/types/anacan';
 import PartnerChatScreen from './partner/PartnerChatScreen';
 import WeeklyStatsTab from './partner/WeeklyStatsTab';
 import NotificationsTab from './partner/NotificationsTab';
-
-interface SurpriseIdea {
-  id: string;
-  title: string;
-  description: string;
-  emoji: string;
-}
-
-const SURPRISE_IDEAS: SurpriseIdea[] = [
-  { id: '1', title: 'Romantik şam yeməyi', description: 'Evdə xüsusi bir axşam yeməyi hazırla', emoji: '🕯️' },
-  { id: '2', title: 'Spa günü', description: 'Evdə masaj və baxım seansi düzəlt', emoji: '💆‍♀️' },
-  { id: '3', title: 'Sürpriz hədiyyə', description: 'Kiçik amma mənalı bir hədiyyə al', emoji: '🎁' },
-  { id: '4', title: 'Gəzinti', description: 'Parkda və ya sahildə romantik gəzinti', emoji: '🌅' },
-  { id: '5', title: 'Mesaj yazı', description: 'Sevgi dolu bir məktub yaz', emoji: '💌' },
-  { id: '6', title: 'Çiçək gətir', description: 'Gözəl bir buket çiçək al', emoji: '💐' },
-];
+import SurpriseTab from './partner/SurpriseTab';
+import LevelUpCelebration from './partner/LevelUpCelebration';
 
 // Animated Progress Ring
 const ProgressRing = ({ progress, size = 120, strokeWidth = 10, color = 'stroke-white' }: {
@@ -130,9 +117,21 @@ const PartnerDashboard = () => {
   const { partnerProfile, partnerDailyLog, loading: partnerLoading, getPregnancyWeek, getDaysUntilDue, getBabyAgeDays } = usePartnerData();
   const { items: shoppingItems, addItem, toggleItem, loading: shoppingLoading } = useShoppingItems();
   const { messages, markAsRead, getUnreadCount } = usePartnerMessages();
-  const { missions, toggleMission: toggleMissionHook, totalPoints, level, pointsToNextLevel, levelProgress, completedCount } = usePartnerMissions();
+  const { missions: persistedMissions, toggleMission: toggleMissionHook, totalPoints, level, pointsToNextLevel, levelProgress, completedCount } = usePartnerMissions();
+  const { dailyMissions } = useDailyMissions();
   const [activeTab, setActiveTab] = useState<'home' | 'missions' | 'shopping' | 'notifications' | 'stats' | 'surprise'>('home');
   const [showChat, setShowChat] = useState(false);
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const previousLevelRef = useRef(level);
+
+  // Merge daily missions with persisted state
+  const missions = dailyMissions.map(dm => {
+    const persisted = persistedMissions.find(pm => pm.id === dm.id);
+    return {
+      ...dm,
+      isCompleted: persisted?.isCompleted || false,
+    };
+  });
 
   const [newItem, setNewItem] = useState('');
   const [loveMessage, setLoveMessage] = useState('');
@@ -186,14 +185,27 @@ const PartnerDashboard = () => {
   
   const weekData = getFruitData();
   
+  // Track level changes for celebration
+  useEffect(() => {
+    if (level > previousLevelRef.current && previousLevelRef.current > 0) {
+      setShowLevelUp(true);
+    }
+    previousLevelRef.current = level;
+  }, [level]);
+
   const toggleMission = async (id: string) => {
     await hapticFeedback.medium();
-    const result = await toggleMissionHook(id);
+    
+    // Find mission in daily missions
+    const mission = missions.find(m => m.id === id);
+    if (!mission) return;
+    
+    const result = await toggleMissionHook(id, mission.points);
     
     if (result?.completed) {
       toast({
         title: `+${result.pointsEarned} xal qazandın! 🎉`,
-        description: missions.find(m => m.id === id)?.title,
+        description: mission.title,
       });
     }
   };
@@ -339,6 +351,13 @@ const PartnerDashboard = () => {
 
   return (
     <div className="min-h-screen pb-28 bg-background">
+      {/* Level Up Celebration */}
+      <LevelUpCelebration 
+        show={showLevelUp} 
+        level={level} 
+        onClose={() => setShowLevelUp(false)} 
+      />
+
       {/* Hero Header */}
       <div className="bg-gradient-to-br from-partner via-indigo-600 to-violet-700 px-5 pt-6 pb-16 relative overflow-hidden">
         {/* Decorative elements */}
@@ -716,7 +735,13 @@ const PartnerDashboard = () => {
                 />
               </div>
 
-              <h2 className="font-bold text-lg">Gündəlik Tapşırıqlar</h2>
+              <div className="flex items-center justify-between">
+                <h2 className="font-bold text-lg">Gündəlik Tapşırıqlar</h2>
+                <span className="text-xs text-muted-foreground bg-muted px-3 py-1 rounded-full flex items-center gap-1">
+                  <RefreshCw className="w-3 h-3" />
+                  Hər gün yenilənir
+                </span>
+              </div>
 
               {missions.map((mission, index) => {
                 const Icon = mission.icon;
@@ -895,6 +920,8 @@ const PartnerDashboard = () => {
               )}
             </motion.div>
           )}
+
+          {activeTab === 'surprise' && <SurpriseTab />}
         </AnimatePresence>
       </div>
     </div>
