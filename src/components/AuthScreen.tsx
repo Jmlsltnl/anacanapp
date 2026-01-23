@@ -155,11 +155,12 @@ const AuthScreen = () => {
             return;
           }
           
-          // Update partner's profile to link back to me
-          await supabase
-            .from('profiles')
-            .update({ linked_partner_id: myProfile.id })
-            .eq('user_id', partnerProfile.user_id);
+          // Update partner's profile to link back to me using SECURITY DEFINER function
+          await supabase.rpc('link_partners', {
+            p_my_profile_id: myProfile.id,
+            p_partner_profile_id: partnerProfile.id,
+            p_partner_user_id: partnerProfile.user_id
+          });
           
           toast({
             title: 'Uğurla bağlandınız! 🎉',
