@@ -20,6 +20,30 @@ import { useBabyMilestones, MILESTONES } from '@/hooks/useBabyMilestones';
 import { useAchievements } from '@/hooks/useAchievements';
 import { useWeeklyTips } from '@/hooks/useDynamicContent';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
+import { useUnreadMessages } from '@/hooks/useUnreadMessages';
+
+// Fetus images by month
+import FetusMonth1 from '@/assets/fetus/month-1.svg';
+import FetusMonth2 from '@/assets/fetus/month-2.svg';
+import FetusMonth3 from '@/assets/fetus/month-3.svg';
+import FetusMonth4 from '@/assets/fetus/month-4.svg';
+import FetusMonth5 from '@/assets/fetus/month-5.svg';
+import FetusMonth6 from '@/assets/fetus/month-6.svg';
+import FetusMonth7 from '@/assets/fetus/month-7.svg';
+import FetusMonth8 from '@/assets/fetus/month-8.svg';
+import FetusMonth9 from '@/assets/fetus/month-9.svg';
+
+const FETUS_IMAGES: { [key: number]: string } = {
+  1: FetusMonth1,
+  2: FetusMonth2,
+  3: FetusMonth3,
+  4: FetusMonth4,
+  5: FetusMonth5,
+  6: FetusMonth6,
+  7: FetusMonth7,
+  8: FetusMonth8,
+  9: FetusMonth9,
+};
 
 interface QuickActionProps {
   icon: any;
@@ -456,37 +480,82 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
         </div>
       </motion.div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-3 gap-3">
+      {/* Baby Development Image Section */}
+      <motion.div 
+        className="bg-gradient-to-br from-pink-50 via-rose-50 to-purple-50 dark:from-pink-950/30 dark:via-rose-950/20 dark:to-purple-950/20 rounded-3xl p-6 shadow-card border border-pink-100/50 dark:border-pink-800/30"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.1 }}
+      >
+        <div className="flex flex-col items-center">
+          {/* Fetus Image */}
+          <motion.div 
+            className="w-48 h-48 mb-4 relative"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2, type: "spring" }}
+          >
+            <img 
+              src={FETUS_IMAGES[Math.min(Math.ceil(pregData.currentWeek / 4.4), 9)] || FETUS_IMAGES[1]} 
+              alt={`${pregData.currentWeek} həftəlik körpə`}
+              className="w-full h-full object-contain drop-shadow-lg"
+            />
+            <motion.div
+              className="absolute -bottom-2 -right-2 w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center"
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <span className="text-2xl">{weekData.emoji}</span>
+            </motion.div>
+          </motion.div>
+          
+          {/* Week and Day Info */}
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground font-medium mb-1">Hazırki vəziyyət</p>
+            <p className="text-2xl font-black text-foreground">
+              {pregData.currentWeek}. həftə, {pregData.currentDay}. gün
+            </p>
+            <p className="text-sm text-primary font-medium mt-1">
+              {weekData.fruit} boyunda • {weekData.lengthCm} sm • {weekData.weightG}g
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Stats Grid - Show kick counter only after week 16 */}
+      <div className={`grid ${pregData.currentWeek >= 16 ? 'grid-cols-3' : 'grid-cols-2'} gap-3`}>
         <motion.div 
           className="bg-card rounded-2xl p-4 shadow-card border border-border/50 text-center"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.15 }}
         >
           <Calendar className="w-6 h-6 text-primary mx-auto mb-2" />
           <p className="text-2xl font-black text-foreground">{daysLeft}</p>
           <p className="text-xs text-muted-foreground">gün qaldı</p>
         </motion.div>
 
-        <motion.button 
-          onClick={addKick}
-          className="bg-card rounded-2xl p-4 shadow-card border border-border/50 text-center"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.15 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Footprints className="w-6 h-6 text-pink-500 mx-auto mb-2" />
-          <p className="text-2xl font-black text-foreground">{kickCount}</p>
-          <p className="text-xs text-muted-foreground">təpik</p>
-        </motion.button>
+        {/* Only show kick counter after week 16 */}
+        {pregData.currentWeek >= 16 && (
+          <motion.button 
+            onClick={addKick}
+            className="bg-card rounded-2xl p-4 shadow-card border border-border/50 text-center"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Footprints className="w-6 h-6 text-pink-500 mx-auto mb-2" />
+            <p className="text-2xl font-black text-foreground">{kickCount}</p>
+            <p className="text-xs text-muted-foreground">təpik</p>
+          </motion.button>
+        )}
 
         <motion.div 
           className="bg-card rounded-2xl p-4 shadow-card border border-border/50 text-center"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.25 }}
         >
           <Scale className="w-6 h-6 text-emerald-500 mx-auto mb-2" />
           <p className="text-2xl font-black text-foreground">+{weightGain}</p>
@@ -1241,6 +1310,7 @@ interface DashboardProps {
 const Dashboard = ({ onOpenChat, onNavigateToTool }: DashboardProps) => {
   const { lifeStage, name } = useUserStore();
   const { profile } = useAuth();
+  const { unreadCount } = useUnreadMessages();
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -1272,6 +1342,15 @@ const Dashboard = ({ onOpenChat, onNavigateToTool }: DashboardProps) => {
               whileTap={{ scale: 0.95 }}
             >
               <MessageCircle className="w-6 h-6 text-partner" />
+              {unreadCount > 0 && (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-destructive rounded-full text-[10px] font-bold text-white flex items-center justify-center"
+                >
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </motion.span>
+              )}
             </motion.button>
           )}
           <motion.button 

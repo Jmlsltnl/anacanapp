@@ -184,36 +184,68 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
           </p>
         </motion.div>
 
-        {/* Recent Sessions */}
+        {/* Recent Sessions - Grouped by Day */}
         {sessions.length > 0 && (
-          <div>
+          <div className="pb-8">
             <h3 className="font-bold text-foreground mb-4">Son sessiyalar</h3>
-            <div className="space-y-3 pb-8">
-              {sessions.slice(0, 5).map((session, index) => (
-                <motion.div
-                  key={session.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="bg-card rounded-2xl p-4 shadow-card border border-border/50 flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                      <Footprints className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-foreground">{session.kick_count} təpik</p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(session.created_at).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </div>
+            {(() => {
+              // Group sessions by date
+              const grouped: { [date: string]: typeof sessions } = {};
+              sessions.forEach(session => {
+                const date = session.session_date;
+                if (!grouped[date]) grouped[date] = [];
+                grouped[date].push(session);
+              });
+              
+              const formatDateLabel = (dateStr: string) => {
+                const date = new Date(dateStr);
+                const today = new Date().toISOString().split('T')[0];
+                const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+                
+                if (dateStr === today) return 'Bu gün';
+                if (dateStr === yesterday) return 'Dünən';
+                return date.toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' });
+              };
+              
+              return Object.entries(grouped).slice(0, 5).map(([date, daySessions]) => (
+                <div key={date} className="mb-4">
+                  {/* Date Header */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-sm font-bold text-primary">{formatDateLabel(date)}</span>
+                    <span className="text-xs text-muted-foreground">
+                      ({daySessions.reduce((sum, s) => sum + s.kick_count, 0)} təpik)
+                    </span>
                   </div>
-                  <span className="text-sm text-muted-foreground font-mono">
-                    {formatTime(session.duration_seconds)}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
+                  
+                  <div className="space-y-2">
+                    {daySessions.map((session, index) => (
+                      <motion.div
+                        key={session.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="bg-card rounded-2xl p-4 shadow-card border border-border/50 flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                            <Footprints className="w-5 h-5 text-primary" />
+                          </div>
+                          <div>
+                            <p className="font-bold text-foreground">{session.kick_count} təpik</p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(session.created_at).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+                        </div>
+                        <span className="text-sm text-muted-foreground font-mono">
+                          {formatTime(session.duration_seconds)}
+                        </span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              ));
+            })()}
           </div>
         )}
       </div>
