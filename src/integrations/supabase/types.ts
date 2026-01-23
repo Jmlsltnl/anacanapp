@@ -1627,6 +1627,14 @@ export type Database = {
         Args: { _group_id: string; _user_id: string }
         Returns: boolean
       }
+      link_partners: {
+        Args: {
+          p_my_profile_id: string
+          p_partner_profile_id: string
+          p_partner_user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "user" | "moderator"
