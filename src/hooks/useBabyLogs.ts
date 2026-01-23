@@ -94,8 +94,11 @@ export const useBabyLogs = () => {
       }
     });
 
-    // Count feeding by type
-    const breastFeedingCount = feedingLogs.filter(l => l.feed_type === 'breast_left' || l.feed_type === 'breast_right').length;
+    // Count feeding by type - support both old and new format
+    const breastFeedingCount = feedingLogs.filter(l => 
+      l.feed_type === 'breast_left' || l.feed_type === 'breast_right' || 
+      l.feed_type === 'left' || l.feed_type === 'right'
+    ).length;
     const formulaCount = feedingLogs.filter(l => l.feed_type === 'formula').length;
     const solidCount = feedingLogs.filter(l => l.feed_type === 'solid').length;
 
