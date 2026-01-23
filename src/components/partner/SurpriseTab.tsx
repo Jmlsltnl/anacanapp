@@ -3,13 +3,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Gift, Check, Clock, Heart, Sparkles, 
   Calendar, Star, ChefHat, Music, Camera,
-  Flower2, MapPin, MessageCircle, ShoppingBag
+  Flower2, MapPin, MessageCircle, ShoppingBag,
+  History, Trophy, Trash2, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { hapticFeedback } from '@/lib/native';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePartnerData } from '@/hooks/usePartnerData';
+import { useSurprises } from '@/hooks/useSurprises';
+import { format } from 'date-fns';
+import { az } from 'date-fns/locale';
 
 interface SurpriseIdea {
   id: string;
@@ -115,7 +119,7 @@ const SURPRISE_IDEAS: SurpriseIdea[] = [
   },
   { 
     id: '10', 
-    title: 'Musiqi playlistи', 
+    title: 'Musiqi playlisti', 
     description: 'Birgə dinlədiyiniz mahnılardan playlist hazırla.', 
     emoji: '🎵',
     icon: Music,
@@ -125,23 +129,25 @@ const SURPRISE_IDEAS: SurpriseIdea[] = [
   },
 ];
 
-interface PlannedSurprise {
-  id: string;
-  surpriseId: string;
-  plannedDate: string;
-  status: 'planned' | 'completed';
-  notes?: string;
-}
-
 const SurpriseTab = () => {
   const { toast } = useToast();
   const { profile } = useAuth();
   const { partnerProfile } = usePartnerData();
+  const { 
+    plannedSurprises, 
+    completedSurprises, 
+    totalPoints,
+    isLoading,
+    addSurprise, 
+    completeSurprise,
+    deleteSurprise 
+  } = useSurprises();
+  
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [plannedSurprises, setPlannedSurprises] = useState<PlannedSurprise[]>([]);
   const [selectedSurprise, setSelectedSurprise] = useState<SurpriseIdea | null>(null);
   const [planningDate, setPlanningDate] = useState('');
   const [planningNotes, setPlanningNotes] = useState('');
+  const [showHistory, setShowHistory] = useState(false);
 
   const categories = [
     { id: 'all', label: 'Hamısı', emoji: '✨' },
@@ -179,57 +185,64 @@ const SurpriseTab = () => {
 
     await hapticFeedback.medium();
 
-    const newPlanned: PlannedSurprise = {
-      id: Date.now().toString(),
-      surpriseId: selectedSurprise.id,
-      plannedDate: planningDate,
-      status: 'planned',
-      notes: planningNotes,
-    };
-
-    setPlannedSurprises(prev => [...prev, newPlanned]);
-
-    // Send notification to partner
-    if (profile && partnerProfile) {
-      try {
-        await supabase.from('partner_messages').insert({
-          sender_id: profile.user_id,
-          receiver_id: partnerProfile.user_id,
-          message_type: 'surprise_planned',
-          content: `🎁 Həyat yoldaşın sənin üçün xüsusi bir sürpriz planladı!`,
-        });
-      } catch (err) {
-        console.error('Error sending surprise notification:', err);
-      }
-    }
-
-    toast({
-      title: 'Sürpriz planlandı! 🎉',
-      description: `${selectedSurprise.title} - ${new Date(planningDate).toLocaleDateString('az-AZ')}`,
+    const result = await addSurprise({
+      surprise_id: selectedSurprise.id,
+      surprise_title: selectedSurprise.title,
+      surprise_emoji: selectedSurprise.emoji,
+      surprise_category: selectedSurprise.category,
+      surprise_points: selectedSurprise.points,
+      planned_date: planningDate,
+      notes: planningNotes || undefined,
     });
 
-    setSelectedSurprise(null);
-    setPlanningDate('');
-    setPlanningNotes('');
+    if (result) {
+      // Send notification to partner
+      if (profile && partnerProfile) {
+        try {
+          await supabase.from('partner_messages').insert({
+            sender_id: profile.user_id,
+            receiver_id: partnerProfile.user_id,
+            message_type: 'surprise_planned',
+            content: `🎁 Həyat yoldaşın sənin üçün xüsusi bir sürpriz planladı!`,
+          });
+        } catch (err) {
+          console.error('Error sending surprise notification:', err);
+        }
+      }
+
+      toast({
+        title: 'Sürpriz planlandı! 🎉',
+        description: `${selectedSurprise.title} - ${format(new Date(planningDate), 'd MMMM yyyy', { locale: az })}`,
+      });
+
+      setSelectedSurprise(null);
+      setPlanningDate('');
+      setPlanningNotes('');
+    }
   };
 
-  const completeSurprise = async (planned: PlannedSurprise) => {
+  const handleCompleteSurprise = async (id: string, title: string, points: number) => {
     await hapticFeedback.heavy();
+    
+    const success = await completeSurprise(id);
+    if (success) {
+      toast({
+        title: `+${points} xal qazandın! 🏆`,
+        description: `${title} tamamlandı!`,
+      });
+    }
+  };
 
-    setPlannedSurprises(prev => 
-      prev.map(p => p.id === planned.id ? { ...p, status: 'completed' as const } : p)
-    );
-
-    const surprise = SURPRISE_IDEAS.find(s => s.id === planned.surpriseId);
-
+  const handleDeleteSurprise = async (id: string) => {
+    await hapticFeedback.light();
+    await deleteSurprise(id);
     toast({
-      title: `+${surprise?.points || 0} xal qazandın! 🏆`,
-      description: `${surprise?.title || 'Sürpriz'} tamamlandı!`,
+      title: 'Sürpriz silindi',
     });
   };
 
   const isPlanned = (surpriseId: string) => 
-    plannedSurprises.some(p => p.surpriseId === surpriseId && p.status === 'planned');
+    plannedSurprises.some(p => p.surprise_id === surpriseId);
 
   return (
     <motion.div
@@ -237,60 +250,143 @@ const SurpriseTab = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="space-y-5"
+      className="space-y-5 pb-32"
     >
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
-          <Gift className="w-6 h-6 text-white" />
+      {/* Header with Stats */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+            <Gift className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h2 className="font-bold text-lg">Sürpriz Planla</h2>
+            <p className="text-sm text-muted-foreground">Onu xoşbəxt etmək üçün</p>
+          </div>
         </div>
-        <div>
-          <h2 className="font-bold text-lg">Sürpriz Planla</h2>
-          <p className="text-sm text-muted-foreground">Onu xoşbəxt etmək üçün ideyalar</p>
+        
+        {/* Stats Badge */}
+        <div className="flex items-center gap-2 bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 px-4 py-2 rounded-2xl">
+          <Trophy className="w-5 h-5 text-amber-600" />
+          <div className="text-right">
+            <p className="text-xs text-amber-700 dark:text-amber-400">Toplam</p>
+            <p className="font-bold text-amber-800 dark:text-amber-300">{totalPoints} xal</p>
+          </div>
         </div>
       </div>
 
       {/* Planned Surprises */}
-      {plannedSurprises.filter(p => p.status === 'planned').length > 0 && (
+      {plannedSurprises.length > 0 && (
         <div className="space-y-3">
           <h3 className="font-semibold flex items-center gap-2">
             <Clock className="w-4 h-4 text-partner" />
-            Planlanmış Sürprizlər
+            Planlanmış Sürprizlər ({plannedSurprises.length})
           </h3>
-          {plannedSurprises.filter(p => p.status === 'planned').map(planned => {
-            const surprise = SURPRISE_IDEAS.find(s => s.id === planned.surpriseId);
-            if (!surprise) return null;
-            
-            return (
-              <motion.div
-                key={planned.id}
-                className="bg-gradient-to-r from-partner/10 to-violet-500/10 rounded-2xl p-4 border border-partner/20"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-              >
-                <div className="flex items-center gap-4">
-                  <div className="text-3xl">{surprise.emoji}</div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold">{surprise.title}</h4>
-                    <p className="text-sm text-muted-foreground flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {new Date(planned.plannedDate).toLocaleDateString('az-AZ')}
-                    </p>
-                  </div>
+          {plannedSurprises.map(planned => (
+            <motion.div
+              key={planned.id}
+              className="bg-gradient-to-r from-partner/10 to-violet-500/10 rounded-2xl p-4 border border-partner/20"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              layout
+            >
+              <div className="flex items-center gap-4">
+                <div className="text-3xl">{planned.surprise_emoji}</div>
+                <div className="flex-1">
+                  <h4 className="font-semibold">{planned.surprise_title}</h4>
+                  <p className="text-sm text-muted-foreground flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    {format(new Date(planned.planned_date), 'd MMMM yyyy', { locale: az })}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
                   <motion.button
-                    onClick={() => completeSurprise(planned)}
+                    onClick={() => handleDeleteSurprise(planned.id)}
+                    className="w-9 h-9 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 flex items-center justify-center"
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </motion.button>
+                  <motion.button
+                    onClick={() => handleCompleteSurprise(planned.id, planned.surprise_title, planned.surprise_points)}
                     className="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center"
                     whileTap={{ scale: 0.9 }}
                   >
                     <Check className="w-5 h-5" />
                   </motion.button>
                 </div>
-                {planned.notes && (
-                  <p className="text-sm text-muted-foreground mt-2 pl-12">{planned.notes}</p>
-                )}
+              </div>
+              {planned.notes && (
+                <p className="text-sm text-muted-foreground mt-2 pl-12">{planned.notes}</p>
+              )}
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      {/* Completed Surprises History */}
+      {completedSurprises.length > 0 && (
+        <div className="space-y-3">
+          <motion.button
+            onClick={() => setShowHistory(!showHistory)}
+            className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-2xl border border-emerald-200 dark:border-emerald-800"
+            whileTap={{ scale: 0.98 }}
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center">
+                <History className="w-5 h-5 text-white" />
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-emerald-800 dark:text-emerald-200">Sürpriz Tarixçəsi</h3>
+                <p className="text-sm text-emerald-600 dark:text-emerald-400">
+                  {completedSurprises.length} sürpriz tamamlanıb
+                </p>
+              </div>
+            </div>
+            <motion.div
+              animate={{ rotate: showHistory ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ChevronDown className="w-5 h-5 text-emerald-600" />
+            </motion.div>
+          </motion.button>
+
+          <AnimatePresence>
+            {showHistory && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-2 overflow-hidden"
+              >
+                {completedSurprises.map((surprise, index) => (
+                  <motion.div
+                    key={surprise.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="bg-card rounded-xl p-3 border border-border/50 flex items-center gap-3"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-xl">
+                      {surprise.surprise_emoji}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-sm">{surprise.surprise_title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {surprise.completed_date 
+                          ? format(new Date(surprise.completed_date), 'd MMM yyyy', { locale: az })
+                          : 'Tamamlandı'
+                        }
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1 bg-amber-100 dark:bg-amber-900/30 px-2 py-1 rounded-lg">
+                      <Star className="w-3 h-3 text-amber-600" />
+                      <span className="text-xs font-bold text-amber-700 dark:text-amber-400">+{surprise.surprise_points}</span>
+                    </div>
+                  </motion.div>
+                ))}
               </motion.div>
-            );
-          })}
+            )}
+          </AnimatePresence>
         </div>
       )}
 
@@ -316,7 +412,6 @@ const SurpriseTab = () => {
       {/* Surprise Ideas Grid */}
       <div className="grid gap-4">
         {filteredIdeas.map((idea, index) => {
-          const Icon = idea.icon;
           const planned = isPlanned(idea.id);
           
           return (
