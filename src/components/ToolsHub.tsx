@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Shield, Timer, Scale, Baby, Briefcase, 
   Volume2, Heart, Footprints, ChevronRight,
-  Utensils, Activity, ArrowLeft, Camera, ChefHat
+  Utensils, Activity, ArrowLeft, Camera, ChefHat, Lock
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import SafetyLookup from './tools/SafetyLookup';
@@ -18,6 +18,7 @@ import Exercises from './tools/Exercises';
 import MoodDiary from './tools/MoodDiary';
 import BabyPhotoshoot from './tools/BabyPhotoshoot';
 import Recipes from './tools/Recipes';
+import { useToast } from '@/hooks/use-toast';
 
 interface Tool {
   id: string;
@@ -26,17 +27,19 @@ interface Tool {
   icon: any;
   color: string;
   bgColor: string;
+  minWeek?: number; // Minimum pregnancy week required
+  stages?: string[]; // Which stages this tool is available for
 }
 
 const tools: Tool[] = [
   { id: 'photoshoot', name: 'Fotosessiya', description: 'AI körpə fotoları', icon: Camera, color: 'text-rose-600', bgColor: 'bg-rose-50' },
   { id: 'recipes', name: 'Sağlam Reseptlər', description: 'Hamiləlik reseptləri', icon: ChefHat, color: 'text-green-600', bgColor: 'bg-green-50' },
   { id: 'safety', name: 'Təhlükəsizlik', description: 'Qida və fəaliyyət yoxlayın', icon: Shield, color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
-  { id: 'kick', name: 'Təpik Sayğacı', description: 'Körpə hərəkətlərini izləyin', icon: Footprints, color: 'text-pink-600', bgColor: 'bg-pink-50' },
-  { id: 'contraction', name: 'Sancı Ölçən', description: '5-1-1 qaydası ilə izləyin', icon: Timer, color: 'text-violet-600', bgColor: 'bg-violet-50' },
+  { id: 'kick', name: 'Təpik Sayğacı', description: 'Körpə hərəkətlərini izləyin', icon: Footprints, color: 'text-pink-600', bgColor: 'bg-pink-50', minWeek: 16, stages: ['bump'] },
+  { id: 'contraction', name: 'Sancı Ölçən', description: '5-1-1 qaydası ilə izləyin', icon: Timer, color: 'text-violet-600', bgColor: 'bg-violet-50', stages: ['bump'] },
   { id: 'weight', name: 'Çəki İzləyici', description: 'AI analiz ilə çəki takibi', icon: Scale, color: 'text-blue-600', bgColor: 'bg-blue-50' },
   { id: 'names', name: 'Körpə Adları', description: 'Azərbaycan adları', icon: Baby, color: 'text-amber-600', bgColor: 'bg-amber-50' },
-  { id: 'hospital', name: 'Xəstəxana Çantası', description: 'Doğuş üçün hazırlıq', icon: Briefcase, color: 'text-teal-600', bgColor: 'bg-teal-50' },
+  { id: 'hospital', name: 'Xəstəxana Çantası', description: 'Doğuş üçün hazırlıq', icon: Briefcase, color: 'text-teal-600', bgColor: 'bg-teal-50', stages: ['bump'] },
   { id: 'whitenoise', name: 'Bəyaz Küylər', description: 'Körpəni sakitləşdirin', icon: Volume2, color: 'text-indigo-600', bgColor: 'bg-indigo-50' },
   { id: 'nutrition', name: 'Qidalanma', description: 'Sağlam qida planı', icon: Utensils, color: 'text-orange-600', bgColor: 'bg-orange-50' },
   { id: 'exercise', name: 'Məşqlər', description: 'Hamiləlik məşqləri', icon: Activity, color: 'text-cyan-600', bgColor: 'bg-cyan-50' },
@@ -51,6 +54,9 @@ interface ToolsHubProps {
 const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTool, setActiveTool] = useState<string | null>(initialTool);
+  const { lifeStage, getPregnancyData } = useUserStore();
+  const { toast } = useToast();
+  const pregData = getPregnancyData();
 
   // Effect to set initial tool from props
   useEffect(() => {
@@ -58,6 +64,41 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
       setActiveTool(initialTool);
     }
   }, [initialTool]);
+
+  const isToolAvailable = (tool: Tool) => {
+    // Check stage restriction
+    if (tool.stages && !tool.stages.includes(lifeStage || '')) {
+      return false;
+    }
+    // Check week restriction for bump stage
+    if (tool.minWeek && lifeStage === 'bump') {
+      const currentWeek = pregData?.currentWeek || 0;
+      if (currentWeek < tool.minWeek) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const handleToolClick = (tool: Tool) => {
+    if (!isToolAvailable(tool)) {
+      if (tool.minWeek && lifeStage === 'bump') {
+        toast({
+          title: `${tool.name} hələ aktiv deyil`,
+          description: `Bu alət ${tool.minWeek}. həftədən sonra aktivləşəcək`,
+          variant: 'destructive',
+        });
+      } else if (tool.stages) {
+        toast({
+          title: `${tool.name} mövcud deyil`,
+          description: `Bu alət yalnız hamiləlik dövründə istifadə oluna bilər`,
+          variant: 'destructive',
+        });
+      }
+      return;
+    }
+    setActiveTool(tool.id);
+  };
 
   const filteredTools = tools.filter(tool => 
     tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -132,22 +173,33 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
       <div className="grid grid-cols-2 gap-4">
         {filteredTools.map((tool, index) => {
           const Icon = tool.icon;
+          const available = isToolAvailable(tool);
           return (
             <motion.button
               key={tool.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              onClick={() => setActiveTool(tool.id)}
-              className="bg-card rounded-3xl p-5 text-left shadow-card border border-border/50"
-              whileHover={{ scale: 1.02, y: -2 }}
-              whileTap={{ scale: 0.98 }}
+              onClick={() => handleToolClick(tool)}
+              className={`bg-card rounded-3xl p-5 text-left shadow-card border border-border/50 relative ${!available ? 'opacity-50' : ''}`}
+              whileHover={available ? { scale: 1.02, y: -2 } : {}}
+              whileTap={available ? { scale: 0.98 } : {}}
             >
+              {!available && (
+                <div className="absolute top-3 right-3">
+                  <Lock className="w-4 h-4 text-muted-foreground" />
+                </div>
+              )}
               <div className={`w-14 h-14 rounded-2xl ${tool.bgColor} flex items-center justify-center mb-4`}>
                 <Icon className={`w-7 h-7 ${tool.color}`} />
               </div>
               <h3 className="font-bold text-foreground mb-1">{tool.name}</h3>
               <p className="text-xs text-muted-foreground">{tool.description}</p>
+              {tool.minWeek && lifeStage === 'bump' && !available && (
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  {tool.minWeek}. həftədən aktiv
+                </p>
+              )}
             </motion.button>
           );
         })}

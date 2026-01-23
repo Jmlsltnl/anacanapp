@@ -475,6 +475,31 @@ const PartnerDashboard = () => {
               exit={{ opacity: 0, y: -20 }}
               className="space-y-5"
             >
+              {/* New Messages Banner */}
+              {getUnreadCount() > 0 && (
+                <motion.button
+                  onClick={() => setShowChat(true)}
+                  className="w-full bg-gradient-to-r from-partner/20 to-indigo-500/20 rounded-2xl p-4 border border-partner/30 flex items-center gap-4 text-left"
+                  initial={{ y: -10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                >
+                  <div className="w-12 h-12 rounded-full bg-partner/20 flex items-center justify-center">
+                    <MessageCircle className="w-6 h-6 text-partner" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-partner">Yeni mesajınız var!</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {getUnreadCount()} oxunmamış mesaj - oxumaq üçün toxunun
+                    </p>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-partner flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">{getUnreadCount()}</span>
+                  </div>
+                </motion.button>
+              )}
+
               {/* Quick Message */}
               <motion.div
                 className="bg-card rounded-2xl p-5 shadow-lg border border-border/50"

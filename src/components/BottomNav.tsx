@@ -58,8 +58,8 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
           {(isPartner ? partnerTabs : womanTabs).map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
-            // Show badge on profile tab for unread messages
-            const showBadge = tab.id === 'profile' && unreadCount > 0;
+            // Show badge on chat tab for unread messages (both partner and woman)
+            const showBadge = (tab.id === 'chat' || (tab.id === 'home' && !isPartner)) && unreadCount > 0;
             
             return (
               <motion.button
