@@ -221,11 +221,33 @@ const SurpriseTab = () => {
     }
   };
 
-  const handleCompleteSurprise = async (id: string, title: string, points: number) => {
+  const handleCompleteSurprise = async (id: string, title: string, points: number, emoji: string) => {
     await hapticFeedback.heavy();
     
     const success = await completeSurprise(id);
     if (success) {
+      // Send completion notification to partner
+      if (profile && partnerProfile) {
+        try {
+          await supabase.from('partner_messages').insert({
+            sender_id: profile.user_id,
+            receiver_id: partnerProfile.user_id,
+            message_type: 'surprise_completed',
+            content: `${emoji} Həyat yoldaşın "${title}" sürprizini sənin üçün tamamladı! 🎉`,
+          });
+
+          // Also add to notifications table
+          await supabase.from('notifications').insert({
+            user_id: partnerProfile.user_id,
+            notification_type: 'surprise',
+            title: 'Sürpriz Tamamlandı! 🎁',
+            message: `${profile.name || 'Həyat yoldaşın'} sənin üçün "${title}" sürprizini tamamladı! ${emoji}`,
+          });
+        } catch (err) {
+          console.error('Error sending surprise completion notification:', err);
+        }
+      }
+
       toast({
         title: `+${points} xal qazandın! 🏆`,
         description: `${title} tamamlandı!`,
@@ -307,7 +329,7 @@ const SurpriseTab = () => {
                     <Trash2 className="w-4 h-4" />
                   </motion.button>
                   <motion.button
-                    onClick={() => handleCompleteSurprise(planned.id, planned.surprise_title, planned.surprise_points)}
+                    onClick={() => handleCompleteSurprise(planned.id, planned.surprise_title, planned.surprise_points, planned.surprise_emoji)}
                     className="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center"
                     whileTap={{ scale: 0.9 }}
                   >

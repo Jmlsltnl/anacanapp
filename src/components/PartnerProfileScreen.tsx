@@ -3,12 +3,13 @@ import { motion } from 'framer-motion';
 import { 
   User, Settings, Bell, Shield, HelpCircle, LogOut, 
   ChevronRight, Crown, Heart, MessageCircle, Sparkles,
-  Trophy, Target, Star, Gift
+  Trophy, Target, Star, Gift, TrendingUp, BarChart3
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useToast } from '@/hooks/use-toast';
 import { usePartnerStats } from '@/hooks/usePartnerStats';
 import { usePartnerMissions } from '@/hooks/usePartnerMissions';
+import { useSurprises } from '@/hooks/useSurprises';
 
 interface PartnerProfileScreenProps {
   onNavigate?: (screen: string) => void;
@@ -19,13 +20,32 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
   const { toast } = useToast();
   const { stats, loading: statsLoading } = usePartnerStats();
   const { level, levelProgress, pointsToNextLevel } = usePartnerMissions();
+  const { 
+    completedSurprises, 
+    totalPoints: surprisePoints, 
+    categoryStats, 
+    monthlyChartData,
+    topCategory 
+  } = useSurprises();
+
+  const getCategoryLabel = (category: string) => {
+    switch (category) {
+      case 'romantic': return { label: 'Romantik', emoji: '❤️', color: 'from-pink-500 to-rose-600' };
+      case 'care': return { label: 'Qayğı', emoji: '🤗', color: 'from-violet-500 to-purple-600' };
+      case 'adventure': return { label: 'Macəra', emoji: '🌟', color: 'from-amber-500 to-orange-600' };
+      case 'gift': return { label: 'Hədiyyə', emoji: '🎁', color: 'from-emerald-500 to-teal-600' };
+      default: return { label: category, emoji: '✨', color: 'from-blue-500 to-indigo-600' };
+    }
+  };
+
+  const maxPoints = Math.max(...monthlyChartData.map(d => d.points), 1);
 
   const achievements = [
     { id: '1', name: 'İlk Sevgi', emoji: '💕', unlocked: true },
     { id: '2', name: 'Dəstəkçi', emoji: '🤝', unlocked: true },
-    { id: '3', name: 'Qayğıkeş', emoji: '🌟', unlocked: true },
-    { id: '4', name: 'Super Partner', emoji: '🏆', unlocked: false },
-    { id: '5', name: 'Ailə Qəhrəmanı', emoji: '👑', unlocked: false },
+    { id: '3', name: 'Qayğıkeş', emoji: '🌟', unlocked: completedSurprises.length >= 3 },
+    { id: '4', name: 'Super Partner', emoji: '🏆', unlocked: completedSurprises.length >= 10 },
+    { id: '5', name: 'Ailə Qəhrəmanı', emoji: '👑', unlocked: surprisePoints >= 500 },
   ];
 
   const menuItems = [
@@ -99,7 +119,7 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
       >
         <div className="bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl p-4 text-white">
           <Trophy className="w-6 h-6 mb-2" />
-          <p className="text-3xl font-black">{stats.totalPoints}</p>
+          <p className="text-3xl font-black">{stats.totalPoints + surprisePoints}</p>
           <p className="text-xs text-white/80">Toplam Xal</p>
         </div>
         <div className="bg-gradient-to-br from-violet-400 to-purple-600 rounded-2xl p-4 text-white">
@@ -108,9 +128,9 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
           <p className="text-xs text-white/80">Tapşırıq</p>
         </div>
         <div className="bg-gradient-to-br from-pink-400 to-rose-500 rounded-2xl p-4 text-white">
-          <Heart className="w-6 h-6 mb-2 fill-white" />
-          <p className="text-3xl font-black">{stats.lovesSent}</p>
-          <p className="text-xs text-white/80">Sevgi Göndərildi</p>
+          <Gift className="w-6 h-6 mb-2" />
+          <p className="text-3xl font-black">{completedSurprises.length}</p>
+          <p className="text-xs text-white/80">Sürpriz</p>
         </div>
         <div className="bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl p-4 text-white">
           <MessageCircle className="w-6 h-6 mb-2" />
@@ -118,6 +138,84 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
           <p className="text-xs text-white/80">Mesaj</p>
         </div>
       </motion.div>
+
+      {/* Surprise Statistics Section */}
+      {completedSurprises.length > 0 && (
+        <motion.div
+          className="bg-card rounded-3xl p-5 mb-6 shadow-card border border-border/50"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.18 }}
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <BarChart3 className="w-5 h-5 text-partner" />
+            <h3 className="font-bold text-foreground">Sürpriz Statistikası</h3>
+          </div>
+
+          {/* Monthly Points Chart */}
+          <div className="mb-5">
+            <p className="text-sm text-muted-foreground mb-3">Aylıq Xal Qrafiki</p>
+            <div className="flex items-end justify-between gap-2 h-24">
+              {monthlyChartData.map((data, index) => (
+                <div key={data.month} className="flex-1 flex flex-col items-center gap-1">
+                  <motion.div
+                    className="w-full bg-gradient-to-t from-partner to-violet-500 rounded-t-lg"
+                    initial={{ height: 0 }}
+                    animate={{ height: `${(data.points / maxPoints) * 100}%` }}
+                    transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
+                    style={{ minHeight: data.points > 0 ? '8px' : '2px' }}
+                  />
+                  <span className="text-[10px] text-muted-foreground font-medium">{data.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Category Breakdown */}
+          <div>
+            <p className="text-sm text-muted-foreground mb-3">Sürpriz Növləri</p>
+            <div className="grid grid-cols-2 gap-2">
+              {Object.entries(categoryStats).map(([category, count]) => {
+                const catInfo = getCategoryLabel(category);
+                return (
+                  <motion.div
+                    key={category}
+                    className={`flex items-center gap-2 p-3 rounded-xl bg-gradient-to-r ${catInfo.color} bg-opacity-10`}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                  >
+                    <span className="text-xl">{catInfo.emoji}</span>
+                    <div>
+                      <p className="text-xs font-medium text-white">{catInfo.label}</p>
+                      <p className="text-lg font-black text-white">{count}</p>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Top Category Badge */}
+          {topCategory && (
+            <motion.div 
+              className="mt-4 flex items-center gap-3 p-3 bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-xl"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-xs text-amber-700 dark:text-amber-400">Ən çox edilən</p>
+                <p className="font-bold text-amber-800 dark:text-amber-300">
+                  {getCategoryLabel(topCategory.category).emoji} {getCategoryLabel(topCategory.category).label} ({topCategory.count} dəfə)
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </motion.div>
+      )}
 
       {/* Level Card */}
       <motion.div
@@ -185,7 +283,7 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
       {/* Linked Partner Info */}
       {partnerWomanData && (
         <motion.div
-          className="bg-gradient-to-r from-pink-50 to-rose-50 rounded-3xl p-5 mb-6 border border-pink-100"
+          className="bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 rounded-3xl p-5 mb-6 border border-pink-100 dark:border-pink-800"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}

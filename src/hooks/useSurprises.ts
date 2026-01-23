@@ -130,11 +130,50 @@ export const useSurprises = () => {
   const completedSurprises = surprises.filter(s => s.status === 'completed');
   const totalPoints = completedSurprises.reduce((sum, s) => sum + s.surprise_points, 0);
 
+  // Category statistics
+  const categoryStats = completedSurprises.reduce((acc, s) => {
+    acc[s.surprise_category] = (acc[s.surprise_category] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Monthly points for chart
+  const monthlyPoints = completedSurprises.reduce((acc, s) => {
+    if (s.completed_date) {
+      const month = new Date(s.completed_date).toISOString().slice(0, 7); // YYYY-MM
+      acc[month] = (acc[month] || 0) + s.surprise_points;
+    }
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Get last 6 months data for chart
+  const getMonthlyChartData = () => {
+    const months: { month: string; points: number; label: string }[] = [];
+    const monthNames = ['Yan', 'Fev', 'Mar', 'Apr', 'May', 'İyn', 'İyl', 'Avq', 'Sen', 'Okt', 'Noy', 'Dek'];
+    
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date();
+      date.setMonth(date.getMonth() - i);
+      const monthKey = date.toISOString().slice(0, 7);
+      months.push({
+        month: monthKey,
+        points: monthlyPoints[monthKey] || 0,
+        label: monthNames[date.getMonth()],
+      });
+    }
+    return months;
+  };
+
+  // Top category
+  const topCategory = Object.entries(categoryStats).sort((a, b) => b[1] - a[1])[0];
+
   return {
     surprises,
     plannedSurprises,
     completedSurprises,
     totalPoints,
+    categoryStats,
+    monthlyChartData: getMonthlyChartData(),
+    topCategory: topCategory ? { category: topCategory[0], count: topCategory[1] } : null,
     isLoading,
     addSurprise,
     completeSurprise,
