@@ -20,12 +20,12 @@ interface ChatMessage {
 }
 
 const PartnerMessagesScreen = () => {
-  const { user, profile } = useAuth();
-  const { partnerProfile } = usePartnerData();
+  const { user, profile, loading: authLoading } = useAuth();
+  const { partnerProfile, loading: partnerLoading } = usePartnerData();
   const { toast } = useToast();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [messagesLoading, setMessagesLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -57,7 +57,7 @@ const PartnerMessagesScreen = () => {
     } catch (error) {
       console.error('Error fetching messages:', error);
     } finally {
-      setLoading(false);
+      setMessagesLoading(false);
     }
   };
 
@@ -197,6 +197,19 @@ const PartnerMessagesScreen = () => {
     }
   });
 
+  // Loading state
+  if (authLoading || partnerLoading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center">
+        <motion.div 
+          className="w-10 h-10 border-4 border-partner border-t-transparent rounded-full"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        />
+      </div>
+    );
+  }
+
   // No partner linked
   if (!partnerProfile) {
     return (
@@ -250,7 +263,7 @@ const PartnerMessagesScreen = () => {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
-        {loading ? (
+        {messagesLoading ? (
           <div className="flex items-center justify-center h-full">
             <motion.div 
               className="w-10 h-10 border-4 border-partner border-t-transparent rounded-full"
