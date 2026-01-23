@@ -314,11 +314,150 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_comment_likes: {
+        Row: {
+          comment_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_comment_likes_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "blog_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          likes_count: number | null
+          parent_comment_id: string | null
+          post_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          likes_count?: number | null
+          parent_comment_id?: string | null
+          post_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          likes_count?: number | null
+          parent_comment_id?: string | null
+          post_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "blog_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blog_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_post_likes: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_post_saves: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_post_saves_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_posts: {
         Row: {
           author_avatar_url: string | null
           author_name: string | null
           category: string
+          comments_count: number | null
           content: string
           cover_image_url: string | null
           created_at: string
@@ -326,7 +465,9 @@ export type Database = {
           id: string
           is_featured: boolean | null
           is_published: boolean | null
+          likes_count: number | null
           reading_time: number | null
+          saves_count: number | null
           slug: string
           tags: string[] | null
           title: string
@@ -337,6 +478,7 @@ export type Database = {
           author_avatar_url?: string | null
           author_name?: string | null
           category?: string
+          comments_count?: number | null
           content: string
           cover_image_url?: string | null
           created_at?: string
@@ -344,7 +486,9 @@ export type Database = {
           id?: string
           is_featured?: boolean | null
           is_published?: boolean | null
+          likes_count?: number | null
           reading_time?: number | null
+          saves_count?: number | null
           slug: string
           tags?: string[] | null
           title: string
@@ -355,6 +499,7 @@ export type Database = {
           author_avatar_url?: string | null
           author_name?: string | null
           category?: string
+          comments_count?: number | null
           content?: string
           cover_image_url?: string | null
           created_at?: string
@@ -362,7 +507,9 @@ export type Database = {
           id?: string
           is_featured?: boolean | null
           is_published?: boolean | null
+          likes_count?: number | null
           reading_time?: number | null
+          saves_count?: number | null
           slug?: string
           tags?: string[] | null
           title?: string
