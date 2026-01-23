@@ -15,6 +15,7 @@ import { useShoppingItems } from '@/hooks/useShoppingItems';
 import { useAuth } from '@/hooks/useAuth';
 import { usePartnerData } from '@/hooks/usePartnerData';
 import { usePartnerMessages } from '@/hooks/usePartnerMessages';
+import { usePartnerMissions } from '@/hooks/usePartnerMissions';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useFruitImages } from '@/hooks/useFruitImages';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,16 +24,21 @@ import PartnerChatScreen from './partner/PartnerChatScreen';
 import WeeklyStatsTab from './partner/WeeklyStatsTab';
 import NotificationsTab from './partner/NotificationsTab';
 
-interface Mission {
+interface SurpriseIdea {
   id: string;
   title: string;
   description: string;
-  icon: any;
-  points: number;
-  isCompleted: boolean;
-  category: 'care' | 'support' | 'surprise';
-  difficulty: 'easy' | 'medium' | 'hard';
+  emoji: string;
 }
+
+const SURPRISE_IDEAS: SurpriseIdea[] = [
+  { id: '1', title: 'Romantik şam yeməyi', description: 'Evdə xüsusi bir axşam yeməyi hazırla', emoji: '🕯️' },
+  { id: '2', title: 'Spa günü', description: 'Evdə masaj və baxım seansi düzəlt', emoji: '💆‍♀️' },
+  { id: '3', title: 'Sürpriz hədiyyə', description: 'Kiçik amma mənalı bir hədiyyə al', emoji: '🎁' },
+  { id: '4', title: 'Gəzinti', description: 'Parkda və ya sahildə romantik gəzinti', emoji: '🌅' },
+  { id: '5', title: 'Mesaj yazı', description: 'Sevgi dolu bir məktub yaz', emoji: '💌' },
+  { id: '6', title: 'Çiçək gətir', description: 'Gözəl bir buket çiçək al', emoji: '💐' },
+];
 
 // Animated Progress Ring
 const ProgressRing = ({ progress, size = 120, strokeWidth = 10, color = 'stroke-white' }: {
@@ -124,15 +130,9 @@ const PartnerDashboard = () => {
   const { partnerProfile, partnerDailyLog, loading: partnerLoading, getPregnancyWeek, getDaysUntilDue, getBabyAgeDays } = usePartnerData();
   const { items: shoppingItems, addItem, toggleItem, loading: shoppingLoading } = useShoppingItems();
   const { messages, markAsRead, getUnreadCount } = usePartnerMessages();
-  const [activeTab, setActiveTab] = useState<'home' | 'missions' | 'shopping' | 'notifications' | 'stats'>('home');
+  const { missions, toggleMission: toggleMissionHook, totalPoints, level, pointsToNextLevel, levelProgress, completedCount } = usePartnerMissions();
+  const [activeTab, setActiveTab] = useState<'home' | 'missions' | 'shopping' | 'notifications' | 'stats' | 'surprise'>('home');
   const [showChat, setShowChat] = useState(false);
-  const [missions, setMissions] = useState<Mission[]>([
-    { id: '1', title: 'Səhər çay hazırla', description: 'Zəncəfilli çay ürəkbulanmaya kömək edir', icon: Coffee, points: 10, isCompleted: false, category: 'care', difficulty: 'easy' },
-    { id: '2', title: 'Ayaq masajı et', description: 'Axşam 15 dəqiqə rahatlatıcı masaj', icon: Heart, points: 20, isCompleted: true, category: 'care', difficulty: 'medium' },
-    { id: '3', title: 'Gül gətir', description: 'Onu sürpriz etmək üçün', icon: Flower2, points: 15, isCompleted: false, category: 'surprise', difficulty: 'easy' },
-    { id: '4', title: 'Həkim vizitinə götür', description: 'Bu həftəki USG randevusu', icon: Stethoscope, points: 25, isCompleted: false, category: 'support', difficulty: 'hard' },
-    { id: '5', title: 'Körpə otağını hazırla', description: 'Mebel yığmaqda kömək et', icon: Baby, points: 30, isCompleted: false, category: 'support', difficulty: 'hard' },
-  ]);
 
   const [newItem, setNewItem] = useState('');
   const [loveMessage, setLoveMessage] = useState('');
@@ -186,22 +186,14 @@ const PartnerDashboard = () => {
   
   const weekData = getFruitData();
   
-  const totalPoints = missions.filter(m => m.isCompleted).reduce((sum, m) => sum + m.points, 0);
-  const level = Math.floor(totalPoints / 50) + 1;
-  const pointsToNextLevel = 50 - (totalPoints % 50);
-  const levelProgress = ((totalPoints % 50) / 50) * 100;
-
   const toggleMission = async (id: string) => {
     await hapticFeedback.medium();
-    const mission = missions.find(m => m.id === id);
-    setMissions(missions.map(m => 
-      m.id === id ? { ...m, isCompleted: !m.isCompleted } : m
-    ));
+    const result = await toggleMissionHook(id);
     
-    if (mission && !mission.isCompleted) {
+    if (result?.completed) {
       toast({
-        title: `+${mission.points} xal qazandın! 🎉`,
-        description: mission.title,
+        title: `+${result.pointsEarned} xal qazandın! 🎉`,
+        description: missions.find(m => m.id === id)?.title,
       });
     }
   };
@@ -612,6 +604,7 @@ const PartnerDashboard = () => {
                     icon={Gift} 
                     label="Sürpriz planla" 
                     gradient="bg-gradient-to-br from-amber-500 to-orange-600"
+                    onClick={() => setActiveTab('surprise')}
                     delay={0.2}
                   />
                   <QuickAction 

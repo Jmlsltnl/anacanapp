@@ -7,8 +7,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useUserStore } from '@/store/userStore';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useFruitImages } from '@/hooks/useFruitImages';
+import { useAIChatHistory } from '@/hooks/useAIChatHistory';
+import { useAuth } from '@/hooks/useAuth';
 import { FRUIT_SIZES } from '@/types/anacan';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface Message {
@@ -23,8 +24,11 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { lifeStage, getPregnancyData, name, dueDate, babyName, babyBirthDate, lastPeriodDate, cycleLength } = useUserStore();
+  const { user } = useAuth();
+  const { messages: savedMessages, addMessage, clearHistory, loading: historyLoading } = useAIChatHistory('woman');
   const { toast } = useToast();
   
   const pregnancyData = getPregnancyData();
@@ -59,23 +63,31 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     cycle_length: cycleLength
   };
 
+  // Load saved messages on mount
   useEffect(() => {
-    if (messages.length === 0) {
-      const welcomeMessage = getWelcomeMessage();
-      setMessages([{
-        id: 'welcome',
-        role: 'assistant',
-        content: welcomeMessage,
-        timestamp: new Date()
-      }]);
+    if (!historyLoading && !isInitialized && user) {
+      if (savedMessages.length > 0) {
+        // Restore saved messages
+        const restoredMessages: Message[] = savedMessages.map(m => ({
+          id: m.id,
+          role: m.role,
+          content: m.content,
+          timestamp: new Date(m.created_at),
+        }));
+        setMessages(restoredMessages);
+      } else {
+        // Show welcome message for new users
+        const welcomeMessage = getWelcomeMessage();
+        setMessages([{
+          id: 'welcome',
+          role: 'assistant',
+          content: welcomeMessage,
+          timestamp: new Date()
+        }]);
+      }
+      setIsInitialized(true);
     }
-  }, []);
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
+  }, [historyLoading, savedMessages, user, isInitialized]);
 
   const getWelcomeMessage = () => {
     const userName = name ? `, ${name}` : '';
@@ -92,6 +104,12 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
         return `Salam${userName}! 👋 Mən Anacan.AI, sizin AI rəfiqənizəm. Sizə necə kömək edə bilərəm?`;
     }
   };
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -112,6 +130,9 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       timestamp: new Date(),
       isStreaming: true
     }]);
+    
+    // Save user message to database
+    await addMessage('user', userMessage.content);
     
     setInput('');
     setIsLoading(true);
@@ -199,20 +220,29 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
           }
         }
 
-        // Mark streaming as complete
+        // Mark streaming as complete and save to database
+        const finalContent = fullContent || 'Bağışlayın, cavab ala bilmədim.';
         setMessages(prev => prev.map(m => 
           m.id === assistantMessageId 
-            ? { ...m, isStreaming: false, content: fullContent || 'Bağışlayın, cavab ala bilmədim.' }
+            ? { ...m, isStreaming: false, content: finalContent }
             : m
         ));
+        // Save assistant message to database
+        if (fullContent) {
+          await addMessage('assistant', fullContent);
+        }
       } else {
         // Fallback to non-streaming response
         const data = await response.json();
+        const content = data.message || 'Bağışlayın, cavab ala bilmədim.';
         setMessages(prev => prev.map(m => 
           m.id === assistantMessageId 
-            ? { ...m, isStreaming: false, content: data.message || 'Bağışlayın, cavab ala bilmədim.' }
+            ? { ...m, isStreaming: false, content }
             : m
         ));
+        if (data.message) {
+          await addMessage('assistant', data.message);
+        }
       }
     } catch (error) {
       console.error('Chat error:', error);
@@ -239,7 +269,8 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     }
   };
 
-  const clearChat = () => {
+  const clearChat = async () => {
+    await clearHistory();
     setMessages([{
       id: 'welcome',
       role: 'assistant',

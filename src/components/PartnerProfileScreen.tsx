@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useToast } from '@/hooks/use-toast';
+import { usePartnerStats } from '@/hooks/usePartnerStats';
+import { usePartnerMissions } from '@/hooks/usePartnerMissions';
 
 interface PartnerProfileScreenProps {
   onNavigate?: (screen: string) => void;
@@ -15,14 +17,8 @@ interface PartnerProfileScreenProps {
 const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
   const { name, email, partnerWomanData, logout } = useUserStore();
   const { toast } = useToast();
-
-  const stats = {
-    totalPoints: 285,
-    completedMissions: 12,
-    level: 5,
-    lovesSent: 48,
-    messagesSent: 156
-  };
+  const { stats, loading: statsLoading } = usePartnerStats();
+  const { level, levelProgress, pointsToNextLevel } = usePartnerMissions();
 
   const achievements = [
     { id: '1', name: 'İlk Sevgi', emoji: '💕', unlocked: true },
@@ -132,19 +128,19 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
       >
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg">
-            <span className="text-3xl font-black text-white">{stats.level}</span>
+            <span className="text-3xl font-black text-white">{level}</span>
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
               <Star className="w-4 h-4 text-amber-500" />
-              <h3 className="font-bold text-foreground">Səviyyə {stats.level}</h3>
+              <h3 className="font-bold text-foreground">Səviyyə {level}</h3>
             </div>
-            <p className="text-sm text-muted-foreground">Növbəti səviyyəyə 15 xal qalıb</p>
+            <p className="text-sm text-muted-foreground">Növbəti səviyyəyə {pointsToNextLevel} xal qalıb</p>
             <div className="h-2 bg-muted rounded-full mt-2 overflow-hidden">
               <motion.div 
                 className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
                 initial={{ width: 0 }}
-                animate={{ width: '70%' }}
+                animate={{ width: `${levelProgress}%` }}
               />
             </div>
           </div>
