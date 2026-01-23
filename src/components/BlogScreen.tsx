@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Search, Clock, Eye, ChevronRight, 
-  BookOpen, Sparkles, Heart, Bookmark
+  BookOpen, Sparkles, Bookmark
 } from 'lucide-react';
 import { useBlog, BlogPost, BlogCategory } from '@/hooks/useBlog';
+import { useSavedPosts } from '@/hooks/useBlogInteractions';
+import { useAuth } from '@/hooks/useAuth';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
@@ -16,16 +18,24 @@ interface BlogScreenProps {
 }
 
 const BlogScreen = ({ onBack }: BlogScreenProps) => {
+  const { user } = useAuth();
   const { posts, categories, featuredPosts, loading, searchPosts, getPostsByCategory } = useBlog();
+  const { savedPosts } = useSavedPosts();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+  const [showSaved, setShowSaved] = useState(false);
 
-  const filteredPosts = searchQuery 
-    ? searchPosts(searchQuery)
-    : selectedCategory 
-      ? getPostsByCategory(selectedCategory)
-      : posts;
+  // Get saved posts list
+  const savedPostsList = posts.filter(p => savedPosts.includes(p.id));
+
+  const filteredPosts = showSaved 
+    ? savedPostsList
+    : searchQuery 
+      ? searchPosts(searchQuery)
+      : selectedCategory 
+        ? getPostsByCategory(selectedCategory)
+        : posts;
 
   if (loading) {
     return (
@@ -70,7 +80,10 @@ const BlogScreen = ({ onBack }: BlogScreenProps) => {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setShowSaved(false);
+            }}
             placeholder="Məqalə axtar..."
             className="pl-12 h-12 rounded-2xl bg-white/90 border-0"
           />
@@ -78,12 +91,12 @@ const BlogScreen = ({ onBack }: BlogScreenProps) => {
       </div>
 
       <div className="px-5 -mt-4 space-y-6">
-        {/* Categories */}
+        {/* Categories + Saved Tab */}
         <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
           <motion.button
-            onClick={() => setSelectedCategory(null)}
+            onClick={() => { setSelectedCategory(null); setShowSaved(false); }}
             className={`shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              !selectedCategory 
+              !selectedCategory && !showSaved
                 ? 'bg-primary text-white shadow-button' 
                 : 'bg-card text-foreground border border-border/50'
             }`}
@@ -91,12 +104,32 @@ const BlogScreen = ({ onBack }: BlogScreenProps) => {
           >
             Hamısı
           </motion.button>
+
+          {/* Saved posts tab - only for logged in users */}
+          {user && (
+            <motion.button
+              onClick={() => { setShowSaved(true); setSelectedCategory(null); setSearchQuery(''); }}
+              className={`shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
+                showSaved 
+                  ? 'bg-primary text-white shadow-button' 
+                  : 'bg-card text-foreground border border-border/50'
+              }`}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Bookmark className="w-4 h-4" />
+              Saxlanılanlar
+              {savedPosts.length > 0 && (
+                <span className="ml-1 bg-white/20 px-1.5 rounded-full text-xs">{savedPosts.length}</span>
+              )}
+            </motion.button>
+          )}
+
           {categories.map(category => (
             <motion.button
               key={category.id}
-              onClick={() => setSelectedCategory(category.slug)}
+              onClick={() => { setSelectedCategory(category.slug); setShowSaved(false); }}
               className={`shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
-                selectedCategory === category.slug 
+                selectedCategory === category.slug && !showSaved
                   ? 'bg-primary text-white shadow-button' 
                   : 'bg-card text-foreground border border-border/50'
               }`}
@@ -108,8 +141,8 @@ const BlogScreen = ({ onBack }: BlogScreenProps) => {
           ))}
         </div>
 
-        {/* Featured Posts */}
-        {!selectedCategory && !searchQuery && featuredPosts.length > 0 && (
+        {/* Featured Posts - hide when showing saved */}
+        {!selectedCategory && !searchQuery && !showSaved && featuredPosts.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Sparkles className="w-5 h-5 text-primary" />
@@ -152,23 +185,32 @@ const BlogScreen = ({ onBack }: BlogScreenProps) => {
           </div>
         )}
 
-        {/* All Posts */}
+        {/* All Posts / Saved Posts */}
         <div>
           <h2 className="font-bold text-foreground mb-3">
-            {selectedCategory 
-              ? categories.find(c => c.slug === selectedCategory)?.name 
-              : searchQuery 
-                ? `"${searchQuery}" üçün nəticələr` 
-                : 'Son məqalələr'
+            {showSaved 
+              ? 'Saxlanılan məqalələr'
+              : selectedCategory 
+                ? categories.find(c => c.slug === selectedCategory)?.name 
+                : searchQuery 
+                  ? `"${searchQuery}" üçün nəticələr` 
+                  : 'Son məqalələr'
             }
           </h2>
 
           {filteredPosts.length === 0 ? (
             <div className="text-center py-12 bg-card rounded-2xl border border-border/50">
-              <div className="text-5xl mb-4">📝</div>
-              <p className="text-muted-foreground">Məqalə tapılmadı</p>
+              <div className="text-5xl mb-4">{showSaved ? '📚' : '📝'}</div>
+              <p className="text-muted-foreground">
+                {showSaved ? 'Saxlanılmış məqalə yoxdur' : 'Məqalə tapılmadı'}
+              </p>
               <p className="text-sm text-muted-foreground mt-1">
-                {searchQuery ? 'Fərqli açar sözlərlə axtarın' : 'Tezliklə yeni məqalələr əlavə olunacaq'}
+                {showSaved 
+                  ? 'Bəyəndiyiniz məqalələri saxlayın' 
+                  : searchQuery 
+                    ? 'Fərqli açar sözlərlə axtarın' 
+                    : 'Tezliklə yeni məqalələr əlavə olunacaq'
+                }
               </p>
             </div>
           ) : (
@@ -194,9 +236,14 @@ const BlogScreen = ({ onBack }: BlogScreenProps) => {
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <Badge variant="secondary" className="mb-1 bg-primary/10 text-primary border-0 text-xs">
-                      {categories.find(c => c.slug === post.category)?.name || post.category}
-                    </Badge>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge variant="secondary" className="bg-primary/10 text-primary border-0 text-xs">
+                        {categories.find(c => c.slug === post.category)?.name || post.category}
+                      </Badge>
+                      {savedPosts.includes(post.id) && (
+                        <Bookmark className="w-3.5 h-3.5 text-primary fill-current" />
+                      )}
+                    </div>
                     <h3 className="font-bold text-foreground line-clamp-2 mb-1">{post.title}</h3>
                     {post.excerpt && (
                       <p className="text-xs text-muted-foreground line-clamp-2">{post.excerpt}</p>
