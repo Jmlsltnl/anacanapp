@@ -240,7 +240,8 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
             animate={{ y: 0 }}
             transition={{ type: 'spring', damping: 25 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full bg-card rounded-t-3xl p-6 safe-bottom"
+            className="w-full bg-card rounded-t-3xl p-6 max-h-[85vh] overflow-y-auto"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 100px)' }}
           >
             <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6" />
             <h2 className="text-xl font-bold text-foreground mb-4">Çəki əlavə et</h2>

@@ -195,7 +195,8 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
               initial={{ y: 100 }}
               animate={{ y: 0 }}
               exit={{ y: 100 }}
-              className="w-full max-w-md bg-card rounded-t-3xl p-6 safe-bottom"
+              className="w-full max-w-md bg-card rounded-t-3xl p-6 max-h-[85vh] overflow-y-auto"
+              style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 100px)' }}
               onClick={e => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-6">

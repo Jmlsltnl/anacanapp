@@ -384,7 +384,8 @@ const SurpriseTab = () => {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25 }}
-              className="w-full max-w-lg bg-card rounded-t-3xl p-6 pb-10"
+              className="w-full max-w-lg bg-card rounded-t-3xl p-6 max-h-[85vh] overflow-y-auto"
+              style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 100px)' }}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="w-12 h-1 bg-muted rounded-full mx-auto mb-6" />

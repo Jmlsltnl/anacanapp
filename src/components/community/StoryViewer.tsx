@@ -355,7 +355,8 @@ const StoryViewer = ({
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25 }}
-              className="w-full max-h-[60vh] bg-card rounded-t-3xl p-6 safe-bottom"
+              className="w-full max-h-[70vh] bg-card rounded-t-3xl p-6 overflow-y-auto"
+              style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 100px)' }}
               onClick={e => e.stopPropagation()}
             >
               <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6" />
