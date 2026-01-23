@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, Trash2, Plus, Image, RefreshCw, Save } from 'lucide-react';
+import { Upload, Trash2, Image, RefreshCw, Info } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { FRUIT_SIZES } from '@/types/anacan';
+import { usePregnancyContentAdmin } from '@/hooks/usePregnancyContent';
 
 interface FruitImage {
   id: string;
@@ -19,20 +18,48 @@ interface FruitImage {
   weight_g: number;
 }
 
+interface WeekFruitData {
+  week: number;
+  fruits: string[];
+  emoji: string;
+  imageUrl: string | null;
+}
+
 const AdminFruitImages = () => {
   const [fruitImages, setFruitImages] = useState<FruitImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState<number | null>(null);
   const { toast } = useToast();
+  const { content: pregnancyContent } = usePregnancyContentAdmin();
 
-  // Get all weeks with fruit data from FRUIT_SIZES
-  const allWeeks = Object.entries(FRUIT_SIZES).map(([week, data]) => ({
-    week: parseInt(week),
-    fruit: data.fruit,
-    emoji: data.emoji,
-    lengthCm: data.lengthCm,
-    weightG: data.weightG,
-  }));
+  // Group pregnancy content by week and get unique fruit names
+  const getWeekFruits = (): WeekFruitData[] => {
+    const weekMap = new Map<number, Set<string>>();
+    
+    pregnancyContent.forEach(item => {
+      if (item.week_number && item.baby_size_fruit) {
+        if (!weekMap.has(item.week_number)) {
+          weekMap.set(item.week_number, new Set());
+        }
+        weekMap.get(item.week_number)!.add(item.baby_size_fruit);
+      }
+    });
+    
+    const weeks: WeekFruitData[] = [];
+    for (let week = 1; week <= 42; week++) {
+      const fruits = weekMap.get(week);
+      const imageData = fruitImages.find(f => f.week_number === week);
+      
+      weeks.push({
+        week,
+        fruits: fruits ? Array.from(fruits) : [],
+        emoji: imageData?.emoji || '🍎',
+        imageUrl: imageData?.image_url || null,
+      });
+    }
+    
+    return weeks;
+  };
 
   useEffect(() => {
     fetchFruitImages();
@@ -49,7 +76,6 @@ const AdminFruitImages = () => {
       setFruitImages(data || []);
     } catch (error) {
       console.error('Error fetching fruit images:', error);
-      // Table may not exist yet, that's ok
     } finally {
       setLoading(false);
     }
@@ -62,30 +88,31 @@ const AdminFruitImages = () => {
       const fileName = `fruit-week-${weekNumber}.${fileExt}`;
       const filePath = `fruit-sizes/${fileName}`;
 
-      // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('assets')
         .upload(filePath, file, { upsert: true });
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
       const { data: urlData } = supabase.storage
         .from('assets')
         .getPublicUrl(filePath);
 
-      // Upsert to database
-      const weekData = FRUIT_SIZES[weekNumber];
+      const weekFruits = pregnancyContent
+        .filter(item => item.week_number === weekNumber && item.baby_size_fruit)
+        .map(item => item.baby_size_fruit!);
+      const fruitName = weekFruits[0] || 'Meyvə';
+
       const { error: dbError } = await supabase
         .from('fruit_size_images')
         .upsert({
           week_number: weekNumber,
-          fruit_name: weekData?.fruit || 'Unknown',
-          fruit_name_az: weekData?.fruit || 'Unknown',
-          emoji: weekData?.emoji || '🍎',
+          fruit_name: fruitName,
+          fruit_name_az: fruitName,
+          emoji: '🍎',
           image_url: urlData.publicUrl,
-          length_cm: weekData?.lengthCm || 0,
-          weight_g: weekData?.weightG || 0,
+          length_cm: 0,
+          weight_g: 0,
         }, { onConflict: 'week_number' });
 
       if (dbError) throw dbError;
@@ -133,9 +160,8 @@ const AdminFruitImages = () => {
     }
   };
 
-  const getImageForWeek = (week: number) => {
-    return fruitImages.find(f => f.week_number === week)?.image_url;
-  };
+  const weekFruits = getWeekFruits();
+  const activeWeeks = weekFruits.filter(w => w.fruits.length > 0 || w.imageUrl);
 
   return (
     <div className="space-y-6">
@@ -143,7 +169,7 @@ const AdminFruitImages = () => {
         <div>
           <h1 className="text-2xl font-bold text-foreground">Körpə Ölçüsü Şəkilləri</h1>
           <p className="text-muted-foreground">
-            Hər həftə üçün meyvə/obyekt şəkilləri yükləyin. Şəkil olmadıqda emoji göstərilir.
+            Hamiləlik Kontentindəki meyvə adlarına uyğun şəkillər yükləyin.
           </p>
         </div>
         <Button variant="outline" onClick={fetchFruitImages} disabled={loading}>
@@ -152,14 +178,33 @@ const AdminFruitImages = () => {
         </Button>
       </div>
 
+      {/* Info Banner */}
+      <Card className="p-4 bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800">
+        <div className="flex items-start gap-3">
+          <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+          <div>
+            <p className="font-medium text-blue-800 dark:text-blue-200">Məlumat mənbəyi</p>
+            <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+              Meyvə adları <strong>"Hamiləlik Kontenti"</strong> bölməsindəki <strong>"Meyvə ölçüsü"</strong> sütunundan gəlir. 
+              Burada yalnız şəkillər idarə olunur.
+            </p>
+          </div>
+        </div>
+      </Card>
+
       {loading ? (
         <Card className="p-8 text-center">
           <RefreshCw className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
         </Card>
+      ) : activeWeeks.length === 0 ? (
+        <Card className="p-8 text-center">
+          <p className="text-muted-foreground">
+            Əvvəlcə "Hamiləlik Kontenti" bölməsinə keçib məlumat əlavə edin.
+          </p>
+        </Card>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {allWeeks.map((weekData, index) => {
-            const imageUrl = getImageForWeek(weekData.week);
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+          {activeWeeks.map((weekData, index) => {
             const isUploading = uploading === weekData.week;
 
             return (
@@ -169,31 +214,37 @@ const AdminFruitImages = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.02 }}
               >
-                <Card className="p-4 text-center relative overflow-hidden">
-                  <div className="absolute top-2 right-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">
+                <Card className="p-3 text-center relative overflow-hidden">
+                  <div className="absolute top-1.5 right-1.5 text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-bold">
                     {weekData.week}. həftə
                   </div>
 
-                  {/* Image/Emoji Display */}
-                  <div className="w-20 h-20 mx-auto mb-3 rounded-xl bg-gradient-to-br from-pink-50 to-rose-100 dark:from-pink-950/30 dark:to-rose-950/30 flex items-center justify-center overflow-hidden">
-                    {imageUrl ? (
+                  <div className="w-16 h-16 mx-auto mb-2 mt-4 rounded-xl bg-gradient-to-br from-pink-50 to-rose-100 dark:from-pink-950/30 dark:to-rose-950/30 flex items-center justify-center overflow-hidden">
+                    {weekData.imageUrl ? (
                       <img 
-                        src={imageUrl} 
-                        alt={weekData.fruit}
+                        src={weekData.imageUrl} 
+                        alt={weekData.fruits[0] || 'Meyvə'}
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="text-4xl">{weekData.emoji}</span>
+                      <span className="text-3xl">{weekData.emoji}</span>
                     )}
                   </div>
 
-                  <p className="font-medium text-foreground text-sm mb-1">{weekData.fruit}</p>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    {weekData.lengthCm} sm · {weekData.weightG}g
-                  </p>
+                  <div className="mb-2">
+                    {weekData.fruits.length > 0 ? (
+                      <p className="font-medium text-foreground text-xs truncate" title={weekData.fruits.join(', ')}>
+                        {weekData.fruits[0]}
+                        {weekData.fruits.length > 1 && (
+                          <span className="text-muted-foreground"> +{weekData.fruits.length - 1}</span>
+                        )}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground italic">Meyvə təyin edilməyib</p>
+                    )}
+                  </div>
 
-                  {/* Upload/Delete Actions */}
-                  <div className="flex gap-2 justify-center">
+                  <div className="flex gap-1 justify-center">
                     <label className="cursor-pointer">
                       <input
                         type="file"
@@ -205,7 +256,7 @@ const AdminFruitImages = () => {
                         }}
                         disabled={isUploading}
                       />
-                      <Button size="sm" variant="outline" asChild disabled={isUploading}>
+                      <Button size="sm" variant="outline" asChild disabled={isUploading} className="h-7 w-7 p-0">
                         <span>
                           {isUploading ? (
                             <RefreshCw className="w-3 h-3 animate-spin" />
@@ -216,12 +267,12 @@ const AdminFruitImages = () => {
                       </Button>
                     </label>
                     
-                    {imageUrl && (
+                    {weekData.imageUrl && (
                       <Button 
                         size="sm" 
                         variant="outline" 
                         onClick={() => handleDeleteImage(weekData.week)}
-                        className="text-destructive hover:text-destructive"
+                        className="text-destructive hover:text-destructive h-7 w-7 p-0"
                       >
                         <Trash2 className="w-3 h-3" />
                       </Button>
@@ -234,7 +285,6 @@ const AdminFruitImages = () => {
         </div>
       )}
 
-      {/* Info Card */}
       <Card className="p-4 bg-muted/30">
         <div className="flex items-start gap-3">
           <Image className="w-5 h-5 text-primary mt-0.5" />
@@ -242,7 +292,6 @@ const AdminFruitImages = () => {
             <p className="font-medium text-foreground">Şəkil formatı tövsiyəsi</p>
             <p className="text-sm text-muted-foreground mt-1">
               PNG və ya WebP formatında, 200x200px ölçüsündə şəffaf fon ilə şəkillər tövsiyə olunur.
-              Şəkil yüklənmədikdə avtomatik olaraq meyvənin emojisi göstərilir.
             </p>
           </div>
         </div>

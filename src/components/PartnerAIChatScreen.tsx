@@ -7,7 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useUserStore } from '@/store/userStore';
 import { usePartnerData } from '@/hooks/usePartnerData';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
-import { useFruitImages } from '@/hooks/useFruitImages';
+import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useAIChatHistory } from '@/hooks/useAIChatHistory';
 import { useAuth } from '@/hooks/useAuth';
 import { FRUIT_SIZES } from '@/types/anacan';
@@ -54,14 +54,18 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const { data: dayContent } = usePregnancyContentByDay(pregnancyDay > 0 ? pregnancyDay : undefined);
   const { data: fruitImages = [] } = useFruitImages();
   
-  // Get dynamic fruit data
+  // Get dynamic fruit data from unified source
   const getDynamicFruitName = () => {
     if (pregnancyWeek <= 0) return null;
     
-    const dbData = fruitImages.find(f => f.week_number === pregnancyWeek);
-    const staticData = FRUIT_SIZES[pregnancyWeek];
+    const fruitData = getDynamicFruitData(
+      fruitImages,
+      pregnancyDay,
+      pregnancyWeek,
+      dayContent
+    );
     
-    return dayContent?.baby_size_fruit || dbData?.fruit_name || staticData?.fruit || null;
+    return fruitData.fruit;
   };
   
   const dynamicFruit = getDynamicFruitName();
