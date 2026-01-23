@@ -775,6 +775,42 @@ export type Database = {
         }
         Relationships: []
       }
+      meal_logs: {
+        Row: {
+          calories: number
+          created_at: string
+          food_name: string
+          id: string
+          logged_at: string
+          meal_type: string
+          notes: string | null
+          portion: string | null
+          user_id: string
+        }
+        Insert: {
+          calories?: number
+          created_at?: string
+          food_name: string
+          id?: string
+          logged_at?: string
+          meal_type: string
+          notes?: string | null
+          portion?: string | null
+          user_id: string
+        }
+        Update: {
+          calories?: number
+          created_at?: string
+          food_name?: string
+          id?: string
+          logged_at?: string
+          meal_type?: string
+          notes?: string | null
+          portion?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
