@@ -17,6 +17,7 @@ interface ChatRequest {
   isPartner?: boolean;
   language?: string;
   stream?: boolean;
+  isWeightAnalysis?: boolean;
   userProfile?: {
     name?: string;
     dueDate?: string;
@@ -151,13 +152,16 @@ Deno.serve(async (req) => {
       throw new Error('AI service not configured');
     }
 
-    const { messages, lifeStage, pregnancyWeek, isPartner, stream = false, userProfile } = await req.json() as ChatRequest;
+    const { messages, lifeStage, pregnancyWeek, isPartner, stream = false, userProfile, isWeightAnalysis } = await req.json() as ChatRequest;
 
     if (!messages || !Array.isArray(messages)) {
       throw new Error('Invalid messages format');
     }
 
-    const systemPrompt = getSystemPrompt(lifeStage || 'bump', pregnancyWeek, isPartner, userProfile);
+    // Use minimal prompt for weight analysis
+    const systemPrompt = isWeightAnalysis 
+      ? `Sən çəki məsləhətçisisən. QAYDALAR: Salamlama yoxdur (Salam, canım, əzizim yazma). Disclaimer/xəbərdarlıq yoxdur. Birbaşa 1-2 cümlə ilə praktik məsləhət ver. Yalnız Azərbaycan dilində.`
+      : getSystemPrompt(lifeStage || 'bump', pregnancyWeek, isPartner, userProfile);
 
     // Prepare contents for Gemini API format
     const contents = messages.map(m => ({

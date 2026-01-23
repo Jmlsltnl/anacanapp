@@ -54,8 +54,9 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
           body: {
             messages: [{
               role: 'user',
-              content: `Hamiləlik həftəsi: ${currentWeek}, başlanğıc çəki: ${startWeight}kg, hazırkı çəki: ${currentWeight}kg, ümumi artım: ${totalGain}kg, tövsiyə olunan artım: ${recommended.min}-${recommended.max}kg. Status: ${status.text}. 1-2 cümlə ilə qısa məsləhət ver.`
-            }]
+              content: `Çəki analizi: ${currentWeek}-ci həftə, başlanğıc: ${startWeight}kg, indi: ${currentWeight}kg, artım: ${totalGain}kg (tövsiyə: ${recommended.min}-${recommended.max}kg). Status: ${status.text}. QAYDALAR: 1) Salamlama yoxdur, birbaşa məsələyə keç. 2) Maksimum 1-2 cümlə. 3) Disclaimer/xəbərdarlıq yoxdur. 4) Yalnız praktik qısa məsləhət.`
+            }],
+            isWeightAnalysis: true
           }
         });
         
@@ -149,7 +150,19 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
             transition={{ delay: 0.1 }}
           >
             <p className="text-sm text-muted-foreground mb-1">Ümumi artım</p>
-            <p className="text-2xl font-black text-primary">+{totalGain.toFixed(1)} kg</p>
+            <div className="flex items-center gap-2">
+              {totalGain >= 0 ? (
+                <TrendingUp className="w-5 h-5 text-primary" />
+              ) : (
+                <TrendingDown className="w-5 h-5 text-amber-500" />
+              )}
+              <p className={`text-2xl font-black ${totalGain >= 0 ? 'text-primary' : 'text-amber-500'}`}>
+                {totalGain >= 0 ? '+' : ''}{totalGain.toFixed(1)} kg
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Başlanğıc: {startWeight} kg
+            </p>
           </motion.div>
 
           <motion.div
