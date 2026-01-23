@@ -71,14 +71,14 @@ export const usePartnerMissions = () => {
     fetchMissions();
   }, [user]);
 
-  const toggleMission = async (missionId: string): Promise<{ pointsEarned: number; completed: boolean } | null> => {
+  const toggleMission = async (missionId: string, missionPoints?: number): Promise<{ pointsEarned: number; completed: boolean } | null> => {
     if (!user) return null;
 
-    const mission = missions.find(m => m.id === missionId);
-    if (!mission) return null;
-
-    const newCompleted = !mission.isCompleted;
-    const pointsEarned = newCompleted ? mission.points : -mission.points;
+    // Find from local missions first, then use provided points
+    const localMission = missions.find(m => m.id === missionId);
+    const points = missionPoints || localMission?.points || 10;
+    const currentlyCompleted = localMission?.isCompleted || false;
+    const newCompleted = !currentlyCompleted;
 
     try {
       // Optimistically update UI
@@ -94,19 +94,19 @@ export const usePartnerMissions = () => {
           mission_id: missionId,
           is_completed: newCompleted,
           completed_at: newCompleted ? new Date().toISOString() : null,
-          points_earned: newCompleted ? mission.points : 0,
+          points_earned: newCompleted ? points : 0,
         }, {
           onConflict: 'user_id,mission_id'
         });
 
       if (error) throw error;
 
-      return { pointsEarned: newCompleted ? mission.points : 0, completed: newCompleted };
+      return { pointsEarned: newCompleted ? points : 0, completed: newCompleted };
     } catch (err) {
       console.error('Error toggling mission:', err);
       // Revert on error
       setMissions(prev => prev.map(m => 
-        m.id === missionId ? { ...m, isCompleted: !newCompleted } : m
+        m.id === missionId ? { ...m, isCompleted: currentlyCompleted } : m
       ));
       return null;
     }
