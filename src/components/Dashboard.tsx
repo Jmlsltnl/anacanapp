@@ -22,7 +22,7 @@ import { useWeeklyTips } from '@/hooks/useDynamicContent';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useNotifications } from '@/hooks/useNotifications';
-import { useFruitImages } from '@/hooks/useFruitImages';
+import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 
 // Fetus images by month
 import FetusMonth1 from '@/assets/fetus/month-1.svg';
@@ -377,18 +377,14 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
     return '❓';
   };
 
-  // Get fruit data from database or static
+  // Get fruit data from unified hook - priority: pregnancy_daily_content > fruit_size_images > static
   const getFruitData = () => {
-    const dbData = fruitImages.find(f => f.week_number === pregData.currentWeek);
-    const staticData = FRUIT_SIZES[pregData.currentWeek] || FRUIT_SIZES[12];
-    
-    return {
-      fruit: dayContent?.baby_size_fruit || dbData?.fruit_name || staticData?.fruit || 'Meyvə',
-      emoji: dbData?.emoji || staticData?.emoji || '🍎',
-      imageUrl: dbData?.image_url || null,
-      lengthCm: dayContent?.baby_size_cm || dbData?.length_cm || staticData?.lengthCm || 0,
-      weightG: dayContent?.baby_weight_gram || dbData?.weight_g || staticData?.weightG || 0,
-    };
+    return getDynamicFruitData(
+      fruitImages,
+      pregnancyDay,
+      pregData.currentWeek,
+      dayContent
+    );
   };
   
   const weekData = getFruitData();

@@ -17,7 +17,7 @@ import { usePartnerData } from '@/hooks/usePartnerData';
 import { usePartnerMessages } from '@/hooks/usePartnerMessages';
 import { usePartnerMissions } from '@/hooks/usePartnerMissions';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
-import { useFruitImages } from '@/hooks/useFruitImages';
+import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { supabase } from '@/integrations/supabase/client';
 import { FRUIT_SIZES } from '@/types/anacan';
 import PartnerChatScreen from './partner/PartnerChatScreen';
@@ -156,20 +156,16 @@ const PartnerDashboard = () => {
   const { data: dayContent } = usePregnancyContentByDay(pregnancyDay > 0 ? pregnancyDay : undefined);
   const { data: fruitImages = [] } = useFruitImages();
   
-  // Get fruit data from dynamic content (same logic as woman's dashboard)
+  // Get fruit data from unified hook - priority: pregnancy_daily_content > fruit_size_images > static
   const getFruitData = () => {
     if (currentWeek <= 0) return null;
     
-    const dbData = fruitImages.find(f => f.week_number === currentWeek);
-    const staticData = FRUIT_SIZES[currentWeek] || FRUIT_SIZES[12];
-    
-    return {
-      fruit: dayContent?.baby_size_fruit || dbData?.fruit_name || staticData?.fruit || 'Meyvə',
-      emoji: dbData?.emoji || staticData?.emoji || '🍎',
-      imageUrl: dbData?.image_url || null,
-      lengthCm: dayContent?.baby_size_cm || dbData?.length_cm || staticData?.lengthCm || 0,
-      weightG: dayContent?.baby_weight_gram || dbData?.weight_g || staticData?.weightG || 0,
-    };
+    return getDynamicFruitData(
+      fruitImages,
+      pregnancyDay,
+      currentWeek,
+      dayContent
+    );
   };
   
   const weekData = getFruitData();

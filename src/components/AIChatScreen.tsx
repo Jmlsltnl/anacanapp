@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useUserStore } from '@/store/userStore';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
-import { useFruitImages } from '@/hooks/useFruitImages';
+import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useAIChatHistory } from '@/hooks/useAIChatHistory';
 import { useAuth } from '@/hooks/useAuth';
 import { FRUIT_SIZES } from '@/types/anacan';
@@ -42,15 +42,18 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const { data: dayContent } = usePregnancyContentByDay(pregnancyDay > 0 && lifeStage === 'bump' ? pregnancyDay : undefined);
   const { data: fruitImages = [] } = useFruitImages();
   
-  // Get dynamic fruit data
+  // Get dynamic fruit data from unified source
   const getDynamicFruitName = () => {
     if (!pregnancyData || lifeStage !== 'bump') return null;
     
-    const currentWeek = pregnancyData.currentWeek;
-    const dbData = fruitImages.find(f => f.week_number === currentWeek);
-    const staticData = FRUIT_SIZES[currentWeek];
+    const fruitData = getDynamicFruitData(
+      fruitImages,
+      pregnancyDay,
+      pregnancyData.currentWeek,
+      dayContent
+    );
     
-    return dayContent?.baby_size_fruit || dbData?.fruit_name || staticData?.fruit || pregnancyData.babySize.fruit;
+    return fruitData.fruit;
   };
   
   // Create profile object from store data
