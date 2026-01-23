@@ -8,8 +8,9 @@ import { useUserStore } from '@/store/userStore';
 import { usePartnerData } from '@/hooks/usePartnerData';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useFruitImages } from '@/hooks/useFruitImages';
+import { useAIChatHistory } from '@/hooks/useAIChatHistory';
+import { useAuth } from '@/hooks/useAuth';
 import { FRUIT_SIZES } from '@/types/anacan';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface Message {
@@ -33,9 +34,12 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showQuickQuestions, setShowQuickQuestions] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { name } = useUserStore();
+  const { user } = useAuth();
   const { partnerProfile, getPregnancyWeek } = usePartnerData();
+  const { messages: savedMessages, addMessage, clearHistory, loading: historyLoading } = useAIChatHistory('partner');
   const { toast } = useToast();
   
   const pregnancyWeek = getPregnancyWeek();
@@ -108,17 +112,36 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     }
   ];
 
+  const getWelcomeMessage = () => {
+    const fruitInfo = dynamicFruit ? ` Körpəniz hazırda ${dynamicFruit} böyüklüyündədir!` : '';
+    return `Salam, ${name || 'qardaş'}! 👋\n\nMən Anacan.AI - sənin partnyor məsləhətçinəm. ${partnerName}${partnerProfile?.life_stage === 'bump' ? `ın hamiləliyinin ${pregnancyWeek || ''}. həftəsində` : ''} ona necə dəstək ola biləcəyin barədə sənə kömək edəcəyəm.${fruitInfo} 💪\n\nAşağıdakı suallardan birini seç və ya öz sualını yaz!`;
+  };
+
+  // Load saved messages on mount
   useEffect(() => {
-    if (messages.length === 0) {
-      const fruitInfo = dynamicFruit ? ` Körpəniz hazırda ${dynamicFruit} böyüklüyündədir!` : '';
-      setMessages([{
-        id: 'welcome',
-        role: 'assistant',
-        content: `Salam, ${name || 'qardaş'}! 👋\n\nMən Anacan.AI - sənin partnyor məsləhətçinəm. ${partnerName}${partnerProfile?.life_stage === 'bump' ? `ın hamiləliyinin ${pregnancyWeek || ''}. həftəsində` : ''} ona necə dəstək ola biləcəyin barədə sənə kömək edəcəyəm.${fruitInfo} 💪\n\nAşağıdakı suallardan birini seç və ya öz sualını yaz!`,
-        timestamp: new Date()
-      }]);
+    if (!historyLoading && !isInitialized && user) {
+      if (savedMessages.length > 0) {
+        // Restore saved messages
+        const restoredMessages: Message[] = savedMessages.map(m => ({
+          id: m.id,
+          role: m.role,
+          content: m.content,
+          timestamp: new Date(m.created_at),
+        }));
+        setMessages(restoredMessages);
+        setShowQuickQuestions(false);
+      } else {
+        // Show welcome message for new users
+        setMessages([{
+          id: 'welcome',
+          role: 'assistant',
+          content: getWelcomeMessage(),
+          timestamp: new Date()
+        }]);
+      }
+      setIsInitialized(true);
     }
-  }, [name, partnerName, pregnancyWeek, dynamicFruit]);
+  }, [historyLoading, savedMessages, user, isInitialized]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -150,6 +173,9 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       timestamp: new Date(),
       isStreaming: true
     }]);
+    
+    // Save user message to database
+    await addMessage('user', userMessage.content);
     
     setInput('');
     setIsLoading(true);
@@ -232,11 +258,16 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
           }
         }
 
+        const finalContent = fullContent || 'Bağışla, cavab ala bilmədim.';
         setMessages(prev => prev.map(m => 
           m.id === assistantMessageId 
-            ? { ...m, isStreaming: false, content: fullContent || 'Bağışla, cavab ala bilmədim.' }
+            ? { ...m, isStreaming: false, content: finalContent }
             : m
         ));
+        // Save assistant message to database
+        if (fullContent) {
+          await addMessage('assistant', fullContent);
+        }
       }
     } catch (error) {
       console.error('Chat error:', error);
@@ -263,11 +294,12 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     }
   };
 
-  const clearChat = () => {
+  const clearChat = async () => {
+    await clearHistory();
     setMessages([{
       id: 'welcome',
       role: 'assistant',
-      content: `Salam, ${name || 'qardaş'}! 👋\n\nMən Anacan.AI - sənin partnyor məsləhətçinəm. Suallarını cavablandırmağa hazıram! 💪`,
+      content: getWelcomeMessage(),
       timestamp: new Date()
     }]);
     setShowQuickQuestions(true);
