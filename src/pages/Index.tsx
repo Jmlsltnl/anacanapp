@@ -25,6 +25,7 @@ import PrivacyScreen from '@/components/PrivacyScreen';
 import AppearanceScreen from '@/components/AppearanceScreen';
 import UserProfileScreen from '@/components/community/UserProfileScreen';
 import BillingScreen from '@/components/BillingScreen';
+import BlogScreen from '@/components/BlogScreen';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -193,6 +194,9 @@ const Index = () => {
   }
   if (activeScreen === 'billing') {
     return <BillingScreen onBack={() => setActiveScreen(null)} />;
+  }
+  if (activeScreen === 'blog') {
+    return <BlogScreen onBack={() => setActiveScreen(null)} />;
   }
 
   // Mother chat overlay (for woman role)
