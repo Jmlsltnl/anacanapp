@@ -178,48 +178,32 @@ Deno.serve(async (req) => {
       ? `, ${customizationParts.join(", ")}` 
       : "";
     
-    // Create the ultimate prompt for face preservation
-    const editPrompt = `
-CRITICAL INSTRUCTIONS - READ CAREFULLY:
+    // Create the ultimate prompt for face preservation using Gemini image model
+    const editPrompt = `Create a stunning, high-quality professional baby photoshoot image.
 
-You are creating a professional baby photoshoot image. Your task is to edit this photo following these EXACT rules:
+TASK: Transform this baby photo into a beautiful photoshoot with the following background theme:
+${backgroundDescription}
 
-1. FACE PRESERVATION (MOST IMPORTANT):
-   - Keep the baby's face EXACTLY as it appears in the original photo
-   - Do NOT change: facial structure, nose shape, lip shape, face proportions, skin texture, skin tone, birthmarks, dimples
-   - The face must be IDENTICAL to the source - this is non-negotiable
-   - Eye expression and gaze direction must remain the same
-   - Any subtle facial details must be preserved perfectly
+CRITICAL REQUIREMENTS:
+1. PRESERVE THE BABY'S FACE EXACTLY - same facial features, expressions, skin tone, and details
+2. Keep the baby's original pose and body position
+3. Create a seamless, professional studio-quality result
+4. Apply beautiful, soft, natural lighting appropriate for baby photography
+5. The final image should look like a real professional photograph, not AI-generated
 
-2. BODY AND POSE:
-   - Keep the baby's body position and pose EXACTLY the same
-   - The baby should be in the EXACT same angle and position
-   - Hand positions and body gestures must remain unchanged
+STYLE MODIFICATIONS (apply if specified):
+${customization.gender !== "keep" ? `- Present as ${genderText}` : "- Keep original appearance"}
+${customization.eyeColor !== "keep" ? `- Eyes: ${eyeColorPrompts[customization.eyeColor]}` : "- Keep original eye color"}
+${customization.hairColor !== "keep" ? `- Hair color: ${hairColorPrompts[customization.hairColor]}` : "- Keep original hair color"}
+${customization.hairStyle !== "keep" ? `- Hair style: ${hairStylePrompts[customization.hairStyle]}` : "- Keep original hair style"}
+${customization.outfit !== "keep" ? `- Outfit: ${outfitPrompts[customization.outfit]}` : "- Keep original clothing"}
 
-3. BACKGROUND TRANSFORMATION:
-   - Replace ONLY the background with: ${backgroundDescription}
-   - The new background should seamlessly blend with the baby
-   - Add beautiful, soft, professional studio lighting
-   - Create depth with subtle bokeh effect in the background
-   - The lighting should be warm and flattering
-
-4. ALLOWED MODIFICATIONS (only if specified):
-   ${customization.gender !== "keep" ? `- Present ${genderText} styling` : "- Keep original gender presentation"}
-   ${customization.eyeColor !== "keep" ? `- Enhance eyes to be ${eyeColorPrompts[customization.eyeColor]}` : "- Keep original eye color exactly"}
-   ${customization.hairColor !== "keep" ? `- Style hair to be ${hairColorPrompts[customization.hairColor]}` : "- Keep original hair color exactly"}
-   ${customization.hairStyle !== "keep" ? `- Style hair ${hairStylePrompts[customization.hairStyle]}` : "- Keep original hair style exactly"}
-   ${customization.outfit !== "keep" ? `- Show baby ${outfitPrompts[customization.outfit]}` : "- Keep original clothing exactly"}
-
-5. QUALITY REQUIREMENTS:
-   - Professional photography quality
-   - 8K resolution appearance
-   - Perfect color grading suitable for baby photography
-   - Soft, flattering shadows
-   - No artifacts or distortions
-   - Magazine-quality final result
-
-The final image should look like it was taken in a professional photography studio with ${backgroundDescription}. The baby${customizationText} should look natural and beautiful while maintaining their unique facial identity.
-`.trim();
+QUALITY: 
+- Ultra high resolution, professional photography
+- Perfect skin tones and natural colors
+- Beautiful bokeh background effect
+- Magazine-quality final result
+- Photorealistic, not cartoon or illustration`;
 
     console.log("Editing image with enhanced prompt");
 

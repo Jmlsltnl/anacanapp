@@ -786,6 +786,47 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
   );
 };
 
+// Daily fun facts about baby - changes every day
+const BABY_FUN_FACTS = [
+  "Bu gün əlləri ilə əşyaları tutmağı öyrənir! 🤲",
+  "Səsləri tanımaq qabiliyyəti artır 🎵",
+  "Bu gün gülüşləri daha mənalı olacaq 😊",
+  "Rəngləri daha aydın görməyə başlayır 🌈",
+  "Hərəkətləri daha koordinasiyalı olur 🏃",
+  "Bu gün yeni dadlar kəşf edə bilər 🍎",
+  "Emosiyalarını daha yaxşı ifadə edir 💕",
+  "Diqqət müddəti artmağa davam edir 👀",
+  "Yatma qaydaları daha müntəzəm olur 😴",
+  "Ətrafı tanımaq bacarığı inkişaf edir 🌍",
+  "Əlaqə qurma bacarıqları güclənir 🤝",
+  "Körpənin yaddaşı hər gün güclənir 🧠",
+  "Bu gün yeni səslər çıxara bilər 🗣️",
+  "Hərəkət koordinasiyası inkişaf edir ⚡",
+  "Mimikalar daha zəngin olur 😮",
+  "Ətrafdakılara diqqət artır 👁️",
+  "Gülümsəmələri daha tez-tez olur 😍",
+  "Oyun zamanı daha aktiv olur 🎮",
+  "Valideynləri tanıma güclənir 👨‍👩‍👧",
+  "Yeni nailiyyətlərə doğru irəliləyir 🌟",
+  "Bu gün əlləri ağzına apara bilər 🖐️",
+  "Şəkillərə baxmağı xoşlayır 🖼️",
+  "Musiqi dinləməkdən zövq alır 🎶",
+  "Ayaqlarını hərəkət etdirməyi sevir 🦶",
+  "Yuxu zamanı yuxu görə bilər 💭",
+  "Üzlərə baxmağı çox xoşlayır 👶",
+  "Bu gün qıcıqlanmaya reaksiya artır 🤭",
+  "Toxunma hissi daha həssas olur 🤚",
+  "Barmaqlarını kəşf etməyə davam edir ✋",
+  "Ətraf səslərə daha çox reaksiya verir 👂",
+];
+
+const getBabyDailyFunFact = (ageInDays: number): string => {
+  // Use age + current day to get a rotating fact
+  const dayOfYear = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+  const factIndex = (ageInDays + dayOfYear) % BABY_FUN_FACTS.length;
+  return BABY_FUN_FACTS[factIndex];
+};
+
 const MommyDashboard = () => {
   const { getBabyData } = useUserStore();
   const { toast } = useToast();
@@ -978,8 +1019,8 @@ const MommyDashboard = () => {
                 {babyData.ageInMonths > 0 ? `${babyData.ageInMonths} aylıq` : `${babyData.ageInDays} günlük`}
               </p>
               <div className="flex items-center gap-2 mt-3">
-                <Award className="w-4 h-4" />
-                <span className="text-sm text-white/80">3 nailiyyət əldə edildi</span>
+                <Sparkles className="w-4 h-4" />
+                <span className="text-sm text-white/80">{getBabyDailyFunFact(babyData.ageInDays)}</span>
               </div>
             </div>
           </div>
