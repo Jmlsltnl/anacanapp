@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, Edit, Trash2, Eye, EyeOff, Star, Search,
-  ChevronDown, Save, X, Image as ImageIcon, Tag, Clock
+  ChevronDown, Save, X, Image as ImageIcon, Tag, Clock, BarChart3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,11 +12,12 @@ import { Badge } from '@/components/ui/badge';
 import { useBlogAdmin, BlogPost, BlogCategory } from '@/hooks/useBlog';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import BlogAnalytics from './BlogAnalytics';
 
 const AdminBlog = () => {
   const { posts, categories, loading, createPost, updatePost, deletePost, createCategory, deleteCategory } = useBlogAdmin();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<'posts' | 'categories'>('posts');
+  const [activeTab, setActiveTab] = useState<'posts' | 'categories' | 'analytics'>('posts');
   const [searchQuery, setSearchQuery] = useState('');
   const [showEditor, setShowEditor] = useState(false);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
@@ -248,10 +249,10 @@ const AdminBlog = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-border pb-2">
+      <div className="flex gap-2 border-b border-border pb-2 overflow-x-auto">
         <button
           onClick={() => setActiveTab('posts')}
-          className={`px-4 py-2 font-medium transition-colors ${
+          className={`px-4 py-2 font-medium transition-colors whitespace-nowrap ${
             activeTab === 'posts'
               ? 'text-primary border-b-2 border-primary'
               : 'text-muted-foreground'
@@ -261,13 +262,24 @@ const AdminBlog = () => {
         </button>
         <button
           onClick={() => setActiveTab('categories')}
-          className={`px-4 py-2 font-medium transition-colors ${
+          className={`px-4 py-2 font-medium transition-colors whitespace-nowrap ${
             activeTab === 'categories'
               ? 'text-primary border-b-2 border-primary'
               : 'text-muted-foreground'
           }`}
         >
           Kateqoriyalar ({categories.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('analytics')}
+          className={`px-4 py-2 font-medium transition-colors whitespace-nowrap flex items-center gap-1.5 ${
+            activeTab === 'analytics'
+              ? 'text-primary border-b-2 border-primary'
+              : 'text-muted-foreground'
+          }`}
+        >
+          <BarChart3 className="w-4 h-4" />
+          Statistika
         </button>
       </div>
 
@@ -410,6 +422,11 @@ const AdminBlog = () => {
             </motion.div>
           ))}
         </div>
+      )}
+
+      {/* Analytics Tab */}
+      {activeTab === 'analytics' && (
+        <BlogAnalytics posts={posts} />
       )}
 
       {/* Post Editor Modal */}

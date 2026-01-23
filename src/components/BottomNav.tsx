@@ -55,7 +55,7 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
       <div className="absolute inset-0 bg-card border-t border-border/50" />
       
       <div className="relative safe-bottom">
-        <div className="flex items-center justify-around py-2 px-2">
+        <div className="flex items-center justify-around py-1.5 px-1">
           {(isPartner ? partnerTabs : womanTabs).map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -66,33 +66,33 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
               <motion.button
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
-                className="flex flex-col items-center gap-1 py-2 px-4 relative"
+                className="flex flex-col items-center gap-0.5 py-1.5 px-2 relative min-w-0"
                 whileTap={{ scale: 0.9 }}
               >
                 {/* Active indicator */}
                 {isActive && (
                   <motion.div
                     layoutId="activeTabIndicator"
-                    className={`absolute -top-1 w-12 h-1 rounded-full ${getGradientClass()}`}
+                    className={`absolute -top-0.5 w-8 h-0.5 rounded-full ${getGradientClass()}`}
                     transition={{ type: "spring" as const, stiffness: 400, damping: 30 }}
                   />
                 )}
                 
                 {/* Icon container */}
                 <motion.div
-                  className={`relative ${isActive ? '' : ''}`}
-                  animate={isActive ? { scale: 1.1 } : { scale: 1 }}
+                  className="relative"
+                  animate={isActive ? { scale: 1.05 } : { scale: 1 }}
                   transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
                 >
                   {isActive && (
                     <motion.div
-                      className={`absolute inset-0 rounded-full ${getGradientClass()} opacity-20 blur-lg`}
+                      className={`absolute inset-0 rounded-full ${getGradientClass()} opacity-20 blur-md`}
                       initial={{ scale: 0 }}
-                      animate={{ scale: 2 }}
+                      animate={{ scale: 1.5 }}
                     />
                   )}
                   <Icon 
-                    className={`w-6 h-6 relative z-10 transition-colors duration-200 ${
+                    className={`w-5 h-5 relative z-10 transition-colors duration-200 ${
                       isActive ? getActiveColor() : 'text-muted-foreground'
                     }`}
                     strokeWidth={isActive ? 2.5 : 2}
@@ -102,7 +102,7 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
                     <motion.span
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[9px] font-bold text-white flex items-center justify-center z-20"
+                      className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-destructive rounded-full text-[8px] font-bold text-white flex items-center justify-center z-20"
                     >
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </motion.span>
@@ -110,10 +110,10 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
                 </motion.div>
                 
                 <motion.span 
-                  className={`text-[10px] font-bold transition-colors duration-200 ${
+                  className={`text-[9px] font-semibold transition-colors duration-200 truncate max-w-full ${
                     isActive ? getActiveColor() : 'text-muted-foreground'
                   }`}
-                  animate={isActive ? { scale: 1.05 } : { scale: 1 }}
+                  animate={isActive ? { scale: 1.02 } : { scale: 1 }}
                 >
                   {tab.label}
                 </motion.span>

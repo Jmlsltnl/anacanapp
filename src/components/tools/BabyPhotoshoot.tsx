@@ -590,12 +590,12 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                   {category === 'Mövsümi' && '🌈'}
                   {category}
                 </h3>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5">
                   {backgrounds.map((bg) => (
                     <motion.button
                       key={bg.id}
                       onClick={() => handleSelectBackground(bg.id, bg.premium)}
-                      className={`relative p-3 rounded-xl flex flex-col items-center gap-1 transition-all ${
+                      className={`relative p-2 rounded-xl flex flex-col items-center gap-0.5 transition-all min-w-0 ${
                         customization.background === bg.id
                           ? `bg-gradient-to-br ${bg.color} text-white shadow-lg scale-105`
                           : 'bg-muted hover:bg-muted/80'
@@ -603,12 +603,12 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                       whileTap={{ scale: 0.95 }}
                     >
                       {bg.premium && !isPremium && (
-                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center">
-                          <Lock className="w-3 h-3 text-white" />
+                        <div className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center">
+                          <Lock className="w-2.5 h-2.5 text-white" />
                         </div>
                       )}
-                      <span className="text-2xl">{bg.emoji}</span>
-                      <span className="text-[10px] font-medium text-center leading-tight">{bg.name}</span>
+                      <span className="text-lg sm:text-xl">{bg.emoji}</span>
+                      <span className="text-[8px] sm:text-[9px] font-medium text-center leading-tight truncate w-full">{bg.name}</span>
                     </motion.button>
                   ))}
                 </div>
@@ -681,20 +681,20 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                 <Scissors className="w-5 h-5 text-purple-500" />
                 <h2 className="font-bold text-foreground text-sm">Saç Forması</h2>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-1.5 overflow-x-auto pb-1">
                 {hairStyleOptions.map((option) => (
                   <motion.button
                     key={option.id}
                     onClick={() => setCustomization(prev => ({ ...prev, hairStyle: option.id }))}
-                    className={`flex-1 p-3 rounded-xl flex flex-col items-center gap-1 transition-all ${
+                    className={`flex-shrink-0 p-2 rounded-xl flex flex-col items-center gap-0.5 transition-all min-w-[52px] ${
                       customization.hairStyle === option.id
                         ? 'bg-primary text-primary-foreground shadow-lg'
                         : 'bg-muted hover:bg-muted/80'
                     }`}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <span className="text-xl">{option.emoji}</span>
-                    <span className="text-[10px] font-medium">{option.name}</span>
+                    <span className="text-lg">{option.emoji}</span>
+                    <span className="text-[8px] font-medium truncate w-full text-center">{option.name}</span>
                   </motion.button>
                 ))}
               </div>
@@ -706,12 +706,12 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                 <Shirt className="w-5 h-5 text-rose-500" />
                 <h2 className="font-bold text-foreground text-sm">Geyim</h2>
               </div>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-5 sm:grid-cols-6 gap-1.5">
                 {currentOutfits.map((outfit) => (
                   <motion.button
                     key={outfit.id}
                     onClick={() => handleSelectOutfit(outfit.id, outfit.premium)}
-                    className={`relative p-3 rounded-xl flex flex-col items-center gap-1 transition-all ${
+                    className={`relative p-2 rounded-xl flex flex-col items-center gap-0.5 transition-all min-w-0 ${
                       customization.outfit === outfit.id
                         ? 'bg-primary text-primary-foreground shadow-lg'
                         : 'bg-muted hover:bg-muted/80'
@@ -719,12 +719,12 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                     whileTap={{ scale: 0.95 }}
                   >
                     {outfit.premium && !isPremium && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center">
-                        <Lock className="w-2.5 h-2.5 text-white" />
+                      <div className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-amber-400 rounded-full flex items-center justify-center">
+                        <Lock className="w-2 h-2 text-white" />
                       </div>
                     )}
-                    <span className="text-xl">{outfit.emoji}</span>
-                    <span className="text-[9px] font-medium leading-tight text-center">{outfit.name}</span>
+                    <span className="text-lg">{outfit.emoji}</span>
+                    <span className="text-[7px] sm:text-[8px] font-medium leading-tight text-center truncate w-full">{outfit.name}</span>
                   </motion.button>
                 ))}
               </div>
