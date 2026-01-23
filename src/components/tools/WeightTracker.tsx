@@ -1,9 +1,10 @@
-import { useState, forwardRef } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, TrendingUp, TrendingDown, Minus, Scale } from 'lucide-react';
+import { ArrowLeft, Plus, TrendingUp, TrendingDown, Minus, Scale, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useWeightEntries } from '@/hooks/useWeightEntries';
 import { useUserStore } from '@/store/userStore';
+import { supabase } from '@/integrations/supabase/client';
 
 interface WeightTrackerProps {
   onBack: () => void;
@@ -14,6 +15,8 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
   const { getPregnancyData } = useUserStore();
   const [newWeight, setNewWeight] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [aiAdvice, setAiAdvice] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
 
   const pregData = getPregnancyData();
   const currentWeek = pregData?.currentWeek || 20;
@@ -40,6 +43,35 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
 
   const status = getStatus();
 
+  // Fetch AI advice
+  useEffect(() => {
+    const fetchAIAdvice = async () => {
+      if (entries.length === 0) return;
+      
+      setAiLoading(true);
+      try {
+        const { data, error } = await supabase.functions.invoke('dr-anacan-chat', {
+          body: {
+            messages: [{
+              role: 'user',
+              content: `Hamiləlik həftəsi: ${currentWeek}, başlanğıc çəki: ${startWeight}kg, hazırkı çəki: ${currentWeight}kg, ümumi artım: ${totalGain}kg, tövsiyə olunan artım: ${recommended.min}-${recommended.max}kg. Status: ${status.text}. 1-2 cümlə ilə qısa məsləhət ver.`
+            }]
+          }
+        });
+        
+        if (data && !error) {
+          setAiAdvice(data.message || data.content);
+        }
+      } catch (e) {
+        console.error('AI advice error:', e);
+      } finally {
+        setAiLoading(false);
+      }
+    };
+    
+    fetchAIAdvice();
+  }, [entries.length, currentWeek, totalGain]);
+
   const handleAddWeight = async () => {
     if (newWeight) {
       const weight = parseFloat(newWeight);
@@ -48,16 +80,6 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
         setNewWeight('');
         setShowAddForm(false);
       }
-    }
-  };
-
-  const getAIAnalysis = () => {
-    if (status.status === 'normal') {
-      return 'Çəki artımınız normaldır! Sağlam qidalanmağa və mülayim məşqlərə davam edin. 💪';
-    } else if (status.status === 'low') {
-      return 'Çəki artımınız bir az azdır. Daha çox protein və sağlam yağlar qəbul etməyə çalışın. Həkiminizlə məsləhətləşin. 🥗';
-    } else {
-      return 'Çəki artımı bir az yüksəkdir. Şəkərli qidaları azaldın və gündəlik gəzintilər edin. Həkiminizlə məsləhətləşin. 🚶‍♀️';
     }
   };
 
@@ -154,7 +176,14 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
             </div>
             <div className="flex-1">
               <h4 className="font-bold text-foreground mb-1">AI Analiz</h4>
-              <p className="text-sm text-muted-foreground">{getAIAnalysis()}</p>
+              {aiLoading ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                  <span className="text-sm text-muted-foreground">Analiz edilir...</span>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">{aiAdvice || 'Məlumat yüklənir...'}</p>
+              )}
             </div>
           </div>
         </motion.div>

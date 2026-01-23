@@ -793,28 +793,23 @@ const MommyDashboard = () => {
   const { isMilestoneAchieved, toggleMilestone, getMilestoneDate } = useBabyMilestones();
   const { unlockAchievement, getTotalPoints } = useAchievements();
   const { activeTimers, startTimer, stopTimer, getElapsedSeconds, getActiveTimer } = useTimerStore();
+  const { todayLogs, addLog, getTodayStats, refetch } = useBabyLogs();
   
   // Current time for timer display
   const [, setTick] = useState(0);
   
+  // Get today's stats from database
+  const todayStats = getTodayStats();
+  
   // Sleep tracking
-  const [totalSleepHours, setTotalSleepHours] = useState(8.5);
   const sleepTimer = getActiveTimer('sleep');
   
   // Feeding tracking with live timer
-  const [feedingLogs, setFeedingLogs] = useState<Array<{id: string; type: 'left' | 'right' | 'formula' | 'solid'; time: Date; durationSeconds?: number}>>([
-    { id: '1', type: 'left', time: new Date(Date.now() - 3600000), durationSeconds: 900 },
-    { id: '2', type: 'right', time: new Date(Date.now() - 7200000), durationSeconds: 720 },
-  ]);
   const [showFeedingModal, setShowFeedingModal] = useState(false);
   const leftFeedTimer = getActiveTimer('feeding', 'left');
   const rightFeedTimer = getActiveTimer('feeding', 'right');
   
-  // Diaper tracking with types
-  const [diaperLogs, setDiaperLogs] = useState<Array<{id: string; type: 'wet' | 'dirty' | 'both'; time: Date}>>([
-    { id: '1', type: 'wet', time: new Date(Date.now() - 1800000) },
-    { id: '2', type: 'both', time: new Date(Date.now() - 5400000) },
-  ]);
+  // Diaper tracking
   const [showDiaperModal, setShowDiaperModal] = useState(false);
 
   // Update timer display every second
@@ -841,11 +836,14 @@ const MommyDashboard = () => {
   const toggleSleep = async () => {
     await hapticFeedback.medium();
     if (sleepTimer) {
-      // End sleep
+      // End sleep - save to database
       const result = stopTimer(sleepTimer.id);
       if (result) {
-        const hours = result.durationSeconds / 3600;
-        setTotalSleepHours(prev => prev + hours);
+        await addLog({
+          log_type: 'sleep',
+          start_time: new Date(Date.now() - result.durationSeconds * 1000).toISOString(),
+          end_time: new Date().toISOString(),
+        });
         toast({ title: "Yuxu bitdi! ☀️", description: `${formatDuration(result.durationSeconds)} yatdı` });
       }
     } else {
@@ -860,22 +858,22 @@ const MommyDashboard = () => {
     const activeTimer = type === 'left' ? leftFeedTimer : rightFeedTimer;
     
     if (activeTimer) {
-      // Stop feeding
+      // Stop feeding - save to database
       const result = stopTimer(activeTimer.id);
       if (result) {
-        setFeedingLogs(prev => [...prev, { 
-          id: Date.now().toString(), 
-          type, 
-          time: new Date(),
-          durationSeconds: result.durationSeconds
-        }]);
+        await addLog({
+          log_type: 'feeding',
+          feed_type: type === 'left' ? 'breast_left' : 'breast_right',
+          start_time: new Date(Date.now() - result.durationSeconds * 1000).toISOString(),
+          end_time: new Date().toISOString(),
+        });
         toast({ 
           title: `${type === 'left' ? 'Sol' : 'Sağ'} sinə bitti!`, 
           description: `Müddət: ${formatDuration(result.durationSeconds)}` 
         });
         
         // Check for achievement
-        if (feedingLogs.length >= 99) {
+        if (todayStats.feedingCount >= 9) {
           unlockAchievement('feeding_pro', 'mommy');
         }
       }
@@ -888,11 +886,10 @@ const MommyDashboard = () => {
 
   const addFeeding = async (type: 'formula' | 'solid') => {
     await hapticFeedback.medium();
-    setFeedingLogs(prev => [...prev, { 
-      id: Date.now().toString(), 
-      type, 
-      time: new Date(),
-    }]);
+    await addLog({
+      log_type: 'feeding',
+      feed_type: type,
+    });
     setShowFeedingModal(false);
     
     const typeLabels = {
@@ -904,7 +901,10 @@ const MommyDashboard = () => {
 
   const addDiaper = async (type: 'wet' | 'dirty' | 'both') => {
     await hapticFeedback.medium();
-    setDiaperLogs(prev => [...prev, { id: Date.now().toString(), type, time: new Date() }]);
+    await addLog({
+      log_type: 'diaper',
+      diaper_type: type === 'both' ? 'mixed' : type,
+    });
     setShowDiaperModal(false);
     
     const typeEmojis = {
@@ -915,7 +915,7 @@ const MommyDashboard = () => {
     toast({ title: `Bez dəyişmə: ${typeEmojis[type]}` });
     
     // Check for achievement
-    if (diaperLogs.length >= 99) {
+    if (todayStats.diaperCount >= 9) {
       unlockAchievement('diaper_hero', 'mommy');
     }
   };
@@ -1000,7 +1000,7 @@ const MommyDashboard = () => {
             </div>
             <div>
               <h3 className="font-bold text-foreground">Yuxu İzləmə</h3>
-              <p className="text-sm text-muted-foreground">Bu gün: {totalSleepHours} saat</p>
+              <p className="text-sm text-muted-foreground">Bu gün: {todayStats.sleepHours} saat</p>
             </div>
           </div>
           <motion.button
@@ -1046,7 +1046,7 @@ const MommyDashboard = () => {
             </div>
             <div>
               <h3 className="font-bold text-foreground">Qidalanma</h3>
-              <p className="text-sm text-muted-foreground">Bu gün: {feedingLogs.length} dəfə</p>
+              <p className="text-sm text-muted-foreground">Bu gün: {todayStats.feedingCount} dəfə</p>
             </div>
           </div>
           <motion.button
@@ -1153,7 +1153,7 @@ const MommyDashboard = () => {
             </div>
             <div>
               <h3 className="font-bold text-foreground">Bez Dəyişmə</h3>
-              <p className="text-sm text-muted-foreground">Bu gün: {diaperLogs.length} dəfə</p>
+              <p className="text-sm text-muted-foreground">Bu gün: {todayStats.diaperCount} dəfə</p>
             </div>
           </div>
           <motion.button
@@ -1201,14 +1201,14 @@ const MommyDashboard = () => {
         
         {/* Recent Diapers */}
         <div className="flex gap-2 overflow-x-auto hide-scrollbar">
-          {diaperLogs.slice(-5).reverse().map((log) => (
+          {todayStats.diaperLogs.slice(-5).reverse().map((log) => (
             <div 
               key={log.id}
               className="flex-shrink-0 px-3 py-2 rounded-xl bg-muted/50 flex items-center gap-2"
             >
-              <span className="text-lg">{getDiaperIcon(log.type)}</span>
+              <span className="text-lg">{getDiaperIcon(log.diaper_type || 'wet')}</span>
               <span className="text-xs text-muted-foreground">
-                {log.time.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
+                {new Date(log.start_time).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
           ))}
@@ -1275,7 +1275,7 @@ const MommyDashboard = () => {
               <Moon className="w-5 h-5 text-violet-600" />
               <span className="text-sm font-medium text-foreground">Yuxu</span>
             </div>
-            <span className="text-sm font-bold text-violet-600">{totalSleepHours} saat</span>
+            <span className="text-sm font-bold text-violet-600">{todayStats.sleepHours} saat</span>
           </div>
           <div className="flex items-center justify-between p-3 bg-amber-50 rounded-2xl">
             <div className="flex items-center gap-3">
@@ -1284,11 +1284,11 @@ const MommyDashboard = () => {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">
-                🤱{feedingLogs.filter(f => f.type === 'left' || f.type === 'right').length}
-                🍼{feedingLogs.filter(f => f.type === 'formula').length}
-                🥣{feedingLogs.filter(f => f.type === 'solid').length}
+                🤱{todayStats.breastFeedingCount}
+                🍼{todayStats.formulaCount}
+                🥣{todayStats.solidCount}
               </span>
-              <span className="text-sm font-bold text-amber-600">{feedingLogs.length} dəfə</span>
+              <span className="text-sm font-bold text-amber-600">{todayStats.feedingCount} dəfə</span>
             </div>
           </div>
           <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-2xl">
@@ -1298,11 +1298,11 @@ const MommyDashboard = () => {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">
-                💧{diaperLogs.filter(d => d.type === 'wet').length}
-                💩{diaperLogs.filter(d => d.type === 'dirty').length}
-                💧💩{diaperLogs.filter(d => d.type === 'both').length}
+                💧{todayStats.wetCount}
+                💩{todayStats.dirtyCount}
+                💧💩{todayStats.bothCount}
               </span>
-              <span className="text-sm font-bold text-emerald-600">{diaperLogs.length} dəfə</span>
+              <span className="text-sm font-bold text-emerald-600">{todayStats.diaperCount} dəfə</span>
             </div>
           </div>
         </div>

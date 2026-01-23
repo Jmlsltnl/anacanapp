@@ -41,12 +41,16 @@ const backgroundCategories = {
     { id: 'nursery_blue', name: 'Uşaq otağı', category: 'Realist', premium: false, emoji: '🛏️', color: 'from-blue-200 to-sky-300', description: 'Cozy nursery room with soft blue tones and wooden crib' },
     { id: 'garden_natural', name: 'Təbii bağça', category: 'Realist', premium: false, emoji: '🌿', color: 'from-green-300 to-emerald-400', description: 'Natural garden setting with green grass and soft sunlight' },
     { id: 'beach_sand', name: 'Çimərlik', category: 'Realist', premium: false, emoji: '🏖️', color: 'from-amber-200 to-blue-300', description: 'Sandy beach with gentle waves and sunset' },
+    { id: 'mountain_view', name: 'Dağ mənzərəsi', category: 'Realist', premium: false, emoji: '⛰️', color: 'from-slate-400 to-blue-500', description: 'Mountain landscape with fresh air and clouds' },
+    { id: 'lake_sunset', name: 'Göl günbatanı', category: 'Realist', premium: true, emoji: '🌅', color: 'from-orange-300 to-rose-400', description: 'Peaceful lake at sunset with golden reflections' },
     
     // Aesthetic fonlar
     { id: 'boho_neutral', name: 'Boho neutral', category: 'Aesthetic', premium: false, emoji: '🪶', color: 'from-amber-100 to-stone-200', description: 'Bohemian style with dried pampas grass, macrame, and neutral earth tones' },
     { id: 'minimalist_cream', name: 'Minimalist krem', category: 'Aesthetic', premium: true, emoji: '🤍', color: 'from-orange-50 to-amber-100', description: 'Clean minimalist setup with cream blankets and simple wooden elements' },
     { id: 'vintage_rustic', name: 'Vintage rustik', category: 'Aesthetic', premium: true, emoji: '🪵', color: 'from-amber-200 to-orange-300', description: 'Rustic vintage setting with wooden crates, burlap, and warm lighting' },
     { id: 'scandinavian', name: 'Skandinaviya', category: 'Aesthetic', premium: true, emoji: '🏠', color: 'from-gray-100 to-slate-200', description: 'Nordic minimalist with white wood and soft textures' },
+    { id: 'earthy_tones', name: 'Torpaq tonları', category: 'Aesthetic', premium: false, emoji: '🍂', color: 'from-amber-200 to-stone-300', description: 'Warm earthy tones with natural textures' },
+    { id: 'cozy_blanket', name: 'Rahat yorğan', category: 'Aesthetic', premium: false, emoji: '🛋️', color: 'from-stone-200 to-amber-100', description: 'Cozy setup with soft blankets and pillows' },
     
     // Fantastik fonlar
     { id: 'adventure_explorer', name: 'Səyyah', category: 'Fantastik', premium: false, emoji: '🧭', color: 'from-emerald-400 to-teal-500', description: 'Adventure explorer theme with vintage maps, compass, and safari elements' },
@@ -55,6 +59,9 @@ const backgroundCategories = {
     { id: 'pirate_ship', name: 'Pirat gəmisi', category: 'Fantastik', premium: true, emoji: '🏴‍☠️', color: 'from-amber-600 to-amber-800', description: 'Pirate adventure with wooden ship deck, treasure chest, and ocean view' },
     { id: 'jungle_safari', name: 'Cəngəllik', category: 'Fantastik', premium: true, emoji: '🦁', color: 'from-green-500 to-amber-500', description: 'Wild jungle safari with exotic animals and tropical plants' },
     { id: 'dinosaur', name: 'Dinozavr', category: 'Fantastik', premium: true, emoji: '🦕', color: 'from-emerald-500 to-green-700', description: 'Prehistoric world with friendly dinosaurs' },
+    { id: 'knight_castle', name: 'Cəngavər', category: 'Fantastik', premium: false, emoji: '⚔️', color: 'from-slate-500 to-gray-700', description: 'Medieval castle with knight armor and sword' },
+    { id: 'race_car', name: 'Yarış maşını', category: 'Fantastik', premium: false, emoji: '🏎️', color: 'from-red-500 to-orange-500', description: 'Racing theme with sports cars and checkered flags' },
+    { id: 'dragon_land', name: 'Əjdaha', category: 'Fantastik', premium: true, emoji: '🐉', color: 'from-green-600 to-emerald-800', description: 'Fantasy dragon land with magical creatures' },
     
     // Mövsümi fonlar
     { id: 'autumn_leaves', name: 'Payız yarpaqları', category: 'Mövsümi', premium: false, emoji: '🍂', color: 'from-orange-400 to-red-500', description: 'Autumn setting with colorful fallen leaves and warm golden lighting' },
@@ -62,6 +69,8 @@ const backgroundCategories = {
     { id: 'spring_flowers', name: 'Bahar çiçəkləri', category: 'Mövsümi', premium: true, emoji: '🌸', color: 'from-pink-300 to-rose-400', description: 'Spring garden with blooming flowers, butterflies, and soft pastel colors' },
     { id: 'christmas', name: 'Yeni il', category: 'Mövsümi', premium: true, emoji: '🎄', color: 'from-red-500 to-green-600', description: 'Festive Christmas setting with tree, presents, and snow' },
     { id: 'easter', name: 'Pasxa', category: 'Mövsümi', premium: true, emoji: '🐰', color: 'from-pink-200 to-yellow-200', description: 'Easter theme with colorful eggs and spring flowers' },
+    { id: 'summer_pool', name: 'Yay hovuzu', category: 'Mövsümi', premium: false, emoji: '🏊', color: 'from-cyan-400 to-blue-500', description: 'Summer pool party with floaties and sunshine' },
+    { id: 'halloween', name: 'Halloween', category: 'Mövsümi', premium: true, emoji: '🎃', color: 'from-orange-500 to-purple-600', description: 'Cute Halloween with pumpkins and friendly ghosts' },
   ],
   girl: [
     // Realist fonlar
@@ -69,12 +78,16 @@ const backgroundCategories = {
     { id: 'nursery_pink', name: 'Uşaq otağı', category: 'Realist', premium: false, emoji: '🛏️', color: 'from-pink-200 to-rose-300', description: 'Cozy nursery room with soft pink tones and elegant decor' },
     { id: 'garden_flowers', name: 'Çiçəkli bağça', category: 'Realist', premium: false, emoji: '🌷', color: 'from-rose-300 to-pink-400', description: 'Beautiful flower garden with roses, peonies, and butterflies' },
     { id: 'lavender_field', name: 'Lavanda tarlası', category: 'Realist', premium: false, emoji: '💜', color: 'from-violet-300 to-purple-400', description: 'Dreamy lavender field at golden hour' },
+    { id: 'rose_garden', name: 'Qızılgül bağı', category: 'Realist', premium: true, emoji: '🌹', color: 'from-rose-400 to-red-400', description: 'Romantic rose garden with blooming flowers' },
+    { id: 'cherry_orchard', name: 'Albalı bağı', category: 'Realist', premium: false, emoji: '🍒', color: 'from-pink-300 to-rose-400', description: 'Cherry orchard with blossoms and soft petals' },
     
     // Aesthetic fonlar
     { id: 'boho_floral', name: 'Boho çiçəkli', category: 'Aesthetic', premium: false, emoji: '🌺', color: 'from-pink-100 to-rose-200', description: 'Bohemian style with dried flowers, lace, and soft pink tones' },
     { id: 'blush_dreamy', name: 'Xəyali çəhrayı', category: 'Aesthetic', premium: true, emoji: '💗', color: 'from-rose-100 to-pink-200', description: 'Dreamy blush pink setup with tulle, pearls, and soft lighting' },
     { id: 'vintage_lace', name: 'Vintage krujeva', category: 'Aesthetic', premium: true, emoji: '🎀', color: 'from-amber-100 to-rose-100', description: 'Vintage setup with lace blankets, antique props, and warm sepia tones' },
     { id: 'parisian', name: 'Paris', category: 'Aesthetic', premium: true, emoji: '🗼', color: 'from-rose-200 to-gray-300', description: 'Parisian chic with Eiffel Tower backdrop' },
+    { id: 'tea_party', name: 'Çay məclisi', category: 'Aesthetic', premium: false, emoji: '🫖', color: 'from-pink-100 to-amber-100', description: 'Elegant tea party with vintage cups and flowers' },
+    { id: 'garden_party', name: 'Bağ şənliyi', category: 'Aesthetic', premium: false, emoji: '🎪', color: 'from-pink-200 to-sky-200', description: 'Garden party with pastel decorations' },
     
     // Fantastik fonlar
     { id: 'princess_castle', name: 'Şahzadə sarayı', category: 'Fantastik', premium: false, emoji: '👑', color: 'from-purple-400 to-pink-500', description: 'Fairy tale castle with royal decorations, golden throne, and sparkles' },
@@ -83,6 +96,9 @@ const backgroundCategories = {
     { id: 'unicorn_rainbow', name: 'Təkbuynuz', category: 'Fantastik', premium: true, emoji: '🦄', color: 'from-pink-400 to-purple-500', description: 'Magical unicorn theme with rainbow, clouds, and sparkly decorations' },
     { id: 'butterfly_garden', name: 'Kəpənək bağı', category: 'Fantastik', premium: true, emoji: '🦋', color: 'from-pink-300 to-cyan-400', description: 'Magical garden full of colorful butterflies' },
     { id: 'swan_lake', name: 'Qu gölü', category: 'Fantastik', premium: true, emoji: '🦢', color: 'from-white to-blue-200', description: 'Elegant swan lake with soft lighting' },
+    { id: 'enchanted_forest', name: 'Sehrli meşə', category: 'Fantastik', premium: false, emoji: '✨', color: 'from-emerald-400 to-purple-500', description: 'Magical enchanted forest with glowing elements' },
+    { id: 'rainbow_land', name: 'Göy qurşağı', category: 'Fantastik', premium: false, emoji: '🌈', color: 'from-red-400 via-yellow-400 to-blue-400', description: 'Colorful rainbow land with fluffy clouds' },
+    { id: 'ice_queen', name: 'Buz kraliçası', category: 'Fantastik', premium: true, emoji: '👸', color: 'from-cyan-300 to-blue-500', description: 'Ice palace with sparkling snowflakes' },
     
     // Mövsümi fonlar
     { id: 'autumn_leaves', name: 'Payız yarpaqları', category: 'Mövsümi', premium: false, emoji: '🍂', color: 'from-orange-400 to-red-500', description: 'Autumn setting with colorful fallen leaves and warm golden lighting' },
@@ -90,6 +106,8 @@ const backgroundCategories = {
     { id: 'cherry_blossom', name: 'Albalı çiçəyi', category: 'Mövsümi', premium: true, emoji: '🌸', color: 'from-pink-300 to-rose-400', description: 'Japanese cherry blossom garden with soft petals falling' },
     { id: 'christmas', name: 'Yeni il', category: 'Mövsümi', premium: true, emoji: '🎄', color: 'from-red-500 to-green-600', description: 'Festive Christmas setting with tree, presents, and snow' },
     { id: 'valentines', name: 'Sevgililər günü', category: 'Mövsümi', premium: true, emoji: '💕', color: 'from-red-400 to-pink-500', description: 'Romantic setting with hearts and roses' },
+    { id: 'spring_picnic', name: 'Bahar piknİki', category: 'Mövsümi', premium: false, emoji: '🧺', color: 'from-green-300 to-pink-300', description: 'Spring picnic in a flower meadow' },
+    { id: 'summer_sunflower', name: 'Günəbaxan', category: 'Mövsümi', premium: false, emoji: '🌻', color: 'from-yellow-400 to-amber-500', description: 'Sunflower field in summer sunshine' },
   ],
 };
 
@@ -139,6 +157,11 @@ const outfitsByGender = {
     { id: 'doctor', name: 'Həkim', emoji: '👨‍⚕️', premium: true },
     { id: 'firefighter', name: 'Yanğınsöndürən', emoji: '🧑‍🚒', premium: true },
     { id: 'teddy', name: 'Ayı kostyumu', emoji: '🧸', premium: true },
+    { id: 'superhero', name: 'Supergəhrəman', emoji: '🦸‍♂️', premium: false },
+    { id: 'knight', name: 'Cəngavər', emoji: '⚔️', premium: true },
+    { id: 'farmer', name: 'Fermer', emoji: '👨‍🌾', premium: false },
+    { id: 'wizard', name: 'Sehrbaz', emoji: '🧙‍♂️', premium: true },
+    { id: 'lion', name: 'Aslan', emoji: '🦁', premium: true },
   ],
   girl: [
     { id: 'keep', name: 'Olduğu kimi', emoji: '👗', premium: false },
@@ -155,6 +178,11 @@ const outfitsByGender = {
     { id: 'ladybug', name: 'Uğurböcəyi', emoji: '🐞', premium: true },
     { id: 'bunny', name: 'Dovşan', emoji: '🐰', premium: true },
     { id: 'unicorn', name: 'Unicorn', emoji: '🦄', premium: true },
+    { id: 'kitty', name: 'Pişik', emoji: '🐱', premium: false },
+    { id: 'snowflake', name: 'Qar dənəsi', emoji: '❄️', premium: true },
+    { id: 'rainbow', name: 'Göy qurşağı', emoji: '🌈', premium: false },
+    { id: 'bee', name: 'Arı', emoji: '🐝', premium: true },
+    { id: 'strawberry', name: 'Çiyələk', emoji: '🍓', premium: true },
   ],
 };
 
@@ -422,7 +450,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     }
   };
 
-  const nextStep = () => setStep(prev => Math.min(prev + 1, 3));
+  const nextStep = () => setStep(prev => Math.min(prev + 1, 2));
   const prevStep = () => setStep(prev => Math.max(prev - 1, 0));
 
   const canProceed = () => {
@@ -704,67 +732,67 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
           </motion.div>
         );
 
-      case 3:
-        return (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-foreground flex items-center gap-2">
-                <ImageIcon className="w-5 h-5 text-muted-foreground" />
-                Foto Qalereyası
-              </h2>
-              {photos.length > 0 && (
-                <span className="text-sm text-muted-foreground">{photos.length} foto</span>
-              )}
-            </div>
-
-            {loadingPhotos ? (
-              <div className="flex justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              </div>
-            ) : photos.length === 0 ? (
-              <div className="bg-muted/50 rounded-3xl p-8 text-center">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Camera className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="font-bold text-foreground mb-2">Hələ foto yoxdur</h3>
-                <p className="text-muted-foreground text-sm">
-                  Şəkil yükləyin və foto yaradın!
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-4">
-                {photos.map((photo, index) => (
-                  <motion.div
-                    key={photo.id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="relative aspect-square rounded-2xl overflow-hidden shadow-card cursor-pointer group"
-                    onClick={() => setViewingPhoto(photo)}
-                  >
-                    <img
-                      src={photo.url}
-                      alt="Baby photo"
-                      className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </motion.div>
-                ))}
-              </div>
-            )}
-          </motion.div>
-        );
-
       default:
         return null;
     }
   };
 
-  const stepTitles = ['Şəkil', 'Fon', 'Detallar', 'Qalereya'];
+  // Gallery component - always visible
+  const renderGallery = () => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="mt-6"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="font-bold text-foreground flex items-center gap-2">
+          <ImageIcon className="w-5 h-5 text-muted-foreground" />
+          Foto Qalereyası
+        </h2>
+        {photos.length > 0 && (
+          <span className="text-sm text-muted-foreground">{photos.length} foto</span>
+        )}
+      </div>
+
+      {loadingPhotos ? (
+        <div className="flex justify-center py-8">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      ) : photos.length === 0 ? (
+        <div className="bg-muted/50 rounded-3xl p-6 text-center">
+          <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+            <Camera className="w-7 h-7 text-primary" />
+          </div>
+          <h3 className="font-bold text-foreground mb-1 text-sm">Hələ foto yoxdur</h3>
+          <p className="text-muted-foreground text-xs">
+            Şəkil yükləyin və foto yaradın!
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 gap-3">
+          {photos.map((photo, index) => (
+            <motion.div
+              key={photo.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: index * 0.03 }}
+              className="relative aspect-square rounded-2xl overflow-hidden shadow-card cursor-pointer group"
+              onClick={() => setViewingPhoto(photo)}
+            >
+              <img
+                src={photo.url}
+                alt="Baby photo"
+                className="w-full h-full object-cover transition-transform group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            </motion.div>
+          ))}
+        </div>
+      )}
+    </motion.div>
+  );
+
+  const stepTitles = ['Şəkil', 'Fon', 'Detallar'];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -791,7 +819,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
         </div>
 
         {/* Step Indicator */}
-        <div className="flex items-center justify-between mt-4">
+        <div className="flex items-center justify-center gap-4 mt-4">
           {stepTitles.map((title, index) => (
             <motion.button
               key={index}
@@ -820,69 +848,55 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
         <AnimatePresence mode="wait">
           {renderStepContent()}
         </AnimatePresence>
+        
+        {/* Gallery always visible at bottom */}
+        {renderGallery()}
       </div>
 
       {/* Fixed Bottom Buttons - positioned above BottomNav */}
-      {step < 3 && (
-        <div 
-          className="fixed bottom-0 left-0 right-0 z-40 px-5 py-4 bg-background border-t border-border"
-          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 80px)' }}
-        >
-          <div className="flex gap-3">
-            {step > 0 && (
-              <Button
-                variant="outline"
-                onClick={prevStep}
-                className="flex-1 h-14 rounded-2xl"
-              >
-                Geri
-              </Button>
-            )}
-            {step < 2 ? (
-              <Button
-                onClick={nextStep}
-                disabled={!canProceed()}
-                className="flex-1 h-14 rounded-2xl gradient-primary text-white font-bold"
-              >
-                Davam et
-              </Button>
-            ) : (
-              <Button
-                onClick={handleGenerate}
-                disabled={isGenerating || !customization.background || !sourceImage}
-                className="flex-1 h-14 rounded-2xl gradient-primary text-white font-bold text-lg shadow-button"
-              >
-                {isGenerating ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Yaradılır...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5" />
-                    <span>Şəkil Yarat</span>
-                  </div>
-                )}
-              </Button>
-            )}
-          </div>
+      <div 
+        className="fixed bottom-0 left-0 right-0 z-40 px-5 py-4 bg-background border-t border-border"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 80px)' }}
+      >
+        <div className="flex gap-3">
+          {step > 0 && (
+            <Button
+              variant="outline"
+              onClick={prevStep}
+              className="flex-1 h-14 rounded-2xl"
+            >
+              Geri
+            </Button>
+          )}
+          {step < 2 ? (
+            <Button
+              onClick={nextStep}
+              disabled={!canProceed()}
+              className="flex-1 h-14 rounded-2xl gradient-primary text-white font-bold"
+            >
+              Davam et
+            </Button>
+          ) : (
+            <Button
+              onClick={handleGenerate}
+              disabled={isGenerating || !customization.background || !sourceImage}
+              className="flex-1 h-14 rounded-2xl gradient-primary text-white font-bold text-lg shadow-button"
+            >
+              {isGenerating ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Yaradılır...</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5" />
+                  <span>Şəkil Yarat</span>
+                </div>
+              )}
+            </Button>
+          )}
         </div>
-      )}
-
-      {step === 3 && (
-        <div 
-          className="fixed bottom-0 left-0 right-0 z-40 px-5 py-4 bg-background border-t border-border"
-          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 80px)' }}
-        >
-          <Button
-            onClick={() => setStep(0)}
-            className="w-full h-14 rounded-2xl gradient-primary text-white font-bold"
-          >
-            <Sparkles className="w-5 h-5 mr-2" />
-            Yeni Foto Yarat
-          </Button>
-        </div>
-      )}
+      </div>
 
       {/* Photo Viewer Modal */}
       <AnimatePresence>
