@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Search, Clock, Eye, ChevronRight, 
-  BookOpen, Sparkles, Filter
+  BookOpen, Sparkles, Heart, Bookmark
 } from 'lucide-react';
 import { useBlog, BlogPost, BlogCategory } from '@/hooks/useBlog';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
+import BlogPostDetail from '@/components/blog/BlogPostDetail';
 
 interface BlogScreenProps {
   onBack: () => void;
@@ -37,93 +38,11 @@ const BlogScreen = ({ onBack }: BlogScreenProps) => {
   // Post detail view
   if (selectedPost) {
     return (
-      <div className="min-h-screen bg-background pb-28">
-        {/* Cover Image */}
-        {selectedPost.cover_image_url && (
-          <div className="relative h-56 w-full">
-            <img 
-              src={selectedPost.cover_image_url} 
-              alt={selectedPost.title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-            <motion.button
-              onClick={() => setSelectedPost(null)}
-              className="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}
-            >
-              <ArrowLeft className="w-5 h-5 text-white" />
-            </motion.button>
-          </div>
-        )}
-
-        {!selectedPost.cover_image_url && (
-          <div className="gradient-primary px-5 pt-4 pb-6">
-            <motion.button
-              onClick={() => setSelectedPost(null)}
-              className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mb-4"
-              whileTap={{ scale: 0.95 }}
-            >
-              <ArrowLeft className="w-5 h-5 text-white" />
-            </motion.button>
-          </div>
-        )}
-
-        <div className="px-5 py-4">
-          {/* Category badge */}
-          <Badge variant="secondary" className="mb-3 bg-primary/10 text-primary border-0">
-            {categories.find(c => c.slug === selectedPost.category)?.name || selectedPost.category}
-          </Badge>
-
-          {/* Title */}
-          <h1 className="text-2xl font-black text-foreground mb-3">
-            {selectedPost.title}
-          </h1>
-
-          {/* Meta info */}
-          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
-            <div className="flex items-center gap-1">
-              <Clock className="w-4 h-4" />
-              <span>{selectedPost.reading_time} dəq</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Eye className="w-4 h-4" />
-              <span>{selectedPost.view_count} baxış</span>
-            </div>
-            <span>
-              {format(new Date(selectedPost.created_at), 'd MMM yyyy', { locale: az })}
-            </span>
-          </div>
-
-          {/* Content */}
-          <div 
-            className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-a:text-primary"
-            dangerouslySetInnerHTML={{ __html: selectedPost.content.replace(/\n/g, '<br/>') }}
-          />
-
-          {/* Tags */}
-          {selectedPost.tags.length > 0 && (
-            <div className="mt-6 flex flex-wrap gap-2">
-              {selectedPost.tags.map(tag => (
-                <Badge key={tag} variant="outline" className="text-xs">
-                  #{tag}
-                </Badge>
-              ))}
-            </div>
-          )}
-
-          {/* Author */}
-          <div className="mt-8 p-4 bg-card rounded-2xl border border-border/50 flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-xl">
-              ✍️
-            </div>
-            <div>
-              <p className="font-bold text-foreground">{selectedPost.author_name}</p>
-              <p className="text-sm text-muted-foreground">Məqalə müəllifi</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <BlogPostDetail 
+        post={selectedPost} 
+        categories={categories} 
+        onBack={() => setSelectedPost(null)} 
+      />
     );
   }
 
