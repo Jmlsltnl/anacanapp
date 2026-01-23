@@ -251,7 +251,7 @@ const PartnerMessagesScreen = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col pb-24">
       {/* Header */}
       <div className="bg-gradient-to-r from-partner to-indigo-600 px-5 pt-6 pb-4 safe-top">
         <div className="flex items-center gap-4">
@@ -342,13 +342,13 @@ const PartnerMessagesScreen = () => {
         )}
       </div>
 
-      {/* Quick Messages */}
-      <div className="px-4 py-2 flex gap-2 overflow-x-auto scrollbar-hide">
+      {/* Quick Messages - Fixed above input */}
+      <div className="fixed left-0 right-0 px-4 py-2 flex gap-2 overflow-x-auto scrollbar-hide bg-background z-40" style={{ bottom: 'calc(env(safe-area-inset-bottom) + 152px)' }}>
         {quickMessages.map(msg => (
           <motion.button
             key={msg}
             onClick={() => sendQuickMessage(msg)}
-            className="px-3 py-1.5 bg-muted rounded-full text-xs font-medium whitespace-nowrap"
+            className="px-3 py-1.5 bg-muted rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0"
             whileTap={{ scale: 0.95 }}
           >
             {msg}
@@ -356,20 +356,18 @@ const PartnerMessagesScreen = () => {
         ))}
       </div>
 
-      {/* Input */}
-      <div className="p-4 bg-card border-t border-border safe-bottom">
+      {/* Input - Fixed above bottom nav */}
+      <div className="fixed left-0 right-0 p-4 bg-card border-t border-border z-40" style={{ bottom: 'calc(env(safe-area-inset-bottom) + 80px)' }}>
         <div className="flex items-center gap-2">
           <ChatMediaUpload onUpload={sendMediaMessage} />
-          <div className="flex-1 relative">
-            <input
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-              placeholder="Mesaj yazın..."
-              className="w-full h-12 px-4 pr-12 rounded-2xl bg-muted text-sm outline-none border-2 border-transparent focus:border-partner/30 transition-colors"
-            />
-          </div>
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+            placeholder="Mesaj yazın..."
+            className="flex-1 h-12 px-4 rounded-2xl bg-muted text-sm outline-none border-2 border-transparent focus:border-partner/30 transition-colors"
+          />
           <motion.button
             onClick={sendMessage}
             disabled={!newMessage.trim()}
