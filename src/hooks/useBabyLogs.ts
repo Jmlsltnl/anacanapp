@@ -94,13 +94,31 @@ export const useBabyLogs = () => {
       }
     });
 
+    // Count feeding by type
+    const breastFeedingCount = feedingLogs.filter(l => l.feed_type === 'breast_left' || l.feed_type === 'breast_right').length;
+    const formulaCount = feedingLogs.filter(l => l.feed_type === 'formula').length;
+    const solidCount = feedingLogs.filter(l => l.feed_type === 'solid').length;
+
+    // Count diaper by type
+    const wetCount = diaperLogs.filter(l => l.diaper_type === 'wet').length;
+    const dirtyCount = diaperLogs.filter(l => l.diaper_type === 'dirty').length;
+    const bothCount = diaperLogs.filter(l => l.diaper_type === 'mixed').length;
+
     return {
       feedingCount: feedingLogs.length,
+      breastFeedingCount,
+      formulaCount,
+      solidCount,
       sleepHours: Math.round(totalSleepMinutes / 60 * 10) / 10,
       diaperCount: diaperLogs.length,
+      wetCount,
+      dirtyCount,
+      bothCount,
       lastFeeding: feedingLogs[0] || null,
       lastSleep: sleepLogs[0] || null,
-      lastDiaper: diaperLogs[0] || null
+      lastDiaper: diaperLogs[0] || null,
+      feedingLogs,
+      diaperLogs,
     };
   };
 
