@@ -1,15 +1,17 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Settings, Bell, Shield, HelpCircle, LogOut, 
   ChevronRight, Crown, Copy, Share2,
-  Heart, Calendar, Palette, ShieldCheck, Edit, CreditCard
+  Heart, Calendar, Palette, ShieldCheck, Edit, CreditCard, Info, ArrowLeft, X,
+  MessageCircle, Baby, ShoppingCart, TrendingUp, Gift
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useNotifications } from '@/hooks/useNotifications';
 import { PremiumModal } from '@/components/PremiumModal';
+import { nativeShare } from '@/lib/native';
 
 interface ProfileScreenProps {
   onNavigate?: (screen: string) => void;
@@ -22,6 +24,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   const { unreadCount } = useNotifications();
   const [partnerCode] = useState(profile?.partner_code || 'ANACAN-XXXX');
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [showPartnerInfo, setShowPartnerInfo] = useState(false);
 
   const menuItems = [
     { id: 'billing', icon: CreditCard, label: 'Abunəliyim' },
@@ -39,6 +42,22 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
       title: 'Kopyalandı!',
       description: 'Partnyor kodu buferə kopyalandı.',
     });
+  };
+
+  const sharePartnerCode = async () => {
+    const shareText = `Anacan tətbiqinə qoşul və hamiləlik səyahətimizdə mənə dəstək ol! Partnyor kodum: ${partnerCode}\n\nTətbiqi yüklə: https://anacanapp.lovable.app`;
+    
+    const success = await nativeShare({
+      title: 'Partnyor Kodu',
+      text: shareText
+    });
+
+    if (success) {
+      toast({
+        title: 'Paylaşıldı!',
+        description: 'Partnyor kodu uğurla paylaşıldı.',
+      });
+    }
   };
 
   const handleLogout = async () => {
@@ -185,6 +204,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
               <Copy className="w-5 h-5 text-primary" />
             </motion.button>
             <motion.button
+              onClick={sharePartnerCode}
               className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -192,8 +212,111 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
               <Share2 className="w-5 h-5 text-white" />
             </motion.button>
           </div>
+
+          {/* Partner Info Button */}
+          <motion.button
+            onClick={() => setShowPartnerInfo(true)}
+            className="w-full mt-3 p-3 rounded-xl bg-partner/5 border border-partner/20 flex items-center gap-3"
+            whileTap={{ scale: 0.98 }}
+          >
+            <Info className="w-5 h-5 text-partner" />
+            <span className="flex-1 text-left text-sm font-medium text-foreground">Partnyor nələr görə və edə bilər?</span>
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          </motion.button>
         </motion.div>
       )}
+
+      {/* Partner Info Modal */}
+      <AnimatePresence>
+        {showPartnerInfo && (
+          <motion.div
+            className="fixed inset-0 z-50 bg-black/50 flex items-end justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowPartnerInfo(false)}
+          >
+            <motion.div
+              className="bg-card w-full max-w-lg rounded-t-3xl max-h-[85vh] overflow-y-auto"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="sticky top-0 bg-card p-4 border-b border-border flex items-center justify-between">
+                <h2 className="text-lg font-bold text-foreground">Partnyor Rejimi Haqqında</h2>
+                <motion.button
+                  onClick={() => setShowPartnerInfo(false)}
+                  className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <X className="w-4 h-4" />
+                </motion.button>
+              </div>
+
+              <div className="p-5 space-y-6">
+                {/* Intro */}
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-partner/10 flex items-center justify-center mx-auto mb-3">
+                    <Heart className="w-8 h-8 text-partner" />
+                  </div>
+                  <p className="text-muted-foreground">
+                    Partnyor kodu ilə həyat yoldaşınız tətbiqə qoşularaq hamiləlik səyahətinizə dəstək ola bilər.
+                  </p>
+                </div>
+
+                {/* What partner can see */}
+                <div>
+                  <h3 className="font-bold text-foreground mb-3 flex items-center gap-2">
+                    👁️ Partnyor nələri görə bilər?
+                  </h3>
+                  <div className="space-y-2">
+                    {[
+                      { icon: Baby, text: 'Körpənin həftəlik inkişafı və ölçüləri' },
+                      { icon: TrendingUp, text: 'Sizin gündəlik əhvalınız və simptomlarınız' },
+                      { icon: Calendar, text: 'Həkim görüşləri və vacib tarixlər' },
+                      { icon: Heart, text: 'Təpik sayğacı və büzüşmə izləyicisi məlumatları' },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
+                        <item.icon className="w-5 h-5 text-primary" />
+                        <span className="text-sm text-foreground">{item.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* What partner can do */}
+                <div>
+                  <h3 className="font-bold text-foreground mb-3 flex items-center gap-2">
+                    ✨ Partnyor nələr edə bilər?
+                  </h3>
+                  <div className="space-y-2">
+                    {[
+                      { icon: MessageCircle, text: 'Sizə sevgi mesajları və dəstək göndərə bilər' },
+                      { icon: ShoppingCart, text: 'Ortaq alış-veriş siyahısına əlavə edə bilər' },
+                      { icon: Gift, text: 'Sürprizlər planlaşdırıb xallar toplaya bilər' },
+                      { icon: TrendingUp, text: 'Missiyaları yerinə yetirib səviyyə qazana bilər' },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
+                        <item.icon className="w-5 h-5 text-partner" />
+                        <span className="text-sm text-foreground">{item.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Privacy note */}
+                <div className="p-4 bg-primary/5 rounded-2xl border border-primary/20">
+                  <p className="text-sm text-muted-foreground">
+                    🔒 <strong className="text-foreground">Gizlilik:</strong> Partnyor sizin şəxsi qeydlərinizi, gündəlik mesajlarınızı və ya AI söhbətlərinizi görə bilməz.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Menu Items */}
       <motion.div

@@ -125,6 +125,12 @@ const Index = () => {
             <AIChatScreen />
           </motion.div>
         );
+      case 'blog':
+        return (
+          <motion.div key="blog" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+            <BlogScreen onBack={() => setActiveTab('home')} />
+          </motion.div>
+        );
       case 'profile':
         return (
           <motion.div key="profile" variants={pageVariants} initial="initial" animate="animate" exit="exit">

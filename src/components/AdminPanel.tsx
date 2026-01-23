@@ -14,6 +14,7 @@ import AdminModeration from './admin/AdminModeration';
 import AdminPregnancyContent from './admin/AdminPregnancyContent';
 import AdminFruitImages from './admin/AdminFruitImages';
 import AdminBlog from './admin/AdminBlog';
+import AdminSupport from './admin/AdminSupport';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -28,6 +29,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminDashboard />;
       case 'users':
         return <AdminUsers />;
+      case 'support':
+        return <AdminSupport />;
       case 'blog':
         return <AdminBlog />;
       case 'products':

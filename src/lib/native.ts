@@ -196,6 +196,29 @@ export const localNotifications = {
   }
 };
 
+// Native Share
+export const nativeShare = async (data: { title?: string; text?: string; url?: string }) => {
+  // Check if native share is available
+  if (navigator.share) {
+    try {
+      await navigator.share(data);
+      return true;
+    } catch (error) {
+      // User cancelled or error
+      console.log('Share cancelled or failed:', error);
+      return false;
+    }
+  } else {
+    // Fallback: copy to clipboard
+    const textToCopy = data.text || data.url || '';
+    if (textToCopy) {
+      await navigator.clipboard.writeText(textToCopy);
+      return true;
+    }
+    return false;
+  }
+};
+
 // Initialize native features
 export const initializeNativeFeatures = async () => {
   if (!isNative) {
