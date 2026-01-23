@@ -23,6 +23,7 @@ const menuItems = [
   { id: 'moderation', label: 'Moderasiya', icon: AlertTriangle },
   { id: 'subscriptions', label: 'Abunəliklər', icon: Crown },
   { id: 'pregnancy', label: 'Hamiləlik Kontenti', icon: Baby },
+  { id: 'fruit-images', label: 'Körpə Ölçüsü Şəkilləri', icon: Baby },
   { id: 'content', label: 'Digər Kontent', icon: FileText },
   { id: 'products', label: 'Məhsullar', icon: Package },
   { id: 'data', label: 'Məlumatlar', icon: Database },
