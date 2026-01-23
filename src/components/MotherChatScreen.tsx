@@ -188,6 +188,23 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
     'Zəng et 📞'
   ];
 
+  const sendQuickMessage = async (msg: string) => {
+    if (!user || !partnerProfile) return;
+
+    await hapticFeedback.light();
+
+    try {
+      await supabase.from('partner_messages').insert({
+        sender_id: user.id,
+        receiver_id: partnerProfile.user_id,
+        message_type: 'text',
+        content: msg,
+      });
+    } catch (error) {
+      console.error('Error sending quick message:', error);
+    }
+  };
+
   const formatTime = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' });
@@ -318,7 +335,7 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
         {quickMessages.map(msg => (
           <motion.button
             key={msg}
-            onClick={() => setNewMessage(msg)}
+            onClick={() => sendQuickMessage(msg)}
             className="px-3 py-1.5 bg-muted rounded-full text-xs font-medium whitespace-nowrap"
             whileTap={{ scale: 0.95 }}
           >

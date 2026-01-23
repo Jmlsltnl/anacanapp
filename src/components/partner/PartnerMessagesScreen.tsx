@@ -166,13 +166,34 @@ const PartnerMessagesScreen = () => {
   };
 
   const quickMessages = [
-    '❤️ Səni sevirəm!',
-    '🏠 Evə gəlirəm',
-    '💪 Yaxşıyam',
-    '🤔 Necəsən?',
-    '😘 Öpürəm!',
-    '🍽️ Yemək istəyirsən?'
+    'Səni sevirəm! ❤️',
+    'Necəsən?',
+    'Evə gəl 🏠',
+    'Yaxşıyam 💪',
+    'Zəng et 📞'
   ];
+
+  const sendQuickMessage = async (msg: string) => {
+    if (!user || !partnerProfile) return;
+
+    await hapticFeedback.light();
+
+    try {
+      await supabase.from('partner_messages').insert({
+        sender_id: user.id,
+        receiver_id: partnerProfile.user_id,
+        message_type: 'text',
+        content: msg,
+      });
+    } catch (error) {
+      console.error('Error sending quick message:', error);
+      toast({
+        title: 'Xəta',
+        description: 'Mesaj göndərilə bilmədi',
+        variant: 'destructive',
+      });
+    }
+  };
 
   const formatDateSeparator = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -322,19 +343,17 @@ const PartnerMessagesScreen = () => {
       </div>
 
       {/* Quick Messages */}
-      <div className="px-4 py-2 border-t border-border/50">
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-          {quickMessages.map(msg => (
-            <motion.button
-              key={msg}
-              onClick={() => setNewMessage(msg)}
-              className="px-3 py-1.5 bg-partner/10 text-partner rounded-full text-xs font-medium whitespace-nowrap hover:bg-partner/20 transition-colors"
-              whileTap={{ scale: 0.95 }}
-            >
-              {msg}
-            </motion.button>
-          ))}
-        </div>
+      <div className="px-4 py-2 flex gap-2 overflow-x-auto scrollbar-hide">
+        {quickMessages.map(msg => (
+          <motion.button
+            key={msg}
+            onClick={() => sendQuickMessage(msg)}
+            className="px-3 py-1.5 bg-muted rounded-full text-xs font-medium whitespace-nowrap"
+            whileTap={{ scale: 0.95 }}
+          >
+            {msg}
+          </motion.button>
+        ))}
       </div>
 
       {/* Input */}
