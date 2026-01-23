@@ -581,6 +581,45 @@ export type Database = {
         }
         Relationships: []
       }
+      fruit_size_images: {
+        Row: {
+          created_at: string
+          emoji: string
+          fruit_name: string
+          fruit_name_az: string | null
+          id: string
+          image_url: string | null
+          length_cm: number | null
+          updated_at: string
+          week_number: number
+          weight_g: number | null
+        }
+        Insert: {
+          created_at?: string
+          emoji?: string
+          fruit_name: string
+          fruit_name_az?: string | null
+          id?: string
+          image_url?: string | null
+          length_cm?: number | null
+          updated_at?: string
+          week_number: number
+          weight_g?: number | null
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          fruit_name?: string
+          fruit_name_az?: string | null
+          id?: string
+          image_url?: string | null
+          length_cm?: number | null
+          updated_at?: string
+          week_number?: number
+          weight_g?: number | null
+        }
+        Relationships: []
+      }
       group_memberships: {
         Row: {
           group_id: string

@@ -21,6 +21,8 @@ import { useAchievements } from '@/hooks/useAchievements';
 import { useWeeklyTips } from '@/hooks/useDynamicContent';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
+import { useNotifications } from '@/hooks/useNotifications';
+import { useFruitImages } from '@/hooks/useFruitImages';
 
 // Fetus images by month
 import FetusMonth1 from '@/assets/fetus/month-1.svg';
@@ -340,6 +342,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
   const { todayLog, updateWaterIntake, updateMood } = useDailyLogs();
   const { getTodayStats, addSession } = useKickSessions();
   const { entries: weightEntries } = useWeightEntries();
+  const { data: fruitImages = [] } = useFruitImages();
   
   // Calculate current pregnancy day (1-280)
   const pregnancyDay = pregData?.dueDate 
@@ -374,13 +377,21 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
     return '❓';
   };
 
-  // Use dynamic content if available, fallback to static
-  const weekData = dayContent ? {
-    fruit: dayContent.baby_size_fruit || FRUIT_SIZES[pregData.currentWeek]?.fruit || 'Meyvə',
-    emoji: '🍎',
-    lengthCm: dayContent.baby_size_cm || FRUIT_SIZES[pregData.currentWeek]?.lengthCm || 0,
-    weightG: dayContent.baby_weight_gram || FRUIT_SIZES[pregData.currentWeek]?.weightG || 0,
-  } : FRUIT_SIZES[pregData.currentWeek] || FRUIT_SIZES[12];
+  // Get fruit data from database or static
+  const getFruitData = () => {
+    const dbData = fruitImages.find(f => f.week_number === pregData.currentWeek);
+    const staticData = FRUIT_SIZES[pregData.currentWeek] || FRUIT_SIZES[12];
+    
+    return {
+      fruit: dayContent?.baby_size_fruit || dbData?.fruit_name || staticData?.fruit || 'Meyvə',
+      emoji: dbData?.emoji || staticData?.emoji || '🍎',
+      imageUrl: dbData?.image_url || null,
+      lengthCm: dayContent?.baby_size_cm || dbData?.length_cm || staticData?.lengthCm || 0,
+      weightG: dayContent?.baby_weight_gram || dbData?.weight_g || staticData?.weightG || 0,
+    };
+  };
+  
+  const weekData = getFruitData();
   
   const daysLeft = dayContent?.days_until_birth ?? (pregData.dueDate ? Math.ceil((pregData.dueDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : 0);
   const totalDays = 280;
@@ -438,15 +449,23 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                 <span className="text-lg text-white/70">həftə {pregData.currentDay} gün</span>
               </div>
             </div>
+            {/* Fruit Size Display - Image or Emoji */}
             <motion.div 
-              className="text-7xl"
+              className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center overflow-hidden"
               animate={{ 
-                scale: [1, 1.1, 1],
-                rotate: [0, 5, -5, 0]
+                scale: [1, 1.05, 1],
               }}
-              transition={{ duration: 4, repeat: Infinity }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
-              {weekData.emoji}
+              {weekData.imageUrl ? (
+                <img 
+                  src={weekData.imageUrl} 
+                  alt={weekData.fruit}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-5xl">{weekData.emoji}</span>
+              )}
             </motion.div>
           </div>
 
@@ -488,12 +507,20 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
         transition={{ delay: 0.1 }}
       >
         <div className="flex flex-col items-center">
-          {/* Fetus Image */}
+          {/* Fetus Image with subtle motion */}
           <motion.div 
             className="w-48 h-48 mb-4 relative"
             initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, type: "spring" }}
+            animate={{ 
+              scale: 1, 
+              opacity: 1,
+              y: [0, -4, 0],
+            }}
+            transition={{ 
+              scale: { delay: 0.2, type: "spring" },
+              opacity: { delay: 0.2 },
+              y: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+            }}
           >
             <img 
               src={FETUS_IMAGES[Math.min(Math.ceil(pregData.currentWeek / 4.4), 9)] || FETUS_IMAGES[1]} 
@@ -501,11 +528,19 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
               className="w-full h-full object-contain drop-shadow-lg"
             />
             <motion.div
-              className="absolute -bottom-2 -right-2 w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center"
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              className="absolute -bottom-2 -right-2 w-14 h-14 rounded-full bg-white/80 dark:bg-card shadow-lg flex items-center justify-center overflow-hidden"
+              animate={{ scale: [1, 1.08, 1] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
             >
-              <span className="text-2xl">{weekData.emoji}</span>
+              {weekData.imageUrl ? (
+                <img 
+                  src={weekData.imageUrl} 
+                  alt={weekData.fruit}
+                  className="w-10 h-10 object-cover rounded-full"
+                />
+              ) : (
+                <span className="text-2xl">{weekData.emoji}</span>
+              )}
             </motion.div>
           </motion.div>
           
@@ -1311,6 +1346,7 @@ const Dashboard = ({ onOpenChat, onNavigateToTool }: DashboardProps) => {
   const { lifeStage, name } = useUserStore();
   const { profile } = useAuth();
   const { unreadCount } = useUnreadMessages();
+  const { unreadCount: notificationCount } = useNotifications();
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -1359,9 +1395,15 @@ const Dashboard = ({ onOpenChat, onNavigateToTool }: DashboardProps) => {
             whileTap={{ scale: 0.95 }}
           >
             <Bell className="w-6 h-6 text-primary" />
-            <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive rounded-full text-[10px] font-bold text-white flex items-center justify-center">
-              3
-            </span>
+            {notificationCount > 0 && (
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -top-1 -right-1 w-5 h-5 bg-destructive rounded-full text-[10px] font-bold text-white flex items-center justify-center"
+              >
+                {notificationCount > 9 ? '9+' : notificationCount}
+              </motion.span>
+            )}
           </motion.button>
         </div>
       </motion.div>
