@@ -907,6 +907,54 @@ export type Database = {
         }
         Relationships: []
       }
+      partner_surprises: {
+        Row: {
+          completed_date: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          planned_date: string
+          status: string
+          surprise_category: string
+          surprise_emoji: string
+          surprise_id: string
+          surprise_points: number
+          surprise_title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_date?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          planned_date: string
+          status?: string
+          surprise_category: string
+          surprise_emoji: string
+          surprise_id: string
+          surprise_points?: number
+          surprise_title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_date?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          planned_date?: string
+          status?: string
+          surprise_category?: string
+          surprise_emoji?: string
+          surprise_id?: string
+          surprise_points?: number
+          surprise_title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       post_comments: {
         Row: {
           content: string
