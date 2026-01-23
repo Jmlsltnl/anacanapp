@@ -3,9 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Shield, Timer, Scale, Baby, Briefcase, 
   Volume2, Heart, Footprints, ChevronRight,
-  Utensils, Activity, ArrowLeft, Camera, ChefHat, Lock
+  Utensils, Activity, ArrowLeft, Camera, ChefHat, Lock, ShoppingCart
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
+import { useAuth } from '@/hooks/useAuth';
 import SafetyLookup from './tools/SafetyLookup';
 import KickCounter from './tools/KickCounter';
 import ContractionTimer from './tools/ContractionTimer';
@@ -18,6 +19,7 @@ import Exercises from './tools/Exercises';
 import MoodDiary from './tools/MoodDiary';
 import BabyPhotoshoot from './tools/BabyPhotoshoot';
 import Recipes from './tools/Recipes';
+import ShoppingList from './tools/ShoppingList';
 import { useToast } from '@/hooks/use-toast';
 
 interface Tool {
@@ -31,9 +33,10 @@ interface Tool {
   stages?: string[]; // Which stages this tool is available for
 }
 
-const tools: Tool[] = [
+const getTools = (hasPartner: boolean): Tool[] => [
   { id: 'photoshoot', name: 'Fotosessiya', description: 'AI körpə fotoları', icon: Camera, color: 'text-rose-600', bgColor: 'bg-rose-50' },
   { id: 'recipes', name: 'Sağlam Reseptlər', description: 'Hamiləlik reseptləri', icon: ChefHat, color: 'text-green-600', bgColor: 'bg-green-50' },
+  { id: 'shopping', name: hasPartner ? 'Ortaq Alışveriş' : 'Alışveriş Siyahısı', description: hasPartner ? 'Partnyor ilə ortaq siyahı' : 'Alınacaqlar siyahısı', icon: ShoppingCart, color: 'text-purple-600', bgColor: 'bg-purple-50' },
   { id: 'safety', name: 'Təhlükəsizlik', description: 'Qida və fəaliyyət yoxlayın', icon: Shield, color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
   { id: 'kick', name: 'Təpik Sayğacı', description: 'Körpə hərəkətlərini izləyin', icon: Footprints, color: 'text-pink-600', bgColor: 'bg-pink-50', minWeek: 16, stages: ['bump'] },
   { id: 'contraction', name: 'Sancı Ölçən', description: '5-1-1 qaydası ilə izləyin', icon: Timer, color: 'text-violet-600', bgColor: 'bg-violet-50', stages: ['bump'] },
@@ -55,8 +58,12 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTool, setActiveTool] = useState<string | null>(initialTool);
   const { lifeStage, getPregnancyData } = useUserStore();
+  const { profile } = useAuth();
   const { toast } = useToast();
   const pregData = getPregnancyData();
+  
+  const hasPartner = !!profile?.linked_partner_id;
+  const tools = getTools(hasPartner);
 
   // Effect to set initial tool from props
   useEffect(() => {
@@ -116,6 +123,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   // Render active tool
   if (activeTool === 'photoshoot') return <BabyPhotoshoot onBack={handleBack} />;
   if (activeTool === 'recipes') return <Recipes onBack={handleBack} />;
+  if (activeTool === 'shopping') return <ShoppingList onBack={handleBack} />;
   if (activeTool === 'safety') return <SafetyLookup onBack={handleBack} />;
   if (activeTool === 'kick') return <KickCounter onBack={handleBack} />;
   if (activeTool === 'contraction') return <ContractionTimer onBack={handleBack} />;
