@@ -16,7 +16,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { usePartnerData } from '@/hooks/usePartnerData';
 import { usePartnerMessages } from '@/hooks/usePartnerMessages';
 import { usePartnerMissions } from '@/hooks/usePartnerMissions';
-import { useDailyMissions } from '@/hooks/useDailyMissions';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useFruitImages } from '@/hooks/useFruitImages';
 import { supabase } from '@/integrations/supabase/client';
@@ -117,21 +116,11 @@ const PartnerDashboard = () => {
   const { partnerProfile, partnerDailyLog, loading: partnerLoading, getPregnancyWeek, getDaysUntilDue, getBabyAgeDays } = usePartnerData();
   const { items: shoppingItems, addItem, toggleItem, loading: shoppingLoading } = useShoppingItems();
   const { messages, markAsRead, getUnreadCount } = usePartnerMessages();
-  const { missions: persistedMissions, toggleMission: toggleMissionHook, totalPoints, level, pointsToNextLevel, levelProgress, completedCount } = usePartnerMissions();
-  const { dailyMissions } = useDailyMissions();
+  const { missions, toggleMission: toggleMissionHook, totalPoints, level, pointsToNextLevel, levelProgress, completedCount } = usePartnerMissions();
   const [activeTab, setActiveTab] = useState<'home' | 'missions' | 'shopping' | 'notifications' | 'stats' | 'surprise'>('home');
   const [showChat, setShowChat] = useState(false);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const previousLevelRef = useRef(level);
-
-  // Merge daily missions with persisted state
-  const missions = dailyMissions.map(dm => {
-    const persisted = persistedMissions.find(pm => pm.id === dm.id);
-    return {
-      ...dm,
-      isCompleted: persisted?.isCompleted || false,
-    };
-  });
 
   const [newItem, setNewItem] = useState('');
   const [loveMessage, setLoveMessage] = useState('');
