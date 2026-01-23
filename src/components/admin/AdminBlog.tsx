@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, Edit, Trash2, Eye, EyeOff, Star, Search,
-  ChevronDown, Save, X, Image as ImageIcon, Tag, Clock, BarChart3
+  ChevronDown, Save, X, Image as ImageIcon, Tag, Clock, BarChart3, Sparkles, Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,7 @@ import { useBlogAdmin, BlogPost, BlogCategory } from '@/hooks/useBlog';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import BlogAnalytics from './BlogAnalytics';
+import { supabase } from '@/integrations/supabase/client';
 
 const AdminBlog = () => {
   const { posts, categories, loading, createPost, updatePost, deletePost, createCategory, deleteCategory } = useBlogAdmin();
@@ -22,6 +23,7 @@ const AdminBlog = () => {
   const [showEditor, setShowEditor] = useState(false);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [generatingContent, setGeneratingContent] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -46,6 +48,53 @@ const AdminBlog = () => {
   });
 
   const [newTag, setNewTag] = useState('');
+
+  const generateAIContent = async () => {
+    if (!formData.title.trim()) {
+      toast({
+        title: 'Başlıq tələb olunur',
+        description: 'Məzmun yaratmaq üçün əvvəlcə başlıq daxil edin',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setGeneratingContent(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-blog-content', {
+        body: { 
+          title: formData.title,
+          category: formData.category
+        }
+      });
+
+      if (error) throw error;
+
+      if (data) {
+        setFormData(prev => ({
+          ...prev,
+          content: data.content || prev.content,
+          excerpt: data.excerpt || prev.excerpt,
+          tags: data.tags || prev.tags,
+          reading_time: data.reading_time || prev.reading_time
+        }));
+
+        toast({
+          title: 'Məzmun yaradıldı!',
+          description: 'AI tərəfindən məqalə mətni hazırlandı'
+        });
+      }
+    } catch (error) {
+      console.error('AI content generation error:', error);
+      toast({
+        title: 'Xəta',
+        description: 'Məzmun yaradıla bilmədi. Yenidən cəhd edin.',
+        variant: 'destructive'
+      });
+    } finally {
+      setGeneratingContent(false);
+    }
+  };
 
   const generateSlug = (title: string) => {
     return title
@@ -531,13 +580,41 @@ const AdminBlog = () => {
 
                 {/* Content */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Məzmun *</label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-sm font-medium">Məzmun *</label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={generateAIContent}
+                      disabled={generatingContent || !formData.title.trim()}
+                      className="gap-2"
+                    >
+                      {generatingContent ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Yaradılır...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4" />
+                          AI ilə yarat
+                        </>
+                      )}
+                    </Button>
+                  </div>
                   <Textarea
                     value={formData.content}
                     onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    placeholder="Məqalənin tam məzmunu..."
+                    placeholder="Məqalənin tam məzmunu... (və ya AI ilə yaradın)"
                     rows={12}
+                    disabled={generatingContent}
                   />
+                  {generatingContent && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      AI məzmun yaradır, bir neçə saniyə gözləyin...
+                    </p>
+                  )}
                 </div>
 
                 {/* Tags */}

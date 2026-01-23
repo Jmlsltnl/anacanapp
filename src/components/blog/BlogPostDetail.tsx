@@ -14,14 +14,17 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
+import RelatedPosts from './RelatedPosts';
 
 interface BlogPostDetailProps {
   post: BlogPost;
   categories: BlogCategory[];
+  allPosts: BlogPost[];
   onBack: () => void;
+  onSelectPost: (post: BlogPost) => void;
 }
 
-const BlogPostDetail = ({ post, categories, onBack }: BlogPostDetailProps) => {
+const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: BlogPostDetailProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const {
@@ -356,6 +359,13 @@ const BlogPostDetail = ({ post, categories, onBack }: BlogPostDetailProps) => {
             </div>
           )}
         </div>
+
+        {/* Related Posts */}
+        <RelatedPosts 
+          currentPost={post} 
+          allPosts={allPosts} 
+          onSelectPost={onSelectPost} 
+        />
       </div>
     </div>
   );

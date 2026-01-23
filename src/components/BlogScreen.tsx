@@ -50,8 +50,10 @@ const BlogScreen = ({ onBack }: BlogScreenProps) => {
     return (
       <BlogPostDetail 
         post={selectedPost} 
-        categories={categories} 
-        onBack={() => setSelectedPost(null)} 
+        categories={categories}
+        allPosts={posts}
+        onBack={() => setSelectedPost(null)}
+        onSelectPost={(post) => setSelectedPost(post)}
       />
     );
   }
