@@ -201,10 +201,10 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
   );
 
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <div className="min-h-screen bg-background pb-24">
       {/* Cover Image */}
       {post.cover_image_url && (
-        <div className="relative h-56 w-full">
+        <div className="relative h-48 w-full">
           <img 
             src={post.cover_image_url} 
             alt={post.title}
@@ -213,45 +213,45 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
           <motion.button
             onClick={onBack}
-            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center"
+            className="absolute top-3 left-3 w-9 h-9 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center"
             whileTap={{ scale: 0.95 }}
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
         </div>
       )}
 
       {!post.cover_image_url && (
-        <div className="gradient-primary px-5 pt-4 pb-6">
+        <div className="gradient-primary px-3 pt-3 pb-4">
           <motion.button
             onClick={onBack}
-            className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mb-4"
+            className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center mb-3"
             whileTap={{ scale: 0.95 }}
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
         </div>
       )}
 
-      <div className="px-5 py-4">
+      <div className="px-3 py-3">
         {/* Category badge */}
-        <Badge variant="secondary" className="mb-3 bg-primary/10 text-primary border-0">
+        <Badge variant="secondary" className="mb-2 bg-primary/10 text-primary border-0 text-xs">
           {categories.find(c => c.slug === post.category)?.name || post.category}
         </Badge>
 
         {/* Title */}
-        <h1 className="text-2xl font-black text-foreground mb-3">
+        <h1 className="text-xl font-black text-foreground mb-2">
           {post.title}
         </h1>
 
         {/* Meta info */}
-        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+        <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
           <div className="flex items-center gap-1">
-            <Clock className="w-4 h-4" />
+            <Clock className="w-3.5 h-3.5" />
             <span>{post.reading_time} dəq</span>
           </div>
           <div className="flex items-center gap-1">
-            <Eye className="w-4 h-4" />
+            <Eye className="w-3.5 h-3.5" />
             <span>{post.view_count} baxış</span>
           </div>
           <span>
@@ -260,48 +260,48 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
         </div>
 
         {/* Like/Save/Comment actions */}
-        <div className="flex items-center gap-4 mb-6 pb-4 border-b border-border">
+        <div className="flex items-center gap-3 mb-4 pb-3 border-b border-border">
           <motion.button
             onClick={toggleLike}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all text-sm ${
               isLiked 
                 ? 'bg-red-500/10 text-red-500' 
                 : 'bg-muted text-muted-foreground'
             }`}
             whileTap={{ scale: 0.95 }}
           >
-            <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
+            <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
             <span className="font-medium">{likesCount}</span>
           </motion.button>
 
           <motion.button
             onClick={toggleSave}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all text-sm ${
               isSaved 
                 ? 'bg-primary/10 text-primary' 
                 : 'bg-muted text-muted-foreground'
             }`}
             whileTap={{ scale: 0.95 }}
           >
-            <Bookmark className={`w-5 h-5 ${isSaved ? 'fill-current' : ''}`} />
+            <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
             <span className="font-medium">{isSaved ? 'Saxlanıldı' : 'Saxla'}</span>
           </motion.button>
 
-          <div className="flex items-center gap-1 text-muted-foreground">
-            <MessageCircle className="w-5 h-5" />
+          <div className="flex items-center gap-1 text-muted-foreground text-sm">
+            <MessageCircle className="w-4 h-4" />
             <span className="font-medium">{commentsCount}</span>
           </div>
         </div>
 
         {/* Content */}
         <div 
-          className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-a:text-primary mb-6"
+          className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-a:text-primary mb-4"
           dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br/>') }}
         />
 
         {/* Tags */}
         {post.tags && post.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex flex-wrap gap-1.5 mb-4">
             {post.tags.map(tag => (
               <Badge key={tag} variant="outline" className="text-xs">
                 #{tag}
@@ -311,36 +311,37 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
         )}
 
         {/* Author */}
-        <div className="p-4 bg-card rounded-2xl border border-border/50 flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-xl">
+        <div className="p-3 bg-card rounded-2xl border border-border/50 flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-lg">
             ✍️
           </div>
           <div>
-            <p className="font-bold text-foreground">{post.author_name}</p>
-            <p className="text-sm text-muted-foreground">Məqalə müəllifi</p>
+            <p className="font-bold text-foreground text-sm">{post.author_name}</p>
+            <p className="text-xs text-muted-foreground">Məqalə müəllifi</p>
           </div>
         </div>
 
         {/* Comments Section */}
-        <div className="bg-card rounded-2xl border border-border/50 p-4">
-          <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
-            <MessageCircle className="w-5 h-5 text-primary" />
+        <div className="bg-card rounded-2xl border border-border/50 p-3">
+          <h3 className="font-bold text-foreground mb-3 flex items-center gap-2 text-sm">
+            <MessageCircle className="w-4 h-4 text-primary" />
             Şərhlər ({commentsCount})
           </h3>
 
           {/* New comment input */}
-          <div className="flex gap-3 mb-6">
+          <div className="flex gap-2 mb-4">
             <Textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder={user ? "Şərhinizi yazın..." : "Şərh yazmaq üçün giriş edin"}
-              className="min-h-[80px]"
+              className="min-h-[60px] text-sm"
               disabled={!user}
             />
             <Button 
               onClick={handleAddComment} 
               disabled={submitting || !newComment.trim()}
-              className="shrink-0"
+              className="shrink-0 h-9"
+              size="sm"
             >
               <Send className="w-4 h-4" />
             </Button>
@@ -348,13 +349,13 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
 
           {/* Comments list */}
           {comments.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="text-4xl mb-2">💬</div>
-              <p className="text-muted-foreground">Hələ şərh yoxdur</p>
-              <p className="text-sm text-muted-foreground">İlk şərhi siz yazın!</p>
+            <div className="text-center py-6">
+              <div className="text-3xl mb-2">💬</div>
+              <p className="text-muted-foreground text-sm">Hələ şərh yoxdur</p>
+              <p className="text-xs text-muted-foreground">İlk şərhi siz yazın!</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {comments.map(comment => renderComment(comment))}
             </div>
           )}

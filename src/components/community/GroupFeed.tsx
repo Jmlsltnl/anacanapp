@@ -52,7 +52,7 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
   if (isEmbedded) {
     // Embedded view for general feed
     return (
-      <div ref={ref} className="space-y-4">
+      <div ref={ref} className="space-y-3">
         {/* Search & Filter */}
         <PostSearchFilter
           searchQuery={searchQuery}
@@ -62,25 +62,25 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
         />
 
         {isLoading ? (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-48 rounded-2xl" />
+              <Skeleton key={i} className="h-40 rounded-2xl" />
             ))}
           </div>
         ) : filteredPosts.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-              <Users className="w-8 h-8 text-muted-foreground" />
+          <div className="text-center py-8">
+            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+              <Users className="w-6 h-6 text-muted-foreground" />
             </div>
-            <h3 className="font-bold text-foreground mb-2">
+            <h3 className="font-bold text-foreground mb-1 text-sm">
               {searchQuery ? 'Nəticə tapılmadı' : 'Hələ paylaşım yoxdur'}
             </h3>
-            <p className="text-sm text-muted-foreground mb-4">
+            <p className="text-xs text-muted-foreground mb-3">
               {searchQuery ? 'Başqa axtarış sözləri sınayın' : 'İlk paylaşımı siz edin!'}
             </p>
             {!searchQuery && (
-              <Button onClick={onCreatePost} className="gradient-primary">
-                <Plus className="w-4 h-4 mr-2" />
+              <Button onClick={onCreatePost} className="gradient-primary text-sm h-9">
+                <Plus className="w-4 h-4 mr-1.5" />
                 Paylaşım yarat
               </Button>
             )}
@@ -102,35 +102,35 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
   }
 
   return (
-    <div ref={ref} className="min-h-screen pb-28">
+    <div ref={ref} className="min-h-screen pb-24">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/50">
-        <div className="px-5 py-4">
-          <div className="flex items-center gap-4">
+        <div className="px-3 py-3">
+          <div className="flex items-center gap-3">
             <motion.button
               onClick={onBack}
-              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
+              className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center"
               whileTap={{ scale: 0.95 }}
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4" />
             </motion.button>
             <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">{group?.icon_emoji || '👥'}</span>
-                <h1 className="text-xl font-black text-foreground truncate">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xl">{group?.icon_emoji || '👥'}</span>
+                <h1 className="text-lg font-black text-foreground truncate">
                   {group?.name || 'Ümumi'}
                 </h1>
               </div>
-              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Users className="w-3 h-3" />
                 <span>{group?.member_count || 0} üzv</span>
               </div>
             </div>
             <Button
               onClick={onCreatePost}
-              className="w-10 h-10 rounded-xl gradient-primary p-0"
+              className="w-9 h-9 rounded-xl gradient-primary p-0"
             >
-              <Plus className="w-5 h-5 text-white" />
+              <Plus className="w-4 h-4 text-white" />
             </Button>
           </div>
         </div>
@@ -146,14 +146,14 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
         
         {/* Stories */}
         {group && (
-          <div className="px-5 pb-2 border-b border-border/50">
+          <div className="px-3 pb-2 border-b border-border/50">
             <StoriesBar groupId={group.id} />
           </div>
         )}
       </div>
 
       {/* Search & Filter */}
-      <div className="px-5 pt-4">
+      <div className="px-3 pt-3">
         <PostSearchFilter
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -163,27 +163,27 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
       </div>
 
       {/* Feed */}
-      <div className="px-5 pt-4 space-y-4">
+      <div className="px-3 pt-3 space-y-3">
         {isLoading ? (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-48 rounded-2xl" />
+              <Skeleton key={i} className="h-40 rounded-2xl" />
             ))}
           </div>
         ) : filteredPosts.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-              <Users className="w-8 h-8 text-muted-foreground" />
+          <div className="text-center py-8">
+            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+              <Users className="w-6 h-6 text-muted-foreground" />
             </div>
-            <h3 className="font-bold text-foreground mb-2">
+            <h3 className="font-bold text-foreground mb-1 text-sm">
               {searchQuery ? 'Nəticə tapılmadı' : 'Hələ paylaşım yoxdur'}
             </h3>
-            <p className="text-sm text-muted-foreground mb-4">
+            <p className="text-xs text-muted-foreground mb-3">
               {searchQuery ? 'Başqa axtarış sözləri sınayın' : 'Bu qrupda ilk paylaşımı siz edin!'}
             </p>
             {!searchQuery && (
-              <Button onClick={onCreatePost} className="gradient-primary">
-                <Plus className="w-4 h-4 mr-2" />
+              <Button onClick={onCreatePost} className="gradient-primary text-sm h-9">
+                <Plus className="w-4 h-4 mr-1.5" />
                 Paylaşım yarat
               </Button>
             )}
