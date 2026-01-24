@@ -1959,6 +1959,69 @@ export type Database = {
         }
         Relationships: []
       }
+      vitamins: {
+        Row: {
+          benefits: string[] | null
+          created_at: string
+          description: string | null
+          description_az: string | null
+          dosage: string | null
+          food_sources: string[] | null
+          icon_emoji: string | null
+          id: string
+          importance: string | null
+          is_active: boolean | null
+          life_stage: string | null
+          name: string
+          name_az: string | null
+          sort_order: number | null
+          trimester: number | null
+          updated_at: string
+          week_end: number | null
+          week_start: number | null
+        }
+        Insert: {
+          benefits?: string[] | null
+          created_at?: string
+          description?: string | null
+          description_az?: string | null
+          dosage?: string | null
+          food_sources?: string[] | null
+          icon_emoji?: string | null
+          id?: string
+          importance?: string | null
+          is_active?: boolean | null
+          life_stage?: string | null
+          name: string
+          name_az?: string | null
+          sort_order?: number | null
+          trimester?: number | null
+          updated_at?: string
+          week_end?: number | null
+          week_start?: number | null
+        }
+        Update: {
+          benefits?: string[] | null
+          created_at?: string
+          description?: string | null
+          description_az?: string | null
+          dosage?: string | null
+          food_sources?: string[] | null
+          icon_emoji?: string | null
+          id?: string
+          importance?: string | null
+          is_active?: boolean | null
+          life_stage?: string | null
+          name?: string
+          name_az?: string | null
+          sort_order?: number | null
+          trimester?: number | null
+          updated_at?: string
+          week_end?: number | null
+          week_start?: number | null
+        }
+        Relationships: []
+      }
       weekly_tips: {
         Row: {
           content: string

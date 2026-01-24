@@ -185,7 +185,7 @@ const FlowDashboard = () => {
     <div className="space-y-2">
       {/* Main Cycle Card with Progress Ring */}
       <motion.div 
-        className="relative overflow-hidden rounded-2xl gradient-flow p-4 text-white shadow-elevated"
+        className="relative overflow-hidden rounded-2xl bg-primary p-4 text-white shadow-elevated"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -612,7 +612,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                   <p className="text-[9px] text-muted-foreground">Gün {pregnancyDay} / 280</p>
                 </div>
               </div>
-              <p className="text-foreground font-medium italic text-xs leading-relaxed">
+              <p className="text-foreground font-medium text-xs leading-relaxed">
                 "{dayContent.baby_message}"
               </p>
             </motion.div>
@@ -958,7 +958,7 @@ const MommyDashboard = () => {
     <div className="space-y-2">
       {/* Baby Hero Card */}
       <motion.div 
-        className="relative overflow-hidden rounded-[1.5rem] gradient-mommy p-5 text-white shadow-elevated"
+        className="relative overflow-hidden rounded-[1.5rem] bg-primary p-5 text-white shadow-elevated"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5 }}

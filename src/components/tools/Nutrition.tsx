@@ -2,7 +2,7 @@ import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Utensils, Apple, Coffee, Droplets, 
-  Plus, Star, X, Check, Trash2, ChefHat, Clock, Heart, Leaf, Search, Users
+  Plus, Star, X, Check, Trash2, ChefHat, Clock, Heart, Leaf, Search, Users, Pill
 } from 'lucide-react';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useMealLogs } from '@/hooks/useMealLogs';
@@ -10,6 +10,7 @@ import { useNutritionTips, useRecipes, Recipe } from '@/hooks/useDynamicContent'
 import { useUserStore } from '@/store/userStore';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import VitaminsTab from './VitaminsTab';
 
 interface NutritionProps {
   onBack: () => void;
@@ -91,7 +92,7 @@ const getRecipeCategories = (lifeStage: string) => {
 };
 
 const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) => {
-  const [activeTab, setActiveTab] = useState<'log' | 'recipes' | 'tips' | 'water'>('log');
+  const [activeTab, setActiveTab] = useState<'log' | 'recipes' | 'tips' | 'vitamins' | 'water'>('log');
   const [selectedMeal, setSelectedMeal] = useState<string | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [recipeCategory, setRecipeCategory] = useState('all');
@@ -476,6 +477,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
           {[
             { id: 'log', label: 'Yemək' },
             { id: 'recipes', label: 'Reseptlər' },
+            { id: 'vitamins', label: 'Vitaminlər' },
             { id: 'tips', label: 'Tövsiyələr' },
             { id: 'water', label: 'Su' },
           ].map(tab => (
@@ -682,6 +684,10 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                 </div>
               )}
             </motion.div>
+          )}
+
+          {activeTab === 'vitamins' && (
+            <VitaminsTab />
           )}
 
           {activeTab === 'water' && (
