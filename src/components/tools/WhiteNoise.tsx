@@ -219,22 +219,22 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="gradient-primary px-5 pt-14 pb-10 rounded-b-[2rem] flex-shrink-0">
-        <div className="flex items-center gap-4">
+      <div className="gradient-primary px-3 pt-3 pb-8 rounded-b-[1.5rem] flex-shrink-0">
+        <div className="flex items-center gap-3">
           <motion.button
             onClick={onBack}
-            className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">Bəyaz Küylər</h1>
-            <p className="text-white/80 text-sm">Körpəni sakitləşdirin</p>
+            <h1 className="text-lg font-bold text-white">Bəyaz Küylər</h1>
+            <p className="text-white/80 text-xs">Körpəni sakitləşdirin</p>
           </div>
           {isPremium && (
-            <div className="bg-amber-400 text-amber-900 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+            <div className="bg-amber-400 text-amber-900 px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1">
               <Crown className="w-3 h-3" />
               Premium
             </div>
@@ -243,32 +243,32 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
       </div>
 
       {/* Content - Scrollable */}
-      <div className="flex-1 overflow-y-auto px-5 -mt-6">
+      <div className="flex-1 overflow-y-auto px-3 -mt-4">
         {/* Free tier usage info */}
         {!isPremium && (
           <motion.div
             initial={{ y: -10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className={`rounded-2xl p-4 mb-4 flex items-center gap-3 ${
+            className={`rounded-xl p-3 mb-3 flex items-center gap-2 ${
               usageInfo.remainingSeconds < 300 
                 ? 'bg-red-50 dark:bg-red-900/20' 
                 : 'bg-amber-50 dark:bg-amber-900/20'
             }`}
           >
             {usageInfo.remainingSeconds < 300 ? (
-              <Lock className="w-5 h-5 text-red-500 flex-shrink-0" />
+              <Lock className="w-4 h-4 text-red-500 flex-shrink-0" />
             ) : (
-              <Crown className="w-5 h-5 text-amber-500 flex-shrink-0" />
+              <Crown className="w-4 h-4 text-amber-500 flex-shrink-0" />
             )}
             <div className="flex-1">
-              <p className={`text-sm font-medium ${
+              <p className={`text-xs font-medium ${
                 usageInfo.remainingSeconds < 300 
                   ? 'text-red-800 dark:text-red-200'
                   : 'text-amber-800 dark:text-amber-200'
               }`}>
                 Bu gün qalan: {remainingMinutes} dəqiqə
               </p>
-              <p className={`text-xs mt-0.5 ${
+              <p className={`text-[10px] mt-0.5 ${
                 usageInfo.remainingSeconds < 300 
                   ? 'text-red-600 dark:text-red-300'
                   : 'text-amber-600 dark:text-amber-300'
@@ -278,7 +278,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
             </div>
             <motion.button
               onClick={() => setShowPremiumModal(true)}
-              className="bg-amber-400 text-amber-900 px-3 py-1.5 rounded-xl text-xs font-bold"
+              className="bg-amber-400 text-amber-900 px-2 py-1 rounded-lg text-[10px] font-bold"
               whileTap={{ scale: 0.95 }}
             >
               Premium
@@ -293,30 +293,30 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className={`bg-gradient-to-r ${sounds.find(s => s.id === activeSound)?.color} rounded-3xl p-6 shadow-elevated mb-6`}
+              className={`bg-gradient-to-r ${sounds.find(s => s.id === activeSound)?.color} rounded-2xl p-4 shadow-elevated mb-4`}
             >
-              <div className="text-center mb-4">
+              <div className="text-center mb-3">
                 <motion.div
-                  className="text-6xl mb-3"
+                  className="text-5xl mb-2"
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
                   {sounds.find(s => s.id === activeSound)?.emoji}
                 </motion.div>
-                <h2 className="text-2xl font-bold text-white">{sounds.find(s => s.id === activeSound)?.name}</h2>
+                <h2 className="text-xl font-bold text-white">{sounds.find(s => s.id === activeSound)?.name}</h2>
                 {timeRemaining !== null && (
-                  <p className="text-white/80 mt-2 font-mono">{formatTime(timeRemaining)} qaldı</p>
+                  <p className="text-white/80 mt-1 font-mono text-sm">{formatTime(timeRemaining)} qaldı</p>
                 )}
               </div>
 
               {/* Waveform Animation */}
-              <div className="flex items-center justify-center gap-1 h-12 mb-4">
+              <div className="flex items-center justify-center gap-0.5 h-10 mb-3">
                 {[...Array(20)].map((_, i) => (
                   <motion.div
                     key={i}
                     className="w-1 bg-white/60 rounded-full"
                     animate={{
-                      height: [10, 30 + Math.random() * 20, 10],
+                      height: [8, 24 + Math.random() * 16, 8],
                     }}
                     transition={{
                       duration: 0.5 + Math.random() * 0.5,
@@ -328,24 +328,24 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
               </div>
 
               {/* Controls */}
-              <div className="flex items-center justify-center gap-4">
+              <div className="flex items-center justify-center gap-3">
                 <motion.button
                   onClick={() => setIsMuted(!isMuted)}
-                  className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center"
+                  className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
                   whileTap={{ scale: 0.9 }}
                 >
-                  {isMuted ? <VolumeX className="w-6 h-6 text-white" /> : <Volume2 className="w-6 h-6 text-white" />}
+                  {isMuted ? <VolumeX className="w-5 h-5 text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
                 </motion.button>
                 
                 <motion.button
                   onClick={() => handleSoundToggle(activeSound)}
-                  className="w-16 h-16 rounded-full bg-white flex items-center justify-center"
+                  className="w-14 h-14 rounded-full bg-white flex items-center justify-center"
                   whileTap={{ scale: 0.9 }}
                 >
-                  <Pause className="w-8 h-8 text-gray-800" />
+                  <Pause className="w-7 h-7 text-gray-800" />
                 </motion.button>
 
-                <div className="w-12" />
+                <div className="w-10" />
               </div>
             </motion.div>
           )}
@@ -353,12 +353,12 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
 
         {/* Volume Slider */}
         <motion.div
-          className="bg-card rounded-2xl p-4 shadow-card border border-border/50 mb-6"
+          className="bg-card rounded-xl p-3 shadow-card border border-border/50 mb-4"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
         >
-          <div className="flex items-center gap-4">
-            <VolumeX className="w-5 h-5 text-muted-foreground" />
+          <div className="flex items-center gap-3">
+            <VolumeX className="w-4 h-4 text-muted-foreground" />
             <input
               type="range"
               min="0"
@@ -367,19 +367,19 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
               onChange={(e) => handleVolumeChange(parseInt(e.target.value))}
               className="flex-1 h-2 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
             />
-            <Volume2 className="w-5 h-5 text-muted-foreground" />
+            <Volume2 className="w-4 h-4 text-muted-foreground" />
           </div>
         </motion.div>
 
         {/* Timer Options */}
-        <div className="mb-6">
-          <h3 className="font-bold text-foreground mb-3">Taymer</h3>
+        <div className="mb-4">
+          <h3 className="font-bold text-foreground mb-2 text-sm">Taymer</h3>
           <div className="flex gap-2">
             {timerOptions.map((option) => (
               <button
                 key={option.label}
                 onClick={() => handleTimerChange(option.value)}
-                className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all ${
+                className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
                   timer === option.value
                     ? 'gradient-primary text-white shadow-button'
                     : 'bg-muted text-muted-foreground'
@@ -390,15 +390,15 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
             ))}
           </div>
           {!isPremium && (
-            <p className="text-xs text-muted-foreground mt-2 text-center">
+            <p className="text-[10px] text-muted-foreground mt-1.5 text-center">
               Limitsiz taymer üçün Premium-a keçin
             </p>
           )}
         </div>
 
         {/* Sounds Grid */}
-        <h3 className="font-bold text-foreground mb-4">Səslər</h3>
-        <div className="grid grid-cols-3 gap-3 pb-24">
+        <h3 className="font-bold text-foreground mb-3 text-sm">Səslər</h3>
+        <div className="grid grid-cols-3 gap-2 pb-24">
           {sounds.map((sound, index) => {
             const isActive = activeSound === sound.id;
             return (
@@ -408,7 +408,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.05 }}
                 onClick={() => handleSoundToggle(sound.id)}
-                className={`relative aspect-square rounded-2xl flex flex-col items-center justify-center transition-all ${
+                className={`relative aspect-square rounded-xl flex flex-col items-center justify-center transition-all ${
                   isActive
                     ? `bg-gradient-to-r ${sound.color} shadow-elevated`
                     : 'bg-card border border-border/50 shadow-card'
@@ -418,18 +418,18 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
               >
                 {isActive && (
                   <motion.div
-                    className="absolute inset-0 rounded-2xl bg-white/20"
+                    className="absolute inset-0 rounded-xl bg-white/20"
                     animate={{ opacity: [0.2, 0.4, 0.2] }}
                     transition={{ duration: 1.5, repeat: Infinity }}
                   />
                 )}
-                <span className="text-3xl mb-1 relative z-10">{sound.emoji}</span>
-                <span className={`text-xs font-bold relative z-10 ${isActive ? 'text-white' : 'text-muted-foreground'}`}>
+                <span className="text-2xl mb-0.5 relative z-10">{sound.emoji}</span>
+                <span className={`text-[10px] font-bold relative z-10 ${isActive ? 'text-white' : 'text-muted-foreground'}`}>
                   {sound.name}
                 </span>
                 {isActive && (
                   <motion.div
-                    className="absolute top-2 right-2 w-3 h-3 rounded-full bg-white"
+                    className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-white"
                     animate={{ scale: [1, 1.2, 1] }}
                     transition={{ duration: 1, repeat: Infinity }}
                   />

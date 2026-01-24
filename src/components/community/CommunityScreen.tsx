@@ -57,32 +57,32 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
     <div ref={ref} className="min-h-screen pb-24">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-background border-b border-border/50">
-        <div className="px-5 py-4">
-          <div className="flex items-center gap-4 mb-4">
+        <div className="px-3 py-3">
+          <div className="flex items-center gap-3 mb-3">
             {onBack && (
               <motion.button
                 onClick={onBack}
-                className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
+                className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center"
                 whileTap={{ scale: 0.95 }}
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-4 h-4" />
               </motion.button>
             )}
             <div className="flex-1">
-              <h1 className="text-2xl font-black text-foreground">Cəmiyyət</h1>
-              <p className="text-sm text-muted-foreground">Digər analar ilə əlaqədə olun</p>
+              <h1 className="text-lg font-black text-foreground">Cəmiyyət</h1>
+              <p className="text-xs text-muted-foreground">Digər analar ilə əlaqədə olun</p>
             </div>
           </div>
 
           {/* Search */}
-          <div className="relative mb-4">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <div className="relative mb-3">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Qrup axtar..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-12 pl-11 pr-4 rounded-xl bg-muted/50 border border-border/50 text-sm outline-none focus:border-primary/50"
+              className="w-full h-10 pl-10 pr-3 rounded-xl bg-muted/50 border border-border/50 text-sm outline-none focus:border-primary/50"
             />
           </div>
 
@@ -98,14 +98,14 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
                 <motion.button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex-1 py-2.5 px-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${
+                  className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
                     activeTab === tab.id
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted text-muted-foreground'
                   }`}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-3.5 h-3.5" />
                   {tab.label}
                 </motion.button>
               );
@@ -115,12 +115,12 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
       </div>
 
       {/* Stories Bar */}
-      <div className="px-5 pt-4 border-b border-border/50 pb-4">
+      <div className="px-3 pt-3 border-b border-border/50 pb-3">
         <StoriesBar groupId={null} />
       </div>
 
       {/* Content */}
-      <div className="px-5 pt-4">
+      <div className="px-3 pt-3">
         <AnimatePresence mode="wait">
           {activeTab === 'feed' && (
             <motion.div
@@ -164,17 +164,17 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
               exit={{ opacity: 0, y: -10 }}
             >
               {myGroups.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-                    <Users className="w-8 h-8 text-muted-foreground" />
+                <div className="text-center py-8">
+                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+                    <Users className="w-6 h-6 text-muted-foreground" />
                   </div>
-                  <h3 className="font-bold text-foreground mb-2">Qruplarınız yoxdur</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <h3 className="font-bold text-foreground mb-1 text-sm">Qruplarınız yoxdur</h3>
+                  <p className="text-xs text-muted-foreground mb-3">
                     Digər analar ilə əlaqə qurmaq üçün qruplara qoşulun
                   </p>
                   <motion.button 
                     onClick={() => setActiveTab('groups')}
-                    className="px-6 py-3 rounded-xl gradient-primary text-white font-bold"
+                    className="px-4 py-2 rounded-xl gradient-primary text-white font-bold text-sm"
                     whileTap={{ scale: 0.98 }}
                   >
                     Qrupları kəşf et
@@ -197,14 +197,14 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
       {/* Floating Action Button for Create Post */}
       <motion.button
         onClick={() => setShowCreatePost(true)}
-        className="fixed bottom-24 right-5 w-14 h-14 rounded-full gradient-primary shadow-elevated flex items-center justify-center z-40"
+        className="fixed bottom-24 right-3 w-12 h-12 rounded-full gradient-primary shadow-elevated flex items-center justify-center z-40"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
       >
-        <Plus className="w-6 h-6 text-white" />
+        <Plus className="w-5 h-5 text-white" />
       </motion.button>
 
       {/* Create Post Modal */}
