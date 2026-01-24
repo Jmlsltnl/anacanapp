@@ -1,9 +1,36 @@
 {
-  "appId": "app.lovable.e07ee1f93d5848fea7a0068ecf028173",
-  "appName": "anacanapp",
+  "appId": "app.lovable.anacan",
+  "appName": "Anacan",
   "webDir": "dist",
   "server": {
     "url": "https://e07ee1f9-3d58-48fe-a7a0-068ecf028173.lovableproject.com?forceHideBadge=true",
     "cleartext": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "launchAutoHide": true,
+      "backgroundColor": "#F97316",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false,
+      "splashFullScreen": true,
+      "splashImmersive": true
+    },
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon",
+      "iconColor": "#F97316"
+    }
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "scheme": "Anacan"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
   }
 }
