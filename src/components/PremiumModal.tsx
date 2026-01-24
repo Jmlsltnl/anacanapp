@@ -1,6 +1,9 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Crown, Check, Sparkles, Star } from 'lucide-react';
+import { X, Crown, Check, Sparkles, Star, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useInAppPurchase } from '@/hooks/useInAppPurchase';
+import { isNativePlatform } from '@/lib/iap';
+import { useToast } from '@/hooks/use-toast';
 
 interface PremiumModalProps {
   isOpen: boolean;
@@ -18,6 +21,87 @@ const premiumFeatures = [
 ];
 
 export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
+  const { toast } = useToast();
+  const {
+    products,
+    isLoading,
+    isPurchasing,
+    error,
+    isSupported,
+    purchaseMonthly,
+    purchaseYearly,
+    restorePurchases,
+  } = useInAppPurchase();
+
+  const isNative = isNativePlatform();
+
+  // Get prices from products or use defaults
+  const monthlyProduct = products.find(p => p.productId.includes('monthly'));
+  const yearlyProduct = products.find(p => p.productId.includes('yearly'));
+
+  const monthlyPrice = monthlyProduct?.price || '₼9.99';
+  const yearlyPrice = yearlyProduct?.price || '₼79.99';
+  const yearlyMonthly = yearlyProduct 
+    ? `₼${(yearlyProduct.priceAmount / 12).toFixed(2)}`
+    : '₼6.67';
+
+  const handleMonthlyPurchase = async () => {
+    if (!isNative) {
+      toast({
+        title: 'Premium mövcud deyil',
+        description: 'Premium almaq üçün mobil tətbiqi yükləyin.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const success = await purchaseMonthly();
+    if (success) {
+      toast({
+        title: 'Premium aktivləşdirildi! 🎉',
+        description: 'İndi bütün xüsusiyyətlərdən istifadə edə bilərsiniz.',
+      });
+      onClose();
+    }
+  };
+
+  const handleYearlyPurchase = async () => {
+    if (!isNative) {
+      toast({
+        title: 'Premium mövcud deyil',
+        description: 'Premium almaq üçün mobil tətbiqi yükləyin.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const success = await purchaseYearly();
+    if (success) {
+      toast({
+        title: 'Premium aktivləşdirildi! 🎉',
+        description: 'İndi bütün xüsusiyyətlərdən istifadə edə bilərsiniz.',
+      });
+      onClose();
+    }
+  };
+
+  const handleRestore = async () => {
+    const success = await restorePurchases();
+    if (success) {
+      toast({
+        title: 'Alışlar bərpa edildi',
+        description: 'Premium abunəliyiniz aktivləşdirildi.',
+      });
+      onClose();
+    } else {
+      toast({
+        title: 'Alış tapılmadı',
+        description: 'Əvvəlki premium abunəlik tapılmadı.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -40,6 +124,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
               <button
                 onClick={onClose}
                 className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"
+                disabled={isPurchasing}
               >
                 <X className="w-5 h-5 text-white" />
               </button>
@@ -67,6 +152,12 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
 
             {/* Features */}
             <div className="px-6 py-6 -mt-6 bg-card rounded-t-3xl relative">
+              {error && (
+                <div className="mb-4 p-3 bg-destructive/10 text-destructive rounded-xl text-sm text-center">
+                  {error}
+                </div>
+              )}
+
               <div className="space-y-3 mb-6">
                 {premiumFeatures.map((item, index) => (
                   <motion.div
@@ -89,15 +180,17 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
               {/* Pricing */}
               <div className="space-y-3 mb-6">
                 <motion.button
-                  className="w-full p-4 rounded-2xl bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 text-white relative overflow-hidden"
+                  className="w-full p-4 rounded-2xl bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 text-white relative overflow-hidden disabled:opacity-50"
                   whileTap={{ scale: 0.98 }}
+                  onClick={handleYearlyPurchase}
+                  disabled={isPurchasing || isLoading}
                 >
                   <div className="absolute top-2 right-2 bg-white text-orange-500 text-xs font-bold px-2 py-0.5 rounded-full">
                     ƏN POPULYAR
                   </div>
                   <div className="text-left">
                     <p className="font-bold text-lg">İllik Plan</p>
-                    <p className="text-white/90 text-sm">₼79.99/il • ₼6.67/ay</p>
+                    <p className="text-white/90 text-sm">{yearlyPrice}/il • {yearlyMonthly}/ay</p>
                   </div>
                   <div className="absolute bottom-2 right-4 flex items-center gap-1">
                     <Star className="w-4 h-4 fill-yellow-300 text-yellow-300" />
@@ -106,27 +199,58 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                 </motion.button>
 
                 <motion.button
-                  className="w-full p-4 rounded-2xl bg-muted text-foreground border-2 border-border"
+                  className="w-full p-4 rounded-2xl bg-muted text-foreground border-2 border-border disabled:opacity-50"
                   whileTap={{ scale: 0.98 }}
+                  onClick={handleMonthlyPurchase}
+                  disabled={isPurchasing || isLoading}
                 >
                   <div className="text-left">
                     <p className="font-bold text-lg">Aylıq Plan</p>
-                    <p className="text-muted-foreground text-sm">₼9.99/ay</p>
+                    <p className="text-muted-foreground text-sm">{monthlyPrice}/ay</p>
                   </div>
                 </motion.button>
               </div>
 
               {/* CTA */}
               <Button
-                className="w-full h-14 rounded-2xl bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 text-white font-bold text-lg shadow-lg"
+                className="w-full h-14 rounded-2xl bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 text-white font-bold text-lg shadow-lg disabled:opacity-50"
+                onClick={handleYearlyPurchase}
+                disabled={isPurchasing || isLoading}
               >
-                <Crown className="w-5 h-5 mr-2" />
-                Premium-a Keç
+                {isPurchasing ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Emal edilir...
+                  </>
+                ) : (
+                  <>
+                    <Crown className="w-5 h-5 mr-2" />
+                    Premium-a Keç
+                  </>
+                )}
               </Button>
+
+              {/* Restore purchases */}
+              {isNative && isSupported && (
+                <button
+                  onClick={handleRestore}
+                  disabled={isPurchasing || isLoading}
+                  className="w-full mt-3 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Alışları bərpa et
+                </button>
+              )}
 
               <p className="text-center text-xs text-muted-foreground mt-4">
                 İstənilən vaxt ləğv edə bilərsiniz
               </p>
+
+              {!isNative && (
+                <p className="text-center text-xs text-muted-foreground mt-2">
+                  💡 Premium almaq üçün App Store və ya Google Play-dən tətbiqi yükləyin
+                </p>
+              )}
             </div>
           </motion.div>
         </motion.div>
