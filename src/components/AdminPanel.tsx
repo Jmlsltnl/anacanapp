@@ -16,6 +16,7 @@ import AdminFruitImages from './admin/AdminFruitImages';
 import AdminBlog from './admin/AdminBlog';
 import AdminSupport from './admin/AdminSupport';
 import AdminVitamins from './admin/AdminVitamins';
+import AdminDynamicContent from './admin/AdminDynamicContent';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -46,6 +47,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminFruitImages />;
       case 'vitamins':
         return <AdminVitamins />;
+      case 'dynamic-content':
+        return <AdminDynamicContent />;
       case 'subscriptions':
         return <AdminSubscriptions />;
       case 'moderation':
