@@ -608,11 +608,11 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                   <span className="text-sm">👶</span>
                 </div>
                 <div>
-                  <p className="text-[10px] text-primary font-bold uppercase tracking-wider">Körpədən Mesaj</p>
-                  <p className="text-[9px] text-muted-foreground">Gün {pregnancyDay} / 280</p>
+                <p className="text-xs text-primary font-bold uppercase tracking-wider">Körpədən Mesaj</p>
+                  <p className="text-[10px] text-muted-foreground">Gün {pregnancyDay} / 280</p>
                 </div>
               </div>
-              <p className="text-foreground font-medium text-xs leading-relaxed">
+              <p className="text-foreground font-medium text-sm leading-relaxed">
                 "{dayContent.baby_message}"
               </p>
             </motion.div>
@@ -631,9 +631,9 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                 <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
                   <span className="text-sm">🤰</span>
                 </div>
-                <p className="text-[10px] text-primary font-bold uppercase tracking-wider">Bədəndəki Dəyişikliklər</p>
+                <p className="text-xs text-primary font-bold uppercase tracking-wider">Bədəndəki Dəyişikliklər</p>
               </div>
-              <p className="text-xs text-foreground/90 leading-relaxed">
+              <p className="text-sm text-foreground/90 leading-relaxed">
                 {dayContent.body_changes}
               </p>
             </motion.div>
@@ -652,9 +652,9 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                 <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
                   <span className="text-sm">🌱</span>
                 </div>
-                <p className="text-[10px] text-primary font-bold uppercase tracking-wider">Körpənin İnkişafı</p>
+                <p className="text-xs text-primary font-bold uppercase tracking-wider">Körpənin İnkişafı</p>
               </div>
-              <p className="text-xs text-foreground/90 leading-relaxed">
+              <p className="text-sm text-foreground/90 leading-relaxed">
                 {dayContent.baby_development}
               </p>
             </motion.div>
@@ -673,9 +673,9 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                 <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
                   <span className="text-sm">💡</span>
                 </div>
-                <p className="text-[10px] text-primary font-bold uppercase tracking-wider">Günün Tövsiyəsi</p>
+                <p className="text-xs text-primary font-bold uppercase tracking-wider">Günün Tövsiyəsi</p>
               </div>
-              <p className="text-xs text-foreground/90 leading-relaxed">
+              <p className="text-sm text-foreground/90 leading-relaxed">
                 {dayContent.daily_tip}
               </p>
             </motion.div>
