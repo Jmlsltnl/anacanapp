@@ -60,38 +60,47 @@ export const pushNotifications = {
   register: async () => {
     if (!isNative) return;
 
-    let permStatus = await PushNotifications.checkPermissions();
+    try {
+      let permStatus = await PushNotifications.checkPermissions();
 
-    if (permStatus.receive === 'prompt') {
-      permStatus = await PushNotifications.requestPermissions();
+      if (permStatus.receive === 'prompt') {
+        permStatus = await PushNotifications.requestPermissions();
+      }
+
+      if (permStatus.receive !== 'granted') {
+        console.log('Push notification permission not granted');
+        return;
+      }
+
+      await PushNotifications.register();
+    } catch (error) {
+      // Firebase may not be configured - this is expected during development
+      console.warn('Push notification registration failed (Firebase not configured?):', error);
     }
-
-    if (permStatus.receive !== 'granted') {
-      console.log('Push notification permission not granted');
-      return;
-    }
-
-    await PushNotifications.register();
   },
 
   addListeners: () => {
     if (!isNative) return;
 
-    PushNotifications.addListener('registration', token => {
-      console.log('Push registration success, token: ' + token.value);
-    });
+    try {
+      PushNotifications.addListener('registration', token => {
+        console.log('Push registration success, token: ' + token.value);
+      });
 
-    PushNotifications.addListener('registrationError', err => {
-      console.error('Registration error: ', err.error);
-    });
+      PushNotifications.addListener('registrationError', err => {
+        console.warn('Push registration error:', err.error);
+      });
 
-    PushNotifications.addListener('pushNotificationReceived', notification => {
-      console.log('Push notification received: ', notification);
-    });
+      PushNotifications.addListener('pushNotificationReceived', notification => {
+        console.log('Push notification received:', notification);
+      });
 
-    PushNotifications.addListener('pushNotificationActionPerformed', notification => {
-      console.log('Push notification action performed', notification.actionId, notification.inputValue);
-    });
+      PushNotifications.addListener('pushNotificationActionPerformed', notification => {
+        console.log('Push notification action performed', notification.actionId, notification.inputValue);
+      });
+    } catch (error) {
+      console.warn('Failed to add push notification listeners:', error);
+    }
   }
 };
 
