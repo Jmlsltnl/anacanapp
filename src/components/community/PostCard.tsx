@@ -227,47 +227,47 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
 
   return (
     <>
-      <div className="bg-card rounded-2xl border border-border/50 overflow-hidden">
+      <div className="bg-card rounded-xl border border-border/50 overflow-hidden">
         {/* Header */}
-        <div className="p-4 flex items-center gap-3">
+        <div className="p-3 flex items-center gap-2">
           <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.95 }}>
-            <Avatar className="w-10 h-10 cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all">
+            <Avatar className="w-9 h-9 cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all">
               <AvatarImage src={post.author?.avatar_url || undefined} />
-              <AvatarFallback className="bg-primary/10 text-primary font-bold">
+              <AvatarFallback className="bg-primary/10 text-primary font-bold text-sm">
                 {post.author?.name?.charAt(0) || 'İ'}
               </AvatarFallback>
             </Avatar>
           </motion.button>
           <div className="flex-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <motion.button 
                 onClick={handleAvatarClick}
-                className="font-bold text-foreground text-sm hover:text-primary transition-colors"
+                className="font-bold text-foreground text-xs hover:text-primary transition-colors"
                 whileTap={{ scale: 0.98 }}
               >
                 {post.author?.name || 'İstifadəçi'}
               </motion.button>
               <UserBadge type={authorBadge} />
             </div>
-            <p className="text-xs text-muted-foreground">{timeAgo}</p>
+            <p className="text-[10px] text-muted-foreground">{timeAgo}</p>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center">
-                <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
+              <button className="w-7 h-7 rounded-full hover:bg-muted flex items-center justify-center">
+                <MoreHorizontal className="w-3.5 h-3.5 text-muted-foreground" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-popover border-border z-50">
               {!isOwnPost && (
-                <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-amber-600">
-                  <Flag className="w-4 h-4 mr-2" />
+                <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-amber-600 text-xs">
+                  <Flag className="w-3.5 h-3.5 mr-1.5" />
                   Şikayət et
                 </DropdownMenuItem>
               )}
               {(isAdmin || isOwnPost) && !isOwnPost && <DropdownMenuSeparator />}
               {(isAdmin || isOwnPost) && (
-                <DropdownMenuItem onClick={handleDeletePost} className="text-red-600">
-                  <Trash2 className="w-4 h-4 mr-2" />
+                <DropdownMenuItem onClick={handleDeletePost} className="text-red-600 text-xs">
+                  <Trash2 className="w-3.5 h-3.5 mr-1.5" />
                   Postu Sil
                 </DropdownMenuItem>
               )}
@@ -276,8 +276,8 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
         </div>
 
         {/* Content with styled hashtags and mentions */}
-        <div className="px-4 pb-3">
-          <p className="text-foreground whitespace-pre-wrap">
+        <div className="px-3 pb-2">
+          <p className="text-foreground whitespace-pre-wrap text-sm">
             {post.content.split(/(\s+)/).map((word, index) => {
               if (word.startsWith('#')) {
                 return (
@@ -299,45 +299,45 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
 
         {/* Media Carousel */}
         {mediaItems.length > 0 && (
-          <div className="px-4 pb-3">
+          <div className="px-3 pb-2">
             <MediaCarousel media={mediaItems} />
           </div>
         )}
 
         {/* Stats */}
-        <div className="px-4 py-2 flex items-center gap-4 text-sm text-muted-foreground border-t border-border/50">
+        <div className="px-3 py-1.5 flex items-center gap-3 text-xs text-muted-foreground border-t border-border/50">
           <span>{post.likes_count} bəyənmə</span>
           <span>{post.comments_count} şərh</span>
         </div>
 
         {/* Actions */}
-        <div className="px-4 py-2 flex items-center gap-2 border-t border-border/50">
+        <div className="px-3 py-1.5 flex items-center gap-1 border-t border-border/50">
           <motion.button
             onClick={handleLike}
-            className={`flex-1 py-2 rounded-xl flex items-center justify-center gap-2 transition-colors ${
+            className={`flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition-colors ${
               post.is_liked ? 'text-rose-500' : 'text-muted-foreground hover:bg-muted'
             }`}
             whileTap={{ scale: 0.95 }}
           >
-            <Heart className={`w-5 h-5 ${post.is_liked ? 'fill-current' : ''}`} />
-            <span className="text-sm font-medium">Bəyən</span>
+            <Heart className={`w-4 h-4 ${post.is_liked ? 'fill-current' : ''}`} />
+            <span className="text-xs font-medium">Bəyən</span>
           </motion.button>
           <motion.button
             onClick={() => setShowComments(!showComments)}
-            className="flex-1 py-2 rounded-xl flex items-center justify-center gap-2 text-muted-foreground hover:bg-muted transition-colors"
+            className="flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 text-muted-foreground hover:bg-muted transition-colors"
             whileTap={{ scale: 0.95 }}
           >
-            <MessageCircle className="w-5 h-5" />
-            <span className="text-sm font-medium">Şərh</span>
-            {showComments ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            <MessageCircle className="w-4 h-4" />
+            <span className="text-xs font-medium">Şərh</span>
+            {showComments ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
           </motion.button>
           <motion.button
             onClick={handleShare}
-            className="flex-1 py-2 rounded-xl flex items-center justify-center gap-2 text-muted-foreground hover:bg-muted transition-colors"
+            className="flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 text-muted-foreground hover:bg-muted transition-colors"
             whileTap={{ scale: 0.95 }}
           >
-            <Share2 className="w-5 h-5" />
-            <span className="text-sm font-medium">Paylaş</span>
+            <Share2 className="w-4 h-4" />
+            <span className="text-xs font-medium">Paylaş</span>
           </motion.button>
         </div>
 
@@ -350,36 +350,36 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
               exit={{ height: 0, opacity: 0 }}
               className="border-t border-border/50 overflow-hidden"
             >
-              <div className="p-4 space-y-4">
+              <div className="p-3 space-y-3">
                 {/* Comment Input */}
                 <div className="flex gap-2">
                   <Input
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     placeholder="Şərh yaz..."
-                    className="flex-1 h-10 rounded-xl"
+                    className="flex-1 h-9 rounded-lg text-sm"
                     onKeyPress={(e) => e.key === 'Enter' && handleComment()}
                   />
                   <Button
                     onClick={handleComment}
                     disabled={!commentText.trim() || createComment.isPending}
-                    className="w-10 h-10 rounded-xl gradient-primary p-0"
+                    className="w-9 h-9 rounded-lg gradient-primary p-0"
                   >
-                    <Send className="w-4 h-4 text-white" />
+                    <Send className="w-3.5 h-3.5 text-white" />
                   </Button>
                 </div>
 
                 {/* Comments List with Reply Support */}
                 {commentsLoading ? (
-                  <div className="text-center py-4">
-                    <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+                  <div className="text-center py-3">
+                    <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
                   </div>
                 ) : topLevelComments.length === 0 ? (
-                  <p className="text-center text-sm text-muted-foreground py-2">
+                  <p className="text-center text-xs text-muted-foreground py-2">
                     Hələ şərh yoxdur
                   </p>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {topLevelComments.map((comment) => (
                       <CommentReply
                         key={comment.id}
