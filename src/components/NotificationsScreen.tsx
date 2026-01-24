@@ -46,20 +46,20 @@ const NotificationsScreen = ({ onBack }: NotificationsScreenProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="gradient-primary px-5 pt-4 pb-6">
-        <div className="flex items-center gap-3 mb-4">
+      <div className="gradient-primary px-3 pt-3 pb-4">
+        <div className="flex items-center gap-2 mb-3">
           <motion.button
             onClick={onBack}
-            className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center"
             whileTap={{ scale: 0.95 }}
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">Bildirişlər</h1>
-            <p className="text-white/80 text-sm">{unreadCount} oxunmamış</p>
+            <h1 className="text-lg font-bold text-white">Bildirişlər</h1>
+            <p className="text-white/80 text-xs">{unreadCount} oxunmamış</p>
           </div>
           {unreadCount > 0 && (
             <motion.button
@@ -74,7 +74,7 @@ const NotificationsScreen = ({ onBack }: NotificationsScreenProps) => {
       </div>
 
       {/* Notifications List */}
-      <div className="px-5 pt-4">
+      <div className="px-3 pt-3">
         <AnimatePresence>
           {loading ? (
             <div className="text-center py-12">
@@ -92,7 +92,7 @@ const NotificationsScreen = ({ onBack }: NotificationsScreenProps) => {
               <p className="text-muted-foreground">Bildiriş yoxdur</p>
             </motion.div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {notifications.map((notification, index) => {
                 const { icon: Icon, color } = getNotificationIcon(notification.notification_type);
                 return (

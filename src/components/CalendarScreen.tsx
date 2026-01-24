@@ -152,20 +152,20 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
     : [];
 
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="gradient-primary px-5 pt-4 pb-6">
-        <div className="flex items-center gap-3 mb-4">
+      <div className="gradient-primary px-3 pt-3 pb-4">
+        <div className="flex items-center gap-2 mb-3">
           <motion.button
             onClick={onBack}
-            className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center"
             whileTap={{ scale: 0.95 }}
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">Təqvim</h1>
-            <p className="text-white/80 text-sm">Dövrənizi və randevularınızı izləyin</p>
+            <h1 className="text-lg font-bold text-white">Təqvim</h1>
+            <p className="text-white/80 text-xs">Dövrənizi və randevularınızı izləyin</p>
           </div>
           <motion.button
             onClick={() => {
@@ -173,23 +173,23 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
                 setShowAddForm(true);
               }
             }}
-            className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center"
             whileTap={{ scale: 0.95 }}
           >
-            <Plus className="w-5 h-5 text-white" />
+            <Plus className="w-4 h-4 text-white" />
           </motion.button>
         </div>
       </div>
 
-      <div className="px-5 -mt-3">
+      <div className="px-3 -mt-2">
         {/* Calendar Card */}
         <motion.div 
-          className="bg-card rounded-3xl p-5 shadow-card border border-border/50"
+          className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
         >
           {/* Month Navigation */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-4">
             <motion.button
               onClick={() => navigateMonth(-1)}
               className="w-10 h-10 rounded-full bg-muted flex items-center justify-center"

@@ -75,36 +75,36 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
 
   return (
     <div ref={ref} className="min-h-screen bg-background">
-      <div className="gradient-primary px-5 pt-4 pb-8 safe-top">
-        <div className="flex items-center gap-4 mb-6">
+      <div className="gradient-primary px-3 pt-3 pb-6 safe-top">
+        <div className="flex items-center gap-2 mb-3">
           <motion.button
             onClick={onBack}
-            className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">Təhlükəsizlik Sorğusu</h1>
-            <p className="text-white/80 text-sm">Qida və fəaliyyətləri yoxlayın</p>
+            <h1 className="text-lg font-bold text-white">Təhlükəsizlik Sorğusu</h1>
+            <p className="text-white/80 text-xs">Qida və fəaliyyətləri yoxlayın</p>
           </div>
         </div>
 
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" />
           <input
             type="text"
             placeholder="Nə yoxlamaq istəyirsiniz?"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-14 pl-12 pr-4 rounded-2xl bg-white/20 border border-white/20 text-white placeholder:text-white/60 text-base outline-none focus:bg-white/30 transition-colors"
+            className="w-full h-10 pl-10 pr-3 rounded-xl bg-white/20 border border-white/20 text-white placeholder:text-white/60 text-sm outline-none focus:bg-white/30 transition-colors"
           />
         </div>
       </div>
 
-      <div className="px-5 -mt-4">
-        <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-4 mb-4">
+      <div className="px-3 -mt-3">
+        <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-3 mb-3">
           {categories.map((cat) => (
             <button
               key={cat.id}

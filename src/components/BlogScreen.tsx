@@ -59,27 +59,27 @@ const BlogScreen = ({ onBack }: BlogScreenProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="gradient-primary px-5 pt-4 pb-8">
-        <div className="flex items-center gap-3 mb-4">
+      <div className="gradient-primary px-3 pt-3 pb-6">
+        <div className="flex items-center gap-2 mb-3">
           <motion.button
             onClick={onBack}
-            className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center"
             whileTap={{ scale: 0.95 }}
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">Bloq</h1>
-            <p className="text-white/80 text-sm">Faydalı məqalələr</p>
+            <h1 className="text-lg font-bold text-white">Bloq</h1>
+            <p className="text-white/80 text-xs">Faydalı məqalələr</p>
           </div>
-          <BookOpen className="w-8 h-8 text-white/80" />
+          <BookOpen className="w-6 h-6 text-white/80" />
         </div>
 
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             value={searchQuery}
             onChange={(e) => {
@@ -87,12 +87,12 @@ const BlogScreen = ({ onBack }: BlogScreenProps) => {
               setShowSaved(false);
             }}
             placeholder="Məqalə axtar..."
-            className="pl-12 h-12 rounded-2xl bg-white/90 border-0"
+            className="pl-10 h-10 rounded-xl bg-white/90 border-0 text-sm"
           />
         </div>
       </div>
 
-      <div className="px-5 -mt-4 space-y-6">
+      <div className="px-3 -mt-3 space-y-3">
         {/* Categories + Saved Tab */}
         <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
           <motion.button

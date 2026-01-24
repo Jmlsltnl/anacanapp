@@ -50,17 +50,17 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
     danger?: boolean;
   }) => (
     <motion.div
-      className={`flex items-center gap-4 p-4 ${onClick ? 'cursor-pointer active:bg-muted/50' : ''}`}
+      className={`flex items-center gap-3 p-3 ${onClick ? 'cursor-pointer active:bg-muted/50' : ''}`}
       onClick={onClick}
       whileTap={onClick ? { scale: 0.99 } : undefined}
     >
-      <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${
+      <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
         danger ? 'bg-destructive/10' : 'bg-muted'
       }`}>
-        <Icon className={`w-5 h-5 ${danger ? 'text-destructive' : 'text-muted-foreground'}`} />
+        <Icon className={`w-4 h-4 ${danger ? 'text-destructive' : 'text-muted-foreground'}`} />
       </div>
       <div className="flex-1">
-        <p className={`font-medium ${danger ? 'text-destructive' : 'text-foreground'}`}>{label}</p>
+        <p className={`font-medium text-sm ${danger ? 'text-destructive' : 'text-foreground'}`}>{label}</p>
         {description && (
           <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
         )}
@@ -78,22 +78,22 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="gradient-primary px-5 pt-4 pb-6">
-        <div className="flex items-center gap-3">
+      <div className="gradient-primary px-3 pt-3 pb-4">
+        <div className="flex items-center gap-2">
           <motion.button
             onClick={onBack}
-            className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center"
             whileTap={{ scale: 0.95 }}
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
-          <h1 className="text-xl font-bold text-white">Tənzimləmələr</h1>
+          <h1 className="text-lg font-bold text-white">Tənzimləmələr</h1>
         </div>
       </div>
 
-      <div className="px-5 pt-4 space-y-4">
+      <div className="px-3 pt-3 space-y-2">
         {/* Native App Indicator */}
         {!isNative && (
           <motion.div 
@@ -112,9 +112,9 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
         )}
 
         {/* Notifications */}
-        <div className="bg-card rounded-3xl overflow-hidden shadow-card border border-border/50">
-          <div className="px-4 pt-4 pb-2">
-            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Bildirişlər</h2>
+        <div className="bg-card rounded-2xl overflow-hidden shadow-card border border-border/50">
+          <div className="px-3 pt-3 pb-1">
+            <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Bildirişlər</h2>
           </div>
           <SettingRow icon={Bell} label="Bildirişlər" description="Bütün bildirişləri aktivləşdirin">
             <Switch 
@@ -139,9 +139,9 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
         </div>
 
         {/* Silent Hours */}
-        <div className="bg-card rounded-3xl overflow-hidden shadow-card border border-border/50">
-          <div className="px-4 pt-4 pb-2">
-            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Sakit saatlar</h2>
+        <div className="bg-card rounded-2xl overflow-hidden shadow-card border border-border/50">
+          <div className="px-3 pt-3 pb-1">
+            <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Sakit saatlar</h2>
           </div>
           <SettingRow 
             icon={BellOff} 
