@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Package, Settings, BarChart3, Shield, 
   ChevronLeft, Menu, LogOut, Bell, Search,
-  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby
+  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,6 +26,7 @@ const menuItems = [
   { id: 'subscriptions', label: 'Abunəliklər', icon: Crown },
   { id: 'pregnancy', label: 'Hamiləlik Kontenti', icon: Baby },
   { id: 'fruit-images', label: 'Körpə Ölçüsü Şəkilləri', icon: Baby },
+  { id: 'vitamins', label: 'Vitaminlər', icon: Pill },
   { id: 'content', label: 'Digər Kontent', icon: FileText },
   { id: 'products', label: 'Məhsullar', icon: Package },
   { id: 'data', label: 'Məlumatlar', icon: Database },
