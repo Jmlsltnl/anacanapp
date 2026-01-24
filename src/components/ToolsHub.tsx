@@ -138,13 +138,13 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   return (
     <div className="pb-24 pt-1 px-3">
       {/* Header */}
-      <motion.div className="mb-3" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+      <motion.div className="mb-2" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
         <h1 className="text-lg font-black text-foreground">Alətlər</h1>
         <p className="text-muted-foreground text-xs">Sizin üçün faydalı alətlər</p>
       </motion.div>
 
       {/* Search */}
-      <motion.div className="relative mb-3" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+      <motion.div className="relative mb-2" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <input
           type="text"
@@ -158,7 +158,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
       {/* Featured Tool - Photoshoot */}
       <motion.button
         onClick={() => setActiveTool('photoshoot')}
-        className="w-full relative overflow-hidden rounded-2xl bg-gradient-to-r from-rose-500 to-pink-600 p-3 mb-3 shadow-elevated text-left"
+        className="w-full relative overflow-hidden rounded-2xl bg-gradient-to-r from-rose-500 to-pink-600 p-3 mb-2 shadow-elevated text-left"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         whileHover={{ scale: 1.01 }}
