@@ -48,13 +48,13 @@ const GroupsList = ({ groups, memberGroupIds, onSelectGroup, searchQuery, isLoad
   }, {} as Record<string, CommunityGroup[]>);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {Object.entries(groupedByType).map(([type, typeGroups]) => (
         <div key={type}>
-          <h3 className="text-sm font-bold text-muted-foreground mb-3 px-1">
+          <h3 className="text-xs font-bold text-muted-foreground mb-2 px-1">
             {GROUP_TYPE_LABELS[type] || type}
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-2">
             {typeGroups.map((group, index) => {
               const isMember = memberGroupIds.has(group.id);
 
@@ -64,27 +64,27 @@ const GroupsList = ({ groups, memberGroupIds, onSelectGroup, searchQuery, isLoad
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="bg-card rounded-2xl border border-border/50 overflow-hidden shadow-sm"
+                  className="bg-card rounded-xl border border-border/50 overflow-hidden shadow-sm"
                 >
-                  <div className="p-4">
-                    <div className="flex items-start gap-3">
+                  <div className="p-3">
+                    <div className="flex items-start gap-2">
                       {/* Icon - Fixed size, no overflow */}
-                      <div className="w-12 h-12 min-w-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                        <span className="text-xl leading-none">{group.icon_emoji || '👥'}</span>
+                      <div className="w-10 h-10 min-w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <span className="text-lg leading-none">{group.icon_emoji || '👥'}</span>
                       </div>
                       
                       {/* Content - Flexible but truncated */}
-                      <div className="flex-1 min-w-0 pr-2">
-                        <h4 className="font-bold text-foreground text-sm leading-tight line-clamp-2">
+                      <div className="flex-1 min-w-0 pr-1">
+                        <h4 className="font-bold text-foreground text-xs leading-tight line-clamp-2">
                           {group.name}
                         </h4>
                         {group.description && (
-                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                          <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-2">
                             {group.description}
                           </p>
                         )}
-                        <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
-                          <Users className="w-3 h-3 flex-shrink-0" />
+                        <div className="flex items-center gap-1 mt-1 text-[10px] text-muted-foreground">
+                          <Users className="w-2.5 h-2.5 flex-shrink-0" />
                           <span>{group.member_count} üzv</span>
                         </div>
                       </div>
@@ -92,20 +92,18 @@ const GroupsList = ({ groups, memberGroupIds, onSelectGroup, searchQuery, isLoad
                       {/* Action Button - Fixed width */}
                       <div className="flex-shrink-0">
                         {isMember ? (
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onSelectGroup(group.id);
-                              }}
-                              className="h-9 px-3 text-xs font-medium"
-                            >
-                              <Check className="w-3.5 h-3.5 mr-1.5 text-green-600" />
-                              Üzv
-                            </Button>
-                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onSelectGroup(group.id);
+                            }}
+                            className="h-7 px-2 text-[10px] font-medium"
+                          >
+                            <Check className="w-3 h-3 mr-1 text-green-600" />
+                            Üzv
+                          </Button>
                         ) : (
                           <Button
                             size="sm"
@@ -114,9 +112,9 @@ const GroupsList = ({ groups, memberGroupIds, onSelectGroup, searchQuery, isLoad
                               joinGroup.mutate(group.id);
                             }}
                             disabled={joinGroup.isPending}
-                            className="h-9 px-4 text-xs font-medium gradient-primary"
+                            className="h-7 px-2 text-[10px] font-medium gradient-primary"
                           >
-                            <UserPlus className="w-3.5 h-3.5 mr-1.5" />
+                            <UserPlus className="w-3 h-3 mr-1" />
                             Qoşul
                           </Button>
                         )}
@@ -125,13 +123,13 @@ const GroupsList = ({ groups, memberGroupIds, onSelectGroup, searchQuery, isLoad
                     
                     {/* Member Actions Row */}
                     {isMember && (
-                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/50">
+                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/50">
                         <button
                           onClick={() => onSelectGroup(group.id)}
-                          className="text-xs text-primary font-medium flex items-center gap-1 hover:underline"
+                          className="text-[10px] text-primary font-medium flex items-center gap-0.5 hover:underline"
                         >
                           Qrupа keç
-                          <ChevronRight className="w-3.5 h-3.5" />
+                          <ChevronRight className="w-3 h-3" />
                         </button>
                         <button
                           onClick={(e) => {
@@ -139,9 +137,9 @@ const GroupsList = ({ groups, memberGroupIds, onSelectGroup, searchQuery, isLoad
                             leaveGroup.mutate(group.id);
                           }}
                           disabled={leaveGroup.isPending}
-                          className="text-xs text-destructive hover:underline"
+                          className="text-[10px] text-destructive hover:underline"
                         >
-                          <UserMinus className="w-3 h-3 inline mr-1" />
+                          <UserMinus className="w-2.5 h-2.5 inline mr-0.5" />
                           Ayrıl
                         </button>
                       </div>
@@ -155,11 +153,11 @@ const GroupsList = ({ groups, memberGroupIds, onSelectGroup, searchQuery, isLoad
       ))}
 
       {filteredGroups.length === 0 && (
-        <div className="text-center py-12">
-          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-            <Users className="w-8 h-8 text-muted-foreground" />
+        <div className="text-center py-8">
+          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+            <Users className="w-6 h-6 text-muted-foreground" />
           </div>
-          <p className="text-muted-foreground">Qrup tapılmadı</p>
+          <p className="text-muted-foreground text-sm">Qrup tapılmadı</p>
         </div>
       )}
     </div>
