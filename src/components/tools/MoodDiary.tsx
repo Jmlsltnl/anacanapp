@@ -78,26 +78,26 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
     : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-fuchsia-50 to-background pb-28">
+    <div className="min-h-screen bg-gradient-to-b from-fuchsia-50 to-background pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-br from-fuchsia-500 to-pink-600 px-5 pt-4 pb-8">
-        <div className="flex items-center gap-3 mb-6">
+      <div className="bg-gradient-to-br from-fuchsia-500 to-pink-600 px-3 pt-3 pb-6">
+        <div className="flex items-center gap-2 mb-3">
           <motion.button
             onClick={onBack}
-            className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center"
             whileTap={{ scale: 0.95 }}
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
           <div>
-            <h1 className="text-xl font-bold text-white">Əhval Gündəliyi</h1>
-            <p className="text-white/80 text-sm">Emosiyalarınızı izləyin</p>
+            <h1 className="text-lg font-bold text-white">Əhval Gündəliyi</h1>
+            <p className="text-white/80 text-xs">Emosiyalarınızı izləyin</p>
           </div>
         </div>
 
         {/* Mood Summary */}
         <motion.div 
-          className="bg-white/10 backdrop-blur-md rounded-3xl p-5 border border-white/20"
+          className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
         >
@@ -118,8 +118,8 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
       </div>
 
       {/* Tabs */}
-      <div className="px-5 -mt-4">
-        <div className="bg-card rounded-2xl p-1.5 flex gap-1 shadow-lg">
+      <div className="px-3 -mt-3">
+        <div className="bg-card rounded-xl p-1 flex gap-1 shadow-lg">
           {[
             { id: 'log', label: 'Qeyd', icon: Plus },
             { id: 'history', label: 'Tarixçə', icon: Calendar },

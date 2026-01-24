@@ -335,7 +335,7 @@ const PartnerDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen pb-28 bg-background">
+    <div className="min-h-screen pb-24 bg-background">
       {/* Level Up Celebration */}
       <LevelUpCelebration 
         show={showLevelUp} 
@@ -344,7 +344,7 @@ const PartnerDashboard = () => {
       />
 
       {/* Hero Header */}
-      <div className="bg-gradient-to-br from-partner via-indigo-600 to-violet-700 px-5 pt-6 pb-16 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-partner via-indigo-600 to-violet-700 px-3 pt-4 pb-14 relative overflow-hidden">
         {/* Decorative elements */}
         <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-white/10 blur-3xl" />
         <div className="absolute bottom-0 left-0 w-40 h-40 rounded-full bg-pink-500/20 blur-3xl" />
@@ -352,26 +352,26 @@ const PartnerDashboard = () => {
         
         <div className="relative z-10">
           {/* Top bar */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-white/70 text-sm font-medium">Partner Paneli</p>
-              <h1 className="text-2xl font-black text-white">Salam, {name || 'Partner'}! 👋</h1>
+              <p className="text-white/70 text-xs font-medium">Partner Paneli</p>
+              <h1 className="text-lg font-black text-white">Salam, {name || 'Partner'}! 👋</h1>
             </div>
             <div className="flex items-center gap-3">
               <motion.button
                 onClick={sendLove}
-                className="w-12 h-12 rounded-full bg-pink-500/30 backdrop-blur flex items-center justify-center"
+                className="w-10 h-10 rounded-full bg-pink-500/30 backdrop-blur flex items-center justify-center"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
-                <Heart className="w-6 h-6 text-white fill-white" />
+                <Heart className="w-5 h-5 text-white fill-white" />
               </motion.button>
               <motion.button
                 onClick={() => setActiveTab('notifications')}
-                className="w-12 h-12 rounded-full bg-white/10 backdrop-blur flex items-center justify-center relative"
+                className="w-10 h-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center relative"
                 whileTap={{ scale: 0.95 }}
               >
-                <Bell className="w-6 h-6 text-white" />
+                <Bell className="w-5 h-5 text-white" />
                 {getUnreadCount() > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 rounded-full text-[10px] text-white font-bold flex items-center justify-center">
                     {getUnreadCount() > 9 ? '9+' : getUnreadCount()}
@@ -383,29 +383,29 @@ const PartnerDashboard = () => {
 
           {/* Partner Status Card */}
           <motion.div 
-            className="bg-white/10 backdrop-blur-xl rounded-3xl p-5 border border-white/20"
+            className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20"
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
           >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               {/* Avatar with mood ring */}
               <div className="relative">
                 <motion.div 
-                  className="w-20 h-20 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center text-4xl shadow-lg"
+                  className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center text-3xl shadow-lg"
                   animate={{ scale: [1, 1.02, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
                   {lifeStage === 'bump' ? '🤰' : lifeStage === 'mommy' ? '👩‍🍼' : '👩'}
                 </motion.div>
-                <div className={`absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-gradient-to-r ${getMoodColor(womanMood)} flex items-center justify-center text-lg shadow-md border-2 border-white`}>
+                <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-gradient-to-r ${getMoodColor(womanMood)} flex items-center justify-center text-sm shadow-md border-2 border-white`}>
                   {getMoodEmoji(womanMood)}
                 </div>
               </div>
 
               {/* Info */}
               <div className="flex-1">
-                <h2 className="text-white font-bold text-xl">{womanName}</h2>
-                <p className="text-white/70 text-sm">
+                <h2 className="text-white font-bold text-lg">{womanName}</h2>
+                <p className="text-white/70 text-xs">
                   {lifeStage === 'bump' && currentWeek > 0 
                     ? `Hamiləlik: ${currentWeek}. həftə` 
                     : lifeStage === 'mommy' 
@@ -427,21 +427,21 @@ const PartnerDashboard = () => {
 
             {/* Stats row */}
             {lifeStage === 'bump' && currentWeek > 0 && (
-              <div className="grid grid-cols-3 gap-3 mt-5">
-                <div className="bg-white/10 rounded-xl p-3 text-center">
-                  <Calendar className="w-5 h-5 text-white/70 mx-auto mb-1" />
-                  <p className="text-white font-bold text-lg">{daysUntilDue}</p>
-                  <p className="text-white/60 text-xs">Gün qaldı</p>
+              <div className="grid grid-cols-3 gap-2 mt-4">
+                <div className="bg-white/10 rounded-xl p-2.5 text-center">
+                  <Calendar className="w-4 h-4 text-white/70 mx-auto mb-0.5" />
+                  <p className="text-white font-bold text-base">{daysUntilDue}</p>
+                  <p className="text-white/60 text-[10px]">Gün qaldı</p>
                 </div>
-                <div className="bg-white/10 rounded-xl p-3 text-center">
-                  <Baby className="w-5 h-5 text-white/70 mx-auto mb-1" />
-                  <p className="text-3xl">{weekData?.emoji || '👶'}</p>
-                  <p className="text-white/60 text-xs">{weekData?.fruit || 'Körpə'}</p>
+                <div className="bg-white/10 rounded-xl p-2.5 text-center">
+                  <Baby className="w-4 h-4 text-white/70 mx-auto mb-0.5" />
+                  <p className="text-2xl">{weekData?.emoji || '👶'}</p>
+                  <p className="text-white/60 text-[10px]">{weekData?.fruit || 'Körpə'}</p>
                 </div>
-                <div className="bg-white/10 rounded-xl p-3 text-center">
-                  <Droplets className="w-5 h-5 text-white/70 mx-auto mb-1" />
-                  <p className="text-white font-bold text-lg">{waterIntake}</p>
-                  <p className="text-white/60 text-xs">ml su</p>
+                <div className="bg-white/10 rounded-xl p-2.5 text-center">
+                  <Droplets className="w-4 h-4 text-white/70 mx-auto mb-0.5" />
+                  <p className="text-white font-bold text-base">{waterIntake}</p>
+                  <p className="text-white/60 text-[10px]">ml su</p>
                 </div>
               </div>
             )}
@@ -450,8 +450,8 @@ const PartnerDashboard = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div className="px-5 -mt-6 relative z-20">
-        <div className="bg-card rounded-2xl p-1.5 flex gap-1 shadow-xl border border-border/50">
+      <div className="px-3 -mt-5 relative z-20">
+        <div className="bg-card rounded-xl p-1 flex gap-1 shadow-xl border border-border/50">
           {[
             { id: 'home', label: 'Əsas', icon: Home },
             { id: 'notifications', label: 'Bildiriş', icon: Bell, badge: getUnreadCount() },
@@ -466,7 +466,7 @@ const PartnerDashboard = () => {
               <motion.button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex-1 py-3 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 relative ${
+                className={`flex-1 py-2.5 rounded-lg text-[10px] font-medium transition-all flex items-center justify-center gap-1 relative ${
                   isActive 
                     ? 'bg-partner text-white shadow-md' 
                     : 'text-muted-foreground hover:bg-muted/50'
@@ -487,7 +487,7 @@ const PartnerDashboard = () => {
       </div>
 
       {/* Content */}
-      <div className="px-5 mt-6">
+      <div className="px-3 mt-4">
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
             <motion.div
@@ -495,7 +495,7 @@ const PartnerDashboard = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="space-y-5"
+              className="space-y-3"
             >
               {/* New Messages Banner */}
               {getUnreadCount() > 0 && (

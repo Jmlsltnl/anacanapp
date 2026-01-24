@@ -87,35 +87,35 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="gradient-primary px-5 pt-4 pb-10 safe-top">
-        <div className="flex items-center gap-4">
+      <div className="gradient-primary px-3 pt-3 pb-8 safe-top">
+        <div className="flex items-center gap-2">
           <motion.button
             onClick={onBack}
-            className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">Çəki İzləyici</h1>
-            <p className="text-white/80 text-sm">AI analiz ilə çəki takibi</p>
+            <h1 className="text-lg font-bold text-white">Çəki İzləyici</h1>
+            <p className="text-white/80 text-xs">AI analiz ilə çəki takibi</p>
           </div>
           <motion.button
             onClick={() => setShowAddForm(true)}
-            className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Plus className="w-5 h-5 text-white" />
+            <Plus className="w-4 h-4 text-white" />
           </motion.button>
         </div>
       </div>
 
-      <div className="px-5 -mt-6">
+      <div className="px-3 -mt-5">
         {/* Current Weight Card */}
         <motion.div
-          className="bg-card rounded-3xl p-6 shadow-elevated border border-border/50 mb-6"
+          className="bg-card rounded-2xl p-4 shadow-elevated border border-border/50 mb-3"
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
         >
