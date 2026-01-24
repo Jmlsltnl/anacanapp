@@ -182,7 +182,7 @@ const FlowDashboard = () => {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {/* Main Cycle Card with Progress Ring */}
       <motion.div 
         className="relative overflow-hidden rounded-2xl gradient-flow p-4 text-white shadow-elevated"
@@ -425,7 +425,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {/* Baby Size Hero Card */}
       <motion.div 
         className="relative overflow-hidden rounded-2xl gradient-bump p-4 text-white shadow-elevated"
@@ -632,7 +632,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
 
       {/* Daily Content Cards - Separated */}
       {dayContent && (
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {/* Baby Message Card */}
           {dayContent.baby_message && (
             <motion.div 
@@ -994,7 +994,7 @@ const MommyDashboard = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {/* Baby Hero Card */}
       <motion.div 
         className="relative overflow-hidden rounded-[1.5rem] gradient-mommy p-5 text-white shadow-elevated"
@@ -1308,7 +1308,7 @@ const MommyDashboard = () => {
         transition={{ delay: 0.3 }}
       >
         <h3 className="text-base font-bold text-foreground mb-3">Bugünkü xülasə</h3>
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <div className="flex items-center justify-between p-2.5 bg-violet-50 rounded-xl">
             <div className="flex items-center gap-2">
               <Moon className="w-4 h-4 text-violet-600" />
@@ -1396,7 +1396,7 @@ const Dashboard = ({ onOpenChat, onNavigateToTool }: DashboardProps) => {
     <div className="pb-24 pt-1 px-3">
       {/* Header */}
       <motion.div 
-        className="flex items-center justify-between mb-3"
+        className="flex items-center justify-between mb-2"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
       >
