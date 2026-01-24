@@ -182,98 +182,98 @@ const FlowDashboard = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Main Cycle Card with Progress Ring */}
       <motion.div 
-        className="relative overflow-hidden rounded-[1.5rem] gradient-flow p-5 text-white shadow-elevated"
+        className="relative overflow-hidden rounded-2xl gradient-flow p-4 text-white shadow-elevated"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-white/5 blur-xl" />
+        <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-white/10 blur-2xl" />
+        <div className="absolute -bottom-8 -left-8 w-24 h-24 rounded-full bg-white/5 blur-xl" />
         
-        <div className="relative z-10 flex items-center gap-6">
+        <div className="relative z-10 flex items-center gap-4">
           {/* Progress Ring */}
           <div className="relative">
-            <ProgressRing progress={progress} size={110} strokeWidth={10} color="stroke-white" />
+            <ProgressRing progress={progress} size={90} strokeWidth={8} color="stroke-white" />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-3xl font-black">{cycleData.currentDay}</span>
-              <span className="text-xs text-white/70">/ {cycleData.cycleLength}</span>
+              <span className="text-2xl font-black">{cycleData.currentDay}</span>
+              <span className="text-[10px] text-white/70">/ {cycleData.cycleLength}</span>
             </div>
           </div>
 
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-3xl">{currentPhase.emoji}</span>
-              <span className="text-sm font-bold uppercase tracking-wider text-white/80">
+            <div className="flex items-center gap-1.5 mb-1">
+              <span className="text-2xl">{currentPhase.emoji}</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-white/80">
                 {cycleData.phase === 'menstrual' ? 'Menstruasiya' :
                  cycleData.phase === 'follicular' ? 'Follikulyar' :
                  cycleData.phase === 'ovulation' ? 'Ovulyasiya' : 'Luteal'}
               </span>
             </div>
-            <p className="text-white/90 text-sm leading-relaxed">{currentPhase.message}</p>
+            <p className="text-white/90 text-xs leading-relaxed">{currentPhase.message}</p>
           </div>
         </div>
       </motion.div>
 
       {/* Daily Goals */}
       <motion.div 
-        className="grid grid-cols-3 gap-2"
+        className="grid grid-cols-3 gap-1.5"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.1 }}
       >
         <motion.button
           onClick={addWater}
-          className="bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl p-3 text-white text-center relative overflow-hidden"
+          className="bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl p-2.5 text-white text-center relative overflow-hidden"
           whileTap={{ scale: 0.95 }}
         >
           <div className="absolute inset-0 bg-white/10" style={{ height: `${(waterCount / 8) * 100}%`, bottom: 0, top: 'auto' }} />
           <div className="relative z-10">
-            <Droplets className="w-6 h-6 mx-auto mb-1" />
-            <p className="text-xl font-black">{waterCount}</p>
-            <p className="text-[10px] text-white/80">/8 stəkan</p>
+            <Droplets className="w-5 h-5 mx-auto mb-0.5" />
+            <p className="text-lg font-black">{waterCount}</p>
+            <p className="text-[9px] text-white/80">/8 stəkan</p>
           </div>
         </motion.button>
 
-        <div className="bg-gradient-to-br from-violet-400 to-purple-600 rounded-xl p-3 text-white text-center">
-          <Moon className="w-6 h-6 mx-auto mb-1" />
-          <p className="text-xl font-black">7.5</p>
-          <p className="text-[10px] text-white/80">saat yuxu</p>
+        <div className="bg-gradient-to-br from-violet-400 to-purple-600 rounded-xl p-2.5 text-white text-center">
+          <Moon className="w-5 h-5 mx-auto mb-0.5" />
+          <p className="text-lg font-black">7.5</p>
+          <p className="text-[9px] text-white/80">saat yuxu</p>
         </div>
 
-        <div className="bg-gradient-to-br from-amber-400 to-orange-600 rounded-xl p-3 text-white text-center">
-          <Flame className="w-6 h-6 mx-auto mb-1" />
-          <p className="text-xl font-black">1,850</p>
-          <p className="text-[10px] text-white/80">kalori</p>
+        <div className="bg-gradient-to-br from-amber-400 to-orange-600 rounded-xl p-2.5 text-white text-center">
+          <Flame className="w-5 h-5 mx-auto mb-0.5" />
+          <p className="text-lg font-black">1,850</p>
+          <p className="text-[9px] text-white/80">kalori</p>
         </div>
       </motion.div>
 
       {/* Symptoms Selection */}
       <motion.div 
-        className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
+        className="bg-card rounded-xl p-3 shadow-card border border-border/50"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-base font-bold text-foreground">Bugünkü simptomlar</h3>
-          <span className="text-xs text-primary font-bold">{selectedSymptoms.length} seçildi</span>
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-bold text-foreground">Bugünkü simptomlar</h3>
+          <span className="text-[10px] text-primary font-bold">{selectedSymptoms.length} seçildi</span>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {symptoms.map((symptom) => (
             <motion.button 
               key={symptom.id}
               onClick={() => toggleSymptom(symptom.id)}
-              className={`px-4 py-2.5 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
+              className={`px-3 py-2 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
                 selectedSymptoms.includes(symptom.id)
                   ? 'bg-primary text-white shadow-md'
                   : 'bg-muted text-muted-foreground hover:bg-primary/10'
               }`}
               whileTap={{ scale: 0.95 }}
             >
-              <span>{symptom.emoji}</span>
+              <span className="text-sm">{symptom.emoji}</span>
               {symptom.label}
             </motion.button>
           ))}
@@ -282,28 +282,28 @@ const FlowDashboard = () => {
 
       {/* Phase Tips */}
       <motion.div 
-        className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl p-4 border border-orange-100"
+        className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-3 border border-orange-100"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3 }}
       >
-        <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="w-4 h-4 text-primary" />
-          <h4 className="text-sm font-bold text-foreground">Bu faza üçün tövsiyələr</h4>
+        <div className="flex items-center gap-1.5 mb-2">
+          <Sparkles className="w-3.5 h-3.5 text-primary" />
+          <h4 className="text-xs font-bold text-foreground">Bu faza üçün tövsiyələr</h4>
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           {currentPhase.tips.map((tip, index) => (
             <motion.div 
               key={index}
-              className="flex items-center gap-3 p-3 bg-white/60 rounded-xl"
+              className="flex items-center gap-2 p-2 bg-white/60 rounded-lg"
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.4 + index * 0.1 }}
             >
-              <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
-                <Star className="w-3 h-3 text-primary" />
+              <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
+                <Star className="w-2.5 h-2.5 text-primary" />
               </div>
-              <span className="text-sm text-foreground">{tip}</span>
+              <span className="text-xs text-foreground">{tip}</span>
             </motion.div>
           ))}
         </div>
@@ -311,21 +311,21 @@ const FlowDashboard = () => {
 
       {/* Next Period Prediction */}
       <motion.div 
-        className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
+        className="bg-card rounded-xl p-3 shadow-card border border-border/50"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4 }}
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-muted-foreground">Növbəti menstruasiya</p>
-            <p className="text-xl font-bold text-foreground mt-1">
+            <p className="text-xs text-muted-foreground">Növbəti menstruasiya</p>
+            <p className="text-base font-bold text-foreground mt-0.5">
               {cycleData.nextPeriodDate.toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' })}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-muted-foreground">Qalır</p>
-            <p className="text-xl font-bold text-flow">
+            <p className="text-xs text-muted-foreground">Qalır</p>
+            <p className="text-base font-bold text-flow">
               {Math.ceil((cycleData.nextPeriodDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))} gün
             </p>
           </div>
@@ -425,29 +425,29 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Baby Size Hero Card */}
       <motion.div 
-        className="relative overflow-hidden rounded-[1.5rem] gradient-bump p-5 text-white shadow-elevated"
+        className="relative overflow-hidden rounded-2xl gradient-bump p-4 text-white shadow-elevated"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full bg-white/5 blur-xl" />
+        <div className="absolute -top-12 -right-12 w-36 h-36 rounded-full bg-white/10 blur-2xl" />
+        <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-white/5 blur-xl" />
         
         <div className="relative z-10">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3">
             <div>
-              <p className="text-white/80 text-sm font-medium">Hamiləlik həftəsi</p>
-              <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-5xl font-black">{pregData.currentWeek}</span>
-                <span className="text-lg text-white/70">həftə {pregData.currentDay} gün</span>
+              <p className="text-white/80 text-xs font-medium">Hamiləlik həftəsi</p>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="text-4xl font-black">{pregData.currentWeek}</span>
+                <span className="text-sm text-white/70">həftə {pregData.currentDay} gün</span>
               </div>
             </div>
             {/* Fruit Size Display - Image or Emoji */}
             <motion.div 
-              className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center overflow-hidden"
+              className="w-16 h-16 rounded-xl bg-white/20 flex items-center justify-center overflow-hidden"
               animate={{ 
                 scale: [1, 1.05, 1],
               }}
@@ -460,30 +460,30 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-5xl">{weekData.emoji}</span>
+                <span className="text-4xl">{weekData.emoji}</span>
               )}
             </motion.div>
           </div>
 
-          <div className="bg-white/10 rounded-2xl p-4 mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-white/80 text-sm">Körpənin ölçüsü: {weekData.fruit}</span>
-              <span className="text-white font-bold">{weekData.lengthCm} sm</span>
+          <div className="bg-white/10 rounded-xl p-3 mb-3">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-white/80 text-xs">Körpənin ölçüsü: {weekData.fruit}</span>
+              <span className="text-white font-bold text-sm">{weekData.lengthCm} sm</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-white/80 text-sm">Təxmini çəki</span>
-              <span className="text-white font-bold">{weekData.weightG}g</span>
+              <span className="text-white/80 text-xs">Təxmini çəki</span>
+              <span className="text-white font-bold text-sm">{weekData.weightG}g</span>
             </div>
           </div>
 
           {/* Progress Bar */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs text-white/70">
+          <div className="space-y-1">
+            <div className="flex justify-between text-[10px] text-white/70">
               <span>Başlanğıc</span>
               <span>{Math.round(progressPercent)}%</span>
               <span>Doğuş</span>
             </div>
-            <div className="h-3 bg-white/20 rounded-full overflow-hidden">
+            <div className="h-2 bg-white/20 rounded-full overflow-hidden">
               <motion.div 
                 className="h-full bg-white rounded-full"
                 initial={{ width: 0 }}
@@ -497,7 +497,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
 
       {/* Baby Development Image Section */}
       <motion.div 
-        className="bg-gradient-to-br from-pink-50 via-rose-50 to-purple-50 dark:from-pink-950/30 dark:via-rose-950/20 dark:to-purple-950/20 rounded-2xl p-4 shadow-card border border-pink-100/50 dark:border-pink-800/30"
+        className="bg-gradient-to-br from-pink-50 via-rose-50 to-purple-50 dark:from-pink-950/30 dark:via-rose-950/20 dark:to-purple-950/20 rounded-xl p-3 shadow-card border border-pink-100/50 dark:border-pink-800/30"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.1 }}
@@ -505,12 +505,12 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
         <div className="flex flex-col items-center">
           {/* Fetus Image with subtle motion */}
           <motion.div 
-            className="w-40 h-40 mb-3 relative"
+            className="w-32 h-32 mb-2 relative"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ 
               scale: 1, 
               opacity: 1,
-              y: [0, -4, 0],
+              y: [0, -3, 0],
             }}
             transition={{ 
               scale: { delay: 0.2, type: "spring" },
@@ -524,7 +524,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
               className="w-full h-full object-contain drop-shadow-lg"
             />
             <motion.div
-              className="absolute -bottom-2 -right-2 w-14 h-14 rounded-full bg-white/80 dark:bg-card shadow-lg flex items-center justify-center overflow-hidden"
+              className="absolute -bottom-1 -right-1 w-11 h-11 rounded-full bg-white/80 dark:bg-card shadow-lg flex items-center justify-center overflow-hidden"
               animate={{ scale: [1, 1.08, 1] }}
               transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
             >
@@ -532,21 +532,21 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                 <img 
                   src={weekData.imageUrl} 
                   alt={weekData.fruit}
-                  className="w-10 h-10 object-cover rounded-full"
+                  className="w-8 h-8 object-cover rounded-full"
                 />
               ) : (
-                <span className="text-2xl">{weekData.emoji}</span>
+                <span className="text-xl">{weekData.emoji}</span>
               )}
             </motion.div>
           </motion.div>
           
           {/* Week and Day Info */}
           <div className="text-center">
-            <p className="text-sm text-muted-foreground font-medium mb-1">Hazırki vəziyyət</p>
-            <p className="text-2xl font-black text-foreground">
+            <p className="text-xs text-muted-foreground font-medium mb-0.5">Hazırki vəziyyət</p>
+            <p className="text-xl font-black text-foreground">
               {pregData.currentWeek}. həftə, {pregData.currentDay}. gün
             </p>
-            <p className="text-sm text-primary font-medium mt-1">
+            <p className="text-xs text-primary font-medium mt-0.5">
               {weekData.fruit} boyunda • {weekData.lengthCm} sm • {weekData.weightG}g
             </p>
           </div>
@@ -554,54 +554,54 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
       </motion.div>
 
       {/* Stats Grid - Show kick counter only after week 16 */}
-      <div className={`grid ${pregData.currentWeek >= 16 ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}>
+      <div className={`grid ${pregData.currentWeek >= 16 ? 'grid-cols-3' : 'grid-cols-2'} gap-1.5`}>
         <motion.div 
-          className="bg-card rounded-xl p-3 shadow-card border border-border/50 text-center"
+          className="bg-card rounded-xl p-2.5 shadow-card border border-border/50 text-center"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.15 }}
         >
-          <Calendar className="w-5 h-5 text-primary mx-auto mb-1" />
-          <p className="text-xl font-black text-foreground">{daysLeft}</p>
-          <p className="text-[10px] text-muted-foreground">gün qaldı</p>
+          <Calendar className="w-4 h-4 text-primary mx-auto mb-0.5" />
+          <p className="text-lg font-black text-foreground">{daysLeft}</p>
+          <p className="text-[9px] text-muted-foreground">gün qaldı</p>
         </motion.div>
 
         {/* Only show kick counter after week 16 */}
         {pregData.currentWeek >= 16 && (
           <motion.button 
             onClick={addKick}
-            className="bg-card rounded-xl p-3 shadow-card border border-border/50 text-center"
+            className="bg-card rounded-xl p-2.5 shadow-card border border-border/50 text-center"
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Footprints className="w-5 h-5 text-pink-500 mx-auto mb-1" />
-            <p className="text-xl font-black text-foreground">{kickCount}</p>
-            <p className="text-[10px] text-muted-foreground">təpik</p>
+            <Footprints className="w-4 h-4 text-pink-500 mx-auto mb-0.5" />
+            <p className="text-lg font-black text-foreground">{kickCount}</p>
+            <p className="text-[9px] text-muted-foreground">təpik</p>
           </motion.button>
         )}
 
         <motion.div 
-          className="bg-card rounded-xl p-3 shadow-card border border-border/50 text-center"
+          className="bg-card rounded-xl p-2.5 shadow-card border border-border/50 text-center"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.25 }}
         >
-          <Scale className="w-5 h-5 text-emerald-500 mx-auto mb-1" />
-          <p className="text-xl font-black text-foreground">+{weightGain}</p>
-          <p className="text-[10px] text-muted-foreground">kq çəki</p>
+          <Scale className="w-4 h-4 text-emerald-500 mx-auto mb-0.5" />
+          <p className="text-lg font-black text-foreground">+{weightGain}</p>
+          <p className="text-[9px] text-muted-foreground">kq çəki</p>
         </motion.div>
       </div>
 
       {/* Baby Development - Static Icons */}
       <motion.div 
-        className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
+        className="bg-card rounded-xl p-3 shadow-card border border-border/50"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.25 }}
       >
-        <h3 className="text-base font-bold text-foreground mb-3">Körpənin inkişafı</h3>
+        <h3 className="text-sm font-bold text-foreground mb-2">Körpənin inkişafı</h3>
         <div className="flex justify-around">
           {[
             { icon: '👀', label: 'Göz', active: weeklyDevelopment.eyes },
@@ -617,12 +617,12 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
               animate={{ scale: 1 }}
               transition={{ delay: 0.3 + index * 0.1 }}
             >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl mb-1 ${
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-lg mb-0.5 ${
                 item.active ? 'bg-primary/20' : 'bg-muted opacity-40'
               }`}>
                 {item.icon}
               </div>
-              <span className={`text-xs ${item.active ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
+              <span className={`text-[10px] ${item.active ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
                 {item.label}
               </span>
             </motion.div>
@@ -632,26 +632,26 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
 
       {/* Daily Content Cards - Separated */}
       {dayContent && (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {/* Baby Message Card */}
           {dayContent.baby_message && (
             <motion.div 
-              className="relative overflow-hidden bg-gradient-to-br from-violet-100 via-purple-50 to-pink-50 dark:from-violet-950/50 dark:via-purple-950/30 dark:to-pink-950/20 rounded-2xl p-4 border border-violet-200/50 dark:border-violet-700/50"
+              className="relative overflow-hidden bg-gradient-to-br from-violet-100 via-purple-50 to-pink-50 dark:from-violet-950/50 dark:via-purple-950/30 dark:to-pink-950/20 rounded-xl p-3 border border-violet-200/50 dark:border-violet-700/50"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3 }}
             >
-              <div className="absolute -right-6 -top-6 text-8xl opacity-10">💬</div>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-full bg-violet-500/20 flex items-center justify-center">
-                  <span className="text-base">👶</span>
+              <div className="absolute -right-4 -top-4 text-6xl opacity-10">💬</div>
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <div className="w-6 h-6 rounded-full bg-violet-500/20 flex items-center justify-center">
+                  <span className="text-sm">👶</span>
                 </div>
                 <div>
-                  <p className="text-xs text-violet-600 dark:text-violet-400 font-bold uppercase tracking-wider">Körpədən Mesaj</p>
-                  <p className="text-[10px] text-muted-foreground">Gün {pregnancyDay} / 280</p>
+                  <p className="text-[10px] text-violet-600 dark:text-violet-400 font-bold uppercase tracking-wider">Körpədən Mesaj</p>
+                  <p className="text-[9px] text-muted-foreground">Gün {pregnancyDay} / 280</p>
                 </div>
               </div>
-              <p className="text-foreground font-medium italic text-sm leading-relaxed">
+              <p className="text-foreground font-medium italic text-xs leading-relaxed">
                 "{dayContent.baby_message}"
               </p>
             </motion.div>
@@ -660,19 +660,19 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           {/* Body Changes Card */}
           {dayContent.body_changes && (
             <motion.div 
-              className="relative overflow-hidden bg-gradient-to-br from-rose-100 via-pink-50 to-orange-50 dark:from-rose-950/50 dark:via-pink-950/30 dark:to-orange-950/20 rounded-2xl p-4 border border-rose-200/50 dark:border-rose-700/50"
+              className="relative overflow-hidden bg-gradient-to-br from-rose-100 via-pink-50 to-orange-50 dark:from-rose-950/50 dark:via-pink-950/30 dark:to-orange-950/20 rounded-xl p-3 border border-rose-200/50 dark:border-rose-700/50"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.35 }}
             >
-              <div className="absolute -right-6 -top-6 text-8xl opacity-10">🤰</div>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-full bg-rose-500/20 flex items-center justify-center">
-                  <span className="text-base">🤰</span>
+              <div className="absolute -right-4 -top-4 text-6xl opacity-10">🤰</div>
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <div className="w-6 h-6 rounded-full bg-rose-500/20 flex items-center justify-center">
+                  <span className="text-sm">🤰</span>
                 </div>
-                <p className="text-xs text-rose-600 dark:text-rose-400 font-bold uppercase tracking-wider">Bədəndəki Dəyişikliklər</p>
+                <p className="text-[10px] text-rose-600 dark:text-rose-400 font-bold uppercase tracking-wider">Bədəndəki Dəyişikliklər</p>
               </div>
-              <p className="text-sm text-foreground/90 leading-relaxed">
+              <p className="text-xs text-foreground/90 leading-relaxed">
                 {dayContent.body_changes}
               </p>
             </motion.div>
@@ -681,19 +681,19 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           {/* Baby Development Card */}
           {dayContent.baby_development && (
             <motion.div 
-              className="relative overflow-hidden bg-gradient-to-br from-blue-100 via-cyan-50 to-teal-50 dark:from-blue-950/50 dark:via-cyan-950/30 dark:to-teal-950/20 rounded-2xl p-4 border border-blue-200/50 dark:border-blue-700/50"
+              className="relative overflow-hidden bg-gradient-to-br from-blue-100 via-cyan-50 to-teal-50 dark:from-blue-950/50 dark:via-cyan-950/30 dark:to-teal-950/20 rounded-xl p-3 border border-blue-200/50 dark:border-blue-700/50"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.4 }}
             >
-              <div className="absolute -right-6 -top-6 text-8xl opacity-10">🌱</div>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
-                  <span className="text-base">🌱</span>
+              <div className="absolute -right-4 -top-4 text-6xl opacity-10">🌱</div>
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
+                  <span className="text-sm">🌱</span>
                 </div>
-                <p className="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider">Körpənin İnkişafı</p>
+                <p className="text-[10px] text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider">Körpənin İnkişafı</p>
               </div>
-              <p className="text-sm text-foreground/90 leading-relaxed">
+              <p className="text-xs text-foreground/90 leading-relaxed">
                 {dayContent.baby_development}
               </p>
             </motion.div>
@@ -702,19 +702,19 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           {/* Daily Tip Card */}
           {dayContent.daily_tip && (
             <motion.div 
-              className="relative overflow-hidden bg-gradient-to-br from-amber-100 via-yellow-50 to-orange-50 dark:from-amber-950/50 dark:via-yellow-950/30 dark:to-orange-950/20 rounded-2xl p-4 border border-amber-200/50 dark:border-amber-700/50"
+              className="relative overflow-hidden bg-gradient-to-br from-amber-100 via-yellow-50 to-orange-50 dark:from-amber-950/50 dark:via-yellow-950/30 dark:to-orange-950/20 rounded-xl p-3 border border-amber-200/50 dark:border-amber-700/50"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.45 }}
             >
-              <div className="absolute -right-6 -top-6 text-8xl opacity-10">💡</div>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center">
-                  <span className="text-base">💡</span>
+              <div className="absolute -right-4 -top-4 text-6xl opacity-10">💡</div>
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center">
+                  <span className="text-sm">💡</span>
                 </div>
-                <p className="text-xs text-amber-600 dark:text-amber-400 font-bold uppercase tracking-wider">Günün Tövsiyəsi</p>
+                <p className="text-[10px] text-amber-600 dark:text-amber-400 font-bold uppercase tracking-wider">Günün Tövsiyəsi</p>
               </div>
-              <p className="text-sm text-foreground/90 leading-relaxed">
+              <p className="text-xs text-foreground/90 leading-relaxed">
                 {dayContent.daily_tip}
               </p>
             </motion.div>
@@ -725,26 +725,26 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
       {/* Weekly Tip from Database */}
       {currentWeekTip && (
         <motion.div 
-          className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-2xl p-4 border border-amber-100 dark:border-amber-800"
+          className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-xl p-3 border border-amber-100 dark:border-amber-800"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
-              <Lightbulb className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
+              <Lightbulb className="w-3 h-3 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <p className="text-xs text-amber-600 dark:text-amber-400 font-bold uppercase tracking-wider">Həftə {pregData?.currentWeek} Tövsiyəsi</p>
-              <h4 className="font-bold text-foreground">{currentWeekTip.title}</h4>
+              <p className="text-[10px] text-amber-600 dark:text-amber-400 font-bold uppercase tracking-wider">Həftə {pregData?.currentWeek} Tövsiyəsi</p>
+              <h4 className="font-bold text-foreground text-sm">{currentWeekTip.title}</h4>
             </div>
           </div>
-          <p className="text-sm text-foreground/80 leading-relaxed">{currentWeekTip.content}</p>
+          <p className="text-xs text-foreground/80 leading-relaxed">{currentWeekTip.content}</p>
         </motion.div>
       )}
 
       {/* Quick Actions Grid */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-4 gap-1.5">
         <QuickActionButton 
           icon={Droplets} 
           label="Su" 
@@ -1393,31 +1393,31 @@ const Dashboard = ({ onOpenChat, onNavigateToTool }: DashboardProps) => {
   const hasPartner = !!profile?.linked_partner_id;
 
   return (
-    <div className="pb-28 pt-2 px-4">
+    <div className="pb-24 pt-1 px-3">
       {/* Header */}
       <motion.div 
-        className="flex items-center justify-between mb-4"
+        className="flex items-center justify-between mb-3"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
       >
         <div>
-          <p className="text-sm text-muted-foreground font-medium">{getGreeting()}</p>
-          <h1 className="text-xl font-black text-foreground">{name || 'Xanım'} 👋</h1>
+          <p className="text-xs text-muted-foreground font-medium">{getGreeting()}</p>
+          <h1 className="text-lg font-black text-foreground">{name || 'Xanım'} 👋</h1>
         </div>
         <div className="flex items-center gap-2">
           {hasPartner && (
             <motion.button 
               onClick={onOpenChat}
-              className="w-10 h-10 rounded-xl bg-partner/10 flex items-center justify-center relative"
+              className="w-9 h-9 rounded-xl bg-partner/10 flex items-center justify-center relative"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <MessageCircle className="w-5 h-5 text-partner" />
+              <MessageCircle className="w-4 h-4 text-partner" />
               {unreadCount > 0 && (
                 <motion.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 w-5 h-5 bg-destructive rounded-full text-[10px] font-bold text-white flex items-center justify-center"
+                  className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[9px] font-bold text-white flex items-center justify-center"
                 >
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </motion.span>
@@ -1425,16 +1425,16 @@ const Dashboard = ({ onOpenChat, onNavigateToTool }: DashboardProps) => {
             </motion.button>
           )}
           <motion.button 
-            className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center relative"
+            className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center relative"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Bell className="w-5 h-5 text-primary" />
+            <Bell className="w-4 h-4 text-primary" />
             {notificationCount > 0 && (
               <motion.span
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="absolute -top-1 -right-1 w-5 h-5 bg-destructive rounded-full text-[10px] font-bold text-white flex items-center justify-center"
+                className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[9px] font-bold text-white flex items-center justify-center"
               >
                 {notificationCount > 9 ? '9+' : notificationCount}
               </motion.span>

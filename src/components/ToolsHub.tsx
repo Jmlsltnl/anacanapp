@@ -136,49 +136,49 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   if (activeTool === 'mood' || activeTool === 'mood-diary') return <MoodDiary onBack={handleBack} />;
 
   return (
-    <div className="pb-28 pt-2 px-5">
+    <div className="pb-24 pt-1 px-3">
       {/* Header */}
-      <motion.div className="mb-6" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-        <h1 className="text-2xl font-black text-foreground">Alətlər</h1>
-        <p className="text-muted-foreground mt-1">Sizin üçün faydalı alətlər</p>
+      <motion.div className="mb-3" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+        <h1 className="text-lg font-black text-foreground">Alətlər</h1>
+        <p className="text-muted-foreground text-xs">Sizin üçün faydalı alətlər</p>
       </motion.div>
 
       {/* Search */}
-      <motion.div className="relative mb-6" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+      <motion.div className="relative mb-3" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <input
           type="text"
           placeholder="Axtarış..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full h-14 pl-12 pr-4 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all outline-none"
+          className="w-full h-10 pl-9 pr-3 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-sm transition-all outline-none"
         />
       </motion.div>
 
       {/* Featured Tool - Photoshoot */}
       <motion.button
         onClick={() => setActiveTool('photoshoot')}
-        className="w-full relative overflow-hidden rounded-3xl bg-gradient-to-r from-rose-500 to-pink-600 p-5 mb-6 shadow-elevated text-left"
+        className="w-full relative overflow-hidden rounded-2xl bg-gradient-to-r from-rose-500 to-pink-600 p-3 mb-3 shadow-elevated text-left"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
       >
-        <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 blur-xl" />
-        <div className="relative z-10 flex items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center">
-            <Camera className="w-8 h-8 text-white" />
+        <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-white/10 blur-xl" />
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center">
+            <Camera className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1">
-            <h3 className="text-white font-bold text-lg">Körpə Fotosessiyası</h3>
-            <p className="text-white/80 text-sm">AI ilə sehrli körpə fotoları yaradın</p>
+            <h3 className="text-white font-bold text-sm">Körpə Fotosessiyası</h3>
+            <p className="text-white/80 text-[11px]">AI ilə sehrli körpə fotoları yaradın</p>
           </div>
-          <ChevronRight className="w-6 h-6 text-white/60" />
+          <ChevronRight className="w-5 h-5 text-white/60" />
         </div>
       </motion.button>
 
       {/* Tools Grid */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-2">
         {filteredTools.map((tool, index) => {
           const Icon = tool.icon;
           const available = isToolAvailable(tool);
@@ -189,22 +189,22 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
               onClick={() => handleToolClick(tool)}
-              className={`bg-card rounded-3xl p-5 text-left shadow-card border border-border/50 relative ${!available ? 'opacity-50' : ''}`}
+              className={`bg-card rounded-2xl p-3 text-left shadow-card border border-border/50 relative ${!available ? 'opacity-50' : ''}`}
               whileHover={available ? { scale: 1.02, y: -2 } : {}}
               whileTap={available ? { scale: 0.98 } : {}}
             >
               {!available && (
-                <div className="absolute top-3 right-3">
-                  <Lock className="w-4 h-4 text-muted-foreground" />
+                <div className="absolute top-2 right-2">
+                  <Lock className="w-3 h-3 text-muted-foreground" />
                 </div>
               )}
-              <div className={`w-14 h-14 rounded-2xl ${tool.bgColor} flex items-center justify-center mb-4`}>
-                <Icon className={`w-7 h-7 ${tool.color}`} />
+              <div className={`w-10 h-10 rounded-xl ${tool.bgColor} flex items-center justify-center mb-2`}>
+                <Icon className={`w-5 h-5 ${tool.color}`} />
               </div>
-              <h3 className="font-bold text-foreground mb-1">{tool.name}</h3>
-              <p className="text-xs text-muted-foreground">{tool.description}</p>
+              <h3 className="font-bold text-foreground text-sm mb-0.5">{tool.name}</h3>
+              <p className="text-[10px] text-muted-foreground leading-tight">{tool.description}</p>
               {tool.minWeek && lifeStage === 'bump' && !available && (
-                <p className="text-[10px] text-muted-foreground mt-1">
+                <p className="text-[9px] text-muted-foreground mt-0.5">
                   {tool.minWeek}. həftədən aktiv
                 </p>
               )}
