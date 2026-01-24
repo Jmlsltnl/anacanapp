@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Shield, Timer, Scale, Baby, Briefcase, 
   Volume2, Heart, Footprints, ChevronRight,
-  Utensils, Activity, ArrowLeft, Camera, ChefHat, Lock, ShoppingCart
+  Utensils, Activity, ArrowLeft, Camera, Lock, ShoppingCart
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
@@ -18,7 +18,6 @@ import Nutrition from './tools/Nutrition';
 import Exercises from './tools/Exercises';
 import MoodDiary from './tools/MoodDiary';
 import BabyPhotoshoot from './tools/BabyPhotoshoot';
-import Recipes from './tools/Recipes';
 import ShoppingList from './tools/ShoppingList';
 import { useToast } from '@/hooks/use-toast';
 
@@ -35,16 +34,15 @@ interface Tool {
 
 const getTools = (hasPartner: boolean): Tool[] => [
   { id: 'photoshoot', name: 'Fotosessiya', description: 'AI körpə fotoları', icon: Camera, color: 'text-rose-600', bgColor: 'bg-rose-50' },
-  { id: 'recipes', name: 'Sağlam Reseptlər', description: 'Hamiləlik reseptləri', icon: ChefHat, color: 'text-green-600', bgColor: 'bg-green-50' },
+  { id: 'nutrition', name: 'Qidalanma', description: 'Sağlam qida və reseptlər', icon: Utensils, color: 'text-orange-600', bgColor: 'bg-orange-50' },
   { id: 'shopping', name: hasPartner ? 'Ortaq Alışveriş' : 'Alışveriş Siyahısı', description: hasPartner ? 'Partnyor ilə ortaq siyahı' : 'Alınacaqlar siyahısı', icon: ShoppingCart, color: 'text-purple-600', bgColor: 'bg-purple-50' },
-  { id: 'safety', name: 'Təhlükəsizlik', description: 'Qida və fəaliyyət yoxlayın', icon: Shield, color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
+  { id: 'safety', name: 'Təhlükəsizlik', description: 'Qida və fəaliyyət yoxlayın', icon: Shield, color: 'text-emerald-600', bgColor: 'bg-emerald-50', stages: ['bump'] },
   { id: 'kick', name: 'Təpik Sayğacı', description: 'Körpə hərəkətlərini izləyin', icon: Footprints, color: 'text-pink-600', bgColor: 'bg-pink-50', minWeek: 16, stages: ['bump'] },
   { id: 'contraction', name: 'Sancı Ölçən', description: '5-1-1 qaydası ilə izləyin', icon: Timer, color: 'text-violet-600', bgColor: 'bg-violet-50', stages: ['bump'] },
   { id: 'weight', name: 'Çəki İzləyici', description: 'AI analiz ilə çəki takibi', icon: Scale, color: 'text-blue-600', bgColor: 'bg-blue-50' },
   { id: 'names', name: 'Körpə Adları', description: 'Azərbaycan adları', icon: Baby, color: 'text-amber-600', bgColor: 'bg-amber-50' },
   { id: 'hospital', name: 'Xəstəxana Çantası', description: 'Doğuş üçün hazırlıq', icon: Briefcase, color: 'text-teal-600', bgColor: 'bg-teal-50', stages: ['bump'] },
   { id: 'whitenoise', name: 'Bəyaz Küylər', description: 'Körpəni sakitləşdirin', icon: Volume2, color: 'text-indigo-600', bgColor: 'bg-indigo-50' },
-  { id: 'nutrition', name: 'Qidalanma', description: 'Sağlam qida planı', icon: Utensils, color: 'text-orange-600', bgColor: 'bg-orange-50' },
   { id: 'exercise', name: 'Məşqlər', description: 'Hamiləlik məşqləri', icon: Activity, color: 'text-cyan-600', bgColor: 'bg-cyan-50' },
   { id: 'mood', name: 'Əhval Gündəliyi', description: 'Emosiyalarınızı izləyin', icon: Heart, color: 'text-fuchsia-600', bgColor: 'bg-fuchsia-50' },
 ];
@@ -122,7 +120,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
 
   // Render active tool
   if (activeTool === 'photoshoot') return <BabyPhotoshoot onBack={handleBack} />;
-  if (activeTool === 'recipes') return <Recipes onBack={handleBack} />;
+  if (activeTool === 'nutrition') return <Nutrition onBack={handleBack} />;
   if (activeTool === 'shopping') return <ShoppingList onBack={handleBack} />;
   if (activeTool === 'safety') return <SafetyLookup onBack={handleBack} />;
   if (activeTool === 'kick') return <KickCounter onBack={handleBack} />;
@@ -131,7 +129,6 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   if (activeTool === 'whitenoise') return <WhiteNoise onBack={handleBack} />;
   if (activeTool === 'names') return <BabyNames onBack={handleBack} />;
   if (activeTool === 'hospital') return <HospitalBag onBack={handleBack} />;
-  if (activeTool === 'nutrition') return <Nutrition onBack={handleBack} />;
   if (activeTool === 'exercise' || activeTool === 'exercises') return <Exercises onBack={handleBack} />;
   if (activeTool === 'mood' || activeTool === 'mood-diary') return <MoodDiary onBack={handleBack} />;
 
