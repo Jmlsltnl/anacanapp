@@ -2,10 +2,6 @@
   "appId": "app.lovable.anacan",
   "appName": "Anacan",
   "webDir": "dist",
-  "server": {
-    "url": "https://e07ee1f9-3d58-48fe-a7a0-068ecf028173.lovableproject.com?forceHideBadge=true",
-    "cleartext": true
-  },
   "plugins": {
     "SplashScreen": {
       "launchShowDuration": 2000,
