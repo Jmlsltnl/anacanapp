@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { GoogleGenAI } from "npm:@google/genai@^1.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -60,45 +61,45 @@ const backgroundPrompts: Record<string, string> = {
 
 const eyeColorPrompts: Record<string, string> = {
   keep: "",
-  blue: "bright sparkling blue eyes",
-  green: "beautiful emerald green eyes",
-  brown: "warm chocolate brown eyes",
-  hazel: "captivating hazel eyes with golden flecks",
-  gray: "striking silver-gray eyes",
-  amber: "stunning amber-colored eyes",
+  blue: "bright sparkling blue eyes like the clear summer sky",
+  green: "beautiful emerald green eyes with golden flecks",
+  brown: "warm chocolate brown eyes with honey highlights",
+  hazel: "captivating hazel eyes with golden and green flecks",
+  gray: "striking silver-gray eyes like morning mist",
+  amber: "stunning amber-colored eyes like warm honey",
 };
 
 const hairColorPrompts: Record<string, string> = {
   keep: "",
-  blonde: "silky golden blonde hair",
-  brown: "soft chestnut brown hair",
-  black: "shiny jet black hair",
-  red: "beautiful auburn red hair",
-  strawberry: "lovely strawberry blonde hair",
-  white: "adorable platinum white-blonde hair",
+  blonde: "silky golden blonde hair with natural highlights",
+  brown: "soft chestnut brown hair with caramel tones",
+  black: "shiny jet black hair with blue undertones",
+  red: "beautiful auburn red hair with copper highlights",
+  strawberry: "lovely strawberry blonde hair with peachy tones",
+  white: "adorable platinum white-blonde hair like cotton candy",
 };
 
 const hairStylePrompts: Record<string, string> = {
   keep: "",
-  curly: "with adorable bouncy curls",
-  straight: "with smooth straight hair",
-  wavy: "with gentle soft waves",
+  curly: "with adorable bouncy ringlet curls",
+  straight: "with smooth silky straight hair",
+  wavy: "with gentle soft beach waves",
   pixie: "in a cute short pixie style",
-  ponytail: "styled in a cute ponytail with a ribbon",
-  braids: "with sweet little braids",
+  ponytail: "styled in a cute ponytail with a satin ribbon",
+  braids: "with sweet little braids adorned with tiny flowers",
 };
 
 const outfitPrompts: Record<string, string> = {
   keep: "",
-  theme: "wearing an outfit that perfectly matches the theme",
-  princess: "wearing a beautiful sparkly princess dress with a tiny tiara",
-  prince: "wearing a charming royal prince outfit with a little crown",
-  fairy: "wearing a magical fairy costume with delicate wings",
-  angel: "wearing a pure white angel outfit with fluffy wings and a halo",
-  flower: "wearing an adorable outfit decorated with flowers",
-  sailor: "wearing a cute classic sailor outfit",
-  casual: "wearing comfortable cute casual clothes",
-  festive: "wearing festive celebration clothes",
+  theme: "wearing an outfit that perfectly matches and complements the theme",
+  princess: "wearing a beautiful sparkly princess dress with a tiny diamond tiara",
+  prince: "wearing a charming royal prince outfit with a golden crown",
+  fairy: "wearing a magical fairy costume with delicate iridescent wings",
+  angel: "wearing a pure white angel outfit with fluffy feathered wings and a golden halo",
+  flower: "wearing an adorable outfit decorated with fresh flowers and petals",
+  sailor: "wearing a cute classic navy sailor outfit with gold buttons",
+  casual: "wearing comfortable cute casual clothes in soft pastel colors",
+  festive: "wearing festive celebration clothes with sparkly accents",
 };
 
 Deno.serve(async (req) => {
@@ -138,82 +139,85 @@ Deno.serve(async (req) => {
       });
     }
 
-    const backgroundDescription = backgroundPrompts[backgroundTheme] || backgroundPrompts.garden_natural;
-    
-    // Build customization parts
-    const customizationParts: string[] = [];
-    
-    // Gender-specific styling
-    const genderText = customization.gender === "boy" 
-      ? "a baby boy" 
-      : customization.gender === "girl" 
-        ? "a baby girl" 
-        : "the baby";
-    
-    // Eye color
-    if (customization.eyeColor && customization.eyeColor !== "keep") {
-      const eyeDesc = eyeColorPrompts[customization.eyeColor];
-      if (eyeDesc) customizationParts.push(`with ${eyeDesc}`);
-    }
-    
-    // Hair color
-    if (customization.hairColor && customization.hairColor !== "keep") {
-      const hairColorDesc = hairColorPrompts[customization.hairColor];
-      if (hairColorDesc) customizationParts.push(hairColorDesc);
-    }
-    
-    // Hair style
-    if (customization.hairStyle && customization.hairStyle !== "keep") {
-      const hairStyleDesc = hairStylePrompts[customization.hairStyle];
-      if (hairStyleDesc) customizationParts.push(hairStyleDesc);
-    }
-    
-    // Outfit
-    if (customization.outfit && customization.outfit !== "keep") {
-      const outfitDesc = outfitPrompts[customization.outfit];
-      if (outfitDesc) customizationParts.push(outfitDesc);
-    }
-    
-    // Create the ultimate prompt for face preservation using Gemini Pro image model
-    const editPrompt = `You are an expert professional baby photographer creating a stunning 2K resolution photoshoot.
-
-MISSION: Transform this baby photo into a breathtaking professional photoshoot masterpiece.
-
-BACKGROUND SCENE:
-${backgroundDescription}
-
-ABSOLUTE REQUIREMENTS:
-1. FACIAL PRESERVATION: Maintain 100% accuracy of the baby's facial features - exact same eyes, nose, mouth, cheeks, skin texture, skin tone, and expression. The face must be instantly recognizable.
-2. NATURAL INTEGRATION: Seamlessly blend the baby into the new scene with perfect lighting matching, shadow consistency, and color harmony.
-3. PROFESSIONAL QUALITY: Achieve magazine-cover quality with sharp focus on the baby, beautiful bokeh background, and studio-grade lighting.
-4. PHOTOREALISTIC OUTPUT: The result must look like a real photograph taken by a professional photographer, never AI-generated or cartoonish.
-
-CUSTOMIZATION APPLIED:
-${customization.gender !== "keep" ? `• Gender presentation: ${genderText}` : "• Keep original gender appearance"}
-${customization.eyeColor !== "keep" ? `• Eye enhancement: ${eyeColorPrompts[customization.eyeColor]}` : "• Preserve original eye color"}
-${customization.hairColor !== "keep" ? `• Hair coloring: ${hairColorPrompts[customization.hairColor]}` : "• Preserve original hair color"}
-${customization.hairStyle !== "keep" ? `• Hair styling: ${hairStylePrompts[customization.hairStyle]}` : "• Preserve original hair style"}
-${customization.outfit !== "keep" ? `• Clothing: ${outfitPrompts[customization.outfit]}` : "• Preserve original clothing"}
-
-TECHNICAL SPECIFICATIONS:
-- Resolution: Ultra-high 2K quality (2048x2048 or higher)
-- Lighting: Soft, diffused professional studio lighting with natural warmth
-- Color grading: Rich, vibrant colors with perfect white balance
-- Skin rendering: Natural, healthy baby skin tones with subtle texture
-- Background: Beautiful depth-of-field with dreamy bokeh effect
-- Overall mood: Warm, heartwarming, and professionally polished
-
-OUTPUT: A single, stunning professional baby photograph that parents would proudly display and share.`;
-
-    console.log("Editing image via Lovable AI Gateway (gemini-3-pro-image-preview)");
-
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) {
       return new Response(JSON.stringify({ error: "AI service not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const backgroundDescription = backgroundPrompts[backgroundTheme] || backgroundPrompts.garden_natural;
+    
+    // Build customization parts for the prompt
+    const genderText = customization.gender === "boy" 
+      ? "Transform the baby to appear as a baby boy" 
+      : customization.gender === "girl" 
+        ? "Transform the baby to appear as a baby girl" 
+        : "Keep the baby's natural appearance";
+    
+    const eyeDesc = customization.eyeColor !== "keep" && eyeColorPrompts[customization.eyeColor] 
+      ? `Give the baby ${eyeColorPrompts[customization.eyeColor]}.` : "";
+    
+    const hairColorDesc = customization.hairColor !== "keep" && hairColorPrompts[customization.hairColor]
+      ? `Give the baby ${hairColorPrompts[customization.hairColor]}` : "";
+    
+    const hairStyleDesc = customization.hairStyle !== "keep" && hairStylePrompts[customization.hairStyle]
+      ? hairStylePrompts[customization.hairStyle] : "";
+    
+    const outfitDesc = customization.outfit !== "keep" && outfitPrompts[customization.outfit]
+      ? outfitPrompts[customization.outfit] : "";
+
+    // Construct the ultimate professional photoshoot prompt
+    const masterPrompt = `You are a world-renowned professional baby photographer creating an award-winning 2K resolution photoshoot masterpiece.
+
+**ABSOLUTE MISSION:** Transform this baby photo into a breathtaking, magazine-cover-quality professional photoshoot image.
+
+**SCENE SETTING:**
+Create ${backgroundDescription}. The scene must feel authentic, luxurious, and perfectly lit with professional studio-grade lighting that wraps around the subject beautifully.
+
+**CRITICAL REQUIREMENTS - FOLLOW EXACTLY:**
+
+1. **FACIAL IDENTITY PRESERVATION (HIGHEST PRIORITY):**
+   - Maintain 100% accuracy of the baby's unique facial features
+   - Preserve exact eye shape, nose structure, mouth curvature, cheek contours
+   - Keep identical skin texture, tone, and natural complexion
+   - The baby must be INSTANTLY recognizable - this is non-negotiable
+
+2. **STYLE CUSTOMIZATION:**
+   ${genderText}.
+   ${eyeDesc}
+   ${hairColorDesc} ${hairStyleDesc}.
+   ${outfitDesc ? `Dress the baby ${outfitDesc}.` : ""}
+
+3. **PROFESSIONAL PHOTOGRAPHY STANDARDS:**
+   - Ultra-sharp focus on the baby's face with creamy bokeh background
+   - Natural skin rendering with subtle texture - NO airbrushing or plastic look
+   - Perfect color grading with rich, vibrant yet natural tones
+   - Professional lighting: soft key light, gentle fill, subtle rim light
+   - Magazine-quality composition following the rule of thirds
+
+4. **TECHNICAL SPECIFICATIONS:**
+   - Output: Ultra-high resolution 2K quality (2048x2048 minimum perceived quality)
+   - Lighting: Soft, diffused professional studio lighting with natural warmth
+   - Color: Rich, vibrant colors with perfect white balance
+   - Skin: Natural, healthy baby skin tones with realistic texture
+   - Background: Beautiful depth-of-field with dreamy cinematic bokeh
+   - Style: Warm, heartwarming, professionally polished Pinterest-worthy aesthetic
+
+5. **ABSOLUTE PROHIBITIONS:**
+   - NO cartoon or illustration style - must be 100% photorealistic
+   - NO AI artifacts, distortions, or uncanny valley effects
+   - NO over-smoothed plastic-looking skin
+   - NO unnatural proportions or anatomy errors
+   - NO low-resolution or pixelated output
+
+**OUTPUT:** Generate ONE stunning professional baby photograph that parents would proudly display, frame, and share. The image should evoke genuine emotion and look like it was taken by a top-tier professional photographer in a premium studio.`;
+
+    console.log("Generating image with Gemini 3 Pro Image Preview");
+
+    // Initialize Google GenAI
+    const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
     // Extract base64 data from data URL if present
     let imageBase64 = sourceImageBase64;
@@ -227,89 +231,52 @@ OUTPUT: A single, stunning professional baby photograph that parents would proud
       }
     }
 
-    const imageUrlForGateway = sourceImageBase64.startsWith("data:")
-      ? sourceImageBase64
-      : `data:${mimeType};base64,${imageBase64}`;
-
-    // Strong system prompt lives on the backend (not the client)
-    const systemPrompt = `You are an elite, award-winning professional baby portrait photographer and photorealistic image editor.
-
-GOAL: Create a breathtaking, magazine-cover-quality baby photoshoot image by editing the provided baby photo.
-
-HARD REQUIREMENTS:
-- Identity lock: Preserve the baby's facial identity perfectly (same face). No face swap, no age change.
-- Photorealism only: No cartoon, painting, CGI, or "AI-looking" artifacts.
-- Natural integration: Match lighting, shadows, white balance, perspective, and depth-of-field.
-- Output: Return exactly ONE final edited image with rich, clean details and natural skin texture.
-
-QUALITY TARGET:
-- Ultra sharp subject, soft cinematic bokeh, premium color grading, clean background details.
-- Aim for high resolution (2K look/feel). Avoid over-smoothing skin.`;
-
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-pro-image-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          {
-            role: "user",
-            content: [
-              { type: "text", text: editPrompt },
-              { type: "image_url", image_url: { url: imageUrlForGateway } },
-            ],
+    // Generate content with Gemini 3 Pro Image Preview
+    const response = await ai.models.generateContent({
+      model: "gemini-3-pro-image-preview",
+      contents: [
+        { text: masterPrompt },
+        {
+          inlineData: {
+            mimeType: mimeType,
+            data: imageBase64,
           },
-        ],
-        modalities: ["image", "text"],
-      }),
+        },
+      ],
+      config: {
+        responseModalities: ["TEXT", "IMAGE"],
+        imageConfig: {
+          aspectRatio: "1:1",
+          imageSize: "2K",
+        },
+      },
     });
 
-    if (!aiResponse.ok) {
-      const errorText = await aiResponse.text();
-      console.error("AI gateway error:", aiResponse.status, errorText);
+    console.log("Gemini response received");
 
-      if (aiResponse.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+    // Extract the generated image from response
+    let generatedImageBase64: string | undefined;
+    let outputMimeType = "image/png";
+
+    if (response.candidates && response.candidates[0]?.content?.parts) {
+      for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData) {
+          generatedImageBase64 = part.inlineData.data;
+          outputMimeType = part.inlineData.mimeType || "image/png";
+          break;
+        }
       }
-
-      if (aiResponse.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exceeded. Please add credits and try again." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      return new Response(JSON.stringify({ error: "Failed to edit image" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
     }
 
-    const aiData = await aiResponse.json();
-    console.log("AI gateway response received");
-
-    const generatedImageUrl: string | undefined =
-      aiData?.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-
-    if (!generatedImageUrl) {
-      console.error("No image in AI response:", JSON.stringify(aiData));
+    if (!generatedImageBase64) {
+      console.error("No image in Gemini response:", JSON.stringify(response));
       return new Response(JSON.stringify({ error: "No image generated" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const outMatch = generatedImageUrl.match(/^data:(image\/\w+);base64,(.+)$/);
-    const outMimeType = outMatch?.[1] ?? "image/png";
-    const generatedImageBase64 = outMatch?.[2] ?? generatedImageUrl;
-    const imageFormat = outMimeType.split("/")[1] || "png";
+    const imageFormat = outputMimeType.split("/")[1] || "png";
 
     // Convert base64 to binary
     const binaryData = Uint8Array.from(atob(generatedImageBase64), (c) => c.charCodeAt(0));
@@ -319,7 +286,7 @@ QUALITY TARGET:
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from("baby-photos")
       .upload(fileName, binaryData, {
-        contentType: `image/${imageFormat}`,
+        contentType: outputMimeType,
         upsert: false,
       });
 
