@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Gift, Check, Clock, Heart, Sparkles, 
   Calendar, Star, ChefHat, Music, Camera,
   Flower2, MapPin, MessageCircle, ShoppingBag,
-  History, Trophy, Trash2, ChevronDown, ChevronUp
+  History, Trophy, Trash2, ChevronDown, ChevronUp, Loader2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { hapticFeedback } from '@/lib/native';
@@ -12,122 +12,38 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePartnerData } from '@/hooks/usePartnerData';
 import { useSurprises } from '@/hooks/useSurprises';
+import { useSurpriseIdeas } from '@/hooks/useDynamicConfig';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
 
 interface SurpriseIdea {
   id: string;
+  surprise_key: string;
   title: string;
-  description: string;
+  title_az: string | null;
+  description: string | null;
+  description_az: string | null;
   emoji: string;
-  icon: any;
-  category: 'romantic' | 'care' | 'adventure' | 'gift';
-  difficulty: 'easy' | 'medium' | 'hard';
+  icon: string | null;
+  category: string;
+  difficulty: string;
   points: number;
 }
 
-const SURPRISE_IDEAS: SurpriseIdea[] = [
-  { 
-    id: '1', 
-    title: 'Romantik şam yeməyi', 
-    description: 'Evdə xüsusi bir axşam yeməyi hazırla. Şamlar, gözəl musiqi və sevimli yeməklər.', 
-    emoji: '🕯️',
-    icon: ChefHat,
-    category: 'romantic',
-    difficulty: 'medium',
-    points: 50
-  },
-  { 
-    id: '2', 
-    title: 'Spa günü', 
-    description: 'Evdə masaj və baxım seansi düzəlt. Üz maskaları, ayaq masajı və rahatlatıcı musiqi.', 
-    emoji: '💆‍♀️',
-    icon: Heart,
-    category: 'care',
-    difficulty: 'easy',
-    points: 30
-  },
-  { 
-    id: '3', 
-    title: 'Sürpriz hədiyyə', 
-    description: 'Kiçik amma mənalı bir hədiyyə al - həmişə istədiyi bir şey.', 
-    emoji: '🎁',
-    icon: ShoppingBag,
-    category: 'gift',
-    difficulty: 'easy',
-    points: 25
-  },
-  { 
-    id: '4', 
-    title: 'Romantik gəzinti', 
-    description: 'Parkda, sahildə və ya şəhərin gözəl yerində romantik gəzinti.', 
-    emoji: '🌅',
-    icon: MapPin,
-    category: 'adventure',
-    difficulty: 'easy',
-    points: 20
-  },
-  { 
-    id: '5', 
-    title: 'Sevgi məktubu', 
-    description: 'Hisslərini kağıza tök. Əl yazısı məktub daha xüsusi olacaq.', 
-    emoji: '💌',
-    icon: MessageCircle,
-    category: 'romantic',
-    difficulty: 'easy',
-    points: 35
-  },
-  { 
-    id: '6', 
-    title: 'Çiçək sürprizi', 
-    description: 'Gözəl bir buket çiçək al və işdən evə gəldiyində sürpriz et.', 
-    emoji: '💐',
-    icon: Flower2,
-    category: 'gift',
-    difficulty: 'easy',
-    points: 20
-  },
-  { 
-    id: '7', 
-    title: 'Film gecəsi', 
-    description: 'Sevimli filmlər, popcorn və rahat bir axşam planla.', 
-    emoji: '🎬',
-    icon: Star,
-    category: 'romantic',
-    difficulty: 'easy',
-    points: 15
-  },
-  { 
-    id: '8', 
-    title: 'Səhər yeməyi sürprizi', 
-    description: 'Erkən qalx və yataqda gözəl bir səhər yeməyi hazırla.', 
-    emoji: '🥐',
-    icon: ChefHat,
-    category: 'care',
-    difficulty: 'medium',
-    points: 40
-  },
-  { 
-    id: '9', 
-    title: 'Fotosessiya', 
-    description: 'Hamiləlik dövrünün xatirəsi üçün peşəkar fotosessiya təşkil et.', 
-    emoji: '📸',
-    icon: Camera,
-    category: 'adventure',
-    difficulty: 'hard',
-    points: 75
-  },
-  { 
-    id: '10', 
-    title: 'Musiqi playlisti', 
-    description: 'Birgə dinlədiyiniz mahnılardan playlist hazırla.', 
-    emoji: '🎵',
-    icon: Music,
-    category: 'romantic',
-    difficulty: 'easy',
-    points: 15
-  },
-];
+// Icon mapping for dynamic icons from database
+const ICON_MAP: Record<string, any> = {
+  ChefHat,
+  Heart,
+  ShoppingBag,
+  MapPin,
+  MessageCircle,
+  Flower2,
+  Star,
+  Camera,
+  Music,
+  Gift,
+  Sparkles,
+};
 
 const SurpriseTab = () => {
   const { toast } = useToast();
@@ -143,23 +59,58 @@ const SurpriseTab = () => {
     deleteSurprise 
   } = useSurprises();
   
+  // Fetch surprise ideas from database
+  const { data: surpriseIdeasData, isLoading: ideasLoading } = useSurpriseIdeas();
+  
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedSurprise, setSelectedSurprise] = useState<SurpriseIdea | null>(null);
   const [planningDate, setPlanningDate] = useState('');
   const [planningNotes, setPlanningNotes] = useState('');
   const [showHistory, setShowHistory] = useState(false);
 
-  const categories = [
-    { id: 'all', label: 'Hamısı', emoji: '✨' },
-    { id: 'romantic', label: 'Romantik', emoji: '❤️' },
-    { id: 'care', label: 'Qayğı', emoji: '🤗' },
-    { id: 'adventure', label: 'Macəra', emoji: '🌟' },
-    { id: 'gift', label: 'Hədiyyə', emoji: '🎁' },
-  ];
+  // Build categories dynamically from data
+  const categories = useMemo(() => {
+    const baseCategories = [{ id: 'all', label: 'Hamısı', emoji: '✨' }];
+    const uniqueCategories = new Set(surpriseIdeasData?.map(s => s.category) || []);
+    
+    const categoryLabels: Record<string, { label: string; emoji: string }> = {
+      romantic: { label: 'Romantik', emoji: '❤️' },
+      care: { label: 'Qayğı', emoji: '🤗' },
+      adventure: { label: 'Macəra', emoji: '🌟' },
+      gift: { label: 'Hədiyyə', emoji: '🎁' },
+      creative: { label: 'Yaradıcı', emoji: '🎨' },
+      fun: { label: 'Əyləncə', emoji: '🎉' },
+    };
+    
+    uniqueCategories.forEach(cat => {
+      if (categoryLabels[cat]) {
+        baseCategories.push({ id: cat, ...categoryLabels[cat] });
+      }
+    });
+    
+    return baseCategories;
+  }, [surpriseIdeasData]);
+
+  // Map database data to UI format
+  const surpriseIdeas: SurpriseIdea[] = useMemo(() => {
+    return (surpriseIdeasData || []).map(idea => ({
+      id: idea.id,
+      surprise_key: idea.surprise_key,
+      title: idea.title_az || idea.title,
+      title_az: idea.title_az,
+      description: idea.description_az || idea.description,
+      description_az: idea.description_az,
+      emoji: idea.emoji || '🎁',
+      icon: idea.icon,
+      category: idea.category,
+      difficulty: idea.difficulty || 'easy',
+      points: idea.points || 10,
+    }));
+  }, [surpriseIdeasData]);
 
   const filteredIdeas = selectedCategory === 'all' 
-    ? SURPRISE_IDEAS 
-    : SURPRISE_IDEAS.filter(s => s.category === selectedCategory);
+    ? surpriseIdeas 
+    : surpriseIdeas.filter(s => s.category === selectedCategory);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {

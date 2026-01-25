@@ -205,3 +205,90 @@ export const usePhotoshootOutfits = (gender?: string) => {
     },
   });
 };
+
+// ===========================================
+// HELP CENTER HOOKS
+// ===========================================
+
+export interface FAQ {
+  id: string;
+  question: string;
+  question_az: string | null;
+  answer: string;
+  answer_az: string | null;
+  category: string;
+  sort_order: number;
+  is_active: boolean;
+}
+
+export interface SupportCategory {
+  id: string;
+  category_key: string;
+  name: string;
+  name_az: string | null;
+  emoji: string;
+  sort_order: number;
+  is_active: boolean;
+}
+
+export interface WeightRecommendation {
+  id: string;
+  trimester: number;
+  bmi_category: string;
+  min_gain_kg: number;
+  max_gain_kg: number;
+  weekly_gain_kg: number | null;
+  description: string | null;
+  description_az: string | null;
+  is_active: boolean;
+}
+
+export const useFaqs = () => {
+  return useQuery({
+    queryKey: ['faqs'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('faqs')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
+      if (error) throw error;
+      return data as FAQ[];
+    },
+  });
+};
+
+export const useSupportCategories = () => {
+  return useQuery({
+    queryKey: ['support-categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('support_categories')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
+      if (error) throw error;
+      return data as SupportCategory[];
+    },
+  });
+};
+
+export const useWeightRecommendations = (trimester?: number) => {
+  return useQuery({
+    queryKey: ['weight-recommendations', trimester],
+    queryFn: async () => {
+      let query = supabase
+        .from('weight_recommendations')
+        .select('*')
+        .eq('is_active', true);
+      
+      if (trimester) {
+        query = query.eq('trimester', trimester);
+      }
+      
+      const { data, error } = await query.order('trimester');
+      if (error) throw error;
+      return data as WeightRecommendation[];
+    },
+  });
+};

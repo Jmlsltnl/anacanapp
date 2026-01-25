@@ -1,8 +1,9 @@
-import { useState, useEffect, forwardRef } from 'react';
+import { useState, useEffect, forwardRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Plus, TrendingUp, TrendingDown, Minus, Scale, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useWeightEntries } from '@/hooks/useWeightEntries';
+import { useWeightRecommendations } from '@/hooks/useDynamicTools';
 import { useUserStore } from '@/store/userStore';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -26,14 +27,24 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
   const currentWeight = stats?.currentWeight || startWeight;
   const totalGain = stats?.totalGain || 0;
   
-  // Recommended weight gain based on week
-  const getRecommendedGain = (week: number) => {
-    if (week <= 12) return { min: 0.5, max: 2 };
-    if (week <= 26) return { min: 4, max: 8 };
+  // Determine trimester
+  const trimester = currentWeek <= 12 ? 1 : currentWeek <= 26 ? 2 : 3;
+  
+  // Get weight recommendations from database
+  const { data: recommendations } = useWeightRecommendations(trimester);
+  
+  // Calculate recommended gain from database or fallback
+  const recommended = useMemo(() => {
+    // Default to 'normal' BMI category - could be extended to use user's actual BMI
+    const rec = recommendations?.find(r => r.bmi_category === 'normal');
+    if (rec) {
+      return { min: Number(rec.min_gain_kg), max: Number(rec.max_gain_kg) };
+    }
+    // Fallback values if database is empty
+    if (trimester === 1) return { min: 0.5, max: 2 };
+    if (trimester === 2) return { min: 4, max: 8 };
     return { min: 8, max: 14 };
-  };
-
-  const recommended = getRecommendedGain(currentWeek);
+  }, [recommendations, trimester]);
   
   const getStatus = () => {
     if (totalGain < recommended.min) return { status: 'low', text: 'Az', color: 'text-amber-600', bg: 'bg-amber-50' };

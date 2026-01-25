@@ -947,6 +947,42 @@ export type Database = {
         }
         Relationships: []
       }
+      faqs: {
+        Row: {
+          answer: string
+          answer_az: string | null
+          category: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          question: string
+          question_az: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          answer: string
+          answer_az?: string | null
+          category?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          question: string
+          question_az?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          answer?: string
+          answer_az?: string | null
+          category?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          question?: string
+          question_az?: string | null
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       favorite_names: {
         Row: {
           created_at: string
@@ -2334,6 +2370,39 @@ export type Database = {
         }
         Relationships: []
       }
+      support_categories: {
+        Row: {
+          category_key: string
+          created_at: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          name_az: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          category_key: string
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          name_az?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          category_key?: string
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          name_az?: string | null
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       support_tickets: {
         Row: {
           admin_response: string | null
@@ -2772,6 +2841,45 @@ export type Database = {
           notes?: string | null
           user_id?: string
           weight?: number
+        }
+        Relationships: []
+      }
+      weight_recommendations: {
+        Row: {
+          bmi_category: string
+          created_at: string | null
+          description: string | null
+          description_az: string | null
+          id: string
+          is_active: boolean | null
+          max_gain_kg: number
+          min_gain_kg: number
+          trimester: number
+          weekly_gain_kg: number | null
+        }
+        Insert: {
+          bmi_category?: string
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_gain_kg: number
+          min_gain_kg: number
+          trimester: number
+          weekly_gain_kg?: number | null
+        }
+        Update: {
+          bmi_category?: string
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_gain_kg?: number
+          min_gain_kg?: number
+          trimester?: number
+          weekly_gain_kg?: number | null
         }
         Relationships: []
       }
