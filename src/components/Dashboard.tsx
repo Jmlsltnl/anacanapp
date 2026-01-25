@@ -480,7 +480,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
               Anacan, hazırda <span className="text-primary">{weekData.fruit}</span> boydayam
             </p>
             <p className="text-xs text-muted-foreground font-medium">
-              {pregData.currentWeek}. həftə, {pregData.currentDay}. gün
+              {pregData.currentWeek}. həftə, {pregData.currentDay}. gün • {pregData.trimester}-{pregData.trimester === 1 ? 'ci' : pregData.trimester === 2 ? 'ci' : 'cü'} Trimester
             </p>
             <div className="flex items-center justify-center gap-2 mt-2">
               <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
