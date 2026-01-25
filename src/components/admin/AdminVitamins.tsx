@@ -90,7 +90,7 @@ const AdminVitamins = () => {
         dosage: formData.dosage || null,
         week_start: formData.week_start ? parseInt(formData.week_start) : null,
         week_end: formData.week_end ? parseInt(formData.week_end) : null,
-        trimester: formData.trimester ? parseInt(formData.trimester) : null,
+        trimester: formData.trimester && formData.trimester !== 'none' ? parseInt(formData.trimester) : null,
         life_stage: formData.life_stage,
         importance: formData.importance,
         icon_emoji: formData.icon_emoji,
@@ -355,7 +355,7 @@ const AdminVitamins = () => {
                     <SelectValue placeholder="Seç" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Yoxdur</SelectItem>
+                    <SelectItem value="none">Yoxdur</SelectItem>
                     <SelectItem value="1">1-ci</SelectItem>
                     <SelectItem value="2">2-ci</SelectItem>
                     <SelectItem value="3">3-cü</SelectItem>
