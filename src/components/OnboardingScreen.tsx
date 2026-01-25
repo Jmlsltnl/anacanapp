@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, ArrowLeft, Check, Calendar, Baby, Heart, Sparkles, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,47 +7,15 @@ import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useAutoJoinGroups } from '@/hooks/useCommunity';
+import { useOnboardingStages, useMultiplesOptions, FALLBACK_STAGES, FALLBACK_MULTIPLES } from '@/hooks/useDynamicOnboarding';
 import type { LifeStage } from '@/types/anacan';
 
-const stages = [
-  {
-    id: 'flow' as LifeStage,
-    title: 'Dövrümü izləmək',
-    subtitle: 'Menstruasiya təqvimi',
-    description: 'Dövrünüzü izləyin, ovulyasiyanı proqnozlaşdırın',
-    icon: Calendar,
-    emoji: '🌸',
-    color: 'flow',
-    bgGradient: 'from-rose-500 to-pink-600',
-  },
-  {
-    id: 'bump' as LifeStage,
-    title: 'Hamiləliyim',
-    subtitle: 'Hamiləlik izləyicisi',
-    description: 'Körpənizin inkişafını həftə-həftə izləyin',
-    icon: Heart,
-    emoji: '🤰',
-    color: 'bump',
-    bgGradient: 'from-violet-500 to-purple-600',
-  },
-  {
-    id: 'mommy' as LifeStage,
-    title: 'Körpəm var',
-    subtitle: 'Analıq yardımçısı',
-    description: 'Körpənizin qidalanma, yuxu və inkişafını izləyin',
-    icon: Baby,
-    emoji: '👶',
-    color: 'mommy',
-    bgGradient: 'from-emerald-500 to-teal-600',
-  },
-];
-
-const multiplesOptions = [
-  { id: 'single', label: 'Tək uşaq', emoji: '👶', count: 1 },
-  { id: 'twins', label: 'Əkiz', emoji: '👶👶', count: 2 },
-  { id: 'triplets', label: 'Üçüz', emoji: '👶👶👶', count: 3 },
-  { id: 'quadruplets', label: 'Dördüz', emoji: '👶👶👶👶', count: 4 },
-];
+// Icon mapping for dynamic stages
+const iconMap: Record<string, React.ComponentType<any>> = {
+  Calendar,
+  Heart,
+  Baby,
+};
 
 const OnboardingScreen = () => {
   const [step, setStep] = useState(0);
@@ -63,6 +31,53 @@ const OnboardingScreen = () => {
   const { updateProfile } = useAuth();
   const { toast } = useToast();
   const { autoJoin } = useAutoJoinGroups();
+  
+  // Fetch dynamic data from backend
+  const { data: dbStages, isLoading: stagesLoading } = useOnboardingStages();
+  const { data: dbMultiples, isLoading: multiplesLoading } = useMultiplesOptions();
+
+  // Use database data or fallback
+  const stages = useMemo(() => {
+    if (!dbStages || dbStages.length === 0) {
+      return FALLBACK_STAGES.map(s => ({
+        id: s.stage_id as LifeStage,
+        title: s.title_az,
+        subtitle: s.subtitle_az,
+        description: s.description_az,
+        icon: iconMap[s.icon_name] || Heart,
+        emoji: s.emoji,
+        color: s.stage_id,
+        bgGradient: s.bg_gradient,
+      }));
+    }
+    return dbStages.map(s => ({
+      id: s.stage_id as LifeStage,
+      title: s.title_az || s.title,
+      subtitle: s.subtitle_az || s.subtitle,
+      description: s.description_az || s.description,
+      icon: iconMap[s.icon_name] || Heart,
+      emoji: s.emoji,
+      color: s.stage_id,
+      bgGradient: s.bg_gradient,
+    }));
+  }, [dbStages]);
+
+  const multiplesOptions = useMemo(() => {
+    if (!dbMultiples || dbMultiples.length === 0) {
+      return FALLBACK_MULTIPLES.map(m => ({
+        id: m.option_id,
+        label: m.label_az,
+        emoji: m.emoji,
+        count: m.baby_count,
+      }));
+    }
+    return dbMultiples.map(m => ({
+      id: m.option_id,
+      label: m.label_az || m.label,
+      emoji: m.emoji,
+      count: m.baby_count,
+    }));
+  }, [dbMultiples]);
 
   const handleStageSelect = (stage: LifeStage) => {
     setSelectedStage(stage);

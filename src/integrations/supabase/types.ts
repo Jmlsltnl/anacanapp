@@ -1330,6 +1330,42 @@ export type Database = {
         }
         Relationships: []
       }
+      multiples_options: {
+        Row: {
+          baby_count: number
+          created_at: string | null
+          emoji: string
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          option_id: string
+          sort_order: number | null
+        }
+        Insert: {
+          baby_count?: number
+          created_at?: string | null
+          emoji: string
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          option_id: string
+          sort_order?: number | null
+        }
+        Update: {
+          baby_count?: number
+          created_at?: string | null
+          emoji?: string
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          option_id?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -1432,6 +1468,96 @@ export type Database = {
           title?: string
           trimester?: number | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      onboarding_stages: {
+        Row: {
+          bg_gradient: string | null
+          created_at: string | null
+          description: string | null
+          description_az: string | null
+          emoji: string | null
+          icon_name: string | null
+          id: string
+          is_active: boolean | null
+          sort_order: number | null
+          stage_id: string
+          subtitle: string | null
+          subtitle_az: string | null
+          title: string
+          title_az: string | null
+        }
+        Insert: {
+          bg_gradient?: string | null
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          emoji?: string | null
+          icon_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          stage_id: string
+          subtitle?: string | null
+          subtitle_az?: string | null
+          title: string
+          title_az?: string | null
+        }
+        Update: {
+          bg_gradient?: string | null
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          emoji?: string | null
+          icon_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          stage_id?: string
+          subtitle?: string | null
+          subtitle_az?: string | null
+          title?: string
+          title_az?: string | null
+        }
+        Relationships: []
+      }
+      partner_daily_tips: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          life_stage: string
+          sort_order: number | null
+          tip_emoji: string | null
+          tip_text: string
+          tip_text_az: string | null
+          updated_at: string | null
+          week_number: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          life_stage?: string
+          sort_order?: number | null
+          tip_emoji?: string | null
+          tip_text: string
+          tip_text_az?: string | null
+          updated_at?: string | null
+          week_number?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          life_stage?: string
+          sort_order?: number | null
+          tip_emoji?: string | null
+          tip_text?: string
+          tip_text_az?: string | null
+          updated_at?: string | null
+          week_number?: number | null
         }
         Relationships: []
       }
