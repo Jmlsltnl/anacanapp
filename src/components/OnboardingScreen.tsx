@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useAutoJoinGroups } from '@/hooks/useCommunity';
 import { useOnboardingStages, useMultiplesOptions, FALLBACK_STAGES, FALLBACK_MULTIPLES } from '@/hooks/useDynamicOnboarding';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import type { LifeStage } from '@/types/anacan';
 
 // Icon mapping for dynamic stages
@@ -35,32 +36,45 @@ const OnboardingScreen = () => {
   // Fetch dynamic data from backend
   const { data: dbStages, isLoading: stagesLoading } = useOnboardingStages();
   const { data: dbMultiples, isLoading: multiplesLoading } = useMultiplesOptions();
+  const { data: appSettings = [] } = useAppSettings();
 
-  // Use database data or fallback
+  // Check which stages are enabled
+  const isStageEnabled = (stageId: string) => {
+    const setting = appSettings.find(s => s.key === `${stageId}_mode_enabled`);
+    if (!setting) return true; // Default enabled
+    const val = setting.value;
+    if (val === 'true' || val === true) return true;
+    if (val === 'false' || val === false) return false;
+    return true;
+  };
+
+  // Use database data or fallback, then filter by enabled settings
   const stages = useMemo(() => {
-    if (!dbStages || dbStages.length === 0) {
-      return FALLBACK_STAGES.map(s => ({
-        id: s.stage_id as LifeStage,
-        title: s.title_az,
-        subtitle: s.subtitle_az,
-        description: s.description_az,
-        icon: iconMap[s.icon_name] || Heart,
-        emoji: s.emoji,
-        color: s.stage_id,
-        bgGradient: s.bg_gradient,
-      }));
-    }
-    return dbStages.map(s => ({
-      id: s.stage_id as LifeStage,
-      title: s.title_az || s.title,
-      subtitle: s.subtitle_az || s.subtitle,
-      description: s.description_az || s.description,
-      icon: iconMap[s.icon_name] || Heart,
-      emoji: s.emoji,
-      color: s.stage_id,
-      bgGradient: s.bg_gradient,
-    }));
-  }, [dbStages]);
+    const allStages = (!dbStages || dbStages.length === 0)
+      ? FALLBACK_STAGES.map(s => ({
+          id: s.stage_id as LifeStage,
+          title: s.title_az,
+          subtitle: s.subtitle_az,
+          description: s.description_az,
+          icon: iconMap[s.icon_name] || Heart,
+          emoji: s.emoji,
+          color: s.stage_id,
+          bgGradient: s.bg_gradient,
+        }))
+      : dbStages.map(s => ({
+          id: s.stage_id as LifeStage,
+          title: s.title_az || s.title,
+          subtitle: s.subtitle_az || s.subtitle,
+          description: s.description_az || s.description,
+          icon: iconMap[s.icon_name] || Heart,
+          emoji: s.emoji,
+          color: s.stage_id,
+          bgGradient: s.bg_gradient,
+        }));
+    
+    // Filter by enabled settings
+    return allStages.filter(stage => isStageEnabled(stage.id));
+  }, [dbStages, appSettings]);
 
   const multiplesOptions = useMemo(() => {
     if (!dbMultiples || dbMultiples.length === 0) {
