@@ -12,6 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { useToast } from '@/hooks/use-toast';
 import { useAISuggestedQuestions } from '@/hooks/useDynamicTools';
+import MarkdownContent from './MarkdownContent';
 
 interface Message {
   id: string;
@@ -369,21 +370,25 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
                     ? 'bg-primary text-primary-foreground rounded-br-md'
                     : 'bg-card border border-border shadow-sm rounded-bl-md'
                 }`}>
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                    {message.content}
-                    {message.isStreaming && (
-                      <motion.span
-                        className="inline-block w-2 h-4 bg-primary ml-1"
-                        animate={{ opacity: [1, 0] }}
-                        transition={{ duration: 0.5, repeat: Infinity }}
-                      />
-                    )}
-                  </p>
-                  {!message.isStreaming && (
-                    <span className="text-[10px] opacity-60 mt-2 block">
-                      {message.timestamp.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
-                    </span>
+                <div className="text-sm leading-relaxed">
+                  {message.role === 'assistant' ? (
+                    <MarkdownContent content={message.content} variant="chat" />
+                  ) : (
+                    <span className="whitespace-pre-wrap">{message.content}</span>
                   )}
+                  {message.isStreaming && (
+                    <motion.span
+                      className="inline-block w-2 h-4 bg-primary ml-1"
+                      animate={{ opacity: [1, 0] }}
+                      transition={{ duration: 0.5, repeat: Infinity }}
+                    />
+                  )}
+                </div>
+                {!message.isStreaming && (
+                  <span className="text-[10px] opacity-60 mt-2 block">
+                    {message.timestamp.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                )}
                 </div>
               </motion.div>
             ))}

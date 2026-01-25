@@ -15,6 +15,7 @@ import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import RelatedPosts from './RelatedPosts';
+import MarkdownContent from '@/components/MarkdownContent';
 
 interface BlogPostDetailProps {
   post: BlogPost;
@@ -294,10 +295,9 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
         </div>
 
         {/* Content */}
-        <div 
-          className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-a:text-primary mb-4"
-          dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br/>') }}
-        />
+        <div className="mb-4">
+          <MarkdownContent content={post.content} variant="blog" />
+        </div>
 
         {/* Tags */}
         {post.tags && post.tags.length > 0 && (
