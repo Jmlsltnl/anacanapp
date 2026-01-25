@@ -18,7 +18,8 @@ import {
   usePhotoshootEyeColors, 
   usePhotoshootHairColors, 
   usePhotoshootHairStyles, 
-  usePhotoshootOutfits 
+  usePhotoshootOutfits,
+  usePhotoshootImageStyles 
 } from '@/hooks/useDynamicTools';
 
 interface BabyPhotoshootProps {
@@ -39,6 +40,7 @@ interface CustomizationOptions {
   hairStyle: string;
   outfit: string;
   background: string;
+  imageStyle: string;
 }
 
 // Fallback data for when DB is loading
@@ -72,6 +74,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     hairStyle: 'keep',
     outfit: 'keep',
     background: '',
+    imageStyle: 'realistic',
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [photos, setPhotos] = useState<GeneratedPhoto[]>([]);
@@ -94,6 +97,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
   const { data: dbHairColors = [] } = usePhotoshootHairColors();
   const { data: dbHairStyles = [] } = usePhotoshootHairStyles();
   const { data: dbOutfits = [] } = usePhotoshootOutfits(customization.gender);
+  const { data: dbImageStyles = [] } = usePhotoshootImageStyles();
 
   // Map DB data or use fallbacks
   const currentBackgrounds = useMemo(() => {
@@ -174,6 +178,22 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     }
     return []; // Will use fallback
   }, [dbOutfits]);
+
+  const imageStyleOptions = useMemo(() => {
+    if (dbImageStyles.length > 0) {
+      return dbImageStyles.map(s => ({
+        id: s.style_id,
+        name: s.style_name_az || s.style_name,
+        emoji: s.emoji || '🎨',
+        promptModifier: s.prompt_modifier || '',
+      }));
+    }
+    // Fallback
+    return [
+      { id: 'realistic', name: 'Realistik', emoji: '📷', promptModifier: 'ultra realistic, photorealistic' },
+      { id: '3d_disney', name: '3D Disney', emoji: '🏰', promptModifier: '3D Disney Pixar style' },
+    ];
+  }, [dbImageStyles]);
 
 
   useEffect(() => {
@@ -308,6 +328,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             hairColor: customization.hairColor,
             hairStyle: customization.hairStyle,
             outfit: customization.outfit,
+            imageStyle: customization.imageStyle,
           },
         },
       });
@@ -544,6 +565,36 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             exit={{ opacity: 0, x: -20 }}
             className="space-y-5"
           >
+            {/* Image Style Selection */}
+            <div className="bg-card rounded-3xl p-5 shadow-elevated">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-purple-500" />
+                </div>
+                <div>
+                  <h2 className="font-bold text-foreground">Şəkil Növü</h2>
+                  <p className="text-xs text-muted-foreground">Foto stilini seçin</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                {imageStyleOptions.map((style) => (
+                  <motion.button
+                    key={style.id}
+                    onClick={() => setCustomization(prev => ({ ...prev, imageStyle: style.id }))}
+                    className={`p-3 rounded-xl flex flex-col items-center gap-1.5 transition-all ${
+                      customization.imageStyle === style.id
+                        ? 'bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-lg scale-105'
+                        : 'bg-muted hover:bg-muted/80'
+                    }`}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span className="text-xl sm:text-2xl">{style.emoji}</span>
+                    <span className="text-[9px] sm:text-[10px] font-medium text-center leading-tight">{style.name}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+
             {/* Background Selection by Category */}
             {Object.entries(groupedBackgrounds).map(([category, backgrounds]) => (
               <div key={category} className="bg-card rounded-3xl p-5 shadow-elevated">

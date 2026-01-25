@@ -370,6 +370,36 @@ export const useToolConfigs = () => {
 };
 
 // ===========================================
+// PHOTOSHOOT IMAGE STYLES HOOKS
+// ===========================================
+
+export interface PhotoshootImageStyle {
+  id: string;
+  style_id: string;
+  style_name: string;
+  style_name_az: string | null;
+  emoji: string;
+  prompt_modifier: string | null;
+  sort_order: number;
+  is_active: boolean;
+}
+
+export const usePhotoshootImageStyles = () => {
+  return useQuery({
+    queryKey: ['photoshoot-image-styles'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('photoshoot_image_styles')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
+      if (error) throw error;
+      return data as PhotoshootImageStyle[];
+    },
+  });
+};
+
+// ===========================================
 // HOSPITAL BAG TEMPLATES HOOKS
 // ===========================================
 
