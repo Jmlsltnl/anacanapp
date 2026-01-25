@@ -18,6 +18,7 @@ import { usePartnerMessages } from '@/hooks/usePartnerMessages';
 import { usePartnerMissions } from '@/hooks/usePartnerMissions';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
+import { useDailyTip } from '@/hooks/usePartnerDailyTips';
 import { supabase } from '@/integrations/supabase/client';
 import { FRUIT_SIZES } from '@/types/anacan';
 import PartnerChatScreen from './partner/PartnerChatScreen';
@@ -155,6 +156,9 @@ const PartnerDashboard = () => {
   // Fetch dynamic pregnancy content (same as woman's dashboard)
   const { data: dayContent } = usePregnancyContentByDay(pregnancyDay > 0 ? pregnancyDay : undefined);
   const { data: fruitImages = [] } = useFruitImages();
+  
+  // Fetch dynamic daily tip from backend
+  const { tipText, tipEmoji } = useDailyTip(lifeStage, currentWeek);
   
   // Get fruit data from unified hook - priority: pregnancy_daily_content > fruit_size_images > static
   const getFruitData = () => {
@@ -660,7 +664,7 @@ const PartnerDashboard = () => {
                 </div>
               </motion.div>
 
-              {/* Today's Tip */}
+              {/* Today's Tip - from database */}
               <motion.div 
                 className="bg-card rounded-2xl p-5 shadow-lg border border-border/50"
                 initial={{ y: 20, opacity: 0 }}
@@ -669,15 +673,12 @@ const PartnerDashboard = () => {
               >
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                    <span className="text-xl">{tipEmoji}</span>
                   </div>
                   <h3 className="font-bold text-lg">Günün Məsləhəti</h3>
                 </div>
                 <p className="text-muted-foreground">
-                  {currentWeek > 0 
-                    ? `${currentWeek}. həftədə körpə artıq səsləri eşidə bilir. Ona mahnı oxumaq və ya danışmaq əlaqənizi gücləndirir! 🎵`
-                    : 'Həyat yoldaşınıza hər gün sevginizi göstərin. Kiçik jestlər böyük fərq yaradır! 💕'
-                  }
+                  {tipText}
                 </p>
               </motion.div>
             </motion.div>
