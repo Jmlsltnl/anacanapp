@@ -294,7 +294,8 @@ const PhotoGalleryViewer = ({
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="p-4 safe-bottom"
+          className="p-4 pb-8"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 32px)' }}
         >
           <div className="flex justify-center gap-3 max-w-md mx-auto">
             <Button
