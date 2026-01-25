@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, HelpCircle, MessageCircle, Mail, Phone, 
-  ChevronRight, Book, FileQuestion, ExternalLink,
-  Send, CheckCircle, Clock, AlertCircle, Plus, Loader2
+  ChevronRight, Send, CheckCircle, Clock, AlertCircle, Plus, Loader2, X
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useSupportTickets, SupportTicket } from '@/hooks/useSupportTickets';
+import { useSupportTicketReplies } from '@/hooks/useSupportTicketReplies';
 import { useFaqs, useSupportCategories } from '@/hooks/useDynamicTools';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
@@ -22,12 +22,24 @@ interface HelpScreenProps {
 const HelpScreen = ({ onBack }: HelpScreenProps) => {
   const [activeTab, setActiveTab] = useState<'faq' | 'contact' | 'tickets'>('faq');
   const [showNewTicket, setShowNewTicket] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
   const [newTicket, setNewTicket] = useState({ subject: '', message: '', category: 'general' });
+  const [replyMessage, setReplyMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const { tickets, loading, createTicket } = useSupportTickets();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  const { tickets, loading, createTicket, refetch } = useSupportTickets();
+  const { replies, loading: repliesLoading, addReply } = useSupportTicketReplies(selectedTicket?.id || null);
   const { data: faqs, isLoading: faqsLoading } = useFaqs();
   const { data: supportCategories, isLoading: categoriesLoading } = useSupportCategories();
   const { toast } = useToast();
+
+  // Scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [replies]);
 
   // Map support categories to the format expected by the UI
   const ticketCategories = supportCategories?.map(cat => ({
@@ -91,6 +103,162 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
     }
   };
 
+  const handleSendReply = async () => {
+    if (!replyMessage.trim() || !selectedTicket) return;
+    
+    setSubmitting(true);
+    const result = await addReply(replyMessage.trim(), false);
+    setSubmitting(false);
+
+    if (!result.error) {
+      setReplyMessage('');
+    } else {
+      toast({
+        title: 'Xəta',
+        description: 'Mesaj göndərilə bilmədi',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  // Ticket Chat View
+  if (selectedTicket) {
+    const canReply = selectedTicket.status !== 'closed';
+
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        {/* Header */}
+        <div className="gradient-primary px-5 pt-4 pb-4">
+          <div className="flex items-center gap-3">
+            <motion.button
+              onClick={() => {
+                setSelectedTicket(null);
+                refetch();
+              }}
+              className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
+              whileTap={{ scale: 0.95 }}
+            >
+              <ArrowLeft className="w-5 h-5 text-white" />
+            </motion.button>
+            <div className="flex-1">
+              <h1 className="text-lg font-bold text-white line-clamp-1">{selectedTicket.subject}</h1>
+              <div className="flex items-center gap-2 text-white/80 text-sm">
+                {getStatusIcon(selectedTicket.status)}
+                <span>{getStatusText(selectedTicket.status)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+          {/* Initial message */}
+          <div className="flex justify-end">
+            <div className="max-w-[80%] bg-primary text-primary-foreground p-3 rounded-2xl rounded-br-md">
+              <p className="text-sm">{selectedTicket.message}</p>
+              <p className="text-[10px] opacity-70 mt-1 text-right">
+                {format(new Date(selectedTicket.created_at), 'd MMM, HH:mm', { locale: az })}
+              </p>
+            </div>
+          </div>
+
+          {/* Admin response (legacy) */}
+          {selectedTicket.admin_response && (
+            <div className="flex justify-start">
+              <div className="max-w-[80%] bg-muted p-3 rounded-2xl rounded-bl-md">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
+                    <span className="text-[10px]">👩‍⚕️</span>
+                  </div>
+                  <span className="text-[10px] font-medium text-primary">Dəstək</span>
+                </div>
+                <p className="text-sm text-foreground">{selectedTicket.admin_response}</p>
+                {selectedTicket.responded_at && (
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    {format(new Date(selectedTicket.responded_at), 'd MMM, HH:mm', { locale: az })}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Chat replies */}
+          {repliesLoading ? (
+            <div className="flex justify-center py-4">
+              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            replies.map((reply) => (
+              <div key={reply.id} className={`flex ${reply.is_admin ? 'justify-start' : 'justify-end'}`}>
+                <div className={`max-w-[80%] p-3 rounded-2xl ${
+                  reply.is_admin 
+                    ? 'bg-muted rounded-bl-md' 
+                    : 'bg-primary text-primary-foreground rounded-br-md'
+                }`}>
+                  {reply.is_admin && (
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
+                        <span className="text-[10px]">👩‍⚕️</span>
+                      </div>
+                      <span className="text-[10px] font-medium text-primary">Dəstək</span>
+                    </div>
+                  )}
+                  <p className={`text-sm ${reply.is_admin ? 'text-foreground' : ''}`}>{reply.message}</p>
+                  <p className={`text-[10px] mt-1 ${
+                    reply.is_admin ? 'text-muted-foreground' : 'opacity-70'
+                  } ${reply.is_admin ? '' : 'text-right'}`}>
+                    {format(new Date(reply.created_at), 'd MMM, HH:mm', { locale: az })}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
+
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Reply Input */}
+        {canReply ? (
+          <div className="p-4 border-t border-border bg-card safe-bottom">
+            <div className="flex gap-2">
+              <Textarea
+                value={replyMessage}
+                onChange={(e) => setReplyMessage(e.target.value)}
+                placeholder="Mesajınızı yazın..."
+                rows={1}
+                className="flex-1 min-h-[44px] max-h-[120px] resize-none"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendReply();
+                  }
+                }}
+              />
+              <Button
+                onClick={handleSendReply}
+                disabled={submitting || !replyMessage.trim()}
+                size="icon"
+                className="h-11 w-11"
+              >
+                {submitting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="p-4 border-t border-border bg-muted/50 safe-bottom">
+            <p className="text-sm text-muted-foreground text-center">
+              Bu müraciət bağlanıb. Yeni müraciət göndərə bilərsiniz.
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background pb-28">
       {/* Header */}
@@ -123,7 +291,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
               onClick={() => setActiveTab(tab.id as any)}
               className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
                 activeTab === tab.id 
-                  ? 'bg-primary text-white shadow-md' 
+                  ? 'bg-primary text-primary-foreground shadow-md' 
                   : 'text-muted-foreground'
               }`}
             >
@@ -195,7 +363,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                     <p className="font-semibold text-foreground">E-poçt</p>
                     <p className="text-sm text-primary">support@anacan.az</p>
                   </div>
-                  <ExternalLink className="w-5 h-5 text-muted-foreground" />
+                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </motion.a>
 
                 <motion.a
@@ -210,7 +378,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                     <p className="font-semibold text-foreground">Telefon</p>
                     <p className="text-sm text-primary">+994 12 000 00 00</p>
                   </div>
-                  <ExternalLink className="w-5 h-5 text-muted-foreground" />
+                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </motion.a>
               </div>
 
@@ -241,7 +409,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
               {!showNewTicket ? (
                 <motion.button
                   onClick={() => setShowNewTicket(true)}
-                  className="w-full bg-primary text-white rounded-2xl p-4 flex items-center justify-center gap-2 font-semibold shadow-button"
+                  className="w-full bg-primary text-primary-foreground rounded-2xl p-4 flex items-center justify-center gap-2 font-semibold shadow-button"
                   whileTap={{ scale: 0.98 }}
                 >
                   <Plus className="w-5 h-5" />
@@ -273,7 +441,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                             onClick={() => setNewTicket({...newTicket, category: cat.id})}
                             className={`px-3 py-1.5 rounded-full text-sm transition-all ${
                               newTicket.category === cat.id
-                                ? 'bg-primary text-white'
+                                ? 'bg-primary text-primary-foreground'
                                 : 'bg-muted text-muted-foreground'
                             }`}
                           >
@@ -336,31 +504,29 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                 ) : (
                   <div className="space-y-3">
                     {tickets.map(ticket => (
-                      <motion.div
+                      <motion.button
                         key={ticket.id}
-                        className="p-4 bg-muted/30 rounded-xl"
+                        className="w-full p-4 bg-muted/30 rounded-xl text-left hover:bg-muted/50 transition-colors"
+                        onClick={() => setSelectedTicket(ticket)}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
+                        whileTap={{ scale: 0.98 }}
                       >
                         <div className="flex items-start justify-between mb-2">
-                          <h4 className="font-semibold text-foreground flex-1">{ticket.subject}</h4>
-                          <div className="flex items-center gap-1 text-xs">
+                          <h4 className="font-semibold text-foreground flex-1 line-clamp-1">{ticket.subject}</h4>
+                          <div className="flex items-center gap-1 text-xs ml-2">
                             {getStatusIcon(ticket.status)}
-                            <span>{getStatusText(ticket.status)}</span>
+                            <span className="text-muted-foreground">{getStatusText(ticket.status)}</span>
                           </div>
                         </div>
-                        <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{ticket.message}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {format(new Date(ticket.created_at), 'd MMM yyyy, HH:mm', { locale: az })}
-                        </p>
-                        
-                        {ticket.admin_response && (
-                          <div className="mt-3 p-3 bg-primary/5 rounded-lg border-l-2 border-primary">
-                            <p className="text-xs text-primary font-medium mb-1">Cavab:</p>
-                            <p className="text-sm text-foreground">{ticket.admin_response}</p>
-                          </div>
-                        )}
-                      </motion.div>
+                        <p className="text-sm text-muted-foreground line-clamp-1 mb-2">{ticket.message}</p>
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs text-muted-foreground">
+                            {format(new Date(ticket.created_at), 'd MMM yyyy', { locale: az })}
+                          </p>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                        </div>
+                      </motion.button>
                     ))}
                   </div>
                 )}
@@ -372,7 +538,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
         {/* App Version */}
         <div className="text-center pt-4">
           <p className="text-xs text-muted-foreground">Anacan v1.0.0</p>
-          <p className="text-xs text-muted-foreground mt-1">© 2024 Anacan. Bütün hüquqlar qorunur.</p>
+          <p className="text-xs text-muted-foreground mt-1">© 2025 Anacan. Bütün hüquqlar qorunur.</p>
         </div>
       </div>
     </div>
