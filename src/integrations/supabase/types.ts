@@ -89,6 +89,48 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_suggested_questions: {
+        Row: {
+          color_from: string | null
+          color_to: string | null
+          created_at: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          life_stage: string
+          question: string
+          question_az: string | null
+          sort_order: number | null
+          user_type: string
+        }
+        Insert: {
+          color_from?: string | null
+          color_to?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          life_stage?: string
+          question: string
+          question_az?: string | null
+          sort_order?: number | null
+          user_type?: string
+        }
+        Update: {
+          color_from?: string | null
+          color_to?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          life_stage?: string
+          question?: string
+          question_az?: string | null
+          sort_order?: number | null
+          user_type?: string
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           created_at: string
@@ -2520,6 +2562,75 @@ export type Database = {
           life_stages?: string[] | null
           sort_order?: number | null
           symptom_key?: string
+        }
+        Relationships: []
+      }
+      tool_configs: {
+        Row: {
+          bg_color: string | null
+          color: string | null
+          created_at: string | null
+          description: string | null
+          description_az: string | null
+          icon: string
+          id: string
+          is_active: boolean | null
+          life_stages: string[] | null
+          min_week: number | null
+          name: string
+          name_az: string | null
+          partner_description: string | null
+          partner_description_az: string | null
+          partner_name: string | null
+          partner_name_az: string | null
+          requires_partner: boolean | null
+          sort_order: number | null
+          tool_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          bg_color?: string | null
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean | null
+          life_stages?: string[] | null
+          min_week?: number | null
+          name: string
+          name_az?: string | null
+          partner_description?: string | null
+          partner_description_az?: string | null
+          partner_name?: string | null
+          partner_name_az?: string | null
+          requires_partner?: boolean | null
+          sort_order?: number | null
+          tool_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          bg_color?: string | null
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean | null
+          life_stages?: string[] | null
+          min_week?: number | null
+          name?: string
+          name_az?: string | null
+          partner_description?: string | null
+          partner_description_az?: string | null
+          partner_name?: string | null
+          partner_name_az?: string | null
+          requires_partner?: boolean | null
+          sort_order?: number | null
+          tool_id?: string
+          updated_at?: string | null
         }
         Relationships: []
       }

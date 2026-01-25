@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useHospitalBagTemplates } from './useDynamicTools';
 
 export interface HospitalBagItem {
   id: string;
@@ -13,40 +14,11 @@ export interface HospitalBagItem {
   updated_at: string;
 }
 
-const defaultItems = [
-  // Ana üçün
-  { item_id: '1', item_name: 'Gecə köynəyi (2-3 ədəd)', category: 'mom' as const },
-  { item_id: '2', item_name: 'Xalat', category: 'mom' as const },
-  { item_id: '3', item_name: 'Ayaqqabı (terlik)', category: 'mom' as const },
-  { item_id: '4', item_name: 'Diş fırçası və pasta', category: 'mom' as const },
-  { item_id: '5', item_name: 'Şampun və sabun', category: 'mom' as const },
-  { item_id: '6', item_name: 'Əmzirmə südqəbi (2-3 ədəd)', category: 'mom' as const },
-  { item_id: '7', item_name: 'Doğuşdan sonra gigiyenik bezlər', category: 'mom' as const },
-  { item_id: '8', item_name: 'Rahat alt paltarları', category: 'mom' as const },
-  { item_id: '9', item_name: 'Dodaq balzamı', category: 'mom' as const },
-  { item_id: '10', item_name: 'Telefon şarj cihazı', category: 'mom' as const },
-  // Körpə üçün
-  { item_id: '11', item_name: 'Körpə paltarları (3-4 dəst)', category: 'baby' as const },
-  { item_id: '12', item_name: 'Corablar', category: 'baby' as const },
-  { item_id: '13', item_name: 'Papaq', category: 'baby' as const },
-  { item_id: '14', item_name: 'Əlcəklər', category: 'baby' as const },
-  { item_id: '15', item_name: 'Bezlər (yenidoğulmuş ölçüsü)', category: 'baby' as const },
-  { item_id: '16', item_name: 'Yaş salfetlər', category: 'baby' as const },
-  { item_id: '17', item_name: 'Körpə yağı/losyonu', category: 'baby' as const },
-  { item_id: '18', item_name: 'Körpə yorğanı', category: 'baby' as const },
-  { item_id: '19', item_name: 'Avtomobil oturacağı', category: 'baby' as const },
-  // Sənədlər
-  { item_id: '20', item_name: 'Şəxsiyyət vəsiqəsi', category: 'documents' as const },
-  { item_id: '21', item_name: 'Tibbi sığorta kartı', category: 'documents' as const },
-  { item_id: '22', item_name: 'Doğuş planı', category: 'documents' as const },
-  { item_id: '23', item_name: 'Həkim kontaktları', category: 'documents' as const },
-  { item_id: '24', item_name: 'Xəstəxana qeydiyyatı', category: 'documents' as const },
-];
-
 export const useHospitalBag = () => {
   const { user } = useAuth();
   const [items, setItems] = useState<HospitalBagItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const { data: templates = [], isLoading: templatesLoading } = useHospitalBagTemplates();
 
   const fetchItems = async () => {
     if (!user) return;
@@ -60,9 +32,9 @@ export const useHospitalBag = () => {
 
       if (error) throw error;
 
-      // If no items exist, initialize with defaults
+      // If no items exist, initialize with templates from DB
       if (!data || data.length === 0) {
-        await initializeDefaults();
+        await initializeFromTemplates();
       } else {
         setItems(data as HospitalBagItem[]);
       }
@@ -73,15 +45,15 @@ export const useHospitalBag = () => {
     }
   };
 
-  const initializeDefaults = async () => {
-    if (!user) return;
+  const initializeFromTemplates = async () => {
+    if (!user || templates.length === 0) return;
 
     try {
-      const itemsToInsert = defaultItems.map(item => ({
+      const itemsToInsert = templates.map((template, index) => ({
         user_id: user.id,
-        item_id: item.item_id,
-        item_name: item.item_name,
-        category: item.category,
+        item_id: template.id,
+        item_name: template.item_name_az || template.item_name,
+        category: template.category as 'mom' | 'baby' | 'documents',
         is_checked: false,
       }));
 
@@ -127,14 +99,14 @@ export const useHospitalBag = () => {
   };
 
   useEffect(() => {
-    if (user) {
+    if (user && !templatesLoading) {
       fetchItems();
     }
-  }, [user]);
+  }, [user, templatesLoading, templates]);
 
   return {
     items,
-    loading,
+    loading: loading || templatesLoading,
     toggleItem,
     getProgress,
     checkedCount: items.filter(i => i.is_checked).length,

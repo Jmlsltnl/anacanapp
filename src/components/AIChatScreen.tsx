@@ -11,6 +11,7 @@ import { useAIChatHistory } from '@/hooks/useAIChatHistory';
 import { useAuth } from '@/hooks/useAuth';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { useToast } from '@/hooks/use-toast';
+import { useAISuggestedQuestions } from '@/hooks/useDynamicTools';
 
 interface Message {
   id: string;
@@ -282,7 +283,12 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     }]);
   };
 
-  const suggestedQuestions = lifeStage === 'bump' 
+  // Fetch dynamic suggested questions
+  const { data: dynamicQuestions = [] } = useAISuggestedQuestions(lifeStage || 'bump', 'mother');
+  
+  const suggestedQuestions = dynamicQuestions.length > 0
+    ? dynamicQuestions.map(q => q.question_az || q.question)
+    : lifeStage === 'bump' 
     ? [
         'Bu həftə körpəm necə inkişaf edir?',
         'Hamiləlikdə hansı qidalar faydalıdır?',
