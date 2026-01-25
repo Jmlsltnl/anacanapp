@@ -3,13 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, HelpCircle, MessageCircle, Mail, Phone, 
   ChevronRight, Book, FileQuestion, ExternalLink,
-  Send, CheckCircle, Clock, AlertCircle, Plus
+  Send, CheckCircle, Clock, AlertCircle, Plus, Loader2
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useSupportTickets, SupportTicket } from '@/hooks/useSupportTickets';
+import { useFaqs, useSupportCategories } from '@/hooks/useDynamicTools';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
@@ -24,49 +25,17 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
   const [newTicket, setNewTicket] = useState({ subject: '', message: '', category: 'general' });
   const [submitting, setSubmitting] = useState(false);
   const { tickets, loading, createTicket } = useSupportTickets();
+  const { data: faqs, isLoading: faqsLoading } = useFaqs();
+  const { data: supportCategories, isLoading: categoriesLoading } = useSupportCategories();
   const { toast } = useToast();
 
-  const faqs = [
-    {
-      question: 'Anacan nədir?',
-      answer: 'Anacan, qadınların menstruasiya dövrünü, hamiləliyi və analıq səyahətini izləmək üçün yaradılmış bir tətbiqdir. AI dəstəyi ilə fərdiləşdirilmiş tövsiyələr alın.'
-    },
-    {
-      question: 'Partner kodu necə işləyir?',
-      answer: 'Partner kodu həyat yoldaşınızla hamiləlik səyahətinizi paylaşmağınıza imkan verir. Profilinizə gedib kodu kopyalayın və partnerinizlə paylaşın. Onlar tətbiqi yükləyib "Partner" olaraq qoşula bilərlər.'
-    },
-    {
-      question: 'Premium üzvlük nədir?',
-      answer: 'Premium üzvlük sizə limitsiz AI söhbət, körpə foto sessiyası, reklamlarsız istifadə və digər ekskluziv xüsusiyyətlər təqdim edir.'
-    },
-    {
-      question: 'Məlumatlarım necə qorunur?',
-      answer: 'Bütün məlumatlarınız şifrələnmiş şəkildə saxlanılır və üçüncü tərəflərlə paylaşılmır. Gizlilik siyasətimizi oxumaq üçün Gizlilik bölməsinə baxın.'
-    },
-    {
-      question: 'Bildirişləri necə idarə edə bilərəm?',
-      answer: 'Ayarlar > Bildirişlər bölməsindən istədiyiniz bildiriş növlərini aktivləşdirə və ya deaktiv edə bilərsiniz. Həmçinin sakit saatları da təyin edə bilərsiniz.'
-    },
-    {
-      question: 'Hesabımı necə silə bilərəm?',
-      answer: 'Hesabınızı silmək üçün bizimlə əlaqə saxlayın. Hesab silindikdə bütün məlumatlarınız birdəfəlik silinəcək və bərpa edilə bilməyəcək.'
-    },
-    {
-      question: 'Doğum tariximi necə dəyişə bilərəm?',
-      answer: 'Profil > Profili Redaktə et bölməsindən təxmini doğum tarixinizi yeniləyə bilərsiniz. Bu, həftə hesablamalarını avtomatik yeniləyəcək.'
-    },
-    {
-      question: 'Körpə foto sessiyası necə işləyir?',
-      answer: 'AI texnologiyası ilə körpənizin şəklini müxtəlif fonlarda və geyimlərdə görə bilərsiniz. Şəkil yükləyin, parametrləri seçin və sehrli nəticəni görün!'
-    },
-  ];
-
-  const ticketCategories = [
-    { id: 'general', label: 'Ümumi sual' },
-    { id: 'technical', label: 'Texniki problem' },
-    { id: 'billing', label: 'Ödəniş' },
-    { id: 'feature', label: 'Xüsusiyyət tələbi' },
-    { id: 'other', label: 'Digər' },
+  // Map support categories to the format expected by the UI
+  const ticketCategories = supportCategories?.map(cat => ({
+    id: cat.category_key,
+    label: cat.name_az || cat.name,
+    emoji: cat.emoji,
+  })) || [
+    { id: 'general', label: 'Ümumi sual', emoji: '❓' },
   ];
 
   const getStatusIcon = (status: SupportTicket['status']) => {
@@ -180,18 +149,24 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                   Tez-tez Soruşulan Suallar
                 </h3>
                 
-                <Accordion type="single" collapsible className="space-y-2">
-                  {faqs.map((faq, index) => (
-                    <AccordionItem key={index} value={`item-${index}`} className="border-none">
-                      <AccordionTrigger className="text-left text-sm font-medium text-foreground hover:no-underline py-3 px-3 rounded-xl hover:bg-muted/50 data-[state=open]:bg-primary/5">
-                        {faq.question}
-                      </AccordionTrigger>
-                      <AccordionContent className="text-sm text-muted-foreground px-3 pb-3">
-                        {faq.answer}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
+                {faqsLoading ? (
+                  <div className="flex justify-center py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                  </div>
+                ) : (
+                  <Accordion type="single" collapsible className="space-y-2">
+                    {(faqs || []).map((faq, index) => (
+                      <AccordionItem key={faq.id} value={`item-${index}`} className="border-none">
+                        <AccordionTrigger className="text-left text-sm font-medium text-foreground hover:no-underline py-3 px-3 rounded-xl hover:bg-muted/50 data-[state=open]:bg-primary/5">
+                          {faq.question_az || faq.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-sm text-muted-foreground px-3 pb-3">
+                          {faq.answer_az || faq.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                )}
               </div>
             </motion.div>
           )}
