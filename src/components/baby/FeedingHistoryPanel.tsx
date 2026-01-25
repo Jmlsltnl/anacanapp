@@ -89,15 +89,15 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
   };
 
   return (
-    <div className="bg-amber-50/50 rounded-2xl overflow-hidden border border-amber-100">
+    <div className="bg-amber-50/50 dark:bg-amber-500/10 rounded-2xl overflow-hidden border border-amber-100 dark:border-amber-500/20">
       {/* Summary Header - Always visible */}
       <button
         onClick={handleToggle}
-        className="w-full p-3 flex items-center justify-between hover:bg-amber-100/30 transition-colors"
+        className="w-full p-3 flex items-center justify-between hover:bg-amber-100/30 dark:hover:bg-amber-500/15 transition-colors"
       >
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center">
-            <Baby className="w-4 h-4 text-amber-600" />
+          <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center">
+            <Baby className="w-4 h-4 text-amber-600 dark:text-amber-400" />
           </div>
           <div className="text-left">
             <p className="text-xs font-semibold text-foreground">Qidalanma xülasəsi</p>
@@ -109,7 +109,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
         <div className="flex items-center gap-2">
           {hasAnyFeedings && (
             <div className="text-right mr-2">
-              <p className="text-xs font-bold text-amber-600">
+              <p className="text-xs font-bold text-amber-600 dark:text-amber-400">
                 {totalFeedings} dəfə
               </p>
               <p className="text-[10px] text-muted-foreground">bu gün</p>
@@ -139,48 +139,48 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                 <div className="grid grid-cols-2 gap-2">
                   {/* Breast Left */}
                   {todayBreakdown.leftCount > 0 && (
-                    <div className="bg-pink-100/50 rounded-xl p-2.5 text-center">
+                    <div className="bg-pink-100/50 dark:bg-pink-500/15 rounded-xl p-2.5 text-center border border-pink-100 dark:border-pink-500/20">
                       <div className="flex items-center justify-center gap-1 mb-1">
-                        <ArrowLeft className="w-3 h-3 text-pink-500" />
-                        <span className="text-xs font-semibold">Sol sinə</span>
+                        <ArrowLeft className="w-3 h-3 text-pink-500 dark:text-pink-400" />
+                        <span className="text-xs font-semibold text-foreground">Sol sinə</span>
                       </div>
-                      <p className="text-sm font-bold text-pink-600">{formatDuration(todayBreakdown.leftTotalSeconds)}</p>
+                      <p className="text-sm font-bold text-pink-600 dark:text-pink-400">{formatDuration(todayBreakdown.leftTotalSeconds)}</p>
                       <p className="text-[10px] text-muted-foreground">{todayBreakdown.leftCount} dəfə</p>
                     </div>
                   )}
                   
                   {/* Breast Right */}
                   {todayBreakdown.rightCount > 0 && (
-                    <div className="bg-blue-100/50 rounded-xl p-2.5 text-center">
+                    <div className="bg-blue-100/50 dark:bg-blue-500/15 rounded-xl p-2.5 text-center border border-blue-100 dark:border-blue-500/20">
                       <div className="flex items-center justify-center gap-1 mb-1">
-                        <span className="text-xs font-semibold">Sağ sinə</span>
-                        <ArrowRight className="w-3 h-3 text-blue-500" />
+                        <span className="text-xs font-semibold text-foreground">Sağ sinə</span>
+                        <ArrowRight className="w-3 h-3 text-blue-500 dark:text-blue-400" />
                       </div>
-                      <p className="text-sm font-bold text-blue-600">{formatDuration(todayBreakdown.rightTotalSeconds)}</p>
+                      <p className="text-sm font-bold text-blue-600 dark:text-blue-400">{formatDuration(todayBreakdown.rightTotalSeconds)}</p>
                       <p className="text-[10px] text-muted-foreground">{todayBreakdown.rightCount} dəfə</p>
                     </div>
                   )}
                   
                   {/* Formula */}
                   {todayBreakdown.formulaCount > 0 && (
-                    <div className="bg-purple-100/50 rounded-xl p-2.5 text-center">
+                    <div className="bg-purple-100/50 dark:bg-purple-500/15 rounded-xl p-2.5 text-center border border-purple-100 dark:border-purple-500/20">
                       <div className="flex items-center justify-center gap-1 mb-1">
                         <span className="text-lg">🍼</span>
-                        <span className="text-xs font-semibold">Süni qida</span>
+                        <span className="text-xs font-semibold text-foreground">Süni qida</span>
                       </div>
-                      <p className="text-sm font-bold text-purple-600">{todayBreakdown.formulaCount} dəfə</p>
+                      <p className="text-sm font-bold text-purple-600 dark:text-purple-400">{todayBreakdown.formulaCount} dəfə</p>
                       <p className="text-[10px] text-muted-foreground">bu gün</p>
                     </div>
                   )}
                   
                   {/* Solid Food */}
                   {todayBreakdown.solidCount > 0 && (
-                    <div className="bg-orange-100/50 rounded-xl p-2.5 text-center">
+                    <div className="bg-orange-100/50 dark:bg-orange-500/15 rounded-xl p-2.5 text-center border border-orange-100 dark:border-orange-500/20">
                       <div className="flex items-center justify-center gap-1 mb-1">
                         <span className="text-lg">🥣</span>
-                        <span className="text-xs font-semibold">Bərk qida</span>
+                        <span className="text-xs font-semibold text-foreground">Bərk qida</span>
                       </div>
-                      <p className="text-sm font-bold text-orange-600">{todayBreakdown.solidCount} dəfə</p>
+                      <p className="text-sm font-bold text-orange-600 dark:text-orange-400">{todayBreakdown.solidCount} dəfə</p>
                       <p className="text-[10px] text-muted-foreground">bu gün</p>
                     </div>
                   )}
@@ -202,19 +202,19 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                       {items.map((item) => (
                         <div 
                           key={item.id}
-                          className="flex items-center justify-between bg-white/60 rounded-lg px-2.5 py-1.5"
+                          className="flex items-center justify-between bg-white/60 dark:bg-card/60 rounded-lg px-2.5 py-1.5 border border-transparent dark:border-border/30"
                         >
                           <div className="flex items-center gap-2">
                             <span className="text-sm">{getFeedTypeEmoji(item.feedType)}</span>
                             <div>
-                              <p className="text-xs font-medium">{getFeedTypeLabel(item.feedType)}</p>
+                              <p className="text-xs font-medium text-foreground">{getFeedTypeLabel(item.feedType)}</p>
                               <p className="text-[10px] text-muted-foreground">
                                 {format(item.startTime, 'HH:mm')}
                                 {item.endTime && ` - ${format(item.endTime, 'HH:mm')}`}
                               </p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-1 text-amber-600">
+                          <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
                             <Clock className="w-3 h-3" />
                             <span className="text-xs font-bold">
                               {formatDuration(item.durationSeconds)}
