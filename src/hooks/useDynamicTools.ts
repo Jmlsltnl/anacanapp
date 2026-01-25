@@ -134,8 +134,9 @@ export const usePhotoshootBackgrounds = (gender?: string) => {
       const { data, error } = await query;
       if (error) throw error;
       
-      if (gender && gender !== 'unisex' && data) {
-        return data.filter(bg => bg.gender === gender || bg.gender === 'unisex');
+      // Filter by gender: 'all' or 'unisex' means universal, otherwise match specific gender
+      if (gender && data) {
+        return data.filter(bg => bg.gender === 'all' || bg.gender === 'unisex' || bg.gender === gender);
       }
       return data;
     },
@@ -198,8 +199,9 @@ export const usePhotoshootOutfits = (gender?: string) => {
         .order('sort_order');
       if (error) throw error;
       
-      if (gender && gender !== 'unisex' && data) {
-        return data.filter(o => o.gender === gender || o.gender === 'unisex');
+      // Filter by gender: 'all' or 'unisex' means universal, otherwise match specific gender
+      if (gender && data) {
+        return data.filter(o => o.gender === 'all' || o.gender === 'unisex' || o.gender === gender);
       }
       return data;
     },
