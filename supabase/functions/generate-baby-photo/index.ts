@@ -205,11 +205,10 @@ TECHNICAL SPECIFICATIONS:
 
 OUTPUT: A single, stunning professional baby photograph that parents would proudly display and share.`;
 
-    console.log("Editing image with Gemini API");
+    console.log("Editing image via Lovable AI Gateway (gemini-3-pro-image-preview)");
 
-    // Use direct Gemini API
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) {
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
       return new Response(JSON.stringify({ error: "AI service not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -219,7 +218,7 @@ OUTPUT: A single, stunning professional baby photograph that parents would proud
     // Extract base64 data from data URL if present
     let imageBase64 = sourceImageBase64;
     let mimeType = "image/jpeg";
-    
+
     if (sourceImageBase64.startsWith("data:")) {
       const dataMatch = sourceImageBase64.match(/^data:(image\/\w+);base64,(.+)$/);
       if (dataMatch) {
@@ -228,48 +227,65 @@ OUTPUT: A single, stunning professional baby photograph that parents would proud
       }
     }
 
-    // Use Gemini's image generation/editing API
-    // Use Gemini 3 Pro Image Preview for highest quality
-    const aiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [
-                { text: editPrompt },
-                {
-                  inlineData: {
-                    mimeType: mimeType,
-                    data: imageBase64
-                  }
-                }
-              ]
-            }
-          ],
-          generationConfig: {
-            responseModalities: ["image", "text"]
-          }
-        }),
-      }
-    );
+    const imageUrlForGateway = sourceImageBase64.startsWith("data:")
+      ? sourceImageBase64
+      : `data:${mimeType};base64,${imageBase64}`;
+
+    // Strong system prompt lives on the backend (not the client)
+    const systemPrompt = `You are an elite, award-winning professional baby portrait photographer and photorealistic image editor.
+
+GOAL: Create a breathtaking, magazine-cover-quality baby photoshoot image by editing the provided baby photo.
+
+HARD REQUIREMENTS:
+- Identity lock: Preserve the baby's facial identity perfectly (same face). No face swap, no age change.
+- Photorealism only: No cartoon, painting, CGI, or "AI-looking" artifacts.
+- Natural integration: Match lighting, shadows, white balance, perspective, and depth-of-field.
+- Output: Return exactly ONE final edited image with rich, clean details and natural skin texture.
+
+QUALITY TARGET:
+- Ultra sharp subject, soft cinematic bokeh, premium color grading, clean background details.
+- Aim for high resolution (2K look/feel). Avoid over-smoothing skin.`;
+
+    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-pro-image-preview",
+        messages: [
+          { role: "system", content: systemPrompt },
+          {
+            role: "user",
+            content: [
+              { type: "text", text: editPrompt },
+              { type: "image_url", image_url: { url: imageUrlForGateway } },
+            ],
+          },
+        ],
+        modalities: ["image", "text"],
+      }),
+    });
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
-      console.error("Gemini API error:", aiResponse.status, errorText);
-      
+      console.error("AI gateway error:", aiResponse.status, errorText);
+
       if (aiResponse.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later." }), {
           status: 429,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      
+
+      if (aiResponse.status === 402) {
+        return new Response(JSON.stringify({ error: "AI credits exceeded. Please add credits and try again." }), {
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       return new Response(JSON.stringify({ error: "Failed to edit image" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -277,31 +293,23 @@ OUTPUT: A single, stunning professional baby photograph that parents would proud
     }
 
     const aiData = await aiResponse.json();
-    console.log("Gemini API Response received");
+    console.log("AI gateway response received");
 
-    // Extract image from Gemini response
-    const candidates = aiData.candidates;
-    let generatedImageBase64: string | null = null;
-    let imageFormat = "jpeg";
+    const generatedImageUrl: string | undefined =
+      aiData?.choices?.[0]?.message?.images?.[0]?.image_url?.url;
 
-    if (candidates && candidates[0]?.content?.parts) {
-      for (const part of candidates[0].content.parts) {
-        if (part.inlineData) {
-          generatedImageBase64 = part.inlineData.data;
-          const responseMime = part.inlineData.mimeType || "image/jpeg";
-          imageFormat = responseMime.split("/")[1] || "jpeg";
-          break;
-        }
-      }
-    }
-    
-    if (!generatedImageBase64) {
-      console.error("No image in response:", JSON.stringify(aiData));
+    if (!generatedImageUrl) {
+      console.error("No image in AI response:", JSON.stringify(aiData));
       return new Response(JSON.stringify({ error: "No image generated" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const outMatch = generatedImageUrl.match(/^data:(image\/\w+);base64,(.+)$/);
+    const outMimeType = outMatch?.[1] ?? "image/png";
+    const generatedImageBase64 = outMatch?.[2] ?? generatedImageUrl;
+    const imageFormat = outMimeType.split("/")[1] || "png";
 
     // Convert base64 to binary
     const binaryData = Uint8Array.from(atob(generatedImageBase64), (c) => c.charCodeAt(0));
