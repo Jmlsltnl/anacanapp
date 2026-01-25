@@ -33,7 +33,10 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
     { id: 'calendar', icon: Calendar, label: 'Təqvim Ayarları' },
     { id: 'privacy', icon: Shield, label: 'Gizlilik' },
     { id: 'help', icon: HelpCircle, label: 'Yardım' },
-    ...(isAdmin ? [{ id: 'admin', icon: ShieldCheck, label: 'Admin Panel', badge: 'Admin' }] : []),
+    ...(isAdmin ? [
+      { id: 'shop', icon: ShoppingCart, label: 'Mağaza (Test)', badge: 'Beta' },
+      { id: 'admin', icon: ShieldCheck, label: 'Admin Panel', badge: 'Admin' }
+    ] : []),
   ];
 
   const copyPartnerCode = () => {

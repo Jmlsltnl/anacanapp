@@ -224,6 +224,9 @@ const Index = () => {
   if (activeScreen === 'blog') {
     return <BlogScreen onBack={() => setActiveScreen(null)} />;
   }
+  if (activeScreen === 'shop' && isAdmin) {
+    return <ShopScreen onBack={() => setActiveScreen(null)} />;
+  }
 
   // Mother chat overlay (for woman role)
   if (showMotherChat && role === 'woman') {
