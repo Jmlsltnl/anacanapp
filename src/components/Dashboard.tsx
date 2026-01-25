@@ -24,6 +24,7 @@ import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useTrimesterTips } from '@/hooks/useTrimesterTips';
+import FeedingHistoryPanel from '@/components/baby/FeedingHistoryPanel';
 
 // Fetus images by month
 import FetusMonth1 from '@/assets/fetus/month-1.svg';
@@ -1369,20 +1370,9 @@ const MommyDashboard = () => {
             </div>
             <span className="text-xs font-bold text-violet-600">{todayStats.sleepHours} saat</span>
           </div>
-          <div className="flex items-center justify-between p-2.5 bg-amber-50 rounded-xl">
-            <div className="flex items-center gap-2">
-              <Baby className="w-4 h-4 text-amber-600" />
-              <span className="text-xs font-medium text-foreground">Qidalanma</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-muted-foreground">
-                🤱{todayStats.breastFeedingCount}
-                🍼{todayStats.formulaCount}
-                🥣{todayStats.solidCount}
-              </span>
-              <span className="text-xs font-bold text-amber-600">{todayStats.feedingCount} dəfə</span>
-            </div>
-          </div>
+          
+          {/* Enhanced Feeding History Panel */}
+          <FeedingHistoryPanel />
           <div className="flex items-center justify-between p-2.5 bg-emerald-50 rounded-xl">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-emerald-600" />
