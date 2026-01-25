@@ -16,14 +16,17 @@ interface GroupFeedProps {
   onCreatePost: () => void;
   isEmbedded?: boolean;
   onUserClick?: (userId: string) => void;
+  externalSearchQuery?: string;
 }
 
-const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, onCreatePost, isEmbedded = false, onUserClick }, ref) => {
+const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, onCreatePost, isEmbedded = false, onUserClick, externalSearchQuery }, ref) => {
   const { data: posts = [], isLoading } = useGroupPosts(group?.id || null);
   const { onlineCount, onlineUsers, typingUsers } = useGroupPresence(group?.id || null);
   
-  // Search and filter state
-  const [searchQuery, setSearchQuery] = useState('');
+  // Search and filter state - use external query if provided
+  const [localSearchQuery, setLocalSearchQuery] = useState('');
+  const searchQuery = externalSearchQuery !== undefined ? externalSearchQuery : localSearchQuery;
+  const setSearchQuery = setLocalSearchQuery;
   const [sortBy, setSortBy] = useState<'recent' | 'popular'>('recent');
 
   // Filter and sort posts

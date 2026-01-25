@@ -79,7 +79,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Qrup axtar..."
+              placeholder="Qrup və ya post axtar..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full h-10 pl-10 pr-3 rounded-xl bg-muted/50 border border-border/50 text-sm outline-none focus:border-primary/50"
@@ -135,6 +135,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
                 onCreatePost={() => setShowCreatePost(true)}
                 isEmbedded
                 onUserClick={handleUserClick}
+                externalSearchQuery={searchQuery}
               />
             </motion.div>
           )}

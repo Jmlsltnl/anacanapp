@@ -44,7 +44,7 @@ const AdminContentManager = () => {
       table: 'admin_recipes',
       title: 'Reseptlər',
       icon: ChefHat,
-      fields: ['title', 'description', 'category', 'prep_time', 'cook_time', 'servings', 'image_url', 'is_active'],
+      fields: ['title', 'description', 'category', 'prep_time', 'cook_time', 'servings', 'ingredients', 'instructions', 'image_url', 'is_active'],
       categories: ['pregnancy', 'breastfeeding', 'baby_food', 'healthy'],
       hasImage: true,
     },
@@ -204,6 +204,8 @@ const AdminContentManager = () => {
     return (
       item.title?.toLowerCase().includes(searchLower) ||
       item.name?.toLowerCase().includes(searchLower) ||
+      item.item_name?.toLowerCase().includes(searchLower) ||
+      item.item_name_az?.toLowerCase().includes(searchLower) ||
       item.description?.toLowerCase().includes(searchLower) ||
       item.content?.toLowerCase().includes(searchLower)
     );
@@ -319,6 +321,25 @@ const AdminContentManager = () => {
             placeholder={field}
           />
         );
+      case 'ingredients':
+      case 'instructions':
+        const arrayValue = Array.isArray(formData[field]) ? formData[field] : [];
+        return (
+          <div className="space-y-2">
+            <Textarea 
+              value={arrayValue.join('\n')} 
+              onChange={(e) => {
+                const lines = e.target.value.split('\n').filter(line => line.trim());
+                setFormData({ ...formData, [field]: lines });
+              }}
+              placeholder={field === 'ingredients' ? 'Hər sətirdə bir inqredient' : 'Hər sətirdə bir addım'}
+              rows={5}
+            />
+            <p className="text-xs text-muted-foreground">
+              {field === 'ingredients' ? 'Hər inqrediyenti yeni sətirdə yazın' : 'Hər addımı yeni sətirdə yazın'}
+            </p>
+          </div>
+        );
       default:
         return (
           <Input 
@@ -358,6 +379,8 @@ const AdminContentManager = () => {
       calories: 'Kalori',
       is_active: 'Aktiv',
       image_url: 'Şəkil',
+      ingredients: 'İnqredientlər',
+      instructions: 'Hazırlanma Qaydası',
     };
     return labels[field] || field;
   };
