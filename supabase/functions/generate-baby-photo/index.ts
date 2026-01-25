@@ -248,8 +248,7 @@ QUALITY:
             }
           ],
           generationConfig: {
-            responseModalities: ["image", "text"],
-            responseMimeType: "image/jpeg"
+            responseModalities: ["image", "text"]
           }
         }),
       }
