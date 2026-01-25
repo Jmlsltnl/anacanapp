@@ -1413,19 +1413,19 @@ const MommyDashboard = () => {
       >
         <h3 className="text-base font-bold text-foreground mb-3">Bugünkü xülasə</h3>
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between p-2.5 bg-violet-50 rounded-xl">
+          <div className="flex items-center justify-between p-2.5 bg-violet-50 dark:bg-violet-500/15 rounded-xl border border-violet-100 dark:border-violet-500/20">
             <div className="flex items-center gap-2">
-              <Moon className="w-4 h-4 text-violet-600" />
+              <Moon className="w-4 h-4 text-violet-600 dark:text-violet-400" />
               <span className="text-xs font-medium text-foreground">Yuxu</span>
             </div>
-            <span className="text-xs font-bold text-violet-600">{todayStats.sleepHours} saat</span>
+            <span className="text-xs font-bold text-violet-600 dark:text-violet-400">{todayStats.sleepHours} saat</span>
           </div>
           
           {/* Enhanced Feeding History Panel */}
           <FeedingHistoryPanel />
-          <div className="flex items-center justify-between p-2.5 bg-emerald-50 rounded-xl">
+          <div className="flex items-center justify-between p-2.5 bg-emerald-50 dark:bg-emerald-500/15 rounded-xl border border-emerald-100 dark:border-emerald-500/20">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-emerald-600" />
+              <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span className="text-xs font-medium text-foreground">Bez dəyişmə</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -1434,7 +1434,7 @@ const MommyDashboard = () => {
                 💩{todayStats.dirtyCount}
                 💧💩{todayStats.bothCount}
               </span>
-              <span className="text-xs font-bold text-emerald-600">{todayStats.diaperCount} dəfə</span>
+              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{todayStats.diaperCount} dəfə</span>
             </div>
           </div>
         </div>
@@ -1442,13 +1442,13 @@ const MommyDashboard = () => {
 
       {/* Development Tip */}
       <motion.div 
-        className="bg-gradient-to-r from-teal-50 to-emerald-50 rounded-2xl p-4 border border-teal-100"
+        className="bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-500/15 dark:to-emerald-500/15 rounded-2xl p-4 border border-teal-100 dark:border-teal-500/20"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.35 }}
       >
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-mommy/20 flex items-center justify-center text-xl">
+          <div className="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-500/20 flex items-center justify-center text-xl">
             💡
           </div>
           <div className="flex-1">
