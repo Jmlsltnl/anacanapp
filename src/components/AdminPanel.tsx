@@ -17,6 +17,7 @@ import AdminBlog from './admin/AdminBlog';
 import AdminSupport from './admin/AdminSupport';
 import AdminVitamins from './admin/AdminVitamins';
 import AdminDynamicContent from './admin/AdminDynamicContent';
+import AdminTrimesterTips from './admin/AdminTrimesterTips';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -49,6 +50,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminVitamins />;
       case 'dynamic-content':
         return <AdminDynamicContent />;
+      case 'trimester-tips':
+        return <AdminTrimesterTips />;
       case 'subscriptions':
         return <AdminSubscriptions />;
       case 'moderation':
