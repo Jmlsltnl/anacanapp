@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SplashScreen from '@/components/SplashScreen';
+import AppIntroduction from '@/components/AppIntroduction';
 import AuthScreen from '@/components/AuthScreen';
 import OnboardingScreen from '@/components/OnboardingScreen';
 import Dashboard from '@/components/Dashboard';
@@ -37,19 +38,26 @@ const pageVariants = {
 
 const Index = () => {
   const [showSplash, setShowSplash] = useState(true);
+  const [showIntro, setShowIntro] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
   const [activeScreen, setActiveScreen] = useState<string | null>(null);
   const [showAdmin, setShowAdmin] = useState(false);
   const [showMotherChat, setShowMotherChat] = useState(false);
   const [viewingUserId, setViewingUserId] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState<string | null>(null);
-  const { isAuthenticated, isOnboarded, role } = useUserStore();
+  const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro } = useUserStore();
   const { isAdmin, loading } = useAuth();
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 2500);
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+      // Show intro if user hasn't seen it
+      if (!hasSeenIntro) {
+        setShowIntro(true);
+      }
+    }, 2500);
     return () => clearTimeout(timer);
-  }, []);
+  }, [hasSeenIntro]);
 
   // Handle tool navigation from Dashboard
   const handleNavigateToTool = (tool: string) => {
@@ -145,6 +153,18 @@ const Index = () => {
   // Splash screen
   if (showSplash) {
     return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  }
+
+  // App introduction (first time users)
+  if (showIntro) {
+    return (
+      <AppIntroduction 
+        onComplete={() => {
+          setShowIntro(false);
+          setHasSeenIntro(true);
+        }} 
+      />
+    );
   }
 
   // Loading state
