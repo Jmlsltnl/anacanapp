@@ -1,4 +1,4 @@
-import { useState, forwardRef } from 'react';
+import { useState, forwardRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Utensils, Apple, Coffee, Droplets, 
@@ -8,6 +8,7 @@ import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useMealLogs } from '@/hooks/useMealLogs';
 import { useNutritionTips, useRecipes, Recipe } from '@/hooks/useDynamicContent';
 import { useCommonFoods } from '@/hooks/useDynamicConfig';
+import { useMealTypes, useNutritionTargets, useRecipeCategories } from '@/hooks/useDynamicTools';
 import { useUserStore } from '@/store/userStore';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -17,20 +18,19 @@ interface NutritionProps {
   onBack: () => void;
 }
 
-// Life stage specific meal types
-const getMealTypes = (lifeStage: string) => {
-  const baseMeals = [
-    { id: 'breakfast', name: 'Səhər yeməyi', icon: Coffee, time: '07:00 - 09:00', emoji: '🍳' },
-    { id: 'lunch', name: 'Nahar', icon: Utensils, time: '12:00 - 14:00', emoji: '🍲' },
-    { id: 'dinner', name: 'Şam yeməyi', icon: Utensils, time: '18:00 - 20:00', emoji: '🍽️' },
-    { id: 'snack', name: 'Qəlyanaltı', icon: Apple, time: 'İstənilən vaxt', emoji: '🍎' },
-  ];
-  
-  if (lifeStage === 'mommy') {
-    return [...baseMeals, { id: 'nursing', name: 'Əmizdirmə', icon: Heart, time: 'Əlavə qida', emoji: '🍼' }];
-  }
-  
-  return baseMeals;
+// Fallback meal types
+const fallbackMealTypes = [
+  { meal_id: 'breakfast', name: 'Səhər yeməyi', name_az: 'Səhər yeməyi', emoji: '🍳', time_range: '07:00 - 09:00' },
+  { meal_id: 'lunch', name: 'Nahar', name_az: 'Nahar', emoji: '🍲', time_range: '12:00 - 14:00' },
+  { meal_id: 'dinner', name: 'Şam yeməyi', name_az: 'Şam yeməyi', emoji: '🍽️', time_range: '18:00 - 20:00' },
+  { meal_id: 'snack', name: 'Qəlyanaltı', name_az: 'Qəlyanaltı', emoji: '🍎', time_range: 'İstənilən vaxt' },
+];
+
+// Fallback targets
+const fallbackTargets = {
+  bump: { calories: 2300, water_glasses: 10, description_az: 'Hamiləlik dövrü' },
+  mommy: { calories: 2500, water_glasses: 12, description_az: 'Əmizdirmə dövrü' },
+  flow: { calories: 2000, water_glasses: 8, description_az: 'Ümumi sağlamlıq' },
 };
 
 // Common foods will be fetched from DB, fallback for loading
@@ -41,47 +41,13 @@ const fallbackFoods = [
   { name: 'Süd (1 stəkan)', calories: 150, emoji: '🥛' },
 ];
 
-// Life stage specific calorie and water targets
-const getTargets = (lifeStage: string) => {
-  switch (lifeStage) {
-    case 'bump':
-      return { calories: 2300, water: 10, description: 'Hamiləlik dövrü' };
-    case 'mommy':
-      return { calories: 2500, water: 12, description: 'Əmizdirmə dövrü' };
-    default: // flow
-      return { calories: 2000, water: 8, description: 'Ümumi sağlamlıq' };
-  }
-};
-
-// Recipe categories by life stage
-const getRecipeCategories = (lifeStage: string) => {
-  const baseCategories = [
-    { id: 'all', name: 'Hamısı', emoji: '🍽️' },
-  ];
-  
-  if (lifeStage === 'bump') {
-    return [
-      ...baseCategories,
-      { id: 'Hamiləlik', name: 'Hamiləlik', emoji: '🤰' },
-      { id: 'Fol turşusu', name: 'Fol turşusu', emoji: '🥬' },
-      { id: 'Dəmir', name: 'Dəmir', emoji: '🥩' },
-      { id: 'Protein', name: 'Protein', emoji: '🍳' },
-    ];
-  } else if (lifeStage === 'mommy') {
-    return [
-      ...baseCategories,
-      { id: 'Əmizdirmə', name: 'Əmizdirmə', emoji: '🍼' },
-      { id: 'Enerji', name: 'Enerji', emoji: '⚡' },
-      { id: 'Körpə yeməyi', name: 'Körpə yeməyi', emoji: '👶' },
-    ];
-  }
-  
-  return [
-    ...baseCategories,
-    { id: 'Sağlam', name: 'Sağlam', emoji: '🥗' },
-    { id: 'Enerji', name: 'Enerji', emoji: '⚡' },
-    { id: 'Yüngül', name: 'Yüngül', emoji: '🌿' },
-  ];
+// Icon mapping for meal types
+const mealIcons: Record<string, any> = {
+  breakfast: Coffee,
+  lunch: Utensils,
+  dinner: Utensils,
+  snack: Apple,
+  nursing: Heart,
 };
 
 const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) => {
@@ -101,14 +67,63 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
   const { data: dbFoods = [], isLoading: foodsLoading } = useCommonFoods();
   const { lifeStage } = useUserStore();
   
+  // Dynamic data from database
+  const { data: dbMealTypes = [] } = useMealTypes(lifeStage || 'flow');
+  const { data: dbTargets = [] } = useNutritionTargets();
+  const { data: dbRecipeCategories = [] } = useRecipeCategories(lifeStage || 'flow');
+  
   // Use DB foods or fallback
   const commonFoods = dbFoods.length > 0 
     ? dbFoods.map(f => ({ name: f.name_az || f.name, calories: f.calories, emoji: f.emoji }))
     : fallbackFoods;
   
-  const mealTypes = getMealTypes(lifeStage || 'flow');
-  const targets = getTargets(lifeStage || 'flow');
-  const recipeCategories = getRecipeCategories(lifeStage || 'flow');
+  // Map meal types from DB or use fallback
+  const mealTypes = useMemo(() => {
+    if (dbMealTypes.length > 0) {
+      return dbMealTypes.map(m => ({
+        id: m.meal_id,
+        name: m.name_az || m.name,
+        icon: mealIcons[m.meal_id] || Utensils,
+        time: m.time_range || '',
+        emoji: m.emoji || '🍽️',
+      }));
+    }
+    return fallbackMealTypes.map(m => ({
+      id: m.meal_id,
+      name: m.name_az || m.name,
+      icon: mealIcons[m.meal_id] || Utensils,
+      time: m.time_range || '',
+      emoji: m.emoji || '🍽️',
+    }));
+  }, [dbMealTypes]);
+  
+  // Get targets from DB or use fallback
+  const targets = useMemo(() => {
+    const stage = lifeStage || 'flow';
+    const dbTarget = dbTargets.find(t => t.life_stage === stage);
+    if (dbTarget) {
+      return { 
+        calories: dbTarget.calories, 
+        water: dbTarget.water_glasses, 
+        description: dbTarget.description_az || dbTarget.description || '' 
+      };
+    }
+    const fallback = fallbackTargets[stage as keyof typeof fallbackTargets] || fallbackTargets.flow;
+    return { calories: fallback.calories, water: fallback.water_glasses, description: fallback.description_az };
+  }, [dbTargets, lifeStage]);
+  
+  // Get recipe categories from DB or use fallback
+  const recipeCategories = useMemo(() => {
+    const base = [{ id: 'all', name: 'Hamısı', emoji: '🍽️' }];
+    if (dbRecipeCategories.length > 0) {
+      return [...base, ...dbRecipeCategories.map(c => ({
+        id: c.category_id,
+        name: c.name_az || c.name,
+        emoji: c.emoji || '🍽️',
+      }))];
+    }
+    return base;
+  }, [dbRecipeCategories]);
   
   const waterGlasses = todayLog?.water_intake || 0;
   const stats = getTodayStats();
