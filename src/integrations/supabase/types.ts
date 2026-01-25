@@ -1825,6 +1825,42 @@ export type Database = {
         }
         Relationships: []
       }
+      photoshoot_image_styles: {
+        Row: {
+          created_at: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          prompt_modifier: string | null
+          sort_order: number | null
+          style_id: string
+          style_name: string
+          style_name_az: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          prompt_modifier?: string | null
+          sort_order?: number | null
+          style_id: string
+          style_name: string
+          style_name_az?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          prompt_modifier?: string | null
+          sort_order?: number | null
+          style_id?: string
+          style_name?: string
+          style_name_az?: string | null
+        }
+        Relationships: []
+      }
       photoshoot_outfits: {
         Row: {
           created_at: string | null

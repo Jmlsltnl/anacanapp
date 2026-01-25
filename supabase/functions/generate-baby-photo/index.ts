@@ -12,6 +12,7 @@ interface CustomizationOptions {
   hairColor: string;
   hairStyle: string;
   outfit: string;
+  imageStyle?: string;
 }
 
 interface RequestBody {
@@ -102,6 +103,22 @@ const outfitPrompts: Record<string, string> = {
   festive: "wearing festive celebration clothes with sparkly accents",
 };
 
+// Image style modifiers - fetched dynamically from DB, these are fallbacks
+const imageStylePrompts: Record<string, string> = {
+  realistic: "ultra realistic, photorealistic, high detail photography, natural lighting, 2K resolution",
+  "3d_render": "3D rendered, high quality 3D graphics, smooth textures, studio lighting",
+  "3d_disney": "3D Disney Pixar style, cute cartoon character, big expressive eyes, soft lighting, magical atmosphere",
+  "3d_pixar": "3D Pixar animation style, adorable character design, vibrant colors, cinematic lighting",
+  anime: "anime style, Japanese animation, big eyes, soft features, colorful",
+  illustration: "digital illustration, artistic, hand-drawn style, soft colors, storybook quality",
+  "2d_simpsons": "The Simpsons cartoon style, 2D animation, yellow skin tone, overbite, simple features",
+  "3d_simpsons": "3D Simpsons style, yellow skin, cartoon proportions, 3D rendered",
+  watercolor: "watercolor painting style, soft washes, delicate brushstrokes, artistic",
+  oil_painting: "oil painting style, classical portrait, rich colors, textured brushwork",
+  clay_art: "claymation style, clay figure, stop motion aesthetic, handcrafted look",
+  pop_art: "pop art style, bold colors, comic book aesthetic, halftone dots",
+};
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -168,51 +185,82 @@ Deno.serve(async (req) => {
     const outfitDesc = customization.outfit !== "keep" && outfitPrompts[customization.outfit]
       ? outfitPrompts[customization.outfit] : "";
 
-    // Construct the ultimate professional photoshoot prompt
-    const masterPrompt = `You are a world-renowned professional baby photographer creating an award-winning 2K resolution photoshoot masterpiece.
+    // Get image style - default to realistic if not specified
+    const imageStyleId = customization.imageStyle || "realistic";
+    const imageStyleDesc = imageStylePrompts[imageStyleId] || imageStylePrompts.realistic;
+    
+    // Determine if it's a non-realistic style that needs different prompting
+    const isRealistic = imageStyleId === "realistic";
+    const is3DStyle = imageStyleId.startsWith("3d") || imageStyleId === "clay_art";
+    const isCartoonStyle = imageStyleId.includes("simpsons") || imageStyleId === "anime";
+    
+    // Build the style instruction based on the selected image style
+    let styleInstruction = "";
+    if (isRealistic) {
+      styleInstruction = `**STYLE: PHOTOREALISTIC**
+   - Create ultra-realistic, photographic quality output
+   - Natural skin rendering with subtle texture - NO airbrushing or plastic look
+   - Professional studio-grade lighting that wraps around the subject`;
+    } else if (is3DStyle) {
+      styleInstruction = `**STYLE: ${imageStyleDesc.toUpperCase()}**
+   - Create this image in ${imageStyleDesc} style
+   - While stylized, PRESERVE the baby's core facial identity - the same unique features should be recognizable
+   - Apply the artistic style while maintaining the essential identity markers`;
+    } else if (isCartoonStyle) {
+      styleInstruction = `**STYLE: ${imageStyleDesc.toUpperCase()}**
+   - Transform the image into ${imageStyleDesc} style
+   - Adapt the baby's features to match this animation style while keeping key recognizable traits
+   - Use the color palette and visual language of this cartoon style`;
+    } else {
+      styleInstruction = `**STYLE: ${imageStyleDesc.toUpperCase()}**
+   - Create this image in ${imageStyleDesc} style
+   - Apply artistic interpretation while preserving the baby's key facial features
+   - Match the aesthetic and techniques of this artistic style`;
+    }
 
-**ABSOLUTE MISSION:** Transform this baby photo into a breathtaking, magazine-cover-quality professional photoshoot image.
+    // Construct the ultimate professional photoshoot prompt
+    const masterPrompt = `You are a world-renowned ${isRealistic ? 'professional baby photographer' : 'digital artist'} creating an award-winning 2K resolution ${isRealistic ? 'photoshoot' : 'artwork'} masterpiece.
+
+**ABSOLUTE MISSION:** Transform this baby photo into a breathtaking, ${isRealistic ? 'magazine-cover-quality professional photoshoot' : 'stunning artistic'} image in ${imageStyleDesc} style.
 
 **SCENE SETTING:**
-Create ${backgroundDescription}. The scene must feel authentic, luxurious, and perfectly lit with professional studio-grade lighting that wraps around the subject beautifully.
+Create ${backgroundDescription}. The scene must feel authentic and perfectly lit.
 
 **CRITICAL REQUIREMENTS - FOLLOW EXACTLY:**
 
-1. **FACIAL IDENTITY PRESERVATION (HIGHEST PRIORITY):**
-   - Maintain 100% accuracy of the baby's unique facial features
+1. **FACIAL IDENTITY PRESERVATION (${isRealistic ? 'HIGHEST PRIORITY' : 'HIGH PRIORITY'}):**
+   ${isRealistic ? `- Maintain 100% accuracy of the baby's unique facial features
    - Preserve exact eye shape, nose structure, mouth curvature, cheek contours
    - Keep identical skin texture, tone, and natural complexion
-   - The baby must be INSTANTLY recognizable - this is non-negotiable
+   - The baby must be INSTANTLY recognizable - this is non-negotiable` : 
+   `- While applying ${imageStyleDesc} style, preserve the baby's KEY recognizable features
+   - The essence of the baby should be identifiable even in stylized form
+   - Maintain proportional relationships of facial features`}
 
-2. **STYLE CUSTOMIZATION:**
+2. ${styleInstruction}
+
+3. **CUSTOMIZATION:**
    ${genderText}.
    ${eyeDesc}
    ${hairColorDesc} ${hairStyleDesc}.
    ${outfitDesc ? `Dress the baby ${outfitDesc}.` : ""}
 
-3. **PROFESSIONAL PHOTOGRAPHY STANDARDS:**
-   - Ultra-sharp focus on the baby's face with creamy bokeh background
-   - Natural skin rendering with subtle texture - NO airbrushing or plastic look
-   - Perfect color grading with rich, vibrant yet natural tones
-   - Professional lighting: soft key light, gentle fill, subtle rim light
-   - Magazine-quality composition following the rule of thirds
-
 4. **TECHNICAL SPECIFICATIONS:**
-   - Output: Ultra-high resolution 2K quality (2048x2048 minimum perceived quality)
-   - Lighting: Soft, diffused professional studio lighting with natural warmth
-   - Color: Rich, vibrant colors with perfect white balance
-   - Skin: Natural, healthy baby skin tones with realistic texture
-   - Background: Beautiful depth-of-field with dreamy cinematic bokeh
-   - Style: Warm, heartwarming, professionally polished Pinterest-worthy aesthetic
+   - Output: High resolution 2K quality
+   - Style: ${imageStyleDesc}
+   - Colors: Rich, vibrant colors appropriate for the chosen style
+   - Background: Beautiful composition with appropriate depth
 
-5. **ABSOLUTE PROHIBITIONS:**
-   - NO cartoon or illustration style - must be 100% photorealistic
+5. **PROHIBITIONS:**
+   ${isRealistic ? `- NO cartoon or illustration style - must be 100% photorealistic
    - NO AI artifacts, distortions, or uncanny valley effects
    - NO over-smoothed plastic-looking skin
-   - NO unnatural proportions or anatomy errors
-   - NO low-resolution or pixelated output
+   - NO unnatural proportions or anatomy errors` :
+   `- NO mixing of styles - stay consistent with ${imageStyleDesc}
+   - NO low-quality or rushed-looking output
+   - Avoid artifacts that break the artistic style`}
 
-**OUTPUT:** Generate ONE stunning professional baby photograph that parents would proudly display, frame, and share. The image should evoke genuine emotion and look like it was taken by a top-tier professional photographer in a premium studio.`;
+**OUTPUT:** Generate ONE stunning ${isRealistic ? 'professional baby photograph' : `artistic baby portrait in ${imageStyleDesc} style`} that parents would proudly display, frame, and share.`;
 
     console.log("Generating image with Gemini 3 Pro Image Preview");
 
