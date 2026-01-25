@@ -138,7 +138,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const backgroundDescription = backgroundPrompts[backgroundTheme] || backgroundPrompts.garden;
+    const backgroundDescription = backgroundPrompts[backgroundTheme] || backgroundPrompts.garden_natural;
     
     // Build customization parts
     const customizationParts: string[] = [];
@@ -174,10 +174,6 @@ Deno.serve(async (req) => {
       if (outfitDesc) customizationParts.push(outfitDesc);
     }
     
-    const customizationText = customizationParts.length > 0 
-      ? `, ${customizationParts.join(", ")}` 
-      : "";
-    
     // Create the ultimate prompt for face preservation using Gemini image model
     const editPrompt = `Create a stunning, high-quality professional baby photoshoot image.
 
@@ -205,61 +201,67 @@ QUALITY:
 - Magazine-quality final result
 - Photorealistic, not cartoon or illustration`;
 
-    console.log("Editing image with enhanced prompt");
+    console.log("Editing image with Gemini API");
 
-    // Use Lovable AI Gateway with gemini-3-pro-image-preview
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
+    // Use direct Gemini API
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) {
       return new Response(JSON.stringify({ error: "AI service not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Format image URL for Lovable AI
-    let imageUrl = sourceImageBase64;
-    if (!sourceImageBase64.startsWith("data:")) {
-      imageUrl = `data:image/jpeg;base64,${sourceImageBase64}`;
+    // Extract base64 data from data URL if present
+    let imageBase64 = sourceImageBase64;
+    let mimeType = "image/jpeg";
+    
+    if (sourceImageBase64.startsWith("data:")) {
+      const dataMatch = sourceImageBase64.match(/^data:(image\/\w+);base64,(.+)$/);
+      if (dataMatch) {
+        mimeType = dataMatch[1];
+        imageBase64 = dataMatch[2];
+      }
     }
 
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-pro-image-preview",
-        messages: [
-          {
-            role: "user",
-            content: [
-              { type: "text", text: editPrompt },
-              {
-                type: "image_url",
-                image_url: { url: imageUrl }
-              }
-            ]
+    // Use Gemini's image generation/editing API
+    const aiResponse = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [
+                { text: editPrompt },
+                {
+                  inlineData: {
+                    mimeType: mimeType,
+                    data: imageBase64
+                  }
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            responseModalities: ["image", "text"],
+            responseMimeType: "image/jpeg"
           }
-        ],
-        modalities: ["image", "text"]
-      }),
-    });
+        }),
+      }
+    );
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
-      console.error("Lovable AI error:", aiResponse.status, errorText);
+      console.error("Gemini API error:", aiResponse.status, errorText);
       
       if (aiResponse.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later." }), {
           status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      
-      if (aiResponse.status === 402) {
-        return new Response(JSON.stringify({ error: "Payment required. Please add credits to continue." }), {
-          status: 402,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
@@ -271,12 +273,25 @@ QUALITY:
     }
 
     const aiData = await aiResponse.json();
-    console.log("Lovable AI Response received");
+    console.log("Gemini API Response received");
 
-    // Extract image from response
-    const generatedImage = aiData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    // Extract image from Gemini response
+    const candidates = aiData.candidates;
+    let generatedImageBase64: string | null = null;
+    let imageFormat = "jpeg";
+
+    if (candidates && candidates[0]?.content?.parts) {
+      for (const part of candidates[0].content.parts) {
+        if (part.inlineData) {
+          generatedImageBase64 = part.inlineData.data;
+          const responseMime = part.inlineData.mimeType || "image/jpeg";
+          imageFormat = responseMime.split("/")[1] || "jpeg";
+          break;
+        }
+      }
+    }
     
-    if (!generatedImage) {
+    if (!generatedImageBase64) {
       console.error("No image in response:", JSON.stringify(aiData));
       return new Response(JSON.stringify({ error: "No image generated" }), {
         status: 500,
@@ -284,21 +299,8 @@ QUALITY:
       });
     }
 
-    // Extract base64 data from data URL
-    const base64Match = generatedImage.match(/^data:image\/(\w+);base64,(.+)$/);
-    if (!base64Match) {
-      console.error("Invalid image format");
-      return new Response(JSON.stringify({ error: "Invalid image format" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const imageFormat = base64Match[1];
-    const imageData = base64Match[2];
-    
     // Convert base64 to binary
-    const binaryData = Uint8Array.from(atob(imageData), (c) => c.charCodeAt(0));
+    const binaryData = Uint8Array.from(atob(generatedImageBase64), (c) => c.charCodeAt(0));
 
     const fileName = `${user.id}/${Date.now()}-${backgroundTheme}.${imageFormat}`;
     
