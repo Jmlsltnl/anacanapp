@@ -6,6 +6,7 @@ import { FRUIT_SIZES } from '@/types/anacan';
 interface UserState {
   isAuthenticated: boolean;
   isOnboarded: boolean;
+  hasSeenIntro: boolean;
   userId: string | null;
   email: string | null;
   name: string | null;
@@ -36,6 +37,7 @@ interface UserState {
   // Actions
   setAuth: (isAuth: boolean, userId?: string, email?: string, name?: string) => void;
   setOnboarded: (isOnboarded: boolean) => void;
+  setHasSeenIntro: (hasSeen: boolean) => void;
   setLifeStage: (stage: LifeStage) => void;
   setRole: (role: UserRole) => void;
   setLastPeriodDate: (date: Date) => void;
@@ -69,6 +71,7 @@ export const useUserStore = create<UserState>()(
     (set, get) => ({
       isAuthenticated: false,
       isOnboarded: false,
+      hasSeenIntro: false,
       userId: null,
       email: null,
       name: null,
@@ -96,6 +99,8 @@ export const useUserStore = create<UserState>()(
       }),
 
       setOnboarded: (isOnboarded) => set({ isOnboarded }),
+
+      setHasSeenIntro: (hasSeen) => set({ hasSeenIntro: hasSeen }),
 
       setLifeStage: (stage) => set({ lifeStage: stage }),
 
@@ -251,6 +256,7 @@ export const useUserStore = create<UserState>()(
       partialize: (state) => ({
         isAuthenticated: state.isAuthenticated,
         isOnboarded: state.isOnboarded,
+        hasSeenIntro: state.hasSeenIntro,
         userId: state.userId,
         email: state.email,
         name: state.name,

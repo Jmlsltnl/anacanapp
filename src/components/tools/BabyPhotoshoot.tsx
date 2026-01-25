@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { useSubscription } from '@/hooks/useSubscription';
 import { PremiumModal } from '@/components/PremiumModal';
+import PhotoGalleryViewer from '@/components/PhotoGalleryViewer';
 import { 
   usePhotoshootBackgrounds, 
   usePhotoshootEyeColors, 
@@ -75,7 +76,8 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
   const [isGenerating, setIsGenerating] = useState(false);
   const [photos, setPhotos] = useState<GeneratedPhoto[]>([]);
   const [loadingPhotos, setLoadingPhotos] = useState(true);
-  const [viewingPhoto, setViewingPhoto] = useState<GeneratedPhoto | null>(null);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryIndex, setGalleryIndex] = useState(0);
   const [sourceImage, setSourceImage] = useState<string | null>(null);
   const [sourceImagePreview, setSourceImagePreview] = useState<string | null>(null);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
@@ -318,7 +320,9 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
       if (data?.photo) {
         setPhotos(prev => [data.photo, ...prev]);
-        setViewingPhoto(data.photo);
+        // Open gallery showing new photo
+        setGalleryIndex(0);
+        setGalleryOpen(true);
         
         try {
           await Haptics.impact({ style: ImpactStyle.Heavy });
@@ -351,7 +355,6 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
       if (error) throw error;
 
       setPhotos(prev => prev.filter(p => p.id !== photoId));
-      setViewingPhoto(null);
 
       toast({
         title: 'Foto silindi',
@@ -738,7 +741,10 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.03 }}
               className="relative aspect-square rounded-2xl overflow-hidden shadow-card cursor-pointer group"
-              onClick={() => setViewingPhoto(photo)}
+              onClick={() => {
+                setGalleryIndex(index);
+                setGalleryOpen(true);
+              }}
             >
               <img
                 src={photo.url}
@@ -859,55 +865,16 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
         </div>
       </div>
 
-      {/* Photo Viewer Modal */}
-      <AnimatePresence>
-        {viewingPhoto && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/90 z-50 flex flex-col"
-            onClick={() => setViewingPhoto(null)}
-          >
-            <div className="flex-1 flex items-center justify-center p-4">
-              <motion.img
-                src={viewingPhoto.url}
-                alt="Baby photo"
-                className="max-w-full max-h-full rounded-2xl shadow-2xl"
-                initial={{ scale: 0.8 }}
-                animate={{ scale: 1 }}
-                onClick={(e) => e.stopPropagation()}
-              />
-            </div>
-
-            <div className="p-5 flex justify-center gap-4 safe-bottom" onClick={(e) => e.stopPropagation()}>
-              <Button
-                variant="outline"
-                className="flex-1 h-14 rounded-2xl bg-white/10 border-white/20 text-white"
-                onClick={() => handleShare(viewingPhoto.url)}
-              >
-                <Share2 className="w-5 h-5 mr-2" />
-                Paylaş
-              </Button>
-              <Button
-                variant="outline"
-                className="flex-1 h-14 rounded-2xl bg-white/10 border-white/20 text-white"
-                onClick={() => handleDownload(viewingPhoto.url)}
-              >
-                <Download className="w-5 h-5 mr-2" />
-                Yüklə
-              </Button>
-              <Button
-                variant="outline"
-                className="h-14 w-14 rounded-2xl bg-red-500/20 border-red-500/30 text-red-400"
-                onClick={() => handleDeletePhoto(viewingPhoto.id)}
-              >
-                <Trash2 className="w-5 h-5" />
-              </Button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Photo Gallery Viewer */}
+      <PhotoGalleryViewer
+        photos={photos}
+        initialIndex={galleryIndex}
+        isOpen={galleryOpen}
+        onClose={() => setGalleryOpen(false)}
+        onDelete={async (photoId) => {
+          await handleDeletePhoto(photoId);
+        }}
+      />
 
       {/* Premium Modal */}
       <PremiumModal 
