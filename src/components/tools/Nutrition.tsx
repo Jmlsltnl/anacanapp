@@ -7,6 +7,7 @@ import {
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useMealLogs } from '@/hooks/useMealLogs';
 import { useNutritionTips, useRecipes, Recipe } from '@/hooks/useDynamicContent';
+import { useCommonFoods } from '@/hooks/useDynamicConfig';
 import { useUserStore } from '@/store/userStore';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -32,20 +33,12 @@ const getMealTypes = (lifeStage: string) => {
   return baseMeals;
 };
 
-// Common foods with calories for quick add
-const commonFoods = [
+// Common foods will be fetched from DB, fallback for loading
+const fallbackFoods = [
   { name: 'Yumurta', calories: 78, emoji: '🥚' },
   { name: 'Çörək (1 dilim)', calories: 80, emoji: '🍞' },
   { name: 'Pendir', calories: 113, emoji: '🧀' },
   { name: 'Süd (1 stəkan)', calories: 150, emoji: '🥛' },
-  { name: 'Alma', calories: 52, emoji: '🍎' },
-  { name: 'Banan', calories: 89, emoji: '🍌' },
-  { name: 'Toyuq döşü', calories: 165, emoji: '🍗' },
-  { name: 'Düyü (1 porsia)', calories: 206, emoji: '🍚' },
-  { name: 'Salat', calories: 20, emoji: '🥗' },
-  { name: 'Şorba', calories: 100, emoji: '🍲' },
-  { name: 'Makaron', calories: 220, emoji: '🍝' },
-  { name: 'Balıq', calories: 180, emoji: '🐟' },
 ];
 
 // Life stage specific calorie and water targets
@@ -105,7 +98,13 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
   const { loading: mealLoading, addMealLog, deleteMealLog, getTodayStats, getMealsByType } = useMealLogs();
   const { data: nutritionTips = [], isLoading: tipsLoading } = useNutritionTips();
   const { data: recipes = [], isLoading: recipesLoading } = useRecipes();
+  const { data: dbFoods = [], isLoading: foodsLoading } = useCommonFoods();
   const { lifeStage } = useUserStore();
+  
+  // Use DB foods or fallback
+  const commonFoods = dbFoods.length > 0 
+    ? dbFoods.map(f => ({ name: f.name_az || f.name, calories: f.calories, emoji: f.emoji }))
+    : fallbackFoods;
   
   const mealTypes = getMealTypes(lifeStage || 'flow');
   const targets = getTargets(lifeStage || 'flow');

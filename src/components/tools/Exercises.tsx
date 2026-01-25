@@ -1,108 +1,46 @@
-import { useState, forwardRef } from 'react';
+import { useState, forwardRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Clock, 
   Heart, Flame, Check, ChevronRight, Star,
-  Award
+  Award, Loader2
 } from 'lucide-react';
 import { useExerciseLogs } from '@/hooks/useExerciseLogs';
 import { useUserStore } from '@/store/userStore';
+import { useExercises } from '@/hooks/useDynamicConfig';
 
 interface ExercisesProps {
   onBack: () => void;
 }
 
-interface Exercise {
-  id: string;
-  name: string;
-  duration: number;
-  calories: number;
-  level: 'easy' | 'medium';
-  trimester: number[];
-  icon: string;
-  description: string;
-  steps: string[];
-}
-
-const exercises: Exercise[] = [
-  {
-    id: '1',
-    name: 'Kegel Məşqləri',
-    duration: 5,
-    calories: 10,
-    level: 'easy',
-    trimester: [1, 2, 3],
-    icon: '🧘‍♀️',
-    description: 'Döşəmə əzələlərini gücləndirmək üçün',
-    steps: ['Rahat oturun', 'Əzələləri sıxın', '5 saniyə saxlayın', 'Boşaldın', '10 dəfə təkrarlayın']
-  },
-  {
-    id: '2',
-    name: 'Gəzinti',
-    duration: 20,
-    calories: 80,
-    level: 'easy',
-    trimester: [1, 2, 3],
-    icon: '🚶‍♀️',
-    description: 'Ürək-damar sağlamlığı üçün',
-    steps: ['Rahat ayaqqabı geyin', 'Yavaş başlayın', 'Düz duruşu qoruyun', 'Sabit tempdə gedin']
-  },
-  {
-    id: '3',
-    name: 'Hamiləlik Yoqası',
-    duration: 15,
-    calories: 50,
-    level: 'easy',
-    trimester: [1, 2, 3],
-    icon: '🧘',
-    description: 'Rahatlama və çeviklik',
-    steps: ['Cat-Cow pozası', 'Pişik uzanması', 'Uşaq pozası', 'Dərin nəfəs']
-  },
-  {
-    id: '4',
-    name: 'Squat Məşqi',
-    duration: 10,
-    calories: 40,
-    level: 'medium',
-    trimester: [1, 2],
-    icon: '🏋️‍♀️',
-    description: 'Ayaq əzələlərini gücləndirmək',
-    steps: ['Ayaqları çiyin genişliyində açın', 'Yavaş-yavaş çökün', 'Dizləri barmaqlardan keçirməyin', '10 dəfə təkrarlayın']
-  },
-  {
-    id: '5',
-    name: 'Üzgüçülük',
-    duration: 30,
-    calories: 150,
-    level: 'medium',
-    trimester: [1, 2, 3],
-    icon: '🏊‍♀️',
-    description: 'Bütün bədən məşqi',
-    steps: ['Hovuza yavaş girin', 'Rahat tempdə üzün', 'Fasilələr verin', 'Hidrasiyanı qoruyun']
-  },
-  {
-    id: '6',
-    name: 'Nəfəs Məşqləri',
-    duration: 10,
-    calories: 15,
-    level: 'easy',
-    trimester: [1, 2, 3],
-    icon: '💨',
-    description: 'Doğuşa hazırlıq',
-    steps: ['Rahat oturun', 'Dərin nəfəs alın', '4 saniyə saxlayın', 'Yavaş-yavaş verin', 'Təkrarlayın']
-  },
-];
-
 const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) => {
-  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+  const [selectedExerciseId, setSelectedExerciseId] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
-  const { loading, addLog, isCompletedToday, getTodayStats, getStreak } = useExerciseLogs();
+  const { loading: logsLoading, addLog, isCompletedToday, getTodayStats, getStreak } = useExerciseLogs();
   const { getPregnancyData } = useUserStore();
+  const { data: dbExercises, isLoading: exercisesLoading } = useExercises();
   
   const pregnancyData = getPregnancyData();
   const currentTrimester = pregnancyData?.trimester || 2;
 
+  // Map DB exercises to component format
+  const exercises = useMemo(() => {
+    if (!dbExercises) return [];
+    return dbExercises.map(e => ({
+      id: e.id,
+      name: e.name_az || e.name,
+      duration: e.duration_minutes,
+      calories: e.calories,
+      level: e.level,
+      trimester: Array.isArray(e.trimester) ? e.trimester : [1, 2, 3],
+      icon: e.icon || '🏃',
+      description: e.description || '',
+      steps: Array.isArray(e.steps) ? e.steps : [],
+    }));
+  }, [dbExercises]);
+
   const filteredExercises = exercises.filter(e => e.trimester.includes(currentTrimester));
+  const selectedExercise = exercises.find(e => e.id === selectedExerciseId) || null;
   const todayStats = getTodayStats();
   const streak = getStreak();
 
@@ -115,14 +53,14 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
         selectedExercise.calories
       );
     }
-    setSelectedExercise(null);
+    setSelectedExerciseId(null);
     setCurrentStep(0);
   };
 
-  if (loading) {
+  if (logsLoading || exercisesLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -204,40 +142,44 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
 
               {/* Exercise List */}
               <h2 className="font-bold text-sm pt-1">Sizin üçün məşqlər</h2>
-              {filteredExercises.map((exercise, index) => {
-                const isCompleted = isCompletedToday(exercise.id);
-                return (
-                  <motion.button
-                    key={exercise.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    onClick={() => setSelectedExercise(exercise)}
-                    className={`w-full bg-card rounded-xl p-3 flex items-center gap-3 shadow-card border ${
-                      isCompleted ? 'border-green-300 bg-green-50' : 'border-border/50'
-                    }`}
-                  >
-                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl ${
-                      isCompleted ? 'bg-green-100' : 'bg-cyan-50'
-                    }`}>
-                      {isCompleted ? '✅' : exercise.icon}
-                    </div>
-                    <div className="flex-1 text-left">
-                      <h3 className="font-semibold text-sm">{exercise.name}</h3>
-                      <p className="text-xs text-muted-foreground">{exercise.description}</p>
-                      <div className="flex gap-2 mt-0.5">
-                        <span className="text-[10px] text-cyan-600 flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> {exercise.duration} dəq
-                        </span>
-                        <span className="text-[10px] text-orange-600 flex items-center gap-1">
-                          <Flame className="w-3 h-3" /> {exercise.calories} kal
-                        </span>
+              {filteredExercises.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">Məşq tapılmadı</p>
+              ) : (
+                filteredExercises.map((exercise, index) => {
+                  const isCompleted = isCompletedToday(exercise.id);
+                  return (
+                    <motion.button
+                      key={exercise.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      onClick={() => setSelectedExerciseId(exercise.id)}
+                      className={`w-full bg-card rounded-xl p-3 flex items-center gap-3 shadow-card border ${
+                        isCompleted ? 'border-green-300 bg-green-50' : 'border-border/50'
+                      }`}
+                    >
+                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl ${
+                        isCompleted ? 'bg-green-100' : 'bg-cyan-50'
+                      }`}>
+                        {isCompleted ? '✅' : exercise.icon}
                       </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                  </motion.button>
-                );
-              })}
+                      <div className="flex-1 text-left">
+                        <h3 className="font-semibold text-sm">{exercise.name}</h3>
+                        <p className="text-xs text-muted-foreground">{exercise.description}</p>
+                        <div className="flex gap-2 mt-0.5">
+                          <span className="text-[10px] text-cyan-600 flex items-center gap-1">
+                            <Clock className="w-3 h-3" /> {exercise.duration} dəq
+                          </span>
+                          <span className="text-[10px] text-orange-600 flex items-center gap-1">
+                            <Flame className="w-3 h-3" /> {exercise.calories} kal
+                          </span>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    </motion.button>
+                  );
+                })
+              )}
             </motion.div>
           ) : (
             <motion.div
@@ -299,7 +241,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
                 <div className="flex gap-2">
                   <motion.button
                     onClick={() => {
-                      setSelectedExercise(null);
+                      setSelectedExerciseId(null);
                       setCurrentStep(0);
                     }}
                     className="flex-1 py-3 rounded-xl border-2 border-border font-medium text-sm"

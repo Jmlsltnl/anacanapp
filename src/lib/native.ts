@@ -7,6 +7,13 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 // Check if we're running on native platform
 export const isNative = Capacitor.isNativePlatform();
 
+// Android-də Firebase (google-services.json) qurulmayanda PushNotifications.register()
+// native tərəfdə crash verə bilir. Default olaraq Android push auto-register söndürülür.
+// Firebase hazır olanda lokal build zamanı bunu aktiv edin:
+//   VITE_ANDROID_PUSH_AUTO_REGISTER=true
+const isAndroid = Capacitor.getPlatform() === 'android';
+const androidPushAutoRegister = (import.meta.env as any).VITE_ANDROID_PUSH_AUTO_REGISTER === 'true';
+
 // Haptic Feedback
 export const hapticFeedback = {
   light: async () => {
@@ -60,18 +67,30 @@ export const pushNotifications = {
   register: async () => {
     if (!isNative) return;
 
-    let permStatus = await PushNotifications.checkPermissions();
-
-    if (permStatus.receive === 'prompt') {
-      permStatus = await PushNotifications.requestPermissions();
-    }
-
-    if (permStatus.receive !== 'granted') {
-      console.log('Push notification permission not granted');
+    if (isAndroid && !androidPushAutoRegister) {
+      console.warn(
+        'Android push auto-register deaktivdir (Firebase qurulmayıb ola bilər). ' +
+          'Aktiv etmək üçün: VITE_ANDROID_PUSH_AUTO_REGISTER=true'
+      );
       return;
     }
 
-    await PushNotifications.register();
+    try {
+      let permStatus = await PushNotifications.checkPermissions();
+
+      if (permStatus.receive === 'prompt') {
+        permStatus = await PushNotifications.requestPermissions();
+      }
+
+      if (permStatus.receive !== 'granted') {
+        console.log('Push notification permission not granted');
+        return;
+      }
+
+      await PushNotifications.register();
+    } catch (error) {
+      console.error('Push notification registration failed:', error);
+    }
   },
 
   addListeners: () => {
