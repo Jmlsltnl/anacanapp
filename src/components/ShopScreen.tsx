@@ -1,19 +1,16 @@
 import { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { Search, ShoppingCart, Heart, Star, ChevronRight, Filter, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, ShoppingCart, Heart, Star, Filter, Loader2, ArrowLeft, Lock } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { useShopCategories } from '@/hooks/useDynamicTools';
+import { useCart } from '@/hooks/useOrders';
+import { useAuth } from '@/hooks/useAuth';
+import CartDrawer from '@/components/shop/CartDrawer';
+import CheckoutScreen from '@/components/shop/CheckoutScreen';
+import OrderSuccessScreen from '@/components/shop/OrderSuccessScreen';
 
-interface DisplayProduct {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  image: string;
-  rating: number;
-  reviews: number;
-  category: string;
-  badge?: string;
+interface ShopScreenProps {
+  onBack?: () => void;
 }
 
 // Emoji mapping for categories (fallback)
@@ -28,15 +25,20 @@ const categoryEmojis: Record<string, string> = {
   default: '🛍️'
 };
 
-const ShopScreen = () => {
+const ShopScreen = ({ onBack }: ShopScreenProps) => {
   const { products: dbProducts, loading } = useProducts();
   const { data: dbCategories = [] } = useShopCategories();
+  const { addToCart, totalItems } = useCart();
+  const { isAdmin } = useAuth();
+  
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [cartCount, setCartCount] = useState(0);
+  const [showCart, setShowCart] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   // Transform DB products to display format
-  const products: DisplayProduct[] = useMemo(() => {
+  const products = useMemo(() => {
     return dbProducts.map(p => ({
       id: p.id,
       name: p.name,
@@ -50,7 +52,6 @@ const ShopScreen = () => {
 
   // Get categories from DB or derive from products
   const categories = useMemo(() => {
-    // If we have DB categories, use them
     if (dbCategories.length > 0) {
       return [
         { id: 'all', name: 'Hamısı', emoji: '✨' },
@@ -61,7 +62,6 @@ const ShopScreen = () => {
         }))
       ];
     }
-    // Fallback: derive from products
     const uniqueCategories = [...new Set(dbProducts.map(p => p.category))];
     const mappedCategories = uniqueCategories.map(cat => ({
       id: cat,
@@ -77,18 +77,53 @@ const ShopScreen = () => {
     return matchesCategory && matchesSearch;
   });
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.08 }
-    }
+  const handleAddToCart = async (productId: string) => {
+    await addToCart(productId, 1);
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  };
+  // Show checkout flow
+  if (showSuccess) {
+    return (
+      <OrderSuccessScreen 
+        onContinue={() => {
+          setShowSuccess(false);
+          setShowCheckout(false);
+        }} 
+      />
+    );
+  }
+
+  if (showCheckout) {
+    return (
+      <CheckoutScreen 
+        onBack={() => setShowCheckout(false)}
+        onSuccess={() => setShowSuccess(true)}
+      />
+    );
+  }
+
+  // Admin-only notice
+  if (!isAdmin) {
+    return (
+      <div className="pb-28 pt-2 px-5 flex flex-col items-center justify-center min-h-[60vh] text-center">
+        <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4">
+          <Lock className="w-10 h-10 text-muted-foreground" />
+        </div>
+        <h2 className="text-xl font-bold mb-2">Mağaza Hazırlanır</h2>
+        <p className="text-muted-foreground max-w-xs">
+          Mağaza bölməsi tezliklə aktiv olacaq. Gözləyin!
+        </p>
+        {onBack && (
+          <button 
+            onClick={onBack}
+            className="mt-6 text-primary font-medium"
+          >
+            Geri qayıt
+          </button>
+        )}
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -106,19 +141,27 @@ const ShopScreen = () => {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
       >
-        <div>
-          <h1 className="text-2xl font-black text-foreground">Mağaza</h1>
-          <p className="text-muted-foreground mt-1">Ana və körpə üçün</p>
+        <div className="flex items-center gap-3">
+          {onBack && (
+            <button onClick={onBack} className="p-2 -ml-2 rounded-full hover:bg-muted">
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+          )}
+          <div>
+            <h1 className="text-2xl font-black text-foreground">Mağaza</h1>
+            <p className="text-muted-foreground mt-1">Ana və körpə üçün</p>
+          </div>
         </div>
         <motion.button 
+          onClick={() => setShowCart(true)}
           className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center relative"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
           <ShoppingCart className="w-6 h-6 text-primary" />
-          {cartCount > 0 && (
+          {totalItems > 0 && (
             <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive rounded-full text-[10px] font-bold text-white flex items-center justify-center">
-              {cartCount}
+              {totalItems}
             </span>
           )}
         </motion.button>
@@ -187,28 +230,21 @@ const ShopScreen = () => {
       {/* Products Grid */}
       <motion.div 
         className="grid grid-cols-2 gap-4"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
       >
-        {filteredProducts.map((product) => (
+        {filteredProducts.map((product, index) => (
           <motion.div
             key={product.id}
-            variants={itemVariants}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 * index }}
             className="bg-card rounded-3xl overflow-hidden shadow-card border border-border/50"
             whileHover={{ y: -4 }}
           >
             {/* Product Image */}
             <div className="relative pt-4 pb-2 px-4">
-              {product.badge && (
-                <span className={`absolute top-3 left-3 px-2 py-1 rounded-lg text-[10px] font-bold ${
-                  product.badge.includes('%') 
-                    ? 'bg-destructive text-white' 
-                    : 'bg-primary text-white'
-                }`}>
-                  {product.badge}
-                </span>
-              )}
               <button className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center">
                 <Heart className="w-4 h-4 text-muted-foreground" />
               </button>
@@ -224,16 +260,9 @@ const ShopScreen = () => {
                 <span className="text-xs text-muted-foreground">({product.reviews})</span>
               </div>
               <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-lg font-black text-primary">{product.price}₼</span>
-                  {product.originalPrice && (
-                    <span className="text-xs text-muted-foreground line-through ml-2">
-                      {product.originalPrice}₼
-                    </span>
-                  )}
-                </div>
+                <span className="text-lg font-black text-primary">{product.price}₼</span>
                 <motion.button
-                  onClick={() => setCartCount(prev => prev + 1)}
+                  onClick={() => handleAddToCart(product.id)}
                   className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-button"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
@@ -256,6 +285,20 @@ const ShopScreen = () => {
           <p className="text-muted-foreground">Heç bir məhsul tapılmadı</p>
         </motion.div>
       )}
+
+      {/* Cart Drawer */}
+      <AnimatePresence>
+        {showCart && (
+          <CartDrawer 
+            isOpen={showCart}
+            onClose={() => setShowCart(false)}
+            onCheckout={() => {
+              setShowCart(false);
+              setShowCheckout(true);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
