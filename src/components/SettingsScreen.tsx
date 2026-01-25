@@ -97,15 +97,15 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
         {/* Native App Indicator */}
         {!isNative && (
           <motion.div 
-            className="bg-amber-50 border border-amber-200 rounded-2xl p-4"
+            className="bg-amber-100 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-2xl p-4"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
           >
             <div className="flex items-center gap-3">
-              <Smartphone className="w-5 h-5 text-amber-600" />
+              <Smartphone className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               <div>
-                <p className="text-sm font-medium text-amber-800">Web rejimində çalışırsınız</p>
-                <p className="text-xs text-amber-600">Bildirişlər yalnız mobil tətbiqdə işləyir</p>
+                <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Web rejimində çalışırsınız</p>
+                <p className="text-xs text-amber-600 dark:text-amber-400">Bildirişlər yalnız mobil tətbiqdə işləyir</p>
               </div>
             </div>
           </motion.div>

@@ -138,9 +138,9 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
                 {item.item_name}
               </span>
               <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                item.category === 'mom' ? 'bg-pink-100 text-pink-700' :
-                item.category === 'baby' ? 'bg-blue-100 text-blue-700' :
-                'bg-amber-100 text-amber-700'
+                item.category === 'mom' ? 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300' :
+                item.category === 'baby' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' :
+                'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
               }`}>
                 {item.category === 'mom' ? '👩' : item.category === 'baby' ? '👶' : '📄'}
               </span>

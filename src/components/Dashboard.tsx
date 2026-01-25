@@ -284,7 +284,7 @@ const FlowDashboard = () => {
 
       {/* Phase Tips */}
       <motion.div 
-        className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-3 border border-orange-100"
+        className="bg-gradient-to-r from-primary/10 to-accent/10 dark:from-primary/20 dark:to-accent/20 rounded-xl p-3 border border-primary/20"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3 }}
@@ -297,7 +297,7 @@ const FlowDashboard = () => {
           {currentPhase.tips.map((tip, index) => (
             <motion.div 
               key={index}
-              className="flex items-center gap-2 p-2 bg-white/60 rounded-lg"
+              className="flex items-center gap-2 p-2 bg-card/60 dark:bg-card/80 rounded-lg"
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.4 + index * 0.1 }}

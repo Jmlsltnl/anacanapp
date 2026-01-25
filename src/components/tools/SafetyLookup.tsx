@@ -44,18 +44,18 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
 
   const getStatusBg = (status: string) => {
     switch (status) {
-      case 'safe': return 'bg-emerald-50 border-emerald-200';
-      case 'warning': return 'bg-amber-50 border-amber-200';
-      case 'danger': return 'bg-red-50 border-red-200';
-      default: return 'bg-gray-50 border-gray-200';
+      case 'safe': return 'bg-emerald-100 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-800';
+      case 'warning': return 'bg-amber-100 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800';
+      case 'danger': return 'bg-red-100 dark:bg-red-900/30 border-red-200 dark:border-red-800';
+      default: return 'bg-muted border-border';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'safe': return <Check className="w-5 h-5 text-emerald-600" />;
-      case 'warning': return <AlertTriangle className="w-5 h-5 text-amber-600" />;
-      case 'danger': return <X className="w-5 h-5 text-red-600" />;
+      case 'safe': return <Check className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />;
+      case 'warning': return <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />;
+      case 'danger': return <X className="w-5 h-5 text-red-600 dark:text-red-400" />;
       default: return null;
     }
   };
@@ -146,9 +146,9 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
                   <p className="text-sm text-muted-foreground">{item.description_az || item.description}</p>
                 </div>
                 <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-                  item.safety_level === 'safe' ? 'bg-emerald-100 text-emerald-700' :
-                  item.safety_level === 'warning' ? 'bg-amber-100 text-amber-700' :
-                  'bg-red-100 text-red-700'
+                  item.safety_level === 'safe' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' :
+                  item.safety_level === 'warning' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' :
+                  'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
                 }`}>
                   {getStatusText(item.safety_level)}
                 </span>
@@ -194,9 +194,9 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
 
               <h2 className="text-2xl font-black text-center text-foreground mb-2">{selectedItem.name_az || selectedItem.name}</h2>
               <p className={`text-center font-bold mb-4 ${
-                selectedItem.safety_level === 'safe' ? 'text-emerald-600' :
-                selectedItem.safety_level === 'warning' ? 'text-amber-600' :
-                'text-red-600'
+                selectedItem.safety_level === 'safe' ? 'text-emerald-600 dark:text-emerald-400' :
+                selectedItem.safety_level === 'warning' ? 'text-amber-600 dark:text-amber-400' :
+                'text-red-600 dark:text-red-400'
               }`}>
                 {getStatusText(selectedItem.safety_level)}
               </p>
