@@ -174,32 +174,36 @@ Deno.serve(async (req) => {
       if (outfitDesc) customizationParts.push(outfitDesc);
     }
     
-    // Create the ultimate prompt for face preservation using Gemini image model
-    const editPrompt = `Create a stunning, high-quality professional baby photoshoot image.
+    // Create the ultimate prompt for face preservation using Gemini Pro image model
+    const editPrompt = `You are an expert professional baby photographer creating a stunning 2K resolution photoshoot.
 
-TASK: Transform this baby photo into a beautiful photoshoot with the following background theme:
+MISSION: Transform this baby photo into a breathtaking professional photoshoot masterpiece.
+
+BACKGROUND SCENE:
 ${backgroundDescription}
 
-CRITICAL REQUIREMENTS:
-1. PRESERVE THE BABY'S FACE EXACTLY - same facial features, expressions, skin tone, and details
-2. Keep the baby's original pose and body position
-3. Create a seamless, professional studio-quality result
-4. Apply beautiful, soft, natural lighting appropriate for baby photography
-5. The final image should look like a real professional photograph, not AI-generated
+ABSOLUTE REQUIREMENTS:
+1. FACIAL PRESERVATION: Maintain 100% accuracy of the baby's facial features - exact same eyes, nose, mouth, cheeks, skin texture, skin tone, and expression. The face must be instantly recognizable.
+2. NATURAL INTEGRATION: Seamlessly blend the baby into the new scene with perfect lighting matching, shadow consistency, and color harmony.
+3. PROFESSIONAL QUALITY: Achieve magazine-cover quality with sharp focus on the baby, beautiful bokeh background, and studio-grade lighting.
+4. PHOTOREALISTIC OUTPUT: The result must look like a real photograph taken by a professional photographer, never AI-generated or cartoonish.
 
-STYLE MODIFICATIONS (apply if specified):
-${customization.gender !== "keep" ? `- Present as ${genderText}` : "- Keep original appearance"}
-${customization.eyeColor !== "keep" ? `- Eyes: ${eyeColorPrompts[customization.eyeColor]}` : "- Keep original eye color"}
-${customization.hairColor !== "keep" ? `- Hair color: ${hairColorPrompts[customization.hairColor]}` : "- Keep original hair color"}
-${customization.hairStyle !== "keep" ? `- Hair style: ${hairStylePrompts[customization.hairStyle]}` : "- Keep original hair style"}
-${customization.outfit !== "keep" ? `- Outfit: ${outfitPrompts[customization.outfit]}` : "- Keep original clothing"}
+CUSTOMIZATION APPLIED:
+${customization.gender !== "keep" ? `• Gender presentation: ${genderText}` : "• Keep original gender appearance"}
+${customization.eyeColor !== "keep" ? `• Eye enhancement: ${eyeColorPrompts[customization.eyeColor]}` : "• Preserve original eye color"}
+${customization.hairColor !== "keep" ? `• Hair coloring: ${hairColorPrompts[customization.hairColor]}` : "• Preserve original hair color"}
+${customization.hairStyle !== "keep" ? `• Hair styling: ${hairStylePrompts[customization.hairStyle]}` : "• Preserve original hair style"}
+${customization.outfit !== "keep" ? `• Clothing: ${outfitPrompts[customization.outfit]}` : "• Preserve original clothing"}
 
-QUALITY: 
-- Ultra high resolution, professional photography
-- Perfect skin tones and natural colors
-- Beautiful bokeh background effect
-- Magazine-quality final result
-- Photorealistic, not cartoon or illustration`;
+TECHNICAL SPECIFICATIONS:
+- Resolution: Ultra-high 2K quality (2048x2048 or higher)
+- Lighting: Soft, diffused professional studio lighting with natural warmth
+- Color grading: Rich, vibrant colors with perfect white balance
+- Skin rendering: Natural, healthy baby skin tones with subtle texture
+- Background: Beautiful depth-of-field with dreamy bokeh effect
+- Overall mood: Warm, heartwarming, and professionally polished
+
+OUTPUT: A single, stunning professional baby photograph that parents would proudly display and share.`;
 
     console.log("Editing image with Gemini API");
 
@@ -225,8 +229,9 @@ QUALITY:
     }
 
     // Use Gemini's image generation/editing API
+    // Use Gemini 3 Pro Image Preview for highest quality
     const aiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
