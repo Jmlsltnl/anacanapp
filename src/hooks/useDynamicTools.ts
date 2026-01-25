@@ -292,3 +292,106 @@ export const useWeightRecommendations = (trimester?: number) => {
     },
   });
 };
+
+// ===========================================
+// AI SUGGESTED QUESTIONS HOOKS
+// ===========================================
+
+export interface AISuggestedQuestion {
+  id: string;
+  life_stage: string;
+  user_type: 'mother' | 'partner';
+  question: string;
+  question_az: string | null;
+  icon: string;
+  color_from: string;
+  color_to: string;
+  sort_order: number;
+  is_active: boolean;
+}
+
+export const useAISuggestedQuestions = (lifeStage: string, userType: 'mother' | 'partner') => {
+  return useQuery({
+    queryKey: ['ai-suggested-questions', lifeStage, userType],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('ai_suggested_questions')
+        .select('*')
+        .eq('is_active', true)
+        .eq('life_stage', lifeStage)
+        .eq('user_type', userType)
+        .order('sort_order');
+      if (error) throw error;
+      return data as AISuggestedQuestion[];
+    },
+  });
+};
+
+// ===========================================
+// TOOL CONFIGS HOOKS
+// ===========================================
+
+export interface ToolConfig {
+  id: string;
+  tool_id: string;
+  name: string;
+  name_az: string | null;
+  description: string | null;
+  description_az: string | null;
+  icon: string;
+  color: string;
+  bg_color: string;
+  min_week: number | null;
+  life_stages: string[];
+  requires_partner: boolean;
+  partner_name: string | null;
+  partner_name_az: string | null;
+  partner_description: string | null;
+  partner_description_az: string | null;
+  sort_order: number;
+  is_active: boolean;
+}
+
+export const useToolConfigs = () => {
+  return useQuery({
+    queryKey: ['tool-configs'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('tool_configs')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
+      if (error) throw error;
+      return data as ToolConfig[];
+    },
+  });
+};
+
+// ===========================================
+// HOSPITAL BAG TEMPLATES HOOKS
+// ===========================================
+
+export interface HospitalBagTemplate {
+  id: string;
+  item_name: string;
+  item_name_az: string | null;
+  category: string;
+  is_essential: boolean;
+  sort_order: number;
+  is_active: boolean;
+}
+
+export const useHospitalBagTemplates = () => {
+  return useQuery({
+    queryKey: ['hospital-bag-templates'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('hospital_bag_templates')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
+      if (error) throw error;
+      return data as HospitalBagTemplate[];
+    },
+  });
+};

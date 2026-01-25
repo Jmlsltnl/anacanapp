@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect, forwardRef } from 'react';
+import { useState, useRef, useEffect, forwardRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, User, Bot, Loader2, RefreshCw, Heart, AlertTriangle, Sparkles, Baby, Home, Gift, Calendar, Stethoscope } from 'lucide-react';
+import { Send, User, Bot, Loader2, RefreshCw, Heart, AlertTriangle, Sparkles, Baby, Home, Gift, Calendar, Stethoscope, LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -12,6 +12,7 @@ import { useAIChatHistory } from '@/hooks/useAIChatHistory';
 import { useAuth } from '@/hooks/useAuth';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { useToast } from '@/hooks/use-toast';
+import { useAISuggestedQuestions } from '@/hooks/useDynamicTools';
 
 interface Message {
   id: string;
@@ -70,51 +71,77 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   
   const dynamicFruit = getDynamicFruitName();
 
-  // Quick questions for partners
-  const quickQuestions: QuickQuestion[] = [
-    {
-      id: '1',
-      icon: Heart,
-      title: 'Emosional dəstək',
-      question: `${partnerName} bu gün əhvalı pisdirsə, onu necə dəstəkləyə bilərəm?`,
-      color: 'from-pink-500 to-rose-600'
-    },
-    {
-      id: '2',
-      icon: Home,
-      title: 'Ev işləri',
-      question: 'Hamiləlik dövründə hansı ev işlərini mən öhdəmə götürməliyəm?',
-      color: 'from-blue-500 to-indigo-600'
-    },
-    {
-      id: '3',
-      icon: Stethoscope,
-      title: 'Həkim vizitləri',
-      question: 'Həkim görüşlərində mən necə faydalı ola bilərəm? Hansı sualları verməliyəm?',
-      color: 'from-emerald-500 to-teal-600'
-    },
-    {
-      id: '4',
-      icon: Gift,
-      title: 'Sürprizlər',
-      question: `${partnerName}ı sevindirmək üçün hansı kiçik sürprizlər edə bilərəm?`,
-      color: 'from-amber-500 to-orange-600'
-    },
-    {
-      id: '5',
-      icon: Baby,
-      title: 'Doğuşa hazırlıq',
-      question: 'Doğuş günü üçün necə hazırlaşmalıyam? Nələr etməliyəm?',
-      color: 'from-violet-500 to-purple-600'
-    },
-    {
-      id: '6',
-      icon: Calendar,
-      title: `${pregnancyWeek}. həftə`,
-      question: `Hamiləliyin ${pregnancyWeek || 24}. həftəsində körpə necə inkişaf edir və mən nə edə bilərəm?`,
-      color: 'from-cyan-500 to-blue-600'
+  // Fetch dynamic suggested questions for partners
+  const { data: dynamicQuestions = [] } = useAISuggestedQuestions(partnerProfile?.life_stage || 'bump', 'partner');
+
+  // Icon mapping for dynamic questions
+  const iconMap: Record<string, LucideIcon> = {
+    'Heart': Heart,
+    'Home': Home,
+    'Stethoscope': Stethoscope,
+    'Gift': Gift,
+    'Baby': Baby,
+    'Calendar': Calendar,
+  };
+
+  // Build quick questions from DB or use fallback
+  const quickQuestions: QuickQuestion[] = useMemo(() => {
+    if (dynamicQuestions.length > 0) {
+      return dynamicQuestions.map((q, idx) => ({
+        id: q.id,
+        icon: iconMap[q.icon] || Heart,
+        title: q.question.split('?')[0].slice(0, 20) + '...',
+        question: q.question_az || q.question,
+        color: `from-${q.color_from} to-${q.color_to}`
+      }));
     }
-  ];
+    
+    // Fallback questions
+    return [
+      {
+        id: '1',
+        icon: Heart,
+        title: 'Emosional dəstək',
+        question: `${partnerName} bu gün əhvalı pisdirsə, onu necə dəstəkləyə bilərəm?`,
+        color: 'from-pink-500 to-rose-600'
+      },
+      {
+        id: '2',
+        icon: Home,
+        title: 'Ev işləri',
+        question: 'Hamiləlik dövründə hansı ev işlərini mən öhdəmə götürməliyəm?',
+        color: 'from-blue-500 to-indigo-600'
+      },
+      {
+        id: '3',
+        icon: Stethoscope,
+        title: 'Həkim vizitləri',
+        question: 'Həkim görüşlərində mən necə faydalı ola bilərəm? Hansı sualları verməliyəm?',
+        color: 'from-emerald-500 to-teal-600'
+      },
+      {
+        id: '4',
+        icon: Gift,
+        title: 'Sürprizlər',
+        question: `${partnerName}ı sevindirmək üçün hansı kiçik sürprizlər edə bilərəm?`,
+        color: 'from-amber-500 to-orange-600'
+      },
+      {
+        id: '5',
+        icon: Baby,
+        title: 'Doğuşa hazırlıq',
+        question: 'Doğuş günü üçün necə hazırlaşmalıyam? Nələr etməliyəm?',
+        color: 'from-violet-500 to-purple-600'
+      },
+      {
+        id: '6',
+        icon: Calendar,
+        title: `${pregnancyWeek}. həftə`,
+        question: `Hamiləliyin ${pregnancyWeek || 24}. həftəsində körpə necə inkişaf edir və mən nə edə bilərəm?`,
+        color: 'from-cyan-500 to-blue-600'
+      }
+    ];
+  }, [dynamicQuestions, partnerName, pregnancyWeek]);
 
   const getWelcomeMessage = () => {
     const fruitInfo = dynamicFruit ? ` Körpəniz hazırda ${dynamicFruit} böyüklüyündədir!` : '';

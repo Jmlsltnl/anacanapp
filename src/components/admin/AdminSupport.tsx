@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
   MessageSquare, Clock, CheckCircle, AlertCircle, 
   Send, User, Mail, Filter, ChevronDown
 } from 'lucide-react';
 import { useSupportTicketsAdmin, AdminSupportTicket } from '@/hooks/useSupportTicketsAdmin';
+import { useSupportCategories } from '@/hooks/useDynamicTools';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
@@ -27,11 +28,27 @@ import {
 
 const AdminSupport = () => {
   const { tickets, loading, respondToTicket, updateStatus, updatePriority } = useSupportTicketsAdmin();
+  const { data: supportCategories = [] } = useSupportCategories();
   const { toast } = useToast();
   const [selectedTicket, setSelectedTicket] = useState<AdminSupportTicket | null>(null);
   const [response, setResponse] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>('all');
+
+  // Build category labels from DB
+  const categoryLabels = useMemo(() => {
+    const labels: Record<string, string> = {};
+    supportCategories.forEach(cat => {
+      labels[cat.category_key] = cat.name_az || cat.name;
+    });
+    // Add fallback for common categories
+    if (!labels['general']) labels['general'] = 'Ümumi';
+    if (!labels['technical']) labels['technical'] = 'Texniki';
+    if (!labels['billing']) labels['billing'] = 'Ödəniş';
+    if (!labels['feature']) labels['feature'] = 'Xüsusiyyət';
+    if (!labels['other']) labels['other'] = 'Digər';
+    return labels;
+  }, [supportCategories]);
 
   const filteredTickets = filterStatus === 'all' 
     ? tickets 
@@ -79,14 +96,7 @@ const AdminSupport = () => {
   };
 
   const getCategoryLabel = (category: string) => {
-    const labels: Record<string, string> = {
-      general: 'Ümumi',
-      technical: 'Texniki',
-      billing: 'Ödəniş',
-      feature: 'Xüsusiyyət',
-      other: 'Digər'
-    };
-    return labels[category] || category;
+    return categoryLabels[category] || category;
   };
 
   const handleRespond = async () => {

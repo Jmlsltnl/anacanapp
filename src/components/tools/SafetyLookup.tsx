@@ -1,16 +1,8 @@
-import { useState, forwardRef } from 'react';
+import { useState, forwardRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Search, Check, AlertTriangle, X } from 'lucide-react';
 import { useSafetyItems } from '@/hooks/useDynamicContent';
-
-const categories = [
-  { id: 'all', name: 'Hamısı', emoji: '✨' },
-  { id: 'food', name: 'Qida', emoji: '🍽️' },
-  { id: 'drink', name: 'İçki', emoji: '🥤' },
-  { id: 'activity', name: 'Fəaliyyət', emoji: '🏃‍♀️' },
-  { id: 'beauty', name: 'Gözəllik', emoji: '💄' },
-  { id: 'medicine', name: 'Dərman', emoji: '💊' },
-];
+import { useSafetyCategories } from '@/hooks/useDynamicTools';
 
 interface SafetyLookupProps {
   onBack: () => void;
@@ -21,6 +13,18 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const { data: safetyItems = [], isLoading } = useSafetyItems();
+  const { data: dbCategories = [], isLoading: categoriesLoading } = useSafetyCategories();
+
+  // Build categories from DB with "all" option prepended
+  const categories = useMemo(() => {
+    const allOption = { id: 'all', name: 'Hamısı', emoji: '✨' };
+    const mappedCategories = dbCategories.map(cat => ({
+      id: cat.category_id,
+      name: cat.name_az || cat.name,
+      emoji: cat.emoji || '📦'
+    }));
+    return [allOption, ...mappedCategories];
+  }, [dbCategories]);
 
   const filteredItems = safetyItems.filter(item => {
     const name = item.name_az || item.name;
@@ -65,7 +69,7 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
     }
   };
 
-  if (isLoading) {
+  if (isLoading || categoriesLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
