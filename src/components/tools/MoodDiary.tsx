@@ -1,34 +1,17 @@
-import { useState, forwardRef } from 'react';
+import { useState, forwardRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Heart, Calendar, Plus, 
-  Sparkles, TrendingUp
+  Sparkles, TrendingUp, Loader2
 } from 'lucide-react';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { hapticFeedback } from '@/lib/native';
+import { useMoodOptions, useSymptoms } from '@/hooks/useDynamicConfig';
+import { useUserStore } from '@/store/userStore';
 
 interface MoodDiaryProps {
   onBack: () => void;
 }
-
-const moodEmojis = [
-  { value: 1, emoji: '😢', label: 'Çox pis', color: 'bg-red-100 border-red-300' },
-  { value: 2, emoji: '😔', label: 'Pis', color: 'bg-orange-100 border-orange-300' },
-  { value: 3, emoji: '😐', label: 'Normal', color: 'bg-yellow-100 border-yellow-300' },
-  { value: 4, emoji: '🙂', label: 'Yaxşı', color: 'bg-lime-100 border-lime-300' },
-  { value: 5, emoji: '😊', label: 'Əla', color: 'bg-green-100 border-green-300' },
-];
-
-const symptomOptions = [
-  { id: 'tired', label: 'Yorğunluq', emoji: '😴' },
-  { id: 'nausea', label: 'Ürəkbulanma', emoji: '🤢' },
-  { id: 'headache', label: 'Baş ağrısı', emoji: '🤕' },
-  { id: 'happy', label: 'Xoşbəxtlik', emoji: '🥰' },
-  { id: 'anxious', label: 'Narahatlıq', emoji: '😰' },
-  { id: 'energetic', label: 'Enerjili', emoji: '⚡' },
-  { id: 'emotional', label: 'Emosional', emoji: '🥺' },
-  { id: 'calm', label: 'Sakit', emoji: '😌' },
-];
 
 const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) => {
   const [activeTab, setActiveTab] = useState<'log' | 'history' | 'insights'>('log');
@@ -36,7 +19,44 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
   
-  const { logs, todayLog, loading, addLog } = useDailyLogs();
+  const { logs, todayLog, loading: logsLoading, addLog } = useDailyLogs();
+  const { lifeStage } = useUserStore();
+  const { data: dbMoods, isLoading: moodsLoading } = useMoodOptions();
+  const { data: dbSymptoms, isLoading: symptomsLoading } = useSymptoms(lifeStage);
+
+  // Map DB data to component format
+  const moodEmojis = useMemo(() => {
+    if (!dbMoods || dbMoods.length === 0) {
+      return [
+        { value: 1, emoji: '😢', label: 'Çox pis', color: 'bg-red-100 border-red-300' },
+        { value: 2, emoji: '😔', label: 'Pis', color: 'bg-orange-100 border-orange-300' },
+        { value: 3, emoji: '😐', label: 'Normal', color: 'bg-yellow-100 border-yellow-300' },
+        { value: 4, emoji: '🙂', label: 'Yaxşı', color: 'bg-lime-100 border-lime-300' },
+        { value: 5, emoji: '😊', label: 'Əla', color: 'bg-green-100 border-green-300' },
+      ];
+    }
+    return dbMoods.map(m => ({
+      value: m.value,
+      emoji: m.emoji,
+      label: m.label_az || m.label,
+      color: m.color_class || 'bg-gray-100 border-gray-300',
+    }));
+  }, [dbMoods]);
+
+  const symptomOptions = useMemo(() => {
+    if (!dbSymptoms || dbSymptoms.length === 0) {
+      return [
+        { id: 'tired', label: 'Yorğunluq', emoji: '😴' },
+        { id: 'nausea', label: 'Ürəkbulanma', emoji: '🤢' },
+        { id: 'headache', label: 'Baş ağrısı', emoji: '🤕' },
+      ];
+    }
+    return dbSymptoms.map(s => ({
+      id: s.symptom_key,
+      label: s.label_az || s.label,
+      emoji: s.emoji,
+    }));
+  }, [dbSymptoms]);
 
   // Initialize from today's log if exists
   useState(() => {
@@ -76,6 +96,16 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
   const averageMood = logs.length > 0 
     ? (logs.reduce((sum, e) => sum + (e.mood || 0), 0) / logs.filter(l => l.mood).length).toFixed(1)
     : 0;
+
+  const loading = logsLoading || moodsLoading || symptomsLoading;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-fuchsia-50 to-background pb-24">
@@ -241,11 +271,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               className="space-y-4"
             >
               <h2 className="font-bold text-lg">Son qeydlər</h2>
-              {loading ? (
-                <div className="text-center py-8">
-                  <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-                </div>
-              ) : logs.length === 0 ? (
+              {logs.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">Hələ qeyd yoxdur</p>
               ) : (
                 logs.slice(0, 10).map((entry, index) => (
@@ -323,7 +349,6 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
                 <h3 className="font-bold mb-4">Həftəlik əhval trendi</h3>
                 <div className="flex items-end justify-between h-32 px-2">
                   {['B.e.', 'Ç.a.', 'Ç.', 'C.a.', 'C.', 'Ş.', 'B.'].map((day, i) => {
-                    // Use actual log data if available
                     const dayLog = logs.find(l => new Date(l.log_date).getDay() === (i + 1) % 7);
                     const height = dayLog?.mood ? (dayLog.mood / 5) * 100 : 50;
                     return (
