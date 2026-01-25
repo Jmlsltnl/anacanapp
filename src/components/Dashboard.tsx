@@ -16,7 +16,7 @@ import { useBabyLogs } from '@/hooks/useBabyLogs';
 import { useAuth } from '@/hooks/useAuth';
 import { useKickSessions } from '@/hooks/useKickSessions';
 import { useWeightEntries } from '@/hooks/useWeightEntries';
-import { useBabyMilestones, MILESTONES } from '@/hooks/useBabyMilestones';
+import { useBabyMilestones } from '@/hooks/useBabyMilestones';
 import { useAchievements } from '@/hooks/useAchievements';
 import { useWeeklyTips } from '@/hooks/useDynamicContent';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
@@ -792,7 +792,7 @@ const MommyDashboard = () => {
   const { getBabyData } = useUserStore();
   const { toast } = useToast();
   const babyData = getBabyData();
-  const { isMilestoneAchieved, toggleMilestone, getMilestoneDate } = useBabyMilestones();
+  const { isMilestoneAchieved, toggleMilestone, getMilestoneDate, MILESTONES } = useBabyMilestones();
   const { unlockAchievement, getTotalPoints } = useAchievements();
   const { activeTimers, startTimer, stopTimer, getElapsedSeconds, getActiveTimer } = useTimerStore();
   const { todayLogs, addLog, getTodayStats, refetch } = useBabyLogs();

@@ -54,7 +54,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
     return dbSymptoms.map(s => ({
       id: s.symptom_key,
       label: s.label_az || s.label,
-      emoji: s.emoji,
+      emoji: s.icon || '🩺',
     }));
   }, [dbSymptoms]);
 

@@ -7,6 +7,7 @@ import {
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useMealLogs } from '@/hooks/useMealLogs';
 import { useNutritionTips, useRecipes, Recipe } from '@/hooks/useDynamicContent';
+import { useCommonFoods } from '@/hooks/useDynamicConfig';
 import { useUserStore } from '@/store/userStore';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -97,7 +98,13 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
   const { loading: mealLoading, addMealLog, deleteMealLog, getTodayStats, getMealsByType } = useMealLogs();
   const { data: nutritionTips = [], isLoading: tipsLoading } = useNutritionTips();
   const { data: recipes = [], isLoading: recipesLoading } = useRecipes();
+  const { data: dbFoods = [], isLoading: foodsLoading } = useCommonFoods();
   const { lifeStage } = useUserStore();
+  
+  // Use DB foods or fallback
+  const commonFoods = dbFoods.length > 0 
+    ? dbFoods.map(f => ({ name: f.name_az || f.name, calories: f.calories, emoji: f.emoji }))
+    : fallbackFoods;
   
   const mealTypes = getMealTypes(lifeStage || 'flow');
   const targets = getTargets(lifeStage || 'flow');
