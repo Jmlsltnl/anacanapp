@@ -99,14 +99,14 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="bg-red-50 border-2 border-red-200 rounded-xl p-3 mb-3 flex items-center gap-3"
+              className="bg-red-100 dark:bg-red-950/50 border-2 border-red-200 dark:border-red-800 rounded-xl p-3 mb-3 flex items-center gap-3"
             >
               <div className="w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center">
                 <AlertCircle className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-red-700 text-sm">Xəstəxanaya getmə vaxtı!</h3>
-                <p className="text-xs text-red-600">5-1-1 qaydası: Sancılar 5 dəqiqədən bir, 1 dəqiqə davam edir</p>
+                <h3 className="font-bold text-red-700 dark:text-red-400 text-sm">Xəstəxanaya getmə vaxtı!</h3>
+                <p className="text-xs text-red-600 dark:text-red-300">5-1-1 qaydası: Sancılar 5 dəqiqədən bir, 1 dəqiqə davam edir</p>
               </div>
             </motion.div>
           )}
@@ -185,7 +185,7 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
 
         {/* 5-1-1 Rule Info */}
         <motion.div
-          className="bg-beige-light rounded-xl p-3 mb-4 border border-beige"
+          className="bg-primary/5 dark:bg-primary/10 rounded-xl p-3 mb-4 border border-primary/20"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
@@ -195,7 +195,7 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
             5-1-1 Qaydası
           </h3>
           <p className="text-xs text-muted-foreground">
-            Sancılar <strong>5 dəqiqə</strong> aralığında, <strong>1 dəqiqə</strong> davam edərsə və bu <strong>1 saat</strong> boyunca davam edərsə, xəstəxanaya getmə vaxtıdır.
+            Sancılar <strong className="text-foreground">5 dəqiqə</strong> aralığında, <strong className="text-foreground">1 dəqiqə</strong> davam edərsə və bu <strong className="text-foreground">1 saat</strong> boyunca davam edərsə, xəstəxanaya getmə vaxtıdır.
           </p>
         </motion.div>
 

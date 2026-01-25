@@ -136,7 +136,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
               whileTap={{ scale: 0.99 }}
             >
               <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl ${
-                name.gender === 'boy' ? 'bg-blue-50' : name.gender === 'girl' ? 'bg-pink-50' : 'bg-purple-50'
+                name.gender === 'boy' ? 'bg-blue-100 dark:bg-blue-900/30' : name.gender === 'girl' ? 'bg-pink-100 dark:bg-pink-900/30' : 'bg-purple-100 dark:bg-purple-900/30'
               }`}>
                 {name.gender === 'boy' ? '👦' : name.gender === 'girl' ? '👧' : '✨'}
               </div>
@@ -194,7 +194,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
               <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6" />
               
               <div className={`w-24 h-24 rounded-2xl mx-auto mb-4 flex items-center justify-center text-5xl ${
-                selectedName.gender === 'boy' ? 'bg-blue-50' : 'bg-pink-50'
+                selectedName.gender === 'boy' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-pink-100 dark:bg-pink-900/30'
               }`}>
                 {selectedName.gender === 'boy' ? '👦' : '👧'}
               </div>
@@ -203,7 +203,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
               
               <div className="flex items-center justify-center gap-2 mb-4">
                 <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                  selectedName.gender === 'boy' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'
+                  selectedName.gender === 'boy' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300'
                 }`}>
                   {selectedName.gender === 'boy' ? 'Oğlan' : 'Qız'}
                 </span>
@@ -212,7 +212,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
                 </span>
               </div>
 
-              <div className="bg-beige-light rounded-2xl p-4 mb-6">
+              <div className="bg-primary/5 dark:bg-primary/10 rounded-2xl p-4 mb-6 border border-primary/20">
                 <p className="text-sm text-muted-foreground mb-1">Mənası</p>
                 <p className="text-lg font-bold text-foreground">{selectedName.meaning_az || selectedName.meaning || 'Məlumat yoxdur'}</p>
               </div>

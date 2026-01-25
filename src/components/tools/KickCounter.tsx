@@ -162,7 +162,7 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
 
         {/* Today's Stats */}
         <motion.div
-          className="bg-beige-light rounded-3xl p-5 mb-6 border border-beige"
+          className="bg-primary/5 dark:bg-primary/10 rounded-3xl p-5 mb-6 border border-primary/20"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
@@ -171,7 +171,7 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
             <span className="font-bold text-foreground">Bugünkü ümumi</span>
             <span className="text-primary font-bold">{todayStats.totalKicks}/10 təpik</span>
           </div>
-          <div className="h-3 bg-beige rounded-full overflow-hidden">
+          <div className="h-3 bg-muted dark:bg-muted/50 rounded-full overflow-hidden">
             <motion.div
               className="h-full gradient-primary rounded-full"
               initial={{ width: 0 }}

@@ -47,9 +47,9 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
   }, [recommendations, trimester]);
   
   const getStatus = () => {
-    if (totalGain < recommended.min) return { status: 'low', text: 'Az', color: 'text-amber-600', bg: 'bg-amber-50' };
-    if (totalGain > recommended.max) return { status: 'high', text: 'Çox', color: 'text-red-600', bg: 'bg-red-50' };
-    return { status: 'normal', text: 'Normal', color: 'text-emerald-600', bg: 'bg-emerald-50' };
+    if (totalGain < recommended.min) return { status: 'low', text: 'Az', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-900/30' };
+    if (totalGain > recommended.max) return { status: 'high', text: 'Çox', color: 'text-red-600 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-900/30' };
+    return { status: 'normal', text: 'Normal', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-100 dark:bg-emerald-900/30' };
   };
 
   const status = getStatus();
@@ -189,7 +189,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
 
         {/* AI Analysis */}
         <motion.div
-          className="bg-beige-light rounded-3xl p-5 mb-6 border border-beige"
+          className="bg-primary/5 dark:bg-primary/10 rounded-3xl p-5 mb-6 border border-primary/20"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}

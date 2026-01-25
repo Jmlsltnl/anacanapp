@@ -87,7 +87,7 @@ const BlogScreen = ({ onBack }: BlogScreenProps) => {
               setShowSaved(false);
             }}
             placeholder="Məqalə axtar..."
-            className="pl-10 h-10 rounded-xl bg-white/90 border-0 text-sm"
+            className="pl-10 h-10 rounded-xl bg-card/90 dark:bg-card border-0 text-sm"
           />
         </div>
       </div>
