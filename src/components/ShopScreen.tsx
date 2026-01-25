@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Search, ShoppingCart, Heart, Star, ChevronRight, Filter, Loader2 } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
+import { useShopCategories } from '@/hooks/useDynamicTools';
 
 interface DisplayProduct {
   id: string;
@@ -15,7 +16,7 @@ interface DisplayProduct {
   badge?: string;
 }
 
-// Emoji mapping for categories
+// Emoji mapping for categories (fallback)
 const categoryEmojis: Record<string, string> = {
   vitamins: '💊',
   skincare: '🧴',
@@ -27,17 +28,9 @@ const categoryEmojis: Record<string, string> = {
   default: '🛍️'
 };
 
-const defaultCategories = [
-  { id: 'all', name: 'Hamısı', emoji: '✨' },
-  { id: 'vitamins', name: 'Vitaminlər', emoji: '💊' },
-  { id: 'skincare', name: 'Dəri Qulluğu', emoji: '🧴' },
-  { id: 'comfort', name: 'Rahatlıq', emoji: '🛋️' },
-  { id: 'baby', name: 'Körpə', emoji: '👶' },
-  { id: 'feeding', name: 'Qidalanma', emoji: '🍼' },
-];
-
 const ShopScreen = () => {
   const { products: dbProducts, loading } = useProducts();
+  const { data: dbCategories = [] } = useShopCategories();
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [cartCount, setCartCount] = useState(0);
@@ -50,13 +43,25 @@ const ShopScreen = () => {
       price: Number(p.price),
       image: categoryEmojis[p.category] || categoryEmojis.default,
       rating: p.rating || 4.5,
-      reviews: Math.floor(Math.random() * 500) + 50, // Placeholder until we have reviews table
+      reviews: Math.floor(Math.random() * 500) + 50,
       category: p.category,
     }));
   }, [dbProducts]);
 
-  // Get unique categories from products
+  // Get categories from DB or derive from products
   const categories = useMemo(() => {
+    // If we have DB categories, use them
+    if (dbCategories.length > 0) {
+      return [
+        { id: 'all', name: 'Hamısı', emoji: '✨' },
+        ...dbCategories.map(cat => ({
+          id: cat.category_key,
+          name: cat.name_az || cat.name,
+          emoji: cat.emoji || categoryEmojis[cat.category_key] || categoryEmojis.default
+        }))
+      ];
+    }
+    // Fallback: derive from products
     const uniqueCategories = [...new Set(dbProducts.map(p => p.category))];
     const mappedCategories = uniqueCategories.map(cat => ({
       id: cat,
@@ -64,7 +69,7 @@ const ShopScreen = () => {
       emoji: categoryEmojis[cat] || categoryEmojis.default
     }));
     return [{ id: 'all', name: 'Hamısı', emoji: '✨' }, ...mappedCategories];
-  }, [dbProducts]);
+  }, [dbProducts, dbCategories]);
 
   const filteredProducts = products.filter(product => {
     const matchesCategory = activeCategory === 'all' || product.category === activeCategory;

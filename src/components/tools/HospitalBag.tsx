@@ -1,4 +1,4 @@
-import { useState, forwardRef } from 'react';
+import { useState, forwardRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Check, Briefcase, Baby, User, Share2 } from 'lucide-react';
 import { useHospitalBag } from '@/hooks/useHospitalBag';
@@ -7,16 +7,31 @@ interface HospitalBagProps {
   onBack: () => void;
 }
 
+// Fallback categories
+const fallbackCategories = [
+  { id: 'all', label: 'Hamısı', emoji: '👜' },
+  { id: 'mom', label: 'Ana', emoji: '👩' },
+  { id: 'baby', label: 'Körpə', emoji: '👶' },
+  { id: 'documents', label: 'Sənədlər', emoji: '📄' },
+];
+
 const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, ref) => {
   const { items, loading, toggleItem, getProgress, checkedCount, totalCount } = useHospitalBag();
-  const [activeCategory, setActiveCategory] = useState<'all' | 'mom' | 'baby' | 'documents'>('all');
+  const [activeCategory, setActiveCategory] = useState<string>('all');
 
-  const categories = [
-    { id: 'all', label: 'Hamısı', icon: Briefcase, emoji: '👜' },
-    { id: 'mom', label: 'Ana', icon: User, emoji: '👩' },
-    { id: 'baby', label: 'Körpə', icon: Baby, emoji: '👶' },
-    { id: 'documents', label: 'Sənədlər', icon: Briefcase, emoji: '📄' },
-  ];
+  // Get unique categories from items or use fallback
+  const categories = useMemo(() => {
+    const uniqueCats = [...new Set(items.map(item => item.category))];
+    if (uniqueCats.length > 0) {
+      const mapped = uniqueCats.map(cat => ({
+        id: cat,
+        label: cat === 'mom' ? 'Ana' : cat === 'baby' ? 'Körpə' : cat === 'documents' ? 'Sənədlər' : cat,
+        emoji: cat === 'mom' ? '👩' : cat === 'baby' ? '👶' : cat === 'documents' ? '📄' : '📦',
+      }));
+      return [{ id: 'all', label: 'Hamısı', emoji: '👜' }, ...mapped];
+    }
+    return fallbackCategories;
+  }, [items]);
 
   const filteredItems = activeCategory === 'all' 
     ? items 
