@@ -234,7 +234,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background safe-top overflow-x-hidden">
+    <div className="min-h-screen min-h-dvh bg-background safe-top overflow-x-hidden overscroll-none">
       <AnimatePresence mode="wait">
         {renderContent()}
       </AnimatePresence>

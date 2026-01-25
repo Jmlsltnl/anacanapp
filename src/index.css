@@ -241,21 +241,33 @@
     -webkit-backdrop-filter: blur(20px);
   }
 
-  /* Safe area for mobile */
+  /* Safe area for mobile - Capacitor */
   .safe-top {
-    padding-top: env(safe-area-inset-top);
+    padding-top: env(safe-area-inset-top, 0px);
   }
 
   .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   .safe-left {
-    padding-left: env(safe-area-inset-left);
+    padding-left: env(safe-area-inset-left, 0px);
   }
 
   .safe-right {
-    padding-right: env(safe-area-inset-right);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
+  /* Full height for mobile app */
+  .mobile-full-height {
+    min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile */
+  }
+
+  /* Prevent overscroll/bounce on iOS */
+  .no-overscroll {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* Shimmer Animation */
