@@ -23,6 +23,7 @@ import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
+import { useTrimesterTips } from '@/hooks/useTrimesterTips';
 
 // Fetus images by month
 import FetusMonth1 from '@/assets/fetus/month-1.svg';
@@ -356,6 +357,9 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
   // Fetch dynamic pregnancy content by day
   const { data: dayContent } = usePregnancyContentByDay(pregnancyDay);
   
+  // Fetch dynamic trimester tips from database
+  const { data: dynamicTrimesterTips = [] } = useTrimesterTips(pregData?.trimester);
+  
   const todayStats = getTodayStats();
   const kickCount = todayStats.totalKicks;
   const waterCount = todayLog?.water_intake || 0;
@@ -407,50 +411,20 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
   
   const trimesterColors = getTrimesterColors(pregData.trimester);
   
-  // Trimester-specific tips
-  const getTrimesterTips = (trimester: number) => {
+  // Trimester info for display
+  const getTrimesterInfo = (trimester: number) => {
     switch (trimester) {
       case 1:
-        return {
-          title: '1-ci Trimester Tövsiyələri',
-          emoji: '🌱',
-          tips: [
-            { icon: '💊', text: 'Fol turşusu (400-800 mq) hər gün qəbul edin' },
-            { icon: '🤢', text: 'Ürək bulanmasına qarşı zəncəfil çayı için' },
-            { icon: '😴', text: 'Çox istirahət edin, bədəniniz sürətlə dəyişir' },
-            { icon: '🥗', text: 'Kiçik porsiyalarla tez-tez qidalanın' },
-            { icon: '💧', text: 'Gündə 8-10 stəkan su için' },
-          ],
-        };
+        return { title: '1-ci Trimester Tövsiyələri', emoji: '🌱' };
       case 2:
-        return {
-          title: '2-ci Trimester Tövsiyələri',
-          emoji: '🌸',
-          tips: [
-            { icon: '🏃', text: 'Mülayim məşqlər edin (yoga, üzgüçülük)' },
-            { icon: '🍎', text: 'Dəmir və kalsium zəngin qidalar yeyin' },
-            { icon: '👶', text: 'Körpənin hərəkətlərini izləməyə başlayın' },
-            { icon: '🛒', text: 'Körpə otağını planlaşdırmağa başlayın' },
-            { icon: '📚', text: 'Doğuş hazırlığı kurslarına baxın' },
-          ],
-        };
+        return { title: '2-ci Trimester Tövsiyələri', emoji: '🌸' };
       case 3:
       default:
-        return {
-          title: '3-cü Trimester Tövsiyələri',
-          emoji: '🍼',
-          tips: [
-            { icon: '🎒', text: 'Xəstəxana çantanızı hazırlayın' },
-            { icon: '🛏️', text: 'Yuxu pozisyalarınızı rahatlaşdırın' },
-            { icon: '📝', text: 'Doğuş planınızı yazın' },
-            { icon: '👣', text: 'Təpikləri sayın - gündə 10+ olmalıdır' },
-            { icon: '🧘', text: 'Nəfəs və relaksasiya texnikalarını öyrənin' },
-          ],
-        };
+        return { title: '3-cü Trimester Tövsiyələri', emoji: '🍼' };
     }
   };
   
-  const trimesterTips = getTrimesterTips(pregData.trimester);
+  const trimesterInfo = getTrimesterInfo(pregData.trimester);
   
   // Get mood emoji
   const getMoodEmoji = (mood: number) => {
@@ -599,36 +573,38 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
       </motion.div>
 
       {/* Trimester Tips Section */}
-      <motion.div 
-        className={`relative overflow-hidden ${trimesterColors.accent} rounded-xl p-3 ${trimesterColors.border}`}
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.15 }}
-      >
-        <div className="absolute -right-6 -top-6 text-7xl opacity-10">{trimesterTips.emoji}</div>
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2">
-            <div className={`w-7 h-7 rounded-full ${trimesterColors.accent} flex items-center justify-center`}>
-              <span className="text-lg">{trimesterTips.emoji}</span>
+      {dynamicTrimesterTips.length > 0 && (
+        <motion.div 
+          className={`relative overflow-hidden ${trimesterColors.accent} rounded-xl p-3 ${trimesterColors.border}`}
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.15 }}
+        >
+          <div className="absolute -right-6 -top-6 text-7xl opacity-10">{trimesterInfo.emoji}</div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-2">
+              <div className={`w-7 h-7 rounded-full ${trimesterColors.accent} flex items-center justify-center`}>
+                <span className="text-lg">{trimesterInfo.emoji}</span>
+              </div>
+              <h3 className={`text-sm font-bold ${trimesterColors.text}`}>{trimesterInfo.title}</h3>
             </div>
-            <h3 className={`text-sm font-bold ${trimesterColors.text}`}>{trimesterTips.title}</h3>
+            <div className="space-y-1.5">
+              {dynamicTrimesterTips.map((tip, index) => (
+                <motion.div 
+                  key={tip.id}
+                  className="flex items-start gap-2 bg-card/50 rounded-lg p-2"
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 + index * 0.05 }}
+                >
+                  <span className="text-sm flex-shrink-0">{tip.icon}</span>
+                  <p className="text-xs text-foreground/90 leading-relaxed">{tip.tip_text}</p>
+                </motion.div>
+              ))}
+            </div>
           </div>
-          <div className="space-y-1.5">
-            {trimesterTips.tips.map((tip, index) => (
-              <motion.div 
-                key={index}
-                className="flex items-start gap-2 bg-card/50 rounded-lg p-2"
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.2 + index * 0.05 }}
-              >
-                <span className="text-sm flex-shrink-0">{tip.icon}</span>
-                <p className="text-xs text-foreground/90 leading-relaxed">{tip.text}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
 
       {/* Stats Grid - Show kick counter only after week 16 */}
       <div className={`grid ${pregData.currentWeek >= 16 ? 'grid-cols-3' : 'grid-cols-2'} gap-1.5`}>

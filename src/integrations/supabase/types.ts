@@ -2115,6 +2115,39 @@ export type Database = {
         }
         Relationships: []
       }
+      trimester_tips: {
+        Row: {
+          created_at: string | null
+          icon: string
+          id: string
+          is_active: boolean | null
+          sort_order: number | null
+          tip_text: string
+          trimester: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          tip_text: string
+          trimester: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          tip_text?: string
+          trimester?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       usage_tracking: {
         Row: {
           created_at: string

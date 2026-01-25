@@ -27,6 +27,7 @@ const menuItems = [
   { id: 'pregnancy', label: 'Hamiləlik Kontenti', icon: Baby },
   { id: 'fruit-images', label: 'Körpə Ölçüsü Şəkilləri', icon: Baby },
   { id: 'vitamins', label: 'Vitaminlər', icon: Pill },
+  { id: 'trimester-tips', label: 'Trimester Tövsiyələri', icon: Baby },
   { id: 'dynamic-content', label: 'Dinamik Məzmun', icon: Layers },
   { id: 'content', label: 'Digər Kontent', icon: FileText },
   { id: 'products', label: 'Məhsullar', icon: Package },
