@@ -368,6 +368,90 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
 
   if (!pregData) return null;
   
+  // Trimester color scheme
+  const getTrimesterColors = (trimester: number) => {
+    switch (trimester) {
+      case 1:
+        return {
+          bg: 'from-green-500/10 via-green-400/5 to-green-500/10 dark:from-green-500/20 dark:via-green-400/10 dark:to-green-500/20',
+          border: 'border-green-500/20',
+          accent: 'bg-green-500/10 dark:bg-green-500/20',
+          text: 'text-green-600 dark:text-green-400',
+          badge: 'bg-green-500/10 text-green-600 dark:text-green-400',
+          progress: 'bg-green-500',
+          icon: 'text-green-600 dark:text-green-400',
+        };
+      case 2:
+        return {
+          bg: 'from-amber-500/10 via-amber-400/5 to-amber-500/10 dark:from-amber-500/20 dark:via-amber-400/10 dark:to-amber-500/20',
+          border: 'border-amber-500/20',
+          accent: 'bg-amber-500/10 dark:bg-amber-500/20',
+          text: 'text-amber-600 dark:text-amber-400',
+          badge: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+          progress: 'bg-amber-500',
+          icon: 'text-amber-600 dark:text-amber-400',
+        };
+      case 3:
+      default:
+        return {
+          bg: 'from-primary/10 via-primary/5 to-primary/10 dark:from-primary/20 dark:via-primary/10 dark:to-primary/20',
+          border: 'border-primary/20',
+          accent: 'bg-primary/10 dark:bg-primary/20',
+          text: 'text-primary',
+          badge: 'bg-primary/10 text-primary',
+          progress: 'bg-primary',
+          icon: 'text-primary',
+        };
+    }
+  };
+  
+  const trimesterColors = getTrimesterColors(pregData.trimester);
+  
+  // Trimester-specific tips
+  const getTrimesterTips = (trimester: number) => {
+    switch (trimester) {
+      case 1:
+        return {
+          title: '1-ci Trimester Tövsiyələri',
+          emoji: '🌱',
+          tips: [
+            { icon: '💊', text: 'Fol turşusu (400-800 mq) hər gün qəbul edin' },
+            { icon: '🤢', text: 'Ürək bulanmasına qarşı zəncəfil çayı için' },
+            { icon: '😴', text: 'Çox istirahət edin, bədəniniz sürətlə dəyişir' },
+            { icon: '🥗', text: 'Kiçik porsiyalarla tez-tez qidalanın' },
+            { icon: '💧', text: 'Gündə 8-10 stəkan su için' },
+          ],
+        };
+      case 2:
+        return {
+          title: '2-ci Trimester Tövsiyələri',
+          emoji: '🌸',
+          tips: [
+            { icon: '🏃', text: 'Mülayim məşqlər edin (yoga, üzgüçülük)' },
+            { icon: '🍎', text: 'Dəmir və kalsium zəngin qidalar yeyin' },
+            { icon: '👶', text: 'Körpənin hərəkətlərini izləməyə başlayın' },
+            { icon: '🛒', text: 'Körpə otağını planlaşdırmağa başlayın' },
+            { icon: '📚', text: 'Doğuş hazırlığı kurslarına baxın' },
+          ],
+        };
+      case 3:
+      default:
+        return {
+          title: '3-cü Trimester Tövsiyələri',
+          emoji: '🍼',
+          tips: [
+            { icon: '🎒', text: 'Xəstəxana çantanızı hazırlayın' },
+            { icon: '🛏️', text: 'Yuxu pozisyalarınızı rahatlaşdırın' },
+            { icon: '📝', text: 'Doğuş planınızı yazın' },
+            { icon: '👣', text: 'Təpikləri sayın - gündə 10+ olmalıdır' },
+            { icon: '🧘', text: 'Nəfəs və relaksasiya texnikalarını öyrənin' },
+          ],
+        };
+    }
+  };
+  
+  const trimesterTips = getTrimesterTips(pregData.trimester);
+  
   // Get mood emoji
   const getMoodEmoji = (mood: number) => {
     if (mood >= 4) return '😊';
@@ -426,15 +510,15 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
 
   return (
     <div className="space-y-2">
-      {/* Baby Development Hero Section */}
+      {/* Baby Development Hero Section - Trimester colored */}
       <motion.div 
-        className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-primary/5 to-primary/10 dark:from-primary/20 dark:via-primary/10 dark:to-primary/20 rounded-2xl p-4 shadow-card border border-primary/20"
+        className={`relative overflow-hidden bg-gradient-to-br ${trimesterColors.bg} rounded-2xl p-4 shadow-card ${trimesterColors.border}`}
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.1 }}
       >
-        <div className="absolute -top-12 -right-12 w-36 h-36 rounded-full bg-primary/10 blur-2xl" />
-        <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-primary/5 blur-xl" />
+        <div className={`absolute -top-12 -right-12 w-36 h-36 rounded-full ${trimesterColors.accent} blur-2xl`} />
+        <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full ${trimesterColors.accent} blur-xl opacity-50`} />
         
         <div className="relative z-10 flex flex-col items-center">
           {/* Fetus Image with subtle motion */}
@@ -458,7 +542,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
               className="w-full h-full object-contain drop-shadow-lg"
             />
             <motion.div
-              className="absolute -bottom-1 -right-1 w-10 h-10 rounded-full bg-card shadow-lg flex items-center justify-center overflow-hidden border-2 border-primary/30"
+              className={`absolute -bottom-1 -right-1 w-10 h-10 rounded-full bg-card shadow-lg flex items-center justify-center overflow-hidden border-2 ${trimesterColors.border}`}
               animate={{ scale: [1, 1.08, 1] }}
               transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
             >
@@ -477,19 +561,19 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           {/* Main Text - "Anacan hazırda meyvə boydayam" */}
           <div className="text-center">
             <p className="text-lg font-bold text-foreground mb-1">
-              Anacan, hazırda <span className="text-primary">{weekData.fruit}</span> boydayam
+              Anacan, hazırda <span className={trimesterColors.text}>{weekData.fruit}</span> boydayam
             </p>
             <p className="text-xs text-muted-foreground font-medium">
-              {pregData.currentWeek}. həftə, {pregData.currentDay}. gün • {pregData.trimester}-{pregData.trimester === 1 ? 'ci' : pregData.trimester === 2 ? 'ci' : 'cü'} Trimester
+              {pregData.currentWeek}. həftə, {pregData.currentDay}. gün • <span className={`font-semibold ${trimesterColors.text}`}>{pregData.trimester}-{pregData.trimester === 1 ? 'ci' : pregData.trimester === 2 ? 'ci' : 'cü'} Trimester</span>
             </p>
             <div className="flex items-center justify-center gap-2 mt-2">
-              <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+              <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
                 {weekData.lengthCm} sm
               </span>
-              <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+              <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
                 {weekData.weightG}g
               </span>
-              <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+              <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
                 {daysLeft} gün qaldı
               </span>
             </div>
@@ -499,12 +583,12 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           <div className="w-full mt-3 space-y-1">
             <div className="flex justify-between text-[10px] text-muted-foreground">
               <span>Başlanğıc</span>
-              <span className="text-primary font-semibold">{Math.round(progressPercent)}%</span>
+              <span className={`${trimesterColors.text} font-semibold`}>{Math.round(progressPercent)}%</span>
               <span>Doğuş</span>
             </div>
-            <div className="h-2 bg-primary/20 rounded-full overflow-hidden">
+            <div className={`h-2 ${trimesterColors.accent} rounded-full overflow-hidden`}>
               <motion.div 
-                className="h-full bg-primary rounded-full"
+                className={`h-full ${trimesterColors.progress} rounded-full`}
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercent}%` }}
                 transition={{ duration: 1, delay: 0.3 }}
@@ -514,15 +598,47 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
         </div>
       </motion.div>
 
+      {/* Trimester Tips Section */}
+      <motion.div 
+        className={`relative overflow-hidden ${trimesterColors.accent} rounded-xl p-3 ${trimesterColors.border}`}
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.15 }}
+      >
+        <div className="absolute -right-6 -top-6 text-7xl opacity-10">{trimesterTips.emoji}</div>
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 mb-2">
+            <div className={`w-7 h-7 rounded-full ${trimesterColors.accent} flex items-center justify-center`}>
+              <span className="text-lg">{trimesterTips.emoji}</span>
+            </div>
+            <h3 className={`text-sm font-bold ${trimesterColors.text}`}>{trimesterTips.title}</h3>
+          </div>
+          <div className="space-y-1.5">
+            {trimesterTips.tips.map((tip, index) => (
+              <motion.div 
+                key={index}
+                className="flex items-start gap-2 bg-card/50 rounded-lg p-2"
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.2 + index * 0.05 }}
+              >
+                <span className="text-sm flex-shrink-0">{tip.icon}</span>
+                <p className="text-xs text-foreground/90 leading-relaxed">{tip.text}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
       {/* Stats Grid - Show kick counter only after week 16 */}
       <div className={`grid ${pregData.currentWeek >= 16 ? 'grid-cols-3' : 'grid-cols-2'} gap-1.5`}>
         <motion.div 
-          className="bg-primary/10 dark:bg-primary/20 rounded-xl p-2.5 shadow-card border border-primary/20 text-center"
+          className={`${trimesterColors.accent} rounded-xl p-2.5 shadow-card ${trimesterColors.border} text-center`}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.15 }}
+          transition={{ delay: 0.2 }}
         >
-          <Calendar className="w-4 h-4 text-primary mx-auto mb-0.5" />
+          <Calendar className={`w-4 h-4 ${trimesterColors.icon} mx-auto mb-0.5`} />
           <p className="text-lg font-black text-foreground">{daysLeft}</p>
           <p className="text-[9px] text-muted-foreground">gün qaldı</p>
         </motion.div>
@@ -531,25 +647,25 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
         {pregData.currentWeek >= 16 && (
           <motion.button 
             onClick={addKick}
-            className="bg-primary/10 dark:bg-primary/20 rounded-xl p-2.5 shadow-card border border-primary/20 text-center"
+            className={`${trimesterColors.accent} rounded-xl p-2.5 shadow-card ${trimesterColors.border} text-center`}
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.25 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Footprints className="w-4 h-4 text-primary mx-auto mb-0.5" />
+            <Footprints className={`w-4 h-4 ${trimesterColors.icon} mx-auto mb-0.5`} />
             <p className="text-lg font-black text-foreground">{kickCount}</p>
             <p className="text-[9px] text-muted-foreground">təpik</p>
           </motion.button>
         )}
 
         <motion.div 
-          className="bg-primary/10 dark:bg-primary/20 rounded-xl p-2.5 shadow-card border border-primary/20 text-center"
+          className={`${trimesterColors.accent} rounded-xl p-2.5 shadow-card ${trimesterColors.border} text-center`}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.25 }}
+          transition={{ delay: 0.3 }}
         >
-          <Scale className="w-4 h-4 text-primary mx-auto mb-0.5" />
+          <Scale className={`w-4 h-4 ${trimesterColors.icon} mx-auto mb-0.5`} />
           <p className="text-lg font-black text-foreground">+{weightGain}</p>
           <p className="text-[9px] text-muted-foreground">kq çəki</p>
         </motion.div>
