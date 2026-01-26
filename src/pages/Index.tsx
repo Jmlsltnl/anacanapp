@@ -28,6 +28,7 @@ import AppearanceScreen from '@/components/AppearanceScreen';
 import UserProfileScreen from '@/components/community/UserProfileScreen';
 import BillingScreen from '@/components/BillingScreen';
 import BlogScreen from '@/components/BlogScreen';
+import LegalScreen from '@/components/LegalScreen';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 
