@@ -185,6 +185,39 @@ export type Database = {
         }
         Relationships: []
       }
+      apple_auth_notifications: {
+        Row: {
+          apple_user_id: string
+          created_at: string
+          email: string | null
+          event_time: string | null
+          event_type: string
+          id: string
+          is_private_email: boolean | null
+          raw_payload: string | null
+        }
+        Insert: {
+          apple_user_id: string
+          created_at?: string
+          email?: string | null
+          event_time?: string | null
+          event_type: string
+          id?: string
+          is_private_email?: boolean | null
+          raw_payload?: string | null
+        }
+        Update: {
+          apple_user_id?: string
+          created_at?: string
+          email?: string | null
+          event_time?: string | null
+          event_type?: string
+          id?: string
+          is_private_email?: boolean | null
+          raw_payload?: string | null
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
           created_at: string
@@ -2606,6 +2639,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          apple_email_enabled: boolean | null
+          apple_user_id: string | null
           avatar_url: string | null
           baby_birth_date: string | null
           baby_count: number | null
@@ -2634,6 +2669,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          apple_email_enabled?: boolean | null
+          apple_user_id?: string | null
           avatar_url?: string | null
           baby_birth_date?: string | null
           baby_count?: number | null
@@ -2662,6 +2699,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          apple_email_enabled?: boolean | null
+          apple_user_id?: string | null
           avatar_url?: string | null
           baby_birth_date?: string | null
           baby_count?: number | null
