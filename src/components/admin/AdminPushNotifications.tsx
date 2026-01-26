@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, Plus, Trash2, Edit, Send, Users, Baby, Heart, Moon, Clock, Calendar, Zap, Search, ChevronLeft, ChevronRight, Loader2, Filter } from 'lucide-react';
+import { Bell, Plus, Trash2, Edit, Send, Users, Baby, Heart, Moon, Clock, Calendar, Zap, Search, ChevronLeft, ChevronRight, Loader2, Filter, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -32,6 +32,7 @@ import {
 } from '@/hooks/useAdvancedNotifications';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const audienceLabels: Record<string, { label: string; icon: any; color: string }> = {
   all: { label: 'Hamı', icon: Users, color: 'bg-blue-500' },
@@ -581,8 +582,8 @@ const PregnancyDayNotificationsTab = () => {
 
 // ==================== BULK PUSH TAB ====================
 const BulkPushTab = () => {
-  const { data: history = [], isLoading } = useBulkPushNotifications();
-  const { data: stats, isLoading: statsLoading } = useAudienceStats();
+  const { data: history = [], isLoading, refetch: refetchHistory } = useBulkPushNotifications();
+  const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useAudienceStats();
   const createBulk = useCreateBulkPushNotification();
   const sendBulk = useSendBulkPushNotification();
 
@@ -592,6 +593,9 @@ const BulkPushTab = () => {
     target_audience: 'all',
   });
   const [isSending, setIsSending] = useState(false);
+  const [showDevices, setShowDevices] = useState(false);
+  const [devices, setDevices] = useState<any[]>([]);
+  const [loadingDevices, setLoadingDevices] = useState(false);
 
   const getTargetStats = (audience: string) => {
     if (!stats) return { users: 0, tokens: 0 };
@@ -599,6 +603,51 @@ const BulkPushTab = () => {
   };
 
   const currentTargetStats = getTargetStats(form.target_audience);
+
+  const loadDevices = async () => {
+    setLoadingDevices(true);
+    try {
+      const { data, error } = await supabase
+        .from('device_tokens')
+        .select(`
+          id,
+          token,
+          platform,
+          device_name,
+          created_at,
+          updated_at,
+          user_id
+        `)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      // Get profile info for each device
+      const userIds = [...new Set(data?.map(d => d.user_id) || [])];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, name, life_stage, role')
+        .in('user_id', userIds);
+
+      const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
+      
+      setDevices(data?.map(d => ({
+        ...d,
+        profile: profileMap.get(d.user_id) || null
+      })) || []);
+    } catch (error) {
+      console.error('Error loading devices:', error);
+      toast.error('Cihaz siyahısı yüklənmədi');
+    } finally {
+      setLoadingDevices(false);
+    }
+  };
+
+  const handleRefreshStats = async () => {
+    await Promise.all([refetchStats(), refetchHistory()]);
+    toast.success('Statistika yeniləndi');
+  };
 
   const handleSendNow = async () => {
     if (!form.title || !form.body) {
@@ -625,6 +674,7 @@ const BulkPushTab = () => {
         toast.warning('Heç bir cihaza göndərilə bilmədi. Qeydiyyatlı cihaz yoxdur.');
       }
       setForm({ title: '', body: '', target_audience: 'all' });
+      refetchHistory();
     } catch (error: any) {
       toast.error(error.message || 'Göndərmə xətası');
     } finally {
@@ -647,6 +697,23 @@ const BulkPushTab = () => {
   return (
     <div className="space-y-6">
       {/* Global Stats */}
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-lg font-semibold">Push Statistikası</h3>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => { setShowDevices(!showDevices); if (!showDevices) loadDevices(); }}
+          >
+            📱 Cihazlar ({stats?.users_with_tokens || 0})
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleRefreshStats}>
+            <RefreshCw className="h-4 w-4 mr-1" />
+            Yenilə
+          </Button>
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="p-4 text-center">
           <div className="text-3xl font-bold text-primary">{stats?.total_users || 0}</div>
@@ -667,6 +734,56 @@ const BulkPushTab = () => {
           <div className="text-sm text-muted-foreground">Göndərilmiş Kampaniya</div>
         </Card>
       </div>
+
+      {/* Device List */}
+      {showDevices && (
+        <Card className="p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="font-medium">Qeydiyyatlı Cihazlar</h4>
+            <Button variant="ghost" size="sm" onClick={loadDevices} disabled={loadingDevices}>
+              {loadingDevices ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            </Button>
+          </div>
+          {loadingDevices ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin" />
+            </div>
+          ) : devices.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p>Heç bir cihaz qeydiyyatda deyil</p>
+              <p className="text-xs mt-1">İstifadəçilər mobil tətbiqi açmalı və bildiriş icazəsi verməlidir</p>
+            </div>
+          ) : (
+            <ScrollArea className="h-64">
+              <div className="space-y-2">
+                {devices.map((device) => (
+                  <div key={device.id} className="flex items-center justify-between p-3 bg-muted rounded-lg text-sm">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xl">
+                        {device.platform === 'ios' ? '🍎' : '🤖'}
+                      </span>
+                      <div>
+                        <div className="font-medium">{device.profile?.name || 'İsimsiz'}</div>
+                        <div className="text-xs text-muted-foreground flex items-center gap-2">
+                          <Badge variant="outline" className="text-xs">
+                            {device.profile?.life_stage || 'unknown'}
+                          </Badge>
+                          <span>{device.platform}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right text-xs text-muted-foreground">
+                      <div>Token: ...{device.token.slice(-8)}</div>
+                      <div>{new Date(device.created_at).toLocaleDateString('az-AZ')}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          )}
+        </Card>
+      )}
 
       {/* Audience Breakdown */}
       <Card className="p-4">
