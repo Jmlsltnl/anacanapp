@@ -290,7 +290,7 @@ const AdminSupport = () => {
                   <p className={`text-[10px] mt-1 ${
                     reply.is_admin ? 'opacity-70 text-right' : 'text-muted-foreground'
                   }`}>
-                    {format(new Date(reply.created_at), 'd MMM, HH:mm', { locale: az })}
+                    {format(new Date(reply.created_at), 'd MMMM, HH:mm', { locale: az })}
                   </p>
                 </div>
               </div>

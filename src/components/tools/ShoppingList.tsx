@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Plus, Trash2, Check, ShoppingCart, 
-  AlertCircle, Users, User, ChevronDown, ChevronUp
+  AlertCircle, Users, User, ChevronDown, ChevronUp, Clock
 } from 'lucide-react';
 import { useShoppingItems } from '@/hooks/useShoppingItems';
 import { useAuth } from '@/hooks/useAuth';
@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { formatRelativeDateAz } from '@/lib/date-utils';
 
 interface ShoppingListProps {
   onBack: () => void;
@@ -177,7 +178,7 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
                 </button>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-foreground truncate">{item.name}</p>
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
                     <Badge variant="outline" className={`text-[10px] ${priorityColors[item.priority]}`}>
                       {priorityLabels[item.priority]}
                     </Badge>
@@ -186,6 +187,10 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
                         {item.added_by === 'partner' ? '👨 Partnyor' : '👩 Ana'}
                       </span>
                     )}
+                    <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {formatRelativeDateAz(item.created_at)}
+                    </span>
                   </div>
                 </div>
                 <button

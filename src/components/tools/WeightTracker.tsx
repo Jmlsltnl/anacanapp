@@ -242,7 +242,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
             <div className="flex justify-between mt-2">
               {entries.slice(0, 7).reverse().map((entry) => (
                 <span key={entry.id} className="text-xs text-muted-foreground">
-                  {new Date(entry.entry_date).toLocaleDateString('az-AZ', { day: 'numeric', month: 'short' })}
+                  {new Date(entry.entry_date).toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' })}
                 </span>
               ))}
             </div>

@@ -21,6 +21,7 @@ import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useDailyTip } from '@/hooks/usePartnerDailyTips';
 import { supabase } from '@/integrations/supabase/client';
 import { FRUIT_SIZES } from '@/types/anacan';
+import { translateSymptoms, formatRelativeDateAz } from '@/lib/date-utils';
 import PartnerChatScreen from './partner/PartnerChatScreen';
 import WeeklyStatsTab from './partner/WeeklyStatsTab';
 import NotificationsTab from './partner/NotificationsTab';
@@ -126,14 +127,15 @@ const PartnerDashboard = () => {
   const [newItem, setNewItem] = useState('');
   const [loveMessage, setLoveMessage] = useState('');
 
-  // Convert shopping items from DB to local format
+  // Convert shopping items from DB to local format with timestamps
   const shoppingList = shoppingItems.map(item => ({
     id: item.id,
     name: item.name,
     quantity: item.quantity,
     isChecked: item.is_checked,
     addedBy: (item.added_by || 'woman') as 'partner' | 'woman',
-    priority: item.priority as 'low' | 'medium' | 'high'
+    priority: item.priority as 'low' | 'medium' | 'high',
+    createdAt: item.created_at
   }));
 
   // Use real partner data or fallback
@@ -583,7 +585,7 @@ const PartnerDashboard = () => {
                   <div>
                     <h3 className="font-bold text-amber-800 dark:text-amber-200">Bugünkü simptomlar</h3>
                     <p className="text-sm text-amber-700 dark:text-amber-300">
-                      {womanName} bugün: {womanSymptoms.slice(0, 3).join(', ')}
+                      {womanName} bugün: {translateSymptoms(womanSymptoms).slice(0, 3).join(', ')}
                       {womanSymptoms.length > 3 && ` +${womanSymptoms.length - 3}`}
                     </p>
                   </div>
@@ -871,7 +873,7 @@ const PartnerDashboard = () => {
                           {item.name}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {item.addedBy === 'woman' ? `${womanName}` : 'Sən'} əlavə etdi
+                          {item.addedBy === 'woman' ? `${womanName}` : 'Sən'} • {formatRelativeDateAz(item.createdAt)}
                         </p>
                       </div>
                       <span className="text-sm font-bold text-muted-foreground bg-muted px-2 py-1 rounded-lg shrink-0">

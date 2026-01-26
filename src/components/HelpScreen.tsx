@@ -207,7 +207,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                   <p className={`text-[10px] mt-1 ${
                     reply.is_admin ? 'text-muted-foreground' : 'opacity-70'
                   } ${reply.is_admin ? '' : 'text-right'}`}>
-                    {format(new Date(reply.created_at), 'd MMM, HH:mm', { locale: az })}
+                    {format(new Date(reply.created_at), 'd MMMM, HH:mm', { locale: az })}
                   </p>
                 </div>
               </div>
