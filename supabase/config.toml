@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.apple-auth-notifications]
 verify_jwt = false
+
+[functions.safety-ai-lookup]
+verify_jwt = false

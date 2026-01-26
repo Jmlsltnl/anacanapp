@@ -6,6 +6,7 @@ import { useWeightEntries } from '@/hooks/useWeightEntries';
 import { useWeightRecommendations } from '@/hooks/useDynamicTools';
 import { useUserStore } from '@/store/userStore';
 import { supabase } from '@/integrations/supabase/client';
+import { formatDateAz, formatTimeAz } from '@/lib/date-utils';
 
 interface WeightTrackerProps {
   onBack: () => void;
@@ -247,7 +248,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
             <div className="flex justify-between mt-2">
               {entries.slice(0, 7).reverse().map((entry) => (
                 <span key={entry.id} className="text-[9px] text-muted-foreground text-center flex-1">
-                  {new Date(entry.entry_date).toLocaleDateString('az-AZ', { day: 'numeric', month: 'short' })}
+                  {formatDateAz(entry.entry_date)}
                 </span>
               ))}
             </div>
@@ -274,7 +275,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
                     <div>
                       <p className="font-bold text-foreground">{entry.weight} kg</p>
                       <p className="text-xs text-muted-foreground">
-                        {new Date(entry.created_at).toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' })}, {new Date(entry.created_at).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
+                        {formatDateAz(entry.created_at)}, {formatTimeAz(entry.created_at)}
                       </p>
                     </div>
                   </div>
