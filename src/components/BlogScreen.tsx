@@ -216,52 +216,47 @@ const BlogScreen = ({ onBack }: BlogScreenProps) => {
               </p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {filteredPosts.map((post, index) => (
                 <motion.button
                   key={post.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
+                  transition={{ delay: index * 0.03 }}
                   onClick={() => setSelectedPost(post)}
-                  className="w-full bg-card rounded-2xl p-4 flex gap-4 shadow-card border border-border/50 text-left"
+                  className="w-full bg-card rounded-xl p-2 flex gap-3 shadow-card border border-border/50 text-left"
                 >
                   {post.cover_image_url ? (
                     <img 
                       src={post.cover_image_url} 
                       alt={post.title}
-                      className="w-20 h-20 rounded-xl object-cover shrink-0"
+                      className="w-16 h-16 rounded-lg object-cover shrink-0"
                     />
                   ) : (
-                    <div className="w-20 h-20 rounded-xl gradient-primary flex items-center justify-center shrink-0">
-                      <BookOpen className="w-8 h-8 text-white/50" />
+                    <div className="w-16 h-16 rounded-lg gradient-primary flex items-center justify-center shrink-0">
+                      <BookOpen className="w-6 h-6 text-white/50" />
                     </div>
                   )}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge variant="secondary" className="bg-primary/10 text-primary border-0 text-xs">
+                  <div className="flex-1 min-w-0 h-16 flex flex-col justify-between py-0.5">
+                    <h3 className="font-semibold text-foreground text-sm line-clamp-2 leading-tight">{post.title}</h3>
+                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                      <Badge variant="secondary" className="bg-primary/10 text-primary border-0 text-[10px] px-1.5 py-0 h-4">
                         {categories.find(c => c.slug === post.category)?.name || post.category}
                       </Badge>
+                      <span className="flex items-center gap-0.5">
+                        <Clock className="w-2.5 h-2.5" />
+                        {post.reading_time} dəq
+                      </span>
+                      <span className="flex items-center gap-0.5">
+                        <Eye className="w-2.5 h-2.5" />
+                        {post.view_count}
+                      </span>
                       {savedPosts.includes(post.id) && (
-                        <Bookmark className="w-3.5 h-3.5 text-primary fill-current" />
+                        <Bookmark className="w-3 h-3 text-primary fill-current" />
                       )}
                     </div>
-                    <h3 className="font-bold text-foreground line-clamp-2 mb-1">{post.title}</h3>
-                    {post.excerpt && (
-                      <p className="text-xs text-muted-foreground line-clamp-2">{post.excerpt}</p>
-                    )}
-                    <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        <span>{post.reading_time} dəq</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Eye className="w-3 h-3" />
-                        <span>{post.view_count}</span>
-                      </div>
-                    </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0 self-center" />
+                  <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 self-center" />
                 </motion.button>
               ))}
             </div>
