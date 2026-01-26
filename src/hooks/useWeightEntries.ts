@@ -54,12 +54,14 @@ export const useWeightEntries = () => {
 
       if (error) throw error;
 
+      // Immediately update local state with the new entry
+      setEntries(prev => [data, ...prev]);
+
       toast({
         title: 'Çəki yadda saxlandı! ⚖️',
         description: `${weight} kg`,
       });
 
-      await fetchEntries();
       return data;
     } catch (error: any) {
       console.error('Error adding weight entry:', error);

@@ -1,8 +1,11 @@
 import { useState, forwardRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Search, Check, AlertTriangle, X } from 'lucide-react';
+import { ArrowLeft, Search, Check, AlertTriangle, X, Loader2, Sparkles } from 'lucide-react';
 import { useSafetyItems } from '@/hooks/useDynamicContent';
 import { useSafetyCategories } from '@/hooks/useDynamicTools';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface SafetyLookupProps {
   onBack: () => void;
@@ -12,8 +15,11 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
   const { data: safetyItems = [], isLoading } = useSafetyItems();
   const { data: dbCategories = [], isLoading: categoriesLoading } = useSafetyCategories();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Build categories from DB with "all" option prepended - filter out any existing "all"
   const categories = useMemo(() => {
@@ -68,6 +74,58 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
       case 'warning': return 'Ehtiyatlı olun';
       case 'danger': return 'Təhlükəli';
       default: return 'Naməlum';
+    }
+  };
+
+  // AI search function - called when no results found and user presses search button
+  const handleAISearch = async () => {
+    if (!searchQuery.trim() || searchQuery.trim().length < 2) {
+      toast({
+        title: 'Axtarış sözü daxil edin',
+        description: 'Ən azı 2 simvol yazın',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('safety-ai-lookup', {
+        body: { 
+          query: searchQuery.trim(),
+          category: activeCategory !== 'all' ? activeCategory : undefined 
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.success && data?.item) {
+        // Invalidate cache to refetch items
+        await queryClient.invalidateQueries({ queryKey: ['safety_items'] });
+        
+        // Show the found/generated item
+        setSelectedItem(data.item);
+        
+        toast({
+          title: 'AI ilə tapıldı! ✨',
+          description: `${data.item.name_az} bazaya əlavə edildi`,
+        });
+      } else {
+        toast({
+          title: 'Heç nə tapılmadı',
+          description: 'AI bu maddə haqqında məlumat tapa bilmədi',
+          variant: 'destructive',
+        });
+      }
+    } catch (error: any) {
+      console.error('AI safety lookup error:', error);
+      toast({
+        title: 'Xəta baş verdi',
+        description: error.message || 'AI axtarışı zamanı xəta',
+        variant: 'destructive',
+      });
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -158,7 +216,33 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
             </motion.button>
           ))}
 
-          {filteredItems.length === 0 && (
+          {filteredItems.length === 0 && searchQuery.trim().length >= 2 && (
+            <div className="text-center py-8">
+              <div className="text-4xl mb-3">🔍</div>
+              <p className="text-sm text-muted-foreground mb-4">Bazada tapılmadı</p>
+              <motion.button
+                onClick={handleAISearch}
+                disabled={aiLoading}
+                className="flex items-center gap-2 px-6 py-3 rounded-2xl gradient-primary text-white font-bold shadow-button mx-auto disabled:opacity-50"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {aiLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    AI axtarır...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5" />
+                    AI ilə axtar
+                  </>
+                )}
+              </motion.button>
+            </div>
+          )}
+
+          {filteredItems.length === 0 && searchQuery.trim().length < 2 && (
             <div className="text-center py-8">
               <div className="text-4xl mb-2">🔍</div>
               <p className="text-sm text-muted-foreground">Heç nə tapılmadı</p>
