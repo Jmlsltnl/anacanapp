@@ -131,6 +131,33 @@ export type Database = {
         }
         Relationships: []
       }
+      app_branding: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          key: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          key: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          key?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           created_at: string
@@ -1079,6 +1106,120 @@ export type Database = {
           name?: string
           origin?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      flow_insights: {
+        Row: {
+          category: string | null
+          content: string
+          content_az: string | null
+          created_at: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          phase: string | null
+          sort_order: number | null
+          title: string
+          title_az: string | null
+        }
+        Insert: {
+          category?: string | null
+          content: string
+          content_az?: string | null
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          phase?: string | null
+          sort_order?: number | null
+          title: string
+          title_az?: string | null
+        }
+        Update: {
+          category?: string | null
+          content?: string
+          content_az?: string | null
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          phase?: string | null
+          sort_order?: number | null
+          title?: string
+          title_az?: string | null
+        }
+        Relationships: []
+      }
+      flow_phase_tips: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          phase: string
+          sort_order: number | null
+          tip_text: string
+          tip_text_az: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          phase: string
+          sort_order?: number | null
+          tip_text: string
+          tip_text_az?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          phase?: string
+          sort_order?: number | null
+          tip_text?: string
+          tip_text_az?: string | null
+        }
+        Relationships: []
+      }
+      flow_symptoms: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          emoji: string
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          sort_order: number | null
+          symptom_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          emoji: string
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          sort_order?: number | null
+          symptom_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          emoji?: string
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          sort_order?: number | null
+          symptom_id?: string
         }
         Relationships: []
       }

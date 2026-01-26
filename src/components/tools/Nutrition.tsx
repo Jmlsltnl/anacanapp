@@ -393,6 +393,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                 animate={{ y: 0 }}
                 exit={{ y: '100%' }}
                 className="w-full bg-card rounded-t-2xl p-4"
+                style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 100px)' }}
                 onClick={e => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between mb-4">

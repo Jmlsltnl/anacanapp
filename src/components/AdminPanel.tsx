@@ -20,6 +20,7 @@ import AdminDynamicContent from './admin/AdminDynamicContent';
 import AdminTrimesterTips from './admin/AdminTrimesterTips';
 import AdminPhotoshoot from './admin/AdminPhotoshoot';
 import AdminOrders from './admin/AdminOrders';
+import AdminBranding from './admin/AdminBranding';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -68,6 +69,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminMessages />;
       case 'settings':
         return <AdminSettings />;
+      case 'branding':
+        return <AdminBranding />;
       case 'security':
         return <AdminSecurity />;
       default:
