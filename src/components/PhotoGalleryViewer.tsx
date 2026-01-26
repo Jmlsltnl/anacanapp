@@ -2,12 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { 
   X, Download, Share2, Trash2, ChevronLeft, ChevronRight,
-  ZoomIn, ZoomOut
+  ZoomIn, ZoomOut, Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { isNative, nativeShare } from '@/lib/native';
+import { isNative, nativeShare, saveImageToGallery, isIOS } from '@/lib/native';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -45,6 +45,7 @@ const PhotoGalleryViewer = ({
   const [isZoomed, setIsZoomed] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -89,32 +90,36 @@ const PhotoGalleryViewer = ({
   };
 
   const handleDownload = async () => {
-    if (!currentPhoto) return;
+    if (!currentPhoto || isDownloading) return;
+    
+    setIsDownloading(true);
     handleHaptic();
     
     try {
-      const response = await fetch(currentPhoto.url);
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
+      const fileName = `anacan-baby-photo-${Date.now()}.jpg`;
+      const success = await saveImageToGallery(currentPhoto.url, fileName);
       
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = `baby-photo-${Date.now()}.jpg`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(blobUrl);
-      
-      toast({
-        title: 'Şəkil yükləndi! 📸',
-        description: 'Foto uğurla yükləndi',
-      });
+      if (success) {
+        await Haptics.impact({ style: ImpactStyle.Heavy }).catch(() => {});
+        
+        toast({
+          title: 'Şəkil yadda saxlanıldı! 📸',
+          description: isIOS 
+            ? 'Şəkil Files tətbiqində və ya paylaşım pəncərəsində əlçatandır' 
+            : 'Şəkil Qalereyaya əlavə edildi',
+        });
+      } else {
+        throw new Error('Download failed');
+      }
     } catch (error) {
+      console.error('Download error:', error);
       toast({
         title: 'Xəta',
         description: 'Şəkil yüklənərkən xəta baş verdi',
         variant: 'destructive',
       });
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -308,10 +313,15 @@ const PhotoGalleryViewer = ({
             
             <Button
               onClick={handleDownload}
-              className="flex-1 h-14 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20"
+              disabled={isDownloading}
+              className="flex-1 h-14 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 disabled:opacity-50"
             >
-              <Download className="w-5 h-5 mr-2" />
-              Yüklə
+              {isDownloading ? (
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+              ) : (
+                <Download className="w-5 h-5 mr-2" />
+              )}
+              {isDownloading ? 'Yüklənir...' : 'Yüklə'}
             </Button>
             
             {onDelete && (

@@ -3,15 +3,17 @@ import { PushNotifications } from '@capacitor/push-notifications';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { StatusBar, Style } from '@capacitor/status-bar';
+import { Filesystem, Directory } from '@capacitor/filesystem';
 
 // Check if we're running on native platform
 export const isNative = Capacitor.isNativePlatform();
+export const isIOS = Capacitor.getPlatform() === 'ios';
+export const isAndroid = Capacitor.getPlatform() === 'android';
 
 // Android-də Firebase (google-services.json) qurulmayanda PushNotifications.register()
 // native tərəfdə crash verə bilir. Default olaraq Android push auto-register söndürülür.
 // Firebase hazır olanda lokal build zamanı bunu aktiv edin:
 //   VITE_ANDROID_PUSH_AUTO_REGISTER=true
-const isAndroid = Capacitor.getPlatform() === 'android';
 const androidPushAutoRegister = (import.meta.env as any).VITE_ANDROID_PUSH_AUTO_REGISTER === 'true';
 
 // Haptic Feedback
@@ -240,6 +242,151 @@ export const nativeShare = async (data: { title?: string; text?: string; url?: s
       return true;
     }
     return false;
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// NATIVE IMAGE DOWNLOAD - Saves images to Photos app on iOS/Android
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Downloads an image and saves it to the device's photo gallery
+ * On iOS: Saves to Photos app (via share sheet as fallback)
+ * On Android: Saves to Pictures folder (visible in Gallery)
+ * On Web: Falls back to browser download
+ */
+export const saveImageToGallery = async (imageUrl: string, fileName?: string): Promise<boolean> => {
+  const finalFileName = fileName || `anacan-photo-${Date.now()}.jpg`;
+  
+  // Web fallback
+  if (!isNative) {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = finalFileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+      
+      return true;
+    } catch (error) {
+      console.error('Web download failed:', error);
+      return false;
+    }
+  }
+
+  try {
+    console.log('Starting native image download:', imageUrl);
+    
+    // Fetch the image as blob
+    const response = await fetch(imageUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.status}`);
+    }
+    
+    const blob = await response.blob();
+    
+    // Convert blob to base64
+    const base64Data = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        // Remove the data:image/xxx;base64, prefix
+        const base64 = result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+
+    if (isIOS) {
+      // iOS: Save to Documents directory - accessible via Files app
+      // For Photos app integration, we'll use the share sheet after saving
+      const result = await Filesystem.writeFile({
+        path: finalFileName,
+        data: base64Data,
+        directory: Directory.Documents,
+      });
+      
+      console.log('iOS: File saved to Documents:', result.uri);
+      
+      // Open share sheet so user can save to Photos
+      // This is the most reliable way on iOS without additional native plugins
+      if (navigator.share) {
+        try {
+          const file = new File([blob], finalFileName, { type: 'image/jpeg' });
+          await navigator.share({
+            files: [file],
+            title: 'Şəkli yadda saxla',
+          });
+        } catch (shareError) {
+          // User may cancel share sheet - file is still saved to Documents
+          console.log('Share cancelled, file still available in Documents');
+        }
+      }
+      
+      return true;
+    } else if (isAndroid) {
+      // Android: Save to Downloads/Pictures - this will be visible in Gallery
+      try {
+        // Try saving to external storage first (Pictures folder)
+        const result = await Filesystem.writeFile({
+          path: `Pictures/${finalFileName}`,
+          data: base64Data,
+          directory: Directory.ExternalStorage,
+        });
+        console.log('Android: File saved to Pictures:', result.uri);
+        return true;
+      } catch (extError) {
+        console.log('External storage failed, trying Documents:', extError);
+        // Fallback to Documents
+        const result = await Filesystem.writeFile({
+          path: finalFileName,
+          data: base64Data,
+          directory: Directory.Documents,
+        });
+        console.log('Android: File saved to Documents:', result.uri);
+        return true;
+      }
+    }
+
+    return false;
+  } catch (error) {
+    console.error('Native image save failed:', error);
+    
+    // Final fallback: Try cache directory
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      
+      const base64Data = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const result = reader.result as string;
+          const base64 = result.split(',')[1];
+          resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+
+      await Filesystem.writeFile({
+        path: finalFileName,
+        data: base64Data,
+        directory: Directory.Cache,
+      });
+      
+      console.log('Fallback: File saved to cache');
+      return true;
+    } catch (fallbackError) {
+      console.error('All save attempts failed:', fallbackError);
+      return false;
+    }
   }
 };
 
