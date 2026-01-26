@@ -49,7 +49,10 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
   };
 
   return (
-    <nav className="relative z-50 flex-shrink-0 bg-card border-t border-border/50">
+    <nav 
+      className="relative z-50 flex-shrink-0 bg-card border-t border-border/50"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
       <div className="flex items-center justify-around py-1.5 px-1">
           {(isPartner ? partnerTabs : womanTabs).map((tab) => {
             const Icon = tab.icon;

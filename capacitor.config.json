@@ -10,7 +10,7 @@
     "SplashScreen": {
       "launchShowDuration": 2000,
       "launchAutoHide": true,
-      "backgroundColor": "#F97316",
+      "backgroundColor": "#FAF7F4",
       "androidScaleType": "CENTER_CROP",
       "showSpinner": false,
       "splashFullScreen": true,
@@ -25,13 +25,14 @@
     }
   },
   "ios": {
-    "contentInset": "always",
+    "contentInset": "never",
     "scheme": "Anacan",
-    "backgroundColor": "#F97316"
+    "backgroundColor": "#FAF7F4"
   },
   "android": {
     "allowMixedContent": true,
     "captureInput": true,
-    "webContentsDebuggingEnabled": false
+    "webContentsDebuggingEnabled": false,
+    "backgroundColor": "#FAF7F4"
   }
 }

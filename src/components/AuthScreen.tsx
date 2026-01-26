@@ -273,7 +273,13 @@ const AuthScreen = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background safe-top safe-bottom overflow-hidden">
+    <div 
+      className="fixed inset-0 flex flex-col bg-background overflow-hidden"
+      style={{ 
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)'
+      }}
+    >
       {/* Decorative Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-primary/5 blur-3xl" />

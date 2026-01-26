@@ -27,7 +27,11 @@ const SplashScreen = forwardRef<HTMLDivElement, SplashScreenProps>(({ onComplete
   return (
     <motion.div
       ref={ref}
-      className="fixed inset-0 flex flex-col items-center justify-center gradient-primary safe-top safe-bottom overflow-hidden"
+      className="fixed inset-0 flex flex-col items-center justify-center gradient-primary overflow-hidden"
+      style={{ 
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)'
+      }}
       initial={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 1.1 }}
       transition={{ duration: 0.5 }}

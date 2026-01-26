@@ -96,7 +96,13 @@ const AppIntroduction = ({ onComplete }: AppIntroductionProps) => {
   const SlideIcon = slide.icon;
 
   return (
-    <div className="fixed inset-0 bg-background z-50 flex flex-col safe-top safe-bottom overflow-hidden">
+    <div 
+      className="fixed inset-0 bg-background z-50 flex flex-col overflow-hidden"
+      style={{ 
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)'
+      }}
+    >
       {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
