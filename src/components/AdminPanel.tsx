@@ -21,6 +21,8 @@ import AdminTrimesterTips from './admin/AdminTrimesterTips';
 import AdminPhotoshoot from './admin/AdminPhotoshoot';
 import AdminOrders from './admin/AdminOrders';
 import AdminBranding from './admin/AdminBranding';
+import AdminLegal from './admin/AdminLegal';
+import AdminPushNotifications from './admin/AdminPushNotifications';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -71,6 +73,10 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminSettings />;
       case 'branding':
         return <AdminBranding />;
+      case 'legal':
+        return <AdminLegal />;
+      case 'push-notifications':
+        return <AdminPushNotifications />;
       case 'security':
         return <AdminSecurity />;
       default:

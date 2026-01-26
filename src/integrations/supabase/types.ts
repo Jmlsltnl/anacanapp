@@ -1390,6 +1390,48 @@ export type Database = {
         }
         Relationships: []
       }
+      legal_documents: {
+        Row: {
+          content: string
+          content_az: string | null
+          created_at: string | null
+          document_type: string
+          effective_date: string | null
+          id: string
+          is_active: boolean | null
+          title: string
+          title_az: string | null
+          updated_at: string | null
+          version: string | null
+        }
+        Insert: {
+          content: string
+          content_az?: string | null
+          created_at?: string | null
+          document_type: string
+          effective_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          title: string
+          title_az?: string | null
+          updated_at?: string | null
+          version?: string | null
+        }
+        Update: {
+          content?: string
+          content_az?: string | null
+          created_at?: string | null
+          document_type?: string
+          effective_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          title?: string
+          title_az?: string | null
+          updated_at?: string | null
+          version?: string | null
+        }
+        Relationships: []
+      }
       meal_logs: {
         Row: {
           calories: number
@@ -1533,6 +1575,44 @@ export type Database = {
           sort_order?: number | null
         }
         Relationships: []
+      }
+      notification_send_log: {
+        Row: {
+          body: string
+          id: string
+          notification_id: string | null
+          sent_at: string | null
+          status: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          id?: string
+          notification_id?: string | null
+          sent_at?: string | null
+          status?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          id?: string
+          notification_id?: string | null
+          sent_at?: string | null
+          status?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_send_log_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "scheduled_notifications"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notifications: {
         Row: {
@@ -2691,6 +2771,42 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_notifications: {
+        Row: {
+          body: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          notification_type: string | null
+          priority: number | null
+          target_audience: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          notification_type?: string | null
+          priority?: number | null
+          target_audience?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          notification_type?: string | null
+          priority?: number | null
+          target_audience?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       shop_categories: {
         Row: {
           category_key: string
@@ -3211,7 +3327,9 @@ export type Database = {
       user_preferences: {
         Row: {
           created_at: string
+          daily_push_enabled: boolean | null
           id: string
+          last_push_sent_at: string | null
           last_white_noise_sound: string | null
           push_comments: boolean | null
           push_community: boolean | null
@@ -3225,7 +3343,9 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          daily_push_enabled?: boolean | null
           id?: string
+          last_push_sent_at?: string | null
           last_white_noise_sound?: string | null
           push_comments?: boolean | null
           push_community?: boolean | null
@@ -3239,7 +3359,9 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          daily_push_enabled?: boolean | null
           id?: string
+          last_push_sent_at?: string | null
           last_white_noise_sound?: string | null
           push_comments?: boolean | null
           push_community?: boolean | null
