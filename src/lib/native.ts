@@ -251,7 +251,7 @@ export const nativeShare = async (data: { title?: string; text?: string; url?: s
 
 /**
  * Downloads an image and saves it to the device's photo gallery
- * On iOS: Saves to Photos app (via share sheet as fallback)
+ * On iOS: Opens share sheet for "Save to Photos" action
  * On Android: Saves to Pictures folder (visible in Gallery)
  * On Web: Falls back to browser download
  */
@@ -305,32 +305,27 @@ export const saveImageToGallery = async (imageUrl: string, fileName?: string): P
     });
 
     if (isIOS) {
-      // iOS: Save to Documents directory - accessible via Files app
-      // For Photos app integration, we'll use the share sheet after saving
-      const result = await Filesystem.writeFile({
-        path: finalFileName,
-        data: base64Data,
-        directory: Directory.Documents,
-      });
-      
-      console.log('iOS: File saved to Documents:', result.uri);
-      
-      // Open share sheet so user can save to Photos
-      // This is the most reliable way on iOS without additional native plugins
-      if (navigator.share) {
-        try {
-          const file = new File([blob], finalFileName, { type: 'image/jpeg' });
-          await navigator.share({
-            files: [file],
-            title: 'Şəkli yadda saxla',
-          });
-        } catch (shareError) {
-          // User may cancel share sheet - file is still saved to Documents
-          console.log('Share cancelled, file still available in Documents');
-        }
+      // iOS: Use share sheet to save directly to Photos app
+      // This provides the native "Save to Photos" option immediately
+      try {
+        const file = new File([blob], finalFileName, { type: 'image/jpeg' });
+        await navigator.share({
+          files: [file],
+          title: 'Şəkli yadda saxla',
+        });
+        console.log('iOS: Share sheet opened for saving to Photos');
+        return true;
+      } catch (shareError) {
+        // If share fails or user cancels, fall back to Documents
+        console.log('Share sheet failed/cancelled, saving to Documents:', shareError);
+        const result = await Filesystem.writeFile({
+          path: finalFileName,
+          data: base64Data,
+          directory: Directory.Documents,
+        });
+        console.log('iOS: File saved to Documents:', result.uri);
+        return true;
       }
-      
-      return true;
     } else if (isAndroid) {
       // Android: Save to Downloads/Pictures - this will be visible in Gallery
       try {
