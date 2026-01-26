@@ -4,7 +4,7 @@ import {
   Droplets, Moon, Utensils, Activity, Plus, TrendingUp, Heart, Sparkles, 
   Bell, ChevronRight, Flame, Target, Calendar, Zap, Sun, Cloud, Wind,
   ThermometerSun, Pill, Baby, Footprints, Scale, Clock, Star, Award,
-  MessageCircle, Check, Lightbulb
+  MessageCircle, Check, Lightbulb, BookOpen
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useTimerStore } from '@/store/timerStore';
@@ -24,6 +24,7 @@ import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useTrimesterTips } from '@/hooks/useTrimesterTips';
+import { useFlowSymptoms, useFlowPhaseTips, useFlowInsights } from '@/hooks/useFlowData';
 import FeedingHistoryPanel from '@/components/baby/FeedingHistoryPanel';
 
 // Fetus images by month
@@ -121,6 +122,11 @@ const FlowDashboard = () => {
   const { todayLog, updateWaterIntake, updateSymptoms, loading: logsLoading } = useDailyLogs();
   const cycleData = getCycleData();
   
+  // Fetch dynamic data from database
+  const { data: dbSymptoms = [] } = useFlowSymptoms();
+  const { data: dbPhaseTips = [] } = useFlowPhaseTips(cycleData?.phase);
+  const { data: dbInsights = [] } = useFlowInsights(cycleData?.phase);
+  
   // Use data from DB or defaults
   const waterCount = todayLog?.water_intake || 0;
   const selectedSymptoms = todayLog?.symptoms || [];
@@ -132,39 +138,47 @@ const FlowDashboard = () => {
       message: 'Menstruasiya dövrünüzdesiniz. Özünüzə qulluq edin 💕',
       emoji: '🌸',
       color: 'from-rose-500 to-pink-600',
-      tips: ['Dəmir zəngin qidalar qəbul edin', 'İsti su torbası istifadə edin', 'Yüngül məşqlər edin']
+      phaseName: 'Menstruasiya'
     },
     follicular: { 
       message: 'Enerji artır! Yeni layihələrə başlamaq üçün əla vaxtdır ✨',
       emoji: '🌱',
       color: 'from-emerald-500 to-teal-600',
-      tips: ['Yeni layihələrə başlayın', 'Sosial fəaliyyətlər planlaşdırın', 'İntensiv məşqlər edin']
+      phaseName: 'Follikulyar'
     },
     ovulation: { 
       message: 'Fertil günlərinizdəsiniz. Enerji ən yüksək səviyyədədir! 🌟',
       emoji: '✨',
       color: 'from-amber-500 to-orange-600',
-      tips: ['Enerji səviyyəniz yüksəkdir', 'Kommunikasiya bacarıqlarınız güclüdür', 'Hamiləlik planlaşdırırsınızsa ideal vaxtdır']
+      phaseName: 'Ovulyasiya'
     },
     luteal: { 
       message: 'Sakit qalın, PMS yaxınlaşır. Özünüzə yumşaq olun 🌸',
       emoji: '🌙',
       color: 'from-violet-500 to-purple-600',
-      tips: ['Maqnezium qəbul edin', 'Stress azaldın', 'Yetərli yuxu alın']
+      phaseName: 'Luteal'
     },
   };
 
   const currentPhase = phaseData[cycleData.phase];
   const progress = (cycleData.currentDay / cycleData.cycleLength) * 100;
 
-  const symptoms = [
-    { id: 'headache', label: 'Baş ağrısı', emoji: '🤕' },
-    { id: 'tired', label: 'Yorğunluq', emoji: '😴' },
-    { id: 'cramps', label: 'Sancı', emoji: '😣' },
-    { id: 'mood', label: 'Əsəbilik', emoji: '😤' },
-    { id: 'bloating', label: 'Şişkinlik', emoji: '🎈' },
-    { id: 'acne', label: 'Sızanaq', emoji: '😔' },
-  ];
+  // Use DB symptoms if available, else fallback
+  const symptoms = dbSymptoms.length > 0 
+    ? dbSymptoms.map(s => ({ id: s.symptom_id, label: s.label_az || s.label, emoji: s.emoji }))
+    : [
+        { id: 'headache', label: 'Baş ağrısı', emoji: '🤕' },
+        { id: 'tired', label: 'Yorğunluq', emoji: '😴' },
+        { id: 'cramps', label: 'Sancı', emoji: '😣' },
+        { id: 'mood', label: 'Əsəbilik', emoji: '😤' },
+        { id: 'bloating', label: 'Şişkinlik', emoji: '🎈' },
+        { id: 'acne', label: 'Sızanaq', emoji: '😔' },
+      ];
+
+  // Use DB tips if available
+  const phaseTips = dbPhaseTips.length > 0
+    ? dbPhaseTips.map(t => ({ text: t.tip_text_az || t.tip_text, emoji: t.emoji }))
+    : [];
 
   const toggleSymptom = async (symptomId: string) => {
     await hapticFeedback.light();
@@ -209,9 +223,7 @@ const FlowDashboard = () => {
             <div className="flex items-center gap-1.5 mb-1">
               <span className="text-2xl">{currentPhase.emoji}</span>
               <span className="text-xs font-bold uppercase tracking-wider text-white/80">
-                {cycleData.phase === 'menstrual' ? 'Menstruasiya' :
-                 cycleData.phase === 'follicular' ? 'Follikulyar' :
-                 cycleData.phase === 'ovulation' ? 'Ovulyasiya' : 'Luteal'}
+                {currentPhase.phaseName}
               </span>
             </div>
             <p className="text-white/90 text-xs leading-relaxed">{currentPhase.message}</p>
@@ -252,7 +264,7 @@ const FlowDashboard = () => {
         </div>
       </motion.div>
 
-      {/* Symptoms Selection */}
+      {/* Symptoms Selection - From Database */}
       <motion.div 
         className="bg-card rounded-xl p-3 shadow-card border border-border/50"
         initial={{ y: 20, opacity: 0 }}
@@ -282,34 +294,68 @@ const FlowDashboard = () => {
         </div>
       </motion.div>
 
-      {/* Phase Tips */}
-      <motion.div 
-        className="bg-gradient-to-r from-primary/10 to-accent/10 dark:from-primary/20 dark:to-accent/20 rounded-xl p-3 border border-primary/20"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3 }}
-      >
-        <div className="flex items-center gap-1.5 mb-2">
-          <Sparkles className="w-3.5 h-3.5 text-primary" />
-          <h4 className="text-xs font-bold text-foreground">Bu faza üçün tövsiyələr</h4>
-        </div>
-        <div className="space-y-1">
-          {currentPhase.tips.map((tip, index) => (
-            <motion.div 
-              key={index}
-              className="flex items-center gap-2 p-2 bg-card/60 dark:bg-card/80 rounded-lg"
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.4 + index * 0.1 }}
-            >
-              <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
-                <Star className="w-2.5 h-2.5 text-primary" />
-              </div>
-              <span className="text-xs text-foreground">{tip}</span>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
+      {/* Phase Tips - From Database */}
+      {phaseTips.length > 0 && (
+        <motion.div 
+          className="bg-gradient-to-r from-flow/10 to-flow-light/10 dark:from-flow/20 dark:to-flow-light/20 rounded-xl p-3 border border-flow/20"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          <div className="flex items-center gap-1.5 mb-2">
+            <Sparkles className="w-3.5 h-3.5 text-flow" />
+            <h4 className="text-xs font-bold text-foreground">{currentPhase.phaseName} fazası üçün tövsiyələr</h4>
+          </div>
+          <div className="space-y-1">
+            {phaseTips.slice(0, 4).map((tip, index) => (
+              <motion.div 
+                key={index}
+                className="flex items-center gap-2 p-2 bg-card/60 dark:bg-card/80 rounded-lg"
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.4 + index * 0.1 }}
+              >
+                <span className="text-sm">{tip.emoji}</span>
+                <span className="text-xs text-foreground">{tip.text}</span>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Health Insights - From Database */}
+      {dbInsights.length > 0 && (
+        <motion.div 
+          className="bg-card rounded-xl p-3 shadow-card border border-border/50"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.35 }}
+        >
+          <div className="flex items-center gap-1.5 mb-2">
+            <BookOpen className="w-3.5 h-3.5 text-flow" />
+            <h4 className="text-xs font-bold text-foreground">Sağlamlıq məsləhətləri</h4>
+          </div>
+          <div className="space-y-2">
+            {dbInsights.slice(0, 2).map((insight, index) => (
+              <motion.div 
+                key={insight.id}
+                className="p-3 bg-muted/50 dark:bg-muted/30 rounded-lg"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45 + index * 0.1 }}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-lg">{insight.emoji}</span>
+                  <h5 className="text-sm font-bold text-foreground">{insight.title_az || insight.title}</h5>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {insight.content_az || insight.content}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      )}
 
       {/* Next Period Prediction */}
       <motion.div 

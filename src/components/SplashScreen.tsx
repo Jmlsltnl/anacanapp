@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useEffect, forwardRef, useRef } from 'react';
 import logoImage from '@/assets/logo.png';
+import { useAppBranding, getBrandingUrl } from '@/hooks/useAppBranding';
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -9,6 +10,10 @@ interface SplashScreenProps {
 const SplashScreen = forwardRef<HTMLDivElement, SplashScreenProps>(({ onComplete }, ref) => {
   // Keep the splash auto-close timer stable even if parent re-renders.
   const onCompleteRef = useRef(onComplete);
+  const { data: branding = [] } = useAppBranding();
+  
+  // Get custom splash logo from database
+  const customSplashLogo = getBrandingUrl(branding, 'splash_logo');
 
   useEffect(() => {
     onCompleteRef.current = onComplete;
@@ -146,7 +151,7 @@ const SplashScreen = forwardRef<HTMLDivElement, SplashScreenProps>(({ onComplete
               transition={{ delay: 0.3, duration: 0.6, type: "spring", stiffness: 200 }}
             >
               <img 
-                src={logoImage} 
+                src={customSplashLogo || logoImage} 
                 alt="Anacan Logo" 
                 className="w-24 h-24 object-contain"
               />

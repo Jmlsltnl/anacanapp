@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAppBranding, getBrandingUrl } from '@/hooks/useAppBranding';
 
 type AuthMode = 'login' | 'register' | 'partner' | 'forgot-password';
 
@@ -20,6 +21,10 @@ const AuthScreen = () => {
   
   const { signIn, signUp, signInWithGoogle } = useAuth();
   const { toast } = useToast();
+  const { data: branding = [] } = useAppBranding();
+  
+  // Get custom login logo from database
+  const customLoginLogo = getBrandingUrl(branding, 'login_logo');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -300,17 +305,21 @@ const AuthScreen = () => {
         >
           {/* Logo */}
           <motion.div 
-            className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-5 shadow-lg border border-white/20"
+            className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-5 shadow-lg border border-white/20 overflow-hidden"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <svg viewBox="0 0 60 60" className="w-10 h-10">
-              <path
-                d="M30 8 L48 52 L42 52 L38 42 L22 42 L18 52 L12 52 L30 8Z M30 20 L24 36 L36 36 L30 20Z"
-                fill="white"
-              />
-              <circle cx="30" cy="18" r="4" fill="white" />
-            </svg>
+            {customLoginLogo ? (
+              <img src={customLoginLogo} alt="Anacan Logo" className="w-12 h-12 object-contain" />
+            ) : (
+              <svg viewBox="0 0 60 60" className="w-10 h-10">
+                <path
+                  d="M30 8 L48 52 L42 52 L38 42 L22 42 L18 52 L12 52 L30 8Z M30 20 L24 36 L36 36 L30 20Z"
+                  fill="white"
+                />
+                <circle cx="30" cy="18" r="4" fill="white" />
+              </svg>
+            )}
           </motion.div>
           <h1 className="text-4xl font-black text-white tracking-tight">Anacan</h1>
           <p className="text-white/80 mt-2 font-medium">Bədəninlə harmoniyada ol</p>
