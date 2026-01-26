@@ -1,95 +1,57 @@
 
-# Tam Ekran Native Tətbiq Planı
+## Problem Analysis
 
-## Problem Analizi
-Hazırda yuxarı və aşağı zonalarda narıncı boşluq görünür çünki:
-1. `capacitor.config.json`-da `backgroundColor: "#F97316"` təyin olunub
-2. `contentInset: "always"` WebView-a əlavə padding əlavə edir
-3. CSS-də `paddingTop/paddingBottom` safe-area ilə ikiqat padding yaranır
+Mağaza (Shop) bölməsində scroll işləmir. Problemi araşdırdım:
 
-## Həll Yolu
+### Səbəb
 
-### 1. Capacitor Konfiqurasiyası
-`contentInset: "never"` təyin etmək - WebView-un özünün safe-area padding əlavə etməsini dayandıracaq. Sonra CSS ilə özümüz idarə edəcik. `backgroundColor`-u səhifə fonuna uyğun `#faf7f4` (beige) etmək.
+`ShopScreen` komponenti `Index.tsx`-də "sub-screen" olaraq birbaşa return edilir (sətir 244-245). Bu o deməkdir ki, o, əsas scroll container-dən (sətir 262-dəki `flex-1 overflow-y-auto`) kənarda qalır.
 
-### 2. Ana Layout Strukturu
-`Index.tsx`-da:
-- Əsas konteynerə `fixed inset-0` tətbiq etmək (tam ekran)
-- Safe-area padding-i silmək ana konteynerdən
-- Header zonası üçün ayrıca div yaratmaq (status bar rəngi üçün)
-- Footer zonası üçün BottomNav-a safe-area padding əlavə etmək
+Digər oxşar ekranlar (`BlogScreen`, `SettingsScreen`) öz scroll strukturlarını təyin edir, lakin `ShopScreen` bunu etmir:
+- `BlogScreen`: `min-h-screen bg-background pb-24` istifadə edir
+- `SettingsScreen`: `min-h-screen bg-background` istifadə edir  
+- `ShopScreen`: Yalnız `pb-28 pt-2 px-5` - scroll wrapper yoxdur
 
-### 3. Yeni Layout Strukturu
-```text
-┌─────────────────────────────┐
-│ Status Bar Arxa Planı      │ ← bg-card rəngi (header fonu)
-│ (safe-area-inset-top)      │
-├─────────────────────────────┤
-│                             │
-│     Scrollable Content      │ ← flex-1 overflow-y-auto
-│                             │
-├─────────────────────────────┤
-│ Bottom Navigation           │ ← bg-card rəngi
-│ (safe-area-inset-bottom)   │
-└─────────────────────────────┘
-```
+### Həll Yolu
 
-### 4. BottomNav Dəyişiklikləri
-- `pb-[env(safe-area-inset-bottom)]` əlavə etmək ki, home indicator zonası nav fonu ilə dolsun.
+`ShopScreen.tsx`-i digər sub-screen-lər kimi düzəltmək lazımdır:
 
-### 5. Digər Səhifələr
-AuthScreen, SplashScreen, AppIntroduction və digər tam-ekran səhifələr üçün yoxlamaq və lazım olsa düzəltmək ki, onlar da eyni prinsipi izləsin.
+1. Əsas container-ə scroll davranışı əlavə et
+2. `min-h-screen` və `overflow-y-auto` əlavə et
 
 ---
 
 ## Texniki Dəyişikliklər
 
-### capacitor.config.json
-- `contentInset`: `"always"` → `"never"`
-- `backgroundColor`: `"#F97316"` → `"#faf7f4"` (beige - səhifə fonu)
+### Fayl: `src/components/ShopScreen.tsx`
 
-### src/pages/Index.tsx
-Əsas return blokunu yenidən strukturlaşdırmaq:
+**Sətir 137:** Əsas container-i dəyişdir:
+
 ```tsx
-<div className="fixed inset-0 flex flex-col bg-background overflow-hidden">
-  {/* Yuxarı safe-area (card fonu ilə) */}
-  <div 
-    className="bg-card flex-shrink-0" 
-    style={{ height: 'env(safe-area-inset-top)' }} 
-  />
-  
-  {/* Əsas scrollable məzmun */}
-  <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-none">
-    <AnimatePresence mode="wait">
-      {renderContent()}
-    </AnimatePresence>
-  </div>
-  
-  {/* Bottom nav (safe-area daxil) */}
-  <BottomNav ... />
-</div>
+// Əvvəl:
+<div className="pb-28 pt-2 px-5">
+
+// Sonra:
+<div className="min-h-screen bg-background overflow-y-auto pb-28 pt-2 px-5">
 ```
 
-### src/components/BottomNav.tsx
-- Nav konteynerinə `pb-[env(safe-area-inset-bottom)]` əlavə etmək
-
-### src/index.css
-- `html` və `body`-ə `position: fixed` və `inset: 0` əlavə etmək
-- `#root`-u da eyni şəkildə nizamlamaq
-
-### index.html
-- Body background rəngini `#faf7f4` saxlamaq (artıq var)
-
-### Digər səhifələr
-AuthScreen, SplashScreen, AppIntroduction-da safe-area idarəetməsini yoxlamaq.
+Bu dəyişiklik:
+- `min-h-screen` - tam ekran hündürlüyü təmin edir
+- `bg-background` - arxa fon rəngi digər ekranlarla uyğunlaşır
+- `overflow-y-auto` - şaquli scroll imkanı verir
 
 ---
 
-## Nəticə
-Bu dəyişikliklərdən sonra:
-- Status bar zonası header/content fonu ilə dolacaq
-- Home indicator zonası navigation fonu ilə dolacaq
-- Heç bir "artıq" narıncı rəng görünməyəcək
-- Tətbiq tam ekran native tətbiq kimi görünəcək
+## Əlavə olaraq
 
-Build etdikdən sonra `npx cap sync ios && npx cap sync android` çalışdırmaq lazımdır.
+Həmçinin loading və admin-only hallarını da yeniləmək lazımdır ki, onlar da eyni şəkildə scroll olunsun:
+
+**Sətir 108 (admin-only):**
+```tsx
+<div className="min-h-screen bg-background overflow-y-auto pb-28 pt-2 px-5 flex flex-col items-center justify-center text-center">
+```
+
+**Sətir 129-130 (loading):**
+```tsx
+<div className="min-h-screen bg-background flex items-center justify-center">
+```
