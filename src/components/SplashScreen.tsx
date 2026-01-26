@@ -12,8 +12,8 @@ const SplashScreen = forwardRef<HTMLDivElement, SplashScreenProps>(({ onComplete
   const onCompleteRef = useRef(onComplete);
   const { data: branding = [] } = useAppBranding();
   
-  // Get custom splash logo from database
-  const customSplashLogo = getBrandingUrl(branding, 'splash_logo');
+  // Get custom logo from database (same as login logo)
+  const customLogo = getBrandingUrl(branding, 'login_logo');
 
   useEffect(() => {
     onCompleteRef.current = onComplete;
@@ -151,7 +151,7 @@ const SplashScreen = forwardRef<HTMLDivElement, SplashScreenProps>(({ onComplete
               transition={{ delay: 0.3, duration: 0.6, type: "spring", stiffness: 200 }}
             >
               <img 
-                src={customSplashLogo || logoImage} 
+                src={customLogo || logoImage} 
                 alt="Anacan Logo" 
                 className="w-24 h-24 object-contain"
               />
@@ -176,7 +176,7 @@ const SplashScreen = forwardRef<HTMLDivElement, SplashScreenProps>(({ onComplete
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.7, duration: 0.5 }}
         >
-          Bədəninlə harmoniyada ol
+          Ən yaxın rəfiqəniz
         </motion.p>
 
         {/* Decorative line */}
