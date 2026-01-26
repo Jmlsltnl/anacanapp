@@ -2,13 +2,13 @@ import { useState, forwardRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Utensils, Apple, Coffee, Droplets, 
-  Plus, Star, X, Check, Trash2, ChefHat, Clock, Heart, Leaf, Search, Users, Pill
+  Plus, Star, X, Check, Trash2, Leaf, Heart
 } from 'lucide-react';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useMealLogs } from '@/hooks/useMealLogs';
-import { useNutritionTips, useRecipes, Recipe } from '@/hooks/useDynamicContent';
+import { useNutritionTips } from '@/hooks/useDynamicContent';
 import { useCommonFoods } from '@/hooks/useDynamicConfig';
-import { useMealTypes, useNutritionTargets, useRecipeCategories } from '@/hooks/useDynamicTools';
+import { useMealTypes, useNutritionTargets } from '@/hooks/useDynamicTools';
 import { useUserStore } from '@/store/userStore';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -51,26 +51,20 @@ const mealIcons: Record<string, any> = {
 };
 
 const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) => {
-  const [activeTab, setActiveTab] = useState<'log' | 'recipes' | 'tips' | 'vitamins' | 'water'>('log');
+  const [activeTab, setActiveTab] = useState<'log' | 'tips' | 'vitamins' | 'water'>('log');
   const [selectedMeal, setSelectedMeal] = useState<string | null>(null);
-  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
-  const [recipeCategory, setRecipeCategory] = useState('all');
-  const [recipeSearch, setRecipeSearch] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [customFood, setCustomFood] = useState({ name: '', calories: '' });
-  const [favorites, setFavorites] = useState<string[]>([]);
   
   const { todayLog, loading: logsLoading, updateWaterIntake } = useDailyLogs();
   const { loading: mealLoading, addMealLog, deleteMealLog, getTodayStats, getMealsByType } = useMealLogs();
   const { data: nutritionTips = [], isLoading: tipsLoading } = useNutritionTips();
-  const { data: recipes = [], isLoading: recipesLoading } = useRecipes();
   const { data: dbFoods = [], isLoading: foodsLoading } = useCommonFoods();
   const { lifeStage } = useUserStore();
   
   // Dynamic data from database
   const { data: dbMealTypes = [] } = useMealTypes(lifeStage || 'flow');
   const { data: dbTargets = [] } = useNutritionTargets();
-  const { data: dbRecipeCategories = [] } = useRecipeCategories(lifeStage || 'flow');
   
   // Use DB foods or fallback
   const commonFoods = dbFoods.length > 0 
@@ -112,31 +106,9 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
     return { calories: fallback.calories, water: fallback.water_glasses, description: fallback.description_az };
   }, [dbTargets, lifeStage]);
   
-  // Get recipe categories from DB or use fallback - filter out any existing "all"
-  const recipeCategories = useMemo(() => {
-    const base = [{ id: 'all', name: 'Hamısı', emoji: '🍽️' }];
-    if (dbRecipeCategories.length > 0) {
-      const filtered = dbRecipeCategories
-        .filter(c => c.category_id !== 'all' && c.name.toLowerCase() !== 'hamısı')
-        .map(c => ({
-          id: c.category_id,
-          name: c.name_az || c.name,
-          emoji: c.emoji || '🍽️',
-        }));
-      return [...base, ...filtered];
-    }
-    return base;
-  }, [dbRecipeCategories]);
-  
   const waterGlasses = todayLog?.water_intake || 0;
   const stats = getTodayStats();
   const todayCalories = stats.totalCalories;
-
-  const toggleFavorite = (recipeId: string) => {
-    setFavorites(prev => 
-      prev.includes(recipeId) ? prev.filter(id => id !== recipeId) : [...prev, recipeId]
-    );
-  };
 
   const addWater = async () => {
     if (waterGlasses < 12) {
@@ -171,112 +143,12 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
     await deleteMealLog(id);
   };
 
-  // Filter recipes
-  const filteredRecipes = recipes.filter(recipe => {
-    const matchesCategory = recipeCategory === 'all' || recipe.category === recipeCategory;
-    const matchesSearch = recipe.title.toLowerCase().includes(recipeSearch.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
-
-  const loading = logsLoading || tipsLoading || mealLoading || recipesLoading;
+  const loading = logsLoading || tipsLoading || mealLoading;
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  // Recipe detail view
-  if (selectedRecipe) {
-    return (
-      <div ref={ref} className="min-h-screen bg-background pb-24">
-        <div className="gradient-primary px-3 pt-3 pb-6 rounded-b-[1.5rem]">
-          <div className="flex items-center gap-3">
-            <motion.button
-              onClick={() => setSelectedRecipe(null)}
-              className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}
-            >
-              <ArrowLeft className="w-4 h-4 text-white" />
-            </motion.button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-white">{selectedRecipe.title}</h1>
-              <p className="text-white/80 text-xs">{selectedRecipe.category}</p>
-            </div>
-            <motion.button
-              onClick={() => toggleFavorite(selectedRecipe.id)}
-              className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}
-            >
-              <Heart className={`w-4 h-4 ${favorites.includes(selectedRecipe.id) ? 'fill-red-400 text-red-400' : 'text-white'}`} />
-            </motion.button>
-          </div>
-        </div>
-
-        <div className="px-3 py-3 space-y-3">
-          <motion.div 
-            className="bg-card rounded-2xl p-4 text-center shadow-card"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <span className="text-5xl">{selectedRecipe.emoji || '🍽️'}</span>
-            <div className="flex justify-center gap-4 mt-3">
-              <div className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-                <span className="text-xs">{selectedRecipe.prep_time || 0} dəq</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5 text-muted-foreground" />
-                <span className="text-xs">{selectedRecipe.servings || 1} porsiya</span>
-              </div>
-            </div>
-          </motion.div>
-
-          {selectedRecipe.ingredients && selectedRecipe.ingredients.length > 0 && (
-            <motion.div 
-              className="bg-card rounded-2xl p-3 shadow-card"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <h3 className="font-bold text-foreground mb-2 flex items-center gap-2 text-sm">
-                <ChefHat className="w-4 h-4 text-orange-500" />
-                İnqrediyentlər
-              </h3>
-              <ul className="space-y-1.5">
-                {selectedRecipe.ingredients.map((ingredient: string, index: number) => (
-                  <li key={index} className="flex items-center gap-2 text-xs text-foreground">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                    {ingredient}
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          )}
-
-          {selectedRecipe.instructions && selectedRecipe.instructions.length > 0 && (
-            <motion.div 
-              className="bg-card rounded-2xl p-3 shadow-card"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <h3 className="font-bold text-foreground mb-2 text-sm">Hazırlanması</h3>
-              <ol className="space-y-2">
-                {selectedRecipe.instructions.map((instruction: string, index: number) => (
-                  <li key={index} className="flex items-start gap-2 text-xs text-foreground">
-                    <div className="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold">
-                      {index + 1}
-                    </div>
-                    {instruction}
-                  </li>
-                ))}
-              </ol>
-            </motion.div>
-          )}
-        </div>
       </div>
     );
   }
@@ -494,7 +366,6 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
         <div className="bg-card rounded-xl p-1 flex gap-0.5 shadow-lg">
           {[
             { id: 'log', label: 'Yemək' },
-            { id: 'recipes', label: 'Reseptlər' },
             { id: 'vitamins', label: 'Vitaminlər' },
             { id: 'tips', label: 'Tövsiyələr' },
             { id: 'water', label: 'Su' },
@@ -562,92 +433,6 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                   </motion.button>
                 );
               })}
-            </motion.div>
-          )}
-
-          {activeTab === 'recipes' && (
-            <motion.div
-              key="recipes"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              className="space-y-3"
-            >
-              {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  value={recipeSearch}
-                  onChange={(e) => setRecipeSearch(e.target.value)}
-                  placeholder="Resept axtar..."
-                  className="pl-9 h-9 text-sm"
-                />
-              </div>
-
-              {/* Categories */}
-              <div className="flex gap-1.5 overflow-x-auto hide-scrollbar pb-1">
-                {recipeCategories.map((category) => (
-                  <motion.button
-                    key={category.id}
-                    onClick={() => setRecipeCategory(category.id)}
-                    className={`flex-shrink-0 px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition-all ${
-                      recipeCategory === category.id
-                        ? 'bg-primary text-white'
-                        : 'bg-muted text-muted-foreground'
-                    }`}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <span className="text-sm">{category.emoji}</span>
-                    <span className="text-[10px] font-medium">{category.name}</span>
-                  </motion.button>
-                ))}
-              </div>
-
-              {/* Recipes list */}
-              <div className="space-y-2">
-                {filteredRecipes.map((recipe, index) => (
-                  <motion.button
-                    key={recipe.id}
-                    onClick={() => setSelectedRecipe(recipe)}
-                    className="w-full bg-card rounded-xl p-3 shadow-card flex items-center gap-3 text-left"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.03 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center text-2xl">
-                      {recipe.emoji || '🍽️'}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-foreground truncate text-sm">{recipe.title}</h3>
-                      <p className="text-[10px] text-muted-foreground">{recipe.category}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[9px] text-muted-foreground flex items-center gap-0.5">
-                          <Clock className="w-2.5 h-2.5" />
-                          {recipe.prep_time || 0} dəq
-                        </span>
-                      </div>
-                    </div>
-                    <motion.button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleFavorite(recipe.id);
-                      }}
-                      className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <Heart className={`w-4 h-4 ${favorites.includes(recipe.id) ? 'fill-red-400 text-red-400' : 'text-muted-foreground'}`} />
-                    </motion.button>
-                  </motion.button>
-                ))}
-              </div>
-
-              {filteredRecipes.length === 0 && (
-                <div className="text-center py-8">
-                  <ChefHat className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-muted-foreground text-sm">Resept tapılmadı</p>
-                </div>
-              )}
             </motion.div>
           )}
 

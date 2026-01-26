@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Shield, Timer, Scale, Baby, Briefcase, 
   Volume2, Heart, Footprints, ChevronRight,
-  Utensils, Activity, ArrowLeft, Camera, Lock, ShoppingCart, LucideIcon, Wrench, BookOpen
+  Utensils, Activity, ArrowLeft, Camera, Lock, ShoppingCart, LucideIcon, Wrench, BookOpen, ChefHat
 } from 'lucide-react';
 import BlogScreen from '@/components/BlogScreen';
 import { useUserStore } from '@/store/userStore';
@@ -20,6 +20,7 @@ import Exercises from './tools/Exercises';
 import MoodDiary from './tools/MoodDiary';
 import BabyPhotoshoot from './tools/BabyPhotoshoot';
 import ShoppingList from './tools/ShoppingList';
+import Recipes from './tools/Recipes';
 import { useToast } from '@/hooks/use-toast';
 import { useToolConfigs } from '@/hooks/useDynamicTools';
 
@@ -50,6 +51,7 @@ const iconMap: Record<string, LucideIcon> = {
   'Heart': Heart,
   'Wrench': Wrench,
   'BookOpen': BookOpen,
+  'ChefHat': ChefHat,
 };
 
 interface ToolsHubProps {
@@ -166,6 +168,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   if (activeTool === 'exercise' || activeTool === 'exercises') return <Exercises onBack={handleBack} />;
   if (activeTool === 'mood' || activeTool === 'mood-diary') return <MoodDiary onBack={handleBack} />;
   if (activeTool === 'blog') return <BlogScreen onBack={handleBack} />;
+  if (activeTool === 'recipes') return <Recipes onBack={handleBack} />;
 
   return (
     <div className="pb-4 pt-3 px-3">
@@ -207,6 +210,32 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
           <div>
             <h3 className="text-white font-bold text-sm">Körpə Fotosessiyası</h3>
             <p className="text-white/80 text-xs">AI ilə unikal körpə fotoları yaradın</p>
+          </div>
+          <ChevronRight className="w-5 h-5 text-white/60 ml-auto" />
+        </div>
+      </motion.button>
+
+      {/* Featured Tool - Recipes Banner */}
+      <motion.button
+        onClick={() => setActiveTool('recipes')}
+        className="relative w-full overflow-hidden rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-red-400 p-4 shadow-elevated text-left mb-2"
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.1 }}
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.99 }}
+      >
+        <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 blur-2xl" />
+        <div className="absolute right-4 bottom-2 opacity-20">
+          <ChefHat className="w-16 h-16 text-white" />
+        </div>
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+            <ChefHat className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h3 className="text-white font-bold text-sm">Reseptlər</h3>
+            <p className="text-white/80 text-xs">Sağlam və ləzzətli yeməklər</p>
           </div>
           <ChevronRight className="w-5 h-5 text-white/60 ml-auto" />
         </div>
