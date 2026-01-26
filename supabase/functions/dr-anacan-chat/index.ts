@@ -256,35 +256,49 @@ Deno.serve(async (req) => {
       parts: [{ text: m.content }]
     }));
 
-    const geminiModel = 'gemini-2.0-flash';
-    const endpoint = stream 
-      ? `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:streamGenerateContent?key=${GEMINI_API_KEY}&alt=sse`
-      : `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${GEMINI_API_KEY}`;
+    // Helper function to make Gemini API request
+    const makeGeminiRequest = async (model: string) => {
+      const endpoint = stream 
+        ? `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${GEMINI_API_KEY}&alt=sse`
+        : `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
 
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        contents: contents,
-        systemInstruction: {
-          parts: [{ text: systemPrompt }]
+      return await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 2048,
-        },
-        safetySettings: [
-          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-        ],
-      }),
-    });
+        body: JSON.stringify({
+          contents: contents,
+          systemInstruction: {
+            parts: [{ text: systemPrompt }]
+          },
+          generationConfig: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 2048,
+          },
+          safetySettings: [
+            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          ],
+        }),
+      });
+    };
+
+    // Try primary model first (gemini-2.0-flash)
+    const primaryModel = 'gemini-2.0-flash';
+    const fallbackModel = 'gemini-2.5-pro';
+    
+    let response = await makeGeminiRequest(primaryModel);
+
+    // If rate limited, fallback to gemini-2.5-pro
+    if (response.status === 429) {
+      console.log('Primary model rate limited, falling back to gemini-2.5-pro');
+      response = await makeGeminiRequest(fallbackModel);
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
