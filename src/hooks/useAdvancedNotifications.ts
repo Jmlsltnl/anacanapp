@@ -1,6 +1,81 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+// ==================== AUDIENCE STATS ====================
+export interface AudienceStats {
+  total_users: number;
+  users_with_tokens: number;
+  by_audience: {
+    all: { users: number; tokens: number };
+    flow: { users: number; tokens: number };
+    bump: { users: number; tokens: number };
+    mommy: { users: number; tokens: number };
+    partner: { users: number; tokens: number };
+  };
+}
+
+export const useAudienceStats = () => {
+  return useQuery({
+    queryKey: ['audience-stats'],
+    queryFn: async (): Promise<AudienceStats> => {
+      // Get all profiles
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('user_id, life_stage, role');
+
+      if (profilesError) throw profilesError;
+
+      // Get all device tokens
+      const { data: tokens, error: tokensError } = await supabase
+        .from('device_tokens')
+        .select('user_id');
+
+      if (tokensError) throw tokensError;
+
+      const tokenUserIds = new Set(tokens?.map(t => t.user_id) || []);
+
+      const stats: AudienceStats = {
+        total_users: profiles?.length || 0,
+        users_with_tokens: tokenUserIds.size,
+        by_audience: {
+          all: { users: profiles?.length || 0, tokens: tokenUserIds.size },
+          flow: { users: 0, tokens: 0 },
+          bump: { users: 0, tokens: 0 },
+          mommy: { users: 0, tokens: 0 },
+          partner: { users: 0, tokens: 0 },
+        },
+      };
+
+      profiles?.forEach(profile => {
+        const hasToken = tokenUserIds.has(profile.user_id);
+        
+        // Check life_stage for partner (from profiles table)
+        const lifeStage = profile.life_stage as string;
+        
+        if (lifeStage === 'flow') {
+          stats.by_audience.flow.users++;
+          if (hasToken) stats.by_audience.flow.tokens++;
+        } else if (lifeStage === 'bump') {
+          stats.by_audience.bump.users++;
+          if (hasToken) stats.by_audience.bump.tokens++;
+        } else if (lifeStage === 'mommy') {
+          stats.by_audience.mommy.users++;
+          if (hasToken) stats.by_audience.mommy.tokens++;
+        }
+        
+        // Partners are identified by role in profiles (cast to string to avoid type error)
+        if ((profile.role as string) === 'partner') {
+          stats.by_audience.partner.users++;
+          if (hasToken) stats.by_audience.partner.tokens++;
+        }
+      });
+
+      return stats;
+    },
+    staleTime: 30000, // Cache for 30 seconds
+  });
+};
+
 // ==================== PREGNANCY DAY NOTIFICATIONS ====================
 export interface PregnancyDayNotification {
   id: string;

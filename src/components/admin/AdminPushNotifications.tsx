@@ -28,7 +28,9 @@ import {
   useBulkPushNotifications,
   useCreateBulkPushNotification,
   useSendBulkPushNotification,
+  useAudienceStats,
 } from '@/hooks/useAdvancedNotifications';
+import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 
 const audienceLabels: Record<string, { label: string; icon: any; color: string }> = {
@@ -580,6 +582,7 @@ const PregnancyDayNotificationsTab = () => {
 // ==================== BULK PUSH TAB ====================
 const BulkPushTab = () => {
   const { data: history = [], isLoading } = useBulkPushNotifications();
+  const { data: stats, isLoading: statsLoading } = useAudienceStats();
   const createBulk = useCreateBulkPushNotification();
   const sendBulk = useSendBulkPushNotification();
 
@@ -590,9 +593,21 @@ const BulkPushTab = () => {
   });
   const [isSending, setIsSending] = useState(false);
 
+  const getTargetStats = (audience: string) => {
+    if (!stats) return { users: 0, tokens: 0 };
+    return stats.by_audience[audience as keyof typeof stats.by_audience] || { users: 0, tokens: 0 };
+  };
+
+  const currentTargetStats = getTargetStats(form.target_audience);
+
   const handleSendNow = async () => {
     if (!form.title || !form.body) {
       toast.error('Başlıq və mətn tələb olunur');
+      return;
+    }
+
+    if (currentTargetStats.tokens === 0) {
+      toast.error('Seçilmiş auditoriyada heç bir qeydiyyatlı cihaz yoxdur!');
       return;
     }
 
@@ -604,7 +619,11 @@ const BulkPushTab = () => {
       // Trigger send
       const result = await sendBulk.mutateAsync(notification.id);
       
-      toast.success(`${result.sent} istifadəçiyə göndərildi!`);
+      if (result.sent > 0) {
+        toast.success(`${result.sent} cihaza göndərildi!`);
+      } else {
+        toast.warning('Heç bir cihaza göndərilə bilmədi. Qeydiyyatlı cihaz yoxdur.');
+      }
       setForm({ title: '', body: '', target_audience: 'all' });
     } catch (error: any) {
       toast.error(error.message || 'Göndərmə xətası');
@@ -613,12 +632,74 @@ const BulkPushTab = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || statsLoading) {
     return <LoadingSpinner />;
   }
 
+  const audienceOptions = [
+    { value: 'all', label: '🌍 Hamı', color: 'bg-blue-500' },
+    { value: 'flow', label: '🌙 Menstruasiya', color: 'bg-pink-500' },
+    { value: 'bump', label: '🤰 Hamilə', color: 'bg-orange-500' },
+    { value: 'mommy', label: '👩‍👧 Ana', color: 'bg-red-500' },
+    { value: 'partner', label: '💑 Partnyor', color: 'bg-purple-500' },
+  ];
+
   return (
     <div className="space-y-6">
+      {/* Global Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className="p-4 text-center">
+          <div className="text-3xl font-bold text-primary">{stats?.total_users || 0}</div>
+          <div className="text-sm text-muted-foreground">Ümumi İstifadəçi</div>
+        </Card>
+        <Card className="p-4 text-center">
+          <div className="text-3xl font-bold text-green-500">{stats?.users_with_tokens || 0}</div>
+          <div className="text-sm text-muted-foreground">Qeydiyyatlı Cihaz</div>
+        </Card>
+        <Card className="p-4 text-center">
+          <div className="text-3xl font-bold text-yellow-500">
+            {stats?.total_users ? Math.round((stats.users_with_tokens / stats.total_users) * 100) : 0}%
+          </div>
+          <div className="text-sm text-muted-foreground">Əhatə Dairəsi</div>
+        </Card>
+        <Card className="p-4 text-center">
+          <div className="text-3xl font-bold text-blue-500">{history.length}</div>
+          <div className="text-sm text-muted-foreground">Göndərilmiş Kampaniya</div>
+        </Card>
+      </div>
+
+      {/* Audience Breakdown */}
+      <Card className="p-4">
+        <h4 className="font-medium mb-4 flex items-center gap-2">
+          <Users className="h-4 w-4" />
+          Auditoriya Statistikası
+        </h4>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          {audienceOptions.map(({ value, label, color }) => {
+            const audienceStats = getTargetStats(value);
+            const percentage = audienceStats.users > 0 ? Math.round((audienceStats.tokens / audienceStats.users) * 100) : 0;
+            return (
+              <div 
+                key={value} 
+                className={`p-3 rounded-lg border-2 transition-all cursor-pointer ${
+                  form.target_audience === value 
+                    ? 'border-primary bg-primary/5' 
+                    : 'border-transparent bg-muted/50 hover:bg-muted'
+                }`}
+                onClick={() => setForm({ ...form, target_audience: value })}
+              >
+                <div className="text-sm font-medium mb-1">{label}</div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span>{audienceStats.users} 👤</span>
+                  <span className="text-green-500">{audienceStats.tokens} 📱</span>
+                </div>
+                <Progress value={percentage} className="h-1 mt-2" />
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
       {/* Send Form */}
       <Card className="p-6">
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -627,6 +708,34 @@ const BulkPushTab = () => {
         </h3>
 
         <div className="space-y-4">
+          {/* Target Preview */}
+          <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="text-2xl">
+                {form.target_audience === 'all' ? '🌍' : 
+                 form.target_audience === 'flow' ? '🌙' :
+                 form.target_audience === 'bump' ? '🤰' :
+                 form.target_audience === 'mommy' ? '👩‍👧' : '💑'}
+              </div>
+              <div>
+                <div className="font-medium">
+                  {audienceOptions.find(a => a.value === form.target_audience)?.label || 'Hamı'}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {currentTargetStats.tokens > 0 
+                    ? `${currentTargetStats.tokens} cihaza göndəriləcək`
+                    : '⚠️ Bu auditoriyada qeydiyyatlı cihaz yoxdur!'
+                  }
+                </div>
+              </div>
+            </div>
+            <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+              currentTargetStats.tokens > 0 ? 'bg-green-500/10 text-green-600' : 'bg-red-500/10 text-red-600'
+            }`}>
+              {currentTargetStats.tokens} 📱
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label>Hədəf Auditoriya</Label>
             <Select value={form.target_audience} onValueChange={(v) => setForm({ ...form, target_audience: v })}>
@@ -634,11 +743,11 @@ const BulkPushTab = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">🌍 Hamı</SelectItem>
-                <SelectItem value="flow">🌙 Menstruasiya (Flow)</SelectItem>
-                <SelectItem value="bump">🤰 Hamilə (Bump)</SelectItem>
-                <SelectItem value="mommy">👩‍👧 Ana (Mommy)</SelectItem>
-                <SelectItem value="partner">💑 Partnyor</SelectItem>
+                {audienceOptions.map(({ value, label }) => (
+                  <SelectItem key={value} value={value}>
+                    {label} ({getTargetStats(value).tokens} cihaz)
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -666,7 +775,7 @@ const BulkPushTab = () => {
             className="w-full" 
             size="lg" 
             onClick={handleSendNow}
-            disabled={isSending || !form.title || !form.body}
+            disabled={isSending || !form.title || !form.body || currentTargetStats.tokens === 0}
           >
             {isSending ? (
               <>
@@ -676,10 +785,17 @@ const BulkPushTab = () => {
             ) : (
               <>
                 <Send className="h-4 w-4 mr-2" />
-                İndi Göndər
+                {currentTargetStats.tokens} Cihaza Göndər
               </>
             )}
           </Button>
+
+          {currentTargetStats.tokens === 0 && (
+            <p className="text-sm text-center text-amber-500">
+              ⚠️ Bu auditoriyada push notification almaq üçün qeydiyyatdan keçmiş cihaz yoxdur. 
+              İstifadəçilər tətbiqi mobil cihazlarından açmalı və bildiriş icazəsi verməlidir.
+            </p>
+          )}
         </div>
       </Card>
 
@@ -694,36 +810,59 @@ const BulkPushTab = () => {
           </Card>
         ) : (
           <div className="space-y-3">
-            {history.map((item: any) => (
-              <Card key={item.id} className="p-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium">{item.title}</h4>
-                      <Badge variant="outline">
-                        {audienceLabels[item.target_audience]?.label || 'Hamı'}
-                      </Badge>
-                      <Badge className={
-                        item.status === 'sent' ? 'bg-green-500/10 text-green-600' :
-                        item.status === 'sending' ? 'bg-yellow-500/10 text-yellow-600' :
-                        item.status === 'failed' ? 'bg-red-500/10 text-red-600' :
-                        'bg-muted text-muted-foreground'
-                      }>
-                        {item.status === 'sent' ? 'Göndərildi' :
-                         item.status === 'sending' ? 'Göndərilir...' :
-                         item.status === 'failed' ? 'Xəta' : 'Gözləyir'}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{item.body}</p>
-                    <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                      <span>✅ {item.total_sent} göndərildi</span>
-                      {item.total_failed > 0 && <span>❌ {item.total_failed} uğursuz</span>}
-                      <span>{new Date(item.created_at).toLocaleString('az-AZ')}</span>
+            {history.map((item: any) => {
+              const total = item.total_sent + item.total_failed;
+              const successRate = total > 0 ? Math.round((item.total_sent / total) * 100) : 0;
+              
+              return (
+                <Card key={item.id} className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <h4 className="font-medium">{item.title}</h4>
+                        <Badge variant="outline">
+                          {audienceLabels[item.target_audience]?.label || 'Hamı'}
+                        </Badge>
+                        <Badge className={
+                          item.status === 'sent' ? 'bg-green-500/10 text-green-600' :
+                          item.status === 'sending' ? 'bg-yellow-500/10 text-yellow-600' :
+                          item.status === 'failed' ? 'bg-red-500/10 text-red-600' :
+                          'bg-muted text-muted-foreground'
+                        }>
+                          {item.status === 'sent' ? 'Göndərildi' :
+                           item.status === 'sending' ? 'Göndərilir...' :
+                           item.status === 'failed' ? 'Xəta' : 'Gözləyir'}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-2">{item.body}</p>
+                      
+                      {/* Statistics */}
+                      <div className="flex items-center gap-4 text-xs">
+                        <span className="text-green-600">✅ {item.total_sent} göndərildi</span>
+                        {item.total_failed > 0 && (
+                          <span className="text-red-500">❌ {item.total_failed} uğursuz</span>
+                        )}
+                        {total > 0 && (
+                          <span className="text-muted-foreground">
+                            📊 {successRate}% uğurlu
+                          </span>
+                        )}
+                        <span className="text-muted-foreground">
+                          🕐 {new Date(item.created_at).toLocaleString('az-AZ')}
+                        </span>
+                      </div>
+                      
+                      {/* Progress bar for large sends */}
+                      {total > 0 && (
+                        <div className="mt-2">
+                          <Progress value={successRate} className="h-1.5" />
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>
