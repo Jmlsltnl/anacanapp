@@ -248,9 +248,9 @@ Create ${backgroundDescription}. The scene must feel authentic and perfectly lit
       }
     }
 
-    // Use Gemini REST API directly for image generation
+    // Use Gemini 3 Pro Image Preview for highest quality image generation
     const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
