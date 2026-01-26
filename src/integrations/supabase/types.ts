@@ -629,6 +629,48 @@ export type Database = {
         }
         Relationships: []
       }
+      bulk_push_notifications: {
+        Row: {
+          body: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          scheduled_at: string | null
+          sent_at: string | null
+          status: string | null
+          target_audience: string
+          title: string
+          total_failed: number | null
+          total_sent: number | null
+        }
+        Insert: {
+          body: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string | null
+          target_audience?: string
+          title: string
+          total_failed?: number | null
+          total_sent?: number | null
+        }
+        Update: {
+          body?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string | null
+          target_audience?: string
+          title?: string
+          total_failed?: number | null
+          total_sent?: number | null
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           created_at: string
@@ -2487,6 +2529,39 @@ export type Database = {
         }
         Relationships: []
       }
+      pregnancy_day_notifications: {
+        Row: {
+          body: string
+          created_at: string | null
+          day_number: number
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string | null
+          day_number: number
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string | null
+          day_number?: number
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category: string
@@ -2551,6 +2626,7 @@ export type Database = {
           name: string
           partner_code: string | null
           period_length: number | null
+          pregnancy_day: number | null
           premium_until: string | null
           role: Database["public"]["Enums"]["app_role"]
           start_weight: number | null
@@ -2578,6 +2654,7 @@ export type Database = {
           name: string
           partner_code?: string | null
           period_length?: number | null
+          pregnancy_day?: number | null
           premium_until?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           start_weight?: number | null
@@ -2605,6 +2682,7 @@ export type Database = {
           name?: string
           partner_code?: string | null
           period_length?: number | null
+          pregnancy_day?: number | null
           premium_until?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           start_weight?: number | null
