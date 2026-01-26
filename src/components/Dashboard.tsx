@@ -1535,7 +1535,7 @@ const Dashboard = ({ onOpenChat, onNavigateToTool }: DashboardProps) => {
   const hasPartner = !!profile?.linked_partner_id;
 
   return (
-    <div className="pb-24 pt-1 px-3">
+    <div className="pb-4 pt-2 px-3">
       {/* Header */}
       <motion.div 
         className="flex items-center justify-between mb-2"

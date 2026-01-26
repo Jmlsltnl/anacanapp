@@ -341,7 +341,7 @@ const PartnerDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen pb-24 bg-background">
+    <div className="pb-4 bg-background">
       {/* Level Up Celebration */}
       <LevelUpCelebration 
         show={showLevelUp} 
@@ -350,7 +350,7 @@ const PartnerDashboard = () => {
       />
 
       {/* Hero Header */}
-      <div className="bg-gradient-to-br from-partner via-indigo-600 to-violet-700 px-3 pt-4 pb-14 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-partner via-indigo-600 to-violet-700 px-3 pt-2 pb-14 relative overflow-hidden">
         {/* Decorative elements */}
         <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-white/10 blur-3xl" />
         <div className="absolute bottom-0 left-0 w-40 h-40 rounded-full bg-pink-500/20 blur-3xl" />
