@@ -25,6 +25,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useTrimesterTips } from '@/hooks/useTrimesterTips';
 import { useFlowSymptoms, useFlowPhaseTips, useFlowInsights } from '@/hooks/useFlowData';
+import { formatDateAz } from '@/lib/date-utils';
 import FeedingHistoryPanel from '@/components/baby/FeedingHistoryPanel';
 
 // Fetus images by month
@@ -255,12 +256,14 @@ const FlowDashboard = () => {
           <Moon className="w-5 h-5 mx-auto mb-0.5" />
           <p className="text-lg font-black">7.5</p>
           <p className="text-[9px] text-white/80">saat yuxu</p>
+          <p className="text-[8px] text-white/60 mt-0.5">tövsiyə edilir</p>
         </div>
 
         <div className="bg-gradient-to-br from-amber-400 to-orange-600 rounded-xl p-2.5 text-white text-center">
           <Flame className="w-5 h-5 mx-auto mb-0.5" />
           <p className="text-lg font-black">1,850</p>
           <p className="text-[9px] text-white/80">kalori</p>
+          <p className="text-[8px] text-white/60 mt-0.5">tövsiyə edilir</p>
         </div>
       </motion.div>
 
@@ -368,13 +371,13 @@ const FlowDashboard = () => {
           <div>
             <p className="text-xs text-muted-foreground">Növbəti menstruasiya</p>
             <p className="text-base font-bold text-foreground mt-0.5">
-              {cycleData.nextPeriodDate.toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' })}
+              {formatDateAz(cycleData.nextPeriodDate)}
             </p>
           </div>
           <div className="text-right">
             <p className="text-xs text-muted-foreground">Qalır</p>
             <p className="text-base font-bold text-flow">
-              {Math.ceil((cycleData.nextPeriodDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))} gün
+              {Math.max(0, Math.ceil((cycleData.nextPeriodDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} gün
             </p>
           </div>
         </div>

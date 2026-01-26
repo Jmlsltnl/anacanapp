@@ -15,14 +15,16 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
   const { data: safetyItems = [], isLoading } = useSafetyItems();
   const { data: dbCategories = [], isLoading: categoriesLoading } = useSafetyCategories();
 
-  // Build categories from DB with "all" option prepended
+  // Build categories from DB with "all" option prepended - filter out any existing "all"
   const categories = useMemo(() => {
     const allOption = { id: 'all', name: 'Hamısı', emoji: '✨' };
-    const mappedCategories = dbCategories.map(cat => ({
-      id: cat.category_id,
-      name: cat.name_az || cat.name,
-      emoji: cat.emoji || '📦'
-    }));
+    const mappedCategories = dbCategories
+      .filter(cat => cat.category_id !== 'all' && cat.name.toLowerCase() !== 'hamısı')
+      .map(cat => ({
+        id: cat.category_id,
+        name: cat.name_az || cat.name,
+        emoji: cat.emoji || '📦'
+      }));
     return [allOption, ...mappedCategories];
   }, [dbCategories]);
 
@@ -78,9 +80,9 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
   }
 
   return (
-    <div ref={ref} className="min-h-screen bg-background">
-      <div className="gradient-primary px-3 pt-3 pb-6 safe-top">
-        <div className="flex items-center gap-2 mb-3">
+    <div ref={ref} className="min-h-screen bg-background pb-24">
+      <div className="gradient-primary px-3 pt-3 pb-4 safe-top">
+        <div className="flex items-center gap-2 mb-2">
           <motion.button
             onClick={onBack}
             className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
@@ -102,50 +104,50 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
             placeholder="Nə yoxlamaq istəyirsiniz?"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-10 pl-10 pr-3 rounded-xl bg-white/20 border border-white/20 text-white placeholder:text-white/60 text-sm outline-none focus:bg-white/30 transition-colors"
+            className="w-full h-9 pl-9 pr-3 rounded-xl bg-white/20 border border-white/20 text-white placeholder:text-white/60 text-sm outline-none focus:bg-white/30 transition-colors"
           />
         </div>
       </div>
 
-      <div className="px-3 -mt-3">
-        <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-3 mb-3">
+      <div className="px-3 -mt-2">
+        <div className="flex gap-1.5 overflow-x-auto hide-scrollbar pb-2 mb-2">
           {categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                 activeCategory === cat.id
                   ? 'bg-primary text-white shadow-button'
                   : 'bg-card border border-border text-muted-foreground'
               }`}
             >
-              <span>{cat.emoji}</span>
+              <span className="text-sm">{cat.emoji}</span>
               {cat.name}
             </button>
           ))}
         </div>
 
-        <div className="space-y-3 pb-8">
+        <div className="space-y-1.5">
           {filteredItems.map((item, index) => (
             <motion.button
               key={item.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
+              transition={{ delay: index * 0.03 }}
               onClick={() => setSelectedItem(item)}
-              className={`w-full p-4 rounded-2xl border-2 text-left transition-all ${getStatusBg(item.safety_level)}`}
+              className={`w-full p-2.5 rounded-xl border text-left transition-all ${getStatusBg(item.safety_level)}`}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
             >
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-xl ${getStatusColor(item.safety_level)} flex items-center justify-center`}>
+              <div className="flex items-center gap-2.5">
+                <div className={`w-9 h-9 rounded-lg ${getStatusColor(item.safety_level)} flex items-center justify-center`}>
                   {getStatusIcon(item.safety_level)}
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-foreground">{item.name_az || item.name}</h3>
-                  <p className="text-sm text-muted-foreground">{item.description_az || item.description}</p>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-sm text-foreground truncate">{item.name_az || item.name}</h3>
+                  <p className="text-xs text-muted-foreground truncate">{item.description_az || item.description}</p>
                 </div>
-                <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
                   item.safety_level === 'safe' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' :
                   item.safety_level === 'warning' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' :
                   'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
@@ -157,10 +159,9 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
           ))}
 
           {filteredItems.length === 0 && (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">🔍</div>
-              <p className="text-muted-foreground">Heç nə tapılmadı</p>
-              <p className="text-sm text-muted-foreground mt-1">Admin paneldən məlumat əlavə edin</p>
+            <div className="text-center py-8">
+              <div className="text-4xl mb-2">🔍</div>
+              <p className="text-sm text-muted-foreground">Heç nə tapılmadı</p>
             </div>
           )}
         </div>
