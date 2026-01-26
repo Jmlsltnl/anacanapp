@@ -168,24 +168,42 @@
   body {
     @apply bg-background text-foreground font-nunito antialiased;
     overscroll-behavior-y: none;
+    /* Native app: fill entire screen */
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0;
+    padding: 0;
   }
 
   html {
     scroll-behavior: smooth;
     overscroll-behavior-y: none;
     -webkit-overflow-scrolling: touch;
+    /* Native app: fill entire screen */
+    height: 100%;
+    background-color: hsl(var(--background));
   }
 
-  /* Prevent pull-to-refresh white space on mobile */
+  /* Prevent pull-to-refresh white space on mobile - native app feel */
   html, body {
     overflow-x: hidden;
-    position: relative;
+    position: fixed;
+    width: 100%;
     height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 
   #root {
     min-height: 100%;
+    min-height: 100dvh;
     overflow-x: hidden;
+    overflow-y: auto;
+    background-color: hsl(var(--background));
+    /* Enable native-like scrolling */
+    -webkit-overflow-scrolling: touch;
   }
 }
 

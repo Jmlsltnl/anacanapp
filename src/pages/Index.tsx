@@ -241,10 +241,14 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen min-h-dvh bg-background safe-top overflow-x-hidden overscroll-none">
-      <AnimatePresence mode="wait">
-        {renderContent()}
-      </AnimatePresence>
+    <div className="fixed inset-0 flex flex-col bg-background overflow-hidden">
+      {/* Main scrollable content area */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden pt-[env(safe-area-inset-top)] overscroll-none">
+        <AnimatePresence mode="wait">
+          {renderContent()}
+        </AnimatePresence>
+      </div>
+      {/* Fixed bottom navigation */}
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} isPartner={role === 'partner'} />
     </div>
   );
