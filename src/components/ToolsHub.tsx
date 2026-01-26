@@ -187,45 +187,30 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         />
       </motion.div>
 
-      {/* Featured Tools - Photoshoot & Blog */}
-      <div className="grid grid-cols-2 gap-2 mb-2">
-        <motion.button
-          onClick={() => setActiveTool('photoshoot')}
-          className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-rose-500 to-pink-600 p-3 shadow-elevated text-left"
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.99 }}
-        >
-          <div className="absolute -right-4 -top-4 w-16 h-16 rounded-full bg-white/10 blur-xl" />
-          <div className="relative z-10">
-            <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center mb-2">
-              <Camera className="w-4 h-4 text-white" />
-            </div>
-            <h3 className="text-white font-bold text-xs">Körpə Fotosessiyası</h3>
-            <p className="text-white/80 text-[10px]">AI ilə fotoları yaradın</p>
+      {/* Featured Tool - Full Width Photoshoot Banner */}
+      <motion.button
+        onClick={() => setActiveTool('photoshoot')}
+        className="relative w-full overflow-hidden rounded-2xl bg-gradient-to-r from-rose-500 via-pink-500 to-orange-400 p-4 shadow-elevated text-left mb-2"
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.99 }}
+      >
+        <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 blur-2xl" />
+        <div className="absolute right-4 bottom-2 opacity-20">
+          <Camera className="w-16 h-16 text-white" />
+        </div>
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+            <Camera className="w-6 h-6 text-white" />
           </div>
-        </motion.button>
-
-        <motion.button
-          onClick={() => setActiveTool('blog')}
-          className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 p-3 shadow-elevated text-left"
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.05 }}
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.99 }}
-        >
-          <div className="absolute -right-4 -top-4 w-16 h-16 rounded-full bg-white/10 blur-xl" />
-          <div className="relative z-10">
-            <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center mb-2">
-              <BookOpen className="w-4 h-4 text-white" />
-            </div>
-            <h3 className="text-white font-bold text-xs">Bloqlar</h3>
-            <p className="text-white/80 text-[10px]">Faydalı məqalələr</p>
+          <div>
+            <h3 className="text-white font-bold text-sm">Körpə Fotosessiyası</h3>
+            <p className="text-white/80 text-xs">AI ilə unikal körpə fotoları yaradın</p>
           </div>
-        </motion.button>
-      </div>
+          <ChevronRight className="w-5 h-5 text-white/60 ml-auto" />
+        </div>
+      </motion.button>
 
       {/* Tools Grid */}
       <div className="grid grid-cols-2 gap-2">
