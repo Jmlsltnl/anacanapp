@@ -166,22 +166,27 @@
   }
 
   html {
-    height: 100%;
+    position: fixed;
+    inset: 0;
     background-color: hsl(var(--background));
     overscroll-behavior: none;
+    overflow: hidden;
   }
 
   body {
     @apply bg-background text-foreground font-nunito antialiased;
-    height: 100%;
+    position: fixed;
+    inset: 0;
     margin: 0;
     padding: 0;
     overscroll-behavior: none;
     -webkit-overflow-scrolling: touch;
+    overflow: hidden;
   }
 
   #root {
-    height: 100%;
+    position: fixed;
+    inset: 0;
     display: flex;
     flex-direction: column;
     background-color: hsl(var(--background));

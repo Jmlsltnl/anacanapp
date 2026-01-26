@@ -241,21 +241,21 @@ const Index = () => {
   }
 
   return (
-    <div 
-      className="flex flex-col bg-background" 
-      style={{ 
-        height: '100%',
-        paddingTop: 'env(safe-area-inset-top)',
-        paddingBottom: 'env(safe-area-inset-bottom)'
-      }}
-    >
+    <div className="fixed inset-0 flex flex-col bg-background overflow-hidden">
+      {/* Status bar area - fills with card background */}
+      <div 
+        className="bg-card flex-shrink-0" 
+        style={{ height: 'env(safe-area-inset-top)' }} 
+      />
+      
       {/* Main scrollable content area */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-none">
         <AnimatePresence mode="wait">
           {renderContent()}
         </AnimatePresence>
       </div>
-      {/* Bottom navigation */}
+      
+      {/* Bottom navigation with safe area */}
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} isPartner={role === 'partner'} />
     </div>
   );
