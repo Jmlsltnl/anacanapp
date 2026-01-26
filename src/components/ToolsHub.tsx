@@ -168,7 +168,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   if (activeTool === 'blog') return <BlogScreen onBack={handleBack} />;
 
   return (
-    <div className="pb-24 pt-1 px-3">
+    <div className="pb-4 pt-3 px-3">
       {/* Header */}
       <motion.div className="mb-2" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
         <h1 className="text-lg font-black text-foreground">Alətlər</h1>
