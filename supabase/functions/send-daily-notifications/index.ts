@@ -9,6 +9,7 @@ interface UserForNotification {
   user_id: string;
   life_stage: string;
   role: string;
+  due_date: string | null;
   daily_push_enabled: boolean;
   last_push_sent_at: string | null;
 }
@@ -19,6 +20,15 @@ interface ScheduledNotification {
   body: string;
   target_audience: string;
   priority: number;
+}
+
+interface PregnancyDayNotification {
+  id: string;
+  day_number: number;
+  title: string;
+  body: string;
+  emoji: string;
+  is_active: boolean;
 }
 
 interface DeviceToken {
@@ -43,7 +53,15 @@ Deno.serve(async (req) => {
     const currentHour = now.getUTCHours() + 4; // Azerbaijan is UTC+4
     const adjustedHour = currentHour >= 24 ? currentHour - 24 : currentHour;
 
-    if (adjustedHour < 9 || adjustedHour >= 24) {
+    // Allow manual trigger to bypass time check
+    let body: { manual?: boolean } = {};
+    try {
+      body = await req.json();
+    } catch {
+      // No body provided
+    }
+
+    if (!body.manual && (adjustedHour < 9 || adjustedHour >= 24)) {
       console.log(`Outside notification hours: ${adjustedHour}:00 (Baku time)`);
       return new Response(
         JSON.stringify({ message: 'Outside notification hours (09:00-00:00)', skipped: true }),
@@ -62,24 +80,27 @@ Deno.serve(async (req) => {
     }
 
     // Get active scheduled notifications
-    const { data: notifications, error: notifError } = await supabase
+    const { data: scheduledNotifications } = await supabase
       .from('scheduled_notifications')
       .select('*')
       .eq('is_active', true)
       .order('priority', { ascending: true });
 
-    if (notifError || !notifications?.length) {
-      console.log('No active notifications found');
-      return new Response(
-        JSON.stringify({ message: 'No active notifications', sent: 0 }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    // Get pregnancy day notifications
+    const { data: pregnancyNotifications } = await supabase
+      .from('pregnancy_day_notifications')
+      .select('*')
+      .eq('is_active', true);
+
+    const pregnancyNotifMap = new Map<number, PregnancyDayNotification>();
+    pregnancyNotifications?.forEach((n: PregnancyDayNotification) => {
+      pregnancyNotifMap.set(n.day_number, n);
+    });
 
     // Get users with push enabled
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('user_id, life_stage, role');
+      .select('user_id, life_stage, role, due_date');
 
     const { data: preferences } = await supabase
       .from('user_preferences')
@@ -104,6 +125,7 @@ Deno.serve(async (req) => {
         user_id: p.user_id,
         life_stage: p.life_stage || 'flow',
         role: p.role || 'user',
+        due_date: p.due_date,
         daily_push_enabled: true,
         last_push_sent_at: null,
       });
@@ -116,6 +138,27 @@ Deno.serve(async (req) => {
         user.last_push_sent_at = pref.last_push_sent_at;
       }
     });
+
+    // Calculate pregnancy day for a user
+    const calculatePregnancyDay = (dueDate: string | null): number | null => {
+      if (!dueDate) return null;
+      const due = new Date(dueDate);
+      const today = new Date();
+      
+      // Pregnancy is 280 days, so conception date is 280 days before due date
+      const conceptionDate = new Date(due);
+      conceptionDate.setDate(conceptionDate.getDate() - 280);
+      
+      // Calculate days since conception
+      const diffTime = today.getTime() - conceptionDate.getTime();
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      
+      // Return only if within valid pregnancy range
+      if (diffDays >= 0 && diffDays <= 280) {
+        return diffDays;
+      }
+      return null;
+    };
 
     // Filter users who can receive notifications (2-3 hour gap)
     const minGapMs = 2 * 60 * 60 * 1000; // 2 hours
@@ -131,18 +174,48 @@ Deno.serve(async (req) => {
     console.log(`Eligible users: ${eligibleUsers.length}`);
 
     let sentCount = 0;
-    const results: Array<{ userId: string; success: boolean; error?: string }> = [];
+    const results: Array<{ userId: string; success: boolean; type?: string; error?: string }> = [];
 
     for (const user of eligibleUsers) {
-      // Find matching notification for this user
-      const userNotification = notifications.find((n: ScheduledNotification) => {
-        if (n.target_audience === 'all') return true;
-        if (n.target_audience === user.life_stage) return true;
-        if (n.target_audience === 'partner' && user.role === 'partner') return true;
-        return false;
-      });
+      let notificationToSend: { title: string; body: string; id: string; type: string } | null = null;
 
-      if (!userNotification) continue;
+      // Priority 1: Check pregnancy day-specific notification for bump users
+      if (user.life_stage === 'bump' && user.due_date) {
+        const pregnancyDay = calculatePregnancyDay(user.due_date);
+        
+        if (pregnancyDay !== null) {
+          const dayNotification = pregnancyNotifMap.get(pregnancyDay);
+          if (dayNotification) {
+            notificationToSend = {
+              id: dayNotification.id,
+              title: `${dayNotification.emoji} ${dayNotification.title}`,
+              body: dayNotification.body,
+              type: 'pregnancy_day',
+            };
+          }
+        }
+      }
+
+      // Priority 2: Fall back to scheduled notifications
+      if (!notificationToSend && scheduledNotifications?.length) {
+        const userNotification = scheduledNotifications.find((n: ScheduledNotification) => {
+          if (n.target_audience === 'all') return true;
+          if (n.target_audience === user.life_stage) return true;
+          if (n.target_audience === 'partner' && user.role === 'partner') return true;
+          return false;
+        });
+
+        if (userNotification) {
+          notificationToSend = {
+            id: userNotification.id,
+            title: userNotification.title,
+            body: userNotification.body,
+            type: 'scheduled',
+          };
+        }
+      }
+
+      if (!notificationToSend) continue;
 
       // Get user's device tokens
       const userTokens = tokens.filter((t: DeviceToken) => t.user_id === user.user_id);
@@ -160,13 +233,13 @@ Deno.serve(async (req) => {
             body: JSON.stringify({
               to: deviceToken.token,
               notification: {
-                title: userNotification.title,
-                body: userNotification.body,
+                title: notificationToSend.title,
+                body: notificationToSend.body,
                 sound: 'default',
               },
               data: {
-                type: userNotification.target_audience,
-                notification_id: userNotification.id,
+                type: notificationToSend.type,
+                notification_id: notificationToSend.id,
               },
               priority: 'high',
             }),
@@ -176,7 +249,7 @@ Deno.serve(async (req) => {
           
           if (fcmResult.success > 0) {
             sentCount++;
-            results.push({ userId: user.user_id, success: true });
+            results.push({ userId: user.user_id, success: true, type: notificationToSend.type });
 
             // Update last_push_sent_at
             await supabase
@@ -191,11 +264,13 @@ Deno.serve(async (req) => {
               .from('notification_send_log')
               .insert({
                 user_id: user.user_id,
-                notification_id: userNotification.id,
-                title: userNotification.title,
-                body: userNotification.body,
+                notification_id: notificationToSend.type === 'scheduled' ? notificationToSend.id : null,
+                title: notificationToSend.title,
+                body: notificationToSend.body,
                 status: 'sent',
               });
+              
+            break; // Only count once per user
           } else {
             const errorMsg = fcmResult.results?.[0]?.error || 'Unknown';
             results.push({ userId: user.user_id, success: false, error: errorMsg });
@@ -224,7 +299,8 @@ Deno.serve(async (req) => {
         message: `Sent ${sentCount} notifications`,
         sent: sentCount,
         eligible: eligibleUsers.length,
-        results: results.slice(0, 10), // First 10 for debugging
+        pregnancyNotificationsAvailable: pregnancyNotifMap.size,
+        results: results.slice(0, 10),
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
