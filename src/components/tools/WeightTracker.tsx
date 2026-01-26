@@ -231,18 +231,23 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
                 return (
                   <motion.div
                     key={entry.id}
-                    className="flex-1 gradient-primary rounded-t-lg"
+                    className="flex-1 gradient-primary rounded-t-lg relative group cursor-pointer"
                     initial={{ height: 0 }}
                     animate={{ height: `${height}%` }}
                     transition={{ delay: 0.5 + index * 0.1 }}
-                  />
+                  >
+                    {/* Tooltip on hover/click */}
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-foreground text-background text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                      {entry.weight} kg
+                    </div>
+                  </motion.div>
                 );
               })}
             </div>
             <div className="flex justify-between mt-2">
               {entries.slice(0, 7).reverse().map((entry) => (
-                <span key={entry.id} className="text-xs text-muted-foreground">
-                  {new Date(entry.entry_date).toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' })}
+                <span key={entry.id} className="text-[9px] text-muted-foreground text-center flex-1">
+                  {new Date(entry.entry_date).toLocaleDateString('az-AZ', { day: 'numeric', month: 'short' })}
                 </span>
               ))}
             </div>
@@ -269,7 +274,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
                     <div>
                       <p className="font-bold text-foreground">{entry.weight} kg</p>
                       <p className="text-xs text-muted-foreground">
-                        {new Date(entry.entry_date).toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' })}
+                        {new Date(entry.created_at).toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' })}, {new Date(entry.created_at).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
                   </div>
@@ -304,7 +309,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
               <Input
                 type="number"
                 step="0.1"
-                placeholder="63.5"
+                placeholder=""
                 value={newWeight}
                 onChange={(e) => setNewWeight(e.target.value)}
                 className="h-14 rounded-2xl text-center text-2xl font-bold"

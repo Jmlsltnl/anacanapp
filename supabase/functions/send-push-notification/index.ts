@@ -39,6 +39,23 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Always store the notification in the app's notifications table
+    try {
+      await supabase
+        .from('notifications')
+        .insert({
+          user_id: userId,
+          title,
+          message: body,
+          notification_type: data?.type || 'push',
+          is_read: false,
+        });
+      console.log(`Notification stored in database for user ${userId}`);
+    } catch (storeError) {
+      console.error('Error storing notification:', storeError);
+      // Continue even if storage fails - we still want to try sending the push
+    }
+
     // Get all device tokens for the user
     const { data: tokens, error: tokensError } = await supabase
       .from('device_tokens')
