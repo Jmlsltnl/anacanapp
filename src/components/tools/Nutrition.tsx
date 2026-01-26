@@ -444,7 +444,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
   }
 
   return (
-    <div ref={ref} className="min-h-screen bg-gradient-to-b from-orange-50 to-background pb-24">
+    <div ref={ref} className="min-h-screen bg-gradient-to-b from-orange-50 dark:from-primary/10 to-background pb-24">
       <div className="gradient-primary px-3 pt-3 pb-6">
         <div className="flex items-center gap-3 mb-3">
           <motion.button
@@ -552,8 +552,8 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                     </div>
                     <div className="flex items-center gap-2">
                       {mealLogs.length > 0 ? (
-                        <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center">
-                          <Check className="w-3.5 h-3.5 text-green-600" />
+                        <div className="w-7 h-7 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                          <Check className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
                         </div>
                       ) : (
                         <Plus className="w-4 h-4 text-primary" />
@@ -733,7 +733,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                       className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${
                         i < waterGlasses 
                           ? 'bg-blue-500 text-white' 
-                          : 'bg-blue-100 text-blue-300'
+                          : 'bg-blue-100 dark:bg-blue-900/30 text-blue-300 dark:text-blue-600'
                       }`}
                     >
                       💧
@@ -752,9 +752,9 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                 </motion.button>
               </div>
 
-              <div className="bg-blue-50 rounded-xl p-3 border border-blue-100">
-                <h3 className="font-bold text-blue-800 mb-1 text-sm">💡 Məsləhət</h3>
-                <p className="text-xs text-blue-700">
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
+                <h3 className="font-bold text-blue-800 dark:text-blue-300 mb-1 text-sm">💡 Məsləhət</h3>
+                <p className="text-xs text-blue-700 dark:text-blue-400">
                   {lifeStage === 'bump' 
                     ? 'Hamiləlik zamanı gündə ən azı 10 stəkan su içmək tövsiyə olunur. Yetərli su içmək körpənin inkişafına kömək edir.'
                     : lifeStage === 'mommy'
