@@ -112,15 +112,18 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
     return { calories: fallback.calories, water: fallback.water_glasses, description: fallback.description_az };
   }, [dbTargets, lifeStage]);
   
-  // Get recipe categories from DB or use fallback
+  // Get recipe categories from DB or use fallback - filter out any existing "all"
   const recipeCategories = useMemo(() => {
     const base = [{ id: 'all', name: 'Hamısı', emoji: '🍽️' }];
     if (dbRecipeCategories.length > 0) {
-      return [...base, ...dbRecipeCategories.map(c => ({
-        id: c.category_id,
-        name: c.name_az || c.name,
-        emoji: c.emoji || '🍽️',
-      }))];
+      const filtered = dbRecipeCategories
+        .filter(c => c.category_id !== 'all' && c.name.toLowerCase() !== 'hamısı')
+        .map(c => ({
+          id: c.category_id,
+          name: c.name_az || c.name,
+          emoji: c.emoji || '🍽️',
+        }));
+      return [...base, ...filtered];
     }
     return base;
   }, [dbRecipeCategories]);

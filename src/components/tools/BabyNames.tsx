@@ -123,7 +123,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
           </motion.div>
         )}
 
-        <div className="space-y-3 pb-8">
+        <div className="space-y-2 pb-24">
           {filteredNames.map((name, index) => (
             <motion.button
               key={name.id}

@@ -75,80 +75,80 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="gradient-primary px-5 pt-4 pb-6">
-        <motion.button
-          onClick={onBack}
-          className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mb-4"
-          whileTap={{ scale: 0.95 }}
-        >
-          <ArrowLeft className="w-5 h-5 text-white" />
-        </motion.button>
-        <div className="flex items-center gap-3">
-          <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center">
-            <ShoppingCart className="w-7 h-7 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-black text-white">
-              {isShared ? 'Ortaq Alışveriş Siyahısı' : 'Alışveriş Siyahısı'}
+      <div className="gradient-primary px-3 pt-3 pb-4 safe-top">
+        <div className="flex items-center gap-2 mb-2">
+          <motion.button
+            onClick={onBack}
+            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
+            whileTap={{ scale: 0.95 }}
+          >
+            <ArrowLeft className="w-4 h-4 text-white" />
+          </motion.button>
+          <div className="flex-1">
+            <h1 className="text-lg font-bold text-white">
+              {isShared ? 'Ortaq Alışveriş' : 'Alışveriş Siyahısı'}
             </h1>
-            <div className="flex items-center gap-2 text-white/80 text-sm">
+            <div className="flex items-center gap-1.5 text-white/80 text-xs">
               {isShared ? (
                 <>
-                  <Users className="w-4 h-4" />
+                  <Users className="w-3 h-3" />
                   <span>Partnyor ilə ortaq</span>
                 </>
               ) : (
                 <>
-                  <User className="w-4 h-4" />
+                  <User className="w-3 h-3" />
                   <span>Şəxsi siyahı</span>
                 </>
               )}
             </div>
           </div>
+          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+            <ShoppingCart className="w-5 h-5 text-white" />
+          </div>
         </div>
       </div>
 
-      <div className="px-5 py-4">
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="bg-card rounded-2xl p-4 border border-border/50">
-            <div className="text-3xl font-black text-primary">{uncheckedCount}</div>
-            <div className="text-sm text-muted-foreground">Alınacaq</div>
+      <div className="px-3 py-2 -mt-2">
+        {/* Stats + Add */}
+        <div className="flex gap-2 mb-2">
+          <div className="flex-1 bg-card rounded-xl p-2.5 border border-border/50 flex items-center gap-2">
+            <div className="text-xl font-black text-primary">{uncheckedCount}</div>
+            <div className="text-xs text-muted-foreground">alınacaq</div>
           </div>
-          <div className="bg-card rounded-2xl p-4 border border-border/50">
-            <div className="text-3xl font-black text-green-600">{checkedCount}</div>
-            <div className="text-sm text-muted-foreground">Alındı</div>
+          <div className="flex-1 bg-card rounded-xl p-2.5 border border-border/50 flex items-center gap-2">
+            <div className="text-xl font-black text-green-600">{checkedCount}</div>
+            <div className="text-xs text-muted-foreground">alındı</div>
           </div>
         </div>
 
         {/* Add item form */}
-        <div className="bg-card rounded-2xl p-4 border border-border/50 mb-6">
-          <div className="flex gap-2 mb-3">
+        <div className="bg-card rounded-xl p-3 border border-border/50 mb-2">
+          <div className="flex gap-2 mb-2">
             <Input
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
               placeholder="Məhsul adı..."
               onKeyPress={(e) => e.key === 'Enter' && handleAddItem()}
-              className="flex-1"
+              className="flex-1 h-9 text-sm"
             />
             <Button 
               onClick={handleAddItem} 
               disabled={submitting || !newItemName.trim()}
-              className="shrink-0"
+              className="shrink-0 h-9 w-9 p-0"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-4 h-4" />
             </Button>
           </div>
           
           {/* Priority selector */}
-          <div className="flex gap-2">
+          <div className="flex gap-1.5">
             {(['low', 'medium', 'high'] as const).map((priority) => (
               <button
                 key={priority}
                 onClick={() => setNewItemPriority(priority)}
-                className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all border ${
+                className={`flex-1 py-1.5 rounded-lg text-[10px] font-medium transition-all border ${
                   newItemPriority === priority
                     ? priorityColors[priority]
                     : 'bg-muted text-muted-foreground border-transparent'
@@ -161,7 +161,7 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
         </div>
 
         {/* Unchecked items */}
-        <div className="space-y-2 mb-6">
+        <div className="space-y-1.5 mb-3">
           <AnimatePresence>
             {uncheckedItems.map((item) => (
               <motion.div
@@ -169,45 +169,39 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: -100 }}
-                className="bg-card rounded-xl p-4 border border-border/50 flex items-center gap-3"
+                className="bg-card rounded-xl p-2.5 border border-border/50 flex items-center gap-2"
               >
                 <button
                   onClick={() => toggleItem(item.id)}
-                  className="w-6 h-6 rounded-full border-2 border-primary flex items-center justify-center shrink-0"
+                  className="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center shrink-0"
                 >
                 </button>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-foreground truncate">{item.name}</p>
-                  <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <Badge variant="outline" className={`text-[10px] ${priorityColors[item.priority]}`}>
+                  <p className="font-medium text-sm text-foreground truncate">{item.name}</p>
+                  <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                    <Badge variant="outline" className={`text-[9px] px-1.5 py-0 ${priorityColors[item.priority]}`}>
                       {priorityLabels[item.priority]}
                     </Badge>
-                    {item.added_by && (
-                      <span className="text-[10px] text-muted-foreground">
-                        {item.added_by === 'partner' ? '👨 Partnyor' : '👩 Ana'}
-                      </span>
-                    )}
-                    <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
+                    <span className="text-[9px] text-muted-foreground flex items-center gap-0.5">
+                      <Clock className="w-2.5 h-2.5" />
                       {formatRelativeDateAz(item.created_at)}
                     </span>
                   </div>
                 </div>
                 <button
                   onClick={() => deleteItem(item.id)}
-                  className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-red-500"
+                  className="w-7 h-7 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-500"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </motion.div>
             ))}
           </AnimatePresence>
 
           {uncheckedItems.length === 0 && (
-            <div className="text-center py-8">
-              <div className="text-4xl mb-2">🛒</div>
-              <p className="text-muted-foreground">Siyahı boşdur</p>
-              <p className="text-sm text-muted-foreground">Yuxarıdan məhsul əlavə edin</p>
+            <div className="text-center py-6">
+              <div className="text-3xl mb-1">🛒</div>
+              <p className="text-sm text-muted-foreground">Siyahı boşdur</p>
             </div>
           )}
         </div>

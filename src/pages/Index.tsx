@@ -135,12 +135,7 @@ const Index = () => {
             <AIChatScreen />
           </motion.div>
         );
-      case 'blog':
-        return (
-          <motion.div key="blog" variants={pageVariants} initial="initial" animate="animate" exit="exit">
-            <BlogScreen onBack={() => setActiveTab('home')} />
-          </motion.div>
-        );
+      // Blog is now accessed via Tools, remove from nav tabs
       case 'profile':
         return (
           <motion.div key="profile" variants={pageVariants} initial="initial" animate="animate" exit="exit">
@@ -225,6 +220,9 @@ const Index = () => {
   }
   if (activeScreen === 'billing') {
     return <BillingScreen onBack={() => setActiveScreen(null)} />;
+  }
+  if (activeScreen === 'legal') {
+    return <LegalScreen onBack={() => setActiveScreen(null)} />;
   }
   if (activeScreen === 'blog') {
     return <BlogScreen onBack={() => setActiveScreen(null)} />;

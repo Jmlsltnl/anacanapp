@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Shield, Timer, Scale, Baby, Briefcase, 
   Volume2, Heart, Footprints, ChevronRight,
-  Utensils, Activity, ArrowLeft, Camera, Lock, ShoppingCart, LucideIcon, Wrench
+  Utensils, Activity, ArrowLeft, Camera, Lock, ShoppingCart, LucideIcon, Wrench, BookOpen
 } from 'lucide-react';
+import BlogScreen from '@/components/BlogScreen';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import SafetyLookup from './tools/SafetyLookup';
@@ -48,6 +49,7 @@ const iconMap: Record<string, LucideIcon> = {
   'Activity': Activity,
   'Heart': Heart,
   'Wrench': Wrench,
+  'BookOpen': BookOpen,
 };
 
 interface ToolsHubProps {
@@ -163,6 +165,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   if (activeTool === 'hospital') return <HospitalBag onBack={handleBack} />;
   if (activeTool === 'exercise' || activeTool === 'exercises') return <Exercises onBack={handleBack} />;
   if (activeTool === 'mood' || activeTool === 'mood-diary') return <MoodDiary onBack={handleBack} />;
+  if (activeTool === 'blog') return <BlogScreen onBack={handleBack} />;
 
   return (
     <div className="pb-24 pt-1 px-3">
@@ -184,27 +187,45 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         />
       </motion.div>
 
-      {/* Featured Tool - Photoshoot */}
-      <motion.button
-        onClick={() => setActiveTool('photoshoot')}
-        className="w-full relative overflow-hidden rounded-2xl bg-gradient-to-r from-rose-500 to-pink-600 p-3 mb-2 shadow-elevated text-left"
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.99 }}
-      >
-        <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-white/10 blur-xl" />
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center">
-            <Camera className="w-5 h-5 text-white" />
+      {/* Featured Tools - Photoshoot & Blog */}
+      <div className="grid grid-cols-2 gap-2 mb-2">
+        <motion.button
+          onClick={() => setActiveTool('photoshoot')}
+          className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-rose-500 to-pink-600 p-3 shadow-elevated text-left"
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
+        >
+          <div className="absolute -right-4 -top-4 w-16 h-16 rounded-full bg-white/10 blur-xl" />
+          <div className="relative z-10">
+            <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center mb-2">
+              <Camera className="w-4 h-4 text-white" />
+            </div>
+            <h3 className="text-white font-bold text-xs">Körpə Fotosessiyası</h3>
+            <p className="text-white/80 text-[10px]">AI ilə fotoları yaradın</p>
           </div>
-          <div className="flex-1">
-            <h3 className="text-white font-bold text-sm">Körpə Fotosessiyası</h3>
-            <p className="text-white/80 text-[11px]">AI ilə sehrli körpə fotoları yaradın</p>
+        </motion.button>
+
+        <motion.button
+          onClick={() => setActiveTool('blog')}
+          className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 p-3 shadow-elevated text-left"
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.05 }}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
+        >
+          <div className="absolute -right-4 -top-4 w-16 h-16 rounded-full bg-white/10 blur-xl" />
+          <div className="relative z-10">
+            <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center mb-2">
+              <BookOpen className="w-4 h-4 text-white" />
+            </div>
+            <h3 className="text-white font-bold text-xs">Bloqlar</h3>
+            <p className="text-white/80 text-[10px]">Faydalı məqalələr</p>
           </div>
-          <ChevronRight className="w-5 h-5 text-white/60" />
-        </div>
-      </motion.button>
+        </motion.button>
+      </div>
 
       {/* Tools Grid */}
       <div className="grid grid-cols-2 gap-2">

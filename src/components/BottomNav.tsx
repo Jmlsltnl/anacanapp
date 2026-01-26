@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Home, Compass, MessageCircle, User, Users, BookOpen } from 'lucide-react';
+import { Home, Compass, MessageCircle, User, Users } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 
@@ -14,7 +14,6 @@ const womanTabs = [
   { id: 'tools', label: 'Alətlər', icon: Compass },
   { id: 'community', label: 'Cəmiyyət', icon: Users },
   { id: 'ai', label: 'Anacan.AI', icon: MessageCircle },
-  { id: 'blog', label: 'Bloq', icon: BookOpen },
   { id: 'profile', label: 'Profil', icon: User },
 ];
 
