@@ -47,6 +47,16 @@ Deno.serve(async (req) => {
       throw new Error('Query is required');
     }
 
+    // Get valid categories from database
+    const { data: categoriesData } = await supabase
+      .from('safety_categories')
+      .select('category_id')
+      .eq('is_active', true)
+      .neq('category_id', 'all');
+    
+    const validCategories = categoriesData?.map(c => c.category_id) || ['food', 'drink', 'activity', 'medicine', 'beauty'];
+    const categoryList = validCategories.join('|');
+
     const systemPrompt = `Sən hamiləlik dövründə qida və fəaliyyətlərin təhlükəsizliyini qiymətləndirən mütəxəssissən.
 
 İstifadəçi "${query}" haqqında soruşur.
@@ -54,13 +64,18 @@ Deno.serve(async (req) => {
 QAYDALAR:
 1. YALNIZ JSON formatında cavab ver, heç bir əlavə mətn olmadan
 2. Hamiləlik üçün təhlükəsizlik səviyyəsini qiymətləndir: "safe", "warning", və ya "danger"
-3. Kateqoriyanı təyin et: "food" (qida), "drink" (içki), "activity" (fəaliyyət), "medicine" (dərman), "cosmetic" (kosmetika), "other" (digər)
+3. Kateqoriyanı MÜTLƏKİ bu siyahıdan seç: ${categoryList}
+   - food: qida məhsulları
+   - drink: içkilər
+   - activity: fəaliyyətlər, idman
+   - medicine: dərmanlar, vitaminlər
+   - beauty: kosmetika, gözəllik prosedurları (epilyasiya, manikür, saç boyası və s.)
 
 JSON formatı:
 {
   "name": "English name",
   "name_az": "Azərbaycan dilində ad",
-  "category": "food|drink|activity|medicine|cosmetic|other",
+  "category": "${categoryList}",
   "safety_level": "safe|warning|danger",
   "description": "Short English description about safety during pregnancy",
   "description_az": "Hamiləlik dövründə təhlükəsizlik haqqında qısa Azərbaycan dilində izahat"
@@ -69,7 +84,8 @@ JSON formatı:
 NÜMUNƏLƏR:
 - Çiy balıq: danger - hamiləlik zamanı çiy balıq bakteriya və parazit riski daşıyır
 - Pişmiş toyuq: safe - düzgün bişirilmiş toyuq hamiləlik üçün yaxşı protein mənbəyidir
-- Kofe: warning - gündə 200mg-dən az kofein təhlükəsizdir, çox içmək riskli ola bilər`;
+- Kofe: warning - gündə 200mg-dən az kofein təhlükəsizdir, çox içmək riskli ola bilər
+- Epilyasiya: warning - mumla epilyasiya təhlükəsizdir, lazer tövsiyə olunmur`;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
@@ -125,10 +141,14 @@ NÜMUNƏLƏR:
       safetyData.safety_level = 'warning';
     }
 
-    // Ensure category is valid
-    const validCategories = ['food', 'drink', 'activity', 'medicine', 'cosmetic', 'other'];
+    // Ensure category is valid - use the fetched valid categories
     if (!validCategories.includes(safetyData.category)) {
-      safetyData.category = category || 'other';
+      // Map common alternatives
+      if (safetyData.category === 'cosmetic' || safetyData.category === 'cosmetics') {
+        safetyData.category = 'beauty';
+      } else {
+        safetyData.category = category && validCategories.includes(category) ? category : validCategories[0] || 'food';
+      }
     }
 
     // Insert into database
