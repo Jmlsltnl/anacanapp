@@ -94,14 +94,15 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
               { id: 'groups', label: 'Bütün Qruplar', icon: Users },
             ].map((tab) => {
               const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
               return (
                 <motion.button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
-                    activeTab === tab.id
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground'
+                  className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all border ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-card dark:bg-muted text-muted-foreground dark:text-white border-border/50'
                   }`}
                   whileTap={{ scale: 0.98 }}
                 >

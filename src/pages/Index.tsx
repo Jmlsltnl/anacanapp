@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SplashScreen from '@/components/SplashScreen';
 import AppIntroduction from '@/components/AppIntroduction';
@@ -50,6 +50,16 @@ const Index = () => {
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro } = useUserStore();
   const { isAdmin, loading } = useAuth();
+  
+  // Ref for scroll container to reset position on navigation
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Reset scroll to top when tab or screen changes
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [activeTab, activeScreen, activeTool]);
   
   // Initialize push notification token registration for native apps
   useDeviceToken();
@@ -249,7 +259,7 @@ const Index = () => {
       />
       
       {/* Main scrollable content area */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-none">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto overflow-x-hidden overscroll-none">
         <AnimatePresence mode="wait">
           {renderContent()}
         </AnimatePresence>

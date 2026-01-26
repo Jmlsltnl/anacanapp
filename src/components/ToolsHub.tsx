@@ -233,8 +233,9 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
                   <Lock className="w-3 h-3 text-muted-foreground" />
                 </div>
               )}
-              <div className={`w-10 h-10 rounded-xl ${tool.bgColor} flex items-center justify-center mb-2`}>
-                <Icon className={`w-5 h-5 ${tool.color}`} />
+              {/* Uniform icon background for all tools */}
+              <div className="w-10 h-10 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center mb-2">
+                <Icon className="w-5 h-5 text-primary" />
               </div>
               <h3 className="font-bold text-foreground text-sm mb-0.5">{tool.name}</h3>
               <p className="text-[10px] text-muted-foreground leading-tight">{tool.description}</p>

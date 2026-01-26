@@ -75,7 +75,12 @@ export const useWeightEntries = () => {
   const getStats = () => {
     if (entries.length === 0) return null;
 
-    const startWeight = profile?.start_weight || (entries.length > 0 ? entries[entries.length - 1].weight : 0);
+    // Start weight is from profile, or the FIRST (oldest) entry if no profile start weight
+    // Entries are ordered by entry_date DESC, so oldest is at the end
+    const firstEntryWeight = entries.length > 0 ? entries[entries.length - 1].weight : 0;
+    const startWeight = profile?.start_weight || firstEntryWeight;
+    
+    // Current weight is the LATEST entry (first in the array since ordered DESC)
     const currentWeight = entries[0]?.weight || startWeight;
     const totalGain = currentWeight - startWeight;
     
