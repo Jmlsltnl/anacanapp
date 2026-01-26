@@ -31,6 +31,7 @@ import BlogScreen from '@/components/BlogScreen';
 import LegalScreen from '@/components/LegalScreen';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
+import { useDeviceToken } from '@/hooks/useDeviceToken';
 
 const pageVariants = {
   initial: { opacity: 0, y: 10 },
@@ -49,6 +50,9 @@ const Index = () => {
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro } = useUserStore();
   const { isAdmin, loading } = useAuth();
+  
+  // Initialize push notification token registration for native apps
+  useDeviceToken();
 
   useEffect(() => {
     const timer = setTimeout(() => {
