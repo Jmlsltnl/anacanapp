@@ -1,5 +1,4 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { GoogleGenAI } from "npm:@google/genai@^1.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -23,22 +22,17 @@ interface RequestBody {
 
 // Pinterest-style aesthetic background prompts
 const backgroundPrompts: Record<string, string> = {
-  // Realist backgrounds
   studio_white: "a professional photography studio with pure white seamless backdrop, soft diffused lighting from multiple sources, clean and minimalist setup, professional baby portrait style",
   nursery_blue: "a cozy baby nursery room with soft blue painted walls, white wooden crib in background, plush toys arranged neatly, natural window light streaming in, warm and comforting atmosphere",
   nursery_pink: "a beautiful baby nursery with soft pink walls, elegant white furniture, tulle canopy, rose gold accents, soft plush toys, dreamy natural lighting",
   garden_natural: "a natural outdoor garden setting with lush green grass, soft dappled sunlight filtering through trees, gentle bokeh background, peaceful spring atmosphere",
   garden_flowers: "a stunning flower garden with blooming roses and peonies, butterflies floating, soft pink and white petals, romantic natural lighting, impressionist style",
-  
-  // Aesthetic backgrounds  
   boho_neutral: "a bohemian style setup with dried pampas grass arrangement, macrame wall hanging, cream and beige linen blankets, natural woven basket, soft earth-toned color palette, warm diffused lighting",
   boho_floral: "a bohemian aesthetic with dried flower arrangements in blush pink, delicate lace fabric, soft rose gold accents, warm peachy lighting, dreamy and romantic atmosphere",
   minimalist_cream: "a clean minimalist setup with cream-colored organic cotton blanket, simple wooden elements, neutral color palette, soft natural lighting, Scandinavian aesthetic",
   blush_dreamy: "a dreamy blush pink setup with flowing tulle fabric, scattered pearl beads, soft pink rose petals, ethereal backlighting, romantic and whimsical atmosphere",
   vintage_rustic: "a rustic vintage setting with weathered wooden crates, burlap and lace textiles, antique brass props, warm sepia-toned lighting, nostalgic farmhouse atmosphere",
   vintage_lace: "an elegant vintage setup with delicate antique lace blankets, soft ivory and cream fabrics, vintage pearl accessories, warm golden hour lighting, timeless aesthetic",
-  
-  // Fantasy backgrounds
   adventure_explorer: "an adventure explorer theme with vintage world map backdrop, antique compass, safari pith helmet, adventure books, warm earthy tones, expedition aesthetic",
   space_astronaut: "a magical space theme with twinkling stars and colorful nebulas, planet props, silver rocket ship, cosmic purple and blue colors, astronaut adventure setting",
   superhero: "a dynamic superhero theme with cityscape silhouette backdrop, dramatic lighting, bold primary colors, heroic pose setup, comic book inspired aesthetic",
@@ -47,17 +41,15 @@ const backgroundPrompts: Record<string, string> = {
   fairy_garden: "an enchanted fairy garden with glowing mushrooms, tiny fairy lights, magical flowers, soft purple and pink mist, whimsical woodland atmosphere",
   mermaid_ocean: "an underwater mermaid paradise with iridescent seashells, pearl strings, coral reef colors, teal and turquoise tones, magical ocean lighting",
   unicorn_rainbow: "a magical unicorn theme with rainbow arch, cotton candy clouds, sparkly stars, pastel pink and purple colors, glittery magical atmosphere",
-  
-  // Seasonal backgrounds
   autumn_leaves: "an autumn setting with colorful fallen maple leaves in orange, red and gold, pumpkin decorations, cozy knit blanket, warm golden hour lighting",
   winter_snow: "a winter wonderland with soft white snow, pine tree branches, cozy cream knit blanket, silver and white decorations, magical snowflake bokeh",
   spring_flowers: "a spring garden with blooming tulips and daffodils, fresh green grass, butterflies, soft pastel colors, cheerful natural lighting",
   cherry_blossom: "a Japanese cherry blossom garden with delicate pink sakura petals falling, soft focus background, ethereal pink mist, serene and peaceful atmosphere",
   flowers: "a stunning field of lavender, sunflowers, and wildflowers in full bloom, soft bokeh background, butterflies and bumblebees, warm summer lighting, impressionist painting style",
-  balloons: "a joyful celebration scene with dozens of colorful helium balloons (pink, blue, yellow, purple, gold) floating around, confetti in the air, a bright sunny sky, festive and happy atmosphere",
-  rainbow: "a magical scene with a vibrant rainbow arching across the sky, cotton candy clouds in pastel colors, sparkles and glitter floating in the air, unicorn-inspired magical elements",
-  castle: "a magnificent fairy-tale castle interior with royal purple and gold decorations, crystal chandeliers, velvet curtains, golden throne elements, magical sparkles, regal and majestic atmosphere",
-  toys: "a cozy nursery scene surrounded by adorable plush teddy bears, soft toys, colorful building blocks, a beautiful wooden rocking horse, soft pastel blankets, warm and comforting lighting",
+  balloons: "a joyful celebration scene with dozens of colorful helium balloons floating around, confetti in the air, a bright sunny sky, festive and happy atmosphere",
+  rainbow: "a magical scene with a vibrant rainbow arching across the sky, cotton candy clouds in pastel colors, sparkles and glitter floating in the air",
+  castle: "a magnificent fairy-tale castle interior with royal purple and gold decorations, crystal chandeliers, velvet curtains, magical sparkles, regal atmosphere",
+  toys: "a cozy nursery scene surrounded by adorable plush teddy bears, soft toys, colorful building blocks, a beautiful wooden rocking horse, soft pastel blankets",
 };
 
 const eyeColorPrompts: Record<string, string> = {
@@ -103,7 +95,6 @@ const outfitPrompts: Record<string, string> = {
   festive: "wearing festive celebration clothes with sparkly accents",
 };
 
-// Image style modifiers - fetched dynamically from DB, these are fallbacks
 const imageStylePrompts: Record<string, string> = {
   realistic: "ultra realistic, photorealistic, high detail photography, natural lighting, 2K resolution",
   "3d_render": "3D rendered, high quality 3D graphics, smooth textures, studio lighting",
@@ -166,7 +157,6 @@ Deno.serve(async (req) => {
 
     const backgroundDescription = backgroundPrompts[backgroundTheme] || backgroundPrompts.garden_natural;
     
-    // Build customization parts for the prompt
     const genderText = customization.gender === "boy" 
       ? "Transform the baby to appear as a baby boy" 
       : customization.gender === "girl" 
@@ -185,16 +175,13 @@ Deno.serve(async (req) => {
     const outfitDesc = customization.outfit !== "keep" && outfitPrompts[customization.outfit]
       ? outfitPrompts[customization.outfit] : "";
 
-    // Get image style - default to realistic if not specified
     const imageStyleId = customization.imageStyle || "realistic";
     const imageStyleDesc = imageStylePrompts[imageStyleId] || imageStylePrompts.realistic;
     
-    // Determine if it's a non-realistic style that needs different prompting
     const isRealistic = imageStyleId === "realistic";
     const is3DStyle = imageStyleId.startsWith("3d") || imageStyleId === "clay_art";
     const isCartoonStyle = imageStyleId.includes("simpsons") || imageStyleId === "anime";
     
-    // Build the style instruction based on the selected image style
     let styleInstruction = "";
     if (isRealistic) {
       styleInstruction = `**STYLE: PHOTOREALISTIC**
@@ -204,38 +191,32 @@ Deno.serve(async (req) => {
     } else if (is3DStyle) {
       styleInstruction = `**STYLE: ${imageStyleDesc.toUpperCase()}**
    - Create this image in ${imageStyleDesc} style
-   - While stylized, PRESERVE the baby's core facial identity - the same unique features should be recognizable
+   - While stylized, PRESERVE the baby's core facial identity
    - Apply the artistic style while maintaining the essential identity markers`;
     } else if (isCartoonStyle) {
       styleInstruction = `**STYLE: ${imageStyleDesc.toUpperCase()}**
    - Transform the image into ${imageStyleDesc} style
-   - Adapt the baby's features to match this animation style while keeping key recognizable traits
-   - Use the color palette and visual language of this cartoon style`;
+   - Adapt the baby's features to match this animation style while keeping key recognizable traits`;
     } else {
       styleInstruction = `**STYLE: ${imageStyleDesc.toUpperCase()}**
    - Create this image in ${imageStyleDesc} style
-   - Apply artistic interpretation while preserving the baby's key facial features
-   - Match the aesthetic and techniques of this artistic style`;
+   - Apply artistic interpretation while preserving the baby's key facial features`;
     }
 
-    // Construct the ultimate professional photoshoot prompt
-    const masterPrompt = `You are a world-renowned ${isRealistic ? 'professional baby photographer' : 'digital artist'} creating an award-winning 2K resolution ${isRealistic ? 'photoshoot' : 'artwork'} masterpiece.
+    const masterPrompt = `You are a world-renowned ${isRealistic ? 'professional baby photographer' : 'digital artist'} creating an award-winning 2K resolution masterpiece.
 
-**ABSOLUTE MISSION:** Transform this baby photo into a breathtaking, ${isRealistic ? 'magazine-cover-quality professional photoshoot' : 'stunning artistic'} image in ${imageStyleDesc} style.
+**ABSOLUTE MISSION:** Transform this baby photo into a breathtaking ${isRealistic ? 'magazine-cover-quality professional photoshoot' : 'stunning artistic'} image in ${imageStyleDesc} style.
 
 **SCENE SETTING:**
 Create ${backgroundDescription}. The scene must feel authentic and perfectly lit.
 
-**CRITICAL REQUIREMENTS - FOLLOW EXACTLY:**
+**CRITICAL REQUIREMENTS:**
 
-1. **FACIAL IDENTITY PRESERVATION (${isRealistic ? 'HIGHEST PRIORITY' : 'HIGH PRIORITY'}):**
+1. **FACIAL IDENTITY PRESERVATION:**
    ${isRealistic ? `- Maintain 100% accuracy of the baby's unique facial features
    - Preserve exact eye shape, nose structure, mouth curvature, cheek contours
-   - Keep identical skin texture, tone, and natural complexion
-   - The baby must be INSTANTLY recognizable - this is non-negotiable` : 
-   `- While applying ${imageStyleDesc} style, preserve the baby's KEY recognizable features
-   - The essence of the baby should be identifiable even in stylized form
-   - Maintain proportional relationships of facial features`}
+   - The baby must be INSTANTLY recognizable` : 
+   `- Preserve the baby's KEY recognizable features in stylized form`}
 
 2. ${styleInstruction}
 
@@ -248,24 +229,12 @@ Create ${backgroundDescription}. The scene must feel authentic and perfectly lit
 4. **TECHNICAL SPECIFICATIONS:**
    - Output: High resolution 2K quality
    - Style: ${imageStyleDesc}
-   - Colors: Rich, vibrant colors appropriate for the chosen style
-   - Background: Beautiful composition with appropriate depth
+   - Colors: Rich, vibrant colors
+   - Background: Beautiful composition with depth
 
-5. **PROHIBITIONS:**
-   ${isRealistic ? `- NO cartoon or illustration style - must be 100% photorealistic
-   - NO AI artifacts, distortions, or uncanny valley effects
-   - NO over-smoothed plastic-looking skin
-   - NO unnatural proportions or anatomy errors` :
-   `- NO mixing of styles - stay consistent with ${imageStyleDesc}
-   - NO low-quality or rushed-looking output
-   - Avoid artifacts that break the artistic style`}
+**OUTPUT:** Generate ONE stunning ${isRealistic ? 'professional baby photograph' : `artistic baby portrait in ${imageStyleDesc} style`}.`;
 
-**OUTPUT:** Generate ONE stunning ${isRealistic ? 'professional baby photograph' : `artistic baby portrait in ${imageStyleDesc} style`} that parents would proudly display, frame, and share.`;
-
-    console.log("Generating image with Gemini 3 Pro Image Preview");
-
-    // Initialize Google GenAI
-    const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+    console.log("Generating image with Gemini via REST API");
 
     // Extract base64 data from data URL if present
     let imageBase64 = sourceImageBase64;
@@ -279,35 +248,51 @@ Create ${backgroundDescription}. The scene must feel authentic and perfectly lit
       }
     }
 
-    // Generate content with Gemini 3 Pro Image Preview
-    const response = await ai.models.generateContent({
-      model: "gemini-3-pro-image-preview",
-      contents: [
-        { text: masterPrompt },
-        {
-          inlineData: {
-            mimeType: mimeType,
-            data: imageBase64,
+    // Use Gemini REST API directly for image generation
+    const geminiResponse = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                { text: masterPrompt },
+                {
+                  inline_data: {
+                    mime_type: mimeType,
+                    data: imageBase64,
+                  },
+                },
+              ],
+            },
+          ],
+          generationConfig: {
+            responseModalities: ["TEXT", "IMAGE"],
           },
-        },
-      ],
-      config: {
-        responseModalities: ["TEXT", "IMAGE"],
-        imageConfig: {
-          aspectRatio: "1:1",
-          imageSize: "2K",
-        },
-      },
-    });
+        }),
+      }
+    );
 
+    if (!geminiResponse.ok) {
+      const errorText = await geminiResponse.text();
+      console.error("Gemini API error:", geminiResponse.status, errorText);
+      return new Response(JSON.stringify({ error: "Image generation failed", details: errorText }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const geminiData = await geminiResponse.json();
     console.log("Gemini response received");
 
     // Extract the generated image from response
     let generatedImageBase64: string | undefined;
     let outputMimeType = "image/png";
 
-    if (response.candidates && response.candidates[0]?.content?.parts) {
-      for (const part of response.candidates[0].content.parts) {
+    if (geminiData.candidates && geminiData.candidates[0]?.content?.parts) {
+      for (const part of geminiData.candidates[0].content.parts) {
         if (part.inlineData) {
           generatedImageBase64 = part.inlineData.data;
           outputMimeType = part.inlineData.mimeType || "image/png";
@@ -317,8 +302,8 @@ Create ${backgroundDescription}. The scene must feel authentic and perfectly lit
     }
 
     if (!generatedImageBase64) {
-      console.error("No image in Gemini response:", JSON.stringify(response));
-      return new Response(JSON.stringify({ error: "No image generated" }), {
+      console.error("No image in Gemini response:", JSON.stringify(geminiData));
+      return new Response(JSON.stringify({ error: "No image generated", response: geminiData }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -346,20 +331,17 @@ Create ${backgroundDescription}. The scene must feel authentic and perfectly lit
       });
     }
 
-    const { data: urlData } = supabase.storage
+    const { data: { publicUrl } } = supabase.storage
       .from("baby-photos")
       .getPublicUrl(fileName);
 
-    const { data: photoRecord, error: dbError } = await supabase
-      .from("baby_photos")
-      .insert({
-        user_id: user.id,
-        storage_path: fileName,
-        prompt: `Theme: ${backgroundTheme}, Customization: ${JSON.stringify(customization)}`,
-        background_theme: backgroundTheme,
-      })
-      .select()
-      .single();
+    // Save to database
+    const { error: dbError } = await supabase.from("baby_photos").insert({
+      user_id: user.id,
+      storage_path: fileName,
+      background_theme: backgroundTheme,
+      prompt: masterPrompt.substring(0, 500),
+    });
 
     if (dbError) {
       console.error("Database error:", dbError);
@@ -368,21 +350,24 @@ Create ${backgroundDescription}. The scene must feel authentic and perfectly lit
     return new Response(
       JSON.stringify({
         success: true,
-        photo: {
-          id: photoRecord?.id,
-          url: urlData.publicUrl,
-          theme: backgroundTheme,
-          createdAt: photoRecord?.created_at,
-        },
+        imageUrl: publicUrl,
+        storagePath: fileName,
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
     );
-  } catch (err) {
-    console.error("Error:", err);
-    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+  } catch (error) {
+    console.error("Error generating image:", error);
     return new Response(
-      JSON.stringify({ error: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : "Unknown error occurred",
+        stack: error instanceof Error ? error.stack : undefined 
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
     );
   }
 });
