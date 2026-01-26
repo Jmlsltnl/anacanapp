@@ -105,7 +105,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
   // Admin-only notice
   if (!isAdmin) {
     return (
-      <div className="pb-28 pt-2 px-5 flex flex-col items-center justify-center min-h-[60vh] text-center">
+      <div className="min-h-screen bg-background overflow-y-auto pb-28 pt-2 px-5 flex flex-col items-center justify-center text-center">
         <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4">
           <Lock className="w-10 h-10 text-muted-foreground" />
         </div>
@@ -127,14 +127,14 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
 
   if (loading) {
     return (
-      <div className="pb-28 pt-2 px-5 flex items-center justify-center min-h-[50vh]">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="pb-28 pt-2 px-5">
+    <div className="min-h-screen bg-background overflow-y-auto pb-28 pt-2 px-5">
       {/* Header */}
       <motion.div 
         className="flex items-center justify-between mb-6"
