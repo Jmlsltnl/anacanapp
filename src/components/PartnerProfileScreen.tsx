@@ -48,9 +48,10 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
     { id: '5', name: 'Ailə Qəhrəmanı', emoji: '👑', unlocked: surprisePoints >= 500 },
   ];
 
+  // Partner-specific menu items - no community/profile visibility settings
   const menuItems = [
-    { id: 'notifications', icon: Bell, label: 'Bildirişlər', badge: '2' },
-    { id: 'privacy', icon: Shield, label: 'Gizlilik' },
+    { id: 'notifications', icon: Bell, label: 'Bildirişlər' },
+    { id: 'partner-privacy', icon: Shield, label: 'Gizlilik' },
     { id: 'help', icon: HelpCircle, label: 'Yardım' },
   ];
 
@@ -326,11 +327,6 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
                 <Icon className="w-5 h-5 text-muted-foreground" />
               </div>
               <span className="flex-1 text-left font-medium text-foreground">{item.label}</span>
-              {item.badge && (
-                <span className="px-2.5 py-1 bg-destructive rounded-full text-[10px] font-bold text-white">
-                  {item.badge}
-                </span>
-              )}
               <ChevronRight className="w-5 h-5 text-muted-foreground" />
             </motion.button>
           );

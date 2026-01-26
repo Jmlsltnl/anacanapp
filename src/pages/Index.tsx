@@ -23,6 +23,7 @@ import CommunityScreen from '@/components/community/CommunityScreen';
 import ProfileEditScreen from '@/components/ProfileEditScreen';
 import HelpScreen from '@/components/HelpScreen';
 import PrivacyScreen from '@/components/PrivacyScreen';
+import PartnerPrivacyScreen from '@/components/PartnerPrivacyScreen';
 import AppearanceScreen from '@/components/AppearanceScreen';
 import UserProfileScreen from '@/components/community/UserProfileScreen';
 import BillingScreen from '@/components/BillingScreen';
@@ -214,6 +215,9 @@ const Index = () => {
   }
   if (activeScreen === 'privacy') {
     return <PrivacyScreen onBack={() => setActiveScreen(null)} />;
+  }
+  if (activeScreen === 'partner-privacy') {
+    return <PartnerPrivacyScreen onBack={() => setActiveScreen(null)} />;
   }
   if (activeScreen === 'appearance') {
     return <AppearanceScreen onBack={() => setActiveScreen(null)} />;

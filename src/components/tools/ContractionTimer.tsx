@@ -220,7 +220,7 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
                       <div>
                         <p className="font-bold text-foreground text-sm">{formatTime(contraction.duration_seconds)} müddət</p>
                         <p className="text-[10px] text-muted-foreground">
-                          {new Date(contraction.start_time).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
+                          {new Date(contraction.start_time).toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' })}, {new Date(contraction.start_time).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
                     </div>

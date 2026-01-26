@@ -169,7 +169,7 @@ const AdminOrders = () => {
                       <Badge className={statusConfig.color}>{statusConfig.label}</Badge>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>{format(new Date(order.created_at), 'd MMM, HH:mm', { locale: az })}</span>
+                      <span>{format(new Date(order.created_at), 'd MMMM, HH:mm', { locale: az })}</span>
                       <span className="font-medium text-foreground">{order.total_amount.toFixed(2)} ₼</span>
                       {order.shipping_address?.name && (
                         <span className="flex items-center gap-1">

@@ -110,7 +110,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
               </Badge>
             )}
             <span className="text-xs text-muted-foreground">
-              {format(new Date(comment.created_at), 'd MMM', { locale: az })}
+              {format(new Date(comment.created_at), 'd MMMM', { locale: az })}
             </span>
           </div>
 
