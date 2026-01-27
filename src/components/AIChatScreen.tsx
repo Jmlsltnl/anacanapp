@@ -9,6 +9,7 @@ import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useAIChatHistory } from '@/hooks/useAIChatHistory';
 import { useAuth } from '@/hooks/useAuth';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { useToast } from '@/hooks/use-toast';
 import { useAISuggestedQuestions } from '@/hooks/useDynamicTools';
@@ -23,6 +24,8 @@ interface Message {
 }
 
 const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
+  useScrollToTop();
+  
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);

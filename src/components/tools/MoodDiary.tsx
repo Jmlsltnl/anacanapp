@@ -8,12 +8,15 @@ import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { hapticFeedback } from '@/lib/native';
 import { useMoodOptions, useSymptoms } from '@/hooks/useDynamicConfig';
 import { useUserStore } from '@/store/userStore';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 interface MoodDiaryProps {
   onBack: () => void;
 }
 
 const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) => {
+  useScrollToTop();
+  
   const [activeTab, setActiveTab] = useState<'log' | 'history' | 'insights'>('log');
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);

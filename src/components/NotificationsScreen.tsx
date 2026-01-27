@@ -4,12 +4,15 @@ import {
   Heart, Pill, Gift
 } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 interface NotificationsScreenProps {
   onBack: () => void;
 }
 
 const NotificationsScreen = ({ onBack }: NotificationsScreenProps) => {
+  useScrollToTop();
+  
   const { 
     notifications, 
     loading, 

@@ -8,12 +8,15 @@ import {
 import { useExerciseLogs } from '@/hooks/useExerciseLogs';
 import { useUserStore } from '@/store/userStore';
 import { useExercises } from '@/hooks/useDynamicConfig';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 interface ExercisesProps {
   onBack: () => void;
 }
 
 const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) => {
+  useScrollToTop();
+  
   const [selectedExerciseId, setSelectedExerciseId] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const { loading: logsLoading, addLog, isCompletedToday, getTodayStats, getStreak } = useExerciseLogs();

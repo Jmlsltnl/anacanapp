@@ -4,6 +4,7 @@ import { ArrowLeft, Camera, Save, User, Calendar, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserStore } from '@/store/userStore';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,6 +18,8 @@ interface ProfileEditScreenProps {
 }
 
 const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
+  useScrollToTop();
+  
   const { user, profile, updateProfile } = useAuth();
   const { lifeStage, babyName, dueDate, lastPeriodDate, cycleLength, setLifeStage, setDueDate, setLastPeriodDate, setCycleLength, setBabyData, babyGender, babyBirthDate } = useUserStore();
   const { toast } = useToast();

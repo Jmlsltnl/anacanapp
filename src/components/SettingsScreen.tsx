@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { useNotificationSettings } from '@/hooks/useNotificationSettings';
 import { useSilentHours } from '@/hooks/useSilentHours';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { toast } from 'sonner';
 
 interface SettingsScreenProps {
@@ -17,6 +18,8 @@ interface SettingsScreenProps {
 }
 
 const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
+  useScrollToTop();
+  
   const { 
     settings, 
     loading, 

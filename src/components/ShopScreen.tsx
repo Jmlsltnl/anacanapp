@@ -5,6 +5,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { useShopCategories } from '@/hooks/useDynamicTools';
 import { useCart } from '@/hooks/useOrders';
 import { useAuth } from '@/hooks/useAuth';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import CartDrawer from '@/components/shop/CartDrawer';
 import CheckoutScreen from '@/components/shop/CheckoutScreen';
 import OrderSuccessScreen from '@/components/shop/OrderSuccessScreen';
@@ -26,6 +27,8 @@ const categoryEmojis: Record<string, string> = {
 };
 
 const ShopScreen = ({ onBack }: ShopScreenProps) => {
+  useScrollToTop();
+  
   const { products: dbProducts, loading } = useProducts();
   const { data: dbCategories = [] } = useShopCategories();
   const { addToCart, totalItems } = useCart();

@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface DoctorsHospitalsProps {
@@ -67,6 +68,8 @@ const dayLabels: Record<string, string> = {
 };
 
 const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
+  useScrollToTop();
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [selectedProvider, setSelectedProvider] = useState<HealthcareProvider | null>(null);

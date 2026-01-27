@@ -4,6 +4,7 @@ import { ArrowLeft, Search, Check, AlertTriangle, X, Loader2, Sparkles } from 'l
 import { useSafetyItems } from '@/hooks/useDynamicContent';
 import { useSafetyCategories } from '@/hooks/useDynamicTools';
 import { supabase } from '@/integrations/supabase/client';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -12,6 +13,8 @@ interface SafetyLookupProps {
 }
 
 const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, ref) => {
+  useScrollToTop();
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedItem, setSelectedItem] = useState<any | null>(null);

@@ -19,6 +19,7 @@ import { usePartnerMissions } from '@/hooks/usePartnerMissions';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useDailyTip } from '@/hooks/usePartnerDailyTips';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { supabase } from '@/integrations/supabase/client';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { translateSymptoms, formatRelativeDateAz } from '@/lib/date-utils';
@@ -112,6 +113,8 @@ const QuickAction = ({ icon: Icon, label, gradient, onClick, delay = 0 }: {
 );
 
 const PartnerDashboard = () => {
+  useScrollToTop();
+  
   const { name } = useUserStore();
   const { toast } = useToast();
   const { profile } = useAuth();

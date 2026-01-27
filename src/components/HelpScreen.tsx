@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useSupportTickets, SupportTicket } from '@/hooks/useSupportTickets';
 import { useSupportTicketReplies } from '@/hooks/useSupportTicketReplies';
 import { useFaqs, useSupportCategories } from '@/hooks/useDynamicTools';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
@@ -20,6 +21,8 @@ interface HelpScreenProps {
 }
 
 const HelpScreen = ({ onBack }: HelpScreenProps) => {
+  useScrollToTop();
+  
   const [activeTab, setActiveTab] = useState<'faq' | 'contact' | 'tickets'>('faq');
   const [showNewTicket, setShowNewTicket] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);

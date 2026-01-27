@@ -8,6 +8,7 @@ import { useRecipes, Recipe } from '@/hooks/useDynamicContent';
 import { useRecipeCategories } from '@/hooks/useDynamicTools';
 import { useUserStore } from '@/store/userStore';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { Input } from '@/components/ui/input';
 import { PremiumModal } from '@/components/PremiumModal';
 
@@ -16,6 +17,8 @@ interface RecipesProps {
 }
 
 const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
+  useScrollToTop();
+  
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [recipeCategory, setRecipeCategory] = useState('all');
   const [recipeSearch, setRecipeSearch] = useState('');

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Pause, Volume2, VolumeX, Crown, Lock, Loader2 } from 'lucide-react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { PremiumModal } from '@/components/PremiumModal';
 import { useWhiteNoiseSounds } from '@/hooks/useDynamicConfig';
 
@@ -18,6 +19,8 @@ interface WhiteNoiseProps {
 }
 
 const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref) => {
+  useScrollToTop();
+  
   const { preferences, loading: prefsLoading, updateWhiteNoiseVolume, updateWhiteNoiseTimer, updateLastWhiteNoiseSound } = useUserPreferences();
   const { isPremium, canUseWhiteNoise, trackWhiteNoiseUsage, freeLimits } = useSubscription();
   const { data: dbSounds, isLoading: soundsLoading } = useWhiteNoiseSounds();

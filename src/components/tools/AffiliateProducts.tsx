@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { useUserStore } from '@/store/userStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAppSetting } from '@/hooks/useAppSettings';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useAffiliateProducts, useSavedProducts, AffiliateProduct } from '@/hooks/useAffiliateProducts';
 import AffiliateProductCard from './affiliate/AffiliateProductCard';
 import AffiliateProductDetail from './affiliate/AffiliateProductDetail';
@@ -27,6 +28,8 @@ const categoryLabels: Record<string, string> = {
 };
 
 const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
+  useScrollToTop();
+  
   const { lifeStage } = useUserStore();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');

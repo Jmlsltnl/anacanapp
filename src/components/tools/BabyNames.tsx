@@ -3,12 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Search, Heart, Shuffle, Star } from 'lucide-react';
 import { useFavoriteNames } from '@/hooks/useFavoriteNames';
 import { useBabyNames } from '@/hooks/useDynamicContent';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 interface BabyNamesProps {
   onBack: () => void;
 }
 
 const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) => {
+  useScrollToTop();
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [genderFilter, setGenderFilter] = useState<'all' | 'boy' | 'girl'>('all');
   const [selectedName, setSelectedName] = useState<any | null>(null);

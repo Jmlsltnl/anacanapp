@@ -3,6 +3,7 @@ import { ArrowLeft, FileText, Shield, Scale, AlertTriangle, CreditCard, Database
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useLegalDocuments, LegalDocument } from '@/hooks/useLegalDocuments';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import MarkdownContent from '@/components/MarkdownContent';
 
 interface LegalScreenProps {
@@ -29,6 +30,8 @@ const documentOrder = [
 ];
 
 const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
+  useScrollToTop();
+  
   const { data: documents = [], isLoading } = useLegalDocuments();
   const [selectedDoc, setSelectedDoc] = useState<LegalDocument | null>(null);
 

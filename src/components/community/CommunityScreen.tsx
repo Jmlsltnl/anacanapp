@@ -2,6 +2,7 @@ import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Users, Plus, Search, TrendingUp } from 'lucide-react';
 import { useCommunityGroups, useUserMemberships } from '@/hooks/useCommunity';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import GroupsList from './GroupsList';
 import GroupFeed from './GroupFeed';
 import CreatePostModal from './CreatePostModal';
@@ -13,6 +14,8 @@ interface CommunityScreenProps {
 }
 
 const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBack }, ref) => {
+  useScrollToTop();
+  
   const [activeTab, setActiveTab] = useState<'feed' | 'groups' | 'my-groups'>('feed');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [showCreatePost, setShowCreatePost] = useState(false);
