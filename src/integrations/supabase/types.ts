@@ -3747,48 +3747,81 @@ export type Database = {
         Row: {
           created_at: string
           daily_push_enabled: boolean | null
+          exercise_days: number[] | null
+          exercise_reminder: boolean | null
           id: string
           last_push_sent_at: string | null
           last_white_noise_sound: string | null
+          notifications_enabled: boolean | null
           push_comments: boolean | null
           push_community: boolean | null
           push_enabled: boolean | null
           push_likes: boolean | null
           push_messages: boolean | null
+          silent_hours_enabled: boolean | null
+          silent_hours_end: string | null
+          silent_hours_start: string | null
+          sound_enabled: boolean | null
           updated_at: string
           user_id: string
+          vibration_enabled: boolean | null
+          vitamin_reminder: boolean | null
+          vitamin_time: string | null
+          water_reminder: boolean | null
           white_noise_timer: number | null
           white_noise_volume: number | null
         }
         Insert: {
           created_at?: string
           daily_push_enabled?: boolean | null
+          exercise_days?: number[] | null
+          exercise_reminder?: boolean | null
           id?: string
           last_push_sent_at?: string | null
           last_white_noise_sound?: string | null
+          notifications_enabled?: boolean | null
           push_comments?: boolean | null
           push_community?: boolean | null
           push_enabled?: boolean | null
           push_likes?: boolean | null
           push_messages?: boolean | null
+          silent_hours_enabled?: boolean | null
+          silent_hours_end?: string | null
+          silent_hours_start?: string | null
+          sound_enabled?: boolean | null
           updated_at?: string
           user_id: string
+          vibration_enabled?: boolean | null
+          vitamin_reminder?: boolean | null
+          vitamin_time?: string | null
+          water_reminder?: boolean | null
           white_noise_timer?: number | null
           white_noise_volume?: number | null
         }
         Update: {
           created_at?: string
           daily_push_enabled?: boolean | null
+          exercise_days?: number[] | null
+          exercise_reminder?: boolean | null
           id?: string
           last_push_sent_at?: string | null
           last_white_noise_sound?: string | null
+          notifications_enabled?: boolean | null
           push_comments?: boolean | null
           push_community?: boolean | null
           push_enabled?: boolean | null
           push_likes?: boolean | null
           push_messages?: boolean | null
+          silent_hours_enabled?: boolean | null
+          silent_hours_end?: string | null
+          silent_hours_start?: string | null
+          sound_enabled?: boolean | null
           updated_at?: string
           user_id?: string
+          vibration_enabled?: boolean | null
+          vitamin_reminder?: boolean | null
+          vitamin_time?: string | null
+          water_reminder?: boolean | null
           white_noise_timer?: number | null
           white_noise_volume?: number | null
         }
