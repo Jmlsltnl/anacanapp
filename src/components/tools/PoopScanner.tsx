@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Camera, Upload, AlertTriangle, CheckCircle, AlertCircle, Loader2, History, Info, Phone } from 'lucide-react';
+import { ArrowLeft, Camera, Upload, AlertTriangle, CheckCircle, AlertCircle, Loader2, History, Info, Phone, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-
+import { takePhoto, pickFromGallery, requestCameraPermission } from '@/lib/permissions';
+import { Capacitor } from '@capacitor/core';
 interface PoopScannerProps {
   onBack: () => void;
 }
@@ -80,6 +81,60 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
       setAnalysis(null);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleCameraCapture = async () => {
+    try {
+      const image = await takePhoto();
+      if (image) {
+        setSelectedImage(image);
+        setAnalysis(null);
+      } else {
+        // Fallback to file input for web
+        cameraInputRef.current?.click();
+      }
+    } catch (error: any) {
+      if (error.message?.includes('permission') || error.message?.includes('denied')) {
+        toast({
+          title: 'Kamera icazəsi lazımdır',
+          description: 'Parametrlərdən kamera icazəsini aktivləşdirin',
+          variant: 'destructive'
+        });
+      } else if (error.message !== 'User cancelled photos app') {
+        toast({
+          title: 'Kamera xətası',
+          description: 'Yenidən cəhd edin',
+          variant: 'destructive'
+        });
+      }
+    }
+  };
+
+  const handleGalleryPick = async () => {
+    try {
+      const image = await pickFromGallery();
+      if (image) {
+        setSelectedImage(image);
+        setAnalysis(null);
+      } else {
+        // Fallback to file input for web
+        fileInputRef.current?.click();
+      }
+    } catch (error: any) {
+      if (error.message?.includes('permission') || error.message?.includes('denied')) {
+        toast({
+          title: 'Şəkil icazəsi lazımdır',
+          description: 'Parametrlərdən şəkil icazəsini aktivləşdirin',
+          variant: 'destructive'
+        });
+      } else if (error.message !== 'User cancelled photos app') {
+        toast({
+          title: 'Qaleriya xətası',
+          description: 'Yenidən cəhd edin',
+          variant: 'destructive'
+        });
+      }
+    }
   };
 
   const analyzeImage = async () => {
@@ -182,7 +237,7 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
                   <Button
                     variant="outline"
                     className="h-24 flex-col gap-2"
-                    onClick={() => cameraInputRef.current?.click()}
+                    onClick={handleCameraCapture}
                   >
                     <Camera className="w-8 h-8 text-primary" />
                     <span className="text-sm">Kamera</span>
@@ -190,13 +245,14 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
                   <Button
                     variant="outline"
                     className="h-24 flex-col gap-2"
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={handleGalleryPick}
                   >
                     <Upload className="w-8 h-8 text-primary" />
                     <span className="text-sm">Qalereyadan</span>
                   </Button>
                 </div>
                 
+                {/* Hidden file inputs as fallback for web */}
                 <input
                   ref={cameraInputRef}
                   type="file"
