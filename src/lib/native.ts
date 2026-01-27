@@ -305,26 +305,57 @@ export const saveImageToGallery = async (imageUrl: string, fileName?: string): P
     });
 
     if (isIOS) {
-      // iOS: Use share sheet to save directly to Photos app
-      // This provides the native "Save to Photos" option immediately
+      // iOS: Save to Documents then trigger share sheet for saving to Photos
       try {
-        const file = new File([blob], finalFileName, { type: 'image/jpeg' });
-        await navigator.share({
-          files: [file],
-          title: 'Şəkli yadda saxla',
-        });
-        console.log('iOS: Share sheet opened for saving to Photos');
-        return true;
-      } catch (shareError) {
-        // If share fails or user cancels, fall back to Documents
-        console.log('Share sheet failed/cancelled, saving to Documents:', shareError);
-        const result = await Filesystem.writeFile({
+        // First save to Documents directory
+        const writeResult = await Filesystem.writeFile({
           path: finalFileName,
           data: base64Data,
           directory: Directory.Documents,
         });
-        console.log('iOS: File saved to Documents:', result.uri);
+        console.log('iOS: File saved to Documents:', writeResult.uri);
+        
+        // Now read it back as a blob for sharing
+        const readResult = await Filesystem.readFile({
+          path: finalFileName,
+          directory: Directory.Documents,
+        });
+        
+        // Convert base64 back to blob for sharing
+        const byteCharacters = atob(readResult.data as string);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const shareBlob = new Blob([byteArray], { type: 'image/jpeg' });
+        const file = new File([shareBlob], finalFileName, { type: 'image/jpeg' });
+        
+        // Open share sheet - user can "Save Image" from here
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'Şəkli yadda saxla',
+          });
+          console.log('iOS: Share sheet opened successfully');
+        } else {
+          console.log('iOS: Sharing files not supported, file saved to Documents');
+        }
+        
         return true;
+      } catch (iosError) {
+        console.error('iOS save error:', iosError);
+        // Last resort: just save to Documents
+        try {
+          await Filesystem.writeFile({
+            path: finalFileName,
+            data: base64Data,
+            directory: Directory.Documents,
+          });
+          return true;
+        } catch {
+          return false;
+        }
       }
     } else if (isAndroid) {
       // Android: Save to Downloads/Pictures - this will be visible in Gallery
