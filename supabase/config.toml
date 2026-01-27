@@ -20,3 +20,12 @@ verify_jwt = false
 
 [functions.safety-ai-lookup]
 verify_jwt = false
+
+[functions.analyze-cry]
+verify_jwt = false
+
+[functions.analyze-poop]
+verify_jwt = false
+
+[functions.weather-clothing]
+verify_jwt = false
