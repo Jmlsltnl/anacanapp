@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Mic, Square, Volume2, AlertCircle, CheckCircle, Clock, Baby, Loader2, History, Info, MicOff } from 'lucide-react';
+import { ArrowLeft, Mic, Square, AlertCircle, CheckCircle, Clock, Loader2, History, Info, AlertTriangle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -18,7 +18,10 @@ interface CryAnalysis {
   explanation: string;
   recommendations: string[];
   urgency: 'low' | 'medium' | 'high';
+  isCryDetected?: boolean;
 }
+
+type AnalysisStage = 'idle' | 'recording' | 'processing' | 'analyzing' | 'complete' | 'no_cry' | 'false_positive' | 'error';
 
 const cryTypeLabels: Record<string, { label: string; emoji: string; color: string }> = {
   hungry: { label: 'Ac', emoji: '🍼', color: 'from-orange-500 to-amber-500' },
@@ -29,12 +32,24 @@ const cryTypeLabels: Record<string, { label: string; emoji: string; color: strin
   attention: { label: 'Diqqət istəyir', emoji: '🤗', color: 'from-blue-500 to-cyan-500' },
   overstimulated: { label: 'Həddən artıq yorulub', emoji: '🥱', color: 'from-gray-500 to-slate-500' },
   sick: { label: 'Xəstəlik', emoji: '🤒', color: 'from-rose-600 to-red-600' },
+  no_cry_detected: { label: 'Ağlama aşkarlanmadı', emoji: '🔇', color: 'from-gray-400 to-gray-500' },
+  false_positive: { label: 'Saxta səs', emoji: '📺', color: 'from-amber-400 to-orange-500' },
+};
+
+const stageMessages: Record<AnalysisStage, string> = {
+  idle: 'Yazmağa başlayın',
+  recording: 'Səs yazılır...',
+  processing: 'Səs emal edilir...',
+  analyzing: 'AI analiz edir...',
+  complete: 'Analiz tamamlandı',
+  no_cry: 'Ağlama aşkarlanmadı',
+  false_positive: 'Saxta səs aşkarlandı',
+  error: 'Xəta baş verdi',
 };
 
 const CryTranslator = ({ onBack }: CryTranslatorProps) => {
-  const [isRecording, setIsRecording] = useState(false);
+  const [stage, setStage] = useState<AnalysisStage>('idle');
   const [recordingTime, setRecordingTime] = useState(0);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<CryAnalysis | null>(null);
   const [audioLevel, setAudioLevel] = useState(0);
   const [showHistory, setShowHistory] = useState(false);
@@ -45,17 +60,28 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationRef = useRef<number | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
   
   const { toast } = useToast();
   const { profile } = useAuth();
 
+  const isRecording = stage === 'recording';
+  const isProcessing = stage === 'processing' || stage === 'analyzing';
+
   useEffect(() => {
     loadHistory();
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      cleanup();
     };
   }, []);
+
+  const cleanup = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    if (audioContextRef.current) {
+      audioContextRef.current.close().catch(() => {});
+    }
+  };
 
   const loadHistory = async () => {
     if (!profile?.user_id) return;
@@ -70,7 +96,6 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
 
   const startRecording = async () => {
     try {
-      // Request microphone permission first
       const permission = await requestMicrophonePermission();
       
       if (!permission.granted) {
@@ -84,8 +109,9 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
-      // Set up audio analyzer for visual feedback
+      // Set up audio analyzer
       const audioContext = new AudioContext();
+      audioContextRef.current = audioContext;
       const source = audioContext.createMediaStreamSource(stream);
       const analyser = audioContext.createAnalyser();
       analyser.fftSize = 256;
@@ -112,7 +138,7 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
       };
       
       mediaRecorder.start(100);
-      setIsRecording(true);
+      setStage('recording');
       setRecordingTime(0);
       setAnalysis(null);
       
@@ -128,6 +154,7 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
       
     } catch (error: any) {
       console.error('Recording error:', error);
+      setStage('error');
       
       if (error.name === 'NotAllowedError' || error.message?.includes('permission')) {
         toast({
@@ -146,12 +173,10 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
   };
 
   const stopRecording = async () => {
-    if (!mediaRecorderRef.current || !isRecording) return;
+    if (!mediaRecorderRef.current || stage !== 'recording') return;
     
     if (timerRef.current) clearInterval(timerRef.current);
     if (animationRef.current) cancelAnimationFrame(animationRef.current);
-    
-    setIsRecording(false);
     
     if (recordingTime < 3) {
       toast({
@@ -160,8 +185,12 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
         variant: 'destructive'
       });
       mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      setStage('idle');
       return;
     }
+    
+    setStage('processing');
     
     mediaRecorderRef.current.onstop = async () => {
       const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
@@ -173,7 +202,7 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
   };
 
   const analyzeAudio = async (audioBlob: Blob) => {
-    setIsAnalyzing(true);
+    setStage('analyzing');
     
     try {
       const reader = new FileReader();
@@ -192,21 +221,39 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
         if (error) throw error;
         
         if (data.success && data.analysis) {
-          setAnalysis(data.analysis);
+          const result = data.analysis as CryAnalysis;
+          setAnalysis(result);
+          
+          // Determine final stage based on result
+          if (result.cryType === 'no_cry_detected') {
+            setStage('no_cry');
+          } else if (result.cryType === 'false_positive') {
+            setStage('false_positive');
+          } else {
+            setStage('complete');
+          }
+          
           loadHistory();
         } else {
           throw new Error(data.error || 'Analysis failed');
         }
       };
     } catch (error) {
+      console.error('Analysis error:', error);
+      setStage('error');
       toast({
         title: 'Analiz xətası',
         description: 'Yenidən cəhd edin',
         variant: 'destructive'
       });
-    } finally {
-      setIsAnalyzing(false);
     }
+  };
+
+  const resetAnalysis = () => {
+    setStage('idle');
+    setAnalysis(null);
+    setRecordingTime(0);
+    setAudioLevel(0);
   };
 
   const getUrgencyColor = (urgency: string) => {
@@ -218,6 +265,33 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
   };
 
   const cryInfo = analysis ? cryTypeLabels[analysis.cryType] || cryTypeLabels.attention : null;
+
+  const renderButtonContent = () => {
+    switch (stage) {
+      case 'processing':
+        return (
+          <div className="flex flex-col items-center">
+            <Loader2 className="w-12 h-12 text-white animate-spin" />
+          </div>
+        );
+      case 'analyzing':
+        return (
+          <div className="flex flex-col items-center">
+            <Loader2 className="w-12 h-12 text-white animate-spin" />
+          </div>
+        );
+      case 'recording':
+        return <Square className="w-10 h-10 text-white" />;
+      default:
+        return <Mic className="w-12 h-12 text-white" />;
+    }
+  };
+
+  const getButtonClass = () => {
+    if (stage === 'recording') return 'bg-red-500 shadow-lg shadow-red-500/30';
+    if (isProcessing) return 'bg-primary/70 cursor-not-allowed';
+    return 'bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/30';
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -256,14 +330,10 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
             <div className="flex flex-col items-center">
               {/* Recording Button */}
               <motion.button
-                onClick={isRecording ? stopRecording : startRecording}
-                disabled={isAnalyzing}
-                className={`relative w-32 h-32 rounded-full flex items-center justify-center transition-all ${
-                  isRecording 
-                    ? 'bg-red-500 shadow-lg shadow-red-500/30' 
-                    : 'bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/30'
-                }`}
-                whileTap={{ scale: 0.95 }}
+                onClick={isRecording ? stopRecording : (isProcessing ? undefined : startRecording)}
+                disabled={isProcessing}
+                className={`relative w-32 h-32 rounded-full flex items-center justify-center transition-all ${getButtonClass()}`}
+                whileTap={isProcessing ? {} : { scale: 0.95 }}
                 animate={isRecording ? { scale: [1, 1.05, 1] } : {}}
                 transition={{ repeat: isRecording ? Infinity : 0, duration: 1 }}
               >
@@ -275,13 +345,7 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
                   />
                 )}
                 
-                {isAnalyzing ? (
-                  <Loader2 className="w-12 h-12 text-white animate-spin" />
-                ) : isRecording ? (
-                  <Square className="w-10 h-10 text-white" />
-                ) : (
-                  <Mic className="w-12 h-12 text-white" />
-                )}
+                {renderButtonContent()}
               </motion.button>
 
               {/* Timer */}
@@ -294,10 +358,13 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
                 <span className="text-xs text-muted-foreground">/10s</span>
               </div>
 
-              {/* Status */}
-              <p className="mt-2 text-sm text-muted-foreground">
-                {isAnalyzing ? 'Analiz edilir...' : isRecording ? 'Dayandırmaq üçün toxunun' : 'Yazmağa başlayın'}
-              </p>
+              {/* Status Message */}
+              <div className="mt-2 flex items-center gap-2">
+                {isProcessing && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
+                <p className="text-sm text-muted-foreground">
+                  {stageMessages[stage]}
+                </p>
+              </div>
 
               {/* Progress bar for recording */}
               {isRecording && (
@@ -310,13 +377,110 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
                   />
                 </div>
               )}
+
+              {/* Processing stages indicator */}
+              {isProcessing && (
+                <div className="w-full mt-4 flex justify-center gap-2">
+                  <div className={`w-3 h-3 rounded-full ${stage === 'processing' ? 'bg-primary animate-pulse' : 'bg-primary'}`} />
+                  <div className={`w-3 h-3 rounded-full ${stage === 'analyzing' ? 'bg-primary animate-pulse' : 'bg-muted'}`} />
+                  <div className="w-3 h-3 rounded-full bg-muted" />
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
 
-        {/* Analysis Result */}
+        {/* No Cry Detected Card */}
         <AnimatePresence>
-          {analysis && cryInfo && (
+          {stage === 'no_cry' && analysis && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <Card className="overflow-hidden border-amber-500/30">
+                <div className="h-2 bg-gradient-to-r from-gray-400 to-gray-500" />
+                <CardContent className="p-4 space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center text-3xl">
+                      🔇
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold">Ağlama aşkarlanmadı</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Ortamda körpə ağlaması eşidilmədi
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-muted/50 rounded-xl">
+                    <p className="text-sm">{analysis.explanation}</p>
+                  </div>
+
+                  <div className="flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                    <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
+                    <p className="text-sm text-amber-600 dark:text-amber-400">
+                      Körpəniz ağladığı zaman yenidən cəhd edin. Mümkün qədər yaxından və aydın səs yazın.
+                    </p>
+                  </div>
+
+                  <Button onClick={resetAnalysis} className="w-full">
+                    <Mic className="w-4 h-4 mr-2" />
+                    Yenidən cəhd et
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* False Positive Card */}
+        <AnimatePresence>
+          {stage === 'false_positive' && analysis && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <Card className="overflow-hidden border-orange-500/30">
+                <div className="h-2 bg-gradient-to-r from-amber-400 to-orange-500" />
+                <CardContent className="p-4 space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-3xl">
+                      📺
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold">Saxta səs aşkarlandı</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Bu səs həqiqi körpə ağlaması deyil
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-muted/50 rounded-xl">
+                    <p className="text-sm">{analysis.explanation}</p>
+                  </div>
+
+                  <div className="flex items-start gap-2 p-3 bg-orange-500/10 border border-orange-500/20 rounded-xl">
+                    <XCircle className="w-5 h-5 text-orange-500 shrink-0" />
+                    <p className="text-sm text-orange-600 dark:text-orange-400">
+                      TV, telefon və ya imitasiya səsləri aşkarlandı. Həqiqi körpə ağlaması ilə yenidən cəhd edin.
+                    </p>
+                  </div>
+
+                  <Button onClick={resetAnalysis} className="w-full">
+                    <Mic className="w-4 h-4 mr-2" />
+                    Yenidən cəhd et
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Success Analysis Result */}
+        <AnimatePresence>
+          {stage === 'complete' && analysis && cryInfo && analysis.isCryDetected !== false && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -371,6 +535,11 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
                       </p>
                     </div>
                   )}
+
+                  <Button onClick={resetAnalysis} variant="outline" className="w-full">
+                    <Mic className="w-4 h-4 mr-2" />
+                    Yeni analiz
+                  </Button>
                 </CardContent>
               </Card>
             </motion.div>
