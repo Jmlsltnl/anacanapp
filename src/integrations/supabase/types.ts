@@ -1767,6 +1767,7 @@ export type Database = {
       }
       marketplace_listings: {
         Row: {
+          admin_notes: string | null
           age_range: string | null
           category: string
           condition: string
@@ -1777,12 +1778,15 @@ export type Database = {
           is_free: boolean | null
           location_city: string | null
           price: number | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           status: string
           title: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          admin_notes?: string | null
           age_range?: string | null
           category?: string
           condition?: string
@@ -1793,12 +1797,15 @@ export type Database = {
           is_free?: boolean | null
           location_city?: string | null
           price?: number | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
           title: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          admin_notes?: string | null
           age_range?: string | null
           category?: string
           condition?: string
@@ -1809,6 +1816,8 @@ export type Database = {
           is_free?: boolean | null
           location_city?: string | null
           price?: number | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
           title?: string
           updated_at?: string
