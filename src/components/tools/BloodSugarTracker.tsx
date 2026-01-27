@@ -153,7 +153,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
       {/* Header */}
       <div className="sticky top-0 z-10 bg-card border-b border-border/50 px-4 py-3">
         <div className="flex items-center justify-between">
@@ -325,7 +325,8 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            className="w-full bg-card rounded-t-3xl p-5 pb-8 max-h-[85vh] overflow-y-auto"
+            className="w-full bg-card rounded-t-3xl p-5 max-h-[85vh] overflow-y-auto"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 24px)' }}
           >
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-bold text-lg">Yeni ölçmə</h2>

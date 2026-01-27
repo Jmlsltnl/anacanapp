@@ -111,7 +111,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-fuchsia-50 dark:from-fuchsia-950/20 to-background pb-24">
+    <div className="min-h-screen bg-gradient-to-b from-fuchsia-50 dark:from-fuchsia-950/20 to-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
       {/* Header */}
       <div className="bg-gradient-to-br from-fuchsia-500 to-pink-600 px-3 pt-3 pb-6">
         <div className="flex items-center gap-2 mb-3">
