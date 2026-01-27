@@ -1,11 +1,12 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Heart, ExternalLink, Star, Clock,
-  Check, X, Play, Share2, ShoppingBag, Tag, Store, Info
+  Check, X, Play, Share2, Tag, Store, Info, ChevronRight, Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { AffiliateProduct, useIsProductSaved, useSaveProduct, useUnsaveProduct } from '@/hooks/useAffiliateProducts';
 import { formatDistanceToNow } from 'date-fns';
 import { az } from 'date-fns/locale';
@@ -23,11 +24,11 @@ interface AffiliateProductDetailProps {
   onBack: () => void;
 }
 
-const platformColors: Record<string, string> = {
-  trendyol: 'bg-orange-500',
-  amazon: 'bg-amber-600',
-  aliexpress: 'bg-red-500',
-  other: 'bg-muted-foreground',
+const platformColors: Record<string, { bg: string; text: string }> = {
+  trendyol: { bg: 'bg-orange-500/10', text: 'text-orange-600' },
+  amazon: { bg: 'bg-amber-500/10', text: 'text-amber-600' },
+  aliexpress: { bg: 'bg-red-500/10', text: 'text-red-600' },
+  other: { bg: 'bg-muted', text: 'text-muted-foreground' },
 };
 
 const platformLabels: Record<string, string> = {
@@ -54,6 +55,8 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
     ? Math.round((1 - product.price / product.original_price) * 100)
     : null;
 
+  const platformStyle = platformColors[product.platform] || platformColors.other;
+
   // Handle carousel scroll
   const onSelect = useCallback(() => {
     if (!carouselApi) return;
@@ -61,13 +64,13 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
   }, [carouselApi]);
 
   // Set up carousel listener
-  useState(() => {
+  useEffect(() => {
     if (!carouselApi) return;
     carouselApi.on('select', onSelect);
     return () => {
       carouselApi.off('select', onSelect);
     };
-  });
+  }, [carouselApi, onSelect]);
 
   const handleSaveToggle = () => {
     if (isSaved) {
@@ -98,22 +101,22 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
   };
 
   return (
-    <div className="min-h-screen bg-background pb-32">
+    <div className="min-h-screen bg-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-card/80 backdrop-blur-lg border-b border-border/50">
+      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl border-b border-border/30">
         <div className="flex items-center justify-between px-4 py-3">
-          <Button variant="ghost" size="icon" onClick={onBack}>
+          <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full">
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={handleShare}>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" onClick={handleShare} className="rounded-full">
               <Share2 className="w-5 h-5" />
             </Button>
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={handleSaveToggle}
-              className={isSaved ? 'text-red-500' : ''}
+              className={`rounded-full ${isSaved ? 'text-red-500' : ''}`}
             >
               <Heart className={`w-5 h-5 ${isSaved ? 'fill-current' : ''}`} />
             </Button>
@@ -121,8 +124,8 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
         </div>
       </div>
 
-      {/* Image Gallery - Carousel */}
-      <div className="relative bg-gradient-to-b from-muted to-background">
+      {/* Image Gallery */}
+      <div className="relative bg-gradient-to-b from-muted/50 to-background">
         {allImages.length > 1 ? (
           <Carousel
             setApi={setCarouselApi}
@@ -132,35 +135,43 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
             <CarouselContent className="-ml-0">
               {allImages.map((img, idx) => (
                 <CarouselItem key={idx} className="pl-0">
-                  <div className="relative aspect-square">
+                  <div className="relative aspect-square flex items-center justify-center p-6">
                     <img
                       src={img || '/placeholder.svg'}
                       alt={`${product.name_az || product.name} - ${idx + 1}`}
-                      className="w-full h-full object-contain p-4"
+                      className="max-w-full max-h-full object-contain rounded-2xl"
                     />
-                    {/* Discount Badge */}
-                    {discountPercent && idx === 0 && (
-                      <Badge className="absolute top-4 left-4 text-sm bg-red-500 text-white border-0 shadow-lg">
-                        -{discountPercent}% Endirim
-                      </Badge>
-                    )}
                   </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
           </Carousel>
         ) : (
-          <div className="relative aspect-square">
+          <div className="relative aspect-square flex items-center justify-center p-6">
             <img
               src={allImages[0] || '/placeholder.svg'}
               alt={product.name_az || product.name}
-              className="w-full h-full object-contain p-4"
+              className="max-w-full max-h-full object-contain rounded-2xl"
             />
-            {discountPercent && (
-              <Badge className="absolute top-4 left-4 text-sm bg-red-500 text-white border-0 shadow-lg">
-                -{discountPercent}% Endirim
-              </Badge>
-            )}
+          </div>
+        )}
+
+        {/* Discount Badge */}
+        {discountPercent && (
+          <div className="absolute top-4 left-4">
+            <Badge className="text-sm bg-red-500 text-white border-0 shadow-lg px-3 py-1 font-bold">
+              -{discountPercent}%
+            </Badge>
+          </div>
+        )}
+
+        {/* Featured Badge */}
+        {product.is_featured && (
+          <div className="absolute top-4 right-4">
+            <Badge className="bg-amber-500/90 text-white border-0 shadow-lg px-3 py-1 flex items-center gap-1">
+              <Sparkles className="w-3 h-3" />
+              Tövsiyyə
+            </Badge>
           </div>
         )}
         
@@ -168,25 +179,25 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
         {product.video_url && (
           <button
             onClick={() => setShowVideo(true)}
-            className="absolute bottom-16 right-4 px-4 py-2 rounded-full bg-background/90 flex items-center gap-2 shadow-lg z-10"
+            className="absolute bottom-20 right-4 px-4 py-2.5 rounded-full bg-background/95 flex items-center gap-2 shadow-xl border border-border/50 z-10"
           >
             <Play className="w-4 h-4 text-primary fill-primary" />
             <span className="text-sm font-medium">Video</span>
           </button>
         )}
         
-        {/* Thumbnail Preview & Indicators */}
+        {/* Thumbnail Preview */}
         {allImages.length > 1 && (
           <div className="px-4 pb-4">
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide py-2">
               {allImages.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => scrollToImage(idx)}
-                  className={`shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${
+                  className={`shrink-0 w-14 h-14 rounded-xl overflow-hidden border-2 transition-all ${
                     idx === currentImageIndex 
-                      ? 'border-primary' 
-                      : 'border-transparent opacity-60'
+                      ? 'border-primary shadow-lg scale-105' 
+                      : 'border-border/50 opacity-70 hover:opacity-100'
                   }`}
                 >
                   <img
@@ -202,157 +213,195 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
       </div>
 
       {/* Product Info */}
-      <div className="px-4 -mt-2">
-        {/* Main Card */}
-        <div className="bg-card rounded-2xl p-4 border border-border/50 shadow-sm mb-4">
-          {/* Platform Badge */}
-          <div className="flex items-center justify-between mb-3">
-            <Badge className={`${platformColors[product.platform]} text-white border-0 flex items-center gap-1`}>
-              <Store className="w-3 h-3" />
-              {product.store_name || platformLabels[product.platform] || product.platform}
-            </Badge>
-            {product.is_featured && (
-              <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20">
-                ⭐ Tövsiyyə olunan
-              </Badge>
-            )}
-          </div>
-          
-          {/* Title */}
-          <h1 className="text-xl font-bold mb-2">{product.name_az || product.name}</h1>
-          
-          {/* Rating */}
-          {product.rating > 0 && (
+      <div className="px-4 space-y-4 -mt-2">
+        {/* Main Info Card */}
+        <Card className="border-0 shadow-lg bg-card/80 backdrop-blur">
+          <CardContent className="p-5">
+            {/* Platform & Store */}
             <div className="flex items-center gap-2 mb-3">
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map(star => (
-                  <Star 
-                    key={star}
-                    className={`w-4 h-4 ${star <= Math.round(product.rating) ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground/30'}`}
-                  />
+              <Badge className={`${platformStyle.bg} ${platformStyle.text} border-0 flex items-center gap-1.5 px-3 py-1`}>
+                <Store className="w-3.5 h-3.5" />
+                {product.store_name || platformLabels[product.platform] || product.platform}
+              </Badge>
+            </div>
+            
+            {/* Title */}
+            <h1 className="text-xl font-bold leading-tight mb-3">{product.name_az || product.name}</h1>
+            
+            {/* Rating */}
+            {product.rating > 0 && (
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <Star 
+                      key={star}
+                      className={`w-4 h-4 ${star <= Math.round(product.rating) ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground/20'}`}
+                    />
+                  ))}
+                </div>
+                <span className="font-bold text-sm">{product.rating.toFixed(1)}</span>
+                {product.review_count > 0 && (
+                  <span className="text-xs text-muted-foreground">({product.review_count} rəy)</span>
+                )}
+              </div>
+            )}
+            
+            {/* Price Section */}
+            <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-2xl p-4 mb-4">
+              <div className="flex items-baseline gap-2 flex-wrap">
+                {product.price ? (
+                  <>
+                    <span className="text-3xl font-black text-primary">{product.price}</span>
+                    <span className="text-lg font-semibold text-primary">{product.currency}</span>
+                    {product.original_price && product.original_price > product.price && (
+                      <span className="text-base text-muted-foreground line-through ml-2">
+                        {product.original_price} {product.currency}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <span className="text-base text-muted-foreground">Qiymət üçün mağazaya keçin</span>
+                )}
+              </div>
+              
+              {/* Price Update Info */}
+              {product.price_updated_at && (
+                <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
+                  <Clock className="w-3 h-3" />
+                  Qiymət {formatDistanceToNow(new Date(product.price_updated_at), { locale: az, addSuffix: true })} yenilənib
+                </p>
+              )}
+
+              {/* Go to Store Link - Right below price update */}
+              <button
+                onClick={handleGoToStore}
+                className="mt-3 w-full flex items-center justify-between p-3 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors group"
+              >
+                <div className="flex items-center gap-2">
+                  <ExternalLink className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium text-primary">Məhsula get</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+            
+            {/* Tags */}
+            {product.tags && product.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {product.tags.map((tag, idx) => (
+                  <Badge key={idx} variant="secondary" className="text-xs rounded-full px-2.5 py-0.5">
+                    <Tag className="w-2.5 h-2.5 mr-1" />
+                    {tag}
+                  </Badge>
                 ))}
               </div>
-              <span className="font-semibold">{product.rating.toFixed(1)}</span>
-              {product.review_count > 0 && (
-                <span className="text-sm text-muted-foreground">({product.review_count} rəy)</span>
-              )}
-            </div>
-          )}
-          
-          {/* Price Section */}
-          <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl p-4 mb-3">
-            <div className="flex items-end gap-3">
-              {product.price ? (
-                <>
-                  <span className="text-3xl font-black text-primary">{product.price}</span>
-                  <span className="text-lg font-medium text-primary mb-1">{product.currency}</span>
-                  {product.original_price && product.original_price > product.price && (
-                    <span className="text-lg text-muted-foreground line-through mb-1">
-                      {product.original_price} {product.currency}
-                    </span>
-                  )}
-                </>
-              ) : (
-                <span className="text-lg text-muted-foreground">Qiymət üçün mağazaya keçin</span>
-              )}
-            </div>
-            {product.price_updated_at && (
-              <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                Qiymət {formatDistanceToNow(new Date(product.price_updated_at), { locale: az, addSuffix: true })} yenilənib
-              </p>
             )}
-          </div>
-          
-          {/* Tags */}
-          {product.tags && product.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-3">
-              {product.tags.map((tag, idx) => (
-                <Badge key={idx} variant="secondary" className="text-xs">
-                  <Tag className="w-2.5 h-2.5 mr-1" />
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          )}
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Description */}
         {(product.description_az || product.description) && (
-          <div className="bg-card rounded-2xl p-4 border border-border/50 mb-4">
-            <h2 className="font-semibold text-sm mb-2 flex items-center gap-2">
-              <Info className="w-4 h-4 text-primary" />
-              Məhsul haqqında
-            </h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {product.description_az || product.description}
-            </p>
-          </div>
+          <Card className="border-0 shadow-md">
+            <CardContent className="p-4">
+              <h2 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Info className="w-3.5 h-3.5 text-primary" />
+                </div>
+                Məhsul haqqında
+              </h2>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {product.description_az || product.description}
+              </p>
+            </CardContent>
+          </Card>
         )}
 
         {/* Pros and Cons */}
         {((product.pros && product.pros.length > 0) || (product.cons && product.cons.length > 0)) && (
-          <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="grid grid-cols-2 gap-3">
             {product.pros && product.pros.length > 0 && (
-              <div className="bg-green-500/5 rounded-xl p-3 border border-green-500/20">
-                <h3 className="text-xs font-semibold text-green-600 mb-2">✓ Üstünlükləri</h3>
-                <ul className="space-y-1">
-                  {product.pros.map((pro, idx) => (
-                    <li key={idx} className="text-xs text-muted-foreground flex items-start gap-1">
-                      <Check className="w-3 h-3 text-green-500 shrink-0 mt-0.5" />
-                      {pro}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <Card className="border-0 shadow-md bg-green-500/5">
+                <CardContent className="p-3">
+                  <h3 className="text-xs font-bold text-green-600 mb-2 flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">
+                      <Check className="w-3 h-3 text-green-600" />
+                    </div>
+                    Üstünlükləri
+                  </h3>
+                  <ul className="space-y-1.5">
+                    {product.pros.map((pro, idx) => (
+                      <li key={idx} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                        <Check className="w-3 h-3 text-green-500 shrink-0 mt-0.5" />
+                        <span>{pro}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
             )}
             {product.cons && product.cons.length > 0 && (
-              <div className="bg-red-500/5 rounded-xl p-3 border border-red-500/20">
-                <h3 className="text-xs font-semibold text-red-600 mb-2">✗ Çatışmazlıqları</h3>
-                <ul className="space-y-1">
-                  {product.cons.map((con, idx) => (
-                    <li key={idx} className="text-xs text-muted-foreground flex items-start gap-1">
-                      <X className="w-3 h-3 text-red-500 shrink-0 mt-0.5" />
-                      {con}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <Card className="border-0 shadow-md bg-red-500/5">
+                <CardContent className="p-3">
+                  <h3 className="text-xs font-bold text-red-600 mb-2 flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center">
+                      <X className="w-3 h-3 text-red-600" />
+                    </div>
+                    Çatışmazlıqları
+                  </h3>
+                  <ul className="space-y-1.5">
+                    {product.cons.map((con, idx) => (
+                      <li key={idx} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                        <X className="w-3 h-3 text-red-500 shrink-0 mt-0.5" />
+                        <span>{con}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
             )}
           </div>
         )}
 
         {/* Specifications */}
         {product.specifications && Object.keys(product.specifications).length > 0 && (
-          <div className="bg-card rounded-2xl p-4 border border-border/50 mb-4">
-            <h2 className="font-semibold text-sm mb-3">Xüsusiyyətləri</h2>
-            <div className="space-y-2">
-              {Object.entries(product.specifications).map(([key, value]) => (
-                <div key={key} className="flex justify-between py-2 border-b border-border/50 last:border-0">
-                  <span className="text-sm text-muted-foreground">{key}</span>
-                  <span className="text-sm font-medium">{value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <Card className="border-0 shadow-md">
+            <CardContent className="p-4">
+              <h2 className="font-semibold text-sm mb-3">Xüsusiyyətləri</h2>
+              <div className="space-y-0">
+                {Object.entries(product.specifications).map(([key, value], idx, arr) => (
+                  <div 
+                    key={key} 
+                    className={`flex justify-between py-2.5 ${idx !== arr.length - 1 ? 'border-b border-border/30' : ''}`}
+                  >
+                    <span className="text-sm text-muted-foreground">{key}</span>
+                    <span className="text-sm font-medium text-right max-w-[60%]">{value}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Review Summary */}
         {(product.review_summary_az || product.review_summary) && (
-          <div className="bg-card rounded-2xl p-4 border border-border/50 mb-4">
-            <h2 className="font-semibold text-sm mb-2 flex items-center gap-2">
-              <Star className="w-4 h-4 text-amber-500" />
-              Rəy xülasəsi
-            </h2>
-            <p className="text-sm text-muted-foreground italic">
-              "{product.review_summary_az || product.review_summary}"
-            </p>
-          </div>
+          <Card className="border-0 shadow-md bg-amber-500/5">
+            <CardContent className="p-4">
+              <h2 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center">
+                  <Star className="w-3.5 h-3.5 text-amber-600 fill-amber-600" />
+                </div>
+                Rəy xülasəsi
+              </h2>
+              <p className="text-sm text-muted-foreground italic leading-relaxed">
+                "{product.review_summary_az || product.review_summary}"
+              </p>
+            </CardContent>
+          </Card>
         )}
 
         {/* Disclaimer */}
-        <div className="bg-muted/30 rounded-xl p-3 text-center mb-4">
-          <p className="text-[10px] text-muted-foreground">
+        <div className="bg-muted/30 rounded-xl p-3 text-center">
+          <p className="text-[10px] text-muted-foreground leading-relaxed">
             Bu səhifədəki link affiliate linkdir. Alış-veriş etdikdə biz kiçik komissiya qazana bilərik.
             Qiymət dəyişə bilər.
           </p>
@@ -360,23 +409,25 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
       </div>
 
       {/* Fixed Bottom Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 bg-card border-t border-border/50 px-4 py-3 safe-bottom">
-        <div className="flex gap-3">
+      <div 
+        className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-xl border-t border-border/30"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
+        <div className="flex gap-3 p-4">
           <Button
             variant="outline"
-            className="flex-1 h-12 rounded-xl"
+            className="flex-1 h-12 rounded-xl border-2"
             onClick={handleSaveToggle}
           >
             <Heart className={`w-5 h-5 mr-2 ${isSaved ? 'fill-red-500 text-red-500' : ''}`} />
             {isSaved ? 'Saxlanıldı' : 'Saxla'}
           </Button>
           <Button
-            className="flex-[2] h-12 rounded-xl font-semibold"
+            className="flex-[2] h-12 rounded-xl font-semibold shadow-lg"
             onClick={handleGoToStore}
           >
-            <ShoppingBag className="w-5 h-5 mr-2" />
+            <ExternalLink className="w-5 h-5 mr-2" />
             Məhsula keç
-            <ExternalLink className="w-4 h-4 ml-2" />
           </Button>
         </div>
       </div>
@@ -394,7 +445,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-4 right-4 text-white"
+              className="absolute top-4 right-4 text-white hover:bg-white/20"
               onClick={() => setShowVideo(false)}
             >
               <X className="w-6 h-6" />
