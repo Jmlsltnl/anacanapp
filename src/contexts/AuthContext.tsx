@@ -48,6 +48,7 @@ interface AuthContextValue {
   signUp: (email: string, password: string, name: string) => Promise<{ data: any; error: any }>;
   signIn: (email: string, password: string) => Promise<{ data: any; error: any }>;
   signInWithGoogle: () => Promise<{ data: any; error: any }>;
+  signInWithApple: () => Promise<{ data: any; error: any }>;
   signOut: () => Promise<{ error: any }>;
   updateProfile: (updates: Partial<Profile>) => Promise<{ data: any; error: any }>;
   linkPartner: (partnerCode: string) => Promise<{ error: any }>;
@@ -198,6 +199,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { data, error: null };
     } catch (error) {
       console.error('Google sign in error:', error);
+      return { data: null, error };
+    }
+  };
+
+  const signInWithApple = async () => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'apple',
+        options: { redirectTo: window.location.origin },
+      });
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Apple sign in error:', error);
       return { data: null, error };
     }
   };
@@ -424,6 +439,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signUp,
         signIn,
         signInWithGoogle,
+        signInWithApple,
         signOut,
         updateProfile,
         linkPartner,

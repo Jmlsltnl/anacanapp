@@ -28,6 +28,7 @@ const menuItems = [
   { id: 'fruit-images', label: 'Körpə Ölçüsü Şəkilləri', icon: Baby },
   { id: 'vitamins', label: 'Vitaminlər', icon: Pill },
   { id: 'trimester-tips', label: 'Trimester Tövsiyələri', icon: Baby },
+  { id: 'flow-content', label: 'Menstruasiya Məzmunu', icon: Baby },
   { id: 'photoshoot', label: 'Fotosessiya', icon: Camera },
   { id: 'dynamic-content', label: 'Dinamik Məzmun', icon: Layers },
   { id: 'tools', label: 'Alətlər Sıralaması', icon: Wrench },

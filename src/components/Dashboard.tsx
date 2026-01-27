@@ -593,7 +593,10 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
             <p className="text-xs text-muted-foreground font-medium">
               {pregData.currentWeek}. həftə, {pregData.currentDay}. gün • <span className={`font-semibold ${trimesterColors.text}`}>{pregData.trimester}-{pregData.trimester === 1 ? 'ci' : pregData.trimester === 2 ? 'ci' : 'cü'} Trimester</span>
             </p>
-            <div className="flex items-center justify-center gap-2 mt-2">
+            <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
+              <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
+                {pregnancyDay}. gün
+              </span>
               <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
                 {weekData.lengthCm} sm
               </span>
@@ -968,7 +971,29 @@ const MommyDashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
-  if (!babyData) return null;
+  // Show setup prompt if baby data is missing
+  if (!babyData) {
+    return (
+      <div className="space-y-4 p-4">
+        <motion.div 
+          className="bg-card rounded-2xl p-6 shadow-card border border-border/50 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <Baby className="w-8 h-8 text-primary" />
+          </div>
+          <h2 className="text-xl font-bold text-foreground mb-2">Körpə məlumatları tələb olunur</h2>
+          <p className="text-muted-foreground text-sm mb-4">
+            Ana dashboard-ı görmək üçün körpənizin doğum tarixini və digər məlumatları əlavə edin.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Profil → Redaktə et → Həyat Mərhələsi bölməsindən məlumatları doldurun
+          </p>
+        </motion.div>
+      </div>
+    );
+  }
 
   // Use all dynamic milestones from hook - with carousel if > 5
   const allMilestones = MILESTONES.map(m => ({

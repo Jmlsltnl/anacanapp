@@ -36,6 +36,8 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
     due_date: dueDate ? new Date(dueDate).toISOString().split('T')[0] : '',
     last_period_date: lastPeriodDate ? new Date(lastPeriodDate).toISOString().split('T')[0] : '',
     cycle_length: cycleLength || 28,
+    baby_birth_date: babyBirthDate ? new Date(babyBirthDate).toISOString().split('T')[0] : '',
+    baby_gender: babyGender || '' as 'boy' | 'girl' | '',
   });
 
   useEffect(() => {
@@ -89,18 +91,26 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
     setLoading(true);
     try {
       // Update profile in database
+      const updateData: any = {
+        name: formData.name,
+        avatar_url: formData.avatar_url,
+        bio: formData.bio,
+        life_stage: formData.life_stage,
+        baby_name: formData.baby_name || null,
+        due_date: formData.due_date || null,
+        last_period_date: formData.last_period_date || null,
+        cycle_length: formData.cycle_length,
+      };
+      
+      // Add mommy specific fields
+      if (formData.life_stage === 'mommy') {
+        updateData.baby_birth_date = formData.baby_birth_date || null;
+        updateData.baby_gender = formData.baby_gender || null;
+      }
+      
       const { error } = await supabase
         .from('profiles')
-        .update({
-          name: formData.name,
-          avatar_url: formData.avatar_url,
-          bio: formData.bio,
-          life_stage: formData.life_stage,
-          baby_name: formData.baby_name || null,
-          due_date: formData.due_date || null,
-          last_period_date: formData.last_period_date || null,
-          cycle_length: formData.cycle_length,
-        })
+        .update(updateData)
         .eq('user_id', user.id);
 
       if (error) throw error;
@@ -110,7 +120,15 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
       if (formData.due_date) setDueDate(new Date(formData.due_date));
       if (formData.last_period_date) setLastPeriodDate(new Date(formData.last_period_date));
       if (formData.cycle_length) setCycleLength(formData.cycle_length);
-      if (formData.baby_name && babyBirthDate && babyGender) {
+      
+      // Update baby data for mommy stage
+      if (formData.life_stage === 'mommy' && formData.baby_birth_date && formData.baby_gender) {
+        setBabyData(
+          new Date(formData.baby_birth_date), 
+          formData.baby_name || 'Körpə', 
+          formData.baby_gender as 'boy' | 'girl'
+        );
+      } else if (formData.baby_name && babyBirthDate && babyGender) {
         setBabyData(new Date(babyBirthDate), formData.baby_name, babyGender);
       }
 
@@ -131,9 +149,12 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-28">
-      {/* Header with safe area */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border/50" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+    <div className="fixed inset-0 flex flex-col bg-background overflow-hidden">
+      {/* Safe area spacer */}
+      <div className="bg-card flex-shrink-0" style={{ height: 'env(safe-area-inset-top, 0px)' }} />
+      
+      {/* Header */}
+      <div className="flex-shrink-0 bg-card border-b border-border/50">
         <div className="px-5 py-4 flex items-center gap-4">
           <motion.button
             onClick={onBack}
@@ -149,8 +170,11 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
           </Button>
         </div>
       </div>
+      
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}>
 
-      <div className="px-5 py-6 space-y-6">
+        <div className="px-5 py-6 space-y-6">
         {/* Avatar Section */}
         <div className="flex flex-col items-center">
           <div className="relative">
@@ -234,7 +258,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
               <SelectContent>
                 <SelectItem value="flow">🌸 Menstruasiya izləyicisi</SelectItem>
                 <SelectItem value="bump">🤰 Hamiləyəm</SelectItem>
-                <SelectItem value="mommy">👶 Anamam</SelectItem>
+                <SelectItem value="mommy">👶 Anayam</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -287,16 +311,42 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
 
           {/* Mommy specific fields */}
           {formData.life_stage === 'mommy' && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">Körpənin adı</label>
-              <Input
-                value={formData.baby_name}
-                onChange={(e) => setFormData(prev => ({ ...prev, baby_name: e.target.value }))}
-                placeholder="Körpənin adı"
-              />
-            </div>
+            <>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-muted-foreground">Körpənin adı</label>
+                <Input
+                  value={formData.baby_name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, baby_name: e.target.value }))}
+                  placeholder="Körpənin adı"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-muted-foreground">Doğuş tarixi</label>
+                <Input
+                  type="date"
+                  value={formData.baby_birth_date}
+                  onChange={(e) => setFormData(prev => ({ ...prev, baby_birth_date: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-muted-foreground">Cinsi</label>
+                <Select
+                  value={formData.baby_gender}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, baby_gender: value as 'boy' | 'girl' }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seçin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="boy">👦 Oğlan</SelectItem>
+                    <SelectItem value="girl">👧 Qız</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </>
           )}
         </div>
+      </div>
       </div>
     </div>
   );
