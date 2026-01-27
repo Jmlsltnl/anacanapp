@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Package, Settings, BarChart3, Shield, 
   ChevronLeft, Menu, LogOut, Bell, Search,
-  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send
+  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +32,7 @@ const menuItems = [
   { id: 'dynamic-content', label: 'Dinamik Məzmun', icon: Layers },
   { id: 'content', label: 'Digər Kontent', icon: FileText },
   { id: 'products', label: 'Məhsullar', icon: Package },
+  { id: 'affiliate', label: 'Affiliate Məhsullar', icon: ShoppingBag },
   { id: 'data', label: 'Məlumatlar', icon: Database },
   { id: 'messages', label: 'Mesajlar', icon: Key },
   { id: 'branding', label: 'Branding', icon: Image },

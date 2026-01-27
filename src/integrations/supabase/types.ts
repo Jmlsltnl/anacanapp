@@ -62,6 +62,84 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_products: {
+        Row: {
+          affiliate_url: string
+          category: string | null
+          category_az: string | null
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          description_az: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          is_featured: boolean | null
+          life_stages: string[] | null
+          name: string
+          name_az: string | null
+          original_price: number | null
+          platform: string | null
+          price: number | null
+          rating: number | null
+          review_count: number | null
+          review_summary: string | null
+          review_summary_az: string | null
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          affiliate_url: string
+          category?: string | null
+          category_az?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          description_az?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          life_stages?: string[] | null
+          name: string
+          name_az?: string | null
+          original_price?: number | null
+          platform?: string | null
+          price?: number | null
+          rating?: number | null
+          review_count?: number | null
+          review_summary?: string | null
+          review_summary_az?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          affiliate_url?: string
+          category?: string | null
+          category_az?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          description_az?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          life_stages?: string[] | null
+          name?: string
+          name_az?: string | null
+          original_price?: number | null
+          platform?: string | null
+          price?: number | null
+          rating?: number | null
+          review_count?: number | null
+          review_summary?: string | null
+          review_summary_az?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       ai_chat_messages: {
         Row: {
           chat_type: string
@@ -659,6 +737,39 @@ export type Database = {
           title?: string
           updated_at?: string
           view_count?: number | null
+        }
+        Relationships: []
+      }
+      blood_sugar_logs: {
+        Row: {
+          created_at: string | null
+          id: string
+          logged_at: string | null
+          meal_context: string | null
+          notes: string | null
+          reading_type: string
+          reading_value: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          logged_at?: string | null
+          meal_context?: string | null
+          notes?: string | null
+          reading_type?: string
+          reading_value: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          logged_at?: string | null
+          meal_context?: string | null
+          notes?: string | null
+          reading_type?: string
+          reading_value?: number
+          user_id?: string
         }
         Relationships: []
       }
@@ -1368,6 +1479,96 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      healthcare_providers: {
+        Row: {
+          accepts_reservations: boolean | null
+          address: string | null
+          address_az: string | null
+          city: string | null
+          created_at: string | null
+          description: string | null
+          description_az: string | null
+          email: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          is_featured: boolean | null
+          latitude: number | null
+          longitude: number | null
+          name: string
+          name_az: string | null
+          phone: string | null
+          provider_type: string
+          rating: number | null
+          review_count: number | null
+          services: Json | null
+          sort_order: number | null
+          specialty: string | null
+          specialty_az: string | null
+          updated_at: string | null
+          website: string | null
+          working_hours: Json | null
+        }
+        Insert: {
+          accepts_reservations?: boolean | null
+          address?: string | null
+          address_az?: string | null
+          city?: string | null
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          name_az?: string | null
+          phone?: string | null
+          provider_type?: string
+          rating?: number | null
+          review_count?: number | null
+          services?: Json | null
+          sort_order?: number | null
+          specialty?: string | null
+          specialty_az?: string | null
+          updated_at?: string | null
+          website?: string | null
+          working_hours?: Json | null
+        }
+        Update: {
+          accepts_reservations?: boolean | null
+          address?: string | null
+          address_az?: string | null
+          city?: string | null
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          name_az?: string | null
+          phone?: string | null
+          provider_type?: string
+          rating?: number | null
+          review_count?: number | null
+          services?: Json | null
+          sort_order?: number | null
+          specialty?: string | null
+          specialty_az?: string | null
+          updated_at?: string | null
+          website?: string | null
+          working_hours?: Json | null
+        }
+        Relationships: []
       }
       hospital_bag_items: {
         Row: {
@@ -2465,6 +2666,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pregnancy_album_photos: {
+        Row: {
+          caption: string | null
+          created_at: string | null
+          id: string
+          month_number: number
+          photo_date: string | null
+          photo_url: string
+          updated_at: string | null
+          user_id: string
+          week_number: number
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string | null
+          id?: string
+          month_number: number
+          photo_date?: string | null
+          photo_url: string
+          updated_at?: string | null
+          user_id: string
+          week_number: number
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string | null
+          id?: string
+          month_number?: number
+          photo_date?: string | null
+          photo_url?: string
+          updated_at?: string | null
+          user_id?: string
+          week_number?: number
+        }
+        Relationships: []
       }
       pregnancy_daily_content: {
         Row: {

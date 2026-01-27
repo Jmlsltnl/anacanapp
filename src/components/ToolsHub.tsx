@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Shield, Timer, Scale, Baby, Briefcase, 
   Volume2, Heart, Footprints, ChevronRight,
-  Utensils, Activity, ArrowLeft, Camera, Lock, ShoppingCart, LucideIcon, Wrench, BookOpen, ChefHat
+  Utensils, Activity, ArrowLeft, Camera, Lock, ShoppingCart, LucideIcon, Wrench, BookOpen, ChefHat,
+  Stethoscope, Droplet, ImagePlus, Package
 } from 'lucide-react';
 import BlogScreen from '@/components/BlogScreen';
 import { useUserStore } from '@/store/userStore';
@@ -21,6 +22,10 @@ import MoodDiary from './tools/MoodDiary';
 import BabyPhotoshoot from './tools/BabyPhotoshoot';
 import ShoppingList from './tools/ShoppingList';
 import Recipes from './tools/Recipes';
+import DoctorsHospitals from './tools/DoctorsHospitals';
+import BloodSugarTracker from './tools/BloodSugarTracker';
+import PregnancyAlbum from './tools/PregnancyAlbum';
+import AffiliateProducts from './tools/AffiliateProducts';
 import { useToast } from '@/hooks/use-toast';
 import { useToolConfigs } from '@/hooks/useDynamicTools';
 
@@ -52,6 +57,10 @@ const iconMap: Record<string, LucideIcon> = {
   'Wrench': Wrench,
   'BookOpen': BookOpen,
   'ChefHat': ChefHat,
+  'Stethoscope': Stethoscope,
+  'Droplet': Droplet,
+  'ImagePlus': ImagePlus,
+  'Package': Package,
 };
 
 interface ToolsHubProps {
@@ -169,6 +178,10 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   if (activeTool === 'mood' || activeTool === 'mood-diary') return <MoodDiary onBack={handleBack} />;
   if (activeTool === 'blog') return <BlogScreen onBack={handleBack} />;
   if (activeTool === 'recipes') return <Recipes onBack={handleBack} />;
+  if (activeTool === 'doctors') return <DoctorsHospitals onBack={handleBack} />;
+  if (activeTool === 'blood-sugar') return <BloodSugarTracker onBack={handleBack} />;
+  if (activeTool === 'pregnancy-album') return <PregnancyAlbum onBack={handleBack} />;
+  if (activeTool === 'affiliate' || activeTool === 'affiliate-products') return <AffiliateProducts onBack={handleBack} />;
 
   return (
     <div className="pb-4 pt-3 px-3">

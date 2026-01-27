@@ -57,7 +57,7 @@ const Index = () => {
   // Reset scroll to top when tab or screen changes
   useEffect(() => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'instant' });
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     }
   }, [activeTab, activeScreen, activeTool]);
   
