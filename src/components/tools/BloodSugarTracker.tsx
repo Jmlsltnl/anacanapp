@@ -11,6 +11,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 import { format, isToday, isYesterday, subDays, startOfDay } from 'date-fns';
 import { az } from 'date-fns/locale';
@@ -61,6 +62,8 @@ const getReadingStatus = (value: number, type: string) => {
 };
 
 const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
+  useScrollToTop();
+  
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();

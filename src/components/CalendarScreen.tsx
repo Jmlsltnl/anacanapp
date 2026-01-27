@@ -7,6 +7,7 @@ import {
 import { useUserStore } from '@/store/userStore';
 import { useAppointments } from '@/hooks/useAppointments';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { Input } from '@/components/ui/input';
 
 interface CalendarScreenProps {
@@ -19,6 +20,8 @@ interface DayEvent {
 }
 
 const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
+  useScrollToTop();
+  
   const { lifeStage, getCycleData, getPregnancyData } = useUserStore();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);

@@ -25,6 +25,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useTrimesterTips } from '@/hooks/useTrimesterTips';
 import { useFlowSymptoms, useFlowPhaseTips, useFlowInsights } from '@/hooks/useFlowData';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { formatDateAz } from '@/lib/date-utils';
 import FeedingHistoryPanel from '@/components/baby/FeedingHistoryPanel';
 

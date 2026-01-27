@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 
 interface PartnerPrivacyScreenProps {
@@ -16,6 +17,8 @@ interface PartnerPrivacyScreenProps {
 }
 
 const PartnerPrivacyScreen = ({ onBack }: PartnerPrivacyScreenProps) => {
+  useScrollToTop();
+  
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);

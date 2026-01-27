@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Play, Square, Timer, AlertCircle, Trash2 } from 'lucide-react';
 import { useContractions } from '@/hooks/useContractions';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { hapticFeedback } from '@/lib/native';
 
 interface ContractionTimerProps {
@@ -9,6 +10,8 @@ interface ContractionTimerProps {
 }
 
 const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ onBack }, ref) => {
+  useScrollToTop();
+  
   const [isActive, setIsActive] = useState(false);
   const [currentDuration, setCurrentDuration] = useState(0);
   const [lastEndTime, setLastEndTime] = useState<Date | null>(null);

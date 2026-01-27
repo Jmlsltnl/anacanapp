@@ -10,12 +10,15 @@ import { useToast } from '@/hooks/use-toast';
 import { usePartnerStats } from '@/hooks/usePartnerStats';
 import { usePartnerMissions } from '@/hooks/usePartnerMissions';
 import { useSurprises } from '@/hooks/useSurprises';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 interface PartnerProfileScreenProps {
   onNavigate?: (screen: string) => void;
 }
 
 const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
+  useScrollToTop();
+  
   const { name, email, partnerWomanData, logout } = useUserStore();
   const { toast } = useToast();
   const { stats, loading: statsLoading } = usePartnerStats();

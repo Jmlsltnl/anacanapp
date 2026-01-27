@@ -7,6 +7,7 @@ import {
 import { useBlog, BlogPost, BlogCategory } from '@/hooks/useBlog';
 import { useSavedPosts } from '@/hooks/useBlogInteractions';
 import { useAuth } from '@/hooks/useAuth';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
@@ -18,6 +19,8 @@ interface BlogScreenProps {
 }
 
 const BlogScreen = ({ onBack }: BlogScreenProps) => {
+  useScrollToTop();
+  
   const { user } = useAuth();
   const { posts, categories, featuredPosts, loading, searchPosts, getPostsByCategory } = useBlog();
   const { savedPosts } = useSavedPosts();

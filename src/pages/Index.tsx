@@ -259,7 +259,7 @@ const Index = () => {
       />
       
       {/* Main scrollable content area */}
-      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto overflow-x-hidden overscroll-none">
+      <div ref={scrollContainerRef} data-scroll-container className="flex-1 overflow-y-auto overflow-x-hidden overscroll-none">
         <AnimatePresence mode="wait">
           {renderContent()}
         </AnimatePresence>

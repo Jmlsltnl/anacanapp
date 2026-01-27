@@ -2,6 +2,7 @@ import { useState, forwardRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Check, Briefcase, Baby, User, Share2 } from 'lucide-react';
 import { useHospitalBag } from '@/hooks/useHospitalBag';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 interface HospitalBagProps {
   onBack: () => void;
@@ -16,6 +17,8 @@ const fallbackCategories = [
 ];
 
 const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, ref) => {
+  useScrollToTop();
+  
   const { items, loading, toggleItem, getProgress, checkedCount, totalCount } = useHospitalBag();
   const [activeCategory, setActiveCategory] = useState<string>('all');
 

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Play, Pause, RotateCcw, Footprints } from 'lucide-react';
 import { useKickSessions } from '@/hooks/useKickSessions';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { hapticFeedback } from '@/lib/native';
 
 interface KickCounterProps {
@@ -9,6 +10,8 @@ interface KickCounterProps {
 }
 
 const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, ref) => {
+  useScrollToTop();
+  
   const [kicks, setKicks] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [time, setTime] = useState(0);

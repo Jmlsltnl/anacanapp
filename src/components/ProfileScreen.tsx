@@ -10,6 +10,7 @@ import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { PremiumModal } from '@/components/PremiumModal';
 import { nativeShare } from '@/lib/native';
 
@@ -18,6 +19,8 @@ interface ProfileScreenProps {
 }
 
 const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
+  useScrollToTop();
+  
   const { name, email, lifeStage, role } = useUserStore();
   const { signOut, profile, isAdmin } = useAuth();
   const { toast } = useToast();

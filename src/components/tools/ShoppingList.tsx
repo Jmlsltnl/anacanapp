@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useShoppingItems } from '@/hooks/useShoppingItems';
 import { useAuth } from '@/hooks/useAuth';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -29,6 +30,8 @@ const priorityLabels = {
 };
 
 const ShoppingList = ({ onBack }: ShoppingListProps) => {
+  useScrollToTop();
+  
   const { profile } = useAuth();
   const { items, loading, addItem, toggleItem, deleteItem, uncheckedCount, checkedCount } = useShoppingItems();
   const { toast } = useToast();

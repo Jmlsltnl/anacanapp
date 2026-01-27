@@ -10,6 +10,7 @@ import { useNutritionTips } from '@/hooks/useDynamicContent';
 import { useCommonFoods } from '@/hooks/useDynamicConfig';
 import { useMealTypes, useNutritionTargets } from '@/hooks/useDynamicTools';
 import { useUserStore } from '@/store/userStore';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import VitaminsTab from './VitaminsTab';
@@ -51,6 +52,8 @@ const mealIcons: Record<string, any> = {
 };
 
 const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) => {
+  useScrollToTop();
+  
   const [activeTab, setActiveTab] = useState<'log' | 'tips' | 'vitamins' | 'water'>('log');
   const [selectedMeal, setSelectedMeal] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);

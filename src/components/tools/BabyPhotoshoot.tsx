@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { PremiumModal } from '@/components/PremiumModal';
 import PhotoGalleryViewer from '@/components/PhotoGalleryViewer';
 import { 
@@ -66,6 +67,8 @@ const fallbackHairStyles = [
 ];
 
 const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack }, ref) => {
+  useScrollToTop();
+  
   const [step, setStep] = useState(0);
   const [customization, setCustomization] = useState<CustomizationOptions>({
     gender: 'girl',
