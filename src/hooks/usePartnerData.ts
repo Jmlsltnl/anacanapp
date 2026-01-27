@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { getPregnancyWeek, getDaysUntilDue as calcDaysUntilDue, getDaysElapsed } from '@/lib/pregnancy-utils';
 
 export interface PartnerWomanData {
   id: string;
@@ -101,30 +102,20 @@ export const usePartnerData = () => {
     }
   }, [profile?.linked_partner_id]);
 
-  // Calculate pregnancy week if partner is in 'bump' stage
-  const getPregnancyWeek = (): number => {
+  // Calculate pregnancy week if partner is in 'bump' stage - using centralized utility
+  const getPartnerPregnancyWeek = (): number => {
     if (!partnerProfile?.last_period_date || partnerProfile.life_stage !== 'bump') {
       return 0;
     }
-    const lastPeriod = new Date(partnerProfile.last_period_date);
-    const today = new Date();
-    const diffDays = Math.floor((today.getTime() - lastPeriod.getTime()) / (1000 * 60 * 60 * 24));
-    return Math.floor(diffDays / 7);
+    return getPregnancyWeek(partnerProfile.last_period_date);
   };
 
-  // Calculate days until due date
-  const getDaysUntilDue = (): number => {
-    if (!partnerProfile?.due_date) {
-      // Calculate from last period if no due date set
-      if (partnerProfile?.last_period_date) {
-        const lastPeriod = new Date(partnerProfile.last_period_date);
-        const dueDate = new Date(lastPeriod.getTime() + 280 * 24 * 60 * 60 * 1000);
-        return Math.ceil((dueDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-      }
+  // Calculate days until due date - using centralized utility
+  const getPartnerDaysUntilDue = (): number => {
+    if (!partnerProfile?.last_period_date && !partnerProfile?.due_date) {
       return 0;
     }
-    const due = new Date(partnerProfile.due_date);
-    return Math.ceil((due.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    return calcDaysUntilDue(partnerProfile.last_period_date, partnerProfile.due_date);
   };
 
   // Get baby age in days for 'mommy' stage
@@ -142,8 +133,8 @@ export const usePartnerData = () => {
     loading,
     error,
     refetch: fetchPartnerData,
-    getPregnancyWeek,
-    getDaysUntilDue,
+    getPregnancyWeek: getPartnerPregnancyWeek,
+    getDaysUntilDue: getPartnerDaysUntilDue,
     getBabyAgeDays,
   };
 };

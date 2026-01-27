@@ -23,6 +23,7 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { supabase } from '@/integrations/supabase/client';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { translateSymptoms, formatRelativeDateAz } from '@/lib/date-utils';
+import { getPregnancyDay } from '@/lib/pregnancy-utils';
 import PartnerChatScreen from './partner/PartnerChatScreen';
 import WeeklyStatsTab from './partner/WeeklyStatsTab';
 import NotificationsTab from './partner/NotificationsTab';
@@ -148,14 +149,14 @@ const PartnerDashboard = () => {
   const waterIntake = partnerDailyLog?.water_intake || 0;
   const lifeStage = partnerProfile?.life_stage || 'bump';
   
-  // Calculate pregnancy week and day from real data
+  // Calculate pregnancy week and day from real data using centralized utilities
   const currentWeek = getPregnancyWeek() || 0;
   const daysUntilDue = getDaysUntilDue() || 0;
   const babyAgeDays = getBabyAgeDays();
   
-  // Calculate pregnancy day for dynamic content
+  // Calculate pregnancy day for dynamic content using centralized utility
   const pregnancyDay = partnerProfile?.last_period_date 
-    ? Math.floor((Date.now() - new Date(partnerProfile.last_period_date).getTime()) / (1000 * 60 * 60 * 24)) + 1
+    ? getPregnancyDay(partnerProfile.last_period_date)
     : 0;
   
   // Fetch dynamic pregnancy content (same as woman's dashboard)
