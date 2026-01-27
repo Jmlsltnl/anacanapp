@@ -19,7 +19,7 @@ const AuthScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
-  const { signIn, signUp, signInWithGoogle } = useAuth();
+  const { signIn, signUp, signInWithGoogle, signInWithApple } = useAuth();
   const { toast } = useToast();
   const { data: branding = [] } = useAppBranding();
   
@@ -596,11 +596,21 @@ const AuthScreen = () => {
                   variant="outline"
                   disabled={isLoading}
                   className="flex-1 h-14 rounded-2xl border-2 hover:bg-muted/50 transition-all"
-                  onClick={() => {
-                    toast({
-                      title: 'Tezliklə',
-                      description: 'Apple ilə giriş tezliklə əlavə olunacaq.',
-                    });
+                  onClick={async () => {
+                    setIsLoading(true);
+                    try {
+                      const { error } = await signInWithApple();
+                      if (error) {
+                        toast({
+                          title: 'Apple ilə giriş alınmadı',
+                          description: 'Yenidən cəhd edin.',
+                          variant: 'destructive',
+                        });
+                      }
+                    } catch (error) {
+                      console.error('Apple auth error:', error);
+                    }
+                    setIsLoading(false);
                   }}
                 >
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
