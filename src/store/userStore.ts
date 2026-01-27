@@ -192,7 +192,7 @@ export const useUserStore = create<UserState>()(
       },
 
       getPregnancyData: () => {
-        const { lastPeriodDate, dueDate } = get();
+        const { lastPeriodDate } = get();
         if (!lastPeriodDate) return null;
 
         const lastPeriod = new Date(lastPeriodDate);
@@ -209,7 +209,8 @@ export const useUserStore = create<UserState>()(
         
         const babySize = FRUIT_SIZES[fruitWeek] || FRUIT_SIZES[4];
 
-        const calculatedDueDate = dueDate || calculateDueDate(lastPeriodDate);
+        // LMP is the single source of truth across the platform
+        const calculatedDueDate = calculateDueDate(lastPeriodDate);
 
         return {
           dueDate: calculatedDueDate,
