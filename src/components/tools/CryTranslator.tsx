@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Mic, Square, Volume2, AlertCircle, CheckCircle, Clock, Baby, Loader2, History, Info } from 'lucide-react';
+import { ArrowLeft, Mic, Square, Volume2, AlertCircle, CheckCircle, Clock, Baby, Loader2, History, Info, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { requestMicrophonePermission } from '@/lib/permissions';
 
 interface CryTranslatorProps {
   onBack: () => void;
@@ -69,6 +70,18 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
 
   const startRecording = async () => {
     try {
+      // Request microphone permission first
+      const permission = await requestMicrophonePermission();
+      
+      if (!permission.granted) {
+        toast({
+          title: 'Mikrofon icazəsi lazımdır',
+          description: 'Parametrlərdən mikrofon icazəsini aktivləşdirin',
+          variant: 'destructive'
+        });
+        return;
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
       // Set up audio analyzer for visual feedback
@@ -113,12 +126,22 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
         });
       }, 1000);
       
-    } catch (error) {
-      toast({
-        title: 'Mikrofon xətası',
-        description: 'Mikrofona giriş icazəsi verin',
-        variant: 'destructive'
-      });
+    } catch (error: any) {
+      console.error('Recording error:', error);
+      
+      if (error.name === 'NotAllowedError' || error.message?.includes('permission')) {
+        toast({
+          title: 'Mikrofon icazəsi lazımdır',
+          description: 'Parametrlərdən mikrofon icazəsini aktivləşdirin',
+          variant: 'destructive'
+        });
+      } else {
+        toast({
+          title: 'Mikrofon xətası',
+          description: 'Mikrofona giriş icazəsi verin',
+          variant: 'destructive'
+        });
+      }
     }
   };
 

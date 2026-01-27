@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, MapPin, Thermometer, Droplets, Wind, Sun, CloudRain, 
-  AlertTriangle, Shirt, Loader2, RefreshCw, Shield, Flower2, CloudSun
+  AlertTriangle, Shirt, Loader2, RefreshCw, Shield, Flower2, CloudSun, MapPinOff
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { getCurrentPosition, requestLocationPermission } from '@/lib/permissions';
 
 interface WeatherClothingProps {
   onBack: () => void;
@@ -47,15 +48,16 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
     setLocationError(null);
 
     try {
-      // Get user location
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 60000
-        });
-      });
+      // Request location permission first
+      const permission = await requestLocationPermission();
+      
+      if (!permission.granted) {
+        setLocationError('Məkan icazəsi lazımdır. Parametrlərdən icazə verin.');
+        return;
+      }
 
+      // Get user location using our permission-aware helper
+      const position = await getCurrentPosition();
       const { latitude, longitude } = position.coords;
 
       const { data, error } = await supabase.functions.invoke('weather-clothing', {
@@ -71,7 +73,11 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
         throw new Error(data.error);
       }
     } catch (error: any) {
-      if (error.code === 1) {
+      console.error('Weather fetch error:', error);
+      
+      if (error.message?.includes('permission') || error.message?.includes('denied')) {
+        setLocationError('Məkan icazəsi rədd edildi. Parametrlərdən icazə verin.');
+      } else if (error.code === 1) {
         setLocationError('Məkan icazəsi rədd edildi. Parametrlərdən icazə verin.');
       } else if (error.code === 2) {
         setLocationError('Məkan təyin edilə bilmədi. Yenidən cəhd edin.');

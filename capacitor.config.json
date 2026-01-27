@@ -22,6 +22,12 @@
     "LocalNotifications": {
       "smallIcon": "ic_stat_icon",
       "iconColor": "#F97316"
+    },
+    "Camera": {
+      "permissionText": "Tətbiq nəcis skaneri və şəkil yükləmək üçün kameraya ehtiyac duyur"
+    },
+    "Geolocation": {
+      "permissionText": "Tətbiq hava vəziyyəti və geyim tövsiyələri üçün məkanınıza ehtiyac duyur"
     }
   },
   "ios": {
