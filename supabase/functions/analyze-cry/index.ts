@@ -67,30 +67,35 @@ Deno.serve(async (req) => {
                 }
               },
               {
-                text: `Sən peşəkar pediatrik audio analizcisən. Bu körpə ağlama səsini diqqətlə analiz et.
+                text: `Sən peşəkar pediatrik audio analizcisən. Bu səs faylını diqqətlə analiz et.
 
-TAPŞIRIQ:
-1. Ağlamanın NÖVünü müəyyən et (aşağıdakılardan BİRİ):
-   - "hungry" (Ac): Ritmik, təkrarlanan, yemək istəyi
-   - "tired" (Yuxulu): Monoton, zəif, yorğunluq əlaməti
-   - "pain" (Ağrı): Kəskin, yüksək tonlu, davamlı
-   - "discomfort" (Narahatlıq): Qıcıqlı, bez/soyuq/isti
-   - "colic" (Kolik): Uzun, intensiv, axşam saatlarında
-   - "attention" (Diqqət): Aralıqlı, valideyn istəyi
-   - "overstimulated" (Həddən artıq stimul): Yorucu mühit
-   - "sick" (Xəstəlik): Zəif, hıçqırıqlı, anormal
+ÇOX VACİB - ÖNCƏ YOXLA:
+1. Bu səsdə körpə ağlaması var mı? Əgər yoxdursa, "no_cry_detected" cavabını ver.
+2. Bu səs saxta/süni ağlama kimi səslənir? (telefon, TV, imitasiya) - əgər belədirsə "false_positive" ver.
+3. Yalnız həqiqi körpə ağlaması aşkar edilərsə növünü müəyyən et.
 
-2. Əminlik faizi (0-100%)
-3. Qısa izahat (Azərbaycan dilində, 1-2 cümlə)
-4. Tövsiyələr (Azərbaycan dilində, 2-3 maddə)
+Ağlama NÖVLƏRİ (yalnız həqiqi ağlama üçün):
+- "hungry": Ritmik, təkrarlanan, yemək istəyi
+- "tired": Monoton, zəif, yorğunluq
+- "pain": Kəskin, yüksək tonlu, davamlı
+- "discomfort": Qıcıqlı, bez/soyuq/isti
+- "colic": Uzun, intensiv, axşam saatlarında
+- "attention": Aralıqlı, valideyn istəyi
+- "overstimulated": Yorucu mühit
+- "sick": Zəif, hıçqırıqlı, anormal
+
+XÜSUSİ HALLAR:
+- "no_cry_detected": Səsdə körpə ağlaması yoxdur
+- "false_positive": Saxta/süni ağlama (TV, telefon, imitasiya)
 
 CAVAB FORMATI (STRICT JSON):
 {
-  "cryType": "hungry|tired|pain|discomfort|colic|attention|overstimulated|sick",
+  "cryType": "hungry|tired|pain|discomfort|colic|attention|overstimulated|sick|no_cry_detected|false_positive",
   "confidence": 85,
-  "explanation": "...",
-  "recommendations": ["...", "..."],
-  "urgency": "low|medium|high"
+  "explanation": "Azərbaycan dilində 1-2 cümlə izahat",
+  "recommendations": ["tövsiyə 1", "tövsiyə 2"],
+  "urgency": "low|medium|high",
+  "isCryDetected": true/false
 }`
               }
             ]
@@ -130,23 +135,33 @@ CAVAB FORMATI (STRICT JSON):
         confidence: 60,
         explanation: 'Ağlama analiz edildi, lakin dəqiq səbəb müəyyən edilə bilmədi.',
         recommendations: ['Körpəni yoxlayın', 'Əmizdirməyə cəhd edin', 'Bezini yoxlayın'],
-        urgency: 'medium'
+        urgency: 'medium',
+        isCryDetected: true
       };
     }
 
-    // Save analysis to database
-    const { error: insertError } = await supabase
-      .from('cry_analyses')
-      .insert({
-        user_id: user.id,
-        audio_duration_seconds: audioDuration,
-        analysis_result: analysisResult,
-        cry_type: analysisResult.cryType,
-        confidence_score: analysisResult.confidence
-      });
+    // Ensure isCryDetected is set correctly
+    if (analysisResult.cryType === 'no_cry_detected' || analysisResult.cryType === 'false_positive') {
+      analysisResult.isCryDetected = false;
+    } else if (analysisResult.isCryDetected === undefined) {
+      analysisResult.isCryDetected = true;
+    }
 
-    if (insertError) {
-      console.error('Database insert error:', insertError);
+    // Only save to database if cry was actually detected
+    if (analysisResult.isCryDetected) {
+      const { error: insertError } = await supabase
+        .from('cry_analyses')
+        .insert({
+          user_id: user.id,
+          audio_duration_seconds: audioDuration,
+          analysis_result: analysisResult,
+          cry_type: analysisResult.cryType,
+          confidence_score: analysisResult.confidence
+        });
+
+      if (insertError) {
+        console.error('Database insert error:', insertError);
+      }
     }
 
     return new Response(JSON.stringify({
