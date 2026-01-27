@@ -13,6 +13,7 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { useToast } from '@/hooks/use-toast';
 import { useAISuggestedQuestions } from '@/hooks/useDynamicTools';
+import { getPregnancyDay } from '@/lib/pregnancy-utils';
 import MarkdownContent from './MarkdownContent';
 
 interface Message {
@@ -39,9 +40,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const pregnancyData = getPregnancyData();
   
   // Calculate pregnancy day for dynamic content
-  const pregnancyDay = lastPeriodDate 
-    ? Math.floor((Date.now() - new Date(lastPeriodDate).getTime()) / (1000 * 60 * 60 * 24)) + 1
-    : 0;
+  const pregnancyDay = lifeStage === 'bump' ? getPregnancyDay(lastPeriodDate) : 0;
   
   // Fetch dynamic pregnancy content
   const { data: dayContent } = usePregnancyContentByDay(pregnancyDay > 0 && lifeStage === 'bump' ? pregnancyDay : undefined);

@@ -7,6 +7,26 @@
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 const PREGNANCY_DURATION_DAYS = 280; // Standard pregnancy duration from LMP
 
+const startOfDay = (date: Date) => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+/**
+ * Get effective due date.
+ * Platform rule: if LMP exists, it is the single source of truth (LMP + 280 days).
+ * Only fall back to an explicit due date when LMP is missing.
+ */
+export const getEffectiveDueDate = (
+  lastPeriodDate: Date | string | null,
+  explicitDueDate?: Date | string | null
+): Date | null => {
+  if (lastPeriodDate) return calculateDueDate(lastPeriodDate);
+  if (explicitDueDate) return startOfDay(new Date(explicitDueDate));
+  return null;
+};
+
 /**
  * Calculate pregnancy day (1-280) from Last Menstrual Period date
  * Day 1 is the first day of LMP
@@ -69,28 +89,12 @@ export const getDaysUntilDue = (
   lastPeriodDate: Date | string | null, 
   dueDate?: Date | string | null
 ): number => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  // If explicit due date is provided, use it
-  if (dueDate) {
-    const due = new Date(dueDate);
-    due.setHours(0, 0, 0, 0);
-    const daysLeft = Math.ceil((due.getTime() - today.getTime()) / MS_PER_DAY);
-    return Math.max(0, daysLeft);
-  }
-  
-  // Otherwise calculate from LMP (280 days from LMP)
-  if (lastPeriodDate) {
-    const lmp = new Date(lastPeriodDate);
-    lmp.setHours(0, 0, 0, 0);
-    
-    const calculatedDueDate = new Date(lmp.getTime() + PREGNANCY_DURATION_DAYS * MS_PER_DAY);
-    const daysLeft = Math.ceil((calculatedDueDate.getTime() - today.getTime()) / MS_PER_DAY);
-    return Math.max(0, daysLeft);
-  }
-  
-  return 0;
+  const today = startOfDay(new Date());
+  const effectiveDueDate = getEffectiveDueDate(lastPeriodDate, dueDate);
+  if (!effectiveDueDate) return 0;
+
+  const daysLeft = Math.ceil((effectiveDueDate.getTime() - today.getTime()) / MS_PER_DAY);
+  return Math.max(0, daysLeft);
 };
 
 /**
@@ -163,7 +167,7 @@ export const getFullPregnancyData = (
   const daysElapsed = getDaysElapsed(lastPeriodDate);
   const progressPercent = getPregnancyProgress(lastPeriodDate);
   const trimester = getTrimester(pregnancyWeek);
-  const dueDate = explicitDueDate ? new Date(explicitDueDate) : calculateDueDate(lastPeriodDate);
+  const dueDate = getEffectiveDueDate(lastPeriodDate, explicitDueDate);
   
   return {
     pregnancyDay,
