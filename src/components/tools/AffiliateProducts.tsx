@@ -1,51 +1,21 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  ArrowLeft, ExternalLink, Star, ShoppingBag, Heart,
-  Filter, ChevronRight, Tag, Package
+  ArrowLeft, Heart, Star, ShoppingBag, Search, Filter, Package
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useUserStore } from '@/store/userStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAppSetting } from '@/hooks/useAppSettings';
+import { useAffiliateProducts, useSavedProducts, AffiliateProduct } from '@/hooks/useAffiliateProducts';
+import AffiliateProductCard from './affiliate/AffiliateProductCard';
+import AffiliateProductDetail from './affiliate/AffiliateProductDetail';
+import SavedProductsList from './affiliate/SavedProductsList';
 
 interface AffiliateProductsProps {
   onBack: () => void;
 }
-
-interface AffiliateProduct {
-  id: string;
-  name: string;
-  name_az: string | null;
-  description: string | null;
-  description_az: string | null;
-  category: string;
-  category_az: string | null;
-  price: number | null;
-  currency: string;
-  original_price: number | null;
-  affiliate_url: string;
-  platform: string;
-  image_url: string | null;
-  rating: number;
-  review_count: number;
-  review_summary: string | null;
-  review_summary_az: string | null;
-  life_stages: string[];
-  is_featured: boolean;
-  is_active: boolean;
-}
-
-const platformLabels: Record<string, { label: string; color: string }> = {
-  trendyol: { label: 'Trendyol', color: 'bg-orange-500' },
-  amazon: { label: 'Amazon', color: 'bg-amber-500' },
-  aliexpress: { label: 'AliExpress', color: 'bg-red-500' },
-  other: { label: 'Digər', color: 'bg-gray-500' },
-};
 
 const categoryLabels: Record<string, string> = {
   baby_gear: 'Körpə əşyaları',
@@ -59,42 +29,48 @@ const categoryLabels: Record<string, string> = {
 const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
   const { lifeStage } = useUserStore();
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState<AffiliateProduct | null>(null);
+  const [showSaved, setShowSaved] = useState(false);
+  
   const affiliateEnabled = useAppSetting('affiliate_section_enabled');
-
-  // Check if affiliate section is enabled
   const isEnabled = affiliateEnabled !== false;
 
-  const { data: products = [], isLoading } = useQuery({
-    queryKey: ['affiliate-products', lifeStage],
-    queryFn: async () => {
-      let query = supabase
-        .from('affiliate_products')
-        .select('*')
-        .eq('is_active', true)
-        .order('is_featured', { ascending: false })
-        .order('rating', { ascending: false });
-      
-      const { data, error } = await query;
-      if (error) throw error;
-      
-      // Filter by life stage
-      return (data as AffiliateProduct[]).filter(
-        p => p.life_stages.includes(lifeStage || 'bump')
-      );
-    },
-    enabled: isEnabled,
-  });
+  const { data: products = [], isLoading } = useAffiliateProducts(lifeStage || undefined);
+  const { data: savedProducts = [] } = useSavedProducts();
 
   // Get unique categories
   const categories = ['all', ...new Set(products.map(p => p.category))];
 
-  const filteredProducts = activeCategory === 'all' 
-    ? products 
-    : products.filter(p => p.category === activeCategory);
+  // Filter products
+  const filteredProducts = products.filter(product => {
+    const matchesCategory = activeCategory === 'all' || product.category === activeCategory;
+    const matchesSearch = !searchQuery || 
+      (product.name_az || product.name).toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (product.description_az || product.description || '').toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
-  const handleProductClick = (product: AffiliateProduct) => {
-    window.open(product.affiliate_url, '_blank', 'noopener,noreferrer');
-  };
+  const featuredProducts = filteredProducts.filter(p => p.is_featured);
+
+  // Handle views
+  if (selectedProduct) {
+    return (
+      <AffiliateProductDetail 
+        product={selectedProduct} 
+        onBack={() => setSelectedProduct(null)} 
+      />
+    );
+  }
+
+  if (showSaved) {
+    return (
+      <SavedProductsList
+        onSelectProduct={setSelectedProduct}
+        onBack={() => setShowSaved(false)}
+      />
+    );
+  }
 
   if (!isEnabled) {
     return (
@@ -122,14 +98,42 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-card border-b border-border/50 px-4 py-3">
-        <div className="flex items-center gap-3 mb-3">
-          <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div>
-            <h1 className="text-lg font-bold">Tövsiyyə olunan məhsullar</h1>
-            <p className="text-xs text-muted-foreground">Sizin üçün seçdiklərimiz</p>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={onBack}>
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <div>
+              <h1 className="text-lg font-bold">Tövsiyyə olunan məhsullar</h1>
+              <p className="text-xs text-muted-foreground">Sizin üçün seçdiklərimiz</p>
+            </div>
           </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="rounded-xl relative"
+            onClick={() => setShowSaved(true)}
+          >
+            <Heart className="w-4 h-4 mr-1" />
+            Saxlanılmış
+            {savedProducts.length > 0 && (
+              <Badge className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-[10px] bg-red-500 text-white border-0">
+                {savedProducts.length}
+              </Badge>
+            )}
+          </Button>
+        </div>
+
+        {/* Search */}
+        <div className="relative mb-3">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Məhsul axtar..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-10 pl-9 pr-3 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-sm transition-all outline-none"
+          />
         </div>
 
         {/* Category Tabs */}
@@ -152,86 +156,39 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
         </div>
       </div>
 
-      {/* Featured Products Banner */}
-      {filteredProducts.filter(p => p.is_featured).length > 0 && (
+      {/* Featured Products */}
+      {featuredProducts.length > 0 && activeCategory === 'all' && !searchQuery && (
         <div className="px-4 py-4">
           <h2 className="font-semibold text-sm mb-3 flex items-center gap-2">
             <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
             Ən çox tövsiyyə olunanlar
           </h2>
           <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-4 px-4">
-            {filteredProducts.filter(p => p.is_featured).map((product, index) => (
-              <motion.button
+            {featuredProducts.map((product, index) => (
+              <AffiliateProductCard
                 key={product.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                onClick={() => handleProductClick(product)}
-                className="flex-shrink-0 w-56 bg-card rounded-2xl overflow-hidden border border-border/50 text-left"
-              >
-                <div className="relative h-32 bg-gradient-to-br from-primary/10 to-primary/5">
-                  {product.image_url ? (
-                    <img 
-                      src={product.image_url} 
-                      alt={product.name_az || product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <ShoppingBag className="w-10 h-10 text-muted-foreground" />
-                    </div>
-                  )}
-                  <Badge className={`absolute top-2 left-2 text-[10px] ${platformLabels[product.platform]?.color || 'bg-gray-500'} text-white border-0`}>
-                    {platformLabels[product.platform]?.label || product.platform}
-                  </Badge>
-                  {product.original_price && product.price && product.original_price > product.price && (
-                    <Badge className="absolute top-2 right-2 text-[10px] bg-red-500 text-white border-0">
-                      -{Math.round((1 - product.price / product.original_price) * 100)}%
-                    </Badge>
-                  )}
-                </div>
-                <div className="p-3">
-                  <h3 className="font-semibold text-sm line-clamp-2 mb-1">{product.name_az || product.name}</h3>
-                  {product.rating > 0 && (
-                    <div className="flex items-center gap-1 text-xs mb-2">
-                      <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                      <span>{product.rating.toFixed(1)}</span>
-                      {product.review_count > 0 && (
-                        <span className="text-muted-foreground">({product.review_count})</span>
-                      )}
-                    </div>
-                  )}
-                  <div className="flex items-center justify-between">
-                    {product.price ? (
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-primary">{product.price} {product.currency}</span>
-                        {product.original_price && product.original_price > product.price && (
-                          <span className="text-xs text-muted-foreground line-through">
-                            {product.original_price} {product.currency}
-                          </span>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-sm text-muted-foreground">Qiymətə bax</span>
-                    )}
-                    <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                  </div>
-                </div>
-              </motion.button>
+                product={product}
+                onSelect={setSelectedProduct}
+                index={index}
+                variant="featured"
+              />
             ))}
           </div>
         </div>
       )}
 
       {/* All Products */}
-      <div className="px-4">
-        <h2 className="font-semibold text-sm mb-3">Bütün məhsullar</h2>
+      <div className="px-4 py-4">
+        <h2 className="font-semibold text-sm mb-3">
+          {searchQuery ? `Axtarış nəticələri` : 'Bütün məhsullar'}
+          <span className="text-muted-foreground font-normal ml-2">({filteredProducts.length})</span>
+        </h2>
         
         {isLoading ? (
           <div className="grid grid-cols-2 gap-3">
             {[1, 2, 3, 4].map(i => (
               <div key={i} className="bg-card rounded-xl overflow-hidden border border-border/50">
-                <Skeleton className="h-28 w-full" />
+                <Skeleton className="aspect-square w-full" />
                 <div className="p-3 space-y-2">
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-3 w-1/2" />
@@ -247,57 +204,19 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
         ) : (
           <div className="grid grid-cols-2 gap-3">
             {filteredProducts.map((product, index) => (
-              <motion.button
+              <AffiliateProductCard
                 key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.03 }}
-                onClick={() => handleProductClick(product)}
-                className="bg-card rounded-xl overflow-hidden border border-border/50 text-left"
-              >
-                <div className="relative h-28 bg-gradient-to-br from-muted to-muted/50">
-                  {product.image_url ? (
-                    <img 
-                      src={product.image_url} 
-                      alt={product.name_az || product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <ShoppingBag className="w-8 h-8 text-muted-foreground" />
-                    </div>
-                  )}
-                  <Badge className={`absolute top-2 left-2 text-[8px] ${platformLabels[product.platform]?.color || 'bg-gray-500'} text-white border-0`}>
-                    {platformLabels[product.platform]?.label || product.platform}
-                  </Badge>
-                </div>
-                <div className="p-2">
-                  <h3 className="font-medium text-xs line-clamp-2 mb-1">{product.name_az || product.name}</h3>
-                  {product.rating > 0 && (
-                    <div className="flex items-center gap-1 text-[10px] mb-1">
-                      <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
-                      <span>{product.rating.toFixed(1)}</span>
-                    </div>
-                  )}
-                  {product.price ? (
-                    <div className="flex items-center gap-1">
-                      <span className="font-bold text-sm text-primary">{product.price}</span>
-                      <span className="text-[10px] text-muted-foreground">{product.currency}</span>
-                    </div>
-                  ) : (
-                    <span className="text-[10px] text-primary flex items-center gap-1">
-                      Ətraflı <ExternalLink className="w-3 h-3" />
-                    </span>
-                  )}
-                </div>
-              </motion.button>
+                product={product}
+                onSelect={setSelectedProduct}
+                index={index}
+              />
             ))}
           </div>
         )}
       </div>
 
       {/* Disclaimer */}
-      <div className="px-4 mt-6">
+      <div className="px-4 mt-2 mb-4">
         <div className="bg-muted/30 rounded-xl p-3 text-center">
           <p className="text-[10px] text-muted-foreground">
             Bu səhifədəki linklər affiliate linklərdir. Alış-veriş etdikdə biz kiçik komissiya qazana bilərik.
