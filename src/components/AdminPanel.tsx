@@ -23,6 +23,7 @@ import AdminOrders from './admin/AdminOrders';
 import AdminBranding from './admin/AdminBranding';
 import AdminLegal from './admin/AdminLegal';
 import AdminPushNotifications from './admin/AdminPushNotifications';
+import AdminAffiliateProducts from './admin/AdminAffiliateProducts';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -77,6 +78,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminLegal />;
       case 'push-notifications':
         return <AdminPushNotifications />;
+      case 'affiliate':
+        return <AdminAffiliateProducts />;
       case 'security':
         return <AdminSecurity />;
       default:
