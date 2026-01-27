@@ -195,7 +195,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   if (activeTool === 'poop-scanner') return <PoopScanner onBack={handleBack} />;
   if (activeTool === 'weather-clothing') return <WeatherClothing onBack={handleBack} />;
   if (activeTool === 'noise-meter') return <NoiseMeter onBack={handleBack} />;
-  if (activeTool === 'secondhand-market') return <SecondHandMarket onBack={handleBack} />;
+  if (activeTool === 'secondhand-market' || activeTool === 'second-hand-market') return <SecondHandMarket onBack={handleBack} />;
   if (activeTool === 'affiliate' || activeTool === 'affiliate-products') return <AffiliateProducts onBack={handleBack} />;
 
   return (
