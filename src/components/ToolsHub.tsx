@@ -75,7 +75,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const { profile } = useAuth();
   const { toast } = useToast();
   const pregData = getPregnancyData();
-  const { data: toolConfigs = [], isLoading: toolsLoading } = useToolConfigs();
+  const { data: toolConfigs = [], isLoading: toolsLoading } = useToolConfigs(lifeStage || undefined);
   
   const hasPartner = !!profile?.linked_partner_id;
 

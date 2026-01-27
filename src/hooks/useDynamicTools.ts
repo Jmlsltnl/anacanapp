@@ -351,20 +351,35 @@ export interface ToolConfig {
   partner_description: string | null;
   partner_description_az: string | null;
   sort_order: number;
+  flow_order: number;
+  bump_order: number;
+  mommy_order: number;
   is_active: boolean;
 }
 
-export const useToolConfigs = () => {
+export const useToolConfigs = (lifeStage?: string) => {
   return useQuery({
-    queryKey: ['tool-configs'],
+    queryKey: ['tool-configs', lifeStage],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('tool_configs')
         .select('*')
-        .eq('is_active', true)
-        .order('sort_order');
+        .eq('is_active', true);
       if (error) throw error;
-      return data as ToolConfig[];
+      
+      // Sort by the appropriate order field based on life stage
+      let sorted = data as ToolConfig[];
+      if (lifeStage === 'flow') {
+        sorted = sorted.sort((a, b) => (a.flow_order ?? a.sort_order) - (b.flow_order ?? b.sort_order));
+      } else if (lifeStage === 'bump') {
+        sorted = sorted.sort((a, b) => (a.bump_order ?? a.sort_order) - (b.bump_order ?? b.sort_order));
+      } else if (lifeStage === 'mommy') {
+        sorted = sorted.sort((a, b) => (a.mommy_order ?? a.sort_order) - (b.mommy_order ?? b.sort_order));
+      } else {
+        sorted = sorted.sort((a, b) => a.sort_order - b.sort_order);
+      }
+      
+      return sorted;
     },
   });
 };

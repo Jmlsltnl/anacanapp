@@ -3539,15 +3539,18 @@ export type Database = {
       tool_configs: {
         Row: {
           bg_color: string | null
+          bump_order: number | null
           color: string | null
           created_at: string | null
           description: string | null
           description_az: string | null
+          flow_order: number | null
           icon: string
           id: string
           is_active: boolean | null
           life_stages: string[] | null
           min_week: number | null
+          mommy_order: number | null
           name: string
           name_az: string | null
           partner_description: string | null
@@ -3561,15 +3564,18 @@ export type Database = {
         }
         Insert: {
           bg_color?: string | null
+          bump_order?: number | null
           color?: string | null
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          flow_order?: number | null
           icon?: string
           id?: string
           is_active?: boolean | null
           life_stages?: string[] | null
           min_week?: number | null
+          mommy_order?: number | null
           name: string
           name_az?: string | null
           partner_description?: string | null
@@ -3583,15 +3589,18 @@ export type Database = {
         }
         Update: {
           bg_color?: string | null
+          bump_order?: number | null
           color?: string | null
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          flow_order?: number | null
           icon?: string
           id?: string
           is_active?: boolean | null
           life_stages?: string[] | null
           min_week?: number | null
+          mommy_order?: number | null
           name?: string
           name_az?: string | null
           partner_description?: string | null
