@@ -1,14 +1,22 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ArrowLeft, Heart, ExternalLink, Star, Clock, ChevronLeft, ChevronRight,
+  ArrowLeft, Heart, ExternalLink, Star, Clock,
   Check, X, Play, Share2, ShoppingBag, Tag, Store, Info
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AffiliateProduct, useIsProductSaved, useSaveProduct, useUnsaveProduct } from '@/hooks/useAffiliateProducts';
-import { formatDistanceToNow, format } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { az } from 'date-fns/locale';
+import { nativeShare } from '@/lib/native';
+import { useToast } from '@/hooks/use-toast';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from '@/components/ui/carousel';
 
 interface AffiliateProductDetailProps {
   product: AffiliateProduct;
@@ -32,6 +40,8 @@ const platformLabels: Record<string, string> = {
 const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showVideo, setShowVideo] = useState(false);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const { toast } = useToast();
   
   const { data: isSaved } = useIsProductSaved(product.id);
   const saveProduct = useSaveProduct();
@@ -44,6 +54,21 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
     ? Math.round((1 - product.price / product.original_price) * 100)
     : null;
 
+  // Handle carousel scroll
+  const onSelect = useCallback(() => {
+    if (!carouselApi) return;
+    setCurrentImageIndex(carouselApi.selectedScrollSnap());
+  }, [carouselApi]);
+
+  // Set up carousel listener
+  useState(() => {
+    if (!carouselApi) return;
+    carouselApi.on('select', onSelect);
+    return () => {
+      carouselApi.off('select', onSelect);
+    };
+  });
+
   const handleSaveToggle = () => {
     if (isSaved) {
       unsaveProduct.mutate(product.id);
@@ -53,16 +78,14 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
   };
 
   const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: product.name_az || product.name,
-          text: product.description_az || product.description || '',
-          url: product.affiliate_url,
-        });
-      } catch (err) {
-        console.log('Share cancelled');
-      }
+    const success = await nativeShare({
+      title: product.name_az || product.name,
+      text: `${product.name_az || product.name} - ${product.price ? `${product.price} ${product.currency}` : 'Qiyməti yoxla'}`,
+      url: product.affiliate_url,
+    });
+    
+    if (success) {
+      toast({ title: 'Paylaşıldı!', description: 'Məhsul linki kopyalandı' });
     }
   };
 
@@ -70,8 +93,9 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
     window.open(product.affiliate_url, '_blank', 'noopener,noreferrer');
   };
 
-  const nextImage = () => setCurrentImageIndex(i => (i + 1) % allImages.length);
-  const prevImage = () => setCurrentImageIndex(i => (i - 1 + allImages.length) % allImages.length);
+  const scrollToImage = (index: number) => {
+    carouselApi?.scrollTo(index);
+  };
 
   return (
     <div className="min-h-screen bg-background pb-32">
@@ -97,70 +121,82 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
         </div>
       </div>
 
-      {/* Image Gallery */}
+      {/* Image Gallery - Carousel */}
       <div className="relative bg-gradient-to-b from-muted to-background">
-        <div className="relative aspect-square">
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={currentImageIndex}
-              src={allImages[currentImageIndex] || '/placeholder.svg'}
+        {allImages.length > 1 ? (
+          <Carousel
+            setApi={setCarouselApi}
+            className="w-full"
+            opts={{ loop: true }}
+          >
+            <CarouselContent className="-ml-0">
+              {allImages.map((img, idx) => (
+                <CarouselItem key={idx} className="pl-0">
+                  <div className="relative aspect-square">
+                    <img
+                      src={img || '/placeholder.svg'}
+                      alt={`${product.name_az || product.name} - ${idx + 1}`}
+                      className="w-full h-full object-contain p-4"
+                    />
+                    {/* Discount Badge */}
+                    {discountPercent && idx === 0 && (
+                      <Badge className="absolute top-4 left-4 text-sm bg-red-500 text-white border-0 shadow-lg">
+                        -{discountPercent}% Endirim
+                      </Badge>
+                    )}
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+        ) : (
+          <div className="relative aspect-square">
+            <img
+              src={allImages[0] || '/placeholder.svg'}
               alt={product.name_az || product.name}
               className="w-full h-full object-contain p-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
             />
-          </AnimatePresence>
-          
-          {/* Navigation Arrows */}
-          {allImages.length > 1 && (
-            <>
-              <button 
-                onClick={prevImage}
-                className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/80 flex items-center justify-center shadow-md"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button 
-                onClick={nextImage}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/80 flex items-center justify-center shadow-md"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </>
-          )}
-          
-          {/* Video Button */}
-          {product.video_url && (
-            <button
-              onClick={() => setShowVideo(true)}
-              className="absolute bottom-4 right-4 px-4 py-2 rounded-full bg-background/90 flex items-center gap-2 shadow-lg"
-            >
-              <Play className="w-4 h-4 text-primary fill-primary" />
-              <span className="text-sm font-medium">Video</span>
-            </button>
-          )}
-          
-          {/* Discount Badge */}
-          {discountPercent && (
-            <Badge className="absolute top-4 left-4 text-sm bg-red-500 text-white border-0 shadow-lg">
-              -{discountPercent}% Endirim
-            </Badge>
-          )}
-        </div>
+            {discountPercent && (
+              <Badge className="absolute top-4 left-4 text-sm bg-red-500 text-white border-0 shadow-lg">
+                -{discountPercent}% Endirim
+              </Badge>
+            )}
+          </div>
+        )}
         
-        {/* Image Indicators */}
+        {/* Video Button */}
+        {product.video_url && (
+          <button
+            onClick={() => setShowVideo(true)}
+            className="absolute bottom-16 right-4 px-4 py-2 rounded-full bg-background/90 flex items-center gap-2 shadow-lg z-10"
+          >
+            <Play className="w-4 h-4 text-primary fill-primary" />
+            <span className="text-sm font-medium">Video</span>
+          </button>
+        )}
+        
+        {/* Thumbnail Preview & Indicators */}
         {allImages.length > 1 && (
-          <div className="flex justify-center gap-1.5 pb-4">
-            {allImages.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentImageIndex(idx)}
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  idx === currentImageIndex ? 'bg-primary' : 'bg-muted-foreground/30'
-                }`}
-              />
-            ))}
+          <div className="px-4 pb-4">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+              {allImages.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => scrollToImage(idx)}
+                  className={`shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${
+                    idx === currentImageIndex 
+                      ? 'border-primary' 
+                      : 'border-transparent opacity-60'
+                  }`}
+                >
+                  <img
+                    src={img || '/placeholder.svg'}
+                    alt={`Thumbnail ${idx + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>
