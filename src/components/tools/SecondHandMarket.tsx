@@ -153,14 +153,14 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
           is_free: formData.is_free,
           age_range: formData.age_range,
           location_city: formData.location_city,
-          status: 'active'
+          status: 'pending' // All listings go to pending first
         });
 
       if (error) throw error;
 
       toast({
         title: 'Uğurlu!',
-        description: 'Elan yaradıldı',
+        description: 'Elan yaradıldı və təsdiq üçün göndərildi',
       });
       
       setShowCreateModal(false);

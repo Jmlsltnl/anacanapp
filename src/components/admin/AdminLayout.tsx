@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Package, Settings, BarChart3, Shield, 
   ChevronLeft, Menu, LogOut, Bell, Search,
-  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench
+  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,6 +40,7 @@ const menuItems = [
   { id: 'branding', label: 'Branding', icon: Image },
   { id: 'legal', label: 'Hüquqi Sənədlər', icon: Scale },
   { id: 'push-notifications', label: 'Push Bildirişləri', icon: Send },
+  { id: 'marketplace', label: 'İkinci Əl Bazarı', icon: Store },
   { id: 'settings', label: 'Tənzimləmələr', icon: Settings },
   { id: 'security', label: 'Təhlükəsizlik', icon: Shield },
 ];
