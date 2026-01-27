@@ -4,7 +4,7 @@ import {
   Search, Shield, Timer, Scale, Baby, Briefcase, 
   Volume2, Heart, Footprints, ChevronRight,
   Utensils, Activity, ArrowLeft, Camera, Lock, ShoppingCart, LucideIcon, Wrench, BookOpen, ChefHat,
-  Stethoscope, Droplet, ImagePlus, Package
+  Stethoscope, Droplet, ImagePlus, Package, Mic, Scan, CloudSun, Gauge, Store
 } from 'lucide-react';
 import BlogScreen from '@/components/BlogScreen';
 import { useUserStore } from '@/store/userStore';
@@ -26,6 +26,11 @@ import DoctorsHospitals from './tools/DoctorsHospitals';
 import BloodSugarTracker from './tools/BloodSugarTracker';
 import PregnancyAlbum from './tools/PregnancyAlbum';
 import AffiliateProducts from './tools/AffiliateProducts';
+import CryTranslator from './tools/CryTranslator';
+import PoopScanner from './tools/PoopScanner';
+import WeatherClothing from './tools/WeatherClothing';
+import NoiseMeter from './tools/NoiseMeter';
+import SecondHandMarket from './tools/SecondHandMarket';
 import { useToast } from '@/hooks/use-toast';
 import { useToolConfigs } from '@/hooks/useDynamicTools';
 
@@ -61,6 +66,11 @@ const iconMap: Record<string, LucideIcon> = {
   'Droplet': Droplet,
   'ImagePlus': ImagePlus,
   'Package': Package,
+  'Mic': Mic,
+  'Scan': Scan,
+  'CloudSun': CloudSun,
+  'Gauge': Gauge,
+  'Store': Store,
 };
 
 interface ToolsHubProps {
@@ -181,6 +191,11 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   if (activeTool === 'doctors') return <DoctorsHospitals onBack={handleBack} />;
   if (activeTool === 'blood-sugar') return <BloodSugarTracker onBack={handleBack} />;
   if (activeTool === 'pregnancy-album') return <PregnancyAlbum onBack={handleBack} />;
+  if (activeTool === 'cry-translator') return <CryTranslator onBack={handleBack} />;
+  if (activeTool === 'poop-scanner') return <PoopScanner onBack={handleBack} />;
+  if (activeTool === 'weather-clothing') return <WeatherClothing onBack={handleBack} />;
+  if (activeTool === 'noise-meter') return <NoiseMeter onBack={handleBack} />;
+  if (activeTool === 'secondhand-market') return <SecondHandMarket onBack={handleBack} />;
   if (activeTool === 'affiliate' || activeTool === 'affiliate-products') return <AffiliateProducts onBack={handleBack} />;
 
   return (

@@ -1106,6 +1106,36 @@ export type Database = {
         }
         Relationships: []
       }
+      cry_analyses: {
+        Row: {
+          analysis_result: Json
+          audio_duration_seconds: number | null
+          confidence_score: number | null
+          created_at: string
+          cry_type: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          analysis_result: Json
+          audio_duration_seconds?: number | null
+          confidence_score?: number | null
+          created_at?: string
+          cry_type?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          analysis_result?: Json
+          audio_duration_seconds?: number | null
+          confidence_score?: number | null
+          created_at?: string
+          cry_type?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_logs: {
         Row: {
           bleeding: string | null
@@ -1735,6 +1765,95 @@ export type Database = {
         }
         Relationships: []
       }
+      marketplace_listings: {
+        Row: {
+          age_range: string | null
+          category: string
+          condition: string
+          created_at: string
+          description: string | null
+          id: string
+          images: string[] | null
+          is_free: boolean | null
+          location_city: string | null
+          price: number | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          age_range?: string | null
+          category?: string
+          condition?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          is_free?: boolean | null
+          location_city?: string | null
+          price?: number | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          age_range?: string | null
+          category?: string
+          condition?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          is_free?: boolean | null
+          location_city?: string | null
+          price?: number | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      marketplace_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_read: boolean | null
+          listing_id: string
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          listing_id: string
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          listing_id?: string
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_messages_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       meal_logs: {
         Row: {
           calories: number
@@ -1876,6 +1995,33 @@ export type Database = {
           label_az?: string | null
           option_id?: string
           sort_order?: number | null
+        }
+        Relationships: []
+      }
+      noise_measurements: {
+        Row: {
+          created_at: string
+          decibel_level: number
+          id: string
+          is_too_loud: boolean | null
+          room_name: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          decibel_level: number
+          id?: string
+          is_too_loud?: boolean | null
+          room_name?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          decibel_level?: number
+          id?: string
+          is_too_loud?: boolean | null
+          room_name?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -2567,6 +2713,39 @@ export type Database = {
           preview_url?: string | null
           prompt_text?: string | null
           sort_order?: number | null
+        }
+        Relationships: []
+      }
+      poop_analyses: {
+        Row: {
+          analysis_result: Json
+          color_detected: string | null
+          concern_level: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          is_normal: boolean | null
+          user_id: string
+        }
+        Insert: {
+          analysis_result: Json
+          color_detected?: string | null
+          concern_level?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_normal?: boolean | null
+          user_id: string
+        }
+        Update: {
+          analysis_result?: Json
+          color_detected?: string | null
+          concern_level?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_normal?: boolean | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -3905,6 +4084,42 @@ export type Database = {
           updated_at?: string
           week_end?: number | null
           week_start?: number | null
+        }
+        Relationships: []
+      }
+      weather_clothing_logs: {
+        Row: {
+          city_name: string | null
+          clothing_advice: string | null
+          created_at: string
+          id: string
+          location_lat: number | null
+          location_lng: number | null
+          pollen_advice: string | null
+          user_id: string
+          weather_data: Json | null
+        }
+        Insert: {
+          city_name?: string | null
+          clothing_advice?: string | null
+          created_at?: string
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          pollen_advice?: string | null
+          user_id: string
+          weather_data?: Json | null
+        }
+        Update: {
+          city_name?: string | null
+          clothing_advice?: string | null
+          created_at?: string
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          pollen_advice?: string | null
+          user_id?: string
+          weather_data?: Json | null
         }
         Relationships: []
       }
