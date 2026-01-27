@@ -67,12 +67,14 @@ export type Database = {
           affiliate_url: string
           category: string | null
           category_az: string | null
+          cons: string[] | null
           created_at: string | null
           currency: string | null
           description: string | null
           description_az: string | null
           id: string
           image_url: string | null
+          images: string[] | null
           is_active: boolean | null
           is_featured: boolean | null
           life_stages: string[] | null
@@ -81,23 +83,32 @@ export type Database = {
           original_price: number | null
           platform: string | null
           price: number | null
+          price_updated_at: string | null
+          pros: string[] | null
           rating: number | null
           review_count: number | null
           review_summary: string | null
           review_summary_az: string | null
           sort_order: number | null
+          specifications: Json | null
+          store_logo_url: string | null
+          store_name: string | null
+          tags: string[] | null
           updated_at: string | null
+          video_url: string | null
         }
         Insert: {
           affiliate_url: string
           category?: string | null
           category_az?: string | null
+          cons?: string[] | null
           created_at?: string | null
           currency?: string | null
           description?: string | null
           description_az?: string | null
           id?: string
           image_url?: string | null
+          images?: string[] | null
           is_active?: boolean | null
           is_featured?: boolean | null
           life_stages?: string[] | null
@@ -106,23 +117,32 @@ export type Database = {
           original_price?: number | null
           platform?: string | null
           price?: number | null
+          price_updated_at?: string | null
+          pros?: string[] | null
           rating?: number | null
           review_count?: number | null
           review_summary?: string | null
           review_summary_az?: string | null
           sort_order?: number | null
+          specifications?: Json | null
+          store_logo_url?: string | null
+          store_name?: string | null
+          tags?: string[] | null
           updated_at?: string | null
+          video_url?: string | null
         }
         Update: {
           affiliate_url?: string
           category?: string | null
           category_az?: string | null
+          cons?: string[] | null
           created_at?: string | null
           currency?: string | null
           description?: string | null
           description_az?: string | null
           id?: string
           image_url?: string | null
+          images?: string[] | null
           is_active?: boolean | null
           is_featured?: boolean | null
           life_stages?: string[] | null
@@ -131,12 +151,19 @@ export type Database = {
           original_price?: number | null
           platform?: string | null
           price?: number | null
+          price_updated_at?: string | null
+          pros?: string[] | null
           rating?: number | null
           review_count?: number | null
           review_summary?: string | null
           review_summary_az?: string | null
           sort_order?: number | null
+          specifications?: Json | null
+          store_logo_url?: string | null
+          store_name?: string | null
+          tags?: string[] | null
           updated_at?: string | null
+          video_url?: string | null
         }
         Relationships: []
       }
@@ -3124,6 +3151,35 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      saved_affiliate_products: {
+        Row: {
+          created_at: string | null
+          id: string
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_affiliate_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       scheduled_notifications: {
         Row: {
