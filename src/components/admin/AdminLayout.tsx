@@ -169,9 +169,9 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
       </motion.aside>
 
       {/* Main Content */}
-      <main className={`flex-1 ${sidebarOpen ? 'ml-[280px]' : 'ml-[80px]'} transition-all duration-300`}>
+      <main className={`flex-1 ${sidebarOpen ? 'ml-[280px]' : 'ml-[80px]'} transition-all duration-300 min-h-screen flex flex-col`}>
         {/* Top Bar */}
-        <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40 flex items-center justify-between px-6">
+        <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40 flex items-center justify-between px-6 shrink-0">
           <div className="flex items-center gap-4 flex-1 max-w-md">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -190,9 +190,11 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
           </div>
         </header>
 
-        {/* Page Content */}
-        <div className="p-6">
-          {children}
+        {/* Page Content - Scrollable Area */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-6 min-h-full">
+            {children}
+          </div>
         </div>
       </main>
     </div>
