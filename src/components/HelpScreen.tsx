@@ -130,8 +130,8 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
 
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        {/* Header */}
-        <div className="gradient-primary px-5 pt-4 pb-4">
+        {/* Header with safe area */}
+        <div className="gradient-primary px-5 pb-4" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
           <div className="flex items-center gap-3">
             <motion.button
               onClick={() => {
@@ -264,8 +264,8 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
 
   return (
     <div className="min-h-screen bg-background pb-28">
-      {/* Header */}
-      <div className="gradient-primary px-5 pt-4 pb-6">
+      {/* Header with safe area */}
+      <div className="gradient-primary px-5 pb-6" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
         <div className="flex items-center gap-3 mb-4">
           <motion.button
             onClick={onBack}

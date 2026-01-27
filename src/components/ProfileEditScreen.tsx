@@ -132,8 +132,8 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
 
   return (
     <div className="min-h-screen bg-background pb-28">
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border/50">
+      {/* Header with safe area */}
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border/50" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         <div className="px-5 py-4 flex items-center gap-4">
           <motion.button
             onClick={onBack}

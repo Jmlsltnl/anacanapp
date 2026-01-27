@@ -19,7 +19,7 @@ export const useSilentHours = () => {
   const [settings, setSettings] = useState<SilentHoursSettings>(defaultSettings);
   const [loading, setLoading] = useState(true);
 
-  // Load settings from user_preferences
+  // Load settings from database
   useEffect(() => {
     const loadSettings = async () => {
       if (!user) {
@@ -30,21 +30,25 @@ export const useSilentHours = () => {
       try {
         const { data, error } = await supabase
           .from('user_preferences')
-          .select('*')
+          .select('silent_hours_enabled, silent_hours_start, silent_hours_end')
           .eq('user_id', user.id)
-          .maybeSingle();
+          .single();
 
-        if (!error && data) {
-          // Parse silent hours from JSON if stored
-          // For now, we'll store in localStorage until we extend the schema
-          const stored = localStorage.getItem(`silent_hours_${user.id}`);
-          if (stored) {
-            setSettings(JSON.parse(stored));
-          }
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error loading silent hours:', error);
         }
-      } catch (err) {
-        console.error('Error loading silent hours:', err);
-      } finally {
+
+        if (data) {
+          setSettings({
+            enabled: data.silent_hours_enabled ?? false,
+            startTime: data.silent_hours_start ?? '22:00',
+            endTime: data.silent_hours_end ?? '08:00',
+          });
+        }
+
+        setLoading(false);
+      } catch (error) {
+        console.error('Error:', error);
         setLoading(false);
       }
     };
@@ -52,15 +56,51 @@ export const useSilentHours = () => {
     loadSettings();
   }, [user]);
 
-  // Update settings
-  const updateSettings = useCallback(async (newSettings: Partial<SilentHoursSettings>) => {
+  // Update settings - persists to database
+  const updateSettings = useCallback(async (updates: Partial<SilentHoursSettings>) => {
     if (!user) return;
-    
-    const updated = { ...settings, ...newSettings };
-    setSettings(updated);
-    
-    // Store in localStorage for now
-    localStorage.setItem(`silent_hours_${user.id}`, JSON.stringify(updated));
+
+    const newSettings = { ...settings, ...updates };
+    setSettings(newSettings);
+
+    // Persist to database
+    try {
+      const dbUpdates: Record<string, unknown> = { user_id: user.id };
+      
+      if ('enabled' in updates) {
+        dbUpdates.silent_hours_enabled = updates.enabled;
+      }
+      if ('startTime' in updates) {
+        dbUpdates.silent_hours_start = updates.startTime;
+      }
+      if ('endTime' in updates) {
+        dbUpdates.silent_hours_end = updates.endTime;
+      }
+
+      const { error } = await supabase
+        .from('user_preferences')
+        .update(dbUpdates)
+        .eq('user_id', user.id);
+
+      // If no row exists, insert it
+      if (error && error.code === 'PGRST116') {
+        await supabase
+          .from('user_preferences')
+          .insert({ user_id: user.id, ...dbUpdates });
+
+      } else if (error) {
+        console.error('Error saving silent hours:', error);
+        setSettings(settings); // Revert on error
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setSettings(settings);
+    }
+
+    // Also save to localStorage for chat-notifications lib
+    if (user) {
+      localStorage.setItem(`silent_hours_${user.id}`, JSON.stringify(newSettings));
+    }
   }, [user, settings]);
 
   // Check if current time is within silent hours
@@ -78,10 +118,8 @@ export const useSilentHours = () => {
 
     // Handle overnight ranges (e.g., 22:00 - 08:00)
     if (startMinutes > endMinutes) {
-      // Silent if after start OR before end
       return currentMinutes >= startMinutes || currentMinutes < endMinutes;
     } else {
-      // Silent if between start and end
       return currentMinutes >= startMinutes && currentMinutes < endMinutes;
     }
   }, [settings]);

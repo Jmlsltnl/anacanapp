@@ -51,8 +51,8 @@ const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
 
   return (
     <div className="min-h-screen bg-background pb-28">
-      {/* Header */}
-      <div className="gradient-primary px-5 pt-4 pb-6">
+      {/* Header with safe area */}
+      <div className="gradient-primary px-5 pb-6" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
         <div className="flex items-center gap-3 mb-4">
           <motion.button
             onClick={onBack}

@@ -52,7 +52,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
   if (selectedDoc) {
     return (
       <div className="flex flex-col h-full bg-background">
-        <div className="flex items-center gap-3 p-4 border-b bg-card">
+        <div className="flex items-center gap-3 p-4 border-b bg-card" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
           <Button variant="ghost" size="icon" onClick={() => setSelectedDoc(null)}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
@@ -75,7 +75,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
 
   return (
     <div className="flex flex-col h-full bg-background">
-      <div className="flex items-center gap-3 p-4 border-b bg-card">
+      <div className="flex items-center gap-3 p-4 border-b bg-card" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ArrowLeft className="h-5 w-5" />
         </Button>

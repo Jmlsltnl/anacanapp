@@ -87,8 +87,8 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
 
   return (
     <div className="min-h-screen bg-background pb-safe">
-      {/* Header */}
-      <div className="bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600 px-5 pt-12 pb-8 rounded-b-3xl">
+      {/* Header with safe area */}
+      <div className="bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600 px-5 pb-8 rounded-b-3xl" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
         <div className="flex items-center gap-4 mb-6">
           <motion.button
             onClick={onBack}
