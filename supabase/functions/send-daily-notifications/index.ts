@@ -10,6 +10,7 @@ interface UserForNotification {
   life_stage: string;
   role: string;
   due_date: string | null;
+  last_period_date: string | null;
   daily_push_enabled: boolean;
   last_push_sent_at: string | null;
 }
@@ -100,7 +101,7 @@ Deno.serve(async (req) => {
     // Get users with push enabled
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('user_id, life_stage, role, due_date');
+      .select('user_id, life_stage, role, due_date, last_period_date');
 
     const { data: preferences } = await supabase
       .from('user_preferences')
@@ -126,6 +127,7 @@ Deno.serve(async (req) => {
         life_stage: p.life_stage || 'flow',
         role: p.role || 'user',
         due_date: p.due_date,
+        last_period_date: p.last_period_date,
         daily_push_enabled: true,
         last_push_sent_at: null,
       });
@@ -139,22 +141,23 @@ Deno.serve(async (req) => {
       }
     });
 
-    // Calculate pregnancy day for a user
-    const calculatePregnancyDay = (dueDate: string | null): number | null => {
-      if (!dueDate) return null;
-      const due = new Date(dueDate);
+    // Calculate pregnancy day for a user - using last_period_date as source of truth
+    const calculatePregnancyDay = (lastPeriodDate: string | null): number | null => {
+      if (!lastPeriodDate) return null;
+      
+      const lmp = new Date(lastPeriodDate);
       const today = new Date();
       
-      // Pregnancy is 280 days, so conception date is 280 days before due date
-      const conceptionDate = new Date(due);
-      conceptionDate.setDate(conceptionDate.getDate() - 280);
+      // Reset time to start of day for accurate calculation
+      lmp.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
       
-      // Calculate days since conception
-      const diffTime = today.getTime() - conceptionDate.getTime();
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      // Calculate days since LMP (pregnancy day is 1-indexed)
+      const diffTime = today.getTime() - lmp.getTime();
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
       
-      // Return only if within valid pregnancy range
-      if (diffDays >= 0 && diffDays <= 280) {
+      // Return only if within valid pregnancy range (1-280)
+      if (diffDays >= 1 && diffDays <= 280) {
         return diffDays;
       }
       return null;
@@ -180,8 +183,8 @@ Deno.serve(async (req) => {
       let notificationToSend: { title: string; body: string; id: string; type: string } | null = null;
 
       // Priority 1: Check pregnancy day-specific notification for bump users
-      if (user.life_stage === 'bump' && user.due_date) {
-        const pregnancyDay = calculatePregnancyDay(user.due_date);
+      if (user.life_stage === 'bump' && user.last_period_date) {
+        const pregnancyDay = calculatePregnancyDay(user.last_period_date);
         
         if (pregnancyDay !== null) {
           const dayNotification = pregnancyNotifMap.get(pregnancyDay);

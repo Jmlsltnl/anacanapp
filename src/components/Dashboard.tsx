@@ -27,6 +27,7 @@ import { useTrimesterTips } from '@/hooks/useTrimesterTips';
 import { useFlowSymptoms, useFlowPhaseTips, useFlowInsights } from '@/hooks/useFlowData';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { formatDateAz } from '@/lib/date-utils';
+import { getPregnancyDay, getDaysUntilDue, getDaysElapsed, getPregnancyProgress } from '@/lib/pregnancy-utils';
 import FeedingHistoryPanel from '@/components/baby/FeedingHistoryPanel';
 
 // Fetus images by month
@@ -396,9 +397,9 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
   const { entries: weightEntries } = useWeightEntries();
   const { data: fruitImages = [] } = useFruitImages();
   
-  // Calculate current pregnancy day (1-280)
-  const pregnancyDay = pregData?.dueDate 
-    ? Math.max(1, 280 - Math.ceil((pregData.dueDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+  // Calculate current pregnancy day (1-280) using centralized utility
+  const pregnancyDay = pregData?.lastPeriodDate 
+    ? getPregnancyDay(pregData.lastPeriodDate)
     : 1;
   
   // Fetch weekly tip from database
@@ -498,10 +499,11 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
   
   const weekData = getFruitData();
   
-  const daysLeft = dayContent?.days_until_birth ?? (pregData.dueDate ? Math.ceil((pregData.dueDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : 0);
+  // Use centralized pregnancy calculations
+  const daysLeft = getDaysUntilDue(pregData.lastPeriodDate, pregData.dueDate);
   const totalDays = 280;
-  const daysElapsed = totalDays - daysLeft;
-  const progressPercent = (daysElapsed / totalDays) * 100;
+  const daysElapsed = getDaysElapsed(pregData.lastPeriodDate);
+  const progressPercent = getPregnancyProgress(pregData.lastPeriodDate);
 
   // Dynamic baby message from database
   const babyMessage = dayContent?.baby_message || "Salam ana! Bu gün çox böyüdüm. 💕";

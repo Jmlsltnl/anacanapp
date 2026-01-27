@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { LifeStage, UserRole, DailyLog, CycleData, PregnancyData, BabyData } from '@/types/anacan';
 import { FRUIT_SIZES } from '@/types/anacan';
+import { getPregnancyWeek, getDayInWeek, getTrimester, calculateDueDate } from '@/lib/pregnancy-utils';
 
 interface UserState {
   isAuthenticated: boolean;
@@ -194,20 +195,12 @@ export const useUserStore = create<UserState>()(
         const { lastPeriodDate, dueDate } = get();
         if (!lastPeriodDate) return null;
 
-        const today = new Date();
         const lastPeriod = new Date(lastPeriodDate);
-        const daysSinceLMP = Math.floor((today.getTime() - lastPeriod.getTime()) / (1000 * 60 * 60 * 24));
-        const currentWeek = Math.floor(daysSinceLMP / 7);
-        const currentDay = daysSinceLMP % 7;
-
-        let trimester: 1 | 2 | 3;
-        if (currentWeek < 13) {
-          trimester = 1;
-        } else if (currentWeek < 27) {
-          trimester = 2;
-        } else {
-          trimester = 3;
-        }
+        
+        // Use centralized pregnancy calculation utilities
+        const currentWeek = getPregnancyWeek(lastPeriodDate);
+        const currentDay = getDayInWeek(lastPeriodDate);
+        const trimester = getTrimester(currentWeek);
 
         const fruitWeek = Object.keys(FRUIT_SIZES)
           .map(Number)
@@ -216,7 +209,7 @@ export const useUserStore = create<UserState>()(
         
         const babySize = FRUIT_SIZES[fruitWeek] || FRUIT_SIZES[4];
 
-        const calculatedDueDate = dueDate || new Date(lastPeriod.getTime() + 280 * 24 * 60 * 60 * 1000);
+        const calculatedDueDate = dueDate || calculateDueDate(lastPeriodDate);
 
         return {
           dueDate: calculatedDueDate,
