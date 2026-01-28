@@ -4,12 +4,20 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
+
+interface UserContext {
+  babyAgeMonths?: number;
+  babyAgeDays?: number;
+  pregnancyWeek?: number;
+  lifeStage?: string;
+}
 
 interface WeatherRequest {
   lat: number;
   lng: number;
+  userContext?: UserContext;
 }
 
 Deno.serve(async (req) => {
@@ -45,7 +53,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { lat, lng } = await req.json() as WeatherRequest;
+    const { lat, lng, userContext } = await req.json() as WeatherRequest;
 
     if (!lat || !lng) {
       throw new Error('Location coordinates required');
@@ -60,7 +68,7 @@ Deno.serve(async (req) => {
     }
     const weatherData = await weatherResponse.json();
 
-    // Get city name from reverse geocoding (Open-Meteo geocoding)
+    // Get city name from reverse geocoding
     const geoUrl = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=az`;
     let cityName = 'Naməlum';
     try {
@@ -89,6 +97,52 @@ Deno.serve(async (req) => {
 
     const current = weatherData.current;
 
+    // Build context-aware prompt based on user data
+    let userContextPrompt = '';
+    
+    if (userContext?.babyAgeMonths !== undefined) {
+      const ageMonths = userContext.babyAgeMonths;
+      let ageDescription = '';
+      
+      if (ageMonths < 1) {
+        ageDescription = `YENİDOĞULMUŞ (${userContext.babyAgeDays} günlük) körpə`;
+      } else if (ageMonths < 3) {
+        ageDescription = `${ageMonths} aylıq YENİDOĞULMUŞ körpə`;
+      } else if (ageMonths < 6) {
+        ageDescription = `${ageMonths} aylıq KİÇİK körpə`;
+      } else if (ageMonths < 12) {
+        ageDescription = `${ageMonths} aylıq körpə`;
+      } else if (ageMonths < 24) {
+        ageDescription = `${ageMonths} aylıq (${Math.floor(ageMonths/12)} yaşında) BALACA UŞAQ`;
+      } else {
+        ageDescription = `${Math.floor(ageMonths/12)} yaşında UŞAQ`;
+      }
+      
+      userContextPrompt = `
+İSTİFADƏÇİ KONTEKST:
+- Körpənin yaşı: ${ageDescription}
+- Körpənin dəqiq yaşı: ${ageMonths} ay (${userContext.babyAgeDays} gün)
+
+YAŞ ƏSASINDA XÜSUSİ QEYDLƏR:
+${ageMonths < 3 ? '- Yenidoğulmuşlar temperatur tənzimləməsində zəifdir, 1 qat əlavə geyim lazımdır' : ''}
+${ageMonths < 6 ? '- Günəşdən mütləq qorumaq lazımdır, birbaşa günəş şüası OLMAMALIDIR' : ''}
+${ageMonths < 12 ? '- Papaq və əlcək çox vacibdir' : ''}
+${ageMonths >= 12 && ageMonths < 24 ? '- Hərəkətli uşaq üçün rahat geyim seçin' : ''}
+`;
+    } else if (userContext?.pregnancyWeek) {
+      userContextPrompt = `
+İSTİFADƏÇİ KONTEKST:
+- Hamiləlik həftəsi: ${userContext.pregnancyWeek}. həftə
+- Trimester: ${userContext.pregnancyWeek <= 12 ? '1-ci' : userContext.pregnancyWeek <= 27 ? '2-ci' : '3-cü'} trimester
+
+HAMİLƏLİK XÜSUSİ QEYDLƏR:
+${userContext.pregnancyWeek >= 28 ? '- 3-cü trimesterdə şişkinlik ola bilər, rahat ayaqqabı tövsiyə edin' : ''}
+${userContext.pregnancyWeek >= 20 ? '- Hamilə qadınlar daha tez istiləyir, bunu nəzərə alın' : ''}
+- Həmişə rahat, elastik geyim tövsiyə edin
+- UV qorunması vacibdir (piqmentasiya riski)
+`;
+    }
+
     // Use Gemini to generate personalized advice
     const geminiResponse = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
@@ -98,7 +152,9 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           contents: [{
             parts: [{
-              text: `Sən körpə geyim və hava məsləhətçisisən. Azərbaycan dilində cavab ver.
+              text: `Sən körpə və ana üçün hava və geyim məsləhətçisisən. Azərbaycan dilində cavab ver.
+
+${userContextPrompt}
 
 CARİ HAVA VƏZİYYƏTİ:
 - Şəhər: ${cityName}
@@ -117,11 +173,12 @@ ${airData ? `
 - Ağcaqayın poleni: ${airData.current?.birch_pollen || 'N/A'}
 ` : ''}
 
-TAPŞIRIQ: Bu hava şəraitində 0-3 yaşlı körpə üçün:
-1. AKSİYON yönümlü geyim tövsiyəsi ver (konkret, dəqiq)
+TAPŞIRIQ: Bu hava şəraitində${userContext?.babyAgeMonths !== undefined ? ` ${userContext.babyAgeMonths} aylıq körpə` : userContext?.pregnancyWeek ? ` hamiləliyin ${userContext.pregnancyWeek}. həftəsindəki ana` : ' 0-3 yaşlı körpə'} üçün:
+1. AKSİYON yönümlü geyim tövsiyəsi ver (konkret, dəqiq, yaşa uyğun)
 2. Əgər pollen yüksəkdirsə, xəbərdarlıq ver
 3. UV yüksəkdirsə, qoruma tövsiyəsi ver
 4. Külək şiddətli isə, xəbərdarlıq ver
+5. Yaş/həftəyə xas xüsusi tövsiyələr əlavə et
 
 CAVAB FORMATI (STRICT JSON):
 {
@@ -130,13 +187,13 @@ CAVAB FORMATI (STRICT JSON):
   "humidity": ${current.relative_humidity_2m},
   "windSpeed": ${current.wind_speed_10m},
   "uvIndex": ${current.uv_index},
-  "weatherDescription": "hava təsviri",
-  "clothingAdvice": "Konkret geyim tövsiyəsi (2-3 cümlə)",
-  "clothingItems": ["geyim 1", "geyim 2", "geyim 3"],
+  "weatherDescription": "hava təsviri (qısa)",
+  "clothingAdvice": "Konkret geyim tövsiyəsi - ${userContext?.babyAgeMonths !== undefined ? `${userContext.babyAgeMonths} aylıq körpə üçün xüsusi` : userContext?.pregnancyWeek ? `hamilə ana üçün xüsusi` : 'körpə üçün'} (3-4 cümlə)",
+  "clothingItems": ["geyim 1", "geyim 2", "geyim 3", "geyim 4"],
   "warnings": ["xəbərdarlıq 1", "xəbərdarlıq 2"],
   "pollenWarning": "pollen xəbərdarlığı və ya null",
   "uvWarning": "UV xəbərdarlığı və ya null",
-  "outdoorAdvice": "Bayırda gəzmə tövsiyəsi",
+  "outdoorAdvice": "Bayırda gəzmə tövsiyəsi (yaş/həftəyə uyğun)",
   "safeToGoOut": true/false,
   "alertLevel": "safe|caution|warning|danger"
 }`
@@ -198,7 +255,8 @@ CAVAB FORMATI (STRICT JSON):
     return new Response(JSON.stringify({
       success: true,
       cityName,
-      advice
+      advice,
+      userContext
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
