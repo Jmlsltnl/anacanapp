@@ -1208,6 +1208,45 @@ export type Database = {
         }
         Relationships: []
       }
+      development_tips: {
+        Row: {
+          age_group: string
+          content: string
+          content_az: string | null
+          created_at: string | null
+          emoji: string
+          id: string
+          is_active: boolean | null
+          sort_order: number | null
+          title: string
+          title_az: string | null
+        }
+        Insert: {
+          age_group: string
+          content: string
+          content_az?: string | null
+          created_at?: string | null
+          emoji: string
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          title: string
+          title_az?: string | null
+        }
+        Update: {
+          age_group?: string
+          content?: string
+          content_az?: string | null
+          created_at?: string | null
+          emoji?: string
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          title?: string
+          title_az?: string | null
+        }
+        Relationships: []
+      }
       device_tokens: {
         Row: {
           created_at: string
@@ -3882,6 +3921,51 @@ export type Database = {
           name?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      quick_actions: {
+        Row: {
+          age_group: string
+          color_from: string
+          color_to: string
+          created_at: string | null
+          icon: string
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          life_stage: string
+          sort_order: number | null
+          tool_key: string
+        }
+        Insert: {
+          age_group?: string
+          color_from?: string
+          color_to?: string
+          created_at?: string | null
+          icon: string
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          life_stage?: string
+          sort_order?: number | null
+          tool_key: string
+        }
+        Update: {
+          age_group?: string
+          color_from?: string
+          color_to?: string
+          created_at?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          life_stage?: string
+          sort_order?: number | null
+          tool_key?: string
         }
         Relationships: []
       }

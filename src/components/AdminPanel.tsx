@@ -31,6 +31,8 @@ import AdminFirstAid from './admin/AdminFirstAid';
 import AdminFairyTales from './admin/AdminFairyTales';
 import AdminPlaces from './admin/AdminPlaces';
 import AdminPlayActivities from './admin/AdminPlayActivities';
+import AdminQuickActions from './admin/AdminQuickActions';
+import AdminDevelopmentTips from './admin/AdminDevelopmentTips';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -101,6 +103,10 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminPlaces />;
       case 'play-activities':
         return <AdminPlayActivities />;
+      case 'quick-actions':
+        return <AdminQuickActions />;
+      case 'development-tips':
+        return <AdminDevelopmentTips />;
       case 'security':
         return <AdminSecurity />;
       default:
