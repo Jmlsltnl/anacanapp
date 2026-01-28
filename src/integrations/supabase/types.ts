@@ -1205,6 +1205,36 @@ export type Database = {
         }
         Relationships: []
       }
+      epds_assessments: {
+        Row: {
+          answers: Json
+          completed_at: string | null
+          id: string
+          recommendation: string | null
+          risk_level: string
+          total_score: number
+          user_id: string
+        }
+        Insert: {
+          answers: Json
+          completed_at?: string | null
+          id?: string
+          recommendation?: string | null
+          risk_level: string
+          total_score: number
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          completed_at?: string | null
+          id?: string
+          recommendation?: string | null
+          risk_level?: string
+          total_score?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       exercise_logs: {
         Row: {
           calories_burned: number
@@ -1286,6 +1316,93 @@ export type Database = {
         }
         Relationships: []
       }
+      fairy_tale_themes: {
+        Row: {
+          cover_image_url: string | null
+          description: string | null
+          description_az: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          name_az: string
+          sort_order: number | null
+        }
+        Insert: {
+          cover_image_url?: string | null
+          description?: string | null
+          description_az?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          name_az: string
+          sort_order?: number | null
+        }
+        Update: {
+          cover_image_url?: string | null
+          description?: string | null
+          description_az?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          name_az?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      fairy_tales: {
+        Row: {
+          audio_url: string | null
+          child_name: string | null
+          content: string
+          cover_image_url: string | null
+          created_at: string | null
+          duration_minutes: number | null
+          hero: string | null
+          id: string
+          is_favorite: boolean | null
+          moral_lesson: string | null
+          play_count: number | null
+          theme: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          audio_url?: string | null
+          child_name?: string | null
+          content: string
+          cover_image_url?: string | null
+          created_at?: string | null
+          duration_minutes?: number | null
+          hero?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          moral_lesson?: string | null
+          play_count?: number | null
+          theme?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          audio_url?: string | null
+          child_name?: string | null
+          content?: string
+          cover_image_url?: string | null
+          created_at?: string | null
+          duration_minutes?: number | null
+          hero?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          moral_lesson?: string | null
+          play_count?: number | null
+          theme?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       faqs: {
         Row: {
           answer: string
@@ -1351,6 +1468,98 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      first_aid_scenarios: {
+        Row: {
+          color: string | null
+          description: string | null
+          description_az: string | null
+          emergency_level: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          sort_order: number | null
+          title: string
+          title_az: string
+        }
+        Insert: {
+          color?: string | null
+          description?: string | null
+          description_az?: string | null
+          emergency_level?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          title: string
+          title_az: string
+        }
+        Update: {
+          color?: string | null
+          description?: string | null
+          description_az?: string | null
+          emergency_level?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          title?: string
+          title_az?: string
+        }
+        Relationships: []
+      }
+      first_aid_steps: {
+        Row: {
+          animation_url: string | null
+          audio_url: string | null
+          duration_seconds: number | null
+          id: string
+          image_url: string | null
+          instruction: string
+          instruction_az: string
+          is_critical: boolean | null
+          scenario_id: string
+          step_number: number
+          title: string
+          title_az: string
+        }
+        Insert: {
+          animation_url?: string | null
+          audio_url?: string | null
+          duration_seconds?: number | null
+          id?: string
+          image_url?: string | null
+          instruction: string
+          instruction_az: string
+          is_critical?: boolean | null
+          scenario_id: string
+          step_number: number
+          title: string
+          title_az: string
+        }
+        Update: {
+          animation_url?: string | null
+          audio_url?: string | null
+          duration_seconds?: number | null
+          id?: string
+          image_url?: string | null
+          instruction?: string
+          instruction_az?: string
+          is_critical?: boolean | null
+          scenario_id?: string
+          step_number?: number
+          title?: string
+          title_az?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "first_aid_steps_scenario_id_fkey"
+            columns: ["scenario_id"]
+            isOneToOne: false
+            referencedRelation: "first_aid_scenarios"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       flow_insights: {
         Row: {
@@ -1624,6 +1833,39 @@ export type Database = {
           updated_at?: string | null
           website?: string | null
           working_hours?: Json | null
+        }
+        Relationships: []
+      }
+      horoscope_readings: {
+        Row: {
+          baby_sign: string | null
+          compatibility_result: Json | null
+          created_at: string | null
+          dad_sign: string | null
+          id: string
+          mom_sign: string | null
+          shared_count: number | null
+          user_id: string
+        }
+        Insert: {
+          baby_sign?: string | null
+          compatibility_result?: Json | null
+          created_at?: string | null
+          dad_sign?: string | null
+          id?: string
+          mom_sign?: string | null
+          shared_count?: number | null
+          user_id: string
+        }
+        Update: {
+          baby_sign?: string | null
+          compatibility_result?: Json | null
+          created_at?: string | null
+          dad_sign?: string | null
+          id?: string
+          mom_sign?: string | null
+          shared_count?: number | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -1935,6 +2177,183 @@ export type Database = {
           name_az?: string | null
           sort_order?: number | null
           time_range?: string | null
+        }
+        Relationships: []
+      }
+      mental_health_resources: {
+        Row: {
+          address: string | null
+          address_az: string | null
+          description: string | null
+          description_az: string | null
+          id: string
+          is_active: boolean | null
+          is_emergency: boolean | null
+          name: string
+          name_az: string
+          phone: string | null
+          resource_type: string
+          sort_order: number | null
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          address_az?: string | null
+          description?: string | null
+          description_az?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_emergency?: boolean | null
+          name: string
+          name_az: string
+          phone?: string | null
+          resource_type: string
+          sort_order?: number | null
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          address_az?: string | null
+          description?: string | null
+          description_az?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_emergency?: boolean | null
+          name?: string
+          name_az?: string
+          phone?: string | null
+          resource_type?: string
+          sort_order?: number | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+      mom_friendly_places: {
+        Row: {
+          address: string | null
+          address_az: string | null
+          avg_rating: number | null
+          category: Database["public"]["Enums"]["place_category"]
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          description_az: string | null
+          has_breastfeeding_room: boolean | null
+          has_changing_table: boolean | null
+          has_elevator: boolean | null
+          has_high_chair: boolean | null
+          has_kids_menu: boolean | null
+          has_parking: boolean | null
+          has_play_area: boolean | null
+          has_ramp: boolean | null
+          has_stroller_access: boolean | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          is_verified: boolean | null
+          latitude: number
+          longitude: number
+          name: string
+          name_az: string | null
+          phone: string | null
+          review_count: number | null
+          updated_at: string | null
+          verified_count: number | null
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          address_az?: string | null
+          avg_rating?: number | null
+          category?: Database["public"]["Enums"]["place_category"]
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          description_az?: string | null
+          has_breastfeeding_room?: boolean | null
+          has_changing_table?: boolean | null
+          has_elevator?: boolean | null
+          has_high_chair?: boolean | null
+          has_kids_menu?: boolean | null
+          has_parking?: boolean | null
+          has_play_area?: boolean | null
+          has_ramp?: boolean | null
+          has_stroller_access?: boolean | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          latitude: number
+          longitude: number
+          name: string
+          name_az?: string | null
+          phone?: string | null
+          review_count?: number | null
+          updated_at?: string | null
+          verified_count?: number | null
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          address_az?: string | null
+          avg_rating?: number | null
+          category?: Database["public"]["Enums"]["place_category"]
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          description_az?: string | null
+          has_breastfeeding_room?: boolean | null
+          has_changing_table?: boolean | null
+          has_elevator?: boolean | null
+          has_high_chair?: boolean | null
+          has_kids_menu?: boolean | null
+          has_parking?: boolean | null
+          has_play_area?: boolean | null
+          has_ramp?: boolean | null
+          has_stroller_access?: boolean | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          latitude?: number
+          longitude?: number
+          name?: string
+          name_az?: string | null
+          phone?: string | null
+          review_count?: number | null
+          updated_at?: string | null
+          verified_count?: number | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+      mood_checkins: {
+        Row: {
+          checked_at: string | null
+          created_at: string | null
+          id: string
+          mood_level: number
+          mood_type: string | null
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          checked_at?: string | null
+          created_at?: string | null
+          id?: string
+          mood_level: number
+          mood_type?: string | null
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          checked_at?: string | null
+          created_at?: string | null
+          id?: string
+          mood_level?: number
+          mood_type?: string | null
+          notes?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -2721,6 +3140,216 @@ export type Database = {
           name_az?: string | null
           preview_url?: string | null
           prompt_text?: string | null
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      place_reviews: {
+        Row: {
+          accessibility_rating: number | null
+          cleanliness_rating: number | null
+          comment: string | null
+          created_at: string | null
+          id: string
+          is_verified: boolean | null
+          place_id: string
+          rating: number
+          staff_rating: number | null
+          user_id: string
+        }
+        Insert: {
+          accessibility_rating?: number | null
+          cleanliness_rating?: number | null
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          is_verified?: boolean | null
+          place_id: string
+          rating: number
+          staff_rating?: number | null
+          user_id: string
+        }
+        Update: {
+          accessibility_rating?: number | null
+          cleanliness_rating?: number | null
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          is_verified?: boolean | null
+          place_id?: string
+          rating?: number
+          staff_rating?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_reviews_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "mom_friendly_places"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      place_verifications: {
+        Row: {
+          amenity_verified: string
+          created_at: string | null
+          id: string
+          is_confirmed: boolean
+          place_id: string
+          user_id: string
+        }
+        Insert: {
+          amenity_verified: string
+          created_at?: string | null
+          id?: string
+          is_confirmed: boolean
+          place_id: string
+          user_id: string
+        }
+        Update: {
+          amenity_verified?: string
+          created_at?: string | null
+          id?: string
+          is_confirmed?: boolean
+          place_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_verifications_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "mom_friendly_places"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      play_activities: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          description_az: string | null
+          difficulty_level: string | null
+          duration_minutes: number | null
+          id: string
+          image_url: string | null
+          instructions: string | null
+          instructions_az: string | null
+          is_active: boolean | null
+          max_age_days: number
+          min_age_days: number
+          required_items: string[] | null
+          skill_tags: string[] | null
+          sort_order: number | null
+          title: string
+          title_az: string
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          difficulty_level?: string | null
+          duration_minutes?: number | null
+          id?: string
+          image_url?: string | null
+          instructions?: string | null
+          instructions_az?: string | null
+          is_active?: boolean | null
+          max_age_days?: number
+          min_age_days?: number
+          required_items?: string[] | null
+          skill_tags?: string[] | null
+          sort_order?: number | null
+          title: string
+          title_az: string
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          difficulty_level?: string | null
+          duration_minutes?: number | null
+          id?: string
+          image_url?: string | null
+          instructions?: string | null
+          instructions_az?: string | null
+          is_active?: boolean | null
+          max_age_days?: number
+          min_age_days?: number
+          required_items?: string[] | null
+          skill_tags?: string[] | null
+          sort_order?: number | null
+          title?: string
+          title_az?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
+      play_activity_logs: {
+        Row: {
+          activity_id: string
+          completed_at: string | null
+          id: string
+          notes: string | null
+          rating: number | null
+          user_id: string
+        }
+        Insert: {
+          activity_id: string
+          completed_at?: string | null
+          id?: string
+          notes?: string | null
+          rating?: number | null
+          user_id: string
+        }
+        Update: {
+          activity_id?: string
+          completed_at?: string | null
+          id?: string
+          notes?: string | null
+          rating?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "play_activity_logs_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "play_activities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      play_inventory_items: {
+        Row: {
+          category: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          name_az: string
+          sort_order: number | null
+        }
+        Insert: {
+          category?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          name_az: string
+          sort_order?: number | null
+        }
+        Update: {
+          category?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          name_az?: string
           sort_order?: number | null
         }
         Relationships: []
@@ -3898,6 +4527,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_badges: {
+        Row: {
+          badge_type: string
+          earned_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_type: string
+          earned_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_type?: string
+          earned_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_blocks: {
         Row: {
           block_type: string
@@ -3927,6 +4577,30 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_play_inventory: {
+        Row: {
+          created_at: string | null
+          id: string
+          item_name: string
+          item_name_az: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          item_name: string
+          item_name_az?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          item_name?: string
+          item_name_az?: string | null
           user_id?: string
         }
         Relationships: []
@@ -4273,6 +4947,81 @@ export type Database = {
         }
         Relationships: []
       }
+      zodiac_compatibility: {
+        Row: {
+          compatibility_score: number | null
+          description: string | null
+          description_az: string | null
+          id: string
+          relationship_type: string | null
+          sign1: string
+          sign2: string
+        }
+        Insert: {
+          compatibility_score?: number | null
+          description?: string | null
+          description_az?: string | null
+          id?: string
+          relationship_type?: string | null
+          sign1: string
+          sign2: string
+        }
+        Update: {
+          compatibility_score?: number | null
+          description?: string | null
+          description_az?: string | null
+          id?: string
+          relationship_type?: string | null
+          sign1?: string
+          sign2?: string
+        }
+        Relationships: []
+      }
+      zodiac_signs: {
+        Row: {
+          characteristics: string[] | null
+          characteristics_az: string[] | null
+          color: string | null
+          element: string | null
+          end_date: string
+          id: string
+          name: string
+          name_az: string
+          ruling_planet: string | null
+          sort_order: number | null
+          start_date: string
+          symbol: string
+        }
+        Insert: {
+          characteristics?: string[] | null
+          characteristics_az?: string[] | null
+          color?: string | null
+          element?: string | null
+          end_date: string
+          id?: string
+          name: string
+          name_az: string
+          ruling_planet?: string | null
+          sort_order?: number | null
+          start_date: string
+          symbol: string
+        }
+        Update: {
+          characteristics?: string[] | null
+          characteristics_az?: string[] | null
+          color?: string | null
+          element?: string | null
+          end_date?: string
+          id?: string
+          name?: string
+          name_az?: string
+          ruling_planet?: string | null
+          sort_order?: number | null
+          start_date?: string
+          symbol?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -4312,6 +5061,15 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user" | "moderator"
+      place_category:
+        | "cafe"
+        | "restaurant"
+        | "park"
+        | "mall"
+        | "hospital"
+        | "metro"
+        | "pharmacy"
+        | "playground"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -4440,6 +5198,16 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user", "moderator"],
+      place_category: [
+        "cafe",
+        "restaurant",
+        "park",
+        "mall",
+        "hospital",
+        "metro",
+        "pharmacy",
+        "playground",
+      ],
     },
   },
 } as const
