@@ -50,23 +50,24 @@ Deno.serve(async (req) => {
       throw new Error('Image data is required');
     }
 
-    // Use Gemini with vision capabilities
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              {
-                inlineData: {
-                  mimeType: 'image/jpeg',
-                  data: imageBase64
-                }
-              },
-              {
-                text: `Sən pediatrik sağlamlıq mütəxəssisisən. Bu körpə bezinin şəklini DİQQƏTLƏ analiz et.
+    // Helper function to call Gemini API with a specific model
+    async function callGeminiAPI(model: string): Promise<Response> {
+      return fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                {
+                  inlineData: {
+                    mimeType: 'image/jpeg',
+                    data: imageBase64
+                  }
+                },
+                {
+                  text: `Sən pediatrik sağlamlıq mütəxəssisisən. Bu körpə bezinin şəklini DİQQƏTLƏ analiz et.
 
 ƏN MÜHÜM: Körpənin nəcisinin RƏNGİNİ, KONSENSIYASINI və GÖRÜNÜŞÜNÜ qiymətləndir.
 
@@ -97,23 +98,49 @@ CAVAB FORMATI (STRICT JSON):
 }
 
 ÇOX MÜHÜM: Əgər ağ, qara və ya qırmızı rəng görürsənsə, "urgent" səviyyəsi ver!`
-              }
-            ]
-          }],
-          generationConfig: {
-            temperature: 0.1,
-            topK: 10,
-            topP: 0.7,
-            maxOutputTokens: 1024,
-          }
-        })
-      }
-    );
+                }
+              ]
+            }],
+            generationConfig: {
+              temperature: 0.1,
+              topK: 10,
+              topP: 0.7,
+              maxOutputTokens: 1024,
+            }
+          })
+        }
+      );
+    }
 
-    if (!response.ok) {
+    // Try primary model first, fallback to alternative on rate limit
+    const models = ['gemini-2.0-flash', 'gemini-2.5-pro', 'gemini-2.5-flash'];
+    let response: Response | null = null;
+    let lastError = '';
+
+    for (const model of models) {
+      console.log(`Trying model: ${model}`);
+      response = await callGeminiAPI(model);
+      
+      if (response.ok) {
+        console.log(`Success with model: ${model}`);
+        break;
+      }
+      
+      if (response.status === 429) {
+        lastError = `Rate limit on ${model}`;
+        console.log(`Rate limit hit on ${model}, trying next...`);
+        continue;
+      }
+      
+      // For other errors, log and try next
       const errorText = await response.text();
-      console.error('Gemini API error:', response.status, errorText);
-      throw new Error('AI analysis failed');
+      lastError = `${model}: ${response.status} - ${errorText}`;
+      console.error('Gemini API error:', lastError);
+    }
+
+    if (!response || !response.ok) {
+      console.error('All models failed:', lastError);
+      throw new Error('AI analysis failed - all models exhausted');
     }
 
     const data = await response.json();
