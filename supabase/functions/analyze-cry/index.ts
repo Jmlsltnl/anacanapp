@@ -13,7 +13,11 @@ interface CryAnalysisRequest {
 }
 
 // Two-stage analysis for accurate cry detection
-async function detectIfCrying(audioBase64: string, apiKey: string): Promise<{ isCrying: boolean; confidence: number; soundType: string }> {
+// NOTE: This is intentionally conservative to minimize false positives.
+async function detectIfCrying(
+  audioBase64: string,
+  apiKey: string
+): Promise<{ isCrying: boolean; confidence: number; soundType: string }> {
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
     {
@@ -32,6 +36,9 @@ async function detectIfCrying(audioBase64: string, apiKey: string): Promise<{ is
               text: `CRITICAL AUDIO CLASSIFICATION TASK
 
 Listen to this audio carefully and classify EXACTLY what type of sound this is.
+
+This gate is STRICT: Only return baby_crying if you are VERY confident it is an INFANT (0-12 months) AND the cry is RHYTHMIC + SUSTAINED (multiple "cry cycles" like wah-wah/neh-neh over several seconds).
+If the audio is a SINGLE loud scream, a bang, a shout, a cough, laughter, TV/music, or general noise — it is NOT baby crying.
 
 STEP 1: What sounds do you hear in this audio?
 - Is there human vocalization?
@@ -56,11 +63,16 @@ NOT CRYING (common false positives):
 - COOING/BABBLING: Happy, playful sounds
 - HICCUPS: Rhythmic but short sounds
 - ADULT SOUNDS: Any adult speech or sounds
+- SINGLE SCREAM / BIG SOUND: One sharp shout/yelp, impact sounds, claps, banging
+- TV/MUSIC: Any media audio, background speech/music
+- ENVIRONMENTAL NOISE: Wind, traffic, fan, white noise, kitchen sounds, etc.
 
-Return ONLY this JSON:
+Return ONLY this JSON (no markdown, no extra keys):
 {
-  "soundType": "baby_crying|cough|sneeze|adult_voice|silence|noise|baby_cooing|unknown",
+  "soundType": "baby_crying|baby_cooing|cough|sneeze|adult_voice|scream|music_tv|bang|noise|silence|animal|unknown",
+  "isBabyVocalization": true or false,
   "isBabyCrying": true or false,
+  "cryPattern": "rhythmic_cry|single_scream|intermittent|none|unknown",
   "confidence": 0-100,
   "reasoning": "Brief explanation of what you actually heard"
 }`
@@ -88,12 +100,33 @@ Return ONLY this JSON:
   try {
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
-      const result = JSON.parse(jsonMatch[0]);
-      return {
-        isCrying: result.isBabyCrying === true && result.confidence >= 80,
-        confidence: result.confidence || 0,
-        soundType: result.soundType || 'unknown'
+      const result = JSON.parse(jsonMatch[0]) as {
+        soundType?: unknown;
+        isBabyVocalization?: unknown;
+        isBabyCrying?: unknown;
+        cryPattern?: unknown;
+        confidence?: unknown;
       };
+
+      const soundType = typeof result.soundType === 'string' ? result.soundType : 'unknown';
+      const confidence = typeof result.confidence === 'number' ? result.confidence : 0;
+      const isBabyVocalization = result.isBabyVocalization === true;
+      const isBabyCrying = result.isBabyCrying === true;
+      const cryPattern = typeof result.cryPattern === 'string' ? result.cryPattern : 'unknown';
+
+      // Conservative gate:
+      // - must be infant vocalization
+      // - must be explicitly baby_crying
+      // - must be rhythmic, sustained crying (not a single scream)
+      // - must meet a higher confidence threshold
+      const isCrying =
+        isBabyVocalization &&
+        isBabyCrying &&
+        soundType === 'baby_crying' &&
+        cryPattern === 'rhythmic_cry' &&
+        confidence >= 92;
+
+      return { isCrying, confidence, soundType };
     }
   } catch (e) {
     console.error('Detection parse error:', e);
@@ -236,6 +269,10 @@ Deno.serve(async (req) => {
         'cough': 'Bu səs öskürəkdir, körpə ağlaması deyil.',
         'sneeze': 'Bu səs asqırmadır, körpə ağlaması deyil.',
         'adult_voice': 'Bu səs böyük insana aiddir, körpə ağlaması deyil.',
+        'scream': 'Bu səs qışqırıq / böyük səsdir, körpə ağlaması kimi qiymətləndirilmir.',
+        'bang': 'Bu zərbə / çırpma kimi səsdir, körpə ağlaması deyil.',
+        'music_tv': 'Bu TV/musiqi və ya media səsidir, körpə ağlaması deyil.',
+        'animal': 'Bu heyvan səsi ola bilər, körpə ağlaması deyil.',
         'silence': 'Səs faylında əsasən səssizlik var.',
         'noise': 'Bu ətraf mühit səsidir, körpə ağlaması deyil.',
         'baby_cooing': 'Körpə xoşbəxt səslər çıxarır, ağlamır.',
