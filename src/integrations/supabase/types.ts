@@ -359,6 +359,39 @@ export type Database = {
         }
         Relationships: []
       }
+      baby_growth: {
+        Row: {
+          created_at: string
+          entry_date: string
+          head_cm: number | null
+          height_cm: number | null
+          id: string
+          notes: string | null
+          user_id: string
+          weight_kg: number | null
+        }
+        Insert: {
+          created_at?: string
+          entry_date?: string
+          head_cm?: number | null
+          height_cm?: number | null
+          id?: string
+          notes?: string | null
+          user_id: string
+          weight_kg?: number | null
+        }
+        Update: {
+          created_at?: string
+          entry_date?: string
+          head_cm?: number | null
+          height_cm?: number | null
+          id?: string
+          notes?: string | null
+          user_id?: string
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
       baby_logs: {
         Row: {
           created_at: string

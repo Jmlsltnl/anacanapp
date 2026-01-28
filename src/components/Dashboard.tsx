@@ -29,6 +29,10 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { formatDateAz } from '@/lib/date-utils';
 import { getPregnancyDay, getDaysUntilDue, getDaysElapsed, getPregnancyProgress } from '@/lib/pregnancy-utils';
 import FeedingHistoryPanel from '@/components/baby/FeedingHistoryPanel';
+import QuickActionsBar from '@/components/mommy/QuickActionsBar';
+import QuickStatsWidget from '@/components/mommy/QuickStatsWidget';
+import GrowthTrackerWidget from '@/components/mommy/GrowthTrackerWidget';
+import DevelopmentTipsWidget from '@/components/mommy/DevelopmentTipsWidget';
 
 // Fetus images by month
 import FetusMonth1 from '@/assets/fetus/month-1.svg';
@@ -936,7 +940,7 @@ const getBabyDailyFunFact = (ageInDays: number): string => {
   return BABY_FUN_FACTS[factIndex];
 };
 
-const MommyDashboard = () => {
+const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string) => void }) => {
   const { getBabyData } = useUserStore();
   const { toast } = useToast();
   const babyData = getBabyData();
@@ -1169,6 +1173,9 @@ const MommyDashboard = () => {
           </div>
         </div>
       </motion.div>
+
+      {/* Quick Actions Bar */}
+      <QuickActionsBar onNavigateToTool={onNavigateToTool} />
 
       {/* Sleep Tracker */}
       <motion.div
@@ -1517,27 +1524,14 @@ const MommyDashboard = () => {
         </div>
       </motion.div>
 
-      {/* Development Tip */}
-      <motion.div 
-        className="bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-500/15 dark:to-emerald-500/15 rounded-2xl p-4 border border-teal-100 dark:border-teal-500/20"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.35 }}
-      >
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-500/20 flex items-center justify-center text-xl">
-            💡
-          </div>
-          <div className="flex-1">
-            <h4 className="font-bold text-foreground">Bu həftənin tövsiyəsi</h4>
-            <p className="text-sm text-muted-foreground mt-1">
-              {babyData.ageInMonths < 3 
-                ? 'Tummy time məşqləri körpənin boyun əzələlərini gücləndirir. Gündə 3-5 dəqiqə ilə başlayın!'
-                : 'Körpənizlə danışmaq dil inkişafı üçün çox vacibdir. Hər fəaliyyəti şərh edin!'}
-            </p>
-          </div>
-        </div>
-      </motion.div>
+      {/* Weekly Stats Overview */}
+      <QuickStatsWidget />
+
+      {/* Growth Tracker */}
+      <GrowthTrackerWidget />
+
+      {/* Development Tips - Dynamic based on age */}
+      <DevelopmentTipsWidget />
     </div>
   );
 };
@@ -1615,7 +1609,7 @@ const Dashboard = ({ onOpenChat, onNavigateToTool }: DashboardProps) => {
 
       {lifeStage === 'flow' && <FlowDashboard />}
       {lifeStage === 'bump' && <BumpDashboard onNavigateToTool={onNavigateToTool} />}
-      {lifeStage === 'mommy' && <MommyDashboard />}
+      {lifeStage === 'mommy' && <MommyDashboard onNavigateToTool={onNavigateToTool} />}
     </div>
   );
 };
