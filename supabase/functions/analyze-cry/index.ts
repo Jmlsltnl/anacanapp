@@ -68,9 +68,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Use Gemini 3 Flash Preview for more accurate audio analysis
+    // Use Gemini 2.0 Flash for audio analysis
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -84,57 +84,56 @@ Deno.serve(async (req) => {
                 }
               },
               {
-                text: `Sən pediatrik audio analiz mütəxəssisisən. Bu səs faylını DİQQƏTLƏ dinlə və analiz et.
+                text: `Sən pediatrik audio analiz mütəxəssisisən. Bu səs faylını DİQQƏTLƏ dinlə.
 
-🔴 ÇOX VACİB - BİRİNCİ ADDIM:
-Bu səsdə HƏQIQI KÖRPƏ AĞLAMASI varmı? Aşağıdakı sualları cavabla:
+🔴 BİRİNCİ VƏ ƏN VACİB ADDIM - BU SƏS NƏDİR?
+Səsi dinlə və DÜRÜST cavab ver:
 
-1. Səsdə insan səsi var mı? (bəli/xeyr)
-2. Bu səs körpəyə aiddir? (bəli/xeyr - böyük uşaq və ya böyük deyil)
-3. Bu həqiqi ağlamadır? (bəli/xeyr)
-4. Bu saxta/süni səsdir? (TV, telefon, video, imitasiya)
+1. Bu səsdə HƏQIQI körpə ağlaması eşidirsən? (Körpə ağlaması = ritmik, davamlı, yüksək tonlu ağlama səsi)
+2. Bu səs sadəcə öskürək, asqırma, danışma, gülmə və ya digər səsdir?
 
-🚫 AĞLAMA OLMAYAN SİTUASİYALAR:
-- Səssizlik, ətraf mühit səsləri → "no_cry_detected"
-- TV/telefon/video səsləri → "false_positive"
-- Böyüklərin imitasiyası → "false_positive"  
-- Heyvan səsləri → "no_cry_detected"
-- Musiqi, radio → "no_cry_detected"
-- Güclü küy, maşın səsi → "no_cry_detected"
+🚫 BUNLAR AĞLAMA DEYİL - "no_cry_detected" qaytarmalısan:
+- Öskürək səsi (qısa, kəsik səslər)
+- Asqırma
+- Gülmə
+- Danışma/mırıldanma
+- Səssizlik
+- Ətraf mühit səsləri (maşın, musiqi, TV)
+- Heyvan səsləri
+- Böyüklərin təqlid etdiyi səslər
 
-✅ HƏQİQİ AĞLAMA NÖVLƏRİ (yalnız həqiqi körpə ağlaması üçün):
-- "hungry": Ritmik "neh-neh" səsi, əmizdirmə hərəkəti
-- "tired": Monoton, zəif, gözlərini ovuşdurma
-- "pain": Ani, kəskin, yüksək tezlikli, davamlı
-- "discomfort": Qıcıqlanma, bez yaş, soyuq/isti
-- "colic": 3+ saat davam edən, axşam saatları
-- "attention": Aralıqlı, valideyn görəndə dayanır
-- "overstimulated": Mühitdən qaçma, başını döndərmə
-- "sick": Zəif, normadan fərqli, hıçqırıqlı
+✅ BUNLAR HƏQİQİ AĞLAMADIR - yalnız bunları analiz et:
+- "hungry": "Neh-neh" ritmik səs, əmizdirmə hərəkəti ilə
+- "tired": Monoton, zəif, davamlı ağlama
+- "pain": Ani, kəskin, çox yüksək tonlu qışqırıq
+- "discomfort": Narahat, qıcıqlanma səsi
+- "colic": 3+ saat davam edən şiddətli ağlama
+- "attention": Aralıqlı ağlama, valideyn görəndə dayanır
+- "overstimulated": Yorğun, həddindən artıq stimulyasiya
+- "sick": Zəif, normadan fərqli ağlama
 
-⚠️ QƏRAR VER:
-- Əgər HƏQİQİ körpə ağlaması YOXdursa → "no_cry_detected" və ya "false_positive" seç
-- Əgər HƏQİQİ körpə ağlaması VAR → yuxarıdakı növlərdən birini seç
-- ŞÜBHƏLİ hallarda "no_cry_detected" seç, yalnış-pozitiv vermə!
+⚠️ QƏRAR QAYDASI:
+- Əgər səs öskürək, asqırma və ya ağlama olmayan hər hansı səsdirsə → "no_cry_detected"
+- Əgər şübhən varsa → "no_cry_detected" 
+- YALNIZ 85%+ əmin olduqda həqiqi ağlama növü göstər
+- Öskürək HEÇBIR ZAMAN ağlama deyil!
 
-CAVAB FORMATI (STRICT JSON, BAŞQA HEÇ NƏ YAZMA):
+JSON CAVAB (YALNIZ JSON, BAŞQA HEÇ NƏ):
 {
-  "cryType": "hungry|tired|pain|discomfort|colic|attention|overstimulated|sick|no_cry_detected|false_positive",
+  "cryType": "hungry|tired|pain|discomfort|colic|attention|overstimulated|sick|no_cry_detected",
   "confidence": 0-100,
-  "explanation": "Azərbaycan dilində 1-2 cümlə. Nə eşitdiyini və niyə bu qərarı verdiyini izah et.",
-  "recommendations": ["konkret tövsiyə 1", "konkret tövsiyə 2", "konkret tövsiyə 3"],
+  "explanation": "Azərbaycan dilində - nə eşitdiyini və niyə bu qərar verdiyini izah et",
+  "recommendations": ["tövsiyə 1", "tövsiyə 2"],
   "urgency": "low|medium|high",
   "isCryDetected": true/false
-}
-
-QEYD: Şübhə halında həmişə "no_cry_detected" seç. Yalnız 70%+ əmin olduqda həqiqi ağlama növü göstər.`
+}`
               }
             ]
           }],
           generationConfig: {
             temperature: 0.1,
-            topK: 10,
-            topP: 0.7,
+            topK: 5,
+            topP: 0.5,
             maxOutputTokens: 1024,
           }
         })
@@ -267,12 +266,12 @@ If no real baby crying detected, use "no_cry_detected". If fake/TV sounds, use "
       analysisResult.isCryDetected = true;
     }
 
-    // Low confidence results should be treated as no detection
-    if (analysisResult.confidence < 50 && analysisResult.isCryDetected) {
+    // Increase threshold to 70% for more accurate detection
+    if (analysisResult.confidence < 70 && analysisResult.isCryDetected) {
       analysisResult.cryType = 'no_cry_detected';
       analysisResult.isCryDetected = false;
-      analysisResult.explanation = 'Ağlama aşkarlandı, lakin aydın deyil. Daha yaxından və aydın səs yazın.';
-      analysisResult.recommendations = ['Körpəyə daha yaxın olun', 'Ətraf səsləri azaldın', 'Yenidən cəhd edin'];
+      analysisResult.explanation = 'Həqiqi körpə ağlaması aşkar edilmədi. Bu səs öskürək, asqırma və ya digər səs ola bilər.';
+      analysisResult.recommendations = ['Körpənin ağlamasını yaxından yazın', 'Ətraf səsləri azaldın', 'Minimum 3 saniyə ağlama yazın'];
     }
 
     // Only save to database if cry was actually detected
