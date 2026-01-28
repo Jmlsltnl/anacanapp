@@ -116,9 +116,8 @@ const AdminTools = () => {
     }
   };
 
-  // Filter and sort tools for current category
+  // Filter and sort tools for current category - show ALL tools in admin (not filtered by life_stages)
   const categoryTools = localTools
-    .filter(t => t.life_stages?.includes(activeCategory))
     .filter(t => !search || 
       (t.name_az || t.name).toLowerCase().includes(search.toLowerCase()) ||
       t.tool_id.toLowerCase().includes(search.toLowerCase())
