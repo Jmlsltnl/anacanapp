@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Wrench, Search, Save, RefreshCw, ChevronDown, ChevronUp, 
-  Power, PowerOff, Eye, EyeOff
+  Power, PowerOff, Eye, EyeOff, Lock, Unlock, Crown, Edit2, X, Check
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +10,10 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,6 +33,14 @@ interface ToolConfig {
   flow_active: boolean;
   bump_active: boolean;
   mommy_active: boolean;
+  flow_locked: boolean;
+  bump_locked: boolean;
+  mommy_locked: boolean;
+  is_premium: boolean;
+  premium_type: string;
+  premium_limit: number;
+  display_name_az: string | null;
+  description_az: string | null;
 }
 
 const categoryLabels: Record<string, string> = {
@@ -37,11 +49,20 @@ const categoryLabels: Record<string, string> = {
   mommy: 'Mommy (Analıq)',
 };
 
+const premiumTypeLabels: Record<string, string> = {
+  none: 'Yoxdur',
+  limited_total: 'İlk X istifadə',
+  limited_monthly: 'Aylıq X limit',
+  premium_only: 'Yalnız Premium',
+};
+
 const AdminTools = () => {
   const [activeCategory, setActiveCategory] = useState<'flow' | 'bump' | 'mommy'>('bump');
   const [search, setSearch] = useState('');
   const [localTools, setLocalTools] = useState<ToolConfig[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
+  const [editingTool, setEditingTool] = useState<ToolConfig | null>(null);
+  const [premiumModal, setPremiumModal] = useState<ToolConfig | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -51,7 +72,7 @@ const AdminTools = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('tool_configs')
-        .select('id, tool_id, name, name_az, icon, life_stages, sort_order, flow_order, bump_order, mommy_order, is_active, flow_active, bump_active, mommy_active')
+        .select('*')
         .order('sort_order');
       if (error) throw error;
       return data as ToolConfig[];
@@ -85,6 +106,16 @@ const AdminTools = () => {
     }
   };
 
+  // Get locked field for current category
+  const getLockedField = (category: string): keyof ToolConfig => {
+    switch (category) {
+      case 'flow': return 'flow_locked';
+      case 'bump': return 'bump_locked';
+      case 'mommy': return 'mommy_locked';
+      default: return 'flow_locked';
+    }
+  };
+
   // Filter and sort tools for current category
   const categoryTools = localTools
     .filter(t => t.life_stages?.includes(activeCategory))
@@ -103,6 +134,19 @@ const AdminTools = () => {
     const newTools = localTools.map(t => {
       if (t.id === tool.id) {
         return { ...t, [activeField]: !t[activeField] };
+      }
+      return t;
+    });
+    setLocalTools(newTools);
+    setHasChanges(true);
+  };
+
+  // Toggle phase-specific locked status
+  const togglePhaseLocked = (tool: ToolConfig) => {
+    const lockedField = getLockedField(activeCategory);
+    const newTools = localTools.map(t => {
+      if (t.id === tool.id) {
+        return { ...t, [lockedField]: !t[lockedField] };
       }
       return t;
     });
@@ -171,6 +215,45 @@ const AdminTools = () => {
     setHasChanges(true);
   };
 
+  // Update premium settings
+  const updatePremiumSettings = (isPremium: boolean, premiumType: string, premiumLimit: number) => {
+    if (!premiumModal) return;
+    
+    const newTools = localTools.map(t => {
+      if (t.id === premiumModal.id) {
+        return { 
+          ...t, 
+          is_premium: isPremium,
+          premium_type: premiumType,
+          premium_limit: premiumLimit,
+        };
+      }
+      return t;
+    });
+    setLocalTools(newTools);
+    setHasChanges(true);
+    setPremiumModal(null);
+  };
+
+  // Update tool display info
+  const updateToolDisplayInfo = (displayName: string, description: string) => {
+    if (!editingTool) return;
+    
+    const newTools = localTools.map(t => {
+      if (t.id === editingTool.id) {
+        return { 
+          ...t, 
+          display_name_az: displayName,
+          description_az: description,
+        };
+      }
+      return t;
+    });
+    setLocalTools(newTools);
+    setHasChanges(true);
+    setEditingTool(null);
+  };
+
   // Save mutation
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -185,6 +268,14 @@ const AdminTools = () => {
             flow_active: tool.flow_active,
             bump_active: tool.bump_active,
             mommy_active: tool.mommy_active,
+            flow_locked: tool.flow_locked,
+            bump_locked: tool.bump_locked,
+            mommy_locked: tool.mommy_locked,
+            is_premium: tool.is_premium,
+            premium_type: tool.premium_type,
+            premium_limit: tool.premium_limit,
+            display_name_az: tool.display_name_az,
+            description_az: tool.description_az,
           })
           .eq('id', tool.id);
         
@@ -214,6 +305,7 @@ const AdminTools = () => {
   };
 
   const activeField = getActiveField(activeCategory);
+  const lockedField = getLockedField(activeCategory);
 
   return (
     <div className="space-y-4">
@@ -224,7 +316,7 @@ const AdminTools = () => {
             Alətlər İdarəsi
           </h2>
           <p className="text-sm text-muted-foreground">
-            Alətləri sıralayın və aktiv/deaktiv edin
+            Alətləri sıralayın, kilidləyin, premium edin
           </p>
         </div>
         <div className="flex gap-2">
@@ -289,6 +381,7 @@ const AdminTools = () => {
                   <div className="space-y-2">
                     {categoryTools.map((tool, index) => {
                       const isPhaseActive = tool[activeField as keyof ToolConfig] as boolean;
+                      const isPhaseLocked = tool[lockedField as keyof ToolConfig] as boolean;
                       return (
                         <motion.div
                           key={tool.id}
@@ -332,17 +425,58 @@ const AdminTools = () => {
                           
                           {/* Tool info */}
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm truncate">{tool.name_az || tool.name}</p>
-                            <p className="text-xs text-muted-foreground">{tool.tool_id}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium text-sm truncate">
+                                {tool.display_name_az || tool.name_az || tool.name}
+                              </p>
+                              {tool.is_premium && (
+                                <Crown className="w-4 h-4 text-amber-500" />
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground truncate">
+                              {tool.description_az || tool.tool_id}
+                            </p>
                           </div>
-                          
-                          {/* Phase toggles */}
-                          <div className="flex items-center gap-3">
+
+                          {/* Action buttons */}
+                          <div className="flex items-center gap-2">
+                            {/* Edit button */}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => setEditingTool(tool)}
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+
+                            {/* Premium button */}
+                            <Button
+                              variant={tool.is_premium ? 'default' : 'ghost'}
+                              size="icon"
+                              className={`h-8 w-8 ${tool.is_premium ? 'bg-amber-500 hover:bg-amber-600' : ''}`}
+                              onClick={() => setPremiumModal(tool)}
+                            >
+                              <Crown className="w-4 h-4" />
+                            </Button>
+
+                            {/* Lock toggle */}
+                            <Button
+                              variant={isPhaseLocked ? 'destructive' : 'outline'}
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => togglePhaseLocked(tool)}
+                              disabled={!tool.is_active}
+                            >
+                              {isPhaseLocked ? (
+                                <Lock className="w-4 h-4" />
+                              ) : (
+                                <Unlock className="w-4 h-4" />
+                              )}
+                            </Button>
+                            
                             {/* Phase-specific toggle */}
                             <div className="flex items-center gap-2">
-                              <span className="text-xs text-muted-foreground">
-                                {category === 'flow' ? 'Flow' : category === 'bump' ? 'Bump' : 'Mommy'}
-                              </span>
                               <Switch
                                 checked={isPhaseActive}
                                 onCheckedChange={() => togglePhaseActive(tool)}
@@ -388,14 +522,181 @@ const AdminTools = () => {
           <span>Aktiv - alət bütün phase-lərdə görünə bilər</span>
         </div>
         <div className="flex items-center gap-2">
-          <EyeOff className="w-4 h-4" />
-          <span>Deaktiv - alət heç bir yerdə görünmür</span>
+          <Lock className="w-4 h-4 text-destructive" />
+          <span>Kilidli - alət premium tələb edir</span>
         </div>
         <div className="flex items-center gap-2">
-          <Switch checked={true} disabled className="scale-75" />
-          <span>Phase toggle - yalnız seçilmiş phase üçün aktiv/deaktiv</span>
+          <Crown className="w-4 h-4 text-amber-500" />
+          <span>Premium - limit və ya premium-only</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Edit2 className="w-4 h-4" />
+          <span>Redaktə - ad və açıqlamanı dəyişin</span>
         </div>
       </div>
+
+      {/* Edit Tool Dialog */}
+      <Dialog open={!!editingTool} onOpenChange={() => setEditingTool(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Aləti Redaktə Et</DialogTitle>
+          </DialogHeader>
+          {editingTool && (
+            <EditToolForm
+              tool={editingTool}
+              onSave={updateToolDisplayInfo}
+              onCancel={() => setEditingTool(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Premium Settings Dialog */}
+      <Dialog open={!!premiumModal} onOpenChange={() => setPremiumModal(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Premium Ayarları</DialogTitle>
+          </DialogHeader>
+          {premiumModal && (
+            <PremiumSettingsForm
+              tool={premiumModal}
+              onSave={updatePremiumSettings}
+              onCancel={() => setPremiumModal(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+// Edit Tool Form Component
+const EditToolForm = ({ 
+  tool, 
+  onSave, 
+  onCancel 
+}: { 
+  tool: ToolConfig; 
+  onSave: (name: string, desc: string) => void; 
+  onCancel: () => void;
+}) => {
+  const [displayName, setDisplayName] = useState(tool.display_name_az || tool.name_az || tool.name);
+  const [description, setDescription] = useState(tool.description_az || '');
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label>Görünən Ad (AZ)</Label>
+        <Input
+          value={displayName}
+          onChange={(e) => setDisplayName(e.target.value)}
+          placeholder="Alət adı"
+        />
+      </div>
+      <div>
+        <Label>Açıqlama (AZ)</Label>
+        <Textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Alət haqqında qısa açıqlama"
+          rows={3}
+        />
+      </div>
+      <DialogFooter>
+        <Button variant="outline" onClick={onCancel}>
+          <X className="w-4 h-4 mr-1" />
+          Ləğv et
+        </Button>
+        <Button onClick={() => onSave(displayName, description)}>
+          <Check className="w-4 h-4 mr-1" />
+          Yadda saxla
+        </Button>
+      </DialogFooter>
+    </div>
+  );
+};
+
+// Premium Settings Form Component
+const PremiumSettingsForm = ({ 
+  tool, 
+  onSave, 
+  onCancel 
+}: { 
+  tool: ToolConfig; 
+  onSave: (isPremium: boolean, type: string, limit: number) => void; 
+  onCancel: () => void;
+}) => {
+  const [isPremium, setIsPremium] = useState(tool.is_premium);
+  const [premiumType, setPremiumType] = useState(tool.premium_type || 'none');
+  const [premiumLimit, setPremiumLimit] = useState(tool.premium_limit || 0);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <Label>Premium Alət</Label>
+        <Switch
+          checked={isPremium}
+          onCheckedChange={setIsPremium}
+        />
+      </div>
+
+      {isPremium && (
+        <>
+          <div>
+            <Label>Premium Növü</Label>
+            <Select value={premiumType} onValueChange={setPremiumType}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Seçin...</SelectItem>
+                <SelectItem value="limited_total">İlk X istifadə pulsuz</SelectItem>
+                <SelectItem value="limited_monthly">Aylıq X istifadə pulsuz</SelectItem>
+                <SelectItem value="premium_only">Yalnız Premium istifadəçilər</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {(premiumType === 'limited_total' || premiumType === 'limited_monthly') && (
+            <div>
+              <Label>
+                {premiumType === 'limited_total' 
+                  ? 'Pulsuz istifadə limiti' 
+                  : 'Aylıq pulsuz limit'}
+              </Label>
+              <Input
+                type="number"
+                min={0}
+                value={premiumLimit}
+                onChange={(e) => setPremiumLimit(parseInt(e.target.value) || 0)}
+                placeholder="Məs: 3"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {premiumType === 'limited_total' 
+                  ? 'İstifadəçi bu qədər dəfə pulsuz istifadə edə bilər' 
+                  : 'İstifadəçi hər ay bu qədər dəfə pulsuz istifadə edə bilər'}
+              </p>
+            </div>
+          )}
+
+          {premiumType === 'premium_only' && (
+            <p className="text-sm text-amber-600 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg">
+              Bu alət yalnız Premium abunəliyi olan istifadəçilər tərəfindən istifadə edilə bilər.
+            </p>
+          )}
+        </>
+      )}
+
+      <DialogFooter>
+        <Button variant="outline" onClick={onCancel}>
+          <X className="w-4 h-4 mr-1" />
+          Ləğv et
+        </Button>
+        <Button onClick={() => onSave(isPremium, premiumType, premiumLimit)}>
+          <Check className="w-4 h-4 mr-1" />
+          Yadda saxla
+        </Button>
+      </DialogFooter>
     </div>
   );
 };

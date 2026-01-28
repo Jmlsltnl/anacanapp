@@ -4474,19 +4474,25 @@ export type Database = {
         Row: {
           bg_color: string | null
           bump_active: boolean | null
+          bump_locked: boolean | null
           bump_order: number | null
           color: string | null
           created_at: string | null
           description: string | null
           description_az: string | null
+          display_name: string | null
+          display_name_az: string | null
           flow_active: boolean | null
+          flow_locked: boolean | null
           flow_order: number | null
           icon: string
           id: string
           is_active: boolean | null
+          is_premium: boolean | null
           life_stages: string[] | null
           min_week: number | null
           mommy_active: boolean | null
+          mommy_locked: boolean | null
           mommy_order: number | null
           name: string
           name_az: string | null
@@ -4494,6 +4500,8 @@ export type Database = {
           partner_description_az: string | null
           partner_name: string | null
           partner_name_az: string | null
+          premium_limit: number | null
+          premium_type: string | null
           requires_partner: boolean | null
           sort_order: number | null
           tool_id: string
@@ -4502,19 +4510,25 @@ export type Database = {
         Insert: {
           bg_color?: string | null
           bump_active?: boolean | null
+          bump_locked?: boolean | null
           bump_order?: number | null
           color?: string | null
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          display_name?: string | null
+          display_name_az?: string | null
           flow_active?: boolean | null
+          flow_locked?: boolean | null
           flow_order?: number | null
           icon?: string
           id?: string
           is_active?: boolean | null
+          is_premium?: boolean | null
           life_stages?: string[] | null
           min_week?: number | null
           mommy_active?: boolean | null
+          mommy_locked?: boolean | null
           mommy_order?: number | null
           name: string
           name_az?: string | null
@@ -4522,6 +4536,8 @@ export type Database = {
           partner_description_az?: string | null
           partner_name?: string | null
           partner_name_az?: string | null
+          premium_limit?: number | null
+          premium_type?: string | null
           requires_partner?: boolean | null
           sort_order?: number | null
           tool_id: string
@@ -4530,19 +4546,25 @@ export type Database = {
         Update: {
           bg_color?: string | null
           bump_active?: boolean | null
+          bump_locked?: boolean | null
           bump_order?: number | null
           color?: string | null
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          display_name?: string | null
+          display_name_az?: string | null
           flow_active?: boolean | null
+          flow_locked?: boolean | null
           flow_order?: number | null
           icon?: string
           id?: string
           is_active?: boolean | null
+          is_premium?: boolean | null
           life_stages?: string[] | null
           min_week?: number | null
           mommy_active?: boolean | null
+          mommy_locked?: boolean | null
           mommy_order?: number | null
           name?: string
           name_az?: string | null
@@ -4550,6 +4572,8 @@ export type Database = {
           partner_description_az?: string | null
           partner_name?: string | null
           partner_name_az?: string | null
+          premium_limit?: number | null
+          premium_type?: string | null
           requires_partner?: boolean | null
           sort_order?: number | null
           tool_id?: string
