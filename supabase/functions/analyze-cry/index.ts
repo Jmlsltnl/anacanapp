@@ -12,6 +12,161 @@ interface CryAnalysisRequest {
   audioDuration: number;
 }
 
+// Two-stage analysis for accurate cry detection
+async function detectIfCrying(audioBase64: string, apiKey: string): Promise<{ isCrying: boolean; confidence: number; soundType: string }> {
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            {
+              inlineData: {
+                mimeType: 'audio/webm',
+                data: audioBase64
+              }
+            },
+            {
+              text: `CRITICAL AUDIO CLASSIFICATION TASK
+
+Listen to this audio carefully and classify EXACTLY what type of sound this is.
+
+STEP 1: What sounds do you hear in this audio?
+- Is there human vocalization?
+- Is there crying sounds?
+- Is there coughing, sneezing, or other respiratory sounds?
+- Is there silence or background noise only?
+
+STEP 2: If there IS human vocalization, determine:
+- Is this an INFANT/BABY making the sound? (0-12 months old)
+- Is this a child or adult?
+
+STEP 3: If it's a baby, is it CRYING?
+Baby crying characteristics:
+- Sustained vocalization (not brief coughs)
+- Rhythmic pattern (wah-wah, neh-neh sounds)
+- High-pitched wailing
+- Duration of several seconds of continuous crying
+
+NOT CRYING (common false positives):
+- COUGHING: Short, abrupt, expulsive sounds
+- SNEEZING: Single burst sounds
+- COOING/BABBLING: Happy, playful sounds
+- HICCUPS: Rhythmic but short sounds
+- ADULT SOUNDS: Any adult speech or sounds
+
+Return ONLY this JSON:
+{
+  "soundType": "baby_crying|cough|sneeze|adult_voice|silence|noise|baby_cooing|unknown",
+  "isBabyCrying": true or false,
+  "confidence": 0-100,
+  "reasoning": "Brief explanation of what you actually heard"
+}`
+            }
+          ]
+        }],
+        generationConfig: {
+          temperature: 0.05,
+          topK: 1,
+          topP: 0.1,
+          maxOutputTokens: 512,
+        }
+      })
+    }
+  );
+
+  if (!response.ok) {
+    console.error('Detection API error:', response.status);
+    return { isCrying: false, confidence: 0, soundType: 'unknown' };
+  }
+
+  const data = await response.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  
+  try {
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const result = JSON.parse(jsonMatch[0]);
+      return {
+        isCrying: result.isBabyCrying === true && result.confidence >= 80,
+        confidence: result.confidence || 0,
+        soundType: result.soundType || 'unknown'
+      };
+    }
+  } catch (e) {
+    console.error('Detection parse error:', e);
+  }
+  
+  return { isCrying: false, confidence: 0, soundType: 'unknown' };
+}
+
+// Classify cry type only if crying is confirmed
+async function classifyCryType(audioBase64: string, apiKey: string): Promise<any> {
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            {
+              inlineData: {
+                mimeType: 'audio/webm',
+                data: audioBase64
+              }
+            },
+            {
+              text: `Bu səsdə TƏSDIQ OLUNMUŞ körpə ağlaması var. İndi ağlamanın SƏBƏBİNİ müəyyən et.
+
+Ağlama növləri:
+- "hungry": Ritmik "neh-neh" səsi, tədricən güclənir
+- "tired": Monoton, zəif, gözlərini ovuşdurma ilə
+- "pain": Ani, kəskin, çox yüksək tonlu qışqırıq
+- "discomfort": Narahat, qıcıqlanma (bez, soyuq/isti)
+- "colic": Şiddətli, axşam saatlarında, uzun sürən
+- "attention": Aralıqlı, valideyn görəndə azalır
+- "overstimulated": Yorğun, həddindən artıq stimulyasiya
+- "sick": Zəif, normadan fərqli
+
+JSON CAVAB:
+{
+  "cryType": "hungry|tired|pain|discomfort|colic|attention|overstimulated|sick",
+  "confidence": 70-100,
+  "explanation": "Azərbaycan dilində izahat",
+  "recommendations": ["tövsiyə 1", "tövsiyə 2", "tövsiyə 3"],
+  "urgency": "low|medium|high"
+}`
+            }
+          ]
+        }],
+        generationConfig: {
+          temperature: 0.2,
+          topK: 10,
+          topP: 0.5,
+          maxOutputTokens: 1024,
+        }
+      })
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Classification failed');
+  }
+
+  const data = await response.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    return JSON.parse(jsonMatch[0]);
+  }
+  
+  throw new Error('No JSON in classification response');
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -51,7 +206,7 @@ Deno.serve(async (req) => {
       throw new Error('Audio data is required');
     }
 
-    // Validate minimum duration - 3 seconds minimum for reliable analysis
+    // Validate minimum duration - 3 seconds minimum
     if (audioDuration < 3) {
       return new Response(JSON.stringify({
         success: true,
@@ -68,227 +223,79 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Use Gemini 2.0 Flash for audio analysis
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              {
-                inlineData: {
-                  mimeType: 'audio/webm',
-                  data: audioBase64
-                }
-              },
-              {
-                text: `Sən pediatrik audio analiz mütəxəssisisən. Bu səs faylını DİQQƏTLƏ dinlə.
+    console.log('Stage 1: Detecting if audio contains baby crying...');
+    
+    // STAGE 1: First detect if there's actually crying
+    const detection = await detectIfCrying(audioBase64, GEMINI_API_KEY);
+    
+    console.log('Detection result:', JSON.stringify(detection));
 
-🔴 BİRİNCİ VƏ ƏN VACİB ADDIM - BU SƏS NƏDİR?
-Səsi dinlə və DÜRÜST cavab ver:
+    // If no crying detected, return immediately
+    if (!detection.isCrying) {
+      const soundTypeMessages: Record<string, string> = {
+        'cough': 'Bu səs öskürəkdir, körpə ağlaması deyil.',
+        'sneeze': 'Bu səs asqırmadır, körpə ağlaması deyil.',
+        'adult_voice': 'Bu səs böyük insana aiddir, körpə ağlaması deyil.',
+        'silence': 'Səs faylında əsasən səssizlik var.',
+        'noise': 'Bu ətraf mühit səsidir, körpə ağlaması deyil.',
+        'baby_cooing': 'Körpə xoşbəxt səslər çıxarır, ağlamır.',
+        'unknown': 'Körpə ağlaması aşkar edilmədi.'
+      };
 
-1. Bu səsdə HƏQIQI körpə ağlaması eşidirsən? (Körpə ağlaması = ritmik, davamlı, yüksək tonlu ağlama səsi)
-2. Bu səs sadəcə öskürək, asqırma, danışma, gülmə və ya digər səsdir?
-
-🚫 BUNLAR AĞLAMA DEYİL - "no_cry_detected" qaytarmalısan:
-- Öskürək səsi (qısa, kəsik səslər)
-- Asqırma
-- Gülmə
-- Danışma/mırıldanma
-- Səssizlik
-- Ətraf mühit səsləri (maşın, musiqi, TV)
-- Heyvan səsləri
-- Böyüklərin təqlid etdiyi səslər
-
-✅ BUNLAR HƏQİQİ AĞLAMADIR - yalnız bunları analiz et:
-- "hungry": "Neh-neh" ritmik səs, əmizdirmə hərəkəti ilə
-- "tired": Monoton, zəif, davamlı ağlama
-- "pain": Ani, kəskin, çox yüksək tonlu qışqırıq
-- "discomfort": Narahat, qıcıqlanma səsi
-- "colic": 3+ saat davam edən şiddətli ağlama
-- "attention": Aralıqlı ağlama, valideyn görəndə dayanır
-- "overstimulated": Yorğun, həddindən artıq stimulyasiya
-- "sick": Zəif, normadan fərqli ağlama
-
-⚠️ QƏRAR QAYDASI:
-- Əgər səs öskürək, asqırma və ya ağlama olmayan hər hansı səsdirsə → "no_cry_detected"
-- Əgər şübhən varsa → "no_cry_detected" 
-- YALNIZ 85%+ əmin olduqda həqiqi ağlama növü göstər
-- Öskürək HEÇBIR ZAMAN ağlama deyil!
-
-JSON CAVAB (YALNIZ JSON, BAŞQA HEÇ NƏ):
-{
-  "cryType": "hungry|tired|pain|discomfort|colic|attention|overstimulated|sick|no_cry_detected",
-  "confidence": 0-100,
-  "explanation": "Azərbaycan dilində - nə eşitdiyini və niyə bu qərar verdiyini izah et",
-  "recommendations": ["tövsiyə 1", "tövsiyə 2"],
-  "urgency": "low|medium|high",
-  "isCryDetected": true/false
-}`
-              }
-            ]
-          }],
-          generationConfig: {
-            temperature: 0.1,
-            topK: 5,
-            topP: 0.5,
-            maxOutputTokens: 1024,
-          }
-        })
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Gemini API error:', response.status, errorText);
-      
-      // Fallback to gemini-2.0-flash if preview model fails
-      const fallbackResponse = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [
-                {
-                  inlineData: {
-                    mimeType: 'audio/webm',
-                    data: audioBase64
-                  }
-                },
-                {
-                  text: `Analyze this audio for baby crying. Return JSON only:
-{
-  "cryType": "hungry|tired|pain|discomfort|colic|attention|overstimulated|sick|no_cry_detected|false_positive",
-  "confidence": 0-100,
-  "explanation": "Brief explanation in Azerbaijani",
-  "recommendations": ["tip1", "tip2"],
-  "urgency": "low|medium|high",
-  "isCryDetected": true/false
-}
-
-If no real baby crying detected, use "no_cry_detected". If fake/TV sounds, use "false_positive".`
-                }
-              ]
-            }],
-            generationConfig: {
-              temperature: 0.2,
-              maxOutputTokens: 1024,
-            }
-          })
-        }
-      );
-
-      if (!fallbackResponse.ok) {
-        throw new Error('AI analysis failed');
-      }
-
-      const fallbackData = await fallbackResponse.json();
-      const fallbackText = fallbackData.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      
-      let fallbackResult;
-      try {
-        const jsonMatch = fallbackText.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          fallbackResult = JSON.parse(jsonMatch[0]);
-        } else {
-          throw new Error('No JSON found');
-        }
-      } catch {
-        fallbackResult = {
-          cryType: 'no_cry_detected',
-          confidence: 50,
-          explanation: 'Səs analiz edildi, lakin dəqiq nəticə əldə edilmədi.',
-          recommendations: ['Yenidən cəhd edin', 'Körpənin ağlamasını yaxından yazın'],
-          urgency: 'low',
-          isCryDetected: false
-        };
-      }
-
-      // Ensure proper isCryDetected value
-      if (fallbackResult.cryType === 'no_cry_detected' || fallbackResult.cryType === 'false_positive') {
-        fallbackResult.isCryDetected = false;
-      } else {
-        fallbackResult.isCryDetected = true;
-      }
-
-      // Only save if cry was detected
-      if (fallbackResult.isCryDetected) {
-        await supabase.from('cry_analyses').insert({
-          user_id: user.id,
-          audio_duration_seconds: audioDuration,
-          analysis_result: fallbackResult,
-          cry_type: fallbackResult.cryType,
-          confidence_score: fallbackResult.confidence
-        });
-      }
+      const explanation = soundTypeMessages[detection.soundType] || soundTypeMessages['unknown'];
 
       return new Response(JSON.stringify({
         success: true,
-        analysis: fallbackResult
+        analysis: {
+          cryType: 'no_cry_detected',
+          confidence: detection.confidence,
+          explanation: explanation,
+          recommendations: [
+            'Körpə ağladıqda yenidən cəhd edin',
+            'Mikrofonu körpəyə yaxınlaşdırın',
+            'Ətraf səsləri minimuma endirin'
+          ],
+          urgency: 'low',
+          isCryDetected: false,
+          detectedSound: detection.soundType
+        }
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
-    const data = await response.json();
-    const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    console.log('Stage 2: Classifying cry type...');
 
-    // Parse JSON from response
+    // STAGE 2: Crying confirmed, now classify the type
     let analysisResult;
     try {
-      const jsonMatch = textContent.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        analysisResult = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error('No JSON found in response');
-      }
-    } catch (parseError) {
-      console.error('JSON parse error:', parseError, 'Raw text:', textContent);
-      // Default to no cry detected on parse failure
+      analysisResult = await classifyCryType(audioBase64, GEMINI_API_KEY);
+      analysisResult.isCryDetected = true;
+    } catch (classifyError) {
+      console.error('Classification error:', classifyError);
       analysisResult = {
-        cryType: 'no_cry_detected',
-        confidence: 50,
-        explanation: 'Səs analiz edildi, lakin dəqiq nəticə əldə edilmədi. Yenidən cəhd edin.',
-        recommendations: ['Körpənin ağlamasını yaxından yazın', 'Ən az 3 saniyə səs yazın', 'Ətraf səsləri minimuma endirin'],
-        urgency: 'low',
-        isCryDetected: false
+        cryType: 'discomfort',
+        confidence: 70,
+        explanation: 'Körpə ağlaması aşkar edildi, lakin dəqiq növü müəyyən edilə bilmədi.',
+        recommendations: ['Körpənin vəziyyətini yoxlayın', 'Bezini yoxlayın', 'Ac olub-olmadığını yoxlayın'],
+        urgency: 'medium',
+        isCryDetected: true
       };
     }
 
-    // Ensure isCryDetected is correctly set based on cryType
-    if (analysisResult.cryType === 'no_cry_detected' || analysisResult.cryType === 'false_positive') {
-      analysisResult.isCryDetected = false;
-    } else {
-      analysisResult.isCryDetected = true;
-    }
+    // Save to database
+    const { error: insertError } = await supabase
+      .from('cry_analyses')
+      .insert({
+        user_id: user.id,
+        audio_duration_seconds: audioDuration,
+        analysis_result: analysisResult,
+        cry_type: analysisResult.cryType,
+        confidence_score: analysisResult.confidence
+      });
 
-    // Increase threshold to 70% for more accurate detection
-    if (analysisResult.confidence < 70 && analysisResult.isCryDetected) {
-      analysisResult.cryType = 'no_cry_detected';
-      analysisResult.isCryDetected = false;
-      analysisResult.explanation = 'Həqiqi körpə ağlaması aşkar edilmədi. Bu səs öskürək, asqırma və ya digər səs ola bilər.';
-      analysisResult.recommendations = ['Körpənin ağlamasını yaxından yazın', 'Ətraf səsləri azaldın', 'Minimum 3 saniyə ağlama yazın'];
-    }
-
-    // Only save to database if cry was actually detected
-    if (analysisResult.isCryDetected) {
-      const { error: insertError } = await supabase
-        .from('cry_analyses')
-        .insert({
-          user_id: user.id,
-          audio_duration_seconds: audioDuration,
-          analysis_result: analysisResult,
-          cry_type: analysisResult.cryType,
-          confidence_score: analysisResult.confidence
-        });
-
-      if (insertError) {
-        console.error('Database insert error:', insertError);
-      }
+    if (insertError) {
+      console.error('Database insert error:', insertError);
     }
 
     return new Response(JSON.stringify({
