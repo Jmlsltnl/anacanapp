@@ -18,35 +18,49 @@ serve(async (req) => {
       throw new Error('GEMINI_API_KEY is not configured');
     }
 
+    const actualChildName = childName || 'Əli';
+    
     const systemPrompt = language === 'az' 
-      ? `Sən uşaqlar üçün nağıl yazan yaradıcı bir köməkçisən. İstifadəçinin verdiyi parametrlərə uyğun olaraq, Azərbaycan dilində, uşaq psixologiyasına uyğun, qorxulu elementlər olmayan, 3-5 dəqiqəlik oxuna biləcək şirin bir nağıl yaz. 
+      ? `Sən uşaqlar üçün nağıl yazan yaradıcı bir köməkçisən. Azərbaycan dilində, uşaq psixologiyasına uyğun, qorxulu elementlər olmayan, 3-5 dəqiqəlik oxuna biləcək şirin bir nağıl yaz.
+
+ÇOX VACİB QAYDALAR:
+1. Uşağın adı "${actualChildName}"-dir. Nağılda HƏMİŞƏ bu addan istifadə et!
+2. "Kiçik dost", "kiçik kosmonavt", "kiçik şəhzadə" və ya hər hansı digər ümumi ifadələr YASAQDIR!
+3. Baş qəhrəman MÜTLƏq "${actualChildName}" olmalıdır.
+4. Başlıq formatı: "${actualChildName}ın [Macəra adı]" və ya "${actualChildName} və [nəsə]"
 
 Nağılın strukturu:
-1. Maraqlı bir giriş (uşağın adı ilə başla)
-2. Macəra hissəsi (seçilmiş tema və qəhrəmanla)
-3. Kulminasiya nöqtəsi
-4. Xoşbəxt son və tərbiyəvi mesaj
+1. Başlıq (uşağın adı ilə)
+2. Maraqlı giriş ("Bir varmış, bir yoxmuş, ${actualChildName} adlı..." ilə başla)
+3. Macəra hissəsi
+4. Kulminasiya nöqtəsi  
+5. Xoşbəxt son və tərbiyəvi mesaj
 
-Üslub qaydaları:
-- Sadə, anlaşılan cümlələr istifadə et
-- Təkrarlanan ifadələr və ritm yarat
-- Emosional və canlı təsvirlər ver
-- Müsbət mesajlarla bitir`
-      : `You are a creative fairy tale writer for children. Write a sweet, child-appropriate story that takes 3-5 minutes to read, without scary elements.`;
+Üslub:
+- Sadə, anlaşılan cümlələr
+- "${actualChildName}" adını nağıl boyu təkrarla
+- Emosional və canlı təsvirlər`
+      : `You are a creative fairy tale writer. Write a sweet story for children.
+
+CRITICAL RULES:
+1. The child's name is "${actualChildName}". ALWAYS use this exact name!
+2. Generic terms like "little friend", "little astronaut" are FORBIDDEN!
+3. The main hero MUST be "${actualChildName}".
+4. Title format: "${actualChildName}'s [Adventure]"`;
 
     const userPrompt = language === 'az'
-      ? `Uşağın adı: ${childName || 'Kiçik dost'}
+      ? `Uşağın adı: ${actualChildName} (bu adı nağılda mütləq istifadə et!)
 Mövzu/Tema: ${theme || 'Meşə macərası'}
-Qəhrəman: ${hero || 'Cəsur dovşan'}
-Tərbiyəvi mesaj: ${moralLesson || 'Dostluğun önəmi'}
+Qəhrəman tipi: ${hero || 'Cəsur'}
+Tərbiyəvi mesaj: ${moralLesson || 'Dostluq'}
 
-Bu parametrlərə uyğun bir nağıl yaz. Nağıl başlıq ilə başlasın.`
-      : `Child's name: ${childName || 'Little friend'}
+"${actualChildName}" adlı uşaq haqqında nağıl yaz. Başlığı "${actualChildName}ın..." və ya "${actualChildName} və..." formatında yaz.`
+      : `Child's name: ${actualChildName} (MUST use this name!)
 Theme: ${theme || 'Forest adventure'}
-Hero: ${hero || 'Brave rabbit'}
-Moral lesson: ${moralLesson || 'Importance of friendship'}
+Hero type: ${hero || 'Brave'}
+Moral: ${moralLesson || 'Friendship'}
 
-Write a fairy tale with these parameters. Start with a title.`;
+Write a story about a child named "${actualChildName}".`;
 
     console.log('Generating fairy tale with Gemini...');
 
