@@ -91,10 +91,18 @@ function calculateMoonSign(birthDate: string): ZodiacInfo {
   const lunarCycle = 29.53059;
   const refNewMoon = new Date('2000-01-06').getTime();
   const daysSinceRef = (date.getTime() - refNewMoon) / (1000 * 60 * 60 * 24);
-  const moonPhase = daysSinceRef % lunarCycle;
+  let moonPhase = daysSinceRef % lunarCycle;
+  
+  // Handle negative modulo for dates before reference
+  if (moonPhase < 0) {
+    moonPhase += lunarCycle;
+  }
+  
   const moonIndex = Math.floor((moonPhase / lunarCycle) * 12);
+  // Ensure index is within bounds
+  const safeIndex = Math.abs(moonIndex) % 12;
 
-  return ZODIAC_SIGNS[moonIndex];
+  return ZODIAC_SIGNS[safeIndex];
 }
 
 serve(async (req) => {
