@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Package, Settings, BarChart3, Shield, 
   ChevronLeft, Menu, LogOut, Bell, Search,
-  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store, ShieldAlert, BookHeart, MapPin, Gamepad2
+  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store, ShieldAlert, BookHeart, MapPin, Gamepad2, Zap, Lightbulb
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -45,6 +45,8 @@ const menuItems = [
   { id: 'fairy-tales', label: 'Sehrli Nağılçı', icon: BookHeart },
   { id: 'places', label: 'Ana Dostu Məkanlar', icon: MapPin },
   { id: 'play-activities', label: 'Ağıllı Oyun Qutusu', icon: Gamepad2 },
+  { id: 'quick-actions', label: 'Sürətli Keçidlər', icon: Zap },
+  { id: 'development-tips', label: 'İnkişaf Tövsiyələri', icon: Lightbulb },
   { id: 'settings', label: 'Tənzimləmələr', icon: Settings },
   { id: 'security', label: 'Təhlükəsizlik', icon: Shield },
 ];
