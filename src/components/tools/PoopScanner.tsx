@@ -151,9 +151,22 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
       
       if (error) throw error;
       
-      if (data.success && data.analysis) {
-        setAnalysis(data.analysis);
-        loadHistory();
+      if (data.success) {
+        // Check if image was valid for analysis
+        if (data.isValidImage === false) {
+          toast({
+            title: 'Şəkil uyğun deyil',
+            description: data.validation?.message || 'Bu şəkil körpə bezi deyil. Düzgün şəkil seçin.',
+            variant: 'destructive'
+          });
+          setSelectedImage(null);
+          return;
+        }
+        
+        if (data.analysis) {
+          setAnalysis(data.analysis);
+          loadHistory();
+        }
       } else {
         throw new Error(data.error || 'Analysis failed');
       }
