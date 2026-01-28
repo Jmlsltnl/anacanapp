@@ -27,6 +27,10 @@ import AdminAffiliateProducts from './admin/AdminAffiliateProducts';
 import AdminTools from './admin/AdminTools';
 import AdminFlowContent from './admin/AdminFlowContent';
 import AdminMarketplace from './admin/AdminMarketplace';
+import AdminFirstAid from './admin/AdminFirstAid';
+import AdminFairyTales from './admin/AdminFairyTales';
+import AdminPlaces from './admin/AdminPlaces';
+import AdminPlayActivities from './admin/AdminPlayActivities';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -89,6 +93,14 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminTools />;
       case 'marketplace':
         return <AdminMarketplace />;
+      case 'first-aid':
+        return <AdminFirstAid />;
+      case 'fairy-tales':
+        return <AdminFairyTales />;
+      case 'places':
+        return <AdminPlaces />;
+      case 'play-activities':
+        return <AdminPlayActivities />;
       case 'security':
         return <AdminSecurity />;
       default:
