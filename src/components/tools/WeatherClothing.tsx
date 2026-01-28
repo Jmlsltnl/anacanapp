@@ -2,13 +2,17 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, MapPin, Thermometer, Droplets, Wind, Sun, CloudRain, 
-  AlertTriangle, Shirt, Loader2, RefreshCw, Shield, Flower2, CloudSun, MapPinOff
+  AlertTriangle, Shirt, Loader2, RefreshCw, Shield, Flower2, CloudSun, MapPinOff, Baby, User
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { getCurrentPosition, requestLocationPermission } from '@/lib/permissions';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { useUserStore } from '@/store/userStore';
+import { differenceInMonths, differenceInDays } from 'date-fns';
+import { getPregnancyWeek } from '@/lib/pregnancy-utils';
 
 interface WeatherClothingProps {
   onBack: () => void;
@@ -38,6 +42,36 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
   const [advice, setAdvice] = useState<WeatherAdvice | null>(null);
   
   const { toast } = useToast();
+  const { profile } = useAuthContext();
+  const { lifeStage, babyBirthDate, lastPeriodDate } = useUserStore();
+
+  // Calculate user context data
+  const getUserContext = () => {
+    const context: {
+      babyAgeMonths?: number;
+      babyAgeDays?: number;
+      pregnancyWeek?: number;
+      lifeStage?: string;
+    } = {
+      lifeStage: lifeStage || profile?.life_stage
+    };
+
+    // Calculate baby age
+    const babyDob = babyBirthDate || (profile?.baby_birth_date ? new Date(profile.baby_birth_date) : null);
+    if (babyDob) {
+      const now = new Date();
+      context.babyAgeMonths = differenceInMonths(now, new Date(babyDob));
+      context.babyAgeDays = differenceInDays(now, new Date(babyDob));
+    }
+
+    // Calculate pregnancy week
+    const lmp = lastPeriodDate || (profile?.last_period_date ? new Date(profile.last_period_date) : null);
+    if (lmp && (context.lifeStage === 'bump' || context.lifeStage === 'pregnant')) {
+      context.pregnancyWeek = getPregnancyWeek(lmp);
+    }
+
+    return context;
+  };
 
   useEffect(() => {
     fetchWeather();
@@ -60,8 +94,15 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
       const position = await getCurrentPosition();
       const { latitude, longitude } = position.coords;
 
+      // Get user context for AI
+      const userContext = getUserContext();
+
       const { data, error } = await supabase.functions.invoke('weather-clothing', {
-        body: { lat: latitude, lng: longitude }
+        body: { 
+          lat: latitude, 
+          lng: longitude,
+          userContext
+        }
       });
 
       if (error) throw error;
@@ -105,15 +146,6 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
     }
   };
 
-  const getAlertBg = (level: string) => {
-    switch (level) {
-      case 'danger': return 'bg-red-500/10 border-red-500/30';
-      case 'warning': return 'bg-orange-500/10 border-orange-500/30';
-      case 'caution': return 'bg-yellow-500/10 border-yellow-500/30';
-      default: return 'bg-green-500/10 border-green-500/30';
-    }
-  };
-
   const getWeatherIcon = (temp: number) => {
     if (temp < 5) return '❄️';
     if (temp < 15) return '🌤️';
@@ -121,29 +153,75 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
     return '🔥';
   };
 
+  const userContext = getUserContext();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-card border-b border-border/50 px-4 py-3">
+      <div className="sticky top-0 z-10 bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 py-3 safe-area-top">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0">
+          <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0 text-white hover:bg-white/20">
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">
             <h1 className="text-lg font-bold">Hava & Geyim</h1>
-            <p className="text-xs text-muted-foreground">Körpəniz üçün geyim məsləhəti</p>
+            <p className="text-xs text-white/80">
+              {userContext.babyAgeMonths !== undefined 
+                ? `${userContext.babyAgeMonths} aylıq körpə üçün` 
+                : userContext.pregnancyWeek 
+                  ? `Hamiləliyin ${userContext.pregnancyWeek}. həftəsi üçün`
+                  : 'Körpəniz üçün geyim məsləhəti'}
+            </p>
           </div>
-          <Button variant="ghost" size="icon" onClick={fetchWeather} disabled={isLoading}>
+          <Button variant="ghost" size="icon" onClick={fetchWeather} disabled={isLoading} className="text-white hover:bg-white/20">
             <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>
 
       <div className="p-4 space-y-4">
+        {/* User Context Card */}
+        {(userContext.babyAgeMonths !== undefined || userContext.pregnancyWeek) && (
+          <Card className="border-primary/20 bg-primary/5">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-3">
+                {userContext.babyAgeMonths !== undefined ? (
+                  <>
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                      <Baby className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Körpənin yaşı</p>
+                      <p className="text-xs text-muted-foreground">
+                        {userContext.babyAgeMonths} ay ({userContext.babyAgeDays} gün)
+                      </p>
+                    </div>
+                  </>
+                ) : userContext.pregnancyWeek ? (
+                  <>
+                    <div className="w-10 h-10 rounded-full bg-pink-500/20 flex items-center justify-center">
+                      <User className="w-5 h-5 text-pink-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Hamiləlik həftəsi</p>
+                      <p className="text-xs text-muted-foreground">{userContext.pregnancyWeek}. həftə</p>
+                    </div>
+                  </>
+                ) : null}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Loading State */}
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-12 h-12 animate-spin text-primary mb-4" />
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            >
+              <CloudSun className="w-16 h-16 text-primary mb-4" />
+            </motion.div>
             <p className="text-muted-foreground">Məkan təyin edilir...</p>
           </div>
         )}
@@ -176,78 +254,83 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
             >
               {/* Location & Current Weather */}
               <Card className="overflow-hidden">
-                <div className={`h-1 ${getAlertColor(advice.alertLevel)}`} />
+                <div className={`h-1.5 ${getAlertColor(advice.alertLevel)}`} />
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <MapPin className="w-4 h-4 text-primary" />
                     <span className="font-medium">{cityName}</span>
-                    <span className={`ml-auto px-2 py-0.5 rounded-full text-xs font-medium ${
+                    <span className={`ml-auto px-3 py-1 rounded-full text-xs font-semibold ${
                       advice.safeToGoOut ? 'bg-green-500/20 text-green-600' : 'bg-red-500/20 text-red-600'
                     }`}>
-                      {advice.safeToGoOut ? 'Çıxmaq olar' : 'Diqqətli olun'}
+                      {advice.safeToGoOut ? '✓ Çıxmaq olar' : '⚠ Diqqətli olun'}
                     </span>
                   </div>
                   
                   <div className="flex items-center gap-4">
-                    <div className="text-5xl">{getWeatherIcon(advice.temperature)}</div>
+                    <div className="text-6xl">{getWeatherIcon(advice.temperature)}</div>
                     <div>
-                      <div className="text-4xl font-bold">{Math.round(advice.temperature)}°C</div>
-                      <p className="text-sm text-muted-foreground">
+                      <div className="text-5xl font-bold">{Math.round(advice.temperature)}°C</div>
+                      <p className="text-sm text-muted-foreground mt-1">
                         Hiss: {Math.round(advice.feelsLike)}°C
                       </p>
                     </div>
                   </div>
                   
-                  <p className="text-sm mt-2">{advice.weatherDescription}</p>
+                  <p className="text-sm mt-3 text-muted-foreground">{advice.weatherDescription}</p>
                   
                   {/* Weather Stats */}
                   <div className="grid grid-cols-3 gap-2 mt-4">
-                    <div className="bg-muted/50 rounded-lg p-2 text-center">
-                      <Droplets className="w-4 h-4 mx-auto text-blue-500" />
+                    <div className="bg-blue-500/10 rounded-xl p-3 text-center">
+                      <Droplets className="w-5 h-5 mx-auto text-blue-500" />
                       <p className="text-xs text-muted-foreground mt-1">Rütubət</p>
-                      <p className="font-semibold text-sm">{advice.humidity}%</p>
+                      <p className="font-bold text-sm">{advice.humidity}%</p>
                     </div>
-                    <div className="bg-muted/50 rounded-lg p-2 text-center">
-                      <Wind className="w-4 h-4 mx-auto text-cyan-500" />
+                    <div className="bg-cyan-500/10 rounded-xl p-3 text-center">
+                      <Wind className="w-5 h-5 mx-auto text-cyan-500" />
                       <p className="text-xs text-muted-foreground mt-1">Külək</p>
-                      <p className="font-semibold text-sm">{Math.round(advice.windSpeed)} km/h</p>
+                      <p className="font-bold text-sm">{Math.round(advice.windSpeed)} km/h</p>
                     </div>
-                    <div className="bg-muted/50 rounded-lg p-2 text-center">
-                      <Sun className="w-4 h-4 mx-auto text-orange-500" />
+                    <div className="bg-orange-500/10 rounded-xl p-3 text-center">
+                      <Sun className="w-5 h-5 mx-auto text-orange-500" />
                       <p className="text-xs text-muted-foreground mt-1">UV</p>
-                      <p className="font-semibold text-sm">{advice.uvIndex}</p>
+                      <p className="font-bold text-sm">{advice.uvIndex}</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Clothing Advice */}
-              <Card>
+              <Card className="border-primary/20">
                 <CardContent className="p-4">
                   <h3 className="font-semibold flex items-center gap-2 mb-3">
                     <Shirt className="w-5 h-5 text-primary" />
-                    Geyim Tövsiyəsi
+                    {userContext.babyAgeMonths !== undefined 
+                      ? `${userContext.babyAgeMonths} aylıq körpə üçün geyim` 
+                      : 'Geyim Tövsiyəsi'}
                   </h3>
-                  <p className="text-sm mb-3">{advice.clothingAdvice}</p>
+                  <p className="text-sm mb-4">{advice.clothingAdvice}</p>
                   
                   <div className="flex flex-wrap gap-2">
                     {advice.clothingItems.map((item, idx) => (
-                      <span 
+                      <motion.span 
                         key={idx}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: idx * 0.1 }}
                         className="px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium"
                       >
                         {item}
-                      </span>
+                      </motion.span>
                     ))}
                   </div>
                 </CardContent>
               </Card>
 
               {/* Outdoor Advice */}
-              <Card className={advice.safeToGoOut ? '' : 'border-orange-500/30'}>
+              <Card className={advice.safeToGoOut ? 'border-green-500/20 bg-green-500/5' : 'border-orange-500/30 bg-orange-500/5'}>
                 <CardContent className="p-4">
                   <h3 className="font-semibold flex items-center gap-2 mb-2">
-                    <CloudSun className="w-5 h-5 text-primary" />
+                    <CloudSun className={`w-5 h-5 ${advice.safeToGoOut ? 'text-green-500' : 'text-orange-500'}`} />
                     Bayırda gəzmə
                   </h3>
                   <p className="text-sm">{advice.outdoorAdvice}</p>
@@ -258,7 +341,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
               {advice.warnings.length > 0 && (
                 <Card className="border-orange-500/30 bg-orange-500/5">
                   <CardContent className="p-4">
-                    <h3 className="font-semibold flex items-center gap-2 text-orange-600 mb-2">
+                    <h3 className="font-semibold flex items-center gap-2 text-orange-600 mb-3">
                       <AlertTriangle className="w-5 h-5" />
                       Xəbərdarlıqlar
                     </h3>
