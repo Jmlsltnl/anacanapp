@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Wrench, GripVertical, Search, Save, RefreshCw, ChevronDown, ChevronUp
+  Wrench, Search, Save, RefreshCw, ChevronDown, ChevronUp, 
+  Power, PowerOff, Eye, EyeOff
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -24,6 +26,9 @@ interface ToolConfig {
   bump_order: number;
   mommy_order: number;
   is_active: boolean;
+  flow_active: boolean;
+  bump_active: boolean;
+  mommy_active: boolean;
 }
 
 const categoryLabels: Record<string, string> = {
@@ -41,12 +46,12 @@ const AdminTools = () => {
   const queryClient = useQueryClient();
 
   // Fetch tools
-  const { data: tools = [], isLoading, refetch } = useQuery({
+  const { data: tools = [], isLoading } = useQuery({
     queryKey: ['admin-tool-configs'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('tool_configs')
-        .select('id, tool_id, name, name_az, icon, life_stages, sort_order, flow_order, bump_order, mommy_order, is_active')
+        .select('id, tool_id, name, name_az, icon, life_stages, sort_order, flow_order, bump_order, mommy_order, is_active, flow_active, bump_active, mommy_active')
         .order('sort_order');
       if (error) throw error;
       return data as ToolConfig[];
@@ -54,16 +59,11 @@ const AdminTools = () => {
   });
 
   // Initialize local tools when data loads
-  useState(() => {
-    if (tools.length > 0 && localTools.length === 0) {
+  useEffect(() => {
+    if (tools.length > 0) {
       setLocalTools(tools);
     }
-  });
-
-  // Update local tools when fetched tools change
-  if (tools.length > 0 && localTools.length === 0) {
-    setLocalTools(tools);
-  }
+  }, [tools]);
 
   // Get order field for current category
   const getOrderField = (category: string): keyof ToolConfig => {
@@ -72,6 +72,16 @@ const AdminTools = () => {
       case 'bump': return 'bump_order';
       case 'mommy': return 'mommy_order';
       default: return 'sort_order';
+    }
+  };
+
+  // Get active field for current category
+  const getActiveField = (category: string): keyof ToolConfig => {
+    switch (category) {
+      case 'flow': return 'flow_active';
+      case 'bump': return 'bump_active';
+      case 'mommy': return 'mommy_active';
+      default: return 'is_active';
     }
   };
 
@@ -86,6 +96,38 @@ const AdminTools = () => {
       const orderField = getOrderField(activeCategory);
       return (a[orderField] as number) - (b[orderField] as number);
     });
+
+  // Toggle phase-specific active status
+  const togglePhaseActive = (tool: ToolConfig) => {
+    const activeField = getActiveField(activeCategory);
+    const newTools = localTools.map(t => {
+      if (t.id === tool.id) {
+        return { ...t, [activeField]: !t[activeField] };
+      }
+      return t;
+    });
+    setLocalTools(newTools);
+    setHasChanges(true);
+  };
+
+  // Toggle global active status
+  const toggleGlobalActive = (tool: ToolConfig) => {
+    const newTools = localTools.map(t => {
+      if (t.id === tool.id) {
+        const newActive = !t.is_active;
+        return { 
+          ...t, 
+          is_active: newActive,
+          flow_active: newActive ? t.flow_active : false,
+          bump_active: newActive ? t.bump_active : false,
+          mommy_active: newActive ? t.mommy_active : false,
+        };
+      }
+      return t;
+    });
+    setLocalTools(newTools);
+    setHasChanges(true);
+  };
 
   // Move tool up
   const moveUp = (tool: ToolConfig) => {
@@ -132,7 +174,6 @@ const AdminTools = () => {
   // Save mutation
   const saveMutation = useMutation({
     mutationFn: async () => {
-      // Update each tool's order
       for (const tool of localTools) {
         const { error } = await supabase
           .from('tool_configs')
@@ -140,6 +181,10 @@ const AdminTools = () => {
             flow_order: tool.flow_order,
             bump_order: tool.bump_order,
             mommy_order: tool.mommy_order,
+            is_active: tool.is_active,
+            flow_active: tool.flow_active,
+            bump_active: tool.bump_active,
+            mommy_active: tool.mommy_active,
           })
           .eq('id', tool.id);
         
@@ -150,7 +195,7 @@ const AdminTools = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-tool-configs'] });
       queryClient.invalidateQueries({ queryKey: ['tool-configs'] });
       setHasChanges(false);
-      toast({ title: 'Yadda saxlanıldı', description: 'Alət sıralaması yeniləndi' });
+      toast({ title: 'Yadda saxlanıldı', description: 'Alət ayarları yeniləndi' });
     },
     onError: (error) => {
       toast({ 
@@ -168,16 +213,18 @@ const AdminTools = () => {
     setHasChanges(false);
   };
 
+  const activeField = getActiveField(activeCategory);
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold flex items-center gap-2">
             <Wrench className="w-5 h-5" />
-            Alətlər Sıralaması
+            Alətlər İdarəsi
           </h2>
           <p className="text-sm text-muted-foreground">
-            Hər kateqoriya üçün alətlərin sırasını idarə edin
+            Alətləri sıralayın və aktiv/deaktiv edin
           </p>
         </div>
         <div className="flex gap-2">
@@ -223,7 +270,12 @@ const AdminTools = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium flex items-center justify-between">
                   <span>{categoryLabels[category]}</span>
-                  <Badge variant="secondary">{categoryTools.length} alət</Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary">
+                      {categoryTools.filter(t => t[activeField as keyof ToolConfig]).length} aktiv
+                    </Badge>
+                    <Badge variant="outline">{categoryTools.length} alət</Badge>
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -235,57 +287,92 @@ const AdminTools = () => {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    {categoryTools.map((tool, index) => (
-                      <motion.div
-                        key={tool.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.02 }}
-                        className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border/50"
-                      >
-                        <div className="flex flex-col gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
-                            onClick={() => moveUp(tool)}
-                            disabled={index === 0}
-                          >
-                            <ChevronUp className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
-                            onClick={() => moveDown(tool)}
-                            disabled={index === categoryTools.length - 1}
-                          >
-                            <ChevronDown className="w-4 h-4" />
-                          </Button>
-                        </div>
-                        
-                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-sm">
-                          {index + 1}
-                        </div>
-                        
-                        <div className="flex-1">
-                          <p className="font-medium text-sm">{tool.name_az || tool.name}</p>
-                          <p className="text-xs text-muted-foreground">{tool.tool_id}</p>
-                        </div>
-                        
-                        <div className="flex gap-1">
-                          {tool.life_stages?.map(stage => (
-                            <Badge 
-                              key={stage} 
-                              variant={stage === category ? 'default' : 'outline'}
-                              className="text-[10px] px-1.5 py-0"
+                    {categoryTools.map((tool, index) => {
+                      const isPhaseActive = tool[activeField as keyof ToolConfig] as boolean;
+                      return (
+                        <motion.div
+                          key={tool.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.02 }}
+                          className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                            !tool.is_active 
+                              ? 'bg-muted/30 border-border/30 opacity-50' 
+                              : !isPhaseActive 
+                                ? 'bg-muted/50 border-border/50' 
+                                : 'bg-card border-border'
+                          }`}
+                        >
+                          {/* Order controls */}
+                          <div className="flex flex-col gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => moveUp(tool)}
+                              disabled={index === 0}
                             >
-                              {stage}
-                            </Badge>
-                          ))}
-                        </div>
-                      </motion.div>
-                    ))}
+                              <ChevronUp className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => moveDown(tool)}
+                              disabled={index === categoryTools.length - 1}
+                            >
+                              <ChevronDown className="w-4 h-4" />
+                            </Button>
+                          </div>
+                          
+                          {/* Order number */}
+                          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-sm font-medium">
+                            {index + 1}
+                          </div>
+                          
+                          {/* Tool info */}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm truncate">{tool.name_az || tool.name}</p>
+                            <p className="text-xs text-muted-foreground">{tool.tool_id}</p>
+                          </div>
+                          
+                          {/* Phase toggles */}
+                          <div className="flex items-center gap-3">
+                            {/* Phase-specific toggle */}
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-muted-foreground">
+                                {category === 'flow' ? 'Flow' : category === 'bump' ? 'Bump' : 'Mommy'}
+                              </span>
+                              <Switch
+                                checked={isPhaseActive}
+                                onCheckedChange={() => togglePhaseActive(tool)}
+                                disabled={!tool.is_active}
+                              />
+                            </div>
+                            
+                            {/* Global toggle */}
+                            <Button
+                              variant={tool.is_active ? 'default' : 'secondary'}
+                              size="sm"
+                              className="h-8 gap-1"
+                              onClick={() => toggleGlobalActive(tool)}
+                            >
+                              {tool.is_active ? (
+                                <>
+                                  <Eye className="w-3.5 h-3.5" />
+                                  <span className="text-xs">Aktiv</span>
+                                </>
+                              ) : (
+                                <>
+                                  <EyeOff className="w-3.5 h-3.5" />
+                                  <span className="text-xs">Deaktiv</span>
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>
@@ -293,6 +380,22 @@ const AdminTools = () => {
           </TabsContent>
         ))}
       </Tabs>
+
+      {/* Legend */}
+      <div className="flex flex-wrap gap-4 text-xs text-muted-foreground bg-muted/30 p-3 rounded-lg">
+        <div className="flex items-center gap-2">
+          <Eye className="w-4 h-4" />
+          <span>Aktiv - alət bütün phase-lərdə görünə bilər</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <EyeOff className="w-4 h-4" />
+          <span>Deaktiv - alət heç bir yerdə görünmür</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Switch checked={true} disabled className="scale-75" />
+          <span>Phase toggle - yalnız seçilmiş phase üçün aktiv/deaktiv</span>
+        </div>
+      </div>
     </div>
   );
 };

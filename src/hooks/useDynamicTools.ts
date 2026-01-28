@@ -355,6 +355,9 @@ export interface ToolConfig {
   bump_order: number;
   mommy_order: number;
   is_active: boolean;
+  flow_active: boolean;
+  bump_active: boolean;
+  mommy_active: boolean;
 }
 
 export const useToolConfigs = (lifeStage?: string) => {
@@ -367,8 +370,18 @@ export const useToolConfigs = (lifeStage?: string) => {
         .eq('is_active', true);
       if (error) throw error;
       
+      // Filter by phase-specific active status
+      let filtered = data as ToolConfig[];
+      if (lifeStage === 'flow') {
+        filtered = filtered.filter(t => t.flow_active !== false);
+      } else if (lifeStage === 'bump') {
+        filtered = filtered.filter(t => t.bump_active !== false);
+      } else if (lifeStage === 'mommy') {
+        filtered = filtered.filter(t => t.mommy_active !== false);
+      }
+      
       // Sort by the appropriate order field based on life stage
-      let sorted = data as ToolConfig[];
+      let sorted = filtered;
       if (lifeStage === 'flow') {
         sorted = sorted.sort((a, b) => (a.flow_order ?? a.sort_order) - (b.flow_order ?? b.sort_order));
       } else if (lifeStage === 'bump') {
