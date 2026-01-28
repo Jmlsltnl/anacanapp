@@ -211,10 +211,27 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
       reader.onloadend = async () => {
         const base64Audio = (reader.result as string).split(',')[1];
         
+        // Calculate baby age in months and days
+        let babyContext = {};
+        if (profile?.baby_birth_date) {
+          const birthDate = new Date(profile.baby_birth_date);
+          const today = new Date();
+          const diffTime = today.getTime() - birthDate.getTime();
+          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+          const ageMonths = Math.floor(diffDays / 30);
+          babyContext = {
+            babyName: profile.baby_name || 'Körpə',
+            babyAgeMonths: ageMonths,
+            babyAgeDays: diffDays,
+            babyGender: profile.baby_gender
+          };
+        }
+        
         const { data, error } = await supabase.functions.invoke('analyze-cry', {
           body: {
             audioBase64: base64Audio,
-            audioDuration: recordingTime
+            audioDuration: recordingTime,
+            userContext: babyContext
           }
         });
         

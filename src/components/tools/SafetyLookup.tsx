@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
 
 interface SafetyLookupProps {
   onBack: () => void;
@@ -14,6 +15,7 @@ interface SafetyLookupProps {
 
 const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, ref) => {
   useScrollToTop();
+  const { profile } = useAuth();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
@@ -91,12 +93,31 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
       return;
     }
 
+    // Build user context for AI
+    let userContext: any = { lifeStage: profile?.life_stage };
+    
+    if (profile?.life_stage === 'bump' && profile?.last_period_date) {
+      const lmp = new Date(profile.last_period_date);
+      const today = new Date();
+      const diffDays = Math.floor((today.getTime() - lmp.getTime()) / (1000 * 60 * 60 * 24));
+      userContext.pregnancyWeek = Math.floor(diffDays / 7);
+      userContext.pregnancyDay = diffDays % 7;
+    } else if (profile?.life_stage === 'mommy' && profile?.baby_birth_date) {
+      const birthDate = new Date(profile.baby_birth_date);
+      const today = new Date();
+      const diffDays = Math.floor((today.getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24));
+      userContext.babyAgeMonths = Math.floor(diffDays / 30);
+      userContext.babyAgeDays = diffDays;
+      userContext.babyName = profile.baby_name;
+    }
+
     setAiLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('safety-ai-lookup', {
         body: { 
           query: searchQuery.trim(),
-          category: activeCategory !== 'all' ? activeCategory : undefined 
+          category: activeCategory !== 'all' ? activeCategory : undefined,
+          userContext 
         },
       });
 

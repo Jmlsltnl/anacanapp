@@ -9,6 +9,12 @@ const corsHeaders = {
 
 interface PoopAnalysisRequest {
   imageBase64: string;
+  userContext?: {
+    babyName?: string;
+    babyAgeMonths?: number;
+    babyAgeDays?: number;
+    babyGender?: string;
+  };
 }
 
 interface ImageValidation {
@@ -134,8 +140,26 @@ CAVAB FORMATI (STRICT JSON, heç bir əlavə mətn yoxdur):
 }
 
 // Stage 2: Analyze the poop
-async function analyzePoop(imageBase64: string, apiKey: string): Promise<Response | null> {
+async function analyzePoop(imageBase64: string, apiKey: string, userContext?: PoopAnalysisRequest['userContext']): Promise<Response | null> {
   const models = ['gemini-2.0-flash', 'gemini-2.5-pro', 'gemini-2.5-flash'];
+  
+  // Build age context for prompt
+  let ageContext = '';
+  if (userContext?.babyAgeMonths !== undefined) {
+    const months = userContext.babyAgeMonths;
+    if (months < 1) {
+      ageContext = `Bu ${userContext.babyAgeDays} günlük YENİDOĞULMUŞ körpənin nəcisidir. Yenidoğulmuşlarda ilk günlərdə mekonium (qara-yaşıl) normaldır.`;
+    } else if (months < 6) {
+      ageContext = `Bu ${months} aylıq körpənin nəcisidir. ${months < 3 ? 'Ana südü ilə qidalanan körpələrdə xardal sarısı nəcis normaldır.' : ''}`;
+    } else if (months < 12) {
+      ageContext = `Bu ${months} aylıq körpənin nəcisidir. Əlavə qidalara başladıqda nəcisin rəngi və konsistensiyası dəyişə bilər.`;
+    } else {
+      ageContext = `Bu ${months} aylıq uşağın nəcisidir.`;
+    }
+    if (userContext.babyName) {
+      ageContext = `Körpənin adı ${userContext.babyName}. ` + ageContext;
+    }
+  }
   
   for (const model of models) {
     console.log(`Trying analysis with model: ${model}`);
@@ -155,6 +179,8 @@ async function analyzePoop(imageBase64: string, apiKey: string): Promise<Respons
               },
               {
                 text: `Sən pediatrik sağlamlıq mütəxəssisisən. Bu körpə bezindəki NƏCİSİ DİQQƏTLƏ analiz et.
+
+${ageContext ? `KÖRPƏ KONTEKST: ${ageContext}` : ''}
 
 ƏN MÜHÜM: Nəcisin RƏNGİNİ, KONSİSTENSİYASINI və GÖRÜNÜŞÜNÜ qiymətləndir.
 
@@ -255,7 +281,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { imageBase64 } = await req.json() as PoopAnalysisRequest;
+    const { imageBase64, userContext } = await req.json() as PoopAnalysisRequest;
 
     if (!imageBase64) {
       throw new Error('Image data is required');
@@ -284,7 +310,7 @@ Deno.serve(async (req) => {
 
     // Stage 2: Analyze poop
     console.log('Stage 2: Analyzing poop...');
-    const response = await analyzePoop(imageBase64, GEMINI_API_KEY);
+    const response = await analyzePoop(imageBase64, GEMINI_API_KEY, userContext);
 
     if (!response) {
       throw new Error('AI analysis failed - all models exhausted');
