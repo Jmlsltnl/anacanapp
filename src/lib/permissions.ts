@@ -109,30 +109,44 @@ export async function requestMicrophonePermission(): Promise<PermissionResult> {
  * Take a photo using the camera (native or web)
  */
 export async function takePhoto(): Promise<string | null> {
+  if (!Capacitor.isNativePlatform()) {
+    // Web fallback - return null to trigger file input
+    return null;
+  }
+
   try {
-    // First request permissions
-    const permission = await requestCameraPermission();
-    if (!permission.granted) {
-      throw new Error('Camera permission denied');
+    // Request permissions first on native
+    const permStatus = await Camera.checkPermissions();
+    
+    if (permStatus.camera !== 'granted') {
+      const requested = await Camera.requestPermissions({ permissions: ['camera'] });
+      if (requested.camera !== 'granted') {
+        throw new Error('Camera permission denied');
+      }
     }
 
-    if (Capacitor.isNativePlatform()) {
-      // Use Capacitor Camera plugin for native
-      const image = await Camera.getPhoto({
-        quality: 90,
-        allowEditing: false,
-        resultType: CameraResultType.Base64,
-        source: CameraSource.Camera,
-        correctOrientation: true,
-      });
+    // Use Capacitor Camera plugin for native
+    const image = await Camera.getPhoto({
+      quality: 85,
+      allowEditing: false,
+      resultType: CameraResultType.Base64,
+      source: CameraSource.Camera,
+      correctOrientation: true,
+      saveToGallery: false,
+      width: 1024,
+      height: 1024,
+    });
 
-      return image.base64String ? `data:image/jpeg;base64,${image.base64String}` : null;
-    } else {
-      // Web fallback - return null to trigger file input
-      return null;
+    if (image.base64String) {
+      return `data:image/jpeg;base64,${image.base64String}`;
     }
+    return null;
   } catch (error: any) {
     console.error('Take photo error:', error);
+    // If user cancelled, don't throw
+    if (error.message?.includes('cancelled') || error.message?.includes('User cancelled')) {
+      return null;
+    }
     throw error;
   }
 }
@@ -141,27 +155,41 @@ export async function takePhoto(): Promise<string | null> {
  * Pick a photo from gallery (native or web)
  */
 export async function pickFromGallery(): Promise<string | null> {
+  if (!Capacitor.isNativePlatform()) {
+    // Web fallback - return null to trigger file input
+    return null;
+  }
+
   try {
-    const permission = await requestCameraPermission();
-    if (!permission.granted) {
-      throw new Error('Photo library permission denied');
+    // Request photo library permissions first on native
+    const permStatus = await Camera.checkPermissions();
+    
+    if (permStatus.photos !== 'granted') {
+      const requested = await Camera.requestPermissions({ permissions: ['photos'] });
+      if (requested.photos !== 'granted') {
+        throw new Error('Photo library permission denied');
+      }
     }
 
-    if (Capacitor.isNativePlatform()) {
-      const image = await Camera.getPhoto({
-        quality: 90,
-        allowEditing: false,
-        resultType: CameraResultType.Base64,
-        source: CameraSource.Photos,
-      });
+    const image = await Camera.getPhoto({
+      quality: 85,
+      allowEditing: false,
+      resultType: CameraResultType.Base64,
+      source: CameraSource.Photos,
+      width: 1024,
+      height: 1024,
+    });
 
-      return image.base64String ? `data:image/jpeg;base64,${image.base64String}` : null;
-    } else {
-      // Web fallback
-      return null;
+    if (image.base64String) {
+      return `data:image/jpeg;base64,${image.base64String}`;
     }
+    return null;
   } catch (error: any) {
     console.error('Pick from gallery error:', error);
+    // If user cancelled, don't throw
+    if (error.message?.includes('cancelled') || error.message?.includes('User cancelled')) {
+      return null;
+    }
     throw error;
   }
 }
