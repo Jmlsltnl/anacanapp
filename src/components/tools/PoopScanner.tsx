@@ -90,22 +90,22 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
         setSelectedImage(image);
         setAnalysis(null);
       } else {
-        // Fallback to file input for web
+        // Fallback to file input for web or if native returned null
         cameraInputRef.current?.click();
       }
     } catch (error: any) {
-      if (error.message?.includes('permission') || error.message?.includes('denied')) {
+      console.error('Camera capture error:', error);
+      const errorMsg = error.message?.toLowerCase() || '';
+      
+      if (errorMsg.includes('permission') || errorMsg.includes('denied')) {
         toast({
           title: 'Kamera icazəsi lazımdır',
-          description: 'Parametrlərdən kamera icazəsini aktivləşdirin',
+          description: 'Tətbiq parametrlərindən kamera icazəsini aktivləşdirin',
           variant: 'destructive'
         });
-      } else if (error.message !== 'User cancelled photos app') {
-        toast({
-          title: 'Kamera xətası',
-          description: 'Yenidən cəhd edin',
-          variant: 'destructive'
-        });
+      } else if (!errorMsg.includes('cancel')) {
+        // Fallback to web file input on any other error
+        cameraInputRef.current?.click();
       }
     }
   };
@@ -117,22 +117,22 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
         setSelectedImage(image);
         setAnalysis(null);
       } else {
-        // Fallback to file input for web
+        // Fallback to file input for web or if native returned null
         fileInputRef.current?.click();
       }
     } catch (error: any) {
-      if (error.message?.includes('permission') || error.message?.includes('denied')) {
+      console.error('Gallery pick error:', error);
+      const errorMsg = error.message?.toLowerCase() || '';
+      
+      if (errorMsg.includes('permission') || errorMsg.includes('denied')) {
         toast({
           title: 'Şəkil icazəsi lazımdır',
-          description: 'Parametrlərdən şəkil icazəsini aktivləşdirin',
+          description: 'Tətbiq parametrlərindən foto kitabxanası icazəsini aktivləşdirin',
           variant: 'destructive'
         });
-      } else if (error.message !== 'User cancelled photos app') {
-        toast({
-          title: 'Qaleriya xətası',
-          description: 'Yenidən cəhd edin',
-          variant: 'destructive'
-        });
+      } else if (!errorMsg.includes('cancel')) {
+        // Fallback to web file input on any other error
+        fileInputRef.current?.click();
       }
     }
   };
