@@ -4,7 +4,8 @@ import {
   Search, Shield, Timer, Scale, Baby, Briefcase, 
   Volume2, Heart, Footprints, ChevronRight,
   Utensils, Activity, ArrowLeft, Camera, Lock, ShoppingCart, LucideIcon, Wrench, BookOpen, ChefHat,
-  Stethoscope, Droplet, ImagePlus, Package, Mic, Scan, CloudSun, Gauge, Store
+  Stethoscope, Droplet, ImagePlus, Package, Mic, Scan, CloudSun, Gauge, Store,
+  MapPin, Gamepad2, ShieldAlert, BookHeart, Stars
 } from 'lucide-react';
 import BlogScreen from '@/components/BlogScreen';
 import { useUserStore } from '@/store/userStore';
@@ -31,6 +32,12 @@ import PoopScanner from './tools/PoopScanner';
 import WeatherClothing from './tools/WeatherClothing';
 import NoiseMeter from './tools/NoiseMeter';
 import SecondHandMarket from './tools/SecondHandMarket';
+import MomFriendlyMap from './tools/MomFriendlyMap';
+import SmartPlayBox from './tools/SmartPlayBox';
+import MentalHealthTracker from './tools/MentalHealthTracker';
+import FirstAidGuide from './tools/FirstAidGuide';
+import FairyTaleGenerator from './tools/FairyTaleGenerator';
+import HoroscopeCompatibility from './tools/HoroscopeCompatibility';
 import { useToast } from '@/hooks/use-toast';
 import { useToolConfigs } from '@/hooks/useDynamicTools';
 
@@ -71,6 +78,11 @@ const iconMap: Record<string, LucideIcon> = {
   'CloudSun': CloudSun,
   'Gauge': Gauge,
   'Store': Store,
+  'MapPin': MapPin,
+  'Gamepad2': Gamepad2,
+  'ShieldAlert': ShieldAlert,
+  'BookHeart': BookHeart,
+  'Stars': Stars,
 };
 
 interface ToolsHubProps {
@@ -196,6 +208,12 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   if (activeTool === 'weather-clothing') return <WeatherClothing onBack={handleBack} />;
   if (activeTool === 'noise-meter') return <NoiseMeter onBack={handleBack} />;
   if (activeTool === 'secondhand-market' || activeTool === 'second-hand-market') return <SecondHandMarket onBack={handleBack} />;
+  if (activeTool === 'mom-friendly-map') return <MomFriendlyMap onBack={handleBack} />;
+  if (activeTool === 'smart-play-box') return <SmartPlayBox onBack={handleBack} />;
+  if (activeTool === 'mental-health') return <MentalHealthTracker onBack={handleBack} />;
+  if (activeTool === 'first-aid') return <FirstAidGuide onBack={handleBack} />;
+  if (activeTool === 'fairy-tale') return <FairyTaleGenerator onBack={handleBack} />;
+  if (activeTool === 'horoscope') return <HoroscopeCompatibility onBack={handleBack} />;
   if (activeTool === 'affiliate' || activeTool === 'affiliate-products') return <AffiliateProducts onBack={handleBack} />;
 
   return (

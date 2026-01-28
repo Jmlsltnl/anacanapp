@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Package, Settings, BarChart3, Shield, 
   ChevronLeft, Menu, LogOut, Bell, Search,
-  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store
+  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store, ShieldAlert, BookHeart, MapPin, Gamepad2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,6 +41,10 @@ const menuItems = [
   { id: 'legal', label: 'Hüquqi Sənədlər', icon: Scale },
   { id: 'push-notifications', label: 'Push Bildirişləri', icon: Send },
   { id: 'marketplace', label: 'İkinci Əl Bazarı', icon: Store },
+  { id: 'first-aid', label: 'İlk Yardım (SOS)', icon: ShieldAlert },
+  { id: 'fairy-tales', label: 'Sehrli Nağılçı', icon: BookHeart },
+  { id: 'places', label: 'Ana Dostu Məkanlar', icon: MapPin },
+  { id: 'play-activities', label: 'Ağıllı Oyun Qutusu', icon: Gamepad2 },
   { id: 'settings', label: 'Tənzimləmələr', icon: Settings },
   { id: 'security', label: 'Təhlükəsizlik', icon: Shield },
 ];
