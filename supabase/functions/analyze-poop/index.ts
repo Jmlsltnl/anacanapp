@@ -11,6 +11,217 @@ interface PoopAnalysisRequest {
   imageBase64: string;
 }
 
+interface ImageValidation {
+  isValidDiaperImage: boolean;
+  imageType: string;
+  confidence: number;
+  message: string;
+}
+
+// Stage 1: Validate if image contains a diaper/poop
+async function validateImage(imageBase64: string, apiKey: string): Promise<ImageValidation> {
+  const models = ['gemini-2.0-flash', 'gemini-2.5-flash'];
+  
+  for (const model of models) {
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                {
+                  inlineData: {
+                    mimeType: 'image/jpeg',
+                    data: imageBase64
+                  }
+                },
+                {
+                  text: `Bu şəklin NƏ OLDUĞUNU müəyyən et. YALNIZ aşağıdakı kateqoriyalardan birini seç:
+
+ŞƏKİL TİPLƏRİ:
+1. "diaper_with_poop" - Körpə bezi İÇİNDƏ nəcis görünür
+2. "diaper_empty" - Boş körpə bezi (nəcis yoxdur)
+3. "poop_no_diaper" - Nəcis var amma bez yoxdur (tualet, pot və s.)
+4. "baby_photo" - Körpə şəkli (bez/nəcis yoxdur)
+5. "adult_content" - Yetkin insan şəkli
+6. "food" - Yemək şəkli
+7. "animal" - Heyvan şəkli
+8. "screenshot" - Ekran görüntüsü, mətni olan şəkil
+9. "landscape" - Mənzərə, bina, küçə
+10. "object" - Əşya, məhsul
+11. "other" - Digər
+
+YALNIZ "diaper_with_poop" və ya "poop_no_diaper" olduqda analiz edilə bilər.
+
+CAVAB FORMATI (STRICT JSON, heç bir əlavə mətn yoxdur):
+{
+  "imageType": "kateqoriya_adı",
+  "isValidForAnalysis": true/false,
+  "confidence": 0-100,
+  "description": "Şəkildə nə görünür (1 cümlə)"
+}`
+                }
+              ]
+            }],
+            generationConfig: {
+              temperature: 0.1,
+              topK: 5,
+              topP: 0.8,
+              maxOutputTokens: 256,
+            }
+          })
+        }
+      );
+
+      if (response.status === 429) {
+        console.log(`Rate limit on ${model} for validation, trying next...`);
+        continue;
+      }
+
+      if (!response.ok) {
+        const errText = await response.text();
+        console.error(`Validation error on ${model}:`, errText);
+        continue;
+      }
+
+      const data = await response.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const result = JSON.parse(jsonMatch[0]);
+        const imageType = result.imageType || 'unknown';
+        const isValid = result.isValidForAnalysis === true || 
+                       imageType === 'diaper_with_poop' || 
+                       imageType === 'poop_no_diaper';
+        
+        // Generate appropriate message based on image type
+        const messages: Record<string, string> = {
+          'diaper_empty': 'Bu bez boşdur, nəcis görünmür. Nəcis olan bez şəkli çəkin.',
+          'baby_photo': 'Bu körpə şəklidir. Zəhmət olmasa körpə bezinin şəklini çəkin.',
+          'adult_content': 'Bu şəkil körpə bezi deyil. Zəhmət olmasa düzgün şəkil seçin.',
+          'food': 'Bu yemək şəklidir. Zəhmət olmasa körpə bezinin şəklini çəkin.',
+          'animal': 'Bu heyvan şəklidir. Zəhmət olmasa körpə bezinin şəklini çəkin.',
+          'screenshot': 'Bu ekran görüntüsüdür. Zəhmət olmasa körpə bezinin real şəklini çəkin.',
+          'landscape': 'Bu mənzərə şəklidir. Zəhmət olmasa körpə bezinin şəklini çəkin.',
+          'object': 'Bu əşya şəklidir. Zəhmət olmasa körpə bezinin şəklini çəkin.',
+          'other': 'Bu şəkil analiz üçün uyğun deyil. Körpə bezinin içindəki nəcisin şəklini çəkin.',
+          'unknown': 'Şəkil tanınmadı. Zəhmət olmasa daha aydın şəkil çəkin.'
+        };
+
+        return {
+          isValidDiaperImage: isValid,
+          imageType: imageType,
+          confidence: result.confidence || 0,
+          message: isValid ? 'Şəkil uyğundur' : (messages[imageType] || messages['other'])
+        };
+      }
+    } catch (e) {
+      console.error(`Validation parse error on ${model}:`, e);
+      continue;
+    }
+  }
+
+  return {
+    isValidDiaperImage: false,
+    imageType: 'unknown',
+    confidence: 0,
+    message: 'Şəkil yoxlanıla bilmədi. Yenidən cəhd edin.'
+  };
+}
+
+// Stage 2: Analyze the poop
+async function analyzePoop(imageBase64: string, apiKey: string): Promise<Response | null> {
+  const models = ['gemini-2.0-flash', 'gemini-2.5-pro', 'gemini-2.5-flash'];
+  
+  for (const model of models) {
+    console.log(`Trying analysis with model: ${model}`);
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              {
+                inlineData: {
+                  mimeType: 'image/jpeg',
+                  data: imageBase64
+                }
+              },
+              {
+                text: `Sən pediatrik sağlamlıq mütəxəssisisən. Bu körpə bezindəki NƏCİSİ DİQQƏTLƏ analiz et.
+
+ƏN MÜHÜM: Nəcisin RƏNGİNİ, KONSİSTENSİYASINI və GÖRÜNÜŞÜNÜ qiymətləndir.
+
+RƏNG ANALİZİ (TİBBİ ƏHƏMİYYƏT):
+
+✅ NORMAL RƏNGLƏR:
+- Qəhvəyi (hər çalar): Normal, sağlam həzm
+- Sarı/Xardal: Normal, xüsusilə ana südü ilə qidalanan körpələrdə
+- Yaşılımtıl-sarı: Normal, formula ilə qidalanan körpələrdə
+- Yaşıl: Adətən normal, dəmir qəbulu və ya yaşıl qidalardan
+
+⚠️ DİQQƏT TƏLƏB EDƏN:
+- Qara (mekonium istisna): Həzm qanaması ola bilər - TƏCİLİ
+- Qırmızı/Qanlı: Həzm problemləri, anal çat - TƏCİLİ
+- Ağ/Solğun/Gil rəngi: Qaraciyər/öd problemi - ÇOX TƏCİLİ
+- Çox sulu/köpüklü: İshal, infeksiya riski
+
+KONSİSTENSİYA:
+- Normal: Yumşaq, pasta kimi
+- Sulu: İshal əlaməti ola bilər
+- Bərk: Qəbizlik əlaməti
+- Köpüklü: Həzm problemi
+
+CAVAB FORMATI (STRICT JSON):
+{
+  "colorDetected": "brown|yellow|green|black|red|white|unknown",
+  "colorNameAz": "Azərbaycanca rəng adı",
+  "consistency": "normal|sulu|bərk|köpüklü",
+  "isNormal": true/false,
+  "concernLevel": "normal|attention|warning|urgent",
+  "explanation": "Azərbaycan dilində ətraflı izahat (2-3 cümlə)",
+  "recommendations": ["tövsiyə 1", "tövsiyə 2", "tövsiyə 3"],
+  "shouldSeeDoctor": true/false,
+  "doctorUrgency": "none|soon|today|immediate"
+}
+
+XƏBƏRDARLIQ: Ağ, qara və ya qırmızı rəng gördükdə "urgent" səviyyəsi VER!`
+              }
+            ]
+          }],
+          generationConfig: {
+            temperature: 0.1,
+            topK: 10,
+            topP: 0.7,
+            maxOutputTokens: 1024,
+          }
+        })
+      }
+    );
+
+    if (response.ok) {
+      console.log(`Analysis success with model: ${model}`);
+      return response;
+    }
+
+    if (response.status === 429) {
+      console.log(`Rate limit on ${model}, trying next...`);
+      continue;
+    }
+
+    const errText = await response.text();
+    console.error(`Analysis error on ${model}:`, errText);
+  }
+
+  return null;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -50,96 +261,32 @@ Deno.serve(async (req) => {
       throw new Error('Image data is required');
     }
 
-    // Helper function to call Gemini API with a specific model
-    async function callGeminiAPI(model: string): Promise<Response> {
-      return fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [
-                {
-                  inlineData: {
-                    mimeType: 'image/jpeg',
-                    data: imageBase64
-                  }
-                },
-                {
-                  text: `Sən pediatrik sağlamlıq mütəxəssisisən. Bu körpə bezinin şəklini DİQQƏTLƏ analiz et.
+    // Stage 1: Validate image
+    console.log('Stage 1: Validating image...');
+    const validation = await validateImage(imageBase64, GEMINI_API_KEY);
+    console.log('Validation result:', validation);
 
-ƏN MÜHÜM: Körpənin nəcisinin RƏNGİNİ, KONSENSIYASINI və GÖRÜNÜŞÜNÜ qiymətləndir.
-
-RƏNG ANALİZİ (RƏNGİN TİBBİ ƏHƏMİYYƏTİ):
-
-✅ NORMAL RƏNGLƏR:
-- Qəhvəyi (hər çalar): Normal, sağlam həzm
-- Sarı/Xardal: Normal, xüsusilə ana südü ilə qidalanan
-- Yaşılımtıl-sarı: Normal, formula ilə qidalanan
-- Yaşıl: Adətən normal, dəmir qəbulu, yaşıl qidalar
-
-⚠️ DİQQƏT TƏLƏB EDƏN:
-- Qara (mekonium istisna): Həzm qanaması ola bilər
-- Qırmızı/Qanlı: Həzm problemləri, anal çat
-- Ağ/Solğun/Gil rəngi: Qaraciyər/öd problemi - TƏCİLİ
-- Çox sulu/köpüklü: İshal, infeksiya
-
-CAVAB FORMATI (STRICT JSON):
-{
-  "colorDetected": "rəng",
-  "consistency": "normal|sulu|bərk|köpüklü",
-  "isNormal": true/false,
-  "concernLevel": "normal|attention|warning|urgent",
-  "explanation": "Azərbaycan dilində izahat (2-3 cümlə)",
-  "recommendations": ["tövsiyə 1", "tövsiyə 2"],
-  "shouldSeeDoctor": true/false,
-  "doctorUrgency": "none|soon|today|immediate"
-}
-
-ÇOX MÜHÜM: Əgər ağ, qara və ya qırmızı rəng görürsənsə, "urgent" səviyyəsi ver!`
-                }
-              ]
-            }],
-            generationConfig: {
-              temperature: 0.1,
-              topK: 10,
-              topP: 0.7,
-              maxOutputTokens: 1024,
-            }
-          })
-        }
-      );
+    if (!validation.isValidDiaperImage) {
+      // Return validation failure - not a valid diaper/poop image
+      return new Response(JSON.stringify({
+        success: true,
+        isValidImage: false,
+        validation: {
+          imageType: validation.imageType,
+          confidence: validation.confidence,
+          message: validation.message
+        },
+        analysis: null
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
-    // Try primary model first, fallback to alternative on rate limit
-    const models = ['gemini-2.0-flash', 'gemini-2.5-pro', 'gemini-2.5-flash'];
-    let response: Response | null = null;
-    let lastError = '';
+    // Stage 2: Analyze poop
+    console.log('Stage 2: Analyzing poop...');
+    const response = await analyzePoop(imageBase64, GEMINI_API_KEY);
 
-    for (const model of models) {
-      console.log(`Trying model: ${model}`);
-      response = await callGeminiAPI(model);
-      
-      if (response.ok) {
-        console.log(`Success with model: ${model}`);
-        break;
-      }
-      
-      if (response.status === 429) {
-        lastError = `Rate limit on ${model}`;
-        console.log(`Rate limit hit on ${model}, trying next...`);
-        continue;
-      }
-      
-      // For other errors, log and try next
-      const errorText = await response.text();
-      lastError = `${model}: ${response.status} - ${errorText}`;
-      console.error('Gemini API error:', lastError);
-    }
-
-    if (!response || !response.ok) {
-      console.error('All models failed:', lastError);
+    if (!response) {
       throw new Error('AI analysis failed - all models exhausted');
     }
 
@@ -158,6 +305,7 @@ CAVAB FORMATI (STRICT JSON):
     } catch {
       analysisResult = {
         colorDetected: 'unknown',
+        colorNameAz: 'Naməlum',
         consistency: 'normal',
         isNormal: true,
         concernLevel: 'normal',
@@ -185,6 +333,12 @@ CAVAB FORMATI (STRICT JSON):
 
     return new Response(JSON.stringify({
       success: true,
+      isValidImage: true,
+      validation: {
+        imageType: validation.imageType,
+        confidence: validation.confidence,
+        message: 'Şəkil uğurla analiz edildi'
+      },
       analysis: analysisResult
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
