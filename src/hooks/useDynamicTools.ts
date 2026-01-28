@@ -358,6 +358,14 @@ export interface ToolConfig {
   flow_active: boolean;
   bump_active: boolean;
   mommy_active: boolean;
+  // New fields
+  flow_locked: boolean;
+  bump_locked: boolean;
+  mommy_locked: boolean;
+  is_premium: boolean;
+  premium_type: string;
+  premium_limit: number;
+  display_name_az: string | null;
 }
 
 export const useToolConfigs = (lifeStage?: string) => {

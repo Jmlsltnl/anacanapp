@@ -5,11 +5,12 @@ import {
   Volume2, Heart, Footprints, ChevronRight,
   Utensils, Activity, ArrowLeft, Camera, Lock, ShoppingCart, LucideIcon, Wrench, BookOpen, ChefHat,
   Stethoscope, Droplet, ImagePlus, Package, Mic, Scan, CloudSun, Gauge, Store,
-  MapPin, Gamepad2, ShieldAlert, BookHeart, Stars
+  MapPin, Gamepad2, ShieldAlert, BookHeart, Stars, Crown
 } from 'lucide-react';
 import BlogScreen from '@/components/BlogScreen';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
+import { useSubscription } from '@/hooks/useSubscription';
 import SafetyLookup from './tools/SafetyLookup';
 import KickCounter from './tools/KickCounter';
 import ContractionTimer from './tools/ContractionTimer';
@@ -38,8 +39,9 @@ import MentalHealthTracker from './tools/MentalHealthTracker';
 import FirstAidGuide from './tools/FirstAidGuide';
 import FairyTaleGenerator from './tools/FairyTaleGenerator';
 import HoroscopeCompatibility from './tools/HoroscopeCompatibility';
+import { PremiumModal } from './PremiumModal';
 import { useToast } from '@/hooks/use-toast';
-import { useToolConfigs } from '@/hooks/useDynamicTools';
+import { useToolConfigs, ToolConfig } from '@/hooks/useDynamicTools';
 
 interface Tool {
   id: string;
@@ -50,6 +52,10 @@ interface Tool {
   bgColor: string;
   minWeek?: number;
   stages?: string[];
+  isPremium?: boolean;
+  premiumType?: string;
+  premiumLimit?: number;
+  isLocked?: boolean;
 }
 
 // Icon mapping for dynamic tool configs
@@ -93,13 +99,23 @@ interface ToolsHubProps {
 const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTool, setActiveTool] = useState<string | null>(initialTool);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
   const { lifeStage, getPregnancyData } = useUserStore();
   const { profile } = useAuth();
+  const { isPremium } = useSubscription();
   const { toast } = useToast();
   const pregData = getPregnancyData();
   const { data: toolConfigs = [], isLoading: toolsLoading } = useToolConfigs(lifeStage || undefined);
   
   const hasPartner = !!profile?.linked_partner_id;
+
+  // Get locked field based on life stage
+  const getLockedStatus = (config: ToolConfig): boolean => {
+    if (lifeStage === 'flow') return config.flow_locked || false;
+    if (lifeStage === 'bump') return config.bump_locked || false;
+    if (lifeStage === 'mommy') return config.mommy_locked || false;
+    return false;
+  };
 
   // Build tools from DB configs
   const tools: Tool[] = useMemo(() => {
@@ -111,7 +127,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     return toolConfigs.map(config => {
       const name = hasPartner && config.requires_partner && config.partner_name_az
         ? config.partner_name_az
-        : config.name_az || config.name;
+        : (config as any).display_name_az || config.name_az || config.name;
       
       const description = hasPartner && config.requires_partner && config.partner_description_az
         ? config.partner_description_az
@@ -126,9 +142,13 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         bgColor: config.bg_color,
         minWeek: config.min_week || undefined,
         stages: config.life_stages,
+        isPremium: config.is_premium || false,
+        premiumType: config.premium_type || 'none',
+        premiumLimit: config.premium_limit || 0,
+        isLocked: getLockedStatus(config),
       };
     });
-  }, [toolConfigs, hasPartner]);
+  }, [toolConfigs, hasPartner, lifeStage]);
 
   // Effect to set initial tool from props
   useEffect(() => {
@@ -169,6 +189,22 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
       }
       return;
     }
+
+    // Check if tool is locked for this phase (requires premium)
+    if (tool.isLocked && !isPremium) {
+      setShowPremiumModal(true);
+      return;
+    }
+
+    // Check premium restrictions
+    if (tool.isPremium && !isPremium) {
+      if (tool.premiumType === 'premium_only') {
+        setShowPremiumModal(true);
+        return;
+      }
+      // For limited types, let the tool handle usage tracking
+    }
+
     setActiveTool(tool.id);
   };
 
@@ -292,6 +328,8 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         {filteredTools.map((tool, index) => {
           const Icon = tool.icon;
           const available = isToolAvailable(tool);
+          const needsPremium = (tool.isLocked || (tool.isPremium && tool.premiumType === 'premium_only')) && !isPremium;
+          
           return (
             <motion.button
               key={tool.id}
@@ -303,11 +341,28 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
               whileHover={available ? { scale: 1.02, y: -2 } : {}}
               whileTap={available ? { scale: 0.98 } : {}}
             >
-              {!available && (
+              {/* Premium badge */}
+              {tool.isPremium && (
+                <div className="absolute top-2 right-2 flex items-center gap-1">
+                  <Crown className="w-3.5 h-3.5 text-amber-500" />
+                </div>
+              )}
+              
+              {/* Locked indicator */}
+              {needsPremium && (
+                <div className="absolute top-2 right-2 flex items-center gap-1 bg-amber-500/20 px-1.5 py-0.5 rounded-full">
+                  <Lock className="w-3 h-3 text-amber-600" />
+                  <Crown className="w-3 h-3 text-amber-500" />
+                </div>
+              )}
+
+              {/* Week restriction lock */}
+              {!available && tool.minWeek && (
                 <div className="absolute top-2 right-2">
                   <Lock className="w-3 h-3 text-muted-foreground" />
                 </div>
               )}
+              
               {/* Uniform icon background for all tools */}
               <div className="w-10 h-10 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center mb-2">
                 <Icon className="w-5 h-5 text-primary" />
@@ -319,10 +374,27 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
                   {tool.minWeek}. həftədən aktiv
                 </p>
               )}
+              {tool.isPremium && tool.premiumType === 'limited_total' && (
+                <p className="text-[9px] text-amber-600 mt-0.5">
+                  İlk {tool.premiumLimit} istifadə pulsuz
+                </p>
+              )}
+              {tool.isPremium && tool.premiumType === 'limited_monthly' && (
+                <p className="text-[9px] text-amber-600 mt-0.5">
+                  Ayda {tool.premiumLimit} pulsuz
+                </p>
+              )}
             </motion.button>
           );
         })}
       </div>
+
+      {/* Premium Modal */}
+      <PremiumModal 
+        isOpen={showPremiumModal} 
+        onClose={() => setShowPremiumModal(false)} 
+        feature="tool"
+      />
     </div>
   );
 };
