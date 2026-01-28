@@ -145,8 +145,27 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
     try {
       const base64Image = selectedImage.split(',')[1];
       
+      // Calculate baby age in months and days
+      let babyContext = {};
+      if (profile?.baby_birth_date) {
+        const birthDate = new Date(profile.baby_birth_date);
+        const today = new Date();
+        const diffTime = today.getTime() - birthDate.getTime();
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        const ageMonths = Math.floor(diffDays / 30);
+        babyContext = {
+          babyName: profile.baby_name || 'Körpə',
+          babyAgeMonths: ageMonths,
+          babyAgeDays: diffDays,
+          babyGender: profile.baby_gender
+        };
+      }
+      
       const { data, error } = await supabase.functions.invoke('analyze-poop', {
-        body: { imageBase64: base64Image }
+        body: { 
+          imageBase64: base64Image,
+          userContext: babyContext
+        }
       });
       
       if (error) throw error;

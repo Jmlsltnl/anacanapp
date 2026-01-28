@@ -10,6 +10,12 @@ const corsHeaders = {
 interface CryAnalysisRequest {
   audioBase64: string;
   audioDuration: number;
+  userContext?: {
+    babyName?: string;
+    babyAgeMonths?: number;
+    babyAgeDays?: number;
+    babyGender?: string;
+  };
 }
 
 // Two-stage analysis for accurate cry detection
@@ -136,7 +142,27 @@ Return ONLY this JSON (no markdown, no extra keys):
 }
 
 // Classify cry type only if crying is confirmed
-async function classifyCryType(audioBase64: string, apiKey: string): Promise<any> {
+async function classifyCryType(audioBase64: string, apiKey: string, userContext?: CryAnalysisRequest['userContext']): Promise<any> {
+  // Build age context for prompt
+  let ageContext = '';
+  if (userContext?.babyAgeMonths !== undefined) {
+    const months = userContext.babyAgeMonths;
+    if (months < 1) {
+      ageContext = `Bu ${userContext.babyAgeDays} günlük YENİDOĞULMUŞ körpədir.`;
+    } else if (months < 3) {
+      ageContext = `Bu ${months} aylıq yenidoğulmuş körpədir (0-3 ay dövrü).`;
+    } else if (months < 6) {
+      ageContext = `Bu ${months} aylıq kiçik körpədir (3-6 ay dövrü).`;
+    } else if (months < 12) {
+      ageContext = `Bu ${months} aylıq körpədir (6-12 ay dövrü).`;
+    } else {
+      ageContext = `Bu ${months} aylıq (${Math.floor(months/12)} yaş) uşaqdır.`;
+    }
+    if (userContext.babyName) {
+      ageContext = `Körpənin adı ${userContext.babyName}. ` + ageContext;
+    }
+  }
+
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
     {
@@ -154,6 +180,16 @@ async function classifyCryType(audioBase64: string, apiKey: string): Promise<any
             {
               text: `Bu səsdə TƏSDIQ OLUNMUŞ körpə ağlaması var. İndi ağlamanın SƏBƏBİNİ müəyyən et.
 
+${ageContext ? `KÖRPƏ KONTEKST: ${ageContext}` : ''}
+
+${userContext?.babyAgeMonths !== undefined && userContext.babyAgeMonths < 3 ? `
+XÜSUSI QEYD: Bu yenidoğulmuş körpədir. Yenidoğulmuşlarda ən çox görülən ağlama səbəbləri:
+- Ac qalma (hər 2-3 saatda qidalanma lazımdır)
+- Bez dəyişdirmə (tez-tez yaş bez narahatlıq yaradır)
+- Kolik (axşam saatlarında şiddətli ağlama)
+- Həddən artıq yorğunluq
+` : ''}
+
 Ağlama növləri:
 - "hungry": Ritmik "neh-neh" səsi, tədricən güclənir
 - "tired": Monoton, zəif, gözlərini ovuşdurma ilə
@@ -161,14 +197,14 @@ Ağlama növləri:
 - "discomfort": Narahat, qıcıqlanma (bez, soyuq/isti)
 - "colic": Şiddətli, axşam saatlarında, uzun sürən
 - "attention": Aralıqlı, valideyn görəndə azalır
-- "overstimulated": Yorğun, həddindən artıq stimulyasiya
+- "overstimulated": Yorğun, həddən artıq stimulyasiya
 - "sick": Zəif, normadan fərqli
 
 JSON CAVAB:
 {
   "cryType": "hungry|tired|pain|discomfort|colic|attention|overstimulated|sick",
   "confidence": 70-100,
-  "explanation": "Azərbaycan dilində izahat",
+  "explanation": "Azərbaycan dilində izahat${userContext?.babyName ? ` (${userContext.babyName} adını istifadə et)` : ''}",
   "recommendations": ["tövsiyə 1", "tövsiyə 2", "tövsiyə 3"],
   "urgency": "low|medium|high"
 }`
@@ -233,7 +269,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { audioBase64, audioDuration } = await req.json() as CryAnalysisRequest;
+    const { audioBase64, audioDuration, userContext } = await req.json() as CryAnalysisRequest;
 
     if (!audioBase64) {
       throw new Error('Audio data is required');
@@ -306,7 +342,7 @@ Deno.serve(async (req) => {
     // STAGE 2: Crying confirmed, now classify the type
     let analysisResult;
     try {
-      analysisResult = await classifyCryType(audioBase64, GEMINI_API_KEY);
+      analysisResult = await classifyCryType(audioBase64, GEMINI_API_KEY, userContext);
       analysisResult.isCryDetected = true;
     } catch (classifyError) {
       console.error('Classification error:', classifyError);

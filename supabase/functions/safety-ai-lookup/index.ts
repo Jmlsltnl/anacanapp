@@ -10,6 +10,14 @@ const corsHeaders = {
 interface SafetyRequest {
   query: string;
   category?: string;
+  userContext?: {
+    lifeStage?: string;
+    pregnancyWeek?: number;
+    pregnancyDay?: number;
+    babyAgeMonths?: number;
+    babyAgeDays?: number;
+    babyName?: string;
+  };
 }
 
 interface SafetyResult {
@@ -41,7 +49,7 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    const { query, category } = await req.json() as SafetyRequest;
+    const { query, category, userContext } = await req.json() as SafetyRequest;
 
     if (!query || query.trim().length < 2) {
       throw new Error('Query is required');
@@ -57,9 +65,32 @@ Deno.serve(async (req) => {
     const validCategories = categoriesData?.map(c => c.category_id) || ['food', 'drink', 'activity', 'medicine', 'beauty'];
     const categoryList = validCategories.join('|');
 
+    // Build user context for personalized response
+    let userContextPrompt = '';
+    if (userContext?.lifeStage === 'bump' && userContext?.pregnancyWeek) {
+      const trimester = userContext.pregnancyWeek <= 12 ? '1-ci' : userContext.pregnancyWeek <= 27 ? '2-ci' : '3-cü';
+      userContextPrompt = `
+İSTİFADƏÇİ KONTEKST:
+- Hamiləliyin ${userContext.pregnancyWeek}. həftəsi (${trimester} trimester)
+- ${userContext.pregnancyWeek <= 12 ? 'İlk trimesterdə əlavə ehtiyatlı olmaq lazımdır' : ''}
+- ${userContext.pregnancyWeek >= 28 ? '3-cü trimesterdə doğuşa yaxın xüsusi diqqət lazımdır' : ''}
+
+Tövsiyələri hamiləliyin bu dövründə verilən xüsusiyyətlərə uyğunlaşdır.`;
+    } else if (userContext?.lifeStage === 'mommy' && userContext?.babyAgeMonths !== undefined) {
+      const months = userContext.babyAgeMonths;
+      userContextPrompt = `
+İSTİFADƏÇİ KONTEKST:
+- ${months < 6 ? 'Əmizdirən ana' : 'Ana'} (körpə ${months} aylıq)
+- ${months < 6 ? 'Əmizdirmə dövründə qida məhdudiyyətləri var' : 'Körpə artıq əlavə qida qəbul edir'}
+- ${months < 1 ? 'Yenidoğulmuş dövrü - maksimum diqqət lazımdır' : ''}
+
+Tövsiyələri əmizdirən ana kontekstinə uyğunlaşdır.`;
+    }
+
     const systemPrompt = `Sən hamiləlik dövründə qida və fəaliyyətlərin təhlükəsizliyini qiymətləndirən mütəxəssissən.
 
 İstifadəçi "${query}" haqqında soruşur.
+${userContextPrompt}
 
 QAYDALAR:
 1. YALNIZ JSON formatında cavab ver, heç bir əlavə mətn olmadan
@@ -78,7 +109,7 @@ JSON formatı:
   "category": "${categoryList}",
   "safety_level": "safe|warning|danger",
   "description": "Short English description about safety during pregnancy",
-  "description_az": "Hamiləlik dövründə təhlükəsizlik haqqında qısa Azərbaycan dilində izahat"
+  "description_az": "Hamiləlik dövründə təhlükəsizlik haqqında qısa Azərbaycan dilində izahat${userContext?.pregnancyWeek ? ` (${userContext.pregnancyWeek}. həftəyə uyğun)` : ''}${userContext?.babyAgeMonths !== undefined ? ' (əmizdirən analar üçün)' : ''}"
 }
 
 NÜMUNƏLƏR:
