@@ -8,6 +8,7 @@ import GroupFeed from './GroupFeed';
 import CreatePostModal from './CreatePostModal';
 import StoriesBar from './StoriesBar';
 import UserProfileScreen from './UserProfileScreen';
+import BannerSlot from '@/components/banners/BannerSlot';
 
 interface CommunityScreenProps {
   onBack?: () => void;
@@ -115,6 +116,9 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
               );
             })}
           </div>
+
+          {/* Top Banner Slot */}
+          <BannerSlot placement="community_top" className="mt-3" />
         </div>
       </div>
 

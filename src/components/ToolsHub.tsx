@@ -42,6 +42,7 @@ import HoroscopeCompatibility from './tools/HoroscopeCompatibility';
 import { PremiumModal } from './PremiumModal';
 import { useToast } from '@/hooks/use-toast';
 import { useToolConfigs, ToolConfig } from '@/hooks/useDynamicTools';
+import BannerSlot from '@/components/banners/BannerSlot';
 
 interface Tool {
   id: string;
@@ -272,6 +273,9 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         />
       </motion.div>
 
+      {/* Top Banner Slot */}
+      <BannerSlot placement="tools_top" onNavigate={() => {}} onToolOpen={setActiveTool} className="mb-2" />
+
       {/* Featured Tool - Full Width Photoshoot Banner */}
       <motion.button
         onClick={() => setActiveTool('photoshoot')}
@@ -388,6 +392,9 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
           );
         })}
       </div>
+
+      {/* Bottom Banner Slot */}
+      <BannerSlot placement="tools_bottom" onNavigate={() => {}} onToolOpen={setActiveTool} className="mt-4" />
 
       {/* Premium Modal */}
       <PremiumModal 
