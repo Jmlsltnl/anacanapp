@@ -560,6 +560,84 @@ export type Database = {
         }
         Relationships: []
       }
+      banners: {
+        Row: {
+          background_color: string | null
+          banner_type: string | null
+          button_text: string | null
+          button_text_az: string | null
+          click_count: number | null
+          created_at: string | null
+          description: string | null
+          description_az: string | null
+          end_date: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          is_premium_only: boolean | null
+          link_type: string | null
+          link_url: string | null
+          placement: string
+          sort_order: number | null
+          start_date: string | null
+          text_color: string | null
+          title: string
+          title_az: string | null
+          updated_at: string | null
+          view_count: number | null
+        }
+        Insert: {
+          background_color?: string | null
+          banner_type?: string | null
+          button_text?: string | null
+          button_text_az?: string | null
+          click_count?: number | null
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_premium_only?: boolean | null
+          link_type?: string | null
+          link_url?: string | null
+          placement: string
+          sort_order?: number | null
+          start_date?: string | null
+          text_color?: string | null
+          title: string
+          title_az?: string | null
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          background_color?: string | null
+          banner_type?: string | null
+          button_text?: string | null
+          button_text_az?: string | null
+          click_count?: number | null
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_premium_only?: boolean | null
+          link_type?: string | null
+          link_url?: string | null
+          placement?: string
+          sort_order?: number | null
+          start_date?: string | null
+          text_color?: string | null
+          title?: string
+          title_az?: string | null
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Relationships: []
+      }
       blog_categories: {
         Row: {
           color: string | null

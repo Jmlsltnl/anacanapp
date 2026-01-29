@@ -33,6 +33,7 @@ import QuickActionsBar from '@/components/mommy/QuickActionsBar';
 import QuickStatsWidget from '@/components/mommy/QuickStatsWidget';
 import GrowthTrackerWidget from '@/components/mommy/GrowthTrackerWidget';
 import DevelopmentTipsWidget from '@/components/mommy/DevelopmentTipsWidget';
+import BannerSlot from '@/components/banners/BannerSlot';
 
 // Fetus images by month
 import FetusMonth1 from '@/assets/fetus/month-1.svg';
@@ -1607,9 +1608,15 @@ const Dashboard = ({ onOpenChat, onNavigateToTool }: DashboardProps) => {
         </div>
       </motion.div>
 
+      {/* Top Banner Slot */}
+      <BannerSlot placement="home_top" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mb-2" />
+
       {lifeStage === 'flow' && <FlowDashboard />}
       {lifeStage === 'bump' && <BumpDashboard onNavigateToTool={onNavigateToTool} />}
       {lifeStage === 'mommy' && <MommyDashboard onNavigateToTool={onNavigateToTool} />}
+
+      {/* Bottom Banner Slot */}
+      <BannerSlot placement="home_bottom" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mt-4" />
     </div>
   );
 };

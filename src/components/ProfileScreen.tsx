@@ -13,6 +13,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { PremiumModal } from '@/components/PremiumModal';
 import { nativeShare } from '@/lib/native';
+import BannerSlot from '@/components/banners/BannerSlot';
 
 interface ProfileScreenProps {
   onNavigate?: (screen: string) => void;
@@ -100,6 +101,9 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
 
   return (
     <div className="pb-24 pt-1 px-3">
+      {/* Top Banner Slot */}
+      <BannerSlot placement="profile_top" onNavigate={onNavigate} className="mb-3" />
+
       {/* Header */}
       <motion.div 
         className="flex items-center justify-between mb-3"
