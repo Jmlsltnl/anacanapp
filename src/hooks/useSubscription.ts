@@ -93,11 +93,14 @@ export function useSubscription() {
     subscription?.plan_type === 'premium_plus' ||
     profile?.is_premium === true;
 
-  const getUsageForFeature = (featureType: 'white_noise' | 'baby_photoshoot'): UsageTracking | undefined => {
-    return usage.find(u => u.feature_type === featureType);
-  };
+  const getUsageForFeature = useCallback(
+    (featureType: 'white_noise' | 'baby_photoshoot'): UsageTracking | undefined => {
+      return usage.find(u => u.feature_type === featureType);
+    },
+    [usage]
+  );
 
-  const canUseWhiteNoise = (): { allowed: boolean; remainingSeconds: number } => {
+  const canUseWhiteNoise = useCallback((): { allowed: boolean; remainingSeconds: number } => {
     if (isPremium) {
       return { allowed: true, remainingSeconds: Infinity };
     }
@@ -110,9 +113,9 @@ export function useSubscription() {
       allowed: remaining > 0,
       remainingSeconds: Math.max(0, remaining),
     };
-  };
+  }, [getUsageForFeature, isPremium]);
 
-  const canUseBabyPhotoshoot = async (): Promise<{ allowed: boolean; remainingCount: number }> => {
+  const canUseBabyPhotoshoot = useCallback(async (): Promise<{ allowed: boolean; remainingCount: number }> => {
     if (isPremium) {
       return { allowed: true, remainingCount: Infinity };
     }
@@ -134,9 +137,9 @@ export function useSubscription() {
       allowed: remaining > 0,
       remainingCount: Math.max(0, remaining),
     };
-  };
+  }, [isPremium, user]);
 
-  const trackWhiteNoiseUsage = async (seconds: number) => {
+  const trackWhiteNoiseUsage = useCallback(async (seconds: number) => {
     if (!user || isPremium) return;
 
     const today = new Date().toISOString().split('T')[0];
@@ -160,7 +163,7 @@ export function useSubscription() {
 
     // Refresh usage
     fetchSubscription();
-  };
+  }, [fetchSubscription, getUsageForFeature, isPremium, user]);
 
   const upgradeToPremium = () => {
     // This would integrate with Stripe or another payment provider
