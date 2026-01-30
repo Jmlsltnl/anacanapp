@@ -53,8 +53,8 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="gradient-primary px-3 pt-3 pb-8 safe-top">
-        <div className="flex items-center gap-3 mb-4">
+      <div className="gradient-primary px-3 pt-3 pb-8 safe-top relative z-20">
+        <div className="flex items-center gap-3 mb-4 relative z-20">
           <motion.button
             onClick={onBack}
             className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"

@@ -139,8 +139,8 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
           <div className="absolute bottom-5 right-10 w-40 h-40 rounded-full bg-pink-300/20 blur-3xl" />
         </div>
         
-        <div className="relative px-4 pt-4 pb-8 safe-area-top">
-          <div className="flex items-center gap-3 mb-4">
+        <div className="relative px-4 pt-4 pb-8 safe-area-top z-20">
+          <div className="flex items-center gap-3 mb-4 relative z-20">
             <motion.button
               onClick={onBack}
               className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"

@@ -45,8 +45,8 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
 
   return (
     <div ref={ref} className="min-h-screen bg-background">
-      <div className="gradient-primary px-3 pt-3 pb-6 safe-top">
-        <div className="flex items-center gap-2 mb-3">
+      <div className="gradient-primary px-3 pt-3 pb-6 safe-top relative z-20">
+        <div className="flex items-center gap-2 mb-3 relative z-20">
           <motion.button
             onClick={onBack}
             className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"

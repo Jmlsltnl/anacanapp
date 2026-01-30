@@ -245,7 +245,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
         {/* Floating Back Button */}
         <motion.button
           onClick={onBack}
-          className="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center safe-area-top"
+          className="absolute top-4 left-4 z-30 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center safe-area-top"
           whileTap={{ scale: 0.95 }}
         >
           <ArrowLeft className="w-5 h-5 text-white" />
@@ -254,7 +254,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
         {/* Floating Share Button */}
         <motion.button
           onClick={handleShare}
-          className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center safe-area-top"
+          className="absolute top-4 right-4 z-30 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center safe-area-top"
           whileTap={{ scale: 0.95 }}
         >
           <Share2 className="w-5 h-5 text-white" />
