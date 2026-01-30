@@ -127,9 +127,9 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white p-4 safe-area-top">
-        <div className="flex items-center gap-3">
-          <button onClick={onBack} className="p-2 hover:bg-white/20 rounded-full transition-colors">
+      <div className="sticky top-0 z-20 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white p-4 safe-area-top">
+        <div className="flex items-center gap-3 relative z-20">
+          <button onClick={onBack} className="p-2 hover:bg-white/20 rounded-full transition-colors relative z-30">
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div className="flex-1">

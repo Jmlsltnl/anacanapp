@@ -166,9 +166,9 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-card border-b border-border/50 px-4 py-3">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0">
+      <div className="sticky top-0 z-20 bg-card border-b border-border/50 px-4 py-3">
+        <div className="flex items-center gap-3 relative z-20">
+          <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0 relative z-30">
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">

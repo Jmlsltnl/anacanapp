@@ -78,9 +78,9 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
   if (!isEnabled) {
     return (
       <div className="min-h-screen bg-background pb-24">
-        <div className="sticky top-0 z-10 bg-card border-b border-border/50 px-4 py-3">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={onBack}>
+        <div className="sticky top-0 z-20 bg-card border-b border-border/50 px-4 py-3">
+          <div className="flex items-center gap-3 relative z-20">
+            <Button variant="ghost" size="icon" onClick={onBack} className="relative z-30">
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <h1 className="text-lg font-bold">Tövsiyyə olunan məhsullar</h1>
@@ -100,10 +100,10 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-card border-b border-border/50 px-4 py-3">
-        <div className="flex items-center justify-between mb-3">
+      <div className="sticky top-0 z-20 bg-card border-b border-border/50 px-4 py-3">
+        <div className="flex items-center justify-between mb-3 relative z-20">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={onBack}>
+            <Button variant="ghost" size="icon" onClick={onBack} className="relative z-30">
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div>
@@ -114,7 +114,7 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
           <Button 
             variant="outline" 
             size="sm" 
-            className="rounded-xl relative"
+            className="rounded-xl relative z-30"
             onClick={() => setShowSaved(true)}
           >
             <Heart className="w-4 h-4 mr-1" />

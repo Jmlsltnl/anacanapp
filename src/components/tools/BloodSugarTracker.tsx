@@ -155,10 +155,10 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
   return (
     <div className="min-h-screen bg-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-card border-b border-border/50 px-4 py-3">
-        <div className="flex items-center justify-between">
+      <div className="sticky top-0 z-20 bg-card border-b border-border/50 px-4 py-3">
+        <div className="flex items-center justify-between relative z-20">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={onBack}>
+            <Button variant="ghost" size="icon" onClick={onBack} className="relative z-30">
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div>
@@ -168,7 +168,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
           </div>
           <Button 
             size="sm" 
-            className="rounded-xl"
+            className="rounded-xl relative z-30"
             onClick={() => setShowAddModal(true)}
           >
             <Plus className="w-4 h-4 mr-1" />

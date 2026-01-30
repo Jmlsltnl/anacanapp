@@ -53,11 +53,11 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="gradient-primary px-3 pt-3 pb-8 safe-top relative z-20">
-        <div className="flex items-center gap-3 mb-4 relative z-20">
+      <div className="gradient-primary px-3 pt-3 pb-8 safe-top relative z-20 isolate">
+        <div className="flex items-center gap-3 mb-4 relative z-30">
           <motion.button
             onClick={onBack}
-            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center relative z-30"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -68,7 +68,7 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
             <p className="text-white/80 text-xs">Doğuş üçün hazırlıq</p>
           </div>
           <motion.button
-            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center relative z-30"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >

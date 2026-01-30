@@ -232,16 +232,16 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-card border-b border-border/50 px-4 py-3">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0">
+      <div className="sticky top-0 z-20 bg-card border-b border-border/50 px-4 py-3">
+        <div className="flex items-center gap-3 relative z-20">
+          <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0 relative z-30">
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">
             <h1 className="text-lg font-bold">Nəcis Skaneri</h1>
             <p className="text-xs text-muted-foreground">AI ilə körpə nəcisini analiz edin</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => setShowHistory(!showHistory)}>
+          <Button variant="ghost" size="icon" onClick={() => setShowHistory(!showHistory)} className="relative z-30">
             <History className="w-5 h-5" />
           </Button>
         </div>

@@ -158,9 +158,9 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 py-3 safe-area-top">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0 text-white hover:bg-white/20">
+      <div className="sticky top-0 z-20 bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 py-3 safe-area-top">
+        <div className="flex items-center gap-3 relative z-20">
+          <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0 text-white hover:bg-white/20 relative z-30">
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">
@@ -173,7 +173,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                   : 'Körpəniz üçün geyim məsləhəti'}
             </p>
           </div>
-          <Button variant="ghost" size="icon" onClick={fetchWeather} disabled={isLoading} className="text-white hover:bg-white/20">
+          <Button variant="ghost" size="icon" onClick={fetchWeather} disabled={isLoading} className="text-white hover:bg-white/20 relative z-30">
             <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
