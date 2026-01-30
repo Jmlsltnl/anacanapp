@@ -227,7 +227,11 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
 
   return (
     <>
-      <div className="bg-card rounded-xl border border-border/50 overflow-hidden">
+      <motion.div 
+        className="bg-card rounded-xl border border-border/50 overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:border-primary/20"
+        whileHover={{ y: -2 }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      >
         {/* Header */}
         <div className="p-3 flex items-center gap-2">
           <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.95 }}>
@@ -375,9 +379,16 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
                     <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
                   </div>
                 ) : topLevelComments.length === 0 ? (
-                  <p className="text-center text-xs text-muted-foreground py-2">
-                    Hələ şərh yoxdur
-                  </p>
+                  <div className="text-center py-6">
+                    <div className="relative inline-block mb-2">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/10 to-pink-500/10 flex items-center justify-center">
+                        <span className="text-2xl">💭</span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Hələ şərh yoxdur. İlk şərhi siz yazın!
+                    </p>
+                  </div>
                 ) : (
                   <div className="space-y-2">
                     {topLevelComments.map((comment) => (
@@ -396,7 +407,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </motion.div>
 
       {/* Share Dialog */}
       <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
