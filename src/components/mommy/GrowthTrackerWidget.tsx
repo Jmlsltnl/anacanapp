@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scale, TrendingUp, Plus, Ruler } from 'lucide-react';
+import { Scale, TrendingUp, Plus, Ruler, CircleDot } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { hapticFeedback } from '@/lib/native';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { differenceInMonths } from 'date-fns';
 
 interface BabyGrowthEntry {
   id: string;
@@ -18,12 +19,21 @@ interface BabyGrowthEntry {
 }
 
 const GrowthTrackerWidget = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { toast } = useToast();
   const [entries, setEntries] = useState<BabyGrowthEntry[]>([]);
   const [showInput, setShowInput] = useState(false);
   const [weightInput, setWeightInput] = useState('');
   const [heightInput, setHeightInput] = useState('');
+  const [headInput, setHeadInput] = useState('');
+
+  // Check if baby is under 1 year old
+  const showHeadCircumference = useMemo(() => {
+    if (!profile?.baby_birth_date) return true; // Show by default if no birth date
+    const birthDate = new Date(profile.baby_birth_date);
+    const ageInMonths = differenceInMonths(new Date(), birthDate);
+    return ageInMonths < 12;
+  }, [profile?.baby_birth_date]);
 
   // Fetch baby growth entries
   useEffect(() => {
@@ -59,6 +69,9 @@ const GrowthTrackerWidget = () => {
   const heightChange = latestEntry && previousEntry
     ? ((latestEntry.height_cm || 0) - (previousEntry.height_cm || 0)).toFixed(1)
     : null;
+  const headChange = latestEntry && previousEntry
+    ? ((latestEntry.head_cm || 0) - (previousEntry.head_cm || 0)).toFixed(1)
+    : null;
 
   const handleAddEntry = async () => {
     if (!user) return;
@@ -84,6 +97,7 @@ const GrowthTrackerWidget = () => {
           user_id: user.id,
           weight_kg: isNaN(weight) ? null : weight,
           height_cm: isNaN(height) ? null : height,
+          head_cm: showHeadCircumference && !isNaN(parseFloat(headInput)) ? parseFloat(headInput) : null,
           entry_date: new Date().toISOString().split('T')[0],
         })
         .select()
@@ -97,6 +111,7 @@ const GrowthTrackerWidget = () => {
       }
       setWeightInput('');
       setHeightInput('');
+      setHeadInput('');
       setShowInput(false);
       
       toast({
@@ -136,20 +151,20 @@ const GrowthTrackerWidget = () => {
       </div>
       
       {/* Current Stats */}
-      <div className="grid grid-cols-2 gap-2 mb-3">
+      <div className={`grid ${showHeadCircumference ? 'grid-cols-3' : 'grid-cols-2'} gap-2 mb-3`}>
         <div className="bg-rose-50 dark:bg-rose-500/15 rounded-xl p-3">
           <div className="flex items-center gap-1.5 mb-1">
             <Scale className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400" />
             <span className="text-[10px] text-rose-600/70 dark:text-rose-400/70">Çəki</span>
           </div>
-          <p className="text-xl font-black text-rose-700 dark:text-rose-300">
-            {latestEntry?.weight_kg ? `${latestEntry.weight_kg} kq` : '— kq'}
+          <p className="text-lg font-black text-rose-700 dark:text-rose-300">
+            {latestEntry?.weight_kg ? `${latestEntry.weight_kg} kq` : '—'}
           </p>
           {weightChange && parseFloat(weightChange) !== 0 && (
             <div className="flex items-center gap-1 mt-1">
               <TrendingUp className={`w-3 h-3 ${parseFloat(weightChange) > 0 ? 'text-green-500' : 'text-red-500 rotate-180'}`} />
               <span className={`text-[10px] font-medium ${parseFloat(weightChange) > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {parseFloat(weightChange) > 0 ? '+' : ''}{weightChange} kq
+                {parseFloat(weightChange) > 0 ? '+' : ''}{weightChange}
               </span>
             </div>
           )}
@@ -160,18 +175,38 @@ const GrowthTrackerWidget = () => {
             <Ruler className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
             <span className="text-[10px] text-indigo-600/70 dark:text-indigo-400/70">Boy</span>
           </div>
-          <p className="text-xl font-black text-indigo-700 dark:text-indigo-300">
-            {latestEntry?.height_cm ? `${latestEntry.height_cm} sm` : '— sm'}
+          <p className="text-lg font-black text-indigo-700 dark:text-indigo-300">
+            {latestEntry?.height_cm ? `${latestEntry.height_cm} sm` : '—'}
           </p>
           {heightChange && parseFloat(heightChange) !== 0 && (
             <div className="flex items-center gap-1 mt-1">
               <TrendingUp className={`w-3 h-3 ${parseFloat(heightChange) > 0 ? 'text-green-500' : 'text-red-500 rotate-180'}`} />
               <span className={`text-[10px] font-medium ${parseFloat(heightChange) > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {parseFloat(heightChange) > 0 ? '+' : ''}{heightChange} sm
+                {parseFloat(heightChange) > 0 ? '+' : ''}{heightChange}
               </span>
             </div>
           )}
         </div>
+
+        {showHeadCircumference && (
+          <div className="bg-amber-50 dark:bg-amber-500/15 rounded-xl p-3">
+            <div className="flex items-center gap-1.5 mb-1">
+              <CircleDot className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
+              <span className="text-[10px] text-amber-600/70 dark:text-amber-400/70">Baş</span>
+            </div>
+            <p className="text-lg font-black text-amber-700 dark:text-amber-300">
+              {latestEntry?.head_cm ? `${latestEntry.head_cm} sm` : '—'}
+            </p>
+            {headChange && parseFloat(headChange) !== 0 && (
+              <div className="flex items-center gap-1 mt-1">
+                <TrendingUp className={`w-3 h-3 ${parseFloat(headChange) > 0 ? 'text-green-500' : 'text-red-500 rotate-180'}`} />
+                <span className={`text-[10px] font-medium ${parseFloat(headChange) > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {parseFloat(headChange) > 0 ? '+' : ''}{headChange}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
       
       {/* Quick Add Input */}
@@ -183,7 +218,7 @@ const GrowthTrackerWidget = () => {
             exit={{ opacity: 0, height: 0 }}
             className="space-y-2"
           >
-            <div className="grid grid-cols-2 gap-2">
+            <div className={`grid ${showHeadCircumference ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}>
               <div>
                 <label className="text-[10px] text-muted-foreground mb-1 block">Çəki (kq)</label>
                 <input
@@ -206,6 +241,19 @@ const GrowthTrackerWidget = () => {
                   className="w-full px-3 py-2 rounded-lg bg-muted/50 border border-border text-sm"
                 />
               </div>
+              {showHeadCircumference && (
+                <div>
+                  <label className="text-[10px] text-muted-foreground mb-1 block">Baş (sm)</label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    value={headInput}
+                    onChange={(e) => setHeadInput(e.target.value)}
+                    placeholder="38"
+                    className="w-full px-3 py-2 rounded-lg bg-muted/50 border border-border text-sm"
+                  />
+                </div>
+              )}
             </div>
             <motion.button
               onClick={handleAddEntry}
