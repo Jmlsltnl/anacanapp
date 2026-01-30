@@ -5,7 +5,7 @@ import {
   Volume2, Heart, Footprints, ChevronRight,
   Utensils, Activity, ArrowLeft, Camera, Lock, ShoppingCart, LucideIcon, Wrench, BookOpen, ChefHat,
   Stethoscope, Droplet, ImagePlus, Package, Mic, Scan, CloudSun, Gauge, Store,
-  MapPin, Gamepad2, ShieldAlert, BookHeart, Stars, Crown
+  MapPin, Gamepad2, ShieldAlert, BookHeart, Stars, Crown, Ruler
 } from 'lucide-react';
 import BlogScreen from '@/components/BlogScreen';
 import { useUserStore } from '@/store/userStore';
@@ -39,6 +39,7 @@ import MentalHealthTracker from './tools/MentalHealthTracker';
 import FirstAidGuide from './tools/FirstAidGuide';
 import FairyTaleGenerator from './tools/FairyTaleGenerator';
 import HoroscopeCompatibility from './tools/HoroscopeCompatibility';
+import BabyGrowthTracker from './tools/BabyGrowthTracker';
 import { PremiumModal } from './PremiumModal';
 import { useToast } from '@/hooks/use-toast';
 import { useToolConfigs, ToolConfig } from '@/hooks/useDynamicTools';
@@ -61,6 +62,7 @@ interface Tool {
 
 // Icon mapping for dynamic tool configs
 const iconMap: Record<string, LucideIcon> = {
+  'Ruler': Ruler,
   'Camera': Camera,
   'Utensils': Utensils,
   'ShoppingCart': ShoppingCart,
@@ -251,6 +253,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   if (activeTool === 'first-aid') return <FirstAidGuide onBack={handleBack} />;
   if (activeTool === 'fairy-tale') return <FairyTaleGenerator onBack={handleBack} />;
   if (activeTool === 'horoscope') return <HoroscopeCompatibility onBack={handleBack} />;
+  if (activeTool === 'baby-growth' || activeTool === 'growth-tracker') return <BabyGrowthTracker onBack={handleBack} />;
   if (activeTool === 'affiliate' || activeTool === 'affiliate-products') return <AffiliateProducts onBack={handleBack} />;
 
   return (
