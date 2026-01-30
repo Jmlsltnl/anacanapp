@@ -4,10 +4,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { DatePickerWheel } from '@/components/ui/date-picker-wheel';
 import { useZodiacSigns, useSaveHoroscopeReading, ZodiacSign } from '@/hooks/useHoroscope';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -300,24 +299,14 @@ Anacan tətbiqi ilə yaradılıb 💜`;
                   <CalendarIcon className="h-4 w-4" />
                   Gözlənilən Doğum Tarixi
                 </Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full h-12 justify-start rounded-xl">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {expectedDueDate ? format(expectedDueDate, "d MMMM yyyy", { locale: az }) : "Tarix seçin"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 z-50" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={expectedDueDate}
-                      onSelect={setExpectedDueDate}
-                      disabled={(date) => date < new Date()}
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
+                <DatePickerWheel
+                  value={expectedDueDate}
+                  onChange={setExpectedDueDate}
+                  minYear={new Date().getFullYear()}
+                  maxYear={new Date().getFullYear() + 1}
+                  disabled={(date) => date < new Date()}
+                  placeholder="Gözlənilən tarix seçin"
+                />
               </div>
             ) : (
               <PersonInput
@@ -815,33 +804,12 @@ const PersonInput = ({
           <CalendarIcon className="h-3 w-3" />
           Doğum tarixi {isRequired && <span className="text-destructive">*</span>}
         </Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-full justify-start text-left h-12 rounded-xl",
-                !data.birthDate && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {data.birthDate ? format(data.birthDate, "d MMMM yyyy", { locale: az }) : "Tarix seçin"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 z-50" align="start">
-            <Calendar
-              mode="single"
-              selected={data.birthDate}
-              onSelect={(date) => setData({ ...data, birthDate: date })}
-              disabled={(date) => date > new Date()}
-              initialFocus
-              className="pointer-events-auto"
-              captionLayout="dropdown-buttons"
-              fromYear={1940}
-              toYear={new Date().getFullYear()}
-            />
-          </PopoverContent>
-        </Popover>
+        <DatePickerWheel
+          value={data.birthDate}
+          onChange={(date) => setData({ ...data, birthDate: date })}
+          disabled={(date) => date > new Date()}
+          placeholder="Doğum tarixini seçin"
+        />
       </div>
 
       {/* Birth Time Toggle */}
