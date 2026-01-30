@@ -159,8 +159,8 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
             <div className="flex gap-3">
               {[1, 2, 3].map(i => (
                 <div key={i} className="flex flex-col items-center gap-1">
-                  <div className="w-16 h-16 rounded-full bg-muted animate-pulse" />
-                  <div className="w-12 h-3 rounded bg-muted animate-pulse" />
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-r from-muted via-muted/60 to-muted bg-[length:200%_100%] animate-shimmer" />
+                  <div className="w-12 h-3 rounded bg-gradient-to-r from-muted via-muted/60 to-muted bg-[length:200%_100%] animate-shimmer" />
                 </div>
               ))}
             </div>

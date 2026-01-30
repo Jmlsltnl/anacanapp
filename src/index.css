@@ -337,7 +337,7 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Shimmer Animation */
+  /* Shimmer Animation - Enhanced */
   .shimmer {
     background: linear-gradient(
       90deg,
@@ -350,8 +350,59 @@
   }
 
   @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Smooth skeleton animation */
+  @keyframes skeleton-pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .animate-skeleton-pulse {
+    animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Card hover effect */
+  .card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px -8px hsl(var(--primary) / 0.15);
+  }
+
+  /* Button press effect */
+  .btn-press {
+    transition: transform 0.15s ease;
+  }
+
+  .btn-press:active {
+    transform: scale(0.97);
+  }
+
+  /* Focus ring enhancement */
+  .focus-ring {
+    @apply outline-none ring-offset-2 ring-offset-background transition-shadow;
+  }
+
+  .focus-ring:focus-visible {
+    @apply ring-2 ring-primary;
+  }
+
+  /* Subtle glow on hover */
+  .glow-hover {
+    transition: box-shadow 0.3s ease;
+  }
+
+  .glow-hover:hover {
+    box-shadow: 0 0 20px -5px hsl(var(--primary) / 0.3);
   }
 }
 
