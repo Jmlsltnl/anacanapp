@@ -345,18 +345,18 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
               whileHover={available ? { scale: 1.02, y: -2 } : {}}
               whileTap={available ? { scale: 0.98 } : {}}
             >
-              {/* Premium badge */}
-              {tool.isPremium && (
-                <div className="absolute top-2 right-2 flex items-center gap-1">
-                  <Crown className="w-3.5 h-3.5 text-amber-500" />
+              {/* Premium/Locked badge with glow effect */}
+              {needsPremium ? (
+                <div className="absolute top-2 right-2 flex items-center gap-1 bg-gradient-to-r from-amber-500/30 to-orange-500/30 backdrop-blur-sm px-2 py-1 rounded-full border border-amber-500/40 shadow-lg shadow-amber-500/20">
+                  <Lock className="w-3 h-3 text-amber-500" />
+                  <Crown className="w-3 h-3 text-amber-400" />
                 </div>
-              )}
-              
-              {/* Locked indicator */}
-              {needsPremium && (
-                <div className="absolute top-2 right-2 flex items-center gap-1 bg-amber-500/20 px-1.5 py-0.5 rounded-full">
-                  <Lock className="w-3 h-3 text-amber-600" />
-                  <Crown className="w-3 h-3 text-amber-500" />
+              ) : tool.isPremium && (
+                <div className="absolute top-2 right-2">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-amber-400 blur-sm opacity-50 rounded-full" />
+                    <Crown className="relative w-4 h-4 text-amber-500 drop-shadow-md" />
+                  </div>
                 </div>
               )}
 
@@ -367,9 +367,14 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
                 </div>
               )}
               
-              {/* Uniform icon background for all tools */}
-              <div className="w-10 h-10 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center mb-2">
-                <Icon className="w-5 h-5 text-primary" />
+              {/* Enhanced icon with gradient background */}
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-2 relative overflow-hidden ${
+                needsPremium 
+                  ? 'bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30' 
+                  : 'bg-gradient-to-br from-primary/10 to-primary/20 dark:from-primary/20 dark:to-primary/30'
+              }`}>
+                <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent dark:from-white/10" />
+                <Icon className={`w-5 h-5 relative z-10 ${needsPremium ? 'text-amber-600 dark:text-amber-400' : 'text-primary'}`} />
               </div>
               <h3 className="font-bold text-foreground text-sm mb-0.5">{tool.name}</h3>
               <p className="text-[10px] text-muted-foreground leading-tight">{tool.description}</p>

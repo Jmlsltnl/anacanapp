@@ -71,23 +71,30 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
             ))}
           </div>
         ) : filteredPosts.length === 0 ? (
-          <div className="text-center py-8">
-            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
-              <Users className="w-6 h-6 text-muted-foreground" />
+          <motion.div 
+            className="text-center py-12"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <div className="relative mx-auto w-24 h-24 mb-4">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-pink-500/20 rounded-full animate-pulse" />
+              <div className="absolute inset-2 bg-card rounded-full flex items-center justify-center">
+                <div className="text-4xl">💬</div>
+              </div>
             </div>
-            <h3 className="font-bold text-foreground mb-1 text-sm">
+            <h3 className="font-bold text-foreground mb-2 text-base">
               {searchQuery ? 'Nəticə tapılmadı' : 'Hələ paylaşım yoxdur'}
             </h3>
-            <p className="text-xs text-muted-foreground mb-3">
-              {searchQuery ? 'Başqa axtarış sözləri sınayın' : 'İlk paylaşımı siz edin!'}
+            <p className="text-sm text-muted-foreground mb-4 max-w-xs mx-auto">
+              {searchQuery ? 'Başqa axtarış sözləri sınayın' : 'İlk paylaşımı siz edin və digər analarla əlaqə qurun!'}
             </p>
             {!searchQuery && (
-              <Button onClick={onCreatePost} className="gradient-primary text-sm h-9">
-                <Plus className="w-4 h-4 mr-1.5" />
+              <Button onClick={onCreatePost} className="gradient-primary text-sm h-10 px-6">
+                <Plus className="w-4 h-4 mr-2" />
                 Paylaşım yarat
               </Button>
             )}
-          </div>
+          </motion.div>
         ) : (
           filteredPosts.map((post, index) => (
             <motion.div
@@ -174,23 +181,30 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
             ))}
           </div>
         ) : filteredPosts.length === 0 ? (
-          <div className="text-center py-8">
-            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
-              <Users className="w-6 h-6 text-muted-foreground" />
+          <motion.div 
+            className="text-center py-12"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <div className="relative mx-auto w-24 h-24 mb-4">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-pink-500/20 rounded-full animate-pulse" />
+              <div className="absolute inset-2 bg-card rounded-full flex items-center justify-center">
+                <div className="text-4xl">🌟</div>
+              </div>
             </div>
-            <h3 className="font-bold text-foreground mb-1 text-sm">
+            <h3 className="font-bold text-foreground mb-2 text-base">
               {searchQuery ? 'Nəticə tapılmadı' : 'Hələ paylaşım yoxdur'}
             </h3>
-            <p className="text-xs text-muted-foreground mb-3">
-              {searchQuery ? 'Başqa axtarış sözləri sınayın' : 'Bu qrupda ilk paylaşımı siz edin!'}
+            <p className="text-sm text-muted-foreground mb-4 max-w-xs mx-auto">
+              {searchQuery ? 'Başqa axtarış sözləri sınayın' : 'Bu qrupda ilk paylaşımı siz edin və söhbətə başlayın!'}
             </p>
             {!searchQuery && (
-              <Button onClick={onCreatePost} className="gradient-primary text-sm h-9">
-                <Plus className="w-4 h-4 mr-1.5" />
+              <Button onClick={onCreatePost} className="gradient-primary text-sm h-10 px-6">
+                <Plus className="w-4 h-4 mr-2" />
                 Paylaşım yarat
               </Button>
             )}
-          </div>
+          </motion.div>
         ) : (
           filteredPosts.map((post, index) => (
             <motion.div
