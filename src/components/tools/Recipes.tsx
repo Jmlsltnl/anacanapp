@@ -101,7 +101,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
           {/* Back button */}
           <motion.button
             onClick={() => setSelectedRecipe(null)}
-            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center border border-white/20"
+            className="absolute top-4 left-4 z-30 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center border border-white/20"
             whileTap={{ scale: 0.95 }}
           >
             <ArrowLeft className="w-5 h-5 text-white" />
@@ -110,7 +110,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
           {/* Favorite button */}
           <motion.button
             onClick={(e) => toggleFavorite(selectedRecipe.id, e)}
-            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center border border-white/20"
+            className="absolute top-4 right-4 z-30 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center border border-white/20"
             whileTap={{ scale: 0.9 }}
           >
             <Heart className={`w-5 h-5 ${favorites.includes(selectedRecipe.id) ? 'fill-red-400 text-red-400' : 'text-white'}`} />
@@ -293,8 +293,8 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
           <div className="absolute bottom-0 left-4 text-6xl opacity-20">🥗</div>
         </div>
         
-        <div className="relative px-4 pt-4 pb-8">
-          <div className="flex items-center gap-3 mb-4">
+        <div className="relative px-4 pt-4 pb-8 z-20">
+          <div className="flex items-center gap-3 mb-4 relative z-20">
             <motion.button
               onClick={onBack}
               className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20"

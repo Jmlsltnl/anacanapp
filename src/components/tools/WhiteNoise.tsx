@@ -215,8 +215,8 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="gradient-primary px-3 pt-3 pb-8 rounded-b-[1.5rem] flex-shrink-0">
-        <div className="flex items-center gap-3">
+      <div className="gradient-primary px-3 pt-3 pb-8 rounded-b-[1.5rem] flex-shrink-0 relative z-20">
+        <div className="flex items-center gap-3 relative z-20">
           <motion.button
             onClick={onBack}
             className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
