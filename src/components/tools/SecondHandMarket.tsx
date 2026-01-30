@@ -1,17 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Plus, Search, Filter, Heart, MessageCircle, MapPin, 
-  Camera, X, Check, Loader2, Package, Tag, User, Clock, Send, ChevronRight
+  Camera, X, Check, Loader2, Package, Tag, User, Clock, Send, 
+  ChevronRight, Sparkles, ImagePlus, Trash2, Image as ImageIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { format } from 'date-fns';
+import { az } from 'date-fns/locale';
 
 interface SecondHandMarketProps {
   onBack: () => void;
@@ -31,27 +35,23 @@ interface Listing {
   location_city: string;
   status: string;
   created_at: string;
-  profile?: {
-    name: string;
-    avatar_url: string;
-  };
 }
 
 const categories = [
-  { id: 'clothing', label: 'Geyim', emoji: '👕' },
-  { id: 'toys', label: 'Oyuncaqlar', emoji: '🧸' },
-  { id: 'furniture', label: 'Mebel', emoji: '🛏️' },
-  { id: 'stroller', label: 'Araba', emoji: '👶' },
-  { id: 'feeding', label: 'Qidalanma', emoji: '🍼' },
-  { id: 'hygiene', label: 'Gigiyena', emoji: '🛁' },
-  { id: 'other', label: 'Digər', emoji: '📦' },
+  { id: 'clothing', label: 'Geyim', emoji: '👕', color: 'from-pink-500 to-rose-600' },
+  { id: 'toys', label: 'Oyuncaqlar', emoji: '🧸', color: 'from-amber-500 to-orange-600' },
+  { id: 'furniture', label: 'Mebel', emoji: '🛏️', color: 'from-blue-500 to-indigo-600' },
+  { id: 'stroller', label: 'Araba', emoji: '👶', color: 'from-violet-500 to-purple-600' },
+  { id: 'feeding', label: 'Qidalanma', emoji: '🍼', color: 'from-emerald-500 to-green-600' },
+  { id: 'hygiene', label: 'Gigiyena', emoji: '🛁', color: 'from-cyan-500 to-teal-600' },
+  { id: 'other', label: 'Digər', emoji: '📦', color: 'from-gray-500 to-slate-600' },
 ];
 
 const conditions = [
-  { id: 'new', label: 'Yeni', color: 'bg-green-500' },
-  { id: 'like_new', label: 'Yeni kimi', color: 'bg-emerald-500' },
-  { id: 'good', label: 'Yaxşı', color: 'bg-blue-500' },
-  { id: 'fair', label: 'Normal', color: 'bg-yellow-500' },
+  { id: 'new', label: 'Yeni', color: 'bg-emerald-500', textColor: 'text-emerald-600' },
+  { id: 'like_new', label: 'Yeni kimi', color: 'bg-green-500', textColor: 'text-green-600' },
+  { id: 'good', label: 'Yaxşı', color: 'bg-blue-500', textColor: 'text-blue-600' },
+  { id: 'fair', label: 'Normal', color: 'bg-amber-500', textColor: 'text-amber-600' },
 ];
 
 const ageRanges = [
@@ -68,7 +68,11 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [showMyListings, setShowMyListings] = useState(false);
   
-  // Create form state
+  // Image upload state
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -82,7 +86,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { toast } = useToast();
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
 
   useEffect(() => {
     loadListings();
@@ -120,6 +124,53 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0 || !user) return;
+    
+    setUploadingImages(true);
+    const newImages: string[] = [];
+    
+    try {
+      for (let i = 0; i < Math.min(files.length, 5 - uploadedImages.length); i++) {
+        const file = files[i];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}-${i}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('community-media')
+          .upload(fileName, file);
+        
+        if (uploadError) throw uploadError;
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('community-media')
+          .getPublicUrl(fileName);
+        
+        newImages.push(publicUrl);
+      }
+      
+      setUploadedImages(prev => [...prev, ...newImages]);
+      toast({ title: 'Şəkillər yükləndi!' });
+    } catch (error) {
+      console.error('Image upload error:', error);
+      toast({
+        title: 'Xəta',
+        description: 'Şəkil yüklənə bilmədi',
+        variant: 'destructive'
+      });
+    } finally {
+      setUploadingImages(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setUploadedImages(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleCreateListing = async () => {
     if (!profile?.user_id) {
       toast({
@@ -153,7 +204,8 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
           is_free: formData.is_free,
           age_range: formData.age_range,
           location_city: formData.location_city,
-          status: 'pending' // All listings go to pending first
+          images: uploadedImages,
+          status: 'pending'
         });
 
       if (error) throw error;
@@ -164,16 +216,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
       });
       
       setShowCreateModal(false);
-      setFormData({
-        title: '',
-        description: '',
-        category: 'clothing',
-        condition: 'good',
-        price: 0,
-        is_free: true,
-        age_range: '',
-        location_city: '',
-      });
+      resetForm();
       loadListings();
     } catch (error) {
       toast({
@@ -184,6 +227,20 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      description: '',
+      category: 'clothing',
+      condition: 'good',
+      price: 0,
+      is_free: true,
+      age_range: '',
+      location_city: '',
+    });
+    setUploadedImages([]);
   };
 
   const getCategoryInfo = (catId: string) => {
@@ -199,74 +256,135 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
     listing.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Stats
+  const freeCount = listings.filter(l => l.is_free).length;
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-card border-b border-border/50 px-4 py-3">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold">İkinci Əl Bazarı</h1>
-            <p className="text-xs text-muted-foreground">Analardan analara</p>
+    <div className="min-h-screen bg-background pb-24">
+      {/* Premium Header */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600" />
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-white/20 blur-3xl" />
+          <div className="absolute bottom-5 right-10 w-40 h-40 rounded-full bg-cyan-300/20 blur-3xl" />
+        </div>
+        
+        <div className="relative px-4 pt-4 pb-8 safe-area-top">
+          <div className="flex items-center gap-3 mb-4">
+            <motion.button
+              onClick={onBack}
+              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"
+              whileTap={{ scale: 0.95 }}
+            >
+              <ArrowLeft className="w-5 h-5 text-white" />
+            </motion.button>
+            <div className="flex-1">
+              <h1 className="text-xl font-bold text-white">İkinci Əl Bazarı</h1>
+              <p className="text-white/80 text-sm">Analardan analara</p>
+            </div>
+            <motion.button
+              onClick={() => setShowCreateModal(true)}
+              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"
+              whileTap={{ scale: 0.95 }}
+            >
+              <Plus className="w-5 h-5 text-white" />
+            </motion.button>
           </div>
-          <Button size="icon" onClick={() => setShowCreateModal(true)}>
-            <Plus className="w-5 h-5" />
-          </Button>
+
+          {/* Search */}
+          <div className="relative mb-4">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Input
+              placeholder="Axtar..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-12 h-12 rounded-2xl bg-white/95 dark:bg-card/95 backdrop-blur-md border-0 shadow-lg"
+            />
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-3">
+            <motion.div
+              className="bg-white/20 backdrop-blur-md rounded-xl p-3 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <p className="text-2xl font-black text-white">{listings.length}</p>
+              <p className="text-xs text-white/70">Elan</p>
+            </motion.div>
+            <motion.div
+              className="bg-white/20 backdrop-blur-md rounded-xl p-3 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+            >
+              <p className="text-2xl font-black text-white">{freeCount}</p>
+              <p className="text-xs text-white/70">Pulsuz</p>
+            </motion.div>
+            <motion.div
+              className="bg-white/20 backdrop-blur-md rounded-xl p-3 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <p className="text-2xl font-black text-white">{categories.length}</p>
+              <p className="text-xs text-white/70">Kateqoriya</p>
+            </motion.div>
+          </div>
         </div>
       </div>
 
-      <div className="p-4 space-y-4">
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Axtar..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-
+      <div className="px-4 -mt-4 space-y-4">
         {/* Category Filter */}
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
-          <Button
-            variant={selectedCategory === null ? 'default' : 'outline'}
-            size="sm"
+        <motion.div
+          className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+        >
+          <motion.button
             onClick={() => setSelectedCategory(null)}
-            className="shrink-0"
+            className={`shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
+              selectedCategory === null
+                ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30' 
+                : 'bg-card text-foreground border border-border/50'
+            }`}
+            whileTap={{ scale: 0.95 }}
           >
+            <Sparkles className="w-4 h-4" />
             Hamısı
-          </Button>
+          </motion.button>
           {categories.map(cat => (
-            <Button
+            <motion.button
               key={cat.id}
-              variant={selectedCategory === cat.id ? 'default' : 'outline'}
-              size="sm"
               onClick={() => setSelectedCategory(cat.id)}
-              className="shrink-0"
+              className={`shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
+                selectedCategory === cat.id
+                  ? `bg-gradient-to-r ${cat.color} text-white shadow-lg` 
+                  : 'bg-card text-foreground border border-border/50'
+              }`}
+              whileTap={{ scale: 0.95 }}
             >
-              {cat.emoji} {cat.label}
-            </Button>
+              <span>{cat.emoji}</span>
+              {cat.label}
+            </motion.button>
           ))}
-        </div>
+        </motion.div>
 
         {/* Toggle My Listings */}
         <div className="flex gap-2">
           <Button
-            variant={!showMyListings ? 'secondary' : 'outline'}
-            size="sm"
+            variant={!showMyListings ? 'default' : 'outline'}
+            className={`flex-1 ${!showMyListings ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : ''}`}
             onClick={() => setShowMyListings(false)}
-            className="flex-1"
           >
             Bütün elanlar
           </Button>
           <Button
-            variant={showMyListings ? 'secondary' : 'outline'}
-            size="sm"
+            variant={showMyListings ? 'default' : 'outline'}
+            className={`flex-1 ${showMyListings ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : ''}`}
             onClick={() => setShowMyListings(true)}
-            className="flex-1"
           >
             Mənim elanlarım
           </Button>
@@ -274,15 +392,28 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
 
         {/* Listings */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <div className="grid grid-cols-2 gap-3">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="bg-card rounded-2xl overflow-hidden animate-pulse">
+                <div className="aspect-square bg-muted" />
+                <div className="p-3">
+                  <div className="h-4 bg-muted rounded w-3/4 mb-2" />
+                  <div className="h-3 bg-muted rounded w-1/2" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : filteredListings.length === 0 ? (
-          <Card>
+          <Card className="border-dashed">
             <CardContent className="p-8 text-center">
-              <Package className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-              <p className="text-muted-foreground">Hələ elan yoxdur</p>
-              <Button className="mt-4" onClick={() => setShowCreateModal(true)}>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 flex items-center justify-center">
+                <Package className="w-8 h-8 text-emerald-500" />
+              </div>
+              <h3 className="font-bold text-foreground mb-1">Hələ elan yoxdur</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                İlk elanı siz yerləşdirin!
+              </p>
+              <Button onClick={() => setShowCreateModal(true)} className="bg-gradient-to-r from-emerald-500 to-teal-600">
                 <Plus className="w-4 h-4 mr-2" />
                 İlk elanı yarat
               </Button>
@@ -290,7 +421,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
           </Card>
         ) : (
           <div className="grid grid-cols-2 gap-3">
-            {filteredListings.map(listing => {
+            {filteredListings.map((listing, index) => {
               const catInfo = getCategoryInfo(listing.category);
               const condInfo = getConditionInfo(listing.condition);
               
@@ -299,37 +430,61 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                   key={listing.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => {
                     setSelectedListing(listing);
                     setShowDetailModal(true);
                   }}
                 >
-                  <Card className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow">
-                    {/* Image placeholder */}
-                    <div className="aspect-square bg-muted flex items-center justify-center text-4xl">
-                      {catInfo.emoji}
+                  <Card className="overflow-hidden cursor-pointer hover:shadow-lg transition-all group">
+                    {/* Image */}
+                    <div className="aspect-square bg-muted relative overflow-hidden">
+                      {listing.images && listing.images.length > 0 ? (
+                        <img 
+                          src={listing.images[0]} 
+                          alt={listing.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        />
+                      ) : (
+                        <div className={`w-full h-full bg-gradient-to-br ${catInfo.color} flex items-center justify-center`}>
+                          <span className="text-5xl">{catInfo.emoji}</span>
+                        </div>
+                      )}
+                      
+                      {/* Price badge */}
+                      <div className="absolute top-2 left-2">
+                        {listing.is_free ? (
+                          <Badge className="bg-emerald-500 text-white border-0 shadow-lg">
+                            Pulsuz
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-white/90 dark:bg-card/90 text-foreground border-0 shadow-lg">
+                            {listing.price} ₼
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      {/* Image count */}
+                      {listing.images && listing.images.length > 1 && (
+                        <div className="absolute bottom-2 right-2 bg-black/50 backdrop-blur-md px-2 py-1 rounded-lg text-white text-xs flex items-center gap-1">
+                          <ImageIcon className="w-3 h-3" />
+                          {listing.images.length}
+                        </div>
+                      )}
                     </div>
                     
                     <CardContent className="p-3">
-                      <h3 className="font-semibold text-sm line-clamp-1">{listing.title}</h3>
+                      <h3 className="font-bold text-sm line-clamp-1 text-foreground">{listing.title}</h3>
                       
-                      <div className="flex items-center gap-1 mt-1">
+                      <div className="flex items-center gap-1.5 mt-1.5">
                         <span className={`w-2 h-2 rounded-full ${condInfo.color}`} />
                         <span className="text-xs text-muted-foreground">{condInfo.label}</span>
-                      </div>
-                      
-                      <div className="flex items-center justify-between mt-2">
-                        {listing.is_free ? (
-                          <span className="text-sm font-bold text-green-600">Pulsuz</span>
-                        ) : (
-                          <span className="text-sm font-bold">{listing.price} ₼</span>
-                        )}
-                        
                         {listing.age_range && (
-                          <span className="text-xs bg-muted px-2 py-0.5 rounded">
-                            {listing.age_range}
-                          </span>
+                          <>
+                            <span className="text-muted-foreground">•</span>
+                            <span className="text-xs text-muted-foreground">{listing.age_range}</span>
+                          </>
                         )}
                       </div>
                       
@@ -349,29 +504,81 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
       </div>
 
       {/* Create Listing Modal */}
-      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+      <Dialog open={showCreateModal} onOpenChange={(open) => { if (!open) resetForm(); setShowCreateModal(open); }}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Yeni elan yarat</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                <Plus className="w-4 h-4 text-white" />
+              </div>
+              Yeni elan yarat
+            </DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-4">
+          <div className="space-y-4 mt-4">
+            {/* Image Upload */}
             <div>
-              <label className="text-sm font-medium mb-1 block">Başlıq *</label>
-              <Input
-                placeholder="Məsələn: 0-3 ay oğlan geyimləri"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              <label className="text-sm font-medium mb-2 block">Şəkillər (maks. 5)</label>
+              <div className="grid grid-cols-5 gap-2">
+                {uploadedImages.map((img, index) => (
+                  <div key={index} className="aspect-square relative rounded-xl overflow-hidden group">
+                    <img src={img} alt="" className="w-full h-full object-cover" />
+                    <motion.button
+                      onClick={() => removeImage(index)}
+                      className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <X className="w-3 h-3" />
+                    </motion.button>
+                  </div>
+                ))}
+                
+                {uploadedImages.length < 5 && (
+                  <motion.button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingImages}
+                    className="aspect-square rounded-xl border-2 border-dashed border-border hover:border-primary flex flex-col items-center justify-center gap-1 transition-colors"
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {uploadingImages ? (
+                      <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                    ) : (
+                      <>
+                        <ImagePlus className="w-5 h-5 text-muted-foreground" />
+                        <span className="text-[10px] text-muted-foreground">Əlavə et</span>
+                      </>
+                    )}
+                  </motion.button>
+                )}
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageUpload}
+                className="hidden"
               />
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-1 block">Təsvir</label>
+              <label className="text-sm font-medium mb-1.5 block">Başlıq *</label>
+              <Input
+                placeholder="Məsələn: 0-3 ay oğlan geyimləri"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="bg-muted/50"
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">Təsvir</label>
               <Textarea
                 placeholder="Əşya haqqında məlumat..."
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
+                className="bg-muted/50"
               />
             </div>
             
@@ -379,15 +586,19 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
               <label className="text-sm font-medium mb-2 block">Kateqoriya</label>
               <div className="flex flex-wrap gap-2">
                 {categories.map(cat => (
-                  <Button
+                  <motion.button
                     key={cat.id}
                     type="button"
-                    variant={formData.category === cat.id ? 'default' : 'outline'}
-                    size="sm"
                     onClick={() => setFormData({ ...formData, category: cat.id })}
+                    className={`px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 ${
+                      formData.category === cat.id 
+                        ? `bg-gradient-to-r ${cat.color} text-white shadow-lg` 
+                        : 'bg-muted hover:bg-muted/80'
+                    }`}
+                    whileTap={{ scale: 0.95 }}
                   >
                     {cat.emoji} {cat.label}
-                  </Button>
+                  </motion.button>
                 ))}
               </div>
             </div>
@@ -396,16 +607,20 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
               <label className="text-sm font-medium mb-2 block">Vəziyyət</label>
               <div className="flex flex-wrap gap-2">
                 {conditions.map(cond => (
-                  <Button
+                  <motion.button
                     key={cond.id}
                     type="button"
-                    variant={formData.condition === cond.id ? 'default' : 'outline'}
-                    size="sm"
                     onClick={() => setFormData({ ...formData, condition: cond.id })}
+                    className={`px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 ${
+                      formData.condition === cond.id 
+                        ? `${cond.color} text-white shadow-lg` 
+                        : 'bg-muted hover:bg-muted/80'
+                    }`}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    <span className={`w-2 h-2 rounded-full ${cond.color} mr-1`} />
+                    <span className={`w-2 h-2 rounded-full ${formData.condition === cond.id ? 'bg-white' : cond.color}`} />
                     {cond.label}
-                  </Button>
+                  </motion.button>
                 ))}
               </div>
             </div>
@@ -414,15 +629,19 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
               <label className="text-sm font-medium mb-2 block">Yaş aralığı</label>
               <div className="flex flex-wrap gap-2">
                 {ageRanges.map(age => (
-                  <Button
+                  <motion.button
                     key={age}
                     type="button"
-                    variant={formData.age_range === age ? 'default' : 'outline'}
-                    size="sm"
                     onClick={() => setFormData({ ...formData, age_range: age })}
+                    className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                      formData.age_range === age 
+                        ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg' 
+                        : 'bg-muted hover:bg-muted/80'
+                    }`}
+                    whileTap={{ scale: 0.95 }}
                   >
                     {age}
-                  </Button>
+                  </motion.button>
                 ))}
               </div>
             </div>
@@ -433,7 +652,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 <Button
                   type="button"
                   variant={formData.is_free ? 'default' : 'outline'}
-                  size="sm"
+                  className={formData.is_free ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : ''}
                   onClick={() => setFormData({ ...formData, is_free: true, price: 0 })}
                 >
                   Pulsuz
@@ -441,7 +660,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 <Button
                   type="button"
                   variant={!formData.is_free ? 'default' : 'outline'}
-                  size="sm"
+                  className={!formData.is_free ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : ''}
                   onClick={() => setFormData({ ...formData, is_free: false })}
                 >
                   Pullu
@@ -454,7 +673,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                     placeholder="0"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                    className="w-24"
+                    className="w-24 bg-muted/50"
                   />
                   <span className="text-muted-foreground">₼</span>
                 </div>
@@ -462,16 +681,17 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-1 block">Şəhər</label>
+              <label className="text-sm font-medium mb-1.5 block">Şəhər</label>
               <Input
                 placeholder="Məsələn: Bakı"
                 value={formData.location_city}
                 onChange={(e) => setFormData({ ...formData, location_city: e.target.value })}
+                className="bg-muted/50"
               />
             </div>
             
             <Button 
-              className="w-full" 
+              className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700" 
               onClick={handleCreateListing}
               disabled={isSubmitting}
             >
@@ -493,42 +713,82 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
 
       {/* Listing Detail Modal */}
       <Dialog open={showDetailModal} onOpenChange={setShowDetailModal}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-h-[90vh] overflow-y-auto p-0">
           {selectedListing && (
             <>
-              <div className="aspect-video bg-muted rounded-lg flex items-center justify-center text-6xl mb-4">
-                {getCategoryInfo(selectedListing.category).emoji}
+              {/* Image Gallery */}
+              <div className="relative">
+                {selectedListing.images && selectedListing.images.length > 0 ? (
+                  <div className="aspect-video bg-muted">
+                    <img 
+                      src={selectedListing.images[0]} 
+                      alt={selectedListing.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className={`aspect-video bg-gradient-to-br ${getCategoryInfo(selectedListing.category).color} flex items-center justify-center`}>
+                    <span className="text-7xl">{getCategoryInfo(selectedListing.category).emoji}</span>
+                  </div>
+                )}
+                
+                <motion.button
+                  onClick={() => setShowDetailModal(false)}
+                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center"
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <X className="w-4 h-4 text-white" />
+                </motion.button>
+
+                {/* Image thumbnails */}
+                {selectedListing.images && selectedListing.images.length > 1 && (
+                  <div className="absolute bottom-3 left-3 right-3 flex gap-2 overflow-x-auto">
+                    {selectedListing.images.map((img, i) => (
+                      <div key={i} className="w-12 h-12 rounded-lg overflow-hidden shrink-0 border-2 border-white/50">
+                        <img src={img} alt="" className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               
-              <div className="space-y-4">
+              <div className="p-5 space-y-4">
                 <div>
-                  <h2 className="text-xl font-bold">{selectedListing.title}</h2>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className={`px-2 py-0.5 rounded text-xs ${getConditionInfo(selectedListing.condition).color} text-white`}>
+                  <h2 className="text-xl font-bold text-foreground">{selectedListing.title}</h2>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Badge className={`${getConditionInfo(selectedListing.condition).color} text-white border-0`}>
                       {getConditionInfo(selectedListing.condition).label}
-                    </span>
+                    </Badge>
                     {selectedListing.age_range && (
-                      <span className="text-xs bg-muted px-2 py-0.5 rounded">
-                        {selectedListing.age_range}
-                      </span>
+                      <Badge variant="secondary">{selectedListing.age_range}</Badge>
                     )}
                   </div>
                 </div>
                 
-                <div className="text-2xl font-bold">
-                  {selectedListing.is_free ? (
-                    <span className="text-green-600">Pulsuz</span>
-                  ) : (
-                    <span>{selectedListing.price} ₼</span>
-                  )}
-                </div>
+                {/* Price Card */}
+                <Card className={`${selectedListing.is_free ? 'bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-emerald-200 dark:border-emerald-900/30' : 'bg-muted/50'}`}>
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Qiymət</p>
+                      <p className={`text-2xl font-black ${selectedListing.is_free ? 'text-emerald-600' : 'text-foreground'}`}>
+                        {selectedListing.is_free ? 'Pulsuz' : `${selectedListing.price} ₼`}
+                      </p>
+                    </div>
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedListing.is_free ? 'bg-emerald-500' : 'bg-muted'}`}>
+                      <Tag className={`w-6 h-6 ${selectedListing.is_free ? 'text-white' : 'text-muted-foreground'}`} />
+                    </div>
+                  </CardContent>
+                </Card>
                 
                 {selectedListing.description && (
-                  <p className="text-muted-foreground">{selectedListing.description}</p>
+                  <div>
+                    <h4 className="font-bold mb-2">Təsvir</h4>
+                    <p className="text-muted-foreground">{selectedListing.description}</p>
+                  </div>
                 )}
                 
                 {selectedListing.location_city && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2 text-muted-foreground">
                     <MapPin className="w-4 h-4" />
                     {selectedListing.location_city}
                   </div>
@@ -536,10 +796,10 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Clock className="w-4 h-4" />
-                  {new Date(selectedListing.created_at).toLocaleDateString('az-AZ')}
+                  {format(new Date(selectedListing.created_at), 'd MMMM yyyy', { locale: az })}
                 </div>
                 
-                <Button className="w-full" size="lg">
+                <Button className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700" size="lg">
                   <MessageCircle className="w-5 h-5 mr-2" />
                   Satıcı ilə əlaqə
                 </Button>
