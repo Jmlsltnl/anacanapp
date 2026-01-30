@@ -34,6 +34,7 @@ import AdminPlayActivities from './admin/AdminPlayActivities';
 import AdminQuickActions from './admin/AdminQuickActions';
 import AdminDevelopmentTips from './admin/AdminDevelopmentTips';
 import AdminBanners from './admin/AdminBanners';
+import AdminBabyGrowth from './admin/AdminBabyGrowth';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -110,6 +111,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminDevelopmentTips />;
       case 'banners':
         return <AdminBanners />;
+      case 'baby-growth':
+        return <AdminBabyGrowth />;
       case 'security':
         return <AdminSecurity />;
       default:

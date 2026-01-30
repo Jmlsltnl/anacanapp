@@ -48,6 +48,7 @@ const menuItems = [
   { id: 'quick-actions', label: 'Sürətli Keçidlər', icon: Zap },
   { id: 'development-tips', label: 'İnkişaf Tövsiyələri', icon: Lightbulb },
   { id: 'banners', label: 'Bannerlər', icon: Megaphone },
+  { id: 'baby-growth', label: 'Böyümə İzləmə', icon: Scale },
   { id: 'settings', label: 'Tənzimləmələr', icon: Settings },
   { id: 'security', label: 'Təhlükəsizlik', icon: Shield },
 ];
