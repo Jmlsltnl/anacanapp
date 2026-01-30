@@ -42,16 +42,11 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
   const [timer, setTimer] = useState<number | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
-  const [usageInfo, setUsageInfo] = useState<{ allowed: boolean; remainingSeconds: number }>({ allowed: true, remainingSeconds: Infinity });
   
   const trackingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastTrackTimeRef = useRef<number>(Date.now());
 
-  // Check usage limits
-  useEffect(() => {
-    const info = canUseWhiteNoise();
-    setUsageInfo(info);
-  }, [canUseWhiteNoise]);
+  const usageInfo = useMemo(() => canUseWhiteNoise(), [canUseWhiteNoise]);
 
   // Initialize from preferences
   useEffect(() => {
@@ -64,11 +59,14 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
           setActiveSound(preferences.last_white_noise_sound);
           if (preferences.white_noise_timer) {
             setTimeRemaining(preferences.white_noise_timer * 60);
+          } else if (!isPremium) {
+            const info = canUseWhiteNoise();
+            setTimeRemaining(info.remainingSeconds < Infinity ? info.remainingSeconds : null);
           }
         }
       }
     }
-  }, [preferences, isPremium]);
+  }, [preferences, isPremium, canUseWhiteNoise]);
 
   // Timer countdown and usage tracking
   useEffect(() => {
@@ -80,30 +78,21 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
           if (prev === null || prev <= 1) {
             setActiveSound(null);
             updateLastWhiteNoiseSound(null);
+            // Free user without explicit timer => daily limit reached
+            if (!isPremium && timer === null) {
+              setShowPremiumModal(true);
+            }
             return null;
           }
           return prev - 1;
         });
       }, 1000);
-    } else if (activeSound && timeRemaining === null) {
-      if (!isPremium) {
-        interval = setInterval(() => {
-          const info = canUseWhiteNoise();
-          setUsageInfo(info);
-          
-          if (!info.allowed) {
-            setActiveSound(null);
-            updateLastWhiteNoiseSound(null);
-            setShowPremiumModal(true);
-          }
-        }, 1000);
-      }
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [activeSound, timeRemaining, isPremium]);
+  }, [activeSound, timeRemaining, isPremium, timer, updateLastWhiteNoiseSound]);
 
   // Track usage every 10 seconds for free users
   useEffect(() => {
@@ -128,7 +117,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
         }
       };
     }
-  }, [activeSound, isPremium]);
+  }, [activeSound, isPremium, trackWhiteNoiseUsage]);
 
   const handleSoundToggle = async (soundId: string) => {
     if (activeSound === soundId) {
@@ -142,7 +131,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
       setTimeRemaining(null);
       await updateLastWhiteNoiseSound(null);
     } else {
-      const { allowed } = canUseWhiteNoise();
+      const { allowed, remainingSeconds } = canUseWhiteNoise();
       if (!allowed && !isPremium) {
         setShowPremiumModal(true);
         return;
@@ -152,14 +141,15 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
       setActiveSound(soundId);
       await updateLastWhiteNoiseSound(soundId);
       
-      if (timer) {
-        setTimeRemaining(timer * 60);
-      } else if (!isPremium) {
-        const info = canUseWhiteNoise();
-        if (info.remainingSeconds < Infinity) {
-          setTimeRemaining(info.remainingSeconds);
-        }
+      if (isPremium) {
+        setTimeRemaining(timer ? timer * 60 : null);
+        return;
       }
+
+      // Free tier: always count down against remaining daily seconds
+      const requestedSeconds = timer ? timer * 60 : remainingSeconds;
+      const cappedSeconds = Math.min(requestedSeconds, remainingSeconds);
+      setTimeRemaining(cappedSeconds);
     }
   };
 
@@ -170,15 +160,36 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
   };
 
   const handleTimerChange = async (newTimer: number | null) => {
+    // Free users don't have unlimited timer option
+    if (!isPremium && newTimer === null) {
+      setShowPremiumModal(true);
+      return;
+    }
+
     setTimer(newTimer);
     await updateWhiteNoiseTimer(newTimer);
-    if (activeSound && newTimer) {
-      setTimeRemaining(newTimer * 60);
-    } else if (!isPremium && activeSound) {
-      const info = canUseWhiteNoise();
-      setTimeRemaining(info.remainingSeconds < Infinity ? info.remainingSeconds : null);
-    } else {
+
+    if (!activeSound) {
+      setTimeRemaining(newTimer ? newTimer * 60 : null);
+      return;
+    }
+
+    if (isPremium) {
+      setTimeRemaining(newTimer ? newTimer * 60 : null);
+      return;
+    }
+
+    const info = canUseWhiteNoise();
+    if (!info.allowed) {
+      setActiveSound(null);
+      await updateLastWhiteNoiseSound(null);
+      setShowPremiumModal(true);
       setTimeRemaining(null);
+      return;
+    }
+
+    if (newTimer) {
+      setTimeRemaining(Math.min(newTimer * 60, info.remainingSeconds));
     }
   };
 
@@ -209,28 +220,28 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
     );
   }
 
-  const remainingMinutes = Math.floor(usageInfo.remainingSeconds / 60);
+  const remainingMinutes = usageInfo.remainingSeconds === Infinity ? null : Math.floor(usageInfo.remainingSeconds / 60);
   const activeDbSound = sounds.find(s => s.id === activeSound);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="gradient-primary px-3 pt-3 pb-8 rounded-b-[1.5rem] flex-shrink-0 relative z-20">
-        <div className="flex items-center gap-3 relative z-20">
+      <div className="gradient-primary px-3 pt-3 pb-8 rounded-b-[1.5rem] flex-shrink-0 relative z-20 isolate">
+        <div className="flex items-center gap-3 relative z-30">
           <motion.button
             onClick={onBack}
-            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-xl bg-background/20 backdrop-blur-md border border-border/30 flex items-center justify-center"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <ArrowLeft className="w-4 h-4 text-white" />
+            <ArrowLeft className="w-4 h-4 text-primary-foreground" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold text-white">Bəyaz Küylər</h1>
-            <p className="text-white/80 text-xs">Körpəni sakitləşdirin</p>
+            <h1 className="text-lg font-bold text-primary-foreground">Bəyaz Küylər</h1>
+            <p className="text-primary-foreground/80 text-xs">Körpəni sakitləşdirin</p>
           </div>
           {isPremium && (
-            <div className="bg-amber-400 text-amber-900 px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1">
+            <div className="bg-background/20 backdrop-blur-md border border-border/30 text-primary-foreground px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1">
               <Crown className="w-3 h-3" />
               Premium
             </div>
@@ -239,42 +250,34 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
       </div>
 
       {/* Content - Scrollable */}
-      <div className="flex-1 overflow-y-auto px-3 -mt-4">
+      <div className="flex-1 overflow-y-auto px-3 -mt-4 relative z-10">
         {/* Free tier usage info */}
-        {!isPremium && (
+        {!isPremium && remainingMinutes !== null && (
           <motion.div
             initial={{ y: -10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className={`rounded-xl p-3 mb-3 flex items-center gap-2 ${
+            className={`rounded-xl p-3 mb-3 flex items-center gap-2 border ${
               usageInfo.remainingSeconds < 300 
-                ? 'bg-red-50 dark:bg-red-900/20' 
-                : 'bg-amber-50 dark:bg-amber-900/20'
+                ? 'bg-destructive/10 border-destructive/20' 
+                : 'bg-primary/10 border-primary/20'
             }`}
           >
             {usageInfo.remainingSeconds < 300 ? (
-              <Lock className="w-4 h-4 text-red-500 flex-shrink-0" />
+              <Lock className="w-4 h-4 text-destructive flex-shrink-0" />
             ) : (
-              <Crown className="w-4 h-4 text-amber-500 flex-shrink-0" />
+              <Crown className="w-4 h-4 text-primary flex-shrink-0" />
             )}
             <div className="flex-1">
-              <p className={`text-xs font-medium ${
-                usageInfo.remainingSeconds < 300 
-                  ? 'text-red-800 dark:text-red-200'
-                  : 'text-amber-800 dark:text-amber-200'
-              }`}>
+              <p className={`text-xs font-medium ${usageInfo.remainingSeconds < 300 ? 'text-destructive' : 'text-foreground'}`}>
                 Bu gün qalan: {remainingMinutes} dəqiqə
               </p>
-              <p className={`text-[10px] mt-0.5 ${
-                usageInfo.remainingSeconds < 300 
-                  ? 'text-red-600 dark:text-red-300'
-                  : 'text-amber-600 dark:text-amber-300'
-              }`}>
+              <p className="text-[10px] mt-0.5 text-muted-foreground">
                 Limitsiz istifadə üçün Premium-a keçin
               </p>
             </div>
             <motion.button
               onClick={() => setShowPremiumModal(true)}
-              className="bg-amber-400 text-amber-900 px-2 py-1 rounded-lg text-[10px] font-bold"
+              className="gradient-primary text-primary-foreground px-2 py-1 rounded-lg text-[10px] font-bold"
               whileTap={{ scale: 0.95 }}
             >
               Premium
@@ -310,7 +313,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
                 {[...Array(20)].map((_, i) => (
                   <motion.div
                     key={i}
-                    className="w-1 bg-white/60 rounded-full"
+                    className="w-1 bg-primary-foreground/60 rounded-full"
                     animate={{
                       height: [8, 24 + Math.random() * 16, 8],
                     }}
@@ -335,10 +338,10 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
                 
                 <motion.button
                   onClick={() => handleSoundToggle(activeSound)}
-                  className="w-14 h-14 rounded-full bg-white flex items-center justify-center"
+                  className="w-14 h-14 rounded-full bg-background text-foreground flex items-center justify-center"
                   whileTap={{ scale: 0.9 }}
                 >
-                  <Pause className="w-7 h-7 text-gray-800" />
+                  <Pause className="w-7 h-7" />
                 </motion.button>
 
                 <div className="w-10" />
