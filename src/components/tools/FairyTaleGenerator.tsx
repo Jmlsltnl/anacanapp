@@ -537,8 +537,8 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
           {selectedTale && (
             <>
               {/* Header with gradient */}
-              <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white p-6 sticky top-0 z-10">
-                <div className="flex items-center gap-3 mb-4">
+              <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white p-6 sticky top-0 z-20 isolate">
+                <div className="flex items-center gap-3 mb-4 relative z-20">
                   <div className="text-4xl">
                     {themes.find(t => t.name === selectedTale.theme)?.emoji || '📖'}
                   </div>

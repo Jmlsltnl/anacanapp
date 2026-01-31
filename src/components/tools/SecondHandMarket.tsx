@@ -265,9 +265,9 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Premium Header */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600" />
-        <div className="absolute inset-0 opacity-30">
+        <div className="relative overflow-hidden isolate">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 pointer-events-none" />
+          <div className="absolute inset-0 opacity-30 pointer-events-none">
           <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-white/20 blur-3xl" />
           <div className="absolute bottom-5 right-10 w-40 h-40 rounded-full bg-cyan-300/20 blur-3xl" />
         </div>
@@ -276,7 +276,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
           <div className="flex items-center gap-3 mb-4 relative z-20">
             <motion.button
               onClick={onBack}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"
+                className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center relative z-30"
               whileTap={{ scale: 0.95 }}
             >
               <ArrowLeft className="w-5 h-5 text-white" />
@@ -287,7 +287,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             </div>
             <motion.button
               onClick={() => setShowCreateModal(true)}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"
+                className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center relative z-30"
               whileTap={{ scale: 0.95 }}
             >
               <Plus className="w-5 h-5 text-white" />

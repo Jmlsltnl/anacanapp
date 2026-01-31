@@ -512,7 +512,7 @@ Anacan tətbiqi ilə yaradılıb 💜`;
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white safe-area-top overflow-hidden">
+      <div className="sticky top-0 z-20 isolate bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white safe-area-top overflow-hidden">
         {/* Animated stars */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {[...Array(15)].map((_, i) => (
@@ -539,9 +539,9 @@ Anacan tətbiqi ilə yaradılıb 💜`;
           ))}
         </div>
 
-        <div className="relative z-10 p-4">
-          <div className="flex items-center gap-3 mb-4">
-            <button onClick={onBack} className="p-2 hover:bg-white/20 rounded-full transition-colors">
+        <div className="relative z-20 p-4">
+          <div className="flex items-center gap-3 mb-4 relative z-20">
+            <button onClick={onBack} className="relative z-30 p-2 hover:bg-white/20 rounded-full transition-colors">
               <ArrowLeft className="h-5 w-5" />
             </button>
             <div className="flex-1">

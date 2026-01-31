@@ -82,13 +82,13 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className={`sticky top-0 z-10 text-white p-4 safe-area-top ${
+      <div className={`sticky top-0 z-20 isolate text-white p-4 safe-area-top ${
         selectedScenario 
           ? `bg-gradient-to-r ${getEmergencyColor(selectedScenario.emergency_level)}`
           : 'bg-gradient-to-r from-red-500 to-rose-500'
       }`}>
-        <div className="flex items-center gap-3">
-          <button onClick={handleBack} className="p-2 hover:bg-white/20 rounded-full transition-colors">
+        <div className="flex items-center gap-3 relative z-20">
+          <button onClick={handleBack} className="relative z-30 p-2 hover:bg-white/20 rounded-full transition-colors">
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div className="flex-1">
@@ -104,7 +104,7 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
           {selectedScenario && (
             <button 
               onClick={() => isSpeaking ? stopSpeaking() : speak(currentStepData?.instruction_az || '')}
-              className="p-2 hover:bg-white/20 rounded-full"
+              className="relative z-30 p-2 hover:bg-white/20 rounded-full"
             >
               {isSpeaking ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
             </button>
