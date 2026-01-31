@@ -1286,6 +1286,54 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_summaries: {
+        Row: {
+          contraction_count: number | null
+          created_at: string
+          id: string
+          is_sent: boolean | null
+          kick_count: number | null
+          mood: number | null
+          notes: string | null
+          partner_user_id: string
+          sent_at: string | null
+          summary_date: string
+          symptoms: string[] | null
+          user_id: string
+          water_intake: number | null
+        }
+        Insert: {
+          contraction_count?: number | null
+          created_at?: string
+          id?: string
+          is_sent?: boolean | null
+          kick_count?: number | null
+          mood?: number | null
+          notes?: string | null
+          partner_user_id: string
+          sent_at?: string | null
+          summary_date?: string
+          symptoms?: string[] | null
+          user_id: string
+          water_intake?: number | null
+        }
+        Update: {
+          contraction_count?: number | null
+          created_at?: string
+          id?: string
+          is_sent?: boolean | null
+          kick_count?: number | null
+          mood?: number | null
+          notes?: string | null
+          partner_user_id?: string
+          sent_at?: string | null
+          summary_date?: string
+          symptoms?: string[] | null
+          user_id?: string
+          water_intake?: number | null
+        }
+        Relationships: []
+      }
       development_tips: {
         Row: {
           age_group: string
@@ -2021,6 +2069,7 @@ export type Database = {
       }
       hospital_bag_items: {
         Row: {
+          added_by: string | null
           category: string
           created_at: string
           id: string
@@ -2031,6 +2080,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          added_by?: string | null
           category: string
           created_at?: string
           id?: string
@@ -2041,6 +2091,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          added_by?: string | null
           category?: string
           created_at?: string
           id?: string
@@ -2573,6 +2624,42 @@ export type Database = {
           label_az?: string | null
           option_id?: string
           sort_order?: number | null
+        }
+        Relationships: []
+      }
+      name_votes: {
+        Row: {
+          created_at: string
+          gender: string
+          id: string
+          meaning: string | null
+          name: string
+          origin: string | null
+          partner_user_id: string | null
+          user_id: string
+          vote: string
+        }
+        Insert: {
+          created_at?: string
+          gender?: string
+          id?: string
+          meaning?: string | null
+          name: string
+          origin?: string | null
+          partner_user_id?: string | null
+          user_id: string
+          vote: string
+        }
+        Update: {
+          created_at?: string
+          gender?: string
+          id?: string
+          meaning?: string | null
+          name?: string
+          origin?: string | null
+          partner_user_id?: string | null
+          user_id?: string
+          vote?: string
         }
         Relationships: []
       }
@@ -4295,6 +4382,48 @@ export type Database = {
           priority?: string | null
           quantity?: number | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      sos_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          alert_type: string
+          created_at: string
+          id: string
+          is_acknowledged: boolean | null
+          latitude: number | null
+          location_name: string | null
+          longitude: number | null
+          message: string | null
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          alert_type?: string
+          created_at?: string
+          id?: string
+          is_acknowledged?: boolean | null
+          latitude?: number | null
+          location_name?: string | null
+          longitude?: number | null
+          message?: string | null
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          alert_type?: string
+          created_at?: string
+          id?: string
+          is_acknowledged?: boolean | null
+          latitude?: number | null
+          location_name?: string | null
+          longitude?: number | null
+          message?: string | null
+          receiver_id?: string
+          sender_id?: string
         }
         Relationships: []
       }

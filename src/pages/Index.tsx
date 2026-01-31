@@ -29,6 +29,10 @@ import UserProfileScreen from '@/components/community/UserProfileScreen';
 import BillingScreen from '@/components/BillingScreen';
 import BlogScreen from '@/components/BlogScreen';
 import LegalScreen from '@/components/LegalScreen';
+import NameVotingScreen from '@/components/partner/NameVotingScreen';
+import PartnerHospitalBagScreen from '@/components/partner/PartnerHospitalBagScreen';
+import DailySummaryScreen from '@/components/partner/DailySummaryScreen';
+import { SOSAlertReceiver } from '@/components/partner/SOSButton';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useDeviceToken } from '@/hooks/useDeviceToken';
@@ -98,7 +102,7 @@ const Index = () => {
         case 'home':
           return (
             <motion.div key="partner-home" variants={pageVariants} initial="initial" animate="animate" exit="exit">
-              <PartnerDashboard />
+              <PartnerDashboard onNavigate={setActiveScreen} />
             </motion.div>
           );
         case 'chat':
@@ -244,6 +248,16 @@ const Index = () => {
   if (activeScreen === 'shop' && isAdmin) {
     return <ShopScreen onBack={() => setActiveScreen(null)} />;
   }
+  // Partner-specific screens
+  if (activeScreen === 'name-voting' && role === 'partner') {
+    return <NameVotingScreen onBack={() => setActiveScreen(null)} />;
+  }
+  if (activeScreen === 'partner-hospital-bag' && role === 'partner') {
+    return <PartnerHospitalBagScreen onBack={() => setActiveScreen(null)} />;
+  }
+  if (activeScreen === 'daily-summary' && role === 'partner') {
+    return <DailySummaryScreen onBack={() => setActiveScreen(null)} />;
+  }
 
   // Mother chat overlay (for woman role)
   if (showMotherChat && role === 'woman') {
@@ -252,6 +266,9 @@ const Index = () => {
 
   return (
     <div className="fixed inset-0 flex flex-col bg-background overflow-hidden">
+      {/* SOS Alert Receiver for partners */}
+      {role === 'partner' && <SOSAlertReceiver />}
+      
       {/* Status bar area - fills with card background */}
       <div 
         className="bg-card flex-shrink-0" 
