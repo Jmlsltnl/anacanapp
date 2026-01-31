@@ -135,18 +135,18 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Premium Header */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-pink-500 via-rose-500 to-fuchsia-600" />
-        <div className="absolute inset-0 opacity-30">
+      <div className="sticky top-0 z-20 isolate relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-pink-500 via-rose-500 to-fuchsia-600 pointer-events-none" />
+        <div className="absolute inset-0 opacity-30 pointer-events-none">
           <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-white/20 blur-3xl" />
           <div className="absolute bottom-5 right-10 w-40 h-40 rounded-full bg-pink-300/20 blur-3xl" />
         </div>
         
-        <div className="relative px-4 pt-4 pb-8 safe-area-top z-20">
-          <div className="flex items-center gap-3 mb-4 relative z-20">
+        <div className="relative px-4 pt-4 pb-8 safe-area-top">
+          <div className="flex items-center gap-3 mb-4 relative z-30">
             <motion.button
               onClick={onBack}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"
+              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center relative z-30"
               whileTap={{ scale: 0.95 }}
             >
               <ArrowLeft className="w-5 h-5 text-white" />
@@ -157,7 +157,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
             </div>
             <motion.button
               onClick={() => setShowFilters(!showFilters)}
-              className={`w-10 h-10 rounded-full backdrop-blur-md flex items-center justify-center ${
+              className={`w-10 h-10 rounded-full backdrop-blur-md flex items-center justify-center relative z-30 ${
                 showFilters || selectedAmenities.length > 0 ? 'bg-white text-pink-600' : 'bg-white/20'
               }`}
               whileTap={{ scale: 0.95 }}
@@ -166,7 +166,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
             </motion.button>
             <motion.button
               onClick={() => setShowAddPlace(true)}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"
+              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center relative z-30"
               whileTap={{ scale: 0.95 }}
             >
               <Plus className="w-5 h-5 text-white" />
@@ -174,7 +174,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
           </div>
 
           {/* Search */}
-          <div className="relative mb-4">
+          <div className="relative mb-4 z-20">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
               value={searchQuery}

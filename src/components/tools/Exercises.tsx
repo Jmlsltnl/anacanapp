@@ -69,13 +69,14 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-background pb-24">
+    <div className="min-h-screen bg-gradient-to-b from-cyan-50 dark:from-cyan-950/20 to-background pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-br from-cyan-500 to-teal-600 px-3 pt-3 pb-6 relative z-20">
-        <div className="flex items-center gap-3 mb-4 relative z-20">
+      <div className="sticky top-0 z-20 isolate bg-gradient-to-br from-cyan-500 to-teal-600 px-3 pt-3 pb-6">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 to-teal-600 pointer-events-none" />
+        <div className="flex items-center gap-3 mb-4 relative z-30">
           <motion.button
             onClick={onBack}
-            className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center relative z-30"
             whileTap={{ scale: 0.95 }}
           >
             <ArrowLeft className="w-4 h-4 text-white" />

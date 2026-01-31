@@ -102,11 +102,12 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="gradient-primary px-3 pt-3 pb-8 safe-top relative z-20">
-        <div className="flex items-center gap-2 relative z-20">
+      <div className="sticky top-0 z-20 isolate gradient-primary px-3 pt-3 pb-8 safe-top">
+        <div className="absolute inset-0 gradient-primary pointer-events-none" />
+        <div className="flex items-center gap-2 relative z-30">
           <motion.button
             onClick={onBack}
-            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center relative z-30"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -118,7 +119,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
           </div>
           <motion.button
             onClick={() => setShowAddForm(true)}
-            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center relative z-30"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >

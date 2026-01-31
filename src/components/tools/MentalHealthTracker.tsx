@@ -157,8 +157,9 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-500 text-white p-4 safe-area-top">
-        <div className="flex items-center gap-3 relative z-20">
+      <div className="sticky top-0 z-20 isolate bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-500 text-white p-4 safe-area-top">
+        <div className="absolute inset-0 bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-500 pointer-events-none" />
+        <div className="flex items-center gap-3 relative z-30">
           <button onClick={onBack} className="p-2 hover:bg-white/20 rounded-full transition-colors relative z-30">
             <ArrowLeft className="h-5 w-5" />
           </button>
