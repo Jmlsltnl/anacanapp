@@ -6,7 +6,8 @@ import {
   Sparkles, Baby, Clock, AlertCircle, Home,
   Coffee, Flower2, Stethoscope, Star, Trophy,
   Target, Zap, Send, Droplets, Activity, BarChart3,
-  Moon, Smile, Frown, Meh, User, Timer, RefreshCw
+  Moon, Smile, Frown, Meh, User, Timer, RefreshCw,
+  Package, FileText, Vote
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { hapticFeedback } from '@/lib/native';
@@ -20,6 +21,8 @@ import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useDailyTip } from '@/hooks/usePartnerDailyTips';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { usePartnerHospitalBag } from '@/hooks/usePartnerHospitalBag';
+import { useDailySummary } from '@/hooks/useDailySummary';
 import { supabase } from '@/integrations/supabase/client';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { translateSymptoms, formatRelativeDateAz } from '@/lib/date-utils';
@@ -29,6 +32,7 @@ import WeeklyStatsTab from './partner/WeeklyStatsTab';
 import NotificationsTab from './partner/NotificationsTab';
 import SurpriseTab from './partner/SurpriseTab';
 import LevelUpCelebration from './partner/LevelUpCelebration';
+import SOSButton from './partner/SOSButton';
 
 // Animated Progress Ring
 const ProgressRing = ({ progress, size = 120, strokeWidth = 10, color = 'stroke-white' }: {
@@ -113,7 +117,11 @@ const QuickAction = ({ icon: Icon, label, gradient, onClick, delay = 0 }: {
   </motion.button>
 );
 
-const PartnerDashboard = () => {
+interface PartnerDashboardProps {
+  onNavigate?: (screen: string) => void;
+}
+
+const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
   useScrollToTop();
   
   const { name } = useUserStore();
@@ -123,6 +131,8 @@ const PartnerDashboard = () => {
   const { items: shoppingItems, addItem, toggleItem, loading: shoppingLoading } = useShoppingItems();
   const { messages, markAsRead, getUnreadCount } = usePartnerMessages();
   const { missions, toggleMission: toggleMissionHook, totalPoints, level, pointsToNextLevel, levelProgress, completedCount } = usePartnerMissions();
+  const { getProgress: getHospitalBagProgress, checkedCount: bagChecked, totalCount: bagTotal } = usePartnerHospitalBag();
+  const { todaySummary } = useDailySummary();
   const [activeTab, setActiveTab] = useState<'home' | 'missions' | 'shopping' | 'notifications' | 'stats' | 'surprise'>('home');
   const [showChat, setShowChat] = useState(false);
   const [showLevelUp, setShowLevelUp] = useState(false);
@@ -599,7 +609,7 @@ const PartnerDashboard = () => {
               {/* Quick Actions */}
               <div>
                 <h2 className="font-bold text-lg mb-3">Sürətli Hərəkətlər</h2>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   <QuickAction 
                     icon={Heart} 
                     label="Sevgi göndər" 
@@ -612,24 +622,126 @@ const PartnerDashboard = () => {
                     label="Canlı chat" 
                     gradient="bg-gradient-to-br from-partner to-indigo-600"
                     onClick={() => setShowChat(true)}
-                    delay={0.15}
+                    delay={0.12}
                   />
                   <QuickAction 
                     icon={Gift} 
                     label="Sürpriz planla" 
                     gradient="bg-gradient-to-br from-amber-500 to-orange-600"
                     onClick={() => setActiveTab('surprise')}
-                    delay={0.2}
-                  />
-                  <QuickAction 
-                    icon={BarChart3} 
-                    label="Statistika" 
-                    gradient="bg-gradient-to-br from-emerald-500 to-teal-600"
-                    onClick={() => setActiveTab('stats')}
-                    delay={0.25}
+                    delay={0.14}
                   />
                 </div>
               </div>
+
+              {/* Synced Features Row */}
+              <div>
+                <h2 className="font-bold text-lg mb-3">Sinxron Funksiyalar</h2>
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Hospital Bag */}
+                  <motion.button
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.16 }}
+                    onClick={() => onNavigate?.('partner-hospital-bag')}
+                    className="bg-card rounded-2xl p-4 border border-border/50 text-left"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center">
+                        <Package className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm">Xəstəxana Çantası</h4>
+                        <p className="text-xs text-muted-foreground">{bagChecked}/{bagTotal} hazır</p>
+                      </div>
+                    </div>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <motion.div 
+                        className="h-full bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${getHospitalBagProgress()}%` }}
+                      />
+                    </div>
+                  </motion.button>
+
+                  {/* Daily Summary */}
+                  <motion.button
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.18 }}
+                    onClick={() => onNavigate?.('daily-summary')}
+                    className="bg-card rounded-2xl p-4 border border-border/50 text-left"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center">
+                        <FileText className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm">Gündəlik Xülasə</h4>
+                        <p className="text-xs text-muted-foreground">
+                          {todaySummary ? 'Bugün göndərildi' : 'Gözləyir...'}
+                        </p>
+                      </div>
+                    </div>
+                    {todaySummary && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-lg">{['😢', '😔', '😐', '🙂', '😊'][((todaySummary.mood || 3) - 1)]}</span>
+                        <span className="text-muted-foreground">{todaySummary.water_intake}ml su</span>
+                        <span className="text-muted-foreground">{todaySummary.kick_count} təpik</span>
+                      </div>
+                    )}
+                  </motion.button>
+
+                  {/* Name Voting */}
+                  <motion.button
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    onClick={() => onNavigate?.('name-voting')}
+                    className="bg-card rounded-2xl p-4 border border-border/50 text-left"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center">
+                        <Vote className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm">Ad Səsverməsi</h4>
+                        <p className="text-xs text-muted-foreground">Körpə adı seçin</p>
+                      </div>
+                    </div>
+                  </motion.button>
+
+                  {/* Statistics */}
+                  <motion.button
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.22 }}
+                    onClick={() => setActiveTab('stats')}
+                    className="bg-card rounded-2xl p-4 border border-border/50 text-left"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
+                        <BarChart3 className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm">Statistika</h4>
+                        <p className="text-xs text-muted-foreground">Həftəlik hesabat</p>
+                      </div>
+                    </div>
+                  </motion.button>
+                </div>
+              </div>
+
+              {/* SOS Button */}
+              <SOSButton />
 
               {/* Level Progress */}
               <motion.div 

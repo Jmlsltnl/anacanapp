@@ -34,6 +34,7 @@ import QuickStatsWidget from '@/components/mommy/QuickStatsWidget';
 import GrowthTrackerWidget from '@/components/mommy/GrowthTrackerWidget';
 import DevelopmentTipsWidget from '@/components/mommy/DevelopmentTipsWidget';
 import BannerSlot from '@/components/banners/BannerSlot';
+import SendDailySummaryWidget from '@/components/partner/SendDailySummaryWidget';
 
 // Fetus images by month
 import FetusMonth1 from '@/assets/fetus/month-1.svg';
@@ -1614,6 +1615,9 @@ const Dashboard = ({ onOpenChat, onNavigateToTool }: DashboardProps) => {
       {lifeStage === 'flow' && <FlowDashboard />}
       {lifeStage === 'bump' && <BumpDashboard onNavigateToTool={onNavigateToTool} />}
       {lifeStage === 'mommy' && <MommyDashboard onNavigateToTool={onNavigateToTool} />}
+
+      {/* Send Daily Summary to Partner Widget - only for bump stage with linked partner */}
+      {lifeStage === 'bump' && <SendDailySummaryWidget />}
 
       {/* Bottom Banner Slot */}
       <BannerSlot placement="home_bottom" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mt-4" />
