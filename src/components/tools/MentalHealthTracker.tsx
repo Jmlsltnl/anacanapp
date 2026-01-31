@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Heart, Phone, AlertTriangle, CheckCircle, ChevronRight, Brain, Wind, Smile, Frown, Meh, ChevronLeft, ExternalLink } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, Heart, Phone, AlertTriangle, CheckCircle, ChevronRight, Brain, Wind, Smile, ChevronLeft, ExternalLink, Sparkles, Activity, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { 
   useMoodCheckins, 
   useTodayMoodCheckin, 
@@ -22,26 +23,27 @@ import {
 import { format, subDays } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface MentalHealthTrackerProps {
   onBack: () => void;
 }
 
 const MOOD_LEVELS = [
-  { value: 1, emoji: '😢', label: 'Çox pis', color: 'from-red-500 to-red-600', bgColor: 'bg-red-100 dark:bg-red-900/30' },
-  { value: 2, emoji: '😔', label: 'Pis', color: 'from-orange-500 to-orange-600', bgColor: 'bg-orange-100 dark:bg-orange-900/30' },
-  { value: 3, emoji: '😐', label: 'Normal', color: 'from-yellow-500 to-yellow-600', bgColor: 'bg-yellow-100 dark:bg-yellow-900/30' },
-  { value: 4, emoji: '😊', label: 'Yaxşı', color: 'from-lime-500 to-lime-600', bgColor: 'bg-lime-100 dark:bg-lime-900/30' },
-  { value: 5, emoji: '🥰', label: 'Əla', color: 'from-green-500 to-green-600', bgColor: 'bg-green-100 dark:bg-green-900/30' },
+  { value: 1, emoji: '😢', label: 'Çox pis', gradient: 'from-red-500 to-rose-600', bg: 'bg-red-100 dark:bg-red-900/30' },
+  { value: 2, emoji: '😔', label: 'Pis', gradient: 'from-orange-500 to-amber-600', bg: 'bg-orange-100 dark:bg-orange-900/30' },
+  { value: 3, emoji: '😐', label: 'Normal', gradient: 'from-yellow-500 to-amber-500', bg: 'bg-yellow-100 dark:bg-yellow-900/30' },
+  { value: 4, emoji: '😊', label: 'Yaxşı', gradient: 'from-lime-500 to-green-500', bg: 'bg-lime-100 dark:bg-lime-900/30' },
+  { value: 5, emoji: '🥰', label: 'Əla', gradient: 'from-emerald-500 to-teal-500', bg: 'bg-emerald-100 dark:bg-emerald-900/30' },
 ];
 
 const BREATHING_EXERCISES = [
-  { name: '4-7-8 Nəfəs', inhale: 4, hold: 7, exhale: 8, description: 'Rahatlama və yuxu üçün' },
-  { name: 'Qutu Nəfəsi', inhale: 4, hold: 4, exhale: 4, description: 'Stress azaltmaq üçün' },
+  { name: '4-7-8 Nəfəs', inhale: 4, hold: 7, exhale: 8, description: 'Rahatlama və yuxu üçün', emoji: '🌙' },
+  { name: 'Qutu Nəfəsi', inhale: 4, hold: 4, exhale: 4, description: 'Stress azaltmaq üçün', emoji: '📦' },
 ];
 
 const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
+  useScrollToTop();
+  
   const [showEPDS, setShowEPDS] = useState(false);
   const [epdsAnswers, setEpdsAnswers] = useState<Record<string, number>>({});
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -88,7 +90,6 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
     setCurrentQuestion(0);
   };
 
-  // Breathing exercise logic
   useEffect(() => {
     if (breathingPhase === 'idle') return;
 
@@ -125,9 +126,9 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
 
   const getRiskColor = (level: string) => {
     switch (level) {
-      case 'high': return 'bg-red-100 text-red-700 border-red-200';
-      case 'moderate': return 'bg-amber-100 text-amber-700 border-amber-200';
-      default: return 'bg-green-100 text-green-700 border-green-200';
+      case 'high': return 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800';
+      case 'moderate': return 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800';
+      default: return 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800';
     }
   };
 
@@ -139,12 +140,10 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
     }
   };
 
-  // Calculate mood trend
   const moodTrend = moodCheckins.length >= 2
     ? moodCheckins.slice(0, 7).reduce((sum, c) => sum + c.mood_level, 0) / Math.min(7, moodCheckins.length)
     : null;
 
-  // Get last 7 days mood data
   const last7Days = [...Array(7)].map((_, i) => {
     const date = format(subDays(new Date(), 6 - i), 'yyyy-MM-dd');
     const checkin = moodCheckins.find(c => c.checked_at === date);
@@ -155,67 +154,108 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
   const otherResources = resources.filter(r => !r.is_emergency);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
-      <div className="sticky top-0 z-20 isolate bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-500 text-white p-4 safe-area-top">
-        <div className="absolute inset-0 bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-500 pointer-events-none" />
-        <div className="flex items-center gap-3 relative z-30">
-          <button onClick={onBack} className="p-2 hover:bg-white/20 rounded-full transition-colors relative z-30">
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold flex items-center gap-2">
-              <Heart className="h-5 w-5" />
-              Sən Necəsən, Ana?
-            </h1>
-            <p className="text-xs text-white/80">Psixoloji sağlamlıq və dəstək</p>
+    <div className="min-h-screen bg-gradient-to-b from-teal-50 dark:from-teal-950/20 to-background pb-24">
+      {/* Premium Header */}
+      <div className="sticky top-0 z-20 isolate overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-teal-500 via-cyan-500 to-emerald-600 pointer-events-none" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,...')] opacity-10 pointer-events-none" />
+        
+        <div className="relative px-4 pt-4 pb-6 safe-area-top">
+          <div className="flex items-center gap-3 mb-4 relative z-30">
+            <motion.button
+              onClick={onBack}
+              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"
+              whileTap={{ scale: 0.95 }}
+            >
+              <ArrowLeft className="w-5 h-5 text-white" />
+            </motion.button>
+            <div className="flex-1">
+              <h1 className="text-xl font-bold text-white flex items-center gap-2">
+                <Heart className="w-5 h-5" />
+                Sən Necəsən, Ana?
+              </h1>
+              <p className="text-white/80 text-sm">Psixoloji sağlamlıq və dəstək</p>
+            </div>
+          </div>
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-3 gap-3">
+            <motion.div
+              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <Smile className="w-5 h-5 mx-auto mb-1 text-white/80" />
+              <p className="text-2xl font-black text-white">{moodCheckins.length}</p>
+              <p className="text-[10px] text-white/70">Qeyd</p>
+            </motion.div>
+            <motion.div
+              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+            >
+              <Activity className="w-5 h-5 mx-auto mb-1 text-white/80" />
+              <p className="text-2xl font-black text-white">{moodTrend ? moodTrend.toFixed(1) : '—'}</p>
+              <p className="text-[10px] text-white/70">Ortalama</p>
+            </motion.div>
+            <motion.div
+              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Calendar className="w-5 h-5 mx-auto mb-1 text-white/80" />
+              <p className="text-2xl font-black text-white">{epdsAssessments.length}</p>
+              <p className="text-[10px] text-white/70">EPDS</p>
+            </motion.div>
           </div>
         </div>
       </div>
 
-      <div className="p-4 space-y-4">
+      <div className="px-4 -mt-2 space-y-4">
         {/* EPDS Alert */}
         {shouldShowEPDSPrompt && !epdsAssessments.length && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
+            className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800"
           >
-            <Card className="border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900/50">
-                    <AlertTriangle className="h-5 w-5 text-amber-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-amber-800 dark:text-amber-200">
-                      Sizinlə danışaq?
-                    </h3>
-                    <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-                      Son günlərdə çətin vaxt keçirdiyinizi gördük. Qısa sorğu ilə vəziyyəti qiymətləndirək?
-                    </p>
-                    <Button 
-                      size="sm" 
-                      className="mt-3 bg-amber-600 hover:bg-amber-700"
-                      onClick={() => setShowEPDS(true)}
-                    >
-                      Sorğuya başla
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="flex items-start gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg">
+                <AlertTriangle className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-amber-800 dark:text-amber-200">Sizinlə danışaq?</h3>
+                <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                  Qısa sorğu ilə vəziyyəti qiymətləndirək?
+                </p>
+                <Button 
+                  size="sm" 
+                  className="mt-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 border-0"
+                  onClick={() => setShowEPDS(true)}
+                >
+                  Sorğuya başla
+                </Button>
+              </div>
+            </div>
           </motion.div>
         )}
 
         {/* Today's Check-in */}
-        <Card className="overflow-hidden">
-          <div className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white p-4">
-            <h3 className="font-semibold flex items-center gap-2">
-              <Smile className="h-5 w-5" />
+        <motion.div
+          className="bg-card rounded-3xl shadow-lg border border-border/50 overflow-hidden"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="bg-gradient-to-r from-teal-500 to-cyan-500 p-4">
+            <h3 className="font-bold text-white flex items-center gap-2">
+              <Smile className="w-5 h-5" />
               Bu gün necəsən?
             </h3>
           </div>
-          <CardContent className="p-4">
+          <div className="p-4">
             {todayCheckin ? (
               <motion.div 
                 initial={{ scale: 0.9, opacity: 0 }}
@@ -223,14 +263,14 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 className="text-center py-6"
               >
                 <motion.div 
-                  className="text-6xl mb-3"
+                  className="text-7xl mb-3"
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 1, repeat: Infinity, repeatDelay: 2 }}
                 >
                   {MOOD_LEVELS.find(m => m.value === todayCheckin.mood_level)?.emoji}
                 </motion.div>
-                <p className="text-lg font-medium">
-                  Bu gün özünüzü <span className="text-primary">{MOOD_LEVELS.find(m => m.value === todayCheckin.mood_level)?.label.toLowerCase()}</span> hiss edirsiniz
+                <p className="text-lg font-medium text-foreground">
+                  Bu gün özünüzü <span className="text-primary font-bold">{MOOD_LEVELS.find(m => m.value === todayCheckin.mood_level)?.label.toLowerCase()}</span> hiss edirsiniz
                 </p>
                 <p className="text-sm text-muted-foreground mt-2">
                   ✨ Qeyd etdiyiniz üçün təşəkkürlər!
@@ -247,10 +287,11 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                       transition={{ delay: index * 0.1 }}
                       onClick={() => handleMoodSelect(mood.value)}
                       disabled={addMoodCheckin.isPending}
-                      className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-all hover:scale-110 ${mood.bgColor}`}
+                      className={`flex flex-col items-center gap-2 p-3 rounded-2xl transition-all hover:scale-110 ${mood.bg}`}
+                      whileTap={{ scale: 0.95 }}
                     >
                       <span className="text-3xl">{mood.emoji}</span>
-                      <span className="text-xs font-medium">{mood.label}</span>
+                      <span className="text-[10px] font-bold">{mood.label}</span>
                     </motion.button>
                   ))}
                 </div>
@@ -259,178 +300,206 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="İstəyirsinizsə, qısa qeyd əlavə edin..."
-                    className="h-16 resize-none"
+                    className="h-16 resize-none rounded-2xl border-2"
                   />
                 </div>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </motion.div>
 
         {/* Weekly Mood Chart */}
         {moodCheckins.length > 0 && (
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Son 7 Gün</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-end justify-between h-24 gap-1">
-                {last7Days.map((day, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                    <div 
-                      className={`w-full rounded-t-lg transition-all ${
-                        day.mood > 0 
-                          ? `bg-gradient-to-t ${MOOD_LEVELS[day.mood - 1]?.color}`
-                          : 'bg-muted'
-                      }`}
-                      style={{ height: day.mood > 0 ? `${(day.mood / 5) * 100}%` : '10%' }}
-                    />
-                    <span className="text-[10px] text-muted-foreground">{day.day}</span>
-                  </div>
-                ))}
-              </div>
-              {moodTrend !== null && (
-                <div className="mt-4 p-3 rounded-lg bg-muted/50 text-center">
-                  <div className="flex items-center justify-center gap-2 mb-1">
-                    <span className="text-2xl">{MOOD_LEVELS.find(m => m.value === Math.round(moodTrend))?.emoji}</span>
-                    <span className="font-semibold">Ortalama: {moodTrend.toFixed(1)}/5</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {moodTrend >= 4 ? '🌟 Əla gedir! Özünüzə qayğı göstərməyə davam edin.' : 
-                     moodTrend >= 3 ? '💪 Yaxşı gedir. Özünüzə vaxt ayırın.' :
-                     '💝 Biraz çətin dövr keçirirsiniz. Yardım istəməkdən çəkinməyin.'}
-                  </p>
+          <motion.div
+            className="bg-card rounded-3xl p-5 shadow-lg border border-border/50"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
+              <Activity className="w-5 h-5 text-teal-500" />
+              Son 7 Gün
+            </h3>
+            <div className="flex items-end justify-between h-28 gap-2">
+              {last7Days.map((day, i) => (
+                <motion.div 
+                  key={i} 
+                  className="flex-1 flex flex-col items-center gap-1"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <div 
+                    className={`w-full rounded-xl transition-all ${
+                      day.mood > 0 
+                        ? `bg-gradient-to-t ${MOOD_LEVELS[day.mood - 1]?.gradient}`
+                        : 'bg-muted'
+                    }`}
+                    style={{ height: day.mood > 0 ? `${(day.mood / 5) * 100}%` : '15%' }}
+                  />
+                  <span className="text-[10px] text-muted-foreground font-medium">{day.day}</span>
+                </motion.div>
+              ))}
+            </div>
+            {moodTrend !== null && (
+              <div className="mt-4 p-4 rounded-2xl bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 border border-teal-200 dark:border-teal-800">
+                <div className="flex items-center justify-center gap-3 mb-2">
+                  <span className="text-3xl">{MOOD_LEVELS.find(m => m.value === Math.round(moodTrend))?.emoji}</span>
+                  <span className="font-bold text-lg text-foreground">Ortalama: {moodTrend.toFixed(1)}/5</span>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+                <p className="text-xs text-muted-foreground text-center">
+                  {moodTrend >= 4 ? '🌟 Əla gedir! Özünüzə qayğı göstərməyə davam edin.' : 
+                   moodTrend >= 3 ? '💪 Yaxşı gedir. Özünüzə vaxt ayırın.' :
+                   '💝 Biraz çətin dövr keçirirsiniz. Yardım istəməkdən çəkinməyin.'}
+                </p>
+              </div>
+            )}
+          </motion.div>
         )}
 
-        {/* Breathing Exercise */}
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setShowBreathing(true)}>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30">
-                  <Wind className="h-6 w-6 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">Nəfəs Məşqi</h3>
-                  <p className="text-xs text-muted-foreground">Rahatlama və stress azaltma</p>
-                </div>
-              </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+        {/* Action Cards */}
+        <div className="grid grid-cols-2 gap-3">
+          {/* Breathing Exercise */}
+          <motion.button
+            onClick={() => setShowBreathing(true)}
+            className="bg-card rounded-2xl p-4 shadow-sm border border-border/50 text-left hover:shadow-md transition-shadow"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center mb-3 shadow-lg">
+              <Wind className="w-6 h-6 text-white" />
             </div>
-          </CardContent>
-        </Card>
+            <h3 className="font-bold text-foreground">Nəfəs Məşqi</h3>
+            <p className="text-xs text-muted-foreground mt-1">Rahatlama və stress azaltma</p>
+          </motion.button>
 
-        {/* EPDS Assessment */}
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setShowEPDS(true)}>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-teal-100 to-emerald-100 dark:from-teal-900/30 dark:to-emerald-900/30">
-                  <Brain className="h-6 w-6 text-teal-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">EPDS Testi</h3>
-                  <p className="text-xs text-muted-foreground">Doğum sonrası depressiya riski</p>
-                </div>
-              </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+          {/* EPDS Assessment */}
+          <motion.button
+            onClick={() => setShowEPDS(true)}
+            className="bg-card rounded-2xl p-4 shadow-sm border border-border/50 text-left hover:shadow-md transition-shadow"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center mb-3 shadow-lg">
+              <Brain className="w-6 h-6 text-white" />
             </div>
-          </CardContent>
-        </Card>
+            <h3 className="font-bold text-foreground">EPDS Testi</h3>
+            <p className="text-xs text-muted-foreground mt-1">Depressiya riski qiymətləndirmə</p>
+          </motion.button>
+        </div>
 
         {/* Previous Assessments */}
         {epdsAssessments.length > 0 && (
-          <div>
-            <h3 className="font-semibold mb-3">Keçmiş Nəticələr</h3>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <h3 className="font-bold text-foreground mb-3 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-teal-500" />
+              Keçmiş Nəticələr
+            </h3>
             <div className="space-y-2">
-              {epdsAssessments.slice(0, 3).map(assessment => (
-                <Card key={assessment.id} onClick={() => setShowResult(assessment)} className="cursor-pointer hover:shadow-sm transition-shadow">
-                  <CardContent className="p-3 flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium">
+              {epdsAssessments.slice(0, 3).map((assessment, index) => (
+                <motion.button 
+                  key={assessment.id} 
+                  onClick={() => setShowResult(assessment)} 
+                  className="w-full bg-card rounded-2xl p-4 shadow-sm border border-border/50 flex items-center justify-between hover:shadow-md transition-shadow"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
+                      <Brain className="w-5 h-5 text-teal-600" />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-medium text-foreground">
                         {format(new Date(assessment.completed_at), 'd MMMM yyyy', { locale: az })}
                       </p>
                       <p className="text-xs text-muted-foreground">Bal: {assessment.total_score}/30</p>
                     </div>
-                    <Badge className={getRiskColor(assessment.risk_level)}>
-                      {getRiskLabel(assessment.risk_level)}
-                    </Badge>
-                  </CardContent>
-                </Card>
+                  </div>
+                  <Badge className={`${getRiskColor(assessment.risk_level)} border`}>
+                    {getRiskLabel(assessment.risk_level)}
+                  </Badge>
+                </motion.button>
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Emergency Resources */}
         {emergencyResources.length > 0 && (
-          <div>
-            <h3 className="font-semibold mb-3 flex items-center gap-2">
-              <Phone className="h-4 w-4 text-red-500" />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <h3 className="font-bold text-foreground mb-3 flex items-center gap-2">
+              <Phone className="w-5 h-5 text-red-500" />
               Təcili Yardım
             </h3>
             <div className="space-y-2">
               {emergencyResources.map(resource => (
-                <Card key={resource.id} className="border-red-200 dark:border-red-800">
-                  <CardContent className="p-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">{resource.name_az}</p>
-                        <p className="text-xs text-muted-foreground">{resource.description_az}</p>
-                      </div>
-                      {resource.phone && (
-                        <Button size="sm" variant="destructive" asChild>
-                          <a href={`tel:${resource.phone}`}>
-                            <Phone className="h-4 w-4 mr-1" />
-                            {resource.phone}
-                          </a>
-                        </Button>
-                      )}
+                <div key={resource.id} className="bg-red-50 dark:bg-red-900/20 rounded-2xl p-4 border border-red-200 dark:border-red-800">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-bold text-red-700 dark:text-red-300">{resource.name_az}</p>
+                      <p className="text-xs text-red-600 dark:text-red-400">{resource.description_az}</p>
                     </div>
-                  </CardContent>
-                </Card>
+                    {resource.phone && (
+                      <Button size="sm" className="bg-gradient-to-r from-red-500 to-rose-600 border-0" asChild>
+                        <a href={`tel:${resource.phone}`}>
+                          <Phone className="w-4 h-4 mr-1" />
+                          {resource.phone}
+                        </a>
+                      </Button>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Other Resources */}
         {otherResources.length > 0 && (
-          <div>
-            <h3 className="font-semibold mb-3">Dəstək Resursları</h3>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <h3 className="font-bold text-foreground mb-3">Dəstək Resursları</h3>
             <div className="space-y-2">
               {otherResources.map(resource => (
-                <Card key={resource.id}>
-                  <CardContent className="p-3">
-                    <p className="font-medium">{resource.name_az}</p>
-                    <p className="text-xs text-muted-foreground">{resource.description_az}</p>
-                    <div className="flex gap-2 mt-2">
-                      {resource.phone && (
-                        <Button size="sm" variant="outline" asChild>
-                          <a href={`tel:${resource.phone}`}>
-                            <Phone className="h-3 w-3 mr-1" />
-                            Zəng et
-                          </a>
-                        </Button>
-                      )}
-                      {resource.website && (
-                        <Button size="sm" variant="outline" asChild>
-                          <a href={resource.website} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-3 w-3 mr-1" />
-                            Sayt
-                          </a>
-                        </Button>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                <div key={resource.id} className="bg-card rounded-2xl p-4 shadow-sm border border-border/50">
+                  <p className="font-bold text-foreground">{resource.name_az}</p>
+                  <p className="text-xs text-muted-foreground">{resource.description_az}</p>
+                  <div className="flex gap-2 mt-3">
+                    {resource.phone && (
+                      <Button size="sm" variant="outline" className="rounded-xl" asChild>
+                        <a href={`tel:${resource.phone}`}>
+                          <Phone className="w-3.5 h-3.5 mr-1" />
+                          Zəng et
+                        </a>
+                      </Button>
+                    )}
+                    {resource.website && (
+                      <Button size="sm" variant="outline" className="rounded-xl" asChild>
+                        <a href={resource.website} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="w-3.5 h-3.5 mr-1" />
+                          Sayt
+                        </a>
+                      </Button>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
 
@@ -438,41 +507,53 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
       <Dialog open={showBreathing} onOpenChange={setShowBreathing}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Nəfəs Məşqi</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Wind className="w-5 h-5 text-cyan-500" />
+              Nəfəs Məşqi
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-6">
             {breathingPhase === 'idle' ? (
               <>
                 <div className="space-y-3">
                   {BREATHING_EXERCISES.map((ex, i) => (
-                    <button
+                    <motion.button
                       key={i}
                       onClick={() => setSelectedExercise(ex)}
-                      className={`w-full p-4 rounded-lg text-left transition-all ${
+                      className={`w-full p-4 rounded-2xl text-left transition-all flex items-center gap-3 ${
                         selectedExercise.name === ex.name
                           ? 'bg-teal-100 dark:bg-teal-900/30 border-2 border-teal-500'
-                          : 'bg-muted hover:bg-muted/80'
+                          : 'bg-muted hover:bg-muted/80 border-2 border-transparent'
                       }`}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      <p className="font-semibold">{ex.name}</p>
-                      <p className="text-xs text-muted-foreground">{ex.description}</p>
-                      <p className="text-xs mt-1">
-                        Nəfəs al: {ex.inhale}s • Saxla: {ex.hold}s • Burax: {ex.exhale}s
-                      </p>
-                    </button>
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-teal-500 flex items-center justify-center text-2xl">
+                        {ex.emoji}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-bold text-foreground">{ex.name}</p>
+                        <p className="text-xs text-muted-foreground">{ex.description}</p>
+                        <p className="text-xs mt-1 text-teal-600 dark:text-teal-400 font-medium">
+                          Nəfəs al: {ex.inhale}s • Saxla: {ex.hold}s • Burax: {ex.exhale}s
+                        </p>
+                      </div>
+                    </motion.button>
                   ))}
                 </div>
-                <Button className="w-full bg-teal-500 hover:bg-teal-600" onClick={startBreathing}>
-                  <Wind className="h-4 w-4 mr-2" />
+                <Button 
+                  className="w-full h-12 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-600 border-0" 
+                  onClick={startBreathing}
+                >
+                  <Wind className="w-5 h-5 mr-2" />
                   Başla
                 </Button>
               </>
             ) : (
               <div className="text-center py-8">
                 <motion.div
-                  className="w-40 h-40 mx-auto rounded-full flex items-center justify-center"
+                  className="w-44 h-44 mx-auto rounded-full flex items-center justify-center shadow-xl"
                   animate={{
-                    scale: breathingPhase === 'inhale' ? 1.5 : breathingPhase === 'exhale' ? 1 : 1.5,
+                    scale: breathingPhase === 'inhale' ? 1.4 : breathingPhase === 'exhale' ? 1 : 1.4,
                     backgroundColor: breathingPhase === 'inhale' ? '#14b8a6' : breathingPhase === 'hold' ? '#0891b2' : '#10b981',
                   }}
                   transition={{
@@ -481,15 +562,15 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                               selectedExercise.exhale,
                   }}
                 >
-                  <span className="text-white text-xl font-bold">
+                  <span className="text-white text-2xl font-bold">
                     {breathingPhase === 'inhale' ? 'Nəfəs al' : 
                      breathingPhase === 'hold' ? 'Saxla' : 'Burax'}
                   </span>
                 </motion.div>
-                <p className="mt-6 text-lg font-medium">
+                <p className="mt-8 text-xl font-bold text-foreground">
                   Dövrə: {breathingCount + 1} / 4
                 </p>
-                <Button variant="outline" className="mt-4" onClick={() => setBreathingPhase('idle')}>
+                <Button variant="outline" className="mt-4 rounded-xl" onClick={() => setBreathingPhase('idle')}>
                   Dayandır
                 </Button>
               </div>
@@ -502,10 +583,22 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
       <Dialog open={showEPDS} onOpenChange={setShowEPDS}>
         <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>EPDS Sorğusu</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Brain className="w-5 h-5 text-teal-500" />
+              EPDS Sorğusu
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <Progress value={((currentQuestion + 1) / EPDS_QUESTIONS.length) * 100} className="h-2" />
+            <div className="flex items-center gap-2">
+              {EPDS_QUESTIONS.map((_, i) => (
+                <div 
+                  key={i}
+                  className={`h-1.5 flex-1 rounded-full transition-all ${
+                    i <= currentQuestion ? 'bg-gradient-to-r from-teal-500 to-cyan-500' : 'bg-muted'
+                  }`}
+                />
+              ))}
+            </div>
             <p className="text-sm text-muted-foreground text-center">
               Sual {currentQuestion + 1} / {EPDS_QUESTIONS.length}
             </p>
@@ -518,27 +611,28 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                 >
-                  <p className="font-medium mb-4 text-lg">{EPDS_QUESTIONS[currentQuestion].question}</p>
+                  <p className="font-bold mb-4 text-lg text-foreground">{EPDS_QUESTIONS[currentQuestion].question}</p>
                   <RadioGroup
                     value={epdsAnswers[EPDS_QUESTIONS[currentQuestion].id]?.toString()}
                     onValueChange={(v) => handleEPDSAnswer(EPDS_QUESTIONS[currentQuestion].id, parseInt(v))}
                     className="space-y-2"
                   >
                     {EPDS_QUESTIONS[currentQuestion].options.map(option => (
-                      <div 
+                      <motion.div 
                         key={option.value} 
-                        className={`flex items-center space-x-3 p-3 rounded-lg transition-all cursor-pointer
+                        className={`flex items-center space-x-3 p-4 rounded-2xl transition-all cursor-pointer border-2
                           ${epdsAnswers[EPDS_QUESTIONS[currentQuestion].id] === option.value
-                            ? 'bg-teal-100 dark:bg-teal-900/30 border-2 border-teal-500'
-                            : 'bg-muted hover:bg-muted/80'
+                            ? 'bg-teal-100 dark:bg-teal-900/30 border-teal-500'
+                            : 'bg-muted/50 hover:bg-muted border-transparent'
                           }`}
                         onClick={() => handleEPDSAnswer(EPDS_QUESTIONS[currentQuestion].id, option.value)}
+                        whileTap={{ scale: 0.98 }}
                       >
                         <RadioGroupItem value={option.value.toString()} id={`option-${option.value}`} />
-                        <Label htmlFor={`option-${option.value}`} className="flex-1 cursor-pointer">
+                        <Label htmlFor={`option-${option.value}`} className="flex-1 cursor-pointer font-medium">
                           {option.label}
                         </Label>
-                      </div>
+                      </motion.div>
                     ))}
                   </RadioGroup>
                 </motion.div>
@@ -547,14 +641,14 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
 
             <div className="flex gap-2 pt-4">
               {currentQuestion > 0 && (
-                <Button variant="outline" onClick={() => setCurrentQuestion(prev => prev - 1)}>
-                  <ChevronLeft className="h-4 w-4 mr-1" />
+                <Button variant="outline" className="rounded-xl" onClick={() => setCurrentQuestion(prev => prev - 1)}>
+                  <ChevronLeft className="w-4 h-4 mr-1" />
                   Geri
                 </Button>
               )}
               {currentQuestion === EPDS_QUESTIONS.length - 1 && (
                 <Button 
-                  className="flex-1 bg-teal-500 hover:bg-teal-600"
+                  className="flex-1 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-600 border-0"
                   onClick={handleSubmitEPDS}
                   disabled={submitEPDS.isPending || Object.keys(epdsAnswers).length < EPDS_QUESTIONS.length}
                 >
@@ -578,28 +672,28 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 <motion.div 
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className={`inline-flex items-center gap-2 px-6 py-3 rounded-full text-lg font-semibold ${getRiskColor(showResult.risk_level)}`}
+                  className={`inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-lg font-bold ${getRiskColor(showResult.risk_level)} border`}
                 >
-                  {showResult.risk_level === 'low' ? <CheckCircle className="h-6 w-6" /> : <AlertTriangle className="h-6 w-6" />}
+                  {showResult.risk_level === 'low' ? <CheckCircle className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
                   {getRiskLabel(showResult.risk_level)}
                 </motion.div>
                 
                 <div>
-                  <p className="text-5xl font-bold">{showResult.total_score}</p>
+                  <p className="text-6xl font-black text-foreground">{showResult.total_score}</p>
                   <p className="text-muted-foreground">/ 30 bal</p>
                 </div>
 
-                <p className="text-sm bg-muted p-4 rounded-lg">{showResult.recommendation}</p>
+                <p className="text-sm bg-muted p-4 rounded-2xl">{showResult.recommendation}</p>
 
                 {showResult.risk_level === 'high' && emergencyResources.length > 0 && (
-                  <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
-                    <p className="text-sm font-medium text-red-700 dark:text-red-300 mb-3">
+                  <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl border border-red-200 dark:border-red-800">
+                    <p className="text-sm font-bold text-red-700 dark:text-red-300 mb-3">
                       🆘 Zəhmət olmasa mütəxəssislə əlaqə saxlayın:
                     </p>
                     {emergencyResources.map(r => (
-                      <Button key={r.id} variant="destructive" className="w-full" asChild>
+                      <Button key={r.id} className="w-full bg-gradient-to-r from-red-500 to-rose-600 border-0" asChild>
                         <a href={`tel:${r.phone}`}>
-                          <Phone className="h-4 w-4 mr-2" />
+                          <Phone className="w-4 h-4 mr-2" />
                           {r.name_az}: {r.phone}
                         </a>
                       </Button>
