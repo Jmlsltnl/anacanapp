@@ -45,11 +45,12 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
 
   return (
     <div ref={ref} className="min-h-screen bg-background">
-      <div className="gradient-primary px-3 pt-3 pb-6 safe-top relative z-20">
-        <div className="flex items-center gap-2 mb-3 relative z-20">
+      <div className="sticky top-0 z-20 isolate gradient-primary px-3 pt-3 pb-6 safe-top">
+        <div className="absolute inset-0 gradient-primary pointer-events-none" />
+        <div className="flex items-center gap-2 mb-3 relative z-30">
           <motion.button
             onClick={onBack}
-            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center relative z-30"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -61,7 +62,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
           </div>
           <motion.button
             onClick={getRandomName}
-            className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center relative z-30"
             whileHover={{ scale: 1.05, rotate: 180 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -69,7 +70,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
           </motion.button>
         </div>
 
-        <div className="relative">
+        <div className="relative z-20">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
           <input
             type="text"

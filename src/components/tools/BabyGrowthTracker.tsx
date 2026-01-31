@@ -187,15 +187,15 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Premium Header */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-rose-500 via-pink-500 to-fuchsia-600" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,...')] opacity-10" />
+      <div className="sticky top-0 z-20 isolate relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-rose-500 via-pink-500 to-fuchsia-600 pointer-events-none" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,...')] opacity-10 pointer-events-none" />
         
-        <div className="relative px-4 pt-4 pb-8 safe-area-top z-20">
-          <div className="flex items-center gap-3 mb-6 relative z-20">
+        <div className="relative px-4 pt-4 pb-8 safe-area-top">
+          <div className="flex items-center gap-3 mb-6 relative z-30">
             <motion.button
               onClick={onBack}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"
+              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center relative z-30"
               whileTap={{ scale: 0.95 }}
             >
               <ArrowLeft className="w-5 h-5 text-white" />
@@ -206,7 +206,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
             </div>
             <motion.button
               onClick={() => setShowAddModal(true)}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"
+              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center relative z-30"
               whileTap={{ scale: 0.95 }}
             >
               <Plus className="w-5 h-5 text-white" />
