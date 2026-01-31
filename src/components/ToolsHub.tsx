@@ -106,6 +106,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTool, setActiveTool] = useState<string | null>(initialTool);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string>('all');
   const { lifeStage, getPregnancyData } = useUserStore();
   const { profile } = useAuth();
   const { isPremium } = useSubscription();
@@ -113,6 +114,26 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const pregData = getPregnancyData();
   const { data: toolConfigs = [], isLoading: toolsLoading } = useToolConfigs(lifeStage || undefined);
   
+  // Tool categories
+  const categories = [
+    { id: 'all', label: 'Hamısı', emoji: '✨' },
+    { id: 'health', label: 'Sağlamlıq', emoji: '💪' },
+    { id: 'baby', label: 'Körpə', emoji: '👶' },
+    { id: 'nutrition', label: 'Qidalanma', emoji: '🍎' },
+    { id: 'tools', label: 'Alətlər', emoji: '🔧' },
+    { id: 'ai', label: 'AI', emoji: '🤖' },
+  ];
+
+  // Map tools to categories
+  const toolCategoryMap: Record<string, string> = {
+    'weight': 'health', 'exercise': 'health', 'exercises': 'health', 'mental-health': 'health', 
+    'blood-sugar': 'health', 'mood': 'health', 'mood-diary': 'health',
+    'kick': 'baby', 'contraction': 'baby', 'names': 'baby', 'baby-growth': 'baby', 
+    'growth-tracker': 'baby', 'cry-translator': 'baby', 'poop-scanner': 'baby', 
+    'whitenoise': 'baby', 'smart-play-box': 'baby', 'fairy-tale': 'baby',
+    'nutrition': 'nutrition', 'recipes': 'nutrition', 'shopping': 'nutrition',
+    'photoshoot': 'ai', 'safety': 'ai', 'horoscope': 'ai', 'weather-clothing': 'ai',
+  };
   const hasPartner = !!profile?.linked_partner_id;
 
   // Get locked field based on life stage
@@ -208,10 +229,14 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     setActiveTool(tool.id);
   };
 
-  const filteredTools = tools.filter(tool => 
-    tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    tool.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter by search and category
+  const filteredTools = tools.filter(tool => {
+    const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tool.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const toolCategory = toolCategoryMap[tool.id] || 'tools';
+    const matchesCategory = activeCategory === 'all' || toolCategory === activeCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   const handleBack = () => {
     if (activeTool) {
@@ -265,156 +290,115 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const stageInfo = getLifeStageInfo();
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Compact Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-lg border-b border-border/50 safe-area-top">
-        <div className="px-4 py-3">
-          {/* Title Row */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stageInfo.color} flex items-center justify-center shadow-lg`}>
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold text-foreground">Alətlər</h1>
-                <p className="text-xs text-muted-foreground">{stageInfo.emoji} {stageInfo.label}</p>
-              </div>
+    <div className="min-h-screen bg-gradient-to-b from-muted/30 to-background pb-24">
+      {/* Minimal Header */}
+      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl safe-area-top">
+        <div className="px-4 pt-3 pb-2">
+          {/* Search Bar with integrated title */}
+          <div className="flex items-center gap-3 mb-3">
+            <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${stageInfo.color} flex items-center justify-center shadow-md flex-shrink-0`}>
+              <span className="text-lg">{stageInfo.emoji}</span>
             </div>
-            
-            {/* Stats Pills */}
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5 bg-primary/10 rounded-full px-2.5 py-1">
-                <Zap className="w-3.5 h-3.5 text-primary" />
-                <span className="text-xs font-bold text-primary">{filteredTools.filter(t => isToolAvailable(t)).length}</span>
-              </div>
-              <div className="flex items-center gap-1.5 bg-amber-500/10 rounded-full px-2.5 py-1">
-                <Crown className="w-3.5 h-3.5 text-amber-500" />
-                <span className="text-xs font-bold text-amber-600">{tools.filter(t => t.isPremium).length}</span>
-              </div>
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Alət axtarın..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-10 pl-10 pr-4 rounded-full bg-muted/60 text-foreground placeholder:text-muted-foreground text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+              />
             </div>
           </div>
 
-          {/* Search Bar */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Alət axtarın..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-10 pr-4 rounded-xl bg-muted/50 border border-border/50 text-foreground placeholder:text-muted-foreground text-sm outline-none focus:bg-muted focus:border-primary/30 transition-all"
-            />
+          {/* Category Tabs */}
+          <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4">
+            {categories.map((cat) => (
+              <motion.button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  activeCategory === cat.id
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                }`}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span>{cat.emoji}</span>
+                <span>{cat.label}</span>
+              </motion.button>
+            ))}
           </div>
         </div>
       </div>
 
-      <div className="px-4 pt-4">
+      <div className="px-4 pt-3">
         {/* Top Banner */}
         <BannerSlot placement="tools_top" onNavigate={() => {}} onToolOpen={setActiveTool} className="mb-4" />
 
-        {/* Quick Access - Horizontal Scroll */}
-        <motion.div 
-          className="mb-5"
+        {/* Featured AI Tool - Full Width Card */}
+        <motion.button
+          onClick={() => setActiveTool('photoshoot')}
+          className="w-full relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 p-4 mb-4 text-left shadow-xl"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
+          whileTap={{ scale: 0.98 }}
         >
-          <div className="flex items-center justify-between mb-2.5">
-            <h2 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-              <Stars className="w-4 h-4 text-amber-500" />
-              Populyar
-            </h2>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.15),transparent_60%)]" />
+          <div className="absolute right-0 bottom-0 opacity-10">
+            <Camera className="w-32 h-32 text-white -mr-6 -mb-6" />
           </div>
-          
-          <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4">
-            {/* AI Photo Card */}
-            <motion.button
-              onClick={() => setActiveTool('photoshoot')}
-              className="flex-shrink-0 relative overflow-hidden rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 p-3.5 w-36 text-left shadow-lg"
-              whileTap={{ scale: 0.96 }}
-            >
-              <div className="absolute -right-4 -bottom-4 opacity-20">
-                <Camera className="w-16 h-16 text-white" />
+          <div className="relative z-10 flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+              <Camera className="w-7 h-7 text-white" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] text-white font-semibold">✨ AI</span>
+                <span className="px-2 py-0.5 rounded-full bg-amber-400/30 text-[10px] text-amber-200 font-semibold flex items-center gap-1">
+                  <Crown className="w-3 h-3" /> Premium
+                </span>
               </div>
-              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center mb-2">
-                <Camera className="w-4.5 h-4.5 text-white" />
-              </div>
-              <p className="text-white font-semibold text-xs leading-tight">Körpə Fotosessiyası</p>
-              <div className="flex items-center gap-1 mt-1.5">
-                <span className="px-1.5 py-0.5 rounded-full bg-white/20 text-[9px] text-white font-medium">AI</span>
-                <Crown className="w-3 h-3 text-amber-300" />
-              </div>
-            </motion.button>
-
-            {/* Recipes Card */}
-            <motion.button
-              onClick={() => setActiveTool('recipes')}
-              className="flex-shrink-0 relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 p-3.5 w-36 text-left shadow-lg"
-              whileTap={{ scale: 0.96 }}
-            >
-              <div className="absolute -right-4 -bottom-4 opacity-20">
-                <ChefHat className="w-16 h-16 text-white" />
-              </div>
-              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center mb-2">
-                <ChefHat className="w-4.5 h-4.5 text-white" />
-              </div>
-              <p className="text-white font-semibold text-xs leading-tight">Sağlam Reseptlər</p>
-              <p className="text-white/70 text-[9px] mt-1">Faydalı yeməklər</p>
-            </motion.button>
-
-            {/* Safety Card */}
-            <motion.button
-              onClick={() => setActiveTool('safety')}
-              className="flex-shrink-0 relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 p-3.5 w-36 text-left shadow-lg"
-              whileTap={{ scale: 0.96 }}
-            >
-              <div className="absolute -right-4 -bottom-4 opacity-20">
-                <Shield className="w-16 h-16 text-white" />
-              </div>
-              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center mb-2">
-                <Shield className="w-4.5 h-4.5 text-white" />
-              </div>
-              <p className="text-white font-semibold text-xs leading-tight">Təhlükəsizlik</p>
-              <div className="flex items-center gap-1 mt-1.5">
-                <span className="px-1.5 py-0.5 rounded-full bg-white/20 text-[9px] text-white font-medium">AI</span>
-              </div>
-            </motion.button>
-
-            {/* First Aid Card */}
-            <motion.button
-              onClick={() => setActiveTool('first-aid')}
-              className="flex-shrink-0 relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500 to-rose-600 p-3.5 w-36 text-left shadow-lg"
-              whileTap={{ scale: 0.96 }}
-            >
-              <div className="absolute -right-4 -bottom-4 opacity-20">
-                <ShieldAlert className="w-16 h-16 text-white" />
-              </div>
-              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center mb-2">
-                <ShieldAlert className="w-4.5 h-4.5 text-white" />
-              </div>
-              <p className="text-white font-semibold text-xs leading-tight">Həyat Qurtaran SOS</p>
-              <p className="text-white/70 text-[9px] mt-1">İlk yardım</p>
-            </motion.button>
+              <h3 className="text-white font-bold text-base">Körpə Fotosessiyası</h3>
+              <p className="text-white/70 text-xs">AI ilə unikal körpə şəkilləri yaradın</p>
+            </div>
+            <ChevronRight className="w-6 h-6 text-white/60" />
           </div>
-        </motion.div>
+        </motion.button>
 
-        {/* All Tools Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-              <Wrench className="w-4 h-4 text-muted-foreground" />
-              Bütün Alətlər
-            </h2>
-            <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-              {filteredTools.length}
-            </span>
-          </div>
+        {/* Quick Access Row */}
+        <div className="flex gap-2 mb-4 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4">
+          {[
+            { id: 'recipes', icon: ChefHat, label: 'Reseptlər', gradient: 'from-orange-500 to-amber-500' },
+            { id: 'safety', icon: Shield, label: 'Təhlükəsizlik', gradient: 'from-emerald-500 to-teal-500' },
+            { id: 'first-aid', icon: ShieldAlert, label: 'İlk Yardım', gradient: 'from-red-500 to-rose-500' },
+            { id: 'doctors', icon: Stethoscope, label: 'Həkimlər', gradient: 'from-blue-500 to-cyan-500' },
+          ].map((item) => (
+            <motion.button
+              key={item.id}
+              onClick={() => setActiveTool(item.id)}
+              className={`flex-shrink-0 flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-gradient-to-r ${item.gradient} shadow-lg`}
+              whileTap={{ scale: 0.95 }}
+            >
+              <item.icon className="w-4 h-4 text-white" />
+              <span className="text-white text-xs font-semibold">{item.label}</span>
+            </motion.button>
+          ))}
+        </div>
 
-          {/* Tools Grid - More Compact */}
-          <div className="grid grid-cols-3 gap-2.5">
+        {/* Tools Count Header */}
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-foreground">
+            {activeCategory === 'all' ? 'Bütün Alətlər' : categories.find(c => c.id === activeCategory)?.label}
+          </h2>
+          <span className="text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full font-medium">
+            {filteredTools.length} alət
+          </span>
+        </div>
+
+        {/* Tools Grid - Modern Cards */}
+        <div className="grid grid-cols-4 gap-2">
+          <AnimatePresence mode="popLayout">
             {filteredTools.map((tool, index) => {
               const Icon = tool.icon;
               const available = isToolAvailable(tool);
@@ -423,70 +407,68 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
               return (
                 <motion.button
                   key={tool.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
+                  layout
+                  initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: Math.min(0.05 + index * 0.02, 0.3) }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ delay: Math.min(index * 0.015, 0.15) }}
                   onClick={() => handleToolClick(tool)}
-                  className={`bg-card rounded-2xl p-3 text-center border border-border/40 relative overflow-hidden transition-all hover:shadow-md hover:border-primary/20 active:scale-95 ${!available ? 'opacity-50' : ''}`}
+                  className={`bg-card/80 backdrop-blur-sm rounded-2xl p-2.5 text-center border border-border/30 relative overflow-hidden transition-all active:scale-90 ${!available ? 'opacity-40' : 'hover:shadow-lg hover:border-primary/20'}`}
                 >
-                  {/* Premium Indicator */}
+                  {/* Premium/Lock indicator */}
                   {needsPremium && (
-                    <div className="absolute top-1.5 right-1.5">
-                      <Lock className="w-3 h-3 text-amber-500" />
+                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-amber-500/20 flex items-center justify-center">
+                      <Lock className="w-2.5 h-2.5 text-amber-500" />
                     </div>
                   )}
                   {!needsPremium && tool.isPremium && (
-                    <div className="absolute top-1.5 right-1.5">
+                    <div className="absolute top-1 right-1">
                       <Crown className="w-3 h-3 text-amber-400" />
                     </div>
                   )}
                   
                   {/* Icon */}
-                  <div className={`w-11 h-11 rounded-xl mx-auto mb-2 flex items-center justify-center ${
+                  <div className={`w-10 h-10 rounded-xl mx-auto mb-1.5 flex items-center justify-center ${
                     needsPremium 
-                      ? 'bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30' 
+                      ? 'bg-gradient-to-br from-amber-500/15 to-orange-500/15' 
                       : 'bg-gradient-to-br from-primary/10 to-primary/20'
                   }`}>
-                    <Icon className={`w-5 h-5 ${needsPremium ? 'text-amber-600 dark:text-amber-400' : 'text-primary'}`} />
+                    <Icon className={`w-5 h-5 ${needsPremium ? 'text-amber-500' : 'text-primary'}`} />
                   </div>
                   
-                  <h3 className="font-medium text-foreground text-[11px] leading-tight line-clamp-2">{tool.name}</h3>
-                  
-                  {/* Limited badge */}
-                  {tool.isPremium && (tool.premiumType === 'limited_total' || tool.premiumType === 'limited_monthly') && (
-                    <div className="flex justify-center mt-1">
-                      <span className="text-[8px] text-amber-600 bg-amber-500/10 px-1.5 py-0.5 rounded-full">
-                        {tool.premiumType === 'limited_total' ? `${tool.premiumLimit} pulsuz` : `Ayda ${tool.premiumLimit}`}
-                      </span>
-                    </div>
-                  )}
-                  
-                  {tool.minWeek && lifeStage === 'bump' && !available && (
-                    <p className="text-[8px] text-muted-foreground mt-1">{tool.minWeek}. həftədən</p>
-                  )}
+                  <h3 className="font-medium text-foreground text-[10px] leading-tight line-clamp-2">{tool.name}</h3>
                 </motion.button>
               );
             })}
-          </div>
+          </AnimatePresence>
+        </div>
 
-          {/* Empty State */}
-          {filteredTools.length === 0 && (
-            <motion.div 
-              className="text-center py-12"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+        {/* Empty State */}
+        {filteredTools.length === 0 && (
+          <motion.div 
+            className="text-center py-16"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <div className="w-20 h-20 rounded-3xl bg-muted/50 flex items-center justify-center mx-auto mb-4">
+              <Search className="w-10 h-10 text-muted-foreground/50" />
+            </div>
+            <p className="font-semibold text-foreground mb-1">Alət tapılmadı</p>
+            <p className="text-sm text-muted-foreground">
+              {searchQuery ? `"${searchQuery}" ilə uyğun alət yoxdur` : 'Bu kateqoriyada alət yoxdur'}
+            </p>
+            <motion.button
+              onClick={() => { setSearchQuery(''); setActiveCategory('all'); }}
+              className="mt-4 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium"
+              whileTap={{ scale: 0.95 }}
             >
-              <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-3">
-                <Search className="w-8 h-8 text-muted-foreground" />
-              </div>
-              <p className="font-semibold text-foreground text-sm mb-1">Alət tapılmadı</p>
-              <p className="text-xs text-muted-foreground">"{searchQuery}" ilə uyğun alət yoxdur</p>
-            </motion.div>
-          )}
-        </motion.div>
+              Hamısını göstər
+            </motion.button>
+          </motion.div>
+        )}
 
         {/* Bottom Banner */}
-        <BannerSlot placement="tools_bottom" onNavigate={() => {}} onToolOpen={setActiveTool} className="mt-5" />
+        <BannerSlot placement="tools_bottom" onNavigate={() => {}} onToolOpen={setActiveTool} className="mt-6" />
       </div>
 
       {/* Premium Modal */}
