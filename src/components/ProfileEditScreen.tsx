@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Camera, Save, User, Calendar, Loader2 } from 'lucide-react';
+import { ArrowLeft, Camera, Save, User, Calendar, Loader2, CalendarDays, Baby, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserStore } from '@/store/userStore';
@@ -11,11 +11,15 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { calculateDueDate, calculateLMPFromDueDate, getPregnancyWeek, getDayInWeek } from '@/lib/pregnancy-utils';
 import type { LifeStage } from '@/types/anacan';
 
 interface ProfileEditScreenProps {
   onBack: () => void;
 }
+
+type DateInputMode = 'lmp' | 'dueDate';
 
 const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
   useScrollToTop();
@@ -27,6 +31,12 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
 
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  
+  // Date input mode for pregnancy - default to LMP if available, else dueDate
+  const [dateInputMode, setDateInputMode] = useState<DateInputMode>(
+    lastPeriodDate ? 'lmp' : 'dueDate'
+  );
+  
   const [formData, setFormData] = useState({
     name: profile?.name || '',
     bio: '',
@@ -39,6 +49,39 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
     baby_birth_date: babyBirthDate ? new Date(babyBirthDate).toISOString().split('T')[0] : '',
     baby_gender: babyGender || '' as 'boy' | 'girl' | '',
   });
+
+  // Compute the calculated date based on mode
+  const calculatedDates = useMemo(() => {
+    if (dateInputMode === 'lmp' && formData.last_period_date) {
+      const lmp = new Date(formData.last_period_date);
+      const dueDate = calculateDueDate(lmp);
+      const week = getPregnancyWeek(lmp);
+      const day = getDayInWeek(lmp);
+      return { 
+        calculatedDueDate: dueDate, 
+        calculatedLMP: null,
+        week,
+        day
+      };
+    } else if (dateInputMode === 'dueDate' && formData.due_date) {
+      const dd = new Date(formData.due_date);
+      const lmp = calculateLMPFromDueDate(dd);
+      const week = lmp ? getPregnancyWeek(lmp) : 0;
+      const day = lmp ? getDayInWeek(lmp) : 0;
+      return { 
+        calculatedDueDate: null, 
+        calculatedLMP: lmp,
+        week,
+        day
+      };
+    }
+    return { calculatedDueDate: null, calculatedLMP: null, week: 0, day: 0 };
+  }, [dateInputMode, formData.last_period_date, formData.due_date]);
+
+  const formatDate = (date: Date | null): string => {
+    if (!date) return '';
+    return date.toLocaleDateString('az-AZ', { day: 'numeric', month: 'long', year: 'numeric' });
+  };
 
   useEffect(() => {
     // Load bio from profile if available
@@ -90,6 +133,22 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
     
     setLoading(true);
     try {
+      // Calculate effective dates for pregnancy
+      let effectiveLMP: string | null = null;
+      let effectiveDueDate: string | null = null;
+      
+      if (formData.life_stage === 'bump') {
+        if (dateInputMode === 'lmp' && formData.last_period_date) {
+          effectiveLMP = formData.last_period_date;
+          const calculatedDD = calculateDueDate(new Date(formData.last_period_date));
+          effectiveDueDate = calculatedDD ? calculatedDD.toISOString().split('T')[0] : null;
+        } else if (dateInputMode === 'dueDate' && formData.due_date) {
+          effectiveDueDate = formData.due_date;
+          const calculatedLMP = calculateLMPFromDueDate(new Date(formData.due_date));
+          effectiveLMP = calculatedLMP ? calculatedLMP.toISOString().split('T')[0] : null;
+        }
+      }
+      
       // Update profile in database
       const updateData: any = {
         name: formData.name,
@@ -97,10 +156,20 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
         bio: formData.bio,
         life_stage: formData.life_stage,
         baby_name: formData.baby_name || null,
-        due_date: formData.due_date || null,
-        last_period_date: formData.last_period_date || null,
         cycle_length: formData.cycle_length,
       };
+      
+      // Set dates based on life stage
+      if (formData.life_stage === 'bump') {
+        updateData.due_date = effectiveDueDate;
+        updateData.last_period_date = effectiveLMP;
+      } else if (formData.life_stage === 'flow') {
+        updateData.last_period_date = formData.last_period_date || null;
+        updateData.due_date = null;
+      } else {
+        updateData.last_period_date = null;
+        updateData.due_date = null;
+      }
       
       // Add mommy specific fields
       if (formData.life_stage === 'mommy') {
@@ -117,8 +186,15 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
 
       // Update local store using existing actions
       setLifeStage(formData.life_stage);
-      if (formData.due_date) setDueDate(new Date(formData.due_date));
-      if (formData.last_period_date) setLastPeriodDate(new Date(formData.last_period_date));
+      
+      // Sync pregnancy dates to local store
+      if (formData.life_stage === 'bump') {
+        if (effectiveLMP) setLastPeriodDate(new Date(effectiveLMP));
+        if (effectiveDueDate) setDueDate(new Date(effectiveDueDate));
+      } else if (formData.life_stage === 'flow') {
+        if (formData.last_period_date) setLastPeriodDate(new Date(formData.last_period_date));
+      }
+      
       if (formData.cycle_length) setCycleLength(formData.cycle_length);
       
       // Update baby data for mommy stage
@@ -266,14 +342,85 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
           {/* Pregnancy specific fields */}
           {formData.life_stage === 'bump' && (
             <>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">Təxmini doğuş tarixi</label>
-                <Input
-                  type="date"
-                  value={formData.due_date}
-                  onChange={(e) => setFormData(prev => ({ ...prev, due_date: e.target.value }))}
-                />
+              {/* Date Input Mode Toggle */}
+              <div className="space-y-3">
+                <label className="text-sm font-medium text-muted-foreground">Tarix növünü seçin</label>
+                <ToggleGroup 
+                  type="single" 
+                  value={dateInputMode} 
+                  onValueChange={(value) => value && setDateInputMode(value as DateInputMode)}
+                  className="grid grid-cols-2 gap-2"
+                >
+                  <ToggleGroupItem 
+                    value="lmp" 
+                    className="flex items-center gap-2 h-auto py-3 px-4 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-xl border"
+                  >
+                    <CalendarDays className="w-4 h-4" />
+                    <span className="text-sm">Son adet tarixi</span>
+                  </ToggleGroupItem>
+                  <ToggleGroupItem 
+                    value="dueDate" 
+                    className="flex items-center gap-2 h-auto py-3 px-4 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-xl border"
+                  >
+                    <Baby className="w-4 h-4" />
+                    <span className="text-sm">Doğuş tarixi</span>
+                  </ToggleGroupItem>
+                </ToggleGroup>
               </div>
+
+              {/* Date Input based on mode */}
+              {dateInputMode === 'lmp' ? (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-muted-foreground">Son menstruasiyanın ilk günü</label>
+                  <Input
+                    type="date"
+                    value={formData.last_period_date}
+                    onChange={(e) => setFormData(prev => ({ ...prev, last_period_date: e.target.value }))}
+                  />
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-muted-foreground">Təxmini doğuş tarixi</label>
+                  <Input
+                    type="date"
+                    value={formData.due_date}
+                    onChange={(e) => setFormData(prev => ({ ...prev, due_date: e.target.value }))}
+                  />
+                </div>
+              )}
+
+              {/* Calculated Date Info Card */}
+              {(calculatedDates.calculatedDueDate || calculatedDates.calculatedLMP) && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-primary/10 rounded-xl p-4 space-y-2"
+                >
+                  <div className="flex items-center gap-2 text-primary">
+                    <Sparkles className="w-4 h-4" />
+                    <span className="text-sm font-medium">Hesablanmış məlumatlar</span>
+                  </div>
+                  
+                  {calculatedDates.calculatedDueDate && (
+                    <p className="text-sm text-foreground">
+                      🎯 Təxmini doğuş tarixi: <strong>{formatDate(calculatedDates.calculatedDueDate)}</strong>
+                    </p>
+                  )}
+                  
+                  {calculatedDates.calculatedLMP && (
+                    <p className="text-sm text-foreground">
+                      📅 Son adet tarixi: <strong>{formatDate(calculatedDates.calculatedLMP)}</strong>
+                    </p>
+                  )}
+                  
+                  {calculatedDates.week > 0 && (
+                    <p className="text-sm text-muted-foreground">
+                      Hazırda: <strong>{calculatedDates.week} həftə {calculatedDates.day} gün</strong>
+                    </p>
+                  )}
+                </motion.div>
+              )}
+              
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground">Körpənin adı (istəyə bağlı)</label>
                 <Input

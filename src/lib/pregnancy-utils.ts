@@ -110,6 +110,19 @@ export const calculateDueDate = (lastPeriodDate: Date | string | null): Date | n
 };
 
 /**
+ * Calculate LMP from due date (reverse calculation)
+ * Due Date - 280 days = LMP
+ */
+export const calculateLMPFromDueDate = (dueDate: Date | string | null): Date | null => {
+  if (!dueDate) return null;
+  
+  const dd = new Date(dueDate);
+  dd.setHours(0, 0, 0, 0);
+  
+  return new Date(dd.getTime() - PREGNANCY_DURATION_DAYS * MS_PER_DAY);
+};
+
+/**
  * Get trimester (1, 2, or 3) from pregnancy week
  */
 export const getTrimester = (weekNumber: number): 1 | 2 | 3 => {
