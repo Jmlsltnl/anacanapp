@@ -265,177 +265,156 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const stageInfo = getLifeStageInfo();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background pb-24">
-      {/* Premium Header */}
-      <div className="sticky top-0 z-20 isolate overflow-hidden">
-        <div className={`absolute inset-0 bg-gradient-to-br ${stageInfo.color} pointer-events-none`} />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,...')] opacity-10 pointer-events-none" />
-        
-        <div className="relative px-4 pt-4 pb-5 safe-area-top">
-          <div className="flex items-center justify-between mb-4 relative z-30">
-            <div>
-              <motion.h1 
-                className="text-2xl font-black text-white flex items-center gap-2"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                <Sparkles className="w-6 h-6" />
-                Alətlər
-              </motion.h1>
-              <motion.p 
-                className="text-white/80 text-sm"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.1 }}
-              >
-                {stageInfo.emoji} {stageInfo.label} dövrü üçün
-              </motion.p>
+    <div className="min-h-screen bg-background pb-24">
+      {/* Compact Header */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-lg border-b border-border/50 safe-area-top">
+        <div className="px-4 py-3">
+          {/* Title Row */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stageInfo.color} flex items-center justify-center shadow-lg`}>
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold text-foreground">Alətlər</h1>
+                <p className="text-xs text-muted-foreground">{stageInfo.emoji} {stageInfo.label}</p>
+              </div>
             </div>
-            <motion.div 
-              className="flex items-center gap-2 bg-white/15 backdrop-blur-md rounded-2xl px-4 py-2"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-            >
-              <Zap className="w-4 h-4 text-amber-300" />
-              <span className="text-white text-sm font-bold">{tools.length}</span>
-              <span className="text-white/70 text-xs">alət</span>
-            </motion.div>
+            
+            {/* Stats Pills */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 bg-primary/10 rounded-full px-2.5 py-1">
+                <Zap className="w-3.5 h-3.5 text-primary" />
+                <span className="text-xs font-bold text-primary">{filteredTools.filter(t => isToolAvailable(t)).length}</span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-amber-500/10 rounded-full px-2.5 py-1">
+                <Crown className="w-3.5 h-3.5 text-amber-500" />
+                <span className="text-xs font-bold text-amber-600">{tools.filter(t => t.isPremium).length}</span>
+              </div>
+            </div>
           </div>
 
-          {/* Stats Row */}
-          <motion.div 
-            className="grid grid-cols-3 gap-3 mb-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-          >
-            <div className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center">
-              <TrendingUp className="w-5 h-5 mx-auto mb-1 text-white/80" />
-              <p className="text-lg font-black text-white">{filteredTools.filter(t => isToolAvailable(t)).length}</p>
-              <p className="text-[10px] text-white/70">Aktiv</p>
-            </div>
-            <div className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center">
-              <Crown className="w-5 h-5 mx-auto mb-1 text-amber-300" />
-              <p className="text-lg font-black text-white">{tools.filter(t => t.isPremium).length}</p>
-              <p className="text-[10px] text-white/70">Premium</p>
-            </div>
-            <div className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center">
-              <Heart className="w-5 h-5 mx-auto mb-1 text-white/80" />
-              <p className="text-lg font-black text-white">AI</p>
-              <p className="text-[10px] text-white/70">Dəstəkli</p>
-            </div>
-          </motion.div>
-
           {/* Search Bar */}
-          <motion.div 
-            className="relative z-20"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Alət axtarın..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-12 pl-12 pr-4 rounded-2xl bg-white/20 backdrop-blur-md border border-white/20 text-white placeholder:text-white/60 text-base outline-none focus:bg-white/30 transition-colors"
+              className="w-full h-10 pl-10 pr-4 rounded-xl bg-muted/50 border border-border/50 text-foreground placeholder:text-muted-foreground text-sm outline-none focus:bg-muted focus:border-primary/30 transition-all"
             />
-          </motion.div>
+          </div>
         </div>
       </div>
 
-      <div className="px-4 -mt-2">
-        {/* Top Banner Slot */}
+      <div className="px-4 pt-4">
+        {/* Top Banner */}
         <BannerSlot placement="tools_top" onNavigate={() => {}} onToolOpen={setActiveTool} className="mb-4" />
 
-        {/* Featured Tools Section */}
+        {/* Quick Access - Horizontal Scroll */}
         <motion.div 
-          className="mb-4"
-          initial={{ opacity: 0, y: 20 }}
+          className="mb-5"
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
         >
-          <h2 className="font-bold text-foreground mb-3 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary" />
-            Öndə Seçilənlər
-          </h2>
+          <div className="flex items-center justify-between mb-2.5">
+            <h2 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+              <Stars className="w-4 h-4 text-amber-500" />
+              Populyar
+            </h2>
+          </div>
           
-          <div className="space-y-3">
-            {/* AI Photoshoot Banner */}
+          <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4">
+            {/* AI Photo Card */}
             <motion.button
               onClick={() => setActiveTool('photoshoot')}
-              className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-r from-rose-500 via-pink-500 to-orange-400 p-5 shadow-xl text-left"
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
+              className="flex-shrink-0 relative overflow-hidden rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 p-3.5 w-36 text-left shadow-lg"
+              whileTap={{ scale: 0.96 }}
             >
-              <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/20 blur-3xl" />
-              <div className="absolute right-4 bottom-2 opacity-30">
-                <Camera className="w-20 h-20 text-white" />
+              <div className="absolute -right-4 -bottom-4 opacity-20">
+                <Camera className="w-16 h-16 text-white" />
               </div>
-              <div className="relative z-10 flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-white/25 backdrop-blur-md flex items-center justify-center shadow-lg">
-                  <Camera className="w-8 h-8 text-white" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="px-2 py-0.5 rounded-full bg-white/25 text-white text-[10px] font-bold">AI</span>
-                    <span className="px-2 py-0.5 rounded-full bg-amber-400/30 text-amber-100 text-[10px] font-bold flex items-center gap-1">
-                      <Crown className="w-3 h-3" /> Premium
-                    </span>
-                  </div>
-                  <h3 className="text-white font-bold text-lg">Körpə Fotosessiyası</h3>
-                  <p className="text-white/80 text-sm">AI ilə unikal körpə fotoları yaradın</p>
-                </div>
-                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                  <ChevronRight className="w-5 h-5 text-white" />
-                </div>
+              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center mb-2">
+                <Camera className="w-4.5 h-4.5 text-white" />
+              </div>
+              <p className="text-white font-semibold text-xs leading-tight">Körpə Fotosessiyası</p>
+              <div className="flex items-center gap-1 mt-1.5">
+                <span className="px-1.5 py-0.5 rounded-full bg-white/20 text-[9px] text-white font-medium">AI</span>
+                <Crown className="w-3 h-3 text-amber-300" />
               </div>
             </motion.button>
 
-            {/* Recipes Banner */}
+            {/* Recipes Card */}
             <motion.button
               onClick={() => setActiveTool('recipes')}
-              className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-r from-amber-500 via-orange-500 to-red-400 p-5 shadow-xl text-left"
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
+              className="flex-shrink-0 relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 p-3.5 w-36 text-left shadow-lg"
+              whileTap={{ scale: 0.96 }}
             >
-              <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/20 blur-3xl" />
-              <div className="absolute right-4 bottom-2 opacity-30">
-                <ChefHat className="w-20 h-20 text-white" />
+              <div className="absolute -right-4 -bottom-4 opacity-20">
+                <ChefHat className="w-16 h-16 text-white" />
               </div>
-              <div className="relative z-10 flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-white/25 backdrop-blur-md flex items-center justify-center shadow-lg">
-                  <ChefHat className="w-8 h-8 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-white font-bold text-lg">Sağlam Reseptlər</h3>
-                  <p className="text-white/80 text-sm">Hamiləlik və analıq üçün yeməklər</p>
-                </div>
-                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                  <ChevronRight className="w-5 h-5 text-white" />
-                </div>
+              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center mb-2">
+                <ChefHat className="w-4.5 h-4.5 text-white" />
               </div>
+              <p className="text-white font-semibold text-xs leading-tight">Sağlam Reseptlər</p>
+              <p className="text-white/70 text-[9px] mt-1">Faydalı yeməklər</p>
+            </motion.button>
+
+            {/* Safety Card */}
+            <motion.button
+              onClick={() => setActiveTool('safety')}
+              className="flex-shrink-0 relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 p-3.5 w-36 text-left shadow-lg"
+              whileTap={{ scale: 0.96 }}
+            >
+              <div className="absolute -right-4 -bottom-4 opacity-20">
+                <Shield className="w-16 h-16 text-white" />
+              </div>
+              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center mb-2">
+                <Shield className="w-4.5 h-4.5 text-white" />
+              </div>
+              <p className="text-white font-semibold text-xs leading-tight">Təhlükəsizlik</p>
+              <div className="flex items-center gap-1 mt-1.5">
+                <span className="px-1.5 py-0.5 rounded-full bg-white/20 text-[9px] text-white font-medium">AI</span>
+              </div>
+            </motion.button>
+
+            {/* First Aid Card */}
+            <motion.button
+              onClick={() => setActiveTool('first-aid')}
+              className="flex-shrink-0 relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500 to-rose-600 p-3.5 w-36 text-left shadow-lg"
+              whileTap={{ scale: 0.96 }}
+            >
+              <div className="absolute -right-4 -bottom-4 opacity-20">
+                <ShieldAlert className="w-16 h-16 text-white" />
+              </div>
+              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center mb-2">
+                <ShieldAlert className="w-4.5 h-4.5 text-white" />
+              </div>
+              <p className="text-white font-semibold text-xs leading-tight">Həyat Qurtaran SOS</p>
+              <p className="text-white/70 text-[9px] mt-1">İlk yardım</p>
             </motion.button>
           </div>
         </motion.div>
 
         {/* All Tools Section */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.1 }}
         >
-          <h2 className="font-bold text-foreground mb-3 flex items-center gap-2">
-            <Wrench className="w-5 h-5 text-muted-foreground" />
-            Bütün Alətlər
-            <span className="ml-auto text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+              <Wrench className="w-4 h-4 text-muted-foreground" />
+              Bütün Alətlər
+            </h2>
+            <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
               {filteredTools.length}
             </span>
-          </h2>
+          </div>
 
-          {/* Tools Grid */}
-          <div className="grid grid-cols-2 gap-3">
+          {/* Tools Grid - More Compact */}
+          <div className="grid grid-cols-3 gap-2.5">
             {filteredTools.map((tool, index) => {
               const Icon = tool.icon;
               const available = isToolAvailable(tool);
@@ -444,71 +423,46 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
               return (
                 <motion.button
                   key={tool.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: Math.min(0.35 + index * 0.03, 0.6) }}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: Math.min(0.05 + index * 0.02, 0.3) }}
                   onClick={() => handleToolClick(tool)}
-                  className={`bg-card rounded-2xl p-4 text-left shadow-sm border border-border/50 relative overflow-hidden transition-all hover:shadow-lg hover:border-primary/20 ${!available ? 'opacity-50' : ''}`}
-                  whileHover={available ? { scale: 1.02, y: -2 } : {}}
-                  whileTap={available ? { scale: 0.98 } : {}}
+                  className={`bg-card rounded-2xl p-3 text-center border border-border/40 relative overflow-hidden transition-all hover:shadow-md hover:border-primary/20 active:scale-95 ${!available ? 'opacity-50' : ''}`}
                 >
-                  {/* Background Glow for Premium */}
+                  {/* Premium Indicator */}
                   {needsPremium && (
-                    <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-gradient-to-br from-amber-400/20 to-orange-400/10 blur-2xl" />
-                  )}
-
-                  {/* Premium/Locked badge */}
-                  {needsPremium ? (
-                    <div className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-gradient-to-r from-amber-500/20 to-orange-500/20 backdrop-blur-sm px-2 py-1 rounded-full border border-amber-500/30">
+                    <div className="absolute top-1.5 right-1.5">
                       <Lock className="w-3 h-3 text-amber-500" />
+                    </div>
+                  )}
+                  {!needsPremium && tool.isPremium && (
+                    <div className="absolute top-1.5 right-1.5">
                       <Crown className="w-3 h-3 text-amber-400" />
                     </div>
-                  ) : tool.isPremium && (
-                    <div className="absolute top-2.5 right-2.5">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-amber-400 blur-sm opacity-40 rounded-full" />
-                        <Crown className="relative w-4 h-4 text-amber-500 drop-shadow-md" />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Week restriction lock */}
-                  {!available && tool.minWeek && (
-                    <div className="absolute top-2.5 right-2.5">
-                      <Lock className="w-4 h-4 text-muted-foreground" />
-                    </div>
                   )}
                   
-                  {/* Enhanced icon */}
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-3 relative overflow-hidden shadow-inner ${
+                  {/* Icon */}
+                  <div className={`w-11 h-11 rounded-xl mx-auto mb-2 flex items-center justify-center ${
                     needsPremium 
                       ? 'bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30' 
-                      : 'bg-gradient-to-br from-primary/15 to-primary/25 dark:from-primary/20 dark:to-primary/30'
+                      : 'bg-gradient-to-br from-primary/10 to-primary/20'
                   }`}>
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/60 to-transparent dark:from-white/10" />
-                    <Icon className={`w-6 h-6 relative z-10 ${needsPremium ? 'text-amber-600 dark:text-amber-400' : 'text-primary'}`} />
+                    <Icon className={`w-5 h-5 ${needsPremium ? 'text-amber-600 dark:text-amber-400' : 'text-primary'}`} />
                   </div>
                   
-                  <h3 className="font-bold text-foreground text-sm mb-1">{tool.name}</h3>
-                  <p className="text-[11px] text-muted-foreground leading-snug line-clamp-2">{tool.description}</p>
+                  <h3 className="font-medium text-foreground text-[11px] leading-tight line-clamp-2">{tool.name}</h3>
+                  
+                  {/* Limited badge */}
+                  {tool.isPremium && (tool.premiumType === 'limited_total' || tool.premiumType === 'limited_monthly') && (
+                    <div className="flex justify-center mt-1">
+                      <span className="text-[8px] text-amber-600 bg-amber-500/10 px-1.5 py-0.5 rounded-full">
+                        {tool.premiumType === 'limited_total' ? `${tool.premiumLimit} pulsuz` : `Ayda ${tool.premiumLimit}`}
+                      </span>
+                    </div>
+                  )}
                   
                   {tool.minWeek && lifeStage === 'bump' && !available && (
-                    <p className="text-[10px] text-muted-foreground mt-1.5 flex items-center gap-1">
-                      <Lock className="w-3 h-3" />
-                      {tool.minWeek}. həftədən aktiv
-                    </p>
-                  )}
-                  {tool.isPremium && tool.premiumType === 'limited_total' && (
-                    <p className="text-[10px] text-amber-600 dark:text-amber-400 mt-1.5 flex items-center gap-1">
-                      <Sparkles className="w-3 h-3" />
-                      İlk {tool.premiumLimit} pulsuz
-                    </p>
-                  )}
-                  {tool.isPremium && tool.premiumType === 'limited_monthly' && (
-                    <p className="text-[10px] text-amber-600 dark:text-amber-400 mt-1.5 flex items-center gap-1">
-                      <Sparkles className="w-3 h-3" />
-                      Ayda {tool.premiumLimit} pulsuz
-                    </p>
+                    <p className="text-[8px] text-muted-foreground mt-1">{tool.minWeek}. həftədən</p>
                   )}
                 </motion.button>
               );
@@ -518,21 +472,21 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
           {/* Empty State */}
           {filteredTools.length === 0 && (
             <motion.div 
-              className="text-center py-16"
+              className="text-center py-12"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <div className="w-20 h-20 rounded-3xl bg-muted flex items-center justify-center mx-auto mb-4">
-                <Search className="w-10 h-10 text-muted-foreground" />
+              <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-3">
+                <Search className="w-8 h-8 text-muted-foreground" />
               </div>
-              <p className="font-bold text-foreground mb-1">Alət tapılmadı</p>
-              <p className="text-sm text-muted-foreground">"{searchQuery}" ilə uyğun alət yoxdur</p>
+              <p className="font-semibold text-foreground text-sm mb-1">Alət tapılmadı</p>
+              <p className="text-xs text-muted-foreground">"{searchQuery}" ilə uyğun alət yoxdur</p>
             </motion.div>
           )}
         </motion.div>
 
-        {/* Bottom Banner Slot */}
-        <BannerSlot placement="tools_bottom" onNavigate={() => {}} onToolOpen={setActiveTool} className="mt-6" />
+        {/* Bottom Banner */}
+        <BannerSlot placement="tools_bottom" onNavigate={() => {}} onToolOpen={setActiveTool} className="mt-5" />
       </div>
 
       {/* Premium Modal */}
