@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Clock, 
   Heart, Flame, Check, ChevronRight, Star,
-  Award, Loader2
+  Award, Loader2, Dumbbell, Sparkles, Play, Trophy
 } from 'lucide-react';
 import { useExerciseLogs } from '@/hooks/useExerciseLogs';
 import { useUserStore } from '@/store/userStore';
@@ -26,7 +26,6 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
   const pregnancyData = getPregnancyData();
   const currentTrimester = pregnancyData?.trimester || 2;
 
-  // Map DB exercises to component format
   const exercises = useMemo(() => {
     if (!dbExercises) return [];
     return dbExercises.map(e => ({
@@ -70,56 +69,66 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-cyan-50 dark:from-cyan-950/20 to-background pb-24">
-      {/* Header */}
-      <div className="sticky top-0 z-20 isolate bg-gradient-to-br from-cyan-500 to-teal-600 px-3 pt-3 pb-6">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 to-teal-600 pointer-events-none" />
-        <div className="flex items-center gap-3 mb-4 relative z-30">
-          <motion.button
-            onClick={onBack}
-            className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center relative z-30"
-            whileTap={{ scale: 0.95 }}
-          >
-            <ArrowLeft className="w-4 h-4 text-white" />
-          </motion.button>
-          <div>
-            <h1 className="text-lg font-bold text-white">Məşqlər</h1>
-            <p className="text-white/80 text-xs">{currentTrimester}. trimester üçün</p>
+      {/* Premium Header */}
+      <div className="sticky top-0 z-20 isolate overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-600 pointer-events-none" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,...')] opacity-10 pointer-events-none" />
+        
+        <div className="relative px-4 pt-4 pb-6 safe-area-top">
+          <div className="flex items-center gap-3 mb-4 relative z-30">
+            <motion.button
+              onClick={selectedExercise ? () => { setSelectedExerciseId(null); setCurrentStep(0); } : onBack}
+              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"
+              whileTap={{ scale: 0.95 }}
+            >
+              <ArrowLeft className="w-5 h-5 text-white" />
+            </motion.button>
+            <div className="flex-1">
+              <h1 className="text-xl font-bold text-white flex items-center gap-2">
+                <Dumbbell className="w-5 h-5" />
+                {selectedExercise ? selectedExercise.name : 'Hamilə Məşqləri'}
+              </h1>
+              <p className="text-white/80 text-sm">{currentTrimester}. trimester üçün xüsusi</p>
+            </div>
+          </div>
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-3 gap-3">
+            <motion.div
+              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <Check className="w-5 h-5 mx-auto mb-1 text-white/80" />
+              <p className="text-2xl font-black text-white">{todayStats.completedCount}</p>
+              <p className="text-[10px] text-white/70">Bu gün</p>
+            </motion.div>
+            <motion.div
+              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+            >
+              <Flame className="w-5 h-5 mx-auto mb-1 text-white/80" />
+              <p className="text-2xl font-black text-white">{todayStats.totalCalories}</p>
+              <p className="text-[10px] text-white/70">Kalori</p>
+            </motion.div>
+            <motion.div
+              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Trophy className="w-5 h-5 mx-auto mb-1 text-white/80" />
+              <p className="text-2xl font-black text-white">{streak}</p>
+              <p className="text-[10px] text-white/70">Gün ardıcıl</p>
+            </motion.div>
           </div>
         </div>
-
-        {/* Stats Card */}
-        <motion.div 
-          className="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/20"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-        >
-          <div className="flex justify-around">
-            <div className="text-center">
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-1">
-                <Check className="w-5 h-5 text-white" />
-              </div>
-              <p className="text-xl font-bold text-white">{todayStats.completedCount}</p>
-              <p className="text-white/70 text-[10px]">Tamamlandı</p>
-            </div>
-            <div className="text-center">
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-1">
-                <Flame className="w-5 h-5 text-white" />
-              </div>
-              <p className="text-xl font-bold text-white">{todayStats.totalCalories}</p>
-              <p className="text-white/70 text-[10px]">Kalori</p>
-            </div>
-            <div className="text-center">
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-1">
-                <Award className="w-5 h-5 text-white" />
-              </div>
-              <p className="text-xl font-bold text-white">{streak}</p>
-              <p className="text-white/70 text-[10px]">Günlük zolaq</p>
-            </div>
-          </div>
-        </motion.div>
       </div>
 
-      <div className="px-3 -mt-3">
+      <div className="px-4 -mt-2">
         <AnimatePresence mode="wait">
           {!selectedExercise ? (
             <motion.div
@@ -127,62 +136,102 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="space-y-3"
             >
               {/* Daily Recommendation */}
               <motion.div
-                className="bg-gradient-to-r from-amber-100 to-orange-100 rounded-xl p-3 border border-amber-200"
+                className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800 mb-4"
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
               >
-                <div className="flex items-center gap-2">
-                  <Star className="w-6 h-6 text-amber-500" />
-                  <div>
-                    <h3 className="font-bold text-amber-800 text-sm">Günün tövsiyəsi</h3>
-                    <p className="text-xs text-amber-700">20 dəq gəzinti + Kegel məşqləri</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg">
+                    <Star className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-amber-800 dark:text-amber-200">Günün tövsiyəsi</h3>
+                    <p className="text-sm text-amber-700 dark:text-amber-300">20 dəq gəzinti + Kegel məşqləri</p>
+                  </div>
+                  <div className="px-3 py-1 rounded-full bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200 text-xs font-bold">
+                    Tövsiyə
                   </div>
                 </div>
               </motion.div>
 
               {/* Exercise List */}
-              <h2 className="font-bold text-sm pt-1">Sizin üçün məşqlər</h2>
+              <h2 className="font-bold text-foreground mb-3 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-cyan-500" />
+                Sizin üçün məşqlər
+              </h2>
+              
               {filteredExercises.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">Məşq tapılmadı</p>
+                <motion.div 
+                  className="text-center py-16"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  <div className="w-20 h-20 rounded-3xl bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center mx-auto mb-4">
+                    <Dumbbell className="w-10 h-10 text-cyan-500" />
+                  </div>
+                  <p className="font-bold text-foreground mb-1">Məşq tapılmadı</p>
+                  <p className="text-sm text-muted-foreground">Admin paneldən məşq əlavə edin</p>
+                </motion.div>
               ) : (
-                filteredExercises.map((exercise, index) => {
-                  const isCompleted = isCompletedToday(exercise.id);
-                  return (
-                    <motion.button
-                      key={exercise.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      onClick={() => setSelectedExerciseId(exercise.id)}
-                      className={`w-full bg-card rounded-xl p-3 flex items-center gap-3 shadow-card border ${
-                        isCompleted ? 'border-green-300 bg-green-50' : 'border-border/50'
-                      }`}
-                    >
-                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl ${
-                        isCompleted ? 'bg-green-100' : 'bg-cyan-50'
-                      }`}>
-                        {isCompleted ? '✅' : exercise.icon}
-                      </div>
-                      <div className="flex-1 text-left">
-                        <h3 className="font-semibold text-sm">{exercise.name}</h3>
-                        <p className="text-xs text-muted-foreground">{exercise.description}</p>
-                        <div className="flex gap-2 mt-0.5">
-                          <span className="text-[10px] text-cyan-600 flex items-center gap-1">
-                            <Clock className="w-3 h-3" /> {exercise.duration} dəq
-                          </span>
-                          <span className="text-[10px] text-orange-600 flex items-center gap-1">
-                            <Flame className="w-3 h-3" /> {exercise.calories} kal
-                          </span>
+                <div className="space-y-3">
+                  {filteredExercises.map((exercise, index) => {
+                    const isCompleted = isCompletedToday(exercise.id);
+                    return (
+                      <motion.button
+                        key={exercise.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.08 }}
+                        onClick={() => setSelectedExerciseId(exercise.id)}
+                        className={`w-full bg-card rounded-2xl p-4 flex items-center gap-4 shadow-sm border transition-all hover:shadow-md ${
+                          isCompleted 
+                            ? 'border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20' 
+                            : 'border-border/50'
+                        }`}
+                      >
+                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-inner ${
+                          isCompleted 
+                            ? 'bg-gradient-to-br from-green-400 to-emerald-500' 
+                            : 'bg-gradient-to-br from-cyan-100 to-teal-100 dark:from-cyan-900/30 dark:to-teal-900/30'
+                        }`}>
+                          {isCompleted ? '✅' : exercise.icon}
                         </div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                    </motion.button>
-                  );
-                })
+                        <div className="flex-1 text-left">
+                          <h3 className="font-bold text-foreground">{exercise.name}</h3>
+                          <p className="text-sm text-muted-foreground line-clamp-1">{exercise.description}</p>
+                          <div className="flex gap-3 mt-1">
+                            <span className="text-xs text-cyan-600 dark:text-cyan-400 flex items-center gap-1 font-medium">
+                              <Clock className="w-3.5 h-3.5" /> {exercise.duration} dəq
+                            </span>
+                            <span className="text-xs text-orange-600 dark:text-orange-400 flex items-center gap-1 font-medium">
+                              <Flame className="w-3.5 h-3.5" /> {exercise.calories} kal
+                            </span>
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                              exercise.level === 'easy' 
+                                ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                                : exercise.level === 'medium'
+                                  ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                                  : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+                            }`}>
+                              {exercise.level === 'easy' ? 'Asan' : exercise.level === 'medium' ? 'Orta' : 'Çətin'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                          isCompleted ? 'bg-green-100 dark:bg-green-900/30' : 'bg-muted'
+                        }`}>
+                          {isCompleted 
+                            ? <Check className="w-5 h-5 text-green-600" />
+                            : <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                          }
+                        </div>
+                      </motion.button>
+                    );
+                  })}
+                </div>
               )}
             </motion.div>
           ) : (
@@ -191,74 +240,101 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -50 }}
-              className="space-y-3"
             >
               {/* Exercise Detail Card */}
-              <div className="bg-card rounded-2xl p-4 shadow-card border border-border/50 text-center">
-                <div className="text-4xl mb-3">{selectedExercise.icon}</div>
-                <h2 className="text-xl font-bold mb-1">{selectedExercise.name}</h2>
-                <p className="text-muted-foreground text-sm mb-3">{selectedExercise.description}</p>
+              <div className="bg-card rounded-3xl shadow-lg border border-border/50 overflow-hidden">
+                {/* Exercise Header */}
+                <div className="bg-gradient-to-br from-cyan-500 to-teal-600 p-6 text-center">
+                  <motion.div 
+                    className="w-20 h-20 rounded-3xl bg-white/20 backdrop-blur-md flex items-center justify-center mx-auto mb-3 text-4xl"
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    {selectedExercise.icon}
+                  </motion.div>
+                  <h2 className="text-xl font-bold text-white mb-1">{selectedExercise.name}</h2>
+                  <p className="text-white/80 text-sm">{selectedExercise.description}</p>
+                </div>
                 
-                <div className="flex justify-center gap-4 mb-4">
+                {/* Stats */}
+                <div className="p-4 grid grid-cols-3 gap-3 border-b border-border">
                   <div className="text-center">
-                    <Clock className="w-5 h-5 text-cyan-500 mx-auto mb-0.5" />
-                    <p className="font-bold text-sm">{selectedExercise.duration}</p>
+                    <div className="w-10 h-10 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center mx-auto mb-1">
+                      <Clock className="w-5 h-5 text-cyan-600" />
+                    </div>
+                    <p className="font-bold text-foreground">{selectedExercise.duration}</p>
                     <p className="text-[10px] text-muted-foreground">dəqiqə</p>
                   </div>
                   <div className="text-center">
-                    <Flame className="w-5 h-5 text-orange-500 mx-auto mb-0.5" />
-                    <p className="font-bold text-sm">{selectedExercise.calories}</p>
+                    <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mx-auto mb-1">
+                      <Flame className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <p className="font-bold text-foreground">{selectedExercise.calories}</p>
                     <p className="text-[10px] text-muted-foreground">kalori</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mx-auto mb-1">
+                      <Award className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <p className="font-bold text-foreground capitalize">
+                      {selectedExercise.level === 'easy' ? 'Asan' : selectedExercise.level === 'medium' ? 'Orta' : 'Çətin'}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">səviyyə</p>
                   </div>
                 </div>
 
                 {/* Steps */}
-                <div className="text-left bg-muted/50 rounded-xl p-3 mb-3">
-                  <h3 className="font-bold mb-2 text-sm">Addımlar:</h3>
-                  <div className="space-y-1.5">
+                <div className="p-4">
+                  <h3 className="font-bold text-foreground mb-3 flex items-center gap-2">
+                    <Play className="w-4 h-4 text-cyan-500" />
+                    Addımlar
+                  </h3>
+                  <div className="space-y-2">
                     {selectedExercise.steps.map((step, i) => (
                       <motion.div
                         key={i}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: i * 0.1 }}
-                        className={`flex items-center gap-2 p-1.5 rounded-lg ${
-                          i === currentStep ? 'bg-primary/10' : ''
+                        className={`flex items-start gap-3 p-3 rounded-xl transition-colors ${
+                          i === currentStep ? 'bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800' : 'bg-muted/30'
                         }`}
                       >
-                        <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                        <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
                           i < currentStep 
-                            ? 'bg-green-500 text-white' 
+                            ? 'bg-gradient-to-br from-green-400 to-emerald-500 text-white' 
                             : i === currentStep 
-                              ? 'bg-primary text-white' 
+                              ? 'bg-gradient-to-br from-cyan-500 to-teal-600 text-white' 
                               : 'bg-muted text-muted-foreground'
                         }`}>
                           {i < currentStep ? '✓' : i + 1}
                         </div>
-                        <span className={`text-xs ${i === currentStep ? 'font-medium' : ''}`}>{step}</span>
+                        <span className={`text-sm pt-0.5 ${i === currentStep ? 'font-medium text-foreground' : 'text-muted-foreground'}`}>
+                          {step}
+                        </span>
                       </motion.div>
                     ))}
                   </div>
                 </div>
 
                 {/* Controls */}
-                <div className="flex gap-2">
+                <div className="p-4 flex gap-3">
                   <motion.button
                     onClick={() => {
                       setSelectedExerciseId(null);
                       setCurrentStep(0);
                     }}
-                    className="flex-1 py-3 rounded-xl border-2 border-border font-medium text-sm"
+                    className="flex-1 py-3.5 rounded-2xl border-2 border-border font-bold text-foreground"
                     whileTap={{ scale: 0.98 }}
                   >
                     Geri
                   </motion.button>
                   <motion.button
                     onClick={handleComplete}
-                    className="flex-1 gradient-primary text-white font-bold py-3 rounded-xl shadow-elevated flex items-center justify-center gap-1.5 text-sm"
+                    className="flex-1 bg-gradient-to-r from-cyan-500 to-teal-600 text-white font-bold py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2"
                     whileTap={{ scale: 0.98 }}
                   >
-                    <Check className="w-4 h-4" />
+                    <Check className="w-5 h-5" />
                     Bitirdim
                   </motion.button>
                 </div>
