@@ -84,6 +84,7 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
           className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          onClick={() => onNavigate?.('partner-privacy')}
         >
           <Settings className="w-6 h-6 text-muted-foreground" />
         </motion.button>
@@ -258,7 +259,10 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-foreground">Nailiyyətlər</h3>
-          <button className="text-primary text-sm font-semibold flex items-center gap-1">
+          <button 
+            onClick={() => onNavigate?.('achievements')}
+            className="text-primary text-sm font-semibold flex items-center gap-1"
+          >
             Hamısı <ChevronRight className="w-4 h-4" />
           </button>
         </div>

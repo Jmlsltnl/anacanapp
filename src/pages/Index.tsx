@@ -9,7 +9,7 @@ import PartnerDashboard from '@/components/PartnerDashboard';
 import ToolsHub from '@/components/ToolsHub';
 import AIChatScreen from '@/components/AIChatScreen';
 import PartnerAIChatScreen from '@/components/PartnerAIChatScreen';
-import PartnerMessagesScreen from '@/components/partner/PartnerMessagesScreen';
+import PartnerChatScreen from '@/components/partner/PartnerChatScreen';
 import ShopScreen from '@/components/ShopScreen';
 import ProfileScreen from '@/components/ProfileScreen';
 import PartnerProfileScreen from '@/components/PartnerProfileScreen';
@@ -104,7 +104,7 @@ const Index = () => {
         case 'chat':
           return (
             <motion.div key="partner-chat" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full">
-              <PartnerMessagesScreen />
+              <PartnerChatScreen onBack={() => setActiveTab('home')} />
             </motion.div>
           );
         case 'ai':
