@@ -15,6 +15,7 @@ import { Switch } from '@/components/ui/switch';
 import { Card, CardContent } from '@/components/ui/card';
 import { useMomFriendlyPlaces, useAddPlace, useAddReview, MomFriendlyPlace } from '@/hooks/useMomFriendlyPlaces';
 import { toast } from 'sonner';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 interface MomFriendlyMapProps {
   onBack: () => void;
@@ -45,6 +46,8 @@ const AMENITIES = [
 ];
 
 const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
+  useScrollToTop();
+  
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [selectedPlace, setSelectedPlace] = useState<MomFriendlyPlace | null>(null);

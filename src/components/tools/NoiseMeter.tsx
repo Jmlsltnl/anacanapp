@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 interface NoiseMeterProps {
   onBack: () => void;
@@ -19,6 +20,8 @@ const NOISE_THRESHOLDS = {
 };
 
 const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
+  useScrollToTop();
+  
   const [isListening, setIsListening] = useState(false);
   const [currentDb, setCurrentDb] = useState(0);
   const [avgDb, setAvgDb] = useState(0);
