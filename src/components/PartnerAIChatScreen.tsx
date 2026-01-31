@@ -13,6 +13,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { useToast } from '@/hooks/use-toast';
 import { useAISuggestedQuestions } from '@/hooks/useDynamicTools';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 interface Message {
   id: string;
@@ -31,6 +32,8 @@ interface QuickQuestion {
 }
 
 const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
+  useScrollToTop();
+  
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);

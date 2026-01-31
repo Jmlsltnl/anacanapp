@@ -12,6 +12,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { nativeShare } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import {
   Carousel,
   CarouselContent,
@@ -39,6 +40,8 @@ const platformLabels: Record<string, string> = {
 };
 
 const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps) => {
+  useScrollToTop();
+  
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showVideo, setShowVideo] = useState(false);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();

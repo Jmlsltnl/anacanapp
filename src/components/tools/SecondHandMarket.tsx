@@ -16,6 +16,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 interface SecondHandMarketProps {
   onBack: () => void;
@@ -59,6 +60,8 @@ const ageRanges = [
 ];
 
 const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
+  useScrollToTop();
+  
   const [listings, setListings] = useState<Listing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');

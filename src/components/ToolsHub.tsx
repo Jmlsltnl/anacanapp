@@ -41,6 +41,7 @@ import FairyTaleGenerator from './tools/FairyTaleGenerator';
 import HoroscopeCompatibility from './tools/HoroscopeCompatibility';
 import BabyGrowthTracker from './tools/BabyGrowthTracker';
 import { PremiumModal } from './PremiumModal';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 import { useToolConfigs, ToolConfig } from '@/hooks/useDynamicTools';
 import BannerSlot from '@/components/banners/BannerSlot';
@@ -100,6 +101,8 @@ interface ToolsHubProps {
 }
 
 const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
+  useScrollToTop();
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTool, setActiveTool] = useState<string | null>(initialTool);
   const [showPremiumModal, setShowPremiumModal] = useState(false);

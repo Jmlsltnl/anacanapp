@@ -6,6 +6,7 @@ import { usePartnerData } from '@/hooks/usePartnerData';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import ChatMediaUpload from '@/components/chat/ChatMediaUpload';
 import ChatMessageBubble from '@/components/chat/ChatMessageBubble';
 
@@ -24,6 +25,8 @@ interface PartnerChatScreenProps {
 }
 
 const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
+  useScrollToTop();
+  
   const { user, profile } = useAuth();
   const { partnerProfile } = usePartnerData();
   const { toast } = useToast();
