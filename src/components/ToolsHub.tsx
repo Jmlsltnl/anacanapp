@@ -396,8 +396,8 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
           </span>
         </div>
 
-        {/* Tools Grid - Modern Cards */}
-        <div className="grid grid-cols-4 gap-2">
+        {/* Tools Grid - 2 Columns with Description */}
+        <div className="grid grid-cols-2 gap-3">
           <AnimatePresence mode="popLayout">
             {filteredTools.map((tool, index) => {
               const Icon = tool.icon;
@@ -408,35 +408,36 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
                 <motion.button
                   key={tool.id}
                   layout
-                  initial={{ opacity: 0, scale: 0.8 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ delay: Math.min(index * 0.015, 0.15) }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ delay: Math.min(index * 0.02, 0.2) }}
                   onClick={() => handleToolClick(tool)}
-                  className={`bg-card/80 backdrop-blur-sm rounded-2xl p-2.5 text-center border border-border/30 relative overflow-hidden transition-all active:scale-90 ${!available ? 'opacity-40' : 'hover:shadow-lg hover:border-primary/20'}`}
+                  className={`bg-card rounded-2xl p-3.5 text-left border border-border/40 relative overflow-hidden transition-all active:scale-95 ${!available ? 'opacity-40' : 'hover:shadow-lg hover:border-primary/20'}`}
                 >
                   {/* Premium/Lock indicator */}
                   {needsPremium && (
-                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-amber-500/20 flex items-center justify-center">
-                      <Lock className="w-2.5 h-2.5 text-amber-500" />
+                    <div className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-amber-500/15 flex items-center justify-center">
+                      <Lock className="w-3 h-3 text-amber-500" />
                     </div>
                   )}
                   {!needsPremium && tool.isPremium && (
-                    <div className="absolute top-1 right-1">
-                      <Crown className="w-3 h-3 text-amber-400" />
+                    <div className="absolute top-2.5 right-2.5">
+                      <Crown className="w-4 h-4 text-amber-400" />
                     </div>
                   )}
                   
                   {/* Icon */}
-                  <div className={`w-10 h-10 rounded-xl mx-auto mb-1.5 flex items-center justify-center ${
+                  <div className={`w-12 h-12 rounded-xl mb-2.5 flex items-center justify-center ${
                     needsPremium 
                       ? 'bg-gradient-to-br from-amber-500/15 to-orange-500/15' 
                       : 'bg-gradient-to-br from-primary/10 to-primary/20'
                   }`}>
-                    <Icon className={`w-5 h-5 ${needsPremium ? 'text-amber-500' : 'text-primary'}`} />
+                    <Icon className={`w-6 h-6 ${needsPremium ? 'text-amber-500' : 'text-primary'}`} />
                   </div>
                   
-                  <h3 className="font-medium text-foreground text-[10px] leading-tight line-clamp-2">{tool.name}</h3>
+                  <h3 className="font-semibold text-foreground text-sm mb-1 pr-6">{tool.name}</h3>
+                  <p className="text-xs text-muted-foreground leading-snug line-clamp-2">{tool.description}</p>
                 </motion.button>
               );
             })}
