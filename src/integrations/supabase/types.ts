@@ -4604,6 +4604,7 @@ export type Database = {
           category: string
           created_at: string | null
           description: string | null
+          description_az: string | null
           difficulty: string | null
           emoji: string | null
           icon: string | null
@@ -4611,12 +4612,15 @@ export type Database = {
           is_active: boolean | null
           points: number | null
           sort_order: number | null
+          surprise_key: string | null
           title: string
+          title_az: string | null
         }
         Insert: {
           category?: string
           created_at?: string | null
           description?: string | null
+          description_az?: string | null
           difficulty?: string | null
           emoji?: string | null
           icon?: string | null
@@ -4624,12 +4628,15 @@ export type Database = {
           is_active?: boolean | null
           points?: number | null
           sort_order?: number | null
+          surprise_key?: string | null
           title: string
+          title_az?: string | null
         }
         Update: {
           category?: string
           created_at?: string | null
           description?: string | null
+          description_az?: string | null
           difficulty?: string | null
           emoji?: string | null
           icon?: string | null
@@ -4637,7 +4644,9 @@ export type Database = {
           is_active?: boolean | null
           points?: number | null
           sort_order?: number | null
+          surprise_key?: string | null
           title?: string
+          title_az?: string | null
         }
         Relationships: []
       }
