@@ -114,7 +114,7 @@ const PartnerMissionsCard = ({ showAll = false }: PartnerMissionsCardProps) => {
               {mission.isCompleted ? (
                 <CheckCircle className="w-5 h-5" />
               ) : (
-                <span className="text-lg">{mission.icon}</span>
+                <mission.icon className="w-5 h-5" />
               )}
             </motion.button>
 
