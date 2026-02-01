@@ -35,6 +35,10 @@ import AdminQuickActions from './admin/AdminQuickActions';
 import AdminDevelopmentTips from './admin/AdminDevelopmentTips';
 import AdminBanners from './admin/AdminBanners';
 import AdminBabyGrowth from './admin/AdminBabyGrowth';
+import AdminRecipes from './admin/AdminRecipes';
+import AdminPartnerTips from './admin/AdminPartnerTips';
+import AdminFAQ from './admin/AdminFAQ';
+import AdminOnboarding from './admin/AdminOnboarding';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -113,6 +117,14 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminBanners />;
       case 'baby-growth':
         return <AdminBabyGrowth />;
+      case 'recipes':
+        return <AdminRecipes />;
+      case 'partner-tips':
+        return <AdminPartnerTips />;
+      case 'faq':
+        return <AdminFAQ />;
+      case 'onboarding':
+        return <AdminOnboarding />;
       case 'security':
         return <AdminSecurity />;
       default:

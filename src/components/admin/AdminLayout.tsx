@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Package, Settings, BarChart3, Shield, 
   ChevronLeft, Menu, LogOut, Bell, Search,
-  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store, ShieldAlert, BookHeart, MapPin, Gamepad2, Zap, Lightbulb, Megaphone
+  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store, ShieldAlert, BookHeart, MapPin, Gamepad2, Zap, Lightbulb, Megaphone, UtensilsCrossed, Heart, HelpCircle, Sparkles, ShoppingCart
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +20,7 @@ const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: Home },
   { id: 'users', label: 'İstifadəçilər', icon: Users },
   { id: 'support', label: 'Dəstək Müraciətləri', icon: MessageSquare },
+  { id: 'orders', label: 'Sifarişlər', icon: ShoppingCart },
   { id: 'blog', label: 'Bloq', icon: FileText },
   { id: 'community', label: 'Cəmiyyət', icon: MessageSquare },
   { id: 'moderation', label: 'Moderasiya', icon: AlertTriangle },
@@ -31,6 +32,10 @@ const menuItems = [
   { id: 'flow-content', label: 'Menstruasiya Məzmunu', icon: Baby },
   { id: 'photoshoot', label: 'Fotosessiya', icon: Camera },
   { id: 'dynamic-content', label: 'Dinamik Məzmun', icon: Layers },
+  { id: 'recipes', label: 'Reseptlər', icon: UtensilsCrossed },
+  { id: 'partner-tips', label: 'Partnyor Məsləhətləri', icon: Heart },
+  { id: 'faq', label: 'FAQ', icon: HelpCircle },
+  { id: 'onboarding', label: 'Qeydiyyat Mərhələləri', icon: Sparkles },
   { id: 'tools', label: 'Alətlər Sıralaması', icon: Wrench },
   { id: 'content', label: 'Digər Kontent', icon: FileText },
   { id: 'products', label: 'Məhsullar', icon: Package },
