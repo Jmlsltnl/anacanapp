@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, Edit, Trash2, Eye, EyeOff, Star, Search,
-  ChevronDown, Save, X, Image as ImageIcon, Tag, Clock, BarChart3, Sparkles, Loader2
+  ChevronDown, Save, X, Image as ImageIcon, Tag, Clock, BarChart3, Sparkles, Loader2,
+  Upload, Link
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,6 +25,8 @@ const AdminBlog = () => {
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [generatingContent, setGeneratingContent] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageInputMode, setImageInputMode] = useState<'url' | 'upload'>('upload');
 
   const [formData, setFormData] = useState({
     title: '',
@@ -103,6 +106,63 @@ const AdminBlog = () => {
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .trim();
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: 'Xəta',
+        description: 'Yalnız şəkil faylları yüklənə bilər',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: 'Xəta',
+        description: 'Şəkil 5MB-dan böyük olmamalıdır',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `blog-${Date.now()}.${fileExt}`;
+      const filePath = `blog-covers/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('assets')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('assets')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, cover_image_url: publicUrl });
+      toast({
+        title: 'Uğurlu!',
+        description: 'Şəkil yükləndi'
+      });
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({
+        title: 'Xəta',
+        description: 'Şəkil yüklənə bilmədi',
+        variant: 'destructive'
+      });
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const handleTitleChange = (title: string) => {
@@ -527,18 +587,85 @@ const AdminBlog = () => {
 
                 {/* Cover Image */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Örtük Şəkli URL</label>
-                  <Input
-                    value={formData.cover_image_url}
-                    onChange={(e) => setFormData({ ...formData, cover_image_url: e.target.value })}
-                    placeholder="https://example.com/image.jpg"
-                  />
-                  {formData.cover_image_url && (
-                    <img
-                      src={formData.cover_image_url}
-                      alt="Preview"
-                      className="mt-2 w-full h-40 object-cover rounded-lg"
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-sm font-medium">Örtük Şəkli</label>
+                    <div className="flex gap-1 bg-muted rounded-lg p-1">
+                      <button
+                        type="button"
+                        onClick={() => setImageInputMode('upload')}
+                        className={`px-3 py-1 text-xs rounded-md flex items-center gap-1 transition-colors ${
+                          imageInputMode === 'upload' 
+                            ? 'bg-background text-foreground shadow-sm' 
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        <Upload className="w-3 h-3" />
+                        Yüklə
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setImageInputMode('url')}
+                        className={`px-3 py-1 text-xs rounded-md flex items-center gap-1 transition-colors ${
+                          imageInputMode === 'url' 
+                            ? 'bg-background text-foreground shadow-sm' 
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        <Link className="w-3 h-3" />
+                        URL
+                      </button>
+                    </div>
+                  </div>
+
+                  {imageInputMode === 'upload' ? (
+                    <div className="space-y-3">
+                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors bg-muted/30">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          disabled={uploadingImage}
+                        />
+                        {uploadingImage ? (
+                          <div className="flex flex-col items-center">
+                            <Loader2 className="w-8 h-8 text-muted-foreground animate-spin mb-2" />
+                            <span className="text-sm text-muted-foreground">Yüklənir...</span>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center">
+                            <Upload className="w-8 h-8 text-muted-foreground mb-2" />
+                            <span className="text-sm text-muted-foreground">Şəkil seçin və ya sürükləyin</span>
+                            <span className="text-xs text-muted-foreground mt-1">PNG, JPG (max 5MB)</span>
+                          </div>
+                        )}
+                      </label>
+                    </div>
+                  ) : (
+                    <Input
+                      value={formData.cover_image_url}
+                      onChange={(e) => setFormData({ ...formData, cover_image_url: e.target.value })}
+                      placeholder="https://example.com/image.jpg"
                     />
+                  )}
+
+                  {formData.cover_image_url && (
+                    <div className="relative mt-3">
+                      <img
+                        src={formData.cover_image_url}
+                        alt="Preview"
+                        className="w-full h-40 object-cover rounded-lg"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 w-8 h-8"
+                        onClick={() => setFormData({ ...formData, cover_image_url: '' })}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
                   )}
                 </div>
 
