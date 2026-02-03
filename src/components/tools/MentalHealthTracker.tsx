@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Heart, Phone, AlertTriangle, CheckCircle, ChevronRight, Brain, Wind, Smile, ChevronLeft, ExternalLink, Sparkles, Activity, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,13 @@ import {
   EPDS_QUESTIONS,
   EPDSAssessment
 } from '@/hooks/useMentalHealth';
+import { 
+  useMoodLevelsDB, 
+  useBreathingExercisesDB,
+  useEPDSQuestionsDB,
+  FALLBACK_MOOD_LEVELS,
+  FALLBACK_BREATHING_EXERCISES
+} from '@/hooks/useMentalHealthData';
 import { format, subDays } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -28,21 +35,60 @@ interface MentalHealthTrackerProps {
   onBack: () => void;
 }
 
-const MOOD_LEVELS = [
-  { value: 1, emoji: '😢', label: 'Çox pis', gradient: 'from-red-500 to-rose-600', bg: 'bg-red-100 dark:bg-red-900/30' },
-  { value: 2, emoji: '😔', label: 'Pis', gradient: 'from-orange-500 to-amber-600', bg: 'bg-orange-100 dark:bg-orange-900/30' },
-  { value: 3, emoji: '😐', label: 'Normal', gradient: 'from-yellow-500 to-amber-500', bg: 'bg-yellow-100 dark:bg-yellow-900/30' },
-  { value: 4, emoji: '😊', label: 'Yaxşı', gradient: 'from-lime-500 to-green-500', bg: 'bg-lime-100 dark:bg-lime-900/30' },
-  { value: 5, emoji: '🥰', label: 'Əla', gradient: 'from-emerald-500 to-teal-500', bg: 'bg-emerald-100 dark:bg-emerald-900/30' },
-];
-
-const BREATHING_EXERCISES = [
-  { name: '4-7-8 Nəfəs', inhale: 4, hold: 7, exhale: 8, description: 'Rahatlama və yuxu üçün', emoji: '🌙' },
-  { name: 'Qutu Nəfəsi', inhale: 4, hold: 4, exhale: 4, description: 'Stress azaltmaq üçün', emoji: '📦' },
-];
-
 const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
   useScrollToTop();
+  
+  // Fetch data from database
+  const { data: moodLevelsDB = [] } = useMoodLevelsDB();
+  const { data: breathingExercisesDB = [] } = useBreathingExercisesDB();
+  const { data: epdsQuestionsDB = [] } = useEPDSQuestionsDB();
+  
+  // Use DB data or fallback
+  const MOOD_LEVELS = useMemo(() => {
+    if (moodLevelsDB.length > 0) {
+      return moodLevelsDB.map(m => ({
+        value: m.mood_value,
+        emoji: m.emoji,
+        label: m.label_az || m.label,
+        gradient: `from-[${m.color}] to-[${m.color}]`,
+        bg: `bg-[${m.color}]/10`
+      }));
+    }
+    return FALLBACK_MOOD_LEVELS.map(m => ({
+      value: m.mood_value,
+      emoji: m.emoji,
+      label: m.label_az || m.label,
+      gradient: m.mood_value === 1 ? 'from-red-500 to-rose-600' :
+                m.mood_value === 2 ? 'from-orange-500 to-amber-600' :
+                m.mood_value === 3 ? 'from-yellow-500 to-amber-500' :
+                m.mood_value === 4 ? 'from-lime-500 to-green-500' : 'from-emerald-500 to-teal-500',
+      bg: m.mood_value === 1 ? 'bg-red-100 dark:bg-red-900/30' :
+          m.mood_value === 2 ? 'bg-orange-100 dark:bg-orange-900/30' :
+          m.mood_value === 3 ? 'bg-yellow-100 dark:bg-yellow-900/30' :
+          m.mood_value === 4 ? 'bg-lime-100 dark:bg-lime-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'
+    }));
+  }, [moodLevelsDB]);
+
+  const BREATHING_EXERCISES = useMemo(() => {
+    if (breathingExercisesDB.length > 0) {
+      return breathingExercisesDB.map(e => ({
+        name: e.name_az || e.name,
+        inhale: e.inhale_seconds,
+        hold: e.hold_seconds,
+        exhale: e.exhale_seconds,
+        description: e.description_az || e.description || '',
+        emoji: e.icon === 'Wind' ? '🌙' : e.icon === 'Square' ? '📦' : '💨'
+      }));
+    }
+    return FALLBACK_BREATHING_EXERCISES.map(e => ({
+      name: e.name_az || e.name,
+      inhale: e.inhale_seconds,
+      hold: e.hold_seconds,
+      exhale: e.exhale_seconds,
+      description: e.description_az || e.description || '',
+      emoji: e.icon === 'Wind' ? '🌙' : e.icon === 'Square' ? '📦' : '💨'
+    }));
+  }, [breathingExercisesDB]);
   
   const [showEPDS, setShowEPDS] = useState(false);
   const [epdsAnswers, setEpdsAnswers] = useState<Record<string, number>>({});
@@ -53,6 +99,13 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
   const [breathingCount, setBreathingCount] = useState(0);
   const [selectedExercise, setSelectedExercise] = useState(BREATHING_EXERCISES[0]);
   const [notes, setNotes] = useState('');
+
+  // Update selected exercise when exercises load
+  useEffect(() => {
+    if (BREATHING_EXERCISES.length > 0 && !selectedExercise) {
+      setSelectedExercise(BREATHING_EXERCISES[0]);
+    }
+  }, [BREATHING_EXERCISES]);
 
   const { data: moodCheckins = [] } = useMoodCheckins(14);
   const { data: todayCheckin } = useTodayMoodCheckin();
