@@ -41,6 +41,8 @@ import AdminFAQ from './admin/AdminFAQ';
 import AdminOnboarding from './admin/AdminOnboarding';
 import AdminMentalHealth from './admin/AdminMentalHealth';
 import AdminToolsConfig from './admin/AdminToolsConfig';
+import AdminPlacesConfig from './admin/AdminPlacesConfig';
+import AdminPartnerConfig from './admin/AdminPartnerConfig';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -131,6 +133,10 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminMentalHealth />;
       case 'tools-config':
         return <AdminToolsConfig />;
+      case 'places-config':
+        return <AdminPlacesConfig />;
+      case 'partner-config':
+        return <AdminPartnerConfig />;
       case 'security':
         return <AdminSecurity />;
       default:

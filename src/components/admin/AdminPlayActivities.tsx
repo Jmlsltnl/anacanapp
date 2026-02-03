@@ -11,16 +11,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-
-const skillCategories = [
-  { value: 'motor', label: 'Motor Bacarıqları' },
-  { value: 'sensory', label: 'Hissi İnkişaf' },
-  { value: 'cognitive', label: 'İdrak' },
-  { value: 'language', label: 'Dil' },
-  { value: 'social', label: 'Sosial' },
-];
+import { useSkillCategories, FALLBACK_SKILL_CATEGORIES } from '@/hooks/useSkillCategories';
 
 const AdminPlayActivities = () => {
+  const { data: dbSkillCategories = [] } = useSkillCategories();
+  const skillCategories = dbSkillCategories.length > 0 
+    ? dbSkillCategories.map(s => ({ value: s.skill_key, label: s.label_az || s.label, color: s.color }))
+    : FALLBACK_SKILL_CATEGORIES.map(s => ({ value: s.skill_key, label: s.label_az, color: s.color }));
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [newActivity, setNewActivity] = useState(false);
   const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -92,14 +90,8 @@ const AdminPlayActivities = () => {
   const getSkillCategoryColor = (tags: string[] | null) => {
     if (!tags || tags.length === 0) return 'bg-gray-500';
     const first = tags[0];
-    switch (first) {
-      case 'motor': return 'bg-blue-500';
-      case 'sensory': return 'bg-purple-500';
-      case 'cognitive': return 'bg-amber-500';
-      case 'language': return 'bg-green-500';
-      case 'social': return 'bg-pink-500';
-      default: return 'bg-gray-500';
-    }
+    const category = skillCategories.find(c => c.value === first);
+    return category?.color || 'bg-gray-500';
   };
 
   return (

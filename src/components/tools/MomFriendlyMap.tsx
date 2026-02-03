@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, MapPin, Star, Filter, Plus, Check, Baby, Heart, Car, 
@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent } from '@/components/ui/card';
 import { useMomFriendlyPlaces, useAddPlace, useAddReview, MomFriendlyPlace } from '@/hooks/useMomFriendlyPlaces';
+import { usePlaceCategories, usePlaceAmenities, FALLBACK_CATEGORIES, FALLBACK_AMENITIES } from '@/hooks/usePlacesConfig';
 import { toast } from 'sonner';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 
@@ -21,32 +22,50 @@ interface MomFriendlyMapProps {
   onBack: () => void;
 }
 
-const CATEGORIES = [
-  { value: 'all', label: 'Hamısı', icon: MapPin, color: 'from-pink-500 to-rose-600' },
-  { value: 'cafe', label: 'Kafe', icon: Utensils, color: 'from-amber-500 to-orange-600' },
-  { value: 'restaurant', label: 'Restoran', icon: Utensils, color: 'from-red-500 to-rose-600' },
-  { value: 'mall', label: 'Mall', icon: Building2, color: 'from-blue-500 to-indigo-600' },
-  { value: 'park', label: 'Park', icon: TreePine, color: 'from-emerald-500 to-green-600' },
-  { value: 'hospital', label: 'Xəstəxana', icon: Heart, color: 'from-rose-500 to-pink-600' },
-  { value: 'metro', label: 'Metro', icon: Train, color: 'from-violet-500 to-purple-600' },
-  { value: 'pharmacy', label: 'Aptek', icon: Pill, color: 'from-cyan-500 to-teal-600' },
-  { value: 'playground', label: 'Oyun Meydançası', icon: PlayCircle, color: 'from-fuchsia-500 to-pink-600' },
-];
-
-const AMENITIES = [
-  { key: 'has_breastfeeding_room', label: 'Əmizdirmə otağı', icon: '🤱' },
-  { key: 'has_changing_table', label: 'Dəyişdirmə masası', icon: '👶' },
-  { key: 'has_elevator', label: 'Lift', icon: '🛗' },
-  { key: 'has_ramp', label: 'Pandus', icon: '♿' },
-  { key: 'has_stroller_access', label: 'Araba ilə giriş', icon: '🚼' },
-  { key: 'has_kids_menu', label: 'Uşaq menyusu', icon: '🍽️' },
-  { key: 'has_play_area', label: 'Oyun guşəsi', icon: '🎠' },
-  { key: 'has_high_chair', label: 'Uşaq oturacağı', icon: '🪑' },
-  { key: 'has_parking', label: 'Parkinq', icon: '🅿️' },
-];
+// Icon mapping for dynamic categories
+const ICON_MAP: Record<string, any> = {
+  MapPin, Utensils, Building2, TreePine, Heart, Train, Pill, PlayCircle,
+};
 
 const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
   useScrollToTop();
+  
+  // Fetch dynamic categories and amenities
+  const { data: dbCategories = [] } = usePlaceCategories();
+  const { data: dbAmenities = [] } = usePlaceAmenities();
+  
+  // Map to component format
+  const CATEGORIES = useMemo(() => {
+    if (dbCategories.length > 0) {
+      return dbCategories.map(c => ({
+        value: c.category_key,
+        label: c.label_az || c.label,
+        icon: ICON_MAP[c.icon_name] || MapPin,
+        color: c.color_gradient,
+      }));
+    }
+    return FALLBACK_CATEGORIES.map(c => ({
+      value: c.category_key,
+      label: c.label_az,
+      icon: ICON_MAP[c.icon_name] || MapPin,
+      color: c.color_gradient,
+    }));
+  }, [dbCategories]);
+
+  const AMENITIES = useMemo(() => {
+    if (dbAmenities.length > 0) {
+      return dbAmenities.map(a => ({
+        key: a.amenity_key,
+        label: a.label_az || a.label,
+        icon: a.emoji,
+      }));
+    }
+    return FALLBACK_AMENITIES.map(a => ({
+      key: a.amenity_key,
+      label: a.label_az,
+      icon: a.emoji,
+    }));
+  }, [dbAmenities]);
   
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
