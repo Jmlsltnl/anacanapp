@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Volume2, VolumeX, Mic, MicOff, Moon, AlertTriangle, CheckCircle, Play, Pause, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,21 +7,43 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useNoiseThresholdsDB } from '@/hooks/useMentalHealthData';
 
 interface NoiseMeterProps {
   onBack: () => void;
 }
 
-const NOISE_THRESHOLDS = {
-  ideal: 40,      // Below 40 dB - ideal for deep sleep
-  acceptable: 50, // 40-50 dB - acceptable
-  warning: 60,    // 50-60 dB - getting loud
-  danger: 70      // Above 60 dB - too loud
+// Fallback thresholds if DB is empty
+const FALLBACK_NOISE_THRESHOLDS = {
+  ideal: 40,
+  acceptable: 50,
+  warning: 60,
+  danger: 70
 };
 
 const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
   useScrollToTop();
   
+  // Fetch thresholds from database
+  const { data: noiseThresholdsDB = [] } = useNoiseThresholdsDB();
+  
+  // Build thresholds from DB or use fallback
+  const NOISE_THRESHOLDS = useMemo(() => {
+    if (noiseThresholdsDB.length > 0) {
+      const getThresholdValue = (key: string, defaultVal: number) => {
+        const t = noiseThresholdsDB.find(n => n.threshold_key === key);
+        return t ? t.min_db : defaultVal;
+      };
+      return {
+        ideal: getThresholdValue('quiet', 40),
+        acceptable: getThresholdValue('moderate', 50),
+        warning: getThresholdValue('loud', 60),
+        danger: getThresholdValue('very_loud', 70)
+      };
+    }
+    return FALLBACK_NOISE_THRESHOLDS;
+  }, [noiseThresholdsDB]);
+
   const [isListening, setIsListening] = useState(false);
   const [currentDb, setCurrentDb] = useState(0);
   const [avgDb, setAvgDb] = useState(0);

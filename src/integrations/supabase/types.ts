@@ -911,6 +911,66 @@ export type Database = {
         }
         Relationships: []
       }
+      breathing_exercises: {
+        Row: {
+          benefits: string[] | null
+          benefits_az: string[] | null
+          color: string | null
+          created_at: string | null
+          description: string | null
+          description_az: string | null
+          exhale_seconds: number
+          hold_after_exhale_seconds: number | null
+          hold_seconds: number | null
+          icon: string | null
+          id: string
+          inhale_seconds: number
+          is_active: boolean | null
+          name: string
+          name_az: string | null
+          sort_order: number | null
+          total_cycles: number | null
+        }
+        Insert: {
+          benefits?: string[] | null
+          benefits_az?: string[] | null
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          exhale_seconds?: number
+          hold_after_exhale_seconds?: number | null
+          hold_seconds?: number | null
+          icon?: string | null
+          id?: string
+          inhale_seconds?: number
+          is_active?: boolean | null
+          name: string
+          name_az?: string | null
+          sort_order?: number | null
+          total_cycles?: number | null
+        }
+        Update: {
+          benefits?: string[] | null
+          benefits_az?: string[] | null
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          exhale_seconds?: number
+          hold_after_exhale_seconds?: number | null
+          hold_seconds?: number | null
+          icon?: string | null
+          id?: string
+          inhale_seconds?: number
+          is_active?: boolean | null
+          name?: string
+          name_az?: string | null
+          sort_order?: number | null
+          total_cycles?: number | null
+        }
+        Relationships: []
+      }
       bulk_push_notifications: {
         Row: {
           body: string
@@ -1430,6 +1490,42 @@ export type Database = {
           risk_level?: string
           total_score?: number
           user_id?: string
+        }
+        Relationships: []
+      }
+      epds_questions: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          is_reverse_scored: boolean | null
+          options: Json
+          question_number: number
+          question_text: string
+          question_text_az: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_reverse_scored?: boolean | null
+          options?: Json
+          question_number: number
+          question_text: string
+          question_text_az?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_reverse_scored?: boolean | null
+          options?: Json
+          question_number?: number
+          question_text?: string
+          question_text_az?: string | null
+          sort_order?: number | null
         }
         Relationships: []
       }
@@ -2558,6 +2654,42 @@ export type Database = {
         }
         Relationships: []
       }
+      mood_levels: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          emoji: string
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          mood_value: number
+          sort_order: number | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          emoji: string
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          mood_value: number
+          sort_order?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          emoji?: string
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          mood_value?: number
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       mood_options: {
         Row: {
           color_class: string | null
@@ -2687,6 +2819,54 @@ export type Database = {
           is_too_loud?: boolean | null
           room_name?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      noise_thresholds: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          description: string | null
+          description_az: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          max_db: number | null
+          min_db: number
+          sort_order: number | null
+          threshold_key: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          max_db?: number | null
+          min_db: number
+          sort_order?: number | null
+          threshold_key: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          max_db?: number | null
+          min_db?: number
+          sort_order?: number | null
+          threshold_key?: string
         }
         Relationships: []
       }

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Package, Settings, BarChart3, Shield, 
   ChevronLeft, Menu, LogOut, Bell, Search,
-  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store, ShieldAlert, BookHeart, MapPin, Gamepad2, Zap, Lightbulb, Megaphone, UtensilsCrossed, Heart, HelpCircle, Sparkles, ShoppingCart
+  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store, ShieldAlert, BookHeart, MapPin, Gamepad2, Zap, Lightbulb, Megaphone, UtensilsCrossed, Heart, HelpCircle, Sparkles, ShoppingCart, Brain
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,6 +36,7 @@ const menuItems = [
   { id: 'partner-tips', label: 'Partnyor Məsləhətləri', icon: Heart },
   { id: 'faq', label: 'FAQ', icon: HelpCircle },
   { id: 'onboarding', label: 'Qeydiyyat Mərhələləri', icon: Sparkles },
+  { id: 'mental-health', label: 'Mental Sağlamlıq', icon: Brain },
   { id: 'tools', label: 'Alətlər Sıralaması', icon: Wrench },
   { id: 'content', label: 'Digər Kontent', icon: FileText },
   { id: 'products', label: 'Məhsullar', icon: Package },
