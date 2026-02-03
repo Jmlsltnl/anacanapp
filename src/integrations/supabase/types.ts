@@ -3390,6 +3390,51 @@ export type Database = {
         }
         Relationships: []
       }
+      partner_achievements: {
+        Row: {
+          achievement_key: string
+          created_at: string | null
+          description: string | null
+          description_az: string | null
+          emoji: string
+          id: string
+          is_active: boolean | null
+          name: string
+          name_az: string | null
+          sort_order: number | null
+          unlock_condition: string | null
+          unlock_threshold: number | null
+        }
+        Insert: {
+          achievement_key: string
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          emoji?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          name_az?: string | null
+          sort_order?: number | null
+          unlock_condition?: string | null
+          unlock_threshold?: number | null
+        }
+        Update: {
+          achievement_key?: string
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          emoji?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          name_az?: string | null
+          sort_order?: number | null
+          unlock_condition?: string | null
+          unlock_threshold?: number | null
+        }
+        Relationships: []
+      }
       partner_daily_tips: {
         Row: {
           created_at: string | null
@@ -3426,6 +3471,42 @@ export type Database = {
           tip_text_az?: string | null
           updated_at?: string | null
           week_number?: number | null
+        }
+        Relationships: []
+      }
+      partner_menu_items: {
+        Row: {
+          created_at: string | null
+          icon_name: string
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          menu_key: string
+          route: string
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          icon_name?: string
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          menu_key: string
+          route: string
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          icon_name?: string
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          menu_key?: string
+          route?: string
+          sort_order?: number | null
         }
         Relationships: []
       }
@@ -3803,6 +3884,75 @@ export type Database = {
           name_az?: string | null
           preview_url?: string | null
           prompt_text?: string | null
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      place_amenities: {
+        Row: {
+          amenity_key: string
+          created_at: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          amenity_key: string
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          amenity_key?: string
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      place_categories: {
+        Row: {
+          category_key: string
+          color_gradient: string | null
+          created_at: string | null
+          icon_name: string
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          category_key: string
+          color_gradient?: string | null
+          created_at?: string | null
+          icon_name?: string
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          category_key?: string
+          color_gradient?: string | null
+          created_at?: string | null
+          icon_name?: string
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -4925,6 +5075,45 @@ export type Database = {
         }
         Relationships: []
       }
+      skill_categories: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          emoji: string | null
+          icon_name: string | null
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          skill_key: string
+          sort_order: number | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          emoji?: string | null
+          icon_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          skill_key: string
+          sort_order?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          emoji?: string | null
+          icon_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          skill_key?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       sos_alerts: {
         Row: {
           acknowledged_at: string | null
@@ -5136,6 +5325,42 @@ export type Database = {
           subject?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      surprise_categories: {
+        Row: {
+          category_key: string
+          color_gradient: string | null
+          created_at: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          category_key: string
+          color_gradient?: string | null
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          category_key?: string
+          color_gradient?: string | null
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          sort_order?: number | null
         }
         Relationships: []
       }
@@ -5406,6 +5631,39 @@ export type Database = {
           sort_order?: number | null
           tool_id?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      trimester_info: {
+        Row: {
+          color_class: string | null
+          created_at: string | null
+          emoji: string
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          trimester_number: number
+        }
+        Insert: {
+          color_class?: string | null
+          created_at?: string | null
+          emoji?: string
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          trimester_number: number
+        }
+        Update: {
+          color_class?: string | null
+          created_at?: string | null
+          emoji?: string
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          trimester_number?: number
         }
         Relationships: []
       }

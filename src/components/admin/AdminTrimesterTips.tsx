@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTrimesterTipsAdmin, TrimesterTip } from '@/hooks/useTrimesterTips';
+import { useTrimesterInfo, FALLBACK_TRIMESTER_INFO } from '@/hooks/useTrimesterInfo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,13 +12,12 @@ import { Plus, Trash2, Edit2, Save, X, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-const TRIMESTER_INFO = [
-  { value: 1, label: '1-ci Trimester', emoji: '🌱', color: 'bg-green-500/10 border-green-500/30' },
-  { value: 2, label: '2-ci Trimester', emoji: '🌸', color: 'bg-amber-500/10 border-amber-500/30' },
-  { value: 3, label: '3-cü Trimester', emoji: '🍼', color: 'bg-primary/10 border-primary/30' },
-];
-
 const AdminTrimesterTips = () => {
+  const { data: dbTrimesterInfo = [] } = useTrimesterInfo();
+  const TRIMESTER_INFO = dbTrimesterInfo.length > 0 
+    ? dbTrimesterInfo.map(t => ({ value: t.trimester_number, label: t.label_az || t.label, emoji: t.emoji, color: t.color_class }))
+    : FALLBACK_TRIMESTER_INFO.map(t => ({ value: t.trimester_number, label: t.label_az, emoji: t.emoji, color: t.color_class }));
+
   const { tips, isLoading, createTip, updateTip, deleteTip } = useTrimesterTipsAdmin();
   const { toast } = useToast();
   const [editingId, setEditingId] = useState<string | null>(null);
