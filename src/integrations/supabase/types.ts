@@ -167,6 +167,42 @@ export type Database = {
         }
         Relationships: []
       }
+      age_ranges: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          max_months: number | null
+          min_months: number | null
+          range_key: string
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          max_months?: number | null
+          min_months?: number | null
+          range_key: string
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          max_months?: number | null
+          min_months?: number | null
+          range_key?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       ai_chat_messages: {
         Row: {
           chat_type: string
@@ -1307,6 +1343,45 @@ export type Database = {
         }
         Relationships: []
       }
+      cry_type_labels: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          cry_type: string
+          description_az: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          cry_type: string
+          description_az?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          cry_type?: string
+          description_az?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       daily_logs: {
         Row: {
           bleeding: string | null
@@ -1391,6 +1466,42 @@ export type Database = {
           symptoms?: string[] | null
           user_id?: string
           water_intake?: number | null
+        }
+        Relationships: []
+      }
+      day_labels: {
+        Row: {
+          created_at: string | null
+          day_key: string
+          day_number: number
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          short_label: string | null
+          short_label_az: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          day_key: string
+          day_number: number
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          short_label?: string | null
+          short_label_az?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          day_key?: string
+          day_number?: number
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          short_label?: string | null
+          short_label_az?: string | null
         }
         Relationships: []
       }
@@ -1526,6 +1637,39 @@ export type Database = {
           question_text?: string
           question_text_az?: string | null
           sort_order?: number | null
+        }
+        Relationships: []
+      }
+      exercise_daily_tips: {
+        Row: {
+          created_at: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          sort_order: number | null
+          tip: string
+          tip_az: string | null
+          trimester: number[] | null
+        }
+        Insert: {
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          tip: string
+          tip_az?: string | null
+          trimester?: number[] | null
+        }
+        Update: {
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          tip?: string
+          tip_az?: string | null
+          trimester?: number[] | null
         }
         Relationships: []
       }
@@ -2130,6 +2274,75 @@ export type Database = {
         }
         Relationships: []
       }
+      horoscope_elements: {
+        Row: {
+          color: string
+          created_at: string | null
+          element_key: string
+          icon: string
+          id: string
+          is_active: boolean | null
+          name: string
+          name_az: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          color?: string
+          created_at?: string | null
+          element_key: string
+          icon?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          name_az?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          color?: string
+          created_at?: string | null
+          element_key?: string
+          icon?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          name_az?: string | null
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      horoscope_loading_steps: {
+        Row: {
+          created_at: string | null
+          icon: string
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          sort_order: number | null
+          step_key: string
+        }
+        Insert: {
+          created_at?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          sort_order?: number | null
+          step_key: string
+        }
+        Update: {
+          created_at?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          sort_order?: number | null
+          step_key?: string
+        }
+        Relationships: []
+      }
       horoscope_readings: {
         Row: {
           baby_sign: string | null
@@ -2301,6 +2514,39 @@ export type Database = {
           title_az?: string | null
           updated_at?: string | null
           version?: string | null
+        }
+        Relationships: []
+      }
+      marketplace_categories: {
+        Row: {
+          category_key: string
+          created_at: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          category_key: string
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          category_key?: string
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          sort_order?: number | null
         }
         Relationships: []
       }
@@ -3804,6 +4050,48 @@ export type Database = {
         }
         Relationships: []
       }
+      poop_color_labels: {
+        Row: {
+          color_key: string
+          created_at: string | null
+          description_az: string | null
+          emoji: string | null
+          hex_color: string | null
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          sort_order: number | null
+          status: string | null
+        }
+        Insert: {
+          color_key: string
+          created_at?: string | null
+          description_az?: string | null
+          emoji?: string | null
+          hex_color?: string | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          sort_order?: number | null
+          status?: string | null
+        }
+        Update: {
+          color_key?: string
+          created_at?: string | null
+          description_az?: string | null
+          emoji?: string | null
+          hex_color?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          sort_order?: number | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       post_comments: {
         Row: {
           content: string
@@ -4093,6 +4381,42 @@ export type Database = {
         }
         Relationships: []
       }
+      product_conditions: {
+        Row: {
+          color: string | null
+          condition_key: string
+          created_at: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          color?: string | null
+          condition_key: string
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          color?: string | null
+          condition_key?: string
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category: string
@@ -4235,6 +4559,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      provider_types: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          sort_order: number | null
+          type_key: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          sort_order?: number | null
+          type_key: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          sort_order?: number | null
+          type_key?: string
+        }
+        Relationships: []
       }
       public_profile_cards: {
         Row: {
@@ -4863,6 +5223,78 @@ export type Database = {
           life_stages?: string[] | null
           sort_order?: number | null
           symptom_key?: string
+        }
+        Relationships: []
+      }
+      temperature_emojis: {
+        Row: {
+          clothing_tip_az: string | null
+          created_at: string | null
+          emoji: string
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          max_temp: number
+          min_temp: number
+          sort_order: number | null
+        }
+        Insert: {
+          clothing_tip_az?: string | null
+          created_at?: string | null
+          emoji: string
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          max_temp: number
+          min_temp: number
+          sort_order?: number | null
+        }
+        Update: {
+          clothing_tip_az?: string | null
+          created_at?: string | null
+          emoji?: string
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          max_temp?: number
+          min_temp?: number
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      time_options: {
+        Row: {
+          created_at: string | null
+          hour_value: number | null
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          option_key: string
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          hour_value?: number | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          option_key: string
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          hour_value?: number | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          option_key?: string
+          sort_order?: number | null
         }
         Relationships: []
       }

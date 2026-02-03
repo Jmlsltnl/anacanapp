@@ -37,6 +37,7 @@ const menuItems = [
   { id: 'faq', label: 'FAQ', icon: HelpCircle },
   { id: 'onboarding', label: 'Qeydiyyat Mərhələləri', icon: Sparkles },
   { id: 'mental-health', label: 'Mental Sağlamlıq', icon: Brain },
+  { id: 'tools-config', label: 'Alət Konfiqurasiyaları', icon: Settings },
   { id: 'tools', label: 'Alətlər Sıralaması', icon: Wrench },
   { id: 'content', label: 'Digər Kontent', icon: FileText },
   { id: 'products', label: 'Məhsullar', icon: Package },
