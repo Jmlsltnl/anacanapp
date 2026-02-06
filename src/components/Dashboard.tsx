@@ -574,21 +574,6 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
               alt={`${pregData.currentWeek} həftəlik körpə`}
               className="w-full h-full object-contain drop-shadow-lg"
             />
-            <motion.div
-              className={`absolute -bottom-1 -right-1 w-10 h-10 rounded-full bg-card shadow-lg flex items-center justify-center overflow-hidden border-2 ${trimesterColors.border}`}
-              animate={{ scale: [1, 1.08, 1] }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-            >
-              {weekData.imageUrl ? (
-                <img 
-                  src={weekData.imageUrl} 
-                  alt={weekData.fruit}
-                  className="w-7 h-7 object-cover rounded-full"
-                />
-              ) : (
-                <span className="text-lg">{weekData.emoji}</span>
-              )}
-            </motion.div>
           </motion.div>
           
           {/* Main Text - "Anacan hazırda meyvə boydayam" */}
