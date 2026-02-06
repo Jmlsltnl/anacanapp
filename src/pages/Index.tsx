@@ -192,7 +192,7 @@ const Index = () => {
       case 'home':
         return (
           <motion.div key="home" variants={pageVariants} initial="initial" animate="animate" exit="exit">
-            <Dashboard onOpenChat={() => setShowMotherChat(true)} onNavigateToTool={handleNavigateToTool} />
+            <Dashboard onOpenChat={() => setShowMotherChat(true)} onNavigateToTool={handleNavigateToTool} onNavigate={setActiveScreen} />
           </motion.div>
         );
       case 'tools':
@@ -302,8 +302,9 @@ const Index = () => {
   if (activeScreen === 'legal') {
     return <LegalScreen onBack={() => setActiveScreen(null)} />;
   }
-  if (activeScreen === 'blog') {
-    return <BlogScreen onBack={() => setActiveScreen(null)} />;
+  if (activeScreen === 'blog' || activeScreen?.startsWith('blog/')) {
+    const initialSlug = activeScreen?.startsWith('blog/') ? activeScreen.replace('blog/', '') : undefined;
+    return <BlogScreen onBack={() => setActiveScreen(null)} initialSlug={initialSlug} />;
   }
   if (activeScreen === 'shop' && isAdmin) {
     return <ShopScreen onBack={() => setActiveScreen(null)} />;
