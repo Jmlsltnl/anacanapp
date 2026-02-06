@@ -556,7 +556,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
         <div className="relative z-10 flex flex-col items-center">
           {/* Fetus Image with subtle motion */}
           <motion.div 
-            className="w-28 h-28 mb-3 relative"
+            className="w-42 h-42 mb-3 relative"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ 
               scale: 1, 
