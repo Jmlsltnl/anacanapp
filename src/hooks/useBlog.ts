@@ -90,12 +90,9 @@ export const useBlog = () => {
 
       if (error) throw error;
       
-      // Increment view count
+      // Increment view count using RPC function (bypasses RLS)
       if (data) {
-        await supabase
-          .from('blog_posts')
-          .update({ view_count: (data.view_count || 0) + 1 })
-          .eq('id', data.id);
+        await supabase.rpc('increment_blog_view_count', { post_id: data.id });
       }
       
       return data as BlogPost;
