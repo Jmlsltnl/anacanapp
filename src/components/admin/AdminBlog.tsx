@@ -18,7 +18,7 @@ import { supabase } from '@/integrations/supabase/client';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
 
 const AdminBlog = () => {
-  const { posts, categories, loading, createPost, updatePost, deletePost, createCategory, deleteCategory } = useBlogAdmin();
+  const { posts, categories, postCategories, loading, createPost, updatePost, deletePost, createCategory, deleteCategory, getPostCategoryIds, setPostCategoriesForPost } = useBlogAdmin();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'posts' | 'categories' | 'analytics'>('posts');
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,6 +30,7 @@ const AdminBlog = () => {
   const [imageInputMode, setImageInputMode] = useState<'url' | 'upload'>('upload');
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const initialFormDataRef = useRef<string>('');
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -195,6 +196,8 @@ const AdminBlog = () => {
 
   const handleEdit = (post: BlogPost) => {
     setEditingPost(post);
+    const postCatIds = getPostCategoryIds(post.id);
+    setSelectedCategoryIds(postCatIds);
     const newFormData = {
       title: post.title,
       slug: post.slug,
@@ -209,13 +212,13 @@ const AdminBlog = () => {
       is_published: post.is_published
     };
     setFormData(newFormData);
-    initialFormDataRef.current = JSON.stringify(newFormData);
+    initialFormDataRef.current = JSON.stringify({ ...newFormData, categoryIds: postCatIds });
     setShowEditor(true);
   };
 
   const hasUnsavedChanges = () => {
     if (!showEditor) return false;
-    return JSON.stringify(formData) !== initialFormDataRef.current;
+    return JSON.stringify({ ...formData, categoryIds: selectedCategoryIds }) !== initialFormDataRef.current;
   };
 
   const handleModalClose = () => {
@@ -243,9 +246,9 @@ const AdminBlog = () => {
 
     let result;
     if (editingPost) {
-      result = await updatePost(editingPost.id, postData);
+      result = await updatePost(editingPost.id, postData, selectedCategoryIds);
     } else {
-      result = await createPost(postData);
+      result = await createPost(postData, selectedCategoryIds);
     }
 
     if (result.error) {
@@ -315,12 +318,31 @@ const AdminBlog = () => {
   };
 
   const handleDeleteCategory = async (id: string) => {
-    if (confirm('Bu kateqoriyanı silmək istədiyinizə əminsiniz?')) {
-      await deleteCategory(id);
+    // Check if category is used
+    const usageCount = postCategories.filter(pc => pc.category_id === id).length;
+    if (usageCount > 0) {
       toast({
-        title: 'Silindi',
-        description: 'Kateqoriya silindi'
+        title: 'Xəta',
+        description: `Bu kateqoriya ${usageCount} məqalədə istifadə olunur. Əvvəlcə məqalələrdən çıxarın.`,
+        variant: 'destructive'
       });
+      return;
+    }
+    
+    if (confirm('Bu kateqoriyanı silmək istədiyinizə əminsiniz?')) {
+      const result = await deleteCategory(id);
+      if (result.error) {
+        toast({
+          title: 'Xəta',
+          description: result.error instanceof Error ? result.error.message : 'Kateqoriya silinə bilmədi',
+          variant: 'destructive'
+        });
+      } else {
+        toast({
+          title: 'Silindi',
+          description: 'Kateqoriya silindi'
+        });
+      }
     }
   };
 
@@ -339,9 +361,18 @@ const AdminBlog = () => {
       is_published: false
     };
     setFormData(emptyForm);
-    initialFormDataRef.current = JSON.stringify(emptyForm);
+    setSelectedCategoryIds([]);
+    initialFormDataRef.current = JSON.stringify({ ...emptyForm, categoryIds: [] });
     setEditingPost(null);
     setShowEditor(false);
+  };
+
+  const toggleCategorySelection = (categoryId: string) => {
+    setSelectedCategoryIds(prev => 
+      prev.includes(categoryId)
+        ? prev.filter(id => id !== categoryId)
+        : [...prev, categoryId]
+    );
   };
 
   useEffect(() => {
@@ -464,9 +495,26 @@ const AdminBlog = () => {
 
                   <h3 className="font-bold text-foreground line-clamp-2 mb-2">{post.title}</h3>
                   
+                  {/* Categories badges */}
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {getPostCategoryIds(post.id).map(catId => {
+                      const cat = categories.find(c => c.id === catId);
+                      return cat ? (
+                        <span
+                          key={catId}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium"
+                          style={{ backgroundColor: `${cat.color}20`, color: cat.color }}
+                        >
+                          {cat.icon} {cat.name}
+                        </span>
+                      ) : null;
+                    })}
+                    {getPostCategoryIds(post.id).length === 0 && (
+                      <span className="text-xs text-muted-foreground italic">Kateqoriya yoxdur</span>
+                    )}
+                  </div>
+                  
                   <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
-                    <span>{categories.find(c => c.slug === post.category)?.name || post.category}</span>
-                    <span>•</span>
                     <span>{post.reading_time} dəq</span>
                     <span>•</span>
                     <span>{post.view_count} baxış</span>
@@ -543,7 +591,7 @@ const AdminBlog = () => {
               )}
               <div className="flex justify-between items-center">
                 <span className="text-xs text-muted-foreground">
-                  {posts.filter(p => p.category === category.slug).length} məqalə
+                  {postCategories.filter(pc => pc.category_id === category.id).length} məqalə
                 </span>
                 <Button
                   size="sm"
@@ -695,29 +743,45 @@ const AdminBlog = () => {
                   )}
                 </div>
 
-                {/* Category & Reading Time */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Kateqoriya</label>
-                    <select
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="w-full h-10 px-3 rounded-md border border-input bg-background"
-                    >
-                      {categories.map(cat => (
-                        <option key={cat.id} value={cat.slug}>{cat.name}</option>
-                      ))}
-                    </select>
+                {/* Categories (Multi-select) */}
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Kateqoriyalar</label>
+                  <div className="flex flex-wrap gap-2 p-3 border border-input rounded-lg bg-muted/30 min-h-[60px]">
+                    {categories.map(cat => {
+                      const isSelected = selectedCategoryIds.includes(cat.id);
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => toggleCategorySelection(cat.id)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                            isSelected
+                              ? 'bg-primary text-primary-foreground'
+                              : 'bg-card border border-border text-muted-foreground hover:bg-muted'
+                          }`}
+                        >
+                          <span>{cat.icon}</span>
+                          <span>{cat.name}</span>
+                          {isSelected && <X className="w-3 h-3 ml-1" />}
+                        </button>
+                      );
+                    })}
                   </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Oxuma müddəti (dəq)</label>
-                    <Input
-                      type="number"
-                      value={formData.reading_time}
-                      onChange={(e) => setFormData({ ...formData, reading_time: parseInt(e.target.value) || 5 })}
-                      min={1}
-                    />
-                  </div>
+                  {selectedCategoryIds.length === 0 && (
+                    <p className="text-xs text-muted-foreground mt-1">Ən azı bir kateqoriya seçin</p>
+                  )}
+                </div>
+
+                {/* Reading Time */}
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Oxuma müddəti (dəq)</label>
+                  <Input
+                    type="number"
+                    value={formData.reading_time}
+                    onChange={(e) => setFormData({ ...formData, reading_time: parseInt(e.target.value) || 5 })}
+                    min={1}
+                    className="max-w-[150px]"
+                  />
                 </div>
 
                 {/* Excerpt */}
