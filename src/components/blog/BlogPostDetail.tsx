@@ -226,7 +226,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
   );
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-24 overflow-y-auto">
       {/* Hero Image */}
       <div className="relative">
         {post.cover_image_url ? (
@@ -244,18 +244,26 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
         
         {/* Floating Back Button */}
         <motion.button
-          onClick={onBack}
-          className="absolute top-4 left-4 z-30 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center safe-area-top"
+          onClick={(e) => {
+            e.stopPropagation();
+            onBack();
+          }}
+          className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center safe-area-top cursor-pointer"
           whileTap={{ scale: 0.95 }}
+          style={{ pointerEvents: 'auto' }}
         >
           <ArrowLeft className="w-5 h-5 text-white" />
         </motion.button>
 
         {/* Floating Share Button */}
         <motion.button
-          onClick={handleShare}
-          className="absolute top-4 right-4 z-30 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center safe-area-top"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleShare();
+          }}
+          className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center safe-area-top cursor-pointer"
           whileTap={{ scale: 0.95 }}
+          style={{ pointerEvents: 'auto' }}
         >
           <Share2 className="w-5 h-5 text-white" />
         </motion.button>

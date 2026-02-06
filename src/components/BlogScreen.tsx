@@ -77,7 +77,7 @@ const BlogScreen = ({ onBack, initialSlug }: BlogScreenProps) => {
   }
 
   return (
-      <div className="min-h-screen bg-background pb-24">
+      <div className="min-h-screen bg-background pb-24 overflow-y-auto">
       {/* Premium Header */}
       <div className="relative overflow-hidden z-10 isolate">
         <div className="absolute inset-0 bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600 pointer-events-none" />
@@ -89,9 +89,13 @@ const BlogScreen = ({ onBack, initialSlug }: BlogScreenProps) => {
         <div className="relative px-4 pt-4 pb-8 safe-area-top z-30">
           <div className="flex items-center gap-3 mb-4 relative z-30">
             <motion.button
-              onClick={onBack}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"
+              onClick={(e) => {
+                e.stopPropagation();
+                onBack();
+              }}
+              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center cursor-pointer"
               whileTap={{ scale: 0.95 }}
+              style={{ pointerEvents: 'auto' }}
             >
               <ArrowLeft className="w-5 h-5 text-white" />
             </motion.button>
