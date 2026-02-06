@@ -2699,6 +2699,84 @@ export type Database = {
           },
         ]
       }
+      maternity_config: {
+        Row: {
+          config_key: string
+          description: string | null
+          description_az: string | null
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          updated_at: string | null
+          value: number
+        }
+        Insert: {
+          config_key: string
+          description?: string | null
+          description_az?: string | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          updated_at?: string | null
+          value: number
+        }
+        Update: {
+          config_key?: string
+          description?: string | null
+          description_az?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          updated_at?: string | null
+          value?: number
+        }
+        Relationships: []
+      }
+      maternity_guidelines: {
+        Row: {
+          category: string | null
+          content: string
+          content_az: string | null
+          created_at: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          sort_order: number | null
+          title: string
+          title_az: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          content: string
+          content_az?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          title: string
+          title_az?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          content?: string
+          content_az?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          title?: string
+          title_az?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       meal_logs: {
         Row: {
           calories: number

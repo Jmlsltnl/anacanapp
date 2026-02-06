@@ -40,6 +40,7 @@ import FirstAidGuide from './tools/FirstAidGuide';
 import FairyTaleGenerator from './tools/FairyTaleGenerator';
 import HoroscopeCompatibility from './tools/HoroscopeCompatibility';
 import BabyGrowthTracker from './tools/BabyGrowthTracker';
+import MaternityCalculator from './tools/MaternityCalculator';
 import { PremiumModal } from './PremiumModal';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
@@ -93,7 +94,11 @@ const iconMap: Record<string, LucideIcon> = {
   'ShieldAlert': ShieldAlert,
   'BookHeart': BookHeart,
   'Stars': Stars,
+  'Calculator': Calculator,
 };
+
+// Import Calculator icon
+import { Calculator } from 'lucide-react';
 
 interface ToolsHubProps {
   initialTool?: string | null;
@@ -277,6 +282,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   if (activeTool === 'horoscope') return <HoroscopeCompatibility onBack={handleBack} />;
   if (activeTool === 'baby-growth' || activeTool === 'growth-tracker') return <BabyGrowthTracker onBack={handleBack} />;
   if (activeTool === 'affiliate' || activeTool === 'affiliate-products') return <AffiliateProducts onBack={handleBack} />;
+  if (activeTool === 'maternity-calculator' || activeTool === 'maternity') return <MaternityCalculator onBack={handleBack} />;
 
   const getLifeStageInfo = () => {
     switch (lifeStage) {
