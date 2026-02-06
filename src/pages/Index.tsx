@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SplashScreen from '@/components/SplashScreen';
 import AppIntroduction from '@/components/AppIntroduction';
@@ -36,6 +36,7 @@ import { SOSAlertReceiver } from '@/components/partner/SOSButton';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useDeviceToken } from '@/hooks/useDeviceToken';
+import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 
 const pageVariants = {
   initial: { opacity: 0, y: 10 },
@@ -84,6 +85,62 @@ const Index = () => {
     setActiveTool(tool);
     setActiveTab('tools');
   };
+
+  // Handle tab change - reset tool state when clicking Tools tab
+  const handleTabChange = (tab: string) => {
+    // If clicking Tools tab while already on tools, reset to tools list
+    if (tab === 'tools') {
+      setActiveTool(null);
+    }
+    setActiveTab(tab);
+  };
+
+  // Tab navigation order for swipe
+  const tabOrder = role === 'partner' 
+    ? ['home', 'chat', 'ai', 'profile'] 
+    : ['home', 'tools', 'community', 'ai', 'profile'];
+
+  // iOS swipe navigation handler
+  const handleSwipeBack = useCallback(() => {
+    // If in a sub-screen, go back
+    if (activeScreen) {
+      setActiveScreen(null);
+      return;
+    }
+    // If in a tool, go back to tools list
+    if (activeTool && activeTab === 'tools') {
+      setActiveTool(null);
+      return;
+    }
+    // If mother chat is open, close it
+    if (showMotherChat) {
+      setShowMotherChat(false);
+      return;
+    }
+    // Navigate to previous tab
+    const currentIndex = tabOrder.indexOf(activeTab);
+    if (currentIndex > 0) {
+      setActiveTab(tabOrder[currentIndex - 1]);
+    }
+  }, [activeScreen, activeTool, activeTab, showMotherChat, tabOrder, role]);
+
+  const handleSwipeForward = useCallback(() => {
+    // Navigate to next tab (only when no sub-screen/tool is open)
+    if (!activeScreen && !activeTool && !showMotherChat) {
+      const currentIndex = tabOrder.indexOf(activeTab);
+      if (currentIndex < tabOrder.length - 1) {
+        setActiveTab(tabOrder[currentIndex + 1]);
+      }
+    }
+  }, [activeScreen, activeTool, activeTab, showMotherChat, tabOrder]);
+
+  // Enable swipe navigation only when authenticated and on main app
+  useSwipeNavigation({
+    onSwipeRight: handleSwipeBack,
+    onSwipeLeft: handleSwipeForward,
+    threshold: 100,
+    enabled: isAuthenticated && !showSplash && !showIntro && !showAdmin
+  });
 
   useEffect(() => {
     if (activeScreen === 'admin' && isAdmin) {
@@ -283,7 +340,7 @@ const Index = () => {
       </div>
       
       {/* Bottom navigation with safe area */}
-      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} isPartner={role === 'partner'} />
+      <BottomNav activeTab={activeTab} onTabChange={handleTabChange} isPartner={role === 'partner'} />
     </div>
   );
 };

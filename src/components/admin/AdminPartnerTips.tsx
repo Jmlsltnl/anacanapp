@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Heart, Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { useAdminPartnerTips, PartnerDailyTip } from '@/hooks/useAdminPartnerTips';
+import UnsavedChangesDialog from './UnsavedChangesDialog';
 
 const lifeStages = [
   { id: 'flow', label: 'Dövr İzləmə', emoji: '🌸' },
@@ -23,10 +24,29 @@ const AdminPartnerTips = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState<PartnerDailyTip | null>(null);
   const [formData, setFormData] = useState<Partial<PartnerDailyTip>>({});
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const initialFormDataRef = useRef<string>('');
+
+  const hasUnsavedChanges = useCallback(() => {
+    return JSON.stringify(formData) !== initialFormDataRef.current;
+  }, [formData]);
+
+  const handleModalClose = useCallback((open: boolean) => {
+    if (!open && hasUnsavedChanges()) {
+      setShowUnsavedDialog(true);
+    } else {
+      setShowModal(open);
+    }
+  }, [hasUnsavedChanges]);
+
+  const handleDiscardChanges = useCallback(() => {
+    setShowModal(false);
+    setShowUnsavedDialog(false);
+  }, []);
 
   const openCreateModal = () => {
     setEditingItem(null);
-    setFormData({
+    const initialData = {
       tip_text: '',
       tip_text_az: '',
       tip_emoji: '💕',
@@ -34,13 +54,16 @@ const AdminPartnerTips = () => {
       week_number: null,
       sort_order: 0,
       is_active: true,
-    });
+    };
+    setFormData(initialData);
+    initialFormDataRef.current = JSON.stringify(initialData);
     setShowModal(true);
   };
 
   const openEditModal = (item: PartnerDailyTip) => {
     setEditingItem(item);
     setFormData({ ...item });
+    initialFormDataRef.current = JSON.stringify({ ...item });
     setShowModal(true);
   };
 
@@ -174,7 +197,7 @@ const AdminPartnerTips = () => {
       </Card>
 
       {/* Modal */}
-      <Dialog open={showModal} onOpenChange={setShowModal}>
+      <Dialog open={showModal} onOpenChange={handleModalClose}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>{editingItem ? 'Məsləhət Redaktə Et' : 'Yeni Məsləhət'}</DialogTitle>
@@ -235,7 +258,7 @@ const AdminPartnerTips = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowModal(false)}>
+            <Button variant="outline" onClick={() => handleModalClose(false)}>
               Ləğv et
             </Button>
             <Button onClick={handleSave} disabled={create.isPending || update.isPending}>
@@ -244,6 +267,16 @@ const AdminPartnerTips = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <UnsavedChangesDialog
+        open={showUnsavedDialog}
+        onOpenChange={setShowUnsavedDialog}
+        onDiscard={handleDiscardChanges}
+        onSave={async () => {
+          await handleSave();
+          setShowUnsavedDialog(false);
+        }}
+      />
     </div>
   );
 };

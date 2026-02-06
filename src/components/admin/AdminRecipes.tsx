@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { UtensilsCrossed, Plus, Pencil, Trash2, Search, Clock, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useAdminRecipesAdmin, AdminRecipe } from '@/hooks/useAdminRecipes';
+import UnsavedChangesDialog from './UnsavedChangesDialog';
 
 const categories = [
   { id: 'pregnancy', label: 'Hamiləlik' },
@@ -25,10 +26,32 @@ const AdminRecipes = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState<AdminRecipe | null>(null);
   const [formData, setFormData] = useState<Partial<AdminRecipe>>({});
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const initialFormDataRef = useRef<string>('');
+
+  // Check if form has unsaved changes
+  const hasUnsavedChanges = useCallback(() => {
+    return JSON.stringify(formData) !== initialFormDataRef.current;
+  }, [formData]);
+
+  // Handle modal close with unsaved changes check
+  const handleModalClose = useCallback((open: boolean) => {
+    if (!open && hasUnsavedChanges()) {
+      setShowUnsavedDialog(true);
+    } else {
+      setShowModal(open);
+    }
+  }, [hasUnsavedChanges]);
+
+  // Force close modal (discard changes)
+  const handleDiscardChanges = useCallback(() => {
+    setShowModal(false);
+    setShowUnsavedDialog(false);
+  }, []);
 
   const openCreateModal = () => {
     setEditingItem(null);
-    setFormData({
+    const initialData = {
       title: '',
       description: '',
       category: 'pregnancy',
@@ -39,13 +62,16 @@ const AdminRecipes = () => {
       instructions: [],
       image_url: '',
       is_active: true,
-    });
+    };
+    setFormData(initialData);
+    initialFormDataRef.current = JSON.stringify(initialData);
     setShowModal(true);
   };
 
   const openEditModal = (item: AdminRecipe) => {
     setEditingItem(item);
     setFormData({ ...item });
+    initialFormDataRef.current = JSON.stringify({ ...item });
     setShowModal(true);
   };
 
@@ -206,7 +232,7 @@ const AdminRecipes = () => {
       </Card>
 
       {/* Modal */}
-      <Dialog open={showModal} onOpenChange={setShowModal}>
+      <Dialog open={showModal} onOpenChange={handleModalClose}>
         <DialogContent className="max-w-2xl max-h-[90vh]">
           <DialogHeader>
             <DialogTitle>{editingItem ? 'Resept Redaktə Et' : 'Yeni Resept'}</DialogTitle>
@@ -285,7 +311,7 @@ const AdminRecipes = () => {
             </div>
           </ScrollArea>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowModal(false)}>
+            <Button variant="outline" onClick={() => handleModalClose(false)}>
               Ləğv et
             </Button>
             <Button onClick={handleSave} disabled={create.isPending || update.isPending}>
@@ -294,6 +320,17 @@ const AdminRecipes = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Unsaved Changes Dialog */}
+      <UnsavedChangesDialog
+        open={showUnsavedDialog}
+        onOpenChange={setShowUnsavedDialog}
+        onDiscard={handleDiscardChanges}
+        onSave={async () => {
+          await handleSave();
+          setShowUnsavedDialog(false);
+        }}
+      />
     </div>
   );
 };
