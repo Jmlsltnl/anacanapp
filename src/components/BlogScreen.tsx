@@ -30,6 +30,7 @@ const BlogScreen = ({ onBack, initialSlug }: BlogScreenProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
   const [showSaved, setShowSaved] = useState(false);
+  const [openedFromHome, setOpenedFromHome] = useState(false);
 
   // Set initial post when posts load and initialSlug is provided
   useEffect(() => {
@@ -37,6 +38,7 @@ const BlogScreen = ({ onBack, initialSlug }: BlogScreenProps) => {
       const post = posts.find(p => p.slug === initialSlug);
       if (post) {
         setSelectedPost(post);
+        setOpenedFromHome(true); // Mark that we came from home screen
       }
     }
   }, [initialSlug, posts, selectedPost]);
@@ -50,6 +52,17 @@ const BlogScreen = ({ onBack, initialSlug }: BlogScreenProps) => {
       : selectedCategory 
         ? getPostsByCategory(selectedCategory)
         : posts;
+
+  // Handle back from post detail
+  const handleBackFromPost = () => {
+    // If opened directly from home screen, go back to home
+    if (openedFromHome) {
+      onBack();
+    } else {
+      // Otherwise, just close the post and show blog list
+      setSelectedPost(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -70,8 +83,11 @@ const BlogScreen = ({ onBack, initialSlug }: BlogScreenProps) => {
         post={selectedPost} 
         categories={categories}
         allPosts={posts}
-        onBack={() => setSelectedPost(null)}
-        onSelectPost={(post) => setSelectedPost(post)}
+        onBack={handleBackFromPost}
+        onSelectPost={(post) => {
+          setSelectedPost(post);
+          setOpenedFromHome(false); // If selecting another post, we're now in blog flow
+        }}
       />
     );
   }
