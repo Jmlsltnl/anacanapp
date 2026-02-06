@@ -18,6 +18,7 @@ export interface BlogPost {
   view_count: number;
   created_at: string;
   updated_at: string;
+  category_ids?: string[]; // For multi-category support
 }
 
 export interface BlogCategory {
@@ -29,6 +30,13 @@ export interface BlogCategory {
   color: string;
   sort_order: number;
   is_active: boolean;
+  created_at: string;
+}
+
+export interface BlogPostCategory {
+  id: string;
+  post_id: string;
+  category_id: string;
   created_at: string;
 }
 
@@ -135,6 +143,7 @@ export const useBlog = () => {
 export const useBlogAdmin = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [categories, setCategories] = useState<BlogCategory[]>([]);
+  const [postCategories, setPostCategories] = useState<BlogPostCategory[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchAllPosts = useCallback(async () => {
@@ -165,7 +174,58 @@ export const useBlogAdmin = () => {
     }
   }, []);
 
-  const createPost = async (post: Partial<Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'view_count'>> & { title: string; content: string; slug: string }) => {
+  const fetchPostCategories = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('blog_post_categories')
+        .select('*');
+
+      if (error) throw error;
+      setPostCategories((data || []) as BlogPostCategory[]);
+    } catch (error) {
+      console.error('Error fetching post categories:', error);
+    }
+  }, []);
+
+  // Get category IDs for a specific post
+  const getPostCategoryIds = useCallback((postId: string): string[] => {
+    return postCategories
+      .filter(pc => pc.post_id === postId)
+      .map(pc => pc.category_id);
+  }, [postCategories]);
+
+  // Set categories for a post (replace all)
+  const setPostCategoriesForPost = async (postId: string, categoryIds: string[]) => {
+    try {
+      // First delete existing categories for this post
+      await supabase
+        .from('blog_post_categories')
+        .delete()
+        .eq('post_id', postId);
+
+      // Then insert new categories
+      if (categoryIds.length > 0) {
+        const inserts = categoryIds.map(categoryId => ({
+          post_id: postId,
+          category_id: categoryId
+        }));
+
+        const { error } = await supabase
+          .from('blog_post_categories')
+          .insert(inserts);
+
+        if (error) throw error;
+      }
+
+      await fetchPostCategories();
+      return { error: null };
+    } catch (error) {
+      console.error('Error setting post categories:', error);
+      return { error };
+    }
+  };
+
+  const createPost = async (post: Partial<Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'view_count'>> & { title: string; content: string; slug: string }, categoryIds?: string[]) => {
     try {
       const { data, error } = await supabase
         .from('blog_posts')
@@ -174,6 +234,12 @@ export const useBlogAdmin = () => {
         .single();
 
       if (error) throw error;
+      
+      // If category IDs provided, set them
+      if (data && categoryIds && categoryIds.length > 0) {
+        await setPostCategoriesForPost(data.id, categoryIds);
+      }
+
       await fetchAllPosts();
       return { data: data as BlogPost, error: null };
     } catch (error) {
@@ -182,7 +248,7 @@ export const useBlogAdmin = () => {
     }
   };
 
-  const updatePost = async (id: string, updates: Partial<BlogPost>) => {
+  const updatePost = async (id: string, updates: Partial<BlogPost>, categoryIds?: string[]) => {
     try {
       const { data, error } = await supabase
         .from('blog_posts')
@@ -192,6 +258,12 @@ export const useBlogAdmin = () => {
         .single();
 
       if (error) throw error;
+      
+      // If category IDs provided, update them
+      if (categoryIds !== undefined) {
+        await setPostCategoriesForPost(id, categoryIds);
+      }
+
       await fetchAllPosts();
       return { data: data as BlogPost, error: null };
     } catch (error) {
@@ -253,6 +325,12 @@ export const useBlogAdmin = () => {
 
   const deleteCategory = async (id: string) => {
     try {
+      // First check if category is used
+      const postsUsingCategory = postCategories.filter(pc => pc.category_id === id);
+      if (postsUsingCategory.length > 0) {
+        return { error: new Error(`Bu kateqoriya ${postsUsingCategory.length} məqalədə istifadə olunur. Əvvəlcə məqalələrdən çıxarın.`) };
+      }
+
       const { error } = await supabase
         .from('blog_categories')
         .delete()
@@ -270,22 +348,25 @@ export const useBlogAdmin = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await Promise.all([fetchAllPosts(), fetchAllCategories()]);
+      await Promise.all([fetchAllPosts(), fetchAllCategories(), fetchPostCategories()]);
       setLoading(false);
     };
     loadData();
-  }, [fetchAllPosts, fetchAllCategories]);
+  }, [fetchAllPosts, fetchAllCategories, fetchPostCategories]);
 
   return {
     posts,
     categories,
+    postCategories,
     loading,
+    getPostCategoryIds,
+    setPostCategoriesForPost,
     createPost,
     updatePost,
     deletePost,
     createCategory,
     updateCategory,
     deleteCategory,
-    refetch: () => Promise.all([fetchAllPosts(), fetchAllCategories()])
+    refetch: () => Promise.all([fetchAllPosts(), fetchAllCategories(), fetchPostCategories()])
   };
 };
