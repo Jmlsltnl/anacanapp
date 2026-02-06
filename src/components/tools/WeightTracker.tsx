@@ -1,7 +1,9 @@
 import { useState, useEffect, forwardRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Plus, TrendingUp, TrendingDown, Minus, Scale, Loader2, Sparkles, Target, Activity, Calendar } from 'lucide-react';
+import { ArrowLeft, Plus, TrendingUp, TrendingDown, Minus, Scale, Loader2, Sparkles, Target, Activity, Calendar, Trash2, RotateCcw, MoreVertical } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useWeightEntries } from '@/hooks/useWeightEntries';
 import { useWeightRecommendations } from '@/hooks/useDynamicTools';
 import { useUserStore } from '@/store/userStore';
@@ -16,7 +18,8 @@ interface WeightTrackerProps {
 const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }, ref) => {
   useScrollToTop();
   
-  const { entries, loading, addEntry, getStats } = useWeightEntries();
+  const { entries, loading, addEntry, getStats, deleteEntry, deleteAllEntries } = useWeightEntries();
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const { getPregnancyData } = useUserStore();
   const [newWeight, setNewWeight] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
@@ -277,10 +280,28 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            <h3 className="font-bold text-foreground mb-3 flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-emerald-500" />
-              Tarixçə
-            </h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-foreground flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-emerald-500" />
+                Tarixçə
+              </h3>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-muted-foreground">
+                    <MoreVertical className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem 
+                    onClick={() => setShowResetConfirm(true)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Tarixçəni sıfırla
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
             <div className="space-y-3 pb-24">
               {entries.slice(0, 10).map((entry, index) => (
                 <motion.div
@@ -288,7 +309,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.05 * index }}
-                  className="bg-card rounded-2xl p-4 shadow-sm border border-border/50 flex items-center justify-between"
+                  className="bg-card rounded-2xl p-4 shadow-sm border border-border/50 flex items-center justify-between group"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 flex items-center justify-center">
@@ -301,26 +322,88 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
                       </p>
                     </div>
                   </div>
-                  {index > 0 && entries[index - 1] && (
-                    <div className={`px-3 py-1.5 rounded-full text-xs font-bold ${
-                      entry.weight > entries[index - 1].weight 
-                        ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                        : entry.weight < entries[index - 1].weight
-                          ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
-                          : 'bg-muted text-muted-foreground'
-                    }`}>
-                      {entry.weight > entries[index - 1].weight 
-                        ? `+${(entry.weight - entries[index - 1].weight).toFixed(1)}` 
-                        : entry.weight < entries[index - 1].weight
-                          ? (entry.weight - entries[index - 1].weight).toFixed(1)
-                          : '0'}
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {index > 0 && entries[index - 1] && (
+                      <div className={`px-3 py-1.5 rounded-full text-xs font-bold ${
+                        entry.weight > entries[index - 1].weight 
+                          ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                          : entry.weight < entries[index - 1].weight
+                            ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+                            : 'bg-muted text-muted-foreground'
+                      }`}>
+                        {entry.weight > entries[index - 1].weight 
+                          ? `+${(entry.weight - entries[index - 1].weight).toFixed(1)}` 
+                          : entry.weight < entries[index - 1].weight
+                            ? (entry.weight - entries[index - 1].weight).toFixed(1)
+                            : '0'}
+                      </div>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                      onClick={() => {
+                        if (confirm('Bu qeydi silmək istəyirsiniz?')) {
+                          deleteEntry(entry.id);
+                        }
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </motion.div>
               ))}
             </div>
           </motion.div>
         )}
+
+        {/* Reset Confirmation Modal */}
+        <AnimatePresence>
+          {showResetConfirm && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => setShowResetConfirm(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full max-w-sm bg-card rounded-3xl p-6 shadow-xl"
+              >
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                  <Trash2 className="w-8 h-8 text-red-500" />
+                </div>
+                <h2 className="text-xl font-bold text-foreground text-center mb-2">Tarixçəni sıfırla</h2>
+                <p className="text-sm text-muted-foreground text-center mb-6">
+                  Bütün çəki qeydləri silinəcək. Bu əməliyyat geri qaytarıla bilməz.
+                </p>
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setShowResetConfirm(false)}
+                  >
+                    Ləğv et
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="flex-1"
+                    onClick={() => {
+                      deleteAllEntries();
+                      setShowResetConfirm(false);
+                    }}
+                  >
+                    Sil
+                  </Button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Add Weight Modal */}

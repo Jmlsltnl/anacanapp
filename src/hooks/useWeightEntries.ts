@@ -118,12 +118,67 @@ export const useWeightEntries = () => {
     fetchEntries();
   }, [user]);
 
+  const deleteEntry = async (entryId: string) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('weight_entries')
+        .delete()
+        .eq('id', entryId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setEntries(prev => prev.filter(e => e.id !== entryId));
+      toast({
+        title: 'Silindi',
+        description: 'Çəki qeydi silindi',
+      });
+    } catch (error: any) {
+      console.error('Error deleting weight entry:', error);
+      toast({
+        title: 'Xəta baş verdi',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const deleteAllEntries = async () => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('weight_entries')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setEntries([]);
+      toast({
+        title: 'Sıfırlandı',
+        description: 'Bütün çəki qeydləri silindi',
+      });
+    } catch (error: any) {
+      console.error('Error deleting all weight entries:', error);
+      toast({
+        title: 'Xəta baş verdi',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
   return {
     entries,
     loading,
     addEntry,
     getStats,
     updateStartWeight,
+    deleteEntry,
+    deleteAllEntries,
     refetch: fetchEntries,
   };
 };

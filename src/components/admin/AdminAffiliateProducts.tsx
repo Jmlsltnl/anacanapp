@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -7,9 +7,55 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2, Edit, Save, X, ExternalLink, Package, Image, Video, Star } from 'lucide-react';
+import { Plus, Trash2, Edit, Save, X, ExternalLink, Package, Image, Video, Star, Upload, Download, FileSpreadsheet } from 'lucide-react';
 import { useAppSetting, useUpdateAppSetting } from '@/hooks/useAppSettings';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+
+// CSV Template headers
+const CSV_HEADERS = [
+  'name*', 'name_az*', 'affiliate_url*', 'category', 'platform', 'price', 'original_price', 
+  'currency', 'image_url', 'images', 'video_url', 'store_name', 'store_logo_url', 
+  'description', 'description_az', 'rating', 'review_count', 'review_summary_az',
+  'life_stages', 'is_featured', 'is_active', 'pros', 'cons', 'tags', 'specifications'
+];
+
+const CSV_TEMPLATE = `name*,name_az*,affiliate_url*,category,platform,price,original_price,currency,image_url,images,video_url,store_name,store_logo_url,description,description_az,rating,review_count,review_summary_az,life_stages,is_featured,is_active,pros,cons,tags,specifications
+Baby Stroller,Uşaq arabası,https://example.com/product1,baby_gear,trendyol,199.99,249.99,AZN,https://example.com/img.jpg,"https://img1.jpg|https://img2.jpg",,Trendyol,,High quality stroller,Yüksək keyfiyyətli araba,4.5,120,Əla məhsuldur,bump|mommy,true,true,"Rahat|Möhkəm","Ağır",körpə|araba,"{""Çəki"":""8kg"",""Rəng"":""Qara""}"`;
+
+const parseCSV = (text: string) => {
+  const lines = text.split('\n').filter(line => line.trim());
+  if (lines.length < 2) return [];
+  
+  const headers = lines[0].split(',').map(h => h.trim().replace('*', ''));
+  const products = [];
+  
+  for (let i = 1; i < lines.length; i++) {
+    const values: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (const char of lines[i]) {
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        values.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    values.push(current.trim());
+    
+    const product: Record<string, any> = {};
+    headers.forEach((header, index) => {
+      const value = values[index] || '';
+      product[header] = value;
+    });
+    products.push(product);
+  }
+  
+  return products;
+};
 
 const AdminAffiliateProducts = () => {
   const { toast } = useToast();
@@ -17,6 +63,8 @@ const AdminAffiliateProducts = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Section enabled toggle
   const sectionEnabled = useAppSetting('affiliate_section_enabled') !== false;
@@ -125,6 +173,107 @@ const AdminAffiliateProducts = () => {
     },
   });
 
+  const bulkImportMutation = useMutation({
+    mutationFn: async (products: Record<string, any>[]) => {
+      const errors: string[] = [];
+      let successCount = 0;
+      
+      for (const product of products) {
+        try {
+          if (!product.name || !product.affiliate_url) {
+            errors.push(`Sətir atlandı: name və ya affiliate_url yoxdur`);
+            continue;
+          }
+
+          const payload = {
+            name: product.name,
+            name_az: product.name_az || null,
+            description: product.description || null,
+            description_az: product.description_az || null,
+            category: product.category || 'general',
+            category_az: product.category_az || null,
+            price: product.price ? parseFloat(product.price) : null,
+            original_price: product.original_price ? parseFloat(product.original_price) : null,
+            currency: product.currency || 'AZN',
+            affiliate_url: product.affiliate_url,
+            platform: product.platform || 'other',
+            image_url: product.image_url || null,
+            images: product.images ? product.images.split('|').filter(Boolean) : [],
+            video_url: product.video_url || null,
+            store_name: product.store_name || null,
+            store_logo_url: product.store_logo_url || null,
+            rating: product.rating ? parseFloat(product.rating) : 0,
+            review_count: product.review_count ? parseInt(product.review_count) : 0,
+            review_summary_az: product.review_summary_az || null,
+            life_stages: product.life_stages ? product.life_stages.split('|').filter(Boolean) : ['bump'],
+            is_featured: product.is_featured === 'true' || product.is_featured === true,
+            is_active: product.is_active !== 'false' && product.is_active !== false,
+            pros: product.pros ? product.pros.split('|').filter(Boolean) : null,
+            cons: product.cons ? product.cons.split('|').filter(Boolean) : null,
+            tags: product.tags ? product.tags.split('|').filter(Boolean) : null,
+            specifications: product.specifications ? JSON.parse(product.specifications) : {},
+            price_updated_at: new Date().toISOString(),
+          };
+
+          const { error } = await supabase.from('affiliate_products').insert(payload);
+          if (error) throw error;
+          successCount++;
+        } catch (e: any) {
+          errors.push(`"${product.name || 'Unknown'}": ${e.message}`);
+        }
+      }
+      
+      return { successCount, errors };
+    },
+    onSuccess: ({ successCount, errors }) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-affiliate-products'] });
+      setImporting(false);
+      if (errors.length > 0) {
+        toast({ 
+          title: `${successCount} məhsul əlavə edildi`, 
+          description: `${errors.length} xəta: ${errors.slice(0, 3).join(', ')}${errors.length > 3 ? '...' : ''}`,
+          variant: errors.length > successCount ? 'destructive' : 'default'
+        });
+      } else {
+        toast({ title: `${successCount} məhsul uğurla əlavə edildi` });
+      }
+    },
+    onError: (err) => {
+      setImporting(false);
+      toast({ title: 'İmport xətası', description: String(err), variant: 'destructive' });
+    },
+  });
+
+  const handleCSVImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setImporting(true);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      const products = parseCSV(text);
+      
+      if (products.length === 0) {
+        setImporting(false);
+        toast({ title: 'CSV boşdur və ya formatı səhvdir', variant: 'destructive' });
+        return;
+      }
+      
+      bulkImportMutation.mutate(products);
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  const downloadCSVTemplate = () => {
+    const blob = new Blob([CSV_TEMPLATE], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'affiliate_products_template.csv';
+    link.click();
+  };
+
   const resetForm = () => {
     setFormData({
       name: '', name_az: '', description: '', description_az: '',
@@ -190,7 +339,7 @@ const AdminAffiliateProducts = () => {
           <h2 className="text-xl font-bold">Affiliate Məhsulları</h2>
           <p className="text-sm text-muted-foreground">Tövsiyyə olunan məhsulları tam idarə edin</p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2">
             <span className="text-sm">Bölmə aktiv:</span>
             <Switch 
@@ -198,9 +347,24 @@ const AdminAffiliateProducts = () => {
               onCheckedChange={(checked) => updateSetting.mutate({ key: 'affiliate_section_enabled', value: checked })}
             />
           </div>
-          <Button onClick={() => setShowAddForm(true)} disabled={showAddForm}>
-            <Plus className="w-4 h-4 mr-2" /> Əlavə et
-          </Button>
+          <div className="flex gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv"
+              onChange={handleCSVImport}
+              className="hidden"
+            />
+            <Button variant="outline" onClick={downloadCSVTemplate}>
+              <Download className="w-4 h-4 mr-2" /> CSV Şablon
+            </Button>
+            <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={importing}>
+              <Upload className="w-4 h-4 mr-2" /> {importing ? 'Yüklənir...' : 'CSV İmport'}
+            </Button>
+            <Button onClick={() => setShowAddForm(true)} disabled={showAddForm}>
+              <Plus className="w-4 h-4 mr-2" /> Əlavə et
+            </Button>
+          </div>
         </div>
       </div>
 
