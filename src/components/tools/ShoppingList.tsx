@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Plus, Trash2, Check, ShoppingCart, 
-  AlertCircle, Users, User, ChevronDown, ChevronUp, Clock
+  AlertCircle, Users, User, ChevronDown, ChevronUp, Clock, Sparkles
 } from 'lucide-react';
 import { useShoppingItems } from '@/hooks/useShoppingItems';
 import { useAuth } from '@/hooks/useAuth';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useDefaultShoppingItems } from '@/hooks/useDefaultShoppingItems';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,9 +19,9 @@ interface ShoppingListProps {
 }
 
 const priorityColors = {
-  low: 'bg-green-100 text-green-700 border-green-200',
-  medium: 'bg-amber-100 text-amber-700 border-amber-200',
-  high: 'bg-red-100 text-red-700 border-red-200'
+  low: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800',
+  medium: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800',
+  high: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800'
 };
 
 const priorityLabels = {
@@ -34,15 +35,23 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
   
   const { profile } = useAuth();
   const { items, loading, addItem, toggleItem, deleteItem, uncheckedCount, checkedCount } = useShoppingItems();
+  const { items: defaultItems } = useDefaultShoppingItems();
   const { toast } = useToast();
   
   const [newItemName, setNewItemName] = useState('');
   const [newItemPriority, setNewItemPriority] = useState<'low' | 'medium' | 'high'>('medium');
   const [showCompleted, setShowCompleted] = useState(false);
+  const [showRecommendations, setShowRecommendations] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   const hasPartner = !!profile?.linked_partner_id;
   const isShared = hasPartner;
+
+  // Filter out already added items from recommendations
+  const existingItemNames = items.map(i => i.name.toLowerCase());
+  const filteredRecommendations = defaultItems.filter(
+    d => !existingItemNames.includes((d.name_az || d.name).toLowerCase())
+  );
 
   const handleAddItem = async () => {
     if (!newItemName.trim()) return;
@@ -162,6 +171,53 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
             ))}
           </div>
         </div>
+
+        {/* Recommendations */}
+        {filteredRecommendations.length > 0 && (
+          <div className="mb-3">
+            <button
+              onClick={() => setShowRecommendations(!showRecommendations)}
+              className="flex items-center gap-2 text-primary hover:text-primary/80 w-full mb-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span className="text-sm font-medium">Platformanın tövsiyələri ({filteredRecommendations.length})</span>
+              {showRecommendations ? <ChevronUp className="w-4 h-4 ml-auto" /> : <ChevronDown className="w-4 h-4 ml-auto" />}
+            </button>
+
+            <AnimatePresence>
+              {showRecommendations && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex flex-wrap gap-1.5">
+                    {filteredRecommendations.slice(0, 8).map((item) => (
+                      <motion.button
+                        key={item.id}
+                        onClick={async () => {
+                          const result = await addItem({
+                            name: item.name_az || item.name,
+                            priority: item.priority
+                          });
+                          if (!result.error) {
+                            toast({ title: `${item.name_az || item.name} əlavə edildi!` });
+                          }
+                        }}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 rounded-full text-xs font-medium text-primary transition-colors border border-primary/20"
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <Plus className="w-3 h-3" />
+                        {item.name_az || item.name}
+                      </motion.button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
 
         {/* Unchecked items */}
         <div className="space-y-1.5 mb-3">

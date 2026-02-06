@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useInAppPurchase } from '@/hooks/useInAppPurchase';
 import { isNativePlatform } from '@/lib/iap';
 import { useToast } from '@/hooks/use-toast';
+import { usePremiumConfig } from '@/hooks/usePremiumConfig';
 
 interface PremiumModalProps {
   isOpen: boolean;
@@ -11,7 +12,8 @@ interface PremiumModalProps {
   feature?: string;
 }
 
-const premiumFeatures = [
+// Fallback features if no data from DB
+const defaultFeatures = [
   { icon: '📸', title: 'Limitsiz fotosessiya', description: 'Sonsuz sayda körpə fotosu yaradın' },
   { icon: '🎵', title: 'Limitsiz bəyaz küy', description: 'Gün boyu bəyaz küy dinləyin' },
   { icon: '👗', title: 'Premium geyimlər', description: 'Eksklüziv geyim seçimləri' },
@@ -22,6 +24,7 @@ const premiumFeatures = [
 
 export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const { toast } = useToast();
+  const { features: dbFeatures, plans: dbPlans, loading: configLoading } = usePremiumConfig();
   const {
     products,
     isLoading,
@@ -33,17 +36,33 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
     restorePurchases,
   } = useInAppPurchase();
 
+  // Use DB features if available, otherwise fallback
+  const premiumFeatures = dbFeatures.length > 0 
+    ? dbFeatures.filter(f => f.is_included_premium).map(f => ({
+        icon: f.icon,
+        title: f.title_az || f.title,
+        description: f.description_az || f.description || ''
+      }))
+    : defaultFeatures;
+
+  // Get premium plan prices from DB
+  const premiumPlan = dbPlans.find(p => p.plan_key === 'premium');
+  const dbMonthlyPrice = premiumPlan?.price_monthly;
+  const dbYearlyPrice = premiumPlan?.price_yearly;
+  const dbCurrency = premiumPlan?.currency || 'AZN';
+
   const isNative = isNativePlatform();
 
-  // Get prices from products or use defaults
+  // Get prices from products or DB config or use defaults
   const monthlyProduct = products.find(p => p.productId.includes('monthly'));
   const yearlyProduct = products.find(p => p.productId.includes('yearly'));
 
-  const monthlyPrice = monthlyProduct?.price || '₼9.99';
-  const yearlyPrice = yearlyProduct?.price || '₼79.99';
+  const currencySymbol = dbCurrency === 'AZN' ? '₼' : dbCurrency;
+  const monthlyPrice = monthlyProduct?.price || (dbMonthlyPrice ? `${currencySymbol}${dbMonthlyPrice}` : '₼9.99');
+  const yearlyPrice = yearlyProduct?.price || (dbYearlyPrice ? `${currencySymbol}${dbYearlyPrice}` : '₼79.99');
   const yearlyMonthly = yearlyProduct 
-    ? `₼${(yearlyProduct.priceAmount / 12).toFixed(2)}`
-    : '₼6.67';
+    ? `${currencySymbol}${(yearlyProduct.priceAmount / 12).toFixed(2)}`
+    : (dbYearlyPrice ? `${currencySymbol}${(dbYearlyPrice / 12).toFixed(2)}` : '₼6.67');
 
   const handleMonthlyPurchase = async () => {
     if (!isNative) {
