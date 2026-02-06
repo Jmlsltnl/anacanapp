@@ -1505,6 +1505,45 @@ export type Database = {
         }
         Relationships: []
       }
+      default_shopping_items: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          life_stage: string | null
+          name: string
+          name_az: string | null
+          priority: string | null
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          life_stage?: string | null
+          name: string
+          name_az?: string | null
+          priority?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          life_stage?: string | null
+          name?: string
+          name_az?: string | null
+          priority?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       development_tips: {
         Row: {
           age_group: string
@@ -4539,6 +4578,111 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      premium_features: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          description_az: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          is_included_free: boolean | null
+          is_included_premium: boolean | null
+          is_included_premium_plus: boolean | null
+          sort_order: number | null
+          title: string
+          title_az: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_included_free?: boolean | null
+          is_included_premium?: boolean | null
+          is_included_premium_plus?: boolean | null
+          sort_order?: number | null
+          title: string
+          title_az?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_included_free?: boolean | null
+          is_included_premium?: boolean | null
+          is_included_premium_plus?: boolean | null
+          sort_order?: number | null
+          title?: string
+          title_az?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      premium_plans: {
+        Row: {
+          badge_text: string | null
+          badge_text_az: string | null
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          description_az: string | null
+          id: string
+          is_active: boolean | null
+          is_popular: boolean | null
+          name: string
+          name_az: string | null
+          plan_key: string
+          price_monthly: number | null
+          price_yearly: number | null
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          badge_text?: string | null
+          badge_text_az?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          description_az?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_popular?: boolean | null
+          name: string
+          name_az?: string | null
+          plan_key: string
+          price_monthly?: number | null
+          price_yearly?: number | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          badge_text?: string | null
+          badge_text_az?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          description_az?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_popular?: boolean | null
+          name?: string
+          name_az?: string | null
+          plan_key?: string
+          price_monthly?: number | null
+          price_yearly?: number | null
+          sort_order?: number | null
           updated_at?: string | null
         }
         Relationships: []

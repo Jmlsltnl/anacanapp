@@ -43,6 +43,8 @@ import AdminMentalHealth from './admin/AdminMentalHealth';
 import AdminToolsConfig from './admin/AdminToolsConfig';
 import AdminPlacesConfig from './admin/AdminPlacesConfig';
 import AdminPartnerConfig from './admin/AdminPartnerConfig';
+import AdminDefaultShoppingItems from './admin/AdminDefaultShoppingItems';
+import AdminPremiumConfig from './admin/AdminPremiumConfig';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -137,6 +139,10 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminPlacesConfig />;
       case 'partner-config':
         return <AdminPartnerConfig />;
+      case 'default-shopping':
+        return <AdminDefaultShoppingItems />;
+      case 'premium-config':
+        return <AdminPremiumConfig />;
       case 'security':
         return <AdminSecurity />;
       default:
