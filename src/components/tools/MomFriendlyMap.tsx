@@ -155,11 +155,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
     <div className="min-h-screen bg-background pb-24">
       {/* Premium Header */}
       <div className="sticky top-0 z-20 isolate relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-pink-500 via-rose-500 to-fuchsia-600 pointer-events-none" />
-        <div className="absolute inset-0 opacity-30 pointer-events-none">
-          <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-white/20 blur-3xl" />
-          <div className="absolute bottom-5 right-10 w-40 h-40 rounded-full bg-pink-300/20 blur-3xl" />
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-br from-rose-500 to-pink-600 pointer-events-none" />
         
         <div className="relative px-4 pt-4 pb-8 safe-area-top">
           <div className="flex items-center gap-3 mb-4 relative z-30">
@@ -177,11 +173,11 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
             <motion.button
               onClick={() => setShowFilters(!showFilters)}
               className={`w-10 h-10 rounded-full backdrop-blur-md flex items-center justify-center relative z-30 ${
-                showFilters || selectedAmenities.length > 0 ? 'bg-white text-pink-600' : 'bg-white/20'
+                showFilters || selectedAmenities.length > 0 ? 'bg-white text-rose-600' : 'bg-white/20'
               }`}
               whileTap={{ scale: 0.95 }}
             >
-              <Filter className={`w-5 h-5 ${showFilters || selectedAmenities.length > 0 ? 'text-pink-600' : 'text-white'}`} />
+              <Filter className={`w-5 h-5 ${showFilters || selectedAmenities.length > 0 ? 'text-rose-600' : 'text-white'}`} />
             </motion.button>
             <motion.button
               onClick={() => setShowAddPlace(true)}
@@ -251,10 +247,10 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
             <motion.button
               key={cat.value}
               onClick={() => setSelectedCategory(cat.value)}
-              className={`shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold transition-all ${
+              className={`shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
                 selectedCategory === cat.value
-                  ? `bg-gradient-to-r ${cat.color} text-white shadow-lg`
-                  : 'bg-card text-foreground border border-border/50'
+                  ? 'bg-rose-500 text-white shadow-md'
+                  : 'bg-card text-foreground border border-border'
               }`}
               whileTap={{ scale: 0.95 }}
             >
@@ -272,11 +268,11 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
             >
-              <Card className="border-pink-200 dark:border-pink-900/30">
+              <Card className="border-border">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-bold text-foreground flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-pink-500" />
+                      <Sparkles className="w-4 h-4 text-rose-500" />
                       İmkanlara görə süz
                     </h3>
                     {selectedAmenities.length > 0 && (
@@ -284,7 +280,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                         variant="ghost"
                         size="sm"
                         onClick={() => setSelectedAmenities([])}
-                        className="text-pink-600 hover:text-pink-700"
+                        className="text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300"
                       >
                         Təmizlə
                       </Button>
@@ -297,8 +293,8 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                         onClick={() => toggleAmenity(amenity.key)}
                         className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
                           selectedAmenities.includes(amenity.key)
-                            ? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-lg'
-                            : 'bg-muted hover:bg-muted/80 text-foreground'
+                            ? 'bg-rose-500 text-white shadow-md'
+                            : 'bg-muted text-foreground hover:bg-muted/80'
                         }`}
                         whileTap={{ scale: 0.95 }}
                       >
@@ -329,16 +325,16 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
             ))}
           </div>
         ) : filteredPlaces.length === 0 ? (
-          <Card className="border-dashed">
+          <Card className="border-dashed border-border">
             <CardContent className="p-8 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-pink-100 to-rose-100 dark:from-pink-900/30 dark:to-rose-900/30 flex items-center justify-center">
-                <MapPin className="w-8 h-8 text-pink-500" />
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-rose-100 dark:bg-rose-900/20 flex items-center justify-center">
+                <MapPin className="w-8 h-8 text-rose-500" />
               </div>
               <h3 className="font-bold text-foreground mb-1">Məkan tapılmadı</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Bu filtrlərə uyğun məkan yoxdur
               </p>
-              <Button onClick={() => setShowAddPlace(true)} className="bg-gradient-to-r from-pink-500 to-rose-600">
+              <Button onClick={() => setShowAddPlace(true)} className="bg-rose-500 hover:bg-rose-600 text-white">
                 <Plus className="w-4 h-4 mr-2" />
                 İlk məkanı əlavə et
               </Button>
@@ -363,7 +359,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                   >
                     <CardContent className="p-4">
                       <div className="flex items-start gap-4">
-                        <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${catInfo.color} flex items-center justify-center shrink-0`}>
+                        <div className="w-14 h-14 rounded-xl bg-rose-500 flex items-center justify-center shrink-0">
                           <catInfo.icon className="w-6 h-6 text-white" />
                         </div>
                         
@@ -371,7 +367,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className="font-bold text-foreground truncate">{place.name_az || place.name}</h3>
                             {place.is_verified && (
-                              <Badge className="shrink-0 bg-emerald-500/10 text-emerald-600 border-0 text-xs">
+                              <Badge className="shrink-0 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-0 text-xs">
                                 <Check className="w-3 h-3 mr-1" /> Təsdiqlənib
                               </Badge>
                             )}

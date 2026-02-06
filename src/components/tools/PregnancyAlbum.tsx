@@ -348,10 +348,18 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-black flex flex-col"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between p-4">
-              <Button variant="ghost" size="icon" onClick={() => setViewingPhoto(null)} className="text-white">
-                <X className="w-5 h-5" />
+          {/* Header with Close Button */}
+            <div className="flex items-center justify-between p-4 safe-area-top">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => {
+                  setViewingPhoto(null);
+                  setEditingCaption(false);
+                }} 
+                className="text-white hover:bg-white/20"
+              >
+                <X className="w-6 h-6" />
               </Button>
               <div className="text-center text-white">
                 <p className="font-semibold">{monthLabels[viewingPhoto.month_number - 1]?.label}</p>
@@ -362,8 +370,12 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="text-white hover:text-red-400"
-                onClick={() => deletePhotoMutation.mutate(viewingPhoto)}
+                className="text-white hover:bg-red-500/20 hover:text-red-400"
+                onClick={() => {
+                  if (confirm('Bu şəkli silmək istədiyinizə əminsiniz?')) {
+                    deletePhotoMutation.mutate(viewingPhoto);
+                  }
+                }}
               >
                 <Trash2 className="w-5 h-5" />
               </Button>
