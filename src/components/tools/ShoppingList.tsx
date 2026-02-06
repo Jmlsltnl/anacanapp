@@ -113,7 +113,7 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
         </div>
       </div>
 
-      <div className="px-3 py-2 -mt-2">
+      <div className="px-3 py-2">
         {/* Stats + Add */}
         <div className="flex gap-2 mb-2">
           <div className="flex-1 bg-card rounded-xl p-2.5 border border-border/50 flex items-center gap-2">

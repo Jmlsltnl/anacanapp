@@ -141,10 +141,11 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
+              title="Başlanğıc çəkidən fərq"
             >
               <Activity className="w-5 h-5 mx-auto mb-1 text-white/80" />
               <p className="text-2xl font-black text-white">{totalGain >= 0 ? '+' : ''}{totalGain.toFixed(1)}</p>
-              <p className="text-[10px] text-white/70">Artım (kg)</p>
+              <p className="text-[10px] text-white/70">Fərq (kg)</p>
             </motion.div>
             <motion.div
               className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center"

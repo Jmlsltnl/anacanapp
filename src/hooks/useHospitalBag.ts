@@ -10,6 +10,8 @@ export interface HospitalBagItem {
   item_name: string;
   category: 'mom' | 'baby' | 'documents';
   is_checked: boolean;
+  priority: number;
+  notes: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -55,6 +57,8 @@ export const useHospitalBag = () => {
         item_name: template.item_name_az || template.item_name,
         category: template.category as 'mom' | 'baby' | 'documents',
         is_checked: false,
+        priority: template.priority || 2,
+        notes: template.notes || null,
       }));
 
       const { data, error } = await supabase

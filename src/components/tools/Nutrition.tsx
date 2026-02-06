@@ -164,7 +164,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
 
     return (
       <div ref={ref} className="min-h-screen bg-gradient-to-b from-primary/5 dark:from-primary/10 to-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
-        <div className="gradient-primary px-3 pt-3 pb-6">
+        <div className="gradient-primary px-3 pt-3 pb-4">
           <div className="flex items-center gap-3 mb-3">
             <motion.button
               onClick={() => setSelectedMeal(null)}
@@ -320,7 +320,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
 
   return (
     <div ref={ref} className="min-h-screen bg-gradient-to-b from-orange-50 dark:from-primary/10 to-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
-      <div className="gradient-primary px-3 pt-3 pb-6 relative z-20">
+      <div className="gradient-primary px-3 pt-3 pb-4 relative z-20">
         <div className="flex items-center gap-3 mb-3 relative z-20">
           <motion.button
             onClick={onBack}

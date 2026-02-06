@@ -447,6 +447,8 @@ export interface HospitalBagTemplate {
   is_essential: boolean;
   sort_order: number;
   is_active: boolean;
+  priority: number;
+  notes: string | null;
 }
 
 export const useHospitalBagTemplates = () => {

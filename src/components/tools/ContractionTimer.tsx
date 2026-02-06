@@ -67,7 +67,7 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className={`${stats.is511 ? 'bg-gradient-to-r from-red-500 to-rose-600' : 'gradient-primary'} px-3 pt-3 pb-8 safe-top transition-colors relative z-20`}>
+      <div className={`${stats.is511 ? 'bg-gradient-to-r from-red-500 to-rose-600' : 'gradient-primary'} px-3 pt-3 pb-4 safe-top transition-colors relative z-20`}>
         <div className="flex items-center gap-3 relative z-20">
           <motion.button
             onClick={onBack}
@@ -94,7 +94,7 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
         </div>
       </div>
 
-      <div className="px-3 -mt-4">
+      <div className="px-3 pt-3">
         {/* 5-1-1 Alert */}
         <AnimatePresence>
           {stats.is511 && (

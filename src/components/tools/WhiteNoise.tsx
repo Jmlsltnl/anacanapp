@@ -226,7 +226,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="gradient-primary px-3 pt-3 pb-8 rounded-b-[1.5rem] flex-shrink-0 relative z-20 isolate">
+      <div className="gradient-primary px-3 pt-3 pb-4 rounded-b-[1.5rem] flex-shrink-0 relative z-20 isolate">
         <div className="flex items-center gap-3 relative z-30">
           <motion.button
             onClick={onBack}
@@ -250,7 +250,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
       </div>
 
       {/* Content - Scrollable */}
-      <div className="flex-1 overflow-y-auto px-3 -mt-4 relative z-10">
+      <div className="flex-1 overflow-y-auto px-3 pt-3 relative z-10">
         {/* Free tier usage info */}
         {!isPremium && remainingMinutes !== null && (
           <motion.div

@@ -818,7 +818,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="gradient-primary px-5 pt-14 pb-8 rounded-b-[2rem] flex-shrink-0">
+      <div className="gradient-primary px-4 pt-4 pb-6 rounded-b-[1.5rem] flex-shrink-0">
         <div className="flex items-center gap-4 mb-4">
           <motion.button
             onClick={onBack}
@@ -865,7 +865,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
       </div>
 
       {/* Content - Scrollable with space for fixed buttons */}
-      <div className="flex-1 overflow-y-auto px-5 py-4 -mt-4 pb-36">
+      <div className="flex-1 overflow-y-auto px-4 py-4 pb-36">
         <AnimatePresence mode="wait">
           {renderStepContent()}
         </AnimatePresence>
