@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { HelpCircle, Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useAdminFAQ, FAQ } from '@/hooks/useAdminFAQ';
+import UnsavedChangesDialog from './UnsavedChangesDialog';
 
 const categories = [
   { id: 'general', label: 'Ümumi' },
@@ -27,10 +28,29 @@ const AdminFAQ = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState<FAQ | null>(null);
   const [formData, setFormData] = useState<Partial<FAQ>>({});
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const initialFormDataRef = useRef<string>('');
+
+  const hasUnsavedChanges = useCallback(() => {
+    return JSON.stringify(formData) !== initialFormDataRef.current;
+  }, [formData]);
+
+  const handleModalClose = useCallback((open: boolean) => {
+    if (!open && hasUnsavedChanges()) {
+      setShowUnsavedDialog(true);
+    } else {
+      setShowModal(open);
+    }
+  }, [hasUnsavedChanges]);
+
+  const handleDiscardChanges = useCallback(() => {
+    setShowModal(false);
+    setShowUnsavedDialog(false);
+  }, []);
 
   const openCreateModal = () => {
     setEditingItem(null);
-    setFormData({
+    const initialData = {
       question: '',
       question_az: '',
       answer: '',
@@ -38,13 +58,16 @@ const AdminFAQ = () => {
       category: 'general',
       sort_order: 0,
       is_active: true,
-    });
+    };
+    setFormData(initialData);
+    initialFormDataRef.current = JSON.stringify(initialData);
     setShowModal(true);
   };
 
   const openEditModal = (item: FAQ) => {
     setEditingItem(item);
     setFormData({ ...item });
+    initialFormDataRef.current = JSON.stringify({ ...item });
     setShowModal(true);
   };
 
@@ -192,7 +215,7 @@ const AdminFAQ = () => {
       </Card>
 
       {/* Modal */}
-      <Dialog open={showModal} onOpenChange={setShowModal}>
+      <Dialog open={showModal} onOpenChange={handleModalClose}>
         <DialogContent className="max-w-2xl max-h-[90vh]">
           <DialogHeader>
             <DialogTitle>{editingItem ? 'Sual Redaktə Et' : 'Yeni Sual'}</DialogTitle>
@@ -254,7 +277,7 @@ const AdminFAQ = () => {
             </div>
           </ScrollArea>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowModal(false)}>
+            <Button variant="outline" onClick={() => handleModalClose(false)}>
               Ləğv et
             </Button>
             <Button onClick={handleSave} disabled={create.isPending || update.isPending}>
@@ -263,6 +286,16 @@ const AdminFAQ = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <UnsavedChangesDialog
+        open={showUnsavedDialog}
+        onOpenChange={setShowUnsavedDialog}
+        onDiscard={handleDiscardChanges}
+        onSave={async () => {
+          await handleSave();
+          setShowUnsavedDialog(false);
+        }}
+      />
     </div>
   );
 };
