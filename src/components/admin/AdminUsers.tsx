@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, MoreVertical, Shield, User, Users, Trash2, Edit } from 'lucide-react';
+import { Search, Filter, MoreVertical, Shield, User, Trash2, Edit, Crown } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -37,16 +38,25 @@ interface UserProfile {
   created_at: string;
 }
 
+interface UserRole {
+  user_id: string;
+  role: 'admin' | 'moderator' | 'user';
+}
+
 const AdminUsers = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
+  const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [roleDialogOpen, setRoleDialogOpen] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'moderator' | 'user'>('user');
   const { toast } = useToast();
 
   useEffect(() => {
     fetchUsers();
+    fetchUserRoles();
   }, []);
 
   const fetchUsers = async () => {
@@ -68,6 +78,26 @@ const AdminUsers = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchUserRoles = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+
+      if (error) throw error;
+      setUserRoles(data || []);
+    } catch (error) {
+      console.error('Error fetching roles:', error);
+    }
+  };
+
+  const getUserRole = (userId: string): 'admin' | 'moderator' | 'user' => {
+    const role = userRoles.find(r => r.user_id === userId);
+    if (role?.role === 'admin') return 'admin';
+    if (role?.role === 'moderator') return 'moderator';
+    return 'user';
   };
 
   const handleUpdateUser = async (userId: string, updates: Partial<UserProfile>) => {
@@ -96,6 +126,47 @@ const AdminUsers = () => {
     }
   };
 
+  const handleAssignRole = async () => {
+    if (!selectedUser) return;
+
+    try {
+      // Check if user already has a role entry
+      const existingRole = userRoles.find(r => r.user_id === selectedUser.user_id);
+
+      if (existingRole) {
+        // Update existing role
+        const { error } = await supabase
+          .from('user_roles')
+          .update({ role: selectedRole })
+          .eq('user_id', selectedUser.user_id);
+
+        if (error) throw error;
+      } else {
+        // Insert new role
+        const { error } = await supabase
+          .from('user_roles')
+          .insert([{ user_id: selectedUser.user_id, role: selectedRole }]);
+
+        if (error) throw error;
+      }
+
+      toast({
+        title: 'Uğurlu',
+        description: `${selectedUser.name} üçün ${getRoleLabel(selectedRole)} rolu təyin edildi`
+      });
+
+      fetchUserRoles();
+      setRoleDialogOpen(false);
+    } catch (error) {
+      console.error('Error assigning role:', error);
+      toast({
+        title: 'Xəta',
+        description: 'Rol təyin edilə bilmədi',
+        variant: 'destructive'
+      });
+    }
+  };
+
   const filteredUsers = users.filter(user =>
     user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.email?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -118,6 +189,30 @@ const AdminUsers = () => {
       case 'mommy': return 'bg-green-500/10 text-green-500';
       case 'partner': return 'bg-blue-500/10 text-blue-500';
       default: return 'bg-muted text-muted-foreground';
+    }
+  };
+
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case 'admin': return 'Admin';
+      case 'moderator': return 'Moderator';
+      default: return 'İstifadəçi';
+    }
+  };
+
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case 'admin': return 'bg-red-500/10 text-red-500 border-red-500/20';
+      case 'moderator': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+      default: return 'bg-muted text-muted-foreground';
+    }
+  };
+
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case 'admin': return <Crown className="w-3 h-3" />;
+      case 'moderator': return <Shield className="w-3 h-3" />;
+      default: return <User className="w-3 h-3" />;
     }
   };
 
@@ -160,6 +255,7 @@ const AdminUsers = () => {
               <tr>
                 <th className="text-left p-4 font-medium text-muted-foreground">İstifadəçi</th>
                 <th className="text-left p-4 font-medium text-muted-foreground">Mərhələ</th>
+                <th className="text-left p-4 font-medium text-muted-foreground">Rol</th>
                 <th className="text-left p-4 font-medium text-muted-foreground">Partner Kodu</th>
                 <th className="text-left p-4 font-medium text-muted-foreground">Tarix</th>
                 <th className="text-right p-4 font-medium text-muted-foreground">Əməliyyatlar</th>
@@ -168,75 +264,93 @@ const AdminUsers = () => {
             <tbody className="divide-y divide-border">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="p-8 text-center text-muted-foreground">
+                  <td colSpan={6} className="p-8 text-center text-muted-foreground">
                     Yüklənir...
                   </td>
                 </tr>
               ) : filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="p-8 text-center text-muted-foreground">
+                  <td colSpan={6} className="p-8 text-center text-muted-foreground">
                     İstifadəçi tapılmadı
                   </td>
                 </tr>
               ) : (
-                filteredUsers.map((user, index) => (
-                  <motion.tr
-                    key={user.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="hover:bg-muted/30"
-                  >
-                    <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <span className="text-primary font-bold">
-                            {user.name?.charAt(0).toUpperCase() || 'U'}
-                          </span>
+                filteredUsers.map((user, index) => {
+                  const userRole = getUserRole(user.user_id);
+                  return (
+                    <motion.tr
+                      key={user.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="hover:bg-muted/30"
+                    >
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span className="text-primary font-bold">
+                              {user.name?.charAt(0).toUpperCase() || 'U'}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="font-medium text-foreground">{user.name}</p>
+                            <p className="text-sm text-muted-foreground">{user.email}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium text-foreground">{user.name}</p>
-                          <p className="text-sm text-muted-foreground">{user.email}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <Badge className={getLifeStageColor(user.life_stage)}>
-                        {getLifeStageLabel(user.life_stage)}
-                      </Badge>
-                    </td>
-                    <td className="p-4">
-                      <code className="text-sm bg-muted px-2 py-1 rounded">
-                        {user.partner_code || '-'}
-                      </code>
-                    </td>
-                    <td className="p-4 text-sm text-muted-foreground">
-                      {new Date(user.created_at).toLocaleDateString('az-AZ')}
-                    </td>
-                    <td className="p-4 text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreVertical className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => {
-                            setSelectedUser(user);
-                            setEditDialogOpen(true);
-                          }}>
-                            <Edit className="w-4 h-4 mr-2" />
-                            Redaktə et
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Sil
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
-                  </motion.tr>
-                ))
+                      </td>
+                      <td className="p-4">
+                        <Badge className={getLifeStageColor(user.life_stage)}>
+                          {getLifeStageLabel(user.life_stage)}
+                        </Badge>
+                      </td>
+                      <td className="p-4">
+                        <Badge className={`${getRoleColor(userRole)} flex items-center gap-1 w-fit`}>
+                          {getRoleIcon(userRole)}
+                          {getRoleLabel(userRole)}
+                        </Badge>
+                      </td>
+                      <td className="p-4">
+                        <code className="text-sm bg-muted px-2 py-1 rounded">
+                          {user.partner_code || '-'}
+                        </code>
+                      </td>
+                      <td className="p-4 text-sm text-muted-foreground">
+                        {new Date(user.created_at).toLocaleDateString('az-AZ')}
+                      </td>
+                      <td className="p-4 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => {
+                              setSelectedUser(user);
+                              setEditDialogOpen(true);
+                            }}>
+                              <Edit className="w-4 h-4 mr-2" />
+                              Redaktə et
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                              setSelectedUser(user);
+                              setSelectedRole(getUserRole(user.user_id));
+                              setRoleDialogOpen(true);
+                            }}>
+                              <Shield className="w-4 h-4 mr-2" />
+                              Rol təyin et
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive">
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Sil
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </motion.tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -283,6 +397,72 @@ const AdminUsers = () => {
                 })}
               >
                 Yadda saxla
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Role Assignment Dialog */}
+      <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rol Təyin Et</DialogTitle>
+          </DialogHeader>
+          {selectedUser && (
+            <div className="space-y-4 mt-4">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-primary font-bold">
+                    {selectedUser.name?.charAt(0).toUpperCase() || 'U'}
+                  </span>
+                </div>
+                <div>
+                  <p className="font-medium">{selectedUser.name}</p>
+                  <p className="text-sm text-muted-foreground">{selectedUser.email}</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-2 block">Rol seçin</label>
+                <Select
+                  value={selectedRole}
+                  onValueChange={(value) => setSelectedRole(value as 'admin' | 'moderator' | 'user')}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="user">
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        İstifadəçi
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="moderator">
+                      <div className="flex items-center gap-2">
+                        <Shield className="w-4 h-4 text-blue-500" />
+                        Moderator
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="admin">
+                      <div className="flex items-center gap-2">
+                        <Crown className="w-4 h-4 text-red-500" />
+                        Admin
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                <p className="text-sm text-amber-600 dark:text-amber-400">
+                  ⚠️ Admin rollu istifadəçilər bütün sistem funksiyalarına tam giriş əldə edəcək.
+                </p>
+              </div>
+
+              <Button className="w-full" onClick={handleAssignRole}>
+                Rolu Təyin Et
               </Button>
             </div>
           )}
