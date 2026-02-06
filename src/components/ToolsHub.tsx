@@ -181,11 +181,9 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     });
   }, [toolConfigs, hasPartner, lifeStage]);
 
-  // Effect to set initial tool from props
+  // Sync activeTool with initialTool prop - reset when tab is clicked
   useEffect(() => {
-    if (initialTool) {
-      setActiveTool(initialTool);
-    }
+    setActiveTool(initialTool);
   }, [initialTool]);
 
   const isToolAvailable = (tool: Tool) => {
