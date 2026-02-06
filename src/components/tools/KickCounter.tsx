@@ -75,7 +75,7 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="gradient-primary px-3 pt-3 pb-8 safe-top relative z-20">
+      <div className="gradient-primary px-3 pt-3 pb-4 safe-top relative z-20">
         <div className="flex items-center gap-2 relative z-20">
           <motion.button
             onClick={onBack}
@@ -92,7 +92,7 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
         </div>
       </div>
 
-      <div className="px-3 -mt-5">
+      <div className="px-3 pt-3">
         {/* Main Counter Card */}
         <motion.div
           className="bg-card rounded-2xl p-4 shadow-elevated border border-border/50 mb-3"

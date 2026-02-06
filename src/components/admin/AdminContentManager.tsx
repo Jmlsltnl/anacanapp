@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Search, Edit, Trash2, ChefHat, Lightbulb, Shield, Baby, Briefcase, Apple, X, Upload, Image, FileUp } from 'lucide-react';
+import UnsavedChangesDialog from './UnsavedChangesDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,7 +38,9 @@ const AdminContentManager = () => {
   const [formData, setFormData] = useState<any>({});
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showBulkImport, setShowBulkImport] = useState(false);
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const initialFormDataRef = useRef<string>('');
 
   const contentConfig = {
     recipes: {
@@ -76,7 +79,7 @@ const AdminContentManager = () => {
       table: 'hospital_bag_templates',
       title: 'Xəstəxana Çantası',
       icon: Briefcase,
-      fields: ['item_name', 'item_name_az', 'category', 'is_essential', 'sort_order', 'is_active'],
+      fields: ['item_name', 'item_name_az', 'category', 'priority', 'notes', 'is_essential', 'sort_order', 'is_active'],
       categories: ['mom', 'baby', 'documents'],
       hasImage: false,
     },
@@ -189,14 +192,38 @@ const AdminContentManager = () => {
 
   const openCreateModal = () => {
     setEditingItem(null);
-    setFormData({ is_active: true });
+    const initialData = { is_active: true };
+    setFormData(initialData);
+    initialFormDataRef.current = JSON.stringify(initialData);
     setShowModal(true);
   };
 
   const openEditModal = (item: ContentItem) => {
     setEditingItem(item);
     setFormData(item);
+    initialFormDataRef.current = JSON.stringify(item);
     setShowModal(true);
+  };
+
+  const hasUnsavedChanges = () => {
+    if (!showModal) return false;
+    return JSON.stringify(formData) !== initialFormDataRef.current;
+  };
+
+  const handleModalClose = () => {
+    if (hasUnsavedChanges()) {
+      setShowUnsavedDialog(true);
+    } else {
+      setShowModal(false);
+      setEditingItem(null);
+      setFormData({});
+    }
+  };
+
+  const handleDiscardChanges = () => {
+    setShowModal(false);
+    setEditingItem(null);
+    setFormData({});
   };
 
   const filteredItems = items.filter(item => {
@@ -282,6 +309,28 @@ const AdminContentManager = () => {
               ))}
             </SelectContent>
           </Select>
+        );
+      case 'priority':
+        return (
+          <Select value={String(formData[field] || 2)} onValueChange={(v) => setFormData({ ...formData, [field]: parseInt(v) })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Prioritet seçin" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1">Yüksək</SelectItem>
+              <SelectItem value="2">Orta</SelectItem>
+              <SelectItem value="3">Aşağı</SelectItem>
+            </SelectContent>
+          </Select>
+        );
+      case 'notes':
+        return (
+          <Textarea 
+            value={formData[field] || ''} 
+            onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
+            placeholder="Qısa açıqlama və ya məlumat"
+            rows={2}
+          />
         );
       case 'is_active':
       case 'is_essential':
@@ -372,6 +421,8 @@ const AdminContentManager = () => {
       item_name_az: 'Element Adı (AZ)',
       is_essential: 'Vacib',
       sort_order: 'Sıralama',
+      priority: 'Prioritet',
+      notes: 'Qeyd',
       prep_time: 'Hazırlıq Vaxtı (dəq)',
       cook_time: 'Bişirmə Vaxtı (dəq)',
       servings: 'Porsiya',
@@ -508,7 +559,10 @@ const AdminContentManager = () => {
       </Tabs>
 
       {/* Edit/Create Modal */}
-      <Dialog open={showModal} onOpenChange={setShowModal}>
+      <Dialog open={showModal} onOpenChange={(open) => {
+        if (!open) handleModalClose();
+        else setShowModal(open);
+      }}>
         <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
@@ -523,7 +577,7 @@ const AdminContentManager = () => {
               </div>
             ))}
             <div className="flex gap-3 pt-4">
-              <Button variant="outline" onClick={() => setShowModal(false)} className="flex-1">
+              <Button variant="outline" onClick={handleModalClose} className="flex-1">
                 Ləğv et
               </Button>
               <Button onClick={handleSave} className="flex-1 gradient-primary">
@@ -539,6 +593,13 @@ const AdminContentManager = () => {
         isOpen={showBulkImport}
         onClose={() => setShowBulkImport(false)}
         onSuccess={fetchItems}
+      />
+
+      {/* Unsaved Changes Dialog */}
+      <UnsavedChangesDialog
+        open={showUnsavedDialog}
+        onOpenChange={setShowUnsavedDialog}
+        onDiscard={handleDiscardChanges}
       />
     </div>
   );

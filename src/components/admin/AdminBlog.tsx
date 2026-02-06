@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, Edit, Trash2, Eye, EyeOff, Star, Search,
@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import BlogAnalytics from './BlogAnalytics';
 import { supabase } from '@/integrations/supabase/client';
+import UnsavedChangesDialog from './UnsavedChangesDialog';
 
 const AdminBlog = () => {
   const { posts, categories, loading, createPost, updatePost, deletePost, createCategory, deleteCategory } = useBlogAdmin();
@@ -27,6 +28,8 @@ const AdminBlog = () => {
   const [generatingContent, setGeneratingContent] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageInputMode, setImageInputMode] = useState<'url' | 'upload'>('upload');
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const initialFormDataRef = useRef<string>('');
 
   const [formData, setFormData] = useState({
     title: '',
@@ -192,7 +195,7 @@ const AdminBlog = () => {
 
   const handleEdit = (post: BlogPost) => {
     setEditingPost(post);
-    setFormData({
+    const newFormData = {
       title: post.title,
       slug: post.slug,
       excerpt: post.excerpt || '',
@@ -204,8 +207,23 @@ const AdminBlog = () => {
       reading_time: post.reading_time,
       is_featured: post.is_featured,
       is_published: post.is_published
-    });
+    };
+    setFormData(newFormData);
+    initialFormDataRef.current = JSON.stringify(newFormData);
     setShowEditor(true);
+  };
+
+  const hasUnsavedChanges = () => {
+    if (!showEditor) return false;
+    return JSON.stringify(formData) !== initialFormDataRef.current;
+  };
+
+  const handleModalClose = () => {
+    if (hasUnsavedChanges()) {
+      setShowUnsavedDialog(true);
+    } else {
+      resetForm();
+    }
   };
 
   const handleSave = async () => {
@@ -307,7 +325,7 @@ const AdminBlog = () => {
   };
 
   const resetForm = () => {
-    setFormData({
+    const emptyForm = {
       title: '',
       slug: '',
       excerpt: '',
@@ -319,10 +337,18 @@ const AdminBlog = () => {
       reading_time: 5,
       is_featured: false,
       is_published: false
-    });
+    };
+    setFormData(emptyForm);
+    initialFormDataRef.current = JSON.stringify(emptyForm);
     setEditingPost(null);
     setShowEditor(false);
   };
+
+  useEffect(() => {
+    if (showEditor && !editingPost) {
+      initialFormDataRef.current = JSON.stringify(formData);
+    }
+  }, [showEditor]);
 
   const filteredPosts = posts.filter(p =>
     p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -546,7 +572,7 @@ const AdminBlog = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-            onClick={() => resetForm()}
+            onClick={handleModalClose}
           >
             <motion.div
               initial={{ scale: 0.95, y: 20 }}
@@ -559,7 +585,7 @@ const AdminBlog = () => {
                 <h2 className="text-xl font-bold">
                   {editingPost ? 'Məqaləni Redaktə Et' : 'Yeni Məqalə'}
                 </h2>
-                <Button variant="ghost" size="icon" onClick={resetForm}>
+                <Button variant="ghost" size="icon" onClick={handleModalClose}>
                   <X className="w-5 h-5" />
                 </Button>
               </div>
@@ -797,7 +823,7 @@ const AdminBlog = () => {
               </div>
 
               <div className="p-6 border-t border-border flex justify-end gap-3 sticky bottom-0 bg-card">
-                <Button variant="outline" onClick={resetForm}>
+                <Button variant="outline" onClick={handleModalClose}>
                   Ləğv et
                 </Button>
                 <Button onClick={handleSave} className="bg-primary">
@@ -890,6 +916,13 @@ const AdminBlog = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Unsaved Changes Dialog */}
+      <UnsavedChangesDialog
+        open={showUnsavedDialog}
+        onOpenChange={setShowUnsavedDialog}
+        onDiscard={resetForm}
+      />
     </div>
   );
 };
