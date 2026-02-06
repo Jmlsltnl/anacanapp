@@ -153,89 +153,58 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      {/* Premium Header */}
-      <div className="sticky top-0 z-20 isolate relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-rose-500 to-pink-600 pointer-events-none" />
-        
-        <div className="relative px-4 pt-4 pb-8 safe-area-top">
-          <div className="flex items-center gap-3 mb-4 relative z-30">
-            <motion.button
-              onClick={onBack}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center relative z-30"
-              whileTap={{ scale: 0.95 }}
-            >
-              <ArrowLeft className="w-5 h-5 text-white" />
-            </motion.button>
-            <div className="flex-1">
-              <h1 className="text-xl font-bold text-white">Ana Dostu Məkanlar</h1>
-              <p className="text-white/80 text-sm">Körpənizlə rahat yerlər</p>
-            </div>
-            <motion.button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`w-10 h-10 rounded-full backdrop-blur-md flex items-center justify-center relative z-30 ${
-                showFilters || selectedAmenities.length > 0 ? 'bg-white text-rose-600' : 'bg-white/20'
-              }`}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Filter className={`w-5 h-5 ${showFilters || selectedAmenities.length > 0 ? 'text-rose-600' : 'text-white'}`} />
-            </motion.button>
-            <motion.button
-              onClick={() => setShowAddPlace(true)}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center relative z-30"
-              whileTap={{ scale: 0.95 }}
-            >
-              <Plus className="w-5 h-5 text-white" />
-            </motion.button>
+      {/* Compact Header */}
+      <div className="sticky top-0 z-20 bg-card border-b border-border/50 px-4 py-3 safe-area-top">
+        <div className="flex items-center gap-3 mb-3 relative z-30">
+          <Button variant="ghost" size="icon" onClick={onBack} className="relative z-30">
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <div className="flex-1">
+            <h1 className="text-lg font-bold">Ana Dostu Məkanlar</h1>
+            <p className="text-xs text-muted-foreground">Körpənizlə rahat yerlər</p>
           </div>
+          <Button
+            variant={showFilters || selectedAmenities.length > 0 ? "default" : "ghost"}
+            size="icon"
+            onClick={() => setShowFilters(!showFilters)}
+            className={showFilters || selectedAmenities.length > 0 ? "bg-rose-500 hover:bg-rose-600" : ""}
+          >
+            <Filter className="w-5 h-5" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => setShowAddPlace(true)}>
+            <Plus className="w-5 h-5" />
+          </Button>
+        </div>
 
-          {/* Search */}
-          <div className="relative mb-4 z-20">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Məkan axtar..."
-              className="pl-12 h-12 rounded-2xl bg-white/95 dark:bg-card/95 backdrop-blur-md border-0 shadow-lg"
-            />
-          </div>
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Məkan axtar..."
+            className="pl-10 h-10 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30"
+          />
+        </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-3">
-            <motion.div
-              className="bg-white/20 backdrop-blur-md rounded-xl p-3 text-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <p className="text-2xl font-black text-white">{places.length}</p>
-              <p className="text-xs text-white/70">Məkan</p>
-            </motion.div>
-            <motion.div
-              className="bg-white/20 backdrop-blur-md rounded-xl p-3 text-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-            >
-              <p className="text-2xl font-black text-white">{verifiedCount}</p>
-              <p className="text-xs text-white/70">Təsdiqlənmiş</p>
-            </motion.div>
-            <motion.div
-              className="bg-white/20 backdrop-blur-md rounded-xl p-3 text-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <div className="flex items-center justify-center gap-1">
-                <Star className="w-4 h-4 text-amber-300 fill-current" />
-                <p className="text-2xl font-black text-white">{avgRating}</p>
-              </div>
-              <p className="text-xs text-white/70">Orta reytinq</p>
-            </motion.div>
-          </div>
+        {/* Mini Stats */}
+        <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <MapPin className="w-3 h-3" />
+            <strong className="text-foreground">{places.length}</strong> məkan
+          </span>
+          <span className="flex items-center gap-1">
+            <Check className="w-3 h-3 text-emerald-500" />
+            <strong className="text-foreground">{verifiedCount}</strong> təsdiqlənmiş
+          </span>
+          <span className="flex items-center gap-1">
+            <Star className="w-3 h-3 text-amber-500 fill-current" />
+            <strong className="text-foreground">{avgRating}</strong> orta reytinq
+          </span>
         </div>
       </div>
 
-      <div className="px-4 -mt-4 space-y-4">
+      <div className="px-4 pt-4 space-y-4">
         {/* Category Pills */}
         <motion.div
           className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar"
