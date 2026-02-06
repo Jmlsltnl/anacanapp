@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Shield, Timer, Scale, Baby, Briefcase, 
@@ -112,6 +112,44 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const [activeTool, setActiveTool] = useState<string | null>(initialTool);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>('all');
+
+  // Preserve ToolsHub scroll position when returning from a tool
+  const toolsListScrollTopRef = useRef<number>(0);
+  const prevActiveToolRef = useRef<string | null>(activeTool);
+
+  const captureToolsListScrollTop = () => {
+    const container = document.querySelector('[data-scroll-container]') as HTMLElement | null;
+    if (container) {
+      toolsListScrollTopRef.current = container.scrollTop;
+    }
+  };
+
+  const openTool = (toolId: string) => {
+    // Save the current list scroll position before opening a tool
+    if (!activeTool) {
+      captureToolsListScrollTop();
+    }
+    setActiveTool(toolId);
+  };
+
+  useEffect(() => {
+    const prev = prevActiveToolRef.current;
+
+    // If we just navigated back from a tool to the list, restore list scroll
+    if (prev && !activeTool) {
+      requestAnimationFrame(() => {
+        const container = document.querySelector('[data-scroll-container]') as HTMLElement | null;
+        if (container) {
+          container.scrollTo({
+            top: toolsListScrollTopRef.current,
+            behavior: 'instant' as ScrollBehavior,
+          });
+        }
+      });
+    }
+
+    prevActiveToolRef.current = activeTool;
+  }, [activeTool]);
   const { lifeStage, getPregnancyData } = useUserStore();
   const { profile } = useAuth();
   const { isPremium } = useSubscription();
@@ -231,7 +269,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
       }
     }
 
-    setActiveTool(tool.id);
+    openTool(tool.id);
   };
 
   // Filter by search and category
@@ -340,11 +378,11 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
 
       <div className="px-4 pt-3">
         {/* Top Banner */}
-        <BannerSlot placement="tools_top" onNavigate={() => {}} onToolOpen={setActiveTool} className="mb-4" />
+        <BannerSlot placement="tools_top" onNavigate={() => {}} onToolOpen={openTool} className="mb-4" />
 
         {/* Featured AI Tool - Full Width Card */}
         <motion.button
-          onClick={() => setActiveTool('photoshoot')}
+          onClick={() => openTool('photoshoot')}
           className="w-full relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 p-4 mb-4 text-left shadow-xl"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -382,7 +420,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
           ].map((item) => (
             <motion.button
               key={item.id}
-              onClick={() => setActiveTool(item.id)}
+              onClick={() => openTool(item.id)}
               className={`flex-shrink-0 flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-gradient-to-r ${item.gradient} shadow-lg`}
               whileTap={{ scale: 0.95 }}
             >
@@ -475,7 +513,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         )}
 
         {/* Bottom Banner */}
-        <BannerSlot placement="tools_bottom" onNavigate={() => {}} onToolOpen={setActiveTool} className="mt-6" />
+        <BannerSlot placement="tools_bottom" onNavigate={() => {}} onToolOpen={openTool} className="mt-6" />
       </div>
 
       {/* Premium Modal */}
