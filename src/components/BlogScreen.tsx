@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Search, Clock, Eye, ChevronRight, 
@@ -17,9 +17,10 @@ import BlogPostDetail from '@/components/blog/BlogPostDetail';
 
 interface BlogScreenProps {
   onBack: () => void;
+  initialSlug?: string;
 }
 
-const BlogScreen = ({ onBack }: BlogScreenProps) => {
+const BlogScreen = ({ onBack, initialSlug }: BlogScreenProps) => {
   useScrollToTop();
   
   const { user } = useAuth();
@@ -29,6 +30,16 @@ const BlogScreen = ({ onBack }: BlogScreenProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
   const [showSaved, setShowSaved] = useState(false);
+
+  // Set initial post when posts load and initialSlug is provided
+  useEffect(() => {
+    if (initialSlug && posts.length > 0 && !selectedPost) {
+      const post = posts.find(p => p.slug === initialSlug);
+      if (post) {
+        setSelectedPost(post);
+      }
+    }
+  }, [initialSlug, posts, selectedPost]);
 
   const savedPostsList = posts.filter(p => savedPosts.includes(p.id));
 

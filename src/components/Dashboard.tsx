@@ -35,6 +35,7 @@ import GrowthTrackerWidget from '@/components/mommy/GrowthTrackerWidget';
 import DevelopmentTipsWidget from '@/components/mommy/DevelopmentTipsWidget';
 import BannerSlot from '@/components/banners/BannerSlot';
 import SendDailySummaryWidget from '@/components/partner/SendDailySummaryWidget';
+import RecentBlogPosts from '@/components/dashboard/RecentBlogPosts';
 
 // Fetus images by month
 import FetusMonth1 from '@/assets/fetus/month-1.svg';
@@ -1526,9 +1527,10 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
 interface DashboardProps {
   onOpenChat?: () => void;
   onNavigateToTool?: (tool: string) => void;
+  onNavigate?: (screen: string) => void;
 }
 
-const Dashboard = ({ onOpenChat, onNavigateToTool }: DashboardProps) => {
+const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps) => {
   const { lifeStage, name } = useUserStore();
   const { profile } = useAuth();
   const { unreadCount } = useUnreadMessages();
@@ -1603,6 +1605,9 @@ const Dashboard = ({ onOpenChat, onNavigateToTool }: DashboardProps) => {
 
       {/* Send Daily Summary to Partner Widget - only for bump stage with linked partner */}
       {lifeStage === 'bump' && <SendDailySummaryWidget />}
+
+      {/* Recent Blog Posts */}
+      {onNavigate && <RecentBlogPosts onNavigate={onNavigate} />}
 
       {/* Bottom Banner Slot */}
       <BannerSlot placement="home_bottom" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mt-4" />
