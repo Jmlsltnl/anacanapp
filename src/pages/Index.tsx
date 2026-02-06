@@ -53,6 +53,7 @@ const Index = () => {
   const [showMotherChat, setShowMotherChat] = useState(false);
   const [viewingUserId, setViewingUserId] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState<string | null>(null);
+  const [toolsResetKey, setToolsResetKey] = useState(0);
   const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro } = useUserStore();
   const { isAdmin, loading } = useAuth();
   
@@ -91,6 +92,8 @@ const Index = () => {
     // If clicking Tools tab while already on tools, reset to tools list
     if (tab === 'tools') {
       setActiveTool(null);
+      // Increment key to force ToolsHub to reset
+      setToolsResetKey(prev => prev + 1);
     }
     setActiveTab(tab);
   };
@@ -195,7 +198,7 @@ const Index = () => {
       case 'tools':
         return (
           <motion.div key="tools" variants={pageVariants} initial="initial" animate="animate" exit="exit">
-            <ToolsHub initialTool={activeTool} onBack={() => setActiveTool(null)} />
+            <ToolsHub key={toolsResetKey} initialTool={activeTool} onBack={() => setActiveTool(null)} />
           </motion.div>
         );
       case 'community':

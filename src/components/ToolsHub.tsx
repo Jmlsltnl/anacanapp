@@ -181,10 +181,12 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     });
   }, [toolConfigs, hasPartner, lifeStage]);
 
-  // Sync activeTool with initialTool prop - reset when tab is clicked
+  // Set initial tool from props on mount
   useEffect(() => {
-    setActiveTool(initialTool);
-  }, [initialTool]);
+    if (initialTool) {
+      setActiveTool(initialTool);
+    }
+  }, []);
 
   const isToolAvailable = (tool: Tool) => {
     if (tool.stages && !tool.stages.includes(lifeStage || '')) {
