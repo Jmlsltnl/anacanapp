@@ -33,6 +33,7 @@ import NameVotingScreen from '@/components/partner/NameVotingScreen';
 import PartnerHospitalBagScreen from '@/components/partner/PartnerHospitalBagScreen';
 import DailySummaryScreen from '@/components/partner/DailySummaryScreen';
 import { SOSAlertReceiver } from '@/components/partner/SOSButton';
+import AppRatingPrompt from '@/components/AppRatingPrompt';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useDeviceToken } from '@/hooks/useDeviceToken';
@@ -327,6 +328,9 @@ const Index = () => {
 
   return (
     <div className="fixed inset-0 flex flex-col bg-background overflow-hidden">
+      {/* App Rating Prompt */}
+      <AppRatingPrompt />
+      
       {/* SOS Alert Receiver for partners */}
       {role === 'partner' && <SOSAlertReceiver />}
       
