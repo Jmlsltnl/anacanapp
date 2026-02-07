@@ -35,6 +35,7 @@ import QuickActionsBar from '@/components/mommy/QuickActionsBar';
 import QuickStatsWidget from '@/components/mommy/QuickStatsWidget';
 import GrowthTrackerWidget from '@/components/mommy/GrowthTrackerWidget';
 import DevelopmentTipsWidget from '@/components/mommy/DevelopmentTipsWidget';
+import BabyCrisisWidget from '@/components/mommy/BabyCrisisWidget';
 import BannerSlot from '@/components/banners/BannerSlot';
 import SendDailySummaryWidget from '@/components/partner/SendDailySummaryWidget';
 import RecentBlogPosts from '@/components/dashboard/RecentBlogPosts';
@@ -1513,6 +1514,12 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           </div>
         </div>
       </motion.div>
+
+      {/* Baby Crisis Calendar Widget */}
+      <BabyCrisisWidget 
+        babyAgeWeeks={Math.floor(babyData.ageInDays / 7)} 
+        babyName={babyData.name} 
+      />
 
       {/* Weekly Stats Overview */}
       <QuickStatsWidget />
