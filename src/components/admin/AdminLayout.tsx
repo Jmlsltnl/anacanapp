@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Package, Settings, BarChart3, Shield, 
   ChevronLeft, Menu, LogOut, Bell, Search,
-  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store, ShieldAlert, BookHeart, MapPin, Gamepad2, Zap, Lightbulb, Megaphone, UtensilsCrossed, Heart, HelpCircle, Sparkles, ShoppingCart, Brain, Calculator
+  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store, ShieldAlert, BookHeart, MapPin, Gamepad2, Zap, Lightbulb, Megaphone, UtensilsCrossed, Heart, HelpCircle, Sparkles, ShoppingCart, Brain, Calculator, Calendar
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,6 +43,8 @@ const menuItems = [
   { id: 'tools', label: 'Alətlər Sıralaması', icon: Wrench },
   { id: 'default-shopping', label: 'Default Alışveriş Siyahısı', icon: ShoppingCart },
   { id: 'maternity', label: 'Dekret Kalkulyatoru', icon: Calculator },
+  { id: 'baby-illustrations', label: 'Körpə İllustrasiyaları', icon: Baby },
+  { id: 'crisis-calendar', label: 'Kriz Təqvimi', icon: Calendar },
   { id: 'content', label: 'Digər Kontent', icon: FileText },
   { id: 'products', label: 'Məhsullar', icon: Package },
   { id: 'affiliate', label: 'Affiliate Məhsullar', icon: ShoppingBag },

@@ -25,6 +25,8 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useTrimesterTips } from '@/hooks/useTrimesterTips';
 import { useFlowSymptoms, useFlowPhaseTips, useFlowInsights } from '@/hooks/useFlowData';
+import { useBabyIllustrationByMonth } from '@/hooks/useBabyMonthIllustrations';
+import { useCurrentBabyCrisis, useUpcomingBabyCrises } from '@/hooks/useBabyCrisisPeriods';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { formatDateAz } from '@/lib/date-utils';
 import { getPregnancyDay, getDaysUntilDue, getDaysElapsed, getPregnancyProgress } from '@/lib/pregnancy-utils';

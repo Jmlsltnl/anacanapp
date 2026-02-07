@@ -299,6 +299,45 @@ export type Database = {
         }
         Relationships: []
       }
+      app_rating_prompts: {
+        Row: {
+          created_at: string
+          first_shown_at: string
+          id: string
+          last_action: string
+          last_shown_at: string
+          platform: string | null
+          rated_at: string | null
+          show_count: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          first_shown_at?: string
+          id?: string
+          last_action?: string
+          last_shown_at?: string
+          platform?: string | null
+          rated_at?: string | null
+          show_count?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          first_shown_at?: string
+          id?: string
+          last_action?: string
+          last_shown_at?: string
+          platform?: string | null
+          rated_at?: string | null
+          show_count?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           created_at: string
@@ -392,6 +431,75 @@ export type Database = {
           reminder_enabled?: boolean | null
           title?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      baby_crisis_periods: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          description_az: string | null
+          duration_days: number | null
+          emoji: string | null
+          id: string
+          is_active: boolean
+          leap_number: number | null
+          severity: string | null
+          sort_order: number
+          symptoms: string[] | null
+          symptoms_az: string[] | null
+          tips: string[] | null
+          tips_az: string[] | null
+          title: string
+          title_az: string | null
+          updated_at: string
+          week_end: number
+          week_start: number
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          description_az?: string | null
+          duration_days?: number | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean
+          leap_number?: number | null
+          severity?: string | null
+          sort_order?: number
+          symptoms?: string[] | null
+          symptoms_az?: string[] | null
+          tips?: string[] | null
+          tips_az?: string[] | null
+          title: string
+          title_az?: string | null
+          updated_at?: string
+          week_end: number
+          week_start: number
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          description_az?: string | null
+          duration_days?: number | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean
+          leap_number?: number | null
+          severity?: string | null
+          sort_order?: number
+          symptoms?: string[] | null
+          symptoms_az?: string[] | null
+          tips?: string[] | null
+          tips_az?: string[] | null
+          title?: string
+          title_az?: string | null
+          updated_at?: string
+          week_end?: number
+          week_start?: number
         }
         Relationships: []
       }
@@ -530,6 +638,48 @@ export type Database = {
           milestone_key?: string
           sort_order?: number | null
           week_number?: number
+        }
+        Relationships: []
+      }
+      baby_month_illustrations: {
+        Row: {
+          created_at: string
+          description: string | null
+          description_az: string | null
+          id: string
+          image_url: string
+          is_active: boolean
+          month_number: number
+          sort_order: number
+          title: string | null
+          title_az: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          description_az?: string | null
+          id?: string
+          image_url: string
+          is_active?: boolean
+          month_number: number
+          sort_order?: number
+          title?: string | null
+          title_az?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          description_az?: string | null
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          month_number?: number
+          sort_order?: number
+          title?: string | null
+          title_az?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -6540,6 +6690,37 @@ export type Database = {
           name: string
           user_id: string
         }[]
+      }
+      get_baby_crisis: {
+        Args: { baby_age_weeks: number }
+        Returns: {
+          color: string | null
+          created_at: string
+          description: string | null
+          description_az: string | null
+          duration_days: number | null
+          emoji: string | null
+          id: string
+          is_active: boolean
+          leap_number: number | null
+          severity: string | null
+          sort_order: number
+          symptoms: string[] | null
+          symptoms_az: string[] | null
+          tips: string[] | null
+          tips_az: string[] | null
+          title: string
+          title_az: string | null
+          updated_at: string
+          week_end: number
+          week_start: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "baby_crisis_periods"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       get_user_linked_partner_id: {
         Args: { _user_id: string }

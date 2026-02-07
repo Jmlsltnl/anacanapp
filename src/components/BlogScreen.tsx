@@ -8,6 +8,7 @@ import {
 import { useBlog, BlogPost, BlogCategory } from '@/hooks/useBlog';
 import { useSavedPosts } from '@/hooks/useBlogInteractions';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -33,15 +34,35 @@ const BlogScreen = ({ onBack, initialSlug }: BlogScreenProps) => {
   const [openedFromHome, setOpenedFromHome] = useState(false);
 
   // Set initial post when posts load and initialSlug is provided
+  // Also increment view count when opening a post
   useEffect(() => {
+    const incrementView = async (postId: string) => {
+      try {
+        await supabase.rpc('increment_blog_view_count', { post_id: postId });
+      } catch (error) {
+        console.error('Failed to increment view count:', error);
+      }
+    };
+
     if (initialSlug && posts.length > 0 && !selectedPost) {
       const post = posts.find(p => p.slug === initialSlug);
       if (post) {
         setSelectedPost(post);
-        setOpenedFromHome(true); // Mark that we came from home screen
+        setOpenedFromHome(true);
+        incrementView(post.id);
       }
     }
   }, [initialSlug, posts, selectedPost]);
+
+  // Increment view count when selecting a post from list
+  const handleSelectPost = async (post: BlogPost) => {
+    setSelectedPost(post);
+    try {
+      await supabase.rpc('increment_blog_view_count', { post_id: post.id });
+    } catch (error) {
+      console.error('Failed to increment view count:', error);
+    }
+  };
 
   const savedPostsList = posts.filter(p => savedPosts.includes(p.id));
 
@@ -85,8 +106,8 @@ const BlogScreen = ({ onBack, initialSlug }: BlogScreenProps) => {
         allPosts={posts}
         onBack={handleBackFromPost}
         onSelectPost={(post) => {
-          setSelectedPost(post);
-          setOpenedFromHome(false); // If selecting another post, we're now in blog flow
+          handleSelectPost(post);
+          setOpenedFromHome(false);
         }}
       />
     );
@@ -249,7 +270,7 @@ const BlogScreen = ({ onBack, initialSlug }: BlogScreenProps) => {
                   initial={{ opacity: 0, x: 30 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.35 + index * 0.1 }}
-                  onClick={() => setSelectedPost(post)}
+                  onClick={() => handleSelectPost(post)}
                   className="shrink-0 w-72 bg-card rounded-2xl overflow-hidden shadow-lg border border-border/50 text-left group"
                 >
                   <div className="relative">
@@ -349,7 +370,7 @@ const BlogScreen = ({ onBack, initialSlug }: BlogScreenProps) => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.45 + index * 0.03 }}
-                  onClick={() => setSelectedPost(post)}
+                  onClick={() => handleSelectPost(post)}
                   className="w-full bg-card rounded-2xl p-3 flex gap-4 shadow-sm border border-border/50 text-left hover:shadow-md transition-all group"
                 >
                   <div className="relative shrink-0">

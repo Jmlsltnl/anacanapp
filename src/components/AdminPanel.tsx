@@ -46,6 +46,8 @@ import AdminPartnerConfig from './admin/AdminPartnerConfig';
 import AdminDefaultShoppingItems from './admin/AdminDefaultShoppingItems';
 import AdminPremiumConfig from './admin/AdminPremiumConfig';
 import AdminMaternityBenefits from './admin/AdminMaternityBenefits';
+import AdminBabyIllustrations from './admin/AdminBabyIllustrations';
+import AdminBabyCrisisCalendar from './admin/AdminBabyCrisisCalendar';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -146,6 +148,10 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminPremiumConfig />;
       case 'maternity':
         return <AdminMaternityBenefits />;
+      case 'baby-illustrations':
+        return <AdminBabyIllustrations />;
+      case 'crisis-calendar':
+        return <AdminBabyCrisisCalendar />;
       case 'security':
         return <AdminSecurity />;
       default:
