@@ -1135,72 +1135,135 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
     }
   };
 
+  // Calculate exact age in months and days
+  const exactMonths = Math.floor(babyData.ageInDays / 30);
+  const remainingDays = babyData.ageInDays % 30;
+
   return (
-    <div className="space-y-2">
-      {/* Baby Hero Card */}
+    <div className="space-y-3">
+      {/* Premium Baby Hero Card */}
       <motion.div 
-        className="relative overflow-hidden rounded-[1.5rem] gradient-primary p-5 text-white shadow-elevated"
+        className="relative overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-primary via-primary to-primary/90 shadow-elevated"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10 blur-2xl" />
+        {/* Decorative elements */}
+        <div className="absolute -top-20 -right-20 w-56 h-56 rounded-full bg-white/10 blur-3xl" />
+        <div className="absolute -bottom-16 -left-16 w-40 h-40 rounded-full bg-white/5 blur-2xl" />
+        <div className="absolute top-4 right-4 w-20 h-20 rounded-full bg-white/5 blur-xl" />
         
-        <div className="relative z-10">
-          <div className="flex items-center gap-4">
+        {/* Floating particles */}
+        <motion.div 
+          className="absolute top-8 right-16 w-2 h-2 rounded-full bg-white/30"
+          animate={{ y: [-5, 5, -5], opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 4, repeat: Infinity }}
+        />
+        <motion.div 
+          className="absolute bottom-12 right-8 w-1.5 h-1.5 rounded-full bg-white/20"
+          animate={{ y: [5, -5, 5], opacity: [0.2, 0.5, 0.2] }}
+          transition={{ duration: 3, repeat: Infinity, delay: 1 }}
+        />
+        
+        <div className="relative z-10 p-5">
+          <div className="flex items-stretch gap-4">
+            {/* Baby Illustration */}
             <motion.div 
-              className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center overflow-hidden"
-              animate={{ scale: [1, 1.02, 1] }}
-              transition={{ duration: 3, repeat: Infinity }}
+              className="relative w-28 h-28 flex-shrink-0"
+              animate={{ y: [0, -3, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             >
-              <img 
-                src={babyIllustration} 
-                alt={`${babyData.ageInMonths} aylıq körpə`}
-                className="w-full h-full object-contain p-1"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/placeholder.svg';
-                }}
-              />
-            </motion.div>
-            <div className="flex-1">
-              <h2 className="text-2xl font-black">{babyData.name}</h2>
-              <p className="text-white/90 mt-0.5 font-medium text-base">
-                {babyData.ageInMonths > 0 ? `${babyData.ageInMonths} aylıq` : `${babyData.ageInDays} günlük`}
-              </p>
-              <div className="flex items-center gap-2 mt-2">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span className="text-xs text-white/80 line-clamp-1">
-                  {illustrationDescription || getBabyDailyFunFact(babyData.ageInDays)}
-                </span>
+              <div className="absolute inset-0 rounded-[1.25rem] bg-white/20 backdrop-blur-sm" />
+              <div className="absolute inset-1 rounded-[1rem] bg-white/30 overflow-hidden flex items-center justify-center">
+                <img 
+                  src={babyIllustration} 
+                  alt={`${babyData.ageInMonths} aylıq körpə`}
+                  className="w-full h-full object-contain p-2 drop-shadow-lg"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/placeholder.svg';
+                  }}
+                />
               </div>
+              {/* Age badge */}
+              <motion.div 
+                className="absolute -bottom-2 -right-2 bg-white rounded-full px-2.5 py-1 shadow-lg"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.3, type: "spring" }}
+              >
+                <span className="text-xs font-black text-primary">
+                  {exactMonths > 0 ? `${exactMonths}ay` : `${babyData.ageInDays}g`}
+                </span>
+              </motion.div>
+            </motion.div>
+
+            {/* Baby Info */}
+            <div className="flex-1 flex flex-col justify-center text-white min-w-0">
+              <motion.div
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 }}
+              >
+                <h2 className="text-2xl font-black tracking-tight truncate">{babyData.name}</h2>
+              </motion.div>
+              
+              <motion.div 
+                className="flex items-center gap-2 mt-1.5"
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span className="text-sm font-bold">
+                    {exactMonths > 0 ? (
+                      <>
+                        {exactMonths} ay {remainingDays > 0 && `${remainingDays} gün`}
+                      </>
+                    ) : (
+                      `${babyData.ageInDays} günlük`
+                    )}
+                  </span>
+                </div>
+              </motion.div>
+
+              <motion.div 
+                className="flex items-start gap-2 mt-3"
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <Sparkles className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-white/80" />
+                <p className="text-xs text-white/85 leading-relaxed line-clamp-2">
+                  {illustrationDescription || getBabyDailyFunFact(babyData.ageInDays)}
+                </p>
+              </motion.div>
             </div>
           </div>
         </div>
       </motion.div>
 
-      {/* Baby Month Info Card - Shows when illustration has description */}
-      {illustrationDescription && (
+      {/* Baby Development Info Card */}
+      {illustrationTitle && (
         <motion.div
-          className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
+          className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 dark:from-primary/10 dark:via-primary/15 dark:to-primary/10 rounded-2xl p-4 border border-primary/20"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.05 }}
+          transition={{ delay: 0.1 }}
         >
           <div className="flex items-start gap-3">
-            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <img 
-                src={babyIllustration} 
-                alt=""
-                className="w-8 h-8 object-contain"
-              />
+            <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0 border border-primary/20">
+              <Baby className="w-6 h-6 text-primary" />
             </div>
-            <div>
+            <div className="flex-1 min-w-0">
               <h3 className="font-bold text-sm text-foreground">
-                {illustrationTitle || `${babyData.ageInMonths} aylıq körpə`}
+                {illustrationTitle}
               </h3>
-              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                {illustrationDescription}
-              </p>
+              {illustrationDescription && (
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed line-clamp-3">
+                  {illustrationDescription}
+                </p>
+              )}
             </div>
           </div>
         </motion.div>
