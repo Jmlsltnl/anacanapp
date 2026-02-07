@@ -1141,105 +1141,126 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
 
   return (
     <div className="space-y-3">
-      {/* Premium Baby Hero Card */}
+      {/* Premium Baby Hero Card - Modern Glassmorphism Design */}
       <motion.div 
-        className="relative overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-primary via-primary to-primary/90 shadow-elevated"
+        className="relative overflow-hidden rounded-[2rem]"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Decorative elements */}
-        <div className="absolute -top-20 -right-20 w-56 h-56 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute -bottom-16 -left-16 w-40 h-40 rounded-full bg-white/5 blur-2xl" />
-        <div className="absolute top-4 right-4 w-20 h-20 rounded-full bg-white/5 blur-xl" />
+        {/* Background gradient layers */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/80" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/20 via-transparent to-transparent" />
         
-        {/* Floating particles */}
-        <motion.div 
-          className="absolute top-8 right-16 w-2 h-2 rounded-full bg-white/30"
-          animate={{ y: [-5, 5, -5], opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 4, repeat: Infinity }}
-        />
-        <motion.div 
-          className="absolute bottom-12 right-8 w-1.5 h-1.5 rounded-full bg-white/20"
-          animate={{ y: [5, -5, 5], opacity: [0.2, 0.5, 0.2] }}
-          transition={{ duration: 3, repeat: Infinity, delay: 1 }}
-        />
+        {/* Decorative orbs */}
+        <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-white/10 blur-3xl" />
+        <div className="absolute -bottom-20 -left-20 w-48 h-48 rounded-full bg-black/5 blur-2xl" />
         
-        <div className="relative z-10 p-5">
-          <div className="flex items-stretch gap-4">
-            {/* Baby Illustration */}
-            <motion.div 
-              className="relative w-28 h-28 flex-shrink-0"
-              animate={{ y: [0, -3, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <div className="absolute inset-0 rounded-[1.25rem] bg-white/20 backdrop-blur-sm" />
-              <div className="absolute inset-1 rounded-[1rem] bg-white/30 overflow-hidden flex items-center justify-center">
-                <img 
-                  src={babyIllustration} 
-                  alt={`${babyData.ageInMonths} aylıq körpə`}
-                  className="w-full h-full object-contain p-2 drop-shadow-lg"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/placeholder.svg';
-                  }}
-                />
-              </div>
-              {/* Age badge */}
-              <motion.div 
-                className="absolute -bottom-2 -right-2 bg-white rounded-full px-2.5 py-1 shadow-lg"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.3, type: "spring" }}
-              >
-                <span className="text-xs font-black text-primary">
-                  {exactMonths > 0 ? `${exactMonths}ay` : `${babyData.ageInDays}g`}
+        <div className="relative z-10 p-4 pt-5">
+          {/* Top section with name and age */}
+          <motion.div 
+            className="flex items-center justify-between mb-4"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <div>
+              <h2 className="text-2xl font-black text-white tracking-tight">{babyData.name}</h2>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-white/70 text-sm">
+                  {exactMonths > 0 ? (
+                    <span className="font-medium">
+                      <span className="text-white font-bold">{exactMonths}</span> ay{' '}
+                      {remainingDays > 0 && (
+                        <>
+                          <span className="text-white font-bold">{remainingDays}</span> gün
+                        </>
+                      )}
+                    </span>
+                  ) : (
+                    <span className="font-medium">
+                      <span className="text-white font-bold">{babyData.ageInDays}</span> günlük
+                    </span>
+                  )}
                 </span>
-              </motion.div>
+              </div>
+            </div>
+            
+            {/* Age badge - pill style */}
+            <motion.div 
+              className="bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-2 shadow-lg"
+              initial={{ scale: 0, rotate: -10 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+            >
+              <div className="text-center">
+                <span className="text-2xl font-black text-primary">{exactMonths || babyData.ageInDays}</span>
+                <span className="text-xs font-bold text-primary/70 ml-0.5">{exactMonths > 0 ? 'ay' : 'gün'}</span>
+              </div>
             </motion.div>
+          </motion.div>
 
-            {/* Baby Info */}
-            <div className="flex-1 flex flex-col justify-center text-white min-w-0">
-              <motion.div
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 }}
-              >
-                <h2 className="text-2xl font-black tracking-tight truncate">{babyData.name}</h2>
-              </motion.div>
+          {/* Center: Large Baby Illustration */}
+          <motion.div 
+            className="flex justify-center mb-4"
+            animate={{ y: [0, -4, 0] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <div className="relative">
+              {/* Glow effect behind image */}
+              <div className="absolute inset-4 bg-white/30 rounded-full blur-2xl" />
               
-              <motion.div 
-                className="flex items-center gap-2 mt-1.5"
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span className="text-sm font-bold">
-                    {exactMonths > 0 ? (
-                      <>
-                        {exactMonths} ay {remainingDays > 0 && `${remainingDays} gün`}
-                      </>
-                    ) : (
-                      `${babyData.ageInDays} günlük`
-                    )}
-                  </span>
+              {/* Image container */}
+              <div className="relative w-36 h-36 rounded-[1.5rem] bg-white/25 backdrop-blur-md p-1 shadow-xl">
+                <div className="w-full h-full rounded-[1.25rem] bg-white/40 overflow-hidden flex items-center justify-center">
+                  <img 
+                    src={babyIllustration} 
+                    alt={`${babyData.ageInMonths} aylıq körpə`}
+                    className="w-full h-full object-contain p-3 drop-shadow-xl"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/placeholder.svg';
+                    }}
+                  />
                 </div>
-              </motion.div>
-
+              </div>
+              
+              {/* Floating sparkle decorations */}
               <motion.div 
-                className="flex items-start gap-2 mt-3"
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
+                className="absolute -top-1 -right-1 text-lg"
+                animate={{ rotate: [0, 15, 0], scale: [1, 1.1, 1] }}
+                transition={{ duration: 3, repeat: Infinity }}
               >
-                <Sparkles className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-white/80" />
-                <p className="text-xs text-white/85 leading-relaxed line-clamp-2">
-                  {illustrationDescription || getBabyDailyFunFact(babyData.ageInDays)}
-                </p>
+                ✨
+              </motion.div>
+              <motion.div 
+                className="absolute -bottom-1 -left-1 text-sm"
+                animate={{ rotate: [0, -15, 0], scale: [1, 1.15, 1] }}
+                transition={{ duration: 2.5, repeat: Infinity, delay: 0.5 }}
+              >
+                💫
               </motion.div>
             </div>
-          </div>
+          </motion.div>
+
+          {/* Bottom: Daily insight */}
+          <motion.div 
+            className="bg-white/15 backdrop-blur-md rounded-2xl p-3"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <div className="flex items-start gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-4 h-4 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-medium text-white/60 uppercase tracking-wide mb-0.5">Günün məlumatı</p>
+                <p className="text-sm text-white/95 leading-relaxed line-clamp-2 font-medium">
+                  {illustrationDescription || getBabyDailyFunFact(babyData.ageInDays)}
+                </p>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </motion.div>
 
