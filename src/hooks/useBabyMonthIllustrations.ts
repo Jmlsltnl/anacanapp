@@ -1,6 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+// Default placeholder for months without illustrations
+export const DEFAULT_BABY_ILLUSTRATION = '/placeholder.svg';
+
 export interface BabyMonthIllustration {
   id: string;
   month_number: number;
@@ -34,7 +37,8 @@ export const useBabyMonthIllustrations = () => {
 
 export const useBabyIllustrationByMonth = (monthNumber: number) => {
   const { data: illustrations = [] } = useBabyMonthIllustrations();
-  return illustrations.find(i => i.month_number === monthNumber);
+  const illustration = illustrations.find(i => i.month_number === monthNumber);
+  return illustration?.image_url || DEFAULT_BABY_ILLUSTRATION;
 };
 
 // Admin hooks

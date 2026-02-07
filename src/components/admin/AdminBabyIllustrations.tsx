@@ -54,13 +54,13 @@ const AdminBabyIllustrations = () => {
       const filePath = `baby-illustrations/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('public-assets')
+        .from('assets')
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
-        .from('public-assets')
+        .from('assets')
         .getPublicUrl(filePath);
 
       setFormData(prev => ({ ...prev, image_url: publicUrl }));
