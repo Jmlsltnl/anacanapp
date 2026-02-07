@@ -940,6 +940,10 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   const { activeTimers, startTimer, stopTimer, getElapsedSeconds, getActiveTimer } = useTimerStore();
   const { todayLogs, addLog, getTodayStats, refetch } = useBabyLogs();
   
+  // Get baby illustration for current month
+  const babyAgeMonths = babyData?.ageInMonths || 1;
+  const { imageUrl: babyIllustration, title: illustrationTitle, description: illustrationDescription } = useBabyIllustrationByMonth(Math.max(1, Math.min(36, babyAgeMonths)));
+  
   // Current time for timer display
   const [, setTick] = useState(0);
   
@@ -1145,25 +1149,62 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         <div className="relative z-10">
           <div className="flex items-center gap-4">
             <motion.div 
-              className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-5xl"
-              animate={{ rotate: [0, -5, 5, 0] }}
+              className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center overflow-hidden"
+              animate={{ scale: [1, 1.02, 1] }}
               transition={{ duration: 3, repeat: Infinity }}
             >
-              {babyData.gender === 'boy' ? '👶🏻' : '👶🏻'}
+              <img 
+                src={babyIllustration} 
+                alt={`${babyData.ageInMonths} aylıq körpə`}
+                className="w-full h-full object-contain p-1"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/placeholder.svg';
+                }}
+              />
             </motion.div>
-            <div>
+            <div className="flex-1">
               <h2 className="text-2xl font-black">{babyData.name}</h2>
               <p className="text-white/90 mt-0.5 font-medium text-base">
                 {babyData.ageInMonths > 0 ? `${babyData.ageInMonths} aylıq` : `${babyData.ageInDays} günlük`}
               </p>
               <div className="flex items-center gap-2 mt-2">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span className="text-xs text-white/80">{getBabyDailyFunFact(babyData.ageInDays)}</span>
+                <span className="text-xs text-white/80 line-clamp-1">
+                  {illustrationDescription || getBabyDailyFunFact(babyData.ageInDays)}
+                </span>
               </div>
             </div>
           </div>
         </div>
       </motion.div>
+
+      {/* Baby Month Info Card - Shows when illustration has description */}
+      {illustrationDescription && (
+        <motion.div
+          className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.05 }}
+        >
+          <div className="flex items-start gap-3">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <img 
+                src={babyIllustration} 
+                alt=""
+                className="w-8 h-8 object-contain"
+              />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm text-foreground">
+                {illustrationTitle || `${babyData.ageInMonths} aylıq körpə`}
+              </h3>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                {illustrationDescription}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Quick Actions Bar */}
       <QuickActionsBar onNavigateToTool={onNavigateToTool} />

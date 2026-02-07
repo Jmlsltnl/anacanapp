@@ -38,7 +38,12 @@ export const useBabyMonthIllustrations = () => {
 export const useBabyIllustrationByMonth = (monthNumber: number) => {
   const { data: illustrations = [] } = useBabyMonthIllustrations();
   const illustration = illustrations.find(i => i.month_number === monthNumber);
-  return illustration?.image_url || DEFAULT_BABY_ILLUSTRATION;
+  return {
+    imageUrl: illustration?.image_url || DEFAULT_BABY_ILLUSTRATION,
+    title: illustration?.title_az || illustration?.title || null,
+    description: illustration?.description_az || illustration?.description || null,
+    hasIllustration: !!illustration
+  };
 };
 
 // Admin hooks
