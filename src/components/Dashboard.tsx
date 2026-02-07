@@ -1269,20 +1269,25 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
 
           {/* Bottom: Monthly insight */}
           <motion.div 
-            className="bg-white/20 backdrop-blur-lg rounded-2xl p-4 border border-white/20"
+            className="bg-gradient-to-br from-white/25 to-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/30 shadow-lg"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-7 h-7 rounded-lg bg-white/25 flex items-center justify-center">
-                <Calendar className="w-3.5 h-3.5 text-white" />
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className="w-8 h-8 rounded-xl bg-white/30 flex items-center justify-center shadow-sm">
+                <Calendar className="w-4 h-4 text-white" />
               </div>
-              <p className="text-xs font-bold text-white uppercase tracking-wide">
-                Bu ay nə baş verir?
-              </p>
+              <div>
+                <p className="text-[10px] font-semibold text-white/70 uppercase tracking-widest">
+                  {exactMonths > 0 ? `${exactMonths}. Ay` : 'Yenidoğulmuş'}
+                </p>
+                <p className="text-sm font-bold text-white">
+                  Bu ay nə baş verir?
+                </p>
+              </div>
             </div>
-            <p className="text-sm text-white leading-relaxed font-medium">
+            <p className="text-[13px] text-white/95 leading-[1.7] font-medium pl-[42px]">
               {illustrationDescription || getBabyDailyFunFact(babyData.ageInDays)}
             </p>
           </motion.div>
