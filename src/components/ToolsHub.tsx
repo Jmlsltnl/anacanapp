@@ -41,6 +41,7 @@ import FairyTaleGenerator from './tools/FairyTaleGenerator';
 import HoroscopeCompatibility from './tools/HoroscopeCompatibility';
 import BabyGrowthTracker from './tools/BabyGrowthTracker';
 import MaternityCalculator from './tools/MaternityCalculator';
+import TeethingTracker from './tools/TeethingTracker';
 import { PremiumModal } from './PremiumModal';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
@@ -321,6 +322,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   if (activeTool === 'baby-growth' || activeTool === 'growth-tracker') return <BabyGrowthTracker onBack={handleBack} />;
   if (activeTool === 'affiliate' || activeTool === 'affiliate-products') return <AffiliateProducts onBack={handleBack} />;
   if (activeTool === 'maternity-calculator' || activeTool === 'maternity') return <MaternityCalculator onBack={handleBack} />;
+  if (activeTool === 'teething' || activeTool === 'teething-tracker') return <TeethingTracker onBack={handleBack} />;
 
   const getLifeStageInfo = () => {
     switch (lifeStage) {
