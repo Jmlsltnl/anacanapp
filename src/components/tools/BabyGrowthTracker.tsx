@@ -196,97 +196,90 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
     : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-rose-50/50 dark:from-rose-950/20 to-background pb-24">
-      {/* Premium Header */}
-      <div className="sticky top-0 z-20 isolate relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-rose-500 via-pink-500 to-fuchsia-600 pointer-events-none" />
-        <div className="absolute inset-0 opacity-20 pointer-events-none">
-          <div className="absolute top-8 right-8 w-32 h-32 rounded-full bg-white/30 blur-3xl" />
-          <div className="absolute bottom-4 left-8 w-24 h-24 rounded-full bg-fuchsia-300/30 blur-2xl" />
-        </div>
-        
-        <div className="relative px-4 pt-4 pb-8 safe-area-top">
-          <div className="flex items-center gap-3 mb-6 relative z-30">
+    <div className="min-h-screen bg-background pb-24">
+      {/* Compact Header */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
+        <div className="px-4 py-3 safe-area-top">
+          <div className="flex items-center gap-3">
             <motion.button
               onClick={onBack}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 relative z-30"
+              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
               whileTap={{ scale: 0.95 }}
             >
-              <ArrowLeft className="w-5 h-5 text-white" />
+              <ArrowLeft className="w-5 h-5 text-foreground" />
             </motion.button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-white flex items-center gap-2">
-                <Baby className="w-5 h-5" />
+              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Baby className="w-5 h-5 text-rose-500" />
                 Böyümə İzləmə
               </h1>
-              <p className="text-white/80 text-sm">Körpənizin inkişafını izləyin</p>
             </div>
             <motion.button
               onClick={() => setShowAddModal(true)}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 relative z-30"
+              className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center"
               whileTap={{ scale: 0.95 }}
             >
-              <Plus className="w-5 h-5 text-white" />
+              <Plus className="w-5 h-5 text-primary-foreground" />
             </motion.button>
-          </div>
-
-          {/* Current Stats Cards */}
-          <div className="grid grid-cols-3 gap-3">
-            <motion.div
-              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <Scale className="w-5 h-5 mx-auto mb-1 text-white/90" />
-              <p className="text-2xl font-black text-white">
-                {latestEntry?.weight_kg ? `${latestEntry.weight_kg}` : '—'}
-              </p>
-              <p className="text-xs text-white/70 font-medium">kq</p>
-              {weightChange !== null && weightChange !== 0 && (
-                <div className={`flex items-center justify-center gap-0.5 mt-1 text-xs font-semibold ${weightChange > 0 ? 'text-emerald-300' : 'text-red-300'}`}>
-                  {weightChange > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                  {weightChange > 0 ? '+' : ''}{weightChange.toFixed(2)}
-                </div>
-              )}
-            </motion.div>
-
-            <motion.div
-              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-            >
-              <Ruler className="w-5 h-5 mx-auto mb-1 text-white/90" />
-              <p className="text-2xl font-black text-white">
-                {latestEntry?.height_cm ? `${latestEntry.height_cm}` : '—'}
-              </p>
-              <p className="text-xs text-white/70 font-medium">sm</p>
-              {heightChange !== null && heightChange !== 0 && (
-                <div className={`flex items-center justify-center gap-0.5 mt-1 text-xs font-semibold ${heightChange > 0 ? 'text-emerald-300' : 'text-red-300'}`}>
-                  {heightChange > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                  {heightChange > 0 ? '+' : ''}{heightChange.toFixed(1)}
-                </div>
-              )}
-            </motion.div>
-
-            <motion.div
-              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Baby className="w-5 h-5 mx-auto mb-1 text-white/90" />
-              <p className="text-2xl font-black text-white">
-                {latestEntry?.head_cm ? `${latestEntry.head_cm}` : '—'}
-              </p>
-              <p className="text-xs text-white/70 font-medium">baş sm</p>
-            </motion.div>
           </div>
         </div>
       </div>
 
-      <div className="px-4 -mt-4 space-y-4">
+      <div className="px-4 pt-4">
+        {/* Current Stats Cards */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <motion.div
+            className="bg-rose-50 dark:bg-rose-500/10 rounded-2xl p-3 text-center border border-rose-100 dark:border-rose-500/20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <Scale className="w-5 h-5 mx-auto mb-1 text-rose-500" />
+            <p className="text-2xl font-black text-rose-600 dark:text-rose-400">
+              {latestEntry?.weight_kg ? `${latestEntry.weight_kg}` : '—'}
+            </p>
+            <p className="text-xs text-rose-600/70 dark:text-rose-400/70 font-medium">kq</p>
+            {weightChange !== null && weightChange !== 0 && (
+              <div className={`flex items-center justify-center gap-0.5 mt-1 text-xs font-semibold ${weightChange > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                {weightChange > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                {weightChange > 0 ? '+' : ''}{weightChange.toFixed(2)}
+              </div>
+            )}
+          </motion.div>
+
+          <motion.div
+            className="bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl p-3 text-center border border-indigo-100 dark:border-indigo-500/20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            <Ruler className="w-5 h-5 mx-auto mb-1 text-indigo-500" />
+            <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
+              {latestEntry?.height_cm ? `${latestEntry.height_cm}` : '—'}
+            </p>
+            <p className="text-xs text-indigo-600/70 dark:text-indigo-400/70 font-medium">sm</p>
+            {heightChange !== null && heightChange !== 0 && (
+              <div className={`flex items-center justify-center gap-0.5 mt-1 text-xs font-semibold ${heightChange > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                {heightChange > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                {heightChange > 0 ? '+' : ''}{heightChange.toFixed(1)}
+              </div>
+            )}
+          </motion.div>
+
+          <motion.div
+            className="bg-amber-50 dark:bg-amber-500/10 rounded-2xl p-3 text-center border border-amber-100 dark:border-amber-500/20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Baby className="w-5 h-5 mx-auto mb-1 text-amber-500" />
+            <p className="text-2xl font-black text-amber-600 dark:text-amber-400">
+              {latestEntry?.head_cm ? `${latestEntry.head_cm}` : '—'}
+            </p>
+            <p className="text-xs text-amber-600/70 dark:text-amber-400/70 font-medium">baş sm</p>
+          </motion.div>
+        </div>
+
         {/* History Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

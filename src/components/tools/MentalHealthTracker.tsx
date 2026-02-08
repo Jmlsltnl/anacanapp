@@ -207,70 +207,65 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
   const otherResources = resources.filter(r => !r.is_emergency);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-teal-50/50 dark:from-teal-950/20 to-background pb-24">
-      {/* Premium Header */}
-      <div className="sticky top-0 z-20 isolate overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-teal-500 via-cyan-500 to-emerald-500 pointer-events-none" />
-        <div className="absolute inset-0 opacity-20 pointer-events-none">
-          <div className="absolute top-8 right-8 w-32 h-32 rounded-full bg-white/30 blur-3xl" />
-          <div className="absolute bottom-4 left-8 w-24 h-24 rounded-full bg-emerald-300/30 blur-2xl" />
-        </div>
-        
-        <div className="relative px-4 pt-4 pb-6 safe-area-top">
-          <div className="flex items-center gap-3 mb-4 relative z-30">
+    <div className="min-h-screen bg-background pb-24">
+      {/* Compact Header */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
+        <div className="px-4 py-3 safe-area-top">
+          <div className="flex items-center gap-3">
             <motion.button
               onClick={onBack}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20"
+              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
               whileTap={{ scale: 0.95 }}
             >
-              <ArrowLeft className="w-5 h-5 text-white" />
+              <ArrowLeft className="w-5 h-5 text-foreground" />
             </motion.button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-white flex items-center gap-2">
-                <Heart className="w-5 h-5" />
+              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Brain className="w-5 h-5 text-teal-500" />
                 Sən Necəsən, Ana?
               </h1>
-              <p className="text-white/80 text-sm">Psixoloji sağlamlıq və dəstək</p>
             </div>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-3 gap-3">
-            <motion.div
-              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <Smile className="w-5 h-5 mx-auto mb-1 text-white/90" />
-              <p className="text-2xl font-black text-white">{moodCheckins.length}</p>
-              <p className="text-xs text-white/70 font-medium">Qeyd</p>
-            </motion.div>
-            <motion.div
-              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-            >
-              <Activity className="w-5 h-5 mx-auto mb-1 text-white/90" />
-              <p className="text-2xl font-black text-white">{moodTrend ? moodTrend.toFixed(1) : '—'}</p>
-              <p className="text-xs text-white/70 font-medium">Ortalama</p>
-            </motion.div>
-            <motion.div
-              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Calendar className="w-5 h-5 mx-auto mb-1 text-white/90" />
-              <p className="text-2xl font-black text-white">{epdsAssessments.length}</p>
-              <p className="text-xs text-white/70 font-medium">EPDS</p>
-            </motion.div>
           </div>
         </div>
       </div>
 
-      <div className="px-4 -mt-2 space-y-4">
+      <div className="px-4 pt-4">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <motion.div
+            className="bg-teal-50 dark:bg-teal-500/10 rounded-2xl p-3 text-center border border-teal-100 dark:border-teal-500/20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <Smile className="w-5 h-5 mx-auto mb-1 text-teal-500" />
+            <p className="text-2xl font-black text-teal-600 dark:text-teal-400">{moodCheckins.length}</p>
+            <p className="text-xs text-teal-600/70 dark:text-teal-400/70 font-medium">Qeyd</p>
+          </motion.div>
+          <motion.div
+            className="bg-cyan-50 dark:bg-cyan-500/10 rounded-2xl p-3 text-center border border-cyan-100 dark:border-cyan-500/20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            <Activity className="w-5 h-5 mx-auto mb-1 text-cyan-500" />
+            <p className="text-2xl font-black text-cyan-600 dark:text-cyan-400">{moodTrend ? moodTrend.toFixed(1) : '—'}</p>
+            <p className="text-xs text-cyan-600/70 dark:text-cyan-400/70 font-medium">Ortalama</p>
+          </motion.div>
+          <motion.div
+            className="bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl p-3 text-center border border-emerald-100 dark:border-emerald-500/20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Calendar className="w-5 h-5 mx-auto mb-1 text-emerald-500" />
+            <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{epdsAssessments.length}</p>
+            <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70 font-medium">EPDS</p>
+          </motion.div>
+        </div>
+      </div>
+
+      <div className="px-4 space-y-4">
         {/* EPDS Alert */}
         {shouldShowEPDSPrompt && !epdsAssessments.length && (
           <motion.div

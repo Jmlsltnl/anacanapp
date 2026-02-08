@@ -96,78 +96,70 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50/50 dark:from-emerald-950/20 to-background pb-24">
-      {/* Premium Header */}
-      <div className="sticky top-0 z-20 isolate overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 pointer-events-none" />
-        <div className="absolute inset-0 opacity-20 pointer-events-none">
-          <div className="absolute top-8 right-8 w-32 h-32 rounded-full bg-white/30 blur-3xl" />
-          <div className="absolute bottom-4 left-8 w-24 h-24 rounded-full bg-cyan-300/30 blur-2xl" />
-        </div>
-        
-        <div className="relative px-4 pt-4 pb-8 safe-area-top">
-          <div className="flex items-center gap-3 mb-4 relative z-30">
+    <div className="min-h-screen bg-background pb-24">
+      {/* Compact Header */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
+        <div className="px-4 py-3 safe-area-top">
+          <div className="flex items-center gap-3">
             <motion.button
               onClick={onBack}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20"
+              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
               whileTap={{ scale: 0.95 }}
             >
-              <ArrowLeft className="w-5 h-5 text-white" />
+              <ArrowLeft className="w-5 h-5 text-foreground" />
             </motion.button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-white flex items-center gap-2">
-                <Scale className="w-5 h-5" />
+              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Scale className="w-5 h-5 text-emerald-500" />
                 Çəki İzləyici
               </h1>
-              <p className="text-white/80 text-sm">AI analiz ilə çəki takibi</p>
             </div>
             <motion.button
               onClick={() => setShowAddForm(true)}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 relative z-30"
+              className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center"
               whileTap={{ scale: 0.95 }}
             >
-              <Plus className="w-5 h-5 text-white" />
+              <Plus className="w-5 h-5 text-primary-foreground" />
             </motion.button>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-3 gap-3">
-            <motion.div
-              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <Scale className="w-5 h-5 mx-auto mb-1 text-white/90" />
-              <p className="text-2xl font-black text-white">{currentWeight}</p>
-              <p className="text-xs text-white/70 font-medium">Hazırkı (kg)</p>
-            </motion.div>
-            <motion.div
-              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-              title="Başlanğıc çəkidən fərq"
-            >
-              <Activity className="w-5 h-5 mx-auto mb-1 text-white/90" />
-              <p className="text-2xl font-black text-white">{totalGain >= 0 ? '+' : ''}{totalGain.toFixed(1)}</p>
-              <p className="text-xs text-white/70 font-medium">Fərq (kg)</p>
-            </motion.div>
-            <motion.div
-              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Target className="w-5 h-5 mx-auto mb-1 text-white/90" />
-              <p className="text-2xl font-black text-white">{recommended.min}-{recommended.max}</p>
-              <p className="text-xs text-white/70 font-medium">Tövsiyə (kg)</p>
-            </motion.div>
           </div>
         </div>
       </div>
 
-      <div className="px-4 -mt-4">
+      <div className="px-4 pt-4">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <motion.div
+            className="bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl p-3 text-center border border-emerald-100 dark:border-emerald-500/20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <Scale className="w-5 h-5 mx-auto mb-1 text-emerald-500" />
+            <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{currentWeight}</p>
+            <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70 font-medium">Hazırkı (kg)</p>
+          </motion.div>
+          <motion.div
+            className="bg-cyan-50 dark:bg-cyan-500/10 rounded-2xl p-3 text-center border border-cyan-100 dark:border-cyan-500/20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            title="Başlanğıc çəkidən fərq"
+          >
+            <Activity className="w-5 h-5 mx-auto mb-1 text-cyan-500" />
+            <p className="text-2xl font-black text-cyan-600 dark:text-cyan-400">{totalGain >= 0 ? '+' : ''}{totalGain.toFixed(1)}</p>
+            <p className="text-xs text-cyan-600/70 dark:text-cyan-400/70 font-medium">Fərq (kg)</p>
+          </motion.div>
+          <motion.div
+            className="bg-violet-50 dark:bg-violet-500/10 rounded-2xl p-3 text-center border border-violet-100 dark:border-violet-500/20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Target className="w-5 h-5 mx-auto mb-1 text-violet-500" />
+            <p className="text-2xl font-black text-violet-600 dark:text-violet-400">{recommended.min}-{recommended.max}</p>
+            <p className="text-xs text-violet-600/70 dark:text-violet-400/70 font-medium">Tövsiyə (kg)</p>
+          </motion.div>
+        </div>
         {/* Status Card */}
         <motion.div
           className="bg-card rounded-3xl p-5 shadow-lg border border-border/50 mb-4"
