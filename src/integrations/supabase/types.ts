@@ -1047,6 +1047,7 @@ export type Database = {
           id: string
           is_featured: boolean | null
           is_published: boolean | null
+          life_stage: string | null
           likes_count: number | null
           reading_time: number | null
           saves_count: number | null
@@ -1068,6 +1069,7 @@ export type Database = {
           id?: string
           is_featured?: boolean | null
           is_published?: boolean | null
+          life_stage?: string | null
           likes_count?: number | null
           reading_time?: number | null
           saves_count?: number | null
@@ -1089,6 +1091,7 @@ export type Database = {
           id?: string
           is_featured?: boolean | null
           is_published?: boolean | null
+          life_stage?: string | null
           likes_count?: number | null
           reading_time?: number | null
           saves_count?: number | null
