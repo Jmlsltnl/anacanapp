@@ -1269,21 +1269,21 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
 
           {/* Bottom: Monthly insight */}
           <motion.div 
-            className="bg-gradient-to-br from-white/25 to-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/30 shadow-lg"
+            className="bg-amber-50 rounded-2xl p-4 border border-amber-200 shadow-lg"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
             {/* Header */}
-            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-white/20">
-              <div className="w-10 h-10 rounded-xl bg-white/30 flex items-center justify-center shadow-sm">
-                <Calendar className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-amber-200">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shadow-sm">
+                <Calendar className="w-5 h-5 text-amber-600" />
               </div>
               <div className="flex-1">
-                <p className="text-[10px] font-semibold text-white/60 uppercase tracking-widest mb-0.5">
+                <p className="text-[10px] font-semibold text-amber-500 uppercase tracking-widest mb-0.5">
                   {exactMonths > 0 ? `${exactMonths}. Ay` : 'Yenidoğulmuş'}
                 </p>
-                <p className="text-sm font-bold text-white">
+                <p className="text-sm font-bold text-amber-900">
                   Bu ay nə baş verir?
                 </p>
               </div>
@@ -1297,8 +1297,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 .slice(0, 4)
                 .map((sentence, index) => (
                   <div key={index} className="flex items-start gap-2.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-white/60 mt-2 flex-shrink-0" />
-                    <p className="text-[13px] text-white/95 leading-relaxed font-medium">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
+                    <p className="text-[13px] text-amber-800 leading-relaxed font-medium">
                       {sentence.trim()}
                     </p>
                   </div>
