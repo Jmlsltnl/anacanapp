@@ -31,6 +31,7 @@ const menuItems = [
   { id: 'vitamins', label: 'Vitaminlər', icon: Pill },
   { id: 'trimester-tips', label: 'Trimester Tövsiyələri', icon: Baby },
   { id: 'flow-content', label: 'Menstruasiya Məzmunu', icon: Baby },
+  { id: 'phase-tips', label: 'Faza Məsləhətləri', icon: Lightbulb },
   { id: 'photoshoot', label: 'Fotosessiya', icon: Camera },
   { id: 'dynamic-content', label: 'Dinamik Məzmun', icon: Layers },
   { id: 'recipes', label: 'Reseptlər', icon: UtensilsCrossed },
