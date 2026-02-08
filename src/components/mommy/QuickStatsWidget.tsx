@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Baby, Moon, Clock, TrendingUp, Droplets, Activity } from 'lucide-react';
 import { useBabyLogs } from '@/hooks/useBabyLogs';
-import { useUserStore } from '@/store/userStore';
+import { useChildren } from '@/hooks/useChildren';
 
 interface DayStats {
   date: string;
@@ -12,8 +12,7 @@ interface DayStats {
 
 const QuickStatsWidget = () => {
   const { logs } = useBabyLogs();
-  const { getBabyData } = useUserStore();
-  const babyData = getBabyData();
+  const { selectedChild } = useChildren();
 
   // Calculate last 7 days stats
   const getWeeklyStats = (): DayStats[] => {
