@@ -28,6 +28,7 @@ import { useFlowSymptoms, useFlowPhaseTips, useFlowInsights } from '@/hooks/useF
 import { useBabyIllustrationByMonth } from '@/hooks/useBabyMonthIllustrations';
 import { useCurrentBabyCrisis, useUpcomingBabyCrises } from '@/hooks/useBabyCrisisPeriods';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useChildren } from '@/hooks/useChildren';
 import { formatDateAz } from '@/lib/date-utils';
 import { getPregnancyDay, getDaysUntilDue, getDaysElapsed, getPregnancyProgress } from '@/lib/pregnancy-utils';
 import FeedingHistoryPanel from '@/components/baby/FeedingHistoryPanel';
@@ -36,6 +37,8 @@ import QuickStatsWidget from '@/components/mommy/QuickStatsWidget';
 import GrowthTrackerWidget from '@/components/mommy/GrowthTrackerWidget';
 import DevelopmentTipsWidget from '@/components/mommy/DevelopmentTipsWidget';
 import BabyCrisisWidget from '@/components/mommy/BabyCrisisWidget';
+import ChildSelector from '@/components/mommy/ChildSelector';
+import TeethingWidget from '@/components/mommy/TeethingWidget';
 import BannerSlot from '@/components/banners/BannerSlot';
 import SendDailySummaryWidget from '@/components/partner/SendDailySummaryWidget';
 import RecentBlogPosts from '@/components/dashboard/RecentBlogPosts';
@@ -674,9 +677,11 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   const { unlockAchievement, getTotalPoints } = useAchievements();
   const { activeTimers, startTimer, stopTimer, getElapsedSeconds, getActiveTimer } = useTimerStore();
   const { todayLogs, addLog, getTodayStats, refetch } = useBabyLogs();
+  const { children, selectedChild, hasChildren, getChildAge } = useChildren();
   
-  // Get baby illustration for current month
-  const babyAgeMonths = babyData?.ageInMonths || 1;
+  // Get baby illustration for current month - use selected child's age if available
+  const childAge = selectedChild ? getChildAge(selectedChild) : null;
+  const babyAgeMonths = childAge?.months || babyData?.ageInMonths || 1;
   const { imageUrl: babyIllustration, title: illustrationTitle, description: illustrationDescription } = useBabyIllustrationByMonth(Math.max(1, Math.min(36, babyAgeMonths)));
   
   // Current time for timer display
@@ -1069,6 +1074,20 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           </div>
         </motion.div>
       )}
+
+      {/* Child Selector - for multiple children */}
+      {hasChildren && (
+        <motion.div 
+          className="flex items-center justify-between"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <ChildSelector />
+        </motion.div>
+      )}
+
+      {/* Teething Widget */}
+      <TeethingWidget onOpen={() => onNavigateToTool?.('teething')} />
 
       {/* Quick Actions Bar */}
       <QuickActionsBar onNavigateToTool={onNavigateToTool} />
