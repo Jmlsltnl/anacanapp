@@ -319,61 +319,52 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
   }
 
   return (
-    <div ref={ref} className="min-h-screen bg-gradient-to-b from-orange-50/50 dark:from-orange-950/20 to-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
-      {/* Premium Header */}
-      <div className="sticky top-0 z-20 isolate overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-500 via-amber-500 to-yellow-500 pointer-events-none" />
-        <div className="absolute inset-0 opacity-20 pointer-events-none">
-          <div className="absolute top-8 right-8 w-32 h-32 rounded-full bg-white/30 blur-3xl" />
-          <div className="absolute bottom-4 left-8 w-24 h-24 rounded-full bg-yellow-300/30 blur-2xl" />
-        </div>
-        
-        <div className="relative px-4 pt-4 pb-6 safe-area-top">
-          <div className="flex items-center gap-3 mb-4 relative z-30">
+    <div ref={ref} className="min-h-screen bg-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
+      {/* Minimalist Header */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50 safe-area-top">
+        <div className="px-4 py-3">
+          <div className="flex items-center gap-3">
             <motion.button
               onClick={onBack}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20"
+              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
               whileTap={{ scale: 0.95 }}
             >
-              <ArrowLeft className="w-5 h-5 text-white" />
+              <ArrowLeft className="w-5 h-5 text-foreground" />
             </motion.button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-white flex items-center gap-2">
-                <Utensils className="w-5 h-5" />
+              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Utensils className="w-5 h-5 text-primary" />
                 Qidalanma
               </h1>
-              <p className="text-white/80 text-sm">{targets.description}</p>
+              <p className="text-xs text-muted-foreground">{targets.description}</p>
             </div>
           </div>
+        </div>
+      </div>
 
-          <motion.div 
-            className="bg-white/15 backdrop-blur-md rounded-2xl p-4 border border-white/20"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-          >
-            <div className="flex justify-between items-center mb-3">
-              <div>
-                <p className="text-white/70 text-xs font-medium">Bugünkü kalori</p>
-                <p className="text-3xl font-black text-white">
-                  {todayCalories} <span className="text-sm font-medium">/ {targets.calories}</span>
-                </p>
-              </div>
-              <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center border border-white/20">
-                <span className="text-3xl">🍽️</span>
-              </div>
+      {/* Stats Card */}
+      <div className="px-4 pt-4">
+        <div className="bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl p-4 text-white">
+          <div className="flex justify-between items-center mb-3">
+            <div>
+              <p className="text-white/70 text-xs font-medium">Bugünkü kalori</p>
+              <p className="text-2xl font-bold">
+                {todayCalories} <span className="text-sm font-normal">/ {targets.calories}</span>
+              </p>
             </div>
-            <div className="h-2.5 bg-white/20 rounded-full overflow-hidden">
-              <motion.div 
-                className="h-full bg-white rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${Math.min((todayCalories / targets.calories) * 100, 100)}%` }}
-                transition={{ duration: 1, ease: "easeOut" }}
-              />
+            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+              <span className="text-2xl">🍽️</span>
             </div>
-            <p className="text-white/60 text-xs mt-2 text-center font-medium">
-              {stats.totalMeals} yemək qeyd edildi
-            </p>
-          </motion.div>
+          </div>
+          <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+            <motion.div 
+              className="h-full bg-white rounded-full"
+              initial={{ width: 0 }}
+              animate={{ width: `${Math.min((todayCalories / targets.calories) * 100, 100)}%` }}
+              transition={{ duration: 1, ease: "easeOut" }}
+            />
+          </div>
+          <p className="text-white/60 text-xs mt-2 text-center">{stats.totalMeals} yemək qeyd edildi</p>
         </div>
       </div>
 

@@ -208,15 +208,15 @@ const AdminPregnancyContent = () => {
       if (file.name.endsWith('.json')) {
         data = JSON.parse(text);
       } else if (file.name.endsWith('.csv')) {
-        // Split by newlines, handling both \r\n and \n
-        const lines = text.split(/\r?\n/).filter(line => line.trim());
-        if (lines.length < 2) {
+        // Use the new multi-line aware CSV parser
+        const { headers: rawHeaders, rows: csvRows } = parseCSV(text);
+        
+        if (rawHeaders.length === 0 || csvRows.length === 0) {
           throw new Error('CSV faylı boşdur və ya yalnız başlıq var');
         }
         
-        // Parse header row - handle quoted headers
-        const rawHeaders = parseCSVLine(lines[0]);
         console.log('Parsed headers:', rawHeaders);
+        console.log('Total rows parsed:', csvRows.length);
         
         // Map user's Excel headers to database fields (comprehensive mapping)
         const headerMap: Record<string, string> = {
@@ -248,22 +248,15 @@ const AdminPregnancyContent = () => {
           'week_number': 'week_number'
         };
         
-        // Find which headers map to which columns
-        const mappedHeaders = rawHeaders.map(h => {
-          const trimmed = h.trim();
-          return headerMap[trimmed] || trimmed.toLowerCase().replace(/\s+/g, '_');
-        });
-        console.log('Mapped headers:', mappedHeaders);
-        
-        // Parse each data row
-        for (let i = 1; i < lines.length; i++) {
-          if (!lines[i].trim()) continue;
-          
-          const values = parseCSVLine(lines[i]);
+        // Process each row
+        for (let i = 0; i < csvRows.length; i++) {
+          const csvRow = csvRows[i];
           const row: any = { is_active: true };
           
-          mappedHeaders.forEach((dbField, idx) => {
-            let value = values[idx]?.trim() || '';
+          // Map each header to its value
+          rawHeaders.forEach((header) => {
+            const dbField = headerMap[header.trim()] || header.trim().toLowerCase().replace(/\s+/g, '_');
+            let value = (csvRow[header] || '').trim();
             
             // Skip empty values or placeholders
             if (!value || value === '-' || value === '–' || value === '—') {
@@ -314,7 +307,7 @@ const AdminPregnancyContent = () => {
             data.push(row);
           }
           
-          setImportProgress(Math.round((i / lines.length) * 40));
+          setImportProgress(Math.round((i / csvRows.length) * 40));
         }
         
         console.log(`Parsed ${data.length} valid rows from CSV`);
@@ -350,7 +343,66 @@ const AdminPregnancyContent = () => {
     }
   };
 
-  // Helper function to parse CSV line properly handling quoted values
+  // Parse entire CSV handling multi-line quoted values
+  const parseCSV = (text: string): { headers: string[], rows: any[] } => {
+    const result: string[][] = [];
+    let current = '';
+    let inQuotes = false;
+    let row: string[] = [];
+    
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      const nextChar = text[i + 1];
+      
+      if (char === '"') {
+        if (inQuotes && nextChar === '"') {
+          // Escaped quote ""
+          current += '"';
+          i++;
+        } else {
+          // Toggle quote state
+          inQuotes = !inQuotes;
+        }
+      } else if (char === ',' && !inQuotes) {
+        row.push(current.trim());
+        current = '';
+      } else if ((char === '\n' || (char === '\r' && nextChar === '\n')) && !inQuotes) {
+        row.push(current.trim());
+        if (row.some(cell => cell.length > 0)) {
+          result.push(row);
+        }
+        row = [];
+        current = '';
+        if (char === '\r') i++; // skip \n after \r
+      } else if (char !== '\r') {
+        current += char;
+      }
+    }
+    // Push last row
+    if (current || row.length > 0) {
+      row.push(current.trim());
+      if (row.some(cell => cell.length > 0)) {
+        result.push(row);
+      }
+    }
+    
+    if (result.length < 2) {
+      return { headers: [], rows: [] };
+    }
+    
+    const headers = result[0];
+    const rows = result.slice(1).map(r => {
+      const obj: any = {};
+      headers.forEach((h, idx) => {
+        obj[h] = r[idx] || '';
+      });
+      return obj;
+    });
+    
+    return { headers, rows };
+  };
+
+  // Helper function to parse CSV line properly handling quoted values (kept for compatibility)
   const parseCSVLine = (line: string): string[] => {
     const values: string[] = [];
     let current = '';
@@ -362,11 +414,9 @@ const AdminPregnancyContent = () => {
       
       if (char === '"') {
         if (inQuotes && nextChar === '"') {
-          // Escaped quote
           current += '"';
           i++;
         } else {
-          // Toggle quote state
           inQuotes = !inQuotes;
         }
       } else if (char === ',' && !inQuotes) {

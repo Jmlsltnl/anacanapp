@@ -191,93 +191,63 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
   }
 
   return (
-      <div ref={ref} className="min-h-screen bg-gradient-to-b from-background to-muted/30 pb-24">
-      {/* Premium Header */}
-        <div className="relative overflow-hidden isolate">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary via-pink-500 to-purple-600 pointer-events-none" />
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIyIi8+PC9nPjwvZz48L3N2Zz4=')] opacity-30 pointer-events-none" />
-        
-        <div className="relative px-4 pt-4 pb-6 safe-top z-20">
-          <div className="flex items-center gap-3 mb-4 relative z-20">
+    <div ref={ref} className="min-h-screen bg-background pb-24">
+      {/* Minimalist Header */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50 safe-area-top">
+        <div className="px-4 py-3">
+          <div className="flex items-center gap-3">
             <motion.button
               onClick={onBack}
-                className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/20 relative z-30"
-              whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.3)' }}
+              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
               whileTap={{ scale: 0.95 }}
             >
-              <ArrowLeft className="w-5 h-5 text-white" />
+              <ArrowLeft className="w-5 h-5 text-foreground" />
             </motion.button>
             <div className="flex-1">
-              <motion.h1 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-xl font-black text-white"
-              >
-                Təhlükəsizlik Sorğusu
-              </motion.h1>
-              <motion.p 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.1 }}
-                className="text-white/70 text-sm"
-              >
-                Qida və fəaliyyətləri yoxlayın
-              </motion.p>
+              <h1 className="text-lg font-bold text-foreground">Təhlükəsizlik Sorğusu</h1>
+              <p className="text-xs text-muted-foreground">Qida və fəaliyyətləri yoxlayın</p>
             </div>
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', delay: 0.2 }}
-              className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/20"
-            >
-              <Shield className="w-6 h-6 text-white" />
-            </motion.div>
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-primary" />
+            </div>
           </div>
 
           {/* Search Bar */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="relative"
-          >
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
+          <div className="relative mt-3">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Nə yoxlamaq istəyirsiniz?"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-12 pl-12 pr-4 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/20 text-white placeholder:text-white/50 text-sm font-medium outline-none focus:bg-white/30 focus:border-white/40 transition-all"
+              className="w-full h-10 pl-10 pr-4 rounded-xl bg-muted border border-border text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />
-          </motion.div>
+          </div>
+        </div>
+      </div>
 
-          {/* Stats Cards */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="grid grid-cols-3 gap-2 mt-4"
-          >
-            {[
-              { label: 'Təhlükəsiz', count: stats.safe, color: 'from-emerald-400 to-green-500', emoji: '✅' },
-              { label: 'Ehtiyatlı', count: stats.warning, color: 'from-amber-400 to-orange-500', emoji: '⚠️' },
-              { label: 'Təhlükəli', count: stats.danger, color: 'from-red-400 to-rose-500', emoji: '🚫' },
-            ].map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.25 + i * 0.05 }}
-                className="bg-white/15 backdrop-blur-sm rounded-xl p-3 border border-white/10"
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-lg">{stat.emoji}</span>
-                  <span className="text-xl font-black text-white">{stat.count}</span>
-                </div>
-                <p className="text-xs text-white/70 font-medium">{stat.label}</p>
-              </motion.div>
-            ))}
-          </motion.div>
+      {/* Stats Cards */}
+      <div className="px-4 pt-4">
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { label: 'Təhlükəsiz', count: stats.safe, bg: 'bg-emerald-50 dark:bg-emerald-950/40', text: 'text-emerald-600 dark:text-emerald-400', emoji: '✅' },
+            { label: 'Ehtiyatlı', count: stats.warning, bg: 'bg-amber-50 dark:bg-amber-950/40', text: 'text-amber-600 dark:text-amber-400', emoji: '⚠️' },
+            { label: 'Təhlükəli', count: stats.danger, bg: 'bg-red-50 dark:bg-red-950/40', text: 'text-red-600 dark:text-red-400', emoji: '🚫' },
+          ].map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.05 }}
+              className={`${stat.bg} rounded-xl p-3 border border-border/50`}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-base">{stat.emoji}</span>
+                <span className={`text-lg font-bold ${stat.text}`}>{stat.count}</span>
+              </div>
+              <p className="text-xs text-muted-foreground font-medium">{stat.label}</p>
+            </motion.div>
+          ))}
         </div>
       </div>
 
