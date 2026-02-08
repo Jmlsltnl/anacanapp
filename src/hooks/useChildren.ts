@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useChildStore } from '@/store/childStore';
 
 export interface Child {
   id: string;
@@ -18,9 +19,19 @@ export interface Child {
 export const useChildren = () => {
   const { user } = useAuth();
   const [children, setChildren] = useState<Child[]>([]);
-  const [selectedChild, setSelectedChild] = useState<Child | null>(null);
   const [loading, setLoading] = useState(true);
   const didAttemptSeedRef = useRef(false);
+  
+  // Use Zustand store for global selectedChildId
+  const { selectedChildId, setSelectedChildId } = useChildStore();
+  
+  // Derive selectedChild from children array and store's selectedChildId
+  const selectedChild = children.find(c => c.id === selectedChildId) || children[0] || null;
+  
+  // Wrapper to set selected child - updates the store
+  const setSelectedChild = useCallback((child: Child | null) => {
+    setSelectedChildId(child?.id || null);
+  }, [setSelectedChildId]);
 
   const fetchChildren = useCallback(async () => {
     if (!user) {
@@ -76,7 +87,8 @@ export const useChildren = () => {
           if (!insertError && inserted) {
             const insertedChild = inserted as Child;
             setChildren([insertedChild]);
-            setSelectedChild(insertedChild);
+            setSelectedChildId(insertedChild.id);
+            setLoading(false);
             return;
           }
 
@@ -90,16 +102,19 @@ export const useChildren = () => {
 
       setChildren(rows);
 
-      // Auto-select first child if none selected
-      if (rows.length > 0 && !selectedChild) {
-        setSelectedChild(rows[0]);
+      // Auto-select first child if none selected or selected child is not in the list
+      if (rows.length > 0) {
+        const currentlySelectedExists = rows.some(c => c.id === selectedChildId);
+        if (!currentlySelectedExists) {
+          setSelectedChildId(rows[0].id);
+        }
       }
     } catch (error) {
       console.error('Error fetching children:', error);
     } finally {
       setLoading(false);
     }
-  }, [user, selectedChild]);
+  }, [user, selectedChildId, setSelectedChildId]);
 
   useEffect(() => {
     fetchChildren();

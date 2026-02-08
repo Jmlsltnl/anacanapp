@@ -90,72 +90,39 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
   const currentStepData = steps[currentStep];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-red-50 dark:from-red-950/20 to-background pb-24">
-      {/* Premium Header */}
-      <div className={`sticky top-0 z-20 isolate overflow-hidden ${
-        selectedScenario 
-          ? `bg-gradient-to-r ${getEmergencyColor(selectedScenario.emergency_level)}`
-          : 'bg-gradient-to-br from-red-500 via-rose-500 to-pink-600'
-      }`}>
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,...')] opacity-10 pointer-events-none" />
-        
-        <div className="relative px-4 pt-4 pb-6 safe-area-top">
-          <div className="flex items-center gap-3 relative z-30">
+    <div className="min-h-screen bg-background pb-24">
+      {/* Compact Header */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
+        <div className="px-4 py-3 safe-area-top">
+          <div className="flex items-center gap-3">
             <motion.button
               onClick={handleBack}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"
+              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
               whileTap={{ scale: 0.95 }}
             >
-              <ArrowLeft className="w-5 h-5 text-white" />
+              <ArrowLeft className="w-5 h-5 text-foreground" />
             </motion.button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-white flex items-center gap-2">
-                <Shield className="w-5 h-5" />
+              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Shield className="w-5 h-5 text-red-500" />
                 {selectedScenario ? selectedScenario.title_az : 'Həyat Qurtaran SOS'}
               </h1>
-              {selectedScenario ? (
-                <p className="text-white/80 text-sm">
+              {selectedScenario && (
+                <p className="text-xs text-muted-foreground">
                   Addım {currentStep + 1} / {steps.length}
                 </p>
-              ) : (
-                <p className="text-white/80 text-sm">Təcili hallarda həyat qurtaran yardım</p>
               )}
             </div>
             {selectedScenario && (
               <motion.button 
                 onClick={() => isSpeaking ? stopSpeaking() : speak(currentStepData?.instruction_az || '')}
-                className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"
+                className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
                 whileTap={{ scale: 0.95 }}
               >
-                {isSpeaking ? <VolumeX className="w-5 h-5 text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
+                {isSpeaking ? <VolumeX className="w-5 h-5 text-foreground" /> : <Volume2 className="w-5 h-5 text-foreground" />}
               </motion.button>
             )}
           </div>
-
-          {/* Header Stats */}
-          {!selectedScenario && (
-            <motion.div 
-              className="grid grid-cols-3 gap-3 mt-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <div className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center">
-                <Shield className="w-5 h-5 mx-auto mb-1 text-white/80" />
-                <p className="text-lg font-bold text-white">{scenarios.length}</p>
-                <p className="text-[10px] text-white/70">Ssenari</p>
-              </div>
-              <div className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center">
-                <Heart className="w-5 h-5 mx-auto mb-1 text-white/80" />
-                <p className="text-lg font-bold text-white">24/7</p>
-                <p className="text-[10px] text-white/70">Dəstək</p>
-              </div>
-              <div className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center">
-                <Zap className="w-5 h-5 mx-auto mb-1 text-white/80" />
-                <p className="text-lg font-bold text-white">Offline</p>
-                <p className="text-[10px] text-white/70">İşləyir</p>
-              </div>
-            </motion.div>
-          )}
         </div>
       </div>
 
@@ -163,7 +130,7 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
         {!selectedScenario ? (
           <motion.div 
             key="scenarios"
-            className="px-4 -mt-2"
+            className="px-4 pt-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
