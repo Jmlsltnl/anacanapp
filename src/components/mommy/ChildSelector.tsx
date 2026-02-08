@@ -14,7 +14,6 @@ interface ChildSelectorProps {
 const genderOptions = [
   { value: 'boy', label: 'Oğlan', emoji: '👦' },
   { value: 'girl', label: 'Qız', emoji: '👧' },
-  { value: 'unknown', label: 'Müəyyən deyil', emoji: '👶' },
 ];
 
 const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
@@ -35,7 +34,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
   const [formData, setFormData] = useState({
     name: '',
     birth_date: '',
-    gender: 'unknown' as 'boy' | 'girl' | 'unknown',
+    gender: 'boy' as 'boy' | 'girl',
   });
 
   const handleAddChild = async () => {
@@ -48,7 +47,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
     if (child) {
       toast.success(`${formData.name} əlavə edildi`);
       setShowAddModal(false);
-      setFormData({ name: '', birth_date: '', gender: 'unknown' });
+      setFormData({ name: '', birth_date: '', gender: 'boy' });
       setSelectedChild(child);
     } else {
       toast.error('Xəta baş verdi');
@@ -84,13 +83,13 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
     setFormData({
       name: child.name,
       birth_date: child.birth_date,
-      gender: child.gender,
+      gender: child.gender === 'unknown' ? 'boy' : child.gender,
     });
     setEditingChild(child);
   };
 
   const openAddModal = () => {
-    setFormData({ name: '', birth_date: '', gender: 'unknown' });
+    setFormData({ name: '', birth_date: '', gender: 'boy' });
     setShowAddModal(true);
   };
 

@@ -36,12 +36,11 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   const [showPartnerInfo, setShowPartnerInfo] = useState(false);
   const [showChildModal, setShowChildModal] = useState(false);
   const [editingChild, setEditingChild] = useState<Child | null>(null);
-  const [childForm, setChildForm] = useState<{ name: string; birth_date: string; gender: 'boy' | 'girl' | 'unknown' }>({ name: '', birth_date: '', gender: 'unknown' });
+  const [childForm, setChildForm] = useState<{ name: string; birth_date: string; gender: 'boy' | 'girl' }>({ name: '', birth_date: '', gender: 'boy' });
 
   const genderOptions = [
     { value: 'boy', label: 'Oğlan', emoji: '👦' },
     { value: 'girl', label: 'Qız', emoji: '👧' },
-    { value: 'unknown', label: 'Müəyyən deyil', emoji: '👶' },
   ];
 
   const handleAddChild = async () => {
@@ -58,7 +57,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
     if (child) {
       toast({ title: `${childForm.name} əlavə edildi` });
       setShowChildModal(false);
-      setChildForm({ name: '', birth_date: '', gender: 'unknown' });
+      setChildForm({ name: '', birth_date: '', gender: 'boy' });
     }
   };
 
@@ -73,7 +72,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
     if (success) {
       toast({ title: 'Yeniləndi' });
       setEditingChild(null);
-      setChildForm({ name: '', birth_date: '', gender: 'unknown' });
+      setChildForm({ name: '', birth_date: '', gender: 'boy' });
     }
   };
 
@@ -85,7 +84,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   };
 
   const openEditChild = (child: Child) => {
-    setChildForm({ name: child.name, birth_date: child.birth_date, gender: child.gender });
+    setChildForm({ name: child.name, birth_date: child.birth_date, gender: child.gender === 'unknown' ? 'boy' : child.gender });
     setEditingChild(child);
   };
 
@@ -409,7 +408,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
             </div>
             <motion.button
               onClick={() => {
-                setChildForm({ name: '', birth_date: '', gender: 'unknown' });
+                setChildForm({ name: '', birth_date: '', gender: 'boy' });
                 setShowChildModal(true);
               }}
               className="w-9 h-9 rounded-xl bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center"
@@ -450,7 +449,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
           {children.length === 0 && (
             <button
               onClick={() => {
-                setChildForm({ name: '', birth_date: '', gender: 'unknown' });
+                setChildForm({ name: '', birth_date: '', gender: 'boy' });
                 setShowChildModal(true);
               }}
               className="w-full p-4 rounded-xl border-2 border-dashed border-muted-foreground/30 flex flex-col items-center gap-2 text-muted-foreground hover:border-pink-400 hover:text-pink-500 transition-colors"
@@ -497,7 +496,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
                 {genderOptions.map((opt) => (
                   <button
                     key={opt.value}
-                    onClick={() => setChildForm(p => ({ ...p, gender: opt.value as 'boy' | 'girl' | 'unknown' }))}
+                    onClick={() => setChildForm(p => ({ ...p, gender: opt.value as 'boy' | 'girl' }))}
                     className={`flex-1 flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all ${
                       childForm.gender === opt.value 
                         ? 'border-primary bg-primary/10' 
