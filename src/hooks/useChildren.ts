@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
@@ -20,6 +20,7 @@ export const useChildren = () => {
   const [children, setChildren] = useState<Child[]>([]);
   const [selectedChild, setSelectedChild] = useState<Child | null>(null);
   const [loading, setLoading] = useState(true);
+  const didAttemptSeedRef = useRef(false);
 
   const fetchChildren = useCallback(async () => {
     if (!user) {
@@ -35,12 +36,63 @@ export const useChildren = () => {
         .eq('is_active', true)
         .order('sort_order');
 
-      if (!error && data) {
-        setChildren(data as Child[]);
-        // Auto-select first child if none selected
-        if (data.length > 0 && !selectedChild) {
-          setSelectedChild(data[0] as Child);
+      if (error) throw error;
+
+      const rows = (data || []) as Child[];
+
+      // Backfill: if this user has baby fields on profile (from onboarding) but no user_children rows yet,
+      // create the first child automatically so Profile/Tools can show it.
+      if (rows.length === 0 && !didAttemptSeedRef.current) {
+        didAttemptSeedRef.current = true;
+
+        const { data: profileRow, error: profileError } = await supabase
+          .from('profiles')
+          .select('baby_name, baby_birth_date, baby_gender')
+          .eq('user_id', user.id)
+          .single();
+
+        if (!profileError && profileRow?.baby_name && profileRow?.baby_birth_date) {
+          const normalizedGender: 'boy' | 'girl' =
+            profileRow.baby_gender === 'girl' || profileRow.baby_gender === 'boy'
+              ? profileRow.baby_gender
+              : 'boy';
+
+          const avatarEmoji = normalizedGender === 'girl' ? '👧' : '👦';
+
+          const { data: inserted, error: insertError } = await supabase
+            .from('user_children')
+            .insert({
+              user_id: user.id,
+              name: profileRow.baby_name,
+              birth_date: profileRow.baby_birth_date,
+              gender: normalizedGender,
+              avatar_emoji: avatarEmoji,
+              is_active: true,
+              sort_order: 0,
+            })
+            .select('*')
+            .single();
+
+          if (!insertError && inserted) {
+            const insertedChild = inserted as Child;
+            setChildren([insertedChild]);
+            setSelectedChild(insertedChild);
+            return;
+          }
+
+          if (insertError) {
+            console.error('Error seeding first child from profile:', insertError);
+          }
+        } else if (profileError) {
+          console.error('Error fetching profile for child seeding:', profileError);
         }
+      }
+
+      setChildren(rows);
+
+      // Auto-select first child if none selected
+      if (rows.length > 0 && !selectedChild) {
+        setSelectedChild(rows[0]);
       }
     } catch (error) {
       console.error('Error fetching children:', error);
@@ -62,14 +114,20 @@ export const useChildren = () => {
     if (!user) return null;
 
     try {
+      const normalizedGender: 'boy' | 'girl' =
+        childData.gender === 'girl' || childData.gender === 'boy' ? childData.gender : 'boy';
+
+      const avatarEmoji = childData.avatar_emoji ?? (normalizedGender === 'girl' ? '👧' : '👦');
+
       const { data, error } = await supabase
         .from('user_children')
         .insert({
           user_id: user.id,
           name: childData.name,
           birth_date: childData.birth_date,
-          gender: childData.gender || 'unknown',
-          avatar_emoji: childData.avatar_emoji || '👶',
+          gender: normalizedGender,
+          avatar_emoji: avatarEmoji,
+          is_active: true,
           sort_order: children.length,
         })
         .select()
