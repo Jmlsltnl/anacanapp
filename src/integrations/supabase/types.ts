@@ -3041,6 +3041,51 @@ export type Database = {
         }
         Relationships: []
       }
+      menstruation_phase_tips: {
+        Row: {
+          category: string | null
+          content: string
+          content_az: string | null
+          created_at: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          phase: string
+          sort_order: number | null
+          title: string
+          title_az: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          content: string
+          content_az?: string | null
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          phase: string
+          sort_order?: number | null
+          title: string
+          title_az?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          content?: string
+          content_az?: string | null
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          phase?: string
+          sort_order?: number | null
+          title?: string
+          title_az?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       mental_health_resources: {
         Row: {
           address: string | null
