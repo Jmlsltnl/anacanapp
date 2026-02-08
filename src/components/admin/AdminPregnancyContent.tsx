@@ -265,14 +265,16 @@ const AdminPregnancyContent = () => {
             
             if (dbField === 'pregnancy_day') {
               const pDay = parseInt(value);
-              if (!isNaN(pDay) && pDay > 0 && pDay <= 280) {
+              // Allow up to 294 days (280 standard + 14 days for delayed birth)
+              if (!isNaN(pDay) && pDay > 0 && pDay <= 294) {
                 row.pregnancy_day = pDay;
                 row.week_number = Math.ceil(pDay / 7);
-                row.days_until_birth = 280 - pDay;
+                row.days_until_birth = Math.max(0, 280 - pDay); // Can be negative for delayed births, but we cap at 0
               }
             } else if (dbField === 'days_until_birth') {
               const daysUntil = parseInt(value);
-              if (!isNaN(daysUntil) && daysUntil >= 0 && daysUntil < 280) {
+              // Allow negative values for delayed births (up to -14 days)
+              if (!isNaN(daysUntil) && daysUntil >= -14 && daysUntil <= 279) {
                 row.days_until_birth = daysUntil;
                 // Calculate pregnancy_day from days_until_birth
                 if (!row.pregnancy_day) {
@@ -289,7 +291,8 @@ const AdminPregnancyContent = () => {
               }
             } else if (dbField === 'week_number') {
               const weekNum = parseInt(value);
-              if (!isNaN(weekNum) && weekNum > 0 && weekNum <= 40) {
+              // Allow up to 42 weeks (40 standard + 2 weeks delay)
+              if (!isNaN(weekNum) && weekNum > 0 && weekNum <= 42) {
                 row.week_number = weekNum;
               }
             } else {
@@ -298,8 +301,8 @@ const AdminPregnancyContent = () => {
             }
           });
           
-          // Ensure we have valid pregnancy_day
-          if (row.pregnancy_day && row.pregnancy_day > 0 && row.pregnancy_day <= 280) {
+          // Ensure we have valid pregnancy_day (up to 294 days)
+          if (row.pregnancy_day && row.pregnancy_day > 0 && row.pregnancy_day <= 294) {
             // Ensure week_number is set
             if (!row.week_number) {
               row.week_number = Math.ceil(row.pregnancy_day / 7);
