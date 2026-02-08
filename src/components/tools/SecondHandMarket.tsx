@@ -263,85 +263,80 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
   const freeCount = listings.filter(l => l.is_free).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50/50 dark:from-emerald-950/20 to-background pb-24">
-      {/* Premium Header */}
-      <div className="sticky top-0 z-20 isolate relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 pointer-events-none" />
-        <div className="absolute inset-0 opacity-20 pointer-events-none">
-          <div className="absolute top-8 right-8 w-32 h-32 rounded-full bg-white/30 blur-3xl" />
-          <div className="absolute bottom-4 left-8 w-24 h-24 rounded-full bg-cyan-300/30 blur-2xl" />
-        </div>
-        
-        <div className="relative px-4 pt-4 pb-6 safe-area-top">
-          <div className="flex items-center gap-3 mb-4 relative z-30">
+    <div className="min-h-screen bg-background pb-24">
+      {/* Compact Header */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
+        <div className="px-4 py-3 safe-area-top">
+          <div className="flex items-center gap-3">
             <motion.button
               onClick={onBack}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20"
+              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
               whileTap={{ scale: 0.95 }}
             >
-              <ArrowLeft className="w-5 h-5 text-white" />
+              <ArrowLeft className="w-5 h-5 text-foreground" />
             </motion.button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-white flex items-center gap-2">
-                <Package className="w-5 h-5" />
+              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Package className="w-5 h-5 text-emerald-500" />
                 İkinci Əl Bazarı
               </h1>
-              <p className="text-white/80 text-sm">Analardan analara</p>
             </div>
             <motion.button
               onClick={() => setShowCreateModal(true)}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20"
+              className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center"
               whileTap={{ scale: 0.95 }}
             >
-              <Plus className="w-5 h-5 text-white" />
+              <Plus className="w-5 h-5 text-primary-foreground" />
             </motion.button>
-          </div>
-
-          {/* Search */}
-          <div className="relative mb-4">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input
-              placeholder="Axtar..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 rounded-2xl bg-white/95 dark:bg-card/95 backdrop-blur-md border-0 shadow-lg"
-            />
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-3">
-            <motion.div
-              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <p className="text-2xl font-black text-white">{listings.length}</p>
-              <p className="text-xs text-white/70 font-medium">Elan</p>
-            </motion.div>
-            <motion.div
-              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-            >
-              <p className="text-2xl font-black text-white">{freeCount}</p>
-              <p className="text-xs text-white/70 font-medium">Pulsuz</p>
-            </motion.div>
-            <motion.div
-              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <p className="text-2xl font-black text-white">{categories.length}</p>
-              <p className="text-xs text-white/70 font-medium">Kateqoriya</p>
-            </motion.div>
           </div>
         </div>
       </div>
 
-      <div className="px-4 -mt-4 space-y-4">
+      <div className="px-4 pt-4">
+        {/* Search */}
+        <div className="relative mb-4">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Input
+            placeholder="Axtar..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-12 h-12 rounded-2xl bg-muted/50 border-border"
+          />
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <motion.div
+            className="bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl p-3 text-center border border-emerald-100 dark:border-emerald-500/20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{listings.length}</p>
+            <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70 font-medium">Elan</p>
+          </motion.div>
+          <motion.div
+            className="bg-amber-50 dark:bg-amber-500/10 rounded-2xl p-3 text-center border border-amber-100 dark:border-amber-500/20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            <p className="text-2xl font-black text-amber-600 dark:text-amber-400">{freeCount}</p>
+            <p className="text-xs text-amber-600/70 dark:text-amber-400/70 font-medium">Pulsuz</p>
+          </motion.div>
+          <motion.div
+            className="bg-violet-50 dark:bg-violet-500/10 rounded-2xl p-3 text-center border border-violet-100 dark:border-violet-500/20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <p className="text-2xl font-black text-violet-600 dark:text-violet-400">{categories.length}</p>
+            <p className="text-xs text-violet-600/70 dark:text-violet-400/70 font-medium">Kateqoriya</p>
+          </motion.div>
+        </div>
+      </div>
+
+      <div className="px-4 space-y-4">
         {/* Category Filter */}
         <motion.div
           className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar"

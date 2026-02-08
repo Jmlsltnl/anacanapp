@@ -111,54 +111,49 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-fuchsia-50/50 dark:from-fuchsia-950/20 to-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
-      {/* Premium Header */}
-      <div className="sticky top-0 z-20 isolate overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-500 via-pink-500 to-rose-500 pointer-events-none" />
-        <div className="absolute inset-0 opacity-20 pointer-events-none">
-          <div className="absolute top-8 right-8 w-32 h-32 rounded-full bg-white/30 blur-3xl" />
-          <div className="absolute bottom-4 left-8 w-24 h-24 rounded-full bg-rose-300/30 blur-2xl" />
-        </div>
-        
-        <div className="relative px-4 pt-4 pb-6 safe-area-top">
-          <div className="flex items-center gap-3 mb-4 relative z-30">
+    <div className="min-h-screen bg-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
+      {/* Compact Header */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
+        <div className="px-4 py-3 safe-area-top">
+          <div className="flex items-center gap-3">
             <motion.button
               onClick={onBack}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20"
+              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
               whileTap={{ scale: 0.95 }}
             >
-              <ArrowLeft className="w-5 h-5 text-white" />
+              <ArrowLeft className="w-5 h-5 text-foreground" />
             </motion.button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-white flex items-center gap-2">
-                <Heart className="w-5 h-5" />
+              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Heart className="w-5 h-5 text-fuchsia-500" />
                 Əhval Gündəliyi
               </h1>
-              <p className="text-white/80 text-sm">Emosiyalarınızı izləyin</p>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Mood Summary */}
-          <motion.div 
-            className="bg-white/15 backdrop-blur-md rounded-2xl p-4 border border-white/20"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white/70 text-xs font-medium">Ortalama əhval</p>
-                <div className="flex items-center gap-3 mt-1">
-                  <span className="text-4xl">{logs[0]?.mood ? moodEmojis.find(m => m.value === logs[0].mood)?.emoji : '😊'}</span>
-                  <span className="text-3xl font-black text-white">{averageMood}</span>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-white/70 text-xs font-medium">Bu həftə</p>
-                <p className="text-2xl font-black text-white">{logs.length} qeyd</p>
+      <div className="px-4 pt-4">
+        {/* Mood Summary */}
+        <motion.div 
+          className="bg-fuchsia-50 dark:bg-fuchsia-500/10 rounded-2xl p-4 border border-fuchsia-100 dark:border-fuchsia-500/20 mb-4"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-fuchsia-600/70 dark:text-fuchsia-400/70 text-xs font-medium">Ortalama əhval</p>
+              <div className="flex items-center gap-3 mt-1">
+                <span className="text-4xl">{logs[0]?.mood ? moodEmojis.find(m => m.value === logs[0].mood)?.emoji : '😊'}</span>
+                <span className="text-3xl font-black text-fuchsia-600 dark:text-fuchsia-400">{averageMood}</span>
               </div>
             </div>
-          </motion.div>
-        </div>
+            <div className="text-right">
+              <p className="text-fuchsia-600/70 dark:text-fuchsia-400/70 text-xs font-medium">Bu həftə</p>
+              <p className="text-2xl font-black text-fuchsia-600 dark:text-fuchsia-400">{logs.length} qeyd</p>
+            </div>
+          </div>
+        </motion.div>
       </div>
 
       {/* Tabs */}
