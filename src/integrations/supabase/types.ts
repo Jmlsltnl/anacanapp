@@ -746,6 +746,60 @@ export type Database = {
         }
         Relationships: []
       }
+      baby_teeth_db: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          description_az: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          name_az: string | null
+          position: string
+          side: string
+          sort_order: number | null
+          svg_path_id: string | null
+          tooth_code: string
+          tooth_type: string
+          typical_emergence_months_max: number | null
+          typical_emergence_months_min: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          name_az?: string | null
+          position: string
+          side: string
+          sort_order?: number | null
+          svg_path_id?: string | null
+          tooth_code: string
+          tooth_type: string
+          typical_emergence_months_max?: number | null
+          typical_emergence_months_min?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          name_az?: string | null
+          position?: string
+          side?: string
+          sort_order?: number | null
+          svg_path_id?: string | null
+          tooth_code?: string
+          tooth_type?: string
+          typical_emergence_months_max?: number | null
+          typical_emergence_months_min?: number | null
+        }
+        Relationships: []
+      }
       banners: {
         Row: {
           background_color: string | null
@@ -6087,6 +6141,93 @@ export type Database = {
         }
         Relationships: []
       }
+      teething_care_tips: {
+        Row: {
+          category: string | null
+          content: string
+          content_az: string | null
+          created_at: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          sort_order: number | null
+          title: string
+          title_az: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          content: string
+          content_az?: string | null
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          title: string
+          title_az?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          content?: string
+          content_az?: string | null
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          title?: string
+          title_az?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      teething_symptoms: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          description_az: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          name_az: string | null
+          relief_tips: string[] | null
+          relief_tips_az: string[] | null
+          severity: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          name_az?: string | null
+          relief_tips?: string[] | null
+          relief_tips_az?: string[] | null
+          severity?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          name_az?: string | null
+          relief_tips?: string[] | null
+          relief_tips_az?: string[] | null
+          severity?: string | null
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       temperature_emojis: {
         Row: {
           clothing_tip_az: string | null
@@ -6578,6 +6719,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_teething_logs: {
+        Row: {
+          created_at: string | null
+          emerged_date: string | null
+          id: string
+          notes: string | null
+          tooth_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          emerged_date?: string | null
+          id?: string
+          notes?: string | null
+          tooth_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          emerged_date?: string | null
+          id?: string
+          notes?: string | null
+          tooth_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_teething_logs_tooth_id_fkey"
+            columns: ["tooth_id"]
+            isOneToOne: false
+            referencedRelation: "baby_teeth_db"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vitamins: {
         Row: {

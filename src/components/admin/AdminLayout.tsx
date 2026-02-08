@@ -64,6 +64,7 @@ const menuItems = [
   { id: 'development-tips', label: 'İnkişaf Tövsiyələri', icon: Lightbulb },
   { id: 'banners', label: 'Bannerlər', icon: Megaphone },
   { id: 'baby-growth', label: 'Böyümə İzləmə', icon: Scale },
+  { id: 'teething', label: 'Diş Çıxarma', icon: Sparkles },
   { id: 'settings', label: 'Tənzimləmələr', icon: Settings },
   { id: 'security', label: 'Təhlükəsizlik', icon: Shield },
 ];

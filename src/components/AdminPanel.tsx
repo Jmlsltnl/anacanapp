@@ -49,6 +49,7 @@ import AdminMaternityBenefits from './admin/AdminMaternityBenefits';
 import AdminBabyIllustrations from './admin/AdminBabyIllustrations';
 import AdminBabyCrisisCalendar from './admin/AdminBabyCrisisCalendar';
 import AdminPhaseTips from './admin/AdminPhaseTips';
+import AdminTeething from './admin/AdminTeething';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -157,6 +158,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminBabyCrisisCalendar />;
       case 'phase-tips':
         return <AdminPhaseTips />;
+      case 'teething':
+        return <AdminTeething />;
       case 'security':
         return <AdminSecurity />;
       default:
