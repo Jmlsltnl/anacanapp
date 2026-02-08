@@ -42,8 +42,12 @@ const AdminContentManager = () => {
   const [showNamesImport, setShowNamesImport] = useState(false);
   const [namesImportData, setNamesImportData] = useState<any[]>([]);
   const [namesImporting, setNamesImporting] = useState(false);
+  const [showRecipesImport, setShowRecipesImport] = useState(false);
+  const [recipesImportData, setRecipesImportData] = useState<any[]>([]);
+  const [recipesImporting, setRecipesImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const namesFileInputRef = useRef<HTMLInputElement>(null);
+  const recipesFileInputRef = useRef<HTMLInputElement>(null);
   const initialFormDataRef = useRef<string>('');
 
   const contentConfig = {
@@ -268,6 +272,134 @@ const AdminContentManager = () => {
     } finally {
       setNamesImporting(false);
     }
+  };
+
+  // Recipes CSV Import Handler
+  const handleRecipesCSVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      if (lines.length < 2) {
+        toast({ title: 'Xəta', description: 'CSV faylı boşdur', variant: 'destructive' });
+        return;
+      }
+
+      const headers = parseCSVLine(lines[0]);
+      const headerMap: Record<string, string> = {
+        'Başlıq': 'title',
+        'Təsvir': 'description',
+        'Kateqoriya': 'category',
+        'Hazırlıq (dəq)': 'prep_time',
+        'Bişirmə (dəq)': 'cook_time',
+        'Porsiya': 'servings',
+        'İnqredientlər': 'ingredients',
+        'Hazırlanma': 'instructions',
+        'Şəkil URL': 'image_url',
+      };
+
+      const parsedData: any[] = [];
+      
+      for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        if (values.length < 2) continue;
+
+        const row: any = { is_active: true };
+        
+        headers.forEach((header, idx) => {
+          const dbField = headerMap[header.trim()];
+          if (dbField && values[idx]) {
+            let value = values[idx].trim().replace(/^"|"$/g, '');
+            
+            if (dbField === 'prep_time' || dbField === 'cook_time' || dbField === 'servings') {
+              const numValue = parseInt(value);
+              row[dbField] = isNaN(numValue) ? 0 : numValue;
+            } else if (dbField === 'ingredients' || dbField === 'instructions') {
+              // Split by semicolon or newline
+              const items = value.split(/[;|\n]/).map(s => s.trim()).filter(s => s);
+              row[dbField] = items;
+            } else {
+              row[dbField] = value;
+            }
+          }
+        });
+
+        if (row.title) {
+          if (!row.category) row.category = 'healthy';
+          parsedData.push(row);
+        }
+      }
+
+      if (parsedData.length === 0) {
+        toast({ title: 'Xəta', description: 'Heç bir resept tapılmadı', variant: 'destructive' });
+        return;
+      }
+
+      setRecipesImportData(parsedData);
+      setShowRecipesImport(true);
+    };
+
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  const handleRecipesImport = async () => {
+    if (recipesImportData.length === 0) return;
+
+    setRecipesImporting(true);
+    try {
+      const { error } = await supabase
+        .from('admin_recipes')
+        .insert(recipesImportData);
+
+      if (error) throw error;
+
+      toast({ 
+        title: 'Uğurlu!', 
+        description: `${recipesImportData.length} resept əlavə edildi` 
+      });
+      setShowRecipesImport(false);
+      setRecipesImportData([]);
+      fetchItems();
+    } catch (error: any) {
+      toast({ 
+        title: 'Xəta', 
+        description: error.message, 
+        variant: 'destructive' 
+      });
+    } finally {
+      setRecipesImporting(false);
+    }
+  };
+
+  const downloadRecipesTemplate = () => {
+    const template = `Başlıq,Təsvir,Kateqoriya,Hazırlıq (dəq),Bişirmə (dəq),Porsiya,İnqredientlər,Hazırlanma,Şəkil URL
+"Limonlu Zəncəfil Çayı","Hamiləlik dövründə ürəkbulanmaya qarşı ideal içki","pregnancy",5,0,2,"Su - 500ml; Təzə zəncəfil - 2sm; Limon - yarım; Bal - 1 çay qaşığı","Zəncəfili doğrayın; Suyu qaynadın; Zəncəfili əlavə edib 5 dəq dəmləyin; Limon və bal əlavə edin",""
+"Avokado Tostu","Folat və sağlam yağlarla zəngin səhər yeməyi","pregnancy",10,5,1,"Çörək - 2 dilim; Avokado - 1 ədəd; Yumurta - 1 ədəd; Duz, istiot","Çörəyi qızardın; Avokadonu əzin; Yumurtanı bişirin; Hamısını birləşdirin",""
+"Banan Smoothie","Enerji verən və qəbizliyə qarşı içki","breastfeeding",5,0,1,"Banan - 1 ədəd; Süd - 200ml; Bal - 1 çay qaşığı; Yulaf - 2 xörək qaşığı","Bütün inqredientləri blenderə qoyun; 1 dəq qarışdırın; Soyuq serviz edin",""`;
+
+    const blob = new Blob([template], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'reseptler_numune.csv';
+    link.click();
+  };
+
+  const downloadNamesTemplate = () => {
+    const template = `Ad,Cins,Mənşə,Məna,Məna (AZ),Populyarlıq
+"Aylin","Qız","Türk","Ayın parıltısı","Ayın ətrafındakı işıq, nur","98%"
+"Əli","Oğlan","Ərəb","Yüksək, əzəmətli","Uca, şərəfli","99%"
+"Ayan","Unisex","Türk","Bəlli, açıq","Göz qabağında olan, tanınan","90%"`;
+
+    const blob = new Blob([template], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'usaq_adlari_numune.csv';
+    link.click();
   };
 
   const handleSave = async () => {
@@ -572,6 +704,24 @@ const AdminContentManager = () => {
           <h1 className="text-2xl font-bold">Kontent İdarəetməsi</h1>
         </div>
         <div className="flex gap-2">
+          {activeTab === 'recipes' && (
+            <>
+              <input
+                type="file"
+                ref={recipesFileInputRef}
+                accept=".csv"
+                onChange={handleRecipesCSVUpload}
+                className="hidden"
+              />
+              <Button onClick={downloadRecipesTemplate} variant="ghost" size="sm" className="gap-1">
+                📥 Şablon
+              </Button>
+              <Button onClick={() => recipesFileInputRef.current?.click()} variant="outline" className="gap-2">
+                <FileUp className="w-4 h-4" />
+                CSV İmport
+              </Button>
+            </>
+          )}
           {activeTab === 'tips' && (
             <Button onClick={() => setShowBulkImport(true)} variant="outline" className="gap-2">
               <FileUp className="w-4 h-4" />
@@ -587,6 +737,9 @@ const AdminContentManager = () => {
                 onChange={handleNamesCSVUpload}
                 className="hidden"
               />
+              <Button onClick={downloadNamesTemplate} variant="ghost" size="sm" className="gap-1">
+                📥 Şablon
+              </Button>
               <Button onClick={() => namesFileInputRef.current?.click()} variant="outline" className="gap-2">
                 <FileUp className="w-4 h-4" />
                 CSV İmport
@@ -793,6 +946,70 @@ const AdminContentManager = () => {
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 `${namesImportData.length} Ad Əlavə Et`
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Recipes CSV Import Modal */}
+      <Dialog open={showRecipesImport} onOpenChange={setShowRecipesImport}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ChefHat className="w-5 h-5 text-primary" />
+              CSV İmport - {recipesImportData.length} resept tapıldı
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-y-auto space-y-3 py-4">
+            {recipesImportData.slice(0, 15).map((item, idx) => (
+              <div key={idx} className="p-3 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🍽️</span>
+                  <div className="flex-1">
+                    <p className="font-semibold">{item.title}</p>
+                    <p className="text-xs text-muted-foreground line-clamp-1">
+                      {item.description}
+                    </p>
+                  </div>
+                  <div className="text-right text-xs text-muted-foreground">
+                    <p>⏱️ {item.prep_time || 0}+{item.cook_time || 0} dəq</p>
+                    <p>🍴 {item.servings || 1} porsiya</p>
+                  </div>
+                </div>
+                {item.ingredients && item.ingredients.length > 0 && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {item.ingredients.length} inqredient • {item.instructions?.length || 0} addım
+                  </p>
+                )}
+              </div>
+            ))}
+            {recipesImportData.length > 15 && (
+              <p className="text-center text-sm text-muted-foreground py-2">
+                və daha {recipesImportData.length - 15} resept...
+              </p>
+            )}
+          </div>
+
+          <div className="flex gap-3 pt-4 border-t">
+            <Button 
+              variant="outline" 
+              onClick={() => { setShowRecipesImport(false); setRecipesImportData([]); }} 
+              className="flex-1"
+              disabled={recipesImporting}
+            >
+              Ləğv et
+            </Button>
+            <Button 
+              onClick={handleRecipesImport} 
+              className="flex-1 gradient-primary"
+              disabled={recipesImporting}
+            >
+              {recipesImporting ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                `${recipesImportData.length} Resept Əlavə Et`
               )}
             </Button>
           </div>
