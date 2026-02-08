@@ -9,9 +9,10 @@ interface TeethingWidgetProps {
 }
 
 const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
-  const { selectedChild, getChildAge } = useChildren();
+  const { selectedChild, getChildAge, hasChildren } = useChildren();
   const { emergedCount, totalTeeth, progress, teeth, loading } = useTeething();
 
+  // Don't render if no children or still loading
   if (loading) {
     return (
       <div className="bg-card rounded-2xl p-4 animate-pulse">
@@ -20,8 +21,13 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
     );
   }
 
-  const childAge = selectedChild ? getChildAge(selectedChild) : null;
-  const ageMonths = childAge?.months || 0;
+  // Don't show widget if no child is selected
+  if (!hasChildren || !selectedChild) {
+    return null;
+  }
+
+  const childAge = getChildAge(selectedChild);
+  const ageMonths = childAge.months;
 
   // Get expected teeth count for age
   const getExpectedTeeth = (months: number): number => {
@@ -108,7 +114,7 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
               <div>
                 <h3 className="font-semibold text-sm">Diş Çıxarma</h3>
                 <p className="text-xs text-muted-foreground">
-                  {selectedChild?.name || 'Körpə'} • {childAge?.displayText || ''}
+                  {selectedChild.name} • {childAge.displayText}
                 </p>
               </div>
             </div>
