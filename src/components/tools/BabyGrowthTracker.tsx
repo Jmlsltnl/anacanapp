@@ -185,28 +185,34 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
     : null;
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-gradient-to-b from-rose-50/50 dark:from-rose-950/20 to-background pb-24">
       {/* Premium Header */}
       <div className="sticky top-0 z-20 isolate relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-rose-500 via-pink-500 to-fuchsia-600 pointer-events-none" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,...')] opacity-10 pointer-events-none" />
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
+          <div className="absolute top-8 right-8 w-32 h-32 rounded-full bg-white/30 blur-3xl" />
+          <div className="absolute bottom-4 left-8 w-24 h-24 rounded-full bg-fuchsia-300/30 blur-2xl" />
+        </div>
         
         <div className="relative px-4 pt-4 pb-8 safe-area-top">
           <div className="flex items-center gap-3 mb-6 relative z-30">
             <motion.button
               onClick={onBack}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center relative z-30"
+              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 relative z-30"
               whileTap={{ scale: 0.95 }}
             >
               <ArrowLeft className="w-5 h-5 text-white" />
             </motion.button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-white">Böyümə İzləmə</h1>
+              <h1 className="text-xl font-bold text-white flex items-center gap-2">
+                <Baby className="w-5 h-5" />
+                Böyümə İzləmə
+              </h1>
               <p className="text-white/80 text-sm">Körpənizin inkişafını izləyin</p>
             </div>
             <motion.button
               onClick={() => setShowAddModal(true)}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center relative z-30"
+              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 relative z-30"
               whileTap={{ scale: 0.95 }}
             >
               <Plus className="w-5 h-5 text-white" />
@@ -216,18 +222,18 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
           {/* Current Stats Cards */}
           <div className="grid grid-cols-3 gap-3">
             <motion.div
-              className="bg-white/20 backdrop-blur-md rounded-2xl p-3 text-center"
+              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <Scale className="w-5 h-5 mx-auto mb-1 text-white/80" />
+              <Scale className="w-5 h-5 mx-auto mb-1 text-white/90" />
               <p className="text-2xl font-black text-white">
                 {latestEntry?.weight_kg ? `${latestEntry.weight_kg}` : '—'}
               </p>
-              <p className="text-xs text-white/70">kq</p>
+              <p className="text-xs text-white/70 font-medium">kq</p>
               {weightChange !== null && weightChange !== 0 && (
-                <div className={`flex items-center justify-center gap-0.5 mt-1 text-xs ${weightChange > 0 ? 'text-emerald-300' : 'text-red-300'}`}>
+                <div className={`flex items-center justify-center gap-0.5 mt-1 text-xs font-semibold ${weightChange > 0 ? 'text-emerald-300' : 'text-red-300'}`}>
                   {weightChange > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                   {weightChange > 0 ? '+' : ''}{weightChange.toFixed(2)}
                 </div>
@@ -235,18 +241,18 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
             </motion.div>
 
             <motion.div
-              className="bg-white/20 backdrop-blur-md rounded-2xl p-3 text-center"
+              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
             >
-              <Ruler className="w-5 h-5 mx-auto mb-1 text-white/80" />
+              <Ruler className="w-5 h-5 mx-auto mb-1 text-white/90" />
               <p className="text-2xl font-black text-white">
                 {latestEntry?.height_cm ? `${latestEntry.height_cm}` : '—'}
               </p>
-              <p className="text-xs text-white/70">sm</p>
+              <p className="text-xs text-white/70 font-medium">sm</p>
               {heightChange !== null && heightChange !== 0 && (
-                <div className={`flex items-center justify-center gap-0.5 mt-1 text-xs ${heightChange > 0 ? 'text-emerald-300' : 'text-red-300'}`}>
+                <div className={`flex items-center justify-center gap-0.5 mt-1 text-xs font-semibold ${heightChange > 0 ? 'text-emerald-300' : 'text-red-300'}`}>
                   {heightChange > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                   {heightChange > 0 ? '+' : ''}{heightChange.toFixed(1)}
                 </div>
@@ -254,16 +260,16 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
             </motion.div>
 
             <motion.div
-              className="bg-white/20 backdrop-blur-md rounded-2xl p-3 text-center"
+              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <Baby className="w-5 h-5 mx-auto mb-1 text-white/80" />
+              <Baby className="w-5 h-5 mx-auto mb-1 text-white/90" />
               <p className="text-2xl font-black text-white">
                 {latestEntry?.head_cm ? `${latestEntry.head_cm}` : '—'}
               </p>
-              <p className="text-xs text-white/70">baş sm</p>
+              <p className="text-xs text-white/70 font-medium">baş sm</p>
             </motion.div>
           </div>
         </div>
