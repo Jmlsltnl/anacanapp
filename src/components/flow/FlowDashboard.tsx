@@ -9,6 +9,10 @@ import { useUserStore } from '@/store/userStore';
 import { usePhaseTips, PHASE_INFO, CATEGORY_INFO, MenstrualPhase, TipCategory } from '@/hooks/usePhaseTips';
 import { format, addDays, subDays, differenceInDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isWithinInterval } from 'date-fns';
 import { az } from 'date-fns/locale';
+import FlowDailyLogger from './FlowDailyLogger';
+import FlowMoodChart from './FlowMoodChart';
+import FlowCycleStats from './FlowCycleStats';
+import FlowRemindersCard from './FlowRemindersCard';
 
 const FlowDashboard = () => {
   const { getCycleData } = useUserStore();
@@ -382,11 +386,47 @@ const FlowDashboard = () => {
         </div>
       </motion.div>
 
-      {/* Daily Insights */}
+      {/* Daily Logger */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4 }}
+      >
+        <FlowDailyLogger compact />
+      </motion.div>
+
+      {/* Mood Chart */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.5 }}
+      >
+        <FlowMoodChart />
+      </motion.div>
+
+      {/* Cycle Stats */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.6 }}
+      >
+        <FlowCycleStats />
+      </motion.div>
+
+      {/* Reminders */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.7 }}
+      >
+        <FlowRemindersCard />
+      </motion.div>
+
+      {/* Daily Insights */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.8 }}
         className="grid grid-cols-2 gap-3"
       >
         <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-2xl p-4 border border-orange-100 dark:border-orange-800/30">

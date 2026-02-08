@@ -1571,6 +1571,45 @@ export type Database = {
         }
         Relationships: []
       }
+      cycle_history: {
+        Row: {
+          created_at: string
+          cycle_length: number | null
+          cycle_number: number
+          end_date: string | null
+          id: string
+          notes: string | null
+          ovulation_date: string | null
+          period_length: number | null
+          start_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          cycle_length?: number | null
+          cycle_number: number
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          ovulation_date?: string | null
+          period_length?: number | null
+          start_date: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          cycle_length?: number | null
+          cycle_number?: number
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          ovulation_date?: string | null
+          period_length?: number | null
+          start_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_logs: {
         Row: {
           bleeding: string | null
@@ -2227,6 +2266,60 @@ export type Database = {
           },
         ]
       }
+      flow_daily_logs: {
+        Row: {
+          created_at: string
+          energy_level: number | null
+          flow_intensity: string | null
+          id: string
+          log_date: string
+          mood: number | null
+          notes: string | null
+          pain_level: number | null
+          sleep_hours: number | null
+          sleep_quality: number | null
+          symptoms: string[] | null
+          temperature: number | null
+          updated_at: string
+          user_id: string
+          water_glasses: number | null
+        }
+        Insert: {
+          created_at?: string
+          energy_level?: number | null
+          flow_intensity?: string | null
+          id?: string
+          log_date?: string
+          mood?: number | null
+          notes?: string | null
+          pain_level?: number | null
+          sleep_hours?: number | null
+          sleep_quality?: number | null
+          symptoms?: string[] | null
+          temperature?: number | null
+          updated_at?: string
+          user_id: string
+          water_glasses?: number | null
+        }
+        Update: {
+          created_at?: string
+          energy_level?: number | null
+          flow_intensity?: string | null
+          id?: string
+          log_date?: string
+          mood?: number | null
+          notes?: string | null
+          pain_level?: number | null
+          sleep_hours?: number | null
+          sleep_quality?: number | null
+          symptoms?: string[] | null
+          temperature?: number | null
+          updated_at?: string
+          user_id?: string
+          water_glasses?: number | null
+        }
+        Relationships: []
+      }
       flow_insights: {
         Row: {
           category: string | null
@@ -2305,6 +2398,45 @@ export type Database = {
         }
         Relationships: []
       }
+      flow_reminders: {
+        Row: {
+          created_at: string
+          days_before: number | null
+          id: string
+          is_enabled: boolean | null
+          message: string | null
+          reminder_type: string
+          time_of_day: string | null
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          days_before?: number | null
+          id?: string
+          is_enabled?: boolean | null
+          message?: string | null
+          reminder_type: string
+          time_of_day?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          days_before?: number | null
+          id?: string
+          is_enabled?: boolean | null
+          message?: string | null
+          reminder_type?: string
+          time_of_day?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       flow_symptoms: {
         Row: {
           category: string | null
@@ -2338,6 +2470,42 @@ export type Database = {
           label_az?: string | null
           sort_order?: number | null
           symptom_id?: string
+        }
+        Relationships: []
+      }
+      flow_symptoms_db: {
+        Row: {
+          category: string | null
+          created_at: string
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          sort_order: number | null
+          symptom_key: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          sort_order?: number | null
+          symptom_key: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          sort_order?: number | null
+          symptom_key?: string
         }
         Relationships: []
       }
