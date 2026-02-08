@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAutoJoinGroups } from '@/hooks/useCommunity';
 import { useOnboardingStages, useMultiplesOptions, FALLBACK_STAGES, FALLBACK_MULTIPLES } from '@/hooks/useDynamicOnboarding';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { supabase } from '@/integrations/supabase/client';
 import type { LifeStage } from '@/types/anacan';
 
 // Icon mapping for dynamic stages
@@ -113,7 +114,7 @@ const OnboardingScreen = () => {
       try {
         if (selectedStage === 'mommy') {
           if (dateInput && babyName && babyGender) {
-            // Save to Supabase
+            // Save to Supabase profiles
             const { error } = await updateProfile({
               life_stage: selectedStage,
               baby_birth_date: dateInput,
@@ -131,6 +132,19 @@ const OnboardingScreen = () => {
               });
               setIsSaving(false);
               return;
+            }
+
+            // Also add child to user_children table
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+              await supabase.from('user_children').insert({
+                user_id: user.id,
+                name: babyName,
+                birth_date: dateInput,
+                gender: babyGender,
+                avatar_emoji: babyGender === 'boy' ? '👦' : '👧',
+                sort_order: 0,
+              });
             }
 
             // Update local store
