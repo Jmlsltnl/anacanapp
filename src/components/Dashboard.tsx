@@ -714,18 +714,25 @@ const getBabyDailyFunFact = (ageInDays: number): string => {
 };
 
 const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string) => void }) => {
-  const { getBabyData } = useUserStore();
   const { toast } = useToast();
-  const babyData = getBabyData();
   const { isMilestoneAchieved, toggleMilestone, getMilestoneDate, MILESTONES } = useBabyMilestones();
   const { unlockAchievement, getTotalPoints } = useAchievements();
   const { activeTimers, startTimer, stopTimer, getElapsedSeconds, getActiveTimer } = useTimerStore();
   const { todayLogs, addLog, getTodayStats, refetch } = useBabyLogs();
-  const { children, selectedChild, hasChildren, getChildAge } = useChildren();
+  const { children, selectedChild, hasChildren, hasMultipleChildren, getChildAge } = useChildren();
   
-  // Get baby illustration for current month - use selected child's age if available
+  // Derive baby data from selectedChild for multi-child support
   const childAge = selectedChild ? getChildAge(selectedChild) : null;
-  const babyAgeMonths = childAge?.months || babyData?.ageInMonths || 1;
+  const babyData = selectedChild && childAge ? {
+    id: selectedChild.id,
+    name: selectedChild.name,
+    birthDate: new Date(selectedChild.birth_date),
+    gender: selectedChild.gender as 'boy' | 'girl',
+    ageInDays: childAge.days,
+    ageInMonths: childAge.months,
+  } : null;
+  
+  const babyAgeMonths = childAge?.months || 1;
   const { imageUrl: babyIllustration, title: illustrationTitle, description: illustrationDescription } = useBabyIllustrationByMonth(Math.max(1, Math.min(36, babyAgeMonths)));
   
   // Current time for timer display

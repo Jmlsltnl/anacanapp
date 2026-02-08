@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import { Lightbulb, BookOpen, Star } from 'lucide-react';
-import { useUserStore } from '@/store/userStore';
 import { useDevelopmentTips } from '@/hooks/useDevelopmentTips';
+import { useChildren } from '@/hooks/useChildren';
 
 const DevelopmentTipsWidget = () => {
-  const { getBabyData } = useUserStore();
-  const babyData = getBabyData();
+  const { selectedChild, getChildAge } = useChildren();
+  const childAge = selectedChild ? getChildAge(selectedChild) : null;
   
-  const ageInMonths = babyData?.ageInMonths || 0;
+  const ageInMonths = childAge?.months || 0;
   
   // Determine age group
   const getAgeGroup = () => {

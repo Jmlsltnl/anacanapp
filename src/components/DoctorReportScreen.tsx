@@ -8,13 +8,15 @@ import {
 import { useUserStore } from '@/store/userStore';
 import { useToast } from '@/hooks/use-toast';
 import { useHealthReport } from '@/hooks/useHealthReport';
+import { useChildren } from '@/hooks/useChildren';
 
 interface DoctorReportScreenProps {
   onBack: () => void;
 }
 
 const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
-  const { name, lifeStage, getCycleData, getPregnancyData, getBabyData } = useUserStore();
+  const { name, lifeStage, getCycleData, getPregnancyData } = useUserStore();
+  const { selectedChild, getChildAge } = useChildren();
   const { toast } = useToast();
   const [selectedPeriod, setSelectedPeriod] = useState('1month');
 
@@ -23,7 +25,17 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
 
   const cycleData = getCycleData();
   const pregData = getPregnancyData();
-  const babyData = getBabyData();
+  
+  // Derive baby data from selectedChild for multi-child support
+  const childAge = selectedChild ? getChildAge(selectedChild) : null;
+  const babyData = selectedChild && childAge ? {
+    id: selectedChild.id,
+    name: selectedChild.name,
+    birthDate: new Date(selectedChild.birth_date),
+    gender: selectedChild.gender as 'boy' | 'girl',
+    ageInDays: childAge.days,
+    ageInMonths: childAge.months,
+  } : null;
 
   const periods = [
     { id: '1week', label: '1 Həftə' },

@@ -4,8 +4,8 @@ import {
   Baby, Thermometer, AlertCircle, Sparkles, Star, Heart, LucideIcon
 } from 'lucide-react';
 import { hapticFeedback } from '@/lib/native';
-import { useUserStore } from '@/store/userStore';
 import { useQuickActions } from '@/hooks/useQuickActions';
+import { useChildren } from '@/hooks/useChildren';
 
 // Icon mapping
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -17,11 +17,11 @@ interface QuickActionsBarProps {
 }
 
 const QuickActionsBar = ({ onNavigateToTool }: QuickActionsBarProps) => {
-  const { getBabyData } = useUserStore();
-  const babyData = getBabyData();
+  const { selectedChild, getChildAge } = useChildren();
   
-  // Determine age group
-  const ageInMonths = babyData?.ageInMonths || 0;
+  // Determine age group from selected child
+  const childAge = selectedChild ? getChildAge(selectedChild) : null;
+  const ageInMonths = childAge?.months || 0;
   const ageGroup = ageInMonths < 3 ? 'newborn' : 'older';
   
   // Fetch from database

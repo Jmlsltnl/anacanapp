@@ -3,10 +3,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { useBabyMilestonesDB } from './useDynamicConfig';
+import { useChildren } from './useChildren';
 
 export interface BabyMilestone {
   id: string;
   user_id: string;
+  child_id: string | null;
   milestone_id: string;
   achieved_at: string;
   notes: string | null;
@@ -15,6 +17,7 @@ export interface BabyMilestone {
 
 export const useBabyMilestones = () => {
   const { user } = useAuth();
+  const { selectedChild } = useChildren();
   const { toast } = useToast();
   const [milestones, setMilestones] = useState<BabyMilestone[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,11 +41,18 @@ export const useBabyMilestones = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('baby_milestones')
         .select('*')
         .eq('user_id', user.id)
         .order('achieved_at', { ascending: false });
+
+      // Filter by selected child if available
+      if (selectedChild) {
+        query = query.eq('child_id', selectedChild.id);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setMilestones(data || []);
@@ -51,7 +61,7 @@ export const useBabyMilestones = () => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, selectedChild]);
 
   useEffect(() => {
     fetchMilestones();
@@ -106,6 +116,7 @@ export const useBabyMilestones = () => {
           .from('baby_milestones')
           .insert({
             user_id: user.id,
+            child_id: selectedChild?.id || null,
             milestone_id: milestoneId,
             notes: notes || null,
           })
@@ -131,7 +142,7 @@ export const useBabyMilestones = () => {
         variant: 'destructive',
       });
     }
-  }, [user, milestones, toast, MILESTONES]);
+  }, [user, milestones, toast, MILESTONES, selectedChild]);
 
   const isMilestoneAchieved = useCallback((milestoneId: string) => {
     return milestones.some(m => m.milestone_id === milestoneId);
