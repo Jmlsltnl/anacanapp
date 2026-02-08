@@ -49,7 +49,7 @@ const NotificationsScreen = ({ onBack }: NotificationsScreenProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-24 overflow-y-auto">
       {/* Header with safe area */}
       <div className="gradient-primary px-3 pb-4" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}>
         <div className="flex items-center gap-2 mb-3">
