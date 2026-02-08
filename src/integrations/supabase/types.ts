@@ -5343,8 +5343,11 @@ export type Database = {
           baby_name: string | null
           badge_type: string | null
           bio: string | null
+          birth_height_cm: number | null
+          birth_weight_kg: number | null
           created_at: string
           cycle_length: number | null
+          delivery_type: string | null
           due_date: string | null
           email: string | null
           id: string
@@ -5373,8 +5376,11 @@ export type Database = {
           baby_name?: string | null
           badge_type?: string | null
           bio?: string | null
+          birth_height_cm?: number | null
+          birth_weight_kg?: number | null
           created_at?: string
           cycle_length?: number | null
+          delivery_type?: string | null
           due_date?: string | null
           email?: string | null
           id?: string
@@ -5403,8 +5409,11 @@ export type Database = {
           baby_name?: string | null
           badge_type?: string | null
           bio?: string | null
+          birth_height_cm?: number | null
+          birth_weight_kg?: number | null
           created_at?: string
           cycle_length?: number | null
+          delivery_type?: string | null
           due_date?: string | null
           email?: string | null
           id?: string

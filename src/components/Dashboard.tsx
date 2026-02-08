@@ -4,7 +4,7 @@ import {
   Droplets, Moon, Utensils, Activity, Plus, TrendingUp, Heart, Sparkles, 
   Bell, ChevronRight, Flame, Target, Calendar, Zap, Sun, Cloud, Wind,
   ThermometerSun, Pill, Baby, Footprints, Scale, Clock, Star, Award,
-  MessageCircle, Check, Lightbulb, BookOpen
+  MessageCircle, Check, Lightbulb, BookOpen, PartyPopper
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useTimerStore } from '@/store/timerStore';
@@ -43,6 +43,7 @@ import BannerSlot from '@/components/banners/BannerSlot';
 import SendDailySummaryWidget from '@/components/partner/SendDailySummaryWidget';
 import RecentBlogPosts from '@/components/dashboard/RecentBlogPosts';
 import FlowDashboard from '@/components/flow/FlowDashboard';
+import BirthOnboardingModal from '@/components/BirthOnboardingModal';
 
 // Fetus images by month
 import FetusMonth1 from '@/assets/fetus/month-1.svg';
@@ -137,13 +138,16 @@ const ProgressRing = ({ progress, size = 100, strokeWidth = 8, color = "stroke-p
 
 
 const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string) => void }) => {
-  const { getPregnancyData } = useUserStore();
+  const { getPregnancyData, setLifeStage } = useUserStore();
   const { toast } = useToast();
   const pregData = getPregnancyData();
   const { todayLog, updateWaterIntake, updateMood } = useDailyLogs();
   const { getTodayStats, addSession } = useKickSessions();
   const { entries: weightEntries } = useWeightEntries();
   const { data: fruitImages = [] } = useFruitImages();
+  
+  // Birth onboarding modal state
+  const [showBirthModal, setShowBirthModal] = useState(false);
   
   // Calculate current pregnancy day (1-280) using centralized utility
   const pregnancyDay = pregData?.lastPeriodDate 
@@ -169,9 +173,12 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
   const latestWeight = weightEntries[0]?.weight;
   const firstWeight = weightEntries[weightEntries.length - 1]?.weight;
   const weightGain = latestWeight && firstWeight ? (latestWeight - firstWeight).toFixed(1) : '0';
+  
+  // Show "I gave birth" button from week 38
+  const showBirthButton = pregData?.currentWeek ? pregData.currentWeek >= 38 : false;
 
   if (!pregData) return null;
-  
+
   // Trimester color scheme
   const getTrimesterColors = (trimester: number) => {
     switch (trimester) {
@@ -624,6 +631,43 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           }}
         />
       </div>
+
+      {/* "I Gave Birth" Button - Shown from week 38 */}
+      {showBirthButton && (
+        <motion.button
+          onClick={() => setShowBirthModal(true)}
+          className="w-full p-4 rounded-2xl bg-gradient-to-r from-pink-500 via-rose-500 to-red-500 text-white shadow-lg relative overflow-hidden"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
+          <div className="absolute -left-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-xl" />
+          
+          <div className="relative z-10 flex items-center justify-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+              <PartyPopper className="w-6 h-6" />
+            </div>
+            <div className="text-left">
+              <p className="font-bold text-lg">Doğum etdim! 🎉</p>
+              <p className="text-white/80 text-sm">Analıq səyahətinizə başlayın</p>
+            </div>
+            <ChevronRight className="w-6 h-6 ml-auto" />
+          </div>
+        </motion.button>
+      )}
+
+      {/* Birth Onboarding Modal */}
+      <BirthOnboardingModal
+        isOpen={showBirthModal}
+        onClose={() => setShowBirthModal(false)}
+        onComplete={() => {
+          setShowBirthModal(false);
+          window.location.reload();
+        }}
+      />
     </div>
   );
 };
