@@ -505,6 +505,7 @@ export type Database = {
       }
       baby_growth: {
         Row: {
+          child_id: string | null
           created_at: string
           entry_date: string
           head_cm: number | null
@@ -515,6 +516,7 @@ export type Database = {
           weight_kg: number | null
         }
         Insert: {
+          child_id?: string | null
           created_at?: string
           entry_date?: string
           head_cm?: number | null
@@ -525,6 +527,7 @@ export type Database = {
           weight_kg?: number | null
         }
         Update: {
+          child_id?: string | null
           created_at?: string
           entry_date?: string
           head_cm?: number | null
@@ -534,10 +537,19 @@ export type Database = {
           user_id?: string
           weight_kg?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "baby_growth_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "user_children"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       baby_logs: {
         Row: {
+          child_id: string | null
           created_at: string
           diaper_type: string | null
           end_time: string | null
@@ -549,6 +561,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          child_id?: string | null
           created_at?: string
           diaper_type?: string | null
           end_time?: string | null
@@ -560,6 +573,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          child_id?: string | null
           created_at?: string
           diaper_type?: string | null
           end_time?: string | null
@@ -570,11 +584,20 @@ export type Database = {
           start_time?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "baby_logs_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "user_children"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       baby_milestones: {
         Row: {
           achieved_at: string
+          child_id: string | null
           created_at: string
           id: string
           milestone_id: string
@@ -583,6 +606,7 @@ export type Database = {
         }
         Insert: {
           achieved_at?: string
+          child_id?: string | null
           created_at?: string
           id?: string
           milestone_id: string
@@ -591,13 +615,22 @@ export type Database = {
         }
         Update: {
           achieved_at?: string
+          child_id?: string | null
           created_at?: string
           id?: string
           milestone_id?: string
           notes?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "baby_milestones_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "user_children"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       baby_milestones_db: {
         Row: {
@@ -6594,6 +6627,48 @@ export type Database = {
         }
         Relationships: []
       }
+      user_children: {
+        Row: {
+          avatar_emoji: string | null
+          birth_date: string
+          created_at: string | null
+          gender: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          notes: string | null
+          sort_order: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          avatar_emoji?: string | null
+          birth_date: string
+          created_at?: string | null
+          gender?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          notes?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          avatar_emoji?: string | null
+          birth_date?: string
+          created_at?: string | null
+          gender?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          notes?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_play_inventory: {
         Row: {
           created_at: string | null
@@ -6722,6 +6797,7 @@ export type Database = {
       }
       user_teething_logs: {
         Row: {
+          child_id: string | null
           created_at: string | null
           emerged_date: string | null
           id: string
@@ -6731,6 +6807,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          child_id?: string | null
           created_at?: string | null
           emerged_date?: string | null
           id?: string
@@ -6740,6 +6817,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          child_id?: string | null
           created_at?: string | null
           emerged_date?: string | null
           id?: string
@@ -6749,6 +6827,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "user_teething_logs_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "user_children"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "user_teething_logs_tooth_id_fkey"
             columns: ["tooth_id"]

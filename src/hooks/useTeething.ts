@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useChildren } from './useChildren';
 
 export interface BabyTooth {
   id: string;
@@ -22,6 +23,7 @@ export interface BabyTooth {
 export interface TeethingLog {
   id: string;
   user_id: string;
+  child_id: string | null;
   tooth_id: string;
   emerged_date: string | null;
   notes: string | null;
@@ -56,6 +58,7 @@ export interface TeethingSymptom {
 
 export const useTeething = () => {
   const { user } = useAuth();
+  const { selectedChild } = useChildren();
   const [teeth, setTeeth] = useState<BabyTooth[]>([]);
   const [logs, setLogs] = useState<TeethingLog[]>([]);
   const [tips, setTips] = useState<TeethingCareTip[]>([]);
@@ -77,15 +80,22 @@ export const useTeething = () => {
   const fetchLogs = useCallback(async () => {
     if (!user) return;
 
-    const { data, error } = await supabase
+    let query = supabase
       .from('user_teething_logs')
       .select('*')
       .eq('user_id', user.id);
 
+    // Filter by selected child if available
+    if (selectedChild) {
+      query = query.eq('child_id', selectedChild.id);
+    }
+
+    const { data, error } = await query;
+
     if (!error && data) {
       setLogs(data as TeethingLog[]);
     }
-  }, [user]);
+  }, [user, selectedChild]);
 
   const fetchTips = useCallback(async () => {
     const { data, error } = await supabase
@@ -128,39 +138,52 @@ export const useTeething = () => {
         .from('user_teething_logs')
         .upsert({
           user_id: user.id,
+          child_id: selectedChild?.id || null,
           tooth_id: toothId,
           emerged_date: date || new Date().toISOString().split('T')[0],
-        }, { onConflict: 'user_id,tooth_id' });
+        }, { onConflict: 'user_id,child_id,tooth_id' });
 
       if (!error) {
         await fetchLogs();
       }
     } else {
-      const { error } = await supabase
+      let query = supabase
         .from('user_teething_logs')
         .delete()
         .eq('user_id', user.id)
         .eq('tooth_id', toothId);
+      
+      if (selectedChild) {
+        query = query.eq('child_id', selectedChild.id);
+      }
+
+      const { error } = await query;
 
       if (!error) {
         await fetchLogs();
       }
     }
-  }, [user, fetchLogs]);
+  }, [user, selectedChild, fetchLogs]);
 
   const updateToothNote = useCallback(async (toothId: string, notes: string) => {
     if (!user) return;
 
-    const { error } = await supabase
+    let query = supabase
       .from('user_teething_logs')
       .update({ notes, updated_at: new Date().toISOString() })
       .eq('user_id', user.id)
       .eq('tooth_id', toothId);
+    
+    if (selectedChild) {
+      query = query.eq('child_id', selectedChild.id);
+    }
+
+    const { error } = await query;
 
     if (!error) {
       await fetchLogs();
     }
-  }, [user, fetchLogs]);
+  }, [user, selectedChild, fetchLogs]);
 
   const isToothEmerged = useCallback((toothId: string) => {
     return logs.some(log => log.tooth_id === toothId);

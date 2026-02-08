@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Check, Calendar, Sparkles, AlertCircle, Heart, Info, X } from 'lucide-react';
+import { ArrowLeft, Check, Calendar, Sparkles, AlertCircle, Heart, Info, X, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -10,14 +10,15 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useTeething, BabyTooth } from '@/hooks/useTeething';
-import { format } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { useChildren } from '@/hooks/useChildren';
+import ChildSelector from '@/components/mommy/ChildSelector';
 
 interface TeethingTrackerProps {
   onBack: () => void;
 }
 
 const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
+  const { selectedChild, hasChildren, hasMultipleChildren, getChildAge } = useChildren();
   const { 
     teeth, 
     tips, 
@@ -31,6 +32,8 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
     totalTeeth, 
     progress 
   } = useTeething();
+  
+  const childAge = selectedChild ? getChildAge(selectedChild) : null;
   
   const [selectedTooth, setSelectedTooth] = useState<BabyTooth | null>(null);
   const [showToothModal, setShowToothModal] = useState(false);
@@ -158,18 +161,37 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b">
-        <div className="flex items-center gap-3 p-4">
-          <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div>
-            <h1 className="text-lg font-semibold">Diş Çıxarma İzləyicisi</h1>
-            <p className="text-xs text-muted-foreground">Körpənizin dişlərini izləyin</p>
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={onBack}>
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <div>
+              <h1 className="text-lg font-semibold">Diş Çıxarma İzləyicisi</h1>
+              <p className="text-xs text-muted-foreground">
+                {selectedChild?.name || 'Körpənizin'} dişlərini izləyin
+              </p>
+            </div>
           </div>
+          {hasChildren && <ChildSelector compact />}
         </div>
       </div>
 
       <div className="p-4 space-y-6">
+        {/* Child Info Banner */}
+        {selectedChild && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20"
+          >
+            <span className="text-2xl">{selectedChild.avatar_emoji}</span>
+            <div>
+              <p className="font-medium text-sm">{selectedChild.name}</p>
+              <p className="text-xs text-muted-foreground">{childAge?.displayText}</p>
+            </div>
+          </motion.div>
+        )}
         {/* Progress Card */}
         <Card className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-950/20 dark:to-rose-950/20 border-pink-200/50">
           <CardContent className="p-4">
