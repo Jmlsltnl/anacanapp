@@ -122,6 +122,34 @@ Deno.serve(async (req) => {
               click_action: 'FLUTTER_NOTIFICATION_CLICK',
             },
             priority: 'high',
+            // Enable background/offline delivery
+            content_available: true,
+            mutable_content: true,
+            // Android specific for high priority
+            android: {
+              priority: 'high',
+              notification: {
+                sound: 'default',
+                default_vibrate_timings: true,
+                default_light_settings: true,
+              },
+            },
+            // iOS specific for background delivery
+            apns: {
+              headers: {
+                'apns-priority': '10',
+                'apns-push-type': 'alert',
+              },
+              payload: {
+                aps: {
+                  alert: { title, body },
+                  sound: 'default',
+                  badge: 1,
+                  'content-available': 1,
+                  'mutable-content': 1,
+                },
+              },
+            },
           }),
         });
 

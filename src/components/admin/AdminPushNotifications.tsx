@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Bell, Plus, Trash2, Edit, Send, Users, Baby, Heart, Moon, Clock, Calendar, Zap, Search, ChevronLeft, ChevronRight, Loader2, Filter, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -55,18 +55,22 @@ const AdminPushNotifications = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="scheduled" className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
             Gündəlik
           </TabsTrigger>
           <TabsTrigger value="pregnancy" className="flex items-center gap-2">
             <Baby className="h-4 w-4" />
-            Hamiləlik Günləri
+            Hamiləlik
+          </TabsTrigger>
+          <TabsTrigger value="flow" className="flex items-center gap-2">
+            <Moon className="h-4 w-4" />
+            Flow
           </TabsTrigger>
           <TabsTrigger value="bulk" className="flex items-center gap-2">
             <Zap className="h-4 w-4" />
-            Bulk Göndər
+            Bulk
           </TabsTrigger>
         </TabsList>
 
@@ -76,6 +80,10 @@ const AdminPushNotifications = () => {
 
         <TabsContent value="pregnancy" className="mt-6">
           <PregnancyDayNotificationsTab />
+        </TabsContent>
+
+        <TabsContent value="flow" className="mt-6">
+          <FlowRemindersTab />
         </TabsContent>
 
         <TabsContent value="bulk" className="mt-6">
@@ -576,6 +584,217 @@ const PregnancyDayNotificationsTab = () => {
         onOpenChange={() => setDeleteDialog(null)}
         onConfirm={() => deleteDialog && handleDelete(deleteDialog)}
       />
+    </div>
+  );
+};
+
+// ==================== FLOW REMINDERS TAB ====================
+const FlowRemindersTab = () => {
+  const [isTriggering, setIsTriggering] = useState(false);
+  const [reminderStats, setReminderStats] = useState<{
+    total: number;
+    byType: Record<string, number>;
+    enabledCount: number;
+  } | null>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
+
+  const reminderTypeLabels: Record<string, { label: string; emoji: string; color: string }> = {
+    period_start: { label: 'Period Başlanğıcı', emoji: '🔴', color: 'bg-rose-500' },
+    period_end: { label: 'Period Sonu', emoji: '✅', color: 'bg-green-500' },
+    ovulation: { label: 'Ovulyasiya', emoji: '🌸', color: 'bg-amber-500' },
+    fertile_start: { label: 'Məhsuldar Başlanğıc', emoji: '💕', color: 'bg-pink-500' },
+    fertile_end: { label: 'Məhsuldar Son', emoji: '📅', color: 'bg-purple-500' },
+    pms: { label: 'PMS Dövrü', emoji: '⚡', color: 'bg-orange-500' },
+    pill: { label: 'Həb Xatırlatması', emoji: '💊', color: 'bg-blue-500' },
+    custom: { label: 'Xüsusi', emoji: '🔔', color: 'bg-gray-500' },
+  };
+
+  const loadStats = async () => {
+    setLoadingStats(true);
+    try {
+      const { data, error } = await supabase
+        .from('flow_reminders')
+        .select('id, reminder_type, is_enabled');
+
+      if (error) throw error;
+
+      const byType: Record<string, number> = {};
+      let enabledCount = 0;
+
+      data?.forEach((r: any) => {
+        byType[r.reminder_type] = (byType[r.reminder_type] || 0) + 1;
+        if (r.is_enabled) enabledCount++;
+      });
+
+      setReminderStats({
+        total: data?.length || 0,
+        byType,
+        enabledCount,
+      });
+    } catch (error) {
+      console.error('Error loading flow reminder stats:', error);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  const handleTriggerNow = async () => {
+    setIsTriggering(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-flow-reminders', {
+        body: { manual: true },
+      });
+
+      if (error) throw error;
+
+      toast.success(`${data.sent || 0} flow xatırlatması göndərildi!`);
+      loadStats();
+    } catch (error) {
+      console.error('Error triggering flow reminders:', error);
+      toast.error('Xəta baş verdi');
+    } finally {
+      setIsTriggering(false);
+    }
+  };
+
+  if (loadingStats) {
+    return <LoadingSpinner />;
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Info Card */}
+      <Card className="p-4 bg-pink-500/10 border-pink-500/20">
+        <div className="flex items-start gap-3">
+          <Moon className="h-5 w-5 text-pink-500 mt-0.5" />
+          <div>
+            <h4 className="font-medium text-pink-600 dark:text-pink-400">Flow Xatırlatmaları</h4>
+            <p className="text-sm text-muted-foreground">
+              İstifadəçilərin yaratdığı period, ovulyasiya və fertil gün xatırlatmaları. 
+              Avtomatik olaraq hər saat yoxlanılır və göndərilir.
+            </p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-3 gap-4">
+        <Card className="p-4 text-center">
+          <div className="text-3xl font-bold text-primary">{reminderStats?.total || 0}</div>
+          <div className="text-sm text-muted-foreground">Toplam Xatırlatma</div>
+        </Card>
+        <Card className="p-4 text-center">
+          <div className="text-3xl font-bold text-green-500">{reminderStats?.enabledCount || 0}</div>
+          <div className="text-sm text-muted-foreground">Aktiv</div>
+        </Card>
+        <Card className="p-4 text-center">
+          <div className="text-3xl font-bold text-muted-foreground">
+            {Object.keys(reminderStats?.byType || {}).length}
+          </div>
+          <div className="text-sm text-muted-foreground">Fərqli Növ</div>
+        </Card>
+      </div>
+
+      {/* Reminder Types Breakdown */}
+      <Card className="p-4">
+        <h3 className="font-bold mb-4">Xatırlatma Növlərinə Görə</h3>
+        <div className="grid grid-cols-2 gap-3">
+          {Object.entries(reminderTypeLabels).map(([type, info]) => {
+            const count = reminderStats?.byType[type] || 0;
+            return (
+              <div 
+                key={type}
+                className="flex items-center justify-between p-3 bg-muted/50 rounded-xl"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">{info.emoji}</span>
+                  <span className="text-sm font-medium">{info.label}</span>
+                </div>
+                <Badge variant={count > 0 ? 'default' : 'secondary'}>
+                  {count}
+                </Badge>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      {/* Actions */}
+      <div className="flex justify-between items-center">
+        <Button variant="outline" onClick={loadStats}>
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Yenilə
+        </Button>
+        <Button onClick={handleTriggerNow} disabled={isTriggering}>
+          {isTriggering ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <Send className="h-4 w-4 mr-2" />
+          )}
+          İndi Test Et
+        </Button>
+      </div>
+
+      {/* Recent Logs */}
+      <Card className="p-4">
+        <h3 className="font-bold mb-4">Son Göndərilən Flow Xatırlatmaları</h3>
+        <RecentFlowLogs />
+      </Card>
+    </div>
+  );
+};
+
+// Recent flow reminder logs component
+const RecentFlowLogs = () => {
+  const [logs, setLogs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadLogs = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('notification_send_log')
+          .select('*')
+          .order('sent_at', { ascending: false })
+          .limit(20);
+
+        if (!error) {
+          setLogs(data || []);
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadLogs();
+  }, []);
+
+  if (loading) {
+    return <div className="text-center py-4 text-muted-foreground">Yüklənir...</div>;
+  }
+
+  if (logs.length === 0) {
+    return <div className="text-center py-4 text-muted-foreground">Hələ heç bir loq yoxdur</div>;
+  }
+
+  return (
+    <div className="space-y-2 max-h-[300px] overflow-y-auto">
+      {logs.map((log) => (
+        <div key={log.id} className="flex items-center justify-between p-2 bg-muted/30 rounded-lg text-sm">
+          <div>
+            <p className="font-medium">{log.title}</p>
+            <p className="text-xs text-muted-foreground">{log.body}</p>
+          </div>
+          <Badge variant={log.status === 'sent' ? 'default' : 'destructive'}>
+            {log.status}
+          </Badge>
+        </div>
+      ))}
     </div>
   );
 };
