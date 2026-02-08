@@ -77,5 +77,5 @@ export const useAdminRecipesAdmin = () => {
     },
   });
 
-  return { ...query, create, update, remove };
+  return { ...query, create, update, remove, refetch: query.refetch };
 };

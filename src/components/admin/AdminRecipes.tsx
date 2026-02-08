@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { UtensilsCrossed, Plus, Pencil, Trash2, Search, Clock, Users } from 'lucide-react';
+import { UtensilsCrossed, Plus, Pencil, Trash2, Search, Clock, Users, FileUp, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useAdminRecipesAdmin, AdminRecipe } from '@/hooks/useAdminRecipes';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const categories = [
   { id: 'pregnancy', label: 'Hamiləlik' },
@@ -21,13 +23,20 @@ const categories = [
 ];
 
 const AdminRecipes = () => {
-  const { data: recipes = [], isLoading, create, update, remove } = useAdminRecipesAdmin();
+  const { toast } = useToast();
+  const { data: recipes = [], isLoading, create, update, remove, refetch } = useAdminRecipesAdmin();
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState<AdminRecipe | null>(null);
   const [formData, setFormData] = useState<Partial<AdminRecipe>>({});
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const initialFormDataRef = useRef<string>('');
+  
+  // CSV Import states
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importData, setImportData] = useState<any[]>([]);
+  const [importing, setImporting] = useState(false);
+  const csvFileInputRef = useRef<HTMLInputElement>(null);
 
   // Check if form has unsaved changes
   const hasUnsavedChanges = useCallback(() => {
@@ -89,6 +98,134 @@ const AdminRecipes = () => {
     await remove.mutateAsync(id);
   };
 
+  // CSV parsing helper
+  const parseCSVLine = (line: string): string[] => {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        result.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    result.push(current.trim());
+    return result;
+  };
+
+  // CSV Upload Handler
+  const handleCSVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      if (lines.length < 2) {
+        toast({ title: 'Xəta', description: 'CSV faylı boşdur', variant: 'destructive' });
+        return;
+      }
+
+      const headers = parseCSVLine(lines[0]);
+      const headerMap: Record<string, string> = {
+        'Başlıq': 'title',
+        'Təsvir': 'description',
+        'Kateqoriya': 'category',
+        'Hazırlıq (dəq)': 'prep_time',
+        'Bişirmə (dəq)': 'cook_time',
+        'Porsiya': 'servings',
+        'İnqredientlər': 'ingredients',
+        'Hazırlanma': 'instructions',
+        'Şəkil URL': 'image_url',
+      };
+
+      const parsedData: any[] = [];
+      
+      for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        if (values.length < 2) continue;
+
+        const row: any = { is_active: true };
+        
+        headers.forEach((header, idx) => {
+          const dbField = headerMap[header.trim()];
+          if (dbField && values[idx]) {
+            let value = values[idx].trim().replace(/^"|"$/g, '');
+            
+            if (dbField === 'prep_time' || dbField === 'cook_time' || dbField === 'servings') {
+              const numValue = parseInt(value);
+              row[dbField] = isNaN(numValue) ? 0 : numValue;
+            } else if (dbField === 'ingredients' || dbField === 'instructions') {
+              const items = value.split(/[;|\n]/).map(s => s.trim()).filter(s => s);
+              row[dbField] = items;
+            } else {
+              row[dbField] = value;
+            }
+          }
+        });
+
+        if (row.title) {
+          if (!row.category) row.category = 'general';
+          parsedData.push(row);
+        }
+      }
+
+      if (parsedData.length === 0) {
+        toast({ title: 'Xəta', description: 'Heç bir resept tapılmadı', variant: 'destructive' });
+        return;
+      }
+
+      setImportData(parsedData);
+      setShowImportModal(true);
+    };
+
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  // Import recipes to database
+  const handleImport = async () => {
+    if (importData.length === 0) return;
+
+    setImporting(true);
+    try {
+      const { error } = await supabase
+        .from('admin_recipes')
+        .insert(importData);
+
+      if (error) throw error;
+
+      toast({ 
+        title: 'Uğurlu!', 
+        description: `${importData.length} resept əlavə edildi` 
+      });
+      setShowImportModal(false);
+      setImportData([]);
+      refetch();
+    } catch (error: any) {
+      toast({ 
+        title: 'Xəta', 
+        description: error.message, 
+        variant: 'destructive' 
+      });
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  // Download template
+  const downloadTemplate = () => {
+    window.open('/templates/reseptler_numune.csv', '_blank');
+  };
+
   const filteredRecipes = recipes.filter((r) =>
     r.title.toLowerCase().includes(search.toLowerCase())
   );
@@ -100,10 +237,27 @@ const AdminRecipes = () => {
           <h1 className="text-2xl font-bold text-foreground">Reseptlər</h1>
           <p className="text-muted-foreground">Hamiləlik və analıq reseptlərini idarə edin</p>
         </div>
-        <Button onClick={openCreateModal} className="gap-2">
-          <Plus className="w-4 h-4" />
-          Yeni Resept
-        </Button>
+        <div className="flex gap-2">
+          <input
+            type="file"
+            ref={csvFileInputRef}
+            accept=".csv"
+            onChange={handleCSVUpload}
+            className="hidden"
+          />
+          <Button onClick={downloadTemplate} variant="ghost" size="sm" className="gap-1">
+            <Download className="w-4 h-4" />
+            Şablon
+          </Button>
+          <Button onClick={() => csvFileInputRef.current?.click()} variant="outline" className="gap-2">
+            <FileUp className="w-4 h-4" />
+            CSV İmport
+          </Button>
+          <Button onClick={openCreateModal} className="gap-2">
+            <Plus className="w-4 h-4" />
+            Yeni Resept
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -331,6 +485,49 @@ const AdminRecipes = () => {
           setShowUnsavedDialog(false);
         }}
       />
+
+      {/* CSV Import Modal */}
+      <Dialog open={showImportModal} onOpenChange={setShowImportModal}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <UtensilsCrossed className="w-5 h-5 text-primary" />
+              CSV İmport - {importData.length} resept tapıldı
+            </DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="flex-1 max-h-[50vh]">
+            <div className="space-y-2 pr-4">
+              {importData.map((recipe, idx) => (
+                <div key={idx} className="p-3 bg-muted/30 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">{recipe.title}</p>
+                      <p className="text-sm text-muted-foreground line-clamp-1">{recipe.description}</p>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Badge variant="outline">{categories.find(c => c.id === recipe.category)?.label || recipe.category}</Badge>
+                      <span>{recipe.prep_time || 0}+{recipe.cook_time || 0} dəq</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowImportModal(false)}>
+              Ləğv et
+            </Button>
+            <Button onClick={handleImport} disabled={importing} className="gap-2">
+              {importing ? (
+                <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <FileUp className="w-4 h-4" />
+              )}
+              {importing ? 'Yüklənir...' : `${importData.length} Resept İmport Et`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
