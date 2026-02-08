@@ -4,16 +4,20 @@ import {
   Settings, Bell, Shield, HelpCircle, LogOut, 
   ChevronRight, Crown, Copy, Share2,
   Heart, Calendar, Palette, ShieldCheck, Edit, CreditCard, Info, ArrowLeft, X,
-  MessageCircle, Baby, ShoppingCart, TrendingUp, Gift
+  MessageCircle, Baby, ShoppingCart, TrendingUp, Gift, Plus, Trash2, Users
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useChildren, Child } from '@/hooks/useChildren';
 import { PremiumModal } from '@/components/PremiumModal';
 import { nativeShare } from '@/lib/native';
 import BannerSlot from '@/components/banners/BannerSlot';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface ProfileScreenProps {
   onNavigate?: (screen: string) => void;
@@ -26,9 +30,64 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   const { signOut, profile, isAdmin } = useAuth();
   const { toast } = useToast();
   const { unreadCount } = useNotifications();
+  const { children, addChild, updateChild, deleteChild, getChildAge } = useChildren();
   const [partnerCode] = useState(profile?.partner_code || 'ANACAN-XXXX');
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [showPartnerInfo, setShowPartnerInfo] = useState(false);
+  const [showChildModal, setShowChildModal] = useState(false);
+  const [editingChild, setEditingChild] = useState<Child | null>(null);
+  const [childForm, setChildForm] = useState<{ name: string; birth_date: string; gender: 'boy' | 'girl' | 'unknown' }>({ name: '', birth_date: '', gender: 'unknown' });
+
+  const genderOptions = [
+    { value: 'boy', label: 'Oğlan', emoji: '👦' },
+    { value: 'girl', label: 'Qız', emoji: '👧' },
+    { value: 'unknown', label: 'Müəyyən deyil', emoji: '👶' },
+  ];
+
+  const handleAddChild = async () => {
+    if (!childForm.name || !childForm.birth_date) {
+      toast({ title: 'Ad və doğum tarixi tələb olunur', variant: 'destructive' });
+      return;
+    }
+    const child = await addChild({
+      name: childForm.name,
+      birth_date: childForm.birth_date,
+      gender: childForm.gender,
+      avatar_emoji: genderOptions.find(g => g.value === childForm.gender)?.emoji || '👶',
+    });
+    if (child) {
+      toast({ title: `${childForm.name} əlavə edildi` });
+      setShowChildModal(false);
+      setChildForm({ name: '', birth_date: '', gender: 'unknown' });
+    }
+  };
+
+  const handleEditChild = async () => {
+    if (!editingChild || !childForm.name || !childForm.birth_date) return;
+    const success = await updateChild(editingChild.id, {
+      name: childForm.name,
+      birth_date: childForm.birth_date,
+      gender: childForm.gender,
+      avatar_emoji: genderOptions.find(g => g.value === childForm.gender)?.emoji || '👶',
+    });
+    if (success) {
+      toast({ title: 'Yeniləndi' });
+      setEditingChild(null);
+      setChildForm({ name: '', birth_date: '', gender: 'unknown' });
+    }
+  };
+
+  const handleDeleteChild = async (child: Child) => {
+    if (confirm(`${child.name} silinsin?`)) {
+      await deleteChild(child.id);
+      toast({ title: 'Silindi' });
+    }
+  };
+
+  const openEditChild = (child: Child) => {
+    setChildForm({ name: child.name, birth_date: child.birth_date, gender: child.gender });
+    setEditingChild(child);
+  };
 
   const menuItems = [
     { id: 'billing', icon: CreditCard, label: 'Abunəliyim' },
@@ -327,6 +386,150 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Children Management Section - Only for mommy stage */}
+      {lifeStage === 'mommy' && (
+        <motion.div
+          className="bg-card rounded-2xl p-4 mb-3 shadow-card border border-border/50"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.28 }}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-xl bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
+                <Users className="w-4 h-4 text-pink-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-foreground text-sm">Uşaqlarım</h3>
+                <p className="text-[10px] text-muted-foreground">
+                  {children.length === 0 ? 'Uşaq əlavə et' : `${children.length} uşaq`}
+                </p>
+              </div>
+            </div>
+            <motion.button
+              onClick={() => {
+                setChildForm({ name: '', birth_date: '', gender: 'unknown' });
+                setShowChildModal(true);
+              }}
+              className="w-9 h-9 rounded-xl bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <Plus className="w-4 h-4 text-pink-600" />
+            </motion.button>
+          </div>
+
+          {children.length > 0 && (
+            <div className="space-y-2">
+              {children.map((child) => {
+                const age = getChildAge(child);
+                return (
+                  <div
+                    key={child.id}
+                    className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl"
+                  >
+                    <span className="text-2xl">{child.avatar_emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{child.name}</p>
+                      <p className="text-xs text-muted-foreground">{age.displayText}</p>
+                    </div>
+                    <motion.button
+                      onClick={() => openEditChild(child)}
+                      className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center"
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <Edit className="w-3.5 h-3.5 text-muted-foreground" />
+                    </motion.button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {children.length === 0 && (
+            <button
+              onClick={() => {
+                setChildForm({ name: '', birth_date: '', gender: 'unknown' });
+                setShowChildModal(true);
+              }}
+              className="w-full p-4 rounded-xl border-2 border-dashed border-muted-foreground/30 flex flex-col items-center gap-2 text-muted-foreground hover:border-pink-400 hover:text-pink-500 transition-colors"
+            >
+              <Baby className="w-8 h-8" />
+              <span className="text-sm font-medium">İlk uşağı əlavə et</span>
+            </button>
+          )}
+        </motion.div>
+      )}
+
+      {/* Add/Edit Child Modal */}
+      <Dialog open={showChildModal || !!editingChild} onOpenChange={(open) => {
+        if (!open) {
+          setShowChildModal(false);
+          setEditingChild(null);
+        }
+      }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{editingChild ? 'Uşaq Redaktə Et' : 'Uşaq Əlavə Et'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Ad</label>
+              <Input
+                value={childForm.name}
+                onChange={(e) => setChildForm(p => ({ ...p, name: e.target.value }))}
+                placeholder="Körpənin adı"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Doğum tarixi</label>
+              <Input
+                type="date"
+                value={childForm.birth_date}
+                onChange={(e) => setChildForm(p => ({ ...p, birth_date: e.target.value }))}
+                max={new Date().toISOString().split('T')[0]}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Cins</label>
+              <div className="flex gap-2 mt-2">
+                {genderOptions.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setChildForm(p => ({ ...p, gender: opt.value as 'boy' | 'girl' | 'unknown' }))}
+                    className={`flex-1 flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all ${
+                      childForm.gender === opt.value 
+                        ? 'border-primary bg-primary/10' 
+                        : 'border-muted hover:border-muted-foreground/30'
+                    }`}
+                  >
+                    <span className="text-2xl">{opt.emoji}</span>
+                    <span className="text-xs">{opt.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={editingChild ? handleEditChild : handleAddChild} className="flex-1">
+                {editingChild ? 'Yadda saxla' : 'Əlavə et'}
+              </Button>
+              {editingChild && (
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  onClick={() => {
+                    handleDeleteChild(editingChild);
+                    setEditingChild(null);
+                  }}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Menu Items */}
       <motion.div

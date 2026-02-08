@@ -94,6 +94,58 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
     setShowAddModal(true);
   };
 
+  // Render add child modal (used in both cases)
+  const renderAddModal = () => (
+    <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Uşaq Əlavə Et</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm font-medium">Ad</label>
+            <Input
+              value={formData.name}
+              onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
+              placeholder="Körpənin adı"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium">Doğum tarixi</label>
+            <Input
+              type="date"
+              value={formData.birth_date}
+              onChange={(e) => setFormData(p => ({ ...p, birth_date: e.target.value }))}
+              max={new Date().toISOString().split('T')[0]}
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium">Cins</label>
+            <div className="flex gap-2 mt-2">
+              {genderOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setFormData(p => ({ ...p, gender: opt.value as any }))}
+                  className={`flex-1 flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all ${
+                    formData.gender === opt.value 
+                      ? 'border-primary bg-primary/10' 
+                      : 'border-muted hover:border-muted-foreground/30'
+                  }`}
+                >
+                  <span className="text-2xl">{opt.emoji}</span>
+                  <span className="text-xs">{opt.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          <Button onClick={handleAddChild} className="w-full">
+            Əlavə et
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
   // If no children, show add button
   if (!hasChildren) {
     return (
@@ -106,55 +158,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
           <Plus className="w-4 h-4" />
           Uşaq əlavə et
         </motion.button>
-
-        <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-          <DialogContent className="max-w-sm">
-            <DialogHeader>
-              <DialogTitle>Uşaq Əlavə Et</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Ad</label>
-                <Input
-                  value={formData.name}
-                  onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
-                  placeholder="Körpənin adı"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Doğum tarixi</label>
-                <Input
-                  type="date"
-                  value={formData.birth_date}
-                  onChange={(e) => setFormData(p => ({ ...p, birth_date: e.target.value }))}
-                  max={new Date().toISOString().split('T')[0]}
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Cins</label>
-                <div className="flex gap-2 mt-2">
-                  {genderOptions.map((opt) => (
-                    <button
-                      key={opt.value}
-                      onClick={() => setFormData(p => ({ ...p, gender: opt.value as any }))}
-                      className={`flex-1 flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all ${
-                        formData.gender === opt.value 
-                          ? 'border-primary bg-primary/10' 
-                          : 'border-muted hover:border-muted-foreground/30'
-                      }`}
-                    >
-                      <span className="text-2xl">{opt.emoji}</span>
-                      <span className="text-xs">{opt.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <Button onClick={handleAddChild} className="w-full">
-                Əlavə et
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        {renderAddModal()}
       </>
     );
   }
@@ -252,54 +256,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
       </div>
 
       {/* Add Modal */}
-      <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Uşaq Əlavə Et</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">Ad</label>
-              <Input
-                value={formData.name}
-                onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
-                placeholder="Körpənin adı"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Doğum tarixi</label>
-              <Input
-                type="date"
-                value={formData.birth_date}
-                onChange={(e) => setFormData(p => ({ ...p, birth_date: e.target.value }))}
-                max={new Date().toISOString().split('T')[0]}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Cins</label>
-              <div className="flex gap-2 mt-2">
-                {genderOptions.map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => setFormData(p => ({ ...p, gender: opt.value as any }))}
-                    className={`flex-1 flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all ${
-                      formData.gender === opt.value 
-                        ? 'border-primary bg-primary/10' 
-                        : 'border-muted hover:border-muted-foreground/30'
-                    }`}
-                  >
-                    <span className="text-2xl">{opt.emoji}</span>
-                    <span className="text-xs">{opt.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-            <Button onClick={handleAddChild} className="w-full">
-              Əlavə et
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {renderAddModal()}
 
       {/* Edit Modal */}
       <Dialog open={!!editingChild} onOpenChange={() => setEditingChild(null)}>
