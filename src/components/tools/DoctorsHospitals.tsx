@@ -114,56 +114,59 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
-      <div className="sticky top-0 z-20 isolate bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-4 pt-4 pb-3 safe-area-top">
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 pointer-events-none" />
-        <div className="flex items-center gap-3 mb-4 relative z-30">
-          <motion.button
-            onClick={onBack}
-            className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center relative z-30"
-            whileTap={{ scale: 0.95 }}
-          >
-            <ArrowLeft className="w-5 h-5 text-white" />
-          </motion.button>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold text-white">Həkimlər və Xəstəxanalar</h1>
-            <p className="text-xs text-white/80">Sizin üçün ən yaxşı seçimlər</p>
-          </div>
-        </div>
-
-        {/* Search */}
-        <div className="relative mb-3 z-20">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" />
-          <input
-            type="text"
-            placeholder="Həkim, xəstəxana və ya ixtisas axtar..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-11 pl-10 pr-3 rounded-xl bg-white/20 border border-white/20 text-white placeholder:text-white/60 text-sm transition-all outline-none focus:bg-white/30"
-          />
-        </div>
-
-        {/* Filter Tabs */}
-        <div className="flex gap-2 relative z-20">
-          {[
-            { id: 'all', label: 'Hamısı', emoji: '✨' },
-            { id: 'hospital', label: 'Xəstəxana', emoji: '🏥' },
-            { id: 'clinic', label: 'Klinika', emoji: '🏢' },
-            { id: 'doctor', label: 'Həkim', emoji: '👨‍⚕️' },
-          ].map((filter) => (
-            <button
-              key={filter.id}
-              onClick={() => setActiveFilter(filter.id)}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
-                activeFilter === filter.id
-                  ? 'bg-white text-indigo-600 shadow-lg'
-                  : 'bg-white/20 text-white/90 hover:bg-white/30'
-              }`}
+      {/* Compact Header */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
+        <div className="px-4 pt-4 pb-3 safe-area-top">
+          <div className="flex items-center gap-3 mb-3">
+            <motion.button
+              onClick={onBack}
+              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
+              whileTap={{ scale: 0.95 }}
             >
-              <span>{filter.emoji}</span>
-              {filter.label}
-            </button>
-          ))}
+              <ArrowLeft className="w-5 h-5 text-foreground" />
+            </motion.button>
+            <div className="flex-1">
+              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-indigo-500" />
+                Həkimlər və Xəstəxanalar
+              </h1>
+            </div>
+          </div>
+
+          {/* Search */}
+          <div className="relative mb-3">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Həkim, xəstəxana axtar..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-10 pl-10 pr-3 rounded-xl bg-muted border-0 text-sm transition-all outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+
+          {/* Filter Tabs */}
+          <div className="flex gap-2">
+            {[
+              { id: 'all', label: 'Hamısı', emoji: '✨' },
+              { id: 'hospital', label: 'Xəstəxana', emoji: '🏥' },
+              { id: 'clinic', label: 'Klinika', emoji: '🏢' },
+              { id: 'doctor', label: 'Həkim', emoji: '👨‍⚕️' },
+            ].map((filter) => (
+              <button
+                key={filter.id}
+                onClick={() => setActiveFilter(filter.id)}
+                className={`flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+                  activeFilter === filter.id
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                }`}
+              >
+                <span>{filter.emoji}</span>
+                {filter.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

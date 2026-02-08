@@ -511,82 +511,48 @@ Anacan tətbiqi ilə yaradılıb 💜`;
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
-      <div className="sticky top-0 z-20 isolate bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white safe-area-top overflow-hidden">
-        {/* Animated stars */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(15)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute text-white/30"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                fontSize: `${8 + Math.random() * 10}px`,
-              }}
-              animate={{
-                opacity: [0.2, 0.8, 0.2],
-                scale: [1, 1.2, 1],
-              }}
-              transition={{
-                duration: 2 + Math.random() * 2,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
+      {/* Compact Header */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
+        <div className="px-4 py-3 safe-area-top">
+          <div className="flex items-center gap-3 mb-3">
+            <motion.button 
+              onClick={onBack} 
+              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
+              whileTap={{ scale: 0.95 }}
             >
-              ✦
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="relative z-20 p-4">
-          <div className="flex items-center gap-3 mb-4 relative z-20">
-            <button onClick={onBack} className="relative z-30 p-2 hover:bg-white/20 rounded-full transition-colors">
-              <ArrowLeft className="h-5 w-5" />
-            </button>
+              <ArrowLeft className="h-5 w-5 text-foreground" />
+            </motion.button>
             <div className="flex-1">
-              <h1 className="text-lg font-bold flex items-center gap-2">
-                <Sparkles className="h-5 w-5" />
-                Ulduz Falı & Uyğunluq
+              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-purple-500" />
+                Ulduz Falı
               </h1>
-              <p className="text-xs text-white/80">AI ilə professional astroloji analiz</p>
             </div>
           </div>
 
           {/* Step Indicators */}
-          <div className="flex items-center justify-between px-2">
+          <div className="flex items-center gap-2">
             {STEPS.map((step, idx) => (
-              <div key={step.id} className="flex items-center">
-                <button
-                  onClick={() => step.id <= currentStep && setCurrentStep(step.id)}
-                  className={cn(
-                    "flex flex-col items-center gap-1 transition-all",
-                    currentStep >= step.id ? "opacity-100" : "opacity-50"
-                  )}
-                >
-                  <div className={cn(
-                    "w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all",
-                    currentStep === step.id 
-                      ? "bg-white text-purple-600 shadow-lg scale-110" 
-                      : currentStep > step.id 
-                        ? "bg-white/30" 
-                        : "bg-white/10"
-                  )}>
-                    {currentStep > step.id ? (
-                      <Check className="h-5 w-5" />
-                    ) : (
-                      step.emoji
-                    )}
-                  </div>
-                  <span className="text-xs font-medium">{step.title}</span>
-                </button>
-                {idx < STEPS.length - 1 && (
-                  <div className={cn(
-                    "w-12 h-0.5 mx-1 transition-colors",
-                    currentStep > step.id ? "bg-white" : "bg-white/20"
-                  )} />
+              <motion.button
+                key={step.id}
+                onClick={() => step.id <= currentStep && setCurrentStep(step.id)}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-medium transition-all",
+                  currentStep === step.id 
+                    ? "bg-primary text-primary-foreground" 
+                    : currentStep > step.id 
+                      ? "bg-primary/20 text-primary"
+                      : "bg-muted text-muted-foreground"
                 )}
-              </div>
+                whileTap={{ scale: 0.98 }}
+              >
+                {currentStep > step.id ? (
+                  <Check className="h-3 w-3" />
+                ) : (
+                  <span>{step.emoji}</span>
+                )}
+                {step.title}
+              </motion.button>
             ))}
           </div>
         </div>

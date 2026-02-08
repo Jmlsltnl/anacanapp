@@ -115,39 +115,36 @@ const BlogScreen = ({ onBack, initialSlug }: BlogScreenProps) => {
 
   return (
       <div className="min-h-screen bg-background pb-24 overflow-y-auto">
-      {/* Premium Header */}
-      <div className="relative overflow-hidden z-10 isolate">
-        <div className="absolute inset-0 bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600 pointer-events-none" />
-        <div className="absolute inset-0 opacity-30 pointer-events-none">
-          <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-white/20 blur-3xl" />
-          <div className="absolute bottom-5 right-10 w-40 h-40 rounded-full bg-pink-300/20 blur-3xl" />
-        </div>
-        
-        <div className="relative px-4 pt-4 pb-8 safe-area-top z-30">
-          <div className="flex items-center gap-3 mb-4 relative z-30">
+      {/* Compact Header */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
+        <div className="px-4 pt-4 pb-3 safe-area-top">
+          <div className="flex items-center gap-3 mb-3">
             <motion.button
               onClick={(e) => {
                 e.stopPropagation();
                 onBack();
               }}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center cursor-pointer"
+              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
               whileTap={{ scale: 0.95 }}
-              style={{ pointerEvents: 'auto' }}
             >
-              <ArrowLeft className="w-5 h-5 text-white" />
+              <ArrowLeft className="w-5 h-5 text-foreground" />
             </motion.button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-white">Ana Bloqu</h1>
-              <p className="text-white/80 text-sm">{posts.length} faydalı məqalə</p>
+              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-violet-500" />
+                Ana Bloqu
+              </h1>
             </div>
-            <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="px-2 py-1 rounded-full bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium">
+                {posts.length} məqalə
+              </span>
             </div>
           </div>
 
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               value={searchQuery}
               onChange={(e) => {
@@ -155,44 +152,13 @@ const BlogScreen = ({ onBack, initialSlug }: BlogScreenProps) => {
                 setShowSaved(false);
               }}
               placeholder="Məqalə axtar..."
-              className="pl-12 h-12 rounded-2xl bg-white/95 dark:bg-card/95 backdrop-blur-md border-0 shadow-lg text-base"
+              className="pl-10 h-10 rounded-xl bg-muted border-0 text-sm"
             />
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-3 mt-4">
-            <motion.div
-              className="bg-white/20 backdrop-blur-md rounded-xl p-3 text-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <p className="text-2xl font-black text-white">{posts.length}</p>
-              <p className="text-xs text-white/70">Məqalə</p>
-            </motion.div>
-            <motion.div
-              className="bg-white/20 backdrop-blur-md rounded-xl p-3 text-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-            >
-              <p className="text-2xl font-black text-white">{categories.length}</p>
-              <p className="text-xs text-white/70">Kateqoriya</p>
-            </motion.div>
-            <motion.div
-              className="bg-white/20 backdrop-blur-md rounded-xl p-3 text-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <p className="text-2xl font-black text-white">{savedPosts.length}</p>
-              <p className="text-xs text-white/70">Saxlanılmış</p>
-            </motion.div>
           </div>
         </div>
       </div>
 
-      <div className="px-4 -mt-4 space-y-4 relative z-20">
+      <div className="px-4 pt-4 space-y-4">
         {/* Categories */}
         <motion.div
           className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar"

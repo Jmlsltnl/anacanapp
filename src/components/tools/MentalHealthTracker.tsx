@@ -2,10 +2,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Heart, Phone, AlertTriangle, CheckCircle, ChevronRight, Brain, Wind, Smile, ChevronLeft, ExternalLink, Sparkles, Activity, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+// Note: RadioGroup removed - using custom button-based selection for better UX
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
@@ -123,10 +123,19 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
   };
 
   const handleEPDSAnswer = (questionId: number, value: number) => {
+    // Update the answer for the current question
     setEpdsAnswers(prev => ({ ...prev, [questionId]: value }));
-    
+  };
+
+  const goToNextQuestion = () => {
     if (currentQuestion < EPDS_QUESTIONS.length - 1) {
-      setTimeout(() => setCurrentQuestion(prev => prev + 1), 300);
+      setCurrentQuestion(prev => prev + 1);
+    }
+  };
+
+  const goToPrevQuestion = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(prev => prev - 1);
     }
   };
 
@@ -663,41 +672,56 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                   exit={{ opacity: 0, x: -20 }}
                 >
                   <p className="font-bold mb-4 text-lg text-foreground">{EPDS_QUESTIONS[currentQuestion].question}</p>
-                  <RadioGroup
-                    value={epdsAnswers[EPDS_QUESTIONS[currentQuestion].id]?.toString()}
-                    onValueChange={(v) => handleEPDSAnswer(EPDS_QUESTIONS[currentQuestion].id, parseInt(v))}
-                    className="space-y-2"
-                  >
-                    {EPDS_QUESTIONS[currentQuestion].options.map(option => (
-                      <motion.div 
-                        key={option.value} 
-                        className={`flex items-center space-x-3 p-4 rounded-2xl transition-all cursor-pointer border-2
-                          ${epdsAnswers[EPDS_QUESTIONS[currentQuestion].id] === option.value
-                            ? 'bg-teal-100 dark:bg-teal-900/30 border-teal-500'
-                            : 'bg-muted/50 hover:bg-muted border-transparent'
-                          }`}
-                        onClick={() => handleEPDSAnswer(EPDS_QUESTIONS[currentQuestion].id, option.value)}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <RadioGroupItem value={option.value.toString()} id={`option-${option.value}`} />
-                        <Label htmlFor={`option-${option.value}`} className="flex-1 cursor-pointer font-medium">
-                          {option.label}
-                        </Label>
-                      </motion.div>
-                    ))}
-                  </RadioGroup>
+                  <div className="space-y-2">
+                    {EPDS_QUESTIONS[currentQuestion].options.map(option => {
+                      const isSelected = epdsAnswers[EPDS_QUESTIONS[currentQuestion].id] === option.value;
+                      return (
+                        <motion.button
+                          key={option.value}
+                          type="button"
+                          className={`w-full flex items-center space-x-3 p-4 rounded-2xl transition-all text-left border-2
+                            ${isSelected
+                              ? 'bg-teal-100 dark:bg-teal-900/30 border-teal-500'
+                              : 'bg-muted/50 hover:bg-muted border-transparent'
+                            }`}
+                          onClick={() => handleEPDSAnswer(EPDS_QUESTIONS[currentQuestion].id, option.value)}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            isSelected ? 'border-teal-500 bg-teal-500' : 'border-muted-foreground/30'
+                          }`}>
+                            {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
+                          </div>
+                          <span className="flex-1 font-medium">{option.label}</span>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
 
             <div className="flex gap-2 pt-4">
-              {currentQuestion > 0 && (
-                <Button variant="outline" className="rounded-xl" onClick={() => setCurrentQuestion(prev => prev - 1)}>
-                  <ChevronLeft className="w-4 h-4 mr-1" />
-                  Geri
+              <Button 
+                variant="outline" 
+                className="rounded-xl" 
+                onClick={goToPrevQuestion}
+                disabled={currentQuestion === 0}
+              >
+                <ChevronLeft className="w-4 h-4 mr-1" />
+                Geri
+              </Button>
+              
+              {currentQuestion < EPDS_QUESTIONS.length - 1 ? (
+                <Button 
+                  className="flex-1 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-600 border-0"
+                  onClick={goToNextQuestion}
+                  disabled={epdsAnswers[EPDS_QUESTIONS[currentQuestion].id] === undefined}
+                >
+                  Növbəti
+                  <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
-              )}
-              {currentQuestion === EPDS_QUESTIONS.length - 1 && (
+              ) : (
                 <Button 
                   className="flex-1 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-600 border-0"
                   onClick={handleSubmitEPDS}
