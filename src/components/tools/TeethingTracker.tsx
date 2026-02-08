@@ -89,7 +89,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
     }
   };
 
-  const renderToothSVG = (teethList: BabyTooth[], position: 'upper' | 'lower') => {
+  const renderToothDiagram = (teethList: BabyTooth[], position: 'upper' | 'lower') => {
     // Arrange teeth in dental arch order
     const sortedTeeth = [...teethList].sort((a, b) => {
       const order = position === 'upper' 
@@ -98,50 +98,72 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
       return order.indexOf(a.tooth_code) - order.indexOf(b.tooth_code);
     });
 
+    // Get tooth dimensions and styles based on type
+    const getToothStyle = (tooth: BabyTooth, emerged: boolean) => {
+      const isMolar = tooth.tooth_type === 'molar';
+      const isCanine = tooth.tooth_type === 'canine';
+      
+      const baseSize = isMolar ? 'w-8 h-10' : isCanine ? 'w-6 h-9' : 'w-6 h-8';
+      const baseColor = emerged 
+        ? 'bg-gradient-to-b from-pink-300 to-pink-400 dark:from-pink-400 dark:to-pink-500 shadow-md shadow-pink-300/50 dark:shadow-pink-500/30' 
+        : 'bg-gradient-to-b from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700';
+      
+      return { baseSize, baseColor, isMolar, isCanine };
+    };
+
     return (
-      <div className="flex justify-center items-center gap-1">
+      <div className={`flex justify-center items-end gap-1 ${position === 'lower' ? 'items-start' : 'items-end'}`}>
         {sortedTeeth.map((tooth, index) => {
           const emerged = isToothEmerged(tooth.id);
-          const isMolar = tooth.tooth_type === 'molar';
-          const isCanine = tooth.tooth_type === 'canine';
+          const { baseSize, baseColor, isMolar, isCanine } = getToothStyle(tooth, emerged);
+          
+          // Create arch effect with different heights
+          const archOffset = Math.abs(index - 4.5);
+          const archMargin = position === 'upper' 
+            ? `mt-${Math.floor(archOffset * 0.5)}`
+            : `mb-${Math.floor(archOffset * 0.5)}`;
           
           return (
             <motion.button
               key={tooth.id}
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.1, y: position === 'upper' ? 2 : -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => handleToothClick(tooth)}
-              className={`relative transition-all duration-200 ${
-                emerged 
-                  ? 'text-primary' 
-                  : 'text-muted-foreground/30 hover:text-muted-foreground/50'
-              }`}
+              className={`relative transition-all duration-200 ${baseSize} ${baseColor} ${
+                position === 'upper' ? 'rounded-t-lg rounded-b-[40%]' : 'rounded-b-lg rounded-t-[40%]'
+              } border-2 ${emerged ? 'border-pink-200 dark:border-pink-300' : 'border-gray-300 dark:border-gray-500'}`}
+              style={{
+                marginTop: position === 'upper' ? `${archOffset * 2}px` : 0,
+                marginBottom: position === 'lower' ? `${archOffset * 2}px` : 0,
+              }}
             >
-              <svg
-                viewBox="0 0 24 32"
-                className={`${isMolar ? 'w-7 h-9' : isCanine ? 'w-5 h-8' : 'w-5 h-7'}`}
-                fill="currentColor"
-              >
-                {isMolar ? (
-                  // Molar shape
-                  <path d="M4 4C4 2 6 0 12 0C18 0 20 2 20 4V20C20 26 18 32 16 32C14 32 13 28 12 28C11 28 10 32 8 32C6 32 4 26 4 20V4Z" />
-                ) : isCanine ? (
-                  // Canine shape (pointed)
-                  <path d="M6 4C6 2 8 0 12 0C16 0 18 2 18 4V18C18 26 15 32 12 32C9 32 6 26 6 18V4Z" />
-                ) : (
-                  // Incisor shape
-                  <path d="M6 4C6 2 8 0 12 0C16 0 18 2 18 4V22C18 28 15 32 12 32C9 32 6 28 6 22V4Z" />
-                )}
-              </svg>
+              {/* Tooth shine effect */}
+              <div className={`absolute inset-0 ${position === 'upper' ? 'rounded-t-lg rounded-b-[40%]' : 'rounded-b-lg rounded-t-[40%]'} overflow-hidden`}>
+                <div className="absolute top-0 left-0 w-1/3 h-full bg-white/30 dark:bg-white/20" />
+              </div>
+              
+              {/* Root indication for emerged teeth */}
+              {emerged && (
+                <div className={`absolute ${position === 'upper' ? '-bottom-1' : '-top-1'} left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-pink-200 dark:bg-pink-300`} />
+              )}
+              
+              {/* Check mark for emerged */}
               {emerged && (
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full flex items-center justify-center"
+                  className={`absolute ${position === 'upper' ? '-top-2' : '-bottom-2'} -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center shadow-sm z-10`}
                 >
-                  <Check className="w-2 h-2 text-white" />
+                  <Check className="w-2.5 h-2.5 text-white" />
                 </motion.div>
               )}
+              
+              {/* Tooth label on hover - using tooltip behavior */}
+              <div className={`absolute ${position === 'upper' ? 'top-full mt-1' : 'bottom-full mb-1'} left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 pointer-events-none`}>
+                <span className="text-[8px] whitespace-nowrap bg-foreground/80 text-background px-1 py-0.5 rounded">
+                  {tooth.name_az || tooth.name}
+                </span>
+              </div>
             </motion.button>
           );
         })}
@@ -223,42 +245,44 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
             </CardTitle>
             <p className="text-xs text-muted-foreground">Dişə toxunaraq qeyd edin</p>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4">
             {/* Upper Jaw */}
             <div className="space-y-2">
               <p className="text-xs text-center text-muted-foreground font-medium">Yuxarı Çənə</p>
-              <div className="bg-gradient-to-b from-rose-50 to-transparent dark:from-rose-950/20 rounded-t-[100px] p-4 pt-6">
-                {renderToothSVG(upperTeeth, 'upper')}
+              <div className="bg-gradient-to-b from-rose-100/80 via-rose-50/50 to-transparent dark:from-rose-900/30 dark:via-rose-950/20 rounded-t-[80px] p-5 pt-8 border-x-2 border-t-2 border-rose-200/50 dark:border-rose-800/30">
+                {renderToothDiagram(upperTeeth, 'upper')}
               </div>
             </div>
 
             {/* Divider - Gum Line */}
-            <div className="relative">
+            <div className="relative py-2">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t-2 border-dashed border-rose-200 dark:border-rose-800" />
+                <div className="w-full h-1 bg-gradient-to-r from-transparent via-rose-300 to-transparent dark:via-rose-600 rounded-full" />
               </div>
               <div className="relative flex justify-center">
-                <span className="bg-background px-3 text-xs text-muted-foreground">Diş əti xətti</span>
+                <span className="bg-background px-4 py-1 text-xs font-medium text-rose-500 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-full">
+                  Diş əti xətti
+                </span>
               </div>
             </div>
 
             {/* Lower Jaw */}
             <div className="space-y-2">
-              <div className="bg-gradient-to-t from-rose-50 to-transparent dark:from-rose-950/20 rounded-b-[100px] p-4 pb-6">
-                {renderToothSVG(lowerTeeth, 'lower')}
+              <div className="bg-gradient-to-t from-rose-100/80 via-rose-50/50 to-transparent dark:from-rose-900/30 dark:via-rose-950/20 rounded-b-[80px] p-5 pb-8 border-x-2 border-b-2 border-rose-200/50 dark:border-rose-800/30">
+                {renderToothDiagram(lowerTeeth, 'lower')}
               </div>
               <p className="text-xs text-center text-muted-foreground font-medium">Aşağı Çənə</p>
             </div>
 
             {/* Legend */}
-            <div className="flex justify-center gap-6 pt-2">
+            <div className="flex justify-center gap-8 pt-4 border-t border-border/50">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-primary" />
-                <span className="text-xs">Çıxıb</span>
+                <div className="w-5 h-6 rounded-t-md rounded-b-[30%] bg-gradient-to-b from-pink-300 to-pink-400 border-2 border-pink-200 shadow-sm" />
+                <span className="text-xs font-medium">Çıxıb</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-muted-foreground/30" />
-                <span className="text-xs">Çıxmayıb</span>
+                <div className="w-5 h-6 rounded-t-md rounded-b-[30%] bg-gradient-to-b from-gray-200 to-gray-300 border-2 border-gray-300" />
+                <span className="text-xs font-medium">Çıxmayıb</span>
               </div>
             </div>
           </CardContent>

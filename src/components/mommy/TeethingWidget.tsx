@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Sparkles, ChevronRight, Check } from 'lucide-react';
+import { Sparkles, ChevronRight, Check, Clock } from 'lucide-react';
 import { useTeething } from '@/hooks/useTeething';
 import { useChildren } from '@/hooks/useChildren';
 import { Progress } from '@/components/ui/progress';
@@ -9,11 +9,11 @@ interface TeethingWidgetProps {
 }
 
 const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
-  const { selectedChild, getChildAge, hasChildren } = useChildren();
-  const { emergedCount, totalTeeth, progress, teeth, loading } = useTeething();
+  const { selectedChild, getChildAge, hasChildren, loading: childrenLoading } = useChildren();
+  const { emergedCount, totalTeeth, progress, loading: teethingLoading } = useTeething();
 
-  // Don't render if no children or still loading
-  if (loading) {
+  // Don't render if still loading
+  if (childrenLoading || teethingLoading) {
     return (
       <div className="bg-card rounded-2xl p-4 animate-pulse">
         <div className="h-20 bg-muted rounded-xl" />
@@ -59,46 +59,16 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
   
   // Determine status
   const isOnTrack = emergedCount >= expectedTeeth - 2;
-  const statusColor = isOnTrack ? 'text-emerald-600' : 'text-amber-600';
+  const statusColor = isOnTrack ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400';
   const statusBg = isOnTrack ? 'bg-emerald-50 dark:bg-emerald-950/30' : 'bg-amber-50 dark:bg-amber-950/30';
-
-  // Render mini teeth visualization
-  const renderMiniTeeth = () => {
-    const upperTeeth = teeth.filter(t => t.position === 'upper').slice(0, 5);
-    const lowerTeeth = teeth.filter(t => t.position === 'lower').slice(0, 5);
-    
-    return (
-      <div className="flex flex-col gap-0.5">
-        <div className="flex justify-center gap-0.5">
-          {upperTeeth.map((tooth) => {
-            const emerged = emergedCount > 0; // simplified check
-            return (
-              <div
-                key={tooth.id}
-                className={`w-2 h-3 rounded-sm ${
-                  emerged ? 'bg-pink-400' : 'bg-muted-foreground/20'
-                }`}
-              />
-            );
-          })}
-        </div>
-        <div className="flex justify-center gap-0.5">
-          {lowerTeeth.map((tooth) => (
-            <div
-              key={tooth.id}
-              className="w-2 h-3 rounded-sm bg-muted-foreground/20"
-            />
-          ))}
-        </div>
-      </div>
-    );
-  };
 
   return (
     <motion.button
       onClick={onOpen}
       className="w-full text-left"
       whileTap={{ scale: 0.98 }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
     >
       <div className="bg-gradient-to-br from-pink-50 via-rose-50 to-fuchsia-50 dark:from-pink-950/30 dark:via-rose-950/30 dark:to-fuchsia-950/30 rounded-2xl p-4 border border-pink-100/50 dark:border-pink-900/30 relative overflow-hidden">
         {/* Background decoration */}
@@ -125,7 +95,7 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
           <div className="mb-3">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-xs text-muted-foreground">Çıxan dişlər</span>
-              <span className="text-sm font-bold text-pink-600">{emergedCount} / {totalTeeth}</span>
+              <span className="text-sm font-bold text-pink-600 dark:text-pink-400">{emergedCount} / {totalTeeth}</span>
             </div>
             <Progress value={progress} className="h-2 bg-pink-100 dark:bg-pink-900/30" />
           </div>
@@ -148,7 +118,10 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
             {/* Next Teeth */}
             {nextTeeth && (
               <div className="flex-1 rounded-xl p-2.5 bg-muted/50">
-                <p className="text-[10px] text-muted-foreground mb-0.5">Növbəti:</p>
+                <div className="flex items-center gap-1 mb-0.5">
+                  <Clock className="w-3 h-3 text-muted-foreground" />
+                  <p className="text-[10px] text-muted-foreground">Növbəti:</p>
+                </div>
                 <p className="text-xs font-medium line-clamp-1">{nextTeeth.name}</p>
                 <p className="text-[10px] text-muted-foreground">{nextTeeth.timeframe}</p>
               </div>
