@@ -39,7 +39,11 @@ const AdminContentManager = () => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showBulkImport, setShowBulkImport] = useState(false);
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const [showNamesImport, setShowNamesImport] = useState(false);
+  const [namesImportData, setNamesImportData] = useState<any[]>([]);
+  const [namesImporting, setNamesImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const namesFileInputRef = useRef<HTMLInputElement>(null);
   const initialFormDataRef = useRef<string>('');
 
   const contentConfig = {
@@ -141,6 +145,130 @@ const AdminContentManager = () => {
   useEffect(() => {
     fetchItems();
   }, [activeTab]);
+
+  // CSV parsing helper for baby names
+  const parseCSVLine = (line: string): string[] => {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        result.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    result.push(current.trim());
+    return result;
+  };
+
+  const handleNamesCSVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      if (lines.length < 2) {
+        toast({ title: 'Xəta', description: 'CSV faylı boşdur', variant: 'destructive' });
+        return;
+      }
+
+      const headers = parseCSVLine(lines[0]);
+      const headerMap: Record<string, string> = {
+        'Ad': 'name',
+        'Cins': 'gender',
+        'Mənşə': 'origin',
+        'Məna': 'meaning',
+        'Məna (AZ)': 'meaning_az',
+        'Populyarlıq': 'popularity',
+      };
+
+      const parsedData: any[] = [];
+      
+      for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        if (values.length < 2) continue;
+
+        const row: any = { is_active: true };
+        
+        headers.forEach((header, idx) => {
+          const dbField = headerMap[header.trim()];
+          if (dbField && values[idx]) {
+            let value = values[idx].trim().replace(/^"|"$/g, '');
+            
+            if (dbField === 'gender') {
+              // Map Azerbaijani gender names to DB values
+              const genderMap: Record<string, string> = {
+                'Qız': 'girl',
+                'Oğlan': 'boy',
+                'Unisex': 'unisex',
+              };
+              value = genderMap[value] || value.toLowerCase();
+            } else if (dbField === 'popularity') {
+              // Parse popularity percentage to number
+              const numValue = parseInt(value.replace('%', ''));
+              row[dbField] = isNaN(numValue) ? 50 : numValue;
+              return;
+            }
+            
+            row[dbField] = value;
+          }
+        });
+
+        if (row.name) {
+          parsedData.push(row);
+        }
+      }
+
+      if (parsedData.length === 0) {
+        toast({ title: 'Xəta', description: 'Heç bir ad tapılmadı', variant: 'destructive' });
+        return;
+      }
+
+      setNamesImportData(parsedData);
+      setShowNamesImport(true);
+    };
+
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  const handleNamesImport = async () => {
+    if (namesImportData.length === 0) return;
+
+    setNamesImporting(true);
+    try {
+      const { error } = await supabase
+        .from('baby_names_db')
+        .insert(namesImportData);
+
+      if (error) throw error;
+
+      toast({ 
+        title: 'Uğurlu!', 
+        description: `${namesImportData.length} ad əlavə edildi` 
+      });
+      setShowNamesImport(false);
+      setNamesImportData([]);
+      fetchItems();
+    } catch (error: any) {
+      toast({ 
+        title: 'Xəta', 
+        description: error.message, 
+        variant: 'destructive' 
+      });
+    } finally {
+      setNamesImporting(false);
+    }
+  };
 
   const handleSave = async () => {
     const config = contentConfig[activeTab];
@@ -450,6 +578,21 @@ const AdminContentManager = () => {
               Toplu İmport
             </Button>
           )}
+          {activeTab === 'names' && (
+            <>
+              <input
+                type="file"
+                ref={namesFileInputRef}
+                accept=".csv"
+                onChange={handleNamesCSVUpload}
+                className="hidden"
+              />
+              <Button onClick={() => namesFileInputRef.current?.click()} variant="outline" className="gap-2">
+                <FileUp className="w-4 h-4" />
+                CSV İmport
+              </Button>
+            </>
+          )}
           <Button onClick={openCreateModal} className="gradient-primary">
             <Plus className="w-4 h-4 mr-2" />
             Yeni Əlavə Et
@@ -594,6 +737,67 @@ const AdminContentManager = () => {
         onClose={() => setShowBulkImport(false)}
         onSuccess={fetchItems}
       />
+
+      {/* Baby Names CSV Import Modal */}
+      <Dialog open={showNamesImport} onOpenChange={setShowNamesImport}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Baby className="w-5 h-5 text-primary" />
+              CSV İmport - {namesImportData.length} ad tapıldı
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-y-auto space-y-3 py-4">
+            {namesImportData.slice(0, 20).map((item, idx) => (
+              <div key={idx} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <span className={`text-lg ${item.gender === 'girl' ? 'text-pink-500' : item.gender === 'boy' ? 'text-blue-500' : 'text-purple-500'}`}>
+                  {item.gender === 'girl' ? '👧' : item.gender === 'boy' ? '👦' : '👶'}
+                </span>
+                <div className="flex-1">
+                  <p className="font-semibold">{item.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {item.origin && `${item.origin} • `}
+                    {item.meaning_az || item.meaning}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                    {item.popularity}%
+                  </span>
+                </div>
+              </div>
+            ))}
+            {namesImportData.length > 20 && (
+              <p className="text-center text-sm text-muted-foreground py-2">
+                və daha {namesImportData.length - 20} ad...
+              </p>
+            )}
+          </div>
+
+          <div className="flex gap-3 pt-4 border-t">
+            <Button 
+              variant="outline" 
+              onClick={() => { setShowNamesImport(false); setNamesImportData([]); }} 
+              className="flex-1"
+              disabled={namesImporting}
+            >
+              Ləğv et
+            </Button>
+            <Button 
+              onClick={handleNamesImport} 
+              className="flex-1 gradient-primary"
+              disabled={namesImporting}
+            >
+              {namesImporting ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                `${namesImportData.length} Ad Əlavə Et`
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Unsaved Changes Dialog */}
       <UnsavedChangesDialog
