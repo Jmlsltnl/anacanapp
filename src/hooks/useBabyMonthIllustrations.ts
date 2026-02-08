@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -36,14 +37,19 @@ export const useBabyMonthIllustrations = () => {
 };
 
 export const useBabyIllustrationByMonth = (monthNumber: number) => {
-  const { data: illustrations = [] } = useBabyMonthIllustrations();
-  const illustration = illustrations.find(i => i.month_number === monthNumber);
-  return {
-    imageUrl: illustration?.image_url || DEFAULT_BABY_ILLUSTRATION,
-    title: illustration?.title_az || illustration?.title || null,
-    description: illustration?.description_az || illustration?.description || null,
-    hasIllustration: !!illustration
-  };
+  const { data: illustrations = [], isLoading, error } = useBabyMonthIllustrations();
+  
+  const result = useMemo(() => {
+    const illustration = illustrations.find(i => i.month_number === monthNumber);
+    return {
+      imageUrl: illustration?.image_url || DEFAULT_BABY_ILLUSTRATION,
+      title: illustration?.title_az || illustration?.title || null,
+      description: illustration?.description_az || illustration?.description || null,
+      hasIllustration: !!illustration
+    };
+  }, [illustrations, monthNumber]);
+
+  return { ...result, isLoading, error };
 };
 
 // Admin hooks
