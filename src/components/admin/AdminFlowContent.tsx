@@ -40,7 +40,7 @@ const AdminFlowContent = () => {
     queryKey: ['flow-symptoms-admin'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('flow_symptoms')
+        .from('flow_symptoms_db')
         .select('*')
         .order('sort_order');
       if (error) throw error;
@@ -48,12 +48,12 @@ const AdminFlowContent = () => {
     },
   });
 
-  // Fetch tips
+  // Fetch tips (phase tips from menstruation_phase_tips)
   const tipsQuery = useQuery({
     queryKey: ['flow-tips-admin'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('flow_phase_tips')
+        .from('menstruation_phase_tips')
         .select('*')
         .order('sort_order');
       if (error) throw error;
@@ -91,10 +91,10 @@ const AdminFlowContent = () => {
 
   const getTableName = () => {
     switch (activeTab) {
-      case 'symptoms': return 'flow_symptoms';
-      case 'tips': return 'flow_phase_tips';
+      case 'symptoms': return 'flow_symptoms_db';
+      case 'tips': return 'menstruation_phase_tips';
       case 'insights': return 'flow_insights';
-      default: return 'flow_symptoms';
+      default: return 'flow_symptoms_db';
     }
   };
 
@@ -110,9 +110,9 @@ const AdminFlowContent = () => {
   const getDefaultFormData = () => {
     switch (activeTab) {
       case 'symptoms':
-        return { symptom_id: '', label: '', label_az: '', emoji: '🤕', category: 'general', is_active: true, sort_order: 0 };
+        return { symptom_key: '', label: '', label_az: '', emoji: '🤕', category: 'physical', color: '#F97316', is_active: true, sort_order: 0 };
       case 'tips':
-        return { phase: 'menstrual', tip_text: '', tip_text_az: '', emoji: '💡', category: 'health', is_active: true, sort_order: 0 };
+        return { phase: 'menstrual', category: 'nutrition', tip_text: '', tip_text_az: '', icon: 'utensils', is_active: true, sort_order: 0 };
       case 'insights':
         return { title: '', title_az: '', content: '', content_az: '', phase: null, emoji: '💡', category: 'general', is_active: true, sort_order: 0 };
       default:
@@ -307,10 +307,10 @@ const AdminFlowContent = () => {
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Simptom ID</label>
+                    <label className="text-sm font-medium">Simptom Key</label>
                     <Input
-                      value={formData.symptom_id || ''}
-                      onChange={(e) => setFormData({ ...formData, symptom_id: e.target.value })}
+                      value={formData.symptom_key || ''}
+                      onChange={(e) => setFormData({ ...formData, symptom_key: e.target.value })}
                       placeholder="headache"
                     />
                   </div>
@@ -335,6 +335,14 @@ const AdminFlowContent = () => {
                   <Input
                     value={formData.label_az || ''}
                     onChange={(e) => setFormData({ ...formData, label_az: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Rəng</label>
+                  <Input
+                    type="color"
+                    value={formData.color || '#F97316'}
+                    onChange={(e) => setFormData({ ...formData, color: e.target.value })}
                   />
                 </div>
               </>

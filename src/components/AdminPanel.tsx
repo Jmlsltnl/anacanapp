@@ -85,6 +85,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminDynamicContent />;
       case 'trimester-tips':
         return <AdminTrimesterTips />;
+      case 'flow-symptoms':
+        return <AdminFlowContent />;
       case 'flow-content':
         return <AdminFlowContent />;
       case 'photoshoot':
