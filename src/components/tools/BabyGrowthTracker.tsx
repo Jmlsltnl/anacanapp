@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { hapticFeedback } from '@/lib/native';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useChildren } from '@/hooks/useChildren';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
 
@@ -22,6 +23,7 @@ interface BabyGrowthTrackerProps {
 interface BabyGrowthEntry {
   id: string;
   user_id: string;
+  child_id: string | null;
   weight_kg: number | null;
   height_cm: number | null;
   head_cm: number | null;
@@ -32,6 +34,7 @@ interface BabyGrowthEntry {
 
 const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
   const { user } = useAuth();
+  const { selectedChild } = useChildren();
   const { toast } = useToast();
   const [entries, setEntries] = useState<BabyGrowthEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -48,17 +51,24 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
 
   useEffect(() => {
     fetchEntries();
-  }, [user]);
+  }, [user, selectedChild]);
 
   const fetchEntries = async () => {
     if (!user) return;
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('baby_growth')
         .select('*')
         .eq('user_id', user.id)
         .order('entry_date', { ascending: false });
+      
+      // Filter by selected child
+      if (selectedChild) {
+        query = query.eq('child_id', selectedChild.id);
+      }
+      
+      const { data, error } = await query;
       
       if (error) throw error;
       setEntries(data || []);
@@ -107,6 +117,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
           .from('baby_growth')
           .insert({
             user_id: user.id,
+            child_id: selectedChild?.id || null,
             weight_kg: isNaN(weight) ? null : weight,
             height_cm: isNaN(height) ? null : height,
             head_cm: isNaN(head) ? null : head,

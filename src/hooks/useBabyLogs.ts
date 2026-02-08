@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useChildren } from './useChildren';
 
 export interface BabyLog {
   id: string;
   user_id: string;
+  child_id: string | null;
   log_type: 'feeding' | 'sleep' | 'diaper';
   start_time: string;
   end_time: string | null;
@@ -25,6 +27,7 @@ export interface FeedingHistoryItem {
 
 export const useBabyLogs = () => {
   const { user } = useAuth();
+  const { selectedChild } = useChildren();
   const [logs, setLogs] = useState<BabyLog[]>([]);
   const [todayLogs, setTodayLogs] = useState<BabyLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,12 +43,19 @@ export const useBabyLogs = () => {
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
       
-      const { data, error } = await supabase
+      let query = supabase
         .from('baby_logs')
         .select('*')
         .eq('user_id', user.id)
         .gte('start_time', sevenDaysAgo.toISOString())
         .order('start_time', { ascending: false });
+
+      // Filter by selected child if available
+      if (selectedChild) {
+        query = query.eq('child_id', selectedChild.id);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       
@@ -62,7 +72,7 @@ export const useBabyLogs = () => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, selectedChild]);
 
   const addLog = async (log: {
     log_type: 'feeding' | 'sleep' | 'diaper';
@@ -80,6 +90,7 @@ export const useBabyLogs = () => {
         .insert({
           ...log,
           user_id: user.id,
+          child_id: selectedChild?.id || null,
           start_time: log.start_time || new Date().toISOString()
         })
         .select()
