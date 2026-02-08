@@ -141,12 +141,47 @@ Deno.serve(async (req) => {
                 title: notification.title,
                 body: notification.body,
                 sound: 'default',
+                badge: 1,
               },
               data: {
                 type: 'bulk',
                 notification_id: notificationId,
+                click_action: 'FLUTTER_NOTIFICATION_CLICK',
               },
               priority: 'high',
+              // Enable background/offline delivery
+              content_available: true,
+              mutable_content: true,
+              // Android specific for high priority background delivery
+              android: {
+                priority: 'high',
+                notification: {
+                  sound: 'default',
+                  default_vibrate_timings: true,
+                  default_light_settings: true,
+                  channel_id: 'high_importance_channel',
+                },
+                direct_boot_ok: true,
+              },
+              // iOS specific for background delivery even when app is killed
+              apns: {
+                headers: {
+                  'apns-priority': '10',
+                  'apns-push-type': 'alert',
+                },
+                payload: {
+                  aps: {
+                    alert: {
+                      title: notification.title,
+                      body: notification.body,
+                    },
+                    sound: 'default',
+                    badge: 1,
+                    'content-available': 1,
+                    'mutable-content': 1,
+                  },
+                },
+              },
             }),
           });
 
