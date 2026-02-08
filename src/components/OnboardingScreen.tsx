@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Check, Calendar, Baby, Heart, Sparkles, Users } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check, Calendar, Baby, Heart, Sparkles, Users, Droplets } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useUserStore } from '@/store/userStore';
@@ -26,9 +26,11 @@ const OnboardingScreen = () => {
   const [babyGender, setBabyGender] = useState<'boy' | 'girl' | null>(null);
   const [multiplesType, setMultiplesType] = useState<'single' | 'twins' | 'triplets' | 'quadruplets'>('single');
   const [babyCount, setBabyCount] = useState(1);
+  const [cycleLength, setCycleLength] = useState(28);
+  const [periodLength, setPeriodLength] = useState(5);
   const [isSaving, setIsSaving] = useState(false);
   
-  const { setLifeStage, setLastPeriodDate, setBabyData, setOnboarded, setDueDate, setMultiplesData } = useUserStore();
+  const { setLifeStage, setLastPeriodDate, setBabyData, setOnboarded, setDueDate, setMultiplesData, setCycleLength: setStoreCycleLength, setPeriodLength: setStorePeriodLength } = useUserStore();
   const { updateProfile } = useAuth();
   const { toast } = useToast();
   const { autoJoin } = useAutoJoinGroups();
@@ -187,10 +189,12 @@ const OnboardingScreen = () => {
         } else {
           // Flow stage
           if (dateInput) {
-            // Save to Supabase
+            // Save to Supabase with cycle data
             const { error } = await updateProfile({
               life_stage: selectedStage,
               last_period_date: dateInput,
+              cycle_length: cycleLength,
+              period_length: periodLength,
             });
 
             if (error) {
@@ -203,8 +207,10 @@ const OnboardingScreen = () => {
               return;
             }
 
-            // Update local store
+            // Update local store with cycle data
             setLastPeriodDate(new Date(dateInput));
+            setStoreCycleLength(cycleLength);
+            setStorePeriodLength(periodLength);
             setLifeStage(selectedStage!);
             setOnboarded(true);
 
@@ -495,6 +501,75 @@ const OnboardingScreen = () => {
                           </motion.button>
                         ))}
                       </div>
+                    </motion.div>
+                  </>
+                )}
+
+                {/* Cycle Length for Flow stage */}
+                {selectedStage === 'flow' && (
+                  <>
+                    <motion.div variants={childVariants}>
+                      <label className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        Sikl uzunluğu (gün)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <motion.button
+                          type="button"
+                          onClick={() => setCycleLength(Math.max(21, cycleLength - 1))}
+                          className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          -
+                        </motion.button>
+                        <div className="flex-1 h-14 rounded-2xl bg-muted/50 flex items-center justify-center">
+                          <span className="text-2xl font-bold text-foreground">{cycleLength}</span>
+                          <span className="text-muted-foreground ml-2">gün</span>
+                        </div>
+                        <motion.button
+                          type="button"
+                          onClick={() => setCycleLength(Math.min(45, cycleLength + 1))}
+                          className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          +
+                        </motion.button>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2 text-center">
+                        Normal aralıq: 21-35 gün
+                      </p>
+                    </motion.div>
+
+                    <motion.div variants={childVariants}>
+                      <label className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+                        <Droplets className="w-4 h-4" />
+                        Period uzunluğu (gün)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <motion.button
+                          type="button"
+                          onClick={() => setPeriodLength(Math.max(2, periodLength - 1))}
+                          className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          -
+                        </motion.button>
+                        <div className="flex-1 h-14 rounded-2xl bg-muted/50 flex items-center justify-center">
+                          <span className="text-2xl font-bold text-foreground">{periodLength}</span>
+                          <span className="text-muted-foreground ml-2">gün</span>
+                        </div>
+                        <motion.button
+                          type="button"
+                          onClick={() => setPeriodLength(Math.min(10, periodLength + 1))}
+                          className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          +
+                        </motion.button>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2 text-center">
+                        Normal aralıq: 3-7 gün
+                      </p>
                     </motion.div>
                   </>
                 )}

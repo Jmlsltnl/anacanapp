@@ -7,29 +7,37 @@ import {
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { usePhaseTips, PHASE_INFO, CATEGORY_INFO, MenstrualPhase, TipCategory } from '@/hooks/usePhaseTips';
-import { format, addDays, subDays, differenceInDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isWithinInterval } from 'date-fns';
+import { format, addDays, subDays, differenceInDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns';
 import { az } from 'date-fns/locale';
 import FlowDailyLogger from './FlowDailyLogger';
 import FlowMoodChart from './FlowMoodChart';
 import FlowCycleStats from './FlowCycleStats';
 import FlowRemindersCard from './FlowRemindersCard';
+import { getPhaseInfoForDate, getNextPeriodDate, getFertileWindow } from '@/lib/cycle-utils';
 
 const FlowDashboard = () => {
-  const { getCycleData } = useUserStore();
+  const { getCycleData, cycleLength, periodLength } = useUserStore();
   const cycleData = getCycleData();
   
   const [selectedCategory, setSelectedCategory] = useState<TipCategory | 'all'>('all');
   const [calendarMonth, setCalendarMonth] = useState(new Date());
 
-  // Current phase from cycle data
-  const currentPhase: MenstrualPhase = cycleData?.phase || 'follicular';
-  const currentDay = cycleData?.currentDay || 1;
-  const cycleLength = cycleData?.cycleLength || 28;
-  const periodLength = cycleData?.periodLength || 5;
-  const lastPeriodDate = cycleData?.lastPeriodDate ? new Date(cycleData.lastPeriodDate) : new Date();
-  const nextPeriodDate = cycleData?.nextPeriodDate ? new Date(cycleData.nextPeriodDate) : addDays(lastPeriodDate, cycleLength);
-  const fertileStart = cycleData?.fertileWindow?.start ? new Date(cycleData.fertileWindow.start) : addDays(lastPeriodDate, 10);
-  const fertileEnd = cycleData?.fertileWindow?.end ? new Date(cycleData.fertileWindow.end) : addDays(lastPeriodDate, 16);
+  // Get last period date
+  const lastPeriodDate = cycleData?.lastPeriodDate 
+    ? new Date(cycleData.lastPeriodDate) 
+    : new Date();
+
+  // Calculate current phase using accurate utility
+  const today = new Date();
+  const currentPhaseInfo = getPhaseInfoForDate(today, lastPeriodDate, cycleLength, periodLength);
+  const currentPhase: MenstrualPhase = currentPhaseInfo.phase;
+  const currentDay = currentPhaseInfo.dayInCycle;
+
+  // Calculate next period and fertile window
+  const nextPeriodDate = getNextPeriodDate(lastPeriodDate, cycleLength);
+  const fertileWindowData = getFertileWindow(lastPeriodDate, cycleLength);
+  const fertileStart = fertileWindowData.start;
+  const fertileEnd = fertileWindowData.end;
 
   // Fetch tips for current phase
   const { data: tips = [], isLoading: tipsLoading } = usePhaseTips(currentPhase);
@@ -67,14 +75,13 @@ const FlowDashboard = () => {
     return eachDayOfInterval({ start, end });
   }, [calendarMonth]);
 
-  // Get day type for calendar
+  // Get day type for calendar using accurate calculation
   const getDayType = (date: Date) => {
-    const daysDiff = differenceInDays(date, lastPeriodDate);
-    const cycleDay = ((daysDiff % cycleLength) + cycleLength) % cycleLength + 1;
-
-    if (cycleDay <= periodLength) return 'period';
-    if (isWithinInterval(date, { start: fertileStart, end: fertileEnd })) return 'fertile';
-    if (cycleDay === 14 || cycleDay === 15) return 'ovulation';
+    const phaseInfo = getPhaseInfoForDate(date, lastPeriodDate, cycleLength, periodLength);
+    
+    if (phaseInfo.isPeriodDay) return 'period';
+    if (phaseInfo.isOvulationDay) return 'ovulation';
+    if (phaseInfo.isFertileDay) return 'fertile';
     return 'normal';
   };
 
