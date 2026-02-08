@@ -5,11 +5,13 @@ import { useToast } from '@/hooks/use-toast';
 import { hapticFeedback } from '@/lib/native';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useChildren } from '@/hooks/useChildren';
 import { differenceInMonths } from 'date-fns';
 
 interface BabyGrowthEntry {
   id: string;
   user_id: string;
+  child_id: string | null;
   weight_kg: number | null;
   height_cm: number | null;
   head_cm: number | null;
@@ -19,7 +21,8 @@ interface BabyGrowthEntry {
 }
 
 const GrowthTrackerWidget = () => {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const { selectedChild, getChildAge } = useChildren();
   const { toast } = useToast();
   const [entries, setEntries] = useState<BabyGrowthEntry[]>([]);
   const [showInput, setShowInput] = useState(false);
@@ -27,25 +30,31 @@ const GrowthTrackerWidget = () => {
   const [heightInput, setHeightInput] = useState('');
   const [headInput, setHeadInput] = useState('');
 
-  // Check if baby is under 1 year old
+  // Check if baby is under 1 year old using selectedChild
   const showHeadCircumference = useMemo(() => {
-    if (!profile?.baby_birth_date) return true; // Show by default if no birth date
-    const birthDate = new Date(profile.baby_birth_date);
-    const ageInMonths = differenceInMonths(new Date(), birthDate);
+    if (!selectedChild) return true; // Show by default if no child selected
+    const ageInMonths = getChildAge(selectedChild).months;
     return ageInMonths < 12;
-  }, [profile?.baby_birth_date]);
+  }, [selectedChild, getChildAge]);
 
-  // Fetch baby growth entries
+  // Fetch baby growth entries - filtered by selectedChild
   useEffect(() => {
     const fetchEntries = async () => {
       if (!user) return;
       try {
-        const { data, error } = await (supabase as any)
+        let query = supabase
           .from('baby_growth')
           .select('*')
           .eq('user_id', user.id)
           .order('entry_date', { ascending: false })
           .limit(10);
+        
+        // Filter by selected child
+        if (selectedChild) {
+          query = query.eq('child_id', selectedChild.id);
+        }
+        
+        const { data, error } = await query;
         
         if (error) {
           console.log('Baby growth fetch error:', error);
@@ -57,7 +66,7 @@ const GrowthTrackerWidget = () => {
       }
     };
     fetchEntries();
-  }, [user]);
+  }, [user, selectedChild]);
 
   const latestEntry = entries[0];
   const previousEntry = entries[1];
@@ -91,10 +100,11 @@ const GrowthTrackerWidget = () => {
     await hapticFeedback.medium();
     
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('baby_growth')
         .insert({
           user_id: user.id,
+          child_id: selectedChild?.id || null,
           weight_kg: isNaN(weight) ? null : weight,
           height_cm: isNaN(height) ? null : height,
           head_cm: showHeadCircumference && !isNaN(parseFloat(headInput)) ? parseFloat(headInput) : null,
