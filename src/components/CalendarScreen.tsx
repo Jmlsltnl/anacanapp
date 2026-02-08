@@ -163,7 +163,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
     : null;
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-24 overflow-y-auto">
       {/* Header */}
       <div className="gradient-primary px-4 pb-5" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}>
         <div className="flex items-center gap-3 mb-4">
