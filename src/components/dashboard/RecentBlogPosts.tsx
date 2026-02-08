@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion';
 import { ChevronRight, Clock, Eye, BookOpen } from 'lucide-react';
-import { useBlog, BlogPost } from '@/hooks/useBlog';
+import { useBlog, BlogPost, BlogLifeStage } from '@/hooks/useBlog';
 import { formatDistanceToNow } from 'date-fns';
 import { az } from 'date-fns/locale';
 
 interface RecentBlogPostsProps {
   onNavigate: (screen: string) => void;
+  lifeStage?: BlogLifeStage;
 }
 
 const BlogPostCard = ({ post, index, onClick }: { post: BlogPost; index: number; onClick: () => void }) => {
@@ -65,11 +66,16 @@ const BlogPostCard = ({ post, index, onClick }: { post: BlogPost; index: number;
   );
 };
 
-const RecentBlogPosts = ({ onNavigate }: RecentBlogPostsProps) => {
+const RecentBlogPosts = ({ onNavigate, lifeStage }: RecentBlogPostsProps) => {
   const { posts, loading } = useBlog();
   
-  // Get only the 3 most recent posts
-  const recentPosts = posts.slice(0, 3);
+  // Filter posts by life stage - show posts that match the current stage or are for 'all'
+  const filteredByStage = lifeStage 
+    ? posts.filter(p => p.life_stage === lifeStage || p.life_stage === 'all' || !p.life_stage)
+    : posts;
+  
+  // Get only the 3 most recent filtered posts
+  const recentPosts = filteredByStage.slice(0, 3);
 
   if (loading) {
     return (

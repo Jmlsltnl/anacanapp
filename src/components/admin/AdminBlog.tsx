@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { useBlogAdmin, BlogPost, BlogCategory } from '@/hooks/useBlog';
+import { useBlogAdmin, BlogPost, BlogCategory, BlogLifeStage } from '@/hooks/useBlog';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import BlogAnalytics from './BlogAnalytics';
@@ -43,8 +43,16 @@ const AdminBlog = () => {
     author_name: 'Anacan',
     reading_time: 5,
     is_featured: false,
-    is_published: false
+    is_published: false,
+    life_stage: 'all' as BlogLifeStage
   });
+
+  const lifeStageOptions: { value: BlogLifeStage; label: string; emoji: string }[] = [
+    { value: 'all', label: 'Hamısı üçün', emoji: '🌐' },
+    { value: 'flow', label: 'Menstruasiya dövrü', emoji: '🩸' },
+    { value: 'bump', label: 'Hamiləlik dövrü', emoji: '🤰' },
+    { value: 'mommy', label: 'Ana (körpə baxımı)', emoji: '👶' }
+  ];
 
   const [newCategory, setNewCategory] = useState({
     name: '',
@@ -209,7 +217,8 @@ const AdminBlog = () => {
       author_name: post.author_name,
       reading_time: post.reading_time,
       is_featured: post.is_featured,
-      is_published: post.is_published
+      is_published: post.is_published,
+      life_stage: (post.life_stage || 'all') as BlogLifeStage
     };
     setFormData(newFormData);
     initialFormDataRef.current = JSON.stringify({ ...newFormData, categoryIds: postCatIds });
@@ -358,7 +367,8 @@ const AdminBlog = () => {
       author_name: 'Anacan',
       reading_time: 5,
       is_featured: false,
-      is_published: false
+      is_published: false,
+      life_stage: 'all' as BlogLifeStage
     };
     setFormData(emptyForm);
     setSelectedCategoryIds([]);
@@ -485,9 +495,21 @@ const AdminBlog = () => {
 
                 <div className="p-4">
                   <div className="flex items-start justify-between mb-2">
-                    <Badge variant={post.is_published ? 'default' : 'secondary'}>
-                      {post.is_published ? 'Dərc edilib' : 'Qaralama'}
-                    </Badge>
+                    <div className="flex items-center gap-1.5">
+                      <Badge variant={post.is_published ? 'default' : 'secondary'}>
+                        {post.is_published ? 'Dərc edilib' : 'Qaralama'}
+                      </Badge>
+                      {/* Life Stage Badge */}
+                      {post.life_stage && post.life_stage !== 'all' && (
+                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                          post.life_stage === 'bump' ? 'bg-pink-100 text-pink-700' :
+                          post.life_stage === 'mommy' ? 'bg-blue-100 text-blue-700' :
+                          'bg-red-100 text-red-700'
+                        }`}>
+                          {lifeStageOptions.find(o => o.value === post.life_stage)?.emoji}
+                        </span>
+                      )}
+                    </div>
                     {post.is_featured && (
                       <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                     )}
@@ -865,6 +887,31 @@ const AdminBlog = () => {
                     onChange={(e) => setFormData({ ...formData, author_name: e.target.value })}
                     placeholder="Anacan"
                   />
+                </div>
+
+                {/* Life Stage Selector */}
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Hədəf Mərhələsi</label>
+                  <div className="flex flex-wrap gap-2">
+                    {lifeStageOptions.map(option => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, life_stage: option.value })}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all border ${
+                          formData.life_stage === option.value
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-card border-border text-muted-foreground hover:bg-muted'
+                        }`}
+                      >
+                        <span>{option.emoji}</span>
+                        <span>{option.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1.5">
+                    Bu məqalə hansı istifadəçi qrupuna aiddir? Dashboard-da həmin qrupa uyğun göstəriləcək.
+                  </p>
                 </div>
 
                 {/* Toggles */}

@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
+export type BlogLifeStage = 'flow' | 'bump' | 'mommy' | 'all';
+
 export interface BlogPost {
   id: string;
   title: string;
@@ -19,6 +21,7 @@ export interface BlogPost {
   created_at: string;
   updated_at: string;
   category_ids?: string[]; // For multi-category support
+  life_stage: BlogLifeStage;
 }
 
 export interface BlogCategory {

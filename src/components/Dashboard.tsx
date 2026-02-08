@@ -1785,8 +1785,8 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
       {/* Send Daily Summary to Partner Widget - only for bump stage with linked partner */}
       {lifeStage === 'bump' && <SendDailySummaryWidget />}
 
-      {/* Recent Blog Posts */}
-      {onNavigate && <RecentBlogPosts onNavigate={onNavigate} />}
+      {/* Recent Blog Posts - filtered by life stage (partner uses bump stage content) */}
+      {onNavigate && <RecentBlogPosts onNavigate={onNavigate} lifeStage={lifeStage === 'partner' ? 'bump' : lifeStage} />}
 
       {/* Bottom Banner Slot */}
       <BannerSlot placement="home_bottom" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mt-4" />
