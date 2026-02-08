@@ -1274,12 +1274,13 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-8 h-8 rounded-xl bg-white/30 flex items-center justify-center shadow-sm">
-                <Calendar className="w-4 h-4 text-white" />
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-white/20">
+              <div className="w-10 h-10 rounded-xl bg-white/30 flex items-center justify-center shadow-sm">
+                <Calendar className="w-5 h-5 text-white" />
               </div>
-              <div>
-                <p className="text-[10px] font-semibold text-white/70 uppercase tracking-widest">
+              <div className="flex-1">
+                <p className="text-[10px] font-semibold text-white/60 uppercase tracking-widest mb-0.5">
                   {exactMonths > 0 ? `${exactMonths}. Ay` : 'Yenidoğulmuş'}
                 </p>
                 <p className="text-sm font-bold text-white">
@@ -1287,9 +1288,23 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 </p>
               </div>
             </div>
-            <p className="text-[13px] text-white/95 leading-[1.7] font-medium pl-[42px]">
-              {illustrationDescription || getBabyDailyFunFact(babyData.ageInDays)}
-            </p>
+            
+            {/* Content - each line separate */}
+            <div className="space-y-2">
+              {(illustrationDescription || getBabyDailyFunFact(babyData.ageInDays))
+                .split(/[.!?]/)
+                .filter(sentence => sentence.trim().length > 0)
+                .slice(0, 4)
+                .map((sentence, index) => (
+                  <div key={index} className="flex items-start gap-2.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-white/60 mt-2 flex-shrink-0" />
+                    <p className="text-[13px] text-white/95 leading-relaxed font-medium">
+                      {sentence.trim()}
+                    </p>
+                  </div>
+                ))
+              }
+            </div>
           </motion.div>
         </div>
       </motion.div>
