@@ -239,12 +239,33 @@ Deno.serve(async (req) => {
                 title: notificationToSend.title,
                 body: notificationToSend.body,
                 sound: 'default',
+                badge: 1,
               },
               data: {
                 type: notificationToSend.type,
                 notification_id: notificationToSend.id,
               },
               priority: 'high',
+              // Enable background/offline delivery
+              content_available: true,
+              mutable_content: true,
+              android: {
+                priority: 'high',
+                notification: {
+                  sound: 'default',
+                },
+              },
+              apns: {
+                headers: {
+                  'apns-priority': '10',
+                },
+                payload: {
+                  aps: {
+                    'content-available': 1,
+                    'mutable-content': 1,
+                  },
+                },
+              },
             }),
           });
 
