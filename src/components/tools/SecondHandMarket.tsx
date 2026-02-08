@@ -263,31 +263,34 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
   const freeCount = listings.filter(l => l.is_free).length;
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50/50 dark:from-emerald-950/20 to-background pb-24">
       {/* Premium Header */}
-        <div className="relative overflow-hidden isolate">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 pointer-events-none" />
-          <div className="absolute inset-0 opacity-30 pointer-events-none">
-          <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-white/20 blur-3xl" />
-          <div className="absolute bottom-5 right-10 w-40 h-40 rounded-full bg-cyan-300/20 blur-3xl" />
+      <div className="sticky top-0 z-20 isolate relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 pointer-events-none" />
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
+          <div className="absolute top-8 right-8 w-32 h-32 rounded-full bg-white/30 blur-3xl" />
+          <div className="absolute bottom-4 left-8 w-24 h-24 rounded-full bg-cyan-300/30 blur-2xl" />
         </div>
         
-        <div className="relative px-4 pt-4 pb-8 safe-area-top z-20">
-          <div className="flex items-center gap-3 mb-4 relative z-20">
+        <div className="relative px-4 pt-4 pb-6 safe-area-top">
+          <div className="flex items-center gap-3 mb-4 relative z-30">
             <motion.button
               onClick={onBack}
-                className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center relative z-30"
+              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20"
               whileTap={{ scale: 0.95 }}
             >
               <ArrowLeft className="w-5 h-5 text-white" />
             </motion.button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-white">İkinci Əl Bazarı</h1>
+              <h1 className="text-xl font-bold text-white flex items-center gap-2">
+                <Package className="w-5 h-5" />
+                İkinci Əl Bazarı
+              </h1>
               <p className="text-white/80 text-sm">Analardan analara</p>
             </div>
             <motion.button
               onClick={() => setShowCreateModal(true)}
-                className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center relative z-30"
+              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20"
               whileTap={{ scale: 0.95 }}
             >
               <Plus className="w-5 h-5 text-white" />
@@ -308,31 +311,31 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-3">
             <motion.div
-              className="bg-white/20 backdrop-blur-md rounded-xl p-3 text-center"
+              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
               <p className="text-2xl font-black text-white">{listings.length}</p>
-              <p className="text-xs text-white/70">Elan</p>
+              <p className="text-xs text-white/70 font-medium">Elan</p>
             </motion.div>
             <motion.div
-              className="bg-white/20 backdrop-blur-md rounded-xl p-3 text-center"
+              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
             >
               <p className="text-2xl font-black text-white">{freeCount}</p>
-              <p className="text-xs text-white/70">Pulsuz</p>
+              <p className="text-xs text-white/70 font-medium">Pulsuz</p>
             </motion.div>
             <motion.div
-              className="bg-white/20 backdrop-blur-md rounded-xl p-3 text-center"
+              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
               <p className="text-2xl font-black text-white">{categories.length}</p>
-              <p className="text-xs text-white/70">Kateqoriya</p>
+              <p className="text-xs text-white/70 font-medium">Kateqoriya</p>
             </motion.div>
           </div>
         </div>

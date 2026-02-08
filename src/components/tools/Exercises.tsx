@@ -68,17 +68,20 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cyan-50 dark:from-cyan-950/20 to-background pb-24">
+    <div className="min-h-screen bg-gradient-to-b from-cyan-50/50 dark:from-cyan-950/20 to-background pb-24">
       {/* Premium Header */}
       <div className="sticky top-0 z-20 isolate overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-600 pointer-events-none" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,...')] opacity-10 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-500 pointer-events-none" />
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
+          <div className="absolute top-8 right-8 w-32 h-32 rounded-full bg-white/30 blur-3xl" />
+          <div className="absolute bottom-4 left-8 w-24 h-24 rounded-full bg-emerald-300/30 blur-2xl" />
+        </div>
         
         <div className="relative px-4 pt-4 pb-6 safe-area-top">
           <div className="flex items-center gap-3 mb-4 relative z-30">
             <motion.button
               onClick={selectedExercise ? () => { setSelectedExerciseId(null); setCurrentStep(0); } : onBack}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"
+              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20"
               whileTap={{ scale: 0.95 }}
             >
               <ArrowLeft className="w-5 h-5 text-white" />
@@ -95,34 +98,34 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
           {/* Stats Cards */}
           <div className="grid grid-cols-3 gap-3">
             <motion.div
-              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center"
+              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <Check className="w-5 h-5 mx-auto mb-1 text-white/80" />
+              <Check className="w-5 h-5 mx-auto mb-1 text-white/90" />
               <p className="text-2xl font-black text-white">{todayStats.completedCount}</p>
-              <p className="text-[10px] text-white/70">Bu gün</p>
+              <p className="text-xs text-white/70 font-medium">Bu gün</p>
             </motion.div>
             <motion.div
-              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center"
+              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
             >
-              <Flame className="w-5 h-5 mx-auto mb-1 text-white/80" />
+              <Flame className="w-5 h-5 mx-auto mb-1 text-white/90" />
               <p className="text-2xl font-black text-white">{todayStats.totalCalories}</p>
-              <p className="text-[10px] text-white/70">Kalori</p>
+              <p className="text-xs text-white/70 font-medium">Kalori</p>
             </motion.div>
             <motion.div
-              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center"
+              className="bg-white/15 backdrop-blur-md rounded-2xl p-3 text-center border border-white/20"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <Trophy className="w-5 h-5 mx-auto mb-1 text-white/80" />
+              <Trophy className="w-5 h-5 mx-auto mb-1 text-white/90" />
               <p className="text-2xl font-black text-white">{streak}</p>
-              <p className="text-[10px] text-white/70">Gün ardıcıl</p>
+              <p className="text-xs text-white/70 font-medium">Gün ardıcıl</p>
             </motion.div>
           </div>
         </div>
