@@ -14,6 +14,7 @@ interface Sound {
   color: string;
   noiseType: string;
   description: string;
+  audioUrl: string | null;
 }
 
 // Noise type metadata
@@ -74,6 +75,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
       color: s.color_gradient || 'from-blue-400 to-cyan-500',
       noiseType: s.noise_type || 'white',
       description: s.description_az || s.description || '',
+      audioUrl: s.audio_url || null,
     }));
   }, [dbSounds]);
 
@@ -100,8 +102,120 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
   
   const trackingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastTrackTimeRef = useRef<number>(Date.now());
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const noiseSourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);
 
   const usageInfo = useMemo(() => canUseWhiteNoise(), [canUseWhiteNoise]);
+
+  // Helper: generate noise buffer
+  const generateNoiseBuffer = (ctx: AudioContext, type: string): AudioBuffer => {
+    const sampleRate = ctx.sampleRate;
+    const duration = 4; // seconds, will loop
+    const length = sampleRate * duration;
+    const buffer = ctx.createBuffer(1, length, sampleRate);
+    const data = buffer.getChannelData(0);
+
+    if (type === 'pink') {
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < length; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+        b6 = white * 0.115926;
+      }
+    } else if (type === 'brown') {
+      let last = 0;
+      for (let i = 0; i < length; i++) {
+        const white = Math.random() * 2 - 1;
+        last = (last + (0.02 * white)) / 1.02;
+        data[i] = last * 3.5;
+      }
+    } else {
+      // white noise
+      for (let i = 0; i < length; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+    }
+    return buffer;
+  };
+
+  // Stop all audio
+  const stopAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = '';
+      audioRef.current = null;
+    }
+    if (noiseSourceRef.current) {
+      try { noiseSourceRef.current.stop(); } catch {}
+      noiseSourceRef.current = null;
+    }
+    if (audioCtxRef.current) {
+      audioCtxRef.current.close();
+      audioCtxRef.current = null;
+    }
+    gainNodeRef.current = null;
+  };
+
+  // Play audio when activeSound changes
+  useEffect(() => {
+    if (!activeSound) {
+      stopAudio();
+      return;
+    }
+
+    const sound = sounds.find(s => s.id === activeSound);
+    if (!sound) { stopAudio(); return; }
+
+    const effectiveVolume = isMuted ? 0 : volume / 100;
+
+    if (sound.audioUrl) {
+      // Play from URL
+      stopAudio();
+      const audio = new Audio(sound.audioUrl);
+      audio.loop = true;
+      audio.volume = effectiveVolume;
+      audio.play().catch(err => console.warn('Audio play failed:', err));
+      audioRef.current = audio;
+    } else {
+      // Generate noise with Web Audio API
+      stopAudio();
+      const ctx = new AudioContext();
+      audioCtxRef.current = ctx;
+      const gainNode = ctx.createGain();
+      gainNode.gain.value = effectiveVolume;
+      gainNode.connect(ctx.destination);
+      gainNodeRef.current = gainNode;
+
+      const buffer = generateNoiseBuffer(ctx, sound.noiseType);
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.loop = true;
+      source.connect(gainNode);
+      source.start();
+      noiseSourceRef.current = source;
+    }
+
+    return () => stopAudio();
+  }, [activeSound, sounds]);
+
+  // Update volume on active audio
+  useEffect(() => {
+    const effectiveVolume = isMuted ? 0 : volume / 100;
+    if (audioRef.current) {
+      audioRef.current.volume = effectiveVolume;
+    }
+    if (gainNodeRef.current) {
+      gainNodeRef.current.gain.value = effectiveVolume;
+    }
+  }, [volume, isMuted]);
 
   // Initialize from preferences
   useEffect(() => {
