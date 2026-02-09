@@ -63,7 +63,7 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
   };
 
   return (
-    <div className="min-h-screen bg-background pb-32 overflow-y-auto">
+    <div className="min-h-screen bg-background pb-44 overflow-y-auto">
       {/* Sticky Header */}
       <div
         className="sticky top-0 z-50 flex items-center justify-between px-4 py-3 bg-card/80 backdrop-blur-md border-b border-border/30"
@@ -235,10 +235,10 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
         )}
       </div>
 
-      {/* Fixed Bottom CTA */}
+      {/* Fixed Bottom CTA - above BottomNav */}
       <div
-        className="fixed bottom-0 left-0 right-0 z-40 bg-card/90 backdrop-blur-md border-t border-border/30 px-4 py-3"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}
+        className="fixed left-0 right-0 z-40 bg-card/90 backdrop-blur-md border-t border-border/30 px-4 py-3"
+        style={{ bottom: 'calc(72px + env(safe-area-inset-bottom))' }}
       >
         <Button
           className="w-full h-14 text-base font-bold rounded-2xl"

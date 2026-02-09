@@ -91,7 +91,7 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background overflow-y-auto pb-28 pt-2 px-4">
+    <div className="min-h-screen bg-background overflow-y-auto pb-44 pt-2 px-4">
       {/* Header */}
       <motion.div className="flex items-center justify-between mb-5" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
         <div className="flex items-center gap-3">
@@ -198,6 +198,22 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
           <div className="text-6xl mb-4">🎂</div>
           <p className="text-muted-foreground">Bu kateqoriyada tort tapılmadı</p>
         </motion.div>
+      )}
+
+      {/* Floating Cart Button - above BottomNav */}
+      {totalItems > 0 && (
+        <motion.button
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          onClick={() => setShowCart(true)}
+          className="fixed right-4 z-40 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center"
+          style={{ bottom: 'calc(80px + env(safe-area-inset-bottom))' }}
+        >
+          <ShoppingCart className="w-6 h-6" />
+          <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-destructive text-destructive-foreground text-xs font-bold flex items-center justify-center">
+            {totalItems}
+          </span>
+        </motion.button>
       )}
 
       {/* Cart Drawer */}
