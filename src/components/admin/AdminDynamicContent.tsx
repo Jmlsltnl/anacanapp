@@ -440,13 +440,13 @@ const AdminDynamicContent = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Dinamik Məzmun</h2>
-          <p className="text-muted-foreground text-sm">Tətbiqdəki bütün konfiqurasiya edilə bilən məlumatları idarə edin</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground">Dinamik Məzmun</h2>
+          <p className="text-muted-foreground text-xs sm:text-sm">Tətbiqdəki bütün konfiqurasiya edilə bilən məlumatları idarə edin</p>
         </div>
         {activeTab !== 'moods' && (
-          <Button onClick={openCreateModal} className="gap-2">
+          <Button onClick={openCreateModal} className="gap-2 w-full sm:w-auto">
             <Plus className="w-4 h-4" />
             Əlavə et
           </Button>
@@ -454,23 +454,22 @@ const AdminDynamicContent = () => {
       </div>
 
       {/* Tabs */}
-      <ScrollArea className="w-full">
-        <div className="flex gap-2 pb-2">
-          {tabs.map(tab => (
-            <Button
-              key={tab.id}
-              variant={activeTab === tab.id ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setActiveTab(tab.id as ContentType)}
-              className="gap-2 whitespace-nowrap"
-            >
-              <tab.icon className="w-4 h-4" />
-              {tab.label}
-              <Badge variant="secondary" className="ml-1 text-xs">{tab.count}</Badge>
-            </Button>
-          ))}
-        </div>
-      </ScrollArea>
+      <div className="flex flex-wrap gap-2">
+        {tabs.map(tab => (
+          <Button
+            key={tab.id}
+            variant={activeTab === tab.id ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab(tab.id as ContentType)}
+            className="gap-1.5"
+          >
+            <tab.icon className="w-4 h-4" />
+            <span className="hidden sm:inline">{tab.label}</span>
+            <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+            <Badge variant="secondary" className="ml-0.5 text-xs">{tab.count}</Badge>
+          </Button>
+        ))}
+      </div>
 
       {/* Search */}
       <div className="relative">
