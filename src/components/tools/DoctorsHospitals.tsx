@@ -56,6 +56,15 @@ const providerTypeLabels: Record<string, { label: string; icon: typeof Stethosco
   doctor: { label: 'Həkim', icon: User },
 };
 
+const specialtyCategories = [
+  { id: 'all', label: 'Hamısı', emoji: '✨' },
+  { id: 'hospital', label: 'Xəstəxana', emoji: '🏥' },
+  { id: 'gynecology', label: 'Ginekologiya', emoji: '👩‍⚕️' },
+  { id: 'ivf', label: 'IVF', emoji: '🔬' },
+  { id: 'pediatrics', label: 'Pediatriya', emoji: '👶' },
+  { id: 'mammology', label: 'Mamologiya', emoji: '🩺' },
+];
+
 const dayLabels: Record<string, string> = {
   monday: 'Bazar ertəsi',
   tuesday: 'Çərşənbə axşamı',
@@ -91,7 +100,31 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
   const filteredProviders = providers.filter(provider => {
     const matchesSearch = (provider.name_az || provider.name).toLowerCase().includes(searchQuery.toLowerCase()) ||
       (provider.specialty_az || provider.specialty || '').toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = activeFilter === 'all' || provider.provider_type === activeFilter;
+    
+    let matchesFilter = false;
+    if (activeFilter === 'all') {
+      matchesFilter = true;
+    } else if (activeFilter === 'hospital') {
+      matchesFilter = provider.provider_type === 'hospital' || provider.provider_type === 'clinic';
+    } else if (activeFilter === 'gynecology') {
+      matchesFilter = provider.provider_type === 'doctor' && 
+        ((provider.specialty_az || '').toLowerCase().includes('ginekoloq') || 
+         (provider.specialty_az || '').toLowerCase().includes('mama'));
+    } else if (activeFilter === 'ivf') {
+      matchesFilter = provider.provider_type === 'doctor' && 
+        ((provider.specialty_az || '').toLowerCase().includes('ivf') || 
+         (provider.specialty_az || '').toLowerCase().includes('fertillik'));
+    } else if (activeFilter === 'pediatrics') {
+      matchesFilter = provider.provider_type === 'doctor' && 
+        ((provider.specialty_az || '').toLowerCase().includes('pediatr') || 
+         (provider.specialty_az || '').toLowerCase().includes('neonatoloq') ||
+         (provider.specialty_az || '').toLowerCase().includes('uşaq'));
+    } else if (activeFilter === 'mammology') {
+      matchesFilter = provider.provider_type === 'doctor' && 
+        ((provider.specialty_az || '').toLowerCase().includes('mamoloq') || 
+         (provider.specialty_az || '').toLowerCase().includes('onkoloq'));
+    }
+    
     return matchesSearch && matchesFilter;
   });
 
@@ -127,7 +160,7 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
             </motion.button>
             <div className="flex-1">
               <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-indigo-500" />
+                <Building2 className="w-5 h-5 text-primary" />
                 Həkimlər və Xəstəxanalar
               </h1>
             </div>
@@ -145,18 +178,13 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
             />
           </div>
 
-          {/* Filter Tabs */}
-          <div className="flex gap-2">
-            {[
-              { id: 'all', label: 'Hamısı', emoji: '✨' },
-              { id: 'hospital', label: 'Xəstəxana', emoji: '🏥' },
-              { id: 'clinic', label: 'Klinika', emoji: '🏢' },
-              { id: 'doctor', label: 'Həkim', emoji: '👨‍⚕️' },
-            ].map((filter) => (
+          {/* Filter Tabs - Scrollable */}
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            {specialtyCategories.map((filter) => (
               <button
                 key={filter.id}
                 onClick={() => setActiveFilter(filter.id)}
-                className={`flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+                className={`shrink-0 px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
                   activeFilter === filter.id
                     ? 'bg-primary text-primary-foreground shadow-md'
                     : 'bg-muted text-muted-foreground hover:bg-muted/80'
