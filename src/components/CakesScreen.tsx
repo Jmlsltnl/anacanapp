@@ -74,11 +74,18 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
 
   if (selectedCake) {
     return (
-      <CakeDetailScreen 
-        cake={selectedCake}
-        onBack={() => setSelectedCake(null)}
-        onOpenCart={() => setShowCart(true)}
-      />
+      <>
+        <CakeDetailScreen 
+          cake={selectedCake}
+          onBack={() => setSelectedCake(null)}
+          onOpenCart={() => setShowCart(true)}
+        />
+        <CakeCartDrawer 
+          open={showCart} 
+          onClose={() => setShowCart(false)} 
+          onCheckout={() => { setShowCart(false); setShowCheckout(true); }}
+        />
+      </>
     );
   }
 
