@@ -1325,6 +1325,119 @@ export type Database = {
         }
         Relationships: []
       }
+      cake_orders: {
+        Row: {
+          cake_id: string | null
+          child_age_months: number | null
+          child_name: string | null
+          contact_phone: string | null
+          created_at: string
+          custom_fields: Json | null
+          custom_text: string | null
+          customer_name: string
+          delivery_address: string | null
+          delivery_date: string | null
+          id: string
+          notes: string | null
+          status: string
+          total_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cake_id?: string | null
+          child_age_months?: number | null
+          child_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          custom_fields?: Json | null
+          custom_text?: string | null
+          customer_name: string
+          delivery_address?: string | null
+          delivery_date?: string | null
+          id?: string
+          notes?: string | null
+          status?: string
+          total_price?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cake_id?: string | null
+          child_age_months?: number | null
+          child_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          custom_fields?: Json | null
+          custom_text?: string | null
+          customer_name?: string
+          delivery_address?: string | null
+          delivery_date?: string | null
+          id?: string
+          notes?: string | null
+          status?: string
+          total_price?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cake_orders_cake_id_fkey"
+            columns: ["cake_id"]
+            isOneToOne: false
+            referencedRelation: "cakes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cakes: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          milestone_label: string | null
+          milestone_type: string | null
+          month_number: number | null
+          name: string
+          price: number
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          milestone_label?: string | null
+          milestone_type?: string | null
+          month_number?: number | null
+          name: string
+          price?: number
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          milestone_label?: string | null
+          milestone_type?: string | null
+          month_number?: number | null
+          name?: string
+          price?: number
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           created_at: string

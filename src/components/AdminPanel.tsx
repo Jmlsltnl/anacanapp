@@ -51,6 +51,7 @@ import AdminBabyCrisisCalendar from './admin/AdminBabyCrisisCalendar';
 import AdminPhaseTips from './admin/AdminPhaseTips';
 import AdminTeething from './admin/AdminTeething';
 import AdminHealthcareReviews from './admin/AdminHealthcareReviews';
+import AdminCakes from './admin/AdminCakes';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -163,6 +164,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminTeething />;
       case 'healthcare-reviews':
         return <AdminHealthcareReviews />;
+      case 'cakes':
+        return <AdminCakes />;
       case 'security':
         return <AdminSecurity />;
       default:

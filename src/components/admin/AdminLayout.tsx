@@ -60,6 +60,7 @@ const menuItems = [
   { id: 'places', label: 'Ana Dostu Məkanlar', icon: MapPin },
   { id: 'places-config', label: 'Məkan Konfiqurasiya', icon: MapPin },
   { id: 'healthcare-reviews', label: 'Həkim/Klinika Rəyləri', icon: Stethoscope },
+  { id: 'cakes', label: 'Tortlar', icon: Package },
   { id: 'play-activities', label: 'Ağıllı Oyun Qutusu', icon: Gamepad2 },
   { id: 'quick-actions', label: 'Sürətli Keçidlər', icon: Zap },
   { id: 'development-tips', label: 'İnkişaf Tövsiyələri', icon: Lightbulb },

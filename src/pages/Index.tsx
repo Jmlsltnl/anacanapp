@@ -11,6 +11,7 @@ import AIChatScreen from '@/components/AIChatScreen';
 import PartnerAIChatScreen from '@/components/PartnerAIChatScreen';
 import PartnerChatScreen from '@/components/partner/PartnerChatScreen';
 import ShopScreen from '@/components/ShopScreen';
+import CakesScreen from '@/components/CakesScreen';
 import ProfileScreen from '@/components/ProfileScreen';
 import PartnerProfileScreen from '@/components/PartnerProfileScreen';
 import NotificationsScreen from '@/components/NotificationsScreen';
@@ -102,7 +103,7 @@ const Index = () => {
   // Tab navigation order for swipe
   const tabOrder = role === 'partner' 
     ? ['home', 'chat', 'ai', 'profile'] 
-    : ['home', 'tools', 'community', 'ai', 'profile'];
+    : ['home', 'tools', 'cakes', 'community', 'ai', 'profile'];
 
   // iOS swipe navigation handler
   const handleSwipeBack = useCallback(() => {
@@ -200,6 +201,12 @@ const Index = () => {
         return (
           <motion.div key="tools" variants={pageVariants} initial="initial" animate="animate" exit="exit">
             <ToolsHub key={toolsResetKey} initialTool={activeTool} onBack={() => setActiveTool(null)} />
+          </motion.div>
+        );
+      case 'cakes':
+        return (
+          <motion.div key="cakes" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+            <CakesScreen />
           </motion.div>
         );
       case 'community':
