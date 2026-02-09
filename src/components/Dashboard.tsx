@@ -29,8 +29,10 @@ import { useBabyIllustrationByMonth } from '@/hooks/useBabyMonthIllustrations';
 import { useCurrentBabyCrisis, useUpcomingBabyCrises } from '@/hooks/useBabyCrisisPeriods';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useChildren } from '@/hooks/useChildren';
+import { useSubscription } from '@/hooks/useSubscription';
+import { usePregnancyDayNavigation } from '@/hooks/usePregnancyDayNavigation';
 import { formatDateAz } from '@/lib/date-utils';
-import { getPregnancyDay, getDaysUntilDue, getDaysElapsed, getPregnancyProgress } from '@/lib/pregnancy-utils';
+import { getPregnancyDay, getDaysUntilDue, getDaysElapsed, getPregnancyProgress, getTrimester } from '@/lib/pregnancy-utils';
 import FeedingHistoryPanel from '@/components/baby/FeedingHistoryPanel';
 import QuickActionsBar from '@/components/mommy/QuickActionsBar';
 import QuickStatsWidget from '@/components/mommy/QuickStatsWidget';
@@ -44,6 +46,7 @@ import SendDailySummaryWidget from '@/components/partner/SendDailySummaryWidget'
 import RecentBlogPosts from '@/components/dashboard/RecentBlogPosts';
 import FlowDashboard from '@/components/flow/FlowDashboard';
 import BirthOnboardingModal from '@/components/BirthOnboardingModal';
+import PregnancyDayNavigator from '@/components/bump/PregnancyDayNavigator';
 
 // Fetus images by month
 import FetusMonth1 from '@/assets/fetus/month-1.svg';
@@ -145,24 +148,40 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
   const { getTodayStats, addSession } = useKickSessions();
   const { entries: weightEntries } = useWeightEntries();
   const { data: fruitImages = [] } = useFruitImages();
+  const { isPremium } = useSubscription();
   
   // Birth onboarding modal state
   const [showBirthModal, setShowBirthModal] = useState(false);
   
-  // Calculate current pregnancy day (1-280) using centralized utility
-  const pregnancyDay = pregData?.lastPeriodDate 
+  // Calculate actual current pregnancy day (1-280)
+  const actualPregnancyDay = pregData?.lastPeriodDate 
     ? getPregnancyDay(pregData.lastPeriodDate)
     : 1;
   
-  // Fetch weekly tip from database
-  const { data: weeklyTips = [] } = useWeeklyTips(pregData?.currentWeek, 'bump');
+  // Day navigation hook - allows viewing past/future days
+  const { 
+    selectedDay: pregnancyDay, 
+    selectedWeek,
+    selectedDayInWeek,
+    selectedTrimester,
+    daysUntilDueFromSelected,
+    isViewingCurrentDay,
+    navigateToDay,
+    actualCurrentDay
+  } = usePregnancyDayNavigation({ 
+    lastPeriodDate: pregData?.lastPeriodDate || null,
+    dueDate: pregData?.dueDate
+  });
+  
+  // Fetch weekly tip from database based on selected week
+  const { data: weeklyTips = [] } = useWeeklyTips(selectedWeek, 'bump');
   const currentWeekTip = weeklyTips[0];
   
-  // Fetch dynamic pregnancy content by day
+  // Fetch dynamic pregnancy content by selected day
   const { data: dayContent } = usePregnancyContentByDay(pregnancyDay);
   
-  // Fetch dynamic trimester tips from database
-  const { data: dynamicTrimesterTips = [] } = useTrimesterTips(pregData?.trimester);
+  // Fetch dynamic trimester tips from database based on selected trimester
+  const { data: dynamicTrimesterTips = [] } = useTrimesterTips(selectedTrimester);
   
   const todayStats = getTodayStats();
   const kickCount = todayStats.totalKicks;
@@ -216,7 +235,8 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
     }
   };
   
-  const trimesterColors = getTrimesterColors(pregData.trimester);
+  // Use selected trimester for colors (based on navigated day)
+  const trimesterColors = getTrimesterColors(selectedTrimester);
   
   // Trimester info for display
   const getTrimesterInfo = (trimester: number) => {
@@ -231,7 +251,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
     }
   };
   
-  const trimesterInfo = getTrimesterInfo(pregData.trimester);
+  const trimesterInfo = getTrimesterInfo(selectedTrimester);
   
   // Get mood emoji
   const getMoodEmoji = (mood: number) => {
@@ -247,28 +267,29 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
     return getDynamicFruitData(
       fruitImages,
       pregnancyDay,
-      pregData.currentWeek,
+      selectedWeek,
       dayContent
     );
   };
   
   const weekData = getFruitData();
   
-  // Use centralized pregnancy calculations
-  const daysLeft = getDaysUntilDue(pregData.lastPeriodDate, pregData.dueDate);
+  // For progress bar and development milestones, use actual current day
+  const daysLeft = daysUntilDueFromSelected;
   const totalDays = 280;
-  const daysElapsed = getDaysElapsed(pregData.lastPeriodDate);
-  const progressPercent = getPregnancyProgress(pregData.lastPeriodDate);
+  const daysElapsed = pregnancyDay;
+  const progressPercent = (pregnancyDay / totalDays) * 100;
 
   // Dynamic baby message from database
   const babyMessage = dayContent?.baby_message || "Salam ana! Bu gün çox böyüdüm. 💕";
 
+  // Development milestones based on selected week
   const weeklyDevelopment = {
-    eyes: pregData.currentWeek >= 8,
-    ears: pregData.currentWeek >= 16,
-    fingers: pregData.currentWeek >= 10,
-    kicks: pregData.currentWeek >= 18,
-    hair: pregData.currentWeek >= 22,
+    eyes: selectedWeek >= 8,
+    ears: selectedWeek >= 16,
+    fingers: selectedWeek >= 10,
+    kicks: selectedWeek >= 18,
+    hair: selectedWeek >= 22,
   };
 
   const addKick = async () => {
@@ -303,6 +324,29 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
         <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full ${trimesterColors.accent} blur-xl opacity-50`} />
         
         <div className="relative z-10 flex flex-col items-center">
+          {/* Day Navigator */}
+          <div className="w-full mb-3">
+            <PregnancyDayNavigator
+              currentActualDay={actualCurrentDay}
+              selectedDay={pregnancyDay}
+              onDayChange={navigateToDay}
+              isPremium={isPremium}
+            />
+          </div>
+
+          {/* Viewing past/future day indicator */}
+          {!isViewingCurrentDay && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-2 px-3 py-1 rounded-full bg-muted border border-border"
+            >
+              <span className="text-xs font-medium text-foreground">
+                {pregnancyDay < actualCurrentDay ? '⏮️ Keçmiş' : '⏭️ Gələcək'} günə baxırsınız
+              </span>
+            </motion.div>
+          )}
+
           {/* Fetus Image with subtle motion */}
           <motion.div 
             className="w-42 h-42 mb-3 relative"
@@ -319,8 +363,8 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
             }}
           >
             <img 
-              src={FETUS_IMAGES[Math.min(Math.ceil(pregData.currentWeek / 4.4), 9)] || FETUS_IMAGES[1]} 
-              alt={`${pregData.currentWeek} həftəlik körpə`}
+              src={FETUS_IMAGES[Math.min(Math.ceil(selectedWeek / 4.4), 9)] || FETUS_IMAGES[1]} 
+              alt={`${selectedWeek} həftəlik körpə`}
               className="w-full h-full object-contain drop-shadow-lg"
             />
           </motion.div>
@@ -331,7 +375,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
               Anacan, hazırda <span className={trimesterColors.text}>{weekData.fruit}</span> boydayam
             </p>
             <p className="text-xs text-muted-foreground font-medium">
-              {pregData.currentWeek}. həftə, {pregData.currentDay}. gün • <span className={`font-semibold ${trimesterColors.text}`}>{pregData.trimester}-{pregData.trimester === 1 ? 'ci' : pregData.trimester === 2 ? 'ci' : 'cü'} Trimester</span>
+              {selectedWeek}. həftə, {selectedDayInWeek}. gün • <span className={`font-semibold ${trimesterColors.text}`}>{selectedTrimester}-{selectedTrimester === 1 ? 'ci' : selectedTrimester === 2 ? 'ci' : 'cü'} Trimester</span>
             </p>
             <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
               <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
@@ -403,7 +447,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
       )}
 
       {/* Stats Grid - Show kick counter only after week 16 */}
-      <div className={`grid ${pregData.currentWeek >= 16 ? 'grid-cols-3' : 'grid-cols-2'} gap-1.5`}>
+      <div className={`grid ${selectedWeek >= 16 ? 'grid-cols-3' : 'grid-cols-2'} gap-1.5`}>
         <motion.div 
           className={`${trimesterColors.accent} rounded-xl p-2.5 shadow-card ${trimesterColors.border} text-center`}
           initial={{ y: 20, opacity: 0 }}
@@ -416,7 +460,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
         </motion.div>
 
         {/* Only show kick counter after week 16 */}
-        {pregData.currentWeek >= 16 && (
+        {selectedWeek >= 16 && (
           <motion.button 
             onClick={addKick}
             className={`${trimesterColors.accent} rounded-xl p-2.5 shadow-card ${trimesterColors.border} text-center`}
@@ -584,7 +628,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
               <Lightbulb className="w-3 h-3 text-primary" />
             </div>
             <div>
-              <p className="text-[10px] text-primary font-bold uppercase tracking-wider">Həftə {pregData?.currentWeek} Tövsiyəsi</p>
+              <p className="text-[10px] text-primary font-bold uppercase tracking-wider">Həftə {selectedWeek} Tövsiyəsi</p>
               <h4 className="font-bold text-foreground text-sm">{currentWeekTip.title}</h4>
             </div>
           </div>
