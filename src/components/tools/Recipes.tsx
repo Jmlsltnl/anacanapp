@@ -64,8 +64,24 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
     return matchesCategory && matchesSearch;
   });
 
+  // Determine which recipes are free (first 3 per category)
+  const freeRecipeIds = useMemo(() => {
+    const ids = new Set<string>();
+    const countPerCategory: Record<string, number> = {};
+    for (const recipe of recipes) {
+      const cat = recipe.category || 'all';
+      countPerCategory[cat] = (countPerCategory[cat] || 0) + 1;
+      if (countPerCategory[cat] <= 3) {
+        ids.add(recipe.id);
+      }
+    }
+    return ids;
+  }, [recipes]);
+
+  const isRecipeFree = (recipe: Recipe) => freeRecipeIds.has(recipe.id);
+
   const handleRecipeClick = (recipe: Recipe) => {
-    if (!isPremium) {
+    if (!isPremium && !isRecipeFree(recipe)) {
       setShowPremiumModal(true);
       return;
     }
@@ -75,7 +91,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
   const totalTime = (recipe: Recipe) => (recipe.prep_time || 0) + (recipe.cook_time || 0);
 
   // Recipe Detail View (only for premium users)
-  if (selectedRecipe && isPremium) {
+  if (selectedRecipe && (isPremium || isRecipeFree(selectedRecipe))) {
     return (
       <div ref={ref} className="min-h-screen bg-background pb-24">
         {/* Compact sticky header */}
@@ -304,8 +320,8 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
                 <Crown className="w-6 h-6 text-amber-900" />
               </div>
               <div className="flex-1">
-                <p className="text-white font-bold">Premium tələb olunur</p>
-                <p className="text-white/70 text-sm">Reseptləri oxumaq üçün Premium-a keçin</p>
+                <p className="text-white font-bold">Daha çox resept?</p>
+                <p className="text-white/70 text-sm">Hər kateqoriyadan 3 resept pulsuzdur. Hamısını görmək üçün Premium-a keçin</p>
               </div>
               <Sparkles className="w-5 h-5 text-amber-300 animate-pulse" />
             </motion.div>
@@ -396,8 +412,8 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
                   whileTap={{ scale: 0.98 }}
                   layout
                 >
-                  {/* Lock overlay for non-premium */}
-                  {!isPremium && (
+                  {/* Lock overlay for non-premium non-free recipes */}
+                  {!isPremium && !isRecipeFree(recipe) && (
                     <div className="absolute inset-0 bg-background/70 backdrop-blur-[2px] flex items-center justify-center z-10">
                       <div className="flex flex-col items-center gap-1">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
