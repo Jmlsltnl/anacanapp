@@ -1399,6 +1399,7 @@ export type Database = {
           has_custom_fields: boolean | null
           id: string
           image_url: string | null
+          images: string[] | null
           is_active: boolean | null
           milestone_label: string | null
           milestone_type: string | null
@@ -1416,6 +1417,7 @@ export type Database = {
           has_custom_fields?: boolean | null
           id?: string
           image_url?: string | null
+          images?: string[] | null
           is_active?: boolean | null
           milestone_label?: string | null
           milestone_type?: string | null
@@ -1433,6 +1435,7 @@ export type Database = {
           has_custom_fields?: boolean | null
           id?: string
           image_url?: string | null
+          images?: string[] | null
           is_active?: boolean | null
           milestone_label?: string | null
           milestone_type?: string | null
