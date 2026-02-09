@@ -97,7 +97,7 @@ const CakeCartDrawer = ({ open, onClose, onCheckout }: CakeCartDrawerProps) => {
 
             {/* Footer */}
             {items.length > 0 && (
-              <div className="p-4 border-t border-border/50 space-y-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
+              <div className="p-4 border-t border-border/50 space-y-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 88px)' }}>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground font-medium">Cəmi:</span>
                   <span className="text-xl font-black text-primary">{totalPrice.toFixed(2)}₼</span>
