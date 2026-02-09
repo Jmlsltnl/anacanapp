@@ -69,7 +69,7 @@ const AdminVitamins = () => {
       dosage: vitamin.dosage || '',
       week_start: vitamin.week_start?.toString() || '',
       week_end: vitamin.week_end?.toString() || '',
-      trimester: vitamin.trimester?.toString() || '',
+      trimester: vitamin.trimester !== null ? vitamin.trimester.toString() : 'none',
       life_stage: vitamin.life_stage || 'bump',
       importance: vitamin.importance || 'recommended',
       icon_emoji: vitamin.icon_emoji || '💊',
@@ -81,16 +81,21 @@ const AdminVitamins = () => {
 
   const handleSave = async () => {
     try {
-      const vitaminData = {
+      const trimesterValue = formData.trimester && formData.trimester !== 'none' 
+        ? parseInt(formData.trimester) 
+        : null;
+
+      const vitaminData: Record<string, any> = {
         name: formData.name,
         name_az: formData.name_az || null,
+        description: formData.description_az || null,
         description_az: formData.description_az || null,
         benefits: formData.benefits ? formData.benefits.split('\n').filter(b => b.trim()) : null,
         food_sources: formData.food_sources ? formData.food_sources.split('\n').filter(f => f.trim()) : null,
         dosage: formData.dosage || null,
         week_start: formData.week_start ? parseInt(formData.week_start) : null,
         week_end: formData.week_end ? parseInt(formData.week_end) : null,
-        trimester: formData.trimester && formData.trimester !== 'none' ? parseInt(formData.trimester) : null,
+        trimester: trimesterValue,
         life_stage: formData.life_stage,
         importance: formData.importance,
         icon_emoji: formData.icon_emoji,
@@ -209,6 +214,9 @@ const AdminVitamins = () => {
                   <span className="px-1.5 py-0.5 bg-muted rounded">
                     {vitamin.life_stage === 'bump' ? 'Hamiləlik' : vitamin.life_stage === 'mommy' ? 'Anacan' : 'Ümumi'}
                   </span>
+                  {vitamin.trimester === 0 && (
+                    <span className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/30 rounded text-purple-700 dark:text-purple-400">Hər üç trimester</span>
+                  )}
                   {vitamin.week_start && vitamin.week_end && (
                     <span>Həftə {vitamin.week_start}-{vitamin.week_end}</span>
                   )}
@@ -356,6 +364,7 @@ const AdminVitamins = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Yoxdur</SelectItem>
+                    <SelectItem value="0">Hər üçü</SelectItem>
                     <SelectItem value="1">1-ci</SelectItem>
                     <SelectItem value="2">2-ci</SelectItem>
                     <SelectItem value="3">3-cü</SelectItem>

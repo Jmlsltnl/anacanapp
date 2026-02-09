@@ -44,10 +44,17 @@ export const useVitamins = (weekNumber?: number, lifeStage?: string) => {
       let vitamins = (data || []) as Vitamin[];
       
       if (weekNumber && lifeStage === 'bump') {
+        const currentTrimester = weekNumber <= 13 ? 1 : weekNumber <= 26 ? 2 : 3;
         vitamins = vitamins.filter(v => {
-          if (v.week_start === null && v.week_end === null) return true;
+          // trimester 0 means "all trimesters" - always show
+          if (v.trimester === 0) return true;
+          // Filter by week range if provided
           if (v.week_start !== null && v.week_end !== null) {
             return weekNumber >= v.week_start && weekNumber <= v.week_end;
+          }
+          // Filter by trimester if set
+          if (v.trimester !== null) {
+            return v.trimester === currentTrimester;
           }
           return true;
         });
