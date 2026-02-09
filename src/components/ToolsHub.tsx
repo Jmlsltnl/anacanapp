@@ -412,10 +412,40 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
           </div>
         </motion.button>
 
+        {/* Recipes Banner */}
+        <motion.button
+          onClick={() => openTool('recipes')}
+          className="w-full relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 p-4 mb-4 text-left shadow-xl"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(255,255,255,0.15),transparent_60%)]" />
+          <div className="absolute right-0 bottom-0 opacity-10">
+            <ChefHat className="w-32 h-32 text-white -mr-6 -mb-6" />
+          </div>
+          <div className="relative z-10 flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+              <ChefHat className="w-7 h-7 text-white" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] text-white font-semibold">🍽️ Reseptlər</span>
+                <span className="px-2 py-0.5 rounded-full bg-amber-400/30 text-[10px] text-amber-200 font-semibold flex items-center gap-1">
+                  <Crown className="w-3 h-3" /> Premium
+                </span>
+              </div>
+              <h3 className="text-white font-bold text-base">Sağlam Reseptlər</h3>
+              <p className="text-white/70 text-xs">Hamiləlik və analıq üçün ləzzətli yeməklər</p>
+            </div>
+            <ChevronRight className="w-6 h-6 text-white/60" />
+          </div>
+        </motion.button>
+
         {/* Quick Access Row */}
         <div className="flex gap-2 mb-4 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4">
           {[
-            { id: 'recipes', icon: ChefHat, label: 'Reseptlər', gradient: 'from-orange-500 to-amber-500' },
             { id: 'safety', icon: Shield, label: 'Təhlükəsizlik', gradient: 'from-emerald-500 to-teal-500' },
             { id: 'first-aid', icon: ShieldAlert, label: 'İlk Yardım', gradient: 'from-red-500 to-rose-500' },
             { id: 'doctors', icon: Stethoscope, label: 'Həkimlər', gradient: 'from-blue-500 to-cyan-500' },
