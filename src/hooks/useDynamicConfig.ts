@@ -48,6 +48,9 @@ export interface WhiteNoiseSound {
   audio_url: string | null;
   is_active: boolean;
   sort_order: number;
+  noise_type: string;
+  description: string | null;
+  description_az: string | null;
 }
 
 export const useWhiteNoiseSounds = () => {

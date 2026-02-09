@@ -7224,33 +7224,42 @@ export type Database = {
           audio_url: string | null
           color_gradient: string | null
           created_at: string | null
+          description: string | null
+          description_az: string | null
           emoji: string | null
           id: string
           is_active: boolean | null
           name: string
           name_az: string | null
+          noise_type: string | null
           sort_order: number | null
         }
         Insert: {
           audio_url?: string | null
           color_gradient?: string | null
           created_at?: string | null
+          description?: string | null
+          description_az?: string | null
           emoji?: string | null
           id?: string
           is_active?: boolean | null
           name: string
           name_az?: string | null
+          noise_type?: string | null
           sort_order?: number | null
         }
         Update: {
           audio_url?: string | null
           color_gradient?: string | null
           created_at?: string | null
+          description?: string | null
+          description_az?: string | null
           emoji?: string | null
           id?: string
           is_active?: boolean | null
           name?: string
           name_az?: string | null
+          noise_type?: string | null
           sort_order?: number | null
         }
         Relationships: []
