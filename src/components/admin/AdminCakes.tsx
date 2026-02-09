@@ -50,6 +50,8 @@ const AdminCakes = () => {
     milestone_label: '',
     is_active: true,
     sort_order: '0',
+    has_custom_fields: false,
+    custom_field_labels: '' as string, // comma-separated
   });
 
   const resetForm = () => {
@@ -57,6 +59,7 @@ const AdminCakes = () => {
       name: '', description: '', price: '', image_url: '',
       category: 'month', month_number: '1', milestone_type: '',
       milestone_label: '', is_active: true, sort_order: '0',
+      has_custom_fields: false, custom_field_labels: '',
     });
     setEditingCake(null);
     setShowForm(false);
@@ -75,6 +78,8 @@ const AdminCakes = () => {
       milestone_label: cake.milestone_label || '',
       is_active: cake.is_active,
       sort_order: String(cake.sort_order),
+      has_custom_fields: cake.has_custom_fields || false,
+      custom_field_labels: Array.isArray(cake.custom_field_labels) ? cake.custom_field_labels.join(', ') : '',
     });
     setShowForm(true);
   };
@@ -105,6 +110,11 @@ const AdminCakes = () => {
       return;
     }
 
+    const customLabels = formData.custom_field_labels
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+
     const payload: Partial<Cake> = {
       name: formData.name,
       description: formData.description || null,
@@ -116,6 +126,8 @@ const AdminCakes = () => {
       milestone_label: formData.category === 'milestone' ? formData.milestone_label : null,
       is_active: formData.is_active,
       sort_order: parseInt(formData.sort_order) || 0,
+      has_custom_fields: formData.has_custom_fields,
+      custom_field_labels: customLabels,
     };
 
     const success = editingCake 
@@ -283,6 +295,23 @@ const AdminCakes = () => {
                 <input type="checkbox" checked={formData.is_active} onChange={e => setFormData({ ...formData, is_active: e.target.checked })} />
                 <Label>Aktiv</Label>
               </div>
+
+              <div className="flex items-center gap-2">
+                <input type="checkbox" checked={formData.has_custom_fields} onChange={e => setFormData({ ...formData, has_custom_fields: e.target.checked })} />
+                <Label>Fərdi sahələr (Custom Fields)</Label>
+              </div>
+
+              {formData.has_custom_fields && (
+                <div>
+                  <Label>Sahə adları (vergüllə ayırın)</Label>
+                  <Input 
+                    value={formData.custom_field_labels} 
+                    onChange={e => setFormData({ ...formData, custom_field_labels: e.target.value })} 
+                    placeholder="Məs: Uşaq adı, Təbrik mətni, Rəng seçimi"
+                  />
+                  <p className="text-[10px] text-muted-foreground mt-1">Müştəri bu sahələri sifariş zamanı dolduracaq</p>
+                </div>
+              )}
 
               <div className="flex gap-2">
                 <Button onClick={handleSave}>Yadda saxla</Button>

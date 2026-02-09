@@ -1394,7 +1394,9 @@ export type Database = {
         Row: {
           category: string
           created_at: string
+          custom_field_labels: Json | null
           description: string | null
+          has_custom_fields: boolean | null
           id: string
           image_url: string | null
           is_active: boolean | null
@@ -1409,7 +1411,9 @@ export type Database = {
         Insert: {
           category?: string
           created_at?: string
+          custom_field_labels?: Json | null
           description?: string | null
+          has_custom_fields?: boolean | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
@@ -1424,7 +1428,9 @@ export type Database = {
         Update: {
           category?: string
           created_at?: string
+          custom_field_labels?: Json | null
           description?: string | null
+          has_custom_fields?: boolean | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
