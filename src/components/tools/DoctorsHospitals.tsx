@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Search, Star, MapPin, Phone, Globe, Clock,
@@ -7,10 +7,11 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { Skeleton } from '@/components/ui/skeleton';
+import ProviderReviews from './doctors/ProviderReviews';
 
 interface DoctorsHospitalsProps {
   onBack: () => void;
@@ -302,6 +303,49 @@ interface ProviderDetailProps {
 
 const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) => {
   const TypeIcon = providerTypeLabels[provider.provider_type]?.icon || Building2;
+  const queryClient = useQueryClient();
+  
+  // Subscribe to realtime updates for this provider's reviews
+  useEffect(() => {
+    const channel = supabase
+      .channel(`provider-${provider.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'healthcare_provider_reviews',
+          filter: `provider_id=eq.${provider.id}`,
+        },
+        () => {
+          // Invalidate queries to refresh data
+          queryClient.invalidateQueries({ queryKey: ['healthcare-providers'] });
+          queryClient.invalidateQueries({ queryKey: ['provider-reviews', provider.id] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [provider.id, queryClient]);
+
+  // Fetch latest provider data for real-time rating updates
+  const { data: latestProvider } = useQuery({
+    queryKey: ['healthcare-provider', provider.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('healthcare_providers')
+        .select('rating, review_count')
+        .eq('id', provider.id)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const currentRating = latestProvider?.rating ?? provider.rating;
+  const currentReviewCount = latestProvider?.review_count ?? provider.review_count;
   
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -348,22 +392,18 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
             )}
           </div>
 
-          {provider.rating > 0 && (
-            <div className="flex items-center gap-2 mb-3">
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star 
-                    key={star} 
-                    className={`w-4 h-4 ${star <= Math.round(provider.rating) ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground/30'}`}
-                  />
-                ))}
-              </div>
-              <span className="font-semibold">{provider.rating.toFixed(1)}</span>
-              {provider.review_count > 0 && (
-                <span className="text-muted-foreground text-sm">({provider.review_count} rəy)</span>
-              )}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star 
+                  key={star} 
+                  className={`w-4 h-4 ${star <= Math.round(currentRating) ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground/30'}`}
+                />
+              ))}
             </div>
-          )}
+            <span className="font-semibold">{currentRating > 0 ? currentRating.toFixed(1) : '0.0'}</span>
+            <span className="text-muted-foreground text-sm">({currentReviewCount} rəy)</span>
+          </div>
 
           {provider.description_az && (
             <p className="text-sm text-muted-foreground">{provider.description_az}</p>
@@ -460,6 +500,9 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
             </div>
           </div>
         )}
+
+        {/* Reviews Section */}
+        <ProviderReviews providerId={provider.id} providerName={provider.name_az || provider.name} />
 
         {/* Reserve Button - Disabled for now */}
         {provider.accepts_reservations && (
