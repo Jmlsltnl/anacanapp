@@ -71,8 +71,15 @@ const menuItems = [
 ];
 
 const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutProps) => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const { profile, signOut } = useAuth();
+
+  // Close mobile sidebar on tab change
+  const handleTabChange = (tab: string) => {
+    onTabChange(tab);
+    setMobileSidebarOpen(false);
+  };
 
   const handleLogout = async () => {
     await signOut();
@@ -81,11 +88,25 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
 
   return (
     <div className="min-h-screen bg-background flex">
+      {/* Mobile overlay */}
+      {mobileSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden" 
+          onClick={() => setMobileSidebarOpen(false)} 
+        />
+      )}
+
       {/* Sidebar */}
       <motion.aside
         initial={false}
-        animate={{ width: sidebarOpen ? 280 : 80 }}
-        className="bg-card border-r border-border flex flex-col fixed h-full z-50"
+        animate={{ 
+          width: sidebarOpen ? 280 : 80,
+          x: 0
+        }}
+        className={`bg-card border-r border-border flex flex-col fixed h-full z-50 
+          max-lg:w-[280px] max-lg:transition-transform max-lg:duration-300
+          ${mobileSidebarOpen ? 'max-lg:translate-x-0' : 'max-lg:-translate-x-full'}
+        `}
       >
         {/* Header */}
         <div className="p-4 border-b border-border flex items-center justify-between">
@@ -122,7 +143,7 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
           {menuItems.map((item) => (
             <motion.button
               key={item.id}
-              onClick={() => onTabChange(item.id)}
+              onClick={() => handleTabChange(item.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                 activeTab === item.id
                   ? 'bg-primary/10 text-primary'
@@ -196,11 +217,22 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
       </motion.aside>
 
       {/* Main Content */}
-      <main className={`flex-1 ${sidebarOpen ? 'ml-[280px]' : 'ml-[80px]'} transition-all duration-300 min-h-screen flex flex-col`}>
+      <main className={`flex-1 transition-all duration-300 min-h-screen flex flex-col
+        max-lg:ml-0
+        ${sidebarOpen ? 'lg:ml-[280px]' : 'lg:ml-[80px]'}
+      `}>
         {/* Top Bar */}
-        <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40 flex items-center justify-between px-6 shrink-0">
-          <div className="flex items-center gap-4 flex-1 max-w-md">
-            <div className="relative flex-1">
+        <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40 flex items-center justify-between px-4 sm:px-6 shrink-0">
+          <div className="flex items-center gap-3 flex-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setMobileSidebarOpen(true)}
+              className="lg:hidden shrink-0"
+            >
+              <Menu className="w-5 h-5" />
+            </Button>
+            <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Axtar..."
@@ -219,7 +251,7 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
 
         {/* Page Content - Scrollable Area */}
         <div className="flex-1 overflow-y-auto">
-          <div className="p-6 min-h-full">
+          <div className="p-3 sm:p-6 min-h-full">
             {children}
           </div>
         </div>

@@ -212,13 +212,13 @@ const AdminToolsConfig = () => {
       </div>
 
       <Tabs defaultValue="cry" className="w-full">
-        <TabsList className="grid w-full grid-cols-6 h-auto">
-          <TabsTrigger value="cry" className="text-xs py-2">Ağlama</TabsTrigger>
-          <TabsTrigger value="poop" className="text-xs py-2">Nəcis</TabsTrigger>
-          <TabsTrigger value="market" className="text-xs py-2">Bazar</TabsTrigger>
-          <TabsTrigger value="providers" className="text-xs py-2">Həkim</TabsTrigger>
-          <TabsTrigger value="horoscope" className="text-xs py-2">Bürclər</TabsTrigger>
-          <TabsTrigger value="weather" className="text-xs py-2">Hava</TabsTrigger>
+        <TabsList className="flex flex-wrap h-auto gap-1 bg-muted p-1">
+          <TabsTrigger value="cry" className="text-xs py-2 px-3">Ağlama</TabsTrigger>
+          <TabsTrigger value="poop" className="text-xs py-2 px-3">Nəcis</TabsTrigger>
+          <TabsTrigger value="market" className="text-xs py-2 px-3">Bazar</TabsTrigger>
+          <TabsTrigger value="providers" className="text-xs py-2 px-3">Həkim</TabsTrigger>
+          <TabsTrigger value="horoscope" className="text-xs py-2 px-3">Bürclər</TabsTrigger>
+          <TabsTrigger value="weather" className="text-xs py-2 px-3">Hava</TabsTrigger>
         </TabsList>
 
         <TabsContent value="cry" className="space-y-4">
