@@ -68,10 +68,10 @@ const PregnancyDayNavigator = ({
         onClick={goBack}
         disabled={!canGoBack}
         className={cn(
-          "w-9 h-9 rounded-full flex items-center justify-center transition-all",
+          "w-9 h-9 rounded-full flex items-center justify-center transition-all border",
           canGoBack 
-            ? "bg-white/20 hover:bg-white/30 text-white active:scale-95" 
-            : "bg-white/5 text-white/30 cursor-not-allowed"
+            ? "bg-primary/10 hover:bg-primary/20 text-primary border-primary/30 active:scale-95" 
+            : "bg-muted text-muted-foreground/40 border-transparent cursor-not-allowed"
         )}
         whileTap={canGoBack ? { scale: 0.9 } : {}}
       >
@@ -90,7 +90,7 @@ const PregnancyDayNavigator = ({
             className={cn(
               "text-sm font-bold px-3 py-1 rounded-full",
               isViewingCurrentDay 
-                ? "bg-white/25 text-white" 
+                ? "bg-primary/20 text-primary" 
                 : "bg-primary text-primary-foreground"
             )}
           >
@@ -116,10 +116,10 @@ const PregnancyDayNavigator = ({
         onClick={goForward}
         disabled={!canGoForward}
         className={cn(
-          "w-9 h-9 rounded-full flex items-center justify-center transition-all",
+          "w-9 h-9 rounded-full flex items-center justify-center transition-all border",
           canGoForward 
-            ? "bg-white/20 hover:bg-white/30 text-white active:scale-95" 
-            : "bg-white/5 text-white/30 cursor-not-allowed"
+            ? "bg-primary/10 hover:bg-primary/20 text-primary border-primary/30 active:scale-95" 
+            : "bg-muted text-muted-foreground/40 border-transparent cursor-not-allowed"
         )}
         whileTap={canGoForward ? { scale: 0.9 } : {}}
       >
@@ -134,7 +134,7 @@ const PregnancyDayNavigator = ({
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
-            className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center ml-1"
+            className="w-8 h-8 rounded-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 flex items-center justify-center ml-1"
             whileTap={{ scale: 0.9 }}
             title="Bu günə qayıt"
           >
