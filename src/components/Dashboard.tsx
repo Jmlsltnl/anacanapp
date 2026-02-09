@@ -1187,6 +1187,29 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
       {/* Quick Actions Bar */}
       <QuickActionsBar onNavigateToTool={onNavigateToTool} />
 
+      {/* Cakes Widget - navigate to cakes tab */}
+      <motion.div
+        className="bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-500/10 dark:to-rose-500/10 rounded-2xl p-4 border border-pink-200/50 dark:border-pink-500/20 shadow-card cursor-pointer"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.12 }}
+        whileHover={{ y: -2 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center shadow-lg">
+            <span className="text-2xl">🎂</span>
+          </div>
+          <div className="flex-1">
+            <h3 className="font-bold text-sm text-foreground">Xüsusi Tortlar</h3>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              {babyData.ageInMonths > 0 ? `${Math.floor(babyData.ageInMonths)}-ci ay tortu sifariş edin!` : 'Körpəniz üçün milestone tortları'}
+            </p>
+          </div>
+          <ChevronRight className="w-5 h-5 text-pink-400" />
+        </div>
+      </motion.div>
+
       {/* Sleep Tracker */}
       <motion.div
         className="bg-card rounded-2xl p-4 shadow-card border border-border/50"

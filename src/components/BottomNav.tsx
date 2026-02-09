@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Home, Compass, MessageCircle, User, Users } from 'lucide-react';
+import { Home, Compass, MessageCircle, User, Users, Cake } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 
@@ -12,6 +12,7 @@ interface BottomNavProps {
 const womanTabs = [
   { id: 'home', label: 'Əsas', icon: Home },
   { id: 'tools', label: 'Alətlər', icon: Compass },
+  { id: 'cakes', label: 'Tortlar', icon: Cake },
   { id: 'community', label: 'Cəmiyyət', icon: Users },
   { id: 'ai', label: 'Anacan.AI', icon: MessageCircle },
   { id: 'profile', label: 'Profil', icon: User },
