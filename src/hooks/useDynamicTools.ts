@@ -97,9 +97,9 @@ export const useMealTypes = (lifeStage?: string) => {
   });
 };
 
-export const useRecipeCategories = (lifeStage?: string) => {
+export const useRecipeCategories = () => {
   return useQuery({
-    queryKey: ['recipe-categories', lifeStage],
+    queryKey: ['recipe-categories'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('recipe_categories')
@@ -107,11 +107,21 @@ export const useRecipeCategories = (lifeStage?: string) => {
         .eq('is_active', true)
         .order('sort_order');
       if (error) throw error;
-      
-      if (lifeStage && data) {
-        return data.filter(c => !c.life_stage || c.life_stage === lifeStage);
-      }
       return data;
+    },
+  });
+};
+
+export const useRecipeCategoriesAdmin = () => {
+  return useQuery({
+    queryKey: ['recipe-categories-admin'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('recipe_categories')
+        .select('*')
+        .order('sort_order');
+      if (error) throw error;
+      return data || [];
     },
   });
 };

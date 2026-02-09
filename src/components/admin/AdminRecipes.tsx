@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { UtensilsCrossed, Plus, Pencil, Trash2, Search, Clock, Users, FileUp, Download, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { UtensilsCrossed, Plus, Pencil, Trash2, Search, Clock, Users, FileUp, Download, Upload, X, Image as ImageIcon, Settings2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,20 +12,24 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { useAdminRecipesAdmin, AdminRecipe } from '@/hooks/useAdminRecipes';
+import { useRecipeCategoriesAdmin } from '@/hooks/useDynamicTools';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-
-const categories = [
-  { id: 'pregnancy', label: 'Hamiləlik' },
-  { id: 'postpartum', label: 'Doğuşdan sonra' },
-  { id: 'baby', label: 'Körpə' },
-  { id: 'general', label: 'Ümumi' },
-];
+import { useQueryClient } from '@tanstack/react-query';
 
 const AdminRecipes = () => {
+  const queryClient = useQueryClient();
   const { toast } = useToast();
   const { data: recipes = [], isLoading, create, update, remove, refetch } = useAdminRecipesAdmin();
+  const { data: dbCategories = [] } = useRecipeCategoriesAdmin();
+  
+  // Category management states
+  const [showCatModal, setShowCatModal] = useState(false);
+  const [editingCat, setEditingCat] = useState<any>(null);
+  const [catForm, setCatForm] = useState({ category_id: '', name: '', name_az: '', emoji: '', sort_order: 0, is_active: true });
+
+  const categories = dbCategories.map(c => ({ id: c.category_id, label: c.name_az || c.name, emoji: c.emoji }));
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState<AdminRecipe | null>(null);
@@ -68,7 +72,7 @@ const AdminRecipes = () => {
     const initialData = {
       title: '',
       description: '',
-      category: 'pregnancy',
+      category: categories[0]?.id || 'general',
       prep_time: 15,
       cook_time: 30,
       servings: 4,
@@ -280,6 +284,50 @@ const AdminRecipes = () => {
     window.open('/templates/reseptler_numune.csv', '_blank');
   };
 
+  // Category CRUD
+  const saveCat = async () => {
+    try {
+      if (editingCat) {
+        const { error } = await supabase.from('recipe_categories').update({
+          name: catForm.name, name_az: catForm.name_az, emoji: catForm.emoji,
+          sort_order: catForm.sort_order, is_active: catForm.is_active,
+          category_id: catForm.category_id,
+        }).eq('id', editingCat.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('recipe_categories').insert([catForm]);
+        if (error) throw error;
+      }
+      queryClient.invalidateQueries({ queryKey: ['recipe-categories-admin'] });
+      queryClient.invalidateQueries({ queryKey: ['recipe-categories'] });
+      setShowCatModal(false);
+      toast({ title: editingCat ? 'Kateqoriya yeniləndi' : 'Kateqoriya əlavə edildi' });
+    } catch (e: any) {
+      toast({ title: 'Xəta', description: e.message, variant: 'destructive' });
+    }
+  };
+
+  const deleteCat = async (id: string) => {
+    if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
+    const { error } = await supabase.from('recipe_categories').delete().eq('id', id);
+    if (error) { toast({ title: 'Xəta', description: error.message, variant: 'destructive' }); return; }
+    queryClient.invalidateQueries({ queryKey: ['recipe-categories-admin'] });
+    queryClient.invalidateQueries({ queryKey: ['recipe-categories'] });
+    toast({ title: 'Kateqoriya silindi' });
+  };
+
+  const openCatCreate = () => {
+    setEditingCat(null);
+    setCatForm({ category_id: '', name: '', name_az: '', emoji: '🍽️', sort_order: dbCategories.length + 1, is_active: true });
+    setShowCatModal(true);
+  };
+
+  const openCatEdit = (cat: any) => {
+    setEditingCat(cat);
+    setCatForm({ category_id: cat.category_id, name: cat.name, name_az: cat.name_az || '', emoji: cat.emoji || '', sort_order: cat.sort_order || 0, is_active: cat.is_active !== false });
+    setShowCatModal(true);
+  };
+
   const filteredRecipes = recipes.filter((r) =>
     r.title.toLowerCase().includes(search.toLowerCase())
   );
@@ -315,7 +363,7 @@ const AdminRecipes = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-primary/10">
@@ -341,26 +389,85 @@ const AdminRecipes = () => {
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-purple-500/10">
-              <UtensilsCrossed className="w-5 h-5 text-purple-500" />
+              <Settings2 className="w-5 h-5 text-purple-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{recipes.filter(r => r.category === 'pregnancy').length}</p>
-              <p className="text-xs text-muted-foreground">Hamiləlik</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-blue-500/10">
-              <UtensilsCrossed className="w-5 h-5 text-blue-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{recipes.filter(r => r.category === 'baby').length}</p>
-              <p className="text-xs text-muted-foreground">Körpə</p>
+              <p className="text-2xl font-bold">{dbCategories.length}</p>
+              <p className="text-xs text-muted-foreground">Kateqoriya</p>
             </div>
           </div>
         </Card>
       </div>
+
+      {/* Category Management */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-lg">Kateqoriyalar</CardTitle>
+          <Button size="sm" onClick={openCatCreate} className="gap-1">
+            <Plus className="w-4 h-4" /> Yeni
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {dbCategories.map(cat => (
+              <div key={cat.id} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/50 border border-border/50">
+                <span>{cat.emoji}</span>
+                <span className="text-sm font-medium">{cat.name_az || cat.name}</span>
+                <Badge variant={cat.is_active ? 'default' : 'secondary'} className="text-[10px] px-1.5">
+                  {cat.is_active ? 'Aktiv' : 'Deaktiv'}
+                </Badge>
+                <Button variant="ghost" size="icon" className="w-6 h-6" onClick={() => openCatEdit(cat)}>
+                  <Pencil className="w-3 h-3" />
+                </Button>
+                <Button variant="ghost" size="icon" className="w-6 h-6" onClick={() => deleteCat(cat.id)}>
+                  <Trash2 className="w-3 h-3 text-destructive" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Category Modal */}
+      <Dialog open={showCatModal} onOpenChange={setShowCatModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingCat ? 'Kateqoriya Redaktə' : 'Yeni Kateqoriya'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Kateqoriya ID (slug)</Label>
+              <Input value={catForm.category_id} onChange={e => setCatForm({ ...catForm, category_id: e.target.value })} placeholder="seher_yemeyi" disabled={!!editingCat} />
+            </div>
+            <div>
+              <Label>Ad</Label>
+              <Input value={catForm.name} onChange={e => setCatForm({ ...catForm, name: e.target.value })} placeholder="Səhər yeməyi" />
+            </div>
+            <div>
+              <Label>Ad (AZ)</Label>
+              <Input value={catForm.name_az} onChange={e => setCatForm({ ...catForm, name_az: e.target.value })} placeholder="Səhər yeməyi" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Emoji</Label>
+                <Input value={catForm.emoji} onChange={e => setCatForm({ ...catForm, emoji: e.target.value })} placeholder="🍳" />
+              </div>
+              <div>
+                <Label>Sıra</Label>
+                <Input type="number" value={catForm.sort_order} onChange={e => setCatForm({ ...catForm, sort_order: parseInt(e.target.value) || 0 })} />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch checked={catForm.is_active} onCheckedChange={v => setCatForm({ ...catForm, is_active: v })} />
+              <Label>Aktiv</Label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCatModal(false)}>Ləğv et</Button>
+            <Button onClick={saveCat}>Yadda saxla</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Search */}
       <Card className="p-4">
@@ -420,7 +527,7 @@ const AdminRecipes = () => {
                           <Users className="w-3 h-3" />
                           {recipe.servings} porsiya
                         </span>
-                        <Badge variant="outline">{categories.find(c => c.id === recipe.category)?.label}</Badge>
+                        <Badge variant="outline">{categories.find(c => c.id === recipe.category)?.label || recipe.category}</Badge>
                       </div>
                     </div>
                   </div>
@@ -458,7 +565,7 @@ const AdminRecipes = () => {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               />
               <Select
-                value={formData.category || 'pregnancy'}
+                value={formData.category || categories[0]?.id || ''}
                 onValueChange={(v) => setFormData({ ...formData, category: v })}
               >
                 <SelectTrigger>
