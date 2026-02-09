@@ -32,7 +32,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
   const { isPremium, loading: subscriptionLoading } = useSubscription();
   
   // Dynamic data from database
-  const { data: dbRecipeCategories = [] } = useRecipeCategories(lifeStage || 'flow');
+  const { data: dbRecipeCategories = [] } = useRecipeCategories();
   
   // Get recipe categories from DB or use fallback - filter out any existing "all"
   const recipeCategories = useMemo(() => {
