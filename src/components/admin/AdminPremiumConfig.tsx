@@ -1,6 +1,6 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Crown, Save, X, Check, Minus } from 'lucide-react';
+import { Plus, Edit2, Trash2, Crown, Save, X, Check, Minus, Search, Users, Settings2, Shield, Loader2, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,10 +9,375 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminPremiumConfig, PremiumFeature, PremiumPlan } from '@/hooks/usePremiumConfig';
+import { useAppSettings, useUpdateAppSetting } from '@/hooks/useAppSettings';
+import { supabase } from '@/integrations/supabase/client';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
 
+// =========== FREE LIMITS TAB ===========
+const FreeLimitsTab = () => {
+  const { data: settings = [], isLoading } = useAppSettings();
+  const updateSetting = useUpdateAppSetting();
+  const { toast } = useToast();
+
+  const freeLimitsSetting = settings.find(s => s.key === 'free_limits');
+  const currentLimits = freeLimitsSetting?.value 
+    ? (typeof freeLimitsSetting.value === 'string' ? JSON.parse(freeLimitsSetting.value) : freeLimitsSetting.value) 
+    : {};
+
+  const [limits, setLimits] = useState<Record<string, number>>({});
+  const [hasChanges, setHasChanges] = useState(false);
+
+  useEffect(() => {
+    if (currentLimits && Object.keys(currentLimits).length > 0) {
+      setLimits(currentLimits);
+    }
+  }, [JSON.stringify(currentLimits)]);
+
+  const limitFields = [
+    { key: 'white_noise_seconds_per_day', label: 'Ağ Səs (saniyə/gün)', icon: '🎵', suffix: 'saniyə', divider: 60, displaySuffix: 'dəqiqə' },
+    { key: 'baby_photoshoot_count', label: 'Körpə Fotosessiya (ümumi)', icon: '📸', suffix: 'foto' },
+    { key: 'fairy_tale_count_per_day', label: 'Nağıl Generatoru (gün/limit)', icon: '📖', suffix: 'nağıl' },
+    { key: 'ai_chat_count_per_day', label: 'AI Çat Mesajları (gün/limit)', icon: '🤖', suffix: 'mesaj' },
+    { key: 'cry_translator_count_per_day', label: 'Ağlama Tərcüməçisi (gün/limit)', icon: '👶', suffix: 'analiz' },
+    { key: 'poop_scanner_count_per_day', label: 'Nəcis Skaneri (gün/limit)', icon: '💩', suffix: 'skan' },
+    { key: 'horoscope_count_per_day', label: 'Ulduz Falı (gün/limit)', icon: '⭐', suffix: 'sorğu' },
+  ];
+
+  const handleSave = async () => {
+    try {
+      await updateSetting.mutateAsync({ key: 'free_limits', value: limits });
+      toast({ title: 'Limitlər yeniləndi ✓' });
+      setHasChanges(false);
+    } catch {
+      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+    }
+  };
+
+  if (isLoading) return <div className="p-6 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></div>;
+
+  return (
+    <div className="space-y-4">
+      <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
+        <p className="text-sm text-muted-foreground">
+          <Settings2 className="w-4 h-4 inline mr-1" />
+          Pulsuz istifadəçilər üçün gündəlik limitləri burada tənzimləyin. Dəyişikliklər dərhal tətbiq olunur.
+        </p>
+      </div>
+
+      <div className="grid gap-4">
+        {limitFields.map(field => (
+          <div key={field.key} className="flex items-center justify-between p-4 bg-card rounded-xl border">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">{field.icon}</span>
+              <div>
+                <p className="font-medium text-sm">{field.label}</p>
+                {field.divider && (
+                  <p className="text-xs text-muted-foreground">
+                    = {Math.round((limits[field.key] || 0) / field.divider)} {field.displaySuffix}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Input
+                type="number"
+                value={limits[field.key] || 0}
+                onChange={(e) => {
+                  setLimits({ ...limits, [field.key]: parseInt(e.target.value) || 0 });
+                  setHasChanges(true);
+                }}
+                className="w-24 text-center"
+              />
+              <span className="text-xs text-muted-foreground w-14">{field.suffix}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {hasChanges && (
+        <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+          <Button onClick={handleSave} className="w-full" disabled={updateSetting.isPending}>
+            <Save className="w-4 h-4 mr-2" />
+            {updateSetting.isPending ? 'Saxlanılır...' : 'Limitləri Saxla'}
+          </Button>
+        </motion.div>
+      )}
+    </div>
+  );
+};
+
+// =========== USER SUBSCRIPTIONS TAB ===========
+interface UserSub {
+  id: string;
+  user_id: string;
+  plan_type: string;
+  status: string;
+  started_at: string;
+  expires_at: string | null;
+  name?: string;
+  email?: string;
+  is_premium?: boolean;
+}
+
+const UserSubscriptionsTab = () => {
+  const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [users, setUsers] = useState<UserSub[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [editingUser, setEditingUser] = useState<UserSub | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({ plan_type: 'free', status: 'active', is_premium: false });
+
+  const searchUsers = async () => {
+    if (!searchQuery.trim()) return;
+    setLoading(true);
+    try {
+      // Search profiles by name or email
+      const { data: profiles, error } = await supabase
+        .from('profiles')
+        .select('user_id, name, email, is_premium')
+        .or(`name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`)
+        .limit(20);
+
+      if (error) throw error;
+      if (!profiles || profiles.length === 0) {
+        setUsers([]);
+        setLoading(false);
+        return;
+      }
+
+      // Get subscriptions for found users
+      const userIds = profiles.map(p => p.user_id);
+      const { data: subs } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .in('user_id', userIds);
+
+      const results: UserSub[] = profiles.map(p => {
+        const sub = subs?.find(s => s.user_id === p.user_id);
+        return {
+          id: sub?.id || '',
+          user_id: p.user_id,
+          plan_type: sub?.plan_type || 'free',
+          status: sub?.status || 'active',
+          started_at: sub?.started_at || '',
+          expires_at: sub?.expires_at || null,
+          name: p.name || 'İstifadəçi',
+          email: p.email || '',
+          is_premium: p.is_premium || false,
+        };
+      });
+
+      setUsers(results);
+    } catch (error) {
+      console.error('Search error:', error);
+      toast({ title: 'Axtarış xətası', variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openEditModal = (user: UserSub) => {
+    setEditingUser(user);
+    setEditForm({
+      plan_type: user.plan_type,
+      status: user.status,
+      is_premium: user.is_premium || false,
+    });
+    setShowEditModal(true);
+  };
+
+  const handleSaveUser = async () => {
+    if (!editingUser) return;
+    
+    try {
+      // Update subscription
+      if (editingUser.id) {
+        await supabase
+          .from('subscriptions')
+          .update({
+            plan_type: editForm.plan_type,
+            status: editForm.status,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', editingUser.id);
+      } else {
+        await supabase
+          .from('subscriptions')
+          .insert({
+            user_id: editingUser.user_id,
+            plan_type: editForm.plan_type,
+            status: editForm.status,
+          });
+      }
+
+      // Update profile is_premium flag
+      const isPrem = editForm.plan_type === 'premium' || editForm.plan_type === 'premium_plus';
+      await supabase
+        .from('profiles')
+        .update({ is_premium: isPrem || editForm.is_premium })
+        .eq('user_id', editingUser.user_id);
+
+      toast({ title: 'İstifadəçi yeniləndi ✓' });
+      setShowEditModal(false);
+      searchUsers(); // Refresh
+    } catch (error) {
+      console.error('Save error:', error);
+      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+    }
+  };
+
+  const quickTogglePremium = async (user: UserSub) => {
+    const newPremium = !user.is_premium;
+    const newPlan = newPremium ? 'premium' : 'free';
+
+    try {
+      if (user.id) {
+        await supabase.from('subscriptions').update({ plan_type: newPlan, updated_at: new Date().toISOString() }).eq('id', user.id);
+      } else {
+        await supabase.from('subscriptions').insert({ user_id: user.user_id, plan_type: newPlan, status: 'active' });
+      }
+      await supabase.from('profiles').update({ is_premium: newPremium }).eq('user_id', user.user_id);
+      
+      toast({ title: newPremium ? 'Premium verildi ✓' : 'Premium ləğv edildi' });
+      searchUsers();
+    } catch {
+      toast({ title: 'Xəta', variant: 'destructive' });
+    }
+  };
+
+  const getPlanBadge = (plan: string) => {
+    switch (plan) {
+      case 'premium': return <Badge className="bg-primary text-primary-foreground text-xs">Premium</Badge>;
+      case 'premium_plus': return <Badge className="bg-amber-500 text-white text-xs">Premium+</Badge>;
+      default: return <Badge variant="outline" className="text-xs">Pulsuz</Badge>;
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
+        <p className="text-sm text-muted-foreground">
+          <Users className="w-4 h-4 inline mr-1" />
+          İstifadəçiləri ad və ya email ilə axtarın, plan tipini dəyişdirin və ya premium verin.
+        </p>
+      </div>
+
+      <div className="flex gap-2">
+        <Input
+          placeholder="Ad və ya email ilə axtar..."
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && searchUsers()}
+          className="flex-1"
+        />
+        <Button onClick={searchUsers} disabled={loading}>
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+        </Button>
+      </div>
+
+      {users.length > 0 ? (
+        <div className="grid gap-3">
+          {users.map(user => (
+            <motion.div
+              key={user.user_id}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-between p-4 bg-card rounded-xl border"
+            >
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="font-medium text-sm truncate">{user.name}</p>
+                  {getPlanBadge(user.plan_type)}
+                </div>
+                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+              </div>
+              <div className="flex items-center gap-2 ml-2">
+                <Switch
+                  checked={user.is_premium || user.plan_type === 'premium' || user.plan_type === 'premium_plus'}
+                  onCheckedChange={() => quickTogglePremium(user)}
+                />
+                <Button variant="ghost" size="icon" onClick={() => openEditModal(user)}>
+                  <Edit2 className="w-4 h-4" />
+                </Button>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      ) : searchQuery && !loading ? (
+        <p className="text-center text-muted-foreground py-8">İstifadəçi tapılmadı</p>
+      ) : null}
+
+      {/* Edit User Modal */}
+      <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Abunəliyi Redaktə Et</DialogTitle>
+          </DialogHeader>
+          {editingUser && (
+            <div className="space-y-4">
+              <div className="bg-muted/50 rounded-lg p-3">
+                <p className="font-medium">{editingUser.name}</p>
+                <p className="text-xs text-muted-foreground">{editingUser.email}</p>
+              </div>
+
+              <div>
+                <Label>Plan Tipi</Label>
+                <Select value={editForm.plan_type} onValueChange={v => setEditForm({ ...editForm, plan_type: v })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="free">Pulsuz</SelectItem>
+                    <SelectItem value="premium">Premium</SelectItem>
+                    <SelectItem value="premium_plus">Premium+</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Status</Label>
+                <Select value={editForm.status} onValueChange={v => setEditForm({ ...editForm, status: v })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Aktiv</SelectItem>
+                    <SelectItem value="cancelled">Ləğv edilib</SelectItem>
+                    <SelectItem value="expired">Müddəti bitib</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Label>Premium bayrağı (profil)</Label>
+                <Switch
+                  checked={editForm.is_premium}
+                  onCheckedChange={v => setEditForm({ ...editForm, is_premium: v })}
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex-1" onClick={() => setShowEditModal(false)}>
+                  Ləğv et
+                </Button>
+                <Button className="flex-1" onClick={handleSaveUser}>
+                  <Save className="w-4 h-4 mr-2" />
+                  Saxla
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+// =========== MAIN COMPONENT ===========
 const AdminPremiumConfig = () => {
   const { features, plans, loading, createFeature, updateFeature, deleteFeature, updatePlan } = useAdminPremiumConfig();
   const { toast } = useToast();
@@ -57,64 +422,25 @@ const AdminPremiumConfig = () => {
   });
 
   const hasUnsavedChanges = () => {
-    if (showFeatureModal) {
-      return JSON.stringify(featureForm) !== initialFormDataRef.current;
-    }
-    if (showPlanModal) {
-      return JSON.stringify(planForm) !== initialPlanFormRef.current;
-    }
+    if (showFeatureModal) return JSON.stringify(featureForm) !== initialFormDataRef.current;
+    if (showPlanModal) return JSON.stringify(planForm) !== initialPlanFormRef.current;
     return false;
   };
 
   const handleFeatureModalClose = () => {
-    if (hasUnsavedChanges()) {
-      setShowUnsavedDialog(true);
-    } else {
-      closeFeatureModal();
-    }
+    if (hasUnsavedChanges()) { setShowUnsavedDialog(true); } else { closeFeatureModal(); }
   };
 
   const closeFeatureModal = () => {
     setShowFeatureModal(false);
     setEditingFeature(null);
-    setFeatureForm({
-      title: '',
-      title_az: '',
-      description: '',
-      description_az: '',
-      icon: '✨',
-      is_included_free: false,
-      is_included_premium: true,
-      is_included_premium_plus: true,
-      sort_order: 0,
-      is_active: true,
-    });
+    setFeatureForm({ title: '', title_az: '', description: '', description_az: '', icon: '✨', is_included_free: false, is_included_premium: true, is_included_premium_plus: true, sort_order: 0, is_active: true });
   };
 
   const openFeatureModal = (feature?: PremiumFeature) => {
     const data = feature ? {
-      title: feature.title,
-      title_az: feature.title_az || '',
-      description: feature.description || '',
-      description_az: feature.description_az || '',
-      icon: feature.icon,
-      is_included_free: feature.is_included_free,
-      is_included_premium: feature.is_included_premium,
-      is_included_premium_plus: feature.is_included_premium_plus,
-      sort_order: feature.sort_order,
-      is_active: feature.is_active,
-    } : {
-      title: '',
-      title_az: '',
-      description: '',
-      description_az: '',
-      icon: '✨',
-      is_included_free: false,
-      is_included_premium: true,
-      is_included_premium_plus: true,
-      sort_order: features.length,
-      is_active: true,
-    };
+      title: feature.title, title_az: feature.title_az || '', description: feature.description || '', description_az: feature.description_az || '', icon: feature.icon, is_included_free: feature.is_included_free, is_included_premium: feature.is_included_premium, is_included_premium_plus: feature.is_included_premium_plus, sort_order: feature.sort_order, is_active: feature.is_active,
+    } : { title: '', title_az: '', description: '', description_az: '', icon: '✨', is_included_free: false, is_included_premium: true, is_included_premium_plus: true, sort_order: features.length, is_active: true };
     setFeatureForm(data);
     initialFormDataRef.current = JSON.stringify(data);
     setEditingFeature(feature || null);
@@ -122,64 +448,24 @@ const AdminPremiumConfig = () => {
   };
 
   const handleSaveFeature = async () => {
-    if (!featureForm.title.trim()) {
-      toast({ title: 'Başlıq daxil edin', variant: 'destructive' });
-      return;
-    }
-
-    let result;
-    if (editingFeature) {
-      result = await updateFeature(editingFeature.id, featureForm);
-    } else {
-      result = await createFeature(featureForm);
-    }
-
-    if (result.error) {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
-    } else {
-      toast({ title: editingFeature ? 'Yeniləndi' : 'Əlavə edildi' });
-      closeFeatureModal();
-    }
+    if (!featureForm.title.trim()) { toast({ title: 'Başlıq daxil edin', variant: 'destructive' }); return; }
+    const result = editingFeature ? await updateFeature(editingFeature.id, featureForm) : await createFeature(featureForm);
+    if (result.error) { toast({ title: 'Xəta baş verdi', variant: 'destructive' }); } else { toast({ title: editingFeature ? 'Yeniləndi' : 'Əlavə edildi' }); closeFeatureModal(); }
   };
 
   const handleDeleteFeature = async (id: string) => {
     if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
     const result = await deleteFeature(id);
-    if (result.error) {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
-    } else {
-      toast({ title: 'Silindi' });
-    }
+    if (result.error) { toast({ title: 'Xəta', variant: 'destructive' }); } else { toast({ title: 'Silindi' }); }
   };
 
-  // Plan functions
   const handlePlanModalClose = () => {
-    if (hasUnsavedChanges()) {
-      setShowUnsavedDialog(true);
-    } else {
-      closePlanModal();
-    }
+    if (hasUnsavedChanges()) { setShowUnsavedDialog(true); } else { closePlanModal(); }
   };
-
-  const closePlanModal = () => {
-    setShowPlanModal(false);
-    setEditingPlan(null);
-  };
+  const closePlanModal = () => { setShowPlanModal(false); setEditingPlan(null); };
 
   const openPlanModal = (plan: PremiumPlan) => {
-    const data = {
-      name: plan.name,
-      name_az: plan.name_az || '',
-      description: plan.description || '',
-      description_az: plan.description_az || '',
-      price_monthly: plan.price_monthly,
-      price_yearly: plan.price_yearly,
-      currency: plan.currency,
-      badge_text: plan.badge_text || '',
-      badge_text_az: plan.badge_text_az || '',
-      is_popular: plan.is_popular,
-      is_active: plan.is_active,
-    };
+    const data = { name: plan.name, name_az: plan.name_az || '', description: plan.description || '', description_az: plan.description_az || '', price_monthly: plan.price_monthly, price_yearly: plan.price_yearly, currency: plan.currency, badge_text: plan.badge_text || '', badge_text_az: plan.badge_text_az || '', is_popular: plan.is_popular, is_active: plan.is_active };
     setPlanForm(data);
     initialPlanFormRef.current = JSON.stringify(data);
     setEditingPlan(plan);
@@ -188,39 +474,32 @@ const AdminPremiumConfig = () => {
 
   const handleSavePlan = async () => {
     if (!editingPlan) return;
-    
     const result = await updatePlan(editingPlan.id, planForm);
-    if (result.error) {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
-    } else {
-      toast({ title: 'Yeniləndi' });
-      closePlanModal();
-    }
+    if (result.error) { toast({ title: 'Xəta', variant: 'destructive' }); } else { toast({ title: 'Yeniləndi' }); closePlanModal(); }
   };
 
-  if (loading) {
-    return <div className="p-6 text-center">Yüklənir...</div>;
-  }
+  if (loading) return <div className="p-6 text-center">Yüklənir...</div>;
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold flex items-center gap-2">
           <Crown className="w-6 h-6 text-amber-500" />
-          Premium Səhifə Dizayneri
+          Premium İdarəetmə
         </h2>
-        <p className="text-muted-foreground">
-          Premium planlar və funksiyaları idarə edin
-        </p>
+        <p className="text-muted-foreground">Planlar, limitlər, funksiyalar və istifadəçi abunəlikləri</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="features">Funksiyalar</TabsTrigger>
-          <TabsTrigger value="plans">Qiymət Planları</TabsTrigger>
-          <TabsTrigger value="preview">Önizləmə</TabsTrigger>
+        <TabsList className="grid grid-cols-5 w-full">
+          <TabsTrigger value="features" className="text-xs">Funksiyalar</TabsTrigger>
+          <TabsTrigger value="plans" className="text-xs">Planlar</TabsTrigger>
+          <TabsTrigger value="limits" className="text-xs">Limitlər</TabsTrigger>
+          <TabsTrigger value="users" className="text-xs">İstifadəçilər</TabsTrigger>
+          <TabsTrigger value="preview" className="text-xs">Önizləmə</TabsTrigger>
         </TabsList>
 
+        {/* Features Tab */}
         <TabsContent value="features" className="space-y-4">
           <div className="flex justify-end">
             <Button onClick={() => openFeatureModal()}>
@@ -228,15 +507,9 @@ const AdminPremiumConfig = () => {
               Yeni Funksiya
             </Button>
           </div>
-
           <div className="grid gap-3">
             {features.map((feature) => (
-              <motion.div
-                key={feature.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between p-4 bg-card rounded-xl border"
-              >
+              <motion.div key={feature.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between p-4 bg-card rounded-xl border">
                 <div className="flex items-center gap-4">
                   <span className="text-2xl">{feature.icon}</span>
                   <div>
@@ -249,41 +522,27 @@ const AdminPremiumConfig = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="icon" onClick={() => openFeatureModal(feature)}>
-                    <Edit2 className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => handleDeleteFeature(feature.id)}>
-                    <Trash2 className="w-4 h-4 text-destructive" />
-                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => openFeatureModal(feature)}><Edit2 className="w-4 h-4" /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => handleDeleteFeature(feature.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
                 </div>
               </motion.div>
             ))}
           </div>
         </TabsContent>
 
+        {/* Plans Tab */}
         <TabsContent value="plans" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-3">
             {plans.map((plan) => (
-              <motion.div
-                key={plan.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`relative p-6 bg-card rounded-xl border-2 ${plan.is_popular ? 'border-primary' : 'border-border'}`}
-              >
-                {plan.is_popular && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">
-                    Populyar
-                  </Badge>
-                )}
+              <motion.div key={plan.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`relative p-6 bg-card rounded-xl border-2 ${plan.is_popular ? 'border-primary' : 'border-border'}`}>
+                {plan.is_popular && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">Populyar</Badge>}
                 <div className="text-center">
                   <h3 className="text-xl font-bold">{plan.name_az || plan.name}</h3>
                   <div className="mt-4">
                     <span className="text-3xl font-bold">{plan.price_monthly}</span>
                     <span className="text-muted-foreground"> {plan.currency}/ay</span>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {plan.price_yearly} {plan.currency}/il
-                  </p>
+                  <p className="text-sm text-muted-foreground mt-2">{plan.price_yearly} {plan.currency}/il</p>
                   <Button className="mt-4 w-full" variant="outline" onClick={() => openPlanModal(plan)}>
                     <Edit2 className="w-4 h-4 mr-2" />
                     Redaktə Et
@@ -294,10 +553,20 @@ const AdminPremiumConfig = () => {
           </div>
         </TabsContent>
 
+        {/* Free Limits Tab */}
+        <TabsContent value="limits">
+          <FreeLimitsTab />
+        </TabsContent>
+
+        {/* User Subscriptions Tab */}
+        <TabsContent value="users">
+          <UserSubscriptionsTab />
+        </TabsContent>
+
+        {/* Preview Tab */}
         <TabsContent value="preview" className="space-y-4">
           <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl p-6">
             <h3 className="text-xl font-bold text-center mb-6">Premium Planlar Önizləmə</h3>
-            
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -306,9 +575,7 @@ const AdminPremiumConfig = () => {
                     {plans.map(plan => (
                       <th key={plan.id} className="text-center p-3">
                         {plan.name_az || plan.name}
-                        <div className="text-sm font-normal text-muted-foreground">
-                          {plan.price_monthly} {plan.currency}/ay
-                        </div>
+                        <div className="text-sm font-normal text-muted-foreground">{plan.price_monthly} {plan.currency}/ay</div>
                       </th>
                     ))}
                   </tr>
@@ -316,31 +583,10 @@ const AdminPremiumConfig = () => {
                 <tbody>
                   {features.map(feature => (
                     <tr key={feature.id} className="border-t">
-                      <td className="p-3">
-                        <span className="mr-2">{feature.icon}</span>
-                        {feature.title_az || feature.title}
-                      </td>
-                      <td className="text-center p-3">
-                        {feature.is_included_free ? (
-                          <Check className="w-5 h-5 text-green-500 mx-auto" />
-                        ) : (
-                          <Minus className="w-5 h-5 text-muted-foreground mx-auto" />
-                        )}
-                      </td>
-                      <td className="text-center p-3">
-                        {feature.is_included_premium ? (
-                          <Check className="w-5 h-5 text-green-500 mx-auto" />
-                        ) : (
-                          <Minus className="w-5 h-5 text-muted-foreground mx-auto" />
-                        )}
-                      </td>
-                      <td className="text-center p-3">
-                        {feature.is_included_premium_plus ? (
-                          <Check className="w-5 h-5 text-green-500 mx-auto" />
-                        ) : (
-                          <Minus className="w-5 h-5 text-muted-foreground mx-auto" />
-                        )}
-                      </td>
+                      <td className="p-3"><span className="mr-2">{feature.icon}</span>{feature.title_az || feature.title}</td>
+                      <td className="text-center p-3">{feature.is_included_free ? <Check className="w-5 h-5 text-green-500 mx-auto" /> : <Minus className="w-5 h-5 text-muted-foreground mx-auto" />}</td>
+                      <td className="text-center p-3">{feature.is_included_premium ? <Check className="w-5 h-5 text-green-500 mx-auto" /> : <Minus className="w-5 h-5 text-muted-foreground mx-auto" />}</td>
+                      <td className="text-center p-3">{feature.is_included_premium_plus ? <Check className="w-5 h-5 text-green-500 mx-auto" /> : <Minus className="w-5 h-5 text-muted-foreground mx-auto" />}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -353,90 +599,30 @@ const AdminPremiumConfig = () => {
       {/* Feature Modal */}
       <Dialog open={showFeatureModal} onOpenChange={handleFeatureModalClose}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {editingFeature ? 'Funksiyanı Redaktə Et' : 'Yeni Funksiya'}
-            </DialogTitle>
-          </DialogHeader>
-          
+          <DialogHeader><DialogTitle>{editingFeature ? 'Funksiyanı Redaktə Et' : 'Yeni Funksiya'}</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-4 gap-2">
               <div>
                 <Label>İkon</Label>
-                <Input
-                  value={featureForm.icon}
-                  onChange={(e) => setFeatureForm({ ...featureForm, icon: e.target.value })}
-                  className="text-center text-xl"
-                />
+                <Input value={featureForm.icon} onChange={e => setFeatureForm({ ...featureForm, icon: e.target.value })} className="text-center text-xl" />
               </div>
               <div className="col-span-3">
                 <Label>Başlıq (EN)</Label>
-                <Input
-                  value={featureForm.title}
-                  onChange={(e) => setFeatureForm({ ...featureForm, title: e.target.value })}
-                />
+                <Input value={featureForm.title} onChange={e => setFeatureForm({ ...featureForm, title: e.target.value })} />
               </div>
             </div>
-
-            <div>
-              <Label>Başlıq (AZ)</Label>
-              <Input
-                value={featureForm.title_az}
-                onChange={(e) => setFeatureForm({ ...featureForm, title_az: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <Label>Açıqlama (AZ)</Label>
-              <Textarea
-                value={featureForm.description_az}
-                onChange={(e) => setFeatureForm({ ...featureForm, description_az: e.target.value })}
-                rows={2}
-              />
-            </div>
-
+            <div><Label>Başlıq (AZ)</Label><Input value={featureForm.title_az} onChange={e => setFeatureForm({ ...featureForm, title_az: e.target.value })} /></div>
+            <div><Label>Açıqlama (AZ)</Label><Textarea value={featureForm.description_az} onChange={e => setFeatureForm({ ...featureForm, description_az: e.target.value })} rows={2} /></div>
             <div className="space-y-3 pt-2">
               <Label>Planlara daxildir:</Label>
-              <div className="flex items-center justify-between">
-                <span>Free</span>
-                <Switch
-                  checked={featureForm.is_included_free}
-                  onCheckedChange={(v) => setFeatureForm({ ...featureForm, is_included_free: v })}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Premium</span>
-                <Switch
-                  checked={featureForm.is_included_premium}
-                  onCheckedChange={(v) => setFeatureForm({ ...featureForm, is_included_premium: v })}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Premium+</span>
-                <Switch
-                  checked={featureForm.is_included_premium_plus}
-                  onCheckedChange={(v) => setFeatureForm({ ...featureForm, is_included_premium_plus: v })}
-                />
-              </div>
+              <div className="flex items-center justify-between"><span>Free</span><Switch checked={featureForm.is_included_free} onCheckedChange={v => setFeatureForm({ ...featureForm, is_included_free: v })} /></div>
+              <div className="flex items-center justify-between"><span>Premium</span><Switch checked={featureForm.is_included_premium} onCheckedChange={v => setFeatureForm({ ...featureForm, is_included_premium: v })} /></div>
+              <div className="flex items-center justify-between"><span>Premium+</span><Switch checked={featureForm.is_included_premium_plus} onCheckedChange={v => setFeatureForm({ ...featureForm, is_included_premium_plus: v })} /></div>
             </div>
-
-            <div className="flex items-center justify-between pt-2">
-              <Label>Aktiv</Label>
-              <Switch
-                checked={featureForm.is_active}
-                onCheckedChange={(v) => setFeatureForm({ ...featureForm, is_active: v })}
-              />
-            </div>
-
+            <div className="flex items-center justify-between pt-2"><Label>Aktiv</Label><Switch checked={featureForm.is_active} onCheckedChange={v => setFeatureForm({ ...featureForm, is_active: v })} /></div>
             <div className="flex gap-2 pt-4">
-              <Button variant="outline" className="flex-1" onClick={handleFeatureModalClose}>
-                <X className="w-4 h-4 mr-2" />
-                Ləğv et
-              </Button>
-              <Button className="flex-1" onClick={handleSaveFeature}>
-                <Save className="w-4 h-4 mr-2" />
-                Saxla
-              </Button>
+              <Button variant="outline" className="flex-1" onClick={handleFeatureModalClose}><X className="w-4 h-4 mr-2" />Ləğv et</Button>
+              <Button className="flex-1" onClick={handleSaveFeature}><Save className="w-4 h-4 mr-2" />Saxla</Button>
             </div>
           </div>
         </DialogContent>
@@ -445,82 +631,20 @@ const AdminPremiumConfig = () => {
       {/* Plan Modal */}
       <Dialog open={showPlanModal} onOpenChange={handlePlanModalClose}>
         <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Planı Redaktə Et</DialogTitle>
-          </DialogHeader>
-          
+          <DialogHeader><DialogTitle>Planı Redaktə Et</DialogTitle></DialogHeader>
           <div className="space-y-4">
-            <div>
-              <Label>Ad (AZ)</Label>
-              <Input
-                value={planForm.name_az}
-                onChange={(e) => setPlanForm({ ...planForm, name_az: e.target.value })}
-              />
-            </div>
-
+            <div><Label>Ad (AZ)</Label><Input value={planForm.name_az} onChange={e => setPlanForm({ ...planForm, name_az: e.target.value })} /></div>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Aylıq Qiymət</Label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={planForm.price_monthly}
-                  onChange={(e) => setPlanForm({ ...planForm, price_monthly: parseFloat(e.target.value) || 0 })}
-                />
-              </div>
-              <div>
-                <Label>İllik Qiymət</Label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={planForm.price_yearly}
-                  onChange={(e) => setPlanForm({ ...planForm, price_yearly: parseFloat(e.target.value) || 0 })}
-                />
-              </div>
+              <div><Label>Aylıq Qiymət</Label><Input type="number" step="0.01" value={planForm.price_monthly} onChange={e => setPlanForm({ ...planForm, price_monthly: parseFloat(e.target.value) || 0 })} /></div>
+              <div><Label>İllik Qiymət</Label><Input type="number" step="0.01" value={planForm.price_yearly} onChange={e => setPlanForm({ ...planForm, price_yearly: parseFloat(e.target.value) || 0 })} /></div>
             </div>
-
-            <div>
-              <Label>Valyuta</Label>
-              <Input
-                value={planForm.currency}
-                onChange={(e) => setPlanForm({ ...planForm, currency: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <Label>Badge Mətni (AZ)</Label>
-              <Input
-                value={planForm.badge_text_az}
-                onChange={(e) => setPlanForm({ ...planForm, badge_text_az: e.target.value })}
-                placeholder="Məs: Ən sərfəli"
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <Label>Populyar</Label>
-              <Switch
-                checked={planForm.is_popular}
-                onCheckedChange={(v) => setPlanForm({ ...planForm, is_popular: v })}
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <Label>Aktiv</Label>
-              <Switch
-                checked={planForm.is_active}
-                onCheckedChange={(v) => setPlanForm({ ...planForm, is_active: v })}
-              />
-            </div>
-
+            <div><Label>Valyuta</Label><Input value={planForm.currency} onChange={e => setPlanForm({ ...planForm, currency: e.target.value })} /></div>
+            <div><Label>Badge Mətni (AZ)</Label><Input value={planForm.badge_text_az} onChange={e => setPlanForm({ ...planForm, badge_text_az: e.target.value })} placeholder="Məs: Ən sərfəli" /></div>
+            <div className="flex items-center justify-between"><Label>Populyar</Label><Switch checked={planForm.is_popular} onCheckedChange={v => setPlanForm({ ...planForm, is_popular: v })} /></div>
+            <div className="flex items-center justify-between"><Label>Aktiv</Label><Switch checked={planForm.is_active} onCheckedChange={v => setPlanForm({ ...planForm, is_active: v })} /></div>
             <div className="flex gap-2 pt-4">
-              <Button variant="outline" className="flex-1" onClick={handlePlanModalClose}>
-                <X className="w-4 h-4 mr-2" />
-                Ləğv et
-              </Button>
-              <Button className="flex-1" onClick={handleSavePlan}>
-                <Save className="w-4 h-4 mr-2" />
-                Saxla
-              </Button>
+              <Button variant="outline" className="flex-1" onClick={handlePlanModalClose}><X className="w-4 h-4 mr-2" />Ləğv et</Button>
+              <Button className="flex-1" onClick={handleSavePlan}><Save className="w-4 h-4 mr-2" />Saxla</Button>
             </div>
           </div>
         </DialogContent>
@@ -529,10 +653,7 @@ const AdminPremiumConfig = () => {
       <UnsavedChangesDialog
         open={showUnsavedDialog}
         onOpenChange={setShowUnsavedDialog}
-        onDiscard={() => {
-          if (showFeatureModal) closeFeatureModal();
-          if (showPlanModal) closePlanModal();
-        }}
+        onDiscard={() => { if (showFeatureModal) closeFeatureModal(); if (showPlanModal) closePlanModal(); }}
       />
     </div>
   );
