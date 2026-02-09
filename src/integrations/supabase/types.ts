@@ -2667,6 +2667,47 @@ export type Database = {
           },
         ]
       }
+      healthcare_provider_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          provider_id: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          provider_id: string
+          rating: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          provider_id?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "healthcare_provider_reviews_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "healthcare_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       healthcare_providers: {
         Row: {
           accepts_reservations: boolean | null
