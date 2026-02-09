@@ -14,6 +14,8 @@ export interface Cake {
   milestone_label: string | null;
   is_active: boolean;
   sort_order: number;
+  has_custom_fields: boolean;
+  custom_field_labels: string[];
   created_at: string;
   updated_at: string;
 }
