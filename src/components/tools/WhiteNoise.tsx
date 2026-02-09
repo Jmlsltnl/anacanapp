@@ -5,14 +5,53 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { PremiumModal } from '@/components/PremiumModal';
-import { useWhiteNoiseSounds } from '@/hooks/useDynamicConfig';
+import { useWhiteNoiseSounds, WhiteNoiseSound } from '@/hooks/useDynamicConfig';
 
 interface Sound {
   id: string;
   name: string;
   emoji: string;
   color: string;
+  noiseType: string;
+  description: string;
 }
+
+// Noise type metadata
+const noiseTypes = [
+  { 
+    id: 'white', 
+    label: 'Bəyaz Küy', 
+    subtitle: 'Sakitləşdirici',
+    description: 'Ana bətnindəki səsə bənzər monoton fon',
+    emoji: '⚪',
+    gradient: 'from-slate-100 to-gray-200 dark:from-slate-800 dark:to-gray-900',
+    borderColor: 'border-slate-300 dark:border-slate-700',
+    textColor: 'text-slate-700 dark:text-slate-300',
+    badgeColor: 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300',
+  },
+  { 
+    id: 'pink', 
+    label: 'Çəhrayı Küy', 
+    subtitle: 'Təbiət effekti',
+    description: 'Yüngül yağış və yarpaq xışıltısı kimi',
+    emoji: '🌸',
+    gradient: 'from-pink-50 to-rose-100 dark:from-pink-900/30 dark:to-rose-900/20',
+    borderColor: 'border-pink-300 dark:border-pink-800',
+    textColor: 'text-pink-700 dark:text-pink-300',
+    badgeColor: 'bg-pink-200 dark:bg-pink-800 text-pink-700 dark:text-pink-300',
+  },
+  { 
+    id: 'brown', 
+    label: 'Qəhvəyi Küy', 
+    subtitle: 'Dərin yuxu',
+    description: 'Dərin və boğuq səslər — şəlalə, göy gurultusu',
+    emoji: '🟤',
+    gradient: 'from-amber-50 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/20',
+    borderColor: 'border-amber-300 dark:border-amber-800',
+    textColor: 'text-amber-800 dark:text-amber-300',
+    badgeColor: 'bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-300',
+  },
+];
 
 interface WhiteNoiseProps {
   onBack: () => void;
@@ -33,8 +72,24 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
       name: s.name_az || s.name,
       emoji: s.emoji,
       color: s.color_gradient || 'from-blue-400 to-cyan-500',
+      noiseType: s.noise_type || 'white',
+      description: s.description_az || s.description || '',
     }));
   }, [dbSounds]);
+
+  // Group sounds by noise type
+  const groupedSounds = useMemo(() => {
+    const groups: Record<string, Sound[]> = {};
+    noiseTypes.forEach(nt => { groups[nt.id] = []; });
+    sounds.forEach(s => {
+      if (groups[s.noiseType]) {
+        groups[s.noiseType].push(s);
+      } else {
+        groups['white'].push(s);
+      }
+    });
+    return groups;
+  }, [sounds]);
   
   const [activeSound, setActiveSound] = useState<string | null>(null);
   const [volume, setVolume] = useState(70);
@@ -68,32 +123,26 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
     }
   }, [preferences, isPremium, canUseWhiteNoise]);
 
-  // Timer countdown and usage tracking
+  // Timer countdown
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
-    
     if (activeSound && timeRemaining !== null && timeRemaining > 0) {
       interval = setInterval(() => {
         setTimeRemaining(prev => {
           if (prev === null || prev <= 1) {
             setActiveSound(null);
             updateLastWhiteNoiseSound(null);
-            if (!isPremium && timer === null) {
-              setShowPremiumModal(true);
-            }
+            if (!isPremium && timer === null) setShowPremiumModal(true);
             return null;
           }
           return prev - 1;
         });
       }, 1000);
     }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
+    return () => { if (interval) clearInterval(interval); };
   }, [activeSound, timeRemaining, isPremium, timer, updateLastWhiteNoiseSound]);
 
-  // Track usage every 10 seconds for free users
+  // Track usage for free users
   useEffect(() => {
     if (activeSound && !isPremium) {
       trackingIntervalRef.current = setInterval(() => {
@@ -104,15 +153,12 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
           lastTrackTimeRef.current = now;
         }
       }, 10000);
-
       return () => {
         if (trackingIntervalRef.current) {
           clearInterval(trackingIntervalRef.current);
           const now = Date.now();
           const elapsed = Math.floor((now - lastTrackTimeRef.current) / 1000);
-          if (elapsed > 0) {
-            trackWhiteNoiseUsage(elapsed);
-          }
+          if (elapsed > 0) trackWhiteNoiseUsage(elapsed);
         }
       };
     }
@@ -122,32 +168,19 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
     if (activeSound === soundId) {
       const now = Date.now();
       const elapsed = Math.floor((now - lastTrackTimeRef.current) / 1000);
-      if (elapsed > 0 && !isPremium) {
-        await trackWhiteNoiseUsage(elapsed);
-      }
-      
+      if (elapsed > 0 && !isPremium) await trackWhiteNoiseUsage(elapsed);
       setActiveSound(null);
       setTimeRemaining(null);
       await updateLastWhiteNoiseSound(null);
     } else {
       const { allowed, remainingSeconds } = canUseWhiteNoise();
-      if (!allowed && !isPremium) {
-        setShowPremiumModal(true);
-        return;
-      }
-      
+      if (!allowed && !isPremium) { setShowPremiumModal(true); return; }
       lastTrackTimeRef.current = Date.now();
       setActiveSound(soundId);
       await updateLastWhiteNoiseSound(soundId);
-      
-      if (isPremium) {
-        setTimeRemaining(timer ? timer * 60 : null);
-        return;
-      }
-
+      if (isPremium) { setTimeRemaining(timer ? timer * 60 : null); return; }
       const requestedSeconds = timer ? timer * 60 : remainingSeconds;
-      const cappedSeconds = Math.min(requestedSeconds, remainingSeconds);
-      setTimeRemaining(cappedSeconds);
+      setTimeRemaining(Math.min(requestedSeconds, remainingSeconds));
     }
   };
 
@@ -158,24 +191,11 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
   };
 
   const handleTimerChange = async (newTimer: number | null) => {
-    if (!isPremium && newTimer === null) {
-      setShowPremiumModal(true);
-      return;
-    }
-
+    if (!isPremium && newTimer === null) { setShowPremiumModal(true); return; }
     setTimer(newTimer);
     await updateWhiteNoiseTimer(newTimer);
-
-    if (!activeSound) {
-      setTimeRemaining(newTimer ? newTimer * 60 : null);
-      return;
-    }
-
-    if (isPremium) {
-      setTimeRemaining(newTimer ? newTimer * 60 : null);
-      return;
-    }
-
+    if (!activeSound) { setTimeRemaining(newTimer ? newTimer * 60 : null); return; }
+    if (isPremium) { setTimeRemaining(newTimer ? newTimer * 60 : null); return; }
     const info = canUseWhiteNoise();
     if (!info.allowed) {
       setActiveSound(null);
@@ -184,10 +204,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
       setTimeRemaining(null);
       return;
     }
-
-    if (newTimer) {
-      setTimeRemaining(Math.min(newTimer * 60, info.remainingSeconds));
-    }
+    if (newTimer) setTimeRemaining(Math.min(newTimer * 60, info.remainingSeconds));
   };
 
   const formatTime = (seconds: number) => {
@@ -228,14 +245,13 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
           <motion.button
             onClick={onBack}
             className="w-10 h-10 rounded-xl bg-muted/80 flex items-center justify-center"
-            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold text-foreground">Ağ Səs</h1>
-            <p className="text-xs text-muted-foreground">Rahatladıcı səslər</p>
+            <h1 className="text-lg font-bold text-foreground">Yuxu Səsləri</h1>
+            <p className="text-xs text-muted-foreground">Küy rəngləri ilə dərin yuxu</p>
           </div>
           {isPremium && (
             <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-lg">
@@ -298,7 +314,6 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
               exit={{ scale: 0.9, opacity: 0 }}
               className={`bg-gradient-to-br ${activeDbSound.color} rounded-3xl p-6 shadow-xl mb-6 relative overflow-hidden`}
             >
-              {/* Background decoration */}
               <div className="absolute inset-0 opacity-20">
                 <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-white/30 blur-2xl" />
                 <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-white/20 blur-3xl" />
@@ -308,15 +323,15 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
                 <div className="text-center mb-4">
                   <motion.div
                     className="text-6xl mb-3 drop-shadow-lg"
-                    animate={{ 
-                      scale: [1, 1.1, 1],
-                      rotate: [0, 5, -5, 0]
-                    }}
+                    animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
                     transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                   >
                     {activeDbSound.emoji}
                   </motion.div>
                   <h2 className="text-2xl font-black text-white drop-shadow-md">{activeDbSound.name}</h2>
+                  {activeDbSound.description && (
+                    <p className="text-white/70 text-xs mt-1">{activeDbSound.description}</p>
+                  )}
                   {timeRemaining !== null && (
                     <div className="inline-flex items-center gap-2 mt-2 bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full">
                       <Timer className="w-4 h-4 text-white/80" />
@@ -331,14 +346,8 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
                     <motion.div
                       key={i}
                       className="w-1.5 bg-white/70 rounded-full"
-                      animate={{
-                        height: [6, 20 + Math.random() * 20, 6],
-                      }}
-                      transition={{
-                        duration: 0.4 + Math.random() * 0.4,
-                        repeat: Infinity,
-                        delay: i * 0.03,
-                      }}
+                      animate={{ height: [6, 20 + Math.random() * 20, 6] }}
+                      transition={{ duration: 0.4 + Math.random() * 0.4, repeat: Infinity, delay: i * 0.03 }}
                     />
                   ))}
                 </div>
@@ -352,7 +361,6 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
                   >
                     {isMuted ? <VolumeX className="w-5 h-5 text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
                   </motion.button>
-                  
                   <motion.button
                     onClick={() => handleSoundToggle(activeSound)}
                     className="w-16 h-16 rounded-2xl bg-white text-foreground flex items-center justify-center shadow-xl"
@@ -360,7 +368,6 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
                   >
                     <Pause className="w-8 h-8" />
                   </motion.button>
-
                   <div className="w-12 h-12" />
                 </div>
               </div>
@@ -376,8 +383,8 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
               <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-3">
                 <Music2 className="w-8 h-8 text-muted-foreground" />
               </div>
-              <h3 className="font-bold text-foreground mb-1">Səs seçin</h3>
-              <p className="text-sm text-muted-foreground">Aşağıdakı səslərdən birini seçərək başlayın</p>
+              <h3 className="font-bold text-foreground mb-1">Hansı səs körpənizə daha xoş gəlir?</h3>
+              <p className="text-sm text-muted-foreground">Aşağıdakı küy növlərindən birini seçərək başlayın</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -414,7 +421,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
 
         {/* Timer Options */}
         <motion.div
-          className="mb-5"
+          className="mb-6"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.15 }}
@@ -450,93 +457,109 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
           )}
         </motion.div>
 
-        {/* Sounds Grid */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <Music2 className="w-4 h-4 text-primary" />
-            <span className="text-sm font-semibold text-foreground">Səslər</span>
-            <span className="ml-auto text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-              {sounds.length} səs
-            </span>
-          </div>
+        {/* Sounds by Noise Type */}
+        {noiseTypes.map((nt, ntIdx) => {
+          const typeSounds = groupedSounds[nt.id] || [];
+          if (typeSounds.length === 0) return null;
           
-          {sounds.length === 0 ? (
-            <div className="text-center py-12 bg-card rounded-2xl border border-border/50">
-              <Music2 className="w-10 h-10 mx-auto mb-2 text-muted-foreground/30" />
-              <p className="text-muted-foreground">Səs tapılmadı</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-3 gap-3">
-              {sounds.map((sound, index) => {
-                const isActive = activeSound === sound.id;
-                return (
-                  <motion.button
-                    key={sound.id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.03 }}
-                    onClick={() => handleSoundToggle(sound.id)}
-                    className={`relative aspect-square rounded-2xl flex flex-col items-center justify-center transition-all overflow-hidden ${
-                      isActive
-                        ? `bg-gradient-to-br ${sound.color} shadow-xl`
-                        : 'bg-card border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/30'
-                    }`}
-                    whileHover={{ scale: 1.03, y: -2 }}
-                    whileTap={{ scale: 0.97 }}
-                  >
-                    {isActive && (
-                      <>
-                        <motion.div
-                          className="absolute inset-0 bg-white/10"
-                          animate={{ opacity: [0.1, 0.3, 0.1] }}
-                          transition={{ duration: 2, repeat: Infinity }}
-                        />
-                        <motion.div
-                          className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-white shadow-lg"
-                          animate={{ scale: [1, 1.3, 1] }}
-                          transition={{ duration: 1, repeat: Infinity }}
-                        />
-                      </>
-                    )}
-                    <span className={`text-3xl mb-1 relative z-10 drop-shadow-sm ${isActive ? 'drop-shadow-lg' : ''}`}>
-                      {sound.emoji}
-                    </span>
-                    <span className={`text-[11px] font-bold relative z-10 px-2 text-center leading-tight ${
-                      isActive ? 'text-white' : 'text-foreground'
-                    }`}>
-                      {sound.name}
-                    </span>
-                    {isActive && (
-                      <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
-                        <div className="flex items-center gap-0.5">
-                          {[...Array(3)].map((_, i) => (
-                            <motion.div
-                              key={i}
-                              className="w-1 bg-white/80 rounded-full"
-                              animate={{ height: [4, 8, 4] }}
-                              transition={{ duration: 0.4, repeat: Infinity, delay: i * 0.1 }}
-                            />
-                          ))}
+          return (
+            <motion.div
+              key={nt.id}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 + ntIdx * 0.08 }}
+              className="mb-5"
+            >
+              {/* Section Header */}
+              <div className={`rounded-2xl p-3 mb-3 border ${nt.borderColor} ${nt.gradient}`}>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{nt.emoji}</span>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className={`font-bold text-sm ${nt.textColor}`}>{nt.label}</h3>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${nt.badgeColor}`}>
+                        {nt.subtitle}
+                      </span>
+                    </div>
+                    <p className={`text-xs mt-0.5 opacity-70 ${nt.textColor}`}>{nt.description}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sounds Grid */}
+              <div className="grid grid-cols-3 gap-3">
+                {typeSounds.map((sound, index) => {
+                  const isActive = activeSound === sound.id;
+                  return (
+                    <motion.button
+                      key={sound.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.25 + ntIdx * 0.08 + index * 0.03 }}
+                      onClick={() => handleSoundToggle(sound.id)}
+                      className={`relative rounded-2xl flex flex-col items-center justify-center transition-all overflow-hidden p-3 ${
+                        isActive
+                          ? `bg-gradient-to-br ${sound.color} shadow-xl`
+                          : 'bg-card border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/30'
+                      }`}
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      {isActive && (
+                        <>
+                          <motion.div
+                            className="absolute inset-0 bg-white/10"
+                            animate={{ opacity: [0.1, 0.3, 0.1] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                          />
+                          <motion.div
+                            className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-white shadow-lg"
+                            animate={{ scale: [1, 1.3, 1] }}
+                            transition={{ duration: 1, repeat: Infinity }}
+                          />
+                        </>
+                      )}
+                      <span className={`text-3xl mb-1 relative z-10 drop-shadow-sm ${isActive ? 'drop-shadow-lg' : ''}`}>
+                        {sound.emoji}
+                      </span>
+                      <span className={`text-[11px] font-bold relative z-10 px-1 text-center leading-tight ${
+                        isActive ? 'text-white' : 'text-foreground'
+                      }`}>
+                        {sound.name}
+                      </span>
+                      {sound.description && !isActive && (
+                        <span className="text-[9px] text-muted-foreground mt-0.5 text-center leading-tight line-clamp-1 px-1">
+                          {sound.description}
+                        </span>
+                      )}
+                      {isActive && (
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
+                          <div className="flex items-center gap-0.5">
+                            {[...Array(3)].map((_, i) => (
+                              <motion.div
+                                key={i}
+                                className="w-1 bg-white/80 rounded-full"
+                                animate={{ height: [4, 8, 4] }}
+                                transition={{ duration: 0.4, repeat: Infinity, delay: i * 0.1 }}
+                              />
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </motion.button>
-                );
-              })}
-            </div>
-          )}
-        </motion.div>
+                      )}
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
 
       {/* Premium Modal */}
       <PremiumModal 
         isOpen={showPremiumModal} 
         onClose={() => setShowPremiumModal(false)}
-        feature="Limitsiz ağ səs"
+        feature="Limitsiz yuxu səsləri"
       />
     </div>
   );

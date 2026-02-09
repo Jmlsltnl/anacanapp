@@ -106,7 +106,7 @@ const AdminDynamicContent = () => {
       case 'exercises':
         return { name: '', name_az: '', duration_minutes: 10, calories: 50, level: 'easy', trimester: [1,2,3], icon: '🧘', description: '', steps: [], is_active: true, sort_order: 0 };
       case 'sounds':
-        return { name: '', name_az: '', emoji: '🎵', color_gradient: 'from-blue-400 to-cyan-500', audio_url: '', is_active: true, sort_order: 0 };
+        return { name: '', name_az: '', emoji: '🎵', color_gradient: 'from-blue-400 to-cyan-500', audio_url: '', noise_type: 'white', description: '', description_az: '', is_active: true, sort_order: 0 };
       case 'surprises':
         return { title: '', description: '', emoji: '🎁', icon: 'gift', category: 'romantic', difficulty: 'easy', points: 10, is_active: true, sort_order: 0 };
       case 'milestones':
@@ -196,9 +196,21 @@ const AdminDynamicContent = () => {
               <Input placeholder="Ad (EN)" value={formData.name || ''} onChange={e => setFormData({...formData, name: e.target.value})} />
               <Input placeholder="Ad (AZ)" value={formData.name_az || ''} onChange={e => setFormData({...formData, name_az: e.target.value})} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <Input placeholder="Emoji" value={formData.emoji || ''} onChange={e => setFormData({...formData, emoji: e.target.value})} />
-              <Input placeholder="Gradient (e.g. from-blue-400 to-cyan-500)" value={formData.color_gradient || ''} onChange={e => setFormData({...formData, color_gradient: e.target.value})} />
+              <Select value={formData.noise_type || 'white'} onValueChange={v => setFormData({...formData, noise_type: v})}>
+                <SelectTrigger><SelectValue placeholder="Küy növü" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="white">⚪ Bəyaz Küy</SelectItem>
+                  <SelectItem value="pink">🌸 Çəhrayı Küy</SelectItem>
+                  <SelectItem value="brown">🟤 Qəhvəyi Küy</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input placeholder="Gradient" value={formData.color_gradient || ''} onChange={e => setFormData({...formData, color_gradient: e.target.value})} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Input placeholder="Təsvir (AZ)" value={formData.description_az || ''} onChange={e => setFormData({...formData, description_az: e.target.value})} />
+              <Input placeholder="Təsvir (EN)" value={formData.description || ''} onChange={e => setFormData({...formData, description: e.target.value})} />
             </div>
             <Input placeholder="Audio URL" value={formData.audio_url || ''} onChange={e => setFormData({...formData, audio_url: e.target.value})} />
             <div className="grid grid-cols-2 gap-3">
@@ -412,6 +424,11 @@ const AdminDynamicContent = () => {
                 )}
                 {item.category && activeTab === 'themes' && (
                   <Badge variant="secondary" className="text-xs">{item.category}</Badge>
+                )}
+                {item.noise_type && activeTab === 'sounds' && (
+                  <Badge variant="outline" className="text-xs">
+                    {item.noise_type === 'white' ? '⚪ Bəyaz' : item.noise_type === 'pink' ? '🌸 Çəhrayı' : '🟤 Qəhvəyi'}
+                  </Badge>
                 )}
                 {item.is_premium && (
                   <Badge className="text-xs bg-amber-500">Premium</Badge>
