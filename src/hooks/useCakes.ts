@@ -8,6 +8,7 @@ export interface Cake {
   description: string | null;
   price: number;
   image_url: string | null;
+  images: string[];
   category: string;
   month_number: number | null;
   milestone_type: string | null;

@@ -44,6 +44,7 @@ const AdminCakes = () => {
     description: '',
     price: '',
     image_url: '',
+    images: [] as string[],
     category: 'month' as 'month' | 'milestone',
     month_number: '1',
     milestone_type: '',
@@ -51,12 +52,12 @@ const AdminCakes = () => {
     is_active: true,
     sort_order: '0',
     has_custom_fields: false,
-    custom_field_labels: '' as string, // comma-separated
+    custom_field_labels: '' as string,
   });
 
   const resetForm = () => {
     setFormData({
-      name: '', description: '', price: '', image_url: '',
+      name: '', description: '', price: '', image_url: '', images: [],
       category: 'month', month_number: '1', milestone_type: '',
       milestone_label: '', is_active: true, sort_order: '0',
       has_custom_fields: false, custom_field_labels: '',
@@ -72,6 +73,7 @@ const AdminCakes = () => {
       description: cake.description || '',
       price: String(cake.price),
       image_url: cake.image_url || '',
+      images: Array.isArray(cake.images) ? cake.images : [],
       category: cake.category as 'month' | 'milestone',
       month_number: String(cake.month_number || 1),
       milestone_type: cake.milestone_type || '',
@@ -84,24 +86,42 @@ const AdminCakes = () => {
     setShowForm(true);
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !file.type.startsWith('image/')) return;
+  const uploadImage = async (file: File): Promise<string | null> => {
+    if (!file.type.startsWith('image/')) return null;
     if (file.size > 5 * 1024 * 1024) {
       toast({ title: 'Fayl çox böyükdür', description: 'Max 5MB', variant: 'destructive' });
-      return;
+      return null;
     }
-    setUploadingImage(true);
-    const fileName = `cake-${Date.now()}.${file.name.split('.').pop()}`;
+    const fileName = `cake-${Date.now()}-${Math.random().toString(36).slice(2, 6)}.${file.name.split('.').pop()}`;
     const { error } = await supabase.storage.from('assets').upload(`cakes/${fileName}`, file);
     if (error) {
       toast({ title: 'Yükləmə xətası', variant: 'destructive' });
-      setUploadingImage(false);
-      return;
+      return null;
     }
     const { data: { publicUrl } } = supabase.storage.from('assets').getPublicUrl(`cakes/${fileName}`);
-    setFormData({ ...formData, image_url: publicUrl });
+    return publicUrl;
+  };
+
+  const handleMainImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImage(true);
+    const url = await uploadImage(file);
+    if (url) setFormData(prev => ({ ...prev, image_url: url }));
     setUploadingImage(false);
+  };
+
+  const handleAdditionalImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImage(true);
+    const url = await uploadImage(file);
+    if (url) setFormData(prev => ({ ...prev, images: [...prev.images, url] }));
+    setUploadingImage(false);
+  };
+
+  const removeAdditionalImage = (index: number) => {
+    setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
   };
 
   const handleSave = async () => {
@@ -120,6 +140,7 @@ const AdminCakes = () => {
       description: formData.description || null,
       price: parseFloat(formData.price),
       image_url: formData.image_url || null,
+      images: formData.images,
       category: formData.category,
       month_number: formData.category === 'month' ? parseInt(formData.month_number) : null,
       milestone_type: formData.category === 'milestone' ? formData.milestone_type : null,
@@ -269,26 +290,41 @@ const AdminCakes = () => {
                 />
               </div>
 
-              {/* Image Upload */}
+              {/* Main Image Upload */}
               <div>
-                <Label>Şəkil</Label>
+                <Label>Əsas şəkil</Label>
                 {formData.image_url ? (
                   <div className="relative inline-block mt-2">
                     <img src={formData.image_url} alt="preview" className="w-32 h-32 object-cover rounded-xl" />
                     <button onClick={() => setFormData({ ...formData, image_url: '' })} className="absolute -top-2 -right-2 w-6 h-6 bg-destructive rounded-full flex items-center justify-center">
-                      <X className="w-3 h-3 text-white" />
+                      <X className="w-3 h-3 text-destructive-foreground" />
                     </button>
                   </div>
                 ) : (
                   <label className="mt-2 flex items-center justify-center w-32 h-32 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/50 transition">
-                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                    {uploadingImage ? (
-                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                    ) : (
-                      <Upload className="w-6 h-6 text-muted-foreground" />
-                    )}
+                    <input type="file" accept="image/*" onChange={handleMainImageUpload} className="hidden" />
+                    {uploadingImage ? <Loader2 className="w-6 h-6 animate-spin text-primary" /> : <Upload className="w-6 h-6 text-muted-foreground" />}
                   </label>
                 )}
+              </div>
+
+              {/* Additional Images */}
+              <div>
+                <Label>Əlavə şəkillər</Label>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {formData.images.map((img, i) => (
+                    <div key={i} className="relative">
+                      <img src={img} alt="" className="w-20 h-20 object-cover rounded-lg" />
+                      <button onClick={() => removeAdditionalImage(i)} className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-destructive rounded-full flex items-center justify-center">
+                        <X className="w-2.5 h-2.5 text-destructive-foreground" />
+                      </button>
+                    </div>
+                  ))}
+                  <label className="flex items-center justify-center w-20 h-20 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition">
+                    <input type="file" accept="image/*" onChange={handleAdditionalImageUpload} className="hidden" />
+                    {uploadingImage ? <Loader2 className="w-4 h-4 animate-spin text-primary" /> : <Plus className="w-4 h-4 text-muted-foreground" />}
+                  </label>
+                </div>
               </div>
 
               <div className="flex items-center gap-2">
