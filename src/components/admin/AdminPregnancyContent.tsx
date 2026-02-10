@@ -581,7 +581,7 @@ const AdminPregnancyContent = () => {
                   <TableCell className="font-bold text-primary">{item.pregnancy_day || '-'}</TableCell>
                   <TableCell>{item.week_number}</TableCell>
                   <TableCell>{item.baby_size_fruit || '-'}</TableCell>
-                  <TableCell>{item.baby_size_cm} sm / {item.baby_weight_gram}g</TableCell>
+                  <TableCell>{item.baby_size_cm} sm / {item.baby_weight_gram} qr</TableCell>
                   <TableCell className="max-w-[180px] truncate text-sm">{item.baby_message || '-'}</TableCell>
                   <TableCell className="max-w-[180px] truncate text-sm">{item.body_changes || '-'}</TableCell>
                   <TableCell className="max-w-[150px] truncate text-sm">{item.daily_tip || '-'}</TableCell>
