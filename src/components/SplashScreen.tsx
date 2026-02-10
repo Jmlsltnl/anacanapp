@@ -155,7 +155,7 @@ const SplashScreen = forwardRef<HTMLDivElement, SplashScreenProps>(({ onComplete
               transition={{ delay: 0.3, duration: 0.6, type: "spring", stiffness: 200 }}
             >
               <img 
-                src={customLogo || logoImage} 
+                src={logoImage} 
                 alt="Anacan Logo" 
                 className="w-24 h-24 object-contain"
               />
