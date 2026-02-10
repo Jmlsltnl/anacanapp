@@ -152,11 +152,12 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     prevActiveToolRef.current = activeTool;
   }, [activeTool]);
   const { lifeStage, getPregnancyData } = useUserStore();
-  const { profile } = useAuth();
+  const { profile, isAdmin } = useAuth();
   const { isPremium } = useSubscription();
   const { toast } = useToast();
   const pregData = getPregnancyData();
-  const { data: toolConfigs = [], isLoading: toolsLoading } = useToolConfigs(lifeStage || undefined);
+  // Admins see ALL tools regardless of life stage
+  const { data: toolConfigs = [], isLoading: toolsLoading } = useToolConfigs(isAdmin ? undefined : (lifeStage || undefined));
   
   const hasPartner = !!profile?.linked_partner_id;
 
@@ -208,6 +209,9 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   }, []);
 
   const isToolAvailable = (tool: Tool) => {
+    // Admins have full access to everything
+    if (isAdmin) return true;
+    
     if (tool.stages && !tool.stages.includes(lifeStage || '')) {
       return false;
     }
@@ -221,6 +225,12 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   };
 
   const handleToolClick = (tool: Tool) => {
+    // Admins bypass all restrictions
+    if (isAdmin) {
+      openTool(tool.id);
+      return;
+    }
+
     if (!isToolAvailable(tool)) {
       if (tool.minWeek && lifeStage === 'bump') {
         toast({
