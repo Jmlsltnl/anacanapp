@@ -385,7 +385,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                 {weekData.lengthCm} sm
               </span>
               <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
-                {weekData.weightG}g
+                {weekData.weightG} qr
               </span>
               <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
                 {daysLeft} gün qaldı
