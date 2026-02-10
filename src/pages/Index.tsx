@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SplashScreen from '@/components/SplashScreen';
+import logoImage from '@/assets/logo.png';
 import AppIntroduction from '@/components/AppIntroduction';
 import AuthScreen from '@/components/AuthScreen';
 import OnboardingScreen from '@/components/OnboardingScreen';
@@ -253,8 +254,23 @@ const Index = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
+        <motion.div
+          animate={{ scale: [1, 1.05, 1], opacity: [0.8, 1, 0.8] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <img src={logoImage} alt="Anacan" className="w-16 h-16 object-contain" />
+        </motion.div>
+        <div className="flex gap-1.5">
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              className="w-2 h-2 rounded-full bg-primary"
+              animate={{ scale: [1, 1.4, 1], opacity: [0.4, 1, 0.4] }}
+              transition={{ duration: 1, repeat: Infinity, delay: i * 0.2, ease: "easeInOut" }}
+            />
+          ))}
+        </div>
       </div>
     );
   }

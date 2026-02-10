@@ -7031,7 +7031,7 @@ export type Database = {
           name: string
           name_az: string | null
           sort_order: number | null
-          trimester: number | null
+          trimester: number[] | null
           updated_at: string
           week_end: number | null
           week_start: number | null
@@ -7051,7 +7051,7 @@ export type Database = {
           name: string
           name_az?: string | null
           sort_order?: number | null
-          trimester?: number | null
+          trimester?: number[] | null
           updated_at?: string
           week_end?: number | null
           week_start?: number | null
@@ -7071,7 +7071,7 @@ export type Database = {
           name?: string
           name_az?: string | null
           sort_order?: number | null
-          trimester?: number | null
+          trimester?: number[] | null
           updated_at?: string
           week_end?: number | null
           week_start?: number | null

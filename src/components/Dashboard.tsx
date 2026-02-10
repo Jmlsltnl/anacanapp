@@ -545,7 +545,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                 </div>
               </div>
               <p className="text-foreground font-medium text-sm leading-relaxed">
-                "{dayContent.baby_message}"
+                {dayContent.baby_message}
               </p>
             </motion.div>
           )}
