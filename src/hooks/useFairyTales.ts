@@ -90,7 +90,12 @@ export const useGenerateFairyTale = () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
-          body: JSON.stringify(params),
+          body: JSON.stringify({
+            childName: params.child_name,
+            theme: params.theme,
+            hero: params.hero,
+            moralLesson: params.moral_lesson,
+          }),
         }
       );
 
