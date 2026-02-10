@@ -25,9 +25,9 @@ const categories = [
 
 const lifeStages = [
   { value: 'all', label: 'Hamısı' },
-  { value: 'pregnant', label: 'Hamilə' },
-  { value: 'baby', label: 'Körpə (0-12 ay)' },
-  { value: 'toddler', label: 'Toddler (1-3 yaş)' },
+  { value: 'bump', label: 'Hamilə' },
+  { value: 'mommy', label: 'Ana (Körpə)' },
+  { value: 'flow', label: 'Menstruasiya' },
 ];
 
 const priorities = [

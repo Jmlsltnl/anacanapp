@@ -66,7 +66,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
 
     // Calculate pregnancy week
     const lmp = lastPeriodDate || (profile?.last_period_date ? new Date(profile.last_period_date) : null);
-    if (lmp && (context.lifeStage === 'bump' || context.lifeStage === 'pregnant')) {
+    if (lmp && context.lifeStage === 'bump') {
       context.pregnancyWeek = getPregnancyWeek(lmp);
     }
 

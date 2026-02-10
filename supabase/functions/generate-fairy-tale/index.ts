@@ -130,10 +130,33 @@ Write a story about a child named "${actualChildName}".`;
       throw new Error('No content generated');
     }
 
-    // Extract title from the generated text (first line usually)
+    // Extract title - clean AI preamble and formatting
     const lines = generatedText.split('\n').filter((line: string) => line.trim());
-    const title = lines[0]?.replace(/^#+\s*/, '').replace(/\*\*/g, '').trim() || 'Sehrli Nağıl';
-    const content = lines.slice(1).join('\n').trim() || generatedText;
+    let rawTitle = lines[0]?.replace(/^#+\s*/, '').replace(/\*\*/g, '').trim() || '';
+    
+    // Remove AI preamble patterns like "Əlbəttə, buyurun..." or "Budur..." etc.
+    rawTitle = rawTitle
+      .replace(/^(əlbəttə|buyurun|budur|bax|mən sizə)[,!.\s]*/i, '')
+      .replace(/^["«"]?\s*/, '')
+      .replace(/\s*["»"]?\s*$/, '')
+      .replace(new RegExp(`^.*üçün bir nağıl:\\s*`, 'i'), '')
+      .replace(new RegExp(`^.*üçün nağıl:\\s*`, 'i'), '')
+      .trim();
+    
+    // If title still doesn't contain the child's name, prefix it
+    if (rawTitle && !rawTitle.includes(actualChildName)) {
+      rawTitle = `${actualChildName} - ${rawTitle}`;
+    }
+    
+    const title = rawTitle || `${actualChildName}ın Nağılı`;
+    
+    // Find where the actual story content begins (skip the title line)
+    const contentStartIndex = lines.findIndex((line: string, i: number) => {
+      if (i === 0) return false;
+      const cleaned = line.replace(/^#+\s*/, '').replace(/\*\*/g, '').trim();
+      return cleaned.length > 0;
+    });
+    const content = (contentStartIndex > 0 ? lines.slice(contentStartIndex) : lines.slice(1)).join('\n').trim() || generatedText;
 
     // Estimate reading duration (average reading speed for children)
     const wordCount = content.split(/\s+/).length;
