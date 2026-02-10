@@ -7,6 +7,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 import { PremiumModal } from '@/components/PremiumModal';
 import { format } from 'date-fns';
@@ -17,6 +18,8 @@ interface BillingScreenProps {
 }
 
 const BillingScreen = ({ onBack }: BillingScreenProps) => {
+  useScrollToTop();
+  
   const { profile } = useAuth();
   const { isPremium, subscription, loading: isLoading } = useSubscription();
   const { toast } = useToast();
@@ -83,9 +86,9 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
   const plan = getPlanDetails();
 
   return (
-    <div className="min-h-screen bg-background pb-safe">
-      {/* Header */}
-      <div className="bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600 px-5 pt-12 pb-8 rounded-b-3xl">
+    <div className="min-h-screen bg-background pb-safe overflow-y-auto">
+      {/* Header with safe area */}
+      <div className="bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600 px-5 pb-8 rounded-b-3xl" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
         <div className="flex items-center gap-4 mb-6">
           <motion.button
             onClick={onBack}

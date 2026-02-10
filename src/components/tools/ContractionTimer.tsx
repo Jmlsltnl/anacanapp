@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Play, Square, Timer, AlertCircle, Trash2 } from 'lucide-react';
 import { useContractions } from '@/hooks/useContractions';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { hapticFeedback } from '@/lib/native';
 
 interface ContractionTimerProps {
@@ -9,6 +10,8 @@ interface ContractionTimerProps {
 }
 
 const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ onBack }, ref) => {
+  useScrollToTop();
+  
   const [isActive, setIsActive] = useState(false);
   const [currentDuration, setCurrentDuration] = useState(0);
   const [lastEndTime, setLastEndTime] = useState<Date | null>(null);
@@ -64,8 +67,8 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className={`${stats.is511 ? 'bg-gradient-to-r from-red-500 to-rose-600' : 'gradient-primary'} px-3 pt-3 pb-8 safe-top transition-colors`}>
-        <div className="flex items-center gap-3">
+      <div className={`${stats.is511 ? 'bg-gradient-to-r from-red-500 to-rose-600' : 'gradient-primary'} px-3 pt-3 pb-4 safe-top transition-colors relative z-20`}>
+        <div className="flex items-center gap-3 relative z-20">
           <motion.button
             onClick={onBack}
             className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
@@ -91,7 +94,7 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
         </div>
       </div>
 
-      <div className="px-3 -mt-4">
+      <div className="px-3 pt-3">
         {/* 5-1-1 Alert */}
         <AnimatePresence>
           {stats.is511 && (
@@ -99,14 +102,14 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="bg-red-50 border-2 border-red-200 rounded-xl p-3 mb-3 flex items-center gap-3"
+              className="bg-red-100 dark:bg-red-950/50 border-2 border-red-200 dark:border-red-800 rounded-xl p-3 mb-3 flex items-center gap-3"
             >
               <div className="w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center">
                 <AlertCircle className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-red-700 text-sm">Xəstəxanaya getmə vaxtı!</h3>
-                <p className="text-xs text-red-600">5-1-1 qaydası: Sancılar 5 dəqiqədən bir, 1 dəqiqə davam edir</p>
+                <h3 className="font-bold text-red-700 dark:text-red-400 text-sm">Xəstəxanaya getmə vaxtı!</h3>
+                <p className="text-xs text-red-600 dark:text-red-300">5-1-1 qaydası: Sancılar 5 dəqiqədən bir, 1 dəqiqə davam edir</p>
               </div>
             </motion.div>
           )}
@@ -185,7 +188,7 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
 
         {/* 5-1-1 Rule Info */}
         <motion.div
-          className="bg-beige-light rounded-xl p-3 mb-4 border border-beige"
+          className="bg-primary/5 dark:bg-primary/10 rounded-xl p-3 mb-4 border border-primary/20"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
@@ -195,7 +198,7 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
             5-1-1 Qaydası
           </h3>
           <p className="text-xs text-muted-foreground">
-            Sancılar <strong>5 dəqiqə</strong> aralığında, <strong>1 dəqiqə</strong> davam edərsə və bu <strong>1 saat</strong> boyunca davam edərsə, xəstəxanaya getmə vaxtıdır.
+            Sancılar <strong className="text-foreground">5 dəqiqə</strong> aralığında, <strong className="text-foreground">1 dəqiqə</strong> davam edərsə və bu <strong className="text-foreground">1 saat</strong> boyunca davam edərsə, xəstəxanaya getmə vaxtıdır.
           </p>
         </motion.div>
 
@@ -220,7 +223,7 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
                       <div>
                         <p className="font-bold text-foreground text-sm">{formatTime(contraction.duration_seconds)} müddət</p>
                         <p className="text-[10px] text-muted-foreground">
-                          {new Date(contraction.start_time).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
+                          {new Date(contraction.start_time).toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' })}, {new Date(contraction.start_time).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
                     </div>

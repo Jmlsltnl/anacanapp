@@ -1,14 +1,16 @@
-import { useState, forwardRef } from 'react';
+import { useState, forwardRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Utensils, Apple, Coffee, Droplets, 
-  Plus, Star, X, Check, Trash2, ChefHat, Clock, Heart, Leaf, Search, Users, Pill
+  Plus, Star, X, Check, Trash2, Leaf, Heart
 } from 'lucide-react';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useMealLogs } from '@/hooks/useMealLogs';
-import { useNutritionTips, useRecipes, Recipe } from '@/hooks/useDynamicContent';
+import { useNutritionTips } from '@/hooks/useDynamicContent';
 import { useCommonFoods } from '@/hooks/useDynamicConfig';
+import { useMealTypes, useNutritionTargets } from '@/hooks/useDynamicTools';
 import { useUserStore } from '@/store/userStore';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import VitaminsTab from './VitaminsTab';
@@ -17,20 +19,19 @@ interface NutritionProps {
   onBack: () => void;
 }
 
-// Life stage specific meal types
-const getMealTypes = (lifeStage: string) => {
-  const baseMeals = [
-    { id: 'breakfast', name: 'Səhər yeməyi', icon: Coffee, time: '07:00 - 09:00', emoji: '🍳' },
-    { id: 'lunch', name: 'Nahar', icon: Utensils, time: '12:00 - 14:00', emoji: '🍲' },
-    { id: 'dinner', name: 'Şam yeməyi', icon: Utensils, time: '18:00 - 20:00', emoji: '🍽️' },
-    { id: 'snack', name: 'Qəlyanaltı', icon: Apple, time: 'İstənilən vaxt', emoji: '🍎' },
-  ];
-  
-  if (lifeStage === 'mommy') {
-    return [...baseMeals, { id: 'nursing', name: 'Əmizdirmə', icon: Heart, time: 'Əlavə qida', emoji: '🍼' }];
-  }
-  
-  return baseMeals;
+// Fallback meal types
+const fallbackMealTypes = [
+  { meal_id: 'breakfast', name: 'Səhər yeməyi', name_az: 'Səhər yeməyi', emoji: '🍳', time_range: '07:00 - 09:00' },
+  { meal_id: 'lunch', name: 'Nahar', name_az: 'Nahar', emoji: '🍲', time_range: '12:00 - 14:00' },
+  { meal_id: 'dinner', name: 'Şam yeməyi', name_az: 'Şam yeməyi', emoji: '🍽️', time_range: '18:00 - 20:00' },
+  { meal_id: 'snack', name: 'Qəlyanaltı', name_az: 'Qəlyanaltı', emoji: '🍎', time_range: 'İstənilən vaxt' },
+];
+
+// Fallback targets
+const fallbackTargets = {
+  bump: { calories: 2300, water_glasses: 10, description_az: 'Hamiləlik dövrü' },
+  mommy: { calories: 2500, water_glasses: 12, description_az: 'Əmizdirmə dövrü' },
+  flow: { calories: 2000, water_glasses: 8, description_az: 'Ümumi sağlamlıq' },
 };
 
 // Common foods will be fetched from DB, fallback for loading
@@ -41,84 +42,76 @@ const fallbackFoods = [
   { name: 'Süd (1 stəkan)', calories: 150, emoji: '🥛' },
 ];
 
-// Life stage specific calorie and water targets
-const getTargets = (lifeStage: string) => {
-  switch (lifeStage) {
-    case 'bump':
-      return { calories: 2300, water: 10, description: 'Hamiləlik dövrü' };
-    case 'mommy':
-      return { calories: 2500, water: 12, description: 'Əmizdirmə dövrü' };
-    default: // flow
-      return { calories: 2000, water: 8, description: 'Ümumi sağlamlıq' };
-  }
-};
-
-// Recipe categories by life stage
-const getRecipeCategories = (lifeStage: string) => {
-  const baseCategories = [
-    { id: 'all', name: 'Hamısı', emoji: '🍽️' },
-  ];
-  
-  if (lifeStage === 'bump') {
-    return [
-      ...baseCategories,
-      { id: 'Hamiləlik', name: 'Hamiləlik', emoji: '🤰' },
-      { id: 'Fol turşusu', name: 'Fol turşusu', emoji: '🥬' },
-      { id: 'Dəmir', name: 'Dəmir', emoji: '🥩' },
-      { id: 'Protein', name: 'Protein', emoji: '🍳' },
-    ];
-  } else if (lifeStage === 'mommy') {
-    return [
-      ...baseCategories,
-      { id: 'Əmizdirmə', name: 'Əmizdirmə', emoji: '🍼' },
-      { id: 'Enerji', name: 'Enerji', emoji: '⚡' },
-      { id: 'Körpə yeməyi', name: 'Körpə yeməyi', emoji: '👶' },
-    ];
-  }
-  
-  return [
-    ...baseCategories,
-    { id: 'Sağlam', name: 'Sağlam', emoji: '🥗' },
-    { id: 'Enerji', name: 'Enerji', emoji: '⚡' },
-    { id: 'Yüngül', name: 'Yüngül', emoji: '🌿' },
-  ];
+// Icon mapping for meal types
+const mealIcons: Record<string, any> = {
+  breakfast: Coffee,
+  lunch: Utensils,
+  dinner: Utensils,
+  snack: Apple,
+  nursing: Heart,
 };
 
 const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) => {
-  const [activeTab, setActiveTab] = useState<'log' | 'recipes' | 'tips' | 'vitamins' | 'water'>('log');
+  useScrollToTop();
+  
+  const [activeTab, setActiveTab] = useState<'log' | 'tips' | 'vitamins' | 'water'>('log');
   const [selectedMeal, setSelectedMeal] = useState<string | null>(null);
-  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
-  const [recipeCategory, setRecipeCategory] = useState('all');
-  const [recipeSearch, setRecipeSearch] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [customFood, setCustomFood] = useState({ name: '', calories: '' });
-  const [favorites, setFavorites] = useState<string[]>([]);
   
   const { todayLog, loading: logsLoading, updateWaterIntake } = useDailyLogs();
   const { loading: mealLoading, addMealLog, deleteMealLog, getTodayStats, getMealsByType } = useMealLogs();
   const { data: nutritionTips = [], isLoading: tipsLoading } = useNutritionTips();
-  const { data: recipes = [], isLoading: recipesLoading } = useRecipes();
   const { data: dbFoods = [], isLoading: foodsLoading } = useCommonFoods();
   const { lifeStage } = useUserStore();
+  
+  // Dynamic data from database
+  const { data: dbMealTypes = [] } = useMealTypes(lifeStage || 'flow');
+  const { data: dbTargets = [] } = useNutritionTargets();
   
   // Use DB foods or fallback
   const commonFoods = dbFoods.length > 0 
     ? dbFoods.map(f => ({ name: f.name_az || f.name, calories: f.calories, emoji: f.emoji }))
     : fallbackFoods;
   
-  const mealTypes = getMealTypes(lifeStage || 'flow');
-  const targets = getTargets(lifeStage || 'flow');
-  const recipeCategories = getRecipeCategories(lifeStage || 'flow');
+  // Map meal types from DB or use fallback
+  const mealTypes = useMemo(() => {
+    if (dbMealTypes.length > 0) {
+      return dbMealTypes.map(m => ({
+        id: m.meal_id,
+        name: m.name_az || m.name,
+        icon: mealIcons[m.meal_id] || Utensils,
+        time: m.time_range || '',
+        emoji: m.emoji || '🍽️',
+      }));
+    }
+    return fallbackMealTypes.map(m => ({
+      id: m.meal_id,
+      name: m.name_az || m.name,
+      icon: mealIcons[m.meal_id] || Utensils,
+      time: m.time_range || '',
+      emoji: m.emoji || '🍽️',
+    }));
+  }, [dbMealTypes]);
+  
+  // Get targets from DB or use fallback
+  const targets = useMemo(() => {
+    const stage = lifeStage || 'flow';
+    const dbTarget = dbTargets.find(t => t.life_stage === stage);
+    if (dbTarget) {
+      return { 
+        calories: dbTarget.calories, 
+        water: dbTarget.water_glasses, 
+        description: dbTarget.description_az || dbTarget.description || '' 
+      };
+    }
+    const fallback = fallbackTargets[stage as keyof typeof fallbackTargets] || fallbackTargets.flow;
+    return { calories: fallback.calories, water: fallback.water_glasses, description: fallback.description_az };
+  }, [dbTargets, lifeStage]);
   
   const waterGlasses = todayLog?.water_intake || 0;
   const stats = getTodayStats();
   const todayCalories = stats.totalCalories;
-
-  const toggleFavorite = (recipeId: string) => {
-    setFavorites(prev => 
-      prev.includes(recipeId) ? prev.filter(id => id !== recipeId) : [...prev, recipeId]
-    );
-  };
 
   const addWater = async () => {
     if (waterGlasses < 12) {
@@ -153,112 +146,12 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
     await deleteMealLog(id);
   };
 
-  // Filter recipes
-  const filteredRecipes = recipes.filter(recipe => {
-    const matchesCategory = recipeCategory === 'all' || recipe.category === recipeCategory;
-    const matchesSearch = recipe.title.toLowerCase().includes(recipeSearch.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
-
-  const loading = logsLoading || tipsLoading || mealLoading || recipesLoading;
+  const loading = logsLoading || tipsLoading || mealLoading;
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  // Recipe detail view
-  if (selectedRecipe) {
-    return (
-      <div ref={ref} className="min-h-screen bg-background pb-24">
-        <div className="gradient-primary px-3 pt-3 pb-6 rounded-b-[1.5rem]">
-          <div className="flex items-center gap-3">
-            <motion.button
-              onClick={() => setSelectedRecipe(null)}
-              className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}
-            >
-              <ArrowLeft className="w-4 h-4 text-white" />
-            </motion.button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-white">{selectedRecipe.title}</h1>
-              <p className="text-white/80 text-xs">{selectedRecipe.category}</p>
-            </div>
-            <motion.button
-              onClick={() => toggleFavorite(selectedRecipe.id)}
-              className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}
-            >
-              <Heart className={`w-4 h-4 ${favorites.includes(selectedRecipe.id) ? 'fill-red-400 text-red-400' : 'text-white'}`} />
-            </motion.button>
-          </div>
-        </div>
-
-        <div className="px-3 py-3 space-y-3">
-          <motion.div 
-            className="bg-card rounded-2xl p-4 text-center shadow-card"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <span className="text-5xl">{selectedRecipe.emoji || '🍽️'}</span>
-            <div className="flex justify-center gap-4 mt-3">
-              <div className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-                <span className="text-xs">{selectedRecipe.prep_time || 0} dəq</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5 text-muted-foreground" />
-                <span className="text-xs">{selectedRecipe.servings || 1} porsiya</span>
-              </div>
-            </div>
-          </motion.div>
-
-          {selectedRecipe.ingredients && selectedRecipe.ingredients.length > 0 && (
-            <motion.div 
-              className="bg-card rounded-2xl p-3 shadow-card"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <h3 className="font-bold text-foreground mb-2 flex items-center gap-2 text-sm">
-                <ChefHat className="w-4 h-4 text-orange-500" />
-                İnqrediyentlər
-              </h3>
-              <ul className="space-y-1.5">
-                {selectedRecipe.ingredients.map((ingredient: string, index: number) => (
-                  <li key={index} className="flex items-center gap-2 text-xs text-foreground">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                    {ingredient}
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          )}
-
-          {selectedRecipe.instructions && selectedRecipe.instructions.length > 0 && (
-            <motion.div 
-              className="bg-card rounded-2xl p-3 shadow-card"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <h3 className="font-bold text-foreground mb-2 text-sm">Hazırlanması</h3>
-              <ol className="space-y-2">
-                {selectedRecipe.instructions.map((instruction: string, index: number) => (
-                  <li key={index} className="flex items-start gap-2 text-xs text-foreground">
-                    <div className="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold">
-                      {index + 1}
-                    </div>
-                    {instruction}
-                  </li>
-                ))}
-              </ol>
-            </motion.div>
-          )}
-        </div>
       </div>
     );
   }
@@ -270,8 +163,8 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
     const mealCalories = stats.mealCalories[selectedMeal as keyof typeof stats.mealCalories] || 0;
 
     return (
-      <div ref={ref} className="min-h-screen bg-gradient-to-b from-orange-50 to-background pb-24">
-        <div className="gradient-primary px-3 pt-3 pb-6">
+      <div ref={ref} className="min-h-screen bg-gradient-to-b from-primary/5 dark:from-primary/10 to-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
+        <div className="gradient-primary px-3 pt-3 pb-4">
           <div className="flex items-center gap-3 mb-3">
             <motion.button
               onClick={() => setSelectedMeal(null)}
@@ -378,6 +271,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                 animate={{ y: 0 }}
                 exit={{ y: '100%' }}
                 className="w-full bg-card rounded-t-2xl p-4"
+                style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 100px)' }}
                 onClick={e => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between mb-4">
@@ -425,36 +319,41 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
   }
 
   return (
-    <div ref={ref} className="min-h-screen bg-gradient-to-b from-orange-50 to-background pb-24">
-      <div className="gradient-primary px-3 pt-3 pb-6">
-        <div className="flex items-center gap-3 mb-3">
-          <motion.button
-            onClick={onBack}
-            className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}
-          >
-            <ArrowLeft className="w-4 h-4 text-white" />
-          </motion.button>
-          <div>
-            <h1 className="text-lg font-bold text-white">Qidalanma</h1>
-            <p className="text-white/80 text-xs">{targets.description}</p>
+    <div ref={ref} className="min-h-screen bg-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
+      {/* Minimalist Header */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50 safe-area-top">
+        <div className="px-4 py-3">
+          <div className="flex items-center gap-3">
+            <motion.button
+              onClick={onBack}
+              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
+              whileTap={{ scale: 0.95 }}
+            >
+              <ArrowLeft className="w-5 h-5 text-foreground" />
+            </motion.button>
+            <div className="flex-1">
+              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Utensils className="w-5 h-5 text-primary" />
+                Qidalanma
+              </h1>
+              <p className="text-xs text-muted-foreground">{targets.description}</p>
+            </div>
           </div>
         </div>
+      </div>
 
-        <motion.div 
-          className="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/20"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-        >
-          <div className="flex justify-between items-center mb-2">
+      {/* Stats Card */}
+      <div className="px-4 pt-4">
+        <div className="bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl p-4 text-white">
+          <div className="flex justify-between items-center mb-3">
             <div>
-              <p className="text-white/70 text-xs">Bugünkü kalori</p>
-              <p className="text-2xl font-black text-white">
+              <p className="text-white/70 text-xs font-medium">Bugünkü kalori</p>
+              <p className="text-2xl font-bold">
                 {todayCalories} <span className="text-sm font-normal">/ {targets.calories}</span>
               </p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-              <div className="text-xl">🍽️</div>
+            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+              <span className="text-2xl">🍽️</span>
             </div>
           </div>
           <div className="h-2 bg-white/20 rounded-full overflow-hidden">
@@ -465,17 +364,14 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
               transition={{ duration: 1, ease: "easeOut" }}
             />
           </div>
-          <p className="text-white/60 text-[10px] mt-1 text-center">
-            {stats.totalMeals} yemək qeyd edildi
-          </p>
-        </motion.div>
+          <p className="text-white/60 text-xs mt-2 text-center">{stats.totalMeals} yemək qeyd edildi</p>
+        </div>
       </div>
 
       <div className="px-3 -mt-3">
         <div className="bg-card rounded-xl p-1 flex gap-0.5 shadow-lg">
           {[
             { id: 'log', label: 'Yemək' },
-            { id: 'recipes', label: 'Reseptlər' },
             { id: 'vitamins', label: 'Vitaminlər' },
             { id: 'tips', label: 'Tövsiyələr' },
             { id: 'water', label: 'Su' },
@@ -533,8 +429,8 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                     </div>
                     <div className="flex items-center gap-2">
                       {mealLogs.length > 0 ? (
-                        <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center">
-                          <Check className="w-3.5 h-3.5 text-green-600" />
+                        <div className="w-7 h-7 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                          <Check className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
                         </div>
                       ) : (
                         <Plus className="w-4 h-4 text-primary" />
@@ -543,92 +439,6 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                   </motion.button>
                 );
               })}
-            </motion.div>
-          )}
-
-          {activeTab === 'recipes' && (
-            <motion.div
-              key="recipes"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              className="space-y-3"
-            >
-              {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  value={recipeSearch}
-                  onChange={(e) => setRecipeSearch(e.target.value)}
-                  placeholder="Resept axtar..."
-                  className="pl-9 h-9 text-sm"
-                />
-              </div>
-
-              {/* Categories */}
-              <div className="flex gap-1.5 overflow-x-auto hide-scrollbar pb-1">
-                {recipeCategories.map((category) => (
-                  <motion.button
-                    key={category.id}
-                    onClick={() => setRecipeCategory(category.id)}
-                    className={`flex-shrink-0 px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition-all ${
-                      recipeCategory === category.id
-                        ? 'bg-primary text-white'
-                        : 'bg-muted text-muted-foreground'
-                    }`}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <span className="text-sm">{category.emoji}</span>
-                    <span className="text-[10px] font-medium">{category.name}</span>
-                  </motion.button>
-                ))}
-              </div>
-
-              {/* Recipes list */}
-              <div className="space-y-2">
-                {filteredRecipes.map((recipe, index) => (
-                  <motion.button
-                    key={recipe.id}
-                    onClick={() => setSelectedRecipe(recipe)}
-                    className="w-full bg-card rounded-xl p-3 shadow-card flex items-center gap-3 text-left"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.03 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center text-2xl">
-                      {recipe.emoji || '🍽️'}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-foreground truncate text-sm">{recipe.title}</h3>
-                      <p className="text-[10px] text-muted-foreground">{recipe.category}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[9px] text-muted-foreground flex items-center gap-0.5">
-                          <Clock className="w-2.5 h-2.5" />
-                          {recipe.prep_time || 0} dəq
-                        </span>
-                      </div>
-                    </div>
-                    <motion.button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleFavorite(recipe.id);
-                      }}
-                      className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <Heart className={`w-4 h-4 ${favorites.includes(recipe.id) ? 'fill-red-400 text-red-400' : 'text-muted-foreground'}`} />
-                    </motion.button>
-                  </motion.button>
-                ))}
-              </div>
-
-              {filteredRecipes.length === 0 && (
-                <div className="text-center py-8">
-                  <ChefHat className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-muted-foreground text-sm">Resept tapılmadı</p>
-                </div>
-              )}
             </motion.div>
           )}
 
@@ -714,7 +524,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                       className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${
                         i < waterGlasses 
                           ? 'bg-blue-500 text-white' 
-                          : 'bg-blue-100 text-blue-300'
+                          : 'bg-blue-100 dark:bg-blue-900/30 text-blue-300 dark:text-blue-600'
                       }`}
                     >
                       💧
@@ -733,9 +543,9 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                 </motion.button>
               </div>
 
-              <div className="bg-blue-50 rounded-xl p-3 border border-blue-100">
-                <h3 className="font-bold text-blue-800 mb-1 text-sm">💡 Məsləhət</h3>
-                <p className="text-xs text-blue-700">
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
+                <h3 className="font-bold text-blue-800 dark:text-blue-300 mb-1 text-sm">💡 Məsləhət</h3>
+                <p className="text-xs text-blue-700 dark:text-blue-400">
                   {lifeStage === 'bump' 
                     ? 'Hamiləlik zamanı gündə ən azı 10 stəkan su içmək tövsiyə olunur. Yetərli su içmək körpənin inkişafına kömək edir.'
                     : lifeStage === 'mommy'

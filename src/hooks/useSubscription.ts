@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useAppSetting } from './useAppSettings';
 
 interface Subscription {
   id: string;
@@ -20,10 +21,15 @@ interface UsageTracking {
   usage_seconds: number;
 }
 
-// Free tier limits
-const FREE_LIMITS = {
-  white_noise_seconds_per_day: 20 * 60, // 20 minutes
-  baby_photoshoot_count: 3, // First 3 photos free
+// Fallback free tier limits (used if DB setting not available)
+const DEFAULT_FREE_LIMITS = {
+  white_noise_seconds_per_day: 20 * 60,
+  baby_photoshoot_count: 3,
+  fairy_tale_count_per_day: 3,
+  ai_chat_count_per_day: 10,
+  cry_translator_count_per_day: 3,
+  poop_scanner_count_per_day: 3,
+  horoscope_count_per_day: 2,
 };
 
 export function useSubscription() {
@@ -32,6 +38,16 @@ export function useSubscription() {
   const [usage, setUsage] = useState<UsageTracking[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Read free limits from DB (app_settings -> free_limits)
+  const dbFreeLimits = useAppSetting('free_limits');
+  
+  const freeLimits = useMemo(() => {
+    if (dbFreeLimits && typeof dbFreeLimits === 'object') {
+      return { ...DEFAULT_FREE_LIMITS, ...dbFreeLimits };
+    }
+    return DEFAULT_FREE_LIMITS;
+  }, [dbFreeLimits]);
+
   const fetchSubscription = useCallback(async () => {
     if (!user) {
       setLoading(false);
@@ -39,7 +55,6 @@ export function useSubscription() {
     }
 
     try {
-      // Fetch subscription
       const { data: subData } = await supabase
         .from('subscriptions')
         .select('*')
@@ -49,7 +64,6 @@ export function useSubscription() {
       if (subData) {
         setSubscription(subData as Subscription);
       } else {
-        // Create default free subscription
         const { data: newSub } = await supabase
           .from('subscriptions')
           .insert({
@@ -65,7 +79,6 @@ export function useSubscription() {
         }
       }
 
-      // Fetch today's usage
       const today = new Date().toISOString().split('T')[0];
       const { data: usageData } = await supabase
         .from('usage_tracking')
@@ -87,32 +100,34 @@ export function useSubscription() {
     fetchSubscription();
   }, [fetchSubscription]);
 
-  // Check both subscription table AND profile.is_premium flag
   const isPremium = 
     subscription?.plan_type === 'premium' || 
     subscription?.plan_type === 'premium_plus' ||
     profile?.is_premium === true;
 
-  const getUsageForFeature = (featureType: 'white_noise' | 'baby_photoshoot'): UsageTracking | undefined => {
-    return usage.find(u => u.feature_type === featureType);
-  };
+  const getUsageForFeature = useCallback(
+    (featureType: 'white_noise' | 'baby_photoshoot'): UsageTracking | undefined => {
+      return usage.find(u => u.feature_type === featureType);
+    },
+    [usage]
+  );
 
-  const canUseWhiteNoise = (): { allowed: boolean; remainingSeconds: number } => {
+  const canUseWhiteNoise = useCallback((): { allowed: boolean; remainingSeconds: number } => {
     if (isPremium) {
       return { allowed: true, remainingSeconds: Infinity };
     }
 
     const whiteNoiseUsage = getUsageForFeature('white_noise');
     const usedSeconds = whiteNoiseUsage?.usage_seconds || 0;
-    const remaining = FREE_LIMITS.white_noise_seconds_per_day - usedSeconds;
+    const remaining = freeLimits.white_noise_seconds_per_day - usedSeconds;
 
     return {
       allowed: remaining > 0,
       remainingSeconds: Math.max(0, remaining),
     };
-  };
+  }, [getUsageForFeature, isPremium, freeLimits]);
 
-  const canUseBabyPhotoshoot = async (): Promise<{ allowed: boolean; remainingCount: number }> => {
+  const canUseBabyPhotoshoot = useCallback(async (): Promise<{ allowed: boolean; remainingCount: number }> => {
     if (isPremium) {
       return { allowed: true, remainingCount: Infinity };
     }
@@ -121,22 +136,21 @@ export function useSubscription() {
       return { allowed: false, remainingCount: 0 };
     }
 
-    // Get total photo count
     const { count } = await supabase
       .from('baby_photos')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', user.id);
 
     const totalPhotos = count || 0;
-    const remaining = FREE_LIMITS.baby_photoshoot_count - totalPhotos;
+    const remaining = freeLimits.baby_photoshoot_count - totalPhotos;
 
     return {
       allowed: remaining > 0,
       remainingCount: Math.max(0, remaining),
     };
-  };
+  }, [isPremium, user, freeLimits]);
 
-  const trackWhiteNoiseUsage = async (seconds: number) => {
+  const trackWhiteNoiseUsage = useCallback(async (seconds: number) => {
     if (!user || isPremium) return;
 
     const today = new Date().toISOString().split('T')[0];
@@ -158,13 +172,10 @@ export function useSubscription() {
         });
     }
 
-    // Refresh usage
     fetchSubscription();
-  };
+  }, [fetchSubscription, getUsageForFeature, isPremium, user]);
 
   const upgradeToPremium = () => {
-    // This would integrate with Stripe or another payment provider
-    // For now, we'll just show a message
     return {
       showUpgradeModal: true,
       monthlyPrice: 9.99,
@@ -181,6 +192,6 @@ export function useSubscription() {
     trackWhiteNoiseUsage,
     upgradeToPremium,
     refetch: fetchSubscription,
-    freeLimits: FREE_LIMITS,
+    freeLimits,
   };
 }

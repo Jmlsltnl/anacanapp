@@ -12,7 +12,7 @@ export interface Vitamin {
   dosage: string | null;
   week_start: number | null;
   week_end: number | null;
-  trimester: number | null;
+  trimester: number[] | null;
   life_stage: string | null;
   importance: string | null;
   icon_emoji: string | null;
@@ -44,10 +44,15 @@ export const useVitamins = (weekNumber?: number, lifeStage?: string) => {
       let vitamins = (data || []) as Vitamin[];
       
       if (weekNumber && lifeStage === 'bump') {
+        const currentTrimester = weekNumber <= 13 ? 1 : weekNumber <= 26 ? 2 : 3;
         vitamins = vitamins.filter(v => {
-          if (v.week_start === null && v.week_end === null) return true;
+          // Filter by week range if provided
           if (v.week_start !== null && v.week_end !== null) {
             return weekNumber >= v.week_start && weekNumber <= v.week_end;
+          }
+          // Filter by trimester array if set
+          if (v.trimester !== null && v.trimester.length > 0) {
+            return v.trimester.includes(currentTrimester);
           }
           return true;
         });

@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import PostCard from './PostCard';
 import { CommunityPost } from '@/hooks/useCommunity';
 import { formatDistanceToNow } from 'date-fns';
@@ -33,6 +34,8 @@ interface UserProfileScreenProps {
 }
 
 const UserProfileScreen = ({ userId, onBack }: UserProfileScreenProps) => {
+  useScrollToTop();
+  
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [stories, setStories] = useState<UserStory[]>([]);

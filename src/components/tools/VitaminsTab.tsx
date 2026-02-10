@@ -2,19 +2,20 @@ import { motion } from 'framer-motion';
 import { Pill, AlertCircle, Leaf, Info } from 'lucide-react';
 import { useVitamins, Vitamin } from '@/hooks/useVitamins';
 import { useUserStore } from '@/store/userStore';
-import { differenceInWeeks } from 'date-fns';
+import { getPregnancyWeek } from '@/lib/pregnancy-utils';
 
 interface VitaminsTabProps {
   className?: string;
 }
 
 const VitaminsTab = ({ className }: VitaminsTabProps) => {
-  const { lifeStage, dueDate } = useUserStore();
+  const { lifeStage, lastPeriodDate } = useUserStore();
   
   // Calculate current pregnancy week
-  const currentWeek = dueDate 
-    ? Math.max(1, 40 - differenceInWeeks(new Date(dueDate), new Date()))
-    : undefined;
+  const currentWeek =
+    lifeStage === 'bump' && lastPeriodDate
+      ? Math.max(1, getPregnancyWeek(lastPeriodDate))
+      : undefined;
   
   const { data: vitamins = [], isLoading } = useVitamins(currentWeek, lifeStage || 'bump');
 

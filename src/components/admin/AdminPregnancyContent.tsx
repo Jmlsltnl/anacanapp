@@ -208,15 +208,15 @@ const AdminPregnancyContent = () => {
       if (file.name.endsWith('.json')) {
         data = JSON.parse(text);
       } else if (file.name.endsWith('.csv')) {
-        // Split by newlines, handling both \r\n and \n
-        const lines = text.split(/\r?\n/).filter(line => line.trim());
-        if (lines.length < 2) {
+        // Use the new multi-line aware CSV parser
+        const { headers: rawHeaders, rows: csvRows } = parseCSV(text);
+        
+        if (rawHeaders.length === 0 || csvRows.length === 0) {
           throw new Error('CSV faylı boşdur və ya yalnız başlıq var');
         }
         
-        // Parse header row - handle quoted headers
-        const rawHeaders = parseCSVLine(lines[0]);
         console.log('Parsed headers:', rawHeaders);
+        console.log('Total rows parsed:', csvRows.length);
         
         // Map user's Excel headers to database fields (comprehensive mapping)
         const headerMap: Record<string, string> = {
@@ -248,22 +248,15 @@ const AdminPregnancyContent = () => {
           'week_number': 'week_number'
         };
         
-        // Find which headers map to which columns
-        const mappedHeaders = rawHeaders.map(h => {
-          const trimmed = h.trim();
-          return headerMap[trimmed] || trimmed.toLowerCase().replace(/\s+/g, '_');
-        });
-        console.log('Mapped headers:', mappedHeaders);
-        
-        // Parse each data row
-        for (let i = 1; i < lines.length; i++) {
-          if (!lines[i].trim()) continue;
-          
-          const values = parseCSVLine(lines[i]);
+        // Process each row
+        for (let i = 0; i < csvRows.length; i++) {
+          const csvRow = csvRows[i];
           const row: any = { is_active: true };
           
-          mappedHeaders.forEach((dbField, idx) => {
-            let value = values[idx]?.trim() || '';
+          // Map each header to its value
+          rawHeaders.forEach((header) => {
+            const dbField = headerMap[header.trim()] || header.trim().toLowerCase().replace(/\s+/g, '_');
+            let value = (csvRow[header] || '').trim();
             
             // Skip empty values or placeholders
             if (!value || value === '-' || value === '–' || value === '—') {
@@ -272,14 +265,16 @@ const AdminPregnancyContent = () => {
             
             if (dbField === 'pregnancy_day') {
               const pDay = parseInt(value);
-              if (!isNaN(pDay) && pDay > 0 && pDay <= 280) {
+              // Allow up to 294 days (280 standard + 14 days for delayed birth)
+              if (!isNaN(pDay) && pDay > 0 && pDay <= 294) {
                 row.pregnancy_day = pDay;
                 row.week_number = Math.ceil(pDay / 7);
-                row.days_until_birth = 280 - pDay;
+                row.days_until_birth = Math.max(0, 280 - pDay); // Can be negative for delayed births, but we cap at 0
               }
             } else if (dbField === 'days_until_birth') {
               const daysUntil = parseInt(value);
-              if (!isNaN(daysUntil) && daysUntil >= 0 && daysUntil < 280) {
+              // Allow negative values for delayed births (up to -14 days)
+              if (!isNaN(daysUntil) && daysUntil >= -14 && daysUntil <= 279) {
                 row.days_until_birth = daysUntil;
                 // Calculate pregnancy_day from days_until_birth
                 if (!row.pregnancy_day) {
@@ -296,7 +291,8 @@ const AdminPregnancyContent = () => {
               }
             } else if (dbField === 'week_number') {
               const weekNum = parseInt(value);
-              if (!isNaN(weekNum) && weekNum > 0 && weekNum <= 40) {
+              // Allow up to 42 weeks (40 standard + 2 weeks delay)
+              if (!isNaN(weekNum) && weekNum > 0 && weekNum <= 42) {
                 row.week_number = weekNum;
               }
             } else {
@@ -305,8 +301,8 @@ const AdminPregnancyContent = () => {
             }
           });
           
-          // Ensure we have valid pregnancy_day
-          if (row.pregnancy_day && row.pregnancy_day > 0 && row.pregnancy_day <= 280) {
+          // Ensure we have valid pregnancy_day (up to 294 days)
+          if (row.pregnancy_day && row.pregnancy_day > 0 && row.pregnancy_day <= 294) {
             // Ensure week_number is set
             if (!row.week_number) {
               row.week_number = Math.ceil(row.pregnancy_day / 7);
@@ -314,7 +310,7 @@ const AdminPregnancyContent = () => {
             data.push(row);
           }
           
-          setImportProgress(Math.round((i / lines.length) * 40));
+          setImportProgress(Math.round((i / csvRows.length) * 40));
         }
         
         console.log(`Parsed ${data.length} valid rows from CSV`);
@@ -350,7 +346,66 @@ const AdminPregnancyContent = () => {
     }
   };
 
-  // Helper function to parse CSV line properly handling quoted values
+  // Parse entire CSV handling multi-line quoted values
+  const parseCSV = (text: string): { headers: string[], rows: any[] } => {
+    const result: string[][] = [];
+    let current = '';
+    let inQuotes = false;
+    let row: string[] = [];
+    
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      const nextChar = text[i + 1];
+      
+      if (char === '"') {
+        if (inQuotes && nextChar === '"') {
+          // Escaped quote ""
+          current += '"';
+          i++;
+        } else {
+          // Toggle quote state
+          inQuotes = !inQuotes;
+        }
+      } else if (char === ',' && !inQuotes) {
+        row.push(current.trim());
+        current = '';
+      } else if ((char === '\n' || (char === '\r' && nextChar === '\n')) && !inQuotes) {
+        row.push(current.trim());
+        if (row.some(cell => cell.length > 0)) {
+          result.push(row);
+        }
+        row = [];
+        current = '';
+        if (char === '\r') i++; // skip \n after \r
+      } else if (char !== '\r') {
+        current += char;
+      }
+    }
+    // Push last row
+    if (current || row.length > 0) {
+      row.push(current.trim());
+      if (row.some(cell => cell.length > 0)) {
+        result.push(row);
+      }
+    }
+    
+    if (result.length < 2) {
+      return { headers: [], rows: [] };
+    }
+    
+    const headers = result[0];
+    const rows = result.slice(1).map(r => {
+      const obj: any = {};
+      headers.forEach((h, idx) => {
+        obj[h] = r[idx] || '';
+      });
+      return obj;
+    });
+    
+    return { headers, rows };
+  };
+
+  // Helper function to parse CSV line properly handling quoted values (kept for compatibility)
   const parseCSVLine = (line: string): string[] => {
     const values: string[] = [];
     let current = '';
@@ -362,11 +417,9 @@ const AdminPregnancyContent = () => {
       
       if (char === '"') {
         if (inQuotes && nextChar === '"') {
-          // Escaped quote
           current += '"';
           i++;
         } else {
-          // Toggle quote state
           inQuotes = !inQuotes;
         }
       } else if (char === ',' && !inQuotes) {
@@ -528,7 +581,7 @@ const AdminPregnancyContent = () => {
                   <TableCell className="font-bold text-primary">{item.pregnancy_day || '-'}</TableCell>
                   <TableCell>{item.week_number}</TableCell>
                   <TableCell>{item.baby_size_fruit || '-'}</TableCell>
-                  <TableCell>{item.baby_size_cm} sm / {item.baby_weight_gram}g</TableCell>
+                  <TableCell>{item.baby_size_cm} sm / {item.baby_weight_gram} qr</TableCell>
                   <TableCell className="max-w-[180px] truncate text-sm">{item.baby_message || '-'}</TableCell>
                   <TableCell className="max-w-[180px] truncate text-sm">{item.body_changes || '-'}</TableCell>
                   <TableCell className="max-w-[150px] truncate text-sm">{item.daily_tip || '-'}</TableCell>

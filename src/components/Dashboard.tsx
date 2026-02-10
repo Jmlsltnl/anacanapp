@@ -4,7 +4,7 @@ import {
   Droplets, Moon, Utensils, Activity, Plus, TrendingUp, Heart, Sparkles, 
   Bell, ChevronRight, Flame, Target, Calendar, Zap, Sun, Cloud, Wind,
   ThermometerSun, Pill, Baby, Footprints, Scale, Clock, Star, Award,
-  MessageCircle, Check, Lightbulb
+  MessageCircle, Check, Lightbulb, BookOpen, PartyPopper
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useTimerStore } from '@/store/timerStore';
@@ -23,6 +23,30 @@ import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
+import { useTrimesterTips } from '@/hooks/useTrimesterTips';
+import { useFlowSymptoms, useFlowPhaseTips, useFlowInsights } from '@/hooks/useFlowData';
+import { useBabyIllustrationByMonth } from '@/hooks/useBabyMonthIllustrations';
+import { useCurrentBabyCrisis, useUpcomingBabyCrises } from '@/hooks/useBabyCrisisPeriods';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useChildren } from '@/hooks/useChildren';
+import { useSubscription } from '@/hooks/useSubscription';
+import { usePregnancyDayNavigation } from '@/hooks/usePregnancyDayNavigation';
+import { formatDateAz } from '@/lib/date-utils';
+import { getPregnancyDay, getDaysUntilDue, getDaysElapsed, getPregnancyProgress, getTrimester } from '@/lib/pregnancy-utils';
+import FeedingHistoryPanel from '@/components/baby/FeedingHistoryPanel';
+import QuickActionsBar from '@/components/mommy/QuickActionsBar';
+import QuickStatsWidget from '@/components/mommy/QuickStatsWidget';
+import GrowthTrackerWidget from '@/components/mommy/GrowthTrackerWidget';
+import DevelopmentTipsWidget from '@/components/mommy/DevelopmentTipsWidget';
+import BabyCrisisWidget from '@/components/mommy/BabyCrisisWidget';
+import ChildSelector from '@/components/mommy/ChildSelector';
+import TeethingWidget from '@/components/mommy/TeethingWidget';
+import BannerSlot from '@/components/banners/BannerSlot';
+import SendDailySummaryWidget from '@/components/partner/SendDailySummaryWidget';
+import RecentBlogPosts from '@/components/dashboard/RecentBlogPosts';
+import FlowDashboard from '@/components/flow/FlowDashboard';
+import BirthOnboardingModal from '@/components/BirthOnboardingModal';
+import PregnancyDayNavigator from '@/components/bump/PregnancyDayNavigator';
 
 // Fetus images by month
 import FetusMonth1 from '@/assets/fetus/month-1.svg';
@@ -113,248 +137,51 @@ const ProgressRing = ({ progress, size = 100, strokeWidth = 8, color = "stroke-p
   );
 };
 
-const FlowDashboard = () => {
-  const { getCycleData, name } = useUserStore();
-  const { toast } = useToast();
-  const { todayLog, updateWaterIntake, updateSymptoms, loading: logsLoading } = useDailyLogs();
-  const cycleData = getCycleData();
-  
-  // Use data from DB or defaults
-  const waterCount = todayLog?.water_intake || 0;
-  const selectedSymptoms = todayLog?.symptoms || [];
+// FlowDashboard is now imported from @/components/flow/FlowDashboard
 
-  if (!cycleData) return null;
-
-  const phaseData = {
-    menstrual: { 
-      message: 'Menstruasiya dövrünüzdesiniz. Özünüzə qulluq edin 💕',
-      emoji: '🌸',
-      color: 'from-rose-500 to-pink-600',
-      tips: ['Dəmir zəngin qidalar qəbul edin', 'İsti su torbası istifadə edin', 'Yüngül məşqlər edin']
-    },
-    follicular: { 
-      message: 'Enerji artır! Yeni layihələrə başlamaq üçün əla vaxtdır ✨',
-      emoji: '🌱',
-      color: 'from-emerald-500 to-teal-600',
-      tips: ['Yeni layihələrə başlayın', 'Sosial fəaliyyətlər planlaşdırın', 'İntensiv məşqlər edin']
-    },
-    ovulation: { 
-      message: 'Fertil günlərinizdəsiniz. Enerji ən yüksək səviyyədədir! 🌟',
-      emoji: '✨',
-      color: 'from-amber-500 to-orange-600',
-      tips: ['Enerji səviyyəniz yüksəkdir', 'Kommunikasiya bacarıqlarınız güclüdür', 'Hamiləlik planlaşdırırsınızsa ideal vaxtdır']
-    },
-    luteal: { 
-      message: 'Sakit qalın, PMS yaxınlaşır. Özünüzə yumşaq olun 🌸',
-      emoji: '🌙',
-      color: 'from-violet-500 to-purple-600',
-      tips: ['Maqnezium qəbul edin', 'Stress azaldın', 'Yetərli yuxu alın']
-    },
-  };
-
-  const currentPhase = phaseData[cycleData.phase];
-  const progress = (cycleData.currentDay / cycleData.cycleLength) * 100;
-
-  const symptoms = [
-    { id: 'headache', label: 'Baş ağrısı', emoji: '🤕' },
-    { id: 'tired', label: 'Yorğunluq', emoji: '😴' },
-    { id: 'cramps', label: 'Sancı', emoji: '😣' },
-    { id: 'mood', label: 'Əsəbilik', emoji: '😤' },
-    { id: 'bloating', label: 'Şişkinlik', emoji: '🎈' },
-    { id: 'acne', label: 'Sızanaq', emoji: '😔' },
-  ];
-
-  const toggleSymptom = async (symptomId: string) => {
-    await hapticFeedback.light();
-    const newSymptoms = selectedSymptoms.includes(symptomId) 
-      ? selectedSymptoms.filter(s => s !== symptomId)
-      : [...selectedSymptoms, symptomId];
-    await updateSymptoms(newSymptoms);
-  };
-
-  const addWater = async () => {
-    await hapticFeedback.medium();
-    await updateWaterIntake(1);
-    toast({
-      title: "Su əlavə edildi! 💧",
-      description: `${waterCount + 1}/8 stəkan`,
-    });
-  };
-
-  return (
-    <div className="space-y-2">
-      {/* Main Cycle Card with Progress Ring */}
-      <motion.div 
-        className="relative overflow-hidden rounded-2xl gradient-primary p-4 text-white shadow-elevated"
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute -bottom-8 -left-8 w-24 h-24 rounded-full bg-white/5 blur-xl" />
-        
-        <div className="relative z-10 flex items-center gap-4">
-          {/* Progress Ring */}
-          <div className="relative">
-            <ProgressRing progress={progress} size={90} strokeWidth={8} color="stroke-white" />
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-2xl font-black">{cycleData.currentDay}</span>
-              <span className="text-[10px] text-white/70">/ {cycleData.cycleLength}</span>
-            </div>
-          </div>
-
-          <div className="flex-1">
-            <div className="flex items-center gap-1.5 mb-1">
-              <span className="text-2xl">{currentPhase.emoji}</span>
-              <span className="text-xs font-bold uppercase tracking-wider text-white/80">
-                {cycleData.phase === 'menstrual' ? 'Menstruasiya' :
-                 cycleData.phase === 'follicular' ? 'Follikulyar' :
-                 cycleData.phase === 'ovulation' ? 'Ovulyasiya' : 'Luteal'}
-              </span>
-            </div>
-            <p className="text-white/90 text-xs leading-relaxed">{currentPhase.message}</p>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Daily Goals */}
-      <motion.div 
-        className="grid grid-cols-3 gap-1.5"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1 }}
-      >
-        <motion.button
-          onClick={addWater}
-          className="bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl p-2.5 text-white text-center relative overflow-hidden"
-          whileTap={{ scale: 0.95 }}
-        >
-          <div className="absolute inset-0 bg-white/10" style={{ height: `${(waterCount / 8) * 100}%`, bottom: 0, top: 'auto' }} />
-          <div className="relative z-10">
-            <Droplets className="w-5 h-5 mx-auto mb-0.5" />
-            <p className="text-lg font-black">{waterCount}</p>
-            <p className="text-[9px] text-white/80">/8 stəkan</p>
-          </div>
-        </motion.button>
-
-        <div className="bg-gradient-to-br from-violet-400 to-purple-600 rounded-xl p-2.5 text-white text-center">
-          <Moon className="w-5 h-5 mx-auto mb-0.5" />
-          <p className="text-lg font-black">7.5</p>
-          <p className="text-[9px] text-white/80">saat yuxu</p>
-        </div>
-
-        <div className="bg-gradient-to-br from-amber-400 to-orange-600 rounded-xl p-2.5 text-white text-center">
-          <Flame className="w-5 h-5 mx-auto mb-0.5" />
-          <p className="text-lg font-black">1,850</p>
-          <p className="text-[9px] text-white/80">kalori</p>
-        </div>
-      </motion.div>
-
-      {/* Symptoms Selection */}
-      <motion.div 
-        className="bg-card rounded-xl p-3 shadow-card border border-border/50"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-      >
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-bold text-foreground">Bugünkü simptomlar</h3>
-          <span className="text-[10px] text-primary font-bold">{selectedSymptoms.length} seçildi</span>
-        </div>
-        <div className="flex flex-wrap gap-1.5">
-          {symptoms.map((symptom) => (
-            <motion.button 
-              key={symptom.id}
-              onClick={() => toggleSymptom(symptom.id)}
-              className={`px-3 py-2 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
-                selectedSymptoms.includes(symptom.id)
-                  ? 'bg-primary text-white shadow-md'
-                  : 'bg-muted text-muted-foreground hover:bg-primary/10'
-              }`}
-              whileTap={{ scale: 0.95 }}
-            >
-              <span className="text-sm">{symptom.emoji}</span>
-              {symptom.label}
-            </motion.button>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* Phase Tips */}
-      <motion.div 
-        className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-3 border border-orange-100"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3 }}
-      >
-        <div className="flex items-center gap-1.5 mb-2">
-          <Sparkles className="w-3.5 h-3.5 text-primary" />
-          <h4 className="text-xs font-bold text-foreground">Bu faza üçün tövsiyələr</h4>
-        </div>
-        <div className="space-y-1">
-          {currentPhase.tips.map((tip, index) => (
-            <motion.div 
-              key={index}
-              className="flex items-center gap-2 p-2 bg-white/60 rounded-lg"
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.4 + index * 0.1 }}
-            >
-              <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
-                <Star className="w-2.5 h-2.5 text-primary" />
-              </div>
-              <span className="text-xs text-foreground">{tip}</span>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* Next Period Prediction */}
-      <motion.div 
-        className="bg-card rounded-xl p-3 shadow-card border border-border/50"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.4 }}
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-muted-foreground">Növbəti menstruasiya</p>
-            <p className="text-base font-bold text-foreground mt-0.5">
-              {cycleData.nextPeriodDate.toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' })}
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="text-xs text-muted-foreground">Qalır</p>
-            <p className="text-base font-bold text-flow">
-              {Math.ceil((cycleData.nextPeriodDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))} gün
-            </p>
-          </div>
-        </div>
-      </motion.div>
-    </div>
-  );
-};
 
 const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string) => void }) => {
-  const { getPregnancyData } = useUserStore();
+  const { getPregnancyData, setLifeStage } = useUserStore();
   const { toast } = useToast();
   const pregData = getPregnancyData();
   const { todayLog, updateWaterIntake, updateMood } = useDailyLogs();
   const { getTodayStats, addSession } = useKickSessions();
   const { entries: weightEntries } = useWeightEntries();
   const { data: fruitImages = [] } = useFruitImages();
+  const { isPremium } = useSubscription();
   
-  // Calculate current pregnancy day (1-280)
-  const pregnancyDay = pregData?.dueDate 
-    ? Math.max(1, 280 - Math.ceil((pregData.dueDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+  // Birth onboarding modal state
+  const [showBirthModal, setShowBirthModal] = useState(false);
+  
+  // Calculate actual current pregnancy day (1-280)
+  const actualPregnancyDay = pregData?.lastPeriodDate 
+    ? getPregnancyDay(pregData.lastPeriodDate)
     : 1;
   
-  // Fetch weekly tip from database
-  const { data: weeklyTips = [] } = useWeeklyTips(pregData?.currentWeek, 'bump');
+  // Day navigation hook - allows viewing past/future days
+  const { 
+    selectedDay: pregnancyDay, 
+    selectedWeek,
+    selectedDayInWeek,
+    selectedTrimester,
+    daysUntilDueFromSelected,
+    isViewingCurrentDay,
+    navigateToDay,
+    actualCurrentDay
+  } = usePregnancyDayNavigation({ 
+    lastPeriodDate: pregData?.lastPeriodDate || null,
+    dueDate: pregData?.dueDate
+  });
+  
+  // Fetch weekly tip from database based on selected week
+  const { data: weeklyTips = [] } = useWeeklyTips(selectedWeek, 'bump');
   const currentWeekTip = weeklyTips[0];
   
-  // Fetch dynamic pregnancy content by day
+  // Fetch dynamic pregnancy content by selected day
   const { data: dayContent } = usePregnancyContentByDay(pregnancyDay);
+  
+  // Fetch dynamic trimester tips from database based on selected trimester
+  const { data: dynamicTrimesterTips = [] } = useTrimesterTips(selectedTrimester);
   
   const todayStats = getTodayStats();
   const kickCount = todayStats.totalKicks;
@@ -365,8 +192,66 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
   const latestWeight = weightEntries[0]?.weight;
   const firstWeight = weightEntries[weightEntries.length - 1]?.weight;
   const weightGain = latestWeight && firstWeight ? (latestWeight - firstWeight).toFixed(1) : '0';
+  
+  // Show "I gave birth" button from week 38
+  const showBirthButton = pregData?.currentWeek ? pregData.currentWeek >= 38 : false;
 
   if (!pregData) return null;
+
+  // Trimester color scheme
+  const getTrimesterColors = (trimester: number) => {
+    switch (trimester) {
+      case 1:
+        return {
+          bg: 'from-green-500/10 via-green-400/5 to-green-500/10 dark:from-green-500/20 dark:via-green-400/10 dark:to-green-500/20',
+          border: 'border-green-500/20',
+          accent: 'bg-green-500/10 dark:bg-green-500/20',
+          text: 'text-green-600 dark:text-green-400',
+          badge: 'bg-green-500/10 text-green-600 dark:text-green-400',
+          progress: 'bg-green-500',
+          icon: 'text-green-600 dark:text-green-400',
+        };
+      case 2:
+        return {
+          bg: 'from-amber-500/10 via-amber-400/5 to-amber-500/10 dark:from-amber-500/20 dark:via-amber-400/10 dark:to-amber-500/20',
+          border: 'border-amber-500/20',
+          accent: 'bg-amber-500/10 dark:bg-amber-500/20',
+          text: 'text-amber-600 dark:text-amber-400',
+          badge: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+          progress: 'bg-amber-500',
+          icon: 'text-amber-600 dark:text-amber-400',
+        };
+      case 3:
+      default:
+        return {
+          bg: 'from-primary/10 via-primary/5 to-primary/10 dark:from-primary/20 dark:via-primary/10 dark:to-primary/20',
+          border: 'border-primary/20',
+          accent: 'bg-primary/10 dark:bg-primary/20',
+          text: 'text-primary',
+          badge: 'bg-primary/10 text-primary',
+          progress: 'bg-primary',
+          icon: 'text-primary',
+        };
+    }
+  };
+  
+  // Use selected trimester for colors (based on navigated day)
+  const trimesterColors = getTrimesterColors(selectedTrimester);
+  
+  // Trimester info for display
+  const getTrimesterInfo = (trimester: number) => {
+    switch (trimester) {
+      case 1:
+        return { title: '1-ci Trimester Tövsiyələri', emoji: '🌱' };
+      case 2:
+        return { title: '2-ci Trimester Tövsiyələri', emoji: '🌸' };
+      case 3:
+      default:
+        return { title: '3-cü Trimester Tövsiyələri', emoji: '🍼' };
+    }
+  };
+  
+  const trimesterInfo = getTrimesterInfo(selectedTrimester);
   
   // Get mood emoji
   const getMoodEmoji = (mood: number) => {
@@ -382,27 +267,29 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
     return getDynamicFruitData(
       fruitImages,
       pregnancyDay,
-      pregData.currentWeek,
+      selectedWeek,
       dayContent
     );
   };
   
   const weekData = getFruitData();
   
-  const daysLeft = dayContent?.days_until_birth ?? (pregData.dueDate ? Math.ceil((pregData.dueDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : 0);
+  // For progress bar and development milestones, use actual current day
+  const daysLeft = daysUntilDueFromSelected;
   const totalDays = 280;
-  const daysElapsed = totalDays - daysLeft;
-  const progressPercent = (daysElapsed / totalDays) * 100;
+  const daysElapsed = pregnancyDay;
+  const progressPercent = (pregnancyDay / totalDays) * 100;
 
   // Dynamic baby message from database
   const babyMessage = dayContent?.baby_message || "Salam ana! Bu gün çox böyüdüm. 💕";
 
+  // Development milestones based on selected week
   const weeklyDevelopment = {
-    eyes: pregData.currentWeek >= 8,
-    ears: pregData.currentWeek >= 16,
-    fingers: pregData.currentWeek >= 10,
-    kicks: pregData.currentWeek >= 18,
-    hair: pregData.currentWeek >= 22,
+    eyes: selectedWeek >= 8,
+    ears: selectedWeek >= 16,
+    fingers: selectedWeek >= 10,
+    kicks: selectedWeek >= 18,
+    hair: selectedWeek >= 22,
   };
 
   const addKick = async () => {
@@ -426,20 +313,43 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
 
   return (
     <div className="space-y-2">
-      {/* Baby Development Hero Section */}
+      {/* Baby Development Hero Section - Trimester colored */}
       <motion.div 
-        className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-primary/5 to-primary/10 dark:from-primary/20 dark:via-primary/10 dark:to-primary/20 rounded-2xl p-4 shadow-card border border-primary/20"
+        className={`relative overflow-hidden bg-gradient-to-br ${trimesterColors.bg} rounded-2xl p-4 shadow-card ${trimesterColors.border}`}
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.1 }}
       >
-        <div className="absolute -top-12 -right-12 w-36 h-36 rounded-full bg-primary/10 blur-2xl" />
-        <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-primary/5 blur-xl" />
+        <div className={`absolute -top-12 -right-12 w-36 h-36 rounded-full ${trimesterColors.accent} blur-2xl`} />
+        <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full ${trimesterColors.accent} blur-xl opacity-50`} />
         
         <div className="relative z-10 flex flex-col items-center">
+          {/* Day Navigator */}
+          <div className="w-full mb-3">
+            <PregnancyDayNavigator
+              currentActualDay={actualCurrentDay}
+              selectedDay={pregnancyDay}
+              onDayChange={navigateToDay}
+              isPremium={isPremium}
+            />
+          </div>
+
+          {/* Viewing past/future day indicator */}
+          {!isViewingCurrentDay && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-2 px-3 py-1 rounded-full bg-muted border border-border"
+            >
+              <span className="text-xs font-medium text-foreground">
+                {pregnancyDay < actualCurrentDay ? '⏮️ Keçmiş' : '⏭️ Gələcək'} günə baxırsınız
+              </span>
+            </motion.div>
+          )}
+
           {/* Fetus Image with subtle motion */}
           <motion.div 
-            className="w-28 h-28 mb-3 relative"
+            className="w-42 h-42 mb-3 relative"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ 
               scale: 1, 
@@ -453,43 +363,31 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
             }}
           >
             <img 
-              src={FETUS_IMAGES[Math.min(Math.ceil(pregData.currentWeek / 4.4), 9)] || FETUS_IMAGES[1]} 
-              alt={`${pregData.currentWeek} həftəlik körpə`}
+              src={FETUS_IMAGES[Math.min(Math.ceil(selectedWeek / 4.4), 9)] || FETUS_IMAGES[1]} 
+              alt={`${selectedWeek} həftəlik körpə`}
               className="w-full h-full object-contain drop-shadow-lg"
             />
-            <motion.div
-              className="absolute -bottom-1 -right-1 w-10 h-10 rounded-full bg-card shadow-lg flex items-center justify-center overflow-hidden border-2 border-primary/30"
-              animate={{ scale: [1, 1.08, 1] }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-            >
-              {weekData.imageUrl ? (
-                <img 
-                  src={weekData.imageUrl} 
-                  alt={weekData.fruit}
-                  className="w-7 h-7 object-cover rounded-full"
-                />
-              ) : (
-                <span className="text-lg">{weekData.emoji}</span>
-              )}
-            </motion.div>
           </motion.div>
           
           {/* Main Text - "Anacan hazırda meyvə boydayam" */}
           <div className="text-center">
             <p className="text-lg font-bold text-foreground mb-1">
-              Anacan, hazırda <span className="text-primary">{weekData.fruit}</span> boydayam
+              Anacan, hazırda <span className={trimesterColors.text}>{weekData.fruit}</span> boydayam
             </p>
             <p className="text-xs text-muted-foreground font-medium">
-              {pregData.currentWeek}. həftə, {pregData.currentDay}. gün
+              {selectedWeek}. həftə, {selectedDayInWeek}. gün • <span className={`font-semibold ${trimesterColors.text}`}>{selectedTrimester}-{selectedTrimester === 1 ? 'ci' : selectedTrimester === 2 ? 'ci' : 'cü'} Trimester</span>
             </p>
-            <div className="flex items-center justify-center gap-2 mt-2">
-              <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+            <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
+              <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
+                {pregnancyDay}. gün
+              </span>
+              <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
                 {weekData.lengthCm} sm
               </span>
-              <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                {weekData.weightG}g
+              <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
+                {weekData.weightG} qr
               </span>
-              <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+              <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
                 {daysLeft} gün qaldı
               </span>
             </div>
@@ -499,12 +397,12 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           <div className="w-full mt-3 space-y-1">
             <div className="flex justify-between text-[10px] text-muted-foreground">
               <span>Başlanğıc</span>
-              <span className="text-primary font-semibold">{Math.round(progressPercent)}%</span>
+              <span className={`${trimesterColors.text} font-semibold`}>{Math.round(progressPercent)}%</span>
               <span>Doğuş</span>
             </div>
-            <div className="h-2 bg-primary/20 rounded-full overflow-hidden">
+            <div className={`h-2 ${trimesterColors.accent} rounded-full overflow-hidden`}>
               <motion.div 
-                className="h-full bg-primary rounded-full"
+                className={`h-full ${trimesterColors.progress} rounded-full`}
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercent}%` }}
                 transition={{ duration: 1, delay: 0.3 }}
@@ -514,42 +412,76 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
         </div>
       </motion.div>
 
-      {/* Stats Grid - Show kick counter only after week 16 */}
-      <div className={`grid ${pregData.currentWeek >= 16 ? 'grid-cols-3' : 'grid-cols-2'} gap-1.5`}>
+      {/* Trimester Tips Section */}
+      {dynamicTrimesterTips.length > 0 && (
         <motion.div 
-          className="bg-primary/10 dark:bg-primary/20 rounded-xl p-2.5 shadow-card border border-primary/20 text-center"
+          className={`relative overflow-hidden ${trimesterColors.accent} rounded-xl p-3 ${trimesterColors.border}`}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.15 }}
         >
-          <Calendar className="w-4 h-4 text-primary mx-auto mb-0.5" />
+          <div className="absolute -right-6 -top-6 text-7xl opacity-10">{trimesterInfo.emoji}</div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-2">
+              <div className={`w-7 h-7 rounded-full ${trimesterColors.accent} flex items-center justify-center`}>
+                <span className="text-lg">{trimesterInfo.emoji}</span>
+              </div>
+              <h3 className={`text-sm font-bold ${trimesterColors.text}`}>{trimesterInfo.title}</h3>
+            </div>
+            <div className="space-y-1.5">
+              {dynamicTrimesterTips.map((tip, index) => (
+                <motion.div 
+                  key={tip.id}
+                  className="flex items-start gap-2 bg-card/50 rounded-lg p-2"
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 + index * 0.05 }}
+                >
+                  <span className="text-sm flex-shrink-0">{tip.icon}</span>
+                  <p className="text-xs text-foreground/90 leading-relaxed">{tip.tip_text}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Stats Grid - Show kick counter only after week 16 */}
+      <div className={`grid ${selectedWeek >= 16 ? 'grid-cols-3' : 'grid-cols-2'} gap-1.5`}>
+        <motion.div 
+          className={`${trimesterColors.accent} rounded-xl p-2.5 shadow-card ${trimesterColors.border} text-center`}
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Calendar className={`w-4 h-4 ${trimesterColors.icon} mx-auto mb-0.5`} />
           <p className="text-lg font-black text-foreground">{daysLeft}</p>
           <p className="text-[9px] text-muted-foreground">gün qaldı</p>
         </motion.div>
 
         {/* Only show kick counter after week 16 */}
-        {pregData.currentWeek >= 16 && (
+        {selectedWeek >= 16 && (
           <motion.button 
             onClick={addKick}
-            className="bg-primary/10 dark:bg-primary/20 rounded-xl p-2.5 shadow-card border border-primary/20 text-center"
+            className={`${trimesterColors.accent} rounded-xl p-2.5 shadow-card ${trimesterColors.border} text-center`}
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.25 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Footprints className="w-4 h-4 text-primary mx-auto mb-0.5" />
+            <Footprints className={`w-4 h-4 ${trimesterColors.icon} mx-auto mb-0.5`} />
             <p className="text-lg font-black text-foreground">{kickCount}</p>
             <p className="text-[9px] text-muted-foreground">təpik</p>
           </motion.button>
         )}
 
         <motion.div 
-          className="bg-primary/10 dark:bg-primary/20 rounded-xl p-2.5 shadow-card border border-primary/20 text-center"
+          className={`${trimesterColors.accent} rounded-xl p-2.5 shadow-card ${trimesterColors.border} text-center`}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.25 }}
+          transition={{ delay: 0.3 }}
         >
-          <Scale className="w-4 h-4 text-primary mx-auto mb-0.5" />
+          <Scale className={`w-4 h-4 ${trimesterColors.icon} mx-auto mb-0.5`} />
           <p className="text-lg font-black text-foreground">+{weightGain}</p>
           <p className="text-[9px] text-muted-foreground">kq çəki</p>
         </motion.div>
@@ -613,7 +545,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                 </div>
               </div>
               <p className="text-foreground font-medium text-sm leading-relaxed">
-                "{dayContent.baby_message}"
+                {dayContent.baby_message}
               </p>
             </motion.div>
           )}
@@ -696,7 +628,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
               <Lightbulb className="w-3 h-3 text-primary" />
             </div>
             <div>
-              <p className="text-[10px] text-primary font-bold uppercase tracking-wider">Həftə {pregData?.currentWeek} Tövsiyəsi</p>
+              <p className="text-[10px] text-primary font-bold uppercase tracking-wider">Həftə {selectedWeek} Tövsiyəsi</p>
               <h4 className="font-bold text-foreground text-sm">{currentWeekTip.title}</h4>
             </div>
           </div>
@@ -743,6 +675,43 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           }}
         />
       </div>
+
+      {/* "I Gave Birth" Button - Shown from week 38 */}
+      {showBirthButton && (
+        <motion.button
+          onClick={() => setShowBirthModal(true)}
+          className="w-full p-4 rounded-2xl bg-gradient-to-r from-pink-500 via-rose-500 to-red-500 text-white shadow-lg relative overflow-hidden"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
+          <div className="absolute -left-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-xl" />
+          
+          <div className="relative z-10 flex items-center justify-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+              <PartyPopper className="w-6 h-6" />
+            </div>
+            <div className="text-left">
+              <p className="font-bold text-lg">Doğum etdim! 🎉</p>
+              <p className="text-white/80 text-sm">Analıq səyahətinizə başlayın</p>
+            </div>
+            <ChevronRight className="w-6 h-6 ml-auto" />
+          </div>
+        </motion.button>
+      )}
+
+      {/* Birth Onboarding Modal */}
+      <BirthOnboardingModal
+        isOpen={showBirthModal}
+        onClose={() => setShowBirthModal(false)}
+        onComplete={() => {
+          setShowBirthModal(false);
+          window.location.reload();
+        }}
+      />
     </div>
   );
 };
@@ -788,17 +757,33 @@ const getBabyDailyFunFact = (ageInDays: number): string => {
   return BABY_FUN_FACTS[factIndex];
 };
 
-const MommyDashboard = () => {
-  const { getBabyData } = useUserStore();
+const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string) => void }) => {
   const { toast } = useToast();
-  const babyData = getBabyData();
   const { isMilestoneAchieved, toggleMilestone, getMilestoneDate, MILESTONES } = useBabyMilestones();
   const { unlockAchievement, getTotalPoints } = useAchievements();
   const { activeTimers, startTimer, stopTimer, getElapsedSeconds, getActiveTimer } = useTimerStore();
   const { todayLogs, addLog, getTodayStats, refetch } = useBabyLogs();
+  const { children, selectedChild, hasChildren, hasMultipleChildren, getChildAge } = useChildren();
+  
+  // Derive baby data from selectedChild for multi-child support
+  const childAge = selectedChild ? getChildAge(selectedChild) : null;
+  const babyData = selectedChild && childAge ? {
+    id: selectedChild.id,
+    name: selectedChild.name,
+    birthDate: new Date(selectedChild.birth_date),
+    gender: selectedChild.gender as 'boy' | 'girl',
+    ageInDays: childAge.days,
+    ageInMonths: childAge.months,
+  } : null;
+  
+  const babyAgeMonths = childAge?.months || 1;
+  const { imageUrl: babyIllustration, title: illustrationTitle, description: illustrationDescription } = useBabyIllustrationByMonth(Math.max(1, Math.min(36, babyAgeMonths)));
   
   // Current time for timer display
   const [, setTick] = useState(0);
+  
+  // Milestone carousel state
+  const [milestonePageIndex, setMilestonePageIndex] = useState(0);
   
   // Get today's stats from database
   const todayStats = getTodayStats();
@@ -820,14 +805,45 @@ const MommyDashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
-  if (!babyData) return null;
+  // Show setup prompt if baby data is missing
+  if (!babyData) {
+    return (
+      <div className="space-y-4 p-4">
+        <motion.div 
+          className="bg-card rounded-2xl p-6 shadow-card border border-border/50 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <Baby className="w-8 h-8 text-primary" />
+          </div>
+          <h2 className="text-xl font-bold text-foreground mb-2">Körpə məlumatları tələb olunur</h2>
+          <p className="text-muted-foreground text-sm mb-4">
+            Ana dashboard-ı görmək üçün körpənizin doğum tarixini və digər məlumatları əlavə edin.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Profil → Redaktə et → Həyat Mərhələsi bölməsindən məlumatları doldurun
+          </p>
+        </motion.div>
+      </div>
+    );
+  }
 
-  // Use dynamic milestones from hook
-  const displayMilestones = MILESTONES.slice(0, 5).map(m => ({
+  // Use all dynamic milestones from hook - with carousel if > 5
+  const allMilestones = MILESTONES.map(m => ({
     ...m,
     achieved: isMilestoneAchieved(m.id),
     achievedDate: getMilestoneDate(m.id),
   }));
+  
+  // Paginate milestones (5 per page)
+  const milestonesPerPage = 5;
+  const totalMilestonePages = Math.ceil(allMilestones.length / milestonesPerPage);
+  const displayMilestones = allMilestones.slice(
+    milestonePageIndex * milestonesPerPage, 
+    (milestonePageIndex + 1) * milestonesPerPage
+  );
+  const hasMoreMilestones = allMilestones.length > milestonesPerPage;
 
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -954,37 +970,243 @@ const MommyDashboard = () => {
     }
   };
 
+  // Calculate exact age in months and days
+  const exactMonths = Math.floor(babyData.ageInDays / 30);
+  const remainingDays = babyData.ageInDays % 30;
+
   return (
-    <div className="space-y-2">
-      {/* Baby Hero Card */}
+    <div className="space-y-3">
+      {/* Premium Baby Hero Card - Modern Glassmorphism Design */}
       <motion.div 
-        className="relative overflow-hidden rounded-[1.5rem] gradient-primary p-5 text-white shadow-elevated"
+        className="relative overflow-hidden rounded-[2rem]"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10 blur-2xl" />
+        {/* Background gradient layers */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/80" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/20 via-transparent to-transparent" />
         
-        <div className="relative z-10">
-          <div className="flex items-center gap-4">
-            <motion.div 
-              className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-5xl"
-              animate={{ rotate: [0, -5, 5, 0] }}
-              transition={{ duration: 3, repeat: Infinity }}
-            >
-              {babyData.gender === 'boy' ? '👶🏻' : '👶🏻'}
-            </motion.div>
+        {/* Decorative orbs */}
+        <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-white/10 blur-3xl" />
+        <div className="absolute -bottom-20 -left-20 w-48 h-48 rounded-full bg-black/5 blur-2xl" />
+        
+        <div className="relative z-10 p-4 pt-5">
+          {/* Top section with name and age */}
+          <motion.div 
+            className="flex items-center justify-between mb-4"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
             <div>
-              <h2 className="text-2xl font-black">{babyData.name}</h2>
-              <p className="text-white/90 mt-0.5 font-medium text-base">
-                {babyData.ageInMonths > 0 ? `${babyData.ageInMonths} aylıq` : `${babyData.ageInDays} günlük`}
-              </p>
-              <div className="flex items-center gap-2 mt-2">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span className="text-xs text-white/80">{getBabyDailyFunFact(babyData.ageInDays)}</span>
+              <h2 className="text-2xl font-black text-white tracking-tight">{babyData.name}</h2>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-white/70 text-sm">
+                  {exactMonths > 0 ? (
+                    <span className="font-medium">
+                      <span className="text-white font-bold">{exactMonths}</span> ay{' '}
+                      {remainingDays > 0 && (
+                        <>
+                          <span className="text-white font-bold">{remainingDays}</span> gün
+                        </>
+                      )}
+                    </span>
+                  ) : (
+                    <span className="font-medium">
+                      <span className="text-white font-bold">{babyData.ageInDays}</span> günlük
+                    </span>
+                  )}
+                </span>
               </div>
             </div>
+            
+            {/* Age badge - pill style */}
+            <motion.div 
+              className="bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-2 shadow-lg"
+              initial={{ scale: 0, rotate: -10 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+            >
+              <div className="text-center">
+                <span className="text-2xl font-black text-primary">{exactMonths || babyData.ageInDays}</span>
+                <span className="text-xs font-bold text-primary/70 ml-0.5">{exactMonths > 0 ? 'ay' : 'gün'}</span>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* Center: Large Baby Illustration - Premium Design */}
+          <motion.div 
+            className="flex justify-center mb-5"
+            animate={{ y: [0, -6, 0] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <div className="relative">
+              {/* Outer glow effect */}
+              <div className="absolute -inset-4 bg-white/20 rounded-full blur-3xl" />
+              <div className="absolute -inset-2 bg-white/15 rounded-full blur-xl animate-pulse-soft" />
+              
+              {/* Premium border container with gradient */}
+              <div className="relative p-1 rounded-[2rem] bg-gradient-to-br from-white/80 via-white/50 to-white/30 shadow-2xl">
+                {/* Inner container */}
+                <div className="relative w-44 h-44 rounded-[1.75rem] bg-white/30 backdrop-blur-md p-1 overflow-hidden">
+                  {/* Shine effect on border */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent rounded-[1.75rem]" />
+                  
+                  {/* Image wrapper with inner glow */}
+                  <div className="relative w-full h-full rounded-[1.5rem] bg-gradient-to-br from-white/60 via-white/40 to-white/20 overflow-hidden flex items-center justify-center shadow-inner">
+                    {/* Radial gradient background */}
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_white_0%,_transparent_70%)] opacity-50" />
+                    
+                    <img 
+                      src={babyIllustration} 
+                      alt={`${babyData.ageInMonths} aylıq körpə`}
+                      className="relative z-10 w-full h-full object-contain p-2 drop-shadow-2xl scale-105"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/placeholder.svg';
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Animated ring around the image */}
+              <motion.div 
+                className="absolute -inset-3 rounded-full border-2 border-dashed border-white/30"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+              />
+              
+              {/* Floating sparkle decorations */}
+              <motion.div 
+                className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow-lg text-lg"
+                animate={{ rotate: [0, 15, 0], scale: [1, 1.15, 1] }}
+                transition={{ duration: 3, repeat: Infinity }}
+              >
+                ✨
+              </motion.div>
+              <motion.div 
+                className="absolute -bottom-2 -left-2 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center shadow-lg text-sm"
+                animate={{ rotate: [0, -15, 0], scale: [1, 1.2, 1] }}
+                transition={{ duration: 2.5, repeat: Infinity, delay: 0.5 }}
+              >
+                💫
+              </motion.div>
+              <motion.div 
+                className="absolute top-1/2 -right-4 w-6 h-6 rounded-full bg-white/80 flex items-center justify-center shadow-md text-xs"
+                animate={{ x: [0, 3, 0], opacity: [0.8, 1, 0.8] }}
+                transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+              >
+                🌟
+              </motion.div>
+            </div>
+          </motion.div>
+
+          {/* Bottom: Monthly insight */}
+          <motion.div 
+            className="bg-amber-50 rounded-2xl p-4 border border-amber-200 shadow-lg"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-amber-200">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shadow-sm">
+                <Calendar className="w-5 h-5 text-amber-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] font-semibold text-amber-500 uppercase tracking-widest mb-0.5">
+                  {exactMonths > 0 ? `${exactMonths}. Ay` : 'Yenidoğulmuş'}
+                </p>
+                <p className="text-sm font-bold text-amber-900">
+                  Bu ay nə baş verir?
+                </p>
+              </div>
+            </div>
+            
+            {/* Content - each line separate */}
+            <div className="space-y-2">
+              {(illustrationDescription || getBabyDailyFunFact(babyData.ageInDays))
+                .split(/[.!?]/)
+                .filter(sentence => sentence.trim().length > 0)
+                .slice(0, 4)
+                .map((sentence, index) => (
+                  <div key={index} className="flex items-start gap-2.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
+                    <p className="text-[13px] text-amber-800 leading-relaxed font-medium">
+                      {sentence.trim()}
+                    </p>
+                  </div>
+                ))
+              }
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Baby Development Info Card */}
+      {illustrationTitle && (
+        <motion.div
+          className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 dark:from-primary/10 dark:via-primary/15 dark:to-primary/10 rounded-2xl p-4 border border-primary/20"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.1 }}
+        >
+          <div className="flex items-start gap-3">
+            <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0 border border-primary/20">
+              <Baby className="w-6 h-6 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-sm text-foreground">
+                {illustrationTitle}
+              </h3>
+              {illustrationDescription && (
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed line-clamp-3">
+                  {illustrationDescription}
+                </p>
+              )}
+            </div>
           </div>
+        </motion.div>
+      )}
+
+      {/* Child Selector - for multiple children */}
+      {hasChildren && (
+        <motion.div 
+          className="flex items-center justify-between"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <ChildSelector />
+        </motion.div>
+      )}
+
+      {/* Teething Widget */}
+      <TeethingWidget onOpen={() => onNavigateToTool?.('teething')} />
+
+      {/* Quick Actions Bar */}
+      <QuickActionsBar onNavigateToTool={onNavigateToTool} />
+
+      {/* Cakes Widget - navigate to cakes tab */}
+      <motion.div
+        className="bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-500/10 dark:to-rose-500/10 rounded-2xl p-4 border border-pink-200/50 dark:border-pink-500/20 shadow-card cursor-pointer"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.12 }}
+        whileHover={{ y: -2 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center shadow-lg">
+            <span className="text-2xl">🎂</span>
+          </div>
+          <div className="flex-1">
+            <h3 className="font-bold text-sm text-foreground">Xüsusi Tortlar</h3>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              {babyData.ageInMonths > 0 ? `${Math.floor(babyData.ageInMonths)}-ci ay tortu sifariş edin!` : 'Körpəniz üçün milestone tortları'}
+            </p>
+          </div>
+          <ChevronRight className="w-5 h-5 text-pink-400" />
         </div>
       </motion.div>
 
@@ -1215,7 +1437,7 @@ const MommyDashboard = () => {
         </div>
       </motion.div>
 
-      {/* Milestones */}
+      {/* Milestones with Carousel */}
       <motion.div 
         className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
         initial={{ y: 20, opacity: 0 }}
@@ -1224,22 +1446,60 @@ const MommyDashboard = () => {
       >
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-base font-bold text-foreground">İnkişaf mərhələləri</h3>
-          <span className="text-xs text-primary font-bold">
-            {displayMilestones.filter(m => m.achieved).length}/{displayMilestones.length}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-primary font-bold">
+              {allMilestones.filter(m => m.achieved).length}/{allMilestones.length}
+            </span>
+            {/* Carousel navigation */}
+            {hasMoreMilestones && (
+              <div className="flex gap-1">
+                <motion.button
+                  onClick={() => setMilestonePageIndex(p => Math.max(0, p - 1))}
+                  disabled={milestonePageIndex === 0}
+                  className="w-6 h-6 rounded-full bg-muted flex items-center justify-center disabled:opacity-40"
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <ChevronRight className="w-3 h-3 rotate-180" />
+                </motion.button>
+                <motion.button
+                  onClick={() => setMilestonePageIndex(p => Math.min(totalMilestonePages - 1, p + 1))}
+                  disabled={milestonePageIndex === totalMilestonePages - 1}
+                  className="w-6 h-6 rounded-full bg-muted flex items-center justify-center disabled:opacity-40"
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <ChevronRight className="w-3 h-3" />
+                </motion.button>
+              </div>
+            )}
+          </div>
         </div>
-        <div className="flex justify-between">
+        
+        {/* Page indicator */}
+        {hasMoreMilestones && (
+          <div className="flex justify-center gap-1 mb-3">
+            {Array.from({ length: totalMilestonePages }).map((_, i) => (
+              <div
+                key={i}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === milestonePageIndex ? 'w-4 bg-primary' : 'w-1.5 bg-muted'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+        
+        <div className="flex justify-between overflow-hidden">
           {displayMilestones.map((milestone, index) => (
             <motion.button 
               key={milestone.id}
               onClick={() => handleMilestoneClick(milestone.id)}
-              className="text-center"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.3 + index * 0.1 }}
+              className="text-center flex-1"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.05 + index * 0.05 }}
               whileTap={{ scale: 0.9 }}
             >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg mb-1 relative ${
+              <div className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center text-lg mb-1 relative ${
                 milestone.achieved 
                   ? 'bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg' 
                   : 'bg-muted opacity-60'
@@ -1251,7 +1511,7 @@ const MommyDashboard = () => {
                   </div>
                 )}
               </div>
-              <span className={`text-[10px] ${
+              <span className={`text-[10px] line-clamp-1 ${
                 milestone.achieved ? 'text-foreground font-medium' : 'text-muted-foreground'
               }`}>
                 {milestone.label}
@@ -1270,30 +1530,19 @@ const MommyDashboard = () => {
       >
         <h3 className="text-base font-bold text-foreground mb-3">Bugünkü xülasə</h3>
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between p-2.5 bg-violet-50 rounded-xl">
+          <div className="flex items-center justify-between p-2.5 bg-violet-50 dark:bg-violet-500/15 rounded-xl border border-violet-100 dark:border-violet-500/20">
             <div className="flex items-center gap-2">
-              <Moon className="w-4 h-4 text-violet-600" />
+              <Moon className="w-4 h-4 text-violet-600 dark:text-violet-400" />
               <span className="text-xs font-medium text-foreground">Yuxu</span>
             </div>
-            <span className="text-xs font-bold text-violet-600">{todayStats.sleepHours} saat</span>
+            <span className="text-xs font-bold text-violet-600 dark:text-violet-400">{todayStats.sleepHours} saat</span>
           </div>
-          <div className="flex items-center justify-between p-2.5 bg-amber-50 rounded-xl">
+          
+          {/* Enhanced Feeding History Panel */}
+          <FeedingHistoryPanel />
+          <div className="flex items-center justify-between p-2.5 bg-emerald-50 dark:bg-emerald-500/15 rounded-xl border border-emerald-100 dark:border-emerald-500/20">
             <div className="flex items-center gap-2">
-              <Baby className="w-4 h-4 text-amber-600" />
-              <span className="text-xs font-medium text-foreground">Qidalanma</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-muted-foreground">
-                🤱{todayStats.breastFeedingCount}
-                🍼{todayStats.formulaCount}
-                🥣{todayStats.solidCount}
-              </span>
-              <span className="text-xs font-bold text-amber-600">{todayStats.feedingCount} dəfə</span>
-            </div>
-          </div>
-          <div className="flex items-center justify-between p-2.5 bg-emerald-50 rounded-xl">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-emerald-600" />
+              <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span className="text-xs font-medium text-foreground">Bez dəyişmə</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -1302,33 +1551,26 @@ const MommyDashboard = () => {
                 💩{todayStats.dirtyCount}
                 💧💩{todayStats.bothCount}
               </span>
-              <span className="text-xs font-bold text-emerald-600">{todayStats.diaperCount} dəfə</span>
+              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{todayStats.diaperCount} dəfə</span>
             </div>
           </div>
         </div>
       </motion.div>
 
-      {/* Development Tip */}
-      <motion.div 
-        className="bg-gradient-to-r from-teal-50 to-emerald-50 rounded-2xl p-4 border border-teal-100"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.35 }}
-      >
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-mommy/20 flex items-center justify-center text-xl">
-            💡
-          </div>
-          <div className="flex-1">
-            <h4 className="font-bold text-foreground">Bu həftənin tövsiyəsi</h4>
-            <p className="text-sm text-muted-foreground mt-1">
-              {babyData.ageInMonths < 3 
-                ? 'Tummy time məşqləri körpənin boyun əzələlərini gücləndirir. Gündə 3-5 dəqiqə ilə başlayın!'
-                : 'Körpənizlə danışmaq dil inkişafı üçün çox vacibdir. Hər fəaliyyəti şərh edin!'}
-            </p>
-          </div>
-        </div>
-      </motion.div>
+      {/* Baby Crisis Calendar Widget */}
+      <BabyCrisisWidget 
+        babyAgeWeeks={Math.floor(babyData.ageInDays / 7)} 
+        babyName={babyData.name} 
+      />
+
+      {/* Weekly Stats Overview */}
+      <QuickStatsWidget />
+
+      {/* Growth Tracker */}
+      <GrowthTrackerWidget />
+
+      {/* Development Tips - Dynamic based on age */}
+      <DevelopmentTipsWidget />
     </div>
   );
 };
@@ -1336,9 +1578,10 @@ const MommyDashboard = () => {
 interface DashboardProps {
   onOpenChat?: () => void;
   onNavigateToTool?: (tool: string) => void;
+  onNavigate?: (screen: string) => void;
 }
 
-const Dashboard = ({ onOpenChat, onNavigateToTool }: DashboardProps) => {
+const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps) => {
   const { lifeStage, name } = useUserStore();
   const { profile } = useAuth();
   const { unreadCount } = useUnreadMessages();
@@ -1354,7 +1597,7 @@ const Dashboard = ({ onOpenChat, onNavigateToTool }: DashboardProps) => {
   const hasPartner = !!profile?.linked_partner_id;
 
   return (
-    <div className="pb-24 pt-1 px-3">
+    <div className="pb-4 pt-2 px-3">
       {/* Header */}
       <motion.div 
         className="flex items-center justify-between mb-2"
@@ -1404,9 +1647,21 @@ const Dashboard = ({ onOpenChat, onNavigateToTool }: DashboardProps) => {
         </div>
       </motion.div>
 
+      {/* Top Banner Slot */}
+      <BannerSlot placement="home_top" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mb-2" />
+
       {lifeStage === 'flow' && <FlowDashboard />}
       {lifeStage === 'bump' && <BumpDashboard onNavigateToTool={onNavigateToTool} />}
-      {lifeStage === 'mommy' && <MommyDashboard />}
+      {lifeStage === 'mommy' && <MommyDashboard onNavigateToTool={onNavigateToTool} />}
+
+      {/* Send Daily Summary to Partner Widget - only for bump stage with linked partner */}
+      {lifeStage === 'bump' && <SendDailySummaryWidget />}
+
+      {/* Recent Blog Posts - filtered by life stage (partner uses bump stage content) */}
+      {onNavigate && <RecentBlogPosts onNavigate={onNavigate} lifeStage={lifeStage === 'partner' ? 'bump' : lifeStage} />}
+
+      {/* Bottom Banner Slot */}
+      <BannerSlot placement="home_bottom" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mt-4" />
     </div>
   );
 };

@@ -2,12 +2,15 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Sun, Moon, Monitor, Check, Palette } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 interface AppearanceScreenProps {
   onBack: () => void;
 }
 
 const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
+  useScrollToTop();
+  
   const { theme, setTheme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -47,9 +50,9 @@ const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-28">
-      {/* Header */}
-      <div className="gradient-primary px-5 pt-4 pb-6">
+    <div className="min-h-screen bg-background pb-28 overflow-y-auto">
+      {/* Header with safe area */}
+      <div className="gradient-primary px-5 pb-6" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
         <div className="flex items-center gap-3 mb-4">
           <motion.button
             onClick={onBack}

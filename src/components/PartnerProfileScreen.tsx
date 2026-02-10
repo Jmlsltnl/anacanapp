@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
   User, Settings, Bell, Shield, HelpCircle, LogOut, 
@@ -10,12 +10,28 @@ import { useToast } from '@/hooks/use-toast';
 import { usePartnerStats } from '@/hooks/usePartnerStats';
 import { usePartnerMissions } from '@/hooks/usePartnerMissions';
 import { useSurprises } from '@/hooks/useSurprises';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { 
+  usePartnerAchievements, 
+  usePartnerMenuItems, 
+  useSurpriseCategories,
+  FALLBACK_ACHIEVEMENTS,
+  FALLBACK_MENU_ITEMS,
+  FALLBACK_SURPRISE_CATEGORIES
+} from '@/hooks/usePartnerConfig';
+
+// Icon mapping for menu items
+const MENU_ICON_MAP: Record<string, any> = {
+  Bell, Shield, HelpCircle, Settings, User,
+};
 
 interface PartnerProfileScreenProps {
   onNavigate?: (screen: string) => void;
 }
 
 const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
+  useScrollToTop();
+  
   const { name, email, partnerWomanData, logout } = useUserStore();
   const { toast } = useToast();
   const { stats, loading: statsLoading } = usePartnerStats();
@@ -28,31 +44,51 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
     topCategory 
   } = useSurprises();
 
-  const getCategoryLabel = (category: string) => {
-    switch (category) {
-      case 'romantic': return { label: 'Romantik', emoji: '❤️', color: 'from-pink-500 to-rose-600' };
-      case 'care': return { label: 'Qayğı', emoji: '🤗', color: 'from-violet-500 to-purple-600' };
-      case 'adventure': return { label: 'Macəra', emoji: '🌟', color: 'from-amber-500 to-orange-600' };
-      case 'gift': return { label: 'Hədiyyə', emoji: '🎁', color: 'from-emerald-500 to-teal-600' };
-      default: return { label: category, emoji: '✨', color: 'from-blue-500 to-indigo-600' };
-    }
-  };
+  // Fetch dynamic config
+  const { data: dbAchievements = [] } = usePartnerAchievements();
+  const { data: dbMenuItems = [] } = usePartnerMenuItems();
+  const { data: dbSurpriseCategories = [] } = useSurpriseCategories();
+
+  // Build achievements from DB or fallback
+  const achievements = useMemo(() => {
+    const source = dbAchievements.length > 0 ? dbAchievements : FALLBACK_ACHIEVEMENTS;
+    return source.map(a => ({
+      id: a.achievement_key,
+      name: (a as any).name_az || (a as any).name || a.achievement_key,
+      emoji: a.emoji,
+      unlocked: a.unlock_condition === 'always_unlocked' 
+        || (a.unlock_condition === 'completed_surprises' && completedSurprises.length >= a.unlock_threshold)
+        || (a.unlock_condition === 'surprise_points' && surprisePoints >= a.unlock_threshold),
+    }));
+  }, [dbAchievements, completedSurprises, surprisePoints]);
+
+  // Build menu items from DB or fallback
+  const menuItems = useMemo(() => {
+    const source = dbMenuItems.length > 0 ? dbMenuItems : FALLBACK_MENU_ITEMS;
+    return source.map(m => ({
+      id: (m as any).route || m.menu_key,
+      icon: MENU_ICON_MAP[(m as any).icon_name || 'Settings'] || Settings,
+      label: (m as any).label_az || (m as any).label || m.menu_key,
+    }));
+  }, [dbMenuItems]);
+
+  // Build surprise category lookup
+  const getCategoryLabel = useMemo(() => {
+    const source = dbSurpriseCategories.length > 0 ? dbSurpriseCategories : FALLBACK_SURPRISE_CATEGORIES;
+    return (category: string) => {
+      const found = source.find(c => c.category_key === category);
+      if (found) {
+        return { 
+          label: found.label_az || category, 
+          emoji: found.emoji, 
+          color: found.color_gradient 
+        };
+      }
+      return { label: category, emoji: '✨', color: 'from-blue-500 to-indigo-600' };
+    };
+  }, [dbSurpriseCategories]);
 
   const maxPoints = Math.max(...monthlyChartData.map(d => d.points), 1);
-
-  const achievements = [
-    { id: '1', name: 'İlk Sevgi', emoji: '💕', unlocked: true },
-    { id: '2', name: 'Dəstəkçi', emoji: '🤝', unlocked: true },
-    { id: '3', name: 'Qayğıkeş', emoji: '🌟', unlocked: completedSurprises.length >= 3 },
-    { id: '4', name: 'Super Partner', emoji: '🏆', unlocked: completedSurprises.length >= 10 },
-    { id: '5', name: 'Ailə Qəhrəmanı', emoji: '👑', unlocked: surprisePoints >= 500 },
-  ];
-
-  const menuItems = [
-    { id: 'notifications', icon: Bell, label: 'Bildirişlər', badge: '2' },
-    { id: 'privacy', icon: Shield, label: 'Gizlilik' },
-    { id: 'help', icon: HelpCircle, label: 'Yardım' },
-  ];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -80,6 +116,7 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
           className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          onClick={() => onNavigate?.('partner-privacy')}
         >
           <Settings className="w-6 h-6 text-muted-foreground" />
         </motion.button>
@@ -254,7 +291,10 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-foreground">Nailiyyətlər</h3>
-          <button className="text-primary text-sm font-semibold flex items-center gap-1">
+          <button 
+            onClick={() => onNavigate?.('achievements')}
+            className="text-primary text-sm font-semibold flex items-center gap-1"
+          >
             Hamısı <ChevronRight className="w-4 h-4" />
           </button>
         </div>
@@ -326,11 +366,6 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
                 <Icon className="w-5 h-5 text-muted-foreground" />
               </div>
               <span className="flex-1 text-left font-medium text-foreground">{item.label}</span>
-              {item.badge && (
-                <span className="px-2.5 py-1 bg-destructive rounded-full text-[10px] font-bold text-white">
-                  {item.badge}
-                </span>
-              )}
               <ChevronRight className="w-5 h-5 text-muted-foreground" />
             </motion.button>
           );

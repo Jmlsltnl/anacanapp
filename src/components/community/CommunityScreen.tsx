@@ -2,17 +2,21 @@ import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Users, Plus, Search, TrendingUp } from 'lucide-react';
 import { useCommunityGroups, useUserMemberships } from '@/hooks/useCommunity';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import GroupsList from './GroupsList';
 import GroupFeed from './GroupFeed';
 import CreatePostModal from './CreatePostModal';
 import StoriesBar from './StoriesBar';
 import UserProfileScreen from './UserProfileScreen';
+import BannerSlot from '@/components/banners/BannerSlot';
 
 interface CommunityScreenProps {
   onBack?: () => void;
 }
 
 const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBack }, ref) => {
+  useScrollToTop();
+  
   const [activeTab, setActiveTab] = useState<'feed' | 'groups' | 'my-groups'>('feed');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [showCreatePost, setShowCreatePost] = useState(false);
@@ -74,12 +78,12 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
             </div>
           </div>
 
-          {/* Search */}
+          {/* Search - only for posts */}
           <div className="relative mb-3">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Qrup axtar..."
+              placeholder="Postlarda axtar..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full h-10 pl-10 pr-3 rounded-xl bg-muted/50 border border-border/50 text-sm outline-none focus:border-primary/50"
@@ -94,14 +98,15 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
               { id: 'groups', label: 'Bütün Qruplar', icon: Users },
             ].map((tab) => {
               const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
               return (
                 <motion.button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
-                    activeTab === tab.id
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground'
+                  className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all border ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-card dark:bg-muted text-muted-foreground dark:text-white border-border/50'
                   }`}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -111,6 +116,9 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
               );
             })}
           </div>
+
+          {/* Top Banner Slot */}
+          <BannerSlot placement="community_top" className="mt-3" />
         </div>
       </div>
 
@@ -135,6 +143,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
                 onCreatePost={() => setShowCreatePost(true)}
                 isEmbedded
                 onUserClick={handleUserClick}
+                externalSearchQuery={searchQuery}
               />
             </motion.div>
           )}

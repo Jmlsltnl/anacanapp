@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, forwardRef } from 'react';
+import { useState, useEffect, useRef, forwardRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Camera, Sparkles, Download, Trash2, 
@@ -11,7 +11,17 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { PremiumModal } from '@/components/PremiumModal';
+import PhotoGalleryViewer from '@/components/PhotoGalleryViewer';
+import { 
+  usePhotoshootBackgrounds, 
+  usePhotoshootEyeColors, 
+  usePhotoshootHairColors, 
+  usePhotoshootHairStyles, 
+  usePhotoshootOutfits,
+  usePhotoshootImageStyles 
+} from '@/hooks/useDynamicTools';
 
 interface BabyPhotoshootProps {
   onBack: () => void;
@@ -31,162 +41,34 @@ interface CustomizationOptions {
   hairStyle: string;
   outfit: string;
   background: string;
+  imageStyle: string;
 }
 
-// Pinterest-style aesthetic categories
-const backgroundCategories = {
-  boy: [
-    // Realist fonlar
-    { id: 'studio_white', name: 'Ağ studiya', category: 'Realist', premium: false, emoji: '⬜', color: 'from-gray-100 to-white', description: 'Professional white studio background with soft lighting' },
-    { id: 'nursery_blue', name: 'Uşaq otağı', category: 'Realist', premium: false, emoji: '🛏️', color: 'from-blue-200 to-sky-300', description: 'Cozy nursery room with soft blue tones and wooden crib' },
-    { id: 'garden_natural', name: 'Təbii bağça', category: 'Realist', premium: false, emoji: '🌿', color: 'from-green-300 to-emerald-400', description: 'Natural garden setting with green grass and soft sunlight' },
-    { id: 'beach_sand', name: 'Çimərlik', category: 'Realist', premium: false, emoji: '🏖️', color: 'from-amber-200 to-blue-300', description: 'Sandy beach with gentle waves and sunset' },
-    { id: 'mountain_view', name: 'Dağ mənzərəsi', category: 'Realist', premium: false, emoji: '⛰️', color: 'from-slate-400 to-blue-500', description: 'Mountain landscape with fresh air and clouds' },
-    { id: 'lake_sunset', name: 'Göl günbatanı', category: 'Realist', premium: true, emoji: '🌅', color: 'from-orange-300 to-rose-400', description: 'Peaceful lake at sunset with golden reflections' },
-    
-    // Aesthetic fonlar
-    { id: 'boho_neutral', name: 'Boho neutral', category: 'Aesthetic', premium: false, emoji: '🪶', color: 'from-amber-100 to-stone-200', description: 'Bohemian style with dried pampas grass, macrame, and neutral earth tones' },
-    { id: 'minimalist_cream', name: 'Minimalist krem', category: 'Aesthetic', premium: true, emoji: '🤍', color: 'from-orange-50 to-amber-100', description: 'Clean minimalist setup with cream blankets and simple wooden elements' },
-    { id: 'vintage_rustic', name: 'Vintage rustik', category: 'Aesthetic', premium: true, emoji: '🪵', color: 'from-amber-200 to-orange-300', description: 'Rustic vintage setting with wooden crates, burlap, and warm lighting' },
-    { id: 'scandinavian', name: 'Skandinaviya', category: 'Aesthetic', premium: true, emoji: '🏠', color: 'from-gray-100 to-slate-200', description: 'Nordic minimalist with white wood and soft textures' },
-    { id: 'earthy_tones', name: 'Torpaq tonları', category: 'Aesthetic', premium: false, emoji: '🍂', color: 'from-amber-200 to-stone-300', description: 'Warm earthy tones with natural textures' },
-    { id: 'cozy_blanket', name: 'Rahat yorğan', category: 'Aesthetic', premium: false, emoji: '🛋️', color: 'from-stone-200 to-amber-100', description: 'Cozy setup with soft blankets and pillows' },
-    
-    // Fantastik fonlar
-    { id: 'adventure_explorer', name: 'Səyyah', category: 'Fantastik', premium: false, emoji: '🧭', color: 'from-emerald-400 to-teal-500', description: 'Adventure explorer theme with vintage maps, compass, and safari elements' },
-    { id: 'space_astronaut', name: 'Astronavt', category: 'Fantastik', premium: true, emoji: '🚀', color: 'from-indigo-500 to-purple-600', description: 'Space theme with stars, planets, rockets, and astronaut props' },
-    { id: 'superhero', name: 'Supergəhrəman', category: 'Fantastik', premium: true, emoji: '🦸', color: 'from-red-500 to-blue-600', description: 'Superhero theme with cape, cityscape background, and dynamic lighting' },
-    { id: 'pirate_ship', name: 'Pirat gəmisi', category: 'Fantastik', premium: true, emoji: '🏴‍☠️', color: 'from-amber-600 to-amber-800', description: 'Pirate adventure with wooden ship deck, treasure chest, and ocean view' },
-    { id: 'jungle_safari', name: 'Cəngəllik', category: 'Fantastik', premium: true, emoji: '🦁', color: 'from-green-500 to-amber-500', description: 'Wild jungle safari with exotic animals and tropical plants' },
-    { id: 'dinosaur', name: 'Dinozavr', category: 'Fantastik', premium: true, emoji: '🦕', color: 'from-emerald-500 to-green-700', description: 'Prehistoric world with friendly dinosaurs' },
-    { id: 'knight_castle', name: 'Cəngavər', category: 'Fantastik', premium: false, emoji: '⚔️', color: 'from-slate-500 to-gray-700', description: 'Medieval castle with knight armor and sword' },
-    { id: 'race_car', name: 'Yarış maşını', category: 'Fantastik', premium: false, emoji: '🏎️', color: 'from-red-500 to-orange-500', description: 'Racing theme with sports cars and checkered flags' },
-    { id: 'dragon_land', name: 'Əjdaha', category: 'Fantastik', premium: true, emoji: '🐉', color: 'from-green-600 to-emerald-800', description: 'Fantasy dragon land with magical creatures' },
-    
-    // Mövsümi fonlar
-    { id: 'autumn_leaves', name: 'Payız yarpaqları', category: 'Mövsümi', premium: false, emoji: '🍂', color: 'from-orange-400 to-red-500', description: 'Autumn setting with colorful fallen leaves and warm golden lighting' },
-    { id: 'winter_snow', name: 'Qış qarı', category: 'Mövsümi', premium: true, emoji: '❄️', color: 'from-blue-100 to-cyan-200', description: 'Winter wonderland with soft snow, pine trees, and cozy blankets' },
-    { id: 'spring_flowers', name: 'Bahar çiçəkləri', category: 'Mövsümi', premium: true, emoji: '🌸', color: 'from-pink-300 to-rose-400', description: 'Spring garden with blooming flowers, butterflies, and soft pastel colors' },
-    { id: 'christmas', name: 'Yeni il', category: 'Mövsümi', premium: true, emoji: '🎄', color: 'from-red-500 to-green-600', description: 'Festive Christmas setting with tree, presents, and snow' },
-    { id: 'easter', name: 'Pasxa', category: 'Mövsümi', premium: true, emoji: '🐰', color: 'from-pink-200 to-yellow-200', description: 'Easter theme with colorful eggs and spring flowers' },
-    { id: 'summer_pool', name: 'Yay hovuzu', category: 'Mövsümi', premium: false, emoji: '🏊', color: 'from-cyan-400 to-blue-500', description: 'Summer pool party with floaties and sunshine' },
-    { id: 'halloween', name: 'Halloween', category: 'Mövsümi', premium: true, emoji: '🎃', color: 'from-orange-500 to-purple-600', description: 'Cute Halloween with pumpkins and friendly ghosts' },
-  ],
-  girl: [
-    // Realist fonlar
-    { id: 'studio_white', name: 'Ağ studiya', category: 'Realist', premium: false, emoji: '⬜', color: 'from-gray-100 to-white', description: 'Professional white studio background with soft lighting' },
-    { id: 'nursery_pink', name: 'Uşaq otağı', category: 'Realist', premium: false, emoji: '🛏️', color: 'from-pink-200 to-rose-300', description: 'Cozy nursery room with soft pink tones and elegant decor' },
-    { id: 'garden_flowers', name: 'Çiçəkli bağça', category: 'Realist', premium: false, emoji: '🌷', color: 'from-rose-300 to-pink-400', description: 'Beautiful flower garden with roses, peonies, and butterflies' },
-    { id: 'lavender_field', name: 'Lavanda tarlası', category: 'Realist', premium: false, emoji: '💜', color: 'from-violet-300 to-purple-400', description: 'Dreamy lavender field at golden hour' },
-    { id: 'rose_garden', name: 'Qızılgül bağı', category: 'Realist', premium: true, emoji: '🌹', color: 'from-rose-400 to-red-400', description: 'Romantic rose garden with blooming flowers' },
-    { id: 'cherry_orchard', name: 'Albalı bağı', category: 'Realist', premium: false, emoji: '🍒', color: 'from-pink-300 to-rose-400', description: 'Cherry orchard with blossoms and soft petals' },
-    
-    // Aesthetic fonlar
-    { id: 'boho_floral', name: 'Boho çiçəkli', category: 'Aesthetic', premium: false, emoji: '🌺', color: 'from-pink-100 to-rose-200', description: 'Bohemian style with dried flowers, lace, and soft pink tones' },
-    { id: 'blush_dreamy', name: 'Xəyali çəhrayı', category: 'Aesthetic', premium: true, emoji: '💗', color: 'from-rose-100 to-pink-200', description: 'Dreamy blush pink setup with tulle, pearls, and soft lighting' },
-    { id: 'vintage_lace', name: 'Vintage krujeva', category: 'Aesthetic', premium: true, emoji: '🎀', color: 'from-amber-100 to-rose-100', description: 'Vintage setup with lace blankets, antique props, and warm sepia tones' },
-    { id: 'parisian', name: 'Paris', category: 'Aesthetic', premium: true, emoji: '🗼', color: 'from-rose-200 to-gray-300', description: 'Parisian chic with Eiffel Tower backdrop' },
-    { id: 'tea_party', name: 'Çay məclisi', category: 'Aesthetic', premium: false, emoji: '🫖', color: 'from-pink-100 to-amber-100', description: 'Elegant tea party with vintage cups and flowers' },
-    { id: 'garden_party', name: 'Bağ şənliyi', category: 'Aesthetic', premium: false, emoji: '🎪', color: 'from-pink-200 to-sky-200', description: 'Garden party with pastel decorations' },
-    
-    // Fantastik fonlar
-    { id: 'princess_castle', name: 'Şahzadə sarayı', category: 'Fantastik', premium: false, emoji: '👑', color: 'from-purple-400 to-pink-500', description: 'Fairy tale castle with royal decorations, golden throne, and sparkles' },
-    { id: 'fairy_garden', name: 'Pəri bağçası', category: 'Fantastik', premium: true, emoji: '🧚', color: 'from-violet-400 to-fuchsia-500', description: 'Enchanted fairy garden with mushrooms, fairy lights, and magical flowers' },
-    { id: 'mermaid_ocean', name: 'Dəniz pərisi', category: 'Fantastik', premium: true, emoji: '🧜‍♀️', color: 'from-teal-400 to-cyan-500', description: 'Underwater mermaid theme with seashells, pearls, and coral reef' },
-    { id: 'unicorn_rainbow', name: 'Təkbuynuz', category: 'Fantastik', premium: true, emoji: '🦄', color: 'from-pink-400 to-purple-500', description: 'Magical unicorn theme with rainbow, clouds, and sparkly decorations' },
-    { id: 'butterfly_garden', name: 'Kəpənək bağı', category: 'Fantastik', premium: true, emoji: '🦋', color: 'from-pink-300 to-cyan-400', description: 'Magical garden full of colorful butterflies' },
-    { id: 'swan_lake', name: 'Qu gölü', category: 'Fantastik', premium: true, emoji: '🦢', color: 'from-white to-blue-200', description: 'Elegant swan lake with soft lighting' },
-    { id: 'enchanted_forest', name: 'Sehrli meşə', category: 'Fantastik', premium: false, emoji: '✨', color: 'from-emerald-400 to-purple-500', description: 'Magical enchanted forest with glowing elements' },
-    { id: 'rainbow_land', name: 'Göy qurşağı', category: 'Fantastik', premium: false, emoji: '🌈', color: 'from-red-400 via-yellow-400 to-blue-400', description: 'Colorful rainbow land with fluffy clouds' },
-    { id: 'ice_queen', name: 'Buz kraliçası', category: 'Fantastik', premium: true, emoji: '👸', color: 'from-cyan-300 to-blue-500', description: 'Ice palace with sparkling snowflakes' },
-    
-    // Mövsümi fonlar
-    { id: 'autumn_leaves', name: 'Payız yarpaqları', category: 'Mövsümi', premium: false, emoji: '🍂', color: 'from-orange-400 to-red-500', description: 'Autumn setting with colorful fallen leaves and warm golden lighting' },
-    { id: 'winter_snow', name: 'Qış qarı', category: 'Mövsümi', premium: true, emoji: '❄️', color: 'from-blue-100 to-cyan-200', description: 'Winter wonderland with soft snow, pine trees, and cozy blankets' },
-    { id: 'cherry_blossom', name: 'Albalı çiçəyi', category: 'Mövsümi', premium: true, emoji: '🌸', color: 'from-pink-300 to-rose-400', description: 'Japanese cherry blossom garden with soft petals falling' },
-    { id: 'christmas', name: 'Yeni il', category: 'Mövsümi', premium: true, emoji: '🎄', color: 'from-red-500 to-green-600', description: 'Festive Christmas setting with tree, presents, and snow' },
-    { id: 'valentines', name: 'Sevgililər günü', category: 'Mövsümi', premium: true, emoji: '💕', color: 'from-red-400 to-pink-500', description: 'Romantic setting with hearts and roses' },
-    { id: 'spring_picnic', name: 'Bahar piknİki', category: 'Mövsümi', premium: false, emoji: '🧺', color: 'from-green-300 to-pink-300', description: 'Spring picnic in a flower meadow' },
-    { id: 'summer_sunflower', name: 'Günəbaxan', category: 'Mövsümi', premium: false, emoji: '🌻', color: 'from-yellow-400 to-amber-500', description: 'Sunflower field in summer sunshine' },
-  ],
-};
-
-const eyeColorOptions = [
-  { id: 'keep', name: 'Olduğu kimi', color: 'bg-gradient-to-r from-gray-300 to-gray-400' },
-  { id: 'blue', name: 'Mavi', color: 'bg-gradient-to-r from-blue-400 to-blue-600' },
-  { id: 'green', name: 'Yaşıl', color: 'bg-gradient-to-r from-green-400 to-emerald-600' },
-  { id: 'brown', name: 'Qəhvəyi', color: 'bg-gradient-to-r from-amber-600 to-amber-800' },
-  { id: 'hazel', name: 'Fındıq', color: 'bg-gradient-to-r from-amber-400 to-green-500' },
-  { id: 'gray', name: 'Boz', color: 'bg-gradient-to-r from-slate-400 to-slate-600' },
-  { id: 'amber', name: 'Kəhrəba', color: 'bg-gradient-to-r from-amber-400 to-orange-500' },
+// Fallback data for when DB is loading
+const fallbackEyeColors = [
+  { color_id: 'keep', color_name: 'Olduğu kimi', color_name_az: 'Olduğu kimi', hex_value: 'from-gray-300 to-gray-400' },
+  { color_id: 'blue', color_name: 'Blue', color_name_az: 'Mavi', hex_value: 'from-blue-400 to-blue-600' },
+  { color_id: 'green', color_name: 'Green', color_name_az: 'Yaşıl', hex_value: 'from-green-400 to-emerald-600' },
+  { color_id: 'brown', color_name: 'Brown', color_name_az: 'Qəhvəyi', hex_value: 'from-amber-600 to-amber-800' },
 ];
 
-const hairColorOptions = [
-  { id: 'keep', name: 'Olduğu kimi', color: 'bg-gradient-to-r from-gray-300 to-gray-400' },
-  { id: 'blonde', name: 'Sarışın', color: 'bg-gradient-to-r from-yellow-300 to-amber-400' },
-  { id: 'brown', name: 'Şabalıdı', color: 'bg-gradient-to-r from-amber-700 to-amber-900' },
-  { id: 'black', name: 'Qara', color: 'bg-gradient-to-r from-gray-800 to-black' },
-  { id: 'red', name: 'Qırmızı', color: 'bg-gradient-to-r from-orange-500 to-red-600' },
-  { id: 'strawberry', name: 'Çiyələk', color: 'bg-gradient-to-r from-rose-400 to-orange-400' },
-  { id: 'platinum', name: 'Platin', color: 'bg-gradient-to-r from-gray-200 to-yellow-100' },
+const fallbackHairColors = [
+  { color_id: 'keep', color_name: 'Keep', color_name_az: 'Olduğu kimi', hex_value: 'from-gray-300 to-gray-400' },
+  { color_id: 'blonde', color_name: 'Blonde', color_name_az: 'Sarışın', hex_value: 'from-yellow-300 to-amber-400' },
+  { color_id: 'brown', color_name: 'Brown', color_name_az: 'Şabalıdı', hex_value: 'from-amber-700 to-amber-900' },
+  { color_id: 'black', color_name: 'Black', color_name_az: 'Qara', hex_value: 'from-gray-800 to-black' },
 ];
 
-const hairStyleOptions = [
-  { id: 'keep', name: 'Olduğu kimi', emoji: '✨' },
-  { id: 'curly', name: 'Buruq', emoji: '🌀' },
-  { id: 'straight', name: 'Düz', emoji: '📏' },
-  { id: 'wavy', name: 'Dalğalı', emoji: '🌊' },
-  { id: 'spiky', name: 'Dikdik', emoji: '⬆️' },
-  { id: 'fluffy', name: 'Qabarıq', emoji: '☁️' },
-  { id: 'thin', name: 'Nazik', emoji: '〰️' },
+const fallbackHairStyles = [
+  { style_id: 'keep', style_name: 'Keep', style_name_az: 'Olduğu kimi', emoji: '✨' },
+  { style_id: 'curly', style_name: 'Curly', style_name_az: 'Buruq', emoji: '🌀' },
+  { style_id: 'straight', style_name: 'Straight', style_name_az: 'Düz', emoji: '📏' },
+  { style_id: 'wavy', style_name: 'Wavy', style_name_az: 'Dalğalı', emoji: '🌊' },
 ];
-
-const outfitsByGender = {
-  boy: [
-    { id: 'keep', name: 'Olduğu kimi', emoji: '👕', premium: false },
-    { id: 'theme', name: 'Mövzuya uyğun', emoji: '🎨', premium: false },
-    { id: 'gentleman', name: 'Centlmen', emoji: '🤵', premium: false },
-    { id: 'sailor', name: 'Dənizçi', emoji: '⚓', premium: false },
-    { id: 'casual', name: 'Gündəlik', emoji: '👶', premium: false },
-    { id: 'prince', name: 'Şahzadə', emoji: '🤴', premium: true },
-    { id: 'pilot', name: 'Pilot', emoji: '✈️', premium: true },
-    { id: 'cowboy', name: 'Kovboy', emoji: '🤠', premium: true },
-    { id: 'sports', name: 'İdmançı', emoji: '⚽', premium: true },
-    { id: 'chef', name: 'Aşpaz', emoji: '👨‍🍳', premium: true },
-    { id: 'astronaut', name: 'Astronavt', emoji: '👨‍🚀', premium: true },
-    { id: 'doctor', name: 'Həkim', emoji: '👨‍⚕️', premium: true },
-    { id: 'firefighter', name: 'Yanğınsöndürən', emoji: '🧑‍🚒', premium: true },
-    { id: 'teddy', name: 'Ayı kostyumu', emoji: '🧸', premium: true },
-    { id: 'superhero', name: 'Supergəhrəman', emoji: '🦸‍♂️', premium: false },
-    { id: 'knight', name: 'Cəngavər', emoji: '⚔️', premium: true },
-    { id: 'farmer', name: 'Fermer', emoji: '👨‍🌾', premium: false },
-    { id: 'wizard', name: 'Sehrbaz', emoji: '🧙‍♂️', premium: true },
-    { id: 'lion', name: 'Aslan', emoji: '🦁', premium: true },
-  ],
-  girl: [
-    { id: 'keep', name: 'Olduğu kimi', emoji: '👗', premium: false },
-    { id: 'theme', name: 'Mövzuya uyğun', emoji: '🎨', premium: false },
-    { id: 'princess', name: 'Şahzadə', emoji: '👸', premium: false },
-    { id: 'flower', name: 'Çiçəkli', emoji: '🌸', premium: false },
-    { id: 'casual', name: 'Gündəlik', emoji: '👶', premium: false },
-    { id: 'ballerina', name: 'Balerina', emoji: '🩰', premium: true },
-    { id: 'fairy', name: 'Pəri', emoji: '🧚', premium: true },
-    { id: 'angel', name: 'Mələk', emoji: '👼', premium: true },
-    { id: 'vintage', name: 'Vintage', emoji: '🎀', premium: true },
-    { id: 'mermaid', name: 'Dəniz pərisi', emoji: '🧜‍♀️', premium: true },
-    { id: 'butterfly', name: 'Kəpənək', emoji: '🦋', premium: true },
-    { id: 'ladybug', name: 'Uğurböcəyi', emoji: '🐞', premium: true },
-    { id: 'bunny', name: 'Dovşan', emoji: '🐰', premium: true },
-    { id: 'unicorn', name: 'Unicorn', emoji: '🦄', premium: true },
-    { id: 'kitty', name: 'Pişik', emoji: '🐱', premium: false },
-    { id: 'snowflake', name: 'Qar dənəsi', emoji: '❄️', premium: true },
-    { id: 'rainbow', name: 'Göy qurşağı', emoji: '🌈', premium: false },
-    { id: 'bee', name: 'Arı', emoji: '🐝', premium: true },
-    { id: 'strawberry', name: 'Çiyələk', emoji: '🍓', premium: true },
-  ],
-};
 
 const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack }, ref) => {
+  useScrollToTop();
+  
   const [step, setStep] = useState(0);
   const [customization, setCustomization] = useState<CustomizationOptions>({
     gender: 'girl',
@@ -195,11 +77,13 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     hairStyle: 'keep',
     outfit: 'keep',
     background: '',
+    imageStyle: 'realistic',
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [photos, setPhotos] = useState<GeneratedPhoto[]>([]);
   const [loadingPhotos, setLoadingPhotos] = useState(true);
-  const [viewingPhoto, setViewingPhoto] = useState<GeneratedPhoto | null>(null);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryIndex, setGalleryIndex] = useState(0);
   const [sourceImage, setSourceImage] = useState<string | null>(null);
   const [sourceImagePreview, setSourceImagePreview] = useState<string | null>(null);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
@@ -210,8 +94,110 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
   const { user } = useAuth();
   const { isPremium, canUseBabyPhotoshoot, freeLimits } = useSubscription();
 
-  const currentBackgrounds = backgroundCategories[customization.gender];
-  const currentOutfits = outfitsByGender[customization.gender];
+  // Fetch dynamic data from database
+  const { data: dbBackgrounds = [] } = usePhotoshootBackgrounds(customization.gender);
+  const { data: dbEyeColors = [] } = usePhotoshootEyeColors();
+  const { data: dbHairColors = [] } = usePhotoshootHairColors();
+  const { data: dbHairStyles = [] } = usePhotoshootHairStyles();
+  const { data: dbOutfits = [] } = usePhotoshootOutfits(customization.gender);
+  const { data: dbImageStyles = [] } = usePhotoshootImageStyles();
+
+  // Map DB data or use fallbacks
+  const currentBackgrounds = useMemo(() => {
+    if (dbBackgrounds.length > 0) {
+      // Group backgrounds by category
+      const grouped: Record<string, any[]> = {};
+      dbBackgrounds.forEach(bg => {
+        const cat = bg.category_name_az || bg.category_name;
+        if (!grouped[cat]) grouped[cat] = [];
+        grouped[cat].push({
+          id: bg.theme_id,
+          name: bg.theme_name_az || bg.theme_name,
+          category: cat,
+          premium: false, // Can add is_premium to DB if needed
+          emoji: bg.theme_emoji || '🎨',
+          color: 'from-gray-200 to-gray-300',
+          description: bg.prompt_template || '',
+        });
+      });
+      return Object.values(grouped).flat();
+    }
+    return []; // Will use fallback in render
+  }, [dbBackgrounds]);
+
+  const eyeColorOptions = useMemo(() => {
+    if (dbEyeColors.length > 0) {
+      return dbEyeColors.map(c => ({
+        id: c.color_id,
+        name: c.color_name_az || c.color_name,
+        color: `bg-gradient-to-r ${c.hex_value || 'from-gray-300 to-gray-400'}`,
+      }));
+    }
+    return fallbackEyeColors.map(c => ({
+      id: c.color_id,
+      name: c.color_name_az || c.color_name,
+      color: `bg-gradient-to-r ${c.hex_value}`,
+    }));
+  }, [dbEyeColors]);
+
+  const hairColorOptions = useMemo(() => {
+    if (dbHairColors.length > 0) {
+      return dbHairColors.map(c => ({
+        id: c.color_id,
+        name: c.color_name_az || c.color_name,
+        color: `bg-gradient-to-r ${c.hex_value || 'from-gray-300 to-gray-400'}`,
+      }));
+    }
+    return fallbackHairColors.map(c => ({
+      id: c.color_id,
+      name: c.color_name_az || c.color_name,
+      color: `bg-gradient-to-r ${c.hex_value}`,
+    }));
+  }, [dbHairColors]);
+
+  const hairStyleOptions = useMemo(() => {
+    if (dbHairStyles.length > 0) {
+      return dbHairStyles.map(s => ({
+        id: s.style_id,
+        name: s.style_name_az || s.style_name,
+        emoji: s.emoji || '✨',
+      }));
+    }
+    return fallbackHairStyles.map(s => ({
+      id: s.style_id,
+      name: s.style_name_az || s.style_name,
+      emoji: s.emoji,
+    }));
+  }, [dbHairStyles]);
+
+  const currentOutfits = useMemo(() => {
+    if (dbOutfits.length > 0) {
+      return dbOutfits.map(o => ({
+        id: o.outfit_id,
+        name: o.outfit_name_az || o.outfit_name,
+        emoji: o.emoji || '👕',
+        premium: false, // Can add is_premium to DB if needed
+      }));
+    }
+    return []; // Will use fallback
+  }, [dbOutfits]);
+
+  const imageStyleOptions = useMemo(() => {
+    if (dbImageStyles.length > 0) {
+      return dbImageStyles.map(s => ({
+        id: s.style_id,
+        name: s.style_name_az || s.style_name,
+        emoji: s.emoji || '🎨',
+        promptModifier: s.prompt_modifier || '',
+      }));
+    }
+    // Fallback
+    return [
+      { id: 'realistic', name: 'Realistik', emoji: '📷', promptModifier: 'ultra realistic, photorealistic' },
+      { id: '3d_disney', name: '3D Disney', emoji: '🏰', promptModifier: '3D Disney Pixar style' },
+    ];
+  }, [dbImageStyles]);
+
 
   useEffect(() => {
     const fetchPhotos = async () => {
@@ -345,6 +331,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             hairColor: customization.hairColor,
             hairStyle: customization.hairStyle,
             outfit: customization.outfit,
+            imageStyle: customization.imageStyle,
           },
         },
       });
@@ -357,7 +344,9 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
       if (data?.photo) {
         setPhotos(prev => [data.photo, ...prev]);
-        setViewingPhoto(data.photo);
+        // Open gallery showing new photo
+        setGalleryIndex(0);
+        setGalleryOpen(true);
         
         try {
           await Haptics.impact({ style: ImpactStyle.Heavy });
@@ -390,7 +379,6 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
       if (error) throw error;
 
       setPhotos(prev => prev.filter(p => p.id !== photoId));
-      setViewingPhoto(null);
 
       toast({
         title: 'Foto silindi',
@@ -462,11 +450,11 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     }
   };
 
-  const groupedBackgrounds = currentBackgrounds.reduce((acc, bg) => {
+  const groupedBackgrounds = currentBackgrounds.reduce<Record<string, Array<{ id: string; name: string; category: string; premium: boolean; emoji: string; color: string; description: string }>>>((acc, bg) => {
     if (!acc[bg.category]) acc[bg.category] = [];
     acc[bg.category].push(bg);
     return acc;
-  }, {} as Record<string, typeof currentBackgrounds>);
+  }, {});
 
   const renderStepContent = () => {
     switch (step) {
@@ -580,6 +568,36 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             exit={{ opacity: 0, x: -20 }}
             className="space-y-5"
           >
+            {/* Image Style Selection */}
+            <div className="bg-card rounded-3xl p-5 shadow-elevated">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-purple-500" />
+                </div>
+                <div>
+                  <h2 className="font-bold text-foreground">Şəkil Növü</h2>
+                  <p className="text-xs text-muted-foreground">Foto stilini seçin</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                {imageStyleOptions.map((style) => (
+                  <motion.button
+                    key={style.id}
+                    onClick={() => setCustomization(prev => ({ ...prev, imageStyle: style.id }))}
+                    className={`p-3 rounded-xl flex flex-col items-center gap-1.5 transition-all ${
+                      customization.imageStyle === style.id
+                        ? 'bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-lg scale-105'
+                        : 'bg-muted hover:bg-muted/80'
+                    }`}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span className="text-xl sm:text-2xl">{style.emoji}</span>
+                    <span className="text-[9px] sm:text-[10px] font-medium text-center leading-tight">{style.name}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+
             {/* Background Selection by Category */}
             {Object.entries(groupedBackgrounds).map(([category, backgrounds]) => (
               <div key={category} className="bg-card rounded-3xl p-5 shadow-elevated">
@@ -777,7 +795,10 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.03 }}
               className="relative aspect-square rounded-2xl overflow-hidden shadow-card cursor-pointer group"
-              onClick={() => setViewingPhoto(photo)}
+              onClick={() => {
+                setGalleryIndex(index);
+                setGalleryOpen(true);
+              }}
             >
               <img
                 src={photo.url}
@@ -797,7 +818,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="gradient-primary px-5 pt-14 pb-8 rounded-b-[2rem] flex-shrink-0">
+      <div className="gradient-primary px-4 pt-4 pb-6 rounded-b-[1.5rem] flex-shrink-0">
         <div className="flex items-center gap-4 mb-4">
           <motion.button
             onClick={onBack}
@@ -844,7 +865,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
       </div>
 
       {/* Content - Scrollable with space for fixed buttons */}
-      <div className="flex-1 overflow-y-auto px-5 py-4 -mt-4 pb-36">
+      <div className="flex-1 overflow-y-auto px-4 py-4 pb-36">
         <AnimatePresence mode="wait">
           {renderStepContent()}
         </AnimatePresence>
@@ -898,55 +919,16 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
         </div>
       </div>
 
-      {/* Photo Viewer Modal */}
-      <AnimatePresence>
-        {viewingPhoto && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/90 z-50 flex flex-col"
-            onClick={() => setViewingPhoto(null)}
-          >
-            <div className="flex-1 flex items-center justify-center p-4">
-              <motion.img
-                src={viewingPhoto.url}
-                alt="Baby photo"
-                className="max-w-full max-h-full rounded-2xl shadow-2xl"
-                initial={{ scale: 0.8 }}
-                animate={{ scale: 1 }}
-                onClick={(e) => e.stopPropagation()}
-              />
-            </div>
-
-            <div className="p-5 flex justify-center gap-4 safe-bottom" onClick={(e) => e.stopPropagation()}>
-              <Button
-                variant="outline"
-                className="flex-1 h-14 rounded-2xl bg-white/10 border-white/20 text-white"
-                onClick={() => handleShare(viewingPhoto.url)}
-              >
-                <Share2 className="w-5 h-5 mr-2" />
-                Paylaş
-              </Button>
-              <Button
-                variant="outline"
-                className="flex-1 h-14 rounded-2xl bg-white/10 border-white/20 text-white"
-                onClick={() => handleDownload(viewingPhoto.url)}
-              >
-                <Download className="w-5 h-5 mr-2" />
-                Yüklə
-              </Button>
-              <Button
-                variant="outline"
-                className="h-14 w-14 rounded-2xl bg-red-500/20 border-red-500/30 text-red-400"
-                onClick={() => handleDeletePhoto(viewingPhoto.id)}
-              >
-                <Trash2 className="w-5 h-5" />
-              </Button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Photo Gallery Viewer */}
+      <PhotoGalleryViewer
+        photos={photos}
+        initialIndex={galleryIndex}
+        isOpen={galleryOpen}
+        onClose={() => setGalleryOpen(false)}
+        onDelete={async (photoId) => {
+          await handleDeletePhoto(photoId);
+        }}
+      />
 
       {/* Premium Modal */}
       <PremiumModal 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { localNotifications, isNative } from '@/lib/native';
+import { useAuth } from './useAuth';
 import { toast } from 'sonner';
 
 interface NotificationSettings {
@@ -26,22 +27,22 @@ const defaultSettings: NotificationSettings = {
 };
 
 export const useNotificationSettings = () => {
+  const { user } = useAuth();
   const [settings, setSettings] = useState<NotificationSettings>(defaultSettings);
   const [loading, setLoading] = useState(true);
 
   // Load settings from database
   useEffect(() => {
     const loadSettings = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          setLoading(false);
-          return;
-        }
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
+      try {
         const { data, error } = await supabase
           .from('user_preferences')
-          .select('*')
+          .select('notifications_enabled, sound_enabled, vibration_enabled, water_reminder, vitamin_reminder, exercise_reminder, vitamin_time, exercise_days')
           .eq('user_id', user.id)
           .single();
 
@@ -50,9 +51,16 @@ export const useNotificationSettings = () => {
         }
 
         if (data) {
-          // Parse notification settings from user_preferences if stored
-          // For now using defaults, can extend user_preferences table later
-          setSettings(defaultSettings);
+          setSettings({
+            notifications_enabled: data.notifications_enabled ?? true,
+            sound_enabled: data.sound_enabled ?? true,
+            vibration_enabled: data.vibration_enabled ?? true,
+            water_reminder: data.water_reminder ?? true,
+            vitamin_reminder: data.vitamin_reminder ?? true,
+            exercise_reminder: data.exercise_reminder ?? false,
+            vitamin_time: data.vitamin_time ?? '09:00',
+            exercise_days: data.exercise_days ?? [1, 3, 5],
+          });
         }
 
         setLoading(false);
@@ -63,11 +71,11 @@ export const useNotificationSettings = () => {
     };
 
     loadSettings();
-  }, []);
+  }, [user]);
 
   // Schedule water reminders
   const scheduleWaterReminders = useCallback(async () => {
-    if (!settings.notifications_enabled || !settings.water_reminder) {
+    if (!settings.notifications_enabled || !settings.water_reminder || !isNative) {
       return;
     }
 
@@ -97,7 +105,7 @@ export const useNotificationSettings = () => {
 
   // Schedule vitamin reminder
   const scheduleVitaminReminder = useCallback(async () => {
-    if (!settings.notifications_enabled || !settings.vitamin_reminder) {
+    if (!settings.notifications_enabled || !settings.vitamin_reminder || !isNative) {
       return;
     }
 
@@ -124,7 +132,7 @@ export const useNotificationSettings = () => {
 
   // Schedule exercise reminders
   const scheduleExerciseReminders = useCallback(async () => {
-    if (!settings.notifications_enabled || !settings.exercise_reminder) {
+    if (!settings.notifications_enabled || !settings.exercise_reminder || !isNative) {
       return;
     }
 
@@ -161,7 +169,7 @@ export const useNotificationSettings = () => {
 
   // Schedule appointment reminder
   const scheduleAppointmentReminder = useCallback(async (appointmentDate: Date, title: string) => {
-    if (!settings.notifications_enabled) {
+    if (!settings.notifications_enabled || !isNative) {
       return;
     }
 
@@ -190,17 +198,45 @@ export const useNotificationSettings = () => {
     toast.success('Randevu xatırlatması təyin edildi');
   }, [settings.notifications_enabled]);
 
-  // Update a single setting
+  // Update a single setting - persists to database
   const updateSetting = useCallback(async <K extends keyof NotificationSettings>(
     key: K,
     value: NotificationSettings[K]
   ) => {
+    if (!user) return;
+
     const newSettings = { ...settings, [key]: value };
     setSettings(newSettings);
 
+    // Persist to database
+    try {
+      const { error } = await supabase
+        .from('user_preferences')
+        .update({ [key]: value })
+        .eq('user_id', user.id);
+
+      // If no row exists, insert it
+      if (error && error.code === 'PGRST116') {
+        await supabase
+          .from('user_preferences')
+          .insert({ user_id: user.id, [key]: value });
+      } else if (error) {
+        console.error('Error saving notification setting:', error);
+        // Revert on error
+        setSettings(settings);
+        return;
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setSettings(settings);
+      return;
+    }
+
     // Cancel all notifications if disabled
     if (key === 'notifications_enabled' && !value) {
-      await localNotifications.cancelAll();
+      if (isNative) {
+        await localNotifications.cancelAll();
+      }
       toast.info('Bütün bildirişlər deaktiv edildi');
       return;
     }
@@ -228,11 +264,11 @@ export const useNotificationSettings = () => {
         toast.success('Məşq xatırlatmaları aktivləşdirildi');
       }
     }
-  }, [settings, scheduleWaterReminders, scheduleVitaminReminder, scheduleExerciseReminders]);
+  }, [user, settings, scheduleWaterReminders, scheduleVitaminReminder, scheduleExerciseReminders]);
 
   // Initialize all reminders
   const initializeReminders = useCallback(async () => {
-    if (!settings.notifications_enabled) return;
+    if (!settings.notifications_enabled || !isNative) return;
 
     // Request permissions first
     const permStatus = await localNotifications.requestPermissions();
@@ -248,9 +284,7 @@ export const useNotificationSettings = () => {
       settings.exercise_reminder ? scheduleExerciseReminders() : Promise.resolve(),
     ]);
 
-    if (isNative) {
-      toast.success('Xatırlatmalar aktivləşdirildi');
-    }
+    console.log('All reminders initialized');
   }, [settings, scheduleWaterReminders, scheduleVitaminReminder, scheduleExerciseReminders]);
 
   return {

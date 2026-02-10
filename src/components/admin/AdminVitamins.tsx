@@ -25,7 +25,7 @@ const AdminVitamins = () => {
     dosage: '',
     week_start: '',
     week_end: '',
-    trimester: '',
+    trimesters: [] as number[],
     life_stage: 'bump',
     importance: 'recommended',
     icon_emoji: '💊',
@@ -43,7 +43,7 @@ const AdminVitamins = () => {
       dosage: '',
       week_start: '',
       week_end: '',
-      trimester: '',
+      trimesters: [],
       life_stage: 'bump',
       importance: 'recommended',
       icon_emoji: '💊',
@@ -69,7 +69,7 @@ const AdminVitamins = () => {
       dosage: vitamin.dosage || '',
       week_start: vitamin.week_start?.toString() || '',
       week_end: vitamin.week_end?.toString() || '',
-      trimester: vitamin.trimester?.toString() || '',
+      trimesters: vitamin.trimester || [],
       life_stage: vitamin.life_stage || 'bump',
       importance: vitamin.importance || 'recommended',
       icon_emoji: vitamin.icon_emoji || '💊',
@@ -81,16 +81,17 @@ const AdminVitamins = () => {
 
   const handleSave = async () => {
     try {
-      const vitaminData = {
+      const vitaminData: Record<string, any> = {
         name: formData.name,
         name_az: formData.name_az || null,
+        description: formData.description_az || null,
         description_az: formData.description_az || null,
         benefits: formData.benefits ? formData.benefits.split('\n').filter(b => b.trim()) : null,
         food_sources: formData.food_sources ? formData.food_sources.split('\n').filter(f => f.trim()) : null,
         dosage: formData.dosage || null,
         week_start: formData.week_start ? parseInt(formData.week_start) : null,
         week_end: formData.week_end ? parseInt(formData.week_end) : null,
-        trimester: formData.trimester ? parseInt(formData.trimester) : null,
+        trimester: formData.trimesters.length > 0 ? formData.trimesters : null,
         life_stage: formData.life_stage,
         importance: formData.importance,
         icon_emoji: formData.icon_emoji,
@@ -209,6 +210,14 @@ const AdminVitamins = () => {
                   <span className="px-1.5 py-0.5 bg-muted rounded">
                     {vitamin.life_stage === 'bump' ? 'Hamiləlik' : vitamin.life_stage === 'mommy' ? 'Anacan' : 'Ümumi'}
                   </span>
+                  {vitamin.trimester && vitamin.trimester.length === 3 && (
+                    <span className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/30 rounded text-purple-700 dark:text-purple-400">Hər üç trimester</span>
+                  )}
+                  {vitamin.trimester && vitamin.trimester.length > 0 && vitamin.trimester.length < 3 && (
+                    <span className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/30 rounded text-purple-700 dark:text-purple-400">
+                      Trimester {vitamin.trimester.join(', ')}
+                    </span>
+                  )}
                   {vitamin.week_start && vitamin.week_end && (
                     <span>Həftə {vitamin.week_start}-{vitamin.week_end}</span>
                   )}
@@ -349,18 +358,36 @@ const AdminVitamins = () => {
                 />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Trimestr</label>
-                <Select value={formData.trimester} onValueChange={v => setFormData({ ...formData, trimester: v })}>
-                  <SelectTrigger className="h-9">
-                    <SelectValue placeholder="Seç" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Yoxdur</SelectItem>
-                    <SelectItem value="1">1-ci</SelectItem>
-                    <SelectItem value="2">2-ci</SelectItem>
-                    <SelectItem value="3">3-cü</SelectItem>
-                  </SelectContent>
-                </Select>
+                <label className="text-xs text-muted-foreground mb-1 block">Trimestrlər</label>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { value: 1, label: '1-ci' },
+                    { value: 2, label: '2-ci' },
+                    { value: 3, label: '3-cü' },
+                  ].map(t => (
+                    <button
+                      key={t.value}
+                      type="button"
+                      onClick={() => {
+                        const current = formData.trimesters;
+                        const updated = current.includes(t.value)
+                          ? current.filter(v => v !== t.value)
+                          : [...current, t.value].sort();
+                        setFormData({ ...formData, trimesters: updated });
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                        formData.trimesters.includes(t.value)
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-muted text-muted-foreground border-border hover:bg-muted/80'
+                      }`}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+                {formData.trimesters.length === 3 && (
+                  <p className="text-[10px] text-primary mt-1">✓ Hər üç trimester seçildi</p>
+                )}
               </div>
             </div>
 

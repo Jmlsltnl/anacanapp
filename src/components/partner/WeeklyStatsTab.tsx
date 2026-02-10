@@ -127,7 +127,7 @@ const WeeklyStatsTab = () => {
         transition={{ delay: 0.2 }}
         className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
       >
-        <h3 className="font-bold mb-4">Əhval Dəyişiklikləri</h3>
+        <h3 className="font-bold text-foreground mb-4">Əhval Dəyişiklikləri</h3>
         <div className="flex justify-between items-end h-32 gap-1">
           {stats.dailyMoods.map((day, idx) => {
             const height = day.mood ? `${(day.mood / 5) * 100}%` : '10%';
@@ -165,7 +165,7 @@ const WeeklyStatsTab = () => {
         transition={{ delay: 0.25 }}
         className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
       >
-        <h3 className="font-bold mb-4">Su İçmə (ml)</h3>
+        <h3 className="font-bold text-foreground mb-4">Su İçmə (ml)</h3>
         <div className="flex justify-between items-end h-24 gap-1">
           {stats.dailyMoods.map((day, idx) => {
             const maxWater = 2500;
@@ -179,7 +179,7 @@ const WeeklyStatsTab = () => {
                   style={{ height: '60px' }}
                 >
                   <motion.div
-                    className={`w-full rounded-t-lg ${isGoalMet ? 'bg-cyan-500' : 'bg-cyan-300'}`}
+                    className={`w-full rounded-t-lg ${isGoalMet ? 'bg-cyan-500 dark:bg-cyan-400' : 'bg-cyan-300 dark:bg-cyan-600'}`}
                     initial={{ height: 0 }}
                     animate={{ height }}
                     transition={{ delay: 0.35 + idx * 0.05, duration: 0.5 }}
@@ -196,9 +196,9 @@ const WeeklyStatsTab = () => {
           })}
         </div>
         <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
-          <div className="w-3 h-3 rounded bg-cyan-500" />
+          <div className="w-3 h-3 rounded bg-cyan-500 dark:bg-cyan-400" />
           <span>Hədəfə çatdı (2L+)</span>
-          <div className="w-3 h-3 rounded bg-cyan-300 ml-2" />
+          <div className="w-3 h-3 rounded bg-cyan-300 dark:bg-cyan-600 ml-2" />
           <span>Hədəf altı</span>
         </div>
       </motion.div>
@@ -210,7 +210,7 @@ const WeeklyStatsTab = () => {
         transition={{ delay: 0.3 }}
         className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
       >
-        <h3 className="font-bold mb-4">Məşqlər</h3>
+        <h3 className="font-bold text-foreground mb-4">Məşqlər</h3>
         <div className="flex justify-between items-end h-24 gap-1">
           {stats.exerciseData.map((day, idx) => {
             const maxMinutes = 60;
@@ -223,7 +223,7 @@ const WeeklyStatsTab = () => {
                   style={{ height: '60px' }}
                 >
                   <motion.div
-                    className={`w-full rounded-t-lg ${day.count > 0 ? 'bg-violet-500' : 'bg-muted'}`}
+                    className={`w-full rounded-t-lg ${day.count > 0 ? 'bg-violet-500 dark:bg-violet-400' : 'bg-muted'}`}
                     initial={{ height: 0 }}
                     animate={{ height }}
                     transition={{ delay: 0.4 + idx * 0.05, duration: 0.5 }}

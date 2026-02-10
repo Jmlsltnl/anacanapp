@@ -8,12 +8,15 @@ import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { hapticFeedback } from '@/lib/native';
 import { useMoodOptions, useSymptoms } from '@/hooks/useDynamicConfig';
 import { useUserStore } from '@/store/userStore';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 interface MoodDiaryProps {
   onBack: () => void;
 }
 
 const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) => {
+  useScrollToTop();
+  
   const [activeTab, setActiveTab] = useState<'log' | 'history' | 'insights'>('log');
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
@@ -108,40 +111,46 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-fuchsia-50 to-background pb-24">
-      {/* Header */}
-      <div className="bg-gradient-to-br from-fuchsia-500 to-pink-600 px-3 pt-3 pb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <motion.button
-            onClick={onBack}
-            className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}
-          >
-            <ArrowLeft className="w-4 h-4 text-white" />
-          </motion.button>
-          <div>
-            <h1 className="text-lg font-bold text-white">Əhval Gündəliyi</h1>
-            <p className="text-white/80 text-xs">Emosiyalarınızı izləyin</p>
+    <div className="min-h-screen bg-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
+      {/* Compact Header */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
+        <div className="px-4 py-3 safe-area-top">
+          <div className="flex items-center gap-3">
+            <motion.button
+              onClick={onBack}
+              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
+              whileTap={{ scale: 0.95 }}
+            >
+              <ArrowLeft className="w-5 h-5 text-foreground" />
+            </motion.button>
+            <div className="flex-1">
+              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Heart className="w-5 h-5 text-fuchsia-500" />
+                Əhval Gündəliyi
+              </h1>
+            </div>
           </div>
         </div>
+      </div>
 
+      <div className="px-4 pt-4">
         {/* Mood Summary */}
         <motion.div 
-          className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20"
+          className="bg-fuchsia-50 dark:bg-fuchsia-500/10 rounded-2xl p-4 border border-fuchsia-100 dark:border-fuchsia-500/20 mb-4"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-white/70 text-sm">Ortalama əhval</p>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-3xl">{logs[0]?.mood ? moodEmojis.find(m => m.value === logs[0].mood)?.emoji : '😊'}</span>
-                <span className="text-2xl font-bold text-white">{averageMood}</span>
+              <p className="text-fuchsia-600/70 dark:text-fuchsia-400/70 text-xs font-medium">Ortalama əhval</p>
+              <div className="flex items-center gap-3 mt-1">
+                <span className="text-4xl">{logs[0]?.mood ? moodEmojis.find(m => m.value === logs[0].mood)?.emoji : '😊'}</span>
+                <span className="text-3xl font-black text-fuchsia-600 dark:text-fuchsia-400">{averageMood}</span>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-white/70 text-sm">Bu həftə</p>
-              <p className="text-xl font-bold text-white">{logs.length} qeyd</p>
+              <p className="text-fuchsia-600/70 dark:text-fuchsia-400/70 text-xs font-medium">Bu həftə</p>
+              <p className="text-2xl font-black text-fuchsia-600 dark:text-fuchsia-400">{logs.length} qeyd</p>
             </div>
           </div>
         </motion.div>
@@ -271,7 +280,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               className="space-y-4"
             >
               <h2 className="font-bold text-lg">Son qeydlər</h2>
-              {logs.length === 0 ? (
+                {logs.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">Hələ qeyd yoxdur</p>
               ) : (
                 logs.slice(0, 10).map((entry, index) => (
@@ -283,19 +292,19 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
                     className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="w-14 h-14 rounded-xl bg-fuchsia-50 flex items-center justify-center text-2xl">
+                      <div className="w-14 h-14 rounded-xl bg-fuchsia-100 dark:bg-fuchsia-900/30 flex items-center justify-center text-2xl">
                         {entry.mood ? moodEmojis.find(m => m.value === entry.mood)?.emoji : '😐'}
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
-                          <p className="font-semibold">
+                          <p className="font-semibold text-foreground">
                             {new Date(entry.log_date).toLocaleDateString('az-AZ', { weekday: 'long', day: 'numeric', month: 'short' })}
                           </p>
                           <div className="flex">
                             {Array.from({ length: 5 }).map((_, i) => (
                               <Heart 
                                 key={i}
-                                className={`w-4 h-4 ${i < (entry.mood || 0) ? 'text-fuchsia-500 fill-current' : 'text-gray-200'}`}
+                                className={`w-4 h-4 ${i < (entry.mood || 0) ? 'text-fuchsia-500 fill-current' : 'text-muted-foreground/30'}`}
                               />
                             ))}
                           </div>
@@ -307,7 +316,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
                           {(entry.symptoms || []).map(s => {
                             const symptom = symptomOptions.find(opt => opt.id === s);
                             return symptom ? (
-                              <span key={s} className="text-xs bg-fuchsia-50 text-fuchsia-600 px-2 py-0.5 rounded-full">
+                              <span key={s} className="text-xs bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600 dark:text-fuchsia-400 px-2 py-0.5 rounded-full">
                                 {symptom.emoji} {symptom.label}
                               </span>
                             ) : null;
@@ -337,8 +346,8 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
                 <p className="text-muted-foreground mb-4">
                   Son bir həftədə əhvalınız ümumiyyətlə yaxşı olub. Ən çox qeyd etdiyiniz simptomları izləyin.
                 </p>
-                <div className="bg-fuchsia-50 rounded-2xl p-4 border border-fuchsia-100">
-                  <p className="text-fuchsia-800 text-sm">
+                <div className="bg-fuchsia-100 dark:bg-fuchsia-900/30 rounded-2xl p-4 border border-fuchsia-200 dark:border-fuchsia-800/50">
+                  <p className="text-fuchsia-800 dark:text-fuchsia-200 text-sm">
                     💡 <strong>Məsləhət:</strong> Yorğunluq hiss etdiyiniz günlərdə istirahət etməyi unutmayın. Hamiləlik zamanı bədəninizin ehtiyaclarına qulaq asmaq vacibdir.
                   </p>
                 </div>
@@ -346,7 +355,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
 
               {/* Weekly Mood Chart */}
               <div className="bg-card rounded-3xl p-6 shadow-card border border-border/50">
-                <h3 className="font-bold mb-4">Həftəlik əhval trendi</h3>
+                <h3 className="font-bold mb-4 text-foreground">Həftəlik əhval trendi</h3>
                 <div className="flex items-end justify-between h-32 px-2">
                   {['B.e.', 'Ç.a.', 'Ç.', 'C.a.', 'C.', 'Ş.', 'B.'].map((day, i) => {
                     const dayLog = logs.find(l => new Date(l.log_date).getDay() === (i + 1) % 7);

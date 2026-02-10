@@ -48,6 +48,9 @@ export interface WhiteNoiseSound {
   audio_url: string | null;
   is_active: boolean;
   sort_order: number;
+  noise_type: string;
+  description: string | null;
+  description_az: string | null;
 }
 
 export const useWhiteNoiseSounds = () => {
@@ -106,12 +109,15 @@ export const usePhotoshootThemes = (category?: string) => {
 // ============ SURPRISE IDEAS ============
 export interface SurpriseIdea {
   id: string;
+  surprise_key?: string;
   title: string;
+  title_az?: string | null;
   description: string | null;
+  description_az?: string | null;
   emoji: string;
   icon: string;
-  category: 'romantic' | 'care' | 'adventure' | 'gift';
-  difficulty: 'easy' | 'medium' | 'hard';
+  category: string;
+  difficulty: string;
   points: number;
   is_active: boolean;
   sort_order: number;

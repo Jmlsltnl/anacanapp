@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Search, Edit, Trash2, ChefHat, Lightbulb, Shield, Baby, Briefcase, Apple, X, Upload, Image, FileUp } from 'lucide-react';
+import UnsavedChangesDialog from './UnsavedChangesDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,14 +38,24 @@ const AdminContentManager = () => {
   const [formData, setFormData] = useState<any>({});
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showBulkImport, setShowBulkImport] = useState(false);
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const [showNamesImport, setShowNamesImport] = useState(false);
+  const [namesImportData, setNamesImportData] = useState<any[]>([]);
+  const [namesImporting, setNamesImporting] = useState(false);
+  const [showRecipesImport, setShowRecipesImport] = useState(false);
+  const [recipesImportData, setRecipesImportData] = useState<any[]>([]);
+  const [recipesImporting, setRecipesImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const namesFileInputRef = useRef<HTMLInputElement>(null);
+  const recipesFileInputRef = useRef<HTMLInputElement>(null);
+  const initialFormDataRef = useRef<string>('');
 
   const contentConfig = {
     recipes: {
       table: 'admin_recipes',
       title: 'Reseptlər',
       icon: ChefHat,
-      fields: ['title', 'description', 'category', 'prep_time', 'cook_time', 'servings', 'image_url', 'is_active'],
+      fields: ['title', 'description', 'category', 'prep_time', 'cook_time', 'servings', 'ingredients', 'instructions', 'image_url', 'is_active'],
       categories: ['pregnancy', 'breastfeeding', 'baby_food', 'healthy'],
       hasImage: true,
     },
@@ -76,7 +87,7 @@ const AdminContentManager = () => {
       table: 'hospital_bag_templates',
       title: 'Xəstəxana Çantası',
       icon: Briefcase,
-      fields: ['item_name', 'item_name_az', 'category', 'is_essential', 'sort_order', 'is_active'],
+      fields: ['item_name', 'item_name_az', 'category', 'priority', 'notes', 'is_essential', 'sort_order', 'is_active'],
       categories: ['mom', 'baby', 'documents'],
       hasImage: false,
     },
@@ -139,6 +150,258 @@ const AdminContentManager = () => {
     fetchItems();
   }, [activeTab]);
 
+  // CSV parsing helper for baby names
+  const parseCSVLine = (line: string): string[] => {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        result.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    result.push(current.trim());
+    return result;
+  };
+
+  const handleNamesCSVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      if (lines.length < 2) {
+        toast({ title: 'Xəta', description: 'CSV faylı boşdur', variant: 'destructive' });
+        return;
+      }
+
+      const headers = parseCSVLine(lines[0]);
+      const headerMap: Record<string, string> = {
+        'Ad': 'name',
+        'Cins': 'gender',
+        'Mənşə': 'origin',
+        'Məna': 'meaning',
+        'Məna (AZ)': 'meaning_az',
+        'Populyarlıq': 'popularity',
+      };
+
+      const parsedData: any[] = [];
+      
+      for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        if (values.length < 2) continue;
+
+        const row: any = { is_active: true };
+        
+        headers.forEach((header, idx) => {
+          const dbField = headerMap[header.trim()];
+          if (dbField && values[idx]) {
+            let value = values[idx].trim().replace(/^"|"$/g, '');
+            
+            if (dbField === 'gender') {
+              // Map Azerbaijani gender names to DB values
+              const genderMap: Record<string, string> = {
+                'Qız': 'girl',
+                'Oğlan': 'boy',
+                'Unisex': 'unisex',
+              };
+              value = genderMap[value] || value.toLowerCase();
+            } else if (dbField === 'popularity') {
+              // Parse popularity percentage to number
+              const numValue = parseInt(value.replace('%', ''));
+              row[dbField] = isNaN(numValue) ? 50 : numValue;
+              return;
+            }
+            
+            row[dbField] = value;
+          }
+        });
+
+        if (row.name) {
+          parsedData.push(row);
+        }
+      }
+
+      if (parsedData.length === 0) {
+        toast({ title: 'Xəta', description: 'Heç bir ad tapılmadı', variant: 'destructive' });
+        return;
+      }
+
+      setNamesImportData(parsedData);
+      setShowNamesImport(true);
+    };
+
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  const handleNamesImport = async () => {
+    if (namesImportData.length === 0) return;
+
+    setNamesImporting(true);
+    try {
+      const { error } = await supabase
+        .from('baby_names_db')
+        .insert(namesImportData);
+
+      if (error) throw error;
+
+      toast({ 
+        title: 'Uğurlu!', 
+        description: `${namesImportData.length} ad əlavə edildi` 
+      });
+      setShowNamesImport(false);
+      setNamesImportData([]);
+      fetchItems();
+    } catch (error: any) {
+      toast({ 
+        title: 'Xəta', 
+        description: error.message, 
+        variant: 'destructive' 
+      });
+    } finally {
+      setNamesImporting(false);
+    }
+  };
+
+  // Recipes CSV Import Handler
+  const handleRecipesCSVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      if (lines.length < 2) {
+        toast({ title: 'Xəta', description: 'CSV faylı boşdur', variant: 'destructive' });
+        return;
+      }
+
+      const headers = parseCSVLine(lines[0]);
+      const headerMap: Record<string, string> = {
+        'Başlıq': 'title',
+        'Təsvir': 'description',
+        'Kateqoriya': 'category',
+        'Hazırlıq (dəq)': 'prep_time',
+        'Bişirmə (dəq)': 'cook_time',
+        'Porsiya': 'servings',
+        'İnqredientlər': 'ingredients',
+        'Hazırlanma': 'instructions',
+        'Şəkil URL': 'image_url',
+      };
+
+      const parsedData: any[] = [];
+      
+      for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        if (values.length < 2) continue;
+
+        const row: any = { is_active: true };
+        
+        headers.forEach((header, idx) => {
+          const dbField = headerMap[header.trim()];
+          if (dbField && values[idx]) {
+            let value = values[idx].trim().replace(/^"|"$/g, '');
+            
+            if (dbField === 'prep_time' || dbField === 'cook_time' || dbField === 'servings') {
+              const numValue = parseInt(value);
+              row[dbField] = isNaN(numValue) ? 0 : numValue;
+            } else if (dbField === 'ingredients' || dbField === 'instructions') {
+              // Split by semicolon or newline
+              const items = value.split(/[;|\n]/).map(s => s.trim()).filter(s => s);
+              row[dbField] = items;
+            } else {
+              row[dbField] = value;
+            }
+          }
+        });
+
+        if (row.title) {
+          if (!row.category) row.category = 'healthy';
+          parsedData.push(row);
+        }
+      }
+
+      if (parsedData.length === 0) {
+        toast({ title: 'Xəta', description: 'Heç bir resept tapılmadı', variant: 'destructive' });
+        return;
+      }
+
+      setRecipesImportData(parsedData);
+      setShowRecipesImport(true);
+    };
+
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  const handleRecipesImport = async () => {
+    if (recipesImportData.length === 0) return;
+
+    setRecipesImporting(true);
+    try {
+      const { error } = await supabase
+        .from('admin_recipes')
+        .insert(recipesImportData);
+
+      if (error) throw error;
+
+      toast({ 
+        title: 'Uğurlu!', 
+        description: `${recipesImportData.length} resept əlavə edildi` 
+      });
+      setShowRecipesImport(false);
+      setRecipesImportData([]);
+      fetchItems();
+    } catch (error: any) {
+      toast({ 
+        title: 'Xəta', 
+        description: error.message, 
+        variant: 'destructive' 
+      });
+    } finally {
+      setRecipesImporting(false);
+    }
+  };
+
+  const downloadRecipesTemplate = () => {
+    const template = `Başlıq,Təsvir,Kateqoriya,Hazırlıq (dəq),Bişirmə (dəq),Porsiya,İnqredientlər,Hazırlanma,Şəkil URL
+"Limonlu Zəncəfil Çayı","Hamiləlik dövründə ürəkbulanmaya qarşı ideal içki","pregnancy",5,0,2,"Su - 500ml; Təzə zəncəfil - 2sm; Limon - yarım; Bal - 1 çay qaşığı","Zəncəfili doğrayın; Suyu qaynadın; Zəncəfili əlavə edib 5 dəq dəmləyin; Limon və bal əlavə edin",""
+"Avokado Tostu","Folat və sağlam yağlarla zəngin səhər yeməyi","pregnancy",10,5,1,"Çörək - 2 dilim; Avokado - 1 ədəd; Yumurta - 1 ədəd; Duz, istiot","Çörəyi qızardın; Avokadonu əzin; Yumurtanı bişirin; Hamısını birləşdirin",""
+"Banan Smoothie","Enerji verən və qəbizliyə qarşı içki","breastfeeding",5,0,1,"Banan - 1 ədəd; Süd - 200ml; Bal - 1 çay qaşığı; Yulaf - 2 xörək qaşığı","Bütün inqredientləri blenderə qoyun; 1 dəq qarışdırın; Soyuq serviz edin",""`;
+
+    const blob = new Blob([template], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'reseptler_numune.csv';
+    link.click();
+  };
+
+  const downloadNamesTemplate = () => {
+    const template = `Ad,Cins,Mənşə,Məna,Məna (AZ),Populyarlıq
+"Aylin","Qız","Türk","Ayın parıltısı","Ayın ətrafındakı işıq, nur","98%"
+"Əli","Oğlan","Ərəb","Yüksək, əzəmətli","Uca, şərəfli","99%"
+"Ayan","Unisex","Türk","Bəlli, açıq","Göz qabağında olan, tanınan","90%"`;
+
+    const blob = new Blob([template], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'usaq_adlari_numune.csv';
+    link.click();
+  };
+
   const handleSave = async () => {
     const config = contentConfig[activeTab];
     
@@ -189,14 +452,38 @@ const AdminContentManager = () => {
 
   const openCreateModal = () => {
     setEditingItem(null);
-    setFormData({ is_active: true });
+    const initialData = { is_active: true };
+    setFormData(initialData);
+    initialFormDataRef.current = JSON.stringify(initialData);
     setShowModal(true);
   };
 
   const openEditModal = (item: ContentItem) => {
     setEditingItem(item);
     setFormData(item);
+    initialFormDataRef.current = JSON.stringify(item);
     setShowModal(true);
+  };
+
+  const hasUnsavedChanges = () => {
+    if (!showModal) return false;
+    return JSON.stringify(formData) !== initialFormDataRef.current;
+  };
+
+  const handleModalClose = () => {
+    if (hasUnsavedChanges()) {
+      setShowUnsavedDialog(true);
+    } else {
+      setShowModal(false);
+      setEditingItem(null);
+      setFormData({});
+    }
+  };
+
+  const handleDiscardChanges = () => {
+    setShowModal(false);
+    setEditingItem(null);
+    setFormData({});
   };
 
   const filteredItems = items.filter(item => {
@@ -204,6 +491,8 @@ const AdminContentManager = () => {
     return (
       item.title?.toLowerCase().includes(searchLower) ||
       item.name?.toLowerCase().includes(searchLower) ||
+      item.item_name?.toLowerCase().includes(searchLower) ||
+      item.item_name_az?.toLowerCase().includes(searchLower) ||
       item.description?.toLowerCase().includes(searchLower) ||
       item.content?.toLowerCase().includes(searchLower)
     );
@@ -281,6 +570,28 @@ const AdminContentManager = () => {
             </SelectContent>
           </Select>
         );
+      case 'priority':
+        return (
+          <Select value={String(formData[field] || 2)} onValueChange={(v) => setFormData({ ...formData, [field]: parseInt(v) })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Prioritet seçin" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1">Yüksək</SelectItem>
+              <SelectItem value="2">Orta</SelectItem>
+              <SelectItem value="3">Aşağı</SelectItem>
+            </SelectContent>
+          </Select>
+        );
+      case 'notes':
+        return (
+          <Textarea 
+            value={formData[field] || ''} 
+            onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
+            placeholder="Qısa açıqlama və ya məlumat"
+            rows={2}
+          />
+        );
       case 'is_active':
       case 'is_essential':
         return (
@@ -319,6 +630,25 @@ const AdminContentManager = () => {
             placeholder={field}
           />
         );
+      case 'ingredients':
+      case 'instructions':
+        const arrayValue = Array.isArray(formData[field]) ? formData[field] : [];
+        return (
+          <div className="space-y-2">
+            <Textarea 
+              value={arrayValue.join('\n')} 
+              onChange={(e) => {
+                const lines = e.target.value.split('\n').filter(line => line.trim());
+                setFormData({ ...formData, [field]: lines });
+              }}
+              placeholder={field === 'ingredients' ? 'Hər sətirdə bir inqredient' : 'Hər sətirdə bir addım'}
+              rows={5}
+            />
+            <p className="text-xs text-muted-foreground">
+              {field === 'ingredients' ? 'Hər inqrediyenti yeni sətirdə yazın' : 'Hər addımı yeni sətirdə yazın'}
+            </p>
+          </div>
+        );
       default:
         return (
           <Input 
@@ -351,6 +681,8 @@ const AdminContentManager = () => {
       item_name_az: 'Element Adı (AZ)',
       is_essential: 'Vacib',
       sort_order: 'Sıralama',
+      priority: 'Prioritet',
+      notes: 'Qeyd',
       prep_time: 'Hazırlıq Vaxtı (dəq)',
       cook_time: 'Bişirmə Vaxtı (dəq)',
       servings: 'Porsiya',
@@ -358,6 +690,8 @@ const AdminContentManager = () => {
       calories: 'Kalori',
       is_active: 'Aktiv',
       image_url: 'Şəkil',
+      ingredients: 'İnqredientlər',
+      instructions: 'Hazırlanma Qaydası',
     };
     return labels[field] || field;
   };
@@ -370,11 +704,47 @@ const AdminContentManager = () => {
           <h1 className="text-2xl font-bold">Kontent İdarəetməsi</h1>
         </div>
         <div className="flex gap-2">
+          {activeTab === 'recipes' && (
+            <>
+              <input
+                type="file"
+                ref={recipesFileInputRef}
+                accept=".csv"
+                onChange={handleRecipesCSVUpload}
+                className="hidden"
+              />
+              <Button onClick={downloadRecipesTemplate} variant="ghost" size="sm" className="gap-1">
+                📥 Şablon
+              </Button>
+              <Button onClick={() => recipesFileInputRef.current?.click()} variant="outline" className="gap-2">
+                <FileUp className="w-4 h-4" />
+                CSV İmport
+              </Button>
+            </>
+          )}
           {activeTab === 'tips' && (
             <Button onClick={() => setShowBulkImport(true)} variant="outline" className="gap-2">
               <FileUp className="w-4 h-4" />
               Toplu İmport
             </Button>
+          )}
+          {activeTab === 'names' && (
+            <>
+              <input
+                type="file"
+                ref={namesFileInputRef}
+                accept=".csv"
+                onChange={handleNamesCSVUpload}
+                className="hidden"
+              />
+              <Button onClick={downloadNamesTemplate} variant="ghost" size="sm" className="gap-1">
+                📥 Şablon
+              </Button>
+              <Button onClick={() => namesFileInputRef.current?.click()} variant="outline" className="gap-2">
+                <FileUp className="w-4 h-4" />
+                CSV İmport
+              </Button>
+            </>
           )}
           <Button onClick={openCreateModal} className="gradient-primary">
             <Plus className="w-4 h-4 mr-2" />
@@ -485,7 +855,10 @@ const AdminContentManager = () => {
       </Tabs>
 
       {/* Edit/Create Modal */}
-      <Dialog open={showModal} onOpenChange={setShowModal}>
+      <Dialog open={showModal} onOpenChange={(open) => {
+        if (!open) handleModalClose();
+        else setShowModal(open);
+      }}>
         <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
@@ -500,7 +873,7 @@ const AdminContentManager = () => {
               </div>
             ))}
             <div className="flex gap-3 pt-4">
-              <Button variant="outline" onClick={() => setShowModal(false)} className="flex-1">
+              <Button variant="outline" onClick={handleModalClose} className="flex-1">
                 Ləğv et
               </Button>
               <Button onClick={handleSave} className="flex-1 gradient-primary">
@@ -516,6 +889,138 @@ const AdminContentManager = () => {
         isOpen={showBulkImport}
         onClose={() => setShowBulkImport(false)}
         onSuccess={fetchItems}
+      />
+
+      {/* Baby Names CSV Import Modal */}
+      <Dialog open={showNamesImport} onOpenChange={setShowNamesImport}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Baby className="w-5 h-5 text-primary" />
+              CSV İmport - {namesImportData.length} ad tapıldı
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-y-auto space-y-3 py-4">
+            {namesImportData.slice(0, 20).map((item, idx) => (
+              <div key={idx} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <span className={`text-lg ${item.gender === 'girl' ? 'text-pink-500' : item.gender === 'boy' ? 'text-blue-500' : 'text-purple-500'}`}>
+                  {item.gender === 'girl' ? '👧' : item.gender === 'boy' ? '👦' : '👶'}
+                </span>
+                <div className="flex-1">
+                  <p className="font-semibold">{item.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {item.origin && `${item.origin} • `}
+                    {item.meaning_az || item.meaning}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                    {item.popularity}%
+                  </span>
+                </div>
+              </div>
+            ))}
+            {namesImportData.length > 20 && (
+              <p className="text-center text-sm text-muted-foreground py-2">
+                və daha {namesImportData.length - 20} ad...
+              </p>
+            )}
+          </div>
+
+          <div className="flex gap-3 pt-4 border-t">
+            <Button 
+              variant="outline" 
+              onClick={() => { setShowNamesImport(false); setNamesImportData([]); }} 
+              className="flex-1"
+              disabled={namesImporting}
+            >
+              Ləğv et
+            </Button>
+            <Button 
+              onClick={handleNamesImport} 
+              className="flex-1 gradient-primary"
+              disabled={namesImporting}
+            >
+              {namesImporting ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                `${namesImportData.length} Ad Əlavə Et`
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Recipes CSV Import Modal */}
+      <Dialog open={showRecipesImport} onOpenChange={setShowRecipesImport}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ChefHat className="w-5 h-5 text-primary" />
+              CSV İmport - {recipesImportData.length} resept tapıldı
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-y-auto space-y-3 py-4">
+            {recipesImportData.slice(0, 15).map((item, idx) => (
+              <div key={idx} className="p-3 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🍽️</span>
+                  <div className="flex-1">
+                    <p className="font-semibold">{item.title}</p>
+                    <p className="text-xs text-muted-foreground line-clamp-1">
+                      {item.description}
+                    </p>
+                  </div>
+                  <div className="text-right text-xs text-muted-foreground">
+                    <p>⏱️ {item.prep_time || 0}+{item.cook_time || 0} dəq</p>
+                    <p>🍴 {item.servings || 1} porsiya</p>
+                  </div>
+                </div>
+                {item.ingredients && item.ingredients.length > 0 && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {item.ingredients.length} inqredient • {item.instructions?.length || 0} addım
+                  </p>
+                )}
+              </div>
+            ))}
+            {recipesImportData.length > 15 && (
+              <p className="text-center text-sm text-muted-foreground py-2">
+                və daha {recipesImportData.length - 15} resept...
+              </p>
+            )}
+          </div>
+
+          <div className="flex gap-3 pt-4 border-t">
+            <Button 
+              variant="outline" 
+              onClick={() => { setShowRecipesImport(false); setRecipesImportData([]); }} 
+              className="flex-1"
+              disabled={recipesImporting}
+            >
+              Ləğv et
+            </Button>
+            <Button 
+              onClick={handleRecipesImport} 
+              className="flex-1 gradient-primary"
+              disabled={recipesImporting}
+            >
+              {recipesImporting ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                `${recipesImportData.length} Resept Əlavə Et`
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Unsaved Changes Dialog */}
+      <UnsavedChangesDialog
+        open={showUnsavedDialog}
+        onOpenChange={setShowUnsavedDialog}
+        onDiscard={handleDiscardChanges}
       />
     </div>
   );

@@ -1,22 +1,24 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, Edit, Trash2, Eye, EyeOff, Star, Search,
-  ChevronDown, Save, X, Image as ImageIcon, Tag, Clock, BarChart3, Sparkles, Loader2
+  ChevronDown, Save, X, Image as ImageIcon, Tag, Clock, BarChart3, Sparkles, Loader2,
+  Upload, Link
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { useBlogAdmin, BlogPost, BlogCategory } from '@/hooks/useBlog';
+import { useBlogAdmin, BlogPost, BlogCategory, BlogLifeStage } from '@/hooks/useBlog';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import BlogAnalytics from './BlogAnalytics';
 import { supabase } from '@/integrations/supabase/client';
+import UnsavedChangesDialog from './UnsavedChangesDialog';
 
 const AdminBlog = () => {
-  const { posts, categories, loading, createPost, updatePost, deletePost, createCategory, deleteCategory } = useBlogAdmin();
+  const { posts, categories, postCategories, loading, createPost, updatePost, deletePost, createCategory, deleteCategory, getPostCategoryIds, setPostCategoriesForPost } = useBlogAdmin();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'posts' | 'categories' | 'analytics'>('posts');
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,6 +26,11 @@ const AdminBlog = () => {
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [generatingContent, setGeneratingContent] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageInputMode, setImageInputMode] = useState<'url' | 'upload'>('upload');
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const initialFormDataRef = useRef<string>('');
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -36,8 +43,16 @@ const AdminBlog = () => {
     author_name: 'Anacan',
     reading_time: 5,
     is_featured: false,
-    is_published: false
+    is_published: false,
+    life_stage: 'all' as BlogLifeStage
   });
+
+  const lifeStageOptions: { value: BlogLifeStage; label: string; emoji: string }[] = [
+    { value: 'all', label: 'Hamısı üçün', emoji: '🌐' },
+    { value: 'flow', label: 'Menstruasiya dövrü', emoji: '🩸' },
+    { value: 'bump', label: 'Hamiləlik dövrü', emoji: '🤰' },
+    { value: 'mommy', label: 'Ana (körpə baxımı)', emoji: '👶' }
+  ];
 
   const [newCategory, setNewCategory] = useState({
     name: '',
@@ -105,6 +120,63 @@ const AdminBlog = () => {
       .trim();
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: 'Xəta',
+        description: 'Yalnız şəkil faylları yüklənə bilər',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: 'Xəta',
+        description: 'Şəkil 5MB-dan böyük olmamalıdır',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `blog-${Date.now()}.${fileExt}`;
+      const filePath = `blog-covers/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('assets')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('assets')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, cover_image_url: publicUrl });
+      toast({
+        title: 'Uğurlu!',
+        description: 'Şəkil yükləndi'
+      });
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({
+        title: 'Xəta',
+        description: 'Şəkil yüklənə bilmədi',
+        variant: 'destructive'
+      });
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleTitleChange = (title: string) => {
     setFormData({
       ...formData,
@@ -132,7 +204,9 @@ const AdminBlog = () => {
 
   const handleEdit = (post: BlogPost) => {
     setEditingPost(post);
-    setFormData({
+    const postCatIds = getPostCategoryIds(post.id);
+    setSelectedCategoryIds(postCatIds);
+    const newFormData = {
       title: post.title,
       slug: post.slug,
       excerpt: post.excerpt || '',
@@ -143,9 +217,25 @@ const AdminBlog = () => {
       author_name: post.author_name,
       reading_time: post.reading_time,
       is_featured: post.is_featured,
-      is_published: post.is_published
-    });
+      is_published: post.is_published,
+      life_stage: (post.life_stage || 'all') as BlogLifeStage
+    };
+    setFormData(newFormData);
+    initialFormDataRef.current = JSON.stringify({ ...newFormData, categoryIds: postCatIds });
     setShowEditor(true);
+  };
+
+  const hasUnsavedChanges = () => {
+    if (!showEditor) return false;
+    return JSON.stringify({ ...formData, categoryIds: selectedCategoryIds }) !== initialFormDataRef.current;
+  };
+
+  const handleModalClose = () => {
+    if (hasUnsavedChanges()) {
+      setShowUnsavedDialog(true);
+    } else {
+      resetForm();
+    }
   };
 
   const handleSave = async () => {
@@ -165,9 +255,9 @@ const AdminBlog = () => {
 
     let result;
     if (editingPost) {
-      result = await updatePost(editingPost.id, postData);
+      result = await updatePost(editingPost.id, postData, selectedCategoryIds);
     } else {
-      result = await createPost(postData);
+      result = await createPost(postData, selectedCategoryIds);
     }
 
     if (result.error) {
@@ -237,17 +327,36 @@ const AdminBlog = () => {
   };
 
   const handleDeleteCategory = async (id: string) => {
-    if (confirm('Bu kateqoriyanı silmək istədiyinizə əminsiniz?')) {
-      await deleteCategory(id);
+    // Check if category is used
+    const usageCount = postCategories.filter(pc => pc.category_id === id).length;
+    if (usageCount > 0) {
       toast({
-        title: 'Silindi',
-        description: 'Kateqoriya silindi'
+        title: 'Xəta',
+        description: `Bu kateqoriya ${usageCount} məqalədə istifadə olunur. Əvvəlcə məqalələrdən çıxarın.`,
+        variant: 'destructive'
       });
+      return;
+    }
+    
+    if (confirm('Bu kateqoriyanı silmək istədiyinizə əminsiniz?')) {
+      const result = await deleteCategory(id);
+      if (result.error) {
+        toast({
+          title: 'Xəta',
+          description: result.error instanceof Error ? result.error.message : 'Kateqoriya silinə bilmədi',
+          variant: 'destructive'
+        });
+      } else {
+        toast({
+          title: 'Silindi',
+          description: 'Kateqoriya silindi'
+        });
+      }
     }
   };
 
   const resetForm = () => {
-    setFormData({
+    const emptyForm = {
       title: '',
       slug: '',
       excerpt: '',
@@ -258,11 +367,29 @@ const AdminBlog = () => {
       author_name: 'Anacan',
       reading_time: 5,
       is_featured: false,
-      is_published: false
-    });
+      is_published: false,
+      life_stage: 'all' as BlogLifeStage
+    };
+    setFormData(emptyForm);
+    setSelectedCategoryIds([]);
+    initialFormDataRef.current = JSON.stringify({ ...emptyForm, categoryIds: [] });
     setEditingPost(null);
     setShowEditor(false);
   };
+
+  const toggleCategorySelection = (categoryId: string) => {
+    setSelectedCategoryIds(prev => 
+      prev.includes(categoryId)
+        ? prev.filter(id => id !== categoryId)
+        : [...prev, categoryId]
+    );
+  };
+
+  useEffect(() => {
+    if (showEditor && !editingPost) {
+      initialFormDataRef.current = JSON.stringify(formData);
+    }
+  }, [showEditor]);
 
   const filteredPosts = posts.filter(p =>
     p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -368,9 +495,21 @@ const AdminBlog = () => {
 
                 <div className="p-4">
                   <div className="flex items-start justify-between mb-2">
-                    <Badge variant={post.is_published ? 'default' : 'secondary'}>
-                      {post.is_published ? 'Dərc edilib' : 'Qaralama'}
-                    </Badge>
+                    <div className="flex items-center gap-1.5">
+                      <Badge variant={post.is_published ? 'default' : 'secondary'}>
+                        {post.is_published ? 'Dərc edilib' : 'Qaralama'}
+                      </Badge>
+                      {/* Life Stage Badge */}
+                      {post.life_stage && post.life_stage !== 'all' && (
+                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                          post.life_stage === 'bump' ? 'bg-pink-100 text-pink-700' :
+                          post.life_stage === 'mommy' ? 'bg-blue-100 text-blue-700' :
+                          'bg-red-100 text-red-700'
+                        }`}>
+                          {lifeStageOptions.find(o => o.value === post.life_stage)?.emoji}
+                        </span>
+                      )}
+                    </div>
                     {post.is_featured && (
                       <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                     )}
@@ -378,9 +517,26 @@ const AdminBlog = () => {
 
                   <h3 className="font-bold text-foreground line-clamp-2 mb-2">{post.title}</h3>
                   
+                  {/* Categories badges */}
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {getPostCategoryIds(post.id).map(catId => {
+                      const cat = categories.find(c => c.id === catId);
+                      return cat ? (
+                        <span
+                          key={catId}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium"
+                          style={{ backgroundColor: `${cat.color}20`, color: cat.color }}
+                        >
+                          {cat.icon} {cat.name}
+                        </span>
+                      ) : null;
+                    })}
+                    {getPostCategoryIds(post.id).length === 0 && (
+                      <span className="text-xs text-muted-foreground italic">Kateqoriya yoxdur</span>
+                    )}
+                  </div>
+                  
                   <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
-                    <span>{categories.find(c => c.slug === post.category)?.name || post.category}</span>
-                    <span>•</span>
                     <span>{post.reading_time} dəq</span>
                     <span>•</span>
                     <span>{post.view_count} baxış</span>
@@ -457,7 +613,7 @@ const AdminBlog = () => {
               )}
               <div className="flex justify-between items-center">
                 <span className="text-xs text-muted-foreground">
-                  {posts.filter(p => p.category === category.slug).length} məqalə
+                  {postCategories.filter(pc => pc.category_id === category.id).length} məqalə
                 </span>
                 <Button
                   size="sm"
@@ -486,7 +642,7 @@ const AdminBlog = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-            onClick={() => resetForm()}
+            onClick={handleModalClose}
           >
             <motion.div
               initial={{ scale: 0.95, y: 20 }}
@@ -499,7 +655,7 @@ const AdminBlog = () => {
                 <h2 className="text-xl font-bold">
                   {editingPost ? 'Məqaləni Redaktə Et' : 'Yeni Məqalə'}
                 </h2>
-                <Button variant="ghost" size="icon" onClick={resetForm}>
+                <Button variant="ghost" size="icon" onClick={handleModalClose}>
                   <X className="w-5 h-5" />
                 </Button>
               </div>
@@ -527,44 +683,127 @@ const AdminBlog = () => {
 
                 {/* Cover Image */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Örtük Şəkli URL</label>
-                  <Input
-                    value={formData.cover_image_url}
-                    onChange={(e) => setFormData({ ...formData, cover_image_url: e.target.value })}
-                    placeholder="https://example.com/image.jpg"
-                  />
-                  {formData.cover_image_url && (
-                    <img
-                      src={formData.cover_image_url}
-                      alt="Preview"
-                      className="mt-2 w-full h-40 object-cover rounded-lg"
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-sm font-medium">Örtük Şəkli</label>
+                    <div className="flex gap-1 bg-muted rounded-lg p-1">
+                      <button
+                        type="button"
+                        onClick={() => setImageInputMode('upload')}
+                        className={`px-3 py-1 text-xs rounded-md flex items-center gap-1 transition-colors ${
+                          imageInputMode === 'upload' 
+                            ? 'bg-background text-foreground shadow-sm' 
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        <Upload className="w-3 h-3" />
+                        Yüklə
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setImageInputMode('url')}
+                        className={`px-3 py-1 text-xs rounded-md flex items-center gap-1 transition-colors ${
+                          imageInputMode === 'url' 
+                            ? 'bg-background text-foreground shadow-sm' 
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        <Link className="w-3 h-3" />
+                        URL
+                      </button>
+                    </div>
+                  </div>
+
+                  {imageInputMode === 'upload' ? (
+                    <div className="space-y-3">
+                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors bg-muted/30">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          disabled={uploadingImage}
+                        />
+                        {uploadingImage ? (
+                          <div className="flex flex-col items-center">
+                            <Loader2 className="w-8 h-8 text-muted-foreground animate-spin mb-2" />
+                            <span className="text-sm text-muted-foreground">Yüklənir...</span>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center">
+                            <Upload className="w-8 h-8 text-muted-foreground mb-2" />
+                            <span className="text-sm text-muted-foreground">Şəkil seçin və ya sürükləyin</span>
+                            <span className="text-xs text-muted-foreground mt-1">PNG, JPG (max 5MB)</span>
+                          </div>
+                        )}
+                      </label>
+                    </div>
+                  ) : (
+                    <Input
+                      value={formData.cover_image_url}
+                      onChange={(e) => setFormData({ ...formData, cover_image_url: e.target.value })}
+                      placeholder="https://example.com/image.jpg"
                     />
+                  )}
+
+                  {formData.cover_image_url && (
+                    <div className="relative mt-3">
+                      <img
+                        src={formData.cover_image_url}
+                        alt="Preview"
+                        className="w-full h-40 object-cover rounded-lg"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 w-8 h-8"
+                        onClick={() => setFormData({ ...formData, cover_image_url: '' })}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
                   )}
                 </div>
 
-                {/* Category & Reading Time */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Kateqoriya</label>
-                    <select
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="w-full h-10 px-3 rounded-md border border-input bg-background"
-                    >
-                      {categories.map(cat => (
-                        <option key={cat.id} value={cat.slug}>{cat.name}</option>
-                      ))}
-                    </select>
+                {/* Categories (Multi-select) */}
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Kateqoriyalar</label>
+                  <div className="flex flex-wrap gap-2 p-3 border border-input rounded-lg bg-muted/30 min-h-[60px]">
+                    {categories.map(cat => {
+                      const isSelected = selectedCategoryIds.includes(cat.id);
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => toggleCategorySelection(cat.id)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                            isSelected
+                              ? 'bg-primary text-primary-foreground'
+                              : 'bg-card border border-border text-muted-foreground hover:bg-muted'
+                          }`}
+                        >
+                          <span>{cat.icon}</span>
+                          <span>{cat.name}</span>
+                          {isSelected && <X className="w-3 h-3 ml-1" />}
+                        </button>
+                      );
+                    })}
                   </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Oxuma müddəti (dəq)</label>
-                    <Input
-                      type="number"
-                      value={formData.reading_time}
-                      onChange={(e) => setFormData({ ...formData, reading_time: parseInt(e.target.value) || 5 })}
-                      min={1}
-                    />
-                  </div>
+                  {selectedCategoryIds.length === 0 && (
+                    <p className="text-xs text-muted-foreground mt-1">Ən azı bir kateqoriya seçin</p>
+                  )}
+                </div>
+
+                {/* Reading Time */}
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Oxuma müddəti (dəq)</label>
+                  <Input
+                    type="number"
+                    value={formData.reading_time}
+                    onChange={(e) => setFormData({ ...formData, reading_time: parseInt(e.target.value) || 5 })}
+                    min={1}
+                    className="max-w-[150px]"
+                  />
                 </div>
 
                 {/* Excerpt */}
@@ -650,6 +889,31 @@ const AdminBlog = () => {
                   />
                 </div>
 
+                {/* Life Stage Selector */}
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Hədəf Mərhələsi</label>
+                  <div className="flex flex-wrap gap-2">
+                    {lifeStageOptions.map(option => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, life_stage: option.value })}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all border ${
+                          formData.life_stage === option.value
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-card border-border text-muted-foreground hover:bg-muted'
+                        }`}
+                      >
+                        <span>{option.emoji}</span>
+                        <span>{option.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1.5">
+                    Bu məqalə hansı istifadəçi qrupuna aiddir? Dashboard-da həmin qrupa uyğun göstəriləcək.
+                  </p>
+                </div>
+
                 {/* Toggles */}
                 <div className="flex gap-6">
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -670,7 +934,7 @@ const AdminBlog = () => {
               </div>
 
               <div className="p-6 border-t border-border flex justify-end gap-3 sticky bottom-0 bg-card">
-                <Button variant="outline" onClick={resetForm}>
+                <Button variant="outline" onClick={handleModalClose}>
                   Ləğv et
                 </Button>
                 <Button onClick={handleSave} className="bg-primary">
@@ -763,6 +1027,13 @@ const AdminBlog = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Unsaved Changes Dialog */}
+      <UnsavedChangesDialog
+        open={showUnsavedDialog}
+        onOpenChange={setShowUnsavedDialog}
+        onDiscard={resetForm}
+      />
     </div>
   );
 };

@@ -6,7 +6,7 @@
     "SplashScreen": {
       "launchShowDuration": 2000,
       "launchAutoHide": true,
-      "backgroundColor": "#F97316",
+      "backgroundColor": "#FAF7F4",
       "androidScaleType": "CENTER_CROP",
       "showSpinner": false,
       "splashFullScreen": true,
@@ -18,15 +18,23 @@
     "LocalNotifications": {
       "smallIcon": "ic_stat_icon",
       "iconColor": "#F97316"
+    },
+    "Camera": {
+      "permissionText": "Tətbiq nəcis skaneri və şəkil yükləmək üçün kameraya ehtiyac duyur"
+    },
+    "Geolocation": {
+      "permissionText": "Tətbiq hava vəziyyəti və geyim tövsiyələri üçün məkanınıza ehtiyac duyur"
     }
   },
   "ios": {
-    "contentInset": "automatic",
-    "scheme": "Anacan"
+    "contentInset": "never",
+    "scheme": "Anacan",
+    "backgroundColor": "#FAF7F4"
   },
   "android": {
     "allowMixedContent": true,
     "captureInput": true,
-    "webContentsDebuggingEnabled": false
+    "webContentsDebuggingEnabled": false,
+    "backgroundColor": "#FAF7F4"
   }
 }

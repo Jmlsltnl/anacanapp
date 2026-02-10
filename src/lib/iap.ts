@@ -1,15 +1,22 @@
 import { Capacitor } from '@capacitor/core';
 
-// Product IDs - bu ID-ləri App Store Connect və Google Play Console-da yaratmalısınız
+// Product IDs - App Store Connect və Google Play Console-da yaradılmalı
+// App ID: com.atlasoon.anacan
 export const IAP_PRODUCTS = {
-  PREMIUM_MONTHLY: 'app.lovable.anacan.premium.monthly',
-  PREMIUM_YEARLY: 'app.lovable.anacan.premium.yearly',
+  PREMIUM_MONTHLY: 'com.atlasoon.anacan.premium.monthly',
+  PREMIUM_YEARLY: 'com.atlasoon.anacan.premium.yearly',
 } as const;
 
-// Plan IDs for Android subscriptions
+// Plan IDs for Android subscriptions (Google Play Console-da Base Plan ID)
 export const IAP_PLANS = {
   MONTHLY_PLAN: 'monthly-plan',
   YEARLY_PLAN: 'yearly-plan',
+} as const;
+
+// App configuration
+export const APP_CONFIG = {
+  APP_ID: 'com.atlasoon.anacan',
+  APP_NAME: 'Anacan',
 } as const;
 
 export interface IAPProduct {

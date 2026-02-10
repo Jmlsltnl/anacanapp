@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 
 interface PrivacyScreenProps {
@@ -16,6 +17,8 @@ interface PrivacyScreenProps {
 }
 
 const PrivacyScreen = ({ onBack }: PrivacyScreenProps) => {
+  useScrollToTop();
+  
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -118,9 +121,9 @@ const PrivacyScreen = ({ onBack }: PrivacyScreenProps) => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-28">
-      {/* Header */}
-      <div className="gradient-primary px-5 pt-4 pb-6">
+    <div className="min-h-screen bg-background pb-28 overflow-y-auto">
+      {/* Header with safe area */}
+      <div className="gradient-primary px-5 pb-6" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
         <div className="flex items-center gap-3 mb-4">
           <motion.button
             onClick={onBack}

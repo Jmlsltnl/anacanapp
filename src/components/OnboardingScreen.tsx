@@ -1,53 +1,23 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Check, Calendar, Baby, Heart, Sparkles, Users } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check, Calendar, Baby, Heart, Sparkles, Users, Droplets } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useAutoJoinGroups } from '@/hooks/useCommunity';
+import { useOnboardingStages, useMultiplesOptions, FALLBACK_STAGES, FALLBACK_MULTIPLES } from '@/hooks/useDynamicOnboarding';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { supabase } from '@/integrations/supabase/client';
 import type { LifeStage } from '@/types/anacan';
 
-const stages = [
-  {
-    id: 'flow' as LifeStage,
-    title: 'Dövrümü izləmək',
-    subtitle: 'Menstruasiya təqvimi',
-    description: 'Dövrünüzü izləyin, ovulyasiyanı proqnozlaşdırın',
-    icon: Calendar,
-    emoji: '🌸',
-    color: 'flow',
-    bgGradient: 'from-rose-500 to-pink-600',
-  },
-  {
-    id: 'bump' as LifeStage,
-    title: 'Hamiləliyim',
-    subtitle: 'Hamiləlik izləyicisi',
-    description: 'Körpənizin inkişafını həftə-həftə izləyin',
-    icon: Heart,
-    emoji: '🤰',
-    color: 'bump',
-    bgGradient: 'from-violet-500 to-purple-600',
-  },
-  {
-    id: 'mommy' as LifeStage,
-    title: 'Körpəm var',
-    subtitle: 'Analıq yardımçısı',
-    description: 'Körpənizin qidalanma, yuxu və inkişafını izləyin',
-    icon: Baby,
-    emoji: '👶',
-    color: 'mommy',
-    bgGradient: 'from-emerald-500 to-teal-600',
-  },
-];
-
-const multiplesOptions = [
-  { id: 'single', label: 'Tək uşaq', emoji: '👶', count: 1 },
-  { id: 'twins', label: 'Əkiz', emoji: '👶👶', count: 2 },
-  { id: 'triplets', label: 'Üçüz', emoji: '👶👶👶', count: 3 },
-  { id: 'quadruplets', label: 'Dördüz', emoji: '👶👶👶👶', count: 4 },
-];
+// Icon mapping for dynamic stages
+const iconMap: Record<string, React.ComponentType<any>> = {
+  Calendar,
+  Heart,
+  Baby,
+};
 
 const OnboardingScreen = () => {
   const [step, setStep] = useState(0);
@@ -57,12 +27,74 @@ const OnboardingScreen = () => {
   const [babyGender, setBabyGender] = useState<'boy' | 'girl' | null>(null);
   const [multiplesType, setMultiplesType] = useState<'single' | 'twins' | 'triplets' | 'quadruplets'>('single');
   const [babyCount, setBabyCount] = useState(1);
+  const [cycleLength, setCycleLength] = useState(28);
+  const [periodLength, setPeriodLength] = useState(5);
   const [isSaving, setIsSaving] = useState(false);
   
-  const { setLifeStage, setLastPeriodDate, setBabyData, setOnboarded, setDueDate, setMultiplesData } = useUserStore();
+  const { setLifeStage, setLastPeriodDate, setBabyData, setOnboarded, setDueDate, setMultiplesData, setCycleLength: setStoreCycleLength, setPeriodLength: setStorePeriodLength } = useUserStore();
   const { updateProfile } = useAuth();
   const { toast } = useToast();
   const { autoJoin } = useAutoJoinGroups();
+  
+  // Fetch dynamic data from backend
+  const { data: dbStages, isLoading: stagesLoading } = useOnboardingStages();
+  const { data: dbMultiples, isLoading: multiplesLoading } = useMultiplesOptions();
+  const { data: appSettings = [] } = useAppSettings();
+
+  // Check which stages are enabled
+  const isStageEnabled = (stageId: string) => {
+    const setting = appSettings.find(s => s.key === `${stageId}_mode_enabled`);
+    if (!setting) return true; // Default enabled
+    const val = setting.value;
+    if (val === 'true' || val === true) return true;
+    if (val === 'false' || val === false) return false;
+    return true;
+  };
+
+  // Use database data or fallback, then filter by enabled settings
+  const stages = useMemo(() => {
+    const allStages = (!dbStages || dbStages.length === 0)
+      ? FALLBACK_STAGES.map(s => ({
+          id: s.stage_id as LifeStage,
+          title: s.title_az,
+          subtitle: s.subtitle_az,
+          description: s.description_az,
+          icon: iconMap[s.icon_name] || Heart,
+          emoji: s.emoji,
+          color: s.stage_id,
+          bgGradient: s.bg_gradient,
+        }))
+      : dbStages.map(s => ({
+          id: s.stage_id as LifeStage,
+          title: s.title_az || s.title,
+          subtitle: s.subtitle_az || s.subtitle,
+          description: s.description_az || s.description,
+          icon: iconMap[s.icon_name] || Heart,
+          emoji: s.emoji,
+          color: s.stage_id,
+          bgGradient: s.bg_gradient,
+        }));
+    
+    // Filter by enabled settings
+    return allStages.filter(stage => isStageEnabled(stage.id));
+  }, [dbStages, appSettings]);
+
+  const multiplesOptions = useMemo(() => {
+    if (!dbMultiples || dbMultiples.length === 0) {
+      return FALLBACK_MULTIPLES.map(m => ({
+        id: m.option_id,
+        label: m.label_az,
+        emoji: m.emoji,
+        count: m.baby_count,
+      }));
+    }
+    return dbMultiples.map(m => ({
+      id: m.option_id,
+      label: m.label_az || m.label,
+      emoji: m.emoji,
+      count: m.baby_count,
+    }));
+  }, [dbMultiples]);
 
   const handleStageSelect = (stage: LifeStage) => {
     setSelectedStage(stage);
@@ -82,7 +114,7 @@ const OnboardingScreen = () => {
       try {
         if (selectedStage === 'mommy') {
           if (dateInput && babyName && babyGender) {
-            // Save to Supabase
+            // Save to Supabase profiles
             const { error } = await updateProfile({
               life_stage: selectedStage,
               baby_birth_date: dateInput,
@@ -100,6 +132,19 @@ const OnboardingScreen = () => {
               });
               setIsSaving(false);
               return;
+            }
+
+            // Also add child to user_children table
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+              await supabase.from('user_children').insert({
+                user_id: user.id,
+                name: babyName,
+                birth_date: dateInput,
+                gender: babyGender,
+                avatar_emoji: babyGender === 'boy' ? '👦' : '👧',
+                sort_order: 0,
+              });
             }
 
             // Update local store
@@ -158,10 +203,12 @@ const OnboardingScreen = () => {
         } else {
           // Flow stage
           if (dateInput) {
-            // Save to Supabase
+            // Save to Supabase with cycle data
             const { error } = await updateProfile({
               life_stage: selectedStage,
               last_period_date: dateInput,
+              cycle_length: cycleLength,
+              period_length: periodLength,
             });
 
             if (error) {
@@ -174,8 +221,10 @@ const OnboardingScreen = () => {
               return;
             }
 
-            // Update local store
+            // Update local store with cycle data
             setLastPeriodDate(new Date(dateInput));
+            setStoreCycleLength(cycleLength);
+            setStorePeriodLength(periodLength);
             setLifeStage(selectedStage!);
             setOnboarded(true);
 
@@ -466,6 +515,75 @@ const OnboardingScreen = () => {
                           </motion.button>
                         ))}
                       </div>
+                    </motion.div>
+                  </>
+                )}
+
+                {/* Cycle Length for Flow stage */}
+                {selectedStage === 'flow' && (
+                  <>
+                    <motion.div variants={childVariants}>
+                      <label className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        Sikl uzunluğu (gün)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <motion.button
+                          type="button"
+                          onClick={() => setCycleLength(Math.max(21, cycleLength - 1))}
+                          className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          -
+                        </motion.button>
+                        <div className="flex-1 h-14 rounded-2xl bg-muted/50 flex items-center justify-center">
+                          <span className="text-2xl font-bold text-foreground">{cycleLength}</span>
+                          <span className="text-muted-foreground ml-2">gün</span>
+                        </div>
+                        <motion.button
+                          type="button"
+                          onClick={() => setCycleLength(Math.min(45, cycleLength + 1))}
+                          className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          +
+                        </motion.button>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2 text-center">
+                        Normal aralıq: 21-35 gün
+                      </p>
+                    </motion.div>
+
+                    <motion.div variants={childVariants}>
+                      <label className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+                        <Droplets className="w-4 h-4" />
+                        Period uzunluğu (gün)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <motion.button
+                          type="button"
+                          onClick={() => setPeriodLength(Math.max(2, periodLength - 1))}
+                          className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          -
+                        </motion.button>
+                        <div className="flex-1 h-14 rounded-2xl bg-muted/50 flex items-center justify-center">
+                          <span className="text-2xl font-bold text-foreground">{periodLength}</span>
+                          <span className="text-muted-foreground ml-2">gün</span>
+                        </div>
+                        <motion.button
+                          type="button"
+                          onClick={() => setPeriodLength(Math.min(10, periodLength + 1))}
+                          className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          +
+                        </motion.button>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2 text-center">
+                        Normal aralıq: 3-7 gün
+                      </p>
                     </motion.div>
                   </>
                 )}

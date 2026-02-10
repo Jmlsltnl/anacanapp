@@ -94,48 +94,68 @@
 
   .dark {
     /* Dark mode with warm undertones matching our orange brand */
-    --background: 20 15% 8%;
-    --foreground: 35 30% 95%;
+    --background: 20 15% 7%;
+    --foreground: 35 40% 95%;
 
-    --card: 20 15% 11%;
-    --card-foreground: 35 30% 95%;
+    --card: 20 15% 10%;
+    --card-foreground: 35 40% 95%;
 
-    --popover: 20 15% 11%;
-    --popover-foreground: 35 30% 95%;
+    --popover: 20 15% 10%;
+    --popover-foreground: 35 40% 95%;
 
     /* Primary stays vibrant orange */
     --primary: 15 87% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 20 20% 16%;
-    --secondary-foreground: 35 35% 85%;
+    --secondary: 20 20% 14%;
+    --secondary-foreground: 35 45% 90%;
 
-    --muted: 20 15% 14%;
-    --muted-foreground: 35 25% 55%;
+    --muted: 20 15% 16%;
+    --muted-foreground: 35 30% 65%;
 
-    --accent: 15 75% 52%;
+    --accent: 15 75% 55%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 65% 50%;
+    --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 20 15% 20%;
-    --input: 20 15% 16%;
+    --border: 20 15% 22%;
+    --input: 20 15% 18%;
     --ring: 15 87% 58%;
 
-    --flow-light: 350 60% 18%;
-    --bump-light: 275 45% 18%;
-    --mommy-light: 165 40% 18%;
-    --partner-light: 215 55% 18%;
-    --beige-light: 30 25% 16%;
+    /* Life stage colors for dark mode - brighter for visibility */
+    --flow: 350 75% 65%;
+    --flow-light: 350 50% 18%;
+    --flow-dark: 350 70% 55%;
+    
+    --bump: 275 55% 65%;
+    --bump-light: 275 40% 18%;
+    --bump-dark: 275 50% 55%;
+    
+    --mommy: 165 55% 55%;
+    --mommy-light: 165 35% 18%;
+    --mommy-dark: 165 50% 45%;
+    
+    --partner: 215 65% 62%;
+    --partner-light: 215 50% 18%;
+    --partner-dark: 215 60% 52%;
 
-    --sidebar-background: 20 15% 8%;
-    --sidebar-foreground: 35 30% 95%;
+    --beige: 35 35% 30%;
+    --beige-light: 30 20% 16%;
+    --beige-dark: 35 30% 22%;
+
+    /* Dark mode gradients */
+    --gradient-warm: linear-gradient(180deg, hsl(20, 15%, 7%) 0%, hsl(20, 15%, 10%) 100%);
+    --gradient-beige: linear-gradient(135deg, hsl(30, 20%, 12%) 0%, hsl(25, 18%, 10%) 100%);
+
+    /* Sidebar */
+    --sidebar-background: 20 15% 7%;
+    --sidebar-foreground: 35 40% 95%;
     --sidebar-primary: 15 87% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 20 20% 16%;
-    --sidebar-accent-foreground: 35 35% 85%;
-    --sidebar-border: 20 15% 20%;
+    --sidebar-accent: 20 20% 14%;
+    --sidebar-accent-foreground: 35 45% 90%;
+    --sidebar-border: 20 15% 22%;
     --sidebar-ring: 15 87% 58%;
   }
 }
@@ -145,12 +165,32 @@
     @apply border-border;
   }
 
-  body {
-    @apply bg-background text-foreground font-nunito antialiased;
+  html {
+    position: fixed;
+    inset: 0;
+    background-color: hsl(var(--background));
+    overscroll-behavior: none;
+    overflow: hidden;
   }
 
-  html {
-    scroll-behavior: smooth;
+  body {
+    @apply bg-background text-foreground font-nunito antialiased;
+    position: fixed;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+    overflow: hidden;
+  }
+
+  #root {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: hsl(var(--background));
+    overflow: hidden;
   }
 }
 
@@ -235,30 +275,69 @@
     -webkit-backdrop-filter: blur(20px);
   }
 
+  .dark .glass {
+    background: rgba(30, 25, 20, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
   .glass-dark {
     background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
   }
 
-  /* Safe area for mobile */
+  /* Dark mode specific overrides for better contrast */
+  .dark .bg-white\/60 {
+    background: hsl(20 15% 14% / 0.6);
+  }
+  
+  .dark .bg-white\/30,
+  .dark .bg-white\/20,
+  .dark .bg-white\/10 {
+    background: hsl(35 30% 95% / 0.1);
+  }
+
+  .dark .text-gray-200 {
+    color: hsl(var(--muted-foreground));
+  }
+
+  .dark .text-gray-800,
+  .dark .text-gray-700,
+  .dark .text-gray-600 {
+    color: hsl(var(--foreground));
+  }
+
+  /* Safe area for mobile - Capacitor */
   .safe-top {
-    padding-top: env(safe-area-inset-top);
+    padding-top: env(safe-area-inset-top, 0px);
   }
 
   .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   .safe-left {
-    padding-left: env(safe-area-inset-left);
+    padding-left: env(safe-area-inset-left, 0px);
   }
 
   .safe-right {
-    padding-right: env(safe-area-inset-right);
+    padding-right: env(safe-area-inset-right, 0px);
   }
 
-  /* Shimmer Animation */
+  /* Full height for mobile app */
+  .mobile-full-height {
+    min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile */
+  }
+
+  /* Prevent overscroll/bounce on iOS */
+  .no-overscroll {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Shimmer Animation - Enhanced */
   .shimmer {
     background: linear-gradient(
       90deg,
@@ -271,8 +350,59 @@
   }
 
   @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Smooth skeleton animation */
+  @keyframes skeleton-pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .animate-skeleton-pulse {
+    animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Card hover effect */
+  .card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px -8px hsl(var(--primary) / 0.15);
+  }
+
+  /* Button press effect */
+  .btn-press {
+    transition: transform 0.15s ease;
+  }
+
+  .btn-press:active {
+    transform: scale(0.97);
+  }
+
+  /* Focus ring enhancement */
+  .focus-ring {
+    @apply outline-none ring-offset-2 ring-offset-background transition-shadow;
+  }
+
+  .focus-ring:focus-visible {
+    @apply ring-2 ring-primary;
+  }
+
+  /* Subtle glow on hover */
+  .glow-hover {
+    transition: box-shadow 0.3s ease;
+  }
+
+  .glow-hover:hover {
+    box-shadow: 0 0 20px -5px hsl(var(--primary) / 0.3);
   }
 }
 

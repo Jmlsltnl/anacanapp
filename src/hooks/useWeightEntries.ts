@@ -54,12 +54,14 @@ export const useWeightEntries = () => {
 
       if (error) throw error;
 
+      // Immediately update local state with the new entry
+      setEntries(prev => [data, ...prev]);
+
       toast({
         title: 'Çəki yadda saxlandı! ⚖️',
         description: `${weight} kg`,
       });
 
-      await fetchEntries();
       return data;
     } catch (error: any) {
       console.error('Error adding weight entry:', error);
@@ -75,7 +77,12 @@ export const useWeightEntries = () => {
   const getStats = () => {
     if (entries.length === 0) return null;
 
-    const startWeight = profile?.start_weight || (entries.length > 0 ? entries[entries.length - 1].weight : 0);
+    // Start weight is from profile, or the FIRST (oldest) entry if no profile start weight
+    // Entries are ordered by entry_date DESC, so oldest is at the end
+    const firstEntryWeight = entries.length > 0 ? entries[entries.length - 1].weight : 0;
+    const startWeight = profile?.start_weight || firstEntryWeight;
+    
+    // Current weight is the LATEST entry (first in the array since ordered DESC)
     const currentWeight = entries[0]?.weight || startWeight;
     const totalGain = currentWeight - startWeight;
     
@@ -111,12 +118,67 @@ export const useWeightEntries = () => {
     fetchEntries();
   }, [user]);
 
+  const deleteEntry = async (entryId: string) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('weight_entries')
+        .delete()
+        .eq('id', entryId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setEntries(prev => prev.filter(e => e.id !== entryId));
+      toast({
+        title: 'Silindi',
+        description: 'Çəki qeydi silindi',
+      });
+    } catch (error: any) {
+      console.error('Error deleting weight entry:', error);
+      toast({
+        title: 'Xəta baş verdi',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const deleteAllEntries = async () => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('weight_entries')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setEntries([]);
+      toast({
+        title: 'Sıfırlandı',
+        description: 'Bütün çəki qeydləri silindi',
+      });
+    } catch (error: any) {
+      console.error('Error deleting all weight entries:', error);
+      toast({
+        title: 'Xəta baş verdi',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
   return {
     entries,
     loading,
     addEntry,
     getStats,
     updateStartWeight,
+    deleteEntry,
+    deleteAllEntries,
     refetch: fetchEntries,
   };
 };

@@ -7,19 +7,35 @@ import {
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useToast } from '@/hooks/use-toast';
+import { useHealthReport } from '@/hooks/useHealthReport';
+import { useChildren } from '@/hooks/useChildren';
 
 interface DoctorReportScreenProps {
   onBack: () => void;
 }
 
 const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
-  const { name, lifeStage, getCycleData, getPregnancyData, getBabyData } = useUserStore();
+  const { name, lifeStage, getCycleData, getPregnancyData } = useUserStore();
+  const { selectedChild, getChildAge } = useChildren();
   const { toast } = useToast();
   const [selectedPeriod, setSelectedPeriod] = useState('1month');
 
+  // Fetch real health data from backend
+  const { trends: healthData, isLoading: healthLoading } = useHealthReport(selectedPeriod);
+
   const cycleData = getCycleData();
   const pregData = getPregnancyData();
-  const babyData = getBabyData();
+  
+  // Derive baby data from selectedChild for multi-child support
+  const childAge = selectedChild ? getChildAge(selectedChild) : null;
+  const babyData = selectedChild && childAge ? {
+    id: selectedChild.id,
+    name: selectedChild.name,
+    birthDate: new Date(selectedChild.birth_date),
+    gender: selectedChild.gender as 'boy' | 'girl',
+    ageInDays: childAge.days,
+    ageInMonths: childAge.months,
+  } : null;
 
   const periods = [
     { id: '1week', label: '1 Həftə' },
@@ -69,13 +85,6 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
     }
     return [];
   };
-
-  const mockHealthData = [
-    { label: 'Orta çəki', value: '65 kq', trend: '+0.5 kq', positive: true },
-    { label: 'Su qəbulu', value: '6.5 stəkan/gün', trend: '+15%', positive: true },
-    { label: 'Yuxu', value: '7.2 saat/gecə', trend: '-0.5 saat', positive: false },
-    { label: 'Məşqlər', value: '3 dəfə/həftə', trend: '+1', positive: true },
-  ];
 
   return (
     <div className="min-h-screen bg-background pb-28">
@@ -187,7 +196,7 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
           </div>
         </motion.div>
 
-        {/* Health Trends */}
+        {/* Health Trends - Real data from backend */}
         <motion.div 
           className="bg-card rounded-3xl p-5 shadow-card border border-border/50"
           initial={{ y: 20, opacity: 0 }}
@@ -195,24 +204,30 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
           transition={{ delay: 0.2 }}
         >
           <h3 className="font-bold mb-4">Sağlamlıq Trendləri</h3>
-          <div className="space-y-3">
-            {mockHealthData.map((item, index) => (
-              <div 
-                key={index}
-                className="flex items-center justify-between p-3 bg-muted/50 rounded-2xl"
-              >
-                <div>
-                  <p className="text-sm font-medium">{item.label}</p>
-                  <p className="text-xs text-muted-foreground">{item.value}</p>
+          {healthLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {healthData.map((item, index) => (
+                <div 
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-muted/50 rounded-2xl"
+                >
+                  <div>
+                    <p className="text-sm font-medium">{item.label}</p>
+                    <p className="text-xs text-muted-foreground">{item.value}</p>
+                  </div>
+                  <span className={`text-sm font-bold ${
+                    item.positive ? 'text-emerald-600' : 'text-amber-600'
+                  }`}>
+                    {item.trend}
+                  </span>
                 </div>
-                <span className={`text-sm font-bold ${
-                  item.positive ? 'text-emerald-600' : 'text-amber-600'
-                }`}>
-                  {item.trend}
-                </span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </motion.div>
 
         {/* Notes Section */}

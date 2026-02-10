@@ -2,10 +2,12 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { LifeStage, UserRole, DailyLog, CycleData, PregnancyData, BabyData } from '@/types/anacan';
 import { FRUIT_SIZES } from '@/types/anacan';
+import { getPregnancyWeek, getDayInWeek, getTrimester, calculateDueDate } from '@/lib/pregnancy-utils';
 
 interface UserState {
   isAuthenticated: boolean;
   isOnboarded: boolean;
+  hasSeenIntro: boolean;
   userId: string | null;
   email: string | null;
   name: string | null;
@@ -36,6 +38,7 @@ interface UserState {
   // Actions
   setAuth: (isAuth: boolean, userId?: string, email?: string, name?: string) => void;
   setOnboarded: (isOnboarded: boolean) => void;
+  setHasSeenIntro: (hasSeen: boolean) => void;
   setLifeStage: (stage: LifeStage) => void;
   setRole: (role: UserRole) => void;
   setLastPeriodDate: (date: Date) => void;
@@ -69,6 +72,7 @@ export const useUserStore = create<UserState>()(
     (set, get) => ({
       isAuthenticated: false,
       isOnboarded: false,
+      hasSeenIntro: false,
       userId: null,
       email: null,
       name: null,
@@ -96,6 +100,8 @@ export const useUserStore = create<UserState>()(
       }),
 
       setOnboarded: (isOnboarded) => set({ isOnboarded }),
+
+      setHasSeenIntro: (hasSeen) => set({ hasSeenIntro: hasSeen }),
 
       setLifeStage: (stage) => set({ lifeStage: stage }),
 
@@ -186,23 +192,15 @@ export const useUserStore = create<UserState>()(
       },
 
       getPregnancyData: () => {
-        const { lastPeriodDate, dueDate } = get();
+        const { lastPeriodDate } = get();
         if (!lastPeriodDate) return null;
 
-        const today = new Date();
         const lastPeriod = new Date(lastPeriodDate);
-        const daysSinceLMP = Math.floor((today.getTime() - lastPeriod.getTime()) / (1000 * 60 * 60 * 24));
-        const currentWeek = Math.floor(daysSinceLMP / 7);
-        const currentDay = daysSinceLMP % 7;
-
-        let trimester: 1 | 2 | 3;
-        if (currentWeek < 13) {
-          trimester = 1;
-        } else if (currentWeek < 27) {
-          trimester = 2;
-        } else {
-          trimester = 3;
-        }
+        
+        // Use centralized pregnancy calculation utilities
+        const currentWeek = getPregnancyWeek(lastPeriodDate);
+        const currentDay = getDayInWeek(lastPeriodDate);
+        const trimester = getTrimester(currentWeek);
 
         const fruitWeek = Object.keys(FRUIT_SIZES)
           .map(Number)
@@ -211,7 +209,8 @@ export const useUserStore = create<UserState>()(
         
         const babySize = FRUIT_SIZES[fruitWeek] || FRUIT_SIZES[4];
 
-        const calculatedDueDate = dueDate || new Date(lastPeriod.getTime() + 280 * 24 * 60 * 60 * 1000);
+        // LMP is the single source of truth across the platform
+        const calculatedDueDate = calculateDueDate(lastPeriodDate);
 
         return {
           dueDate: calculatedDueDate,
@@ -251,6 +250,7 @@ export const useUserStore = create<UserState>()(
       partialize: (state) => ({
         isAuthenticated: state.isAuthenticated,
         isOnboarded: state.isOnboarded,
+        hasSeenIntro: state.hasSeenIntro,
         userId: state.userId,
         email: state.email,
         name: state.name,

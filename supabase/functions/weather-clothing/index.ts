@@ -1,0 +1,274 @@
+/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
+
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
+};
+
+interface UserContext {
+  babyAgeMonths?: number;
+  babyAgeDays?: number;
+  pregnancyWeek?: number;
+  lifeStage?: string;
+}
+
+interface WeatherRequest {
+  lat: number;
+  lng: number;
+  userContext?: UserContext;
+}
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+    if (!GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY not configured');
+    }
+
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { lat, lng, userContext } = await req.json() as WeatherRequest;
+
+    if (!lat || !lng) {
+      throw new Error('Location coordinates required');
+    }
+
+    // Fetch weather data from Open-Meteo (FREE, no API key needed)
+    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,wind_speed_10m,wind_gusts_10m,weather_code,uv_index&hourly=temperature_2m&daily=uv_index_max&timezone=auto`;
+    
+    const weatherResponse = await fetch(weatherUrl);
+    if (!weatherResponse.ok) {
+      throw new Error('Failed to fetch weather data');
+    }
+    const weatherData = await weatherResponse.json();
+
+    // Get city name from reverse geocoding
+    const geoUrl = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=az`;
+    let cityName = 'Naməlum';
+    try {
+      const geoResponse = await fetch(geoUrl, {
+        headers: { 'User-Agent': 'AnacanApp/1.0' }
+      });
+      if (geoResponse.ok) {
+        const geoData = await geoResponse.json();
+        cityName = geoData.address?.city || geoData.address?.town || geoData.address?.state || 'Naməlum';
+      }
+    } catch {
+      console.log('Geocoding failed, using default');
+    }
+
+    // Get air quality data (Open-Meteo Air Quality API - FREE)
+    const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&current=european_aqi,dust,grass_pollen,birch_pollen,olive_pollen,alder_pollen`;
+    let airData = null;
+    try {
+      const airResponse = await fetch(airUrl);
+      if (airResponse.ok) {
+        airData = await airResponse.json();
+      }
+    } catch {
+      console.log('Air quality fetch failed');
+    }
+
+    const current = weatherData.current;
+
+    // Build context-aware prompt based on user data
+    let userContextPrompt = '';
+    
+    if (userContext?.babyAgeMonths !== undefined) {
+      const ageMonths = userContext.babyAgeMonths;
+      let ageDescription = '';
+      
+      if (ageMonths < 1) {
+        ageDescription = `YENİDOĞULMUŞ (${userContext.babyAgeDays} günlük) körpə`;
+      } else if (ageMonths < 3) {
+        ageDescription = `${ageMonths} aylıq YENİDOĞULMUŞ körpə`;
+      } else if (ageMonths < 6) {
+        ageDescription = `${ageMonths} aylıq KİÇİK körpə`;
+      } else if (ageMonths < 12) {
+        ageDescription = `${ageMonths} aylıq körpə`;
+      } else if (ageMonths < 24) {
+        ageDescription = `${ageMonths} aylıq (${Math.floor(ageMonths/12)} yaşında) BALACA UŞAQ`;
+      } else {
+        ageDescription = `${Math.floor(ageMonths/12)} yaşında UŞAQ`;
+      }
+      
+      userContextPrompt = `
+İSTİFADƏÇİ KONTEKST:
+- Körpənin yaşı: ${ageDescription}
+- Körpənin dəqiq yaşı: ${ageMonths} ay (${userContext.babyAgeDays} gün)
+
+YAŞ ƏSASINDA XÜSUSİ QEYDLƏR:
+${ageMonths < 3 ? '- Yenidoğulmuşlar temperatur tənzimləməsində zəifdir, 1 qat əlavə geyim lazımdır' : ''}
+${ageMonths < 6 ? '- Günəşdən mütləq qorumaq lazımdır, birbaşa günəş şüası OLMAMALIDIR' : ''}
+${ageMonths < 12 ? '- Papaq və əlcək çox vacibdir' : ''}
+${ageMonths >= 12 && ageMonths < 24 ? '- Hərəkətli uşaq üçün rahat geyim seçin' : ''}
+`;
+    } else if (userContext?.pregnancyWeek) {
+      userContextPrompt = `
+İSTİFADƏÇİ KONTEKST:
+- Hamiləlik həftəsi: ${userContext.pregnancyWeek}. həftə
+- Trimester: ${userContext.pregnancyWeek <= 12 ? '1-ci' : userContext.pregnancyWeek <= 27 ? '2-ci' : '3-cü'} trimester
+
+HAMİLƏLİK XÜSUSİ QEYDLƏR:
+${userContext.pregnancyWeek >= 28 ? '- 3-cü trimesterdə şişkinlik ola bilər, rahat ayaqqabı tövsiyə edin' : ''}
+${userContext.pregnancyWeek >= 20 ? '- Hamilə qadınlar daha tez istiləyir, bunu nəzərə alın' : ''}
+- Həmişə rahat, elastik geyim tövsiyə edin
+- UV qorunması vacibdir (piqmentasiya riski)
+`;
+    }
+
+    // Use Gemini to generate personalized advice
+    const geminiResponse = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `Sən körpə və ana üçün hava və geyim məsləhətçisisən. Azərbaycan dilində cavab ver.
+
+${userContextPrompt}
+
+CARİ HAVA VƏZİYYƏTİ:
+- Şəhər: ${cityName}
+- Temperatur: ${current.temperature_2m}°C
+- Hiss olunan: ${current.apparent_temperature}°C
+- Rütubət: ${current.relative_humidity_2m}%
+- Külək: ${current.wind_speed_10m} km/h
+- Külək şırnaqdırı: ${current.wind_gusts_10m} km/h
+- Yağış: ${current.precipitation} mm
+- UV indeksi: ${current.uv_index}
+- Hava kodu: ${current.weather_code}
+${airData ? `
+- Hava keyfiyyəti (AQI): ${airData.current?.european_aqi || 'N/A'}
+- Toz: ${airData.current?.dust || 'N/A'}
+- Çəmən poleni: ${airData.current?.grass_pollen || 'N/A'}
+- Ağcaqayın poleni: ${airData.current?.birch_pollen || 'N/A'}
+` : ''}
+
+TAPŞIRIQ: Bu hava şəraitində${userContext?.babyAgeMonths !== undefined ? ` ${userContext.babyAgeMonths} aylıq körpə` : userContext?.pregnancyWeek ? ` hamiləliyin ${userContext.pregnancyWeek}. həftəsindəki ana` : ' 0-3 yaşlı körpə'} üçün:
+1. AKSİYON yönümlü geyim tövsiyəsi ver (konkret, dəqiq, yaşa uyğun)
+2. Əgər pollen yüksəkdirsə, xəbərdarlıq ver
+3. UV yüksəkdirsə, qoruma tövsiyəsi ver
+4. Külək şiddətli isə, xəbərdarlıq ver
+5. Yaş/həftəyə xas xüsusi tövsiyələr əlavə et
+
+CAVAB FORMATI (STRICT JSON):
+{
+  "temperature": ${current.temperature_2m},
+  "feelsLike": ${current.apparent_temperature},
+  "humidity": ${current.relative_humidity_2m},
+  "windSpeed": ${current.wind_speed_10m},
+  "uvIndex": ${current.uv_index},
+  "weatherDescription": "hava təsviri (qısa)",
+  "clothingAdvice": "Konkret geyim tövsiyəsi - ${userContext?.babyAgeMonths !== undefined ? `${userContext.babyAgeMonths} aylıq körpə üçün xüsusi` : userContext?.pregnancyWeek ? `hamilə ana üçün xüsusi` : 'körpə üçün'} (3-4 cümlə)",
+  "clothingItems": ["geyim 1", "geyim 2", "geyim 3", "geyim 4"],
+  "warnings": ["xəbərdarlıq 1", "xəbərdarlıq 2"],
+  "pollenWarning": "pollen xəbərdarlığı və ya null",
+  "uvWarning": "UV xəbərdarlığı və ya null",
+  "outdoorAdvice": "Bayırda gəzmə tövsiyəsi (yaş/həftəyə uyğun)",
+  "safeToGoOut": true/false,
+  "alertLevel": "safe|caution|warning|danger"
+}`
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.3,
+            maxOutputTokens: 1024,
+          }
+        })
+      }
+    );
+
+    if (!geminiResponse.ok) {
+      throw new Error('AI analysis failed');
+    }
+
+    const geminiData = await geminiResponse.json();
+    const textContent = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    let advice;
+    try {
+      const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        advice = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('No JSON found');
+      }
+    } catch {
+      advice = {
+        temperature: current.temperature_2m,
+        feelsLike: current.apparent_temperature,
+        humidity: current.relative_humidity_2m,
+        windSpeed: current.wind_speed_10m,
+        uvIndex: current.uv_index,
+        weatherDescription: 'Hava məlumatı alındı',
+        clothingAdvice: 'Körpəni hava şəraitinə uyğun geyindirin.',
+        clothingItems: ['Rahat geyim', 'Papaq', 'Əlcək'],
+        warnings: [],
+        pollenWarning: null,
+        uvWarning: null,
+        outdoorAdvice: 'Hava şəraitini izləyin',
+        safeToGoOut: true,
+        alertLevel: 'safe'
+      };
+    }
+
+    // Save to database
+    await supabase.from('weather_clothing_logs').insert({
+      user_id: user.id,
+      location_lat: lat,
+      location_lng: lng,
+      city_name: cityName,
+      weather_data: weatherData.current,
+      clothing_advice: advice.clothingAdvice,
+      pollen_advice: advice.pollenWarning
+    });
+
+    return new Response(JSON.stringify({
+      success: true,
+      cityName,
+      advice,
+      userContext
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+
+  } catch (error) {
+    console.error('Error in weather-clothing:', error);
+    return new Response(JSON.stringify({
+      success: false,
+      error: error instanceof Error ? error.message : 'Weather fetch failed'
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+});

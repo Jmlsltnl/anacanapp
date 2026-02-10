@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Home, Compass, MessageCircle, User, Users, BookOpen } from 'lucide-react';
+import { Home, Compass, MessageCircle, User, Users, Cake } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 
@@ -12,9 +12,9 @@ interface BottomNavProps {
 const womanTabs = [
   { id: 'home', label: 'Əsas', icon: Home },
   { id: 'tools', label: 'Alətlər', icon: Compass },
+  { id: 'cakes', label: 'Tortlar', icon: Cake },
   { id: 'community', label: 'Cəmiyyət', icon: Users },
   { id: 'ai', label: 'Anacan.AI', icon: MessageCircle },
-  { id: 'blog', label: 'Bloq', icon: BookOpen },
   { id: 'profile', label: 'Profil', icon: User },
 ];
 
@@ -50,12 +50,11 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50">
-      {/* Solid background to prevent content showing through */}
-      <div className="absolute inset-0 bg-card border-t border-border/50" />
-      
-      <div className="relative safe-bottom">
-        <div className="flex items-center justify-around py-1.5 px-1">
+    <nav 
+      className="relative z-50 flex-shrink-0 bg-card border-t border-border/50"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
+      <div className="flex items-center justify-around py-1.5 px-1">
           {(isPartner ? partnerTabs : womanTabs).map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -119,8 +118,7 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
                 </motion.span>
               </motion.button>
             );
-          })}
-        </div>
+        })}
       </div>
     </nav>
   );

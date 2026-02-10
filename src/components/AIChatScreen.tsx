@@ -9,8 +9,12 @@ import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useAIChatHistory } from '@/hooks/useAIChatHistory';
 import { useAuth } from '@/hooks/useAuth';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { useToast } from '@/hooks/use-toast';
+import { useAISuggestedQuestions } from '@/hooks/useDynamicTools';
+import { getPregnancyDay } from '@/lib/pregnancy-utils';
+import MarkdownContent from './MarkdownContent';
 
 interface Message {
   id: string;
@@ -21,6 +25,8 @@ interface Message {
 }
 
 const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
+  useScrollToTop();
+  
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -34,9 +40,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const pregnancyData = getPregnancyData();
   
   // Calculate pregnancy day for dynamic content
-  const pregnancyDay = lastPeriodDate 
-    ? Math.floor((Date.now() - new Date(lastPeriodDate).getTime()) / (1000 * 60 * 60 * 24)) + 1
-    : 0;
+  const pregnancyDay = lifeStage === 'bump' ? getPregnancyDay(lastPeriodDate) : 0;
   
   // Fetch dynamic pregnancy content
   const { data: dayContent } = usePregnancyContentByDay(pregnancyDay > 0 && lifeStage === 'bump' ? pregnancyDay : undefined);
@@ -282,7 +286,12 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     }]);
   };
 
-  const suggestedQuestions = lifeStage === 'bump' 
+  // Fetch dynamic suggested questions
+  const { data: dynamicQuestions = [] } = useAISuggestedQuestions(lifeStage || 'bump', 'mother');
+  
+  const suggestedQuestions = dynamicQuestions.length > 0
+    ? dynamicQuestions.map(q => q.question_az || q.question)
+    : lifeStage === 'bump' 
     ? [
         'Bu həftə körpəm necə inkişaf edir?',
         'Hamiləlikdə hansı qidalar faydalıdır?',
@@ -301,7 +310,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       ];
 
   return (
-    <div ref={ref} className="flex flex-col h-full bg-gradient-to-b from-background to-muted/20">
+    <div ref={ref} className="flex flex-col bg-gradient-to-b from-background to-muted/20" style={{ height: 'calc(100dvh - 80px)' }}>
       {/* Header */}
       <div className="px-5 py-4 border-b border-border bg-card/50 backdrop-blur-sm">
         <div className="flex items-center justify-between">
@@ -363,21 +372,25 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
                     ? 'bg-primary text-primary-foreground rounded-br-md'
                     : 'bg-card border border-border shadow-sm rounded-bl-md'
                 }`}>
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                    {message.content}
-                    {message.isStreaming && (
-                      <motion.span
-                        className="inline-block w-2 h-4 bg-primary ml-1"
-                        animate={{ opacity: [1, 0] }}
-                        transition={{ duration: 0.5, repeat: Infinity }}
-                      />
-                    )}
-                  </p>
-                  {!message.isStreaming && (
-                    <span className="text-[10px] opacity-60 mt-2 block">
-                      {message.timestamp.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
-                    </span>
+                <div className="text-sm leading-relaxed">
+                  {message.role === 'assistant' ? (
+                    <MarkdownContent content={message.content} variant="chat" />
+                  ) : (
+                    <span className="whitespace-pre-wrap">{message.content}</span>
                   )}
+                  {message.isStreaming && (
+                    <motion.span
+                      className="inline-block w-2 h-4 bg-primary ml-1"
+                      animate={{ opacity: [1, 0] }}
+                      transition={{ duration: 0.5, repeat: Infinity }}
+                    />
+                  )}
+                </div>
+                {!message.isStreaming && (
+                  <span className="text-[10px] opacity-60 mt-2 block">
+                    {message.timestamp.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                )}
                 </div>
               </motion.div>
             ))}
@@ -409,7 +422,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="p-4 border-t border-border bg-card/50 backdrop-blur-sm safe-bottom">
+      <div className="p-4 border-t border-border bg-card/50 backdrop-blur-sm flex-shrink-0" style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}>
         <div className="flex gap-2 items-end">
           <div className="flex-1 relative">
             <Textarea

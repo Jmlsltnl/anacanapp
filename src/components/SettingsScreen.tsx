@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { useNotificationSettings } from '@/hooks/useNotificationSettings';
 import { useSilentHours } from '@/hooks/useSilentHours';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { toast } from 'sonner';
 
 interface SettingsScreenProps {
@@ -17,6 +18,8 @@ interface SettingsScreenProps {
 }
 
 const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
+  useScrollToTop();
+  
   const { 
     settings, 
     loading, 
@@ -78,9 +81,9 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
-      <div className="gradient-primary px-3 pt-3 pb-4">
+    <div className="min-h-screen bg-background pb-24 overflow-y-auto">
+      {/* Header with safe area */}
+      <div className="gradient-primary px-3 pb-4" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}>
         <div className="flex items-center gap-2">
           <motion.button
             onClick={onBack}
@@ -97,15 +100,15 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
         {/* Native App Indicator */}
         {!isNative && (
           <motion.div 
-            className="bg-amber-50 border border-amber-200 rounded-2xl p-4"
+            className="bg-amber-100 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-2xl p-4"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
           >
             <div className="flex items-center gap-3">
-              <Smartphone className="w-5 h-5 text-amber-600" />
+              <Smartphone className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               <div>
-                <p className="text-sm font-medium text-amber-800">Web rejimində çalışırsınız</p>
-                <p className="text-xs text-amber-600">Bildirişlər yalnız mobil tətbiqdə işləyir</p>
+                <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Web rejimində çalışırsınız</p>
+                <p className="text-xs text-amber-600 dark:text-amber-400">Bildirişlər yalnız mobil tətbiqdə işləyir</p>
               </div>
             </div>
           </motion.div>

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Play, Pause, RotateCcw, Footprints } from 'lucide-react';
 import { useKickSessions } from '@/hooks/useKickSessions';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { hapticFeedback } from '@/lib/native';
 
 interface KickCounterProps {
@@ -9,6 +10,8 @@ interface KickCounterProps {
 }
 
 const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, ref) => {
+  useScrollToTop();
+  
   const [kicks, setKicks] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [time, setTime] = useState(0);
@@ -72,8 +75,8 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="gradient-primary px-3 pt-3 pb-8 safe-top">
-        <div className="flex items-center gap-2">
+      <div className="gradient-primary px-3 pt-3 pb-4 safe-top relative z-20">
+        <div className="flex items-center gap-2 relative z-20">
           <motion.button
             onClick={onBack}
             className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
@@ -89,7 +92,7 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
         </div>
       </div>
 
-      <div className="px-3 -mt-5">
+      <div className="px-3 pt-3">
         {/* Main Counter Card */}
         <motion.div
           className="bg-card rounded-2xl p-4 shadow-elevated border border-border/50 mb-3"
@@ -162,7 +165,7 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
 
         {/* Today's Stats */}
         <motion.div
-          className="bg-beige-light rounded-3xl p-5 mb-6 border border-beige"
+          className="bg-primary/5 dark:bg-primary/10 rounded-3xl p-5 mb-6 border border-primary/20"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
@@ -171,7 +174,7 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
             <span className="font-bold text-foreground">Bugünkü ümumi</span>
             <span className="text-primary font-bold">{todayStats.totalKicks}/10 təpik</span>
           </div>
-          <div className="h-3 bg-beige rounded-full overflow-hidden">
+          <div className="h-3 bg-muted dark:bg-muted/50 rounded-full overflow-hidden">
             <motion.div
               className="h-full gradient-primary rounded-full"
               initial={{ width: 0 }}

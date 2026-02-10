@@ -106,7 +106,7 @@ const AdminDynamicContent = () => {
       case 'exercises':
         return { name: '', name_az: '', duration_minutes: 10, calories: 50, level: 'easy', trimester: [1,2,3], icon: '🧘', description: '', steps: [], is_active: true, sort_order: 0 };
       case 'sounds':
-        return { name: '', name_az: '', emoji: '🎵', color_gradient: 'from-blue-400 to-cyan-500', audio_url: '', is_active: true, sort_order: 0 };
+        return { name: '', name_az: '', emoji: '🎵', color_gradient: 'from-blue-400 to-cyan-500', audio_url: '', noise_type: 'white', description: '', description_az: '', is_active: true, sort_order: 0 };
       case 'surprises':
         return { title: '', description: '', emoji: '🎁', icon: 'gift', category: 'romantic', difficulty: 'easy', points: 10, is_active: true, sort_order: 0 };
       case 'milestones':
@@ -196,9 +196,21 @@ const AdminDynamicContent = () => {
               <Input placeholder="Ad (EN)" value={formData.name || ''} onChange={e => setFormData({...formData, name: e.target.value})} />
               <Input placeholder="Ad (AZ)" value={formData.name_az || ''} onChange={e => setFormData({...formData, name_az: e.target.value})} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <Input placeholder="Emoji" value={formData.emoji || ''} onChange={e => setFormData({...formData, emoji: e.target.value})} />
-              <Input placeholder="Gradient (e.g. from-blue-400 to-cyan-500)" value={formData.color_gradient || ''} onChange={e => setFormData({...formData, color_gradient: e.target.value})} />
+              <Select value={formData.noise_type || 'white'} onValueChange={v => setFormData({...formData, noise_type: v})}>
+                <SelectTrigger><SelectValue placeholder="Küy növü" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="white">⚪ Bəyaz Küy</SelectItem>
+                  <SelectItem value="pink">🌸 Çəhrayı Küy</SelectItem>
+                  <SelectItem value="brown">🟤 Qəhvəyi Küy</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input placeholder="Gradient" value={formData.color_gradient || ''} onChange={e => setFormData({...formData, color_gradient: e.target.value})} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Input placeholder="Təsvir (AZ)" value={formData.description_az || ''} onChange={e => setFormData({...formData, description_az: e.target.value})} />
+              <Input placeholder="Təsvir (EN)" value={formData.description || ''} onChange={e => setFormData({...formData, description: e.target.value})} />
             </div>
             <Input placeholder="Audio URL" value={formData.audio_url || ''} onChange={e => setFormData({...formData, audio_url: e.target.value})} />
             <div className="grid grid-cols-2 gap-3">
@@ -413,6 +425,11 @@ const AdminDynamicContent = () => {
                 {item.category && activeTab === 'themes' && (
                   <Badge variant="secondary" className="text-xs">{item.category}</Badge>
                 )}
+                {item.noise_type && activeTab === 'sounds' && (
+                  <Badge variant="outline" className="text-xs">
+                    {item.noise_type === 'white' ? '⚪ Bəyaz' : item.noise_type === 'pink' ? '🌸 Çəhrayı' : '🟤 Qəhvəyi'}
+                  </Badge>
+                )}
                 {item.is_premium && (
                   <Badge className="text-xs bg-amber-500">Premium</Badge>
                 )}
@@ -440,13 +457,13 @@ const AdminDynamicContent = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Dinamik Məzmun</h2>
-          <p className="text-muted-foreground text-sm">Tətbiqdəki bütün konfiqurasiya edilə bilən məlumatları idarə edin</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground">Dinamik Məzmun</h2>
+          <p className="text-muted-foreground text-xs sm:text-sm">Tətbiqdəki bütün konfiqurasiya edilə bilən məlumatları idarə edin</p>
         </div>
         {activeTab !== 'moods' && (
-          <Button onClick={openCreateModal} className="gap-2">
+          <Button onClick={openCreateModal} className="gap-2 w-full sm:w-auto">
             <Plus className="w-4 h-4" />
             Əlavə et
           </Button>
@@ -454,23 +471,22 @@ const AdminDynamicContent = () => {
       </div>
 
       {/* Tabs */}
-      <ScrollArea className="w-full">
-        <div className="flex gap-2 pb-2">
-          {tabs.map(tab => (
-            <Button
-              key={tab.id}
-              variant={activeTab === tab.id ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setActiveTab(tab.id as ContentType)}
-              className="gap-2 whitespace-nowrap"
-            >
-              <tab.icon className="w-4 h-4" />
-              {tab.label}
-              <Badge variant="secondary" className="ml-1 text-xs">{tab.count}</Badge>
-            </Button>
-          ))}
-        </div>
-      </ScrollArea>
+      <div className="flex flex-wrap gap-2">
+        {tabs.map(tab => (
+          <Button
+            key={tab.id}
+            variant={activeTab === tab.id ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab(tab.id as ContentType)}
+            className="gap-1.5"
+          >
+            <tab.icon className="w-4 h-4" />
+            <span className="hidden sm:inline">{tab.label}</span>
+            <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+            <Badge variant="secondary" className="ml-0.5 text-xs">{tab.count}</Badge>
+          </Button>
+        ))}
+      </div>
 
       {/* Search */}
       <div className="relative">
