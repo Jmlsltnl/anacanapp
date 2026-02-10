@@ -246,7 +246,7 @@ export const usePregnancyDayNotificationByDay = (day: number | null) => {
   return useQuery({
     queryKey: ['pregnancy-day-notification', day],
     queryFn: async () => {
-      if (day === null || day < 0 || day > 280) return null;
+      if (day === null || day < 0 || day > 293) return null;
 
       const { data, error } = await supabase
         .from('pregnancy_day_notifications')
@@ -262,6 +262,6 @@ export const usePregnancyDayNotificationByDay = (day: number | null) => {
 
       return data as PregnancyDayNotification | null;
     },
-    enabled: day !== null && day >= 0 && day <= 280,
+    enabled: day !== null && day >= 0 && day <= 293,
   });
 };

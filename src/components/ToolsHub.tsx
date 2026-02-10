@@ -112,7 +112,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTool, setActiveTool] = useState<string | null>(initialTool);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string>('all');
+  
 
   // Preserve ToolsHub scroll position when returning from a tool
   const toolsListScrollTopRef = useRef<number>(0);
@@ -158,26 +158,6 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const pregData = getPregnancyData();
   const { data: toolConfigs = [], isLoading: toolsLoading } = useToolConfigs(lifeStage || undefined);
   
-  // Tool categories
-  const categories = [
-    { id: 'all', label: 'Hamısı', emoji: '✨' },
-    { id: 'health', label: 'Sağlamlıq', emoji: '💪' },
-    { id: 'baby', label: 'Körpə', emoji: '👶' },
-    { id: 'nutrition', label: 'Qidalanma', emoji: '🍎' },
-    { id: 'tools', label: 'Alətlər', emoji: '🔧' },
-    { id: 'ai', label: 'AI', emoji: '🤖' },
-  ];
-
-  // Map tools to categories
-  const toolCategoryMap: Record<string, string> = {
-    'weight': 'health', 'exercise': 'health', 'exercises': 'health', 'mental-health': 'health', 
-    'blood-sugar': 'health', 'mood': 'health', 'mood-diary': 'health',
-    'kick': 'baby', 'contraction': 'baby', 'names': 'baby', 'baby-growth': 'baby', 
-    'growth-tracker': 'baby', 'cry-translator': 'baby', 'poop-scanner': 'baby', 
-    'whitenoise': 'baby', 'smart-play-box': 'baby', 'fairy-tale': 'baby',
-    'nutrition': 'nutrition', 'recipes': 'nutrition', 'shopping': 'nutrition',
-    'photoshoot': 'ai', 'safety': 'ai', 'horoscope': 'ai', 'weather-clothing': 'ai',
-  };
   const hasPartner = !!profile?.linked_partner_id;
 
   // Get locked field based on life stage
@@ -277,9 +257,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const filteredTools = tools.filter(tool => {
     const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tool.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const toolCategory = toolCategoryMap[tool.id] || 'tools';
-    const matchesCategory = activeCategory === 'all' || toolCategory === activeCategory;
-    return matchesSearch && matchesCategory;
+    return matchesSearch;
   });
 
   const handleBack = () => {
@@ -357,24 +335,6 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
             </div>
           </div>
 
-          {/* Category Tabs */}
-          <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4">
-            {categories.map((cat) => (
-              <motion.button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                  activeCategory === cat.id
-                    ? 'bg-primary text-primary-foreground shadow-md'
-                    : 'bg-muted/50 text-muted-foreground hover:bg-muted'
-                }`}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span>{cat.emoji}</span>
-                <span>{cat.label}</span>
-              </motion.button>
-            ))}
-          </div>
         </div>
       </div>
 
@@ -465,7 +425,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         {/* Tools Count Header */}
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold text-foreground">
-            {activeCategory === 'all' ? 'Bütün Alətlər' : categories.find(c => c.id === activeCategory)?.label}
+            Bütün Alətlər
           </h2>
           <span className="text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full font-medium">
             {filteredTools.length} alət
@@ -535,7 +495,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
               {searchQuery ? `"${searchQuery}" ilə uyğun alət yoxdur` : 'Bu kateqoriyada alət yoxdur'}
             </p>
             <motion.button
-              onClick={() => { setSearchQuery(''); setActiveCategory('all'); }}
+              onClick={() => { setSearchQuery(''); }}
               className="mt-4 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium"
               whileTap={{ scale: 0.95 }}
             >

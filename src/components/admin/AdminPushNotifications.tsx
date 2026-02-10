@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Bell, Plus, Trash2, Edit, Send, Users, Baby, Heart, Moon, Clock, Calendar, Zap, Search, ChevronLeft, ChevronRight, Loader2, Filter, RefreshCw } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Bell, Plus, Trash2, Edit, Send, Users, Baby, Heart, Moon, Clock, Calendar, Zap, Search, ChevronLeft, ChevronRight, Loader2, Filter, RefreshCw, Upload, Download, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -294,19 +294,24 @@ const PregnancyDayNotificationsTab = () => {
   });
 
   const DAYS_PER_PAGE = 28; // 4 weeks per page
-  const totalPages = Math.ceil(281 / DAYS_PER_PAGE);
+  const TOTAL_DAYS = 294; // 42 weeks
+  const totalPages = Math.ceil(TOTAL_DAYS / DAYS_PER_PAGE);
+
+  // CSV import state
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [importing, setImporting] = useState(false);
 
   // Create a map of existing notifications
   const notificationMap = new Map(notifications.map(n => [n.day_number, n]));
 
   // Generate days for current page
   const startDay = currentPage * DAYS_PER_PAGE;
-  const endDay = Math.min(startDay + DAYS_PER_PAGE, 281);
+  const endDay = Math.min(startDay + DAYS_PER_PAGE, TOTAL_DAYS);
   const daysInPage = Array.from({ length: endDay - startDay }, (_, i) => startDay + i);
 
   // Search filter
   const filteredDays = searchDay
-    ? [parseInt(searchDay)].filter(d => d >= 0 && d <= 280)
+    ? [parseInt(searchDay)].filter(d => d >= 0 && d < TOTAL_DAYS)
     : daysInPage;
 
   const handleCreate = (dayNumber: number) => {
@@ -362,6 +367,121 @@ const PregnancyDayNotificationsTab = () => {
     }
   };
 
+  const handleDownloadTemplate = () => {
+    const csvContent = 'day_number,title,body,emoji,is_active\n0,"Hamiləliyin 0-cı günü 🌟","Bu gün yeni bir səyahət başlayır!",👶,true\n1,"Hamiləliyin 1-ci günü 🌟","Körpəniz inkişaf edir...",🌱,true\n7,"Hamiləliyin 7-ci günü 🌟","Bir həftəlik hamiləsiniz!",✨,true';
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'pregnancy_notifications_numune.csv';
+    link.click();
+  };
+
+  const handleCSVImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setImporting(true);
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').filter(l => l.trim());
+      
+      if (lines.length < 2) {
+        toast.error('CSV faylı boşdur');
+        return;
+      }
+
+      // Parse header
+      const header = lines[0].toLowerCase().replace(/[\ufeff]/g, '');
+      const cols = header.split(',').map(c => c.trim().replace(/"/g, ''));
+      
+      const dayIdx = cols.indexOf('day_number');
+      const titleIdx = cols.indexOf('title');
+      const bodyIdx = cols.indexOf('body');
+      const emojiIdx = cols.indexOf('emoji');
+      const activeIdx = cols.indexOf('is_active');
+
+      if (dayIdx === -1 || titleIdx === -1 || bodyIdx === -1) {
+        toast.error('CSV-də day_number, title, body sütunları tələb olunur');
+        return;
+      }
+
+      // Parse rows - handle quoted fields
+      const parseCSVLine = (line: string): string[] => {
+        const result: string[] = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') {
+            inQuotes = !inQuotes;
+          } else if (ch === ',' && !inQuotes) {
+            result.push(current.trim());
+            current = '';
+          } else {
+            current += ch;
+          }
+        }
+        result.push(current.trim());
+        return result;
+      };
+
+      const rows: any[] = [];
+      let skipped = 0;
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        const dayNum = parseInt(values[dayIdx]);
+        const title = values[titleIdx]?.replace(/^"|"$/g, '');
+        const body = values[bodyIdx]?.replace(/^"|"$/g, '');
+        
+        if (isNaN(dayNum) || dayNum < 0 || dayNum >= 294 || !title || !body) {
+          skipped++;
+          continue;
+        }
+
+        rows.push({
+          day_number: dayNum,
+          title,
+          body,
+          emoji: emojiIdx !== -1 ? (values[emojiIdx]?.replace(/^"|"$/g, '') || '👶') : '👶',
+          is_active: activeIdx !== -1 ? values[activeIdx]?.toLowerCase().trim() !== 'false' : true,
+        });
+      }
+
+      if (rows.length === 0) {
+        toast.error('Heç bir etibarlı sətir tapılmadı');
+        return;
+      }
+
+      // Upsert: update existing, insert new
+      let inserted = 0;
+      let updated = 0;
+      let errors = 0;
+
+      for (const row of rows) {
+        const existing = notificationMap.get(row.day_number);
+        try {
+          if (existing) {
+            await updateNotification.mutateAsync({ id: existing.id, ...row });
+            updated++;
+          } else {
+            await createNotification.mutateAsync(row);
+            inserted++;
+          }
+        } catch {
+          errors++;
+        }
+      }
+
+      toast.success(`CSV import tamamlandı: ${inserted} yeni, ${updated} yeniləndi${errors > 0 ? `, ${errors} xəta` : ''}${skipped > 0 ? `, ${skipped} keçildi` : ''}`);
+    } catch (error) {
+      toast.error('CSV oxuma xətası');
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   const getWeekNumber = (day: number) => Math.floor(day / 7) + 1;
   const getTrimester = (day: number) => {
     if (day < 84) return { num: 1, color: 'bg-pink-500' };
@@ -382,7 +502,7 @@ const PregnancyDayNotificationsTab = () => {
           <div className="text-sm text-muted-foreground">Əlavə Edilib</div>
         </Card>
         <Card className="p-4 text-center">
-          <div className="text-3xl font-bold text-orange-500">281</div>
+          <div className="text-3xl font-bold text-orange-500">{TOTAL_DAYS}</div>
           <div className="text-sm text-muted-foreground">Toplam Gün</div>
         </Card>
         <Card className="p-4 text-center">
@@ -390,23 +510,53 @@ const PregnancyDayNotificationsTab = () => {
           <div className="text-sm text-muted-foreground">Aktiv</div>
         </Card>
         <Card className="p-4 text-center">
-          <div className="text-3xl font-bold text-muted-foreground">{281 - notifications.length}</div>
+          <div className="text-3xl font-bold text-muted-foreground">{TOTAL_DAYS - notifications.length}</div>
           <div className="text-sm text-muted-foreground">Boş Gün</div>
         </Card>
       </div>
+
+      {/* CSV Import Section */}
+      <Card className="p-4 border-dashed">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <FileText className="h-5 w-5 text-primary" />
+            <div>
+              <h4 className="font-medium">CSV Import</h4>
+              <p className="text-sm text-muted-foreground">Bildirişləri toplu şəkildə CSV ilə əlavə edin (0-293 gün)</p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={handleDownloadTemplate}>
+              <Download className="h-4 w-4 mr-1" />
+              Nümunə CSV
+            </Button>
+            <Button size="sm" onClick={() => fileInputRef.current?.click()} disabled={importing}>
+              {importing ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Upload className="h-4 w-4 mr-1" />}
+              CSV Import
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv"
+              className="hidden"
+              onChange={handleCSVImport}
+            />
+          </div>
+        </div>
+      </Card>
 
       {/* Search & Pagination */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2 flex-1">
           <Search className="h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Gün nömrəsi axtar (0-280)..."
+            placeholder="Gün nömrəsi axtar (0-293)..."
             value={searchDay}
             onChange={(e) => setSearchDay(e.target.value.replace(/\D/g, ''))}
             className="max-w-[200px]"
             type="number"
             min={0}
-            max={280}
+            max={293}
           />
           {searchDay && (
             <Button variant="ghost" size="sm" onClick={() => setSearchDay('')}>
@@ -512,7 +662,7 @@ const PregnancyDayNotificationsTab = () => {
                 <Input
                   type="number"
                   min={0}
-                  max={280}
+                  max={293}
                   value={form.day_number}
                   onChange={(e) => setForm({ ...form, day_number: parseInt(e.target.value) || 0 })}
                   disabled={!!editingId}
