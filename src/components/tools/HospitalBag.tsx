@@ -1,25 +1,24 @@
 import { useState, forwardRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Check, Share2, Info, AlertTriangle, Star, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Check, Info, AlertTriangle, Star, ChevronDown, Package, Baby, FileText } from 'lucide-react';
 import { useHospitalBag } from '@/hooks/useHospitalBag';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { Progress } from '@/components/ui/progress';
 
 interface HospitalBagProps {
   onBack: () => void;
 }
 
-// Fallback categories
-const fallbackCategories = [
-  { id: 'all', label: 'Hamısı', emoji: '👜' },
-  { id: 'mom', label: 'Ana', emoji: '👩' },
-  { id: 'baby', label: 'Körpə', emoji: '👶' },
-  { id: 'documents', label: 'Sənədlər', emoji: '📄' },
-];
+const categoryConfig = {
+  documents: { label: 'Sənədlər', emoji: '📄', icon: FileText, color: 'from-amber-500 to-orange-500' },
+  mom: { label: 'Ana üçün', emoji: '👩', icon: Package, color: 'from-pink-500 to-rose-500' },
+  baby: { label: 'Körpə üçün', emoji: '👶', icon: Baby, color: 'from-blue-500 to-cyan-500' },
+};
 
 const priorityConfig = {
-  1: { label: 'Yüksək', color: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300', icon: AlertTriangle },
-  2: { label: 'Orta', color: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300', icon: Star },
-  3: { label: 'Aşağı', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300', icon: Info },
+  1: { label: 'Çox Vacib', color: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400', dot: '🔴' },
+  2: { label: 'Orta', color: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400', dot: '🟡' },
+  3: { label: 'İstəyə bağlı', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400', dot: '🟢' },
 };
 
 const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, ref) => {
@@ -29,36 +28,31 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
 
-  // Get unique categories from items or use fallback
-  const categories = useMemo(() => {
-    const uniqueCats = [...new Set(items.map(item => item.category))];
-    if (uniqueCats.length > 0) {
-      const mapped = uniqueCats.map(cat => ({
-        id: cat,
-        label: cat === 'mom' ? 'Ana' : cat === 'baby' ? 'Körpə' : cat === 'documents' ? 'Sənədlər' : cat,
-        emoji: cat === 'mom' ? '👩' : cat === 'baby' ? '👶' : cat === 'documents' ? '📄' : '📦',
-      }));
-      return [{ id: 'all', label: 'Hamısı', emoji: '👜' }, ...mapped];
-    }
-    return fallbackCategories;
-  }, [items]);
+  const categories = [
+    { id: 'all', label: 'Hamısı', emoji: '👜' },
+    { id: 'documents', label: 'Sənədlər', emoji: '📄' },
+    { id: 'mom', label: 'Ana', emoji: '👩' },
+    { id: 'baby', label: 'Körpə', emoji: '👶' },
+  ];
 
   const filteredItems = activeCategory === 'all' 
     ? items 
     : items.filter(item => item.category === activeCategory);
 
-  // Sort by priority (1=high first)
   const sortedItems = [...filteredItems].sort((a, b) => (a.priority || 2) - (b.priority || 2));
 
   const progress = getProgress();
 
-  const handleItemClick = (itemId: string) => {
-    if (expandedItem === itemId) {
-      setExpandedItem(null);
-    } else {
-      setExpandedItem(itemId);
+  // Group items by category for "all" view
+  const groupedItems = useMemo(() => {
+    if (activeCategory !== 'all') return null;
+    const groups: Record<string, typeof items> = {};
+    for (const item of sortedItems) {
+      if (!groups[item.category]) groups[item.category] = [];
+      groups[item.category].push(item);
     }
-  };
+    return groups;
+  }, [activeCategory, sortedItems]);
 
   if (loading) {
     return (
@@ -68,168 +62,210 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
     );
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Compact Header */}
-      <div className="bg-gradient-to-r from-primary to-primary/80 px-4 pt-4 pb-4 safe-top">
-        <div className="flex items-center gap-3 mb-3">
+  const renderItem = (item: typeof items[0], index: number) => {
+    const priority = item.priority || 2;
+    const pConfig = priorityConfig[priority as keyof typeof priorityConfig];
+    const isExpanded = expandedItem === item.item_id;
+    const hasNotes = item.notes && item.notes.trim().length > 0;
+
+    return (
+      <motion.div
+        key={item.id}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.02, duration: 0.25 }}
+        layout
+        className={`rounded-xl overflow-hidden transition-all ${
+          item.is_checked
+            ? 'bg-primary/5 border border-primary/20'
+            : 'bg-card border border-border/50'
+        }`}
+      >
+        <div 
+          className="p-3 flex items-center gap-3 cursor-pointer active:bg-muted/50 transition-colors"
+          onClick={() => {
+            if (hasNotes) {
+              setExpandedItem(isExpanded ? null : item.item_id);
+            } else {
+              toggleItem(item.item_id);
+            }
+          }}
+        >
           <motion.button
-            onClick={onBack}
-            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleItem(item.item_id);
+            }}
+            className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all flex-shrink-0 ${
+              item.is_checked 
+                ? 'bg-primary shadow-sm' 
+                : 'border-2 border-muted-foreground/30'
+            }`}
+            whileTap={{ scale: 0.85 }}
+            animate={item.is_checked ? { scale: [1, 1.15, 1] } : {}}
+            transition={{ duration: 0.2 }}
           >
-            <ArrowLeft className="w-4 h-4 text-white" />
+            {item.is_checked && <Check className="w-3.5 h-3.5 text-primary-foreground" />}
           </motion.button>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold text-white">Xəstəxana Çantası</h1>
+          
+          <div className="flex-1 min-w-0">
+            <span className={`font-medium text-sm transition-all block ${
+              item.is_checked ? 'text-muted-foreground line-through' : 'text-foreground'
+            }`}>
+              {item.item_name}
+            </span>
+            {hasNotes && !isExpanded && (
+              <p className="text-xs text-muted-foreground/70 truncate mt-0.5">
+                {item.notes}
+              </p>
+            )}
           </div>
-          <div className="text-right">
-            <span className="text-white font-bold text-lg">{checkedCount}/{totalCount}</span>
-            <p className="text-white/70 text-[10px]">hazır</p>
+
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${pConfig?.color}`}>
+              {pConfig?.dot}
+            </span>
+            {hasNotes && (
+              <motion.div
+                animate={{ rotate: isExpanded ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground/50" />
+              </motion.div>
+            )}
           </div>
         </div>
 
-        {/* Progress Bar */}
-        <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-          <motion.div 
-            className="h-full bg-white rounded-full"
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.5 }}
-          />
+        <AnimatePresence>
+          {isExpanded && hasNotes && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+            >
+              <div className="px-3 pb-3 pt-0">
+                <div className="flex items-start gap-2 bg-muted/50 rounded-lg p-2.5">
+                  <Info className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {item.notes}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    );
+  };
+
+  const renderCategorySection = (catKey: string, catItems: typeof items) => {
+    const config = categoryConfig[catKey as keyof typeof categoryConfig];
+    if (!config || catItems.length === 0) return null;
+    const checkedInCat = catItems.filter(i => i.is_checked).length;
+
+    return (
+      <div key={catKey} className="mb-4">
+        <div className="flex items-center gap-2 mb-2 px-1">
+          <span className="text-base">{config.emoji}</span>
+          <span className="text-sm font-semibold text-foreground">{config.label}</span>
+          <span className="text-xs text-muted-foreground ml-auto">
+            {checkedInCat}/{catItems.length}
+          </span>
+        </div>
+        <div className="space-y-1.5">
+          {catItems.map((item, i) => renderItem(item, i))}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-background pb-24">
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-md border-b border-border/50">
+        <div className="flex items-center gap-3 px-4 py-3">
+          <motion.button
+            onClick={onBack}
+            className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center"
+            whileTap={{ scale: 0.95 }}
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </motion.button>
+          <div className="flex-1">
+            <h1 className="text-lg font-bold">Xəstəxana Çantası</h1>
+          </div>
+          <div className="text-right">
+            <span className="text-sm font-bold text-primary">{checkedCount}/{totalCount}</span>
+          </div>
+        </div>
+
+        {/* Progress */}
+        <div className="px-4 pb-3">
+          <Progress value={progress} className="h-2" />
+          <div className="flex justify-between mt-1">
+            <span className="text-[10px] text-muted-foreground">36-cı həftədən hazır olmalıdır</span>
+            <span className="text-[10px] font-medium text-primary">{progress.toFixed(0)}%</span>
+          </div>
+        </div>
+
+        {/* Category Tabs */}
+        <div className="flex gap-1.5 px-4 pb-3 overflow-x-auto hide-scrollbar">
+          {categories.map((cat) => {
+            const catCount = cat.id === 'all' 
+              ? items.length 
+              : items.filter(i => i.category === cat.id).length;
+            const catChecked = cat.id === 'all'
+              ? checkedCount
+              : items.filter(i => i.category === cat.id && i.is_checked).length;
+            
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+                  activeCategory === cat.id
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground'
+                }`}
+              >
+                <span>{cat.emoji}</span>
+                {cat.label}
+                <span className="opacity-70">({catChecked}/{catCount})</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       <div className="px-3 pt-3">
-        {/* Categories */}
-        <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-3 mb-3">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id as any)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                activeCategory === cat.id
-                  ? 'gradient-primary text-white shadow-button'
-                  : 'bg-card border border-border text-muted-foreground'
-              }`}
-            >
-              <span>{cat.emoji}</span>
-              {cat.label}
-            </button>
+        {/* Priority Legend */}
+        <div className="flex gap-3 mb-3 px-1">
+          {Object.entries(priorityConfig).map(([key, config]) => (
+            <span key={key} className="text-[10px] text-muted-foreground flex items-center gap-1">
+              {config.dot} {config.label}
+            </span>
           ))}
         </div>
 
-        {/* Checklist */}
-        <div className="space-y-2 pb-6">
-          {sortedItems.map((item, index) => {
-            const priority = item.priority || 2;
-            const priorityInfo = priorityConfig[priority as keyof typeof priorityConfig];
-            const PriorityIcon = priorityInfo?.icon || Star;
-            const isExpanded = expandedItem === item.item_id;
-            const hasNotes = item.notes && item.notes.trim().length > 0;
-
-            return (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.03 }}
-                className={`rounded-xl overflow-hidden transition-all ${
-                  item.is_checked
-                    ? 'bg-primary/10 border-2 border-primary/30'
-                    : 'bg-card border-2 border-border/50 shadow-card'
-                }`}
-              >
-                <div 
-                  className="p-3 flex items-center gap-3 cursor-pointer"
-                  onClick={() => handleItemClick(item.item_id)}
-                >
-                  <motion.button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleItem(item.item_id);
-                    }}
-                    className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors flex-shrink-0 ${
-                      item.is_checked ? 'gradient-primary' : 'bg-muted'
-                    }`}
-                    animate={item.is_checked ? { scale: [1, 1.2, 1] } : {}}
-                  >
-                    {item.is_checked && <Check className="w-4 h-4 text-white" />}
-                  </motion.button>
-                  
-                  <div className="flex-1 min-w-0">
-                    <span className={`font-medium text-sm transition-all block ${
-                      item.is_checked ? 'text-primary line-through' : 'text-foreground'
-                    }`}>
-                      {item.item_name}
-                    </span>
-                    {hasNotes && !isExpanded && (
-                      <p className="text-xs text-muted-foreground truncate mt-0.5">
-                        {item.notes}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {/* Priority Badge */}
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${priorityInfo?.color}`}>
-                      <PriorityIcon className="w-3 h-3 inline mr-0.5" />
-                      {priority === 1 ? '!' : priority === 3 ? '○' : ''}
-                    </span>
-
-                    {/* Category Badge */}
-                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                      item.category === 'mom' ? 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300' :
-                      item.category === 'baby' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' :
-                      'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
-                    }`}>
-                      {item.category === 'mom' ? '👩' : item.category === 'baby' ? '👶' : '📄'}
-                    </span>
-
-                    {/* Expand indicator */}
-                    {hasNotes && (
-                      <motion.div
-                        animate={{ rotate: isExpanded ? 180 : 0 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                      </motion.div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Expanded Info */}
-                <AnimatePresence>
-                  {isExpanded && hasNotes && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="px-4 pb-3 pt-1 border-t border-border/50">
-                        <div className="flex items-start gap-2">
-                          <Info className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            {item.notes}
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            );
-          })}
-        </div>
+        {/* Items */}
+        {activeCategory === 'all' && groupedItems ? (
+          ['documents', 'mom', 'baby'].map(catKey => 
+            groupedItems[catKey] ? renderCategorySection(catKey, groupedItems[catKey]) : null
+          )
+        ) : (
+          <div className="space-y-1.5">
+            {sortedItems.map((item, i) => renderItem(item, i))}
+          </div>
+        )}
 
         {/* Completion Message */}
         {progress === 100 && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 text-center text-white mb-6"
+            className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 text-center text-white mt-4"
           >
             <div className="text-4xl mb-2">🎉</div>
             <h3 className="text-lg font-bold">Təbrik edirik!</h3>
