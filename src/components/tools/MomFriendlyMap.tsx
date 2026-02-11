@@ -512,9 +512,6 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                         <p className="text-sm text-muted-foreground">{selectedPlace.review_count} rəy</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground">{selectedPlace.verified_count} təsdiq</p>
-                    </div>
                   </CardContent>
                 </Card>
 
