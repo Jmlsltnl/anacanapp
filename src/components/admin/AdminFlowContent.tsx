@@ -112,7 +112,7 @@ const AdminFlowContent = () => {
       case 'symptoms':
         return { symptom_key: '', label: '', label_az: '', emoji: '🤕', category: 'physical', color: '#F97316', is_active: true, sort_order: 0 };
       case 'tips':
-        return { phase: 'menstrual', category: 'nutrition', tip_text: '', tip_text_az: '', icon: 'utensils', is_active: true, sort_order: 0 };
+        return { phase: 'menstrual', category: 'nutrition', title: '', title_az: '', content: '', content_az: '', emoji: '💡', is_active: true, sort_order: 0 };
       case 'insights':
         return { title: '', title_az: '', content: '', content_az: '', phase: null, emoji: '💡', category: 'general', is_active: true, sort_order: 0 };
       default:
@@ -190,7 +190,7 @@ const AdminFlowContent = () => {
       return item.label?.toLowerCase().includes(searchLower) || item.label_az?.toLowerCase().includes(searchLower);
     }
     if (activeTab === 'tips') {
-      return item.tip_text?.toLowerCase().includes(searchLower) || item.tip_text_az?.toLowerCase().includes(searchLower);
+      return item.title?.toLowerCase().includes(searchLower) || item.title_az?.toLowerCase().includes(searchLower);
     }
     return item.title?.toLowerCase().includes(searchLower) || item.title_az?.toLowerCase().includes(searchLower);
   });
@@ -260,7 +260,7 @@ const AdminFlowContent = () => {
               <div>
                 <p className="font-medium text-foreground">
                   {activeTab === 'symptoms' && (item.label_az || item.label)}
-                  {activeTab === 'tips' && (item.tip_text_az || item.tip_text)}
+                  {activeTab === 'tips' && (item.title_az || item.title)}
                   {activeTab === 'insights' && (item.title_az || item.title)}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
@@ -378,18 +378,34 @@ const AdminFlowContent = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Tövsiyə (EN)</label>
+                  <label className="text-sm font-medium">Başlıq (EN)</label>
+                  <Input
+                    value={formData.title || ''}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="Tip title"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Başlıq (AZ)</label>
+                  <Input
+                    value={formData.title_az || ''}
+                    onChange={(e) => setFormData({ ...formData, title_az: e.target.value })}
+                    placeholder="Azərbaycan dilində başlıq"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Məzmun (EN)</label>
                   <Textarea
-                    value={formData.tip_text || ''}
-                    onChange={(e) => setFormData({ ...formData, tip_text: e.target.value })}
+                    value={formData.content || ''}
+                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                     rows={2}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Tövsiyə (AZ)</label>
+                  <label className="text-sm font-medium">Məzmun (AZ)</label>
                   <Textarea
-                    value={formData.tip_text_az || ''}
-                    onChange={(e) => setFormData({ ...formData, tip_text_az: e.target.value })}
+                    value={formData.content_az || ''}
+                    onChange={(e) => setFormData({ ...formData, content_az: e.target.value })}
                     rows={2}
                   />
                 </div>
