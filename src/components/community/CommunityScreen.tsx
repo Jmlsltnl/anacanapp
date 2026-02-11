@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Users, Plus, Search, TrendingUp } from 'lucide-react';
 import { useCommunityGroups, useUserMemberships } from '@/hooks/useCommunity';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useUserStore } from '@/store/userStore';
+import { useAppSetting } from '@/hooks/useAppSettings';
 import GroupsList from './GroupsList';
 import GroupFeed from './GroupFeed';
 import CreatePostModal from './CreatePostModal';
@@ -17,6 +19,12 @@ interface CommunityScreenProps {
 const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBack }, ref) => {
   useScrollToTop();
   
+  const { lifeStage } = useUserStore();
+  const headerKey = `community_header_${lifeStage || 'mommy'}`;
+  const dynamicHeader = useAppSetting(headerKey);
+  const defaultHeader = 'Digər analar ilə əlaqədə olun';
+  const headerText = typeof dynamicHeader === 'string' ? dynamicHeader : defaultHeader;
+
   const [activeTab, setActiveTab] = useState<'feed' | 'groups' | 'my-groups'>('feed');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [showCreatePost, setShowCreatePost] = useState(false);
@@ -74,7 +82,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
             )}
             <div className="flex-1">
               <h1 className="text-lg font-black text-foreground">Cəmiyyət</h1>
-              <p className="text-xs text-muted-foreground">Digər analar ilə əlaqədə olun</p>
+              <p className="text-xs text-muted-foreground">{headerText}</p>
             </div>
           </div>
 

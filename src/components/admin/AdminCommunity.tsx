@@ -47,6 +47,53 @@ const AdminCommunity = () => {
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
+  // Community header texts per life stage
+  const [headerTexts, setHeaderTexts] = useState({
+    flow: '',
+    bump: '',
+    mommy: '',
+  });
+  const [headerSaving, setHeaderSaving] = useState(false);
+
+  useEffect(() => {
+    const fetchHeaders = async () => {
+      const { data } = await supabase
+        .from('app_settings')
+        .select('*')
+        .in('key', ['community_header_flow', 'community_header_bump', 'community_header_mommy']);
+      if (data) {
+        const map: Record<string, string> = {};
+        data.forEach((s: any) => {
+          const stage = s.key.replace('community_header_', '');
+          map[stage] = typeof s.value === 'string' ? s.value : JSON.stringify(s.value);
+        });
+        setHeaderTexts({
+          flow: map.flow || '',
+          bump: map.bump || '',
+          mommy: map.mommy || '',
+        });
+      }
+    };
+    fetchHeaders();
+  }, []);
+
+  const saveHeaders = async () => {
+    setHeaderSaving(true);
+    try {
+      for (const stage of ['flow', 'bump', 'mommy'] as const) {
+        await supabase
+          .from('app_settings')
+          .update({ value: headerTexts[stage] })
+          .eq('key', `community_header_${stage}`);
+      }
+      toast({ title: 'Başlıq mətnləri yeniləndi ✓' });
+    } catch {
+      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+    } finally {
+      setHeaderSaving(false);
+    }
+  };
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -207,6 +254,32 @@ const AdminCommunity = () => {
 
   return (
     <div className="space-y-6">
+      {/* Community Header Texts per Life Stage */}
+      <Card className="p-4">
+        <h3 className="font-bold text-foreground mb-3">📝 Cəmiyyət Başlıq Mətnləri (Fazalara görə)</h3>
+        <div className="space-y-3">
+          {[
+            { key: 'flow' as const, label: '🩸 Menstruasiya', placeholder: 'Digər qadınlar ilə əlaqədə olun' },
+            { key: 'bump' as const, label: '🤰 Hamiləlik', placeholder: 'Digər hamilə analar ilə əlaqədə olun' },
+            { key: 'mommy' as const, label: '👩‍👧 Analıq', placeholder: 'Digər analar ilə əlaqədə olun' },
+          ].map((stage) => (
+            <div key={stage.key} className="flex items-center gap-3">
+              <span className="text-sm font-medium w-32 flex-shrink-0">{stage.label}</span>
+              <Input
+                value={headerTexts[stage.key]}
+                onChange={(e) => setHeaderTexts(prev => ({ ...prev, [stage.key]: e.target.value }))}
+                placeholder={stage.placeholder}
+                className="flex-1"
+              />
+            </div>
+          ))}
+          <Button onClick={saveHeaders} disabled={headerSaving} size="sm" className="gap-2">
+            <Save className="w-4 h-4" />
+            {headerSaving ? 'Saxlanılır...' : 'Yadda saxla'}
+          </Button>
+        </div>
+      </Card>
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Cəmiyyət Qrupları</h1>
