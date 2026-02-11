@@ -19,9 +19,10 @@ import BlogPostDetail from '@/components/blog/BlogPostDetail';
 interface BlogScreenProps {
   onBack: () => void;
   initialSlug?: string;
+  lifeStage?: string;
 }
 
-const BlogScreen = ({ onBack, initialSlug }: BlogScreenProps) => {
+const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
   useScrollToTop();
   
   const { user } = useAuth();
@@ -66,13 +67,22 @@ const BlogScreen = ({ onBack, initialSlug }: BlogScreenProps) => {
 
   const savedPostsList = posts.filter(p => savedPosts.includes(p.id));
 
+  // Sort posts: current life stage first, then others
+  const sortedPosts = lifeStage 
+    ? [...posts].sort((a, b) => {
+        const aMatch = a.life_stage === lifeStage ? 0 : 1;
+        const bMatch = b.life_stage === lifeStage ? 0 : 1;
+        return aMatch - bMatch;
+      })
+    : posts;
+
   const filteredPosts = showSaved 
     ? savedPostsList
     : searchQuery 
       ? searchPosts(searchQuery)
       : selectedCategory 
         ? getPostsByCategory(selectedCategory)
-        : posts;
+        : sortedPosts;
 
   // Handle back from post detail
   const handleBackFromPost = () => {

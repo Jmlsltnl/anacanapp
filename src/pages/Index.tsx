@@ -57,7 +57,7 @@ const Index = () => {
   const [viewingUserId, setViewingUserId] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [toolsResetKey, setToolsResetKey] = useState(0);
-  const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro } = useUserStore();
+  const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, lifeStage } = useUserStore();
   const { isAdmin, loading } = useAuth();
   
   // Ref for scroll container to reset position on navigation
@@ -328,7 +328,7 @@ const Index = () => {
   }
   if (activeScreen === 'blog' || activeScreen?.startsWith('blog/')) {
     const initialSlug = activeScreen?.startsWith('blog/') ? activeScreen.replace('blog/', '') : undefined;
-    return <BlogScreen onBack={() => setActiveScreen(null)} initialSlug={initialSlug} />;
+    return <BlogScreen onBack={() => setActiveScreen(null)} initialSlug={initialSlug} lifeStage={lifeStage} />;
   }
   if (activeScreen === 'shop' && isAdmin) {
     return <ShopScreen onBack={() => setActiveScreen(null)} />;
