@@ -14,6 +14,7 @@ export interface AdminRecipe {
   instructions: string[];
   image_url: string | null;
   is_active: boolean;
+  life_stages: string[];
 }
 
 export const useAdminRecipesQuery = () => {
@@ -30,6 +31,7 @@ export const useAdminRecipesQuery = () => {
         ...item,
         ingredients: Array.isArray(item.ingredients) ? item.ingredients as string[] : [],
         instructions: Array.isArray(item.instructions) ? item.instructions as string[] : [],
+        life_stages: Array.isArray((item as any).life_stages) ? (item as any).life_stages as string[] : [],
       })) as AdminRecipe[];
     },
   });
