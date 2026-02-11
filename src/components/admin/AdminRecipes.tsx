@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { UtensilsCrossed, Plus, Pencil, Trash2, Search, Clock, Users, FileUp, Download, Upload, X, Image as ImageIcon, Settings2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,7 +24,15 @@ const AdminRecipes = () => {
   const { toast } = useToast();
   const { data: recipes = [], isLoading, create, update, remove, refetch } = useAdminRecipesAdmin();
   const { data: dbCategories = [] } = useRecipeCategoriesAdmin();
-  
+  const { data: recipeTags = [] } = useQuery({
+    queryKey: ['recipe-tags'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('recipe_tags').select('*').eq('is_active', true).order('sort_order');
+      if (error) throw error;
+      return data as { id: string; tag_id: string; name: string; name_az: string | null; emoji: string | null; sort_order: number; is_active: boolean }[];
+    },
+  });
+
   // Category management states
   const [showCatModal, setShowCatModal] = useState(false);
   const [editingCat, setEditingCat] = useState<any>(null);
@@ -80,7 +89,7 @@ const AdminRecipes = () => {
       instructions: [],
       image_url: '',
       is_active: true,
-      life_stages: [],
+      tags: [],
     };
     setFormData(initialData);
     initialFormDataRef.current = JSON.stringify(initialData);
@@ -529,11 +538,14 @@ const AdminRecipes = () => {
                           {recipe.servings} porsiya
                         </span>
                         <Badge variant="outline">{categories.find(c => c.id === recipe.category)?.label || recipe.category}</Badge>
-                        {(recipe.life_stages || []).map(ls => (
-                          <Badge key={ls} variant="outline" className="text-[10px]">
-                            {ls === 'bump' ? '🤰 Hamilə' : ls === 'flow' ? '🩸 Menstruasiya' : ls === 'mommy' ? '👶 Ana' : ls}
-                          </Badge>
-                        ))}
+                        {(recipe.tags || []).map(t => {
+                          const tagInfo = recipeTags.find(rt => rt.tag_id === t);
+                          return (
+                            <Badge key={t} variant="outline" className="text-[10px]">
+                              {tagInfo ? `${tagInfo.emoji} ${tagInfo.name_az || tagInfo.name}` : t}
+                            </Badge>
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
@@ -586,25 +598,21 @@ const AdminRecipes = () => {
                 </SelectContent>
               </Select>
               <div className="space-y-2">
-                <Label>Həyat mərhələsi etiketi</Label>
+                <Label>Alt kateqoriya etiketləri</Label>
                 <div className="flex flex-wrap gap-2">
-                  {[
-                    { id: 'bump', label: '🤰 Hamilə', },
-                    { id: 'flow', label: '🩸 Menstruasiya' },
-                    { id: 'mommy', label: '👶 Ana' },
-                  ].map(stage => {
-                    const selected = (formData.life_stages || []).includes(stage.id);
+                  {recipeTags.map(tag => {
+                    const selected = (formData.tags || []).includes(tag.tag_id);
                     return (
                       <button
-                        key={stage.id}
+                        key={tag.tag_id}
                         type="button"
                         onClick={() => {
-                          const current = formData.life_stages || [];
+                          const current = formData.tags || [];
                           setFormData({
                             ...formData,
-                            life_stages: selected
-                              ? current.filter(s => s !== stage.id)
-                              : [...current, stage.id],
+                            tags: selected
+                              ? current.filter(s => s !== tag.tag_id)
+                              : [...current, tag.tag_id],
                           });
                         }}
                         className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
@@ -613,7 +621,7 @@ const AdminRecipes = () => {
                             : 'bg-muted/50 text-muted-foreground border-border hover:bg-muted'
                         }`}
                       >
-                        {stage.label}
+                        {tag.emoji} {tag.name_az || tag.name}
                       </button>
                     );
                   })}
