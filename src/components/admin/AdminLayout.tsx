@@ -66,6 +66,7 @@ const menuItems = [
   { id: 'play-activities', label: 'Ağıllı Oyun Qutusu', icon: Gamepad2 },
   { id: 'quick-actions', label: 'Sürətli Keçidlər', icon: Zap },
   { id: 'development-tips', label: 'İnkişaf Tövsiyələri', icon: Lightbulb },
+  { id: 'baby-daily-info', label: 'Günlük Məlumatlar (Ana)', icon: Calendar },
   { id: 'banners', label: 'Bannerlər', icon: Megaphone },
   { id: 'baby-growth', label: 'Böyümə İzləmə', icon: Scale },
   { id: 'teething', label: 'Diş Çıxarma', icon: Sparkles },
