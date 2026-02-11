@@ -49,13 +49,18 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
     }
   };
 
+  // Hide cakes tab in flow mode
+  const visibleWomanTabs = lifeStage === 'flow' 
+    ? womanTabs.filter(t => t.id !== 'cakes') 
+    : womanTabs;
+
   return (
     <nav 
       className="relative z-50 flex-shrink-0 bg-card border-t border-border/50"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div className="flex items-center justify-around py-1.5 px-1">
-          {(isPartner ? partnerTabs : womanTabs).map((tab) => {
+          {(isPartner ? partnerTabs : visibleWomanTabs).map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             // Show badge on chat tab for unread messages (both partner and woman)
