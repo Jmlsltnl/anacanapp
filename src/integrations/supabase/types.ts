@@ -25,6 +25,7 @@ export type Database = {
           ingredients: Json
           instructions: Json
           is_active: boolean | null
+          life_stages: string[] | null
           prep_time: number | null
           servings: number | null
           title: string
@@ -40,6 +41,7 @@ export type Database = {
           ingredients?: Json
           instructions?: Json
           is_active?: boolean | null
+          life_stages?: string[] | null
           prep_time?: number | null
           servings?: number | null
           title: string
@@ -55,6 +57,7 @@ export type Database = {
           ingredients?: Json
           instructions?: Json
           is_active?: boolean | null
+          life_stages?: string[] | null
           prep_time?: number | null
           servings?: number | null
           title?: string

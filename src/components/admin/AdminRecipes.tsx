@@ -80,6 +80,7 @@ const AdminRecipes = () => {
       instructions: [],
       image_url: '',
       is_active: true,
+      life_stages: [],
     };
     setFormData(initialData);
     initialFormDataRef.current = JSON.stringify(initialData);
@@ -528,6 +529,11 @@ const AdminRecipes = () => {
                           {recipe.servings} porsiya
                         </span>
                         <Badge variant="outline">{categories.find(c => c.id === recipe.category)?.label || recipe.category}</Badge>
+                        {(recipe.life_stages || []).map(ls => (
+                          <Badge key={ls} variant="outline" className="text-[10px]">
+                            {ls === 'bump' ? '🤰 Hamilə' : ls === 'flow' ? '🩸 Menstruasiya' : ls === 'mommy' ? '👶 Ana' : ls}
+                          </Badge>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -579,6 +585,40 @@ const AdminRecipes = () => {
                   ))}
                 </SelectContent>
               </Select>
+              <div className="space-y-2">
+                <Label>Həyat mərhələsi etiketi</Label>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { id: 'bump', label: '🤰 Hamilə', },
+                    { id: 'flow', label: '🩸 Menstruasiya' },
+                    { id: 'mommy', label: '👶 Ana' },
+                  ].map(stage => {
+                    const selected = (formData.life_stages || []).includes(stage.id);
+                    return (
+                      <button
+                        key={stage.id}
+                        type="button"
+                        onClick={() => {
+                          const current = formData.life_stages || [];
+                          setFormData({
+                            ...formData,
+                            life_stages: selected
+                              ? current.filter(s => s !== stage.id)
+                              : [...current, stage.id],
+                          });
+                        }}
+                        className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                          selected
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-muted/50 text-muted-foreground border-border hover:bg-muted'
+                        }`}
+                      >
+                        {stage.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
               <div className="grid grid-cols-3 gap-3">
                 <Input
                   type="number"
