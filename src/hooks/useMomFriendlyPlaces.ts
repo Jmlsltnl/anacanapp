@@ -90,6 +90,7 @@ export const usePlaceReviews = (placeId: string) => {
         .from('place_reviews')
         .select('*')
         .eq('place_id', placeId)
+        .eq('is_verified', true)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -124,7 +125,7 @@ export const useAddPlace = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mom-friendly-places'] });
-      toast.success('Məkan uğurla əlavə edildi!');
+      toast.success('Məkan əlavə edildi! Admin təsdiqindən sonra görünəcək.');
     },
     onError: () => {
       toast.error('Məkan əlavə edilə bilmədi');
@@ -162,7 +163,7 @@ export const useAddReview = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['place-reviews', variables.place_id] });
       queryClient.invalidateQueries({ queryKey: ['mom-friendly-places'] });
-      toast.success('Rəyiniz əlavə edildi!');
+      toast.success('Rəyiniz göndərildi! Admin təsdiqindən sonra görünəcək.');
     },
     onError: () => {
       toast.error('Rəy əlavə edilə bilmədi');
