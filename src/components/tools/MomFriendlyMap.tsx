@@ -13,7 +13,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent } from '@/components/ui/card';
-import { useMomFriendlyPlaces, useAddPlace, useAddReview, MomFriendlyPlace } from '@/hooks/useMomFriendlyPlaces';
+import { useMomFriendlyPlaces, useAddPlace, useAddReview, usePlaceReviews, MomFriendlyPlace } from '@/hooks/useMomFriendlyPlaces';
+import { Textarea } from '@/components/ui/textarea';
 import { usePlaceCategories, usePlaceAmenities, FALLBACK_CATEGORIES, FALLBACK_AMENITIES } from '@/hooks/usePlacesConfig';
 import { toast } from 'sonner';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
@@ -79,7 +80,14 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
     amenities: selectedAmenities,
   });
 
+  const { data: placeReviews = [] } = usePlaceReviews(selectedPlace?.id || '');
+
   const addPlaceMutation = useAddPlace();
+  const addReviewMutation = useAddReview();
+
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState('');
+  const [showReviewForm, setShowReviewForm] = useState(false);
 
   const [newPlace, setNewPlace] = useState({
     name: '',
@@ -543,6 +551,94 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                     </a>
                   </Button>
                 )}
+
+                {/* Reviews Section */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-bold flex items-center gap-2">
+                      <Star className="w-4 h-4 text-amber-500" />
+                      Rəylər ({placeReviews.length})
+                    </h4>
+                    <Button
+                      size="sm"
+                      variant={showReviewForm ? "outline" : "default"}
+                      onClick={() => setShowReviewForm(!showReviewForm)}
+                      className={!showReviewForm ? "bg-rose-500 hover:bg-rose-600 text-white" : ""}
+                    >
+                      {showReviewForm ? 'Ləğv et' : 'Rəy yaz'}
+                    </Button>
+                  </div>
+
+                  {/* Review Form */}
+                  {showReviewForm && (
+                    <Card className="mb-3 border-rose-200 dark:border-rose-900/30">
+                      <CardContent className="p-4 space-y-3">
+                        <div>
+                          <p className="text-sm font-medium mb-2">Qiymətləndirmə</p>
+                          <div className="flex gap-1">
+                            {[1, 2, 3, 4, 5].map(star => (
+                              <button
+                                key={star}
+                                onClick={() => setReviewRating(star)}
+                                className="p-1"
+                              >
+                                <Star className={`w-7 h-7 transition-colors ${star <= reviewRating ? 'text-amber-500 fill-current' : 'text-muted-foreground'}`} />
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium mb-2">Şərh (istəyə bağlı)</p>
+                          <Textarea
+                            value={reviewComment}
+                            onChange={(e) => setReviewComment(e.target.value)}
+                            placeholder="Təcrübənizi paylaşın..."
+                            className="bg-muted/50 resize-none"
+                            rows={3}
+                          />
+                        </div>
+                        <Button
+                          className="w-full bg-rose-500 hover:bg-rose-600 text-white"
+                          disabled={reviewRating === 0 || addReviewMutation.isPending}
+                          onClick={async () => {
+                            if (!selectedPlace) return;
+                            await addReviewMutation.mutateAsync({
+                              place_id: selectedPlace.id,
+                              rating: reviewRating,
+                              comment: reviewComment || undefined,
+                            });
+                            setReviewRating(0);
+                            setReviewComment('');
+                            setShowReviewForm(false);
+                          }}
+                        >
+                          {addReviewMutation.isPending ? 'Göndərilir...' : 'Rəy göndər'}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Reviews List */}
+                  {placeReviews.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">Hələ rəy yoxdur. İlk rəyi siz yazın!</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {placeReviews.map(review => (
+                        <div key={review.id} className="bg-muted/30 rounded-xl p-3">
+                          <div className="flex items-center gap-1 mb-1">
+                            {[1, 2, 3, 4, 5].map(s => (
+                              <Star key={s} className={`w-3.5 h-3.5 ${s <= review.rating ? 'text-amber-500 fill-current' : 'text-muted-foreground'}`} />
+                            ))}
+                            <span className="text-xs text-muted-foreground ml-2">
+                              {new Date(review.created_at).toLocaleDateString('az-AZ')}
+                            </span>
+                          </div>
+                          {review.comment && <p className="text-sm text-foreground">{review.comment}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </>
           )}
