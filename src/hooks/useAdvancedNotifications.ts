@@ -83,6 +83,7 @@ export interface PregnancyDayNotification {
   title: string;
   body: string;
   emoji: string | null;
+  send_time: string;
   is_active: boolean | null;
   created_at: string;
   updated_at: string;

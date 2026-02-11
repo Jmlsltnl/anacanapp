@@ -5287,6 +5287,7 @@ export type Database = {
           emoji: string | null
           id: string
           is_active: boolean | null
+          send_time: string
           title: string
           updated_at: string | null
         }
@@ -5297,6 +5298,7 @@ export type Database = {
           emoji?: string | null
           id?: string
           is_active?: boolean | null
+          send_time?: string
           title: string
           updated_at?: string | null
         }
@@ -5307,6 +5309,7 @@ export type Database = {
           emoji?: string | null
           id?: string
           is_active?: boolean | null
+          send_time?: string
           title?: string
           updated_at?: string | null
         }
