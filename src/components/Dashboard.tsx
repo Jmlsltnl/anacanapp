@@ -779,7 +779,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   
   const babyAgeMonths = childAge?.months || 1;
   const { imageUrl: babyIllustration, title: illustrationTitle, description: illustrationDescription } = useBabyIllustrationByMonth(Math.max(1, Math.min(36, babyAgeMonths)));
-  const { data: dailyInfo } = useBabyDailyInfoByDay(babyData.ageInDays > 0 ? babyData.ageInDays : null);
+  const { data: dailyInfo } = useBabyDailyInfoByDay(babyData?.ageInDays && babyData.ageInDays > 0 ? babyData.ageInDays : null);
   
   // Current time for timer display
   const [, setTick] = useState(0);
