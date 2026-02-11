@@ -25,9 +25,9 @@ export type Database = {
           ingredients: Json
           instructions: Json
           is_active: boolean | null
-          life_stages: string[] | null
           prep_time: number | null
           servings: number | null
+          tags: string[] | null
           title: string
           updated_at: string
         }
@@ -41,9 +41,9 @@ export type Database = {
           ingredients?: Json
           instructions?: Json
           is_active?: boolean | null
-          life_stages?: string[] | null
           prep_time?: number | null
           servings?: number | null
+          tags?: string[] | null
           title: string
           updated_at?: string
         }
@@ -57,9 +57,9 @@ export type Database = {
           ingredients?: Json
           instructions?: Json
           is_active?: boolean | null
-          life_stages?: string[] | null
           prep_time?: number | null
           servings?: number | null
+          tags?: string[] | null
           title?: string
           updated_at?: string
         }
@@ -5758,6 +5758,39 @@ export type Database = {
           name?: string
           name_az?: string | null
           sort_order?: number | null
+        }
+        Relationships: []
+      }
+      recipe_tags: {
+        Row: {
+          created_at: string
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          name_az: string | null
+          sort_order: number | null
+          tag_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          name_az?: string | null
+          sort_order?: number | null
+          tag_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          name_az?: string | null
+          sort_order?: number | null
+          tag_id?: string
         }
         Relationships: []
       }
