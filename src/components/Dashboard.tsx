@@ -984,8 +984,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         transition={{ duration: 0.5 }}
       >
         {/* Background gradient layers */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/80" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/20 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-[hsl(12,80%,48%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/15 via-transparent to-transparent" />
         
         {/* Decorative orbs */}
         <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-white/10 blur-3xl" />
@@ -1102,45 +1102,46 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             </div>
           </motion.div>
 
-          {/* Bottom: Monthly insight */}
-          <motion.div 
-            className="bg-amber-50 rounded-2xl p-4 border border-amber-200 shadow-lg"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            {/* Header */}
-            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-amber-200">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shadow-sm">
-                <Calendar className="w-5 h-5 text-amber-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-[10px] font-semibold text-amber-500 uppercase tracking-widest mb-0.5">
-                  {exactMonths > 0 ? `${exactMonths}. Ay` : 'Yenidoğulmuş'}
+        </div>
+      </motion.div>
+
+      {/* Bu ay nə baş verir? - Separate section */}
+      <motion.div 
+        className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800 shadow-lg"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+      >
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-4 pb-3 border-b border-amber-200 dark:border-amber-800">
+          <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-800/50 flex items-center justify-center shadow-sm">
+            <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+          </div>
+          <div className="flex-1">
+            <p className="text-[10px] font-semibold text-amber-500 dark:text-amber-400 uppercase tracking-widest mb-0.5">
+              {exactMonths > 0 ? `${exactMonths}. Ay` : 'Yenidoğulmuş'}
+            </p>
+            <p className="text-sm font-bold text-amber-900 dark:text-amber-100">
+              Bu ay nə baş verir?
+            </p>
+          </div>
+        </div>
+        
+        {/* Content - each line separate */}
+        <div className="space-y-2">
+          {(illustrationDescription || getBabyDailyFunFact(babyData.ageInDays))
+            .split(/[.!?]/)
+            .filter(sentence => sentence.trim().length > 0)
+            .slice(0, 4)
+            .map((sentence, index) => (
+              <div key={index} className="flex items-start gap-2.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
+                <p className="text-[13px] text-amber-800 dark:text-amber-200 leading-relaxed font-medium">
+                  {sentence.trim()}
                 </p>
-                <p className="text-sm font-bold text-amber-900">
-                  Bu ay nə baş verir?
-                </p>
               </div>
-            </div>
-            
-            {/* Content - each line separate */}
-            <div className="space-y-2">
-              {(illustrationDescription || getBabyDailyFunFact(babyData.ageInDays))
-                .split(/[.!?]/)
-                .filter(sentence => sentence.trim().length > 0)
-                .slice(0, 4)
-                .map((sentence, index) => (
-                  <div key={index} className="flex items-start gap-2.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
-                    <p className="text-[13px] text-amber-800 leading-relaxed font-medium">
-                      {sentence.trim()}
-                    </p>
-                  </div>
-                ))
-              }
-            </div>
-          </motion.div>
+            ))
+          }
         </div>
       </motion.div>
 
