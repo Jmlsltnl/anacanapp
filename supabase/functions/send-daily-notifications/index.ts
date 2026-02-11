@@ -32,6 +32,15 @@ interface PregnancyDayNotification {
   is_active: boolean;
 }
 
+interface MommyDayNotification {
+  id: string;
+  day_number: number;
+  title: string;
+  body: string;
+  emoji: string;
+  is_active: boolean;
+}
+
 interface DeviceToken {
   token: string;
   user_id: string;
@@ -98,10 +107,30 @@ Deno.serve(async (req) => {
       pregnancyNotifMap.set(n.day_number, n);
     });
 
+    // Get mommy day notifications
+    const { data: mommyNotifications } = await supabase
+      .from('mommy_day_notifications')
+      .select('*')
+      .eq('is_active', true);
+
+    const mommyNotifMap = new Map<number, MommyDayNotification>();
+    mommyNotifications?.forEach((n: MommyDayNotification) => {
+      // Group by day - use first found for push
+      if (!mommyNotifMap.has(n.day_number)) {
+        mommyNotifMap.set(n.day_number, n);
+      }
+    });
+
     // Get users with push enabled
     const { data: profiles } = await supabase
       .from('profiles')
       .select('user_id, life_stage, role, due_date, last_period_date');
+
+    // Get children for mommy users (to calculate child age)
+    const { data: children } = await supabase
+      .from('user_children')
+      .select('user_id, birth_date')
+      .order('birth_date', { ascending: false });
 
     const { data: preferences } = await supabase
       .from('user_preferences')
@@ -182,7 +211,7 @@ Deno.serve(async (req) => {
     for (const user of eligibleUsers) {
       let notificationToSend: { title: string; body: string; id: string; type: string } | null = null;
 
-      // Priority 1: Check pregnancy day-specific notification for bump users
+      // Priority 1a: Check pregnancy day-specific notification for bump users
       if (user.life_stage === 'bump' && user.last_period_date) {
         const pregnancyDay = calculatePregnancyDay(user.last_period_date);
         
@@ -195,6 +224,34 @@ Deno.serve(async (req) => {
               body: dayNotification.body,
               type: 'pregnancy_day',
             };
+          }
+        }
+      }
+
+      // Priority 1b: Check mommy day-specific notification for mommy users
+      if (!notificationToSend && user.life_stage === 'mommy') {
+        // Find the youngest child's birth_date for this user
+        const userChildren = children?.filter((c: any) => c.user_id === user.user_id) || [];
+        if (userChildren.length > 0) {
+          const youngestChild = userChildren[0]; // already sorted desc by birth_date
+          if (youngestChild.birth_date) {
+            const birthDate = new Date(youngestChild.birth_date);
+            const today = new Date();
+            birthDate.setHours(0, 0, 0, 0);
+            today.setHours(0, 0, 0, 0);
+            const childAgeDays = Math.floor((today.getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+            
+            if (childAgeDays >= 1 && childAgeDays <= 1460) {
+              const mommyNotif = mommyNotifMap.get(childAgeDays);
+              if (mommyNotif) {
+                notificationToSend = {
+                  id: mommyNotif.id,
+                  title: `${mommyNotif.emoji} ${mommyNotif.title}`,
+                  body: mommyNotif.body,
+                  type: 'mommy_day',
+                };
+              }
+            }
           }
         }
       }
@@ -324,6 +381,7 @@ Deno.serve(async (req) => {
         sent: sentCount,
         eligible: eligibleUsers.length,
         pregnancyNotificationsAvailable: pregnancyNotifMap.size,
+        mommyNotificationsAvailable: mommyNotifMap.size,
         results: results.slice(0, 10),
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
