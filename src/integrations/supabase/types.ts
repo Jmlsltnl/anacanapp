@@ -3681,6 +3681,42 @@ export type Database = {
         }
         Relationships: []
       }
+      mommy_day_notifications: {
+        Row: {
+          body: string
+          created_at: string
+          day_number: number
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          send_time: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          day_number: number
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          send_time?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          day_number?: number
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          send_time?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       mood_checkins: {
         Row: {
           checked_at: string | null
