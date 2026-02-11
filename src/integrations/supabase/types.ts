@@ -506,6 +506,33 @@ export type Database = {
         }
         Relationships: []
       }
+      baby_daily_info: {
+        Row: {
+          created_at: string
+          day_number: number
+          id: string
+          info: string
+          is_active: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_number: number
+          id?: string
+          info: string
+          is_active?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_number?: number
+          id?: string
+          info?: string
+          is_active?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       baby_growth: {
         Row: {
           child_id: string | null

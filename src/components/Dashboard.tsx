@@ -26,6 +26,7 @@ import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useTrimesterTips } from '@/hooks/useTrimesterTips';
 import { useFlowSymptoms, useFlowPhaseTips, useFlowInsights } from '@/hooks/useFlowData';
 import { useBabyIllustrationByMonth } from '@/hooks/useBabyMonthIllustrations';
+import { useBabyDailyInfoByDay } from '@/hooks/useBabyDailyInfo';
 import { useCurrentBabyCrisis, useUpcomingBabyCrises } from '@/hooks/useBabyCrisisPeriods';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useChildren } from '@/hooks/useChildren';
@@ -778,6 +779,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   
   const babyAgeMonths = childAge?.months || 1;
   const { imageUrl: babyIllustration, title: illustrationTitle, description: illustrationDescription } = useBabyIllustrationByMonth(Math.max(1, Math.min(36, babyAgeMonths)));
+  const { data: dailyInfo } = useBabyDailyInfoByDay(babyData.ageInDays > 0 ? babyData.ageInDays : null);
   
   // Current time for timer display
   const [, setTick] = useState(0);
@@ -1105,45 +1107,44 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         </div>
       </motion.div>
 
-      {/* Bu ay nə baş verir? - Separate section */}
-      <motion.div 
-        className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800 shadow-lg"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-      >
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-4 pb-3 border-b border-amber-200 dark:border-amber-800">
-          <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-800/50 flex items-center justify-center shadow-sm">
-            <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+      {/* Bu günün məlumatları */}
+      {dailyInfo && (
+        <motion.div 
+          className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800 shadow-lg"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <div className="flex items-center gap-3 mb-4 pb-3 border-b border-amber-200 dark:border-amber-800">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-800/50 flex items-center justify-center shadow-sm">
+              <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[10px] font-semibold text-amber-500 dark:text-amber-400 uppercase tracking-widest mb-0.5">
+                {babyData.ageInDays}. Gün
+              </p>
+              <p className="text-sm font-bold text-amber-900 dark:text-amber-100">
+                Bu günün məlumatları
+              </p>
+            </div>
           </div>
-          <div className="flex-1">
-            <p className="text-[10px] font-semibold text-amber-500 dark:text-amber-400 uppercase tracking-widest mb-0.5">
-              {exactMonths > 0 ? `${exactMonths}. Ay` : 'Yenidoğulmuş'}
-            </p>
-            <p className="text-sm font-bold text-amber-900 dark:text-amber-100">
-              Bu ay nə baş verir?
-            </p>
+          
+          <div className="space-y-2">
+            {dailyInfo.info
+              .split('\n')
+              .filter(line => line.trim().length > 0)
+              .map((line, index) => (
+                <div key={index} className="flex items-start gap-2.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
+                  <p className="text-[13px] text-amber-800 dark:text-amber-200 leading-relaxed font-medium">
+                    {line.trim()}
+                  </p>
+                </div>
+              ))
+            }
           </div>
-        </div>
-        
-        {/* Content - each line separate */}
-        <div className="space-y-2">
-          {(illustrationDescription || getBabyDailyFunFact(babyData.ageInDays))
-            .split(/[.!?]/)
-            .filter(sentence => sentence.trim().length > 0)
-            .slice(0, 4)
-            .map((sentence, index) => (
-              <div key={index} className="flex items-start gap-2.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
-                <p className="text-[13px] text-amber-800 dark:text-amber-200 leading-relaxed font-medium">
-                  {sentence.trim()}
-                </p>
-              </div>
-            ))
-          }
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
 
       {/* Baby Development Info Card */}
       {illustrationTitle && (
