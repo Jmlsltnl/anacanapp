@@ -3681,6 +3681,33 @@ export type Database = {
         }
         Relationships: []
       }
+      mommy_daily_messages: {
+        Row: {
+          created_at: string
+          day_number: number
+          id: string
+          is_active: boolean
+          message: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_number: number
+          id?: string
+          is_active?: boolean
+          message: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_number?: number
+          id?: string
+          is_active?: boolean
+          message?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       mommy_day_notifications: {
         Row: {
           body: string
