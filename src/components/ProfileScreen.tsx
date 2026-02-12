@@ -601,7 +601,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
         {[
           { id: 'legal/privacy_policy', icon: FileText, label: 'Gizlilik Siyasəti' },
           { id: 'legal/terms_of_service', icon: Scale, label: 'İstifadə Şərtləri' },
-          { id: 'legal/disclaimer', icon: AlertCircle, label: 'Məsuliyyətdən İmtina' },
+          { id: 'legal/disclaimer', icon: AlertCircle, label: 'Məsuliyyətdən İmtina Bəyanatı' },
           { id: 'legal/refund_policy', icon: RotateCcw, label: 'Geri Qaytarma Siyasəti' },
           { id: 'legal/gdpr_ccpa', icon: Shield, label: 'GDPR / CCPA' },
           { id: 'legal/data_usage', icon: Database, label: 'Məlumat İstifadəsi' },
