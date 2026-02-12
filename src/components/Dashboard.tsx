@@ -26,6 +26,8 @@ import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useTrimesterTips } from '@/hooks/useTrimesterTips';
 import { useFlowSymptoms, useFlowPhaseTips, useFlowInsights } from '@/hooks/useFlowData';
 import { useBabyIllustrationByMonth } from '@/hooks/useBabyMonthIllustrations';
+import { useBabyDailyInfoByDay } from '@/hooks/useBabyDailyInfo';
+import { useMommyDailyMessageByDay } from '@/hooks/useMommyDailyMessages';
 import { useCurrentBabyCrisis, useUpcomingBabyCrises } from '@/hooks/useBabyCrisisPeriods';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useChildren } from '@/hooks/useChildren';
@@ -778,6 +780,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   
   const babyAgeMonths = childAge?.months || 1;
   const { imageUrl: babyIllustration, title: illustrationTitle, description: illustrationDescription } = useBabyIllustrationByMonth(Math.max(1, Math.min(36, babyAgeMonths)));
+  const { data: dailyInfo } = useBabyDailyInfoByDay(babyData?.ageInDays && babyData.ageInDays > 0 ? babyData.ageInDays : null);
+  const { data: mommyMessage } = useMommyDailyMessageByDay(babyData?.ageInDays && babyData.ageInDays > 0 ? babyData.ageInDays : null);
   
   // Current time for timer display
   const [, setTick] = useState(0);
@@ -984,8 +988,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         transition={{ duration: 0.5 }}
       >
         {/* Background gradient layers */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/80" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/20 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-[hsl(12,80%,48%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/15 via-transparent to-transparent" />
         
         {/* Decorative orbs */}
         <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-white/10 blur-3xl" />
@@ -1102,49 +1106,89 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             </div>
           </motion.div>
 
-          {/* Bottom: Monthly insight */}
-          <motion.div 
-            className="bg-amber-50 rounded-2xl p-4 border border-amber-200 shadow-lg"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            {/* Header */}
-            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-amber-200">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shadow-sm">
-                <Calendar className="w-5 h-5 text-amber-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-[10px] font-semibold text-amber-500 uppercase tracking-widest mb-0.5">
-                  {exactMonths > 0 ? `${exactMonths}. Ay` : 'Yenidoğulmuş'}
-                </p>
-                <p className="text-sm font-bold text-amber-900">
-                  Bu ay nə baş verir?
-                </p>
-              </div>
-            </div>
-            
-            {/* Content - each line separate */}
-            <div className="space-y-2">
-              {(illustrationDescription || getBabyDailyFunFact(babyData.ageInDays))
-                .split(/[.!?]/)
-                .filter(sentence => sentence.trim().length > 0)
-                .slice(0, 4)
-                .map((sentence, index) => (
-                  <div key={index} className="flex items-start gap-2.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
-                    <p className="text-[13px] text-amber-800 leading-relaxed font-medium">
-                      {sentence.trim()}
-                    </p>
-                  </div>
-                ))
-              }
-            </div>
-          </motion.div>
         </div>
       </motion.div>
 
-      {/* Baby Development Info Card */}
+      {/* Bu günün məlumatları */}
+      {dailyInfo && (
+        <motion.div 
+          className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800 shadow-lg"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <div className="flex items-center gap-3 mb-4 pb-3 border-b border-amber-200 dark:border-amber-800">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-800/50 flex items-center justify-center shadow-sm">
+              <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[10px] font-semibold text-amber-500 dark:text-amber-400 uppercase tracking-widest mb-0.5">
+                {babyData.ageInDays}. Gün
+              </p>
+              <p className="text-sm font-bold text-amber-900 dark:text-amber-100">
+                Bu günün məlumatları
+              </p>
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            {dailyInfo.info
+              .split('\n')
+              .filter(line => line.trim().length > 0)
+              .map((line, index) => (
+                <div key={index} className="flex items-start gap-2.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
+                  <p className="text-[13px] text-amber-800 dark:text-amber-200 leading-relaxed font-medium">
+                    {line.trim()}
+                  </p>
+                </div>
+              ))
+            }
+          </div>
+        </motion.div>
+      )}
+
+      {/* Anaya Mesaj */}
+      {mommyMessage && (
+        <motion.div 
+          className="bg-gradient-to-br from-rose-50 via-pink-50 to-rose-50 dark:from-rose-900/20 dark:via-pink-900/15 dark:to-rose-900/20 rounded-2xl p-4 border border-rose-200 dark:border-rose-800/50 shadow-lg relative overflow-hidden"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          {/* Decorative elements */}
+          <div className="absolute top-2 right-3 opacity-10 text-4xl pointer-events-none">💝</div>
+          <div className="absolute bottom-1 left-4 opacity-5 text-5xl pointer-events-none">🌸</div>
+
+          <div className="flex items-center gap-3 mb-3 pb-2.5 border-b border-rose-200/60 dark:border-rose-700/40 relative z-10">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-200 to-pink-200 dark:from-rose-800/50 dark:to-pink-800/50 flex items-center justify-center shadow-sm">
+              <span className="text-lg">💌</span>
+            </div>
+            <div className="flex-1">
+              <p className="text-[10px] font-semibold text-rose-400 dark:text-rose-400 uppercase tracking-widest mb-0.5">
+                {babyData?.ageInDays}. Gün
+              </p>
+              <p className="text-sm font-bold text-rose-800 dark:text-rose-100">
+                Anaya Mesaj
+              </p>
+            </div>
+          </div>
+          
+          <div className="relative z-10">
+            {mommyMessage.message
+              .split('\n')
+              .filter((line: string) => line.trim().length > 0)
+              .map((line: string, index: number) => (
+                <p key={index} className="text-[13px] text-rose-700 dark:text-rose-200 leading-relaxed font-medium mb-1.5 last:mb-0 italic">
+                  {line.trim()}
+                </p>
+              ))
+            }
+          </div>
+        </motion.div>
+      )}
+
+
       {illustrationTitle && (
         <motion.div
           className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 dark:from-primary/10 dark:via-primary/15 dark:to-primary/10 rounded-2xl p-4 border border-primary/20"

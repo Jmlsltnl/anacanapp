@@ -69,9 +69,9 @@ const BlogPostCard = ({ post, index, onClick }: { post: BlogPost; index: number;
 const RecentBlogPosts = ({ onNavigate, lifeStage }: RecentBlogPostsProps) => {
   const { posts, loading } = useBlog();
   
-  // Filter posts by life stage - show posts that match the current stage or are for 'all'
+  // Filter posts strictly by life stage - only show posts for the current stage
   const filteredByStage = lifeStage 
-    ? posts.filter(p => p.life_stage === lifeStage || p.life_stage === 'all' || !p.life_stage)
+    ? posts.filter(p => p.life_stage === lifeStage)
     : posts;
   
   // Get only the 3 most recent filtered posts

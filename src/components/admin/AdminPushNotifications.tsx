@@ -30,6 +30,12 @@ import {
   useSendBulkPushNotification,
   useAudienceStats,
 } from '@/hooks/useAdvancedNotifications';
+import {
+  useMommyDayNotifications,
+  useCreateMommyDayNotification,
+  useUpdateMommyDayNotification,
+  useDeleteMommyDayNotification,
+} from '@/hooks/useMommyDayNotifications';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -55,7 +61,7 @@ const AdminPushNotifications = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="scheduled" className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
             Gündəlik
@@ -63,6 +69,10 @@ const AdminPushNotifications = () => {
           <TabsTrigger value="pregnancy" className="flex items-center gap-2">
             <Baby className="h-4 w-4" />
             Hamiləlik
+          </TabsTrigger>
+          <TabsTrigger value="mommy" className="flex items-center gap-2">
+            <Heart className="h-4 w-4" />
+            Ana
           </TabsTrigger>
           <TabsTrigger value="flow" className="flex items-center gap-2">
             <Moon className="h-4 w-4" />
@@ -80,6 +90,10 @@ const AdminPushNotifications = () => {
 
         <TabsContent value="pregnancy" className="mt-6">
           <PregnancyDayNotificationsTab />
+        </TabsContent>
+
+        <TabsContent value="mommy" className="mt-6">
+          <MommyDayNotificationsTab />
         </TabsContent>
 
         <TabsContent value="flow" className="mt-6">
@@ -290,6 +304,7 @@ const PregnancyDayNotificationsTab = () => {
     title: '',
     body: '',
     emoji: '👶',
+    send_time: '09:00',
     is_active: true,
   });
 
@@ -301,8 +316,13 @@ const PregnancyDayNotificationsTab = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importing, setImporting] = useState(false);
 
-  // Create a map of existing notifications
-  const notificationMap = new Map(notifications.map(n => [n.day_number, n]));
+  // Create a map of existing notifications (grouped by day)
+  const notificationsByDay = new Map<number, typeof notifications>();
+  notifications.forEach(n => {
+    const existing = notificationsByDay.get(n.day_number) || [];
+    existing.push(n);
+    notificationsByDay.set(n.day_number, existing);
+  });
 
   // Generate days for current page
   const startDay = currentPage * DAYS_PER_PAGE;
@@ -321,6 +341,7 @@ const PregnancyDayNotificationsTab = () => {
       title: `Hamiləliyin ${dayNumber}-ci günü 🌟`,
       body: '',
       emoji: '👶',
+      send_time: '09:00',
       is_active: true,
     });
     setEditDialog(true);
@@ -333,6 +354,7 @@ const PregnancyDayNotificationsTab = () => {
       title: notification.title,
       body: notification.body,
       emoji: notification.emoji || '👶',
+      send_time: notification.send_time || '09:00',
       is_active: notification.is_active ?? true,
     });
     setEditDialog(true);
@@ -368,7 +390,7 @@ const PregnancyDayNotificationsTab = () => {
   };
 
   const handleDownloadTemplate = () => {
-    const csvContent = 'day_number,title,body,emoji,is_active\n0,"Hamiləliyin 0-cı günü 🌟","Bu gün yeni bir səyahət başlayır!",👶,true\n1,"Hamiləliyin 1-ci günü 🌟","Körpəniz inkişaf edir...",🌱,true\n7,"Hamiləliyin 7-ci günü 🌟","Bir həftəlik hamiləsiniz!",✨,true';
+    const csvContent = 'day_number,send_time,title,body,emoji,is_active\n0,09:00,"Hamiləliyin 0-cı günü 🌟","Bu gün yeni bir səyahət başlayır!",👶,true\n0,14:00,"Günorta xatırlatması 🌸","Bol su içməyi unutma!",💧,true\n1,09:00,"Hamiləliyin 1-ci günü 🌟","Körpəniz inkişaf edir...",🌱,true\n7,09:00,"Hamiləliyin 7-ci günü 🌟","Bir həftəlik hamiləsiniz!",✨,true\n7,20:00,"Axşam xatırlatması 🌙","Yaxşı yuxu keyfiyyəti vacibdir",😴,true';
     const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -399,6 +421,7 @@ const PregnancyDayNotificationsTab = () => {
       const bodyIdx = cols.indexOf('body');
       const emojiIdx = cols.indexOf('emoji');
       const activeIdx = cols.indexOf('is_active');
+      const timeIdx = cols.indexOf('send_time');
 
       if (dayIdx === -1 || titleIdx === -1 || bodyIdx === -1) {
         toast.error('CSV-də day_number, title, body sütunları tələb olunur');
@@ -444,6 +467,7 @@ const PregnancyDayNotificationsTab = () => {
           title,
           body,
           emoji: emojiIdx !== -1 ? (values[emojiIdx]?.replace(/^"|"$/g, '') || '👶') : '👶',
+          send_time: timeIdx !== -1 ? (values[timeIdx]?.replace(/^"|"$/g, '') || '09:00') : '09:00',
           is_active: activeIdx !== -1 ? values[activeIdx]?.toLowerCase().trim() !== 'false' : true,
         });
       }
@@ -459,21 +483,15 @@ const PregnancyDayNotificationsTab = () => {
       let errors = 0;
 
       for (const row of rows) {
-        const existing = notificationMap.get(row.day_number);
         try {
-          if (existing) {
-            await updateNotification.mutateAsync({ id: existing.id, ...row });
-            updated++;
-          } else {
-            await createNotification.mutateAsync(row);
-            inserted++;
-          }
+          await createNotification.mutateAsync(row);
+          inserted++;
         } catch {
           errors++;
         }
       }
 
-      toast.success(`CSV import tamamlandı: ${inserted} yeni, ${updated} yeniləndi${errors > 0 ? `, ${errors} xəta` : ''}${skipped > 0 ? `, ${skipped} keçildi` : ''}`);
+      toast.success(`CSV import tamamlandı: ${inserted} yeni${errors > 0 ? `, ${errors} xəta` : ''}${skipped > 0 ? `, ${skipped} keçildi` : ''}`);
     } catch (error) {
       toast.error('CSV oxuma xətası');
     } finally {
@@ -594,21 +612,23 @@ const PregnancyDayNotificationsTab = () => {
       <ScrollArea className="h-[500px]">
         <div className="grid grid-cols-7 gap-2">
           {filteredDays.map((day) => {
-            const notification = notificationMap.get(day);
+            const dayNotifications = notificationsByDay.get(day) || [];
             const trimester = getTrimester(day);
             const week = getWeekNumber(day);
+            const hasNotifications = dayNotifications.length > 0;
+            const allActive = dayNotifications.every(n => n.is_active);
 
             return (
               <Card
                 key={day}
                 className={`p-3 cursor-pointer transition-all hover:scale-105 ${
-                  notification
-                    ? notification.is_active
+                  hasNotifications
+                    ? allActive
                       ? 'bg-green-500/10 border-green-500/30'
                       : 'bg-yellow-500/10 border-yellow-500/30'
                     : 'bg-muted/30 border-dashed'
                 }`}
-                onClick={() => notification ? handleEdit(notification) : handleCreate(day)}
+                onClick={() => hasNotifications ? handleEdit(dayNotifications[0]) : handleCreate(day)}
               >
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-1 mb-1">
@@ -617,8 +637,13 @@ const PregnancyDayNotificationsTab = () => {
                     </Badge>
                   </div>
                   <div className="text-lg font-bold">{day}</div>
-                  {notification ? (
-                    <div className="text-xl">{notification.emoji}</div>
+                  {hasNotifications ? (
+                    <div className="flex items-center justify-center gap-0.5">
+                      <span className="text-lg">{dayNotifications[0].emoji}</span>
+                      {dayNotifications.length > 1 && (
+                        <Badge className="text-[9px] px-1 h-4 bg-primary/20 text-primary">+{dayNotifications.length - 1}</Badge>
+                      )}
+                    </div>
                   ) : (
                     <div className="text-xl opacity-30">+</div>
                   )}
@@ -656,7 +681,7 @@ const PregnancyDayNotificationsTab = () => {
           </DialogHeader>
 
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>Gün Nömrəsi</Label>
                 <Input
@@ -666,6 +691,15 @@ const PregnancyDayNotificationsTab = () => {
                   value={form.day_number}
                   onChange={(e) => setForm({ ...form, day_number: parseInt(e.target.value) || 0 })}
                   disabled={!!editingId}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Göndərmə Saatı</Label>
+                <Input
+                  type="time"
+                  value={form.send_time}
+                  onChange={(e) => setForm({ ...form, send_time: e.target.value })}
+                  placeholder="09:00"
                 />
               </div>
               <div className="space-y-2">
@@ -1486,5 +1520,446 @@ const DeleteConfirmDialog = ({
     </AlertDialogContent>
   </AlertDialog>
 );
+
+// ==================== MOMMY DAY NOTIFICATIONS TAB ====================
+const MommyDayNotificationsTab = () => {
+  const { data: notifications = [], isLoading } = useMommyDayNotifications();
+  const createNotification = useCreateMommyDayNotification();
+  const updateNotification = useUpdateMommyDayNotification();
+  const deleteNotification = useDeleteMommyDayNotification();
+
+  const [searchDay, setSearchDay] = useState('');
+  const [currentPage, setCurrentPage] = useState(0);
+  const [editDialog, setEditDialog] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState({
+    day_number: 1,
+    title: '',
+    body: '',
+    emoji: '👶',
+    send_time: '09:00',
+    is_active: true,
+  });
+
+  const DAYS_PER_PAGE = 28;
+  const TOTAL_DAYS = 1460;
+  const totalPages = Math.ceil(TOTAL_DAYS / DAYS_PER_PAGE);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [importing, setImporting] = useState(false);
+
+  const notificationsByDay = new Map<number, typeof notifications>();
+  notifications.forEach(n => {
+    const existing = notificationsByDay.get(n.day_number) || [];
+    existing.push(n);
+    notificationsByDay.set(n.day_number, existing);
+  });
+
+  const startDay = currentPage * DAYS_PER_PAGE + 1;
+  const endDay = Math.min(startDay + DAYS_PER_PAGE - 1, TOTAL_DAYS);
+  const daysInPage = Array.from({ length: endDay - startDay + 1 }, (_, i) => startDay + i);
+
+  const filteredDays = searchDay
+    ? [parseInt(searchDay)].filter(d => d >= 1 && d <= TOTAL_DAYS)
+    : daysInPage;
+
+  const getMonthNumber = (day: number) => Math.ceil(day / 30);
+
+  const handleCreate = (dayNumber: number) => {
+    setEditingId(null);
+    setForm({
+      day_number: dayNumber,
+      title: `Körpənizin ${dayNumber}-ci günü 🌟`,
+      body: '',
+      emoji: '👶',
+      send_time: '09:00',
+      is_active: true,
+    });
+    setEditDialog(true);
+  };
+
+  const handleEdit = (notification: any) => {
+    setEditingId(notification.id);
+    setForm({
+      day_number: notification.day_number,
+      title: notification.title,
+      body: notification.body,
+      emoji: notification.emoji || '👶',
+      send_time: notification.send_time || '09:00',
+      is_active: notification.is_active ?? true,
+    });
+    setEditDialog(true);
+  };
+
+  const handleSave = async () => {
+    if (!form.title || !form.body) {
+      toast.error('Başlıq və mətn tələb olunur');
+      return;
+    }
+    try {
+      if (editingId) {
+        await updateNotification.mutateAsync({ id: editingId, ...form });
+        toast.success('Bildiriş yeniləndi');
+      } else {
+        await createNotification.mutateAsync(form);
+        toast.success('Bildiriş yaradıldı');
+      }
+      setEditDialog(false);
+    } catch (error: any) {
+      toast.error(error.message || 'Xəta baş verdi');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteNotification.mutateAsync(id);
+      toast.success('Bildiriş silindi');
+      setDeleteDialog(null);
+    } catch (error) {
+      toast.error('Xəta baş verdi');
+    }
+  };
+
+  const handleDownloadTemplate = () => {
+    const csvContent = 'day_number,send_time,title,body,emoji,is_active\n1,09:00,"Körpənizin 1-ci günü 🌟","Yeni doğulmuş körpəniz haqqında məlumat",👶,true\n1,14:00,"Günorta xatırlatması 🌸","Körpənizi əmizdirməyi unutmayın!",🍼,true\n30,09:00,"Körpəniz 1 aylıqdır 🎉","İlk ay tamamlandı!",🎂,true\n365,09:00,"Körpəniz 1 yaşındadır! 🎂","İlk doğum günü mübarək!",🎁,true';
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'ana_notifications_numune.csv';
+    link.click();
+  };
+
+  const handleCSVImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setImporting(true);
+    try {
+      const text = await file.text();
+      
+      // Handle multi-line CSV with quoted fields
+      const parseCSVWithMultiline = (csvText: string): string[][] => {
+        const rows: string[][] = [];
+        let current = '';
+        let inQuotes = false;
+        const chars = csvText.split('');
+        
+        for (let i = 0; i < chars.length; i++) {
+          const ch = chars[i];
+          if (ch === '"') {
+            if (inQuotes && chars[i + 1] === '"') {
+              current += '"';
+              i++;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+            if (current.trim()) {
+              rows.push(parseCSVLine(current));
+            }
+            current = '';
+            if (ch === '\r' && chars[i + 1] === '\n') i++;
+          } else {
+            current += ch;
+          }
+        }
+        if (current.trim()) rows.push(parseCSVLine(current));
+        return rows;
+      };
+
+      const parseCSVLine = (line: string): string[] => {
+        const result: string[] = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') {
+            inQuotes = !inQuotes;
+          } else if (ch === ',' && !inQuotes) {
+            result.push(current.trim());
+            current = '';
+          } else {
+            current += ch;
+          }
+        }
+        result.push(current.trim());
+        return result;
+      };
+
+      const allRows = parseCSVWithMultiline(text);
+      if (allRows.length < 2) {
+        toast.error('CSV faylı boşdur');
+        return;
+      }
+
+      const header = allRows[0].map(c => c.toLowerCase().replace(/[\ufeff]/g, '').replace(/"/g, ''));
+      const dayIdx = header.indexOf('day_number');
+      const titleIdx = header.indexOf('title');
+      const bodyIdx = header.indexOf('body');
+      const emojiIdx = header.indexOf('emoji');
+      const activeIdx = header.indexOf('is_active');
+      const timeIdx = header.indexOf('send_time');
+
+      if (dayIdx === -1 || titleIdx === -1 || bodyIdx === -1) {
+        toast.error('CSV-də day_number, title, body sütunları tələb olunur');
+        return;
+      }
+
+      const rows: any[] = [];
+      let skipped = 0;
+
+      for (let i = 1; i < allRows.length; i++) {
+        const values = allRows[i];
+        const dayNum = parseInt(values[dayIdx]);
+        const title = values[titleIdx]?.replace(/^"|"$/g, '');
+        const body = values[bodyIdx]?.replace(/^"|"$/g, '');
+        
+        if (isNaN(dayNum) || dayNum < 1 || dayNum > 1460 || !title || !body) {
+          skipped++;
+          continue;
+        }
+
+        rows.push({
+          day_number: dayNum,
+          title,
+          body,
+          emoji: emojiIdx !== -1 ? (values[emojiIdx]?.replace(/^"|"$/g, '') || '👶') : '👶',
+          send_time: timeIdx !== -1 ? (values[timeIdx]?.replace(/^"|"$/g, '') || '09:00') : '09:00',
+          is_active: activeIdx !== -1 ? values[activeIdx]?.toLowerCase().trim() !== 'false' : true,
+        });
+      }
+
+      if (rows.length === 0) {
+        toast.error('Heç bir etibarlı sətir tapılmadı');
+        return;
+      }
+
+      let inserted = 0;
+      let errors = 0;
+
+      for (const row of rows) {
+        try {
+          await createNotification.mutateAsync(row);
+          inserted++;
+        } catch {
+          errors++;
+        }
+      }
+
+      toast.success(`CSV import tamamlandı: ${inserted} yeni${errors > 0 ? `, ${errors} xəta` : ''}${skipped > 0 ? `, ${skipped} keçildi` : ''}`);
+    } catch (error) {
+      toast.error('CSV oxuma xətası');
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Stats */}
+      <div className="grid grid-cols-4 gap-4">
+        <Card className="p-4 text-center">
+          <div className="text-3xl font-bold text-primary">{notifications.length}</div>
+          <div className="text-sm text-muted-foreground">Əlavə Edilib</div>
+        </Card>
+        <Card className="p-4 text-center">
+          <div className="text-3xl font-bold text-red-500">{TOTAL_DAYS}</div>
+          <div className="text-sm text-muted-foreground">Toplam Gün</div>
+        </Card>
+        <Card className="p-4 text-center">
+          <div className="text-3xl font-bold text-green-500">{notifications.filter(n => n.is_active).length}</div>
+          <div className="text-sm text-muted-foreground">Aktiv</div>
+        </Card>
+        <Card className="p-4 text-center">
+          <div className="text-3xl font-bold text-muted-foreground">
+            {new Set(Array.from({ length: TOTAL_DAYS }, (_, i) => i + 1).filter(d => !notificationsByDay.has(d))).size}
+          </div>
+          <div className="text-sm text-muted-foreground">Boş Gün</div>
+        </Card>
+      </div>
+
+      {/* CSV Import */}
+      <Card className="p-4 border-dashed">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <FileText className="h-5 w-5 text-primary" />
+            <div>
+              <h4 className="font-medium">CSV Import</h4>
+              <p className="text-sm text-muted-foreground">Ana bildirişlərini toplu şəkildə CSV ilə əlavə edin (1-1460 gün)</p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={handleDownloadTemplate}>
+              <Download className="h-4 w-4 mr-1" />
+              Nümunə CSV
+            </Button>
+            <Button size="sm" onClick={() => fileInputRef.current?.click()} disabled={importing}>
+              {importing ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Upload className="h-4 w-4 mr-1" />}
+              CSV Import
+            </Button>
+            <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleCSVImport} />
+          </div>
+        </div>
+      </Card>
+
+      {/* Search & Pagination */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2 flex-1">
+          <Search className="h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Gün nömrəsi axtar (1-1460)..."
+            value={searchDay}
+            onChange={(e) => setSearchDay(e.target.value.replace(/\D/g, ''))}
+            className="max-w-[200px]"
+            type="number"
+            min={1}
+            max={1460}
+          />
+          {searchDay && (
+            <Button variant="ghost" size="sm" onClick={() => setSearchDay('')}>Sıfırla</Button>
+          )}
+        </div>
+
+        {!searchDay && (
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="icon" disabled={currentPage === 0} onClick={() => setCurrentPage(p => p - 1)}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-sm text-muted-foreground min-w-[100px] text-center">
+              Gün {startDay} - {endDay}
+            </span>
+            <Button variant="outline" size="icon" disabled={currentPage >= totalPages - 1} onClick={() => setCurrentPage(p => p + 1)}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Days Grid */}
+      <ScrollArea className="h-[500px]">
+        <div className="grid grid-cols-7 gap-2">
+          {filteredDays.map((day) => {
+            const dayNotifications = notificationsByDay.get(day) || [];
+            const month = getMonthNumber(day);
+            const hasNotifications = dayNotifications.length > 0;
+            const allActive = dayNotifications.every(n => n.is_active);
+
+            return (
+              <Card
+                key={day}
+                className={`p-3 cursor-pointer transition-all hover:scale-105 ${
+                  hasNotifications
+                    ? allActive ? 'bg-green-500/10 border-green-500/30' : 'bg-yellow-500/10 border-yellow-500/30'
+                    : 'bg-muted/30 border-dashed'
+                }`}
+                onClick={() => hasNotifications ? handleEdit(dayNotifications[0]) : handleCreate(day)}
+              >
+                <div className="text-center">
+                  <Badge variant="outline" className="text-[10px] px-1 mb-1">A{month}</Badge>
+                  <div className="text-lg font-bold">{day}</div>
+                  {hasNotifications ? (
+                    <div className="flex items-center justify-center gap-0.5">
+                      <span className="text-lg">{dayNotifications[0].emoji}</span>
+                      {dayNotifications.length > 1 && (
+                        <Badge className="text-[9px] px-1 h-4 bg-primary/20 text-primary">+{dayNotifications.length - 1}</Badge>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-xl opacity-30">+</div>
+                  )}
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      </ScrollArea>
+
+      {/* Legend */}
+      <div className="flex items-center gap-6 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded bg-green-500/20 border border-green-500/30" />
+          <span>Əlavə Edilib</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded bg-yellow-500/20 border border-yellow-500/30" />
+          <span>Deaktiv</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded bg-muted/30 border border-dashed" />
+          <span>Boş</span>
+        </div>
+      </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={editDialog} onOpenChange={setEditDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Heart className="h-5 w-5 text-red-500" />
+              Gün {form.day_number} - Ay {getMonthNumber(form.day_number)}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>Gün Nömrəsi</Label>
+                <Input type="number" min={1} max={1460} value={form.day_number}
+                  onChange={(e) => setForm({ ...form, day_number: parseInt(e.target.value) || 1 })}
+                  disabled={!!editingId} />
+              </div>
+              <div className="space-y-2">
+                <Label>Göndərmə Saatı</Label>
+                <Input type="time" value={form.send_time}
+                  onChange={(e) => setForm({ ...form, send_time: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Emoji</Label>
+                <Input value={form.emoji} onChange={(e) => setForm({ ...form, emoji: e.target.value })} placeholder="👶" />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Başlıq</Label>
+              <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Bildiriş başlığı..." />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Mətn</Label>
+              <Textarea value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })}
+                placeholder="Bildiriş mətni..." rows={4} />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Switch checked={form.is_active} onCheckedChange={(checked) => setForm({ ...form, is_active: checked })} />
+              <Label>Aktiv</Label>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialog(false)}>Ləğv et</Button>
+            {editingId && (
+              <Button variant="destructive" onClick={() => { setEditDialog(false); setDeleteDialog(editingId); }}>
+                <Trash2 className="h-4 w-4 mr-1" /> Sil
+              </Button>
+            )}
+            <Button onClick={handleSave} disabled={createNotification.isPending || updateNotification.isPending}>
+              {editingId ? 'Yenilə' : 'Yarat'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <DeleteConfirmDialog open={deleteDialog !== null} onOpenChange={() => setDeleteDialog(null)}
+        onConfirm={() => deleteDialog && handleDelete(deleteDialog)} />
+    </div>
+  );
+};
 
 export default AdminPushNotifications;

@@ -8,6 +8,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -64,6 +66,8 @@ const menuItems = [
   { id: 'play-activities', label: 'Ağıllı Oyun Qutusu', icon: Gamepad2 },
   { id: 'quick-actions', label: 'Sürətli Keçidlər', icon: Zap },
   { id: 'development-tips', label: 'İnkişaf Tövsiyələri', icon: Lightbulb },
+  { id: 'baby-daily-info', label: 'Günlük Məlumatlar (Ana)', icon: Calendar },
+  { id: 'mommy-daily-messages', label: 'Anaya Mesaj', icon: Heart },
   { id: 'banners', label: 'Bannerlər', icon: Megaphone },
   { id: 'baby-growth', label: 'Böyümə İzləmə', icon: Scale },
   { id: 'teething', label: 'Diş Çıxarma', icon: Sparkles },
@@ -75,6 +79,21 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const { profile, signOut } = useAuth();
+
+  // Fetch pending counts for approval badges
+  const { data: pendingCounts } = useQuery({
+    queryKey: ['admin-pending-counts'],
+    queryFn: async () => {
+      const [placesRes, reviewsRes] = await Promise.all([
+        supabase.from('mom_friendly_places').select('id', { count: 'exact', head: true }).eq('is_verified', false),
+        supabase.from('place_reviews').select('id', { count: 'exact', head: true }).eq('is_verified', false),
+      ]);
+      return {
+        places: (placesRes.count || 0) + (reviewsRes.count || 0),
+      };
+    },
+    refetchInterval: 30000,
+  });
 
   // Close mobile sidebar on tab change
   const handleTabChange = (tab: string) => {
@@ -141,33 +160,41 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
 
         {/* Navigation */}
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {menuItems.map((item) => (
-            <motion.button
-              key={item.id}
-              onClick={() => handleTabChange(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                activeTab === item.id
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-              }`}
-              whileHover={{ x: 4 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <item.icon className="w-5 h-5 shrink-0" />
-              <AnimatePresence>
-                {sidebarOpen && (
-                  <motion.span
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: 'auto' }}
-                    exit={{ opacity: 0, width: 0 }}
-                    className="font-medium whitespace-nowrap"
-                  >
-                    {item.label}
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </motion.button>
-          ))}
+          {menuItems.map((item) => {
+            const pendingCount = item.id === 'places' ? pendingCounts?.places : 0;
+            return (
+              <motion.button
+                key={item.id}
+                onClick={() => handleTabChange(item.id)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                  activeTab === item.id
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                }`}
+                whileHover={{ x: 4 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <item.icon className="w-5 h-5 shrink-0" />
+                <AnimatePresence>
+                  {sidebarOpen && (
+                    <motion.span
+                      initial={{ opacity: 0, width: 0 }}
+                      animate={{ opacity: 1, width: 'auto' }}
+                      exit={{ opacity: 0, width: 0 }}
+                      className="font-medium whitespace-nowrap flex-1 text-left"
+                    >
+                      {item.label}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+                {pendingCount && pendingCount > 0 ? (
+                  <span className="px-1.5 py-0.5 text-xs font-bold bg-destructive text-destructive-foreground rounded-full shrink-0">
+                    {pendingCount}
+                  </span>
+                ) : null}
+              </motion.button>
+            );
+          })}
         </nav>
 
         {/* User Section */}

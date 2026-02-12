@@ -27,6 +27,7 @@ export type Database = {
           is_active: boolean | null
           prep_time: number | null
           servings: number | null
+          tags: string[] | null
           title: string
           updated_at: string
         }
@@ -42,6 +43,7 @@ export type Database = {
           is_active?: boolean | null
           prep_time?: number | null
           servings?: number | null
+          tags?: string[] | null
           title: string
           updated_at?: string
         }
@@ -57,6 +59,7 @@ export type Database = {
           is_active?: boolean | null
           prep_time?: number | null
           servings?: number | null
+          tags?: string[] | null
           title?: string
           updated_at?: string
         }
@@ -500,6 +503,33 @@ export type Database = {
           updated_at?: string
           week_end?: number
           week_start?: number
+        }
+        Relationships: []
+      }
+      baby_daily_info: {
+        Row: {
+          created_at: string
+          day_number: number
+          id: string
+          info: string
+          is_active: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_number: number
+          id?: string
+          info: string
+          is_active?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_number?: number
+          id?: string
+          info?: string
+          is_active?: boolean
+          updated_at?: string
         }
         Relationships: []
       }
@@ -3651,6 +3681,69 @@ export type Database = {
         }
         Relationships: []
       }
+      mommy_daily_messages: {
+        Row: {
+          created_at: string
+          day_number: number
+          id: string
+          is_active: boolean
+          message: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_number: number
+          id?: string
+          is_active?: boolean
+          message: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_number?: number
+          id?: string
+          is_active?: boolean
+          message?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      mommy_day_notifications: {
+        Row: {
+          body: string
+          created_at: string
+          day_number: number
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          send_time: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          day_number: number
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          send_time?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          day_number?: number
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          send_time?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       mood_checkins: {
         Row: {
           checked_at: string | null
@@ -5287,6 +5380,7 @@ export type Database = {
           emoji: string | null
           id: string
           is_active: boolean | null
+          send_time: string
           title: string
           updated_at: string | null
         }
@@ -5297,6 +5391,7 @@ export type Database = {
           emoji?: string | null
           id?: string
           is_active?: boolean | null
+          send_time?: string
           title: string
           updated_at?: string | null
         }
@@ -5307,6 +5402,7 @@ export type Database = {
           emoji?: string | null
           id?: string
           is_active?: boolean | null
+          send_time?: string
           title?: string
           updated_at?: string | null
         }
@@ -5752,6 +5848,39 @@ export type Database = {
           name?: string
           name_az?: string | null
           sort_order?: number | null
+        }
+        Relationships: []
+      }
+      recipe_tags: {
+        Row: {
+          created_at: string
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          name_az: string | null
+          sort_order: number | null
+          tag_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          name_az?: string | null
+          sort_order?: number | null
+          tag_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          name_az?: string | null
+          sort_order?: number | null
+          tag_id?: string
         }
         Relationships: []
       }
