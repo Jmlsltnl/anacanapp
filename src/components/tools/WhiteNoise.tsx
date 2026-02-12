@@ -206,16 +206,21 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(({ onBack }, ref)
     return () => stopAudio();
   }, [activeSound, sounds]);
 
-  // Update volume on active audio
+  // Update volume on active audio - separate from playback effect
   useEffect(() => {
+    if (!activeSound) return;
     const effectiveVolume = isMuted ? 0 : volume / 100;
     if (audioRef.current) {
       audioRef.current.volume = effectiveVolume;
     }
     if (gainNodeRef.current) {
-      gainNodeRef.current.gain.value = effectiveVolume;
+      try {
+        gainNodeRef.current.gain.setValueAtTime(effectiveVolume, gainNodeRef.current.context.currentTime);
+      } catch {
+        gainNodeRef.current.gain.value = effectiveVolume;
+      }
     }
-  }, [volume, isMuted]);
+  }, [volume, isMuted, activeSound]);
 
   // Initialize from preferences
   useEffect(() => {

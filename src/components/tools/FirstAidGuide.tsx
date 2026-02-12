@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, AlertTriangle, ChevronRight, ChevronLeft, Volume2, VolumeX, Phone, Shield, Heart, Zap } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, ChevronRight, ChevronLeft, Phone, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useFirstAidScenarios, useFirstAidSteps, FirstAidScenario } from '@/hooks/useFirstAid';
@@ -16,40 +16,14 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
   
   const [selectedScenario, setSelectedScenario] = useState<FirstAidScenario | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
-  const [isSpeaking, setIsSpeaking] = useState(false);
 
   const { data: scenarios = [], isLoading } = useFirstAidScenarios();
   const { data: steps = [] } = useFirstAidSteps(selectedScenario?.id || '');
 
-  const speak = (text: string) => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'az-AZ';
-      utterance.rate = 0.9;
-      utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => setIsSpeaking(false);
-      window.speechSynthesis.speak(utterance);
-    }
-  };
-
-  const stopSpeaking = () => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
-    }
-  };
-
-  useEffect(() => {
-    if (selectedScenario && steps[currentStep]) {
-      speak(steps[currentStep].instruction_az);
-    }
-    return () => stopSpeaking();
-  }, [currentStep, steps, selectedScenario]);
+  // TTS disabled - no auto-speaking
 
   const handleBack = () => {
     if (selectedScenario) {
-      stopSpeaking();
       setSelectedScenario(null);
       setCurrentStep(0);
     } else {
@@ -113,15 +87,7 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                 </p>
               )}
             </div>
-            {selectedScenario && (
-              <motion.button 
-                onClick={() => isSpeaking ? stopSpeaking() : speak(currentStepData?.instruction_az || '')}
-                className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-                whileTap={{ scale: 0.95 }}
-              >
-                {isSpeaking ? <VolumeX className="w-5 h-5 text-foreground" /> : <Volume2 className="w-5 h-5 text-foreground" />}
-              </motion.button>
-            )}
+            {/* TTS button removed */}
           </div>
         </div>
       </div>

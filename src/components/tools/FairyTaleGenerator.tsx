@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Sparkles, BookOpen, Heart, Trash2, Volume2, Loader2, VolumeX, Wand2, Clock, Star } from 'lucide-react';
+import { ArrowLeft, Sparkles, BookOpen, Heart, Trash2, Loader2, Wand2, Clock, Star, BookOpenCheck } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,7 +46,6 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
   const [selectedTale, setSelectedTale] = useState<FairyTale | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [createStep, setCreateStep] = useState(1);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [formData, setFormData] = useState({
     child_name: '',
     theme: '',
@@ -78,38 +77,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
     }
   };
 
-  const speakTale = (tale: FairyTale) => {
-    if ('speechSynthesis' in window) {
-      if (isSpeaking) {
-        window.speechSynthesis.cancel();
-        setIsSpeaking(false);
-        return;
-      }
-
-      const text = tale.content.replace(/[#*_`]/g, ''); // Remove markdown
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'az-AZ';
-      utterance.rate = 0.85;
-      utterance.pitch = 1.1;
-      
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
-      
-      setIsSpeaking(true);
-      incrementPlayCount.mutate(tale.id);
-      window.speechSynthesis.speak(utterance);
-    } else {
-      toast.error('Bu cihaz səsli oxumağı dəstəkləmir');
-    }
-  };
-
-  const stopSpeaking = () => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
-    }
-  };
+  // TTS removed from fairy tales
 
   const resetCreate = () => {
     setShowCreate(false);
@@ -293,7 +261,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                                     {getReadingTime(tale.content)} dəq
                                   </span>
                                   <span className="flex items-center gap-1">
-                                    <Volume2 className="h-3 w-3" />
+                                    <BookOpenCheck className="h-3 w-3" />
                                     {tale.play_count || 0}×
                                   </span>
                                   <span>
@@ -534,7 +502,6 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
       {/* Tale Reader Modal */}
       <Dialog open={!!selectedTale} onOpenChange={(open) => {
         if (!open) {
-          stopSpeaking();
           setSelectedTale(null);
         }
       }}>
@@ -570,23 +537,6 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 {/* Action buttons */}
                 <div className="flex gap-2 pt-4 border-t sticky bottom-0 bg-background pb-2">
                   <Button
-                    variant={isSpeaking ? "default" : "outline"}
-                    className={`flex-1 ${isSpeaking ? 'bg-green-500 hover:bg-green-600' : ''}`}
-                    onClick={() => speakTale(selectedTale)}
-                  >
-                    {isSpeaking ? (
-                      <>
-                        <VolumeX className="h-4 w-4 mr-2" />
-                        Dayandır
-                      </>
-                    ) : (
-                      <>
-                        <Volume2 className="h-4 w-4 mr-2" />
-                        Oxu
-                      </>
-                    )}
-                  </Button>
-                  <Button
                     variant="outline"
                     size="icon"
                     onClick={() => {
@@ -607,7 +557,6 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     size="icon"
                     className="text-red-500 hover:text-red-600 hover:bg-red-50"
                     onClick={() => {
-                      stopSpeaking();
                       deleteTale.mutate(selectedTale.id);
                       setSelectedTale(null);
                     }}

@@ -98,7 +98,7 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-4">
       {/* Header */}
       <div className="sticky top-0 z-20 bg-card border-b border-border/50 px-4 py-3">
         <div className="flex items-center justify-between mb-3 relative z-20">

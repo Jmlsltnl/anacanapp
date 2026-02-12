@@ -70,6 +70,11 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [showMyListings, setShowMyListings] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [contactListing, setContactListing] = useState<Listing | null>(null);
+  const [contactMessage, setContactMessage] = useState('');
+  const [contactMessages, setContactMessages] = useState<any[]>([]);
+  const [sendingMessage, setSendingMessage] = useState(false);
   
   // Image upload state
   const [uploadingImages, setUploadingImages] = useState(false);
@@ -244,6 +249,50 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
       location_city: '',
     });
     setUploadedImages([]);
+  };
+
+  // Load messages for a listing contact
+  const loadContactMessages = async (listing: Listing) => {
+    if (!profile?.user_id) return;
+    const { data } = await supabase
+      .from('marketplace_messages')
+      .select('*')
+      .eq('listing_id', listing.id)
+      .or(`sender_id.eq.${profile.user_id},receiver_id.eq.${profile.user_id}`)
+      .order('created_at', { ascending: true });
+    setContactMessages(data || []);
+  };
+
+  useEffect(() => {
+    if (showContactModal && contactListing) {
+      loadContactMessages(contactListing);
+    }
+  }, [showContactModal, contactListing]);
+
+  const handleSendMessage = async () => {
+    if (!contactMessage.trim() || !contactListing || !profile?.user_id) return;
+    setSendingMessage(true);
+    try {
+      const { error } = await supabase
+        .from('marketplace_messages')
+        .insert({
+          listing_id: contactListing.id,
+          sender_id: profile.user_id,
+          receiver_id: contactListing.user_id,
+          content: contactMessage.trim(),
+        });
+      if (error) throw error;
+      setContactMessage('');
+      await loadContactMessages(contactListing);
+    } catch (error) {
+      toast({
+        title: 'Xəta',
+        description: 'Mesaj göndərilə bilmədi',
+        variant: 'destructive'
+      });
+    } finally {
+      setSendingMessage(false);
+    }
   };
 
   const getCategoryInfo = (catId: string) => {
@@ -800,12 +849,105 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                   {format(new Date(selectedListing.created_at), 'd MMMM yyyy', { locale: az })}
                 </div>
                 
-                <Button className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700" size="lg">
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  Satıcı ilə əlaqə
-                </Button>
+              <Button 
+                className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700" 
+                size="lg"
+                onClick={() => {
+                  setShowDetailModal(false);
+                  if (selectedListing) {
+                    setContactListing(selectedListing);
+                    setShowContactModal(true);
+                  }
+                }}
+                disabled={selectedListing?.user_id === profile?.user_id}
+              >
+                <MessageCircle className="w-5 h-5 mr-2" />
+                {selectedListing?.user_id === profile?.user_id ? 'Öz elanınızdır' : 'Satıcı ilə əlaqə'}
+              </Button>
               </div>
             </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Contact Seller Modal */}
+      <Dialog open={showContactModal} onOpenChange={setShowContactModal}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageCircle className="w-5 h-5 text-emerald-500" />
+              Satıcı ilə əlaqə
+            </DialogTitle>
+          </DialogHeader>
+          
+          {contactListing && (
+            <div className="space-y-4 mt-2">
+              {/* Listing info */}
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
+                {contactListing.images?.[0] ? (
+                  <img src={contactListing.images[0]} alt="" className="w-12 h-12 rounded-lg object-cover" />
+                ) : (
+                  <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${getCategoryInfo(contactListing.category).color} flex items-center justify-center`}>
+                    <span className="text-xl">{getCategoryInfo(contactListing.category).emoji}</span>
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm truncate">{contactListing.title}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {contactListing.is_free ? 'Pulsuz' : `${contactListing.price} ₼`}
+                  </p>
+                </div>
+              </div>
+
+              {/* Messages */}
+              <div className="max-h-60 overflow-y-auto space-y-2 p-2">
+                {contactMessages.length === 0 ? (
+                  <div className="text-center py-6">
+                    <MessageCircle className="w-10 h-10 mx-auto text-muted-foreground/30 mb-2" />
+                    <p className="text-sm text-muted-foreground">Hələ mesaj yoxdur</p>
+                    <p className="text-xs text-muted-foreground">Satıcıya mesaj göndərin</p>
+                  </div>
+                ) : (
+                  contactMessages.map(msg => (
+                    <div 
+                      key={msg.id}
+                      className={`flex ${msg.sender_id === profile?.user_id ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div className={`max-w-[75%] px-3 py-2 rounded-2xl text-sm ${
+                        msg.sender_id === profile?.user_id 
+                          ? 'bg-primary text-primary-foreground rounded-br-sm' 
+                          : 'bg-muted rounded-bl-sm'
+                      }`}>
+                        <p>{msg.content}</p>
+                        <p className={`text-[10px] mt-1 ${
+                          msg.sender_id === profile?.user_id ? 'text-primary-foreground/60' : 'text-muted-foreground'
+                        }`}>
+                          {format(new Date(msg.created_at), 'HH:mm')}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Message input */}
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Mesajınızı yazın..."
+                  value={contactMessage}
+                  onChange={(e) => setContactMessage(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
+                  className="flex-1"
+                />
+                <Button 
+                  onClick={handleSendMessage}
+                  disabled={!contactMessage.trim() || sendingMessage}
+                  className="bg-gradient-to-r from-emerald-500 to-teal-600"
+                >
+                  {sendingMessage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                </Button>
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>
