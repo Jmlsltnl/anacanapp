@@ -4,14 +4,26 @@ import {
   ArrowLeft, Bell, Moon, Sun, Globe, Lock, 
   Smartphone, Database, Trash2, ChevronRight,
   Volume2, Vibrate, Clock, Calendar, Droplets, Dumbbell, Pill,
-  BellOff, Heart, MessageCircle, Users
+  BellOff, Heart, MessageCircle, Users, Download, AlertTriangle, Loader2
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { useNotificationSettings } from '@/hooks/useNotificationSettings';
 import { useSilentHours } from '@/hooks/useSilentHours';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface SettingsScreenProps {
   onBack: () => void;
@@ -30,12 +42,104 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   
   const { settings: silentSettings, updateSettings: updateSilentSettings } = useSilentHours();
   const { settings: pushSettings, updateSetting: updatePushSetting, loading: pushLoading } = usePushNotifications();
+  const { user, signOut } = useAuth();
   const [showTimeEdit, setShowTimeEdit] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Initialize reminders on mount
   useEffect(() => {
     initializeReminders();
   }, []);
+
+  // ── Data Export ──
+  const handleDataExport = async () => {
+    if (!user) return;
+    setIsExporting(true);
+
+    try {
+      const tables = [
+        { name: 'profiles', label: 'Profil' },
+        { name: 'daily_logs', label: 'Gündəlik qeydlər' },
+        { name: 'appointments', label: 'Randevular' },
+        { name: 'baby_growth', label: 'Körpə inkişafı' },
+        { name: 'baby_logs', label: 'Körpə qeydləri' },
+        { name: 'weight_entries', label: 'Çəki qeydləri' },
+        { name: 'cycle_history', label: 'Siklus tarixi' },
+        { name: 'kick_sessions', label: 'Təpik sessiyaları' },
+        { name: 'contractions', label: 'Büzüşmələr' },
+        { name: 'blood_sugar_logs', label: 'Qan şəkəri' },
+      ];
+
+      const exportData: Record<string, any> = {
+        export_date: new Date().toISOString(),
+        user_email: user.email,
+      };
+
+      for (const table of tables) {
+        try {
+          const { data } = await supabase
+            .from(table.name as any)
+            .select('*')
+            .eq('user_id', user.id);
+          if (data && data.length > 0) {
+            exportData[table.name] = data;
+          }
+        } catch {
+          // Skip tables that don't exist or have errors
+        }
+      }
+
+      // Create and download JSON file
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `anacan-data-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success('Məlumatlarınız uğurla yükləndi!');
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Məlumat ixracı zamanı xəta baş verdi');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  // ── Delete Account ──
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== 'SİL') return;
+    setIsDeleting(true);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Sessiya tapılmadı');
+        return;
+      }
+
+      const { error } = await supabase.functions.invoke('delete-user-account', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+
+      if (error) throw error;
+
+      toast.success('Hesabınız uğurla silindi');
+      await signOut();
+    } catch (error) {
+      console.error('Delete account error:', error);
+      toast.error('Hesab silinərkən xəta baş verdi');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteDialog(false);
+    }
+  };
 
   const SettingRow = ({ 
     icon: Icon, 
@@ -284,19 +388,28 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
         {/* Privacy & Data */}
         <div className="bg-card rounded-3xl overflow-hidden shadow-card border border-border/50">
           <div className="px-4 pt-4 pb-2">
-            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Məxfilik</h2>
+            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Məxfilik və Məlumat</h2>
           </div>
           <SettingRow icon={Lock} label="Şifrə ilə qoruma" description="Tətbiqi qoruyun" onClick={() => toast.info('Tezliklə əlavə olunacaq')}>
             <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </SettingRow>
-          <SettingRow icon={Database} label="Məlumat ixracı" description="Bütün məlumatlarınızı yükləyin" onClick={() => toast.info('Tezliklə əlavə olunacaq')}>
-            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+          <SettingRow 
+            icon={Download} 
+            label="Məlumat ixracı" 
+            description="Bütün məlumatlarınızı JSON formatında yükləyin" 
+            onClick={isExporting ? undefined : handleDataExport}
+          >
+            {isExporting ? (
+              <Loader2 className="w-5 h-5 text-primary animate-spin" />
+            ) : (
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            )}
           </SettingRow>
           <SettingRow 
             icon={Trash2} 
             label="Hesabı sil" 
-            description="Bütün məlumatları silin" 
-            onClick={() => toast.error('Bu əməliyyat geri qaytarıla bilməz!')}
+            description="Bütün məlumatları geri dönməz şəkildə silin" 
+            onClick={() => setShowDeleteDialog(true)}
             danger
           >
             <ChevronRight className="w-5 h-5 text-destructive" />
@@ -309,6 +422,65 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
           <p className="text-xs text-muted-foreground mt-1">Made with ❤️ in Azerbaijan</p>
         </div>
       </div>
+
+      {/* Delete Account Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent className="max-w-sm mx-4">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-12 h-12 rounded-2xl bg-destructive/10 flex items-center justify-center">
+                <AlertTriangle className="w-6 h-6 text-destructive" />
+              </div>
+              <AlertDialogTitle className="text-lg">Hesabı sil</AlertDialogTitle>
+            </div>
+            <AlertDialogDescription className="text-sm space-y-3">
+              <p>
+                Bu əməliyyat <strong className="text-destructive">geri qaytarıla bilməz</strong>. 
+                Hesabınız və bütün məlumatlarınız həmişəlik silinəcək:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-xs text-muted-foreground">
+                <li>Profil məlumatları</li>
+                <li>Bütün qeydlər və izləmə tarixçəsi</li>
+                <li>Cəmiyyət paylaşımları və şərhlər</li>
+                <li>AI söhbət tarixçəsi</li>
+                <li>Premium abunəlik (əgər varsa)</li>
+              </ul>
+              <div className="pt-2">
+                <p className="text-xs font-medium text-foreground mb-2">
+                  Təsdiqləmək üçün <strong>"SİL"</strong> yazın:
+                </p>
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder="SİL"
+                  className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm font-mono text-center tracking-widest"
+                />
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2">
+            <AlertDialogCancel 
+              onClick={() => setDeleteConfirmText('')}
+              className="rounded-xl"
+            >
+              Ləğv et
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteAccount}
+              disabled={deleteConfirmText !== 'SİL' || isDeleting}
+              className="bg-destructive hover:bg-destructive/90 rounded-xl"
+            >
+              {isDeleting ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              ) : (
+                <Trash2 className="w-4 h-4 mr-2" />
+              )}
+              Hesabı sil
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

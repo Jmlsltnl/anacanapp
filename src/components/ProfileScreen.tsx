@@ -4,7 +4,8 @@ import {
   Settings, Bell, Shield, HelpCircle, LogOut, 
   ChevronRight, Crown, Copy, Share2,
   Heart, Calendar, Palette, ShieldCheck, Edit, CreditCard, Info, ArrowLeft, X,
-  MessageCircle, Baby, ShoppingCart, TrendingUp, Gift, Plus, Trash2, Users
+  MessageCircle, Baby, ShoppingCart, TrendingUp, Gift, Plus, Trash2, Users,
+  FileText, Scale, AlertCircle, RotateCcw
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
@@ -586,6 +587,42 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
         <LogOut className="w-5 h-5" />
         Çıxış
       </motion.button>
+
+      {/* Legal Links */}
+      <motion.div
+        className="mt-4 bg-card rounded-2xl overflow-hidden shadow-card border border-border/50"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.55 }}
+      >
+        <div className="px-3 pt-3 pb-1">
+          <h2 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Hüquqi</h2>
+        </div>
+        {[
+          { id: 'legal', icon: FileText, label: 'Gizlilik Siyasəti', param: 'privacy' },
+          { id: 'legal', icon: Scale, label: 'İstifadə Şərtləri', param: 'terms' },
+          { id: 'legal', icon: AlertCircle, label: 'Məsuliyyətdən İmtina', param: 'disclaimer' },
+          { id: 'legal', icon: RotateCcw, label: 'Geri Qaytarma Siyasəti', param: 'refund' },
+        ].map((item, index, arr) => {
+          const Icon = item.icon;
+          return (
+            <motion.button
+              key={item.param}
+              onClick={() => onNavigate?.(item.id)}
+              className={`w-full flex items-center gap-3 p-2.5 hover:bg-muted/50 transition-colors ${
+                index !== arr.length - 1 ? 'border-b border-border/30' : ''
+              }`}
+              whileTap={{ scale: 0.99 }}
+            >
+              <div className="w-7 h-7 rounded-lg bg-muted/70 flex items-center justify-center">
+                <Icon className="w-3.5 h-3.5 text-muted-foreground" />
+              </div>
+              <span className="flex-1 text-left text-xs font-medium text-muted-foreground">{item.label}</span>
+              <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
+            </motion.button>
+          );
+        })}
+      </motion.div>
 
       {/* Version */}
       <p className="text-center text-xs text-muted-foreground mt-3">
