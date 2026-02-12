@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, FileText, Shield, Scale, AlertTriangle, CreditCard, Database, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useLegalDocuments, LegalDocument } from '@/hooks/useLegalDocuments';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import MarkdownContent from '@/components/MarkdownContent';
+import HtmlContent from '@/components/ui/HtmlContent';
 
 interface LegalScreenProps {
   onBack: () => void;
@@ -35,13 +36,12 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
   const { data: documents = [], isLoading } = useLegalDocuments();
   const [selectedDoc, setSelectedDoc] = useState<LegalDocument | null>(null);
 
-  // If initial document is provided, find and show it
-  useState(() => {
-    if (initialDocument && documents.length > 0) {
+  useEffect(() => {
+    if (initialDocument && documents.length > 0 && !selectedDoc) {
       const doc = documents.find(d => d.document_type === initialDocument);
       if (doc) setSelectedDoc(doc);
     }
-  });
+  }, [initialDocument, documents]);
 
   const sortedDocuments = [...documents].sort((a, b) => {
     const indexA = documentOrder.indexOf(a.document_type);
@@ -65,7 +65,11 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
               Versiya: {selectedDoc.version} | Son yenilənmə: {new Date(selectedDoc.updated_at).toLocaleDateString('az-AZ')}
             </div>
             <div className="prose prose-sm dark:prose-invert max-w-none">
-              <MarkdownContent content={selectedDoc.content_az || selectedDoc.content} />
+              {(() => {
+                const c = selectedDoc.content_az || selectedDoc.content;
+                const isHtml = c.trim().startsWith('<') || /<[a-z][\s\S]*>/i.test(c);
+                return isHtml ? <HtmlContent content={c} /> : <MarkdownContent content={c} />;
+              })()}
             </div>
           </div>
         </ScrollArea>
