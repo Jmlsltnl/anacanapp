@@ -115,7 +115,10 @@ const AdminBlog = () => {
   const generateSlug = (title: string) => {
     return title
       .toLowerCase()
-      .replace(/[^a-z0-9\s-ğüşöçəı]/g, '')
+      .replace(/ş/g, 's').replace(/ə/g, 'e').replace(/ı/g, 'i')
+      .replace(/ğ/g, 'g').replace(/ö/g, 'o').replace(/ü/g, 'u')
+      .replace(/ç/g, 'c').replace(/İ/gi, 'i')
+      .replace(/[^a-z0-9\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .trim();
