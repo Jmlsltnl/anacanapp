@@ -104,7 +104,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
   };
 
   return (
-    <div className="min-h-screen bg-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
+    <div className="min-h-screen bg-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 160px)' }}>
       {/* Header */}
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl border-b border-border/30">
         <div className="flex items-center justify-between px-4 py-3">
@@ -413,8 +413,8 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
 
       {/* Fixed Bottom Bar */}
       <div 
-        className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-xl border-t border-border/30"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        className="fixed left-0 right-0 z-30 bg-background/95 backdrop-blur-xl border-t border-border/30"
+        style={{ bottom: 'calc(env(safe-area-inset-bottom) + 72px)' }}
       >
         <div className="flex gap-3 p-4">
           <Button
