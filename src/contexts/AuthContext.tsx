@@ -320,7 +320,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!mounted) return;
       console.warn('Auth bootstrap timeout - forcing loading=false');
       finishLoading();
-    }, 8000);
+    }, 3000);
 
     const hydrateUser = async (u: User) => {
       try {

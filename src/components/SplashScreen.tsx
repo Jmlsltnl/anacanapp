@@ -14,7 +14,7 @@ const SplashScreen = forwardRef<HTMLDivElement, SplashScreenProps>(({ onComplete
   }, [onComplete]);
 
   useEffect(() => {
-    const timer = setTimeout(() => onCompleteRef.current(), 2500);
+    const timer = setTimeout(() => onCompleteRef.current(), 1500);
     return () => clearTimeout(timer);
   }, []);
 
