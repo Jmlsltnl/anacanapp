@@ -91,11 +91,24 @@ const SplashScreen = forwardRef<HTMLDivElement, SplashScreenProps>(({ onComplete
                 src={logoImage} 
                 alt="Anacan" 
                 className="w-full h-full object-contain"
-                onError={(e) => {
-                  // Fallback: hide broken image icon
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
               />
+              {/* Fallback text if logo fails */}
+              <span 
+                className="absolute inset-0 flex items-center justify-center text-4xl font-black text-white pointer-events-none"
+                style={{ opacity: 0 }}
+                ref={(el) => {
+                  if (!el) return;
+                  const img = el.previousElementSibling as HTMLImageElement;
+                  if (img) {
+                    img.onerror = () => {
+                      img.style.display = 'none';
+                      el.style.opacity = '1';
+                    };
+                  }
+                }}
+              >
+                A
+              </span>
             </motion.div>
           </div>
         </motion.div>
