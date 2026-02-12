@@ -8,6 +8,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import RichTextEditor from '@/components/ui/RichTextEditor';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { useBlogAdmin, BlogPost, BlogCategory, BlogLifeStage } from '@/hooks/useBlog';
@@ -842,11 +843,10 @@ const AdminBlog = () => {
                       )}
                     </Button>
                   </div>
-                  <Textarea
-                    value={formData.content}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                  <RichTextEditor
+                    content={formData.content}
+                    onChange={(html) => setFormData({ ...formData, content: html })}
                     placeholder="Məqalənin tam məzmunu... (və ya AI ilə yaradın)"
-                    rows={12}
                     disabled={generatingContent}
                   />
                   {generatingContent && (

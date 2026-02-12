@@ -317,8 +317,9 @@ const Index = () => {
   if (activeScreen === 'billing') {
     return <BillingScreen onBack={() => setActiveScreen(null)} />;
   }
-  if (activeScreen === 'legal') {
-    return <LegalScreen onBack={() => setActiveScreen(null)} />;
+  if (activeScreen === 'legal' || activeScreen?.startsWith('legal/')) {
+    const initialDocType = activeScreen?.startsWith('legal/') ? activeScreen.replace('legal/', '') : undefined;
+    return <LegalScreen onBack={() => setActiveScreen(null)} initialDocument={initialDocType} />;
   }
   if (activeScreen === 'blog' || activeScreen?.startsWith('blog/')) {
     const initialSlug = activeScreen?.startsWith('blog/') ? activeScreen.replace('blog/', '') : undefined;

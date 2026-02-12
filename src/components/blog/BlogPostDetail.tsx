@@ -16,6 +16,7 @@ import { az } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import RelatedPosts from './RelatedPosts';
 import MarkdownContent from '@/components/MarkdownContent';
+import HtmlContent from '@/components/ui/HtmlContent';
 
 interface BlogPostDetailProps {
   post: BlogPost;
@@ -343,7 +344,11 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <MarkdownContent content={post.content} variant="blog" />
+          {post.content.trim().startsWith('<') || /<[a-z][\s\S]*>/i.test(post.content) ? (
+            <HtmlContent content={post.content} />
+          ) : (
+            <MarkdownContent content={post.content} variant="blog" />
+          )}
         </motion.div>
 
         {/* Tags */}

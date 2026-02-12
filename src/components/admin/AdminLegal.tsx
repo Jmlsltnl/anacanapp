@@ -3,6 +3,7 @@ import { FileText, Save, Plus, Eye, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import RichTextEditor from '@/components/ui/RichTextEditor';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card } from '@/components/ui/card';
@@ -187,22 +188,20 @@ const AdminLegal = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Məzmun (AZ) - Markdown dəstəklənir</Label>
-                  <Textarea
-                    value={editForm.content_az || ''}
-                    onChange={(e) => setEditForm({ ...editForm, content_az: e.target.value })}
-                    rows={15}
-                    className="font-mono text-sm"
+                  <Label>Məzmun (AZ)</Label>
+                  <RichTextEditor
+                    content={editForm.content_az || ''}
+                    onChange={(html) => setEditForm({ ...editForm, content_az: html })}
+                    placeholder="Hüquqi sənədin məzmunu..."
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Məzmun (EN) - Markdown</Label>
-                  <Textarea
-                    value={editForm.content || ''}
-                    onChange={(e) => setEditForm({ ...editForm, content: e.target.value })}
-                    rows={10}
-                    className="font-mono text-sm"
+                  <Label>Məzmun (EN)</Label>
+                  <RichTextEditor
+                    content={editForm.content || ''}
+                    onChange={(html) => setEditForm({ ...editForm, content: html })}
+                    placeholder="Legal document content..."
                   />
                 </div>
               </TabsContent>

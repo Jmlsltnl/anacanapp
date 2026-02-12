@@ -5,7 +5,7 @@ import {
   ChevronRight, Crown, Copy, Share2,
   Heart, Calendar, Palette, ShieldCheck, Edit, CreditCard, Info, ArrowLeft, X,
   MessageCircle, Baby, ShoppingCart, TrendingUp, Gift, Plus, Trash2, Users,
-  FileText, Scale, AlertCircle, RotateCcw
+  FileText, Scale, AlertCircle, RotateCcw, Database
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
@@ -599,15 +599,17 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
           <h2 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Hüquqi</h2>
         </div>
         {[
-          { id: 'legal', icon: FileText, label: 'Gizlilik Siyasəti', param: 'privacy' },
-          { id: 'legal', icon: Scale, label: 'İstifadə Şərtləri', param: 'terms' },
-          { id: 'legal', icon: AlertCircle, label: 'Məsuliyyətdən İmtina', param: 'disclaimer' },
-          { id: 'legal', icon: RotateCcw, label: 'Geri Qaytarma Siyasəti', param: 'refund' },
+          { id: 'legal/privacy_policy', icon: FileText, label: 'Gizlilik Siyasəti' },
+          { id: 'legal/terms_of_service', icon: Scale, label: 'İstifadə Şərtləri' },
+          { id: 'legal/disclaimer', icon: AlertCircle, label: 'Məsuliyyətdən İmtina' },
+          { id: 'legal/refund_policy', icon: RotateCcw, label: 'Geri Qaytarma Siyasəti' },
+          { id: 'legal/gdpr_ccpa', icon: Shield, label: 'GDPR / CCPA' },
+          { id: 'legal/data_usage', icon: Database, label: 'Məlumat İstifadəsi' },
         ].map((item, index, arr) => {
           const Icon = item.icon;
           return (
             <motion.button
-              key={item.param}
+              key={item.id}
               onClick={() => onNavigate?.(item.id)}
               className={`w-full flex items-center gap-3 p-2.5 hover:bg-muted/50 transition-colors ${
                 index !== arr.length - 1 ? 'border-b border-border/30' : ''
