@@ -80,7 +80,7 @@ const Index = () => {
       if (!hasSeenIntro) {
         setShowIntro(true);
       }
-    }, 2500);
+    }, 1500);
     return () => clearTimeout(timer);
   }, [hasSeenIntro]);
 
@@ -255,19 +255,13 @@ const Index = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
-        <motion.div
-          animate={{ scale: [1, 1.05, 1], opacity: [0.8, 1, 0.8] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <img src={logoImage} alt="Anacan" className="w-16 h-16 object-contain" />
-        </motion.div>
+        <img src={logoImage} alt="Anacan" className="w-16 h-16 object-contain animate-pulse" />
         <div className="flex gap-1.5">
           {[0, 1, 2].map((i) => (
-            <motion.div
+            <div
               key={i}
-              className="w-2 h-2 rounded-full bg-primary"
-              animate={{ scale: [1, 1.4, 1], opacity: [0.4, 1, 0.4] }}
-              transition={{ duration: 1, repeat: Infinity, delay: i * 0.2, ease: "easeInOut" }}
+              className="w-2 h-2 rounded-full bg-primary animate-pulse"
+              style={{ animationDelay: `${i * 200}ms` }}
             />
           ))}
         </div>
