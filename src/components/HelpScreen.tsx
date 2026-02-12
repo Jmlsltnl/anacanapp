@@ -355,7 +355,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                 <h3 className="font-bold text-foreground mb-4">Bizimlə Əlaqə</h3>
                 
                 <motion.a
-                  href="mailto:support@anacan.az"
+                  href="mailto:info@anacan.az"
                   className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors mb-3"
                   whileTap={{ scale: 0.98 }}
                 >
@@ -364,7 +364,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                   </div>
                   <div className="flex-1">
                     <p className="font-semibold text-foreground">E-poçt</p>
-                    <p className="text-sm text-primary">support@anacan.az</p>
+                    <p className="text-sm text-primary">info@anacan.az</p>
                   </div>
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </motion.a>

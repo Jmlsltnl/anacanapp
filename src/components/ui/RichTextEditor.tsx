@@ -9,10 +9,12 @@ import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
   List, ListOrdered, Heading1, Heading2, Heading3,
   AlignLeft, AlignCenter, AlignRight, Link as LinkIcon, 
-  Image as ImageIcon, Undo, Redo, Quote, Minus, Code
+  Image as ImageIcon, Undo, Redo, Quote, Minus, Code, Upload
 } from 'lucide-react';
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface RichTextEditorProps {
   content: string;
@@ -45,6 +47,8 @@ const MenuButton = ({ onClick, active, disabled, children, title }: {
 );
 
 const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', disabled, className }: RichTextEditorProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -77,13 +81,50 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', 
     }
   }, [editor]);
 
-  const addImage = useCallback(() => {
+  const handleImageUpload = useCallback(async (file: File) => {
     if (!editor) return;
-    const url = prompt('Şəkil URL daxil edin:');
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
+    if (!file.type.startsWith('image/')) {
+      toast.error('Yalnız şəkil faylları yükləyə bilərsiniz');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Şəkil 5MB-dan böyük ola bilməz');
+      return;
+    }
+
+    try {
+      const ext = file.name.split('.').pop();
+      const fileName = `editor/${Date.now()}-${Math.random().toString(36).substring(2)}.${ext}`;
+      
+      const { error } = await supabase.storage
+        .from('assets')
+        .upload(fileName, file);
+
+      if (error) throw error;
+
+      const { data: urlData } = supabase.storage
+        .from('assets')
+        .getPublicUrl(fileName);
+
+      editor.chain().focus().setImage({ src: urlData.publicUrl }).run();
+      toast.success('Şəkil yükləndi');
+    } catch (err) {
+      console.error('Image upload error:', err);
+      toast.error('Şəkil yüklənərkən xəta baş verdi');
     }
   }, [editor]);
+
+  const onImageButtonClick = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const onFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleImageUpload(file);
+      e.target.value = '';
+    }
+  }, [handleImageUpload]);
 
   if (!editor) return null;
 
@@ -91,6 +132,15 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', 
 
   return (
     <div className={cn('border border-input rounded-lg overflow-hidden bg-background', className)}>
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={onFileChange}
+        className="hidden"
+      />
+
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 p-1.5 border-b border-border bg-muted/30">
         <MenuButton onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')} title="Qalın">
@@ -153,8 +203,8 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', 
         <MenuButton onClick={addLink} active={editor.isActive('link')} title="Link">
           <LinkIcon size={s} />
         </MenuButton>
-        <MenuButton onClick={addImage} title="Şəkil">
-          <ImageIcon size={s} />
+        <MenuButton onClick={onImageButtonClick} title="Şəkil yüklə">
+          <Upload size={s} />
         </MenuButton>
 
         <div className="w-px h-5 bg-border mx-1" />
@@ -170,7 +220,42 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', 
       {/* Editor */}
       <EditorContent 
         editor={editor} 
-        className="prose prose-sm dark:prose-invert max-w-none p-4 min-h-[200px] focus-within:outline-none [&_.ProseMirror]:outline-none [&_.ProseMirror]:min-h-[180px] [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-muted-foreground [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
+        className={cn(
+          'p-4 min-h-[200px] focus-within:outline-none',
+          '[&_.ProseMirror]:outline-none [&_.ProseMirror]:min-h-[180px]',
+          // Placeholder
+          '[&_.ProseMirror_p.is-editor-empty:first-child::before]:text-muted-foreground',
+          '[&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)]',
+          '[&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left',
+          '[&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0',
+          '[&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none',
+          // Headings
+          '[&_.ProseMirror_h1]:text-2xl [&_.ProseMirror_h1]:font-bold [&_.ProseMirror_h1]:mb-3 [&_.ProseMirror_h1]:mt-4',
+          '[&_.ProseMirror_h2]:text-xl [&_.ProseMirror_h2]:font-semibold [&_.ProseMirror_h2]:mb-2 [&_.ProseMirror_h2]:mt-3',
+          '[&_.ProseMirror_h3]:text-lg [&_.ProseMirror_h3]:font-semibold [&_.ProseMirror_h3]:mb-2 [&_.ProseMirror_h3]:mt-3',
+          // Lists
+          '[&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ul]:mb-3',
+          '[&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_ol]:mb-3',
+          '[&_.ProseMirror_li]:mb-1',
+          // Blockquote
+          '[&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-primary/30',
+          '[&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:italic',
+          '[&_.ProseMirror_blockquote]:text-muted-foreground [&_.ProseMirror_blockquote]:my-3',
+          // Code block
+          '[&_.ProseMirror_pre]:bg-muted [&_.ProseMirror_pre]:rounded-lg [&_.ProseMirror_pre]:p-3',
+          '[&_.ProseMirror_pre]:font-mono [&_.ProseMirror_pre]:text-sm [&_.ProseMirror_pre]:my-3',
+          '[&_.ProseMirror_pre]:overflow-x-auto',
+          '[&_.ProseMirror_code]:bg-muted [&_.ProseMirror_code]:rounded [&_.ProseMirror_code]:px-1.5',
+          '[&_.ProseMirror_code]:py-0.5 [&_.ProseMirror_code]:font-mono [&_.ProseMirror_code]:text-sm',
+          // Horizontal rule
+          '[&_.ProseMirror_hr]:border-border [&_.ProseMirror_hr]:my-4',
+          // Paragraph
+          '[&_.ProseMirror_p]:mb-2',
+          // Images
+          '[&_.ProseMirror_img]:max-w-full [&_.ProseMirror_img]:h-auto [&_.ProseMirror_img]:rounded-lg [&_.ProseMirror_img]:my-3',
+          // Links
+          '[&_.ProseMirror_a]:text-primary [&_.ProseMirror_a]:underline',
+        )}
       />
     </div>
   );

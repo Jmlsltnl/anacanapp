@@ -278,8 +278,8 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
         <div className="text-center py-4">
           <p className="text-xs text-muted-foreground">
             Suallarınız üçün:{' '}
-            <a href="mailto:support@anacan.az" className="text-primary font-medium">
-              support@anacan.az
+            <a href="mailto:info@anacan.az" className="text-primary font-medium">
+              info@anacan.az
             </a>
           </p>
         </div>
