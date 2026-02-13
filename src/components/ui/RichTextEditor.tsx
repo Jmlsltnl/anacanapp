@@ -11,10 +11,51 @@ import {
   AlignLeft, AlignCenter, AlignRight, Link as LinkIcon, 
   Image as ImageIcon, Undo, Redo, Quote, Minus, Code, Upload
 } from 'lucide-react';
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+
+// Simple markdown to HTML converter for legacy content
+const markdownToHtml = (md: string): string => {
+  let html = md;
+  // Headings (### before ## before #)
+  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  // Bold & italic
+  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  // Blockquote
+  html = html.replace(/^> (.+)$/gm, '<blockquote><p>$1</p></blockquote>');
+  // Unordered list items
+  html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+  html = html.replace(/(<li>.*<\/li>\n?)+/g, (match) => `<ul>${match}</ul>`);
+  // Ordered list items
+  html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+  // Horizontal rule
+  html = html.replace(/^---$/gm, '<hr>');
+  // Links
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+  // Inline code
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // Wrap remaining plain lines in <p> tags
+  html = html.split('\n').map(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return '';
+    if (/^<(h[1-6]|ul|ol|li|blockquote|hr|p|div|pre|code|img)/.test(trimmed)) return trimmed;
+    return `<p>${trimmed}</p>`;
+  }).join('\n');
+  // Clean up empty lines
+  html = html.replace(/\n{2,}/g, '\n');
+  return html;
+};
+
+const isMarkdown = (text: string): boolean => {
+  if (text.trim().startsWith('<') && /<[a-z][\s\S]*>/i.test(text)) return false;
+  return /(\*\*|^#{1,3} |^- |^\d+\. |^> |^---$|\[.+\]\(.+\))/m.test(text);
+};
 
 interface RichTextEditorProps {
   content: string;
@@ -49,6 +90,13 @@ const MenuButton = ({ onClick, active, disabled, children, title }: {
 const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', disabled, className }: RichTextEditorProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Convert markdown to HTML if needed
+  const processedContent = useMemo(() => {
+    if (!content) return '';
+    if (isMarkdown(content)) return markdownToHtml(content);
+    return content;
+  }, [content]);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -60,7 +108,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', 
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Placeholder.configure({ placeholder }),
     ],
-    content,
+    content: processedContent,
     editable: !disabled,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
@@ -69,7 +117,8 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', 
 
   useEffect(() => {
     if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content);
+      const newContent = isMarkdown(content) ? markdownToHtml(content) : content;
+      editor.commands.setContent(newContent);
     }
   }, [content]);
 
