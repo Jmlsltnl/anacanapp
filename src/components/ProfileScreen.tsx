@@ -323,7 +323,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
                 </motion.button>
               </div>
 
-              <div className="p-5 space-y-6">
+              <div className="p-5 pb-24 space-y-6">
                 {/* Intro */}
                 <div className="text-center">
                   <div className="w-16 h-16 rounded-2xl bg-partner/10 flex items-center justify-center mx-auto mb-3">
