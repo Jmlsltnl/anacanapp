@@ -423,6 +423,14 @@ export const initializeNativeFeatures = async () => {
   // Set status bar style
   await statusBar.setDark();
   
+  // Hide splash screen as soon as app is ready
+  try {
+    const { SplashScreen } = await import('@capacitor/splash-screen');
+    await SplashScreen.hide();
+  } catch (e) {
+    console.warn('SplashScreen hide failed:', e);
+  }
+  
   // Register for push notifications
   await pushNotifications.register();
   pushNotifications.addListeners();

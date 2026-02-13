@@ -159,11 +159,12 @@ const Index = () => {
     }
   }, [activeScreen, activeTool, activeTab, showMotherChat, tabOrder]);
 
-  // Enable swipe navigation only when authenticated and on main app
+  // Enable edge-only swipe navigation for back/forward
   useSwipeNavigation({
-    onSwipeRight: handleSwipeBack,
-    onSwipeLeft: handleSwipeForward,
-    threshold: 100,
+    onSwipeBack: handleSwipeBack,
+    onSwipeForward: handleSwipeForward,
+    edgeWidth: 30,
+    threshold: 60,
     enabled: isAuthenticated && !showSplash && !showIntro && !showAdmin
   });
 
