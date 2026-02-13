@@ -240,7 +240,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
               </div>
 
               {/* Timeline */}
-              <div className="overflow-y-auto max-h-[calc(90vh-80px)] p-4 pb-8">
+              <div className="overflow-y-auto max-h-[calc(90vh-80px)] p-4 pb-24">
                 <div className="relative">
                   {/* Timeline line */}
                   <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-border" />
@@ -348,6 +348,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
             />
             <motion.div
               className="relative bg-background rounded-t-3xl w-full max-h-[85vh] overflow-hidden"
+              style={{ marginBottom: 'calc(env(safe-area-inset-bottom) + 72px)' }}
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
@@ -389,7 +390,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
               </div>
 
               {/* Content */}
-              <div className="overflow-y-auto max-h-[calc(85vh-140px)] p-4 space-y-4">
+              <div className="overflow-y-auto max-h-[calc(85vh-140px)] p-4 pb-24 space-y-4">
                 {/* Description */}
                 <div className="bg-muted/30 rounded-xl p-4">
                   <p className="text-sm text-foreground leading-relaxed">

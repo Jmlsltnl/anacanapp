@@ -70,9 +70,20 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
   const { data: dbTargets = [] } = useNutritionTargets();
   
   // Use DB foods or fallback
-  const commonFoods = dbFoods.length > 0 
-    ? dbFoods.map(f => ({ name: f.name_az || f.name, calories: f.calories, emoji: f.emoji }))
-    : fallbackFoods;
+  const allCommonFoods = dbFoods.length > 0 
+    ? dbFoods.map(f => ({ name: f.name_az || f.name, calories: f.calories, emoji: f.emoji, meal_types: f.meal_types }))
+    : fallbackFoods.map(f => ({ ...f, meal_types: ['breakfast', 'lunch', 'dinner', 'snack'] }));
+  
+  // Filter foods by selected meal type - lunch and dinner share the same foods
+  const getFilteredFoods = (mealId: string) => {
+    const effectiveMealTypes = mealId === 'dinner' ? ['lunch', 'dinner'] : mealId === 'lunch' ? ['lunch', 'dinner'] : [mealId];
+    return allCommonFoods.filter(f => {
+      if (!f.meal_types || f.meal_types.length === 0) return true;
+      return effectiveMealTypes.some(mt => f.meal_types!.includes(mt));
+    });
+  };
+  
+  const commonFoods = selectedMeal ? getFilteredFoods(selectedMeal) : allCommonFoods;
   
   // Map meal types from DB or use fallback
   const mealTypes = useMemo(() => {
