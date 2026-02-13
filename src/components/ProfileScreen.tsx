@@ -102,11 +102,10 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
     ] : []),
   ];
 
-  const copyPartnerCode = () => {
-    navigator.clipboard.writeText(partnerCode);
-    toast({
-      title: 'Kopyalandı!',
-      description: 'Partnyor kodu buferə kopyalandı.',
+  const copyPartnerCode = async () => {
+    await nativeShare({
+      title: 'Partnyor Kodu',
+      text: `Partnyor kodum: ${partnerCode}`,
     });
   };
 

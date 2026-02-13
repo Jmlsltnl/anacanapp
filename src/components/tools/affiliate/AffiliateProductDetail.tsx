@@ -91,7 +91,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
     });
     
     if (success) {
-      toast({ title: 'Paylaşıldı!', description: 'Məhsul linki kopyalandı' });
+      toast({ title: 'Paylaşıldı!' });
     }
   };
 
