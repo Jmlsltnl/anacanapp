@@ -1369,6 +1369,9 @@ export type Database = {
           delivery_date: string | null
           id: string
           notes: string | null
+          payment_method: string | null
+          payment_proof_url: string | null
+          payment_status: string | null
           status: string
           total_price: number
           updated_at: string
@@ -1387,6 +1390,9 @@ export type Database = {
           delivery_date?: string | null
           id?: string
           notes?: string | null
+          payment_method?: string | null
+          payment_proof_url?: string | null
+          payment_status?: string | null
           status?: string
           total_price?: number
           updated_at?: string
@@ -1405,6 +1411,9 @@ export type Database = {
           delivery_date?: string | null
           id?: string
           notes?: string | null
+          payment_method?: string | null
+          payment_proof_url?: string | null
+          payment_status?: string | null
           status?: string
           total_price?: number
           updated_at?: string
@@ -4495,6 +4504,51 @@ export type Database = {
           surprise_title?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      payment_methods: {
+        Row: {
+          config: Json | null
+          created_at: string | null
+          description: string | null
+          description_az: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          label: string
+          label_az: string | null
+          method_key: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          config?: Json | null
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          label_az?: string | null
+          method_key: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          config?: Json | null
+          created_at?: string | null
+          description?: string | null
+          description_az?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          label_az?: string | null
+          method_key?: string
+          sort_order?: number | null
+          updated_at?: string | null
         }
         Relationships: []
       }
