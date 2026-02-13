@@ -241,6 +241,7 @@ export interface CommonFood {
   calories: number;
   emoji: string;
   category: string;
+  meal_types: string[] | null;
   is_active: boolean;
   sort_order: number;
 }

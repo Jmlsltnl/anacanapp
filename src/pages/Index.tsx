@@ -56,6 +56,7 @@ const Index = () => {
   const [showMotherChat, setShowMotherChat] = useState(false);
   const [viewingUserId, setViewingUserId] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState<string | null>(null);
+  const [toolOpenedFromDashboard, setToolOpenedFromDashboard] = useState(false);
   const [toolsResetKey, setToolsResetKey] = useState(0);
   const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, lifeStage } = useUserStore();
   const { isAdmin, loading } = useAuth();
@@ -87,7 +88,19 @@ const Index = () => {
   // Handle tool navigation from Dashboard
   const handleNavigateToTool = (tool: string) => {
     setActiveTool(tool);
+    setToolOpenedFromDashboard(true);
     setActiveTab('tools');
+  };
+
+  // Handle back from tool - go to Dashboard if opened from there
+  const handleToolBack = () => {
+    if (toolOpenedFromDashboard) {
+      setActiveTool(null);
+      setToolOpenedFromDashboard(false);
+      setActiveTab('home');
+    } else {
+      setActiveTool(null);
+    }
   };
 
   // Handle tab change - reset tool state when clicking Tools tab
@@ -95,6 +108,7 @@ const Index = () => {
     // If clicking Tools tab while already on tools, reset to tools list
     if (tab === 'tools') {
       setActiveTool(null);
+      setToolOpenedFromDashboard(false);
       // Increment key to force ToolsHub to reset
       setToolsResetKey(prev => prev + 1);
     }
@@ -113,9 +127,9 @@ const Index = () => {
       setActiveScreen(null);
       return;
     }
-    // If in a tool, go back to tools list
+    // If in a tool, go back
     if (activeTool && activeTab === 'tools') {
-      setActiveTool(null);
+      handleToolBack();
       return;
     }
     // If mother chat is open, close it
@@ -128,7 +142,7 @@ const Index = () => {
     if (currentIndex > 0) {
       setActiveTab(tabOrder[currentIndex - 1]);
     }
-  }, [activeScreen, activeTool, activeTab, showMotherChat, tabOrder, role]);
+  }, [activeScreen, activeTool, activeTab, showMotherChat, tabOrder, role, toolOpenedFromDashboard, handleToolBack]);
 
   const handleSwipeForward = useCallback(() => {
     // Navigate to next tab (only when no sub-screen/tool is open)
@@ -201,7 +215,7 @@ const Index = () => {
       case 'tools':
         return (
           <motion.div key="tools" variants={pageVariants} initial="initial" animate="animate" exit="exit">
-            <ToolsHub key={toolsResetKey} initialTool={activeTool} onBack={() => setActiveTool(null)} />
+            <ToolsHub key={toolsResetKey} initialTool={activeTool} onBack={handleToolBack} />
           </motion.div>
         );
       case 'cakes':

@@ -1541,6 +1541,7 @@ export type Database = {
           emoji: string | null
           id: string
           is_active: boolean | null
+          meal_types: string[] | null
           name: string
           name_az: string | null
           sort_order: number | null
@@ -1552,6 +1553,7 @@ export type Database = {
           emoji?: string | null
           id?: string
           is_active?: boolean | null
+          meal_types?: string[] | null
           name: string
           name_az?: string | null
           sort_order?: number | null
@@ -1563,6 +1565,7 @@ export type Database = {
           emoji?: string | null
           id?: string
           is_active?: boolean | null
+          meal_types?: string[] | null
           name?: string
           name_az?: string | null
           sort_order?: number | null

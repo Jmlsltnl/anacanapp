@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Droplets, Moon, Utensils, Activity, Plus, TrendingUp, Heart, Sparkles, 
@@ -802,6 +802,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   
   // Diaper tracking
   const [showDiaperModal, setShowDiaperModal] = useState(false);
+  const feedingSummaryRef = useRef<HTMLDivElement>(null);
 
   // Update timer display every second
   useEffect(() => {
@@ -957,7 +958,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
       case 'wet': return '💧';
       case 'dirty': return '💩';
       case 'both': return '💧💩';
-      default: return '👶';
+      case 'mixed': return '💧💩';
+      default: return '💧';
     }
   };
 
@@ -1318,7 +1320,10 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             </div>
           </div>
           <motion.button
-            onClick={() => setShowFeedingModal(true)}
+            onClick={() => {
+              setShowFeedingModal(true);
+              setTimeout(() => feedingSummaryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+            }}
             className="px-4 py-2.5 rounded-xl bg-amber-100 text-amber-700 font-bold text-xs"
             whileTap={{ scale: 0.95 }}
           >
@@ -1583,7 +1588,9 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           </div>
           
           {/* Enhanced Feeding History Panel */}
-          <FeedingHistoryPanel />
+          <div ref={feedingSummaryRef}>
+            <FeedingHistoryPanel />
+          </div>
           <div className="flex items-center justify-between p-2.5 bg-emerald-50 dark:bg-emerald-500/15 rounded-xl border border-emerald-100 dark:border-emerald-500/20">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
