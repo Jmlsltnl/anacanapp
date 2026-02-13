@@ -1140,7 +1140,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
               .map((line, index) => (
                 <div key={index} className="flex items-start gap-2.5">
                   <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
-                  <p className="text-[13px] text-amber-800 dark:text-amber-200 leading-relaxed font-medium">
+                  <p className="text-[13px] text-amber-800 dark:text-white leading-relaxed font-medium">
                     {line.trim()}
                   </p>
                 </div>
@@ -1181,7 +1181,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
               .split('\n')
               .filter((line: string) => line.trim().length > 0)
               .map((line: string, index: number) => (
-                <p key={index} className="text-[13px] text-rose-700 dark:text-rose-200 leading-relaxed font-medium mb-1.5 last:mb-0 italic">
+                <p key={index} className="text-[13px] text-rose-700 dark:text-rose-200 leading-relaxed font-medium mb-1.5 last:mb-0">
                   {line.trim()}
                 </p>
               ))
