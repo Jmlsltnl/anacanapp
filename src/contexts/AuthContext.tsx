@@ -219,17 +219,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      // Ignore AuthSessionMissingError - session already gone
+      if (error && error.name !== 'AuthSessionMissingError') {
+        console.error('Sign out error:', error);
+      }
+    } catch (error: any) {
+      // Still clear state even if signOut throws
+      if (error?.name !== 'AuthSessionMissingError') {
+        console.error('Sign out error:', error);
+      }
+    } finally {
+      // Always clear local state regardless of server response
       setUser(null);
       setSession(null);
       setProfile(null);
       setUserRole(null);
       storeLogout();
-      return { error: null };
-    } catch (error) {
-      console.error('Sign out error:', error);
-      return { error };
     }
+    return { error: null };
   };
 
   const updateProfile = async (updates: Partial<Profile>) => {
