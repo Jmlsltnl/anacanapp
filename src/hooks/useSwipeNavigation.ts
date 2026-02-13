@@ -20,6 +20,7 @@ export const useSwipeNavigation = ({
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
+  const touchEndY = useRef<number | null>(null);
 
   useEffect(() => {
     if (!enabled) return;
@@ -31,6 +32,7 @@ export const useSwipeNavigation = ({
 
     const handleTouchMove = (e: TouchEvent) => {
       touchEndX.current = e.touches[0].clientX;
+      touchEndY.current = e.touches[0].clientY;
     };
 
     const handleTouchEnd = () => {
@@ -39,7 +41,7 @@ export const useSwipeNavigation = ({
       }
 
       const deltaX = touchEndX.current - touchStartX.current;
-      const deltaY = Math.abs(touchEndX.current - touchStartX.current);
+      const deltaY = Math.abs((touchEndY.current ?? touchStartY.current!) - touchStartY.current!);
       
       // Only trigger if horizontal swipe is significant and more horizontal than vertical
       if (Math.abs(deltaX) > threshold && Math.abs(deltaX) > deltaY) {
@@ -57,6 +59,7 @@ export const useSwipeNavigation = ({
       touchStartX.current = null;
       touchStartY.current = null;
       touchEndX.current = null;
+      touchEndY.current = null;
     };
 
     document.addEventListener('touchstart', handleTouchStart, { passive: true });
