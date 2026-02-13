@@ -343,7 +343,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setProfile(profileData);
         setUserRole(roleData);
 
-        // Re-sync store with better name if profile is available.
         setAuth(
           true,
           u.id,
@@ -353,6 +352,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         syncProfileToStore(profileData);
       } catch (error) {
         console.error('Error hydrating user:', error);
+        // Don't clear user/session on hydration error - keep the session alive
       }
     };
 
@@ -368,7 +368,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setSession(initialSession);
           setUser(initialSession.user);
 
-          // Unblock UI immediately; hydrate profile/role in background.
           setAuth(
             true,
             initialSession.user.id,
@@ -388,19 +387,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    initializeAuth();
-
+    // Set up listener BEFORE getSession to avoid race conditions
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       console.log('Auth state changed:', event, currentSession?.user?.email);
       if (!mounted) return;
 
-      try {
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
+      // Only handle meaningful auth events - ignore intermediate states
+      if (event === 'SIGNED_OUT') {
+        setSession(null);
+        setUser(null);
+        setProfile(null);
+        setUserRole(null);
+        storeLogout();
+        finishLoading();
+        return;
+      }
 
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
         if (currentSession?.user) {
+          setSession(currentSession);
+          setUser(currentSession.user);
           setAuth(
             true,
             currentSession.user.id,
@@ -408,26 +416,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             currentSession.user.user_metadata?.name || 'İstifadəçi'
           );
           finishLoading();
-          void hydrateUser(currentSession.user);
-        } else {
-          setProfile(null);
-          setUserRole(null);
-          storeLogout();
-          finishLoading();
+          // Only hydrate on SIGNED_IN (not TOKEN_REFRESHED to avoid unnecessary refetches)
+          if (event === 'SIGNED_IN') {
+            void hydrateUser(currentSession.user);
+          }
         }
-      } catch (error) {
-        console.error('Error handling auth state change:', error);
-      } finally {
+        return;
+      }
+
+      // For USER_UPDATED and other events
+      if (currentSession?.user) {
+        setSession(currentSession);
+        setUser(currentSession.user);
         finishLoading();
+        void hydrateUser(currentSession.user);
       }
     });
+
+    initializeAuth();
 
     return () => {
       mounted = false;
       clearBootstrapTimeout();
       subscription.unsubscribe();
     };
-  }, [fetchProfile, fetchUserRole, setAuth, syncProfileToStore, storeLogout]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const isAdmin = userRole?.role === 'admin';
   const isModerator = userRole?.role === 'moderator' || isAdmin;
