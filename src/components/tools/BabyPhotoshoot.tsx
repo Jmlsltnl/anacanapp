@@ -419,23 +419,12 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
   };
 
   const handleShare = async (url: string) => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Körpə Fotosessiyası',
-          text: 'Anacan tətbiqində yaradılmış körpə fotosu',
-          url: url,
-        });
-      } catch (error) {
-        console.log('Share cancelled');
-      }
-    } else {
-      await navigator.clipboard.writeText(url);
-      toast({
-        title: 'Link kopyalandı',
-        description: 'Foto linki panoya kopyalandı',
-      });
-    }
+    const { nativeShare } = await import('@/lib/native');
+    await nativeShare({
+      title: 'Körpə Fotosessiyası',
+      text: 'Anacan tətbiqində yaradılmış körpə fotosu',
+      url: url,
+    });
   };
 
   const nextStep = () => setStep(prev => Math.min(prev + 1, 2));

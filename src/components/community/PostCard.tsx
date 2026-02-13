@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, MessageCircle, Share2, MoreHorizontal, ChevronDown, ChevronUp, Send, Trash2, Crown, Shield, Copy, Check, Flag } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal, ChevronDown, ChevronUp, Send, Trash2, Crown, Shield, Flag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { CommunityPost, useToggleLike, usePostComments, useCreateComment } from '@/hooks/useCommunity';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { hapticFeedback } from '@/lib/native';
+import { hapticFeedback, nativeShare } from '@/lib/native';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -67,10 +67,9 @@ const UserBadge = ({ type }: { type: 'admin' | 'premium' | 'moderator' | null })
 const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
-  const [showShareDialog, setShowShareDialog] = useState(false);
+  
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [reportReason, setReportReason] = useState('');
-  const [linkCopied, setLinkCopied] = useState(false);
   const { isAdmin, user } = useAuth();
   const { toast } = useToast();
 
@@ -148,43 +147,14 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   const universalLink = webFallbackUrl; // For iOS Universal Links
 
   const handleShare = async () => {
-    hapticFeedback.light();
-    
-    // Use universal link for sharing (works with deep linking)
-    const shareUrl = webFallbackUrl;
-    const shareText = `${post.author?.name || 'İstifadəçi'} paylaşdı: ${post.content.substring(0, 100)}${post.content.length > 100 ? '...' : ''}`;
-    
-    // Check if native share is available
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Anacan - Paylaşım',
-          text: shareText,
-          url: shareUrl,
-        });
-      } catch (err) {
-        // User cancelled or share failed, show dialog instead
-        if ((err as Error).name !== 'AbortError') {
-          setShowShareDialog(true);
-        }
-      }
-    } else {
-      // Fallback to custom share dialog
-      setShowShareDialog(true);
-    }
+    const shareText = post.content.substring(0, 100) + (post.content.length > 100 ? '...' : '');
+    hapticFeedback.medium();
+    await nativeShare({
+      title: 'Anacan - Paylaşım',
+      text: shareText,
+    });
   };
 
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(webFallbackUrl);
-      setLinkCopied(true);
-      hapticFeedback.medium();
-      toast({ title: 'Link kopyalandı!' });
-      setTimeout(() => setLinkCopied(false), 2000);
-    } catch (err) {
-      toast({ title: 'Xəta', description: 'Link kopyalana bilmədi', variant: 'destructive' });
-    }
-  };
 
   // Try to open in app, fallback to store
   const handleOpenInApp = () => {
@@ -408,62 +378,6 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
           )}
         </AnimatePresence>
       </motion.div>
-
-      {/* Share Dialog */}
-      <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-        <DialogContent className="sm:max-w-md max-w-[90vw] rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-center">Postu Paylaş</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            {/* Copy Link */}
-            <div className="flex items-center gap-2">
-              <Input
-                value={webFallbackUrl}
-                readOnly
-                className="flex-1 text-sm"
-              />
-              <Button
-                onClick={handleCopyLink}
-                variant="outline"
-                className="shrink-0"
-              >
-                {linkCopied ? (
-                  <Check className="w-4 h-4 text-green-500" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-              </Button>
-            </div>
-
-            {/* Open in App button */}
-            <Button
-              onClick={handleOpenInApp}
-              className="w-full gradient-primary"
-            >
-              📱 Tətbiqdə Aç
-            </Button>
-
-            {/* Social Share Buttons */}
-            <div className="flex justify-center gap-3">
-              <Button
-                variant="outline"
-                onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(post.content.substring(0, 50) + '... ' + webFallbackUrl)}`, '_blank')}
-                className="flex-1"
-              >
-                WhatsApp
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => window.open(`https://t.me/share/url?url=${encodeURIComponent(webFallbackUrl)}&text=${encodeURIComponent(post.content.substring(0, 50))}`, '_blank')}
-                className="flex-1"
-              >
-                Telegram
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Report Dialog */}
       <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>

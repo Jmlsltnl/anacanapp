@@ -197,7 +197,7 @@ const HoroscopeCompatibility = ({ onBack }: HoroscopeCompatibilityProps) => {
     }
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
     if (!analysisResult) return;
 
     const { charts, analysis } = analysisResult;
@@ -211,12 +211,8 @@ ${charts.baby ? `👶 ${charts.baby.isExpected ? 'Gözlənilən' : ''} Körpə: 
 
 Anacan tətbiqi ilə yaradılıb 💜`;
 
-    if (navigator.share) {
-      navigator.share({ text });
-    } else {
-      navigator.clipboard.writeText(text);
-      toast.success('Mətn kopyalandı!');
-    }
+    const { nativeShare } = await import('@/lib/native');
+    await nativeShare({ text });
   };
 
   const getScoreGradient = (score: number) => {

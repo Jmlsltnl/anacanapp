@@ -92,15 +92,12 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
   };
 
   const handleShare = async () => {
-    try {
-      await navigator.share({
-        title: post.title,
-        text: post.excerpt || '',
-        url: window.location.href
-      });
-    } catch (e) {
-      toast({ title: 'Link kopyalandı!' });
-    }
+    const { nativeShare } = await import('@/lib/native');
+    await nativeShare({
+      title: post.title,
+      text: post.excerpt || '',
+      url: window.location.href
+    });
   };
 
   const renderComment = (comment: BlogComment, isReply = false) => (
