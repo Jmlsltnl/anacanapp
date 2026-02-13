@@ -44,6 +44,36 @@ const AuthScreen = () => {
     setIsLoading(true);
 
     try {
+      if (!email || !password) {
+        toast({
+          title: 'Məlumat tələb olunur',
+          description: 'E-mail və şifrə daxil edin.',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (partnerMode === 'login') {
+        // Partner login - just sign in, no code needed
+        const { error: authError } = await signIn(email, password);
+        if (authError) {
+          toast({
+            title: 'Giriş alınmadı',
+            description: 'E-mail və ya şifrə yanlışdır.',
+            variant: 'destructive',
+          });
+        } else {
+          toast({
+            title: 'Xoş gəldiniz! 👋',
+            description: 'Partnyor panelinə daxil oldunuz.',
+          });
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      // ── Registration flow: validate partner code ──
       if (!partnerCode.startsWith('ANACAN-') || partnerCode.length < 10) {
         toast({
           title: 'Kod yanlışdır',
@@ -54,7 +84,7 @@ const AuthScreen = () => {
         return;
       }
       
-      // First verify the partner code exists BEFORE registering
+      // Verify the partner code exists BEFORE registering
       const { data: partnerProfiles, error: findError } = await supabase
         .rpc('find_partner_by_code', { p_partner_code: partnerCode });
 
@@ -69,41 +99,17 @@ const AuthScreen = () => {
         setIsLoading(false);
         return;
       }
-      
-      if (!email || !password) {
+
+      // Register new partner
+      const { error: registerError } = await signUp(email, password, name || 'Partner');
+      if (registerError) {
         toast({
-          title: 'Məlumat tələb olunur',
-          description: 'E-mail və şifrə daxil edin.',
+          title: 'Qeydiyyat alınmadı',
+          description: 'Bu e-mail artıq qeydiyyatdan keçib.',
           variant: 'destructive',
         });
         setIsLoading(false);
         return;
-      }
-
-      if (partnerMode === 'login') {
-        // Just login
-        const { error: authError } = await signIn(email, password);
-        if (authError) {
-          toast({
-            title: 'Giriş alınmadı',
-            description: 'E-mail və ya şifrə yanlışdır.',
-            variant: 'destructive',
-          });
-          setIsLoading(false);
-          return;
-        }
-      } else {
-        // Register new partner
-        const { error: registerError } = await signUp(email, password, name || 'Partner');
-        if (registerError) {
-          toast({
-            title: 'Qeydiyyat alınmadı',
-            description: 'Bu e-mail artıq qeydiyyatdan keçib.',
-            variant: 'destructive',
-          });
-          setIsLoading(false);
-          return;
-        }
       }
       
       // Wait for profile to be created (trigger may take a moment)
@@ -491,21 +497,23 @@ const AuthScreen = () => {
                     </div>
                   </motion.div>
 
-                  <motion.div variants={itemVariants}>
-                    <div className="relative group">
-                      <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-blue-500" />
-                      <Input
-                        type="text"
-                        placeholder="ANACAN-XXXX"
-                        value={partnerCode}
-                        onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
-                        className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base uppercase tracking-widest font-mono transition-all"
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2 text-center">
-                      Partnyor kodu xanımınızın profilində tapıla bilər
-                    </p>
-                  </motion.div>
+                  {partnerMode === 'register' && (
+                    <motion.div variants={itemVariants}>
+                      <div className="relative group">
+                        <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-blue-500" />
+                        <Input
+                          type="text"
+                          placeholder="ANACAN-XXXX"
+                          value={partnerCode}
+                          onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
+                          className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base uppercase tracking-widest font-mono transition-all"
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2 text-center">
+                        Partnyor kodu xanımınızın profilində tapıla bilər
+                      </p>
+                    </motion.div>
+                  )}
 
                   <motion.div variants={itemVariants} className="pt-2">
                     <Button
