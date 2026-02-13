@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { lovable } from '@/integrations/lovable/index';
 import { useUserStore } from '@/store/userStore';
 import type { User, Session } from '@supabase/supabase-js';
 
@@ -191,12 +192,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: window.location.origin },
+      const result = await lovable.auth.signInWithOAuth('google', {
+        redirect_uri: window.location.origin,
       });
-      if (error) throw error;
-      return { data, error: null };
+      if (result.error) throw result.error;
+      return { data: result, error: null };
     } catch (error) {
       console.error('Google sign in error:', error);
       return { data: null, error };
@@ -205,12 +205,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithApple = async () => {
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'apple',
-        options: { redirectTo: window.location.origin },
+      const result = await lovable.auth.signInWithOAuth('apple', {
+        redirect_uri: window.location.origin,
       });
-      if (error) throw error;
-      return { data, error: null };
+      if (result.error) throw result.error;
+      return { data: result, error: null };
     } catch (error) {
       console.error('Apple sign in error:', error);
       return { data: null, error };
