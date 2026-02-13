@@ -1310,20 +1310,20 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         transition={{ delay: 0.15 }}
       >
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
+          <button
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={() => feedingSummaryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+          >
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center">
               <Baby className="w-5 h-5 text-white" />
             </div>
-            <div>
+            <div className="text-left">
               <h3 className="font-bold text-sm text-foreground">Qidalanma</h3>
               <p className="text-xs text-muted-foreground">Bu gün: {todayStats.feedingCount} dəfə</p>
             </div>
-          </div>
+          </button>
           <motion.button
-            onClick={() => {
-              setShowFeedingModal(true);
-              setTimeout(() => feedingSummaryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
-            }}
+            onClick={() => setShowFeedingModal(true)}
             className="px-4 py-2.5 rounded-xl bg-amber-100 text-amber-700 font-bold text-xs"
             whileTap={{ scale: 0.95 }}
           >
