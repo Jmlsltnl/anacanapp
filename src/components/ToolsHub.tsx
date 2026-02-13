@@ -272,7 +272,12 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
 
   const handleBack = () => {
     if (activeTool) {
-      setActiveTool(null);
+      // If opened from Dashboard (onBack exists and we have initialTool), go back to Dashboard
+      if (onBack && initialTool) {
+        onBack();
+      } else {
+        setActiveTool(null);
+      }
     } else if (onBack) {
       onBack();
     }

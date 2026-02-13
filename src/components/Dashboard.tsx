@@ -1241,6 +1241,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         transition={{ delay: 0.12 }}
         whileHover={{ y: -2 }}
         whileTap={{ scale: 0.98 }}
+        onClick={() => onNavigateToTool?.('cakes')}
       >
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center shadow-lg">
