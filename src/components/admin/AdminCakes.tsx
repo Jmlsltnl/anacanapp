@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Cake as CakeIcon, Loader2, Upload, X, Eye, EyeOff } from 'lucide-react';
+import { Plus, Edit2, Trash2, Cake as CakeIcon, Loader2, Upload, X, Eye, EyeOff, Settings, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminCakes, type Cake } from '@/hooks/useCakes';
 import { useCakeOrders } from '@/hooks/useCakes';
+import { usePaymentMethods } from '@/hooks/usePaymentMethods';
 import { supabase } from '@/integrations/supabase/client';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const MILESTONE_OPTIONS = [
   { value: 'first_tooth', label: 'İlk Diş' },
@@ -30,14 +33,23 @@ const ORDER_STATUSES = [
   { value: 'cancelled', label: 'Ləğv edildi', color: 'bg-red-100 text-red-700' },
 ];
 
+const PAYMENT_STATUSES = [
+  { value: 'pending', label: 'Gözləyir', color: 'bg-yellow-100 text-yellow-700' },
+  { value: 'paid', label: 'Ödənilib', color: 'bg-green-100 text-green-700' },
+  { value: 'failed', label: 'Uğursuz', color: 'bg-red-100 text-red-700' },
+];
+
 const AdminCakes = () => {
   const { toast } = useToast();
   const { cakes, loading, addCake, updateCake, deleteCake } = useAdminCakes();
   const { orders, updateOrderStatus } = useCakeOrders();
-  const [activeTab, setActiveTab] = useState<'cakes' | 'orders'>('cakes');
+  const { methods: paymentMethods, loading: pmLoading, updateMethod } = usePaymentMethods();
+  const [activeTab, setActiveTab] = useState<'cakes' | 'orders' | 'payments'>('cakes');
   const [showForm, setShowForm] = useState(false);
   const [editingCake, setEditingCake] = useState<Cake | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [proofViewUrl, setProofViewUrl] = useState<string | null>(null);
+  const [editingConfig, setEditingConfig] = useState<{ id: string; config: Record<string, any> } | null>(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -174,6 +186,36 @@ const AdminCakes = () => {
     toast({ title: 'Status yeniləndi' });
   };
 
+  const handlePaymentStatusChange = async (orderId: string, paymentStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from('cake_orders')
+        .update({ payment_status: paymentStatus } as any)
+        .eq('id', orderId);
+      if (error) throw error;
+      toast({ title: 'Ödəniş statusu yeniləndi' });
+    } catch (error) {
+      console.error('Error updating payment status:', error);
+      toast({ title: 'Xəta', variant: 'destructive' });
+    }
+  };
+
+  const handleTogglePaymentMethod = async (id: string, isActive: boolean) => {
+    const success = await updateMethod(id, { is_active: isActive });
+    if (success) {
+      toast({ title: isActive ? 'Ödəniş metodu aktivləşdirildi' : 'Ödəniş metodu deaktiv edildi' });
+    }
+  };
+
+  const handleSaveC2CConfig = async () => {
+    if (!editingConfig) return;
+    const success = await updateMethod(editingConfig.id, { config: editingConfig.config } as any);
+    if (success) {
+      toast({ title: 'Konfiqurasiya yadda saxlanıldı' });
+      setEditingConfig(null);
+    }
+  };
+
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
 
   return (
@@ -183,18 +225,27 @@ const AdminCakes = () => {
           <h2 className="text-2xl font-bold text-foreground">🎂 Tortlar</h2>
           <p className="text-muted-foreground text-sm">Aylıq və Milestone tortlarını idarə edin</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button
             variant={activeTab === 'cakes' ? 'default' : 'outline'}
             onClick={() => setActiveTab('cakes')}
+            size="sm"
           >
-            <CakeIcon className="w-4 h-4 mr-2" /> Tortlar ({cakes.length})
+            <CakeIcon className="w-4 h-4 mr-1" /> Tortlar ({cakes.length})
           </Button>
           <Button
             variant={activeTab === 'orders' ? 'default' : 'outline'}
             onClick={() => setActiveTab('orders')}
+            size="sm"
           >
             📋 Sifarişlər ({orders.length})
+          </Button>
+          <Button
+            variant={activeTab === 'payments' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('payments')}
+            size="sm"
+          >
+            <Settings className="w-4 h-4 mr-1" /> Ödəniş
           </Button>
         </div>
       </div>
@@ -403,55 +454,198 @@ const AdminCakes = () => {
 
       {activeTab === 'orders' && (
         <div className="space-y-3">
-          {orders.map(order => (
-            <motion.div 
-              key={order.id}
-              className="bg-card rounded-xl p-4 border border-border/50 space-y-3"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-bold text-sm">{order.customer_name}</h3>
-                  <p className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleDateString('az-AZ')}</p>
+          {orders.map(order => {
+            const orderAny = order as any;
+            return (
+              <motion.div 
+                key={order.id}
+                className="bg-card rounded-xl p-4 border border-border/50 space-y-3"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-bold text-sm">{order.customer_name}</h3>
+                    <p className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleDateString('az-AZ')}</p>
+                  </div>
+                  <span className="text-sm font-bold text-primary">{order.total_price}₼</span>
                 </div>
-                <span className="text-sm font-bold text-primary">{order.total_price}₼</span>
-              </div>
-              {order.child_name && <p className="text-xs"><strong>Uşaq:</strong> {order.child_name}</p>}
-              {order.custom_text && <p className="text-xs"><strong>Mətn:</strong> {order.custom_text}</p>}
-              {order.contact_phone && <p className="text-xs"><strong>Telefon:</strong> {order.contact_phone}</p>}
-              {order.delivery_date && <p className="text-xs"><strong>Çatdırılma:</strong> {order.delivery_date}</p>}
-              {order.delivery_address && <p className="text-xs"><strong>Ünvan:</strong> {order.delivery_address}</p>}
-              {order.notes && <p className="text-xs"><strong>Qeyd:</strong> {order.notes}</p>}
-              {order.custom_fields && Object.keys(order.custom_fields).length > 0 && (
-                <div className="text-xs space-y-0.5">
-                  {Object.entries(order.custom_fields).map(([k, v]) => (
-                    <p key={k}><strong>{k}:</strong> {v}</p>
-                  ))}
+                {order.child_name && <p className="text-xs"><strong>Uşaq:</strong> {order.child_name}</p>}
+                {order.custom_text && <p className="text-xs"><strong>Mətn:</strong> {order.custom_text}</p>}
+                {order.contact_phone && <p className="text-xs"><strong>Telefon:</strong> {order.contact_phone}</p>}
+                {order.delivery_date && <p className="text-xs"><strong>Çatdırılma:</strong> {order.delivery_date}</p>}
+                {order.delivery_address && <p className="text-xs"><strong>Ünvan:</strong> {order.delivery_address}</p>}
+                {order.notes && <p className="text-xs"><strong>Qeyd:</strong> {order.notes}</p>}
+
+                {/* Payment Info */}
+                {orderAny.payment_method && (
+                  <div className="bg-muted/50 rounded-lg p-2 space-y-1">
+                    <p className="text-xs font-semibold">💳 Ödəniş: {
+                      orderAny.payment_method === 'c2c_transfer' ? 'Kartdan Karta' :
+                      orderAny.payment_method === 'card' || orderAny.payment_method === 'card_simulated' ? 'Kart' : 'Nağd'
+                    }</p>
+                    {orderAny.payment_status && (
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                          PAYMENT_STATUSES.find(s => s.value === orderAny.payment_status)?.color || 'bg-yellow-100 text-yellow-700'
+                        }`}>
+                          {PAYMENT_STATUSES.find(s => s.value === orderAny.payment_status)?.label || 'Gözləyir'}
+                        </span>
+                        <select
+                          value={orderAny.payment_status || 'pending'}
+                          onChange={e => handlePaymentStatusChange(order.id, e.target.value)}
+                          className="h-6 rounded-md border border-input bg-background px-1 text-[10px]"
+                        >
+                          {PAYMENT_STATUSES.map(s => (
+                            <option key={s.value} value={s.value}>{s.label}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                    {orderAny.payment_proof_url && (
+                      <button
+                        onClick={() => setProofViewUrl(orderAny.payment_proof_url)}
+                        className="flex items-center gap-1 text-xs text-primary hover:underline mt-1"
+                      >
+                        <ImageIcon className="w-3 h-3" />
+                        Ödəniş təsdiqini gör
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {order.custom_fields && Object.keys(order.custom_fields).length > 0 && (
+                  <div className="text-xs space-y-0.5">
+                    {Object.entries(order.custom_fields).map(([k, v]) => (
+                      <p key={k}><strong>{k}:</strong> {v}</p>
+                    ))}
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <Label className="text-xs">Status:</Label>
+                  <select
+                    value={order.status}
+                    onChange={e => handleStatusChange(order.id, e.target.value)}
+                    className="h-8 rounded-md border border-input bg-background px-2 text-xs"
+                  >
+                    {ORDER_STATUSES.map(s => (
+                      <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                  </select>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${ORDER_STATUSES.find(s => s.value === order.status)?.color || ''}`}>
+                    {ORDER_STATUSES.find(s => s.value === order.status)?.label}
+                  </span>
                 </div>
-              )}
-              <div className="flex items-center gap-2">
-                <Label className="text-xs">Status:</Label>
-                <select
-                  value={order.status}
-                  onChange={e => handleStatusChange(order.id, e.target.value)}
-                  className="h-8 rounded-md border border-input bg-background px-2 text-xs"
-                >
-                  {ORDER_STATUSES.map(s => (
-                    <option key={s.value} value={s.value}>{s.label}</option>
-                  ))}
-                </select>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${ORDER_STATUSES.find(s => s.value === order.status)?.color || ''}`}>
-                  {ORDER_STATUSES.find(s => s.value === order.status)?.label}
-                </span>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
           {orders.length === 0 && (
             <p className="text-center text-muted-foreground py-8">Hələ sifariş yoxdur</p>
           )}
         </div>
       )}
+
+      {/* Payment Methods Tab */}
+      {activeTab === 'payments' && (
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">Tort sifarişləri üçün mövcud ödəniş üsullarını aktiv/deaktiv edin</p>
+          
+          {pmLoading ? (
+            <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
+          ) : (
+            <div className="space-y-3">
+              {paymentMethods.map(method => (
+                <motion.div
+                  key={method.id}
+                  className="bg-card rounded-xl p-4 border border-border/50 flex items-center justify-between gap-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-sm">{method.label_az || method.label}</h3>
+                    <p className="text-xs text-muted-foreground">{method.description_az || method.description}</p>
+                    {method.method_key === 'c2c_transfer' && (
+                      <button
+                        onClick={() => setEditingConfig({ id: method.id, config: method.config || {} })}
+                        className="text-xs text-primary hover:underline mt-1"
+                      >
+                        ⚙️ Kart məlumatlarını redaktə et
+                      </button>
+                    )}
+                  </div>
+                  <Switch
+                    checked={method.is_active}
+                    onCheckedChange={(checked) => handleTogglePaymentMethod(method.id, checked)}
+                  />
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Payment Proof Viewer Dialog */}
+      <Dialog open={!!proofViewUrl} onOpenChange={() => setProofViewUrl(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Ödəniş Təsdiqi</DialogTitle>
+          </DialogHeader>
+          {proofViewUrl && (
+            proofViewUrl.endsWith('.pdf') ? (
+              <iframe src={proofViewUrl} className="w-full h-[500px] rounded-lg" />
+            ) : (
+              <img src={proofViewUrl} alt="Ödəniş təsdiqi" className="w-full rounded-lg" />
+            )
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* C2C Config Dialog */}
+      <Dialog open={!!editingConfig} onOpenChange={() => setEditingConfig(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Kartdan Karta - Konfiqurasiya</DialogTitle>
+          </DialogHeader>
+          {editingConfig && (
+            <div className="space-y-4">
+              <div>
+                <Label>Kart nömrəsi</Label>
+                <Input
+                  value={editingConfig.config.card_number || ''}
+                  onChange={e => setEditingConfig({ ...editingConfig, config: { ...editingConfig.config, card_number: e.target.value } })}
+                  placeholder="0000 0000 0000 0000"
+                />
+              </div>
+              <div>
+                <Label>Kart sahibi</Label>
+                <Input
+                  value={editingConfig.config.card_holder || ''}
+                  onChange={e => setEditingConfig({ ...editingConfig, config: { ...editingConfig.config, card_holder: e.target.value } })}
+                  placeholder="Ad Soyad"
+                />
+              </div>
+              <div>
+                <Label>Bank adı</Label>
+                <Input
+                  value={editingConfig.config.bank_name || ''}
+                  onChange={e => setEditingConfig({ ...editingConfig, config: { ...editingConfig.config, bank_name: e.target.value } })}
+                  placeholder="Məs: Kapital Bank"
+                />
+              </div>
+              <div>
+                <Label>Əlavə təlimat</Label>
+                <textarea
+                  value={editingConfig.config.instructions || ''}
+                  onChange={e => setEditingConfig({ ...editingConfig, config: { ...editingConfig.config, instructions: e.target.value } })}
+                  placeholder="Köçürmə zamanı qeyd hissəsində sifariş nömrənizi yazın"
+                  className="w-full min-h-[60px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+                />
+              </div>
+              <Button onClick={handleSaveC2CConfig} className="w-full">Yadda saxla</Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

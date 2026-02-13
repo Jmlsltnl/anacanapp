@@ -1,27 +1,43 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Send, Cake as CakeIcon, CreditCard, Banknote, Lock, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Send, Cake as CakeIcon, CreditCard, Banknote, Lock, ArrowLeftRight, Upload, Loader2, FileText, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useCakeOrders } from '@/hooks/useCakes';
 import { useCakeCart } from '@/hooks/useCakeCart';
+import { usePaymentMethods, type PaymentMethod } from '@/hooks/usePaymentMethods';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CakeOrderFormProps {
   onBack: () => void;
   onSuccess: () => void;
 }
 
-type PaymentMethod = 'cash' | 'card';
-
 const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
   const { toast } = useToast();
   const { createOrder } = useCakeOrders();
   const { items, totalPrice, clearCart } = useCakeCart();
+  const { getActiveMethods, loading: pmLoading } = usePaymentMethods();
   const [submitting, setSubmitting] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash');
+  const [paymentMethod, setPaymentMethod] = useState<string>('cash');
   const [showCardProcessing, setShowCardProcessing] = useState(false);
+  const [uploadingProof, setUploadingProof] = useState(false);
+  const [proofUrl, setProofUrl] = useState<string | null>(null);
+  const [proofFileName, setProofFileName] = useState<string | null>(null);
+
+  const activeMethods = getActiveMethods();
+
+  // Set default to first active method
+  useEffect(() => {
+    if (activeMethods.length > 0 && !activeMethods.find(m => m.method_key === paymentMethod)) {
+      setPaymentMethod(activeMethods[0].method_key);
+    }
+  }, [activeMethods]);
+
+  const c2cMethod = activeMethods.find(m => m.method_key === 'c2c_transfer');
+  const c2cConfig = c2cMethod?.config || {};
   
   const [formData, setFormData] = useState({
     customer_name: '',
@@ -71,6 +87,38 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
     return true;
   };
 
+  const handleProofUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({ title: 'Xəta', description: 'Yalnız şəkil (JPG, PNG) və ya PDF yükləyə bilərsiniz', variant: 'destructive' });
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: 'Xəta', description: 'Fayl max 10MB ola bilər', variant: 'destructive' });
+      return;
+    }
+
+    setUploadingProof(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const fileName = `payment-proof-${Date.now()}-${Math.random().toString(36).slice(2, 6)}.${ext}`;
+      const { error } = await supabase.storage.from('assets').upload(`payment-proofs/${fileName}`, file);
+      if (error) throw error;
+      const { data: { publicUrl } } = supabase.storage.from('assets').getPublicUrl(`payment-proofs/${fileName}`);
+      setProofUrl(publicUrl);
+      setProofFileName(file.name);
+      toast({ title: 'Fayl yükləndi ✓' });
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({ title: 'Yükləmə xətası', variant: 'destructive' });
+    } finally {
+      setUploadingProof(false);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!formData.customer_name.trim()) {
       toast({ title: 'Xəta', description: 'Müştəri adı tələb olunur', variant: 'destructive' });
@@ -84,12 +132,16 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
       toast({ title: 'Xəta', description: 'Səbət boşdur', variant: 'destructive' });
       return;
     }
-    if (paymentMethod === 'card' && !validateCard()) return;
+    if (paymentMethod === 'card_simulated' && !validateCard()) return;
+    if (paymentMethod === 'c2c_transfer' && !proofUrl) {
+      toast({ title: 'Xəta', description: 'Zəhmət olmasa köçürmə təsdiqini yükləyin', variant: 'destructive' });
+      return;
+    }
 
     setSubmitting(true);
 
     // Simulate card processing
-    if (paymentMethod === 'card') {
+    if (paymentMethod === 'card_simulated') {
       setShowCardProcessing(true);
       await new Promise(resolve => setTimeout(resolve, 2500));
       setShowCardProcessing(false);
@@ -104,6 +156,9 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
 
     const itemsSummary = items.map(i => `${i.cake.name} x${i.quantity}`).join(', ');
 
+    const paymentLabel = paymentMethod === 'c2c_transfer' ? 'Kartdan Karta' :
+      paymentMethod === 'card_simulated' ? 'Kart' : 'Nağd';
+
     const result = await createOrder({
       cake_id: items[0].cake.id,
       customer_name: formData.customer_name,
@@ -113,20 +168,34 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
       contact_phone: formData.contact_phone,
       delivery_date: formData.delivery_date || null,
       delivery_address: formData.delivery_address || null,
-      notes: `${formData.notes || ''}${paymentMethod === 'card' ? ' [Kart ilə ödəniş]' : ' [Nağd ödəniş]'}`.trim(),
-      custom_fields: { ...allCustomFields, payment_method: paymentMethod === 'card' ? 'Kart' : 'Nağd' },
+      notes: `${formData.notes || ''} [${paymentLabel} ödəniş]`.trim(),
+      custom_fields: { ...allCustomFields, payment_method: paymentLabel },
       status: 'pending',
       total_price: totalPrice,
     });
 
-    setSubmitting(false);
+    // Update payment fields separately since they're not in the typed interface
     if (result) {
+      try {
+        await supabase
+          .from('cake_orders')
+          .update({
+            payment_method: paymentMethod,
+            payment_proof_url: proofUrl,
+            payment_status: paymentMethod === 'c2c_transfer' ? 'pending' : (paymentMethod === 'card_simulated' ? 'paid' : 'pending'),
+          } as any)
+          .eq('id', (result as any).id);
+      } catch (e) {
+        console.error('Error updating payment info:', e);
+      }
+
       clearCart();
       toast({ title: 'Sifariş göndərildi! 🎂' });
       onSuccess();
     } else {
       toast({ title: 'Xəta', description: 'Sifariş göndərilə bilmədi', variant: 'destructive' });
     }
+    setSubmitting(false);
   };
 
   // Card processing overlay
@@ -155,6 +224,24 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
       </div>
     );
   }
+
+  const getMethodIcon = (key: string) => {
+    switch (key) {
+      case 'cash': return <Banknote className="w-6 h-6" />;
+      case 'card_simulated': return <CreditCard className="w-6 h-6" />;
+      case 'c2c_transfer': return <ArrowLeftRight className="w-6 h-6" />;
+      default: return <Banknote className="w-6 h-6" />;
+    }
+  };
+
+  const getMethodLabel = (method: PaymentMethod) => {
+    switch (method.method_key) {
+      case 'cash': return { title: 'Nağd', sub: 'Çatdırılmada ödə' };
+      case 'card_simulated': return { title: 'Kart', sub: 'Onlayn ödəniş' };
+      case 'c2c_transfer': return { title: 'Köçürmə', sub: 'Kartdan karta' };
+      default: return { title: method.label_az || method.label, sub: method.description_az || '' };
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background pb-44 pt-2 px-4 overflow-y-auto">
@@ -217,37 +304,32 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
         {/* Payment Method */}
         <div className="space-y-3">
           <Label className="text-sm font-semibold">Ödəniş üsulu</Label>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => setPaymentMethod('cash')}
-              className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
-                paymentMethod === 'cash'
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border/50 bg-card'
-              }`}
-            >
-              <Banknote className={`w-6 h-6 ${paymentMethod === 'cash' ? 'text-primary' : 'text-muted-foreground'}`} />
-              <span className={`text-sm font-bold ${paymentMethod === 'cash' ? 'text-primary' : 'text-muted-foreground'}`}>Nağd</span>
-              <span className="text-[10px] text-muted-foreground">Çatdırılmada ödə</span>
-            </button>
-            <button
-              onClick={() => setPaymentMethod('card')}
-              className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
-                paymentMethod === 'card'
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border/50 bg-card'
-              }`}
-            >
-              <CreditCard className={`w-6 h-6 ${paymentMethod === 'card' ? 'text-primary' : 'text-muted-foreground'}`} />
-              <span className={`text-sm font-bold ${paymentMethod === 'card' ? 'text-primary' : 'text-muted-foreground'}`}>Kart</span>
-              <span className="text-[10px] text-muted-foreground">Onlayn ödəniş</span>
-            </button>
+          <div className={`grid gap-3 ${activeMethods.length === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+            {activeMethods.map(method => {
+              const { title, sub } = getMethodLabel(method);
+              const isSelected = paymentMethod === method.method_key;
+              return (
+                <button
+                  key={method.id}
+                  onClick={() => setPaymentMethod(method.method_key)}
+                  className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 transition-all ${
+                    isSelected ? 'border-primary bg-primary/5' : 'border-border/50 bg-card'
+                  }`}
+                >
+                  <span className={isSelected ? 'text-primary' : 'text-muted-foreground'}>
+                    {getMethodIcon(method.method_key)}
+                  </span>
+                  <span className={`text-xs font-bold ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>{title}</span>
+                  <span className="text-[9px] text-muted-foreground leading-tight text-center">{sub}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
         {/* Card Details */}
         <AnimatePresence>
-          {paymentMethod === 'card' && (
+          {paymentMethod === 'card_simulated' && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
@@ -307,6 +389,79 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
           )}
         </AnimatePresence>
 
+        {/* C2C Transfer Details */}
+        <AnimatePresence>
+          {paymentMethod === 'c2c_transfer' && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden"
+            >
+              <div className="bg-card rounded-2xl p-4 border border-border/50 space-y-4">
+                {/* Transfer info */}
+                <div className="bg-primary/5 rounded-xl p-3 space-y-2">
+                  <h4 className="font-bold text-sm text-primary">💳 Köçürmə məlumatları</h4>
+                  {c2cConfig.card_number && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-muted-foreground">Kart nömrəsi:</span>
+                      <span className="font-mono font-bold text-sm">{c2cConfig.card_number}</span>
+                    </div>
+                  )}
+                  {c2cConfig.card_holder && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-muted-foreground">Kart sahibi:</span>
+                      <span className="font-bold text-sm">{c2cConfig.card_holder}</span>
+                    </div>
+                  )}
+                  {c2cConfig.bank_name && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-muted-foreground">Bank:</span>
+                      <span className="text-sm">{c2cConfig.bank_name}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center border-t border-primary/10 pt-2">
+                    <span className="text-xs text-muted-foreground">Məbləğ:</span>
+                    <span className="font-black text-primary">{totalPrice.toFixed(2)} ₼</span>
+                  </div>
+                  {c2cConfig.instructions && (
+                    <p className="text-[10px] text-muted-foreground mt-1">ℹ️ {c2cConfig.instructions}</p>
+                  )}
+                </div>
+
+                {/* Upload proof */}
+                <div>
+                  <Label className="text-sm font-semibold">Köçürmə təsdiqi yükləyin *</Label>
+                  <p className="text-[10px] text-muted-foreground mb-2">Köçürmənin screenshotunu və ya PDF-ini yükləyin</p>
+                  
+                  {proofUrl ? (
+                    <div className="flex items-center gap-3 bg-green-50 dark:bg-green-950/30 rounded-xl p-3 border border-green-200 dark:border-green-800">
+                      <FileText className="w-5 h-5 text-green-600" />
+                      <span className="text-sm text-green-700 dark:text-green-400 flex-1 truncate">{proofFileName}</span>
+                      <button onClick={() => { setProofUrl(null); setProofFileName(null); }} className="p-1 hover:bg-green-100 dark:hover:bg-green-900 rounded-full">
+                        <X className="w-4 h-4 text-green-600" />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-border rounded-2xl cursor-pointer hover:border-primary/50 transition bg-muted/30">
+                      <input type="file" accept="image/*,.pdf" onChange={handleProofUpload} className="hidden" />
+                      {uploadingProof ? (
+                        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                      ) : (
+                        <>
+                          <Upload className="w-6 h-6 text-muted-foreground mb-1" />
+                          <span className="text-xs text-muted-foreground">Şəkil və ya PDF</span>
+                        </>
+                      )}
+                    </label>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Total & Submit */}
         <div className="bg-card rounded-2xl p-4 border border-border/50">
           <div className="flex items-center justify-between mb-3">
@@ -318,8 +473,12 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
               <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
             ) : (
               <>
-                {paymentMethod === 'card' ? <CreditCard className="w-5 h-5 mr-2" /> : <Send className="w-5 h-5 mr-2" />}
-                {paymentMethod === 'card' ? `Ödə və sifariş ver` : `Sifariş göndər`} — {totalPrice.toFixed(2)}₼
+                {paymentMethod === 'card_simulated' ? <CreditCard className="w-5 h-5 mr-2" /> : 
+                 paymentMethod === 'c2c_transfer' ? <ArrowLeftRight className="w-5 h-5 mr-2" /> :
+                 <Send className="w-5 h-5 mr-2" />}
+                {paymentMethod === 'card_simulated' ? `Ödə və sifariş ver` : 
+                 paymentMethod === 'c2c_transfer' ? `Sifarişi təsdiqlə` :
+                 `Sifariş göndər`} — {totalPrice.toFixed(2)}₼
               </>
             )}
           </Button>
