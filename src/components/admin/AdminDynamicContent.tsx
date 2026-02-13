@@ -114,7 +114,7 @@ const AdminDynamicContent = () => {
       case 'symptoms':
         return { symptom_key: '', label: '', label_az: '', icon: '🤕', life_stages: ['flow', 'bump', 'mommy'], is_active: true, sort_order: 0 };
       case 'foods':
-        return { name: '', name_az: '', calories: 100, emoji: '🍽️', category: 'general', is_active: true, sort_order: 0 };
+        return { name: '', name_az: '', calories: 100, emoji: '🍽️', category: 'general', meal_types: [] as string[], is_active: true, sort_order: 0 };
       case 'categories':
         return { category_key: '', name: '', name_az: '', emoji: '📦', is_active: true, sort_order: 0 };
       case 'themes':
@@ -314,6 +314,40 @@ const AdminDynamicContent = () => {
               <Input placeholder="Emoji" value={formData.emoji || ''} onChange={e => setFormData({...formData, emoji: e.target.value})} />
               <Input placeholder="Kateqoriya" value={formData.category || ''} onChange={e => setFormData({...formData, category: e.target.value})} />
             </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Yemək növləri</label>
+              <div className="flex flex-wrap gap-3">
+                {[
+                  { id: 'breakfast', label: '🍳 Səhər yeməyi' },
+                  { id: 'lunch', label: '🍲 Nahar' },
+                  { id: 'dinner', label: '🍽️ Şam yeməyi' },
+                  { id: 'snack', label: '🍎 Qəlyanaltı' },
+                ].map(mt => {
+                  const selected = (formData.meal_types || []).includes(mt.id);
+                  return (
+                    <button
+                      key={mt.id}
+                      type="button"
+                      onClick={() => {
+                        const current: string[] = formData.meal_types || [];
+                        const updated = selected
+                          ? current.filter((t: string) => t !== mt.id)
+                          : [...current, mt.id];
+                        setFormData({ ...formData, meal_types: updated });
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-sm border transition-colors ${
+                        selected
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-muted/50 text-muted-foreground border-border hover:bg-muted'
+                      }`}
+                    >
+                      {mt.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground">Heç biri seçilməsə bütün yemək növlərində göstəriləcək</p>
+            </div>
             <Input type="number" placeholder="Sıra" value={formData.sort_order || 0} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value)})} />
             <div className="flex items-center gap-2">
               <Switch checked={formData.is_active} onCheckedChange={v => setFormData({...formData, is_active: v})} />
@@ -418,7 +452,7 @@ const AdminDynamicContent = () => {
               {item.description && (
                 <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{item.description}</p>
               )}
-              <div className="flex gap-2 mt-1">
+              <div className="flex flex-wrap gap-1.5 mt-1">
                 {item.level && (
                   <Badge variant="outline" className="text-xs">{item.level}</Badge>
                 )}
@@ -429,6 +463,16 @@ const AdminDynamicContent = () => {
                   <Badge variant="outline" className="text-xs">
                     {item.noise_type === 'white' ? '⚪ Bəyaz' : item.noise_type === 'pink' ? '🌸 Çəhrayı' : '🟤 Qəhvəyi'}
                   </Badge>
+                )}
+                {activeTab === 'foods' && item.meal_types && item.meal_types.length > 0 && (
+                  item.meal_types.map((mt: string) => (
+                    <Badge key={mt} variant="secondary" className="text-xs">
+                      {mt === 'breakfast' ? '🍳 Səhər' : mt === 'lunch' ? '🍲 Nahar' : mt === 'dinner' ? '🍽️ Şam' : '🍎 Qəlyanaltı'}
+                    </Badge>
+                  ))
+                )}
+                {activeTab === 'foods' && item.calories && (
+                  <Badge variant="outline" className="text-xs">{item.calories} kal</Badge>
                 )}
                 {item.is_premium && (
                   <Badge className="text-xs bg-amber-500">Premium</Badge>

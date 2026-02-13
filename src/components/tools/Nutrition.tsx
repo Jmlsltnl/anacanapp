@@ -74,12 +74,11 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
     ? dbFoods.map(f => ({ name: f.name_az || f.name, calories: f.calories, emoji: f.emoji, meal_types: f.meal_types }))
     : fallbackFoods.map(f => ({ ...f, meal_types: ['breakfast', 'lunch', 'dinner', 'snack'] }));
   
-  // Filter foods by selected meal type - lunch and dinner share the same foods
+  // Filter foods by selected meal type using meal_types array directly
   const getFilteredFoods = (mealId: string) => {
-    const effectiveMealTypes = mealId === 'dinner' ? ['lunch', 'dinner'] : mealId === 'lunch' ? ['lunch', 'dinner'] : [mealId];
     return allCommonFoods.filter(f => {
       if (!f.meal_types || f.meal_types.length === 0) return true;
-      return effectiveMealTypes.some(mt => f.meal_types!.includes(mt));
+      return f.meal_types.includes(mealId);
     });
   };
   
