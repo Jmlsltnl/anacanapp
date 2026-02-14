@@ -1,6 +1,10 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { lovable } from '@/integrations/lovable/index';
+// Lovable Cloud auth - loaded lazily, may not be available in native builds
+let lovableAuth: any = null;
+const loadLovableAuth = import('@/integrations/lovable/index')
+  .then((mod) => { lovableAuth = mod.lovable; })
+  .catch(() => { console.warn('Lovable Cloud auth not available (native build)'); });
 import { useUserStore } from '@/store/userStore';
 import type { User, Session } from '@supabase/supabase-js';
 
@@ -192,7 +196,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
-      const result = await lovable.auth.signInWithOAuth('google', {
+      await loadLovableAuth;
+      if (!lovableAuth) throw new Error('Social login not available');
+      const result = await lovableAuth.auth.signInWithOAuth('google', {
         redirect_uri: window.location.origin,
       });
       if (result.error) throw result.error;
@@ -205,7 +211,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithApple = async () => {
     try {
-      const result = await lovable.auth.signInWithOAuth('apple', {
+      await loadLovableAuth;
+      if (!lovableAuth) throw new Error('Social login not available');
+      const result = await lovableAuth.auth.signInWithOAuth('apple', {
         redirect_uri: window.location.origin,
       });
       if (result.error) throw result.error;
