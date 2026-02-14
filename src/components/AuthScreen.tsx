@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppBranding, getBrandingUrl } from '@/hooks/useAppBranding';
+import { useAppSetting } from '@/hooks/useAppSettings';
 
 type AuthMode = 'login' | 'register' | 'forgot-password';
 type PartnerAuthMode = 'login' | 'register';
@@ -27,6 +28,8 @@ const AuthScreen = () => {
   const { signIn, signUp, signInWithGoogle, signInWithApple } = useAuth();
   const { toast } = useToast();
   const { data: branding = [] } = useAppBranding();
+  const socialLoginEnabled = useAppSetting('social_login_enabled');
+  const isSocialLoginEnabled = socialLoginEnabled === true || socialLoginEnabled === 'true';
   
   // Get custom login logo from database
   const customLoginLogo = getBrandingUrl(branding, 'login_logo');
@@ -775,7 +778,8 @@ const AuthScreen = () => {
               </motion.form>
             </AnimatePresence>
 
-            {/* Social Login */}
+            {/* Social Login - only shown when enabled in app_settings */}
+            {isSocialLoginEnabled && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -816,6 +820,7 @@ const AuthScreen = () => {
                 </Button>
               </div>
             </motion.div>
+            )}
 
             {/* Partner Section Button */}
             <motion.div
