@@ -326,7 +326,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!mounted) return;
       console.warn('Auth bootstrap timeout - forcing loading=false');
       finishLoading();
-    }, 3000);
+    }, 5000);
 
     const hydrateUser = async (u: User) => {
       try {
@@ -356,45 +356,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    const initializeAuth = async () => {
-      try {
-        const {
-          data: { session: initialSession },
-        } = await supabase.auth.getSession();
-
-        if (!mounted) return;
-
-        if (initialSession?.user) {
-          setSession(initialSession);
-          setUser(initialSession.user);
-
-          setAuth(
-            true,
-            initialSession.user.id,
-            initialSession.user.email || '',
-            initialSession.user.user_metadata?.name || 'İstifadəçi'
-          );
-          finishLoading();
-          void hydrateUser(initialSession.user);
-        } else {
-          storeLogout();
-          finishLoading();
-        }
-      } catch (error) {
-        console.error('Error initializing auth:', error);
-      } finally {
-        finishLoading();
-      }
-    };
-
-    // Set up listener BEFORE getSession to avoid race conditions
+    // Single source of truth: only onAuthStateChange handles auth state.
+    // No separate initializeAuth / getSession call to avoid race conditions.
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       console.log('Auth state changed:', event, currentSession?.user?.email);
       if (!mounted) return;
 
-      // Only handle meaningful auth events - ignore intermediate states
       if (event === 'SIGNED_OUT') {
         setSession(null);
         setUser(null);
@@ -405,7 +374,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+      if (event === 'INITIAL_SESSION') {
+        if (currentSession?.user) {
+          setSession(currentSession);
+          setUser(currentSession.user);
+          // Set auth immediately so UI doesn't flash to login
+          setAuth(
+            true,
+            currentSession.user.id,
+            currentSession.user.email || '',
+            currentSession.user.user_metadata?.name || 'İstifadəçi'
+          );
+          finishLoading();
+          // Hydrate profile data in the background
+          void hydrateUser(currentSession.user);
+        } else {
+          // No session on initial load - user is truly not logged in
+          storeLogout();
+          finishLoading();
+        }
+        return;
+      }
+
+      if (event === 'SIGNED_IN') {
         if (currentSession?.user) {
           setSession(currentSession);
           setUser(currentSession.user);
@@ -416,15 +407,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             currentSession.user.user_metadata?.name || 'İstifadəçi'
           );
           finishLoading();
-          // Only hydrate on SIGNED_IN (not TOKEN_REFRESHED to avoid unnecessary refetches)
-          if (event === 'SIGNED_IN') {
-            void hydrateUser(currentSession.user);
-          }
+          void hydrateUser(currentSession.user);
         }
         return;
       }
 
-      // For USER_UPDATED and other events
+      if (event === 'TOKEN_REFRESHED') {
+        if (currentSession?.user) {
+          // Silently update session - don't re-hydrate to avoid flickering
+          setSession(currentSession);
+          setUser(currentSession.user);
+        }
+        // Do NOT call storeLogout if token refresh comes back without a session
+        // The session might still be recoverable
+        return;
+      }
+
+      // USER_UPDATED and other events
       if (currentSession?.user) {
         setSession(currentSession);
         setUser(currentSession.user);
@@ -432,8 +431,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         void hydrateUser(currentSession.user);
       }
     });
-
-    initializeAuth();
 
     return () => {
       mounted = false;
