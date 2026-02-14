@@ -1,10 +1,14 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-// Lovable Cloud auth - loaded lazily, may not be available in native builds
+// Lovable Cloud auth - only available in web builds, not in native Capacitor
 let lovableAuth: any = null;
-const loadLovableAuth = import('@/integrations/lovable/index')
-  .then((mod) => { lovableAuth = mod.lovable; })
-  .catch(() => { console.warn('Lovable Cloud auth not available (native build)'); });
+const isCapacitorNative = typeof (window as any)?.Capacitor?.isNativePlatform === 'function'
+  && (window as any).Capacitor.isNativePlatform();
+const loadLovableAuth: Promise<void> = isCapacitorNative
+  ? Promise.resolve()
+  : import('@/integrations/lovable/index')
+      .then((mod) => { lovableAuth = mod.lovable; })
+      .catch(() => { console.warn('Lovable Cloud auth not available'); });
 import { useUserStore } from '@/store/userStore';
 import type { User, Session } from '@supabase/supabase-js';
 
