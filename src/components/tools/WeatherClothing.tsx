@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, MapPin, Thermometer, Droplets, Wind, Sun, CloudRain, 
-  AlertTriangle, Shirt, Loader2, RefreshCw, Shield, Flower2, CloudSun, MapPinOff, Baby, User
+  AlertTriangle, Shirt, Loader2, RefreshCw, Shield, Flower2, CloudSun, MapPinOff, Baby, User, Home
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -27,6 +27,10 @@ interface WeatherAdvice {
   weatherDescription: string;
   clothingAdvice: string;
   clothingItems: string[];
+  indoorClothingAdvice?: string;
+  indoorClothingItems?: string[];
+  idealRoomTemperature?: string;
+  roomTemperatureAdvice?: string;
   warnings: string[];
   pollenWarning: string | null;
   uvWarning: string | null;
@@ -305,8 +309,8 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                   <h3 className="font-semibold flex items-center gap-2 mb-3">
                     <Shirt className="w-5 h-5 text-primary" />
                     {userContext.babyAgeMonths !== undefined 
-                      ? `${userContext.babyAgeMonths} aylıq körpə üçün geyim` 
-                      : 'Geyim Tövsiyəsi'}
+                      ? `${userContext.babyAgeMonths} aylıq körpə üçün bayır geyimi` 
+                      : 'Bayırda Geyim Tövsiyəsi'}
                   </h3>
                   <p className="text-sm mb-4">{advice.clothingAdvice}</p>
                   
@@ -325,6 +329,54 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Indoor Clothing & Room Temperature */}
+              {(advice.indoorClothingAdvice || advice.idealRoomTemperature) && (
+                <Card className="border-purple-500/20 bg-purple-500/5">
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold flex items-center gap-2 mb-3">
+                      <Home className="w-5 h-5 text-purple-500" />
+                      Ev daxilində
+                    </h3>
+                    
+                    {/* Room Temperature */}
+                    {advice.idealRoomTemperature && (
+                      <div className="bg-purple-500/10 rounded-xl p-3 mb-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Thermometer className="w-4 h-4 text-purple-600" />
+                          <span className="font-semibold text-sm text-purple-700">İdeal otaq temperaturu</span>
+                        </div>
+                        <p className="text-2xl font-bold text-purple-600">{advice.idealRoomTemperature}</p>
+                        {advice.roomTemperatureAdvice && (
+                          <p className="text-xs text-muted-foreground mt-1">{advice.roomTemperatureAdvice}</p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Indoor Clothing */}
+                    {advice.indoorClothingAdvice && (
+                      <>
+                        <p className="text-sm mb-3">{advice.indoorClothingAdvice}</p>
+                        {advice.indoorClothingItems && advice.indoorClothingItems.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {advice.indoorClothingItems.map((item, idx) => (
+                              <motion.span
+                                key={idx}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: idx * 0.1 }}
+                                className="px-3 py-1.5 bg-purple-500/10 text-purple-700 rounded-full text-sm font-medium"
+                              >
+                                {item}
+                              </motion.span>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Outdoor Advice */}
               <Card className={advice.safeToGoOut ? 'border-green-500/20 bg-green-500/5' : 'border-orange-500/30 bg-orange-500/5'}>

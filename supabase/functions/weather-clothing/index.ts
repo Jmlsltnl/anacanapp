@@ -173,12 +173,16 @@ ${airData ? `
 - Ağcaqayın poleni: ${airData.current?.birch_pollen || 'N/A'}
 ` : ''}
 
-TAPŞIRIQ: Bu hava şəraitində${userContext?.babyAgeMonths !== undefined ? ` ${userContext.babyAgeMonths} aylıq körpə` : userContext?.pregnancyWeek ? ` hamiləliyin ${userContext.pregnancyWeek}. həftəsindəki ana` : ' 0-3 yaşlı körpə'} üçün:
-1. AKSİYON yönümlü geyim tövsiyəsi ver (konkret, dəqiq, yaşa uyğun)
-2. Əgər pollen yüksəkdirsə, xəbərdarlıq ver
-3. UV yüksəkdirsə, qoruma tövsiyəsi ver
-4. Külək şiddətli isə, xəbərdarlıq ver
-5. Yaş/həftəyə xas xüsusi tövsiyələr əlavə et
+TAPŞIRIQ: Bu hava şəraitində${userContext?.babyAgeMonths !== undefined ? ` ${userContext.babyAgeMonths} aylıq (${userContext.babyAgeDays} günlük) körpə` : userContext?.pregnancyWeek ? ` hamiləliyin ${userContext.pregnancyWeek}. həftəsindəki ana` : ' körpə'} üçün:
+1. BAYIRDA geyim tövsiyəsi ver - konkret, dəqiq, yaşa uyğun
+2. EV DAXİLİNDƏ necə geyinməli - ev geyimi tövsiyəsi ver
+3. Evin ideal temperaturu neçə dərəcə olmalıdır - yaşa uyğun
+4. Əgər pollen yüksəkdirsə, xəbərdarlıq ver
+5. UV yüksəkdirsə, qoruma tövsiyəsi ver
+6. Külək şiddətli isə, xəbərdarlıq ver
+7. Yaş/həftəyə xas xüsusi tövsiyələr əlavə et
+
+ÖNƏMLİ: Körpənin DƏQIQ yaşına uyğun tövsiyə ver. Məsələn 1 aylıq körpə ilə 18 aylıq körpənin ehtiyacları çox fərqlidir.
 
 CAVAB FORMATI (STRICT JSON):
 {
@@ -188,8 +192,12 @@ CAVAB FORMATI (STRICT JSON):
   "windSpeed": ${current.wind_speed_10m},
   "uvIndex": ${current.uv_index},
   "weatherDescription": "hava təsviri (qısa)",
-  "clothingAdvice": "Konkret geyim tövsiyəsi - ${userContext?.babyAgeMonths !== undefined ? `${userContext.babyAgeMonths} aylıq körpə üçün xüsusi` : userContext?.pregnancyWeek ? `hamilə ana üçün xüsusi` : 'körpə üçün'} (3-4 cümlə)",
+  "clothingAdvice": "BAYIRDA konkret geyim tövsiyəsi - ${userContext?.babyAgeMonths !== undefined ? `${userContext.babyAgeMonths} aylıq körpə üçün xüsusi` : userContext?.pregnancyWeek ? `hamilə ana üçün xüsusi` : 'körpə üçün'} (3-4 cümlə)",
   "clothingItems": ["geyim 1", "geyim 2", "geyim 3", "geyim 4"],
+  "indoorClothingAdvice": "Ev daxilində geyim tövsiyəsi - yaşa uyğun (2-3 cümlə)",
+  "indoorClothingItems": ["ev geyimi 1", "ev geyimi 2", "ev geyimi 3"],
+  "idealRoomTemperature": "optimal otaq temperaturu aralığı (məs: 20-22°C)",
+  "roomTemperatureAdvice": "Otaq temperaturu haqqında ətraflı məsləhət - yaşa uyğun (2-3 cümlə)",
   "warnings": ["xəbərdarlıq 1", "xəbərdarlıq 2"],
   "pollenWarning": "pollen xəbərdarlığı və ya null",
   "uvWarning": "UV xəbərdarlığı və ya null",
@@ -201,7 +209,7 @@ CAVAB FORMATI (STRICT JSON):
           }],
           generationConfig: {
             temperature: 0.3,
-            maxOutputTokens: 1024,
+            maxOutputTokens: 1500,
           }
         })
       }
@@ -232,6 +240,10 @@ CAVAB FORMATI (STRICT JSON):
         weatherDescription: 'Hava məlumatı alındı',
         clothingAdvice: 'Körpəni hava şəraitinə uyğun geyindirin.',
         clothingItems: ['Rahat geyim', 'Papaq', 'Əlcək'],
+        indoorClothingAdvice: 'Evdə rahat pambıq geyim geyindirin.',
+        indoorClothingItems: ['Pambıq bodi', 'Corab'],
+        idealRoomTemperature: '20-22°C',
+        roomTemperatureAdvice: 'Otaq temperaturunu 20-22°C arasında saxlayın.',
         warnings: [],
         pollenWarning: null,
         uvWarning: null,
