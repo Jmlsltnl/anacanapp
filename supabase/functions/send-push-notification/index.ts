@@ -1,4 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,14 +13,7 @@ interface PushPayload {
   data?: Record<string, unknown>;
 }
 
-interface FCMResponse {
-  success?: number;
-  failure?: number;
-  results?: Array<{ message_id?: string; error?: string }>;
-}
-
 Deno.serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -39,167 +33,80 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Always store the notification in the app's notifications table
+    // Store notification in database
     try {
-      await supabase
-        .from('notifications')
-        .insert({
-          user_id: userId,
-          title,
-          message: body,
-          notification_type: data?.type || 'push',
-          is_read: false,
-        });
-      console.log(`Notification stored in database for user ${userId}`);
+      await supabase.from('notifications').insert({
+        user_id: userId, title, message: body,
+        notification_type: data?.type || 'push', is_read: false,
+      });
     } catch (storeError) {
       console.error('Error storing notification:', storeError);
-      // Continue even if storage fails - we still want to try sending the push
     }
 
-    // Get all device tokens for the user
+    // Get device tokens
     const { data: tokens, error: tokensError } = await supabase
-      .from('device_tokens')
-      .select('token, platform')
-      .eq('user_id', userId);
+      .from('device_tokens').select('token, platform').eq('user_id', userId);
 
     if (tokensError) {
-      console.error('Error fetching tokens:', tokensError);
       return new Response(
         JSON.stringify({ error: 'Failed to fetch device tokens' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    if (!tokens || tokens.length === 0) {
+    if (!tokens?.length) {
       return new Response(
         JSON.stringify({ message: 'No device tokens found for user', sent: 0 }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Get FCM server key
-    const fcmKey = Deno.env.get('FCM_SERVER_KEY');
-    
-    if (!fcmKey) {
-      console.log('FCM_SERVER_KEY not configured, logging push request only');
-      console.log(`Push notification request for user ${userId}:`);
-      console.log(`Title: ${title}, Body: ${body}, Tokens: ${tokens.length}`);
-      
+    // Get Firebase access token
+    const saJson = Deno.env.get('FIREBASE_SERVICE_ACCOUNT_JSON');
+    if (!saJson) {
+      console.log('FIREBASE_SERVICE_ACCOUNT_JSON not configured');
       return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: `FCM not configured. Push notification logged for ${tokens.length} device(s)`,
-          sent: 0,
-          logged: tokens.length,
-        }),
+        JSON.stringify({ success: true, message: `FCM not configured. Logged for ${tokens.length} device(s)`, sent: 0, logged: tokens.length }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Send push notifications via FCM
+    const { accessToken, projectId } = await getFirebaseAccessToken(saJson);
+
     let successCount = 0;
     let failureCount = 0;
     const results: Array<{ token: string; success: boolean; error?: string }> = [];
 
-    for (const { token, platform } of tokens) {
-      try {
-        const fcmResponse = await fetch('https://fcm.googleapis.com/fcm/send', {
-          method: 'POST',
-          headers: {
-            'Authorization': `key=${fcmKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            to: token,
-            notification: {
-              title,
-              body,
-              sound: 'default',
-              badge: 1,
-            },
-            data: {
-              ...data,
-              click_action: 'FLUTTER_NOTIFICATION_CLICK',
-            },
-            priority: 'high',
-            // Enable background/offline delivery
-            content_available: true,
-            mutable_content: true,
-            // Android specific for high priority
-            android: {
-              priority: 'high',
-              notification: {
-                sound: 'default',
-                default_vibrate_timings: true,
-                default_light_settings: true,
-              },
-            },
-            // iOS specific for background delivery
-            apns: {
-              headers: {
-                'apns-priority': '10',
-                'apns-push-type': 'alert',
-              },
-              payload: {
-                aps: {
-                  alert: { title, body },
-                  sound: 'default',
-                  badge: 1,
-                  'content-available': 1,
-                  'mutable-content': 1,
-                },
-              },
-            },
-          }),
-        });
+    const fcmData: Record<string, string> = {};
+    if (data) {
+      Object.entries(data).forEach(([k, v]) => { fcmData[k] = String(v); });
+    }
 
-        const fcmResult: FCMResponse = await fcmResponse.json();
-        
-        if (fcmResult.success && fcmResult.success > 0) {
-          successCount++;
-          results.push({ token: token.substring(0, 20) + '...', success: true });
-        } else {
-          failureCount++;
-          const errorMsg = fcmResult.results?.[0]?.error || 'Unknown error';
-          results.push({ token: token.substring(0, 20) + '...', success: false, error: errorMsg });
-          
-          // If token is invalid, remove it from database
-          if (['InvalidRegistration', 'NotRegistered'].includes(errorMsg)) {
-            await supabase
-              .from('device_tokens')
-              .delete()
-              .eq('token', token);
-            console.log(`Removed invalid token: ${token.substring(0, 20)}...`);
-          }
-        }
-      } catch (err) {
+    for (const { token } of tokens) {
+      const result = await sendFCMv1(accessToken, projectId, token, title, body, fcmData);
+
+      if (result.success) {
+        successCount++;
+        results.push({ token: token.substring(0, 20) + '...', success: true });
+      } else {
         failureCount++;
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        results.push({ 
-          token: token.substring(0, 20) + '...', 
-          success: false, 
-          error: errorMessage 
-        });
+        results.push({ token: token.substring(0, 20) + '...', success: false, error: result.error });
+        if (result.unregistered) {
+          await supabase.from('device_tokens').delete().eq('token', token);
+        }
       }
     }
 
-    console.log(`Push notification sent: ${successCount} success, ${failureCount} failed`);
+    console.log(`Push sent: ${successCount} success, ${failureCount} failed`);
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: `Push notification sent to ${successCount}/${tokens.length} device(s)`,
-        sent: successCount,
-        failed: failureCount,
-        results,
-      }),
+      JSON.stringify({ success: true, sent: successCount, failed: failureCount, results }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (err) {
     console.error('Error in send-push-notification:', err);
-    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: err instanceof Error ? err.message : 'Unknown error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
