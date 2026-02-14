@@ -91,13 +91,17 @@ export const useUserStore = create<UserState>()(
       multiplesType: null,
       partnerWomanData: null,
 
-      setAuth: (isAuth, userId, email, name) => set({
-        isAuthenticated: isAuth,
-        userId: userId || null,
-        email: email || null,
-        name: name || null,
-        partnerCode: isAuth ? generatePartnerCode() : null,
-      }),
+      setAuth: (isAuth, userId, email, name) => {
+        const current = get();
+        set({
+          isAuthenticated: isAuth,
+          userId: userId || null,
+          email: email || null,
+          name: name || null,
+          // Only generate partner code if we don't already have one
+          partnerCode: isAuth ? (current.partnerCode || generatePartnerCode()) : null,
+        });
+      },
 
       setOnboarded: (isOnboarded) => set({ isOnboarded }),
 
