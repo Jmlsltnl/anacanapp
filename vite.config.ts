@@ -13,6 +13,13 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+  build: {
+    rollupOptions: {
+      // @lovable.dev/cloud-auth-js is provided by Lovable Cloud at runtime
+      // and is not available on npm for native/local builds
+      external: ['@lovable.dev/cloud-auth-js'],
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
