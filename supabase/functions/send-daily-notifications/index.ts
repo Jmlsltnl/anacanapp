@@ -1,4 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -60,86 +61,62 @@ Deno.serve(async (req) => {
 
     // Check current time - only send between 9:00 and 00:00
     const now = new Date();
-    const currentHour = now.getUTCHours() + 4; // Azerbaijan is UTC+4
+    const currentHour = now.getUTCHours() + 4;
     const adjustedHour = currentHour >= 24 ? currentHour - 24 : currentHour;
 
-    // Allow manual trigger to bypass time check
     let body: { manual?: boolean } = {};
-    try {
-      body = await req.json();
-    } catch {
-      // No body provided
-    }
+    try { body = await req.json(); } catch { /* No body */ }
 
     if (!body.manual && (adjustedHour < 9 || adjustedHour >= 24)) {
-      console.log(`Outside notification hours: ${adjustedHour}:00 (Baku time)`);
       return new Response(
-        JSON.stringify({ message: 'Outside notification hours (09:00-00:00)', skipped: true }),
+        JSON.stringify({ message: 'Outside notification hours', skipped: true }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Get FCM server key
-    const fcmKey = Deno.env.get('FCM_SERVER_KEY');
-    if (!fcmKey) {
-      console.log('FCM_SERVER_KEY not configured');
+    // Get Firebase access token
+    const saJson = Deno.env.get('FIREBASE_SERVICE_ACCOUNT_JSON');
+    if (!saJson) {
       return new Response(
-        JSON.stringify({ error: 'FCM not configured' }),
+        JSON.stringify({ error: 'Firebase service account not configured' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    const { accessToken, projectId } = await getFirebaseAccessToken(saJson);
+
     // Get active scheduled notifications
     const { data: scheduledNotifications } = await supabase
-      .from('scheduled_notifications')
-      .select('*')
-      .eq('is_active', true)
-      .order('priority', { ascending: true });
+      .from('scheduled_notifications').select('*').eq('is_active', true).order('priority', { ascending: true });
 
     // Get pregnancy day notifications
     const { data: pregnancyNotifications } = await supabase
-      .from('pregnancy_day_notifications')
-      .select('*')
-      .eq('is_active', true);
+      .from('pregnancy_day_notifications').select('*').eq('is_active', true);
 
     const pregnancyNotifMap = new Map<number, PregnancyDayNotification>();
-    pregnancyNotifications?.forEach((n: PregnancyDayNotification) => {
-      pregnancyNotifMap.set(n.day_number, n);
-    });
+    pregnancyNotifications?.forEach((n: PregnancyDayNotification) => { pregnancyNotifMap.set(n.day_number, n); });
 
     // Get mommy day notifications
     const { data: mommyNotifications } = await supabase
-      .from('mommy_day_notifications')
-      .select('*')
-      .eq('is_active', true);
+      .from('mommy_day_notifications').select('*').eq('is_active', true);
 
     const mommyNotifMap = new Map<number, MommyDayNotification>();
     mommyNotifications?.forEach((n: MommyDayNotification) => {
-      // Group by day - use first found for push
-      if (!mommyNotifMap.has(n.day_number)) {
-        mommyNotifMap.set(n.day_number, n);
-      }
+      if (!mommyNotifMap.has(n.day_number)) mommyNotifMap.set(n.day_number, n);
     });
 
-    // Get users with push enabled
+    // Get users
     const { data: profiles } = await supabase
-      .from('profiles')
-      .select('user_id, life_stage, role, due_date, last_period_date');
+      .from('profiles').select('user_id, life_stage, role, due_date, last_period_date');
 
-    // Get children for mommy users (to calculate child age)
     const { data: children } = await supabase
-      .from('user_children')
-      .select('user_id, birth_date')
-      .order('birth_date', { ascending: false });
+      .from('user_children').select('user_id, birth_date').order('birth_date', { ascending: false });
 
     const { data: preferences } = await supabase
-      .from('user_preferences')
-      .select('user_id, push_enabled, daily_push_enabled, last_push_sent_at');
+      .from('user_preferences').select('user_id, push_enabled, daily_push_enabled, last_push_sent_at');
 
-    // Get all device tokens
     const { data: tokens } = await supabase
-      .from('device_tokens')
-      .select('token, user_id, platform');
+      .from('device_tokens').select('token, user_id, platform');
 
     if (!tokens?.length) {
       return new Response(
@@ -152,13 +129,9 @@ Deno.serve(async (req) => {
     const userMap = new Map<string, UserForNotification>();
     profiles?.forEach((p: any) => {
       userMap.set(p.user_id, {
-        user_id: p.user_id,
-        life_stage: p.life_stage || 'flow',
-        role: p.role || 'user',
-        due_date: p.due_date,
-        last_period_date: p.last_period_date,
-        daily_push_enabled: true,
-        last_push_sent_at: null,
+        user_id: p.user_id, life_stage: p.life_stage || 'flow', role: p.role || 'user',
+        due_date: p.due_date, last_period_date: p.last_period_date,
+        daily_push_enabled: true, last_push_sent_at: null,
       });
     });
 
@@ -170,37 +143,21 @@ Deno.serve(async (req) => {
       }
     });
 
-    // Calculate pregnancy day for a user - using last_period_date as source of truth
     const calculatePregnancyDay = (lastPeriodDate: string | null): number | null => {
       if (!lastPeriodDate) return null;
-      
       const lmp = new Date(lastPeriodDate);
       const today = new Date();
-      
-      // Reset time to start of day for accurate calculation
       lmp.setHours(0, 0, 0, 0);
       today.setHours(0, 0, 0, 0);
-      
-      // Calculate days since LMP (pregnancy day is 1-indexed)
-      const diffTime = today.getTime() - lmp.getTime();
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-      
-      // Return only if within valid pregnancy range (1-280)
-      if (diffDays >= 1 && diffDays <= 280) {
-        return diffDays;
-      }
-      return null;
+      const diffDays = Math.floor((today.getTime() - lmp.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      return (diffDays >= 1 && diffDays <= 280) ? diffDays : null;
     };
 
-    // Filter users who can receive notifications (2-3 hour gap)
-    const minGapMs = 2 * 60 * 60 * 1000; // 2 hours
+    const minGapMs = 2 * 60 * 60 * 1000;
     const eligibleUsers = Array.from(userMap.values()).filter(user => {
       if (!user.daily_push_enabled) return false;
       if (!user.last_push_sent_at) return true;
-      
-      const lastSent = new Date(user.last_push_sent_at).getTime();
-      const gap = Date.now() - lastSent;
-      return gap >= minGapMs;
+      return Date.now() - new Date(user.last_push_sent_at).getTime() >= minGapMs;
     });
 
     console.log(`Eligible users: ${eligibleUsers.length}`);
@@ -211,163 +168,86 @@ Deno.serve(async (req) => {
     for (const user of eligibleUsers) {
       let notificationToSend: { title: string; body: string; id: string; type: string } | null = null;
 
-      // Priority 1a: Check pregnancy day-specific notification for bump users
+      // Priority 1a: pregnancy day
       if (user.life_stage === 'bump' && user.last_period_date) {
         const pregnancyDay = calculatePregnancyDay(user.last_period_date);
-        
         if (pregnancyDay !== null) {
           const dayNotification = pregnancyNotifMap.get(pregnancyDay);
           if (dayNotification) {
             notificationToSend = {
               id: dayNotification.id,
               title: `${dayNotification.emoji} ${dayNotification.title}`,
-              body: dayNotification.body,
-              type: 'pregnancy_day',
+              body: dayNotification.body, type: 'pregnancy_day',
             };
           }
         }
       }
 
-      // Priority 1b: Check mommy day-specific notification for mommy users
+      // Priority 1b: mommy day
       if (!notificationToSend && user.life_stage === 'mommy') {
-        // Find the youngest child's birth_date for this user
         const userChildren = children?.filter((c: any) => c.user_id === user.user_id) || [];
-        if (userChildren.length > 0) {
-          const youngestChild = userChildren[0]; // already sorted desc by birth_date
-          if (youngestChild.birth_date) {
-            const birthDate = new Date(youngestChild.birth_date);
-            const today = new Date();
-            birthDate.setHours(0, 0, 0, 0);
-            today.setHours(0, 0, 0, 0);
-            const childAgeDays = Math.floor((today.getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-            
-            if (childAgeDays >= 1 && childAgeDays <= 1460) {
-              const mommyNotif = mommyNotifMap.get(childAgeDays);
-              if (mommyNotif) {
-                notificationToSend = {
-                  id: mommyNotif.id,
-                  title: `${mommyNotif.emoji} ${mommyNotif.title}`,
-                  body: mommyNotif.body,
-                  type: 'mommy_day',
-                };
-              }
+        if (userChildren.length > 0 && userChildren[0].birth_date) {
+          const birthDate = new Date(userChildren[0].birth_date);
+          const today = new Date();
+          birthDate.setHours(0, 0, 0, 0);
+          today.setHours(0, 0, 0, 0);
+          const childAgeDays = Math.floor((today.getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+          if (childAgeDays >= 1 && childAgeDays <= 1460) {
+            const mommyNotif = mommyNotifMap.get(childAgeDays);
+            if (mommyNotif) {
+              notificationToSend = {
+                id: mommyNotif.id,
+                title: `${mommyNotif.emoji} ${mommyNotif.title}`,
+                body: mommyNotif.body, type: 'mommy_day',
+              };
             }
           }
         }
       }
 
-      // Priority 2: Fall back to scheduled notifications
+      // Priority 2: scheduled
       if (!notificationToSend && scheduledNotifications?.length) {
-        const userNotification = scheduledNotifications.find((n: ScheduledNotification) => {
+        const match = scheduledNotifications.find((n: ScheduledNotification) => {
           if (n.target_audience === 'all') return true;
           if (n.target_audience === user.life_stage) return true;
           if (n.target_audience === 'partner' && user.role === 'partner') return true;
           return false;
         });
-
-        if (userNotification) {
-          notificationToSend = {
-            id: userNotification.id,
-            title: userNotification.title,
-            body: userNotification.body,
-            type: 'scheduled',
-          };
+        if (match) {
+          notificationToSend = { id: match.id, title: match.title, body: match.body, type: 'scheduled' };
         }
       }
 
       if (!notificationToSend) continue;
 
-      // Get user's device tokens
       const userTokens = tokens.filter((t: DeviceToken) => t.user_id === user.user_id);
       if (!userTokens.length) continue;
 
-      // Send to all user's devices
       for (const deviceToken of userTokens) {
-        try {
-          const fcmResponse = await fetch('https://fcm.googleapis.com/fcm/send', {
-            method: 'POST',
-            headers: {
-              'Authorization': `key=${fcmKey}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              to: deviceToken.token,
-              notification: {
-                title: notificationToSend.title,
-                body: notificationToSend.body,
-                sound: 'default',
-                badge: 1,
-              },
-              data: {
-                type: notificationToSend.type,
-                notification_id: notificationToSend.id,
-              },
-              priority: 'high',
-              // Enable background/offline delivery
-              content_available: true,
-              mutable_content: true,
-              android: {
-                priority: 'high',
-                notification: {
-                  sound: 'default',
-                },
-              },
-              apns: {
-                headers: {
-                  'apns-priority': '10',
-                },
-                payload: {
-                  aps: {
-                    'content-available': 1,
-                    'mutable-content': 1,
-                  },
-                },
-              },
-            }),
+        const result = await sendFCMv1(accessToken, projectId, deviceToken.token, notificationToSend.title, notificationToSend.body, {
+          type: notificationToSend.type, notification_id: notificationToSend.id,
+        });
+
+        if (result.success) {
+          sentCount++;
+          results.push({ userId: user.user_id, success: true, type: notificationToSend.type });
+
+          await supabase.from('user_preferences').upsert({
+            user_id: user.user_id, last_push_sent_at: new Date().toISOString(),
+          }, { onConflict: 'user_id' });
+
+          await supabase.from('notification_send_log').insert({
+            user_id: user.user_id,
+            notification_id: notificationToSend.type === 'scheduled' ? notificationToSend.id : null,
+            title: notificationToSend.title, body: notificationToSend.body, status: 'sent',
           });
 
-          const fcmResult = await fcmResponse.json();
-          
-          if (fcmResult.success > 0) {
-            sentCount++;
-            results.push({ userId: user.user_id, success: true, type: notificationToSend.type });
-
-            // Update last_push_sent_at
-            await supabase
-              .from('user_preferences')
-              .upsert({
-                user_id: user.user_id,
-                last_push_sent_at: new Date().toISOString(),
-              }, { onConflict: 'user_id' });
-
-            // Log the notification
-            await supabase
-              .from('notification_send_log')
-              .insert({
-                user_id: user.user_id,
-                notification_id: notificationToSend.type === 'scheduled' ? notificationToSend.id : null,
-                title: notificationToSend.title,
-                body: notificationToSend.body,
-                status: 'sent',
-              });
-              
-            break; // Only count once per user
-          } else {
-            const errorMsg = fcmResult.results?.[0]?.error || 'Unknown';
-            results.push({ userId: user.user_id, success: false, error: errorMsg });
-
-            // Remove invalid tokens
-            if (['InvalidRegistration', 'NotRegistered'].includes(errorMsg)) {
-              await supabase
-                .from('device_tokens')
-                .delete()
-                .eq('token', deviceToken.token);
-            }
+          break;
+        } else {
+          results.push({ userId: user.user_id, success: false, error: result.error });
+          if (result.unregistered) {
+            await supabase.from('device_tokens').delete().eq('token', deviceToken.token);
           }
-        } catch (err) {
-          const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-          console.error(`Error sending to ${user.user_id}:`, err);
-          results.push({ userId: user.user_id, success: false, error: errorMsg });
         }
       }
     }
@@ -376,10 +256,7 @@ Deno.serve(async (req) => {
 
     return new Response(
       JSON.stringify({
-        success: true,
-        message: `Sent ${sentCount} notifications`,
-        sent: sentCount,
-        eligible: eligibleUsers.length,
+        success: true, sent: sentCount, eligible: eligibleUsers.length,
         pregnancyNotificationsAvailable: pregnancyNotifMap.size,
         mommyNotificationsAvailable: mommyNotifMap.size,
         results: results.slice(0, 10),
@@ -388,9 +265,8 @@ Deno.serve(async (req) => {
     );
   } catch (err) {
     console.error('Error in send-daily-notifications:', err);
-    const errorMsg = err instanceof Error ? err.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: errorMsg }),
+      JSON.stringify({ error: err instanceof Error ? err.message : 'Unknown error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

@@ -1,4 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -30,7 +31,6 @@ interface DeviceToken {
   platform: string;
 }
 
-// Calculate cycle information
 function getCycleInfo(lastPeriodDate: string, cycleLength: number, periodLength: number) {
   const today = new Date();
   const lmp = new Date(lastPeriodDate);
@@ -39,40 +39,20 @@ function getCycleInfo(lastPeriodDate: string, cycleLength: number, periodLength:
 
   const daysSincePeriod = Math.floor((today.getTime() - lmp.getTime()) / (1000 * 60 * 60 * 24));
   const currentCycleDay = (daysSincePeriod % cycleLength) + 1;
-  
-  // Calculate next period date
   const cyclesPassed = Math.floor(daysSincePeriod / cycleLength);
   const nextPeriodDate = new Date(lmp);
   nextPeriodDate.setDate(nextPeriodDate.getDate() + (cyclesPassed + 1) * cycleLength);
   const daysUntilPeriod = Math.floor((nextPeriodDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  
-  // Calculate ovulation day (14 days before next period)
   const ovulationDate = new Date(nextPeriodDate);
   ovulationDate.setDate(ovulationDate.getDate() - 14);
   const daysUntilOvulation = Math.floor((ovulationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  
-  // Fertile window (5 days before to 1 day after ovulation)
   const fertileStart = new Date(ovulationDate);
   fertileStart.setDate(fertileStart.getDate() - 5);
   const daysUntilFertile = Math.floor((fertileStart.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  
-  // Period end
-  const periodEnd = new Date(lmp);
-  periodEnd.setDate(periodEnd.getDate() + periodLength);
   const isPeriodDay = currentCycleDay <= periodLength;
-  
-  // PMS (7 days before period)
   const daysUntilPMS = daysUntilPeriod - 7;
-  
-  return {
-    currentCycleDay,
-    daysUntilPeriod,
-    daysUntilOvulation,
-    daysUntilFertile,
-    daysUntilPMS,
-    isPeriodDay,
-    cycleLength,
-  };
+
+  return { currentCycleDay, daysUntilPeriod, daysUntilOvulation, daysUntilFertile, daysUntilPMS, isPeriodDay, cycleLength };
 }
 
 Deno.serve(async (req) => {
@@ -86,17 +66,12 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Check current time - only send between 9:00 and 22:00
     const now = new Date();
-    const currentHour = now.getUTCHours() + 4; // Azerbaijan UTC+4
+    const currentHour = now.getUTCHours() + 4;
     const adjustedHour = currentHour >= 24 ? currentHour - 24 : currentHour;
 
     let body: { manual?: boolean } = {};
-    try {
-      body = await req.json();
-    } catch {
-      // No body
-    }
+    try { body = await req.json(); } catch { /* No body */ }
 
     if (!body.manual && (adjustedHour < 9 || adjustedHour >= 22)) {
       return new Response(
@@ -105,19 +80,18 @@ Deno.serve(async (req) => {
       );
     }
 
-    const fcmKey = Deno.env.get('FCM_SERVER_KEY');
-    if (!fcmKey) {
+    const saJson = Deno.env.get('FIREBASE_SERVICE_ACCOUNT_JSON');
+    if (!saJson) {
       return new Response(
-        JSON.stringify({ error: 'FCM not configured' }),
+        JSON.stringify({ error: 'Firebase service account not configured' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Get all enabled flow reminders
+    const { accessToken, projectId } = await getFirebaseAccessToken(saJson);
+
     const { data: reminders } = await supabase
-      .from('flow_reminders')
-      .select('*')
-      .eq('is_enabled', true);
+      .from('flow_reminders').select('*').eq('is_enabled', true);
 
     if (!reminders?.length) {
       return new Response(
@@ -126,16 +100,11 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Get user profiles with flow stage
     const { data: profiles } = await supabase
-      .from('profiles')
-      .select('user_id, life_stage, last_period_date, cycle_length, period_length')
-      .eq('life_stage', 'flow');
+      .from('profiles').select('user_id, life_stage, last_period_date, cycle_length, period_length').eq('life_stage', 'flow');
 
-    // Get device tokens
     const { data: tokens } = await supabase
-      .from('device_tokens')
-      .select('token, user_id, platform');
+      .from('device_tokens').select('token, user_id, platform');
 
     if (!tokens?.length) {
       return new Response(
@@ -145,27 +114,20 @@ Deno.serve(async (req) => {
     }
 
     const profileMap = new Map<string, UserProfile>();
-    profiles?.forEach((p: UserProfile) => {
-      if (p.last_period_date) {
-        profileMap.set(p.user_id, p);
-      }
-    });
+    profiles?.forEach((p: UserProfile) => { if (p.last_period_date) profileMap.set(p.user_id, p); });
 
     const tokensByUser = new Map<string, DeviceToken[]>();
     tokens.forEach((t: DeviceToken) => {
-      if (!tokensByUser.has(t.user_id)) {
-        tokensByUser.set(t.user_id, []);
-      }
+      if (!tokensByUser.has(t.user_id)) tokensByUser.set(t.user_id, []);
       tokensByUser.get(t.user_id)!.push(t);
     });
 
     let sentCount = 0;
     const results: Array<{ userId: string; type: string; success: boolean }> = [];
 
-    // Check each reminder
     for (const reminder of reminders as FlowReminder[]) {
       const profile = profileMap.get(reminder.user_id);
-      if (!profile || !profile.last_period_date) continue;
+      if (!profile?.last_period_date) continue;
 
       const cycleLength = profile.cycle_length || 28;
       const periodLength = profile.period_length || 5;
@@ -175,126 +137,54 @@ Deno.serve(async (req) => {
       let notificationTitle = reminder.title || '';
       let notificationBody = reminder.message || '';
 
-      // Check if reminder should be sent today based on type
       switch (reminder.reminder_type) {
         case 'period_start':
-          if (cycleInfo.daysUntilPeriod === reminder.days_before) {
-            shouldSend = true;
-            notificationTitle = notificationTitle || 'Period yaxınlaşır 🔴';
-            notificationBody = notificationBody || `Perioda ${reminder.days_before} gün qaldı!`;
-          }
+          if (cycleInfo.daysUntilPeriod === reminder.days_before) { shouldSend = true; notificationTitle = notificationTitle || 'Period yaxınlaşır 🔴'; notificationBody = notificationBody || `Perioda ${reminder.days_before} gün qaldı!`; }
           break;
         case 'period_end':
-          // Send on the last day of period
-          if (cycleInfo.isPeriodDay && cycleInfo.currentCycleDay === periodLength) {
-            shouldSend = true;
-            notificationTitle = notificationTitle || 'Period bitdi ✅';
-            notificationBody = notificationBody || 'Periodunuz sona çatdı!';
-          }
+          if (cycleInfo.isPeriodDay && cycleInfo.currentCycleDay === periodLength) { shouldSend = true; notificationTitle = notificationTitle || 'Period bitdi ✅'; notificationBody = notificationBody || 'Periodunuz sona çatdı!'; }
           break;
         case 'ovulation':
-          if (cycleInfo.daysUntilOvulation === reminder.days_before) {
-            shouldSend = true;
-            notificationTitle = notificationTitle || 'Ovulyasiya günü 🌸';
-            notificationBody = notificationBody || `Ovulyasiyaya ${reminder.days_before} gün qaldı!`;
-          }
+          if (cycleInfo.daysUntilOvulation === reminder.days_before) { shouldSend = true; notificationTitle = notificationTitle || 'Ovulyasiya günü 🌸'; notificationBody = notificationBody || `Ovulyasiyaya ${reminder.days_before} gün qaldı!`; }
           break;
         case 'fertile_start':
-          if (cycleInfo.daysUntilFertile === reminder.days_before) {
-            shouldSend = true;
-            notificationTitle = notificationTitle || 'Məhsuldar günlər 💕';
-            notificationBody = notificationBody || 'Məhsuldar günlər başlayır!';
-          }
+          if (cycleInfo.daysUntilFertile === reminder.days_before) { shouldSend = true; notificationTitle = notificationTitle || 'Məhsuldar günlər 💕'; notificationBody = notificationBody || 'Məhsuldar günlər başlayır!'; }
           break;
         case 'fertile_end':
-          // 6 days after fertile start
-          if (cycleInfo.daysUntilFertile === -(6 - reminder.days_before)) {
-            shouldSend = true;
-            notificationTitle = notificationTitle || 'Məhsuldar günlər bitir 📅';
-            notificationBody = notificationBody || 'Məhsuldar günlər sona çatır.';
-          }
+          if (cycleInfo.daysUntilFertile === -(6 - reminder.days_before)) { shouldSend = true; notificationTitle = notificationTitle || 'Məhsuldar günlər bitir 📅'; notificationBody = notificationBody || 'Məhsuldar günlər sona çatır.'; }
           break;
         case 'pms':
-          if (cycleInfo.daysUntilPMS === reminder.days_before) {
-            shouldSend = true;
-            notificationTitle = notificationTitle || 'PMS dövrü ⚡';
-            notificationBody = notificationBody || 'PMS dövrü yaxınlaşır, özünüzə baxın!';
-          }
+          if (cycleInfo.daysUntilPMS === reminder.days_before) { shouldSend = true; notificationTitle = notificationTitle || 'PMS dövrü ⚡'; notificationBody = notificationBody || 'PMS dövrü yaxınlaşır, özünüzə baxın!'; }
           break;
         case 'pill':
-          // Daily pill reminder - always send
-          shouldSend = true;
-          notificationTitle = notificationTitle || 'Həb vaxtı 💊';
-          notificationBody = notificationBody || 'Gündəlik həbinizi qəbul etməyi unutmayın!';
+          shouldSend = true; notificationTitle = notificationTitle || 'Həb vaxtı 💊'; notificationBody = notificationBody || 'Gündəlik həbinizi qəbul etməyi unutmayın!';
           break;
       }
 
       if (!shouldSend) continue;
 
-      // Check time of day matches
       const reminderHour = parseInt(reminder.time_of_day?.split(':')[0] || '9');
-      if (Math.abs(adjustedHour - reminderHour) > 1) continue; // 1 hour tolerance
+      if (Math.abs(adjustedHour - reminderHour) > 1) continue;
 
-      // Get user's device tokens
       const userTokens = tokensByUser.get(reminder.user_id);
       if (!userTokens?.length) continue;
 
-      // Send notification
       for (const deviceToken of userTokens) {
-        try {
-          const fcmResponse = await fetch('https://fcm.googleapis.com/fcm/send', {
-            method: 'POST',
-            headers: {
-              'Authorization': `key=${fcmKey}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              to: deviceToken.token,
-              notification: {
-                title: notificationTitle,
-                body: notificationBody,
-                sound: 'default',
-                badge: 1,
-              },
-              data: {
-                type: 'flow_reminder',
-                reminder_type: reminder.reminder_type,
-              },
-              priority: 'high',
-              // Enable background delivery
-              content_available: true,
-              mutable_content: true,
-            }),
+        const result = await sendFCMv1(accessToken, projectId, deviceToken.token, notificationTitle, notificationBody, {
+          type: 'flow_reminder', reminder_type: reminder.reminder_type,
+        });
+
+        if (result.success) {
+          sentCount++;
+          results.push({ userId: reminder.user_id, type: reminder.reminder_type, success: true });
+
+          await supabase.from('notification_send_log').insert({
+            user_id: reminder.user_id, title: notificationTitle, body: notificationBody, status: 'sent',
           });
 
-          const fcmResult = await fcmResponse.json();
-          
-          if (fcmResult.success > 0) {
-            sentCount++;
-            results.push({ userId: reminder.user_id, type: reminder.reminder_type, success: true });
-
-            // Log the notification
-            await supabase
-              .from('notification_send_log')
-              .insert({
-                user_id: reminder.user_id,
-                title: notificationTitle,
-                body: notificationBody,
-                status: 'sent',
-              });
-
-            break; // One per user per reminder type
-          } else {
-            const errorMsg = fcmResult.results?.[0]?.error;
-            if (['InvalidRegistration', 'NotRegistered'].includes(errorMsg)) {
-              await supabase
-                .from('device_tokens')
-                .delete()
-                .eq('token', deviceToken.token);
-            }
-          }
-        } catch (err) {
-          console.error(`Error sending to ${reminder.user_id}:`, err);
+          break;
+        } else if (result.unregistered) {
+          await supabase.from('device_tokens').delete().eq('token', deviceToken.token);
         }
       }
     }
@@ -302,13 +192,7 @@ Deno.serve(async (req) => {
     console.log(`Flow reminders sent: ${sentCount}`);
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        message: `Sent ${sentCount} flow reminders`,
-        sent: sentCount,
-        totalReminders: reminders.length,
-        results: results.slice(0, 10),
-      }),
+      JSON.stringify({ success: true, sent: sentCount, totalReminders: reminders.length, results: results.slice(0, 10) }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (err) {
