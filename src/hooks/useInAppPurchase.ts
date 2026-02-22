@@ -179,15 +179,32 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
       
       console.log('IAP: Starting purchase for', productId, 'plan:', planId);
       
-      const transaction = await NativePurchases.purchaseProduct({
+      const purchaseOptions: any = {
         productIdentifier: productId,
-        planIdentifier: planId,
         productType: PURCHASE_TYPE.SUBS,
         quantity: 1,
-        appAccountToken: user?.id,
-      });
+      };
 
-      console.log('IAP: Purchase completed, transaction:', JSON.stringify(transaction));
+      // planIdentifier is required for Android subscriptions, ignored on iOS
+      if (planId) {
+        purchaseOptions.planIdentifier = planId;
+      }
+
+      // Only pass appAccountToken if user is logged in (must be valid UUID on iOS)
+      if (user?.id) {
+        purchaseOptions.appAccountToken = user.id;
+      }
+
+      console.log('IAP: Purchase options:', JSON.stringify(purchaseOptions));
+      
+      const result = await NativePurchases.purchaseProduct(purchaseOptions);
+      
+      console.log('IAP: Raw purchase result:', JSON.stringify(result));
+      
+      // Handle both direct transaction and wrapped response
+      const transaction = result?.transactionId ? result : result?.transaction;
+
+      console.log('IAP: Parsed transaction:', JSON.stringify(transaction));
 
       if (transaction && transaction.transactionId) {
         await processTransaction(transaction);
