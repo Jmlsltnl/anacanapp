@@ -36,6 +36,7 @@ import PartnerHospitalBagScreen from '@/components/partner/PartnerHospitalBagScr
 import DailySummaryScreen from '@/components/partner/DailySummaryScreen';
 import { SOSAlertReceiver } from '@/components/partner/SOSButton';
 import AppRatingPrompt from '@/components/AppRatingPrompt';
+import FloatingTimerWidget from '@/components/FloatingTimerWidget';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useDeviceToken } from '@/hooks/useDeviceToken';
@@ -384,6 +385,9 @@ const Index = () => {
           {renderContent()}
         </AnimatePresence>
       </div>
+      
+      {/* Floating timer widget - above bottom nav */}
+      <FloatingTimerWidget />
       
       {/* Bottom navigation with safe area */}
       <BottomNav activeTab={activeTab} onTabChange={handleTabChange} isPartner={role === 'partner'} />

@@ -2,19 +2,23 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-interface ActiveTimer {
+export type TimerType = 'sleep' | 'feeding' | 'diaper' | 'white-noise';
+
+export interface ActiveTimer {
   id: string;
-  type: 'sleep' | 'feeding';
+  type: TimerType;
   feedType?: 'left' | 'right';
+  label?: string;
   startTime: number; // timestamp
 }
 
 interface TimerState {
   activeTimers: ActiveTimer[];
-  startTimer: (type: 'sleep' | 'feeding', feedType?: 'left' | 'right') => string;
+  startTimer: (type: TimerType, feedType?: 'left' | 'right', label?: string) => string;
   stopTimer: (id: string) => { durationSeconds: number } | null;
-  getActiveTimer: (type: 'sleep' | 'feeding', feedType?: 'left' | 'right') => ActiveTimer | undefined;
+  getActiveTimer: (type: TimerType, feedType?: 'left' | 'right') => ActiveTimer | undefined;
   getElapsedSeconds: (id: string) => number;
+  hasAnyActiveTimer: () => boolean;
   clearAllTimers: () => void;
 }
 
@@ -23,12 +27,13 @@ export const useTimerStore = create<TimerState>()(
     (set, get) => ({
       activeTimers: [],
       
-      startTimer: (type, feedType) => {
+      startTimer: (type, feedType, label) => {
         const id = `${type}-${feedType || 'main'}-${Date.now()}`;
         const timer: ActiveTimer = {
           id,
           type,
           feedType,
+          label,
           startTime: Date.now(),
         };
         
@@ -63,6 +68,10 @@ export const useTimerStore = create<TimerState>()(
         const timer = get().activeTimers.find(t => t.id === id);
         if (!timer) return 0;
         return Math.floor((Date.now() - timer.startTime) / 1000);
+      },
+      
+      hasAnyActiveTimer: () => {
+        return get().activeTimers.length > 0;
       },
       
       clearAllTimers: () => {

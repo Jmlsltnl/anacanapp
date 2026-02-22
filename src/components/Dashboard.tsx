@@ -813,23 +813,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   // Show setup prompt if baby data is missing
   if (!babyData) {
     return (
-      <div className="space-y-4 p-4">
-        <motion.div 
-          className="bg-card rounded-2xl p-6 shadow-card border border-border/50 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-            <Baby className="w-8 h-8 text-primary" />
-          </div>
-          <h2 className="text-xl font-bold text-foreground mb-2">Körpə məlumatları tələb olunur</h2>
-          <p className="text-muted-foreground text-sm mb-4">
-            Ana dashboard-ı görmək üçün körpənizin doğum tarixini və digər məlumatları əlavə edin.
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Profil → Redaktə et → Həyat Mərhələsi bölməsindən məlumatları doldurun
-          </p>
-        </motion.div>
+      <div className="flex items-center justify-center p-8 min-h-[200px]">
+        <p className="text-muted-foreground text-sm animate-pulse">Yüklənir...</p>
       </div>
     );
   }
