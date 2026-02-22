@@ -302,6 +302,27 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                   İstənilən vaxt ləğv edə bilərsiniz • Abunəlik avtomatik yenilənir
                 </p>
 
+                {/* Terms & Privacy - Required by Apple */}
+                <div className="flex items-center justify-center gap-3 mt-2">
+                  <a 
+                    href="https://anacanapp.lovable.app/legal/terms_of_service" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-[10px] text-muted-foreground underline hover:text-foreground"
+                  >
+                    İstifadə Şərtləri
+                  </a>
+                  <span className="text-[10px] text-muted-foreground">•</span>
+                  <a 
+                    href="https://anacanapp.lovable.app/legal/privacy_policy" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-[10px] text-muted-foreground underline hover:text-foreground"
+                  >
+                    Məxfilik Siyasəti
+                  </a>
+                </div>
+
                 {!isNative && (
                   <p className="text-center text-[10px] text-muted-foreground mt-1.5 pb-2">
                     💡 Premium almaq üçün App Store və ya Google Play-dən tətbiqi yükləyin
