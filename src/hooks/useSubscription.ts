@@ -10,6 +10,7 @@ interface Subscription {
   status: 'active' | 'cancelled' | 'expired';
   started_at: string;
   expires_at: string | null;
+  updated_at?: string;
 }
 
 interface UsageTracking {
@@ -100,10 +101,16 @@ export function useSubscription() {
     fetchSubscription();
   }, [fetchSubscription]);
 
+  // Premium if active subscription OR cancelled but not yet expired OR profile flag
   const isPremium = 
-    subscription?.plan_type === 'premium' || 
-    subscription?.plan_type === 'premium_plus' ||
+    (subscription?.plan_type === 'premium' || subscription?.plan_type === 'premium_plus') &&
+    (subscription?.status === 'active' || 
+      (subscription?.status === 'cancelled' && subscription?.expires_at && new Date(subscription.expires_at) > new Date())
+    ) ||
     profile?.is_premium === true;
+
+  const isCancelled = subscription?.status === 'cancelled';
+  const cancelledButActive = isCancelled && isPremium;
 
   const getUsageForFeature = useCallback(
     (featureType: 'white_noise' | 'baby_photoshoot'): UsageTracking | undefined => {
@@ -175,6 +182,38 @@ export function useSubscription() {
     fetchSubscription();
   }, [fetchSubscription, getUsageForFeature, isPremium, user]);
 
+  const cancelSubscription = useCallback(async (): Promise<boolean> => {
+    if (!user || !subscription) return false;
+    try {
+      const { error } = await supabase
+        .from('subscriptions')
+        .update({ status: 'cancelled' })
+        .eq('id', subscription.id);
+      if (error) throw error;
+      await fetchSubscription();
+      return true;
+    } catch (err) {
+      console.error('Error cancelling subscription:', err);
+      return false;
+    }
+  }, [user, subscription, fetchSubscription]);
+
+  const restoreSubscription = useCallback(async (): Promise<boolean> => {
+    if (!user || !subscription) return false;
+    try {
+      const { error } = await supabase
+        .from('subscriptions')
+        .update({ status: 'active' })
+        .eq('id', subscription.id);
+      if (error) throw error;
+      await fetchSubscription();
+      return true;
+    } catch (err) {
+      console.error('Error restoring subscription:', err);
+      return false;
+    }
+  }, [user, subscription, fetchSubscription]);
+
   const upgradeToPremium = () => {
     return {
       showUpgradeModal: true,
@@ -186,10 +225,14 @@ export function useSubscription() {
   return {
     subscription,
     isPremium,
+    isCancelled,
+    cancelledButActive,
     loading,
     canUseWhiteNoise,
     canUseBabyPhotoshoot,
     trackWhiteNoiseUsage,
+    cancelSubscription,
+    restoreSubscription,
     upgradeToPremium,
     refetch: fetchSubscription,
     freeLimits,
