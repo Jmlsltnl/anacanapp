@@ -135,7 +135,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
 
             {/* Scrollable Content */}
             <div className="overflow-y-auto flex-1 -mt-5 bg-card rounded-t-3xl relative">
-              <div className="px-5 pt-6 pb-8">
+              <div className="px-5 pt-6 pb-safe-bottom" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 0px) + 1.5rem)' }}>
                 {error && (
                   <div className="mb-4 p-3 bg-destructive/10 text-destructive rounded-xl text-sm text-center">
                     {error}
