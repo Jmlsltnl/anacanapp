@@ -258,8 +258,8 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
 
             {/* ── Sticky Footer - always visible ── */}
             <div
-              className="shrink-0 border-t border-border/40 bg-card px-4 pt-3 pb-4"
-              style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}
+              className="shrink-0 border-t border-border/40 bg-card px-4 pt-3"
+              style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5rem)' }}
             >
               <Button
                 className="w-full h-12 rounded-2xl bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 text-white font-bold text-sm shadow-lg shadow-orange-500/20 border-0 disabled:opacity-50"
