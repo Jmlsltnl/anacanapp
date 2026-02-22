@@ -159,8 +159,17 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
     }
   };
 
-  const purchaseMonthly = async (): Promise<boolean> => {
-    if (!NativePurchases || !isSupported) return false;
+  const executePurchase = async (productId: string, planId: string): Promise<boolean> => {
+    if (!NativePurchases) {
+      console.error('IAP: NativePurchases plugin not loaded');
+      setError('Ödəniş sistemi yüklənməyib. Tətbiqi yenidən başladın.');
+      return false;
+    }
+    if (!isSupported) {
+      console.error('IAP: Billing not supported on this device');
+      setError('Bu cihazda ödəniş dəstəklənmir.');
+      return false;
+    }
 
     setIsPurchasing(true);
     setError(null);
@@ -168,21 +177,32 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
     try {
       const { PURCHASE_TYPE } = await import('@capgo/native-purchases');
       
+      console.log('IAP: Starting purchase for', productId, 'plan:', planId);
+      
       const transaction = await NativePurchases.purchaseProduct({
-        productIdentifier: IAP_PRODUCTS.PREMIUM_MONTHLY,
-        planIdentifier: IAP_PLANS.MONTHLY_PLAN,
+        productIdentifier: productId,
+        planIdentifier: planId,
         productType: PURCHASE_TYPE.SUBS,
+        quantity: 1,
         appAccountToken: user?.id,
       });
 
-      await processTransaction(transaction);
-      return true;
-    } catch (err: any) {
-      console.error('Purchase error:', err);
-      if (err.code === 'USER_CANCELLED') {
-        setError(null); // User cancelled, not an error
+      console.log('IAP: Purchase completed, transaction:', JSON.stringify(transaction));
+
+      if (transaction && transaction.transactionId) {
+        await processTransaction(transaction);
+        return true;
       } else {
-        setError('Alış zamanı xəta baş verdi');
+        console.error('IAP: No valid transaction returned', transaction);
+        setError('Alış tamamlana bilmədi. Yenidən cəhd edin.');
+        return false;
+      }
+    } catch (err: any) {
+      console.error('IAP: Purchase error:', err, JSON.stringify(err));
+      if (err?.code === 'USER_CANCELLED' || err?.message?.includes('cancel')) {
+        setError(null);
+      } else {
+        setError(`Alış zamanı xəta: ${err?.message || 'Naməlum xəta'}`);
       }
       return false;
     } finally {
@@ -190,35 +210,12 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
     }
   };
 
+  const purchaseMonthly = async (): Promise<boolean> => {
+    return executePurchase(IAP_PRODUCTS.PREMIUM_MONTHLY, IAP_PLANS.MONTHLY_PLAN);
+  };
+
   const purchaseYearly = async (): Promise<boolean> => {
-    if (!NativePurchases || !isSupported) return false;
-
-    setIsPurchasing(true);
-    setError(null);
-
-    try {
-      const { PURCHASE_TYPE } = await import('@capgo/native-purchases');
-      
-      const transaction = await NativePurchases.purchaseProduct({
-        productIdentifier: IAP_PRODUCTS.PREMIUM_YEARLY,
-        planIdentifier: IAP_PLANS.YEARLY_PLAN,
-        productType: PURCHASE_TYPE.SUBS,
-        appAccountToken: user?.id,
-      });
-
-      await processTransaction(transaction);
-      return true;
-    } catch (err: any) {
-      console.error('Purchase error:', err);
-      if (err.code === 'USER_CANCELLED') {
-        setError(null);
-      } else {
-        setError('Alış zamanı xəta baş verdi');
-      }
-      return false;
-    } finally {
-      setIsPurchasing(false);
-    }
+    return executePurchase(IAP_PRODUCTS.PREMIUM_YEARLY, IAP_PLANS.YEARLY_PLAN);
   };
 
   const restorePurchases = async (): Promise<boolean> => {
