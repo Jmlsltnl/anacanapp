@@ -135,7 +135,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
 
             {/* Scrollable Content */}
             <div className="overflow-y-auto flex-1 -mt-5 bg-card rounded-t-3xl relative">
-              <div className="px-5 pt-6 pb-4">
+              <div className="px-5 pt-6 pb-8">
                 {error && (
                   <div className="mb-4 p-3 bg-destructive/10 text-destructive rounded-xl text-sm text-center">
                     {error}
@@ -303,7 +303,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                 </p>
 
                 {/* Terms & Privacy - Required by Apple */}
-                <div className="flex items-center justify-center gap-3 mt-2">
+                <div className="flex items-center justify-center gap-3 mt-2 pb-1">
                   <a 
                     href="https://anacanapp.lovable.app/legal/terms_of_service" 
                     target="_blank" 
@@ -324,7 +324,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                 </div>
 
                 {!isNative && (
-                  <p className="text-center text-[10px] text-muted-foreground mt-1.5 pb-2">
+                  <p className="text-center text-[10px] text-muted-foreground mt-1.5">
                     💡 Premium almaq üçün App Store və ya Google Play-dən tətbiqi yükləyin
                   </p>
                 )}

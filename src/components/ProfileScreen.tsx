@@ -14,6 +14,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useChildren, Child } from '@/hooks/useChildren';
 import { PremiumModal } from '@/components/PremiumModal';
+import { useSubscription } from '@/hooks/useSubscription';
 import { nativeShare } from '@/lib/native';
 import BannerSlot from '@/components/banners/BannerSlot';
 import { Button } from '@/components/ui/button';
@@ -32,6 +33,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   const { toast } = useToast();
   const { unreadCount } = useNotifications();
   const { children, addChild, updateChild, deleteChild, getChildAge } = useChildren();
+  const { isPremium } = useSubscription();
   const [partnerCode] = useState(profile?.partner_code || 'ANACAN-XXXX');
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [showPartnerInfo, setShowPartnerInfo] = useState(false);
@@ -218,27 +220,29 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
         </div>
       </motion.div>
 
-      {/* Premium Banner - opens modal */}
-      <motion.button
-        onClick={() => setShowPremiumModal(true)}
-        className="w-full bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-2xl p-4 mb-3 border border-amber-100 dark:border-amber-900/50 text-left"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-      >
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
-            <Crown className="w-7 h-7 text-white" />
+      {/* Premium Banner - opens modal (hide for premium users) */}
+      {!isPremium && (
+        <motion.button
+          onClick={() => setShowPremiumModal(true)}
+          className="w-full bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-2xl p-4 mb-3 border border-amber-100 dark:border-amber-900/50 text-left"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
+              <Crown className="w-7 h-7 text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-foreground">Anacan Premium</h3>
+              <p className="text-sm text-muted-foreground">Bütün xüsusiyyətləri açın</p>
+            </div>
+            <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </div>
-          <div className="flex-1">
-            <h3 className="font-bold text-foreground">Anacan Premium</h3>
-            <p className="text-sm text-muted-foreground">Bütün xüsusiyyətləri açın</p>
-          </div>
-          <ChevronRight className="w-5 h-5 text-muted-foreground" />
-        </div>
-      </motion.button>
+        </motion.button>
+      )}
 
       {/* Partner Code */}
       {role === 'woman' && (
