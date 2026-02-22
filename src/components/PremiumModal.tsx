@@ -91,7 +91,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center"
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[60] flex items-end sm:items-center justify-center"
           onClick={onClose}
         >
           <motion.div
@@ -135,7 +135,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
 
             {/* Scrollable Content */}
             <div className="overflow-y-auto flex-1 -mt-5 bg-card rounded-t-3xl relative">
-              <div className="px-5 pt-6 pb-safe-bottom" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 0px) + 1.5rem)' }}>
+              <div className="px-5 pt-6" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5rem)' }}>
                 {error && (
                   <div className="mb-4 p-3 bg-destructive/10 text-destructive rounded-xl text-sm text-center">
                     {error}
