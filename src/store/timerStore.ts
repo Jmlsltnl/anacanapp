@@ -1,6 +1,7 @@
 // Persistent Timer Store - keeps timers running across page navigation
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { showTimerNotification, clearTimerNotification, clearAllTimerNotifications } from '@/utils/timerNotifications';
 
 export type TimerType = 'sleep' | 'feeding' | 'diaper' | 'white-noise';
 
@@ -41,6 +42,9 @@ export const useTimerStore = create<TimerState>()(
           activeTimers: [...state.activeTimers, timer]
         }));
         
+        // Show persistent notification
+        showTimerNotification(id, type, label, feedType);
+        
         return id;
       },
       
@@ -53,6 +57,9 @@ export const useTimerStore = create<TimerState>()(
         set((state) => ({
           activeTimers: state.activeTimers.filter(t => t.id !== id)
         }));
+        
+        // Clear notification
+        clearTimerNotification(id);
         
         return { durationSeconds };
       },
@@ -75,6 +82,7 @@ export const useTimerStore = create<TimerState>()(
       },
       
       clearAllTimers: () => {
+        clearAllTimerNotifications();
         set({ activeTimers: [] });
       },
     }),
