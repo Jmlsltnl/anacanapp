@@ -1,96 +1,78 @@
 
 
-# iOS Live Activity və Android Widget Quraşdırma Planı
+# Persistent Timer Notification + Native Widget Faylları
 
-## Vacib Qeyd
+## Hissə 1: Persistent Local Notifications (Lovable-da tam işləyəcək)
 
-iOS Live Activities və Android Widgets **native kod** tələb edir (Swift / Kotlin). Bu funksionallıq **Lovable web redaktorunda tam həyata keçirilə bilməz** — native faylları yarada bilərik, amma onları işlətmək üçün **Xcode (iOS)** və **Android Studio (Android)** lazımdır.
+Timer başlayanda native notification göstəriləcək, background-da da görünəcək. Timer dayandığında notification silinəcək.
 
----
+### Yeni fayl: `src/utils/timerNotifications.ts`
+- `showTimerNotification(timerId, type, label)` — Timer başlayanda ongoing notification göstərir
+- `clearTimerNotification(timerId)` — Timer dayandığında notification silir
+- `clearAllTimerNotifications()` — Bütün timer notification-ları silir
+- Timer tipinə görə fərqli başlıq və ikon (Yuxu, Əmizdirmə, Bez, Küy Səsi)
 
-## Alternativ: Capacitor Local Notifications (Dərhal işləyən həll)
+### Dəyişiklik: `src/store/timerStore.ts`
+- `startTimer()` — Timer başlayanda `showTimerNotification()` çağırılacaq
+- `stopTimer()` — Timer dayandığında `clearTimerNotification()` çağırılacaq
+- `clearAllTimers()` — `clearAllTimerNotifications()` çağırılacaq
 
-Timer aktiv olduqda **persistent notification** göstərmək — bu, Live Activity-yə oxşar təcrübə verir və yeni build-lər ilə dərhal işləyir.
-
-**Nə edəcəyik:**
-- Timer başlayanda local notification göstərmək (ongoing/persistent)
-- Timer dayandığında notification-u silmək
-- Notification-a klik edəndə app-ə qayıtmaq
-
-Bu üsul iOS və Android-də eyni cür işləyir, native kod tələb etmir.
-
----
-
-## Tam Native Həll (Step-by-step)
-
-Əgər həqiqi Live Activity / Widget istəyirsinizsə, aşağıdakı addımları **yerli kompüterdə** etməlisiniz:
-
-### iOS Live Activity
-
-**Addım 1: Xcode-da Widget Extension yaradın**
-- Xcode-da layihəni açın
-- File - New - Target - Widget Extension seçin
-- "Include Live Activity" işarəsini qoyun
-- Ad: "AnacanTimerWidget"
-
-**Addım 2: ActivityAttributes yaradın (Swift)**
-- `AnacanTimerAttributes.swift` faylı yaradılacaq
-- Timer tipi (yuxu/əmizdirmə/bez), başlama vaxtı, etiket saxlanacaq
-
-**Addım 3: Live Activity UI dizayn edin (SwiftUI)**
-- Lock screen və Dynamic Island görünüşləri
-- Timer geri sayımı, ikon, rəng
-
-**Addım 4: Capacitor Plugin yaradın**
-- Web tərəfdən Live Activity-ni başlatmaq/dayandırmaq üçün bridge
-- `startLiveActivity(type, label)` və `stopLiveActivity()` metodları
-
-**Addım 5: Web kodunda inteqrasiya**
-- `timerStore.ts`-də timer başlayanda plugin çağırılacaq
-- Timer dayandığında Live Activity bağlanacaq
-
-### Android Widget
-
-**Addım 1: Android Studio-da Widget yaradın**
-- New - Widget - App Widget seçin
-- Ad: "TimerWidget"
-
-**Addım 2: Widget layout (XML)**
-- Timer tipi, keçən vaxt, dayandırma düyməsi
-
-**Addım 3: Widget Service (Kotlin)**
-- Hər saniyə yenilənən foreground service
-- Timer məlumatlarını SharedPreferences-dən oxumaq
-
-**Addım 4: Capacitor Plugin (eyni plugin)**
-- Android tərəfdə widget-i yeniləmək üçün bridge
+### Dəyişiklik: `src/components/FloatingTimerWidget.tsx`
+- Background-a keçəndə notification aktiv qalacaq (artıq timerStore-dan avtomatik işləyəcək)
 
 ---
 
-## Tövsiyə
+## Hissə 2: Native Fayllar (Yerli kompüterdə istifadə üçün)
 
-**Persistent Local Notification** həllini tətbiq edək — bu, Lovable-da tam işləyir, hər iki platformada eynidir və istifadəçi təcrübəsi Live Activity-yə yaxındır. Sonradan yerli kompüterdə native Live Activity əlavə edə bilərsiniz.
+Bu faylları Lovable-da yarada bilərik, amma onları işlətmək üçün Xcode/Android Studio lazımdır.
+
+### iOS Live Activity faylları:
+1. `ios/App/AnacanTimerWidget/AnacanTimerAttributes.swift` — ActivityAttributes data modeli
+2. `ios/App/AnacanTimerWidget/AnacanTimerWidgetLiveActivity.swift` — Lock screen + Dynamic Island UI
+3. `ios/App/App/Plugins/LiveActivityPlugin.swift` — Capacitor bridge plugin
+4. `ios/App/App/Plugins/LiveActivityPlugin.m` — Objective-C bridge header
+
+### Android Widget faylları:
+1. `android/app/src/main/java/com/atlasoon/anacan/TimerWidgetProvider.kt` — Widget provider
+2. `android/app/src/main/java/com/atlasoon/anacan/TimerWidgetPlugin.kt` — Capacitor bridge
+3. `android/app/src/main/res/layout/widget_timer.xml` — Widget layout
+4. `android/app/src/main/res/xml/timer_widget_info.xml` — Widget metadata
+
+### Web inteqrasiya:
+5. `src/plugins/LiveActivityPlugin.ts` — Capacitor plugin TypeScript interface (iOS + Android)
+6. `src/store/timerStore.ts` — Plugin çağırışları əlavə ediləcək
 
 ---
 
 ## Texniki Detallar
 
-### Persistent Notification həlli üçün dəyişikliklər:
+### timerNotifications.ts strukturu:
+```typescript
+import { LocalNotifications } from '@capacitor/local-notifications';
+import { isNative } from '@/lib/native';
 
-1. **`src/store/timerStore.ts`** — Timer başlayanda/dayandığında `LocalNotifications` API çağırılacaq
-2. **`src/utils/timerNotifications.ts`** (yeni fayl) — Notification idarəetmə utility:
-   - `showTimerNotification(type, label)` — ongoing notification göstər
-   - `updateTimerNotification(type, elapsed)` — vaxtı yenilə
-   - `clearTimerNotification()` — notification sil
-3. **`src/components/FloatingTimerWidget.tsx`** — Background-da da notification aktiv olacaq
-4. **`capacitor.config.json`** — LocalNotifications plugin artıq konfiqurasiya edilib
+// Notification ID-ləri: timer hash-indən generasiya
+// Timer başlayanda: schedule notification (ongoing=true Android-də)
+// Timer dayandığında: cancel notification by id
+```
 
-### Native Live Activity üçün lazım olan fayllar (yerli kompüterdə yaradılmalı):
+### LiveActivityPlugin.ts strukturu:
+```typescript
+import { registerPlugin } from '@capacitor/core';
 
-- `ios/App/AnacanTimerWidget/` — Widget extension qovluğu
-- `ios/App/AnacanTimerWidget/AnacanTimerAttributes.swift` — Data model
-- `ios/App/AnacanTimerWidget/AnacanTimerWidgetLiveActivity.swift` — UI
-- `ios/App/App/Plugins/LiveActivityPlugin.swift` — Capacitor bridge
-- `android/app/src/main/java/.../TimerWidget.kt` — Android widget
-- `android/app/src/main/java/.../TimerWidgetService.kt` — Update service
+interface LiveActivityPlugin {
+  startActivity(options: { type: string; label: string; startTime: number }): Promise<void>;
+  stopActivity(): Promise<void>;
+}
+
+const LiveActivity = registerPlugin<LiveActivityPlugin>('LiveActivity');
+export default LiveActivity;
+```
+
+### Quraşdırma addımları (native fayllar üçün):
+1. `npm run build && npx cap sync`
+2. **iOS:** Xcode-da Widget Extension target-i əl ilə yaradılmalıdır (File > New > Target > Widget Extension)
+3. **iOS:** Yaradılan Swift fayllarını Widget Extension target-ə köçürün
+4. **Android:** `AndroidManifest.xml`-ə widget receiver əlavə edin
+5. Yenidən build edin
 
