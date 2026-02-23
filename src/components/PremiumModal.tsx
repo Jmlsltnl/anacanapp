@@ -59,8 +59,8 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const dbCurrency = premiumPlan?.currency || 'AZN';
   const isNative = isNativePlatform();
 
-  const monthlyProduct = products.find(p => p.productId.includes('monthly'));
-  const yearlyProduct = products.find(p => p.productId.includes('yearly'));
+  const monthlyProduct = products.find(p => p?.productId?.includes('monthly'));
+  const yearlyProduct = products.find(p => p?.productId?.includes('yearly'));
 
   const currencySymbol = dbCurrency === 'AZN' ? '₼' : dbCurrency;
   const monthlyPrice = monthlyProduct?.price || (dbMonthlyPrice ? `${dbMonthlyPrice}` : '9.99');
