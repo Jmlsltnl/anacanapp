@@ -220,8 +220,29 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
         </div>
       </motion.div>
 
-      {/* Premium Banner - opens modal (hide for premium users) */}
-      {!isPremium && (
+      {/* Premium Banner */}
+      {isPremium ? (
+        <motion.button
+          onClick={() => onNavigate?.('billing')}
+          className="w-full bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-2xl p-4 mb-3 border border-amber-200 dark:border-amber-800/50 text-left"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
+              <Crown className="w-7 h-7 text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-foreground">Anacan Premium ✨</h3>
+              <p className="text-sm text-muted-foreground">Premium abunəliyiniz aktivdir</p>
+            </div>
+            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+          </div>
+        </motion.button>
+      ) : (
         <motion.button
           onClick={() => setShowPremiumModal(true)}
           className="w-full bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-2xl p-4 mb-3 border border-amber-100 dark:border-amber-900/50 text-left"
