@@ -1,46 +1,57 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SplashScreen from '@/components/SplashScreen';
 import logoImage from '@/assets/logo.png';
 import AppIntroduction from '@/components/AppIntroduction';
 import AuthScreen from '@/components/AuthScreen';
 import OnboardingScreen from '@/components/OnboardingScreen';
-import Dashboard from '@/components/Dashboard';
-import PartnerDashboard from '@/components/PartnerDashboard';
-import ToolsHub from '@/components/ToolsHub';
-import AIChatScreen from '@/components/AIChatScreen';
-import PartnerAIChatScreen from '@/components/PartnerAIChatScreen';
-import PartnerChatScreen from '@/components/partner/PartnerChatScreen';
-import ShopScreen from '@/components/ShopScreen';
-import CakesScreen from '@/components/CakesScreen';
-import ProfileScreen from '@/components/ProfileScreen';
-import PartnerProfileScreen from '@/components/PartnerProfileScreen';
-import NotificationsScreen from '@/components/NotificationsScreen';
-import SettingsScreen from '@/components/SettingsScreen';
-import CalendarScreen from '@/components/CalendarScreen';
-import AdminPanel from '@/components/AdminPanel';
 import BottomNav from '@/components/BottomNav';
-import MotherChatScreen from '@/components/MotherChatScreen';
-import CommunityScreen from '@/components/community/CommunityScreen';
-import ProfileEditScreen from '@/components/ProfileEditScreen';
-import HelpScreen from '@/components/HelpScreen';
-import PrivacyScreen from '@/components/PrivacyScreen';
-import PartnerPrivacyScreen from '@/components/PartnerPrivacyScreen';
-import AppearanceScreen from '@/components/AppearanceScreen';
-import UserProfileScreen from '@/components/community/UserProfileScreen';
-import BillingScreen from '@/components/BillingScreen';
-import BlogScreen from '@/components/BlogScreen';
-import LegalScreen from '@/components/LegalScreen';
-import NameVotingScreen from '@/components/partner/NameVotingScreen';
-import PartnerHospitalBagScreen from '@/components/partner/PartnerHospitalBagScreen';
-import DailySummaryScreen from '@/components/partner/DailySummaryScreen';
-import { SOSAlertReceiver } from '@/components/partner/SOSButton';
 import AppRatingPrompt from '@/components/AppRatingPrompt';
 import FloatingTimerWidget from '@/components/FloatingTimerWidget';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useDeviceToken } from '@/hooks/useDeviceToken';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
+
+// Lazy load heavy screens
+const Dashboard = lazy(() => import('@/components/Dashboard'));
+const PartnerDashboard = lazy(() => import('@/components/PartnerDashboard'));
+const ToolsHub = lazy(() => import('@/components/ToolsHub'));
+const AIChatScreen = lazy(() => import('@/components/AIChatScreen'));
+const PartnerAIChatScreen = lazy(() => import('@/components/PartnerAIChatScreen'));
+const PartnerChatScreen = lazy(() => import('@/components/partner/PartnerChatScreen'));
+const ShopScreen = lazy(() => import('@/components/ShopScreen'));
+const CakesScreen = lazy(() => import('@/components/CakesScreen'));
+const ProfileScreen = lazy(() => import('@/components/ProfileScreen'));
+const PartnerProfileScreen = lazy(() => import('@/components/PartnerProfileScreen'));
+const NotificationsScreen = lazy(() => import('@/components/NotificationsScreen'));
+const SettingsScreen = lazy(() => import('@/components/SettingsScreen'));
+const CalendarScreen = lazy(() => import('@/components/CalendarScreen'));
+const AdminPanel = lazy(() => import('@/components/AdminPanel'));
+const MotherChatScreen = lazy(() => import('@/components/MotherChatScreen'));
+const CommunityScreen = lazy(() => import('@/components/community/CommunityScreen'));
+const ProfileEditScreen = lazy(() => import('@/components/ProfileEditScreen'));
+const HelpScreen = lazy(() => import('@/components/HelpScreen'));
+const PrivacyScreen = lazy(() => import('@/components/PrivacyScreen'));
+const PartnerPrivacyScreen = lazy(() => import('@/components/PartnerPrivacyScreen'));
+const AppearanceScreen = lazy(() => import('@/components/AppearanceScreen'));
+const UserProfileScreen = lazy(() => import('@/components/community/UserProfileScreen'));
+const BillingScreen = lazy(() => import('@/components/BillingScreen'));
+const BlogScreen = lazy(() => import('@/components/BlogScreen'));
+const LegalScreen = lazy(() => import('@/components/LegalScreen'));
+const NameVotingScreen = lazy(() => import('@/components/partner/NameVotingScreen'));
+const PartnerHospitalBagScreen = lazy(() => import('@/components/partner/PartnerHospitalBagScreen'));
+const DailySummaryScreen = lazy(() => import('@/components/partner/DailySummaryScreen'));
+const SOSAlertReceiverModule = lazy(() => import('@/components/partner/SOSButton').then(m => ({ default: m.SOSAlertReceiver })));
+
+const suspenseFallback = (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="flex flex-col items-center gap-4">
+      <img src={logoImage} alt="Anacan" className="w-16 h-16 object-contain animate-pulse" />
+      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+    </div>
+  </div>
+);
 
 const pageVariants = {
   initial: { opacity: 0, y: 10 },
@@ -302,67 +313,40 @@ const Index = () => {
 
   // Admin Panel
   if (showAdmin && isAdmin) {
-    return <AdminPanel onExit={() => setShowAdmin(false)} />;
+    return <Suspense fallback={suspenseFallback}><AdminPanel onExit={() => setShowAdmin(false)} /></Suspense>;
   }
 
   // User Profile View (Community)
   if (viewingUserId) {
-    return <UserProfileScreen userId={viewingUserId} onBack={() => setViewingUserId(null)} />;
+    return <Suspense fallback={suspenseFallback}><UserProfileScreen userId={viewingUserId} onBack={() => setViewingUserId(null)} /></Suspense>;
   }
 
   // Sub-screens
-  if (activeScreen === 'notifications') {
-    return <NotificationsScreen onBack={() => setActiveScreen(null)} />;
-  }
-  if (activeScreen === 'settings') {
-    return <SettingsScreen onBack={() => setActiveScreen(null)} />;
-  }
-  if (activeScreen === 'calendar') {
-    return <CalendarScreen onBack={() => setActiveScreen(null)} />;
-  }
-  if (activeScreen === 'edit-profile') {
-    return <ProfileEditScreen onBack={() => setActiveScreen(null)} />;
-  }
-  if (activeScreen === 'help') {
-    return <HelpScreen onBack={() => setActiveScreen(null)} />;
-  }
-  if (activeScreen === 'privacy') {
-    return <PrivacyScreen onBack={() => setActiveScreen(null)} />;
-  }
-  if (activeScreen === 'partner-privacy') {
-    return <PartnerPrivacyScreen onBack={() => setActiveScreen(null)} />;
-  }
-  if (activeScreen === 'appearance') {
-    return <AppearanceScreen onBack={() => setActiveScreen(null)} />;
-  }
-  if (activeScreen === 'billing') {
-    return <BillingScreen onBack={() => setActiveScreen(null)} />;
-  }
+  if (activeScreen === 'notifications') return <Suspense fallback={suspenseFallback}><NotificationsScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'settings') return <Suspense fallback={suspenseFallback}><SettingsScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'calendar') return <Suspense fallback={suspenseFallback}><CalendarScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'edit-profile') return <Suspense fallback={suspenseFallback}><ProfileEditScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'help') return <Suspense fallback={suspenseFallback}><HelpScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'privacy') return <Suspense fallback={suspenseFallback}><PrivacyScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'partner-privacy') return <Suspense fallback={suspenseFallback}><PartnerPrivacyScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'appearance') return <Suspense fallback={suspenseFallback}><AppearanceScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'billing') return <Suspense fallback={suspenseFallback}><BillingScreen onBack={() => setActiveScreen(null)} /></Suspense>;
   if (activeScreen === 'legal' || activeScreen?.startsWith('legal/')) {
     const initialDocType = activeScreen?.startsWith('legal/') ? activeScreen.replace('legal/', '') : undefined;
-    return <LegalScreen onBack={() => setActiveScreen(null)} initialDocument={initialDocType} />;
+    return <Suspense fallback={suspenseFallback}><LegalScreen onBack={() => setActiveScreen(null)} initialDocument={initialDocType} /></Suspense>;
   }
   if (activeScreen === 'blog' || activeScreen?.startsWith('blog/')) {
     const initialSlug = activeScreen?.startsWith('blog/') ? activeScreen.replace('blog/', '') : undefined;
-    return <BlogScreen onBack={() => setActiveScreen(null)} initialSlug={initialSlug} lifeStage={lifeStage} />;
+    return <Suspense fallback={suspenseFallback}><BlogScreen onBack={() => setActiveScreen(null)} initialSlug={initialSlug} lifeStage={lifeStage} /></Suspense>;
   }
-  if (activeScreen === 'shop' && isAdmin) {
-    return <ShopScreen onBack={() => setActiveScreen(null)} />;
-  }
-  // Partner-specific screens
-  if (activeScreen === 'name-voting' && role === 'partner') {
-    return <NameVotingScreen onBack={() => setActiveScreen(null)} />;
-  }
-  if (activeScreen === 'partner-hospital-bag' && role === 'partner') {
-    return <PartnerHospitalBagScreen onBack={() => setActiveScreen(null)} />;
-  }
-  if (activeScreen === 'daily-summary' && role === 'partner') {
-    return <DailySummaryScreen onBack={() => setActiveScreen(null)} />;
-  }
+  if (activeScreen === 'shop' && isAdmin) return <Suspense fallback={suspenseFallback}><ShopScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'name-voting' && role === 'partner') return <Suspense fallback={suspenseFallback}><NameVotingScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'partner-hospital-bag' && role === 'partner') return <Suspense fallback={suspenseFallback}><PartnerHospitalBagScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'daily-summary' && role === 'partner') return <Suspense fallback={suspenseFallback}><DailySummaryScreen onBack={() => setActiveScreen(null)} /></Suspense>;
 
   // Mother chat overlay (for woman role)
   if (showMotherChat && role === 'woman') {
-    return <MotherChatScreen onBack={() => setShowMotherChat(false)} />;
+    return <Suspense fallback={suspenseFallback}><MotherChatScreen onBack={() => setShowMotherChat(false)} /></Suspense>;
   }
 
   return (
@@ -371,7 +355,7 @@ const Index = () => {
       <AppRatingPrompt />
       
       {/* SOS Alert Receiver for partners */}
-      {role === 'partner' && <SOSAlertReceiver />}
+      {role === 'partner' && <Suspense fallback={null}><SOSAlertReceiverModule /></Suspense>}
       
       {/* Status bar area - fills with card background */}
       <div 
@@ -381,9 +365,15 @@ const Index = () => {
       
       {/* Main scrollable content area */}
       <div ref={scrollContainerRef} data-scroll-container className="flex-1 overflow-y-auto overflow-x-hidden overscroll-none">
-        <AnimatePresence mode="wait">
-          {renderContent()}
-        </AnimatePresence>
+        <Suspense fallback={
+          <div className="flex-1 flex items-center justify-center py-20">
+            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          </div>
+        }>
+          <AnimatePresence mode="wait">
+            {renderContent()}
+          </AnimatePresence>
+        </Suspense>
       </div>
       
       {/* Floating timer widget - above bottom nav */}

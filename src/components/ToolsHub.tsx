@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Shield, Timer, Scale, Baby, Briefcase, 
@@ -11,37 +11,37 @@ import BlogScreen from '@/components/BlogScreen';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
-import SafetyLookup from './tools/SafetyLookup';
-import KickCounter from './tools/KickCounter';
-import ContractionTimer from './tools/ContractionTimer';
-import WeightTracker from './tools/WeightTracker';
-import WhiteNoise from './tools/WhiteNoise';
-import BabyNames from './tools/BabyNames';
-import HospitalBag from './tools/HospitalBag';
-import Nutrition from './tools/Nutrition';
-import Exercises from './tools/Exercises';
-import MoodDiary from './tools/MoodDiary';
-import BabyPhotoshoot from './tools/BabyPhotoshoot';
-import ShoppingList from './tools/ShoppingList';
-import Recipes from './tools/Recipes';
-import DoctorsHospitals from './tools/DoctorsHospitals';
-import BloodSugarTracker from './tools/BloodSugarTracker';
-import PregnancyAlbum from './tools/PregnancyAlbum';
-import AffiliateProducts from './tools/AffiliateProducts';
-import CryTranslator from './tools/CryTranslator';
-import PoopScanner from './tools/PoopScanner';
-import WeatherClothing from './tools/WeatherClothing';
-import NoiseMeter from './tools/NoiseMeter';
-import SecondHandMarket from './tools/SecondHandMarket';
-import MomFriendlyMap from './tools/MomFriendlyMap';
-import SmartPlayBox from './tools/SmartPlayBox';
-import MentalHealthTracker from './tools/MentalHealthTracker';
-import FirstAidGuide from './tools/FirstAidGuide';
-import FairyTaleGenerator from './tools/FairyTaleGenerator';
-import HoroscopeCompatibility from './tools/HoroscopeCompatibility';
-import BabyGrowthTracker from './tools/BabyGrowthTracker';
-import MaternityCalculator from './tools/MaternityCalculator';
-import TeethingTracker from './tools/TeethingTracker';
+const SafetyLookup = lazy(() => import('./tools/SafetyLookup'));
+const KickCounter = lazy(() => import('./tools/KickCounter'));
+const ContractionTimer = lazy(() => import('./tools/ContractionTimer'));
+const WeightTracker = lazy(() => import('./tools/WeightTracker'));
+const WhiteNoise = lazy(() => import('./tools/WhiteNoise'));
+const BabyNames = lazy(() => import('./tools/BabyNames'));
+const HospitalBag = lazy(() => import('./tools/HospitalBag'));
+const Nutrition = lazy(() => import('./tools/Nutrition'));
+const Exercises = lazy(() => import('./tools/Exercises'));
+const MoodDiary = lazy(() => import('./tools/MoodDiary'));
+const BabyPhotoshoot = lazy(() => import('./tools/BabyPhotoshoot'));
+const ShoppingList = lazy(() => import('./tools/ShoppingList'));
+const Recipes = lazy(() => import('./tools/Recipes'));
+const DoctorsHospitals = lazy(() => import('./tools/DoctorsHospitals'));
+const BloodSugarTracker = lazy(() => import('./tools/BloodSugarTracker'));
+const PregnancyAlbum = lazy(() => import('./tools/PregnancyAlbum'));
+const AffiliateProducts = lazy(() => import('./tools/AffiliateProducts'));
+const CryTranslator = lazy(() => import('./tools/CryTranslator'));
+const PoopScanner = lazy(() => import('./tools/PoopScanner'));
+const WeatherClothing = lazy(() => import('./tools/WeatherClothing'));
+const NoiseMeter = lazy(() => import('./tools/NoiseMeter'));
+const SecondHandMarket = lazy(() => import('./tools/SecondHandMarket'));
+const MomFriendlyMap = lazy(() => import('./tools/MomFriendlyMap'));
+const SmartPlayBox = lazy(() => import('./tools/SmartPlayBox'));
+const MentalHealthTracker = lazy(() => import('./tools/MentalHealthTracker'));
+const FirstAidGuide = lazy(() => import('./tools/FirstAidGuide'));
+const FairyTaleGenerator = lazy(() => import('./tools/FairyTaleGenerator'));
+const HoroscopeCompatibility = lazy(() => import('./tools/HoroscopeCompatibility'));
+const BabyGrowthTracker = lazy(() => import('./tools/BabyGrowthTracker'));
+const MaternityCalculator = lazy(() => import('./tools/MaternityCalculator'));
+const TeethingTracker = lazy(() => import('./tools/TeethingTracker'));
 import { PremiumModal } from './PremiumModal';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
@@ -283,39 +283,54 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     }
   };
 
+  const toolFallback = (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+
   // Render active tool
-  if (activeTool === 'photoshoot') return <BabyPhotoshoot onBack={handleBack} />;
-  if (activeTool === 'nutrition') return <Nutrition onBack={handleBack} />;
-  if (activeTool === 'shopping') return <ShoppingList onBack={handleBack} />;
-  if (activeTool === 'safety') return <SafetyLookup onBack={handleBack} />;
-  if (activeTool === 'kick') return <KickCounter onBack={handleBack} />;
-  if (activeTool === 'contraction') return <ContractionTimer onBack={handleBack} />;
-  if (activeTool === 'weight') return <WeightTracker onBack={handleBack} />;
-  if (activeTool === 'whitenoise') return <WhiteNoise onBack={handleBack} />;
-  if (activeTool === 'names') return <BabyNames onBack={handleBack} />;
-  if (activeTool === 'hospital') return <HospitalBag onBack={handleBack} />;
-  if (activeTool === 'exercise' || activeTool === 'exercises') return <Exercises onBack={handleBack} />;
-  if (activeTool === 'mood' || activeTool === 'mood-diary') return <MoodDiary onBack={handleBack} />;
-  if (activeTool === 'blog') return <BlogScreen onBack={handleBack} />;
-  if (activeTool === 'recipes') return <Recipes onBack={handleBack} />;
-  if (activeTool === 'doctors') return <DoctorsHospitals onBack={handleBack} />;
-  if (activeTool === 'blood-sugar') return <BloodSugarTracker onBack={handleBack} />;
-  if (activeTool === 'pregnancy-album') return <PregnancyAlbum onBack={handleBack} />;
-  if (activeTool === 'cry-translator') return <CryTranslator onBack={handleBack} />;
-  if (activeTool === 'poop-scanner') return <PoopScanner onBack={handleBack} />;
-  if (activeTool === 'weather-clothing') return <WeatherClothing onBack={handleBack} />;
-  if (activeTool === 'noise-meter') return <NoiseMeter onBack={handleBack} />;
-  if (activeTool === 'secondhand-market' || activeTool === 'second-hand-market') return <SecondHandMarket onBack={handleBack} />;
-  if (activeTool === 'mom-friendly-map') return <MomFriendlyMap onBack={handleBack} />;
-  if (activeTool === 'smart-play-box') return <SmartPlayBox onBack={handleBack} />;
-  if (activeTool === 'mental-health') return <MentalHealthTracker onBack={handleBack} />;
-  if (activeTool === 'first-aid') return <FirstAidGuide onBack={handleBack} />;
-  if (activeTool === 'fairy-tale') return <FairyTaleGenerator onBack={handleBack} />;
-  if (activeTool === 'horoscope') return <HoroscopeCompatibility onBack={handleBack} />;
-  if (activeTool === 'baby-growth' || activeTool === 'growth-tracker') return <BabyGrowthTracker onBack={handleBack} />;
-  if (activeTool === 'affiliate' || activeTool === 'affiliate-products') return <AffiliateProducts onBack={handleBack} />;
-  if (activeTool === 'maternity-calculator' || activeTool === 'maternity') return <MaternityCalculator onBack={handleBack} />;
-  if (activeTool === 'teething' || activeTool === 'teething-tracker') return <TeethingTracker onBack={handleBack} />;
+  const toolComponent = (() => {
+    switch (activeTool) {
+      case 'photoshoot': return <BabyPhotoshoot onBack={handleBack} />;
+      case 'nutrition': return <Nutrition onBack={handleBack} />;
+      case 'shopping': return <ShoppingList onBack={handleBack} />;
+      case 'safety': return <SafetyLookup onBack={handleBack} />;
+      case 'kick': return <KickCounter onBack={handleBack} />;
+      case 'contraction': return <ContractionTimer onBack={handleBack} />;
+      case 'weight': return <WeightTracker onBack={handleBack} />;
+      case 'whitenoise': return <WhiteNoise onBack={handleBack} />;
+      case 'names': return <BabyNames onBack={handleBack} />;
+      case 'hospital': return <HospitalBag onBack={handleBack} />;
+      case 'exercise': case 'exercises': return <Exercises onBack={handleBack} />;
+      case 'mood': case 'mood-diary': return <MoodDiary onBack={handleBack} />;
+      case 'blog': return <BlogScreen onBack={handleBack} />;
+      case 'recipes': return <Recipes onBack={handleBack} />;
+      case 'doctors': return <DoctorsHospitals onBack={handleBack} />;
+      case 'blood-sugar': return <BloodSugarTracker onBack={handleBack} />;
+      case 'pregnancy-album': return <PregnancyAlbum onBack={handleBack} />;
+      case 'cry-translator': return <CryTranslator onBack={handleBack} />;
+      case 'poop-scanner': return <PoopScanner onBack={handleBack} />;
+      case 'weather-clothing': return <WeatherClothing onBack={handleBack} />;
+      case 'noise-meter': return <NoiseMeter onBack={handleBack} />;
+      case 'secondhand-market': case 'second-hand-market': return <SecondHandMarket onBack={handleBack} />;
+      case 'mom-friendly-map': return <MomFriendlyMap onBack={handleBack} />;
+      case 'smart-play-box': return <SmartPlayBox onBack={handleBack} />;
+      case 'mental-health': return <MentalHealthTracker onBack={handleBack} />;
+      case 'first-aid': return <FirstAidGuide onBack={handleBack} />;
+      case 'fairy-tale': return <FairyTaleGenerator onBack={handleBack} />;
+      case 'horoscope': return <HoroscopeCompatibility onBack={handleBack} />;
+      case 'baby-growth': case 'growth-tracker': return <BabyGrowthTracker onBack={handleBack} />;
+      case 'affiliate': case 'affiliate-products': return <AffiliateProducts onBack={handleBack} />;
+      case 'maternity-calculator': case 'maternity': return <MaternityCalculator onBack={handleBack} />;
+      case 'teething': case 'teething-tracker': return <TeethingTracker onBack={handleBack} />;
+      default: return null;
+    }
+  })();
+
+  if (toolComponent) {
+    return <Suspense fallback={toolFallback}>{toolComponent}</Suspense>;
+  }
 
   const getLifeStageInfo = () => {
     switch (lifeStage) {
