@@ -333,39 +333,64 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Call Gemini 3 Pro Image Preview for highest quality generation
-    console.log("Calling Gemini 3 Pro Image Preview...");
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                { text: masterPrompt },
-                {
-                  inline_data: {
-                    mime_type: mimeType,
-                    data: imageBase64,
-                  },
-                },
-              ],
-            },
-          ],
-          generationConfig: {
-            responseModalities: ["TEXT", "IMAGE"],
-          },
-        }),
-      }
-    );
+    // Try models in order: Gemini 3.1 Flash Image (primary), Gemini 3 Pro Image (fallback)
+    const models = [
+      "gemini-3.1-flash-image-preview",
+      "gemini-3-pro-image-preview",
+    ];
 
-    if (!geminiResponse.ok) {
-      const errorText = await geminiResponse.text();
-      console.error("Gemini API error:", geminiResponse.status, errorText);
-      return new Response(JSON.stringify({ error: "Image generation failed", details: errorText }), {
-        status: 500,
+    let geminiResponse: Response | null = null;
+    let lastError = "";
+
+    for (const model of models) {
+      console.log(`Trying model: ${model}...`);
+      const resp = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  { text: masterPrompt },
+                  {
+                    inline_data: {
+                      mime_type: mimeType,
+                      data: imageBase64,
+                    },
+                  },
+                ],
+              },
+            ],
+            generationConfig: {
+              responseModalities: ["TEXT", "IMAGE"],
+            },
+          }),
+        }
+      );
+
+      if (resp.ok) {
+        geminiResponse = resp;
+        console.log(`Success with model: ${model}`);
+        break;
+      }
+
+      lastError = await resp.text();
+      console.error(`Model ${model} failed (${resp.status}):`, lastError);
+      
+      // Only retry on 503 (unavailable), fail fast on other errors
+      if (resp.status !== 503) {
+        return new Response(JSON.stringify({ error: "Image generation failed", details: lastError }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    if (!geminiResponse) {
+      return new Response(JSON.stringify({ error: "All AI models are currently unavailable. Please try again later.", details: lastError }), {
+        status: 503,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
