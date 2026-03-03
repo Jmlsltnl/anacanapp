@@ -60,6 +60,10 @@ const AdminPlaces = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
+      // Delete child records first
+      await supabase.from('place_verifications').delete().eq('place_id', id);
+      await supabase.from('place_reviews').delete().eq('place_id', id);
+      // Then delete the place
       const { error } = await supabase
         .from('mom_friendly_places')
         .delete()
