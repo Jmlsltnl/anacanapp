@@ -223,22 +223,18 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
               onClick={() => setSelectedItem(null)}
             >
               <motion.div
-                initial={{ y: '100%' }}
-                animate={{ y: 0 }}
-                exit={{ y: '100%' }}
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full bg-card rounded-t-2xl max-h-[80vh] overflow-hidden"
+                className="w-full max-w-sm bg-card rounded-2xl max-h-[80vh] overflow-hidden shadow-xl"
               >
-                <div className="pt-2.5 pb-1.5">
-                  <div className="w-10 h-1 bg-muted-foreground/25 rounded-full mx-auto" />
-                </div>
-
-                <div className="px-4 pb-6 overflow-y-auto max-h-[calc(80vh-40px)]" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 16px) + 24px)' }}>
+                <div className="px-4 py-4 overflow-y-auto max-h-[80vh]">
                   {/* Compact hero */}
                   <div className={`flex items-center gap-3 rounded-xl bg-gradient-to-r ${cfg.gradient} p-3 mb-3`}>
                     <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
