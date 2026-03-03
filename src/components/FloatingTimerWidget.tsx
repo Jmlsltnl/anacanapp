@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Moon, Baby, Volume2, Square, ChevronUp, ChevronDown, Clock } from 'lucide-react';
+import { Moon, Baby, Volume2, Square, Clock, X } from 'lucide-react';
 import { useTimerStore, type TimerType } from '@/store/timerStore';
 
 const timerConfig: Record<TimerType, { icon: typeof Moon; color: string; label: string }> = {
@@ -23,11 +23,14 @@ const FloatingTimerWidget = () => {
   const [expanded, setExpanded] = useState(false);
   const [, setTick] = useState(0);
 
-  // Tick every second to update elapsed times
   useEffect(() => {
     if (activeTimers.length === 0) return;
     const interval = setInterval(() => setTick(t => t + 1), 1000);
     return () => clearInterval(interval);
+  }, [activeTimers.length]);
+
+  useEffect(() => {
+    if (activeTimers.length === 0) setExpanded(false);
   }, [activeTimers.length]);
 
   if (activeTimers.length === 0) return null;
@@ -37,94 +40,82 @@ const FloatingTimerWidget = () => {
   const PrimaryIcon = config.icon;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 20, opacity: 0 }}
-        className="fixed left-3 right-3 z-[55] transition-all"
-        style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 4rem)' }}
-      >
-        <div className="bg-card/95 backdrop-blur-xl rounded-2xl shadow-lg border border-border/60 overflow-hidden">
-          {/* Collapsed: single row */}
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="w-full flex items-center gap-3 px-4 py-2.5"
-          >
-            {/* Pulsing indicator */}
-            <div className="relative">
-              <div className={`w-2 h-2 rounded-full bg-green-500`} />
-              <div className="absolute inset-0 w-2 h-2 rounded-full bg-green-500 animate-ping opacity-75" />
-            </div>
-
-            <PrimaryIcon className={`w-4.5 h-4.5 ${config.color}`} />
-
-            <div className="flex-1 text-left">
-              <span className="text-xs font-semibold text-foreground">
-                {primaryTimer.label || config.label}
-                {primaryTimer.feedType ? ` (${primaryTimer.feedType === 'left' ? 'Sol' : 'Sağ'})` : ''}
-              </span>
-              {activeTimers.length > 1 && (
-                <span className="text-[10px] text-muted-foreground ml-1.5">
-                  +{activeTimers.length - 1}
-                </span>
-              )}
-            </div>
-
-            <span className="text-sm font-mono font-bold text-foreground tabular-nums">
-              {formatTime(getElapsedSeconds(primaryTimer.id))}
+    <AnimatePresence mode="wait">
+      {!expanded ? (
+        <motion.button
+          key="mini"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0, opacity: 0 }}
+          onClick={() => setExpanded(true)}
+          whileTap={{ scale: 0.9 }}
+          className="fixed right-3 z-[55] flex items-center gap-1.5 rounded-full shadow-lg border border-border/60 bg-card/95 backdrop-blur-xl px-2.5 py-1.5"
+          style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 4.5rem)' }}
+        >
+          <div className="relative">
+            <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+            <div className="absolute inset-0 w-1.5 h-1.5 rounded-full bg-green-500 animate-ping opacity-75" />
+          </div>
+          <PrimaryIcon className={`w-3.5 h-3.5 ${config.color}`} />
+          <span className="text-[11px] font-mono font-bold text-foreground tabular-nums">
+            {formatTime(getElapsedSeconds(primaryTimer.id))}
+          </span>
+          {activeTimers.length > 1 && (
+            <span className="text-[9px] font-semibold text-muted-foreground bg-muted rounded-full w-4 h-4 flex items-center justify-center">
+              {activeTimers.length}
             </span>
-
-            <motion.button
-              onClick={(e) => { e.stopPropagation(); stopTimer(primaryTimer.id); }}
-              whileTap={{ scale: 0.85 }}
-              className="w-7 h-7 rounded-full bg-destructive/10 flex items-center justify-center"
-            >
-              <Square className="w-3 h-3 text-destructive fill-destructive" />
-            </motion.button>
-
-            {activeTimers.length > 1 && (
-              expanded ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronUp className="w-4 h-4 text-muted-foreground" />
-            )}
-          </button>
-
-          {/* Expanded: all timers */}
-          <AnimatePresence>
-            {expanded && activeTimers.length > 1 && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="border-t border-border/40"
+          )}
+        </motion.button>
+      ) : (
+        <motion.div
+          key="panel"
+          initial={{ x: 60, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: 60, opacity: 0 }}
+          transition={{ type: 'spring', damping: 22, stiffness: 300 }}
+          className="fixed right-3 z-[55] w-52"
+          style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 4.5rem)' }}
+        >
+          <div className="bg-card/95 backdrop-blur-xl rounded-2xl shadow-lg border border-border/60 overflow-hidden">
+            <div className="flex items-center justify-between px-3 pt-2 pb-1">
+              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Taymer</span>
+              <button
+                onClick={() => setExpanded(false)}
+                className="w-5 h-5 rounded-full bg-muted/60 flex items-center justify-center"
               >
-                {activeTimers.slice(1).map((timer) => {
-                  const tc = timerConfig[timer.type] || timerConfig.sleep;
-                  const Icon = tc.icon;
-                  return (
-                    <div key={timer.id} className="flex items-center gap-3 px-4 py-2">
-                      <Icon className={`w-4 h-4 ${tc.color}`} />
-                      <span className="flex-1 text-xs font-medium text-foreground">
+                <X className="w-3 h-3 text-muted-foreground" />
+              </button>
+            </div>
+            <div className="px-2 pb-2 space-y-1">
+              {activeTimers.map((timer) => {
+                const tc = timerConfig[timer.type] || timerConfig.sleep;
+                const Icon = tc.icon;
+                return (
+                  <div key={timer.id} className="flex items-center gap-2 rounded-xl bg-muted/40 px-2.5 py-1.5">
+                    <Icon className={`w-3.5 h-3.5 ${tc.color} shrink-0`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[11px] font-semibold text-foreground truncate leading-tight">
                         {timer.label || tc.label}
                         {timer.feedType ? ` (${timer.feedType === 'left' ? 'Sol' : 'Sağ'})` : ''}
-                      </span>
-                      <span className="text-xs font-mono font-semibold text-foreground tabular-nums">
+                      </p>
+                      <p className="text-xs font-mono font-bold text-foreground tabular-nums">
                         {formatTime(getElapsedSeconds(timer.id))}
-                      </span>
-                      <motion.button
-                        onClick={() => stopTimer(timer.id)}
-                        whileTap={{ scale: 0.85 }}
-                        className="w-6 h-6 rounded-full bg-destructive/10 flex items-center justify-center"
-                      >
-                        <Square className="w-2.5 h-2.5 text-destructive fill-destructive" />
-                      </motion.button>
+                      </p>
                     </div>
-                  );
-                })}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.div>
+                    <motion.button
+                      onClick={() => stopTimer(timer.id)}
+                      whileTap={{ scale: 0.85 }}
+                      className="w-6 h-6 rounded-full bg-destructive/10 flex items-center justify-center shrink-0"
+                    >
+                      <Square className="w-2.5 h-2.5 text-destructive fill-destructive" />
+                    </motion.button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </motion.div>
+      )}
     </AnimatePresence>
   );
 };
