@@ -17,7 +17,7 @@ import {
   useSubmitEPDS,
   useMentalHealthResources,
   useShouldShowEPDSPrompt,
-  EPDS_QUESTIONS,
+  EPDS_QUESTIONS as FALLBACK_EPDS_QUESTIONS,
   EPDSAssessment
 } from '@/hooks/useMentalHealth';
 import { 
@@ -42,6 +42,21 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
   const { data: moodLevelsDB = [] } = useMoodLevelsDB();
   const { data: breathingExercisesDB = [] } = useBreathingExercisesDB();
   const { data: epdsQuestionsDB = [] } = useEPDSQuestionsDB();
+
+  // Map DB EPDS questions to component format, fallback to hardcoded
+  const EPDS_QUESTIONS = useMemo(() => {
+    if (epdsQuestionsDB.length > 0) {
+      return epdsQuestionsDB.map(q => ({
+        id: q.question_number,
+        question: q.question_text_az || q.question_text,
+        options: (q.options || []).map(o => ({
+          value: o.value,
+          label: o.text_az || o.text,
+        })),
+      }));
+    }
+    return FALLBACK_EPDS_QUESTIONS;
+  }, [epdsQuestionsDB]);
   
   // Use DB data or fallback
   const MOOD_LEVELS = useMemo(() => {
