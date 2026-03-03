@@ -292,6 +292,21 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
           }
         }
 
+        // Process any remaining buffer after stream ends
+        if (buffer.trim()) {
+          for (const line of buffer.split('\n')) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6).trim();
+              if (data === '[DONE]' || !data) continue;
+              try {
+                const parsed = JSON.parse(data);
+                const content = parsed.choices?.[0]?.delta?.content || '';
+                if (content) fullContent += content;
+              } catch { /* ignore */ }
+            }
+          }
+        }
+
         const finalContent = fullContent || 'Bağışla, cavab ala bilmədim.';
         setMessages(prev => prev.map(m => 
           m.id === assistantMessageId 
