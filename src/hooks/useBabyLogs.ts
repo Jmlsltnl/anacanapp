@@ -61,11 +61,14 @@ export const useBabyLogs = () => {
       
       setLogs((data || []) as BabyLog[]);
       
-      // Filter today's logs
-      const today = new Date().toISOString().split('T')[0];
-      const todayData = (data || []).filter(log => 
-        log.start_time.startsWith(today)
-      ) as BabyLog[];
+      // Filter today's logs using local timezone
+      const now = new Date();
+      const localToday = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const todayData = (data || []).filter(log => {
+        const logDate = new Date(log.start_time);
+        const logLocal = `${logDate.getFullYear()}-${String(logDate.getMonth() + 1).padStart(2, '0')}-${String(logDate.getDate()).padStart(2, '0')}`;
+        return logLocal === localToday;
+      }) as BabyLog[];
       setTodayLogs(todayData);
     } catch (error) {
       console.error('Error fetching baby logs:', error);

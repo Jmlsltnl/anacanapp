@@ -38,11 +38,14 @@ export const useMealLogs = () => {
       
       setLogs((data as MealLog[]) || []);
       
-      // Filter today's logs
-      const today = new Date().toISOString().split('T')[0];
-      const todayData = (data || []).filter(log => 
-        log.logged_at.startsWith(today)
-      ) as MealLog[];
+      // Filter today's logs using local timezone
+      const now = new Date();
+      const localToday = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const todayData = (data || []).filter(log => {
+        const logDate = new Date(log.logged_at);
+        const logLocal = `${logDate.getFullYear()}-${String(logDate.getMonth() + 1).padStart(2, '0')}-${String(logDate.getDate()).padStart(2, '0')}`;
+        return logLocal === localToday;
+      }) as MealLog[];
       setTodayLogs(todayData);
     } catch (error) {
       console.error('Error fetching meal logs:', error);
