@@ -1,5 +1,4 @@
 import { Capacitor } from '@capacitor/core';
-import { PushNotifications } from '@capacitor/push-notifications';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { StatusBar, Style } from '@capacitor/status-bar';
@@ -64,7 +63,7 @@ export const statusBar = {
   }
 };
 
-// Push Notifications
+// Push Notifications - uses @capacitor-firebase/messaging for proper FCM tokens on iOS & Android
 export const pushNotifications = {
   register: async () => {
     if (!isNative) return;
@@ -78,10 +77,13 @@ export const pushNotifications = {
     }
 
     try {
-      let permStatus = await PushNotifications.checkPermissions();
+      // Try Firebase Messaging first (returns proper FCM token on both platforms)
+      const { FirebaseMessaging } = await import('@capacitor-firebase/messaging');
+      
+      let permStatus = await FirebaseMessaging.checkPermissions();
 
       if (permStatus.receive === 'prompt') {
-        permStatus = await PushNotifications.requestPermissions();
+        permStatus = await FirebaseMessaging.requestPermissions();
       }
 
       if (permStatus.receive !== 'granted') {
@@ -89,29 +91,65 @@ export const pushNotifications = {
         return;
       }
 
-      await PushNotifications.register();
+      const tokenResult = await FirebaseMessaging.getToken();
+      console.log('Firebase Messaging token obtained:', tokenResult.token.substring(0, 30) + '...');
     } catch (error) {
-      console.error('Push notification registration failed:', error);
+      console.warn('Firebase Messaging not available, falling back to Capacitor PushNotifications:', error);
+      
+      // Fallback to @capacitor/push-notifications
+      try {
+        const { PushNotifications: CapPush } = await import('@capacitor/push-notifications');
+        
+        let permStatus = await CapPush.checkPermissions();
+        if (permStatus.receive === 'prompt') {
+          permStatus = await CapPush.requestPermissions();
+        }
+        if (permStatus.receive !== 'granted') {
+          console.log('Push notification permission not granted');
+          return;
+        }
+        await CapPush.register();
+      } catch (fallbackError) {
+        console.error('Push notification registration failed:', fallbackError);
+      }
     }
   },
 
   addListeners: () => {
     if (!isNative) return;
 
-    PushNotifications.addListener('registration', token => {
-      console.log('Push registration success, token: ' + token.value);
-    });
+    // Try Firebase Messaging listeners first
+    import('@capacitor-firebase/messaging').then(({ FirebaseMessaging }) => {
+      FirebaseMessaging.addListener('tokenReceived', token => {
+        console.log('Firebase Messaging token refreshed:', token.token.substring(0, 30) + '...');
+      });
 
-    PushNotifications.addListener('registrationError', err => {
-      console.error('Registration error: ', err.error);
-    });
+      FirebaseMessaging.addListener('notificationReceived', notification => {
+        console.log('Push notification received:', notification);
+      });
 
-    PushNotifications.addListener('pushNotificationReceived', notification => {
-      console.log('Push notification received: ', notification);
-    });
+      FirebaseMessaging.addListener('notificationActionPerformed', action => {
+        console.log('Push notification action performed:', action);
+      });
+    }).catch(() => {
+      // Fallback to capacitor push listeners
+      import('@capacitor/push-notifications').then(({ PushNotifications: CapPush }) => {
+        CapPush.addListener('registration', token => {
+          console.log('Push registration success, token: ' + token.value);
+        });
 
-    PushNotifications.addListener('pushNotificationActionPerformed', notification => {
-      console.log('Push notification action performed', notification.actionId, notification.inputValue);
+        CapPush.addListener('registrationError', err => {
+          console.error('Registration error: ', err.error);
+        });
+
+        CapPush.addListener('pushNotificationReceived', notification => {
+          console.log('Push notification received: ', notification);
+        });
+
+        CapPush.addListener('pushNotificationActionPerformed', notification => {
+          console.log('Push notification action performed', notification.actionId, notification.inputValue);
+        });
+      });
     });
   }
 };
