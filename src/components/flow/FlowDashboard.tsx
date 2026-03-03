@@ -117,7 +117,7 @@ const FlowDashboard = () => {
               </h2>
             </div>
             <div className="text-right">
-              <p className="text-white/70 text-xs">Sikl günü</p>
+              <p className="text-white/70 text-xs">Tsikl günü</p>
               <p className="text-4xl font-bold text-white">{currentDay}</p>
             </div>
           </div>
@@ -142,7 +142,7 @@ const FlowDashboard = () => {
             <div className="bg-white/15 rounded-xl p-3 text-center">
               <Calendar className="w-5 h-5 text-white mx-auto mb-1" />
               <p className="text-white text-lg font-bold">{cycleLength}</p>
-              <p className="text-white/70 text-[10px]">gün sikl</p>
+              <p className="text-white/70 text-[10px]">gün tsikl</p>
             </div>
             <div className="bg-white/15 rounded-xl p-3 text-center">
               <Heart className="w-5 h-5 text-white mx-auto mb-1" />

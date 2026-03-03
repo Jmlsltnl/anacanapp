@@ -67,7 +67,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
         { name: 'baby_growth', label: 'Körpə inkişafı' },
         { name: 'baby_logs', label: 'Körpə qeydləri' },
         { name: 'weight_entries', label: 'Çəki qeydləri' },
-        { name: 'cycle_history', label: 'Siklus tarixi' },
+        { name: 'cycle_history', label: 'Tsikl tarixi' },
         { name: 'kick_sessions', label: 'Təpik sessiyaları' },
         { name: 'contractions', label: 'Büzüşmələr' },
         { name: 'blood_sugar_logs', label: 'Qan şəkəri' },

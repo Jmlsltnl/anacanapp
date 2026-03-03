@@ -51,7 +51,7 @@ ${userProfile.dueDate ? `- Təxmini doğuş tarixi: ${userProfile.dueDate}` : ""
 ${userProfile.babyName ? `- Körpənin adı: ${userProfile.babyName}` : ""}
 ${userProfile.babyBirthDate ? `- Körpənin doğum tarixi: ${userProfile.babyBirthDate}` : ""}
 ${userProfile.lastPeriodDate ? `- Son menstruasiya tarixi: ${userProfile.lastPeriodDate}` : ""}
-${userProfile.cycleLength ? `- Sikl uzunluğu: ${userProfile.cycleLength} gün` : ""}
+${userProfile.cycleLength ? `- Tsikl uzunluğu: ${userProfile.cycleLength} gün` : ""}
 ${userProfile.partnerName ? `- Həyat yoldaşının adı: ${userProfile.partnerName}` : ""}
 `
     : "";
@@ -134,7 +134,7 @@ ${userContext}
                 : cyclePhase === "ovulation"
                   ? "Ovulyasiya fazası"
                   : "Luteal faza"
-          }${cycleDay ? ` (Sikl günü: ${cycleDay})` : ""}`
+          }${cycleDay ? ` (Tsikl günü: ${cycleDay})` : ""}`
         : "";
 
       const phaseSpecificAdvice =
@@ -175,12 +175,12 @@ ${userContext}
 
       return `${basePrompt}
 
-🌙 İSTİFADƏÇİ MENSTRUAL SİKL İZLƏYİR:
+🌙 İSTİFADƏÇİ MENSTRUAL TSİKL İZLƏYİR:
 ${phaseInfo}
 ${phaseSpecificAdvice}
 
 💡 ƏSAS MÖVZULAR:
-- Menstrual sikl haqqında dəqiq, peşəkar məlumat
+- Menstrual tsikl haqqında dəqiq, peşəkar məlumat
 - Hər faza üçün xüsusi tövsiyələr
 - Ağrı idarəetməsi və rahatlandırma üsulları
 - PMS və əhval dəyişiklikləri ilə mübarizə
