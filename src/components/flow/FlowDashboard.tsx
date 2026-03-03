@@ -9,18 +9,41 @@ import { useUserStore } from '@/store/userStore';
 import { usePhaseTips, PHASE_INFO, CATEGORY_INFO, MenstrualPhase, TipCategory } from '@/hooks/usePhaseTips';
 import { format, addDays, subDays, differenceInDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns';
 import { az } from 'date-fns/locale';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import FlowDailyLogger from './FlowDailyLogger';
 import FlowMoodChart from './FlowMoodChart';
 import FlowCycleStats from './FlowCycleStats';
 import FlowRemindersCard from './FlowRemindersCard';
 import { getPhaseInfoForDate, getNextPeriodDate, getFertileWindow } from '@/lib/cycle-utils';
-
 const FlowDashboard = () => {
   const { getCycleData, cycleLength, periodLength } = useUserStore();
   const cycleData = getCycleData();
   
   const [selectedCategory, setSelectedCategory] = useState<TipCategory | 'all'>('all');
   const [calendarMonth, setCalendarMonth] = useState(new Date());
+
+  // Fetch upcoming labels from app_settings
+  const { data: upcomingLabels } = useQuery({
+    queryKey: ['flow-upcoming-labels'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('app_settings')
+        .select('key, value')
+        .in('key', ['flow_label_next_period', 'flow_label_fertile_window', 'flow_label_ovulation_day']);
+      const labels: Record<string, string> = {};
+      data?.forEach(item => {
+        const val = typeof item.value === 'string' ? item.value : JSON.stringify(item.value);
+        labels[item.key] = val.replace(/^"|"$/g, '');
+      });
+      return labels;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const labelNextPeriod = upcomingLabels?.flow_label_next_period || 'Növbəti Period';
+  const labelFertileWindow = upcomingLabels?.flow_label_fertile_window || 'Reproduktiv Dövr';
+  const labelOvulationDay = upcomingLabels?.flow_label_ovulation_day || 'Ovulyasiya Günü';
 
   // Get last period date
   const lastPeriodDate = cycleData?.lastPeriodDate 
@@ -358,7 +381,7 @@ const FlowDashboard = () => {
               <Droplets className="w-5 h-5 text-red-500" />
             </div>
             <div className="flex-1">
-              <p className="font-semibold text-foreground text-sm">Növbəti Period</p>
+              <p className="font-semibold text-foreground text-sm">{labelNextPeriod}</p>
               <p className="text-xs text-muted-foreground">
                 {format(nextPeriodDate, 'd MMMM', { locale: az })} • {daysUntilPeriod > 0 ? `${daysUntilPeriod} gün qaldı` : 'Bu gün'}
               </p>
@@ -371,7 +394,7 @@ const FlowDashboard = () => {
               <Heart className="w-5 h-5 text-pink-500" />
             </div>
             <div className="flex-1">
-              <p className="font-semibold text-foreground text-sm">Məhsuldar Pəncərə</p>
+              <p className="font-semibold text-foreground text-sm">{labelFertileWindow}</p>
               <p className="text-xs text-muted-foreground">
                 {format(fertileStart, 'd MMMM', { locale: az })} - {format(fertileEnd, 'd MMMM', { locale: az })}
               </p>
@@ -384,7 +407,7 @@ const FlowDashboard = () => {
               <Sparkles className="w-5 h-5 text-purple-500" />
             </div>
             <div className="flex-1">
-              <p className="font-semibold text-foreground text-sm">Ovulyasiya Günü</p>
+              <p className="font-semibold text-foreground text-sm">{labelOvulationDay}</p>
               <p className="text-xs text-muted-foreground">
                 {format(addDays(lastPeriodDate, 14), 'd MMMM', { locale: az })}
               </p>
