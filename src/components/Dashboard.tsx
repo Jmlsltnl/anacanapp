@@ -1669,6 +1669,10 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
             className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center relative"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onNavigate) onNavigate('notifications');
+            }}
           >
             <Bell className="w-4 h-4 text-primary" />
             {notificationCount > 0 && (
