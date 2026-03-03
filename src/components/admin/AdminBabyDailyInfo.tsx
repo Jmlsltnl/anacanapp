@@ -5,8 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Trash2, Save, X, Upload, Download, Search } from 'lucide-react';
+import { Plus, Trash2, Save, X, Upload, Download, Search, FileDown } from 'lucide-react';
 import { toast } from 'sonner';
+import { exportToCSV } from '@/utils/csvExport';
 
 const AdminBabyDailyInfo = () => {
   const { data, isLoading, createInfo, updateInfo, deleteInfo, bulkImport } = useBabyDailyInfoAdmin();
@@ -150,6 +151,25 @@ const AdminBabyDailyInfo = () => {
             <Download className="w-4 h-4 mr-1" /> Nümunə CSV
           </Button>
         </a>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            exportToCSV(
+              data,
+              [
+                { key: 'day_number', header: 'day_number' },
+                { key: 'info', header: 'info' },
+                { key: 'is_active', header: 'is_active' },
+              ],
+              'baby_daily_info_export.csv'
+            );
+            toast.success(`${data.length} məlumat ixrac edildi`);
+          }}
+          disabled={data.length === 0}
+        >
+          <FileDown className="w-4 h-4 mr-1" /> İxrac
+        </Button>
         <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleCSVImport} />
 
         <div className="flex-1" />

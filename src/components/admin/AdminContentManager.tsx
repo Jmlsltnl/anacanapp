@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Search, Edit, Trash2, ChefHat, Lightbulb, Shield, Baby, Briefcase, Apple, X, Upload, Image, FileUp } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, ChefHat, Lightbulb, Shield, Baby, Briefcase, Apple, X, Upload, Image, FileUp, FileDown } from 'lucide-react';
+import { exportToCSV } from '@/utils/csvExport';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -743,6 +744,30 @@ const AdminContentManager = () => {
               <Button onClick={() => namesFileInputRef.current?.click()} variant="outline" className="gap-2">
                 <FileUp className="w-4 h-4" />
                 CSV İmport
+              </Button>
+              <Button
+                variant="outline"
+                className="gap-2"
+                onClick={() => {
+                  exportToCSV(
+                    items,
+                    [
+                      { key: 'name', header: 'Ad' },
+                      { key: 'gender', header: 'Cins' },
+                      { key: 'origin', header: 'Mənşə' },
+                      { key: 'meaning', header: 'Məna' },
+                      { key: 'meaning_az', header: 'Məna (AZ)' },
+                      { key: 'popularity', header: 'Populyarlıq' },
+                      { key: 'is_active', header: 'Aktiv' },
+                    ],
+                    'baby_names_export.csv'
+                  );
+                  toast({ title: `${items.length} ad ixrac edildi` });
+                }}
+                disabled={items.length === 0}
+              >
+                <FileDown className="w-4 h-4" />
+                İxrac
               </Button>
             </>
           )}

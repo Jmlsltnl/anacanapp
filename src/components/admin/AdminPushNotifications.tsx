@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Bell, Plus, Trash2, Edit, Send, Users, Baby, Heart, Moon, Clock, Calendar, Zap, Search, ChevronLeft, ChevronRight, Loader2, Filter, RefreshCw, Upload, Download, FileText } from 'lucide-react';
+import { Bell, Plus, Trash2, Edit, Send, Users, Baby, Heart, Moon, Clock, Calendar, Zap, Search, ChevronLeft, ChevronRight, Loader2, Filter, RefreshCw, Upload, Download, FileText, FileDown } from 'lucide-react';
+import { exportToCSV } from '@/utils/csvExport';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -547,6 +548,29 @@ const PregnancyDayNotificationsTab = () => {
             <Button variant="outline" size="sm" onClick={handleDownloadTemplate}>
               <Download className="h-4 w-4 mr-1" />
               Nümunə CSV
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                exportToCSV(
+                  notifications,
+                  [
+                    { key: 'day_number', header: 'day_number' },
+                    { key: 'send_time', header: 'send_time' },
+                    { key: 'title', header: 'title' },
+                    { key: 'body', header: 'body' },
+                    { key: 'emoji', header: 'emoji' },
+                    { key: 'is_active', header: 'is_active' },
+                  ],
+                  'pregnancy_notifications_export.csv'
+                );
+                toast.success(`${notifications.length} bildiriş ixrac edildi`);
+              }}
+              disabled={notifications.length === 0}
+            >
+              <FileDown className="h-4 w-4 mr-1" />
+              İxrac
             </Button>
             <Button size="sm" onClick={() => fileInputRef.current?.click()} disabled={importing}>
               {importing ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Upload className="h-4 w-4 mr-1" />}
@@ -1798,6 +1822,29 @@ const MommyDayNotificationsTab = () => {
             <Button variant="outline" size="sm" onClick={handleDownloadTemplate}>
               <Download className="h-4 w-4 mr-1" />
               Nümunə CSV
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                exportToCSV(
+                  notifications,
+                  [
+                    { key: 'day_number', header: 'day_number' },
+                    { key: 'send_time', header: 'send_time' },
+                    { key: 'title', header: 'title' },
+                    { key: 'body', header: 'body' },
+                    { key: 'emoji', header: 'emoji' },
+                    { key: 'is_active', header: 'is_active' },
+                  ],
+                  'mommy_notifications_export.csv'
+                );
+                toast.success(`${notifications.length} bildiriş ixrac edildi`);
+              }}
+              disabled={notifications.length === 0}
+            >
+              <FileDown className="h-4 w-4 mr-1" />
+              İxrac
             </Button>
             <Button size="sm" onClick={() => fileInputRef.current?.click()} disabled={importing}>
               {importing ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Upload className="h-4 w-4 mr-1" />}

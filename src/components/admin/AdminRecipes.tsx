@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { UtensilsCrossed, Plus, Pencil, Trash2, Search, Clock, Users, FileUp, Download, Upload, X, Image as ImageIcon, Settings2 } from 'lucide-react';
+import { UtensilsCrossed, Plus, Pencil, Trash2, Search, Clock, Users, FileUp, Download, Upload, X, Image as ImageIcon, Settings2, FileDown } from 'lucide-react';
+import { exportToCSV } from '@/utils/csvExport';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -364,6 +365,33 @@ const AdminRecipes = () => {
           <Button onClick={() => csvFileInputRef.current?.click()} variant="outline" className="gap-2">
             <FileUp className="w-4 h-4" />
             CSV İmport
+          </Button>
+          <Button
+            variant="outline"
+            className="gap-2"
+            onClick={() => {
+              exportToCSV(
+                recipes,
+                [
+                  { key: 'title', header: 'Başlıq' },
+                  { key: 'description', header: 'Təsvir' },
+                  { key: 'category', header: 'Kateqoriya' },
+                  { key: 'prep_time', header: 'Hazırlıq (dəq)' },
+                  { key: 'cook_time', header: 'Bişirmə (dəq)' },
+                  { key: 'servings', header: 'Porsiya' },
+                  { key: 'ingredients', header: 'İnqredientlər' },
+                  { key: 'instructions', header: 'Hazırlanma' },
+                  { key: 'image_url', header: 'Şəkil URL' },
+                  { key: 'is_active', header: 'Aktiv' },
+                ],
+                'recipes_export.csv'
+              );
+              toast({ title: `${recipes.length} resept ixrac edildi` });
+            }}
+            disabled={recipes.length === 0}
+          >
+            <FileDown className="w-4 h-4" />
+            İxrac
           </Button>
           <Button onClick={openCreateModal} className="gap-2">
             <Plus className="w-4 h-4" />
