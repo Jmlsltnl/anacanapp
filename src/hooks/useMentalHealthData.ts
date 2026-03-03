@@ -63,7 +63,7 @@ export const useEPDSQuestionsDB = () => {
         options: (q.options as { value: number; text: string; text_az: string }[]) || [],
       })) as EPDSQuestion[];
     },
-    staleTime: 1000 * 60 * 30, // 30 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
 
