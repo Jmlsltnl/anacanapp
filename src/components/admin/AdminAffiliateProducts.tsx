@@ -7,7 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2, Edit, Save, X, ExternalLink, Package, Image, Video, Star, Upload, Download, FileSpreadsheet } from 'lucide-react';
+import { Plus, Trash2, Edit, Save, X, ExternalLink, Package, Image, Video, Star, Upload, Download, FileSpreadsheet, FileDown } from 'lucide-react';
+import { exportToCSV } from '@/utils/csvExport';
 import { useAppSetting, useUpdateAppSetting } from '@/hooks/useAppSettings';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
@@ -360,6 +361,42 @@ const AdminAffiliateProducts = () => {
             </Button>
             <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={importing}>
               <Upload className="w-4 h-4 mr-2" /> {importing ? 'Yüklənir...' : 'CSV İmport'}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+              const items = products || [];
+                exportToCSV(
+                  items,
+                  [
+                    { key: 'name', header: 'name' },
+                    { key: 'name_az', header: 'name_az' },
+                    { key: 'affiliate_url', header: 'affiliate_url' },
+                    { key: 'category', header: 'category' },
+                    { key: 'platform', header: 'platform' },
+                    { key: 'price', header: 'price' },
+                    { key: 'original_price', header: 'original_price' },
+                    { key: 'currency', header: 'currency' },
+                    { key: 'image_url', header: 'image_url' },
+                    { key: 'images', header: 'images' },
+                    { key: 'store_name', header: 'store_name' },
+                    { key: 'description_az', header: 'description_az' },
+                    { key: 'rating', header: 'rating' },
+                    { key: 'review_count', header: 'review_count' },
+                    { key: 'life_stages', header: 'life_stages' },
+                    { key: 'is_featured', header: 'is_featured' },
+                    { key: 'is_active', header: 'is_active' },
+                    { key: 'pros', header: 'pros' },
+                    { key: 'cons', header: 'cons' },
+                    { key: 'tags', header: 'tags' },
+                  ],
+                  'affiliate_products_export.csv'
+                );
+                toast({ title: `${items.length} məhsul ixrac edildi` });
+              }}
+              disabled={products.length === 0}
+            >
+              <FileDown className="w-4 h-4 mr-2" /> İxrac
             </Button>
             <Button onClick={() => setShowAddForm(true)} disabled={showAddForm}>
               <Plus className="w-4 h-4 mr-2" /> Əlavə et

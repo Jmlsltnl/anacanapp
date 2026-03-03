@@ -5,8 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Trash2, Save, X, Upload, Download, Search, Heart } from 'lucide-react';
+import { Plus, Trash2, Save, X, Upload, Download, Search, Heart, FileDown } from 'lucide-react';
 import { toast } from 'sonner';
+import { exportToCSV } from '@/utils/csvExport';
 
 const AdminMommyDailyMessages = () => {
   const { data, isLoading, createMessage, updateMessage, deleteMessage, bulkImport } = useMommyDailyMessagesAdmin();
@@ -138,6 +139,25 @@ const AdminMommyDailyMessages = () => {
           </Button>
           <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}>
             <Upload className="w-4 h-4 mr-1" /> CSV Import
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              exportToCSV(
+                data,
+                [
+                  { key: 'day_number', header: 'day_number' },
+                  { key: 'message', header: 'message' },
+                  { key: 'is_active', header: 'is_active' },
+                ],
+                'mommy_daily_messages_export.csv'
+              );
+              toast.success(`${data.length} mesaj ixrac edildi`);
+            }}
+            disabled={data.length === 0}
+          >
+            <FileDown className="w-4 h-4 mr-1" /> İxrac
           </Button>
           <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleCSVImport} />
           <Button size="sm" onClick={handleCreate}>
