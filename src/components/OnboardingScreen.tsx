@@ -525,7 +525,7 @@ const OnboardingScreen = () => {
                     <motion.div variants={childVariants}>
                       <label className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
-                        Sikl uzunluğu (gün)
+                        Tsikl uzunluğu (gün)
                       </label>
                       <div className="flex items-center gap-3">
                         <motion.button

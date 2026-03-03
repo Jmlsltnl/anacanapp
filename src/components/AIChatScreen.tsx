@@ -102,7 +102,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     
     switch (lifeStage) {
       case 'flow':
-        return `Salam${userName}! 👋 Mən Anacan.AI, sizin sağlamlıq rəfiqənizəm. Menstrual sikliniz, simptomlarınız və ya ümumi sağlamlığınız haqqında suallarınız varsa, kömək etməkdən məmnun olaram! 💜`;
+        return `Salam${userName}! 👋 Mən Anacan.AI, sizin sağlamlıq rəfiqənizəm. Menstrual tsikliniz, simptomlarınız və ya ümumi sağlamlığınız haqqında suallarınız varsa, kömək etməkdən məmnun olaram! 💜`;
       case 'bump':
         return `Salam, əziz ana${userName}! 🤰 Mən Anacan.AI. ${pregnancyData ? `Hamiləliyin ${pregnancyData.currentWeek}-ci həftəsindəsiniz - körpəniz ${dynamicFruit || pregnancyData.babySize.fruit} böyüklüyündədir! ` : ''}Hamiləliyiniz haqqında hər hansı sualınız varsa, buradayam! 🌸`;
       case 'mommy':
@@ -304,7 +304,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
         'Körpəm niyə ağlayır?'
       ]
     : [
-        'Menstrual siklim haqqında məlumat ver',
+        'Menstrual tsiklim haqqında məlumat ver',
         'PMS simptomları ilə necə mübarizə aparım?',
         'Fertil pəncərəm nə vaxtdır?'
       ];

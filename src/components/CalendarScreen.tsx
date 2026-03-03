@@ -178,7 +178,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
             <h1 className="text-xl font-bold text-white">Təqvim</h1>
             {lifeStage === 'flow' && currentCycleDay && (
               <p className="text-white/80 text-sm">
-                Sikl günü: {currentCycleDay} / {cycleLength}
+                Tsikl günü: {currentCycleDay} / {cycleLength}
               </p>
             )}
           </div>
@@ -204,7 +204,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
             <div className="bg-white/15 rounded-xl p-2.5 text-center">
               <CalendarIcon className="w-4 h-4 text-white mx-auto mb-1" />
               <p className="text-white text-sm font-bold">{cycleLength}</p>
-              <p className="text-white/70 text-[10px]">gün sikl</p>
+              <p className="text-white/70 text-[10px]">gün tsikl</p>
             </div>
             <div className="bg-white/15 rounded-xl p-2.5 text-center">
               <Sparkles className="w-4 h-4 text-white mx-auto mb-1" />
@@ -345,7 +345,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
                   </h3>
                   {lifeStage === 'flow' && cycleData && (
                     <p className="text-xs text-muted-foreground">
-                      Sikl günü: {getCycleDayForDate(selectedDate, lastPeriodDate, cycleLength)}
+                      Tsikl günü: {getCycleDayForDate(selectedDate, lastPeriodDate, cycleLength)}
                     </p>
                   )}
                 </div>

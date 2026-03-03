@@ -29,9 +29,9 @@ const FlowCycleStats = () => {
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-bold text-foreground flex items-center gap-2">
           <BarChart3 className="w-5 h-5 text-indigo-500" />
-          Sikl Statistikası
+          Tsikl Statistikası
         </h3>
-        <span className="text-xs text-muted-foreground">{stats.totalCycles} sikl</span>
+        <span className="text-xs text-muted-foreground">{stats.totalCycles} tsikl</span>
       </div>
 
       {/* Stats Grid */}
@@ -39,7 +39,7 @@ const FlowCycleStats = () => {
         <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-xl p-3">
           <div className="flex items-center gap-2 mb-1">
             <Calendar className="w-4 h-4 text-purple-500" />
-            <span className="text-xs text-muted-foreground">Orta Sikl</span>
+            <span className="text-xs text-muted-foreground">Orta Tsikl</span>
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.averageCycleLength}</p>
           <p className="text-xs text-muted-foreground">gün</p>
@@ -78,7 +78,7 @@ const FlowCycleStats = () => {
       {/* Recent Cycles */}
       {cycles.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-foreground mb-3">Son Sikllər</h4>
+          <h4 className="text-sm font-medium text-foreground mb-3">Son Tsikllər</h4>
           <div className="space-y-2">
             {cycles.slice(0, 3).map((cycle, index) => (
               <div
@@ -100,7 +100,7 @@ const FlowCycleStats = () => {
                       )}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {cycle.cycle_length ? `${cycle.cycle_length} gün sikl` : 'Davam edir'}
+                      {cycle.cycle_length ? `${cycle.cycle_length} gün tsikl` : 'Davam edir'}
                     </p>
                   </div>
                 </div>
@@ -119,7 +119,7 @@ const FlowCycleStats = () => {
         <div className="text-center py-6">
           <Calendar className="w-10 h-10 text-muted-foreground/50 mx-auto mb-2" />
           <p className="text-sm text-muted-foreground">
-            Sikl tarixi yoxdur
+            Tsikl tarixi yoxdur
           </p>
           <p className="text-xs text-muted-foreground mt-1">
             Period günlərini qeyd etdikdə tarix yaranacaq
