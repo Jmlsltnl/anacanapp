@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Heart, Lightbulb, MessageSquare, Plus, Pencil, Trash2, Search,
-  Droplets
+  Droplets, Tag, Save
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-type ContentType = 'symptoms' | 'tips' | 'insights';
+type ContentType = 'symptoms' | 'tips' | 'insights' | 'labels';
 
 const PHASES = [
   { id: 'menstrual', label: 'Menstruasiya', emoji: '🌸' },
@@ -74,10 +74,58 @@ const AdminFlowContent = () => {
     },
   });
 
+  // Flow upcoming labels state
+  const [flowLabels, setFlowLabels] = useState({
+    flow_label_next_period: 'Növbəti Period',
+    flow_label_fertile_window: 'Reproduktiv Dövr',
+    flow_label_ovulation_day: 'Ovulyasiya Günü',
+  });
+  const [labelsLoading, setLabelsLoading] = useState(false);
+
+  const labelsQuery = useQuery({
+    queryKey: ['flow-labels-admin'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('app_settings')
+        .select('key, value')
+        .in('key', ['flow_label_next_period', 'flow_label_fertile_window', 'flow_label_ovulation_day']);
+      return data || [];
+    },
+  });
+
+  useEffect(() => {
+    if (labelsQuery.data) {
+      const labels: any = { ...flowLabels };
+      labelsQuery.data.forEach((item: any) => {
+        const val = typeof item.value === 'string' ? item.value : JSON.stringify(item.value);
+        labels[item.key] = val.replace(/^"|"$/g, '');
+      });
+      setFlowLabels(labels);
+    }
+  }, [labelsQuery.data]);
+
+  const saveLabels = async () => {
+    setLabelsLoading(true);
+    try {
+      for (const [key, value] of Object.entries(flowLabels)) {
+        await supabase
+          .from('app_settings')
+          .update({ value: JSON.stringify(value) })
+          .eq('key', key);
+      }
+      queryClient.invalidateQueries({ queryKey: ['flow-upcoming-labels'] });
+      toast({ title: 'Başlıqlar saxlanıldı ✅' });
+    } catch {
+      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+    }
+    setLabelsLoading(false);
+  };
+
   const tabs = [
     { id: 'symptoms', label: 'Simptomlar', icon: Heart, count: symptomsQuery.data?.length || 0 },
     { id: 'tips', label: 'Faza Tövsiyələri', icon: Lightbulb, count: tipsQuery.data?.length || 0 },
     { id: 'insights', label: 'Məsləhətlər', icon: MessageSquare, count: insightsQuery.data?.length || 0 },
+    { id: 'labels', label: 'Başlıqlar', icon: Tag, count: 3 },
   ];
 
   const getCurrentData = () => {
@@ -207,10 +255,12 @@ const AdminFlowContent = () => {
             Flow Dashboard-da göstərilən simptomlar, tövsiyələr və məsləhətləri idarə edin
           </p>
         </div>
-        <Button onClick={openCreateModal} className="gradient-primary gap-2">
-          <Plus className="w-4 h-4" />
-          Əlavə et
-        </Button>
+        {activeTab !== 'labels' && (
+          <Button onClick={openCreateModal} className="gradient-primary gap-2">
+            <Plus className="w-4 h-4" />
+            Əlavə et
+          </Button>
+        )}
       </div>
 
       {/* Tabs */}
@@ -235,6 +285,47 @@ const AdminFlowContent = () => {
         })}
       </div>
 
+      {activeTab === 'labels' ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Tag className="w-5 h-5" />
+              Qarşıdan Gələnlər Başlıqları
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1 block">🩸 Period başlığı</label>
+              <Input
+                value={flowLabels.flow_label_next_period}
+                onChange={(e) => setFlowLabels({ ...flowLabels, flow_label_next_period: e.target.value })}
+                placeholder="Növbəti Period"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1 block">💕 Reproduktiv dövr başlığı</label>
+              <Input
+                value={flowLabels.flow_label_fertile_window}
+                onChange={(e) => setFlowLabels({ ...flowLabels, flow_label_fertile_window: e.target.value })}
+                placeholder="Reproduktiv Dövr"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1 block">✨ Ovulyasiya başlığı</label>
+              <Input
+                value={flowLabels.flow_label_ovulation_day}
+                onChange={(e) => setFlowLabels({ ...flowLabels, flow_label_ovulation_day: e.target.value })}
+                placeholder="Ovulyasiya Günü"
+              />
+            </div>
+            <Button onClick={saveLabels} disabled={labelsLoading} className="gap-2">
+              <Save className="w-4 h-4" />
+              {labelsLoading ? 'Saxlanılır...' : 'Saxla'}
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+      <>
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -504,6 +595,8 @@ const AdminFlowContent = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </>
+      )}
     </div>
   );
 };
