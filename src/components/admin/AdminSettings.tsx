@@ -266,7 +266,7 @@ const AdminSettings = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">AI Tənzimləmələri</h3>
-                  <p className="text-sm text-muted-foreground">Dr. Anacan AI modeli və parametrləri</p>
+                  <p className="text-sm text-muted-foreground">Anacan.AI modeli və parametrləri</p>
                 </div>
               </div>
 
@@ -289,7 +289,7 @@ const AdminSettings = () => {
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Dr. Anacan AI chat üçün istifadə olunan model
+                    Anacan.AI chat üçün istifadə olunan model
                   </p>
                 </div>
               </div>

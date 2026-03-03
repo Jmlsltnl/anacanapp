@@ -43,7 +43,7 @@ const slides = [
   {
     id: 4,
     icon: MessageCircle,
-    title: 'Dr. Anacan AI',
+    title: 'Anacan.AI',
     subtitle: '24/7 şəxsi məsləhətçi',
     description: 'Suallarınızı soruşun, sağlamlıq haqqında məlumat alın. Süni intellekt dəstəyi hər an yanınızda.',
     gradient: 'from-emerald-500 to-teal-600',
