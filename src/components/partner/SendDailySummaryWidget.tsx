@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Send, Check, FileText, Sparkles } from 'lucide-react';
+import { Send, Check, FileText, Sparkles, RefreshCw } from 'lucide-react';
 import { useDailySummary } from '@/hooks/useDailySummary';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -8,9 +8,16 @@ import { useToast } from '@/hooks/use-toast';
 
 const SendDailySummaryWidget: React.FC = () => {
   const { profile } = useAuth();
-  const { generateAndSendSummary, todaySummary } = useDailySummary();
+  const { generateAndSendSummary, todaySummary, updateSummarySilently } = useDailySummary();
   const { toast } = useToast();
   const [sending, setSending] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await updateSummarySilently();
+    setRefreshing(false);
+  };
 
   // Only show for women with linked partner
   if (profile?.life_stage === 'partner' || !profile?.linked_partner_id) {
@@ -56,33 +63,42 @@ const SendDailySummaryWidget: React.FC = () => {
               : 'Partnyorunuza bugünkü vəziyyətinizi göndərin'}
           </p>
         </div>
-        <Button
-          size="sm"
-          onClick={handleSend}
-          disabled={sending}
-          className={alreadySent 
-            ? 'bg-green-500 hover:bg-green-600' 
-            : 'bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700'}
-        >
-          {sending ? (
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            >
-              <Sparkles className="w-4 h-4" />
-            </motion.div>
-          ) : alreadySent ? (
-            <>
-              <Check className="w-4 h-4 mr-1" />
-              Yenidən
-            </>
-          ) : (
-            <>
-              <Send className="w-4 h-4 mr-1" />
-              Göndər
-            </>
-          )}
-        </Button>
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+          </button>
+          <Button
+            size="sm"
+            onClick={handleSend}
+            disabled={sending}
+            className={alreadySent 
+              ? 'bg-green-500 hover:bg-green-600' 
+              : 'bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700'}
+          >
+            {sending ? (
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              >
+                <Sparkles className="w-4 h-4" />
+              </motion.div>
+            ) : alreadySent ? (
+              <>
+                <Check className="w-4 h-4 mr-1" />
+                Yenidən
+              </>
+            ) : (
+              <>
+                <Send className="w-4 h-4 mr-1" />
+                Göndər
+              </>
+            )}
+          </Button>
+        </div>
       </div>
     </motion.div>
   );
