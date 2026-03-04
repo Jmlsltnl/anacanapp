@@ -41,6 +41,7 @@ const menuItems = [
   { id: 'partner-config', label: 'Partner Konfiqurasiya', icon: Heart },
   { id: 'faq', label: 'FAQ', icon: HelpCircle },
   { id: 'onboarding', label: 'Qeydiyyat Mərhələləri', icon: Sparkles },
+  { id: 'intro-slides', label: 'Qarşılama Ekranları', icon: Sparkles },
   { id: 'mental-health', label: 'Mental Sağlamlıq', icon: Brain },
   { id: 'tools-config', label: 'Alət Konfiqurasiyaları', icon: Settings },
   { id: 'tools', label: 'Alətlər Sıralaması', icon: Wrench },
