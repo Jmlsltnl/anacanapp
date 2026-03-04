@@ -4,7 +4,7 @@ import {
   Droplets, Moon, Utensils, Activity, Plus, TrendingUp, Heart, Sparkles, 
   Bell, ChevronRight, Flame, Target, Calendar, Zap, Sun, Cloud, Wind,
   ThermometerSun, Pill, Baby, Footprints, Scale, Clock, Star, Award,
-  MessageCircle, Check, Lightbulb, BookOpen, PartyPopper
+  MessageCircle, Check, Lightbulb, BookOpen, PartyPopper, RefreshCw
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useTimerStore } from '@/store/timerStore';
@@ -1256,7 +1256,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             </div>
             <div>
               <h3 className="font-bold text-sm text-foreground">Yuxu İzləmə</h3>
-              <p className="text-xs text-muted-foreground">Bu gün: {todayStats.sleepHours} saat</p>
+              <p className="text-xs text-muted-foreground">Bu gün: {(() => { const m = Math.round(todayStats.sleepHours * 60); const h = Math.floor(m / 60); const rm = m % 60; if (h === 0 && rm === 0) return '0 dəq'; if (h === 0) return `${rm} dəq`; if (rm === 0) return `${h} saat`; return `${h}s ${rm}d`; })()}</p>
             </div>
           </div>
           <motion.button
@@ -1563,14 +1563,32 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3 }}
       >
-        <h3 className="text-base font-bold text-foreground mb-3">Bugünkü xülasə</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-base font-bold text-foreground">Bugünkü xülasə</h3>
+          <button
+            onClick={() => refetch()}
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+          </button>
+        </div>
         <div className="space-y-1.5">
           <div className="flex items-center justify-between p-2.5 bg-violet-50 dark:bg-violet-500/15 rounded-xl border border-violet-100 dark:border-violet-500/20">
             <div className="flex items-center gap-2">
               <Moon className="w-4 h-4 text-violet-600 dark:text-violet-400" />
               <span className="text-xs font-medium text-foreground">Yuxu</span>
             </div>
-            <span className="text-xs font-bold text-violet-600 dark:text-violet-400">{todayStats.sleepHours} saat</span>
+            <span className="text-xs font-bold text-violet-600 dark:text-violet-400">
+              {(() => {
+                const totalMin = Math.round(todayStats.sleepHours * 60);
+                const h = Math.floor(totalMin / 60);
+                const m = totalMin % 60;
+                if (h === 0 && m === 0) return '0 dəq';
+                if (h === 0) return `${m} dəq`;
+                if (m === 0) return `${h} saat`;
+                return `${h} saat ${m} dəq`;
+              })()}
+            </span>
           </div>
           
           {/* Enhanced Feeding History Panel */}
