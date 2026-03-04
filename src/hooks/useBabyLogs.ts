@@ -248,6 +248,7 @@ export const useBabyLogs = () => {
       lastSleep: sleepLogs[0] || null,
       lastDiaper: diaperLogs[0] || null,
       feedingLogs,
+      sleepLogs,
       diaperLogs,
     };
   }, [todayLogs]);

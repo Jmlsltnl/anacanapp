@@ -4,7 +4,7 @@ import {
   Droplets, Moon, Utensils, Activity, Plus, TrendingUp, Heart, Sparkles, 
   Bell, ChevronRight, Flame, Target, Calendar, Zap, Sun, Cloud, Wind,
   ThermometerSun, Pill, Baby, Footprints, Scale, Clock, Star, Award,
-  MessageCircle, Check, Lightbulb, BookOpen, PartyPopper, RefreshCw
+  MessageCircle, Check, Lightbulb, BookOpen, PartyPopper, RefreshCw, ChevronUp, ChevronDown
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useTimerStore } from '@/store/timerStore';
@@ -803,6 +803,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   // Diaper tracking
   const [showDiaperModal, setShowDiaperModal] = useState(false);
   const feedingSummaryRef = useRef<HTMLDivElement>(null);
+  const [sleepExpanded, setSleepExpanded] = useState(false);
 
   // Update timer display every second
   useEffect(() => {
@@ -1573,22 +1574,89 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           </button>
         </div>
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between p-2.5 bg-violet-50 dark:bg-violet-500/15 rounded-xl border border-violet-100 dark:border-violet-500/20">
-            <div className="flex items-center gap-2">
-              <Moon className="w-4 h-4 text-violet-600 dark:text-violet-400" />
-              <span className="text-xs font-medium text-foreground">Yuxu</span>
-            </div>
-            <span className="text-xs font-bold text-violet-600 dark:text-violet-400">
-              {(() => {
-                const totalMin = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60);
-                const h = Math.floor(totalMin / 60);
-                const m = totalMin % 60;
-                if (h === 0 && m === 0) return '0 dəq';
-                if (h === 0) return `${m} dəq`;
-                if (m === 0) return `${h} saat`;
-                return `${h} saat ${m} dəq`;
-              })()}
-            </span>
+          {/* Sleep Summary - Expandable */}
+          <div className="bg-violet-50/50 dark:bg-violet-500/10 rounded-2xl overflow-hidden border border-violet-100 dark:border-violet-500/20">
+            <button
+              onClick={() => setSleepExpanded(!sleepExpanded)}
+              className="w-full p-3 flex items-center justify-between hover:bg-violet-100/30 dark:hover:bg-violet-500/15 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-violet-100 dark:bg-violet-500/20 flex items-center justify-center">
+                  <Moon className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+                </div>
+                <div className="text-left">
+                  <p className="text-xs font-semibold text-foreground">Yuxu xülasəsi</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {todayStats.sleepLogs?.length || 0} yuxu qeydə alınıb
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="text-right mr-2">
+                  <p className="text-xs font-bold text-violet-600 dark:text-violet-400">
+                    {(() => {
+                      const totalMin = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60);
+                      const h = Math.floor(totalMin / 60);
+                      const m = totalMin % 60;
+                      if (h === 0 && m === 0) return '0 dəq';
+                      if (h === 0) return `${m} dəq`;
+                      if (m === 0) return `${h} saat`;
+                      return `${h} saat ${m} dəq`;
+                    })()}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">bu gün</p>
+                </div>
+                {sleepExpanded ? (
+                  <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                )}
+              </div>
+            </button>
+            <AnimatePresence>
+              {sleepExpanded && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="px-3 pb-3 space-y-1.5">
+                    {(todayStats.sleepLogs && todayStats.sleepLogs.length > 0) ? (
+                      [...todayStats.sleepLogs].reverse().map((log) => {
+                        const start = new Date(log.start_time);
+                        const end = log.end_time ? new Date(log.end_time) : null;
+                        const durationSec = end ? Math.round((end.getTime() - start.getTime()) / 1000) : 0;
+                        const dH = Math.floor(durationSec / 3600);
+                        const dM = Math.floor((durationSec % 3600) / 60);
+                        const dS = durationSec % 60;
+                        const durText = dH > 0 ? `${dH}s ${dM}d` : dM > 0 ? `${dM} dəq ${dS} san` : `${dS} san`;
+
+                        return (
+                          <div key={log.id} className="flex items-center justify-between p-2 bg-violet-100/50 dark:bg-violet-500/10 rounded-xl">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm">😴</span>
+                              <div>
+                                <p className="text-[11px] font-medium text-foreground">
+                                  {start.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
+                                  {end && ` – ${end.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}`}
+                                </p>
+                              </div>
+                            </div>
+                            <span className="text-[11px] font-semibold text-violet-600 dark:text-violet-400">
+                              {end ? durText : 'Davam edir...'}
+                            </span>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <p className="text-[11px] text-muted-foreground text-center py-2">Bu gün yuxu qeydə alınmayıb</p>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
           
           {/* Enhanced Feeding History Panel */}
