@@ -84,6 +84,7 @@ const eyeColorDescriptions: Record<string, string> = {
   hazel: "enchanting hazel eyes with swirling green and golden amber tones",
   gray: "striking silver-gray eyes like morning mist over the ocean",
   amber: "stunning warm amber eyes like golden honey in sunlight",
+  violet: "mesmerizing violet purple eyes with a magical ethereal shimmer",
 };
 
 const hairColorDescriptions: Record<string, string> = {
@@ -94,6 +95,9 @@ const hairColorDescriptions: Record<string, string> = {
   red: "beautiful auburn red hair with copper and ginger highlights",
   strawberry: "lovely strawberry blonde hair with peachy rose tones",
   white: "adorable platinum white-blonde baby hair like soft cotton",
+  platinum: "shimmering platinum silver-blonde hair, light and airy",
+  auburn: "rich deep auburn hair with warm reddish-brown tones",
+  chestnut: "warm chestnut hair with deep reddish-brown undertones",
 };
 
 const hairStyleDescriptions: Record<string, string> = {
@@ -176,11 +180,29 @@ const imageStyleConfig: Record<string, { style: string; faceNote: string }> = {
 // ═══════════════════════════════════════════════════════════════════════════════
 // MASTER PROMPT BUILDER - Creates the perfect generation prompt
 // ═══════════════════════════════════════════════════════════════════════════════
-function buildMasterPrompt(
+async function buildMasterPrompt(
   backgroundTheme: string,
-  customization: CustomizationOptions
-): string {
-  const background = backgroundPrompts[backgroundTheme] || backgroundPrompts.garden_natural;
+  customization: CustomizationOptions,
+  supabase: any
+): Promise<string> {
+  // Try hardcoded first, then fetch from DB
+  let background = backgroundPrompts[backgroundTheme];
+  if (!background) {
+    try {
+      const { data } = await supabase
+        .from('photoshoot_backgrounds')
+        .select('prompt_template')
+        .eq('theme_id', backgroundTheme)
+        .eq('is_active', true)
+        .single();
+      if (data?.prompt_template) {
+        background = data.prompt_template;
+      }
+    } catch (e) {
+      console.error('Failed to fetch background from DB:', e);
+    }
+  }
+  if (!background) background = backgroundPrompts.garden_natural;
   const styleId = customization.imageStyle || "realistic";
   const styleConfig = imageStyleConfig[styleId] || imageStyleConfig.realistic;
   
@@ -318,7 +340,7 @@ Deno.serve(async (req) => {
     }
 
     // Build the master prompt
-    const masterPrompt = buildMasterPrompt(backgroundTheme, customization);
+    const masterPrompt = await buildMasterPrompt(backgroundTheme, customization, supabase);
     console.log("Generated prompt for theme:", backgroundTheme, "style:", customization.imageStyle);
 
     // Extract base64 data from data URL if present
