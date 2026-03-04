@@ -148,7 +148,7 @@ export function getFertileWindow(
  */
 export function calculateCycleStats(cycles: { cycle_length: number | null; period_length: number | null }[]) {
   const validCycleLengths = cycles
-    .filter(c => c.cycle_length && c.cycle_length >= 21 && c.cycle_length <= 45)
+    .filter(c => c.cycle_length && c.cycle_length >= 10 && c.cycle_length <= 50)
     .map(c => c.cycle_length!);
   
   const validPeriodLengths = cycles

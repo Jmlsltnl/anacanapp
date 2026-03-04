@@ -530,7 +530,7 @@ const OnboardingScreen = () => {
                       <div className="flex items-center gap-3">
                         <motion.button
                           type="button"
-                          onClick={() => setCycleLength(Math.max(21, cycleLength - 1))}
+                          onClick={() => setCycleLength(Math.max(10, cycleLength - 1))}
                           className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
                           whileTap={{ scale: 0.95 }}
                         >
@@ -542,7 +542,7 @@ const OnboardingScreen = () => {
                         </div>
                         <motion.button
                           type="button"
-                          onClick={() => setCycleLength(Math.min(45, cycleLength + 1))}
+                          onClick={() => setCycleLength(Math.min(50, cycleLength + 1))}
                           className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
                           whileTap={{ scale: 0.95 }}
                         >
@@ -550,7 +550,7 @@ const OnboardingScreen = () => {
                         </motion.button>
                       </div>
                       <p className="text-xs text-muted-foreground mt-2 text-center">
-                        Normal aralıq: 21-35 gün
+                        Aralıq: 10-50 gün (normal: 21-35 gün)
                       </p>
                     </motion.div>
 
