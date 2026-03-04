@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
@@ -23,6 +23,7 @@ export const useDailySummary = () => {
   const [summaries, setSummaries] = useState<DailySummary[]>([]);
   const [todaySummary, setTodaySummary] = useState<DailySummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const getPartnerUserId = useCallback(async (): Promise<string | null> => {
     if (!profile?.linked_partner_id) return null;
@@ -45,7 +46,6 @@ export const useDailySummary = () => {
     if (!user) return;
 
     try {
-      // Determine if I'm viewing my own summaries or partner's
       const isPartner = profile?.life_stage === 'partner';
 
       let query = supabase
@@ -55,10 +55,8 @@ export const useDailySummary = () => {
         .limit(30);
 
       if (isPartner) {
-        // Partner views summaries sent to them
         query = query.eq('partner_user_id', user.id);
       } else {
-        // Woman views her own summaries
         query = query.eq('user_id', user.id);
       }
 
@@ -67,7 +65,6 @@ export const useDailySummary = () => {
       if (error) throw error;
       setSummaries((data || []) as DailySummary[]);
 
-      // Find today's summary
       const today = new Date().toISOString().split('T')[0];
       const todayData = data?.find(s => s.summary_date === today) || null;
       setTodaySummary(todayData as DailySummary | null);
@@ -78,16 +75,16 @@ export const useDailySummary = () => {
     }
   };
 
-  const generateAndSendSummary = async () => {
-    if (!user || profile?.life_stage === 'partner') return { error: 'Only woman can send summary' };
+  // Silently update today's summary without sending notification
+  const updateSummarySilently = useCallback(async () => {
+    if (!user || profile?.life_stage === 'partner') return;
 
     try {
       const partnerUserId = await getPartnerUserId();
-      if (!partnerUserId) return { error: 'No partner linked' };
+      if (!partnerUserId) return;
 
       const today = new Date().toISOString().split('T')[0];
 
-      // Fetch today's data
       const [dailyLogRes, kicksRes, contractionsRes] = await Promise.all([
         supabase
           .from('daily_logs')
@@ -113,7 +110,70 @@ export const useDailySummary = () => {
       const totalKicks = kicksRes.data?.reduce((sum, k) => sum + (k.kick_count || 0), 0) || 0;
       const contractionCount = contractionsRes.data?.length || 0;
 
-      // Create or update summary
+      await supabase
+        .from('daily_summaries')
+        .upsert({
+          user_id: user.id,
+          partner_user_id: partnerUserId,
+          summary_date: today,
+          mood: dailyLog?.mood || null,
+          symptoms: dailyLog?.symptoms || null,
+          water_intake: dailyLog?.water_intake || 0,
+          kick_count: totalKicks,
+          contraction_count: contractionCount,
+          is_sent: false,
+        }, {
+          onConflict: 'user_id,summary_date'
+        });
+
+      await fetchSummaries();
+    } catch (error) {
+      console.error('Error auto-updating summary:', error);
+    }
+  }, [user, profile?.life_stage, getPartnerUserId]);
+
+  // Debounced version to avoid rapid-fire updates
+  const debouncedUpdateSummary = useCallback(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      updateSummarySilently();
+    }, 1500);
+  }, [updateSummarySilently]);
+
+  const generateAndSendSummary = async () => {
+    if (!user || profile?.life_stage === 'partner') return { error: 'Only woman can send summary' };
+
+    try {
+      const partnerUserId = await getPartnerUserId();
+      if (!partnerUserId) return { error: 'No partner linked' };
+
+      const today = new Date().toISOString().split('T')[0];
+
+      const [dailyLogRes, kicksRes, contractionsRes] = await Promise.all([
+        supabase
+          .from('daily_logs')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('log_date', today)
+          .single(),
+        supabase
+          .from('kick_sessions')
+          .select('kick_count')
+          .eq('user_id', user.id)
+          .gte('created_at', `${today}T00:00:00`)
+          .lte('created_at', `${today}T23:59:59`),
+        supabase
+          .from('contractions')
+          .select('id')
+          .eq('user_id', user.id)
+          .gte('start_time', `${today}T00:00:00`)
+          .lte('start_time', `${today}T23:59:59`),
+      ]);
+
+      const dailyLog = dailyLogRes.data;
+      const totalKicks = kicksRes.data?.reduce((sum, k) => sum + (k.kick_count || 0), 0) || 0;
+      const contractionCount = contractionsRes.data?.length || 0;
+
       const { data, error } = await supabase
         .from('daily_summaries')
         .upsert({
@@ -135,7 +195,6 @@ export const useDailySummary = () => {
 
       if (error) throw error;
 
-      // Send partner notification
       const moodEmojis = ['😢', '😔', '😐', '🙂', '😊'];
       const moodText = dailyLog?.mood ? moodEmojis[dailyLog.mood - 1] : '❓';
 
@@ -160,35 +219,38 @@ export const useDailySummary = () => {
     }
   };
 
-  // Set up realtime subscription
+  // Realtime subscriptions on summary + source tables
   useEffect(() => {
     fetchSummaries();
 
     const channel = supabase
-      .channel('daily_summaries_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'daily_summaries'
-        },
-        () => {
-          fetchSummaries();
-        }
-      )
+      .channel('summary_and_sources')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_summaries' }, () => {
+        fetchSummaries();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_logs', filter: user ? `user_id=eq.${user.id}` : undefined }, () => {
+        debouncedUpdateSummary();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'kick_sessions', filter: user ? `user_id=eq.${user.id}` : undefined }, () => {
+        debouncedUpdateSummary();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'contractions', filter: user ? `user_id=eq.${user.id}` : undefined }, () => {
+        debouncedUpdateSummary();
+      })
       .subscribe();
 
     return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
       supabase.removeChannel(channel);
     };
-  }, [user, profile?.life_stage]);
+  }, [user, profile?.life_stage, debouncedUpdateSummary]);
 
   return {
     summaries,
     todaySummary,
     loading,
     generateAndSendSummary,
+    updateSummarySilently,
     refetch: fetchSummaries,
   };
 };
