@@ -54,6 +54,7 @@ import AdminHealthcareReviews from './admin/AdminHealthcareReviews';
 import AdminCakes from './admin/AdminCakes';
 import AdminBabyDailyInfo from './admin/AdminBabyDailyInfo';
 import AdminMommyDailyMessages from './admin/AdminMommyDailyMessages';
+import AdminIntroSlides from './admin/AdminIntroSlides';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -172,6 +173,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminBabyDailyInfo />;
       case 'mommy-daily-messages':
         return <AdminMommyDailyMessages />;
+      case 'intro-slides':
+        return <AdminIntroSlides />;
       case 'security':
         return <AdminSecurity />;
       default:

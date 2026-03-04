@@ -3148,6 +3148,48 @@ export type Database = {
         }
         Relationships: []
       }
+      intro_slides: {
+        Row: {
+          bg_decor: string | null
+          created_at: string
+          description: string | null
+          gradient: string
+          icon_name: string
+          id: string
+          is_active: boolean
+          sort_order: number
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          bg_decor?: string | null
+          created_at?: string
+          description?: string | null
+          gradient?: string
+          icon_name?: string
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          bg_decor?: string | null
+          created_at?: string
+          description?: string | null
+          gradient?: string
+          icon_name?: string
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       kick_sessions: {
         Row: {
           created_at: string
