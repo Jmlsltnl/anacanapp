@@ -239,6 +239,7 @@ export const useBabyLogs = () => {
       formulaCount,
       solidCount,
       sleepHours: Math.round(totalSleepMinutes / 60 * 10) / 10,
+      sleepMinutes: Math.round(totalSleepMinutes),
       diaperCount: diaperLogs.length,
       wetCount,
       dirtyCount,

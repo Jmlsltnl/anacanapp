@@ -1256,7 +1256,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             </div>
             <div>
               <h3 className="font-bold text-sm text-foreground">Yuxu İzləmə</h3>
-              <p className="text-xs text-muted-foreground">Bu gün: {(() => { const m = Math.round(todayStats.sleepHours * 60); const h = Math.floor(m / 60); const rm = m % 60; if (h === 0 && rm === 0) return '0 dəq'; if (h === 0) return `${rm} dəq`; if (rm === 0) return `${h} saat`; return `${h}s ${rm}d`; })()}</p>
+              <p className="text-xs text-muted-foreground">Bu gün: {(() => { const m = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60); const h = Math.floor(m / 60); const rm = m % 60; if (h === 0 && rm === 0) return '0 dəq'; if (h === 0) return `${rm} dəq`; if (rm === 0) return `${h} saat`; return `${h}s ${rm}d`; })()}</p>
             </div>
           </div>
           <motion.button
@@ -1580,7 +1580,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             </div>
             <span className="text-xs font-bold text-violet-600 dark:text-violet-400">
               {(() => {
-                const totalMin = Math.round(todayStats.sleepHours * 60);
+                const totalMin = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60);
                 const h = Math.floor(totalMin / 60);
                 const m = totalMin % 60;
                 if (h === 0 && m === 0) return '0 dəq';
