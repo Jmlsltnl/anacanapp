@@ -449,8 +449,8 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                   type="number"
                   value={formData.cycle_length}
                   onChange={(e) => setFormData(prev => ({ ...prev, cycle_length: parseInt(e.target.value) || 28 }))}
-                  min={21}
-                  max={35}
+                  min={10}
+                  max={50}
                 />
               </div>
             </>
