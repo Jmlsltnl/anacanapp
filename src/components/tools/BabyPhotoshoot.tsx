@@ -71,7 +71,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
   
   const [step, setStep] = useState(0);
   const [customization, setCustomization] = useState<CustomizationOptions>({
-    gender: 'girl',
+    gender: 'boy',
     eyeColor: 'keep',
     hairColor: 'keep',
     hairStyle: 'keep',
@@ -125,33 +125,50 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     return []; // Will use fallback in render
   }, [dbBackgrounds]);
 
-  const eyeColorOptions = useMemo(() => {
-    if (dbEyeColors.length > 0) {
-      return dbEyeColors.map(c => ({
-        id: c.color_id,
-        name: c.color_name_az || c.color_name,
-        color: `bg-gradient-to-r ${c.hex_value || 'from-gray-300 to-gray-400'}`,
-      }));
+  // Map Tailwind gradient classes to actual CSS hex colors for inline styles
+  const gradientToHex: Record<string, [string, string]> = {
+    'from-gray-300 to-gray-400': ['#d1d5db', '#9ca3af'],
+    'from-blue-400 to-blue-600': ['#60a5fa', '#2563eb'],
+    'from-green-400 to-emerald-600': ['#4ade80', '#059669'],
+    'from-amber-600 to-amber-800': ['#d97706', '#92400e'],
+    'from-amber-400 to-green-600': ['#fbbf24', '#16a34a'],
+    'from-gray-400 to-slate-600': ['#9ca3af', '#475569'],
+    'from-amber-500 to-orange-600': ['#f59e0b', '#ea580c'],
+    'from-violet-400 to-purple-600': ['#a78bfa', '#9333ea'],
+    'from-yellow-300 to-amber-400': ['#fde047', '#fbbf24'],
+    'from-amber-700 to-amber-900': ['#b45309', '#78350f'],
+    'from-gray-800 to-black': ['#1f2937', '#000000'],
+    'from-orange-600 to-red-700': ['#ea580c', '#b91c1c'],
+    'from-orange-300 to-pink-400': ['#fdba74', '#f472b6'],
+    'from-gray-100 to-gray-300': ['#f3f4f6', '#d1d5db'],
+    'from-red-800 to-amber-900': ['#991b1b', '#78350f'],
+    'from-amber-800 to-red-900': ['#92400e', '#7f1d1d'],
+  };
+
+  const getGradientStyle = (hexValue: string): React.CSSProperties => {
+    const colors = gradientToHex[hexValue];
+    if (colors) {
+      return { background: `linear-gradient(to right, ${colors[0]}, ${colors[1]})` };
     }
-    return fallbackEyeColors.map(c => ({
+    // Fallback: try to render as-is
+    return { background: `linear-gradient(to right, #d1d5db, #9ca3af)` };
+  };
+
+  const eyeColorOptions = useMemo(() => {
+    const source = dbEyeColors.length > 0 ? dbEyeColors : fallbackEyeColors;
+    return source.map(c => ({
       id: c.color_id,
       name: c.color_name_az || c.color_name,
-      color: `bg-gradient-to-r ${c.hex_value}`,
+      hexValue: c.hex_value || 'from-gray-300 to-gray-400',
     }));
   }, [dbEyeColors]);
 
   const hairColorOptions = useMemo(() => {
-    if (dbHairColors.length > 0) {
-      return dbHairColors.map(c => ({
-        id: c.color_id,
-        name: c.color_name_az || c.color_name,
-        color: `bg-gradient-to-r ${c.hex_value || 'from-gray-300 to-gray-400'}`,
-      }));
-    }
-    return fallbackHairColors.map(c => ({
+    const source = dbHairColors.length > 0 ? dbHairColors : fallbackHairColors;
+    return source.map(c => ({
       id: c.color_id,
       name: c.color_name_az || c.color_name,
-      color: `bg-gradient-to-r ${c.hex_value}`,
+      hexValue: c.hex_value || 'from-gray-300 to-gray-400',
     }));
   }, [dbHairColors]);
 
@@ -592,9 +609,14 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
               <div key={category} className="bg-card rounded-3xl p-5 shadow-elevated">
                 <h3 className="font-bold text-foreground mb-3 flex items-center gap-2">
                   {category === 'Realist' && '📷'}
-                  {category === 'Aesthetic' && '✨'}
-                  {category === 'Fantastik' && '🎭'}
+                  {category === 'Estetik' && '✨'}
+                  {category === 'Fantaziya' && '🎭'}
                   {category === 'Mövsümi' && '🌈'}
+                  {category === 'Bayram' && '🎉'}
+                  {category === 'Minimalist və Təbii' && '🌿'}
+                  {category === 'Nağılvari' && '📖'}
+                  {category === 'Yaradıcı' && '🎨'}
+                  {category === 'Klassik və Vintage' && '🕰️'}
                   {category}
                 </h3>
                 <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5">
@@ -650,7 +672,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                     }`}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <div className={`w-8 h-8 rounded-full ${option.color}`} />
+                    <div className="w-8 h-8 rounded-full" style={getGradientStyle(option.hexValue)} />
                     <span className="text-[9px] font-medium text-foreground">{option.name}</span>
                   </motion.button>
                 ))}
@@ -675,7 +697,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                     }`}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <div className={`w-8 h-8 rounded-full ${option.color}`} />
+                    <div className="w-8 h-8 rounded-full" style={getGradientStyle(option.hexValue)} />
                     <span className="text-[9px] font-medium text-foreground">{option.name}</span>
                   </motion.button>
                 ))}
