@@ -356,7 +356,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                     className="flex items-center gap-2 h-auto py-3 px-4 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-xl border"
                   >
                     <CalendarDays className="w-4 h-4" />
-                    <span className="text-sm">Son adet tarixi</span>
+                    <span className="text-sm">Son menstruasiya tarixi</span>
                   </ToggleGroupItem>
                   <ToggleGroupItem 
                     value="dueDate" 
