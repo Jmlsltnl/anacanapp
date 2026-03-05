@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ShoppingBag, Loader2, Upload, Check, User, MapPin, FileText, CreditCard, Tag, Package, Info } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Loader2, Upload, Check, User, MapPin, FileText, CreditCard, Tag, Package, Info, icons } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
