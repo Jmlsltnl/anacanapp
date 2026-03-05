@@ -226,8 +226,8 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
           </div>
         )}
 
-        {/* Proof upload */}
-        {paymentMethod && (
+        {/* Proof upload - only for card transfer */}
+        {paymentMethod && paymentMethod !== 'cash_on_delivery' && paymentMethod.includes('transfer') && (
           <div className="space-y-2">
             <Label className="text-xs text-muted-foreground">Ödəniş sübutu (şəkil/PDF)</Label>
             <label className="flex items-center gap-3 p-3 rounded-xl border-2 border-dashed border-border/60 cursor-pointer hover:border-primary/40 transition-all bg-card">
