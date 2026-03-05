@@ -113,7 +113,7 @@ Deno.serve(async (req) => {
       throw new Error(`AI gateway error: ${response.status}`);
     }
 
-    // Streaming: pass through directly (already OpenAI-compatible SSE)
+    // Streaming: pass through Gemini SSE directly
     if (stream) {
       return new Response(response.body, {
         headers: {
@@ -125,10 +125,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Non-streaming response
+    // Non-streaming response (Gemini format)
     const data = await response.json();
     const assistantMessage =
-      data.choices?.[0]?.message?.content || "Bağışlayın, cavab ala bilmədim. Yenidən cəhd edin.";
+      data.candidates?.[0]?.content?.parts?.[0]?.text || "Bağışlayın, cavab ala bilmədim. Yenidən cəhd edin.";
 
     return new Response(
       JSON.stringify({ message: assistantMessage, success: true }),
