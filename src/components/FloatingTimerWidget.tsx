@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Moon, Baby, Volume2, Square, Clock, X } from 'lucide-react';
+import { Moon, Baby, Volume2, Square, Clock, X, VolumeX } from 'lucide-react';
 import { useTimerStore, type TimerType } from '@/store/timerStore';
+import { useWhiteNoiseStore } from '@/store/whiteNoiseStore';
 
 const timerConfig: Record<TimerType, { icon: typeof Moon; color: string; label: string }> = {
   sleep: { icon: Moon, color: 'text-indigo-500', label: 'Yuxu' },
@@ -20,24 +21,30 @@ const formatTime = (totalSeconds: number) => {
 
 const FloatingTimerWidget = () => {
   const { activeTimers, stopTimer, getElapsedSeconds } = useTimerStore();
+  const whiteNoise = useWhiteNoiseStore();
   const [expanded, setExpanded] = useState(false);
   const [, setTick] = useState(0);
 
+  const hasTimers = activeTimers.length > 0;
+  const hasWhiteNoise = whiteNoise.isPlaying;
+  const hasAnything = hasTimers || hasWhiteNoise;
+
   useEffect(() => {
-    if (activeTimers.length === 0) return;
+    if (!hasAnything) return;
     const interval = setInterval(() => setTick(t => t + 1), 1000);
     return () => clearInterval(interval);
-  }, [activeTimers.length]);
+  }, [hasAnything]);
 
   useEffect(() => {
-    if (activeTimers.length === 0) setExpanded(false);
-  }, [activeTimers.length]);
+    if (!hasAnything) setExpanded(false);
+  }, [hasAnything]);
 
-  if (activeTimers.length === 0) return null;
+  if (!hasAnything) return null;
 
   const primaryTimer = activeTimers[0];
-  const config = timerConfig[primaryTimer.type] || timerConfig.sleep;
-  const PrimaryIcon = config.icon;
+  const config = primaryTimer ? (timerConfig[primaryTimer.type] || timerConfig.sleep) : null;
+  const PrimaryIcon = config?.icon || Volume2;
+  const primaryColor = config?.color || 'text-emerald-500';
 
   return (
     <AnimatePresence mode="wait">
@@ -56,13 +63,24 @@ const FloatingTimerWidget = () => {
             <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
             <div className="absolute inset-0 w-1.5 h-1.5 rounded-full bg-green-500 animate-ping opacity-75" />
           </div>
-          <PrimaryIcon className={`w-3.5 h-3.5 ${config.color}`} />
-          <span className="text-[11px] font-mono font-bold text-foreground tabular-nums">
-            {formatTime(getElapsedSeconds(primaryTimer.id))}
-          </span>
-          {activeTimers.length > 1 && (
+          {hasWhiteNoise && !primaryTimer ? (
+            <>
+              <span className="text-sm">{whiteNoise.soundEmoji || '🔊'}</span>
+              <span className="text-[11px] font-semibold text-foreground truncate max-w-[60px]">
+                {whiteNoise.soundName || 'Küy'}
+              </span>
+            </>
+          ) : primaryTimer ? (
+            <>
+              <PrimaryIcon className={`w-3.5 h-3.5 ${primaryColor}`} />
+              <span className="text-[11px] font-mono font-bold text-foreground tabular-nums">
+                {formatTime(getElapsedSeconds(primaryTimer.id))}
+              </span>
+            </>
+          ) : null}
+          {(activeTimers.length + (hasWhiteNoise ? 1 : 0)) > 1 && (
             <span className="text-[9px] font-semibold text-muted-foreground bg-muted rounded-full w-4 h-4 flex items-center justify-center">
-              {activeTimers.length}
+              {activeTimers.length + (hasWhiteNoise ? 1 : 0)}
             </span>
           )}
         </motion.button>
@@ -87,6 +105,36 @@ const FloatingTimerWidget = () => {
               </button>
             </div>
             <div className="px-2 pb-2 space-y-1">
+              {/* White noise entry */}
+              {hasWhiteNoise && (
+                <div className="flex items-center gap-2 rounded-xl bg-emerald-500/10 px-2.5 py-1.5">
+                  <span className="text-sm shrink-0">{whiteNoise.soundEmoji || '🔊'}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-semibold text-foreground truncate leading-tight">
+                      {whiteNoise.soundName || 'Küy Səsi'}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">Oynayır</p>
+                  </div>
+                  <motion.button
+                    onClick={() => whiteNoise.toggleMute()}
+                    whileTap={{ scale: 0.85 }}
+                    className="w-6 h-6 rounded-full bg-muted/60 flex items-center justify-center shrink-0"
+                  >
+                    {whiteNoise.isMuted 
+                      ? <VolumeX className="w-2.5 h-2.5 text-muted-foreground" />
+                      : <Volume2 className="w-2.5 h-2.5 text-emerald-600" />
+                    }
+                  </motion.button>
+                  <motion.button
+                    onClick={() => whiteNoise.stop()}
+                    whileTap={{ scale: 0.85 }}
+                    className="w-6 h-6 rounded-full bg-destructive/10 flex items-center justify-center shrink-0"
+                  >
+                    <Square className="w-2.5 h-2.5 text-destructive fill-destructive" />
+                  </motion.button>
+                </div>
+              )}
+              {/* Timer entries */}
               {activeTimers.map((timer) => {
                 const tc = timerConfig[timer.type] || timerConfig.sleep;
                 const Icon = tc.icon;

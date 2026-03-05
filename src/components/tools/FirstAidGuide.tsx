@@ -109,9 +109,9 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.1 }}
             >
-              <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-2xl p-4 shadow-lg flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center">
-                  <Phone className="w-7 h-7 text-white" />
+              <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-2xl p-4 shadow-lg flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                  <Phone className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1">
                   <p className="text-xl font-black text-white">103</p>
@@ -150,11 +150,11 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                     className={`w-full rounded-2xl border-2 p-4 text-left transition-all hover:shadow-lg ${getEmergencyBg(scenario.emergency_level)}`}
                   >
                     <div className="flex items-center gap-4">
-                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${getEmergencyColor(scenario.emergency_level)} flex items-center justify-center text-3xl shadow-lg`}>
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${getEmergencyColor(scenario.emergency_level)} flex items-center justify-center text-2xl shadow-md`}>
                         {scenario.icon}
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-lg font-bold text-foreground mb-1">{scenario.title_az}</h3>
+                        <h3 className="text-base font-bold text-foreground mb-0.5">{scenario.title_az}</h3>
                         <p className="text-sm text-muted-foreground line-clamp-2">{scenario.description_az}</p>
                         <div className="flex items-center gap-2 mt-2">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r ${getEmergencyColor(scenario.emergency_level)} text-white`}>
@@ -216,21 +216,21 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                     )}
 
                     <motion.div 
-                      className={`w-28 h-28 rounded-3xl bg-gradient-to-br ${getEmergencyColor(selectedScenario.emergency_level)} flex items-center justify-center mx-auto mb-6 shadow-xl`}
+                      className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${getEmergencyColor(selectedScenario.emergency_level)} flex items-center justify-center mx-auto mb-4 shadow-xl`}
                       animate={{ scale: [1, 1.05, 1] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
-                      <span className="text-5xl">
+                      <span className="text-4xl">
                         {currentStep === 0 ? '👋' : currentStep === steps.length - 1 ? '✅' : selectedScenario.icon}
                       </span>
                     </motion.div>
 
-                    <div className="bg-card rounded-3xl p-6 shadow-lg border border-border/50 mb-4">
-                      <span className="inline-block px-3 py-1 rounded-full bg-muted text-muted-foreground text-sm font-medium mb-3">
+                    <div className="bg-card rounded-2xl p-4 shadow-lg border border-border/50 mb-4">
+                      <span className="inline-block px-3 py-1 rounded-full bg-muted text-muted-foreground text-xs font-medium mb-2">
                         Addım {currentStep + 1}
                       </span>
-                      <h2 className="text-2xl font-black text-foreground mb-3">{currentStepData.title_az}</h2>
-                      <p className="text-lg text-muted-foreground leading-relaxed">
+                      <h2 className="text-xl font-black text-foreground mb-2">{currentStepData.title_az}</h2>
+                      <p className="text-base text-muted-foreground leading-relaxed">
                         {currentStepData.instruction_az}
                       </p>
                     </div>

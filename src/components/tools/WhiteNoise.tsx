@@ -6,6 +6,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { PremiumModal } from '@/components/PremiumModal';
 import { useWhiteNoiseSounds, WhiteNoiseSound } from '@/hooks/useDynamicConfig';
+import { useWhiteNoiseStore } from '@/store/whiteNoiseStore';
 
 interface Sound {
   id: string;
@@ -20,33 +21,24 @@ interface Sound {
 // Noise type metadata
 const noiseTypes = [
   { 
-    id: 'white', 
-    label: 'Bəyaz Küy', 
-    subtitle: 'Sakitləşdirici',
-    description: 'Ana bətnindəki səsə bənzər monoton fon',
-    emoji: '⚪',
+    id: 'white', label: 'Bəyaz Küy', subtitle: 'Sakitləşdirici',
+    description: 'Ana bətnindəki səsə bənzər monoton fon', emoji: '⚪',
     gradient: 'from-slate-100 to-gray-200 dark:from-slate-800 dark:to-gray-900',
     borderColor: 'border-slate-300 dark:border-slate-700',
     textColor: 'text-slate-700 dark:text-slate-300',
     badgeColor: 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300',
   },
   { 
-    id: 'pink', 
-    label: 'Çəhrayı Küy', 
-    subtitle: 'Təbiət effekti',
-    description: 'Yüngül yağış və yarpaq xışıltısı kimi',
-    emoji: '🌸',
+    id: 'pink', label: 'Çəhrayı Küy', subtitle: 'Təbiət effekti',
+    description: 'Yüngül yağış və yarpaq xışıltısı kimi', emoji: '🌸',
     gradient: 'from-pink-50 to-rose-100 dark:from-pink-900/30 dark:to-rose-900/20',
     borderColor: 'border-pink-300 dark:border-pink-800',
     textColor: 'text-pink-700 dark:text-pink-300',
     badgeColor: 'bg-pink-200 dark:bg-pink-800 text-pink-700 dark:text-pink-300',
   },
   { 
-    id: 'brown', 
-    label: 'Qəhvəyi Küy', 
-    subtitle: 'Dərin yuxu',
-    description: 'Dərin və boğuq səslər — şəlalə, göy gurultusu',
-    emoji: '🟤',
+    id: 'brown', label: 'Qəhvəyi Küy', subtitle: 'Dərin yuxu',
+    description: 'Dərin və boğuq səslər — şəlalə, göy gurultusu', emoji: '🟤',
     gradient: 'from-amber-50 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/20',
     borderColor: 'border-amber-300 dark:border-amber-800',
     textColor: 'text-amber-800 dark:text-amber-300',
@@ -64,6 +56,9 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
   const { preferences, loading: prefsLoading, updateWhiteNoiseVolume, updateWhiteNoiseTimer, updateLastWhiteNoiseSound } = useUserPreferences();
   const { isPremium, canUseWhiteNoise, trackWhiteNoiseUsage, freeLimits } = useSubscription();
   const { data: dbSounds, isLoading: soundsLoading } = useWhiteNoiseSounds();
+  
+  // Global audio store
+  const whiteNoise = useWhiteNoiseStore();
   
   // Map DB sounds to component format
   const sounds: Sound[] = useMemo(() => {
@@ -93,154 +88,43 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
     return groups;
   }, [sounds]);
   
-  const [activeSound, setActiveSound] = useState<string | null>(null);
-  const [volume, setVolume] = useState(70);
-  const [isMuted, setIsMuted] = useState(false);
   const [timer, setTimer] = useState<number | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   
   const trackingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastTrackTimeRef = useRef<number>(Date.now());
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const noiseSourceRef = useRef<AudioBufferSourceNode | null>(null);
-  const gainNodeRef = useRef<GainNode | null>(null);
 
   const usageInfo = useMemo(() => canUseWhiteNoise(), [canUseWhiteNoise]);
 
-  // Helper: generate noise buffer
-  const generateNoiseBuffer = (ctx: AudioContext, type: string): AudioBuffer => {
-    const sampleRate = ctx.sampleRate;
-    const duration = 4; // seconds, will loop
-    const length = sampleRate * duration;
-    const buffer = ctx.createBuffer(1, length, sampleRate);
-    const data = buffer.getChannelData(0);
-
-    if (type === 'pink') {
-      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-      for (let i = 0; i < length; i++) {
-        const white = Math.random() * 2 - 1;
-        b0 = 0.99886 * b0 + white * 0.0555179;
-        b1 = 0.99332 * b1 + white * 0.0750759;
-        b2 = 0.96900 * b2 + white * 0.1538520;
-        b3 = 0.86650 * b3 + white * 0.3104856;
-        b4 = 0.55000 * b4 + white * 0.5329522;
-        b5 = -0.7616 * b5 - white * 0.0168980;
-        data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
-        b6 = white * 0.115926;
-      }
-    } else if (type === 'brown') {
-      let last = 0;
-      for (let i = 0; i < length; i++) {
-        const white = Math.random() * 2 - 1;
-        last = (last + (0.02 * white)) / 1.02;
-        data[i] = last * 3.5;
-      }
-    } else {
-      // white noise
-      for (let i = 0; i < length; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
-    }
-    return buffer;
-  };
-
-  // Stop all audio
-  const stopAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = '';
-      audioRef.current = null;
-    }
-    if (noiseSourceRef.current) {
-      try { noiseSourceRef.current.stop(); } catch {}
-      noiseSourceRef.current = null;
-    }
-    if (audioCtxRef.current) {
-      audioCtxRef.current.close();
-      audioCtxRef.current = null;
-    }
-    gainNodeRef.current = null;
-  };
-
-  // Play audio when activeSound changes
-  useEffect(() => {
-    if (!activeSound) {
-      stopAudio();
-      return;
-    }
-
-    const sound = sounds.find(s => s.id === activeSound);
-    if (!sound) { stopAudio(); return; }
-
-    const effectiveVolume = isMuted ? 0 : volume / 100;
-
-    if (sound.audioUrl) {
-      // Play from URL
-      stopAudio();
-      const audio = new Audio(sound.audioUrl);
-      audio.loop = true;
-      audio.volume = effectiveVolume;
-      audio.play().catch(err => console.warn('Audio play failed:', err));
-      audioRef.current = audio;
-    } else {
-      // Generate noise with Web Audio API
-      stopAudio();
-      const ctx = new AudioContext();
-      audioCtxRef.current = ctx;
-      const gainNode = ctx.createGain();
-      gainNode.gain.value = effectiveVolume;
-      gainNode.connect(ctx.destination);
-      gainNodeRef.current = gainNode;
-
-      const buffer = generateNoiseBuffer(ctx, sound.noiseType);
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      source.loop = true;
-      source.connect(gainNode);
-      source.start();
-      noiseSourceRef.current = source;
-    }
-
-    return () => stopAudio();
-  }, [activeSound, sounds]);
-
-  // Update volume on active audio - separate from playback effect
-  useEffect(() => {
-    if (!activeSound) return;
-    const effectiveVolume = isMuted ? 0 : volume / 100;
-    if (audioRef.current) {
-      audioRef.current.volume = effectiveVolume;
-    }
-    if (gainNodeRef.current) {
-      try {
-        gainNodeRef.current.gain.setValueAtTime(effectiveVolume, gainNodeRef.current.context.currentTime);
-      } catch {
-        gainNodeRef.current.gain.value = effectiveVolume;
-      }
-    }
-  }, [volume, isMuted, activeSound]);
+  // Derive active state from global store
+  const activeSound = whiteNoise.activeSoundId;
+  const volume = whiteNoise.volume;
+  const isMuted = whiteNoise.isMuted;
 
   // Initialize from preferences
   useEffect(() => {
     if (preferences) {
-      setVolume(preferences.white_noise_volume || 70);
+      whiteNoise.setVolume(preferences.white_noise_volume || 70);
       setTimer(preferences.white_noise_timer);
-      if (preferences.last_white_noise_sound) {
+      if (preferences.last_white_noise_sound && !whiteNoise.isPlaying) {
         const { allowed } = canUseWhiteNoise();
         if (allowed || isPremium) {
-          setActiveSound(preferences.last_white_noise_sound);
-          if (preferences.white_noise_timer) {
-            setTimeRemaining(preferences.white_noise_timer * 60);
-          } else if (!isPremium) {
-            const info = canUseWhiteNoise();
-            setTimeRemaining(info.remainingSeconds < Infinity ? info.remainingSeconds : null);
+          // Find and auto-play last sound
+          const sound = sounds.find(s => s.id === preferences.last_white_noise_sound);
+          if (sound) {
+            whiteNoise.play(sound);
+            if (preferences.white_noise_timer) {
+              setTimeRemaining(preferences.white_noise_timer * 60);
+            } else if (!isPremium) {
+              const info = canUseWhiteNoise();
+              setTimeRemaining(info.remainingSeconds < Infinity ? info.remainingSeconds : null);
+            }
           }
         }
       }
     }
-  }, [preferences, isPremium, canUseWhiteNoise]);
+  }, [preferences, isPremium, sounds.length]);
 
   // Timer countdown
   useEffect(() => {
@@ -249,7 +133,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
       interval = setInterval(() => {
         setTimeRemaining(prev => {
           if (prev === null || prev <= 1) {
-            setActiveSound(null);
+            whiteNoise.stop();
             updateLastWhiteNoiseSound(null);
             if (!isPremium && timer === null) setShowPremiumModal(true);
             return null;
@@ -259,7 +143,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
       }, 1000);
     }
     return () => { if (interval) clearInterval(interval); };
-  }, [activeSound, timeRemaining, isPremium, timer, updateLastWhiteNoiseSound]);
+  }, [activeSound, timeRemaining, isPremium, timer]);
 
   // Track usage for free users
   useEffect(() => {
@@ -288,14 +172,16 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
       const now = Date.now();
       const elapsed = Math.floor((now - lastTrackTimeRef.current) / 1000);
       if (elapsed > 0 && !isPremium) await trackWhiteNoiseUsage(elapsed);
-      setActiveSound(null);
+      whiteNoise.stop();
       setTimeRemaining(null);
       await updateLastWhiteNoiseSound(null);
     } else {
       const { allowed, remainingSeconds } = canUseWhiteNoise();
       if (!allowed && !isPremium) { setShowPremiumModal(true); return; }
       lastTrackTimeRef.current = Date.now();
-      setActiveSound(soundId);
+      const sound = sounds.find(s => s.id === soundId);
+      if (!sound) return;
+      whiteNoise.play(sound);
       await updateLastWhiteNoiseSound(soundId);
       if (isPremium) { setTimeRemaining(timer ? timer * 60 : null); return; }
       const requestedSeconds = timer ? timer * 60 : remainingSeconds;
@@ -304,8 +190,8 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
   };
 
   const handleVolumeChange = async (newVolume: number) => {
-    setVolume(newVolume);
-    setIsMuted(false);
+    whiteNoise.setVolume(newVolume);
+    whiteNoise.setMuted(false);
     await updateWhiteNoiseVolume(newVolume);
   };
 
@@ -317,7 +203,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
     if (isPremium) { setTimeRemaining(newTimer ? newTimer * 60 : null); return; }
     const info = canUseWhiteNoise();
     if (!info.allowed) {
-      setActiveSound(null);
+      whiteNoise.stop();
       await updateLastWhiteNoiseSound(null);
       setShowPremiumModal(true);
       setTimeRemaining(null);
@@ -474,7 +360,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
                 {/* Controls */}
                 <div className="flex items-center justify-center gap-4">
                   <motion.button
-                    onClick={() => setIsMuted(!isMuted)}
+                    onClick={() => whiteNoise.toggleMute()}
                     className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center"
                     whileTap={{ scale: 0.9 }}
                   >

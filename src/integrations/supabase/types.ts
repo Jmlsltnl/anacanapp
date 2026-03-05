@@ -275,6 +275,60 @@ export type Database = {
         }
         Relationships: []
       }
+      album_orders: {
+        Row: {
+          album_type: string
+          contact_phone: string | null
+          created_at: string
+          customer_name: string
+          delivery_address: string | null
+          id: string
+          notes: string | null
+          order_number: string | null
+          payment_method: string | null
+          payment_proof_url: string | null
+          payment_status: string | null
+          status: string
+          total_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          album_type?: string
+          contact_phone?: string | null
+          created_at?: string
+          customer_name: string
+          delivery_address?: string | null
+          id?: string
+          notes?: string | null
+          order_number?: string | null
+          payment_method?: string | null
+          payment_proof_url?: string | null
+          payment_status?: string | null
+          status?: string
+          total_price?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          album_type?: string
+          contact_phone?: string | null
+          created_at?: string
+          customer_name?: string
+          delivery_address?: string | null
+          id?: string
+          notes?: string | null
+          order_number?: string | null
+          payment_method?: string | null
+          payment_proof_url?: string | null
+          payment_status?: string | null
+          status?: string
+          total_price?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       app_branding: {
         Row: {
           created_at: string | null

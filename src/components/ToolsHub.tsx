@@ -42,6 +42,7 @@ const HoroscopeCompatibility = lazy(() => import('./tools/HoroscopeCompatibility
 const BabyGrowthTracker = lazy(() => import('./tools/BabyGrowthTracker'));
 const MaternityCalculator = lazy(() => import('./tools/MaternityCalculator'));
 const TeethingTracker = lazy(() => import('./tools/TeethingTracker'));
+const BabyMonthlyAlbum = lazy(() => import('./baby/BabyMonthlyAlbum'));
 import { PremiumModal } from './PremiumModal';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
@@ -309,6 +310,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
       case 'doctors': return <DoctorsHospitals onBack={handleBack} />;
       case 'blood-sugar': return <BloodSugarTracker onBack={handleBack} />;
       case 'pregnancy-album': return <PregnancyAlbum onBack={handleBack} />;
+      case 'baby-album': return <BabyMonthlyAlbum onBack={handleBack} />;
       case 'cry-translator': return <CryTranslator onBack={handleBack} />;
       case 'poop-scanner': return <PoopScanner onBack={handleBack} />;
       case 'weather-clothing': return <WeatherClothing onBack={handleBack} />;

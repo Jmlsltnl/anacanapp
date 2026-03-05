@@ -137,10 +137,10 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background overflow-y-auto pb-28 pt-2 px-5">
+    <div className="min-h-screen bg-background overflow-y-auto pb-28 px-4 safe-area-top pt-2">
       {/* Header */}
       <motion.div 
-        className="flex items-center justify-between mb-6"
+        className="flex items-center justify-between mb-4"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
       >
@@ -151,8 +151,8 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
             </button>
           )}
           <div>
-            <h1 className="text-2xl font-black text-foreground">Mağaza</h1>
-            <p className="text-muted-foreground mt-1">Ana və körpə üçün</p>
+            <h1 className="text-xl font-black text-foreground">Mağaza</h1>
+            <p className="text-muted-foreground text-sm">Ana və körpə üçün</p>
           </div>
         </div>
         <motion.button 
@@ -172,7 +172,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
 
       {/* Search */}
       <motion.div 
-        className="relative mb-6"
+        className="relative mb-4"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.1 }}
@@ -183,7 +183,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
           placeholder="Məhsul axtarın..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full h-14 pl-12 pr-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all outline-none"
+          className="w-full h-12 pl-12 pr-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-sm transition-all outline-none"
         />
         <button className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-card flex items-center justify-center shadow-sm">
           <Filter className="w-5 h-5 text-muted-foreground" />
@@ -192,7 +192,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
 
       {/* Categories */}
       <motion.div 
-        className="flex gap-3 mb-6 overflow-x-auto hide-scrollbar pb-2"
+        className="flex gap-2 mb-4 overflow-x-auto hide-scrollbar pb-2"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
@@ -201,7 +201,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
           <button
             key={category.id}
             onClick={() => setActiveCategory(category.id)}
-            className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-bold whitespace-nowrap transition-all ${
+            className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
               activeCategory === category.id
                 ? 'gradient-primary text-white shadow-button'
                 : 'bg-card border border-border/50 text-muted-foreground hover:border-primary/20'
@@ -215,7 +215,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
 
       {/* Featured Banner */}
       <motion.div
-        className="relative overflow-hidden rounded-3xl gradient-sunset p-5 mb-6 shadow-elevated"
+        className="relative overflow-hidden rounded-2xl gradient-sunset p-4 mb-4 shadow-elevated"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.3 }}
@@ -225,14 +225,14 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
           <span className="inline-block px-3 py-1 bg-white/20 rounded-full text-white text-xs font-bold mb-2">
             Xüsusi Təklif
           </span>
-          <h3 className="text-white font-black text-xl mb-1">İlk sifarişə 20% endirim!</h3>
+          <h3 className="text-white font-black text-lg mb-1">İlk sifarişə 20% endirim!</h3>
           <p className="text-white/80 text-sm">ANACAN20 kodunu daxil edin</p>
         </div>
       </motion.div>
 
       {/* Products Grid */}
       <motion.div 
-        className="grid grid-cols-2 gap-4"
+        className="grid grid-cols-2 gap-3"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4 }}
