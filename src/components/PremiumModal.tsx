@@ -1,10 +1,11 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Crown, Sparkles, Loader2, RefreshCw, Lock, Check, Zap, Shield, Star } from 'lucide-react';
+import { X, Crown, Sparkles, Loader2, RefreshCw, Lock, Check, Zap, Shield, Star, icons } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useInAppPurchase } from '@/hooks/useInAppPurchase';
 import { isNativePlatform } from '@/lib/iap';
 import { useToast } from '@/hooks/use-toast';
 import { usePremiumConfig } from '@/hooks/usePremiumConfig';
+import { usePaywallConfig } from '@/hooks/usePaywallConfig';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSubscription } from '@/hooks/useSubscription';
 
@@ -17,25 +18,18 @@ interface PremiumModalProps {
 export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const { toast } = useToast();
   const { features: dbFeatures, plans: dbPlans, loading: configLoading } = usePremiumConfig();
+  const paywallConfig = usePaywallConfig();
   const { isPremium, subscription } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<'yearly' | 'monthly'>('yearly');
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const {
-    products,
-    isLoading,
-    isPurchasing,
-    error,
-    isSupported,
-    purchaseMonthly,
-    purchaseYearly,
-    restorePurchases,
+    products, isLoading, isPurchasing, error, isSupported,
+    purchaseMonthly, purchaseYearly, restorePurchases,
   } = useInAppPurchase();
 
   useEffect(() => {
-    if (isPremium && subscription?.plan_type === 'premium') {
-      setSelectedPlan('yearly');
-    }
+    if (isPremium && subscription?.plan_type === 'premium') setSelectedPlan('yearly');
   }, [isPremium, subscription]);
 
   useEffect(() => {
@@ -81,8 +75,8 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
 
   const isCurrentlyMonthly = isPremium && subscription?.plan_type === 'premium';
   const ctaText = isCurrentlyMonthly && selectedPlan === 'yearly'
-    ? 'İllik Plana Keç'
-    : isPremium ? 'Planı Yenilə' : 'Premium-a Keç';
+    ? paywallConfig.cta_switch_yearly
+    : isPremium ? paywallConfig.cta_upgrade : paywallConfig.cta_new_user;
 
   const handlePurchase = useCallback(async () => {
     if (!isNative) {
@@ -107,6 +101,14 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
     }
   }, [restorePurchases, toast, onClose]);
 
+  const renderPillIcon = (iconName: string) => {
+    const IconComp = icons[iconName as keyof typeof icons];
+    return IconComp ? <IconComp className="w-3 h-3" /> : <Sparkles className="w-3 h-3" />;
+  };
+
+  const savingsBadgeText = paywallConfig.savings_badge.replace('{percent}', String(savingsPercent));
+  const featureLockText = feature ? paywallConfig.feature_lock_text.replace('{feature}', feature) : '';
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -118,8 +120,12 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
           onClick={onClose}
           role="presentation"
         >
-          {/* Fullscreen gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-b from-amber-600 via-orange-600 to-rose-700" />
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(to bottom, ${paywallConfig.gradient_from}, ${paywallConfig.gradient_via}, ${paywallConfig.gradient_to})`,
+            }}
+          />
           <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'radial-gradient(circle at 25% 25%, white 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
           <motion.div
@@ -133,9 +139,9 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
-            aria-label="Anacan Premium abunəlik"
+            aria-label={paywallConfig.title}
           >
-            {/* Close button */}
+            {/* Close */}
             <button
               ref={closeButtonRef}
               onClick={onClose}
@@ -147,7 +153,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
               <X className="w-4 h-4 text-white" />
             </button>
 
-            {/* ── Top: Branding ── */}
+            {/* Top: Branding */}
             <div className="text-center pt-6 pb-3 px-5 shrink-0">
               <motion.div
                 initial={{ scale: 0 }}
@@ -157,45 +163,38 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
               >
                 <Crown className="w-7 h-7 text-white" />
               </motion.div>
-              <h2 className="text-xl font-extrabold text-white tracking-tight">Anacan Premium</h2>
-              <p className="text-white/70 text-xs mt-0.5">Tam təcrübə · Sınırsız imkanlar</p>
+              <h2 className="text-xl font-extrabold text-white tracking-tight">{paywallConfig.title}</h2>
+              <p className="text-white/70 text-xs mt-0.5">{paywallConfig.subtitle}</p>
 
               {feature && (
                 <div className="mt-2 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1 inline-flex items-center gap-1.5">
                   <Lock className="w-3 h-3 text-white" />
-                  <span className="text-white text-[10px] font-medium">{feature} üçün Premium lazımdır</span>
+                  <span className="text-white text-[10px] font-medium">{featureLockText}</span>
                 </div>
               )}
             </div>
 
-            {/* ── Middle: Features (scrollable if needed, but compact) ── */}
+            {/* Middle: Features */}
             <div className="flex-1 overflow-y-auto overscroll-contain px-5 min-h-0">
               {error && (
                 <div className="mb-2 p-2 bg-white/10 text-white rounded-xl text-xs text-center" role="alert">{error}</div>
               )}
 
-              {/* Benefits pills */}
+              {/* Benefit pills */}
               <div className="flex items-center justify-center gap-1.5 mb-3">
-                {[
-                  { icon: Zap, text: 'Limitsiz' },
-                  { icon: Shield, text: 'Reklamsız' },
-                  { icon: Sparkles, text: 'AI dəstəyi' },
-                ].map((b, i) => (
+                {paywallConfig.pills.map((b, i) => (
                   <div key={i} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/10 text-white text-[10px] font-semibold">
-                    <b.icon className="w-3 h-3" />
+                    {renderPillIcon(b.icon)}
                     {b.text}
                   </div>
                 ))}
               </div>
 
-              {/* Feature list - compact 2-column grid */}
+              {/* Feature grid */}
               {allFeatures.length > 0 && (
                 <div className="grid grid-cols-2 gap-1.5 mb-4">
                   {allFeatures.slice(0, 8).map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-2.5 py-2"
-                    >
+                    <div key={item.id} className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-2.5 py-2">
                       <span className="text-sm shrink-0">{item.icon}</span>
                       <span className="text-[10px] font-medium text-white/90 leading-tight line-clamp-2">{item.title_az || item.title}</span>
                     </div>
@@ -203,7 +202,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                 </div>
               )}
 
-              {/* Plan Selection - compact side by side */}
+              {/* Plan Selection */}
               <div className="grid grid-cols-2 gap-2.5 mb-3">
                 {/* Yearly */}
                 <motion.button
@@ -221,18 +220,18 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                       ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
                       : 'bg-white/20 text-white'
                   }`}>
-                    {savingsPercent}% QƏNAƏT
+                    {savingsBadgeText}
                   </span>
                   <div className="flex items-center justify-between mb-0.5">
-                    <p className="font-bold text-xs">İllik</p>
+                    <p className="font-bold text-xs">{paywallConfig.yearly_label}</p>
                     {selectedPlan === 'yearly' && (
                       <div className="w-4 h-4 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
                         <Check className="w-2.5 h-2.5 text-white" />
                       </div>
                     )}
                   </div>
-                  <p className="text-lg font-black">{currencySymbol}{yearlyMonthly}<span className="text-[10px] font-normal opacity-60">/ay</span></p>
-                  <p className={`text-[10px] mt-0.5 ${selectedPlan === 'yearly' ? 'text-muted-foreground' : 'text-white/50'}`}>{currencySymbol}{yearlyPrice}/il</p>
+                  <p className="text-lg font-black">{currencySymbol}{yearlyMonthly}<span className="text-[10px] font-normal opacity-60">{paywallConfig.yearly_suffix}</span></p>
+                  <p className={`text-[10px] mt-0.5 ${selectedPlan === 'yearly' ? 'text-muted-foreground' : 'text-white/50'}`}>{currencySymbol}{yearlyPrice}{paywallConfig.yearly_total_suffix}</p>
                 </motion.button>
 
                 {/* Monthly */}
@@ -247,29 +246,29 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                   aria-pressed={selectedPlan === 'monthly'}
                 >
                   <div className="flex items-center justify-between mb-0.5 mt-1">
-                    <p className="font-bold text-xs">Aylıq</p>
+                    <p className="font-bold text-xs">{paywallConfig.monthly_label}</p>
                     {selectedPlan === 'monthly' && (
                       <div className="w-4 h-4 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
                         <Check className="w-2.5 h-2.5 text-white" />
                       </div>
                     )}
                   </div>
-                  <p className="text-lg font-black">{currencySymbol}{monthlyPrice}<span className="text-[10px] font-normal opacity-60">/ay</span></p>
+                  <p className="text-lg font-black">{currencySymbol}{monthlyPrice}<span className="text-[10px] font-normal opacity-60">{paywallConfig.monthly_suffix}</span></p>
                   <p className={`text-[10px] mt-0.5 ${selectedPlan === 'monthly' ? 'text-muted-foreground' : 'text-white/50'}`}>&nbsp;</p>
                 </motion.button>
               </div>
             </div>
 
-            {/* ── Bottom: CTA + Legal (always visible) ── */}
+            {/* Bottom: CTA + Legal */}
             <div className="shrink-0 px-5 pt-2" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}>
               <Button
                 className="w-full h-12 rounded-2xl bg-white hover:bg-white/95 text-orange-600 font-bold text-sm shadow-xl shadow-black/15 border-0 disabled:opacity-50 transition-all"
                 onClick={handlePurchase}
                 disabled={isPurchasing || isLoading}
-                aria-label={isPurchasing ? 'Emal edilir' : ctaText}
+                aria-label={isPurchasing ? paywallConfig.purchasing_text : ctaText}
               >
                 {isPurchasing ? (
-                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Emal edilir...</>
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{paywallConfig.purchasing_text}</>
                 ) : (
                   <><Crown className="w-4 h-4 mr-2" />{ctaText}</>
                 )}
@@ -279,21 +278,21 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                 {isNative && isSupported && (
                   <>
                     <button onClick={handleRestore} disabled={isPurchasing || isLoading} className="text-[10px] text-white/50 hover:text-white/80 transition-colors disabled:opacity-50 flex items-center gap-1">
-                      <RefreshCw className="w-3 h-3" />Bərpa et
+                      <RefreshCw className="w-3 h-3" />{paywallConfig.restore_text}
                     </button>
                     <span className="text-[10px] text-white/30">•</span>
                   </>
                 )}
-                <a href="https://anacanapp.lovable.app/legal/terms_of_service" target="_blank" rel="noopener noreferrer" className="text-[10px] text-white/50 underline hover:text-white/80">Şərtlər</a>
+                <a href="https://anacanapp.lovable.app/legal/terms_of_service" target="_blank" rel="noopener noreferrer" className="text-[10px] text-white/50 underline hover:text-white/80">{paywallConfig.terms_label}</a>
                 <span className="text-[10px] text-white/30">•</span>
-                <a href="https://anacanapp.lovable.app/legal/privacy_policy" target="_blank" rel="noopener noreferrer" className="text-[10px] text-white/50 underline hover:text-white/80">Məxfilik</a>
+                <a href="https://anacanapp.lovable.app/legal/privacy_policy" target="_blank" rel="noopener noreferrer" className="text-[10px] text-white/50 underline hover:text-white/80">{paywallConfig.privacy_label}</a>
               </div>
               <p className="text-center text-[9px] text-white/40 mt-1">
-                İstənilən vaxt ləğv edə bilərsiniz • Avtomatik yenilənir
+                {paywallConfig.cancel_notice}
               </p>
-              {!isNative && (
+              {!isNative && paywallConfig.non_native_notice && (
                 <p className="text-center text-[10px] text-white/40 mt-1 flex items-center justify-center gap-1">
-                  <Star className="w-3 h-3" />App Store / Google Play-dən yükləyin
+                  <Star className="w-3 h-3" />{paywallConfig.non_native_notice}
                 </p>
               )}
             </div>
