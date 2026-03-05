@@ -437,7 +437,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="p-4 border-t border-border bg-card/50 backdrop-blur-sm flex-shrink-0" style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}>
+      <div className="px-3 py-2 border-t border-border bg-card/50 backdrop-blur-sm flex-shrink-0">
         <div className="flex gap-2 items-end">
           <div className="flex-1 relative">
             <Textarea
@@ -445,7 +445,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder="Anacan.AI-yə sualınızı yazın..."
-              className="min-h-[48px] max-h-[120px] pr-4 resize-none rounded-2xl border-2 focus:border-primary/50"
+              className="min-h-[40px] max-h-[100px] pr-4 resize-none rounded-xl border-2 focus:border-primary/50 text-sm py-2"
               disabled={isLoading}
             />
           </div>
@@ -453,12 +453,12 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
             size="icon"
-            className="h-12 w-12 rounded-2xl gradient-primary shadow-lg disabled:opacity-50"
+            className="h-10 w-10 rounded-xl gradient-primary shadow-lg disabled:opacity-50"
           >
             {isLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <Send className="w-5 h-5" />
+              <Send className="w-4 h-4" />
             )}
           </Button>
         </div>
