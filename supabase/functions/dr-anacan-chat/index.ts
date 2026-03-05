@@ -39,9 +39,9 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY not configured");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) {
+      console.error("GEMINI_API_KEY not configured");
       throw new Error("AI service not configured");
     }
 
@@ -65,29 +65,37 @@ Deno.serve(async (req) => {
       ? `Sən çəki məsləhətçisisən. QAYDALAR: Salamlama yoxdur. "Canım", "əzizim", "balacam" kimi ifadələr İSTİFADƏ ETMƏ. Disclaimer/xəbərdarlıq yoxdur. Birbaşa 1-2 cümlə ilə praktik məsləhət ver. Yalnız Azərbaycan dilində.`
       : getSystemPrompt(lifeStage || "bump", pregnancyWeek, isPartner, userProfile, cyclePhase, cycleDay);
 
-    const apiMessages = [
-      { role: "system", content: systemPrompt },
-      ...messages,
-    ];
+    // Convert OpenAI-style messages to Gemini format
+    const geminiContents = messages.map((msg: ChatMessage) => ({
+      role: msg.role === "assistant" ? "model" : "user",
+      parts: [{ text: msg.content }],
+    }));
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
+    const geminiBody = {
+      contents: geminiContents,
+      systemInstruction: {
+        parts: [{ text: systemPrompt }],
       },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: apiMessages,
-        stream,
-        max_tokens: 8192,
+      generationConfig: {
         temperature: 0.7,
-      }),
-    });
+        maxOutputTokens: 8192,
+      },
+    };
+
+    const geminiModel = "gemini-2.5-flash";
+    const endpoint = stream ? "streamGenerateContent" : "generateContent";
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:${endpoint}?${stream ? "alt=sse&" : ""}key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(geminiBody),
+      },
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+      console.error("Gemini API error:", response.status, errorText);
 
       if (response.status === 429) {
         return new Response(
@@ -95,19 +103,60 @@ Deno.serve(async (req) => {
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Payment required. Please add credits.", success: false }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-        );
-      }
 
-      throw new Error(`AI gateway error: ${response.status}`);
+      throw new Error(`Gemini API error: ${response.status}`);
     }
 
-    // Streaming: pass through directly (already OpenAI-compatible SSE)
-    if (stream) {
-      return new Response(response.body, {
+    // Streaming: transform Gemini SSE to OpenAI-compatible SSE format
+    if (stream && response.body) {
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      const encoder = new TextEncoder();
+
+      const transformedStream = new ReadableStream({
+        async start(controller) {
+          let buffer = "";
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) {
+                controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+                controller.close();
+                break;
+              }
+
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split("\n");
+              buffer = lines.pop() || "";
+
+              for (const line of lines) {
+                if (!line.startsWith("data: ")) continue;
+                const jsonStr = line.slice(6).trim();
+                if (!jsonStr) continue;
+
+                try {
+                  const geminiData = JSON.parse(jsonStr);
+                  const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
+                  if (text) {
+                    // Convert to OpenAI-compatible delta format
+                    const openAIChunk = {
+                      choices: [{ delta: { content: text }, index: 0 }],
+                    };
+                    controller.enqueue(encoder.encode(`data: ${JSON.stringify(openAIChunk)}\n\n`));
+                  }
+                } catch {
+                  // Skip unparseable chunks
+                }
+              }
+            }
+          } catch (err) {
+            console.error("Stream transform error:", err);
+            controller.close();
+          }
+        },
+      });
+
+      return new Response(transformedStream, {
         headers: {
           ...corsHeaders,
           "Content-Type": "text/event-stream",
@@ -120,7 +169,7 @@ Deno.serve(async (req) => {
     // Non-streaming response
     const data = await response.json();
     const assistantMessage =
-      data.choices?.[0]?.message?.content || "Bağışlayın, cavab ala bilmədim. Yenidən cəhd edin.";
+      data.candidates?.[0]?.content?.parts?.[0]?.text || "Bağışlayın, cavab ala bilmədim. Yenidən cəhd edin.";
 
     return new Response(
       JSON.stringify({ message: assistantMessage, success: true }),
