@@ -28,6 +28,7 @@ const categoryEmojis: Record<string, string> = {
 interface ProductDisplay {
   id: string;
   name: string;
+  originalPrice?: number;
   price: number;
   image: string;
   rating: number;
@@ -56,6 +57,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
       id: p.id,
       name: p.name,
       price: Number(p.price),
+      originalPrice: (p as any).original_price ? Number((p as any).original_price) : undefined,
       image: categoryEmojis[p.category] || categoryEmojis.default,
       rating: p.rating || 4.5,
       reviews: Math.floor(Math.random() * 500) + 50,
@@ -189,7 +191,12 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
 
           {/* Price & Add */}
           <div className="flex items-center justify-between bg-card rounded-2xl p-4 border border-border/50">
-            <span className="text-2xl font-black text-primary">{selectedProduct.price}₼</span>
+            <div>
+              <span className="text-2xl font-black text-primary">{selectedProduct.price}₼</span>
+              {selectedProduct.originalPrice && selectedProduct.originalPrice > selectedProduct.price && (
+                <span className="text-sm text-muted-foreground line-through ml-2">{selectedProduct.originalPrice}₼</span>
+              )}
+            </div>
             <motion.button
               onClick={() => handleAddToCart(selectedProduct.id)}
               className="px-5 py-2.5 rounded-xl gradient-primary text-white text-sm font-bold shadow-button flex items-center gap-2"
@@ -316,7 +323,12 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
                 <span className="text-[10px] text-muted-foreground">({product.reviews})</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-black text-primary">{product.price}₼</span>
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-black text-primary">{product.price}₼</span>
+                  {product.originalPrice && product.originalPrice > product.price && (
+                    <span className="text-[10px] text-muted-foreground line-through">{product.originalPrice}₼</span>
+                  )}
+                </div>
                 <motion.button
                   onClick={(e) => { e.stopPropagation(); handleAddToCart(product.id); }}
                   className="w-7 h-7 rounded-lg gradient-primary flex items-center justify-center"
