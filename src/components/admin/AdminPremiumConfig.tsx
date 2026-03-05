@@ -382,7 +382,7 @@ const UserSubscriptionsTab = () => {
 const AdminPremiumConfig = () => {
   const { features, plans, loading, createFeature, updateFeature, deleteFeature, updatePlan } = useAdminPremiumConfig();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState('features');
+  const [activeTab, setActiveTab] = useState('designer');
   
   // Feature modal state
   const [showFeatureModal, setShowFeatureModal] = useState(false);
