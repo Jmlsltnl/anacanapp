@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Crown, Save, X, Check, Minus, Search, Users, Settings2, Shield, Loader2, ChevronDown } from 'lucide-react';
+import { Plus, Edit2, Trash2, Crown, Save, X, Check, Minus, Search, Users, Settings2, Shield, Loader2, ChevronDown, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,6 +15,7 @@ import { useAdminPremiumConfig, PremiumFeature, PremiumPlan } from '@/hooks/useP
 import { useAppSettings, useUpdateAppSetting } from '@/hooks/useAppSettings';
 import { supabase } from '@/integrations/supabase/client';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
+import PaywallDesignerTab from './PaywallDesignerTab';
 
 // =========== FREE LIMITS TAB ===========
 const FreeLimitsTab = () => {
