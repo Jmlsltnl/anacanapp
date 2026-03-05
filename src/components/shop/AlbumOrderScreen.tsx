@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ShoppingBag, Loader2, Upload, Check, User, MapPin, FileText, CreditCard, Tag, Package, Info } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Loader2, Upload, Check, User, MapPin, FileText, CreditCard, Tag, Package, Info, icons } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -210,7 +210,10 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
                     paymentMethod === m.method_key ? 'border-primary bg-primary/5' : 'border-border/50 bg-card'
                   }`}
                 >
-                  <span className="text-lg">{m.icon || '💳'}</span>
+                  {(() => {
+                    const IconComp = m.icon && icons[m.icon as keyof typeof icons];
+                    return IconComp ? <IconComp className="w-5 h-5 text-primary" /> : <CreditCard className="w-5 h-5 text-primary" />;
+                  })()}
                   <div className="flex-1">
                     <p className="text-sm font-medium">{m.label_az || m.label}</p>
                     {m.description_az && <p className="text-[11px] text-muted-foreground">{m.description_az}</p>}
