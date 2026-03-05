@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Crown, Save, X, Check, Minus, Search, Users, Settings2, Shield, Loader2, ChevronDown } from 'lucide-react';
+import { Plus, Edit2, Trash2, Crown, Save, X, Check, Minus, Search, Users, Settings2, Shield, Loader2, ChevronDown, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,6 +15,7 @@ import { useAdminPremiumConfig, PremiumFeature, PremiumPlan } from '@/hooks/useP
 import { useAppSettings, useUpdateAppSetting } from '@/hooks/useAppSettings';
 import { supabase } from '@/integrations/supabase/client';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
+import PaywallDesignerTab from './PaywallDesignerTab';
 
 // =========== FREE LIMITS TAB ===========
 const FreeLimitsTab = () => {
@@ -381,7 +382,7 @@ const UserSubscriptionsTab = () => {
 const AdminPremiumConfig = () => {
   const { features, plans, loading, createFeature, updateFeature, deleteFeature, updatePlan } = useAdminPremiumConfig();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState('features');
+  const [activeTab, setActiveTab] = useState('designer');
   
   // Feature modal state
   const [showFeatureModal, setShowFeatureModal] = useState(false);
@@ -491,13 +492,19 @@ const AdminPremiumConfig = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-5 w-full">
+        <TabsList className="grid grid-cols-6 w-full">
+          <TabsTrigger value="designer" className="text-xs">Dizayner</TabsTrigger>
           <TabsTrigger value="features" className="text-xs">Funksiyalar</TabsTrigger>
           <TabsTrigger value="plans" className="text-xs">Planlar</TabsTrigger>
           <TabsTrigger value="limits" className="text-xs">Limitlər</TabsTrigger>
           <TabsTrigger value="users" className="text-xs">İstifadəçilər</TabsTrigger>
           <TabsTrigger value="preview" className="text-xs">Önizləmə</TabsTrigger>
         </TabsList>
+
+        {/* Paywall Designer Tab */}
+        <TabsContent value="designer">
+          <PaywallDesignerTab />
+        </TabsContent>
 
         {/* Features Tab */}
         <TabsContent value="features" className="space-y-4">
