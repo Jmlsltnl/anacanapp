@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { 
   ArrowLeft, Crown, CheckCircle, 
   XCircle, Sparkles, AlertTriangle, Loader2, RotateCcw,
-  Zap, Shield, CreditCard, icons, Calendar, TrendingUp
+  Zap, Shield, CreditCard, icons, Calendar, TrendingUp,
+  Lock, Star, ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -12,6 +13,7 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 import { PremiumModal } from '@/components/PremiumModal';
 import { useBillingConfig } from '@/hooks/usePaywallConfig';
+import { usePremiumConfig } from '@/hooks/usePremiumConfig';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
 
@@ -26,6 +28,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
   const { isPremium, subscription, isCancelled, cancelledButActive, cancelSubscription, restoreSubscription, loading: isLoading } = useSubscription();
   const { toast } = useToast();
   const config = useBillingConfig();
+  const { features: dbFeatures } = usePremiumConfig();
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
@@ -63,6 +66,10 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
   };
 
   const savingsPercent = 44;
+  const isFreeUser = !hasPremiumSub && !isPremium;
+
+  // Get premium-only features for free user showcase
+  const premiumOnlyFeatures = dbFeatures.filter(f => !f.is_included_free && f.is_included_premium);
 
   return (
     <div className="min-h-screen bg-background pb-safe overflow-y-auto">
@@ -123,6 +130,108 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
       </div>
 
       <div className="px-5 -mt-4 space-y-3.5">
+        {/* ═══ FREE USER CONTENT ═══ */}
+        {isFreeUser && (
+          <>
+            {/* Premium promotion card */}
+            <motion.div 
+              initial={{ y: 10, opacity: 0 }} 
+              animate={{ y: 0, opacity: 1 }}
+              className="bg-gradient-to-br from-primary/5 via-accent/5 to-primary/10 rounded-2xl p-4 border border-primary/15 shadow-sm"
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-foreground">Premium-a yüksəldin!</h3>
+                  <p className="text-[10px] text-muted-foreground">Sınırsız imkanlar əldə edin</p>
+                </div>
+              </div>
+
+              {/* What you're missing */}
+              <div className="space-y-2 mb-3.5">
+                {(premiumOnlyFeatures.length > 0 ? premiumOnlyFeatures.slice(0, 4) : config.features).map((f, i) => {
+                  const feat = 'title_az' in f ? f : null;
+                  return (
+                    <motion.div 
+                      key={i} 
+                      initial={{ x: -10, opacity: 0 }} 
+                      animate={{ x: 0, opacity: 1 }} 
+                      transition={{ delay: 0.05 * i }}
+                      className="flex items-center gap-2.5"
+                    >
+                      <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                        {feat ? (
+                          <span className="text-xs">{feat.icon}</span>
+                        ) : (
+                          renderIcon((f as any).icon, 'w-3 h-3 text-primary')
+                        )}
+                      </div>
+                      <span className="text-xs font-medium text-foreground flex-1">
+                        {feat ? (feat.title_az || feat.title) : (f as any).text}
+                      </span>
+                      <Lock className="w-3 h-3 text-muted-foreground/50" />
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+              <Button
+                onClick={() => setShowPremiumModal(true)}
+                className="w-full h-11 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground font-bold text-sm shadow-md shadow-primary/15"
+              >
+                <Crown className="w-4 h-4 mr-2" />{config.get_premium_cta}
+              </Button>
+            </motion.div>
+
+            {/* Current free limits info */}
+            <motion.div 
+              initial={{ y: 10, opacity: 0 }} 
+              animate={{ y: 0, opacity: 1 }} 
+              transition={{ delay: 0.1 }}
+              className="bg-card rounded-2xl p-4 border border-border/50 shadow-sm"
+            >
+              <h3 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
+                <Shield className="w-3.5 h-3.5 text-muted-foreground" />Pulsuz plana daxildir
+              </h3>
+              <div className="space-y-2">
+                {[
+                  { text: 'Gündəlik limitli AI çat', included: true },
+                  { text: 'Əsas izləmə alətləri', included: true },
+                  { text: 'Topluluk girişi', included: true },
+                  { text: 'Reklam ilə istifadə', included: true },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-2 text-xs">
+                    <CheckCircle className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span className="text-muted-foreground">{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Premium comparison teaser */}
+            <motion.button
+              initial={{ y: 10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.15 }}
+              onClick={() => setShowPremiumModal(true)}
+              className="w-full bg-card rounded-2xl p-4 border border-border/50 shadow-sm flex items-center gap-3 text-left"
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400/20 to-orange-500/20 flex items-center justify-center shrink-0">
+                <Star className="w-5 h-5 text-amber-500" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-foreground">Planları müqayisə edin</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Premium ilə nələr əldə edəcəyinizi görün</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </motion.button>
+          </>
+        )}
+
+        {/* ═══ PREMIUM USER CONTENT ═══ */}
         {/* Cancelled but active notice */}
         {cancelledButActive && subscription?.expires_at && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-3.5 bg-amber-50 dark:bg-amber-900/20 rounded-2xl flex items-start gap-2.5 border border-amber-200 dark:border-amber-800">
@@ -159,7 +268,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
           </motion.div>
         )}
 
-        {/* Features summary */}
+        {/* Features summary - premium only */}
         {isPremium && (
           <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.05 }} className="bg-card rounded-2xl p-4 border border-border/50 shadow-sm">
             <h3 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
@@ -178,8 +287,8 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
           </motion.div>
         )}
 
-        {/* Actions */}
-        {isPremium ? (
+        {/* Actions - premium */}
+        {isPremium && (
           <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }} className="space-y-2.5">
             {subscription?.plan_type === 'premium' && !isCancelled && (
               <Button
@@ -211,15 +320,6 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
                 {config.cancel_cta}
               </Button>
             )}
-          </motion.div>
-        ) : (
-          <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
-            <Button
-              onClick={() => setShowPremiumModal(true)}
-              className="w-full h-13 rounded-2xl bg-gradient-to-r from-primary via-accent to-destructive hover:opacity-90 text-primary-foreground font-bold text-base shadow-lg shadow-primary/20"
-            >
-              <Crown className="w-5 h-5 mr-2" />{config.get_premium_cta}
-            </Button>
           </motion.div>
         )}
 
