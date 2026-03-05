@@ -210,7 +210,10 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
                     paymentMethod === m.method_key ? 'border-primary bg-primary/5' : 'border-border/50 bg-card'
                   }`}
                 >
-                  <span className="text-lg">{m.icon || '💳'}</span>
+                  {(() => {
+                    const IconComp = m.icon && icons[m.icon as keyof typeof icons];
+                    return IconComp ? <IconComp className="w-5 h-5 text-primary" /> : <CreditCard className="w-5 h-5 text-primary" />;
+                  })()}
                   <div className="flex-1">
                     <p className="text-sm font-medium">{m.label_az || m.label}</p>
                     {m.description_az && <p className="text-[11px] text-muted-foreground">{m.description_az}</p>}
