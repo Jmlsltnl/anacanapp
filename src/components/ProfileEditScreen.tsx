@@ -319,7 +319,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
         <div className="bg-card rounded-2xl p-5 space-y-4 border border-border/50">
           <h3 className="font-bold text-foreground flex items-center gap-2">
             <Calendar className="w-4 h-4 text-primary" />
-            Həyat Mərhələsi
+            Mərhələ
           </h3>
 
           <div className="space-y-2">
@@ -356,7 +356,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                     className="flex items-center gap-2 h-auto py-3 px-4 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-xl border"
                   >
                     <CalendarDays className="w-4 h-4" />
-                    <span className="text-sm">Son adet tarixi</span>
+                    <span className="text-sm">Son menstruasiya tarixi</span>
                   </ToggleGroupItem>
                   <ToggleGroupItem 
                     value="dueDate" 
@@ -409,7 +409,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                   
                   {calculatedDates.calculatedLMP && (
                     <p className="text-sm text-foreground">
-                      📅 Son adet tarixi: <strong>{formatDate(calculatedDates.calculatedLMP)}</strong>
+                      📅 Son menstruasiya tarixi: <strong>{formatDate(calculatedDates.calculatedLMP)}</strong>
                     </p>
                   )}
                   
