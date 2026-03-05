@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
       parts: [{ text: msg.content }],
     }));
 
-    const geminiBody: any = {
+    const geminiBody = {
       contents: geminiContents,
       systemInstruction: {
         parts: [{ text: systemPrompt }],
@@ -83,9 +83,9 @@ Deno.serve(async (req) => {
     };
 
     const geminiModel = "gemini-2.5-flash";
-    const endpoint = stream ? "streamGenerateContent?alt=sse" : "generateContent";
+    const endpoint = stream ? "streamGenerateContent" : "generateContent";
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:${endpoint}&key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:${endpoint}?${stream ? "alt=sse&" : ""}key=${GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+      console.error("Gemini API error:", response.status, errorText);
 
       if (response.status === 429) {
         return new Response(
@@ -103,19 +103,60 @@ Deno.serve(async (req) => {
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Payment required. Please add credits.", success: false }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-        );
-      }
 
-      throw new Error(`AI gateway error: ${response.status}`);
+      throw new Error(`Gemini API error: ${response.status}`);
     }
 
-    // Streaming: pass through Gemini SSE directly
-    if (stream) {
-      return new Response(response.body, {
+    // Streaming: transform Gemini SSE to OpenAI-compatible SSE format
+    if (stream && response.body) {
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      const encoder = new TextEncoder();
+
+      const transformedStream = new ReadableStream({
+        async start(controller) {
+          let buffer = "";
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) {
+                controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+                controller.close();
+                break;
+              }
+
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split("\n");
+              buffer = lines.pop() || "";
+
+              for (const line of lines) {
+                if (!line.startsWith("data: ")) continue;
+                const jsonStr = line.slice(6).trim();
+                if (!jsonStr) continue;
+
+                try {
+                  const geminiData = JSON.parse(jsonStr);
+                  const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
+                  if (text) {
+                    // Convert to OpenAI-compatible delta format
+                    const openAIChunk = {
+                      choices: [{ delta: { content: text }, index: 0 }],
+                    };
+                    controller.enqueue(encoder.encode(`data: ${JSON.stringify(openAIChunk)}\n\n`));
+                  }
+                } catch {
+                  // Skip unparseable chunks
+                }
+              }
+            }
+          } catch (err) {
+            console.error("Stream transform error:", err);
+            controller.close();
+          }
+        },
+      });
+
+      return new Response(transformedStream, {
         headers: {
           ...corsHeaders,
           "Content-Type": "text/event-stream",
@@ -125,7 +166,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Non-streaming response (Gemini format)
+    // Non-streaming response
     const data = await response.json();
     const assistantMessage =
       data.candidates?.[0]?.content?.parts?.[0]?.text || "Bağışlayın, cavab ala bilmədim. Yenidən cəhd edin.";
