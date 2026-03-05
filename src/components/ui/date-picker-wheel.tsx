@@ -165,7 +165,7 @@ export function DatePickerWheel({
       <div className="grid grid-cols-7 gap-1">
         {/* Empty cells for days before the first day */}
         {Array.from({ length: adjustedFirstDay }).map((_, i) => (
-          <div key={`empty-${i}`} className="h-10" />
+          <div key={`empty-${i}`} className="aspect-square" />
         ))}
 
         {/* Day cells */}
@@ -190,8 +190,8 @@ export function DatePickerWheel({
               onClick={() => handleSelectDay(day)}
               disabled={isDisabled}
               className={cn(
-                "h-10 w-10 rounded-full text-sm font-medium transition-all",
-                "flex items-center justify-center mx-auto",
+                "w-full aspect-square rounded-full text-sm font-medium transition-all",
+                "flex items-center justify-center",
                 isSelected
                   ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/30"
                   : isToday

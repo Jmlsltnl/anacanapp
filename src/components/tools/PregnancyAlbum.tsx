@@ -2,8 +2,9 @@ import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, ImagePlus, Camera, Calendar, Trash2, 
-  ChevronLeft, ChevronRight, X, Edit, Save, Heart
+  ChevronLeft, ChevronRight, X, Edit, Save, Heart, ShoppingBag
 } from 'lucide-react';
+import AlbumOrderScreen from '@/components/shop/AlbumOrderScreen';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -69,6 +70,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
   const [uploading, setUploading] = useState(false);
   const [editingCaption, setEditingCaption] = useState(false);
   const [caption, setCaption] = useState('');
+  const [showOrder, setShowOrder] = useState(false);
 
   const pregData = getPregnancyData();
   const currentWeek = pregData?.currentWeek || 1;
@@ -190,6 +192,10 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
     return photos.find(p => p.month_number === month);
   };
 
+  if (showOrder) {
+    return <AlbumOrderScreen albumType="pregnancy" onBack={() => setShowOrder(false)} />;
+  }
+
   return (
     <div className="min-h-screen bg-background pb-24">
       <input
@@ -206,10 +212,14 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
           <Button variant="ghost" size="icon" onClick={onBack} className="relative z-30">
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div>
+          <div className="flex-1">
             <h1 className="text-lg font-bold">Hamiləlik Albomu</h1>
             <p className="text-xs text-muted-foreground">Hər ay xatirə</p>
           </div>
+          <Button size="sm" variant="outline" className="rounded-xl gap-1.5" onClick={() => setShowOrder(true)}>
+            <ShoppingBag className="w-4 h-4" />
+            <span className="text-xs">Fiziki Albom</span>
+          </Button>
         </div>
       </div>
 

@@ -230,6 +230,12 @@ CAVAB FORMATI (STRICT JSON):
       } else {
         throw new Error('No JSON found');
       }
+      // Override AI-generated numeric values with actual API data
+      advice.temperature = current.temperature_2m;
+      advice.feelsLike = current.apparent_temperature;
+      advice.humidity = current.relative_humidity_2m;
+      advice.windSpeed = current.wind_speed_10m;
+      advice.uvIndex = current.uv_index;
     } catch {
       advice = {
         temperature: current.temperature_2m,

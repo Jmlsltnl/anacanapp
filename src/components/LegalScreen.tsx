@@ -64,7 +64,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
             <div className="mb-4 text-sm text-muted-foreground">
               Versiya: {selectedDoc.version} | Son yenilənmə: {new Date(selectedDoc.updated_at).toLocaleDateString('az-AZ')}
             </div>
-            <div className="prose prose-sm dark:prose-invert max-w-none">
+            <div className="prose prose-xs dark:prose-invert max-w-none text-sm [&_h1]:text-lg [&_h2]:text-base [&_h3]:text-sm [&_p]:text-sm [&_li]:text-sm">
               {(() => {
                 const c = selectedDoc.content_az || selectedDoc.content;
                 const isHtml = c.trim().startsWith('<') || /<[a-z][\s\S]*>/i.test(c);

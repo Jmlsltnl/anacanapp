@@ -325,7 +325,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       ];
 
   return (
-    <div ref={ref} className="flex flex-col bg-gradient-to-b from-background to-muted/20" style={{ height: 'calc(100dvh - 80px)' }}>
+    <div ref={ref} className="flex flex-col bg-gradient-to-b from-background to-muted/20" style={{ height: 'calc(100dvh - 80px - env(safe-area-inset-bottom, 0px))' }}>
       {/* Header */}
       <div className="px-5 py-4 border-b border-border bg-card/50 backdrop-blur-sm">
         <div className="flex items-center justify-between">
