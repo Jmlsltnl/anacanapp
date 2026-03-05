@@ -39,9 +39,9 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY not configured");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) {
+      console.error("GEMINI_API_KEY not configured");
       throw new Error("AI service not configured");
     }
 
@@ -65,25 +65,33 @@ Deno.serve(async (req) => {
       ? `Sən çəki məsləhətçisisən. QAYDALAR: Salamlama yoxdur. "Canım", "əzizim", "balacam" kimi ifadələr İSTİFADƏ ETMƏ. Disclaimer/xəbərdarlıq yoxdur. Birbaşa 1-2 cümlə ilə praktik məsləhət ver. Yalnız Azərbaycan dilində.`
       : getSystemPrompt(lifeStage || "bump", pregnancyWeek, isPartner, userProfile, cyclePhase, cycleDay);
 
-    const apiMessages = [
-      { role: "system", content: systemPrompt },
-      ...messages,
-    ];
+    // Convert OpenAI-style messages to Gemini format
+    const geminiContents = messages.map((msg: ChatMessage) => ({
+      role: msg.role === "assistant" ? "model" : "user",
+      parts: [{ text: msg.content }],
+    }));
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
+    const geminiBody: any = {
+      contents: geminiContents,
+      systemInstruction: {
+        parts: [{ text: systemPrompt }],
       },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: apiMessages,
-        stream,
-        max_tokens: 8192,
+      generationConfig: {
         temperature: 0.7,
-      }),
-    });
+        maxOutputTokens: 8192,
+      },
+    };
+
+    const geminiModel = "gemini-2.5-flash";
+    const endpoint = stream ? "streamGenerateContent?alt=sse" : "generateContent";
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:${endpoint}&key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(geminiBody),
+      },
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
