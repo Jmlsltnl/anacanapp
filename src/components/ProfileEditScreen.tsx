@@ -409,7 +409,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                   
                   {calculatedDates.calculatedLMP && (
                     <p className="text-sm text-foreground">
-                      📅 Son adet tarixi: <strong>{formatDate(calculatedDates.calculatedLMP)}</strong>
+                      📅 Son menstruasiya tarixi: <strong>{formatDate(calculatedDates.calculatedLMP)}</strong>
                     </p>
                   )}
                   
