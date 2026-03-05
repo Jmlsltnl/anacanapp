@@ -493,15 +493,17 @@ const AdminPremiumConfig = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-7 w-full">
-          <TabsTrigger value="designer" className="text-xs">Paywall</TabsTrigger>
-          <TabsTrigger value="billing" className="text-xs">Abunəlik</TabsTrigger>
-          <TabsTrigger value="features" className="text-xs">Funksiyalar</TabsTrigger>
-          <TabsTrigger value="plans" className="text-xs">Planlar</TabsTrigger>
-          <TabsTrigger value="limits" className="text-xs">Limitlər</TabsTrigger>
-          <TabsTrigger value="users" className="text-xs">İstifadəçilər</TabsTrigger>
-          <TabsTrigger value="preview" className="text-xs">Önizləmə</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto -mx-2 px-2">
+          <TabsList className="inline-flex w-auto min-w-full">
+            <TabsTrigger value="designer" className="text-xs px-3">Paywall</TabsTrigger>
+            <TabsTrigger value="billing" className="text-xs px-3">Abunəlik</TabsTrigger>
+            <TabsTrigger value="features" className="text-xs px-3">Funksiyalar</TabsTrigger>
+            <TabsTrigger value="plans" className="text-xs px-3">Planlar</TabsTrigger>
+            <TabsTrigger value="limits" className="text-xs px-3">Limitlər</TabsTrigger>
+            <TabsTrigger value="users" className="text-xs px-3">İstifadəçilər</TabsTrigger>
+            <TabsTrigger value="preview" className="text-xs px-3">Önizləmə</TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* Paywall Designer Tab */}
         <TabsContent value="designer">
