@@ -16,6 +16,7 @@ import { useAppSettings, useUpdateAppSetting } from '@/hooks/useAppSettings';
 import { supabase } from '@/integrations/supabase/client';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
 import PaywallDesignerTab from './PaywallDesignerTab';
+import BillingDesignerTab from './BillingDesignerTab';
 
 // =========== FREE LIMITS TAB ===========
 const FreeLimitsTab = () => {
