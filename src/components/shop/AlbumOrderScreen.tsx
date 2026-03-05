@@ -8,6 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePaymentMethods } from '@/hooks/usePaymentMethods';
+import { useCouponValidator } from '@/hooks/useCoupons';
+import CouponInput from './CouponInput';
 import { useToast } from '@/hooks/use-toast';
 
 interface AlbumOrderScreenProps {
@@ -19,6 +21,7 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { methods: paymentMethods, loading: pmLoading } = usePaymentMethods();
+  const { couponCode, setCouponCode, appliedCoupon, validating, validateCoupon, removeCoupon, recordUsage } = useCouponValidator('album');
   
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -158,6 +161,19 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
               </label>
             </div>
           )}
+
+          {/* Coupon Code */}
+          <div>
+            <Label className="text-sm mb-2 block">Kupon kodu</Label>
+            <CouponInput
+              couponCode={couponCode}
+              onCodeChange={setCouponCode}
+              onApply={() => validateCoupon(couponCode, 0)}
+              onRemove={removeCoupon}
+              appliedCoupon={appliedCoupon}
+              validating={validating}
+            />
+          </div>
         </div>
 
         <Button onClick={handleSubmit} disabled={submitting || !name || !phone} className="w-full h-12 rounded-2xl text-base font-bold">

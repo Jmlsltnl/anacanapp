@@ -56,6 +56,7 @@ import AdminBabyDailyInfo from './admin/AdminBabyDailyInfo';
 import AdminMommyDailyMessages from './admin/AdminMommyDailyMessages';
 import AdminIntroSlides from './admin/AdminIntroSlides';
 import AdminAlbumOrders from './admin/AdminAlbumOrders';
+import AdminCoupons from './admin/AdminCoupons';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -178,6 +179,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminIntroSlides />;
       case 'album-orders':
         return <AdminAlbumOrders />;
+      case 'coupons':
+        return <AdminCoupons />;
       case 'security':
         return <AdminSecurity />;
       default:

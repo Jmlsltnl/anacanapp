@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Package, Settings, BarChart3, Shield, 
   ChevronLeft, Menu, LogOut, Bell, Search,
-  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store, ShieldAlert, BookHeart, MapPin, Gamepad2, Zap, Lightbulb, Megaphone, UtensilsCrossed, Heart, HelpCircle, Sparkles, ShoppingCart, Brain, Calculator, Calendar, Stethoscope
+  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store, ShieldAlert, BookHeart, MapPin, Gamepad2, Zap, Lightbulb, Megaphone, UtensilsCrossed, Heart, HelpCircle, Sparkles, ShoppingCart, Brain, Calculator, Calendar, Stethoscope, Tag
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -65,6 +65,7 @@ const menuItems = [
   { id: 'healthcare-reviews', label: 'Həkim/Klinika Rəyləri', icon: Stethoscope },
   { id: 'cakes', label: 'Tortlar', icon: Package },
   { id: 'album-orders', label: 'Albom Sifarişləri', icon: Package },
+  { id: 'coupons', label: 'Kupon Kodları', icon: Tag },
   { id: 'play-activities', label: 'Ağıllı Oyun Qutusu', icon: Gamepad2 },
   { id: 'quick-actions', label: 'Sürətli Keçidlər', icon: Zap },
   { id: 'development-tips', label: 'İnkişaf Tövsiyələri', icon: Lightbulb },

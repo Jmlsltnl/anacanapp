@@ -1807,6 +1807,95 @@ export type Database = {
         }
         Relationships: []
       }
+      coupon_usage: {
+        Row: {
+          coupon_id: string
+          created_at: string | null
+          discount_amount: number
+          id: string
+          order_id: string | null
+          order_type: string
+          user_id: string
+        }
+        Insert: {
+          coupon_id: string
+          created_at?: string | null
+          discount_amount?: number
+          id?: string
+          order_id?: string | null
+          order_type?: string
+          user_id: string
+        }
+        Update: {
+          coupon_id?: string
+          created_at?: string | null
+          discount_amount?: number
+          id?: string
+          order_id?: string | null
+          order_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_usage_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupons: {
+        Row: {
+          applicable_to: string[]
+          code: string
+          created_at: string | null
+          description: string | null
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          max_uses: number | null
+          min_order_amount: number | null
+          starts_at: string | null
+          updated_at: string | null
+          used_count: number | null
+        }
+        Insert: {
+          applicable_to?: string[]
+          code: string
+          created_at?: string | null
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          min_order_amount?: number | null
+          starts_at?: string | null
+          updated_at?: string | null
+          used_count?: number | null
+        }
+        Update: {
+          applicable_to?: string[]
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          min_order_amount?: number | null
+          starts_at?: string | null
+          updated_at?: string | null
+          used_count?: number | null
+        }
+        Relationships: []
+      }
       cry_analyses: {
         Row: {
           analysis_result: Json
@@ -5711,6 +5800,7 @@ export type Database = {
           image_url: string | null
           is_active: boolean | null
           name: string
+          original_price: number | null
           price: number
           rating: number | null
           stock: number | null
@@ -5724,6 +5814,7 @@ export type Database = {
           image_url?: string | null
           is_active?: boolean | null
           name: string
+          original_price?: number | null
           price?: number
           rating?: number | null
           stock?: number | null
@@ -5737,6 +5828,7 @@ export type Database = {
           image_url?: string | null
           is_active?: boolean | null
           name?: string
+          original_price?: number | null
           price?: number
           rating?: number | null
           stock?: number | null
