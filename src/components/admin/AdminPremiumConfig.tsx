@@ -493,8 +493,9 @@ const AdminPremiumConfig = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-6 w-full">
-          <TabsTrigger value="designer" className="text-xs">Dizayner</TabsTrigger>
+        <TabsList className="grid grid-cols-7 w-full">
+          <TabsTrigger value="designer" className="text-xs">Paywall</TabsTrigger>
+          <TabsTrigger value="billing" className="text-xs">Abunəlik</TabsTrigger>
           <TabsTrigger value="features" className="text-xs">Funksiyalar</TabsTrigger>
           <TabsTrigger value="plans" className="text-xs">Planlar</TabsTrigger>
           <TabsTrigger value="limits" className="text-xs">Limitlər</TabsTrigger>
@@ -505,6 +506,11 @@ const AdminPremiumConfig = () => {
         {/* Paywall Designer Tab */}
         <TabsContent value="designer">
           <PaywallDesignerTab />
+        </TabsContent>
+
+        {/* Billing Designer Tab */}
+        <TabsContent value="billing">
+          <BillingDesignerTab />
         </TabsContent>
 
         {/* Features Tab */}
