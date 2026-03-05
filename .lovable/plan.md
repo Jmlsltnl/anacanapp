@@ -1,78 +1,135 @@
 
 
-# Persistent Timer Notification + Native Widget Faylları
+# Plan: Multiple UI/UX Fixes and Features
 
-## Hissə 1: Persistent Local Notifications (Lovable-da tam işləyəcək)
-
-Timer başlayanda native notification göstəriləcək, background-da da görünəcək. Timer dayandığında notification silinəcək.
-
-### Yeni fayl: `src/utils/timerNotifications.ts`
-- `showTimerNotification(timerId, type, label)` — Timer başlayanda ongoing notification göstərir
-- `clearTimerNotification(timerId)` — Timer dayandığında notification silir
-- `clearAllTimerNotifications()` — Bütün timer notification-ları silir
-- Timer tipinə görə fərqli başlıq və ikon (Yuxu, Əmizdirmə, Bez, Küy Səsi)
-
-### Dəyişiklik: `src/store/timerStore.ts`
-- `startTimer()` — Timer başlayanda `showTimerNotification()` çağırılacaq
-- `stopTimer()` — Timer dayandığında `clearTimerNotification()` çağırılacaq
-- `clearAllTimers()` — `clearAllTimerNotifications()` çağırılacaq
-
-### Dəyişiklik: `src/components/FloatingTimerWidget.tsx`
-- Background-a keçəndə notification aktiv qalacaq (artıq timerStore-dan avtomatik işləyəcək)
+This plan addresses 9 distinct issues across the application.
 
 ---
 
-## Hissə 2: Native Fayllar (Yerli kompüterdə istifadə üçün)
+## 1. Horoscope Calendar Not Fully Visible
 
-Bu faylları Lovable-da yarada bilərik, amma onları işlətmək üçün Xcode/Android Studio lazımdır.
+**Problem**: The `DatePickerWheel` calendar modal renders day cells at fixed `w-10 h-10` which can overflow on smaller screens or within the horoscope's constrained layout.
 
-### iOS Live Activity faylları:
-1. `ios/App/AnacanTimerWidget/AnacanTimerAttributes.swift` — ActivityAttributes data modeli
-2. `ios/App/AnacanTimerWidget/AnacanTimerWidgetLiveActivity.swift` — Lock screen + Dynamic Island UI
-3. `ios/App/App/Plugins/LiveActivityPlugin.swift` — Capacitor bridge plugin
-4. `ios/App/App/Plugins/LiveActivityPlugin.m` — Objective-C bridge header
+**Fix**: Change day cells from fixed `w-10 h-10` to responsive `w-full aspect-square` within the 7-column grid, ensuring the calendar adapts to container width. The modal container (`inset-x-4 max-w-sm`) should be sufficient but the inner grid cells need to be flexible.
 
-### Android Widget faylları:
-1. `android/app/src/main/java/com/atlasoon/anacan/TimerWidgetProvider.kt` — Widget provider
-2. `android/app/src/main/java/com/atlasoon/anacan/TimerWidgetPlugin.kt` — Capacitor bridge
-3. `android/app/src/main/res/layout/widget_timer.xml` — Widget layout
-4. `android/app/src/main/res/xml/timer_widget_info.xml` — Widget metadata
-
-### Web inteqrasiya:
-5. `src/plugins/LiveActivityPlugin.ts` — Capacitor plugin TypeScript interface (iOS + Android)
-6. `src/store/timerStore.ts` — Plugin çağırışları əlavə ediləcək
+**Files**: `src/components/ui/date-picker-wheel.tsx`
 
 ---
 
-## Texniki Detallar
+## 2. Weather Analysis Accuracy
 
-### timerNotifications.ts strukturu:
-```typescript
-import { LocalNotifications } from '@capacitor/local-notifications';
-import { isNative } from '@/lib/native';
+**Problem**: The edge function uses Open-Meteo API which can differ from Apple Weather (which uses proprietary data sources). The real weather values (temperature, feels_like, wind) are passed correctly from Open-Meteo but the AI (Gemini) regenerates them in JSON output, potentially returning different numbers than the actual API data.
 
-// Notification ID-ləri: timer hash-indən generasiya
-// Timer başlayanda: schedule notification (ongoing=true Android-də)
-// Timer dayandığında: cancel notification by id
-```
+**Fix**: After parsing Gemini's JSON response, overwrite the numeric weather fields (`temperature`, `feelsLike`, `humidity`, `windSpeed`, `uvIndex`) with the actual Open-Meteo values instead of trusting Gemini's output. This ensures displayed weather data matches the real API data.
 
-### LiveActivityPlugin.ts strukturu:
-```typescript
-import { registerPlugin } from '@capacitor/core';
+**Files**: `supabase/functions/weather-clothing/index.ts`
 
-interface LiveActivityPlugin {
-  startActivity(options: { type: string; label: string; startTime: number }): Promise<void>;
-  stopActivity(): Promise<void>;
-}
+---
 
-const LiveActivity = registerPlugin<LiveActivityPlugin>('LiveActivity');
-export default LiveActivity;
-```
+## 3. First Aid (Həyat Qurtaran SOS) - More Compact Layout
 
-### Quraşdırma addımları (native fayllar üçün):
-1. `npm run build && npx cap sync`
-2. **iOS:** Xcode-da Widget Extension target-i əl ilə yaradılmalıdır (File > New > Target > Widget Extension)
-3. **iOS:** Yaradılan Swift fayllarını Widget Extension target-ə köçürün
-4. **Android:** `AndroidManifest.xml`-ə widget receiver əlavə edin
-5. Yenidən build edin
+**Problem**: Scenario cards use large `w-16 h-16` icons, `text-lg` titles, generous padding, and large step icons (`w-28 h-28`).
+
+**Fix**: Reduce icon sizes (`w-12 h-12`), title fonts (`text-base`), padding (`p-3`), and step display icon (`w-20 h-20`). Make the overall layout more compact while keeping readability.
+
+**Files**: `src/components/tools/FirstAidGuide.tsx`
+
+---
+
+## 4. White Noise Persistent Playback Across Pages
+
+**Problem**: When navigating away from WhiteNoise, the audio stops because the component unmounts and the `AudioContext`/`AudioBufferSourceNode` are destroyed.
+
+**Fix**:
+- Create a global `whiteNoiseStore` (zustand, persisted) that manages a singleton `AudioContext` and active sound state at app level
+- Move audio playback logic (AudioContext, gain node, source node) into a global service/store that persists across navigation
+- Add WhiteNoise to the `FloatingTimerWidget` — when a white-noise timer is active, show a minimal floating widget with play/pause and stop controls
+- When user clicks the floating widget, navigate back to WhiteNoise screen
+
+**Files**: 
+- `src/store/whiteNoiseStore.ts` (new)
+- `src/components/tools/WhiteNoise.tsx` (refactor to use store)
+- `src/components/FloatingTimerWidget.tsx` (add white-noise playback controls)
+- `src/App.tsx` or root layout (mount audio engine globally)
+
+---
+
+## 5. Pregnancy Album in Main Section + Baby Monthly Album + Physical Album Orders
+
+**Problem**: Pregnancy Album only accessible from tools. Need: (a) accessible from main dashboard, (b) baby monthly photo album for post-birth, (c) "Order Physical Album" button in both, (d) admin management for album orders with same payment methods as cakes.
+
+**Fix**:
+- Add Pregnancy Album card/widget to Dashboard for `bump` users
+- Create `BabyMonthlyAlbum` component for `mommy` users (upload monthly photos, months 1-12+)
+- Add "Fiziki Albom Sifariş Et" button to both album screens
+- Create `album_orders` DB table with same structure as cake orders
+- Create admin section `AdminAlbumOrders` for managing orders
+- Reuse cake payment methods for album orders
+
+**Files**:
+- `src/components/Dashboard.tsx` (add album widget)
+- `src/components/baby/BabyMonthlyAlbum.tsx` (new)
+- `src/components/tools/PregnancyAlbum.tsx` (add order button)
+- `src/components/shop/AlbumOrderScreen.tsx` (new)
+- `src/components/admin/AdminAlbumOrders.tsx` (new)
+- `src/components/admin/AdminLayout.tsx`, `AdminPanel.tsx` (add menu item)
+- DB migration: `album_orders` table + RLS
+
+---
+
+## 6. Shop Screen - More Compact + Fix Back Button
+
+**Problem**: Header back arrow overlaps iOS safe area. Layout has generous spacing.
+
+**Fix**: Add `safe-area-top` padding to the shop header, reduce font sizes (`text-xl` instead of `text-2xl`), reduce spacing (`mb-4` instead of `mb-6`), make product cards more compact.
+
+**Files**: `src/components/ShopScreen.tsx`
+
+---
+
+## 7. Legal/Policy Pages - Compact Fonts + Replace "Atlasoon MMC"
+
+**Problem**: Policy pages need smaller fonts. "Atlasoon MMC" text exists in database content.
+
+**Fix**:
+- In `LegalScreen.tsx`, add `text-sm` or `prose-xs` to the document content area
+- For "Atlasoon MMC" → "Anacan MMC": This text is in the database `legal_documents` table content. Will need a data UPDATE query to replace all occurrences.
+
+**Files**: 
+- `src/components/LegalScreen.tsx`
+- DB data update: `UPDATE legal_documents SET content = REPLACE(content, 'Atlasoon MMC', 'Anacan MMC'), content_az = REPLACE(content_az, 'Atlasoon MMC', 'Anacan MMC')`
+
+---
+
+## 8. AI Chat - Input Area Below Footer Fix
+
+**Problem**: The AI chat input area uses `height: calc(100dvh - 80px)` which may not account for the bottom navigation bar correctly, causing the input to be hidden.
+
+**Fix**: Adjust the height calculation to properly account for bottom nav + safe area. Use `pb-safe` and ensure the input area has proper `sticky bottom-0` positioning with z-index above the bottom nav, or adjust the container height to exclude the bottom nav.
+
+**Files**: `src/components/AIChatScreen.tsx`
+
+---
+
+## 9. "Atlasoon MMC" → "Anacan MMC" in Code
+
+**Problem**: Only found in `src/lib/iap.ts` as app ID references (com.atlasoon.anacan) — these are package IDs and shouldn't be changed. The "Atlasoon MMC" company name text is in the database legal documents.
+
+**Fix**: Database UPDATE to replace company name in legal documents content.
+
+---
+
+## Implementation Order
+
+1. Quick UI fixes (calendar, first aid, shop, legal, AI chat) — parallel
+2. Weather accuracy fix (edge function)  
+3. White noise persistence (most complex, new store + refactor)
+4. Album features + ordering system (DB + multiple new components)
+5. Database content update for company name
+
+## Estimated Scope
+- ~12 files modified/created
+- 1 DB migration (album_orders table)
+- 1 DB data update (legal documents)
+- 1 edge function update
 
