@@ -21,40 +21,51 @@ serve(async (req) => {
     const actualChildName = childName || 'Əli';
     
     const systemPrompt = language === 'az' 
-      ? `Sən uşaqlar üçün nağıl yazan yaradıcı bir köməkçisən. Azərbaycan dilində, uşaq psixologiyasına uyğun, qorxulu elementlər olmayan, 3-5 dəqiqəlik oxuna biləcək şirin bir nağıl yaz.
+      ? `Sən uşaqlar üçün nağıl yazan peşəkar yazıçısan. Azərbaycan dilində, uşaq psixologiyasına uyğun, qorxulu elementlər olmayan, 3-5 dəqiqəlik oxuna biləcək şirin bir nağıl yaz.
 
 ÇOX VACİB QAYDALAR:
 1. Uşağın adı "${actualChildName}"-dir. Nağılda HƏMİŞƏ bu addan istifadə et!
 2. "Kiçik dost", "kiçik kosmonavt", "kiçik şəhzadə" və ya hər hansı digər ümumi ifadələr YASAQDIR!
 3. Baş qəhrəman MÜTLƏq "${actualChildName}" olmalıdır.
 4. Başlıq formatı: "${actualChildName}ın [Macəra adı]" və ya "${actualChildName} və [nəsə]"
+5. Nağılda istifadə olunan digər adlar (köməkçi qəhrəmanlar, heyvanlar) Azərbaycanca olmalıdır (məs: Zübeydə, Əlibala, Günəş, Lalə, Tülkü baba, Ayı dayı, Ceyran, Bülbül).
+6. Nağıl TƏBİİ və SAKİT tonla yazılmalıdır - HEÇ bir abartılı, şişirdilmiş ifadə olmamalıdır.
+7. Azərbaycan dili qrammatikasına MÜKƏMMƏl əməl et: düzgün hal şəkilçiləri, felin zamanları, sifət və zərflərin düzgün istifadəsi, vergül və nöqtə qaydaları.
 
 Nağılın strukturu:
 1. Başlıq (uşağın adı ilə)
-2. Maraqlı giriş ("Bir varmış, bir yoxmuş, ${actualChildName} adlı..." ilə başla)
-3. Macəra hissəsi
+2. Sadə giriş ("Bir varmış, bir yoxmuş, ${actualChildName} adlı..." ilə başla)
+3. Macəra hissəsi (təbii, həyati, inandırıcı hadisələr)
 4. Kulminasiya nöqtəsi  
 5. Xoşbəxt son və tərbiyəvi mesaj
 
 Üslub:
 - Sadə, anlaşılan cümlələr
-- "${actualChildName}" adını nağıl boyu təkrarla
-- Emosional və canlı təsvirlər`
+- "${actualChildName}" adını nağıl boyu istifadə et
+- Təbii, isti, ana/ata nağıl danışığı tonu
+- Abartısız, realist, uşağın anlaşacağı səviyyədə`
       : `You are a creative fairy tale writer. Write a sweet story for children.
 
 CRITICAL RULES:
 1. The child's name is "${actualChildName}". ALWAYS use this exact name!
 2. Generic terms like "little friend", "little astronaut" are FORBIDDEN!
 3. The main hero MUST be "${actualChildName}".
-4. Title format: "${actualChildName}'s [Adventure]"`;
+4. Title format: "${actualChildName}'s [Adventure]"
+5. Use local/Azerbaijani-style names for supporting characters.
+6. Keep the tone natural and calm - no exaggeration.`;
 
     const userPrompt = language === 'az'
       ? `Uşağın adı: ${actualChildName} (bu adı nağılda mütləq istifadə et!)
 Mövzu/Tema: ${theme || 'Meşə macərası'}
-Qəhrəman tipi: ${hero || 'Cəsur'}
+Köməkçi qəhrəman: ${hero || 'Heyvan dostu'}
 Tərbiyəvi mesaj: ${moralLesson || 'Dostluq'}
 
-"${actualChildName}" adlı uşaq haqqında nağıl yaz. Başlığı "${actualChildName}ın..." və ya "${actualChildName} və..." formatında yaz.`
+VACİB:
+- "${actualChildName}" adlı uşaq haqqında nağıl yaz
+- Başlığı "${actualChildName}ın..." və ya "${actualChildName} və..." formatında yaz
+- Digər adlar Azərbaycanca olsun (məs: nənə Gülnarə, Tülkü baba, Bülbül xanım)
+- Abartısız, təbii dildə yaz
+- Azərbaycan dili qrammatikasına diqqətlə əməl et`
       : `Child's name: ${actualChildName} (MUST use this name!)
 Theme: ${theme || 'Forest adventure'}
 Hero type: ${hero || 'Brave'}

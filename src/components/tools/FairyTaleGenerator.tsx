@@ -550,7 +550,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                       });
                     }}
                   >
-                    <Heart className={`h-4 w-4 ${selectedTale.is_favorite ? 'fill-red-500 text-red-500' : ''}`} />
+                    <Heart className={`h-4 w-4 ${selectedTale.is_favorite ? 'fill-red-500 text-white' : ''}`} />
                   </Button>
                   <Button
                     variant="outline"

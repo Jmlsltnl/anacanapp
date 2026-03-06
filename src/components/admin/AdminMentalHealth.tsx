@@ -9,16 +9,18 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Edit, Trash2, Brain, Smile, Wind, Volume2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Brain, Smile, Wind, Volume2, Phone } from 'lucide-react';
 import { 
   useAdminEPDSQuestions, 
   useAdminMoodLevels, 
   useAdminBreathingExercises,
   useAdminNoiseThresholds,
+  useAdminMentalHealthResources,
   EPDSQuestion,
   MoodLevel,
   BreathingExercise,
-  NoiseThreshold
+  NoiseThreshold,
+  MentalHealthResourceAdmin
 } from '@/hooks/useAdminMentalHealth';
 
 const AdminMentalHealth = () => {
@@ -26,26 +28,30 @@ const AdminMentalHealth = () => {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Mental Sağlamlıq İdarəetməsi</h2>
-        <p className="text-muted-foreground">EPDS sualları, əhval, nəfəs məşqləri və səs hədləri</p>
+        <p className="text-muted-foreground">EPDS sualları, əhval, nəfəs məşqləri, səs hədləri və dəstək resursları</p>
       </div>
 
       <Tabs defaultValue="epds" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="epds" className="flex items-center gap-2">
-            <Brain className="w-4 h-4" />
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="epds" className="flex items-center gap-1 text-xs">
+            <Brain className="w-3.5 h-3.5" />
             EPDS
           </TabsTrigger>
-          <TabsTrigger value="mood" className="flex items-center gap-2">
-            <Smile className="w-4 h-4" />
+          <TabsTrigger value="mood" className="flex items-center gap-1 text-xs">
+            <Smile className="w-3.5 h-3.5" />
             Əhval
           </TabsTrigger>
-          <TabsTrigger value="breathing" className="flex items-center gap-2">
-            <Wind className="w-4 h-4" />
+          <TabsTrigger value="breathing" className="flex items-center gap-1 text-xs">
+            <Wind className="w-3.5 h-3.5" />
             Nəfəs
           </TabsTrigger>
-          <TabsTrigger value="noise" className="flex items-center gap-2">
-            <Volume2 className="w-4 h-4" />
-            Səs Hədd
+          <TabsTrigger value="noise" className="flex items-center gap-1 text-xs">
+            <Volume2 className="w-3.5 h-3.5" />
+            Səs
+          </TabsTrigger>
+          <TabsTrigger value="resources" className="flex items-center gap-1 text-xs">
+            <Phone className="w-3.5 h-3.5" />
+            Resurslar
           </TabsTrigger>
         </TabsList>
 
@@ -53,6 +59,7 @@ const AdminMentalHealth = () => {
         <TabsContent value="mood"><MoodTab /></TabsContent>
         <TabsContent value="breathing"><BreathingTab /></TabsContent>
         <TabsContent value="noise"><NoiseTab /></TabsContent>
+        <TabsContent value="resources"><ResourcesTab /></TabsContent>
       </Tabs>
     </div>
   );
@@ -532,3 +539,138 @@ const NoiseForm = ({ item, onSave }: { item: NoiseThreshold | null; onSave: (dat
 };
 
 export default AdminMentalHealth;
+
+// Resources Tab
+const ResourcesTab = () => {
+  const { data: resources = [], create, update, remove } = useAdminMentalHealthResources();
+  const [editItem, setEditItem] = useState<MentalHealthResourceAdmin | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    name_az: '',
+    description: '',
+    description_az: '',
+    resource_type: 'hotline',
+    phone: '',
+    website: '',
+    address: '',
+    address_az: '',
+    is_emergency: false,
+    is_active: true,
+    sort_order: 0,
+  });
+
+  const handleEdit = (item: MentalHealthResourceAdmin) => {
+    setEditItem(item);
+    setFormData({
+      name: item.name,
+      name_az: item.name_az,
+      description: item.description || '',
+      description_az: item.description_az || '',
+      resource_type: item.resource_type,
+      phone: item.phone || '',
+      website: item.website || '',
+      address: item.address || '',
+      address_az: item.address_az || '',
+      is_emergency: item.is_emergency || false,
+      is_active: item.is_active ?? true,
+      sort_order: item.sort_order || 0,
+    });
+    setIsOpen(true);
+  };
+
+  const handleSave = () => {
+    if (editItem) {
+      update.mutate({ id: editItem.id, ...formData });
+    } else {
+      create.mutate(formData);
+    }
+    setIsOpen(false);
+    setEditItem(null);
+    setFormData({ name: '', name_az: '', description: '', description_az: '', resource_type: 'hotline', phone: '', website: '', address: '', address_az: '', is_emergency: false, is_active: true, sort_order: 0 });
+  };
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="text-lg">Təcili Yardım & Dəstək Resursları</CardTitle>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm" onClick={() => { setEditItem(null); setFormData({ name: '', name_az: '', description: '', description_az: '', resource_type: 'hotline', phone: '', website: '', address: '', address_az: '', is_emergency: false, is_active: true, sort_order: 0 }); }}>
+              <Plus className="w-4 h-4 mr-1" /> Əlavə et
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{editItem ? 'Redaktə et' : 'Yeni Resurs'}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Ad (EN)</Label><Input value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} /></div>
+                <div><Label>Ad (AZ)</Label><Input value={formData.name_az} onChange={e => setFormData({...formData, name_az: e.target.value})} /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Təsvir (EN)</Label><Textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} /></div>
+                <div><Label>Təsvir (AZ)</Label><Textarea value={formData.description_az} onChange={e => setFormData({...formData, description_az: e.target.value})} /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Telefon</Label><Input value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} /></div>
+                <div><Label>Sayt</Label><Input value={formData.website} onChange={e => setFormData({...formData, website: e.target.value})} /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Ünvan (EN)</Label><Input value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} /></div>
+                <div><Label>Ünvan (AZ)</Label><Input value={formData.address_az} onChange={e => setFormData({...formData, address_az: e.target.value})} /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Tip</Label><Input value={formData.resource_type} onChange={e => setFormData({...formData, resource_type: e.target.value})} placeholder="hotline, clinic, support" /></div>
+                <div><Label>Sıra</Label><Input type="number" value={formData.sort_order} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value) || 0})} /></div>
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <Switch checked={formData.is_emergency} onCheckedChange={v => setFormData({...formData, is_emergency: v})} />
+                  <Label>Təcili</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Switch checked={formData.is_active} onCheckedChange={v => setFormData({...formData, is_active: v})} />
+                  <Label>Aktiv</Label>
+                </div>
+              </div>
+              <Button onClick={handleSave} className="w-full">Yadda saxla</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Ad (AZ)</TableHead>
+              <TableHead>Telefon</TableHead>
+              <TableHead>Tip</TableHead>
+              <TableHead>Təcili</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Əməliyyat</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {resources.map(r => (
+              <TableRow key={r.id}>
+                <TableCell className="font-medium">{r.name_az}</TableCell>
+                <TableCell>{r.phone || '—'}</TableCell>
+                <TableCell><Badge variant="outline">{r.resource_type}</Badge></TableCell>
+                <TableCell>{r.is_emergency ? <Badge className="bg-red-500">Təcili</Badge> : '—'}</TableCell>
+                <TableCell>{r.is_active ? <Badge className="bg-green-500">Aktiv</Badge> : <Badge variant="secondary">Deaktiv</Badge>}</TableCell>
+                <TableCell>
+                  <div className="flex gap-1">
+                    <Button size="icon" variant="ghost" onClick={() => handleEdit(r)}><Edit className="w-4 h-4" /></Button>
+                    <Button size="icon" variant="ghost" className="text-red-500" onClick={() => remove.mutate(r.id)}><Trash2 className="w-4 h-4" /></Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+};

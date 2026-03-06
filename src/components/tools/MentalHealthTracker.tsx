@@ -246,7 +246,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
             <div className="flex-1">
               <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <Brain className="w-5 h-5 text-teal-500" />
-                Sən Necəsən, Ana?
+                Mental Sağlamlıq
               </h1>
             </div>
           </div>
