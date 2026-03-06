@@ -28,7 +28,7 @@ const AdminMentalHealth = () => {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Mental Sağlamlıq İdarəetməsi</h2>
-        <p className="text-muted-foreground">EPDS sualları, əhval, nəfəs məşqləri və səs hədləri</p>
+        <p className="text-muted-foreground">EPDS sualları, əhval, nəfəs məşqləri, səs hədləri və dəstək resursları</p>
       </div>
 
       <Tabs defaultValue="epds" className="space-y-4">
