@@ -60,6 +60,11 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
     if (!file || !user || !uploadMonth) return;
     setUploading(true);
     try {
+      // If replacing, delete old photo first
+      if (replacingPhoto) {
+        await supabase.storage.from('baby-album').remove([`${user.id}/${replacingPhoto.name}`]);
+        setReplacingPhoto(null);
+      }
       const ext = file.name.split('.').pop();
       const path = `${user.id}/month-${uploadMonth}-${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from('baby-album').upload(path, file);
@@ -71,6 +76,7 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
     } finally {
       setUploading(false);
       setUploadMonth(null);
+      setViewingPhoto(null);
     }
   };
 
