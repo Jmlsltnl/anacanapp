@@ -36,6 +36,7 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
   const [showOrder, setShowOrder] = useState(false);
   const [replacingPhoto, setReplacingPhoto] = useState<AlbumPhoto | null>(null);
   const [viewingPhoto, setViewingPhoto] = useState<AlbumPhoto | null>(null);
+  const [showActionSheet, setShowActionSheet] = useState<AlbumPhoto | null>(null);
 
   const { data: photos = [], isLoading } = useQuery({
     queryKey: ['baby-album-photos', user?.id],
@@ -131,7 +132,7 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
               key={month}
               onClick={() => {
                 if (photo) {
-                  setViewingPhoto(photo);
+                  setShowActionSheet(photo);
                 } else {
                   setUploadMonth(month);
                   fileInputRef.current?.click();
@@ -203,6 +204,82 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
             <div className="flex-1 flex items-center justify-center p-4">
               <img src={viewingPhoto.url} alt="Baby photo" className="max-w-full max-h-full object-contain rounded-lg" />
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Action Sheet */}
+      <AnimatePresence>
+        {showActionSheet && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/60 flex items-end justify-center"
+            onClick={() => setShowActionSheet(null)}
+          >
+            <motion.div
+              initial={{ y: 300 }}
+              animate={{ y: 0 }}
+              exit={{ y: 300 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="w-full max-w-md bg-card rounded-t-2xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-4 flex items-center gap-3 border-b border-border/50">
+                <img src={showActionSheet.url} alt="Preview" className="w-16 h-16 rounded-xl object-cover" />
+                <p className="font-semibold text-sm">
+                  {monthLabels.find(m => m.month === showActionSheet.month)?.label}
+                </p>
+              </div>
+
+              <div className="p-4 grid grid-cols-3 gap-2">
+                <Button
+                  variant="outline"
+                  className="flex flex-col items-center gap-1.5 h-auto py-3 rounded-xl"
+                  onClick={() => {
+                    setViewingPhoto(showActionSheet);
+                    setShowActionSheet(null);
+                  }}
+                >
+                  <Camera className="w-5 h-5 text-primary" />
+                  <span className="text-xs font-medium">Bax</span>
+                </Button>
+
+                <Button
+                  variant="outline"
+                  className="flex flex-col items-center gap-1.5 h-auto py-3 rounded-xl"
+                  onClick={() => {
+                    handleReplace(showActionSheet);
+                    setShowActionSheet(null);
+                  }}
+                >
+                  <RefreshCw className="w-5 h-5 text-blue-500" />
+                  <span className="text-xs font-medium">Dəyişdir</span>
+                </Button>
+
+                <Button
+                  variant="outline"
+                  className="flex flex-col items-center gap-1.5 h-auto py-3 rounded-xl border-destructive/30"
+                  onClick={() => {
+                    setShowActionSheet(null);
+                    if (confirm('Bu şəkli silmək istədiyinizə əminsiniz?')) {
+                      handleDelete(showActionSheet);
+                    }
+                  }}
+                >
+                  <Trash2 className="w-5 h-5 text-destructive" />
+                  <span className="text-xs font-medium text-destructive">Sil</span>
+                </Button>
+              </div>
+
+              <div className="px-4 pb-4">
+                <Button variant="ghost" className="w-full rounded-xl bg-muted" onClick={() => setShowActionSheet(null)}>
+                  Ləğv et
+                </Button>
+              </div>
+              <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
