@@ -192,7 +192,7 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
             </div>
 
             {/* Step Content */}
-            <div className="flex-1 flex flex-col items-center justify-start px-3 pt-2 pb-1 text-center overflow-y-auto">
+            <div className="flex-1 flex flex-col items-center justify-start px-3 pt-2 pb-1 text-center overflow-hidden min-h-0">
               {currentStepData && (
                 <AnimatePresence mode="wait">
                   <motion.div
