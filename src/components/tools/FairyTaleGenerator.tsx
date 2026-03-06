@@ -58,6 +58,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
     theme: '',
     hero: '',
     moral_lesson: '',
+    language: 'az',
   });
 
   const { data: tales = [], isLoading } = useFairyTales();
