@@ -230,49 +230,49 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                         {currentStepData.instruction_az}
                       </p>
                     </div>
+
+                    {/* Navigation */}
+                    <div className="mt-3 space-y-1.5">
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 h-10 rounded-xl text-sm"
+                          onClick={prevStep}
+                          disabled={currentStep === 0}
+                        >
+                          <ChevronLeft className="w-4 h-4 mr-1" />
+                          Əvvəlki
+                        </Button>
+                        <Button
+                          size="sm"
+                          className={`flex-1 h-10 rounded-xl text-sm font-bold ${
+                            currentStep === steps.length - 1 
+                              ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' 
+                              : `bg-gradient-to-r ${getEmergencyColor(selectedScenario.emergency_level)}`
+                          }`}
+                          onClick={currentStep === steps.length - 1 ? handleBack : nextStep}
+                        >
+                          {currentStep === steps.length - 1 ? 'Tamamla' : 'Növbəti'}
+                          <ChevronRight className="w-4 h-4 ml-1" />
+                        </Button>
+                      </div>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full h-9 rounded-xl border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 text-xs"
+                        asChild
+                      >
+                        <a href="tel:103">
+                          <Phone className="w-3.5 h-3.5 mr-1.5" />
+                          103 Zəng Et
+                        </a>
+                      </Button>
+                    </div>
                   </motion.div>
                 </AnimatePresence>
               )}
-            </div>
-
-            {/* Navigation */}
-            <div className="px-3 pb-2 pt-1 space-y-1.5 shrink-0">
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 h-10 rounded-xl text-sm"
-                  onClick={prevStep}
-                  disabled={currentStep === 0}
-                >
-                  <ChevronLeft className="w-4 h-4 mr-1" />
-                  Əvvəlki
-                </Button>
-                <Button
-                  size="sm"
-                  className={`flex-1 h-10 rounded-xl text-sm font-bold ${
-                    currentStep === steps.length - 1 
-                      ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' 
-                      : `bg-gradient-to-r ${getEmergencyColor(selectedScenario.emergency_level)}`
-                  }`}
-                  onClick={currentStep === steps.length - 1 ? handleBack : nextStep}
-                >
-                  {currentStep === steps.length - 1 ? 'Tamamla' : 'Növbəti'}
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
-              </div>
-
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full h-9 rounded-xl border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 text-xs"
-                asChild
-              >
-                <a href="tel:103">
-                  <Phone className="w-3.5 h-3.5 mr-1.5" />
-                  103 Zəng Et
-                </a>
-              </Button>
             </div>
           </motion.div>
         )}
