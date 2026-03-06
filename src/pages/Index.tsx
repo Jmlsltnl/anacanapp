@@ -364,7 +364,7 @@ const Index = () => {
       />
       
       {/* Main scrollable content area */}
-      <div ref={scrollContainerRef} data-scroll-container className="flex-1 overflow-y-auto overflow-x-hidden overscroll-none">
+      <div ref={scrollContainerRef} data-scroll-container className="flex-1 overflow-y-auto overflow-x-hidden overscroll-none pb-16">
         <Suspense fallback={
           <div className="flex-1 flex items-center justify-center py-20">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
