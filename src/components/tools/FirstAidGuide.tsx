@@ -202,35 +202,34 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                     exit={{ opacity: 0, y: -10 }}
                     className="w-full max-w-sm"
                   >
-                    {currentStepData.is_critical && (
-                      <div className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-3 py-1 rounded-full mb-2 inline-flex items-center gap-1.5 text-xs font-semibold">
-                        <AlertTriangle className="w-3 h-3" />
-                        Kritik addım!
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${getEmergencyColor(selectedScenario.emergency_level)} flex items-center justify-center shadow-sm shrink-0`}>
+                        <span className="text-base">
+                          {currentStep === 0 ? '👋' : currentStep === steps.length - 1 ? '✅' : selectedScenario.icon}
+                        </span>
                       </div>
-                    )}
-
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${getEmergencyColor(selectedScenario.emergency_level)} flex items-center justify-center mx-auto mb-2 shadow-md`}>
-                      <span className="text-2xl">
-                        {currentStep === 0 ? '👋' : currentStep === steps.length - 1 ? '✅' : selectedScenario.icon}
-                      </span>
-                    </div>
-
-                    <div className="bg-card rounded-xl p-3 shadow border border-border/50 mb-2">
-                      <span className="inline-block px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-[10px] font-medium mb-1.5">
+                      <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-[10px] font-medium">
                         Addım {currentStep + 1}
                       </span>
-                      <h2 className="text-base font-bold text-foreground mb-1">{currentStepData.title_az}</h2>
-                      <p className="text-sm text-muted-foreground leading-snug">
+                      {currentStepData.is_critical && (
+                        <span className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-2 py-0.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1">
+                          <AlertTriangle className="w-2.5 h-2.5" />
+                          Kritik
+                        </span>
+                      )}
+                      {currentStepData.duration_seconds && (
+                        <span className="ml-auto text-[10px] text-muted-foreground font-medium">
+                          ⏱️ {currentStepData.duration_seconds}s
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="bg-card rounded-lg p-2.5 shadow-sm border border-border/50">
+                      <h2 className="text-sm font-bold text-foreground mb-0.5">{currentStepData.title_az}</h2>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
                         {currentStepData.instruction_az}
                       </p>
                     </div>
-
-                    {currentStepData.duration_seconds && (
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted text-muted-foreground text-xs">
-                        <span>⏱️</span>
-                        <span className="font-medium">{currentStepData.duration_seconds} san</span>
-                      </div>
-                    )}
                   </motion.div>
                 </AnimatePresence>
               )}
