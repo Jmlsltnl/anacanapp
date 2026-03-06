@@ -284,3 +284,75 @@ export const useAdminNoiseThresholds = () => {
 
   return { ...query, create, update, remove };
 };
+
+// Mental Health Resources
+export interface MentalHealthResourceAdmin {
+  id: string;
+  name: string;
+  name_az: string;
+  description: string | null;
+  description_az: string | null;
+  resource_type: string;
+  phone: string | null;
+  website: string | null;
+  address: string | null;
+  address_az: string | null;
+  is_emergency: boolean | null;
+  is_active: boolean | null;
+  sort_order: number | null;
+}
+
+export const useAdminMentalHealthResources = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const query = useQuery({
+    queryKey: ['admin-mental-health-resources'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('mental_health_resources')
+        .select('*')
+        .order('sort_order');
+      if (error) throw error;
+      return data as MentalHealthResourceAdmin[];
+    },
+  });
+
+  const create = useMutation({
+    mutationFn: async (item: Partial<MentalHealthResourceAdmin>) => {
+      const { error } = await supabase.from('mental_health_resources').insert([item as any]);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-mental-health-resources'] });
+      queryClient.invalidateQueries({ queryKey: ['mental-health-resources'] });
+      toast({ title: 'Resurs əlavə edildi' });
+    },
+  });
+
+  const update = useMutation({
+    mutationFn: async ({ id, ...item }: Partial<MentalHealthResourceAdmin> & { id: string }) => {
+      const { error } = await supabase.from('mental_health_resources').update(item).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-mental-health-resources'] });
+      queryClient.invalidateQueries({ queryKey: ['mental-health-resources'] });
+      toast({ title: 'Resurs yeniləndi' });
+    },
+  });
+
+  const remove = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('mental_health_resources').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-mental-health-resources'] });
+      queryClient.invalidateQueries({ queryKey: ['mental-health-resources'] });
+      toast({ title: 'Resurs silindi' });
+    },
+  });
+
+  return { ...query, create, update, remove };
+};
