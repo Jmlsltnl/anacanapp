@@ -90,7 +90,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
   const resetCreate = () => {
     setShowCreate(false);
     setCreateStep(1);
-    setFormData({ child_name: '', theme: '', hero: '', moral_lesson: '' });
+    setFormData({ child_name: '', theme: '', hero: '', moral_lesson: '', language: 'az' });
   };
 
   const favoriteTales = tales.filter(t => t.is_favorite);
