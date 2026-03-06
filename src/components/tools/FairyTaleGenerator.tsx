@@ -42,6 +42,13 @@ const HERO_SUGGESTIONS = [
   { emoji: '🌟', label: 'Ulduz' },
 ];
 
+const LANGUAGES = [
+  { code: 'az', label: 'Azərbaycan', flag: '🇦🇿' },
+  { code: 'en', label: 'English', flag: '🇬🇧' },
+  { code: 'ru', label: 'Русский', flag: '🇷🇺' },
+  { code: 'tr', label: 'Türkçe', flag: '🇹🇷' },
+];
+
 const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
   const [selectedTale, setSelectedTale] = useState<FairyTale | null>(null);
   const [showCreate, setShowCreate] = useState(false);
