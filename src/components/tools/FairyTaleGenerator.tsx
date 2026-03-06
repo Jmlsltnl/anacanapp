@@ -483,6 +483,53 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                   />
                 </div>
 
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setCreateStep(2)}>
+                    Geri
+                  </Button>
+                  <Button className="flex-1" onClick={() => setCreateStep(4)}>
+                    Davam et
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
+            {createStep === 4 && (
+              <motion.div
+                key="step3"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="space-y-4"
+              >
+                <div>
+                  <Label className="text-base font-semibold">Köməkçi qəhrəman</Label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    İstəyə bağlı - uşağın dostu
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {HERO_SUGGESTIONS.map(hero => (
+                      <button
+                        key={hero.label}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, hero: hero.label })}
+                        className={`px-3 py-1.5 rounded-full text-sm transition-all ${
+                          formData.hero === hero.label
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted hover:bg-muted/80'
+                        }`}
+                      >
+                        {hero.emoji} {hero.label}
+                      </button>
+                    ))}
+                  </div>
+                  <Input
+                    value={formData.hero}
+                    onChange={(e) => setFormData({ ...formData, hero: e.target.value })}
+                    placeholder="Və ya özünüz yazın..."
+                  />
+                </div>
+
                 <div>
                   <Label className="text-base font-semibold">Tərbiyəvi mesaj</Label>
                   <p className="text-xs text-muted-foreground mb-2">
