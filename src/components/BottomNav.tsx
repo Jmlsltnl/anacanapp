@@ -56,8 +56,8 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
 
   return (
     <nav 
-      className="relative z-50 flex-shrink-0 bg-card border-t border-border/50"
-      style={{ paddingBottom: 'max(0px, env(safe-area-inset-bottom, 0px))' }}
+      className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border/50"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <div className="flex items-center justify-around py-1.5 px-1">
           {(isPartner ? partnerTabs : visibleWomanTabs).map((tab) => {
