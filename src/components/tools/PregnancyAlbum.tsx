@@ -71,6 +71,8 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
   const [editingCaption, setEditingCaption] = useState(false);
   const [caption, setCaption] = useState('');
   const [showOrder, setShowOrder] = useState(false);
+  const [showActionSheet, setShowActionSheet] = useState<AlbumPhoto | null>(null);
+  const [replacingPhotoId, setReplacingPhotoId] = useState<string | null>(null);
 
   const pregData = getPregnancyData();
   const currentWeek = pregData?.currentWeek || 1;
@@ -92,30 +94,36 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
   });
 
   const uploadPhotoMutation = useMutation({
-    mutationFn: async (file: File) => {
+    mutationFn: async ({ file, replacePhoto }: { file: File; replacePhoto?: AlbumPhoto | null }) => {
       if (!user?.id) throw new Error('İstifadəçi tapılmadı');
       
       const monthToUpload = selectedMonth || currentMonth;
+      
+      // If replacing, delete old photo first
+      if (replacePhoto) {
+        const oldPath = replacePhoto.photo_url.split('/pregnancy-album/')[1];
+        if (oldPath) {
+          await supabase.storage.from('pregnancy-album').remove([decodeURIComponent(oldPath)]);
+        }
+        await supabase.from('pregnancy_album_photos').delete().eq('id', replacePhoto.id);
+      }
+      
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}/${monthToUpload}-${Date.now()}.${fileExt}`;
       
-      // Upload to storage
       const { error: uploadError } = await supabase.storage
         .from('pregnancy-album')
         .upload(fileName, file);
       
       if (uploadError) throw uploadError;
       
-      // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('pregnancy-album')
         .getPublicUrl(fileName);
       
-      // Get approximate week for this month
       const weekForMonth = monthLabels.find(m => m.month === monthToUpload);
       const weekNumber = parseInt(weekForMonth?.weeks.split('-')[0] || '1');
       
-      // Save to database
       const { error: dbError } = await supabase
         .from('pregnancy_album_photos')
         .insert({
@@ -132,10 +140,13 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
       queryClient.invalidateQueries({ queryKey: ['pregnancy-album-photos'] });
       setSelectedMonth(null);
       setCaption('');
+      setReplacingPhotoId(null);
+      setViewingPhoto(null);
       toast({ title: 'Şəkil əlavə edildi', description: 'Hamiləlik albomuna şəkil əlavə edildi' });
     },
     onError: (error) => {
       console.error('Upload error:', error);
+      setReplacingPhotoId(null);
       toast({ title: 'Xəta', description: 'Şəkil yüklənə bilmədi', variant: 'destructive' });
     },
     onSettled: () => {
@@ -145,13 +156,10 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
 
   const deletePhotoMutation = useMutation({
     mutationFn: async (photo: AlbumPhoto) => {
-      // Delete from storage
       const path = photo.photo_url.split('/pregnancy-album/')[1];
       if (path) {
-        await supabase.storage.from('pregnancy-album').remove([path]);
+        await supabase.storage.from('pregnancy-album').remove([decodeURIComponent(path)]);
       }
-      
-      // Delete from database
       const { error } = await supabase
         .from('pregnancy_album_photos')
         .delete()
@@ -161,6 +169,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pregnancy-album-photos'] });
       setViewingPhoto(null);
+      setShowActionSheet(null);
       toast({ title: 'Silindi', description: 'Şəkil albomdan silindi' });
     },
   });
@@ -184,12 +193,41 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
     const file = e.target.files?.[0];
     if (!file) return;
     
+    // Reset the input so the same file can be selected again
+    e.target.value = '';
+    
     setUploading(true);
-    uploadPhotoMutation.mutate(file);
+    
+    // Find the photo being replaced
+    const replacePhoto = replacingPhotoId 
+      ? photos.find(p => p.id === replacingPhotoId) || null 
+      : null;
+    
+    uploadPhotoMutation.mutate({ file, replacePhoto });
   };
 
   const getPhotoForMonth = (month: number) => {
     return photos.find(p => p.month_number === month);
+  };
+
+  // Handle replace: set state then open file picker (in same user gesture)
+  const handleReplace = (photo: AlbumPhoto) => {
+    setReplacingPhotoId(photo.id);
+    setSelectedMonth(photo.month_number);
+    setShowActionSheet(null);
+    setViewingPhoto(null);
+    // Must click in the same tick as user gesture for mobile
+    setTimeout(() => {
+      fileInputRef.current?.click();
+    }, 100);
+  };
+
+  // Handle delete with confirmation
+  const handleDelete = (photo: AlbumPhoto) => {
+    setShowActionSheet(null);
+    if (confirm('Bu şəkli silmək istədiyinizə əminsiniz?')) {
+      deletePhotoMutation.mutate(photo);
+    }
   };
 
   if (showOrder) {
@@ -270,9 +308,10 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                 transition={{ delay: index * 0.05 }}
                 onClick={() => {
                   if (photo) {
-                    setViewingPhoto(photo);
+                    setShowActionSheet(photo);
                   } else if (!isFuture) {
                     setSelectedMonth(month.month);
+                    setReplacingPhotoId(null);
                     fileInputRef.current?.click();
                   }
                 }}
@@ -349,6 +388,90 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
         </div>
       </div>
 
+      {/* Action Sheet - appears when tapping a photo */}
+      <AnimatePresence>
+        {showActionSheet && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/60 flex items-end justify-center"
+            onClick={() => setShowActionSheet(null)}
+          >
+            <motion.div
+              initial={{ y: 300 }}
+              animate={{ y: 0 }}
+              exit={{ y: 300 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="w-full max-w-md bg-card rounded-t-2xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Photo preview */}
+              <div className="p-4 flex items-center gap-3 border-b border-border/50">
+                <img 
+                  src={showActionSheet.photo_url} 
+                  alt="Preview" 
+                  className="w-16 h-16 rounded-xl object-cover"
+                />
+                <div>
+                  <p className="font-semibold text-sm">
+                    {monthLabels[showActionSheet.month_number - 1]?.label}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {format(new Date(showActionSheet.photo_date), 'd MMMM yyyy', { locale: az })}
+                  </p>
+                  {showActionSheet.caption && (
+                    <p className="text-xs text-muted-foreground mt-0.5">{showActionSheet.caption}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="p-2">
+                <button
+                  onClick={() => {
+                    setViewingPhoto(showActionSheet);
+                    setShowActionSheet(null);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted/50 active:bg-muted transition-colors"
+                >
+                  <Camera className="w-5 h-5 text-primary" />
+                  <span className="text-sm font-medium">Şəkilə bax</span>
+                </button>
+                
+                <button
+                  onClick={() => handleReplace(showActionSheet)}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted/50 active:bg-muted transition-colors"
+                >
+                  <RefreshCw className="w-5 h-5 text-blue-500" />
+                  <span className="text-sm font-medium">Dəyişdir</span>
+                </button>
+                
+                <button
+                  onClick={() => handleDelete(showActionSheet)}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted/50 active:bg-muted transition-colors"
+                >
+                  <Trash2 className="w-5 h-5 text-destructive" />
+                  <span className="text-sm font-medium text-destructive">Sil</span>
+                </button>
+              </div>
+
+              {/* Cancel */}
+              <div className="p-2 pt-0">
+                <button
+                  onClick={() => setShowActionSheet(null)}
+                  className="w-full py-3 rounded-xl bg-muted text-sm font-medium"
+                >
+                  Ləğv et
+                </button>
+              </div>
+              
+              <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Photo Viewer Modal */}
       <AnimatePresence>
         {viewingPhoto && (
@@ -358,7 +481,6 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-black flex flex-col"
           >
-          {/* Header with Close Button */}
             <div className="flex items-center justify-between p-4 safe-area-top">
               <Button 
                 variant="ghost" 
@@ -382,14 +504,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                   variant="ghost" 
                   size="icon" 
                   className="text-white hover:bg-white/20"
-                  onClick={() => {
-                    setSelectedMonth(viewingPhoto.month_number);
-                    deletePhotoMutation.mutate(viewingPhoto, {
-                      onSuccess: () => {
-                        fileInputRef.current?.click();
-                      }
-                    });
-                  }}
+                  onClick={() => handleReplace(viewingPhoto)}
                 >
                   <RefreshCw className="w-5 h-5" />
                 </Button>
@@ -397,18 +512,13 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                   variant="ghost" 
                   size="icon" 
                   className="text-white hover:bg-red-500/20 hover:text-red-400"
-                  onClick={() => {
-                    if (confirm('Bu şəkli silmək istədiyinizə əminsiniz?')) {
-                      deletePhotoMutation.mutate(viewingPhoto);
-                    }
-                  }}
+                  onClick={() => handleDelete(viewingPhoto)}
                 >
                   <Trash2 className="w-5 h-5" />
                 </Button>
               </div>
             </div>
 
-            {/* Photo */}
             <div className="flex-1 flex items-center justify-center p-4">
               <img 
                 src={viewingPhoto.photo_url} 
@@ -417,7 +527,6 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
               />
             </div>
 
-            {/* Caption */}
             <div className="p-4">
               {editingCaption ? (
                 <div className="flex gap-2">
