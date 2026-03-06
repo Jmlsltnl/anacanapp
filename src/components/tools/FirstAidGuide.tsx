@@ -236,7 +236,7 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
             </div>
 
             {/* Navigation */}
-            <div className="px-3 pb-3 pt-1 space-y-2 safe-area-bottom">
+            <div className="px-3 pb-2 pt-1 space-y-1.5 shrink-0">
               <div className="flex gap-2">
                 <Button
                   variant="outline"
