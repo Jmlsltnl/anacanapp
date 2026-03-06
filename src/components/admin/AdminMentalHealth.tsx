@@ -59,6 +59,7 @@ const AdminMentalHealth = () => {
         <TabsContent value="mood"><MoodTab /></TabsContent>
         <TabsContent value="breathing"><BreathingTab /></TabsContent>
         <TabsContent value="noise"><NoiseTab /></TabsContent>
+        <TabsContent value="resources"><ResourcesTab /></TabsContent>
       </Tabs>
     </div>
   );
