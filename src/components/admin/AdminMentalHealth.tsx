@@ -32,22 +32,26 @@ const AdminMentalHealth = () => {
       </div>
 
       <Tabs defaultValue="epds" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="epds" className="flex items-center gap-2">
-            <Brain className="w-4 h-4" />
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="epds" className="flex items-center gap-1 text-xs">
+            <Brain className="w-3.5 h-3.5" />
             EPDS
           </TabsTrigger>
-          <TabsTrigger value="mood" className="flex items-center gap-2">
-            <Smile className="w-4 h-4" />
+          <TabsTrigger value="mood" className="flex items-center gap-1 text-xs">
+            <Smile className="w-3.5 h-3.5" />
             Əhval
           </TabsTrigger>
-          <TabsTrigger value="breathing" className="flex items-center gap-2">
-            <Wind className="w-4 h-4" />
+          <TabsTrigger value="breathing" className="flex items-center gap-1 text-xs">
+            <Wind className="w-3.5 h-3.5" />
             Nəfəs
           </TabsTrigger>
-          <TabsTrigger value="noise" className="flex items-center gap-2">
-            <Volume2 className="w-4 h-4" />
-            Səs Hədd
+          <TabsTrigger value="noise" className="flex items-center gap-1 text-xs">
+            <Volume2 className="w-3.5 h-3.5" />
+            Səs
+          </TabsTrigger>
+          <TabsTrigger value="resources" className="flex items-center gap-1 text-xs">
+            <Phone className="w-3.5 h-3.5" />
+            Resurslar
           </TabsTrigger>
         </TabsList>
 
