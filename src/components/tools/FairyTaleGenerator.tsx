@@ -78,7 +78,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
       const result = await generateTale.mutateAsync(formData);
       setShowCreate(false);
       setSelectedTale(result);
-      setFormData({ child_name: '', theme: '', hero: '', moral_lesson: '' });
+      setFormData({ child_name: '', theme: '', hero: '', moral_lesson: '', language: 'az' });
       setCreateStep(1);
     } catch (error) {
       // Error handled in hook
