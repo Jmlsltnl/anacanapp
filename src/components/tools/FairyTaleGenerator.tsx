@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Sparkles, BookOpen, Heart, Trash2, Loader2, Wand2, Clock, Star, BookOpenCheck } from 'lucide-react';
+import { ArrowLeft, Sparkles, BookOpen, Heart, Trash2, Loader2, Wand2, Clock, Star, BookOpenCheck, Globe } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,6 +42,13 @@ const HERO_SUGGESTIONS = [
   { emoji: '🌟', label: 'Ulduz' },
 ];
 
+const LANGUAGES = [
+  { code: 'az', label: 'Azərbaycan', flag: '🇦🇿' },
+  { code: 'en', label: 'English', flag: '🇬🇧' },
+  { code: 'ru', label: 'Русский', flag: '🇷🇺' },
+  { code: 'tr', label: 'Türkçe', flag: '🇹🇷' },
+];
+
 const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
   const [selectedTale, setSelectedTale] = useState<FairyTale | null>(null);
   const [showCreate, setShowCreate] = useState(false);
@@ -51,6 +58,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
     theme: '',
     hero: '',
     moral_lesson: '',
+    language: 'az',
   });
 
   const { data: tales = [], isLoading } = useFairyTales();
@@ -70,7 +78,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
       const result = await generateTale.mutateAsync(formData);
       setShowCreate(false);
       setSelectedTale(result);
-      setFormData({ child_name: '', theme: '', hero: '', moral_lesson: '' });
+      setFormData({ child_name: '', theme: '', hero: '', moral_lesson: '', language: 'az' });
       setCreateStep(1);
     } catch (error) {
       // Error handled in hook
@@ -82,7 +90,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
   const resetCreate = () => {
     setShowCreate(false);
     setCreateStep(1);
-    setFormData({ child_name: '', theme: '', hero: '', moral_lesson: '' });
+    setFormData({ child_name: '', theme: '', hero: '', moral_lesson: '', language: 'az' });
   };
 
   const favoriteTales = tales.filter(t => t.is_favorite);
@@ -325,9 +333,9 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
             </DialogTitle>
           </DialogHeader>
 
-          <Progress value={(createStep / 3) * 100} className="mb-4" />
+          <Progress value={(createStep / 4) * 100} className="mb-4" />
           <p className="text-xs text-muted-foreground text-center mb-4">
-            Addım {createStep} / 3
+            Addım {createStep} / 4
           </p>
 
           <AnimatePresence mode="wait">
@@ -351,6 +359,33 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     className="text-lg"
                     autoFocus
                   />
+                </div>
+
+                {/* Language Selection */}
+                <div>
+                  <Label className="text-base font-semibold flex items-center gap-2">
+                    <Globe className="h-4 w-4" /> Nağılın dili *
+                  </Label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Hansı dildə yazılsın?
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {LANGUAGES.map(lang => (
+                      <button
+                        key={lang.code}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, language: lang.code })}
+                        className={`p-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2 ${
+                          formData.language === lang.code
+                            ? 'bg-primary text-primary-foreground shadow-md'
+                            : 'bg-muted hover:bg-muted/80'
+                        }`}
+                      >
+                        <span className="text-lg">{lang.flag}</span>
+                        {lang.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <Button
@@ -448,6 +483,25 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                   />
                 </div>
 
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setCreateStep(2)}>
+                    Geri
+                  </Button>
+                  <Button className="flex-1" onClick={() => setCreateStep(4)}>
+                    Davam et
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
+            {createStep === 4 && (
+              <motion.div
+                key="step4"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="space-y-4"
+              >
                 <div>
                   <Label className="text-base font-semibold">Tərbiyəvi mesaj</Label>
                   <p className="text-xs text-muted-foreground mb-2">
@@ -472,7 +526,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setCreateStep(2)}>
+                  <Button variant="outline" onClick={() => setCreateStep(3)}>
                     Geri
                   </Button>
                   <Button

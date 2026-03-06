@@ -78,10 +78,10 @@ export const useGenerateFairyTale = () => {
       theme: string;
       hero?: string;
       moral_lesson?: string;
+      language?: string;
     }) => {
       if (!user?.id) throw new Error('User not authenticated');
 
-      // Call edge function to generate story
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-fairy-tale`,
         {
@@ -95,6 +95,7 @@ export const useGenerateFairyTale = () => {
             theme: params.theme,
             hero: params.hero,
             moralLesson: params.moral_lesson,
+            language: params.language || 'az',
           }),
         }
       );
