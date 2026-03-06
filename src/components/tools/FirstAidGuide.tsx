@@ -104,21 +104,21 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
             {/* Emergency Call Button */}
             <motion.a
               href="tel:103"
-              className="block w-full mb-6"
+              className="block w-full mb-4"
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.1 }}
             >
-              <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-2xl p-4 shadow-lg flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                  <Phone className="w-6 h-6 text-white" />
+              <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-2xl p-3 shadow-lg flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <Phone className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-xl font-black text-white">103</p>
-                  <p className="text-sm text-white/80">Təcili Tibbi Yardım</p>
+                  <p className="text-lg font-black text-white">103</p>
+                  <p className="text-xs text-white/80">Təcili Tibbi Yardım</p>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center animate-pulse">
-                  <ChevronRight className="w-5 h-5 text-white" />
+                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center animate-pulse">
+                  <ChevronRight className="w-4 h-4 text-white" />
                 </div>
               </div>
             </motion.a>
