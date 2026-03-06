@@ -34,6 +34,7 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
   const [uploading, setUploading] = useState(false);
   const [uploadMonth, setUploadMonth] = useState<number | null>(null);
   const [showOrder, setShowOrder] = useState(false);
+  const [replacingPhoto, setReplacingPhoto] = useState<AlbumPhoto | null>(null);
   const [viewingPhoto, setViewingPhoto] = useState<AlbumPhoto | null>(null);
 
   const { data: photos = [], isLoading } = useQuery({
