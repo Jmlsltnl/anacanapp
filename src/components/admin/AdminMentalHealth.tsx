@@ -9,16 +9,18 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Edit, Trash2, Brain, Smile, Wind, Volume2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Brain, Smile, Wind, Volume2, Phone } from 'lucide-react';
 import { 
   useAdminEPDSQuestions, 
   useAdminMoodLevels, 
   useAdminBreathingExercises,
   useAdminNoiseThresholds,
+  useAdminMentalHealthResources,
   EPDSQuestion,
   MoodLevel,
   BreathingExercise,
-  NoiseThreshold
+  NoiseThreshold,
+  MentalHealthResourceAdmin
 } from '@/hooks/useAdminMentalHealth';
 
 const AdminMentalHealth = () => {
