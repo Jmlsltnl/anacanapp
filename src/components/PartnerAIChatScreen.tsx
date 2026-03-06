@@ -492,7 +492,7 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="p-4 border-t border-border bg-card/50 backdrop-blur-sm safe-bottom">
+      <div className="p-4 border-t border-border bg-card/80 backdrop-blur-md safe-bottom">
         <div className="flex gap-2 items-end">
           <div className="flex-1 relative">
             <Textarea
