@@ -255,10 +255,8 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     }
 
     if (tool.isPremium && !isPremium) {
-      if (tool.premiumType === 'premium_only') {
-        setShowPremiumModal(true);
-        return;
-      }
+      setShowPremiumModal(true);
+      return;
     }
 
     openTool(tool.id);
@@ -470,7 +468,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
             {filteredTools.map((tool, index) => {
               const Icon = tool.icon;
               const available = isToolAvailable(tool);
-              const needsPremium = (tool.isLocked || (tool.isPremium && tool.premiumType === 'premium_only')) && !isPremium;
+              const needsPremium = (tool.isLocked || tool.isPremium) && !isPremium;
               
               return (
                 <motion.button
