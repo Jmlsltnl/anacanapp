@@ -170,18 +170,18 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
         ) : (
           <motion.div
             key="steps"
-            className="flex flex-col min-h-[calc(100vh-140px)]"
-            initial={{ opacity: 0, x: 50 }}
+            className="flex flex-col h-[calc(100vh-56px)]"
+            initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
+            exit={{ opacity: 0, x: -30 }}
           >
             {/* Progress */}
-            <div className="px-4 pt-4">
-              <div className="flex items-center gap-2 mb-2">
+            <div className="px-3 pt-2">
+              <div className="flex items-center gap-1">
                 {steps.map((_, i) => (
                   <div 
                     key={i}
-                    className={`h-1.5 flex-1 rounded-full transition-all ${
+                    className={`h-1 flex-1 rounded-full transition-all ${
                       i <= currentStep 
                         ? `bg-gradient-to-r ${getEmergencyColor(selectedScenario.emergency_level)}`
                         : 'bg-muted'
@@ -192,51 +192,43 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
             </div>
 
             {/* Step Content */}
-            <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+            <div className="flex-1 flex flex-col items-center justify-center px-4 py-2 text-center overflow-y-auto">
               {currentStepData && (
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentStep}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className="w-full max-w-md"
+                    exit={{ opacity: 0, y: -10 }}
+                    className="w-full max-w-sm"
                   >
                     {currentStepData.is_critical && (
-                      <motion.div 
-                        className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-4 py-2 rounded-full mb-4 inline-flex items-center gap-2"
-                        animate={{ scale: [1, 1.02, 1] }}
-                        transition={{ duration: 1, repeat: Infinity }}
-                      >
-                        <AlertTriangle className="w-4 h-4" />
+                      <div className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-3 py-1 rounded-full mb-2 inline-flex items-center gap-1.5 text-xs font-semibold">
+                        <AlertTriangle className="w-3 h-3" />
                         Kritik addım!
-                      </motion.div>
+                      </div>
                     )}
 
-                    <motion.div 
-                      className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${getEmergencyColor(selectedScenario.emergency_level)} flex items-center justify-center mx-auto mb-4 shadow-xl`}
-                      animate={{ scale: [1, 1.05, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      <span className="text-4xl">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${getEmergencyColor(selectedScenario.emergency_level)} flex items-center justify-center mx-auto mb-2 shadow-md`}>
+                      <span className="text-2xl">
                         {currentStep === 0 ? '👋' : currentStep === steps.length - 1 ? '✅' : selectedScenario.icon}
                       </span>
-                    </motion.div>
+                    </div>
 
-                    <div className="bg-card rounded-2xl p-4 shadow-lg border border-border/50 mb-4">
-                      <span className="inline-block px-3 py-1 rounded-full bg-muted text-muted-foreground text-xs font-medium mb-2">
+                    <div className="bg-card rounded-xl p-3 shadow border border-border/50 mb-2">
+                      <span className="inline-block px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-[10px] font-medium mb-1.5">
                         Addım {currentStep + 1}
                       </span>
-                      <h2 className="text-xl font-black text-foreground mb-2">{currentStepData.title_az}</h2>
-                      <p className="text-base text-muted-foreground leading-relaxed">
+                      <h2 className="text-base font-bold text-foreground mb-1">{currentStepData.title_az}</h2>
+                      <p className="text-sm text-muted-foreground leading-snug">
                         {currentStepData.instruction_az}
                       </p>
                     </div>
 
                     {currentStepData.duration_seconds && (
-                      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-muted-foreground">
-                        <span className="text-xl">⏱️</span>
-                        <span className="font-medium">Təxmini vaxt: {currentStepData.duration_seconds} saniyə</span>
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted text-muted-foreground text-xs">
+                        <span>⏱️</span>
+                        <span className="font-medium">{currentStepData.duration_seconds} san</span>
                       </div>
                     )}
                   </motion.div>
@@ -245,21 +237,21 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
             </div>
 
             {/* Navigation */}
-            <div className="p-4 space-y-3 safe-area-bottom">
-              <div className="flex gap-3">
+            <div className="px-3 pb-3 pt-1 space-y-2 safe-area-bottom">
+              <div className="flex gap-2">
                 <Button
                   variant="outline"
-                  size="lg"
-                  className="flex-1 h-14 rounded-2xl text-base"
+                  size="sm"
+                  className="flex-1 h-10 rounded-xl text-sm"
                   onClick={prevStep}
                   disabled={currentStep === 0}
                 >
-                  <ChevronLeft className="w-5 h-5 mr-2" />
+                  <ChevronLeft className="w-4 h-4 mr-1" />
                   Əvvəlki
                 </Button>
                 <Button
-                  size="lg"
-                  className={`flex-1 h-14 rounded-2xl text-base font-bold ${
+                  size="sm"
+                  className={`flex-1 h-10 rounded-xl text-sm font-bold ${
                     currentStep === steps.length - 1 
                       ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' 
                       : `bg-gradient-to-r ${getEmergencyColor(selectedScenario.emergency_level)}`
@@ -267,17 +259,18 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                   onClick={currentStep === steps.length - 1 ? handleBack : nextStep}
                 >
                   {currentStep === steps.length - 1 ? 'Tamamla' : 'Növbəti'}
-                  <ChevronRight className="w-5 h-5 ml-2" />
+                  <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               </div>
 
               <Button
                 variant="outline"
-                className="w-full h-12 rounded-2xl border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                size="sm"
+                className="w-full h-9 rounded-xl border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 text-xs"
                 asChild
               >
                 <a href="tel:103">
-                  <Phone className="w-4 h-4 mr-2" />
+                  <Phone className="w-3.5 h-3.5 mr-1.5" />
                   103 Zəng Et
                 </a>
               </Button>
