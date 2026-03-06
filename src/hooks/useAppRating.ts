@@ -7,8 +7,10 @@ interface AppRatingState {
   shouldShowPrompt: boolean;
   loading: boolean;
   recordAction: (action: 'later' | 'rated' | 'never') => Promise<void>;
-  checkAndShowPrompt: () => Promise<boolean>;
 }
+
+const USAGE_COUNT_KEY = 'anacan_app_usage_count';
+const RATING_DONE_KEY = 'anacan_rating_done';
 
 export const useAppRating = (): AppRatingState => {
   const { user } = useAuth();
@@ -17,78 +19,53 @@ export const useAppRating = (): AppRatingState => {
 
   const getPlatform = (): string => {
     if (Capacitor.isNativePlatform()) {
-      return Capacitor.getPlatform(); // 'ios' or 'android'
+      return Capacitor.getPlatform();
     }
     return 'web';
   };
 
-  const checkAndShowPrompt = useCallback(async (): Promise<boolean> => {
+  useEffect(() => {
     if (!user) {
       setLoading(false);
-      return false;
+      return;
     }
 
-    try {
-      // Get user's profile to check when they registered
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('created_at')
-        .eq('user_id', user.id)
-        .single();
+    // Check if already rated
+    const ratingDone = localStorage.getItem(RATING_DONE_KEY);
+    if (ratingDone === 'true') {
+      setLoading(false);
+      return;
+    }
 
-      if (!profile) {
-        setLoading(false);
-        return false;
-      }
+    // Track usage count
+    const currentCount = parseInt(localStorage.getItem(USAGE_COUNT_KEY) || '0', 10) + 1;
+    localStorage.setItem(USAGE_COUNT_KEY, String(currentCount));
 
-      const registrationDate = new Date(profile.created_at);
-      const now = new Date();
-      const daysSinceRegistration = Math.floor((now.getTime() - registrationDate.getTime()) / (1000 * 60 * 60 * 24));
+    // Show on 3rd usage
+    if (currentCount >= 3) {
+      // Check DB if already rated
+      const checkDb = async () => {
+        try {
+          const { data } = await supabase
+            .from('app_rating_prompts')
+            .select('last_action')
+            .eq('user_id', user.id)
+            .single();
 
-      // Only show after 2 days of usage
-      if (daysSinceRegistration < 2) {
-        setLoading(false);
-        return false;
-      }
-
-      // Check rating prompt history
-      const { data: ratingPrompt } = await supabase
-        .from('app_rating_prompts')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (!ratingPrompt) {
-        // First time - show prompt
-        setShouldShowPrompt(true);
-        setLoading(false);
-        return true;
-      }
-
-      // Already rated or chose 'never' - don't show
-      if (ratingPrompt.last_action === 'rated' || ratingPrompt.last_action === 'never') {
-        setLoading(false);
-        return false;
-      }
-
-      // Check if 'later' was chosen and 1 day has passed
-      if (ratingPrompt.last_action === 'later') {
-        const lastShown = new Date(ratingPrompt.last_shown_at);
-        const hoursSinceLastShown = (now.getTime() - lastShown.getTime()) / (1000 * 60 * 60);
-        
-        if (hoursSinceLastShown >= 24) {
+          if (data?.last_action === 'rated' || data?.last_action === 'never') {
+            localStorage.setItem(RATING_DONE_KEY, 'true');
+            setLoading(false);
+            return;
+          }
           setShouldShowPrompt(true);
-          setLoading(false);
-          return true;
+        } catch {
+          setShouldShowPrompt(true);
         }
-      }
-
+        setLoading(false);
+      };
+      checkDb();
+    } else {
       setLoading(false);
-      return false;
-    } catch (error) {
-      console.error('Error checking app rating:', error);
-      setLoading(false);
-      return false;
     }
   }, [user]);
 
@@ -128,33 +105,29 @@ export const useAppRating = (): AppRatingState => {
           });
       }
 
+      if (action === 'rated' || action === 'never') {
+        localStorage.setItem(RATING_DONE_KEY, 'true');
+      }
+
       setShouldShowPrompt(false);
     } catch (error) {
       console.error('Error recording rating action:', error);
     }
   }, [user]);
 
-  useEffect(() => {
-    checkAndShowPrompt();
-  }, [checkAndShowPrompt]);
-
   return {
     shouldShowPrompt,
     loading,
     recordAction,
-    checkAndShowPrompt
   };
 };
 
-// Helper to open app store
 export const openAppStore = () => {
   const platform = Capacitor.getPlatform();
   
   if (platform === 'ios') {
-    // Replace with your actual App Store ID
     window.open('https://apps.apple.com/app/id123456789', '_blank');
   } else if (platform === 'android') {
-    // Replace with your actual package name
-    window.open('https://play.google.com/store/apps/details?id=app.lovable.anacan', '_blank');
+    window.open('https://play.google.com/store/apps/details?id=com.atlasoon.anacan', '_blank');
   }
 };
