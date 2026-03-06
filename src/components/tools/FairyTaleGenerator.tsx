@@ -333,9 +333,9 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
             </DialogTitle>
           </DialogHeader>
 
-          <Progress value={(createStep / 3) * 100} className="mb-4" />
+          <Progress value={(createStep / 4) * 100} className="mb-4" />
           <p className="text-xs text-muted-foreground text-center mb-4">
-            Addım {createStep} / 3
+            Addım {createStep} / 4
           </p>
 
           <AnimatePresence mode="wait">
