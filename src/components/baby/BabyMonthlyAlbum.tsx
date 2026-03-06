@@ -94,11 +94,9 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
   };
 
   const handleReplace = (photo: AlbumPhoto) => {
+    setReplacingPhoto(photo);
     setUploadMonth(photo.month);
-    // First delete old, then open file picker
-    handleDelete(photo).then(() => {
-      fileInputRef.current?.click();
-    });
+    fileInputRef.current?.click();
   };
 
   if (showOrder) {
