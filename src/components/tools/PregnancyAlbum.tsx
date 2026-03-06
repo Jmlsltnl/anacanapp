@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ArrowLeft, ImagePlus, Camera, Calendar, Trash2, 
+  ArrowLeft, ImagePlus, Camera, Calendar, Trash2, RefreshCw,
   ChevronLeft, ChevronRight, X, Edit, Save, Heart, ShoppingBag
 } from 'lucide-react';
 import AlbumOrderScreen from '@/components/shop/AlbumOrderScreen';
