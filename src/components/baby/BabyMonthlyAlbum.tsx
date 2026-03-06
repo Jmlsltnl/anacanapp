@@ -132,7 +132,7 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
               key={month}
               onClick={() => {
                 if (photo) {
-                  setViewingPhoto(photo);
+                  setShowActionSheet(photo);
                 } else {
                   setUploadMonth(month);
                   fileInputRef.current?.click();
