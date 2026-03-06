@@ -255,10 +255,8 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     }
 
     if (tool.isPremium && !isPremium) {
-      if (tool.premiumType === 'premium_only') {
-        setShowPremiumModal(true);
-        return;
-      }
+      setShowPremiumModal(true);
+      return;
     }
 
     openTool(tool.id);
