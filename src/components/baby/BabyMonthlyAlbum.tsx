@@ -97,8 +97,12 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
             <motion.button
               key={month}
               onClick={() => {
-                setUploadMonth(month);
-                fileInputRef.current?.click();
+                if (photo) {
+                  setViewingPhoto(photo);
+                } else {
+                  setUploadMonth(month);
+                  fileInputRef.current?.click();
+                }
               }}
               className="relative aspect-square rounded-2xl overflow-hidden border-2 border-dashed border-border/60 bg-card flex flex-col items-center justify-center gap-1 hover:border-primary/40 transition-all"
               whileTap={{ scale: 0.95 }}
