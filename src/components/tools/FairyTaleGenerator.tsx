@@ -361,6 +361,33 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                   />
                 </div>
 
+                {/* Language Selection */}
+                <div>
+                  <Label className="text-base font-semibold flex items-center gap-2">
+                    <Globe className="h-4 w-4" /> Nağılın dili *
+                  </Label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Hansı dildə yazılsın?
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {LANGUAGES.map(lang => (
+                      <button
+                        key={lang.code}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, language: lang.code })}
+                        className={`p-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2 ${
+                          formData.language === lang.code
+                            ? 'bg-primary text-primary-foreground shadow-md'
+                            : 'bg-muted hover:bg-muted/80'
+                        }`}
+                      >
+                        <span className="text-lg">{lang.flag}</span>
+                        {lang.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <Button
                   className="w-full"
                   onClick={() => setCreateStep(2)}
