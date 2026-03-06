@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ArrowLeft, ImagePlus, Camera, Calendar, Trash2, 
+  ArrowLeft, ImagePlus, Camera, Calendar, Trash2, RefreshCw,
   ChevronLeft, ChevronRight, X, Edit, Save, Heart, ShoppingBag
 } from 'lucide-react';
 import AlbumOrderScreen from '@/components/shop/AlbumOrderScreen';
@@ -377,18 +377,35 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                   {format(new Date(viewingPhoto.photo_date), 'd MMMM yyyy', { locale: az })}
                 </p>
               </div>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="text-white hover:bg-red-500/20 hover:text-red-400"
-                onClick={() => {
-                  if (confirm('Bu şəkli silmək istədiyinizə əminsiniz?')) {
-                    deletePhotoMutation.mutate(viewingPhoto);
-                  }
-                }}
-              >
-                <Trash2 className="w-5 h-5" />
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-white hover:bg-white/20"
+                  onClick={() => {
+                    setSelectedMonth(viewingPhoto.month_number);
+                    deletePhotoMutation.mutate(viewingPhoto, {
+                      onSuccess: () => {
+                        fileInputRef.current?.click();
+                      }
+                    });
+                  }}
+                >
+                  <RefreshCw className="w-5 h-5" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-white hover:bg-red-500/20 hover:text-red-400"
+                  onClick={() => {
+                    if (confirm('Bu şəkli silmək istədiyinizə əminsiniz?')) {
+                      deletePhotoMutation.mutate(viewingPhoto);
+                    }
+                  }}
+                >
+                  <Trash2 className="w-5 h-5" />
+                </Button>
+              </div>
             </div>
 
             {/* Photo */}

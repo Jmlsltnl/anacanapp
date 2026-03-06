@@ -424,7 +424,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
       toast({
         title: 'Yükləndi! 📥',
-        description: 'Foto cihazınıza yükləndi',
+        description: 'Şəkil müvəffəqiyyətlə endirildi',
       });
     } catch (error) {
       toast({

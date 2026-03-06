@@ -34,6 +34,7 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
   const [uploading, setUploading] = useState(false);
   const [uploadMonth, setUploadMonth] = useState<number | null>(null);
   const [showOrder, setShowOrder] = useState(false);
+  const [replacingPhoto, setReplacingPhoto] = useState<AlbumPhoto | null>(null);
   const [viewingPhoto, setViewingPhoto] = useState<AlbumPhoto | null>(null);
 
   const { data: photos = [], isLoading } = useQuery({
@@ -59,6 +60,11 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
     if (!file || !user || !uploadMonth) return;
     setUploading(true);
     try {
+      // If replacing, delete old photo first
+      if (replacingPhoto) {
+        await supabase.storage.from('baby-album').remove([`${user.id}/${replacingPhoto.name}`]);
+        setReplacingPhoto(null);
+      }
       const ext = file.name.split('.').pop();
       const path = `${user.id}/month-${uploadMonth}-${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from('baby-album').upload(path, file);
@@ -70,6 +76,7 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
     } finally {
       setUploading(false);
       setUploadMonth(null);
+      setViewingPhoto(null);
     }
   };
 
@@ -87,11 +94,9 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
   };
 
   const handleReplace = (photo: AlbumPhoto) => {
+    setReplacingPhoto(photo);
     setUploadMonth(photo.month);
-    // First delete old, then open file picker
-    handleDelete(photo).then(() => {
-      fileInputRef.current?.click();
-    });
+    fileInputRef.current?.click();
   };
 
   if (showOrder) {
