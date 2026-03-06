@@ -44,28 +44,26 @@ export const useAppRating = (): AppRatingState => {
     // Show on 3rd usage
     if (currentCount >= 3) {
       // Check DB if already rated
-      supabase
-        .from('app_rating_prompts')
-        .select('last_action')
-        .eq('user_id', user.id)
-        .single()
-        .then(({ data }) => {
+      const checkDb = async () => {
+        try {
+          const { data } = await supabase
+            .from('app_rating_prompts')
+            .select('last_action')
+            .eq('user_id', user.id)
+            .single();
+
           if (data?.last_action === 'rated' || data?.last_action === 'never') {
             localStorage.setItem(RATING_DONE_KEY, 'true');
             setLoading(false);
             return;
           }
-          if (data?.last_action === 'later') {
-            // Show again after 24h check - but since we track by usage, show it
-          }
           setShouldShowPrompt(true);
-          setLoading(false);
-        })
-        .catch(() => {
-          // No record - first time, show it
+        } catch {
           setShouldShowPrompt(true);
-          setLoading(false);
-        });
+        }
+        setLoading(false);
+      };
+      checkDb();
     } else {
       setLoading(false);
     }
