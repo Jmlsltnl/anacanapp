@@ -426,44 +426,48 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                 </div>
               </div>
 
-              {/* Actions */}
-              <div className="p-2">
-                <button
+              {/* Action Buttons */}
+              <div className="p-4 grid grid-cols-3 gap-2">
+                <Button
+                  variant="outline"
+                  className="flex flex-col items-center gap-1.5 h-auto py-3 rounded-xl"
                   onClick={() => {
                     setViewingPhoto(showActionSheet);
                     setShowActionSheet(null);
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted/50 active:bg-muted transition-colors"
                 >
                   <Camera className="w-5 h-5 text-primary" />
-                  <span className="text-sm font-medium">Şəkilə bax</span>
-                </button>
+                  <span className="text-xs font-medium">Bax</span>
+                </Button>
                 
-                <button
+                <Button
+                  variant="outline"
+                  className="flex flex-col items-center gap-1.5 h-auto py-3 rounded-xl"
                   onClick={() => handleReplace(showActionSheet)}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted/50 active:bg-muted transition-colors"
                 >
                   <RefreshCw className="w-5 h-5 text-blue-500" />
-                  <span className="text-sm font-medium">Dəyişdir</span>
-                </button>
+                  <span className="text-xs font-medium">Dəyişdir</span>
+                </Button>
                 
-                <button
+                <Button
+                  variant="outline"
+                  className="flex flex-col items-center gap-1.5 h-auto py-3 rounded-xl border-destructive/30"
                   onClick={() => handleDelete(showActionSheet)}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted/50 active:bg-muted transition-colors"
                 >
                   <Trash2 className="w-5 h-5 text-destructive" />
-                  <span className="text-sm font-medium text-destructive">Sil</span>
-                </button>
+                  <span className="text-xs font-medium text-destructive">Sil</span>
+                </Button>
               </div>
 
               {/* Cancel */}
-              <div className="p-2 pt-0">
-                <button
+              <div className="px-4 pb-4">
+                <Button
+                  variant="ghost"
+                  className="w-full rounded-xl bg-muted"
                   onClick={() => setShowActionSheet(null)}
-                  className="w-full py-3 rounded-xl bg-muted text-sm font-medium"
                 >
                   Ləğv et
-                </button>
+                </Button>
               </div>
               
               <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
