@@ -355,7 +355,7 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   };
 
   return (
-    <div ref={ref} className="flex flex-col h-full bg-gradient-to-b from-partner/5 to-background">
+    <div ref={ref} className="fixed inset-0 bottom-[80px] flex flex-col bg-gradient-to-b from-partner/5 to-background" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
       {/* Header */}
       <div className="px-5 py-4 border-b border-border bg-card/50 backdrop-blur-sm safe-top">
         <div className="flex items-center justify-between">
