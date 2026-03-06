@@ -170,13 +170,13 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
         ) : (
           <motion.div
             key="steps"
-            className="flex flex-col h-[calc(100vh-56px)]"
+            className="flex flex-col"
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -30 }}
           >
             {/* Progress */}
-            <div className="px-3 pt-2">
+            <div className="px-3 pt-1.5">
               <div className="flex items-center gap-1">
                 {steps.map((_, i) => (
                   <div 
@@ -192,7 +192,7 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
             </div>
 
             {/* Step Content */}
-            <div className="flex-1 flex flex-col items-center justify-start px-3 pt-2 pb-1 text-center overflow-hidden min-h-0">
+            <div className="flex flex-col items-center px-3 pt-1.5 text-center">
               {currentStepData && (
                 <AnimatePresence mode="wait">
                   <motion.div
