@@ -124,17 +124,17 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
             </motion.a>
 
             {/* Scenario Selection */}
-            <h2 className="font-bold text-foreground mb-3 flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-500" />
+            <h2 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-red-500" />
               Təcili Vəziyyət Seçin
             </h2>
 
             {isLoading ? (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {[1, 2, 3].map(i => (
-                  <div key={i} className="bg-card rounded-2xl p-6 animate-pulse">
-                    <div className="h-6 bg-muted rounded w-1/2 mb-2" />
-                    <div className="h-4 bg-muted rounded w-3/4" />
+                  <div key={i} className="bg-card rounded-xl p-4 animate-pulse">
+                    <div className="h-5 bg-muted rounded w-1/2 mb-1" />
+                    <div className="h-3 bg-muted rounded w-3/4" />
                   </div>
                 ))}
               </div>
