@@ -57,10 +57,15 @@ CRITICAL RULES:
     const userPrompt = language === 'az'
       ? `Uşağın adı: ${actualChildName} (bu adı nağılda mütləq istifadə et!)
 Mövzu/Tema: ${theme || 'Meşə macərası'}
-Qəhrəman tipi: ${hero || 'Cəsur'}
+Köməkçi qəhrəman: ${hero || 'Heyvan dostu'}
 Tərbiyəvi mesaj: ${moralLesson || 'Dostluq'}
 
-"${actualChildName}" adlı uşaq haqqında nağıl yaz. Başlığı "${actualChildName}ın..." və ya "${actualChildName} və..." formatında yaz.`
+VACİB:
+- "${actualChildName}" adlı uşaq haqqında nağıl yaz
+- Başlığı "${actualChildName}ın..." və ya "${actualChildName} və..." formatında yaz
+- Digər adlar Azərbaycanca olsun (məs: nənə Gülnarə, Tülkü baba, Bülbül xanım)
+- Abartısız, təbii dildə yaz
+- Azərbaycan dili qrammatikasına diqqətlə əməl et`
       : `Child's name: ${actualChildName} (MUST use this name!)
 Theme: ${theme || 'Forest adventure'}
 Hero type: ${hero || 'Brave'}
