@@ -1,8 +1,8 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ImagePlus, Camera, X, Loader2, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Camera, X, Loader2, ShoppingBag, Trash2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
@@ -11,6 +11,12 @@ import AlbumOrderScreen from '@/components/shop/AlbumOrderScreen';
 
 interface BabyMonthlyAlbumProps {
   onBack: () => void;
+}
+
+interface AlbumPhoto {
+  name: string;
+  month: number;
+  url: string;
 }
 
 const monthLabels = Array.from({ length: 12 }, (_, i) => ({
@@ -28,6 +34,7 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
   const [uploading, setUploading] = useState(false);
   const [uploadMonth, setUploadMonth] = useState<number | null>(null);
   const [showOrder, setShowOrder] = useState(false);
+  const [viewingPhoto, setViewingPhoto] = useState<AlbumPhoto | null>(null);
 
   const { data: photos = [], isLoading } = useQuery({
     queryKey: ['baby-album-photos', user?.id],
@@ -64,6 +71,27 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
       setUploading(false);
       setUploadMonth(null);
     }
+  };
+
+  const handleDelete = async (photo: AlbumPhoto) => {
+    if (!user) return;
+    try {
+      const { error } = await supabase.storage.from('baby-album').remove([`${user.id}/${photo.name}`]);
+      if (error) throw error;
+      toast({ title: 'Şəkil silindi' });
+      setViewingPhoto(null);
+      queryClient.invalidateQueries({ queryKey: ['baby-album-photos'] });
+    } catch (err) {
+      toast({ title: 'Xəta', description: 'Şəkil silinə bilmədi', variant: 'destructive' });
+    }
+  };
+
+  const handleReplace = (photo: AlbumPhoto) => {
+    setUploadMonth(photo.month);
+    // First delete old, then open file picker
+    handleDelete(photo).then(() => {
+      fileInputRef.current?.click();
+    });
   };
 
   if (showOrder) {
@@ -127,6 +155,52 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
       </div>
 
       <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
+
+      {/* Photo Viewer Modal */}
+      <AnimatePresence>
+        {viewingPhoto && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black flex flex-col"
+          >
+            <div className="flex items-center justify-between p-4 safe-area-top">
+              <Button variant="ghost" size="icon" onClick={() => setViewingPhoto(null)} className="text-white hover:bg-white/20">
+                <X className="w-6 h-6" />
+              </Button>
+              <p className="font-semibold text-white">
+                {monthLabels.find(m => m.month === viewingPhoto.month)?.label}
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-white hover:bg-white/20"
+                  onClick={() => handleReplace(viewingPhoto)}
+                >
+                  <RefreshCw className="w-5 h-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-white hover:bg-red-500/20 hover:text-red-400"
+                  onClick={() => {
+                    if (confirm('Bu şəkli silmək istədiyinizə əminsiniz?')) {
+                      handleDelete(viewingPhoto);
+                    }
+                  }}
+                >
+                  <Trash2 className="w-5 h-5" />
+                </Button>
+              </div>
+            </div>
+            <div className="flex-1 flex items-center justify-center p-4">
+              <img src={viewingPhoto.url} alt="Baby photo" className="max-w-full max-h-full object-contain rounded-lg" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {uploading && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">

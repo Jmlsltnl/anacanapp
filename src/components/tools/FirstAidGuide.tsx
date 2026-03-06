@@ -139,30 +139,28 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                 ))}
               </div>
             ) : (
-              <div className="space-y-3 pb-8">
+              <div className="space-y-2 pb-4">
                 {scenarios.map((scenario, index) => (
                   <motion.button
                     key={scenario.id}
                     onClick={() => setSelectedScenario(scenario)}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`w-full rounded-2xl border-2 p-4 text-left transition-all hover:shadow-lg ${getEmergencyBg(scenario.emergency_level)}`}
+                    transition={{ delay: index * 0.05 }}
+                    className={`w-full rounded-xl border p-3 text-left transition-all hover:shadow-md ${getEmergencyBg(scenario.emergency_level)}`}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${getEmergencyColor(scenario.emergency_level)} flex items-center justify-center text-2xl shadow-md`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${getEmergencyColor(scenario.emergency_level)} flex items-center justify-center text-xl shadow`}>
                         {scenario.icon}
                       </div>
-                      <div className="flex-1">
-                        <h3 className="text-base font-bold text-foreground mb-0.5">{scenario.title_az}</h3>
-                        <p className="text-sm text-muted-foreground line-clamp-2">{scenario.description_az}</p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r ${getEmergencyColor(scenario.emergency_level)} text-white`}>
-                            {scenario.emergency_level === 'critical' ? 'KRİTİK' : scenario.emergency_level === 'high' ? 'YÜKSƏK' : 'ORTA'}
-                          </span>
-                        </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-bold text-foreground">{scenario.title_az}</h3>
+                        <p className="text-xs text-muted-foreground line-clamp-1">{scenario.description_az}</p>
+                        <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-gradient-to-r ${getEmergencyColor(scenario.emergency_level)} text-white`}>
+                          {scenario.emergency_level === 'critical' ? 'KRİTİK' : scenario.emergency_level === 'high' ? 'YÜKSƏK' : 'ORTA'}
+                        </span>
                       </div>
-                      <ChevronRight className="w-6 h-6 text-muted-foreground" />
+                      <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
                     </div>
                   </motion.button>
                 ))}
