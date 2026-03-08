@@ -253,15 +253,14 @@ export const usePregnancyDayNotificationByDay = (day: number | null) => {
         .from('pregnancy_day_notifications')
         .select('*')
         .eq('day_number', day)
-        .eq('is_active', true)
-        .single();
+        .eq('is_active', true);
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('Error fetching notification for day:', error);
         return null;
       }
 
-      return data as PregnancyDayNotification | null;
+      return data as PregnancyDayNotification[];
     },
     enabled: day !== null && day >= 0 && day <= 293,
   });

@@ -13,7 +13,6 @@ interface UserForNotification {
   due_date: string | null;
   last_period_date: string | null;
   daily_push_enabled: boolean;
-  last_push_sent_at: string | null;
 }
 
 interface ScheduledNotification {
@@ -24,16 +23,7 @@ interface ScheduledNotification {
   priority: number;
 }
 
-interface PregnancyDayNotification {
-  id: string;
-  day_number: number;
-  title: string;
-  body: string;
-  emoji: string;
-  is_active: boolean;
-}
-
-interface MommyDayNotification {
+interface DayNotification {
   id: string;
   day_number: number;
   title: string;
@@ -59,7 +49,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Check current time - only send between 9:00 and 00:00
+    // Check current time - only send between 9:00 and 00:00 Baku time (UTC+4)
     const now = new Date();
     const currentHour = now.getUTCHours() + 4;
     const adjustedHour = currentHour >= 24 ? currentHour - 24 : currentHour;
@@ -89,20 +79,27 @@ Deno.serve(async (req) => {
     const { data: scheduledNotifications } = await supabase
       .from('scheduled_notifications').select('*').eq('is_active', true).order('priority', { ascending: true });
 
-    // Get pregnancy day notifications
+    // Get ALL pregnancy day notifications (multiple per day allowed)
     const { data: pregnancyNotifications } = await supabase
       .from('pregnancy_day_notifications').select('*').eq('is_active', true);
 
-    const pregnancyNotifMap = new Map<number, PregnancyDayNotification>();
-    pregnancyNotifications?.forEach((n: PregnancyDayNotification) => { pregnancyNotifMap.set(n.day_number, n); });
+    // Group by day_number - multiple notifications per day
+    const pregnancyNotifsByDay = new Map<number, DayNotification[]>();
+    pregnancyNotifications?.forEach((n: DayNotification) => {
+      const existing = pregnancyNotifsByDay.get(n.day_number) || [];
+      existing.push(n);
+      pregnancyNotifsByDay.set(n.day_number, existing);
+    });
 
-    // Get mommy day notifications
+    // Get ALL mommy day notifications (multiple per day allowed)
     const { data: mommyNotifications } = await supabase
       .from('mommy_day_notifications').select('*').eq('is_active', true);
 
-    const mommyNotifMap = new Map<number, MommyDayNotification>();
-    mommyNotifications?.forEach((n: MommyDayNotification) => {
-      if (!mommyNotifMap.has(n.day_number)) mommyNotifMap.set(n.day_number, n);
+    const mommyNotifsByDay = new Map<number, DayNotification[]>();
+    mommyNotifications?.forEach((n: DayNotification) => {
+      const existing = mommyNotifsByDay.get(n.day_number) || [];
+      existing.push(n);
+      mommyNotifsByDay.set(n.day_number, existing);
     });
 
     // Get users
@@ -113,7 +110,7 @@ Deno.serve(async (req) => {
       .from('user_children').select('user_id, birth_date').order('birth_date', { ascending: false });
 
     const { data: preferences } = await supabase
-      .from('user_preferences').select('user_id, push_enabled, daily_push_enabled, last_push_sent_at');
+      .from('user_preferences').select('user_id, push_enabled, daily_push_enabled');
 
     const { data: tokens } = await supabase
       .from('device_tokens').select('token, user_id, platform');
@@ -125,13 +122,30 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Get today's already sent notifications to prevent duplicates
+    const todayStart = new Date();
+    todayStart.setUTCHours(0, 0, 0, 0);
+    const { data: todaySentLogs } = await supabase
+      .from('notification_send_log')
+      .select('user_id, source_type, source_notification_id')
+      .gte('sent_at', todayStart.toISOString())
+      .eq('status', 'sent');
+
+    // Build a set of "userId:sourceType:sourceNotifId" for dedup
+    const alreadySent = new Set<string>();
+    todaySentLogs?.forEach((log: any) => {
+      if (log.source_type && log.source_notification_id) {
+        alreadySent.add(`${log.user_id}:${log.source_type}:${log.source_notification_id}`);
+      }
+    });
+
     // Build user map
     const userMap = new Map<string, UserForNotification>();
     profiles?.forEach((p: any) => {
       userMap.set(p.user_id, {
         user_id: p.user_id, life_stage: p.life_stage || 'flow', role: p.role || 'user',
         due_date: p.due_date, last_period_date: p.last_period_date,
-        daily_push_enabled: true, last_push_sent_at: null,
+        daily_push_enabled: true,
       });
     });
 
@@ -139,7 +153,6 @@ Deno.serve(async (req) => {
       const user = userMap.get(pref.user_id);
       if (user) {
         user.daily_push_enabled = pref.daily_push_enabled ?? pref.push_enabled ?? true;
-        user.last_push_sent_at = pref.last_push_sent_at;
       }
     });
 
@@ -153,38 +166,42 @@ Deno.serve(async (req) => {
       return (diffDays >= 1 && diffDays <= 280) ? diffDays : null;
     };
 
-    const minGapMs = 2 * 60 * 60 * 1000;
-    const eligibleUsers = Array.from(userMap.values()).filter(user => {
-      if (!user.daily_push_enabled) return false;
-      if (!user.last_push_sent_at) return true;
-      return Date.now() - new Date(user.last_push_sent_at).getTime() >= minGapMs;
-    });
+    const eligibleUsers = Array.from(userMap.values()).filter(user => user.daily_push_enabled);
 
     console.log(`Eligible users: ${eligibleUsers.length}`);
 
     let sentCount = 0;
-    const results: Array<{ userId: string; success: boolean; type?: string; error?: string }> = [];
+    const results: Array<{ userId: string; success: boolean; type?: string; day?: number; error?: string }> = [];
 
     for (const user of eligibleUsers) {
-      let notificationToSend: { title: string; body: string; id: string; type: string } | null = null;
+      const userTokens = tokens.filter((t: DeviceToken) => t.user_id === user.user_id);
+      if (!userTokens.length) continue;
 
-      // Priority 1a: pregnancy day
+      // Collect all notifications to send for this user
+      const notificationsToSend: Array<{ title: string; body: string; id: string; type: string; day?: number }> = [];
+
+      // Priority 1a: pregnancy day notifications (ALL for the user's current day)
       if (user.life_stage === 'bump' && user.last_period_date) {
         const pregnancyDay = calculatePregnancyDay(user.last_period_date);
         if (pregnancyDay !== null) {
-          const dayNotification = pregnancyNotifMap.get(pregnancyDay);
-          if (dayNotification) {
-            notificationToSend = {
-              id: dayNotification.id,
-              title: `${dayNotification.emoji} ${dayNotification.title}`,
-              body: dayNotification.body, type: 'pregnancy_day',
-            };
+          const dayNotifications = pregnancyNotifsByDay.get(pregnancyDay) || [];
+          for (const dn of dayNotifications) {
+            const dedupKey = `${user.user_id}:pregnancy_day:${dn.id}`;
+            if (!alreadySent.has(dedupKey)) {
+              notificationsToSend.push({
+                id: dn.id,
+                title: `${dn.emoji || ''} ${dn.title}`.trim(),
+                body: dn.body,
+                type: 'pregnancy_day',
+                day: pregnancyDay,
+              });
+            }
           }
         }
       }
 
-      // Priority 1b: mommy day
-      if (!notificationToSend && user.life_stage === 'mommy') {
+      // Priority 1b: mommy day notifications (ALL for the child's current day)
+      if (user.life_stage === 'mommy') {
         const userChildren = children?.filter((c: any) => c.user_id === user.user_id) || [];
         if (userChildren.length > 0 && userChildren[0].birth_date) {
           const birthDate = new Date(userChildren[0].birth_date);
@@ -193,20 +210,25 @@ Deno.serve(async (req) => {
           today.setHours(0, 0, 0, 0);
           const childAgeDays = Math.floor((today.getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
           if (childAgeDays >= 1 && childAgeDays <= 1460) {
-            const mommyNotif = mommyNotifMap.get(childAgeDays);
-            if (mommyNotif) {
-              notificationToSend = {
-                id: mommyNotif.id,
-                title: `${mommyNotif.emoji} ${mommyNotif.title}`,
-                body: mommyNotif.body, type: 'mommy_day',
-              };
+            const dayNotifications = mommyNotifsByDay.get(childAgeDays) || [];
+            for (const dn of dayNotifications) {
+              const dedupKey = `${user.user_id}:mommy_day:${dn.id}`;
+              if (!alreadySent.has(dedupKey)) {
+                notificationsToSend.push({
+                  id: dn.id,
+                  title: `${dn.emoji || ''} ${dn.title}`.trim(),
+                  body: dn.body,
+                  type: 'mommy_day',
+                  day: childAgeDays,
+                });
+              }
             }
           }
         }
       }
 
-      // Priority 2: scheduled
-      if (!notificationToSend && scheduledNotifications?.length) {
+      // Priority 2: scheduled notifications (only if no day-specific notifications were found at all for this day)
+      if (notificationsToSend.length === 0 && scheduledNotifications?.length) {
         const match = scheduledNotifications.find((n: ScheduledNotification) => {
           if (n.target_audience === 'all') return true;
           if (n.target_audience === user.life_stage) return true;
@@ -214,42 +236,53 @@ Deno.serve(async (req) => {
           return false;
         });
         if (match) {
-          notificationToSend = { id: match.id, title: match.title, body: match.body, type: 'scheduled' };
-        }
-      }
-
-      if (!notificationToSend) continue;
-
-      const userTokens = tokens.filter((t: DeviceToken) => t.user_id === user.user_id);
-      if (!userTokens.length) continue;
-
-      for (const deviceToken of userTokens) {
-        const result = await sendFCMv1(accessToken, projectId, deviceToken.token, notificationToSend.title, notificationToSend.body, {
-          type: notificationToSend.type, notification_id: notificationToSend.id,
-        });
-
-        if (result.success) {
-          sentCount++;
-          results.push({ userId: user.user_id, success: true, type: notificationToSend.type });
-
-          await supabase.from('user_preferences').upsert({
-            user_id: user.user_id, last_push_sent_at: new Date().toISOString(),
-          }, { onConflict: 'user_id' });
-
-          await supabase.from('notification_send_log').insert({
-            user_id: user.user_id,
-            notification_id: notificationToSend.type === 'scheduled' ? notificationToSend.id : null,
-            title: notificationToSend.title, body: notificationToSend.body, status: 'sent',
-          });
-
-          break;
-        } else {
-          results.push({ userId: user.user_id, success: false, error: result.error });
-          if (result.unregistered) {
-            await supabase.from('device_tokens').delete().eq('token', deviceToken.token);
+          const dedupKey = `${user.user_id}:scheduled:${match.id}`;
+          if (!alreadySent.has(dedupKey)) {
+            notificationsToSend.push({ id: match.id, title: match.title, body: match.body, type: 'scheduled' });
           }
         }
       }
+
+      // Send all collected notifications
+      for (const notif of notificationsToSend) {
+        let sent = false;
+        for (const deviceToken of userTokens) {
+          const result = await sendFCMv1(accessToken, projectId, deviceToken.token, notif.title, notif.body, {
+            type: notif.type, notification_id: notif.id,
+          });
+
+          if (result.success) {
+            sentCount++;
+            sent = true;
+            results.push({ userId: user.user_id, success: true, type: notif.type, day: notif.day });
+
+            await supabase.from('notification_send_log').insert({
+              user_id: user.user_id,
+              notification_id: notif.type === 'scheduled' ? notif.id : null,
+              title: notif.title,
+              body: notif.body,
+              status: 'sent',
+              source_type: notif.type,
+              source_notification_id: notif.id,
+            });
+
+            break; // sent to one device is enough
+          } else {
+            results.push({ userId: user.user_id, success: false, error: result.error });
+            if (result.unregistered) {
+              await supabase.from('device_tokens').delete().eq('token', deviceToken.token);
+            }
+          }
+        }
+      }
+    }
+
+    // Update last_push_sent_at for users who got notifications
+    const sentUserIds = [...new Set(results.filter(r => r.success).map(r => r.userId))];
+    for (const userId of sentUserIds) {
+      await supabase.from('user_preferences').upsert({
+        user_id: userId, last_push_sent_at: new Date().toISOString(),
+      }, { onConflict: 'user_id' });
     }
 
     console.log(`Daily notifications sent: ${sentCount}`);
@@ -257,9 +290,9 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true, sent: sentCount, eligible: eligibleUsers.length,
-        pregnancyNotificationsAvailable: pregnancyNotifMap.size,
-        mommyNotificationsAvailable: mommyNotifMap.size,
-        results: results.slice(0, 10),
+        pregnancyDaysAvailable: pregnancyNotifsByDay.size,
+        mommyDaysAvailable: mommyNotifsByDay.size,
+        results: results.slice(0, 20),
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
