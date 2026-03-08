@@ -4193,6 +4193,8 @@ export type Database = {
           id: string
           notification_id: string | null
           sent_at: string | null
+          source_notification_id: string | null
+          source_type: string | null
           status: string | null
           title: string
           user_id: string
@@ -4202,6 +4204,8 @@ export type Database = {
           id?: string
           notification_id?: string | null
           sent_at?: string | null
+          source_notification_id?: string | null
+          source_type?: string | null
           status?: string | null
           title: string
           user_id: string
@@ -4211,6 +4215,8 @@ export type Database = {
           id?: string
           notification_id?: string | null
           sent_at?: string | null
+          source_notification_id?: string | null
+          source_type?: string | null
           status?: string | null
           title?: string
           user_id?: string
