@@ -93,6 +93,7 @@ Deno.serve(async (req) => {
 
     let sentCount = 0;
     let failedCount = 0;
+    const errors: string[] = [];
 
     const batchSize = 100;
     for (let i = 0; i < tokens.length; i += batchSize) {
@@ -110,6 +111,10 @@ Deno.serve(async (req) => {
           });
         } else {
           failedCount++;
+          // Log first 5 errors for debugging
+          if (errors.length < 5) {
+            errors.push(`${deviceToken.platform}|${deviceToken.token.slice(-8)}|${result.error}`);
+          }
           if (result.unregistered) {
             await supabase.from('device_tokens').delete().eq('token', deviceToken.token);
           }
@@ -118,6 +123,9 @@ Deno.serve(async (req) => {
       await Promise.all(promises);
     }
 
+    if (errors.length > 0) {
+      console.error('FCM errors sample:', JSON.stringify(errors));
+    }
     await supabase.from('bulk_push_notifications').update({
       status: 'sent', sent_at: new Date().toISOString(), total_sent: sentCount, total_failed: failedCount,
     }).eq('id', notificationId);
