@@ -125,7 +125,7 @@ Deno.serve(async (req) => {
 
     if (errors.length > 0) {
       console.error('FCM errors sample:', JSON.stringify(errors));
-
+    }
     await supabase.from('bulk_push_notifications').update({
       status: 'sent', sent_at: new Date().toISOString(), total_sent: sentCount, total_failed: failedCount,
     }).eq('id', notificationId);
