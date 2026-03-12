@@ -312,7 +312,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const newProfile = await fetchProfile(user.id);
       setProfile(newProfile);
-      syncProfileToStore(newProfile);
+      syncProfileToStore(newProfile, user.id);
       return { error: null };
     } catch (error) {
       console.error('Link partner error:', error);
