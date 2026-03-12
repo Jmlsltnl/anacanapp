@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
+import type { AnalyticsEvent, AnalyticsParams } from '@/lib/analytics';
 
 /**
- * Hook to automatically track screen views in Firebase Analytics + internal DB.
- * Place at the top of every screen/tool component.
+ * Auto-track screen view on mount. Use in every screen/tool component.
  */
 export const useScreenAnalytics = (screenName: string, screenClass?: string) => {
   useEffect(() => {
@@ -13,11 +13,8 @@ export const useScreenAnalytics = (screenName: string, screenClass?: string) => 
 };
 
 /**
- * Fire-and-forget analytics event helper (non-blocking).
+ * Fire-and-forget analytics event (non-blocking, safe to call anywhere).
  */
-export const trackEvent = (
-  eventName: Parameters<typeof import('@/lib/analytics').analytics.logEvent>[0] extends never ? string : any,
-  params?: Record<string, string | number | boolean | undefined>
-) => {
-  import('@/lib/analytics').then(m => m.analytics.logEvent(eventName, params)).catch(() => {});
+export const trackEvent = (eventName: string, params?: Record<string, string | number | boolean | undefined>) => {
+  import('@/lib/analytics').then(m => m.logEvent(eventName as any, params)).catch(() => {});
 };
