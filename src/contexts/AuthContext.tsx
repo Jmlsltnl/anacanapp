@@ -393,7 +393,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (currentSession?.user) {
           setSession(currentSession);
           setUser(currentSession.user);
-          // Set auth immediately so UI doesn't flash to login
           setAuth(
             true,
             currentSession.user.id,
@@ -401,7 +400,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             currentSession.user.user_metadata?.name || 'İstifadəçi'
           );
           finishLoading();
-          // Hydrate profile data in the background
+          // Set analytics user ID
+          import('@/lib/analytics').then(m => {
+            m.analytics.setUserId(currentSession.user.id);
+            m.analytics.setUserProperties({ life_stage: '' });
+          }).catch(() => {});
           void hydrateUser(currentSession.user);
         } else {
           // No session on initial load - user is truly not logged in
