@@ -5,6 +5,7 @@ import { useSafetyItems } from '@/hooks/useDynamicContent';
 import { useSafetyCategories } from '@/hooks/useDynamicTools';
 import { supabase } from '@/integrations/supabase/client';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
