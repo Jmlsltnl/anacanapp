@@ -98,6 +98,8 @@ export const useGenerateFairyTale = () => {
             hero: params.hero,
             moralLesson: params.moral_lesson,
             language: params.language || 'az',
+            ageRange: params.age_range,
+            storyStyle: params.story_style,
           }),
         }
       );
