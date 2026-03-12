@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useMaternityBenefits } from '@/hooks/useMaternityBenefits';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import MarkdownContent from '@/components/MarkdownContent';
 
 interface MaternityCalculatorProps {
