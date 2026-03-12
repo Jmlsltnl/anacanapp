@@ -182,6 +182,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminAlbumOrders />;
       case 'coupons':
         return <AdminCoupons />;
+      case 'analytics':
+        return <AdminAnalytics />;
       case 'security':
         return <AdminSecurity />;
       default:
