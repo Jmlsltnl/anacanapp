@@ -180,6 +180,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
       });
       if (error) throw error;
+      import('@/lib/analytics').then(m => m.analytics.logSignUp('email')).catch(() => {});
       return { data, error: null };
     } catch (error) {
       console.error('Sign up error:', error);
