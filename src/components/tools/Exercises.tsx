@@ -9,6 +9,7 @@ import { useExerciseLogs } from '@/hooks/useExerciseLogs';
 import { useUserStore } from '@/store/userStore';
 import { useExercises } from '@/hooks/useDynamicConfig';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 
 interface ExercisesProps {
   onBack: () => void;
