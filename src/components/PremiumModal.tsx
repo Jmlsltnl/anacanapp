@@ -34,6 +34,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
 
   useEffect(() => {
     if (!isOpen) return;
+    import('@/lib/analytics').then(m => m.analytics.logPaywallShown(feature || 'general')).catch(() => {});
     setTimeout(() => closeButtonRef.current?.focus(), 100);
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !isPurchasing) { onClose(); return; }
