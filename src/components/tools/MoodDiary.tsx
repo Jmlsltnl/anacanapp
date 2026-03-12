@@ -9,6 +9,7 @@ import { hapticFeedback } from '@/lib/native';
 import { useMoodOptions, useSymptoms } from '@/hooks/useDynamicConfig';
 import { useUserStore } from '@/store/userStore';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 
 interface MoodDiaryProps {
   onBack: () => void;
