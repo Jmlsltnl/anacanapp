@@ -24,6 +24,7 @@ const priorityConfig = {
 
 const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, ref) => {
   useScrollToTop();
+  useScreenAnalytics('HospitalBag', 'Tools');
   
   const { items, loading, toggleItem, getProgress, checkedCount, totalCount } = useHospitalBag();
   const [activeCategory, setActiveCategory] = useState<string>('all');
