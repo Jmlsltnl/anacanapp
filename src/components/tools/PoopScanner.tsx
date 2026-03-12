@@ -8,6 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { takePhoto, pickFromGallery, requestCameraPermission } from '@/lib/permissions';
 import { Capacitor } from '@capacitor/core';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+
 interface PoopScannerProps {
   onBack: () => void;
 }
