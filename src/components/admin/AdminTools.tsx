@@ -566,6 +566,13 @@ const AdminTools = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <AdminUsageStats 
+        eventNames={['tool_opened', 'tool_used']}
+        title="🔧 Alət İstifadə Statistikası"
+        showEventData
+        showUsers
+      />
     </div>
   );
 };
