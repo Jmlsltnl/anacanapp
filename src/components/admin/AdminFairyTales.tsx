@@ -217,6 +217,13 @@ const AdminFairyTales = () => {
           ))}
         </div>
       )}
+
+      <AdminUsageStats 
+        eventNames={['fairy_tale_generated']}
+        title="📖 Nağıl Generatoru İstifadə Statistikası"
+        showEventData
+        showUsers
+      />
     </div>
   );
 };
