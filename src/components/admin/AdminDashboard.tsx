@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { formatDistanceToNow, subDays, format } from 'date-fns';
 import { az } from 'date-fns/locale';
+import AdminUsageStats from './AdminUsageStats';
 
 interface Stats {
   totalUsers: number;
