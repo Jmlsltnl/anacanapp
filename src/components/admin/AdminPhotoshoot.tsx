@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from '@/components/ui/textarea';
+import AdminUsageStats from './AdminUsageStats';
 
 interface EditingItem {
   id: string;
@@ -1001,6 +1002,13 @@ const AdminPhotoshoot = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      <AdminUsageStats 
+        eventNames={['baby_photo_generated', 'tool_opened']}
+        title="📸 Foto Generator İstifadə Statistikası"
+        showEventData
+        showUsers
+      />
     </div>
   );
 };

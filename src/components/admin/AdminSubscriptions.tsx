@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Crown, User, Calendar, MoreHorizontal, Check, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import AdminUsageStats from './AdminUsageStats';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -299,6 +300,13 @@ const AdminSubscriptions = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <AdminUsageStats 
+        eventNames={['premium_subscribed', 'premium_cancelled', 'premium_paywall_shown', 'premium_paywall_clicked']}
+        title="👑 Premium Statistikası"
+        showEventData
+        showUsers
+      />
     </div>
   );
 };

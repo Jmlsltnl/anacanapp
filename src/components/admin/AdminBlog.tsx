@@ -17,6 +17,7 @@ import { format } from 'date-fns';
 import BlogAnalytics from './BlogAnalytics';
 import { supabase } from '@/integrations/supabase/client';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
+import AdminUsageStats from './AdminUsageStats';
 
 const AdminBlog = () => {
   const { posts, categories, postCategories, loading, createPost, updatePost, deletePost, createCategory, deleteCategory, getPostCategoryIds, setPostCategoriesForPost } = useBlogAdmin();
@@ -1036,6 +1037,13 @@ const AdminBlog = () => {
         open={showUnsavedDialog}
         onOpenChange={setShowUnsavedDialog}
         onDiscard={resetForm}
+      />
+
+      <AdminUsageStats 
+        eventNames={['blog_read', 'blog_liked', 'blog_saved']}
+        title="📝 Bloq İstifadə Statistikası"
+        showEventData
+        showUsers
       />
     </div>
   );

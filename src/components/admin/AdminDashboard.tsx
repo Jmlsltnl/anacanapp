@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { formatDistanceToNow, subDays, format } from 'date-fns';
 import { az } from 'date-fns/locale';
+import AdminUsageStats from './AdminUsageStats';
 
 interface Stats {
   totalUsers: number;
@@ -450,6 +451,21 @@ const AdminDashboard = () => {
             ))}
           </div>
         </Card>
+      </div>
+
+      {/* AI & Key Tool Usage */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <AdminUsageStats 
+          eventNames={['ai_chat_started', 'ai_chat_message']}
+          title="🤖 Anacan AI İstifadəsi"
+          showUsers
+        />
+        <AdminUsageStats 
+          eventNames={['baby_photo_generated', 'cry_analyzed', 'poop_analyzed', 'fairy_tale_generated']}
+          title="⚡ AI Alətləri İstifadəsi"
+          showEventData
+          showUsers
+        />
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { UtensilsCrossed, Plus, Pencil, Trash2, Search, Clock, Users, FileUp, Download, Upload, X, Image as ImageIcon, Settings2, FileDown } from 'lucide-react';
+import AdminUsageStats from './AdminUsageStats';
 import { exportToCSV } from '@/utils/csvExport';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -807,6 +808,13 @@ const AdminRecipes = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AdminUsageStats 
+        eventNames={['recipe_viewed']}
+        title="🍳 Resept İstifadə Statistikası"
+        showEventData
+        showUsers
+      />
     </div>
   );
 };
