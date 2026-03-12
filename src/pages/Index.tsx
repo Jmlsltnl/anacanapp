@@ -81,7 +81,12 @@ const Index = () => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     }
-  }, [activeTab, activeScreen, activeTool]);
+    // Track screen/tab views
+    const screenName = activeScreen || activeTool || activeTab;
+    if (screenName && isAuthenticated) {
+      import('@/lib/analytics').then(m => m.analytics.logScreenView(screenName)).catch(() => {});
+    }
+  }, [activeTab, activeScreen, activeTool, isAuthenticated]);
   
   // Initialize push notification token registration for native apps
   useDeviceToken();
