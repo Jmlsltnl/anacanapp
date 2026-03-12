@@ -325,7 +325,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [profileData, roleData] = await Promise.all([fetchProfile(user.id), fetchUserRole(user.id)]);
     setProfile(profileData);
     setUserRole(roleData);
-    syncProfileToStore(profileData);
+    syncProfileToStore(profileData, user.id);
   }, [user, fetchProfile, fetchUserRole, syncProfileToStore]);
 
   // ─────────────────────────────────────────
