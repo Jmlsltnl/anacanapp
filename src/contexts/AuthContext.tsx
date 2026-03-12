@@ -376,7 +376,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           u.email || '',
           profileData?.name || u.user_metadata?.name || 'İstifadəçi'
         );
-        syncProfileToStore(profileData);
+        syncProfileToStore(profileData, u.id);
       } catch (error) {
         console.error('Error hydrating user:', error);
         // Don't clear user/session on hydration error - keep the session alive
