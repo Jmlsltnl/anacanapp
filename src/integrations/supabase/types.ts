@@ -329,6 +329,78 @@ export type Database = {
         }
         Relationships: []
       }
+      analytics_daily_summary: {
+        Row: {
+          event_category: string
+          event_name: string
+          id: string
+          life_stage: string | null
+          premium_users: number | null
+          summary_date: string
+          total_count: number | null
+          unique_users: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          event_category?: string
+          event_name: string
+          id?: string
+          life_stage?: string | null
+          premium_users?: number | null
+          summary_date: string
+          total_count?: number | null
+          unique_users?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          event_category?: string
+          event_name?: string
+          id?: string
+          life_stage?: string | null
+          premium_users?: number | null
+          summary_date?: string
+          total_count?: number | null
+          unique_users?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      analytics_events: {
+        Row: {
+          created_at: string | null
+          event_category: string
+          event_data: Json | null
+          event_name: string
+          id: string
+          is_premium: boolean | null
+          life_stage: string | null
+          platform: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          event_category?: string
+          event_data?: Json | null
+          event_name: string
+          id?: string
+          is_premium?: boolean | null
+          life_stage?: string | null
+          platform?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          event_category?: string
+          event_data?: Json | null
+          event_name?: string
+          id?: string
+          is_premium?: boolean | null
+          life_stage?: string | null
+          platform?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       app_branding: {
         Row: {
           created_at: string | null
