@@ -51,6 +51,7 @@ const LANGUAGES = [
 ];
 
 const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
+  useScreenAnalytics('FairyTaleGenerator', 'Tools');
   const [selectedTale, setSelectedTale] = useState<FairyTale | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [createStep, setCreateStep] = useState(1);

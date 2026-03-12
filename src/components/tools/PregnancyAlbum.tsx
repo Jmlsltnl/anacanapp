@@ -59,6 +59,7 @@ const getMonthFromWeek = (week: number): number => {
 
 const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
   useScrollToTop();
+  useScreenAnalytics('PregnancyAlbum', 'Tools');
   
   const { user } = useAuth();
   const { getPregnancyData } = useUserStore();

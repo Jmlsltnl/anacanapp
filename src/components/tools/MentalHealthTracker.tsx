@@ -38,6 +38,7 @@ interface MentalHealthTrackerProps {
 
 const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
   useScrollToTop();
+  useScreenAnalytics('MentalHealthTracker', 'Tools');
   
   // Fetch data from database
   const { data: moodLevelsDB = [] } = useMoodLevelsDB();

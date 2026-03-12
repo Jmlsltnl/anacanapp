@@ -26,6 +26,7 @@ interface MotherChatScreenProps {
 
 const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
   useScrollToTop();
+  useScreenAnalytics('PartnerChat', 'Chat');
   
   const { user, profile } = useAuth();
   const { toast } = useToast();

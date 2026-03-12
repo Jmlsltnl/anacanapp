@@ -79,6 +79,7 @@ const dayLabels: Record<string, string> = {
 
 const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
   useScrollToTop();
+  useScreenAnalytics('DoctorsHospitals', 'Tools');
   
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<string>('all');

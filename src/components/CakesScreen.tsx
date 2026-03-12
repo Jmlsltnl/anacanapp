@@ -22,6 +22,7 @@ const MONTHS = Array.from({ length: 12 }, (_, i) => ({
 
 const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
   useScrollToTop();
+  useScreenAnalytics('Cakes', 'Shop');
   const { cakes, loading } = useCakes();
   const { totalItems } = useCakeCart();
   

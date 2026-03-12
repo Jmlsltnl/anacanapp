@@ -24,6 +24,7 @@ const FALLBACK_NOISE_THRESHOLDS = {
 
 const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
   useScrollToTop();
+  useScreenAnalytics('NoiseMeter', 'Tools');
   
   // Fetch thresholds from database
   const { data: noiseThresholdsDB = [] } = useNoiseThresholdsDB();

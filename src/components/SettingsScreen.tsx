@@ -32,6 +32,7 @@ interface SettingsScreenProps {
 
 const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   useScrollToTop();
+  useScreenAnalytics('Settings', 'Settings');
   
   const { 
     settings, 

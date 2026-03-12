@@ -40,6 +40,7 @@ interface ProductDisplay {
 
 const ShopScreen = ({ onBack }: ShopScreenProps) => {
   useScrollToTop();
+  useScreenAnalytics('Shop', 'Shop');
   
   const { products: dbProducts, loading } = useProducts();
   const { data: dbCategories = [] } = useShopCategories();

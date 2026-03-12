@@ -28,6 +28,7 @@ interface ProfileScreenProps {
 
 const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   useScrollToTop();
+  useScreenAnalytics('Profile', 'Profile');
   
   const { name, email, lifeStage, role } = useUserStore();
   const { signOut, profile, isAdmin } = useAuth();

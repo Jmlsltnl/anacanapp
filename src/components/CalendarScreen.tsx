@@ -26,6 +26,7 @@ interface DayEventType {
 
 const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
   useScrollToTop();
+  useScreenAnalytics('Calendar', 'Calendar');
   
   const { lifeStage, getCycleData, getPregnancyData, cycleLength, periodLength } = useUserStore();
   const [currentMonth, setCurrentMonth] = useState(new Date());

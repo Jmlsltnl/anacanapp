@@ -49,6 +49,7 @@ const stageMessages: Record<AnalysisStage, string> = {
 };
 
 const CryTranslator = ({ onBack }: CryTranslatorProps) => {
+  useScreenAnalytics('CryTranslator', 'Tools');
   const [stage, setStage] = useState<AnalysisStage>('idle');
   const [recordingTime, setRecordingTime] = useState(0);
   const [analysis, setAnalysis] = useState<CryAnalysis | null>(null);

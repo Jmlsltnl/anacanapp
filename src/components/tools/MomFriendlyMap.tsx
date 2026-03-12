@@ -31,6 +31,7 @@ const ICON_MAP: Record<string, any> = {
 
 const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
   useScrollToTop();
+  useScreenAnalytics('MomFriendlyMap', 'Tools');
   
   // Fetch dynamic categories and amenities
   const { data: dbCategories = [] } = usePlaceCategories();

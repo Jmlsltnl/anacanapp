@@ -61,6 +61,7 @@ const ageRanges = [
 
 const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
   useScrollToTop();
+  useScreenAnalytics('SecondHandMarket', 'Tools');
   
   const [listings, setListings] = useState<Listing[]>([]);
   const [isLoading, setIsLoading] = useState(true);

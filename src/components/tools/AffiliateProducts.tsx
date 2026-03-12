@@ -30,6 +30,7 @@ const categoryLabels: Record<string, string> = {
 
 const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
   useScrollToTop();
+  useScreenAnalytics('AffiliateProducts', 'Tools');
   
   const { lifeStage } = useUserStore();
   const [activeCategory, setActiveCategory] = useState<string>('all');

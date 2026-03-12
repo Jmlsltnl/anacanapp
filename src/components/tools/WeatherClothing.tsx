@@ -41,6 +41,7 @@ interface WeatherAdvice {
 }
 
 const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
+  useScreenAnalytics('WeatherClothing', 'Tools');
   const [isLoading, setIsLoading] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [cityName, setCityName] = useState<string>('');

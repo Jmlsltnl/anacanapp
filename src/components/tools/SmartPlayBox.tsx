@@ -48,6 +48,7 @@ const DIFFICULTY_LABELS: Record<string, { label: string; color: string }> = {
 };
 
 const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
+  useScreenAnalytics('SmartPlayBox', 'Tools');
   const { profile } = useAuthContext();
   const [selectedActivity, setSelectedActivity] = useState<PlayActivity | null>(null);
   const [showInventory, setShowInventory] = useState(false);
