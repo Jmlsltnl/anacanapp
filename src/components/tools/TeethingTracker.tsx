@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { useTeething, BabyTooth } from '@/hooks/useTeething';
 import { useChildren } from '@/hooks/useChildren';
 import ChildSelector from '@/components/mommy/ChildSelector';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 
 interface TeethingTrackerProps {
   onBack: () => void;
