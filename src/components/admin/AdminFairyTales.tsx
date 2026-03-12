@@ -319,3 +319,5 @@ const ThemeForm = ({ theme, onSave, onCancel, isLoading }: ThemeFormProps) => {
 };
 
 export default AdminFairyTales;
+
+// Note: AdminUsageStats is added inside the component below

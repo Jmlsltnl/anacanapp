@@ -1002,6 +1002,13 @@ const AdminPhotoshoot = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      <AdminUsageStats 
+        eventNames={['baby_photo_generated', 'tool_opened']}
+        title="📸 Foto Generator İstifadə Statistikası"
+        showEventData
+        showUsers
+      />
     </div>
   );
 };
