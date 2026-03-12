@@ -298,6 +298,13 @@ const AdminPlaces = () => {
           )}
         </TabsContent>
       </Tabs>
+
+      <AdminUsageStats 
+        eventNames={['place_viewed']}
+        title="📍 Məkan İstifadə Statistikası"
+        showEventData
+        showUsers
+      />
     </div>
   );
 };

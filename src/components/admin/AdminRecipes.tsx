@@ -808,6 +808,13 @@ const AdminRecipes = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AdminUsageStats 
+        eventNames={['recipe_viewed']}
+        title="🍳 Resept İstifadə Statistikası"
+        showEventData
+        showUsers
+      />
     </div>
   );
 };

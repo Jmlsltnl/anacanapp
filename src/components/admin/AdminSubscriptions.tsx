@@ -300,6 +300,13 @@ const AdminSubscriptions = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <AdminUsageStats 
+        eventNames={['premium_subscribed', 'premium_cancelled', 'premium_paywall_shown', 'premium_paywall_clicked']}
+        title="👑 Premium Statistikası"
+        showEventData
+        showUsers
+      />
     </div>
   );
 };
