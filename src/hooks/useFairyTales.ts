@@ -79,6 +79,8 @@ export const useGenerateFairyTale = () => {
       hero?: string;
       moral_lesson?: string;
       language?: string;
+      age_range?: string;
+      story_style?: string;
     }) => {
       if (!user?.id) throw new Error('User not authenticated');
 
