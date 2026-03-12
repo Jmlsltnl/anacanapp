@@ -84,9 +84,11 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
       toast({ title: 'Premium mövcud deyil', description: 'Premium almaq üçün mobil tətbiqi yükləyin.', variant: 'destructive' });
       return;
     }
+    import('@/lib/analytics').then(m => m.analytics.logPaywallClicked(feature || 'general', selectedPlan)).catch(() => {});
     const purchaseFn = selectedPlan === 'yearly' ? purchaseYearly : purchaseMonthly;
     const success = await purchaseFn();
     if (success) {
+      import('@/lib/analytics').then(m => m.analytics.logPremiumSubscribed(selectedPlan)).catch(() => {});
       toast({ title: 'Premium aktivləşdirildi! 🎉', description: 'İndi bütün xüsusiyyətlərdən istifadə edə bilərsiniz.' });
       onClose();
     }
