@@ -7,6 +7,7 @@ import {
 import { useShoppingItems } from '@/hooks/useShoppingItems';
 import { useAuth } from '@/hooks/useAuth';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { useDefaultShoppingItems } from '@/hooks/useDefaultShoppingItems';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
