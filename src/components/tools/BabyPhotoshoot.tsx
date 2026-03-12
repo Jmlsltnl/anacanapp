@@ -69,6 +69,7 @@ const fallbackHairStyles = [
 
 const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack }, ref) => {
   useScrollToTop();
+  useScreenAnalytics('BabyPhotoshoot', 'Tools');
   
   const [step, setStep] = useState(0);
   const [customization, setCustomization] = useState<CustomizationOptions>({

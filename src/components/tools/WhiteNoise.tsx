@@ -53,6 +53,7 @@ interface WhiteNoiseProps {
 
 const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoiseComponent({ onBack }, ref) {
   useScrollToTop();
+  useScreenAnalytics('WhiteNoise', 'Tools');
   
   const { preferences, loading: prefsLoading, updateWhiteNoiseVolume, updateWhiteNoiseTimer, updateLastWhiteNoiseSound } = useUserPreferences();
   const { isPremium, canUseWhiteNoise, trackWhiteNoiseUsage, freeLimits } = useSubscription();

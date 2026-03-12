@@ -100,6 +100,7 @@ const STEPS = [
 ];
 
 const HoroscopeCompatibility = ({ onBack }: HoroscopeCompatibilityProps) => {
+  useScreenAnalytics('HoroscopeCompatibility', 'Tools');
   const { profile } = useAuthContext();
   const [currentStep, setCurrentStep] = useState(1);
   const [momData, setMomData] = useState<PersonData>({

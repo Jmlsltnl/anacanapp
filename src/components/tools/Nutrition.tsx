@@ -54,6 +54,7 @@ const mealIcons: Record<string, any> = {
 
 const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) => {
   useScrollToTop();
+  useScreenAnalytics('Nutrition', 'Tools');
   
   const [activeTab, setActiveTab] = useState<'log' | 'tips' | 'vitamins' | 'water'>('log');
   const [selectedMeal, setSelectedMeal] = useState<string | null>(null);
