@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 
 interface HoroscopeCompatibilityProps {
   onBack: () => void;

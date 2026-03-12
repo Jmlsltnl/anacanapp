@@ -12,6 +12,7 @@ interface ContractionTimerProps {
 
 const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ onBack }, ref) => {
   useScrollToTop();
+  useScreenAnalytics('ContractionTimer', 'Tools');
   
   const [isActive, setIsActive] = useState(false);
   const [currentDuration, setCurrentDuration] = useState(0);

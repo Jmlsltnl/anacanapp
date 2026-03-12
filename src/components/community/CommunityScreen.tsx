@@ -19,6 +19,7 @@ interface CommunityScreenProps {
 
 const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBack }, ref) => {
   useScrollToTop();
+  useScreenAnalytics('Community', 'Social');
   
   const { lifeStage } = useUserStore();
   const headerKey = `community_header_${lifeStage || 'mommy'}`;

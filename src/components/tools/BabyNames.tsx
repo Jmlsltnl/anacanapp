@@ -12,6 +12,7 @@ interface BabyNamesProps {
 
 const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) => {
   useScrollToTop();
+  useScreenAnalytics('BabyNames', 'Tools');
   
   const [searchQuery, setSearchQuery] = useState('');
   const [genderFilter, setGenderFilter] = useState<'all' | 'boy' | 'girl'>('all');

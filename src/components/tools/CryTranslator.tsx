@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { requestMicrophonePermission } from '@/lib/permissions';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 
 interface CryTranslatorProps {
   onBack: () => void;

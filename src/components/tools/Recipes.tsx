@@ -21,6 +21,7 @@ interface RecipesProps {
 
 const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
   useScrollToTop();
+  useScreenAnalytics('Recipes', 'Tools');
   
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [recipeCategory, setRecipeCategory] = useState('all');

@@ -33,6 +33,7 @@ const priorityLabels = {
 
 const ShoppingList = ({ onBack }: ShoppingListProps) => {
   useScrollToTop();
+  useScreenAnalytics('ShoppingList', 'Tools');
   
   const { profile } = useAuth();
   const { items, loading, addItem, toggleItem, deleteItem, uncheckedCount, checkedCount } = useShoppingItems();

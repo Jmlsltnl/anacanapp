@@ -27,6 +27,7 @@ interface Message {
 
 const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   useScrollToTop();
+  useScreenAnalytics('AIChat', 'Chat');
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');

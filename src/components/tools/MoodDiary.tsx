@@ -17,6 +17,7 @@ interface MoodDiaryProps {
 
 const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) => {
   useScrollToTop();
+  useScreenAnalytics('MoodDiary', 'Tools');
   
   const [activeTab, setActiveTab] = useState<'log' | 'history' | 'insights'>('log');
   const [selectedMood, setSelectedMood] = useState<number | null>(null);

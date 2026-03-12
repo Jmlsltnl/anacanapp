@@ -18,6 +18,7 @@ interface WeightTrackerProps {
 
 const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }, ref) => {
   useScrollToTop();
+  useScreenAnalytics('WeightTracker', 'Tools');
   
   const { entries, loading, addEntry, getStats, deleteEntry, deleteAllEntries } = useWeightEntries();
   const [showResetConfirm, setShowResetConfirm] = useState(false);

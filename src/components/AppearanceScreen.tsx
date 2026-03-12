@@ -11,6 +11,7 @@ interface AppearanceScreenProps {
 
 const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
   useScrollToTop();
+  useScreenAnalytics('Appearance', 'Settings');
   
   const { theme, setTheme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);

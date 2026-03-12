@@ -4,6 +4,7 @@ import { ArrowLeft, Pause, Play, Volume2, VolumeX, Crown, Lock, Loader2, Timer, 
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { PremiumModal } from '@/components/PremiumModal';
 import { useWhiteNoiseSounds, WhiteNoiseSound } from '@/hooks/useDynamicConfig';
 import { useWhiteNoiseStore } from '@/store/whiteNoiseStore';

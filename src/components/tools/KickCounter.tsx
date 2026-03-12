@@ -12,6 +12,7 @@ interface KickCounterProps {
 
 const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, ref) => {
   useScrollToTop();
+  useScreenAnalytics('KickCounter', 'Tools');
   
   const [kicks, setKicks] = useState(0);
   const [isActive, setIsActive] = useState(false);

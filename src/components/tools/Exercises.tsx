@@ -17,6 +17,7 @@ interface ExercisesProps {
 
 const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) => {
   useScrollToTop();
+  useScreenAnalytics('Exercises', 'Tools');
   
   const [selectedExerciseId, setSelectedExerciseId] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);

@@ -25,6 +25,7 @@ interface BlogScreenProps {
 
 const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
   useScrollToTop();
+  useScreenAnalytics('Blog', 'Content');
   
   const { user } = useAuth();
   const { posts, categories, featuredPosts, loading, searchPosts, getPostsByCategory } = useBlog();

@@ -34,6 +34,7 @@ interface BabyGrowthEntry {
 }
 
 const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
+  useScreenAnalytics('BabyGrowthTracker', 'Tools');
   const { user } = useAuth();
   const { selectedChild } = useChildren();
   const { toast } = useToast();
