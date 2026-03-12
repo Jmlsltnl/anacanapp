@@ -452,6 +452,21 @@ const AdminDashboard = () => {
           </div>
         </Card>
       </div>
+
+      {/* AI & Key Tool Usage */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <AdminUsageStats 
+          eventNames={['ai_chat_started', 'ai_chat_message']}
+          title="🤖 Anacan AI İstifadəsi"
+          showUsers
+        />
+        <AdminUsageStats 
+          eventNames={['baby_photo_generated', 'cry_analyzed', 'poop_analyzed', 'fairy_tale_generated']}
+          title="⚡ AI Alətləri İstifadəsi"
+          showEventData
+          showUsers
+        />
+      </div>
     </div>
   );
 };
