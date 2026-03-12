@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Play, Pause, RotateCcw, Footprints } from 'lucide-react';
 import { useKickSessions } from '@/hooks/useKickSessions';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { hapticFeedback } from '@/lib/native';
 
 interface KickCounterProps {
