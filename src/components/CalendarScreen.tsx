@@ -8,6 +8,7 @@ import { useUserStore } from '@/store/userStore';
 import { useAppointments } from '@/hooks/useAppointments';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { Input } from '@/components/ui/input';
 import { getPhaseInfoForDate, getCycleDayForDate } from '@/lib/cycle-utils';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths } from 'date-fns';

@@ -19,6 +19,7 @@ interface MaternityCalculatorProps {
 }
 
 const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
+  useScreenAnalytics('MaternityCalculator', 'Tools');
   useScrollToTop();
   
   const { config, guidelines, loading, calculateBenefit } = useMaternityBenefits();

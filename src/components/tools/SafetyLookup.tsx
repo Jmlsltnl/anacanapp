@@ -16,6 +16,7 @@ interface SafetyLookupProps {
 
 const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, ref) => {
   useScrollToTop();
+  useScreenAnalytics('SafetyLookup', 'Tools');
   const { profile } = useAuth();
 
   const [searchQuery, setSearchQuery] = useState('');

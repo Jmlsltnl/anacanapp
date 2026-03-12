@@ -12,6 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useChildren, Child } from '@/hooks/useChildren';
 import { PremiumModal } from '@/components/PremiumModal';
 import { useSubscription } from '@/hooks/useSubscription';

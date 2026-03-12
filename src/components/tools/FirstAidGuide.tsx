@@ -14,6 +14,7 @@ interface FirstAidGuideProps {
 
 const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
   useScrollToTop();
+  useScreenAnalytics('FirstAidGuide', 'Tools');
   
   const [selectedScenario, setSelectedScenario] = useState<FirstAidScenario | null>(null);
   const [currentStep, setCurrentStep] = useState(0);

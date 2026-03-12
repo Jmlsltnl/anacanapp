@@ -13,6 +13,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { useUserStore } from '@/store/userStore';
 import { differenceInMonths, differenceInDays } from 'date-fns';
 import { getPregnancyWeek } from '@/lib/pregnancy-utils';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 
 interface WeatherClothingProps {
   onBack: () => void;

@@ -13,6 +13,7 @@ interface NotificationsScreenProps {
 
 const NotificationsScreen = ({ onBack }: NotificationsScreenProps) => {
   useScrollToTop();
+  useScreenAnalytics('Notifications', 'Notifications');
   
   const { 
     notifications, 

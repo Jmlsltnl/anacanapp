@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Check, Info, AlertTriangle, Star, ChevronDown, Package, Baby, FileText } from 'lucide-react';
 import { useHospitalBag } from '@/hooks/useHospitalBag';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { Progress } from '@/components/ui/progress';
 
 interface HospitalBagProps {

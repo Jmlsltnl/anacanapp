@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { Skeleton } from '@/components/ui/skeleton';
 import ProviderReviews from './doctors/ProviderReviews';
 

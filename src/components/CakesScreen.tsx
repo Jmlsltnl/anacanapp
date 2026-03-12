@@ -4,6 +4,7 @@ import { ArrowLeft, Cake as CakeIcon, Search, Loader2, ShoppingBag, ShoppingCart
 import { useCakes, type Cake } from '@/hooks/useCakes';
 import { useCakeCart } from '@/hooks/useCakeCart';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import CakeDetailScreen from '@/components/cakes/CakeDetailScreen';
 import CakeCartDrawer from '@/components/cakes/CakeCartDrawer';
 import CakeOrderForm from '@/components/cakes/CakeOrderForm';

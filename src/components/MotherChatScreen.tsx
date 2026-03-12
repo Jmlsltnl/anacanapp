@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import ChatMediaUpload from '@/components/chat/ChatMediaUpload';
 import ChatMessageBubble from '@/components/chat/ChatMessageBubble';
 

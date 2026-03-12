@@ -12,6 +12,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { useToast } from '@/hooks/use-toast';
 import { format, isToday, isYesterday, subDays, startOfDay } from 'date-fns';
 import { az } from 'date-fns/locale';

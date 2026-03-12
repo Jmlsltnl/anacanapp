@@ -9,6 +9,7 @@ import { useUserStore } from '@/store/userStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAppSetting } from '@/hooks/useAppSettings';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { useAffiliateProducts, useSavedProducts, AffiliateProduct } from '@/hooks/useAffiliateProducts';
 import AffiliateProductCard from './affiliate/AffiliateProductCard';
 import AffiliateProductDetail from './affiliate/AffiliateProductDetail';

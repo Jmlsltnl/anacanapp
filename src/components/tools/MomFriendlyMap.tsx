@@ -18,6 +18,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { usePlaceCategories, usePlaceAmenities, FALLBACK_CATEGORIES, FALLBACK_AMENITIES } from '@/hooks/usePlacesConfig';
 import { toast } from 'sonner';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 
 interface MomFriendlyMapProps {
   onBack: () => void;

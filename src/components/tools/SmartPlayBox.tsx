@@ -11,6 +11,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { differenceInDays, differenceInMonths } from 'date-fns';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 
 interface SmartPlayBoxProps {
   onBack: () => void;

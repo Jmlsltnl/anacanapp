@@ -19,6 +19,7 @@ interface TeethingTrackerProps {
 }
 
 const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
+  useScreenAnalytics('TeethingTracker', 'Tools');
   const { selectedChild, hasChildren, hasMultipleChildren, getChildAge } = useChildren();
   const { 
     teeth, 
