@@ -237,8 +237,10 @@ serve(async (req) => {
   try {
     const { childName, theme, hero, moralLesson, language = 'az', ageRange, storyStyle } = await req.json();
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+    if (!GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY is not configured');
+    }
     
     const actualChildName = childName || 'Əli';
     
@@ -249,89 +251,46 @@ serve(async (req) => {
 
     let generatedText = '';
 
-    if (LOVABLE_API_KEY) {
-      // Use Lovable AI Gateway
-      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt },
-          ],
-          temperature: 0.7,
-          max_tokens: 3000,
-        }),
-      });
+    const callGemini = async (model: string) => {
+      return await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
+            generationConfig: {
+              temperature: 0.7,
+              topK: 30,
+              topP: 0.9,
+              maxOutputTokens: 3000,
+            },
+            safetySettings: [
+              { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+              { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+              { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+              { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+            ],
+          }),
+        }
+      );
+    };
 
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: 'Çox tez-tez sorğu göndərilir. Bir az gözləyin.' }), {
-          status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: 'AI kredit limiti bitib.' }), {
-          status: 402,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Lovable AI error:', response.status, errorText);
-        throw new Error(`AI gateway error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      generatedText = data.choices?.[0]?.message?.content || '';
-    } else if (GEMINI_API_KEY) {
-      // Fallback to direct Gemini API
-      const callGemini = async (model: string) => {
-        return await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ role: 'user', parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
-              generationConfig: {
-                temperature: 0.7,
-                topK: 30,
-                topP: 0.9,
-                maxOutputTokens: 3000,
-              },
-              safetySettings: [
-                { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-                { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-                { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-                { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-              ],
-            }),
-          }
-        );
-      };
-
-      let response = await callGemini('gemini-2.0-flash');
-      if (response.status === 429) {
-        response = await callGemini('gemini-2.5-flash-lite');
-      }
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Gemini API error:', response.status, errorText);
-        throw new Error(`Gemini API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    } else {
-      throw new Error('No AI API key configured');
+    // Try Gemini 2.5 Pro first, fallback to Flash on rate limit
+    let response = await callGemini('gemini-2.5-pro');
+    if (response.status === 429) {
+      console.log('Gemini Pro rate limited, falling back to Flash...');
+      response = await callGemini('gemini-2.5-flash');
     }
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Gemini API error:', response.status, errorText);
+      throw new Error(`Gemini API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
     if (!generatedText) {
       throw new Error('No content generated');
