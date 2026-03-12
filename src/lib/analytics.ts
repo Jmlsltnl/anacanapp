@@ -1,9 +1,10 @@
 /**
- * Firebase Analytics integration for Anacan app
- * Handles both web and native platforms via Capacitor
+ * Firebase Analytics + Internal Analytics integration for Anacan app
+ * Dual-tracks to Firebase Analytics AND internal database
  */
 
 import { Capacitor } from '@capacitor/core';
+import { supabase } from '@/integrations/supabase/client';
 
 // Firebase Analytics for web
 let firebaseAnalytics: any = null;
@@ -16,7 +17,6 @@ const initWebAnalytics = async () => {
     const { initializeApp, getApps } = await import('firebase/app');
     const { getAnalytics, logEvent: firebaseLogEvent, setUserId: firebaseSetUserId, setUserProperties: firebaseSetUserProps } = await import('firebase/analytics');
     
-    // Firebase config - these are public/publishable keys
     const firebaseConfig = {
       apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
       authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
@@ -27,13 +27,11 @@ const initWebAnalytics = async () => {
       measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || '',
     };
     
-    // Check if Firebase is configured
     if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-      console.warn('Firebase Analytics not configured. Set VITE_FIREBASE_* environment variables.');
+      console.warn('Firebase Analytics not configured.');
       return null;
     }
     
-    // Initialize Firebase app if not already initialized
     const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
     firebaseAnalytics = getAnalytics(app);
     
@@ -63,6 +61,8 @@ export type AnalyticsEvent =
   | 'partner_linked'
   | 'premium_subscribed'
   | 'premium_cancelled'
+  | 'premium_paywall_shown'
+  | 'premium_paywall_clicked'
   | 'notification_received'
   | 'notification_clicked'
   | 'water_logged'
@@ -76,33 +76,95 @@ export type AnalyticsEvent =
   | 'shopping_item_added'
   | 'appointment_created'
   | 'mood_logged'
+  | 'cry_analyzed'
+  | 'poop_analyzed'
+  | 'fairy_tale_generated'
+  | 'breathing_exercise_done'
+  | 'white_noise_played'
+  | 'horoscope_viewed'
+  | 'recipe_viewed'
+  | 'name_searched'
+  | 'baby_growth_logged'
+  | 'place_viewed'
+  | 'product_viewed'
   | 'custom_event';
 
 export interface AnalyticsParams {
   [key: string]: string | number | boolean | undefined;
 }
 
+// Event category mapping
+const EVENT_CATEGORIES: Record<string, string> = {
+  login: 'auth', sign_up: 'auth',
+  tool_opened: 'tools', tool_used: 'tools',
+  blog_read: 'content', blog_liked: 'content', blog_saved: 'content',
+  community_post_created: 'community', community_post_liked: 'community',
+  ai_chat_started: 'ai', ai_chat_message: 'ai',
+  premium_subscribed: 'premium', premium_cancelled: 'premium',
+  premium_paywall_shown: 'premium', premium_paywall_clicked: 'premium',
+  water_logged: 'health', symptom_logged: 'health', weight_logged: 'health',
+  kick_counted: 'health', contraction_timed: 'health', meal_logged: 'health',
+  exercise_completed: 'health', mood_logged: 'health', baby_growth_logged: 'health',
+  baby_photo_generated: 'tools', cry_analyzed: 'tools', poop_analyzed: 'tools',
+  fairy_tale_generated: 'tools', breathing_exercise_done: 'tools',
+  white_noise_played: 'tools', horoscope_viewed: 'tools',
+  recipe_viewed: 'content', name_searched: 'tools',
+  place_viewed: 'content', product_viewed: 'content',
+  shopping_item_added: 'tools', appointment_created: 'tools',
+  partner_linked: 'social',
+  screen_view: 'navigation', page_view: 'navigation',
+  notification_received: 'notification', notification_clicked: 'notification',
+};
+
+// Internal DB tracking - fire and forget, non-blocking
+const trackInternal = async (eventName: string, params?: AnalyticsParams) => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Get user profile info for enrichment
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('life_stage, is_premium')
+      .eq('user_id', user.id)
+      .single();
+
+    await supabase.from('analytics_events').insert({
+      user_id: user.id,
+      event_name: eventName,
+      event_category: EVENT_CATEGORIES[eventName] || 'general',
+      event_data: params || {},
+      platform: Capacitor.isNativePlatform() ? Capacitor.getPlatform() : 'web',
+      life_stage: profile?.life_stage || null,
+      is_premium: profile?.is_premium || false,
+    });
+  } catch {
+    // Silent fail - analytics should never break the app
+  }
+};
+
 /**
- * Log an analytics event
+ * Log an analytics event - dual tracks to Firebase + internal DB
  */
 export const logEvent = async (eventName: AnalyticsEvent, params?: AnalyticsParams): Promise<void> => {
   try {
+    // Firebase tracking
     if (Capacitor.isNativePlatform()) {
-      // Use Capacitor Firebase Analytics for native
       const { FirebaseAnalytics } = await import('@capacitor-firebase/analytics');
       await FirebaseAnalytics.logEvent({
         name: eventName,
         params: params as Record<string, any> || {},
       });
     } else {
-      // Use web Firebase Analytics
       const webAnalytics = await initWebAnalytics();
       if (webAnalytics) {
         webAnalytics.logEvent(webAnalytics.analytics, eventName, params);
       }
     }
+
+    // Internal DB tracking (non-blocking)
+    trackInternal(eventName, params);
     
-    // Also log to console in development
     if (import.meta.env.DEV) {
       console.log(`📊 Analytics: ${eventName}`, params);
     }
@@ -173,7 +235,7 @@ export const analytics = {
   logSignUp: (method: string) => logEvent('sign_up', { method }),
   
   // Tool events
-  logToolOpened: (toolId: string) => logEvent('tool_opened', { tool_id: toolId }),
+  logToolOpened: (toolId: string, toolName?: string) => logEvent('tool_opened', { tool_id: toolId, tool_name: toolName }),
   logToolUsed: (toolId: string, action: string) => logEvent('tool_used', { tool_id: toolId, action }),
   
   // Blog events
@@ -198,14 +260,28 @@ export const analytics = {
   logMeal: (mealType: string, calories: number) => logEvent('meal_logged', { meal_type: mealType, calories }),
   logExercise: (exerciseId: string, durationMin: number) => logEvent('exercise_completed', { exercise_id: exerciseId, duration_min: durationMin }),
   logMood: (moodValue: number) => logEvent('mood_logged', { mood_value: moodValue }),
+  logBabyGrowth: () => logEvent('baby_growth_logged'),
   
   // Feature events
   logBabyPhotoGenerated: (style: string) => logEvent('baby_photo_generated', { style }),
   logShoppingItemAdded: () => logEvent('shopping_item_added'),
   logAppointmentCreated: (type: string) => logEvent('appointment_created', { appointment_type: type }),
+  logCryAnalyzed: () => logEvent('cry_analyzed'),
+  logPoopAnalyzed: () => logEvent('poop_analyzed'),
+  logFairyTaleGenerated: () => logEvent('fairy_tale_generated'),
+  logBreathingExercise: (exerciseId: string) => logEvent('breathing_exercise_done', { exercise_id: exerciseId }),
+  logWhiteNoisePlayed: (soundId: string) => logEvent('white_noise_played', { sound_id: soundId }),
+  logHoroscopeViewed: () => logEvent('horoscope_viewed'),
+  logRecipeViewed: (recipeId: string) => logEvent('recipe_viewed', { recipe_id: recipeId }),
+  logNameSearched: (query: string) => logEvent('name_searched', { query }),
+  logPlaceViewed: (placeId: string) => logEvent('place_viewed', { place_id: placeId }),
+  logProductViewed: (productId: string) => logEvent('product_viewed', { product_id: productId }),
   
   // Premium events
   logPremiumSubscribed: (plan: string) => logEvent('premium_subscribed', { plan }),
+  logPremiumCancelled: () => logEvent('premium_cancelled'),
+  logPaywallShown: (source: string) => logEvent('premium_paywall_shown', { source }),
+  logPaywallClicked: (source: string, plan: string) => logEvent('premium_paywall_clicked', { source, plan }),
   logPartnerLinked: () => logEvent('partner_linked'),
 };
 

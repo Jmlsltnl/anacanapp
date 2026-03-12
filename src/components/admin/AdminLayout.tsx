@@ -20,6 +20,7 @@ interface AdminLayoutProps {
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: Home },
+  { id: 'analytics', label: 'Analitika', icon: BarChart3 },
   { id: 'users', label: 'İstifadəçilər', icon: Users },
   { id: 'support', label: 'Dəstək Müraciətləri', icon: MessageSquare },
   { id: 'orders', label: 'Sifarişlər', icon: ShoppingCart },
