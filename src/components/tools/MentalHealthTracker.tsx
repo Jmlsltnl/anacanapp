@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { 
   useMoodCheckins, 
   useTodayMoodCheckin, 
@@ -37,6 +38,7 @@ interface MentalHealthTrackerProps {
 
 const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
   useScrollToTop();
+  useScreenAnalytics('MentalHealthTracker', 'Tools');
   
   // Fetch data from database
   const { data: moodLevelsDB = [] } = useMoodLevelsDB();

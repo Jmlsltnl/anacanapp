@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserStore } from '@/store/userStore';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
@@ -58,6 +59,7 @@ const getMonthFromWeek = (week: number): number => {
 
 const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
   useScrollToTop();
+  useScreenAnalytics('PregnancyAlbum', 'Tools');
   
   const { user } = useAuth();
   const { getPregnancyData } = useUserStore();

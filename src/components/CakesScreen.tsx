@@ -4,6 +4,7 @@ import { ArrowLeft, Cake as CakeIcon, Search, Loader2, ShoppingBag, ShoppingCart
 import { useCakes, type Cake } from '@/hooks/useCakes';
 import { useCakeCart } from '@/hooks/useCakeCart';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import CakeDetailScreen from '@/components/cakes/CakeDetailScreen';
 import CakeCartDrawer from '@/components/cakes/CakeCartDrawer';
 import CakeOrderForm from '@/components/cakes/CakeOrderForm';
@@ -21,6 +22,7 @@ const MONTHS = Array.from({ length: 12 }, (_, i) => ({
 
 const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
   useScrollToTop();
+  useScreenAnalytics('Cakes', 'Shop');
   const { cakes, loading } = useCakes();
   const { totalItems } = useCakeCart();
   

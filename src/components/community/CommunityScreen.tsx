@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Users, Plus, Search, TrendingUp } from 'lucide-react';
 import { useCommunityGroups, useUserMemberships } from '@/hooks/useCommunity';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { useUserStore } from '@/store/userStore';
 import { useAppSetting } from '@/hooks/useAppSettings';
 import GroupsList from './GroupsList';
@@ -18,6 +19,7 @@ interface CommunityScreenProps {
 
 const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBack }, ref) => {
   useScrollToTop();
+  useScreenAnalytics('Community', 'Social');
   
   const { lifeStage } = useUserStore();
   const headerKey = `community_header_${lifeStage || 'mommy'}`;

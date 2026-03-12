@@ -13,6 +13,7 @@ import { az } from 'date-fns/locale';
 import MarkdownContent from '@/components/MarkdownContent';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 
 interface FairyTaleGeneratorProps {
   onBack: () => void;
@@ -50,6 +51,7 @@ const LANGUAGES = [
 ];
 
 const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
+  useScreenAnalytics('FairyTaleGenerator', 'Tools');
   const [selectedTale, setSelectedTale] = useState<FairyTale | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [createStep, setCreateStep] = useState(1);

@@ -11,6 +11,7 @@ import { useNotificationSettings } from '@/hooks/useNotificationSettings';
 import { useSilentHours } from '@/hooks/useSilentHours';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -31,6 +32,7 @@ interface SettingsScreenProps {
 
 const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   useScrollToTop();
+  useScreenAnalytics('Settings', 'Settings');
   
   const { 
     settings, 

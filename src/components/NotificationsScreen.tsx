@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 
 interface NotificationsScreenProps {
   onBack: () => void;
@@ -12,6 +13,7 @@ interface NotificationsScreenProps {
 
 const NotificationsScreen = ({ onBack }: NotificationsScreenProps) => {
   useScrollToTop();
+  useScreenAnalytics('Notifications', 'Notifications');
   
   const { 
     notifications, 

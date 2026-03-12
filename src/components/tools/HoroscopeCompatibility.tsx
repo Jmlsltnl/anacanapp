@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 
 interface HoroscopeCompatibilityProps {
   onBack: () => void;
@@ -99,6 +100,7 @@ const STEPS = [
 ];
 
 const HoroscopeCompatibility = ({ onBack }: HoroscopeCompatibilityProps) => {
+  useScreenAnalytics('HoroscopeCompatibility', 'Tools');
   const { profile } = useAuthContext();
   const [currentStep, setCurrentStep] = useState(1);
   const [momData, setMomData] = useState<PersonData>({

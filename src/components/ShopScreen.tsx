@@ -6,6 +6,7 @@ import { useShopCategories } from '@/hooks/useDynamicTools';
 import { useCart } from '@/hooks/useOrders';
 import { useAuth } from '@/hooks/useAuth';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import CartDrawer from '@/components/shop/CartDrawer';
 import CheckoutScreen from '@/components/shop/CheckoutScreen';
 import OrderSuccessScreen from '@/components/shop/OrderSuccessScreen';
@@ -39,6 +40,7 @@ interface ProductDisplay {
 
 const ShopScreen = ({ onBack }: ShopScreenProps) => {
   useScrollToTop();
+  useScreenAnalytics('Shop', 'Shop');
   
   const { products: dbProducts, loading } = useProducts();
   const { data: dbCategories = [] } = useShopCategories();

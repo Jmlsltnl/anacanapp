@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { PremiumModal } from '@/components/PremiumModal';
 import PhotoGalleryViewer from '@/components/PhotoGalleryViewer';
 import { 
@@ -68,6 +69,7 @@ const fallbackHairStyles = [
 
 const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack }, ref) => {
   useScrollToTop();
+  useScreenAnalytics('BabyPhotoshoot', 'Tools');
   
   const [step, setStep] = useState(0);
   const [customization, setCustomization] = useState<CustomizationOptions>({

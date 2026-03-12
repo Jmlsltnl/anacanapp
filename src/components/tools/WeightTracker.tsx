@@ -8,6 +8,7 @@ import { useWeightEntries } from '@/hooks/useWeightEntries';
 import { useWeightRecommendations } from '@/hooks/useDynamicTools';
 import { useUserStore } from '@/store/userStore';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDateAz, formatTimeAz } from '@/lib/date-utils';
 
@@ -17,6 +18,7 @@ interface WeightTrackerProps {
 
 const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }, ref) => {
   useScrollToTop();
+  useScreenAnalytics('WeightTracker', 'Tools');
   
   const { entries, loading, addEntry, getStats, deleteEntry, deleteAllEntries } = useWeightEntries();
   const [showResetConfirm, setShowResetConfirm] = useState(false);

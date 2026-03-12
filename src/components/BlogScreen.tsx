@@ -10,6 +10,7 @@ import { useSavedPosts } from '@/hooks/useBlogInteractions';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
@@ -24,6 +25,7 @@ interface BlogScreenProps {
 
 const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
   useScrollToTop();
+  useScreenAnalytics('Blog', 'Content');
   
   const { user } = useAuth();
   const { posts, categories, featuredPosts, loading, searchPosts, getPostsByCategory } = useBlog();

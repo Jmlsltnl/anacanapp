@@ -9,6 +9,7 @@ import { hapticFeedback } from '@/lib/native';
 import { useMoodOptions, useSymptoms } from '@/hooks/useDynamicConfig';
 import { useUserStore } from '@/store/userStore';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 
 interface MoodDiaryProps {
   onBack: () => void;
@@ -16,6 +17,7 @@ interface MoodDiaryProps {
 
 const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) => {
   useScrollToTop();
+  useScreenAnalytics('MoodDiary', 'Tools');
   
   const [activeTab, setActiveTab] = useState<'log' | 'history' | 'insights'>('log');
   const [selectedMood, setSelectedMood] = useState<number | null>(null);

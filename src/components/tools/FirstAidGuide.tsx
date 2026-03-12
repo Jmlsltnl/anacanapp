@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useFirstAidScenarios, useFirstAidSteps, FirstAidScenario } from '@/hooks/useFirstAid';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { toast } from 'sonner';
 
 interface FirstAidGuideProps {
@@ -13,6 +14,7 @@ interface FirstAidGuideProps {
 
 const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
   useScrollToTop();
+  useScreenAnalytics('FirstAidGuide', 'Tools');
   
   const [selectedScenario, setSelectedScenario] = useState<FirstAidScenario | null>(null);
   const [currentStep, setCurrentStep] = useState(0);

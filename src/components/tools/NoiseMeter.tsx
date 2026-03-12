@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useNoiseThresholdsDB } from '@/hooks/useMentalHealthData';
 
 interface NoiseMeterProps {
@@ -23,6 +24,7 @@ const FALLBACK_NOISE_THRESHOLDS = {
 
 const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
   useScrollToTop();
+  useScreenAnalytics('NoiseMeter', 'Tools');
   
   // Fetch thresholds from database
   const { data: noiseThresholdsDB = [] } = useNoiseThresholdsDB();

@@ -131,7 +131,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const syncProfileToStore = useCallback(
-    (profileData: Profile | null) => {
+    (profileData: Profile | null, userId?: string) => {
       if (!profileData) {
         setOnboarded(false);
         return;
@@ -161,6 +161,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setOnboarded(true);
       } else {
         setOnboarded(false);
+      }
+
+      // Set analytics user properties for GA + internal tracking
+      if (userId) {
+        import('@/lib/analytics').then(m => {
+          m.analytics.setUserId(userId);
+          m.analytics.setUserProperties({
+            life_stage: profileData.life_stage || 'unknown',
+            is_premium: String(profileData.is_premium || false),
+            role: profileData.life_stage === 'partner' ? 'partner' : 'woman',
+          });
+        }).catch(() => {});
       }
     },
     [setOnboarded, setPartnerCode, setLastPeriodDate, setCycleLength, setPeriodLength, setDueDate, setBabyData, setRole, setLifeStage, setLinkedPartnerId]
@@ -267,7 +279,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error;
       const newProfile = data as Profile;
       setProfile(newProfile);
-      syncProfileToStore(newProfile);
+      syncProfileToStore(newProfile, user?.id);
       return { data: newProfile, error: null };
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -300,7 +312,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const newProfile = await fetchProfile(user.id);
       setProfile(newProfile);
-      syncProfileToStore(newProfile);
+      syncProfileToStore(newProfile, user.id);
       return { error: null };
     } catch (error) {
       console.error('Link partner error:', error);
@@ -313,7 +325,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [profileData, roleData] = await Promise.all([fetchProfile(user.id), fetchUserRole(user.id)]);
     setProfile(profileData);
     setUserRole(roleData);
-    syncProfileToStore(profileData);
+    syncProfileToStore(profileData, user.id);
   }, [user, fetchProfile, fetchUserRole, syncProfileToStore]);
 
   // ─────────────────────────────────────────
@@ -364,7 +376,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           u.email || '',
           profileData?.name || u.user_metadata?.name || 'İstifadəçi'
         );
-        syncProfileToStore(profileData);
+        syncProfileToStore(profileData, u.id);
       } catch (error) {
         console.error('Error hydrating user:', error);
         // Don't clear user/session on hydration error - keep the session alive

@@ -11,6 +11,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { differenceInDays, differenceInMonths } from 'date-fns';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 
 interface SmartPlayBoxProps {
   onBack: () => void;
@@ -47,6 +48,7 @@ const DIFFICULTY_LABELS: Record<string, { label: string; color: string }> = {
 };
 
 const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
+  useScreenAnalytics('SmartPlayBox', 'Tools');
   const { profile } = useAuthContext();
   const [selectedActivity, setSelectedActivity] = useState<PlayActivity | null>(null);
   const [showInventory, setShowInventory] = useState(false);

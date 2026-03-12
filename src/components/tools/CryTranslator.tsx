@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { requestMicrophonePermission } from '@/lib/permissions';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 
 interface CryTranslatorProps {
   onBack: () => void;
@@ -48,6 +49,7 @@ const stageMessages: Record<AnalysisStage, string> = {
 };
 
 const CryTranslator = ({ onBack }: CryTranslatorProps) => {
+  useScreenAnalytics('CryTranslator', 'Tools');
   const [stage, setStage] = useState<AnalysisStage>('idle');
   const [recordingTime, setRecordingTime] = useState(0);
   const [analysis, setAnalysis] = useState<CryAnalysis | null>(null);

@@ -17,7 +17,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
-
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 interface SecondHandMarketProps {
   onBack: () => void;
 }
@@ -61,6 +61,7 @@ const ageRanges = [
 
 const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
   useScrollToTop();
+  useScreenAnalytics('SecondHandMarket', 'Tools');
   
   const [listings, setListings] = useState<Listing[]>([]);
   const [isLoading, setIsLoading] = useState(true);

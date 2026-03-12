@@ -8,6 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { takePhoto, pickFromGallery, requestCameraPermission } from '@/lib/permissions';
 import { Capacitor } from '@capacitor/core';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+
 interface PoopScannerProps {
   onBack: () => void;
 }
@@ -34,6 +36,7 @@ const colorLabels: Record<string, { label: string; emoji: string }> = {
 };
 
 const PoopScanner = ({ onBack }: PoopScannerProps) => {
+  useScreenAnalytics('PoopScanner', 'Tools');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<PoopAnalysis | null>(null);

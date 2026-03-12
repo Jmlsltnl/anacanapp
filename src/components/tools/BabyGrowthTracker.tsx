@@ -15,6 +15,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useChildren } from '@/hooks/useChildren';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 
 interface BabyGrowthTrackerProps {
   onBack: () => void;
@@ -33,6 +34,7 @@ interface BabyGrowthEntry {
 }
 
 const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
+  useScreenAnalytics('BabyGrowthTracker', 'Tools');
   const { user } = useAuth();
   const { selectedChild } = useChildren();
   const { toast } = useToast();

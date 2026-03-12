@@ -1,0 +1,20 @@
+import { useEffect } from 'react';
+import type { AnalyticsEvent, AnalyticsParams } from '@/lib/analytics';
+
+/**
+ * Auto-track screen view on mount. Use in every screen/tool component.
+ */
+export const useScreenAnalytics = (screenName: string, screenClass?: string) => {
+  useEffect(() => {
+    import('@/lib/analytics').then(m => 
+      m.analytics.logScreenView(screenName, screenClass || screenName)
+    ).catch(() => {});
+  }, [screenName, screenClass]);
+};
+
+/**
+ * Fire-and-forget analytics event (non-blocking, safe to call anywhere).
+ */
+export const trackEvent = (eventName: string, params?: Record<string, string | number | boolean | undefined>) => {
+  import('@/lib/analytics').then(m => m.logEvent(eventName as any, params)).catch(() => {});
+};

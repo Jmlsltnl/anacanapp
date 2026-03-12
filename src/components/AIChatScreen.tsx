@@ -10,6 +10,7 @@ import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useAIChatHistory } from '@/hooks/useAIChatHistory';
 import { useAuth } from '@/hooks/useAuth';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { useToast } from '@/hooks/use-toast';
 import { useAISuggestedQuestions } from '@/hooks/useDynamicTools';
@@ -26,6 +27,7 @@ interface Message {
 
 const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   useScrollToTop();
+  useScreenAnalytics('AIChat', 'Chat');
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');

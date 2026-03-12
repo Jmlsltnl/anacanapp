@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import ChatMediaUpload from '@/components/chat/ChatMediaUpload';
 import ChatMessageBubble from '@/components/chat/ChatMessageBubble';
 
@@ -25,6 +26,7 @@ interface MotherChatScreenProps {
 
 const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
   useScrollToTop();
+  useScreenAnalytics('PartnerChat', 'Chat');
   
   const { user, profile } = useAuth();
   const { toast } = useToast();

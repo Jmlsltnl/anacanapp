@@ -4,6 +4,7 @@ import { ArrowLeft, Pause, Play, Volume2, VolumeX, Crown, Lock, Loader2, Timer, 
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { PremiumModal } from '@/components/PremiumModal';
 import { useWhiteNoiseSounds, WhiteNoiseSound } from '@/hooks/useDynamicConfig';
 import { useWhiteNoiseStore } from '@/store/whiteNoiseStore';
@@ -52,6 +53,7 @@ interface WhiteNoiseProps {
 
 const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoiseComponent({ onBack }, ref) {
   useScrollToTop();
+  useScreenAnalytics('WhiteNoise', 'Tools');
   
   const { preferences, loading: prefsLoading, updateWhiteNoiseVolume, updateWhiteNoiseTimer, updateLastWhiteNoiseSound } = useUserPreferences();
   const { isPremium, canUseWhiteNoise, trackWhiteNoiseUsage, freeLimits } = useSubscription();
