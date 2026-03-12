@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import AdminUsageStats from './AdminUsageStats';
 
 const AdminPlaces = () => {
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved'>('all');
