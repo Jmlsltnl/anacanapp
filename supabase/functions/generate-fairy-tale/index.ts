@@ -5,133 +5,226 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-const getSystemPrompt = (language: string, childName: string) => {
+const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: string }> = {
+  '0-2': {
+    az: 'Çox sadə cümlələr (3-5 söz). Təkrarlanan ifadələr. Heyvan səsləri. Rənglər və formalar. Nağıl 1-2 dəqiqəlik olsun.',
+    en: 'Very simple sentences (3-5 words). Repetitive phrases. Animal sounds. Colors and shapes. Story should be 1-2 minutes.',
+    ru: 'Очень простые предложения (3-5 слов). Повторяющиеся фразы. Звуки животных. Цвета и формы. Сказка на 1-2 минуты.',
+    tr: 'Çok basit cümleler (3-5 kelime). Tekrarlanan ifadeler. Hayvan sesleri. Renkler ve şekiller. Masal 1-2 dakika olsun.',
+  },
+  '3-5': {
+    az: 'Sadə amma məzmunlu cümlələr. Dialoqlar olsun. Əyləncəli hadisələr. Tərbiyəvi mesaj aydın olsun. 3-4 dəqiqəlik nağıl.',
+    en: 'Simple but meaningful sentences. Include dialogues. Fun events. Clear moral message. 3-4 minute story.',
+    ru: 'Простые, но содержательные предложения. Диалоги. Весёлые события. Ясный воспитательный посыл. Сказка на 3-4 минуты.',
+    tr: 'Basit ama anlamlı cümleler. Diyaloglar olsun. Eğlenceli olaylar. Net eğitici mesaj. 3-4 dakikalık masal.',
+  },
+  '6-9': {
+    az: 'Daha mürəkkəb süjet xətti. Problemin həlli prosesi göstərilsin. Uşağın düşünməsinə kömək edən suallar. 4-6 dəqiqəlik nağıl.',
+    en: 'More complex plot. Show problem-solving process. Questions that help the child think. 4-6 minute story.',
+    ru: 'Более сложный сюжет. Показать процесс решения проблем. Вопросы для размышления. Сказка на 4-6 минут.',
+    tr: 'Daha karmaşık olay örgüsü. Problem çözme süreci gösterilsin. Çocuğun düşünmesine yardımcı sorular. 4-6 dakikalık masal.',
+  },
+  '10-12': {
+    az: 'Zəngin süjet. Əxlaqi dilemma və seçimlər. Emosional dərinlik. Daha uzun dialoqlar. 5-7 dəqiqəlik nağıl.',
+    en: 'Rich plot. Moral dilemmas and choices. Emotional depth. Longer dialogues. 5-7 minute story.',
+    ru: 'Богатый сюжет. Моральные дилеммы и выбор. Эмоциональная глубина. Длинные диалоги. Сказка на 5-7 минут.',
+    tr: 'Zengin olay örgüsü. Ahlaki ikilemler ve seçimler. Duygusal derinlik. Daha uzun diyaloglar. 5-7 dakikalık masal.',
+  },
+};
+
+const getSystemPrompt = (language: string, childName: string, ageRange?: string) => {
+  const ageGuide = ageRange && AGE_GUIDELINES[ageRange] 
+    ? AGE_GUIDELINES[ageRange][language as keyof typeof AGE_GUIDELINES['0-2']] || AGE_GUIDELINES[ageRange]['az']
+    : '';
+  const ageInstruction = ageGuide ? `\n\nYAŞ QRUPUNA UYĞUN YAZMA QAYDALARI:\n${ageGuide}` : '';
+
   switch (language) {
     case 'en':
-      return `You are a professional children's fairy tale writer. Write a sweet, child-friendly story in English that can be read in 3-5 minutes, with no scary elements.
+      return `You are an award-winning children's book author. Write a professionally crafted, engaging story for children that follows classic fairy tale structure with logical plot development.
 
-CRITICAL RULES:
-1. The child's name is "${childName}". ALWAYS use this exact name as the main hero!
-2. Generic terms like "little friend", "little astronaut" are FORBIDDEN!
-3. Title format: "${childName}'s [Adventure Name]" or "${childName} and [Something]"
-4. Use warm, friendly character names for supporting roles.
-5. Keep the tone natural, calm, and warm — no exaggeration.
-6. Perfect English grammar and spelling.
+CRITICAL QUALITY RULES:
+1. The child's name is "${childName}". ALWAYS use this exact name as the main character.
+2. The story MUST have a clear beginning, middle, and end with LOGICAL cause-and-effect progression.
+3. Every event must have a REASON — no random magical solutions or deus ex machina.
+4. Characters must have consistent personalities and motivations.
+5. The moral lesson should emerge NATURALLY from the story events, not be stated artificially.
+6. Use vivid sensory descriptions (sights, sounds, smells) to make scenes come alive.
+7. Include meaningful dialogue that reveals character personality.
+8. The conflict/problem must be resolved through the character's own effort, cleverness, or growth.
+9. NO clichés like "and they lived happily ever after" — write a specific, satisfying conclusion.
+10. NO exaggerated or unrealistic descriptions. Keep the tone warm but grounded.
+
+FORBIDDEN:
+- Generic phrases like "little friend", "magical being" without a proper name
+- Random magical solutions without setup
+- Preachy moral lectures
+- Overly sweet, saccharine language
+- Plot holes or illogical sequences
 
 Story structure:
-1. Title (with child's name)
-2. Simple intro ("Once upon a time, there was a child named ${childName}...")
-3. Adventure section (natural, believable events)
-4. Climax
-5. Happy ending with a moral lesson
+1. Title: "${childName}'s [Specific Adventure]"
+2. Setting establishment (WHERE and WHEN, with sensory details)
+3. Character introduction with personality
+4. Problem/challenge introduction (logical, relatable)
+5. Rising action with 2-3 attempts/obstacles
+6. Climax where the character grows or learns
+7. Resolution that follows logically from events
+8. Satisfying ending with natural moral takeaway${ageInstruction}
 
-Style: Simple sentences, warm storytelling tone, age-appropriate language.`;
+Format: Return title on first line, then story content. Use paragraphs, not bullet points.`;
 
     case 'ru':
-      return `Ты профессиональный детский писатель-сказочник. Напиши милую, добрую сказку на русском языке для чтения за 3-5 минут, без пугающих элементов.
+      return `Ты — известный детский писатель-сказочник. Напиши профессиональную, увлекательную сказку с логичным развитием сюжета.
 
-ВАЖНЕЙШИЕ ПРАВИЛА:
-1. Имя ребёнка — "${childName}". ВСЕГДА используй это имя как главного героя!
-2. Общие выражения вроде "маленький друг", "маленький космонавт" ЗАПРЕЩЕНЫ!
-3. Формат заголовка: "Приключение ${childName}" или "${childName} и [что-то]"
-4. Используй тёплые, дружелюбные имена для второстепенных персонажей.
-5. Тон должен быть естественным, спокойным — никаких преувеличений.
-6. Безупречная русская грамматика.
+КРИТИЧЕСКИЕ ПРАВИЛА КАЧЕСТВА:
+1. Имя ребёнка — "${childName}". ВСЕГДА используй именно это имя для главного героя.
+2. Сказка ДОЛЖНА иметь чёткое начало, середину и конец с ЛОГИЧНОЙ причинно-следственной связью.
+3. Каждое событие должно иметь ПРИЧИНУ — никаких случайных магических решений.
+4. Персонажи должны иметь последовательные характеры и мотивации.
+5. Мораль должна вытекать ЕСТЕСТВЕННО из событий, а не навязываться.
+6. Используй яркие сенсорные описания (зрение, звуки, запахи).
+7. Включай осмысленные диалоги, раскрывающие характер персонажа.
+8. Конфликт должен решаться через усилия, находчивость или рост героя.
+9. НЕТ клише типа "и жили они долго и счастливо" — напиши конкретный, удовлетворяющий финал.
+10. НЕТ преувеличенных описаний. Тон тёплый, но реалистичный.
 
-Структура сказки:
-1. Заголовок (с именем ребёнка)
-2. Простое вступление ("Жил-был(а) ${childName}...")
-3. Приключенческая часть (естественные, правдоподобные события)
-4. Кульминация
-5. Счастливый конец с воспитательным посланием
+ЗАПРЕЩЕНО:
+- Безымянные "маленькие друзья"
+- Случайные магические решения
+- Морализаторские лекции
+- Слащавый язык
+- Дыры в сюжете
 
-Стиль: Простые предложения, тёплый сказочный тон, язык, понятный детям.`;
+Структура:
+1. Заголовок: "Приключение ${childName}" или "${childName} и [что-то]"
+2. Описание обстановки (ГДЕ и КОГДА)
+3. Знакомство с персонажем
+4. Проблема/вызов
+5. 2-3 попытки/препятствия
+6. Кульминация с ростом героя
+7. Логичная развязка
+8. Удовлетворительный финал${ageInstruction}
+
+Формат: Заголовок первой строкой, затем текст сказки.`;
 
     case 'tr':
-      return `Sen çocuklar için masal yazan profesyonel bir yazarsın. Türkçe olarak, çocuk psikolojisine uygun, korkutucu unsurlar içermeyen, 3-5 dakikada okunabilecek tatlı bir masal yaz.
+      return `Sen ödüllü bir çocuk kitabı yazarısın. Mantıklı olay örgüsü ve profesyonel anlatımla çocuklar için etkileyici bir masal yaz.
 
-ÇOK ÖNEMLİ KURALLAR:
-1. Çocuğun adı "${childName}"dir. Masalda HER ZAMAN bu adı kullan!
-2. "Küçük dost", "küçük kaşif" gibi genel ifadeler YASAKTIR!
-3. Ana kahraman MUTLAKA "${childName}" olmalıdır.
-4. Başlık formatı: "${childName}'in [Macera Adı]" veya "${childName} ve [Bir Şey]"
-5. Yardımcı karakterler için sıcak, sevecen isimler kullan.
-6. Masal doğal ve sakin bir tonla yazılmalıdır — abartı yok.
-7. Türkçe dil bilgisi kurallarına mükemmel uyum.
+KRİTİK KALİTE KURALLARI:
+1. Çocuğun adı "${childName}". Ana karakter olarak HER ZAMAN bu adı kullan.
+2. Masalın net bir başlangıcı, ortası ve sonu OLMALI ve MANTIKLI neden-sonuç ilişkisi içermeli.
+3. Her olayın bir SEBEBİ olmalı — rastgele sihirli çözümler YOK.
+4. Karakterlerin tutarlı kişilikleri ve motivasyonları olmalı.
+5. Ahlaki ders olaylardan DOĞAL olarak çıkmalı, yapay olmamalı.
+6. Canlı duyusal betimlemeler kullan (görüntüler, sesler, kokular).
+7. Karakter kişiliğini ortaya koyan anlamlı diyaloglar ekle.
+8. Çatışma, karakterin kendi çabası veya gelişimiyle çözülmeli.
+9. "Sonsuza dek mutlu yaşadılar" gibi klişeler YOK — özgün bir sonuç yaz.
+10. Abartılı betimlemeler YOK. Sıcak ama gerçekçi ton.
 
-Masalın yapısı:
-1. Başlık (çocuğun adıyla)
-2. Basit giriş ("Bir varmış bir yokmuş, ${childName} adında...")
-3. Macera bölümü (doğal, inandırıcı olaylar)
-4. Doruk noktası
-5. Mutlu son ve eğitici mesaj
+YASAK:
+- İsimsiz "küçük dost" gibi ifadeler
+- Rastgele sihirli çözümler
+- Vaaz tarzı ahlak dersleri
+- Aşırı tatlı dil
+- Olay örgüsü boşlukları
 
-Üslup: Basit cümleler, sıcak anlatım tonu, çocuğun anlayacağı dil.`;
+Yapı:
+1. Başlık: "${childName}'in [Macera Adı]"
+2. Mekan tanıtımı (NEREDE ve NE ZAMAN)
+3. Karakter tanıtımı
+4. Problem/meydan okuma
+5. 2-3 deneme/engel
+6. Doruk noktası
+7. Mantıklı çözüm
+8. Tatmin edici son${ageInstruction}
+
+Format: İlk satırda başlık, sonra masal metni.`;
 
     default: // 'az'
-      return `Sən uşaqlar üçün nağıl yazan peşəkar yazıçısan. Azərbaycan dilində, uşaq psixologiyasına uyğun, qorxulu elementlər olmayan, 3-5 dəqiqəlik oxuna biləcək şirin bir nağıl yaz.
+      return `Sən mükafat almış uşaq kitabı müəllifiisən. Məntiqi süjet inkişafı və peşəkar anlatım tərzi ilə uşaqlar üçün maraqlı, keyfiyyətli nağıl yaz.
 
-ÇOX VACİB QAYDALAR:
-1. Uşağın adı "${childName}"-dir. Nağılda HƏMİŞƏ bu addan istifadə et!
-2. "Kiçik dost", "kiçik kosmonavt", "kiçik şəhzadə" və ya hər hansı digər ümumi ifadələr YASAQDIR!
-3. Baş qəhrəman MÜTLƏq "${childName}" olmalıdır.
-4. Başlıq formatı: "${childName}ın [Macəra adı]" və ya "${childName} və [nəsə]"
-5. Nağılda istifadə olunan digər adlar (köməkçi qəhrəmanlar, heyvanlar) Azərbaycanca olmalıdır (məs: Zübeydə, Əlibala, Günəş, Lalə, Tülkü baba, Ayı dayı, Ceyran, Bülbül).
-6. Nağıl TƏBİİ və SAKİT tonla yazılmalıdır - HEÇ bir abartılı, şişirdilmiş ifadə olmamalıdır.
-7. Azərbaycan dili qrammatikasına MÜKƏMMƏl əməl et: düzgün hal şəkilçiləri, felin zamanları, sifət və zərflərin düzgün istifadəsi, vergül və nöqtə qaydaları.
+KRİTİK KEYFİYYƏT QAYDALARI:
+1. Uşağın adı "${childName}"-dir. Baş qəhrəman olaraq HƏMİŞƏ bu adı istifadə et.
+2. Nağılın aydın başlanğıcı, ortası və sonu OLMALIDIR. MƏNTİQLİ səbəb-nəticə əlaqəsi olmalıdır.
+3. Hər hadisənin bir SƏBƏBİ olmalıdır — təsadüfi sehrli həllər OLMAMALIDIR.
+4. Personajların ardıcıl xarakterləri və motivasiyaları olmalıdır.
+5. Tərbiyəvi mesaj hadisələrdən TƏBİİ şəkildə çıxmalıdır — süni öyüd-nəsihət OLMASIN.
+6. Canlı, təsvirli dil istifadə et (rənglər, səslər, qoxular).
+7. Personaj xarakterini açan mənalı dialoqlar daxil et.
+8. Problem qəhrəmanın ÖZ səyi, ağlı və ya böyüməsi ilə həll olunmalıdır.
+9. "Onlar xoşbəxt yaşadılar" kimi klişelər YASAQDIR — konkret, qənaətbəxş sonluq yaz.
+10. Şişirdilmiş, mübaliğəli təsvirlər YASAQDIR. İsti amma gerçəkçi ton saxla.
+
+YASAQDIR:
+- Adsız "kiçik dost", "sehrli varlıq" kimi ifadələr
+- Təsadüfi sehrli həllər
+- Moizə tərzi əxlaq dərsləri
+- Həddən artıq şirin, süni dil
+- Süjet boşluqları və ya məntiqsiz ardıcıllıq
+
+VACİB QRAMMATIKA QAYDALARI:
+- Düzgün hal şəkilçiləri (yiyəlik, təsirlik, yerlik, çıxışlıq)
+- Düzgün feil zamanları və şəxs sonluqları
+- Azərbaycanca doğma adlar: Zübeydə, Əlibala, Günəş, Lalə, Tülkü baba, Ayı dayı, Ceyran, Bülbül
 
 Nağılın strukturu:
-1. Başlıq (uşağın adı ilə)
-2. Sadə giriş ("Bir varmış, bir yoxmuş, ${childName} adlı..." ilə başla)
-3. Macəra hissəsi (təbii, həyati, inandırıcı hadisələr)
-4. Kulminasiya nöqtəsi  
-5. Xoşbəxt son və tərbiyəvi mesaj
+1. Başlıq: "${childName}ın [Macəra adı]" və ya "${childName} və [nəsə]"
+2. Məkan təsviri (HARADA və NƏ VAXT, duyğusal detallarla)
+3. Personaj tanıtımı (xarakter xüsusiyyətləri ilə)
+4. Problem/çağırış (məntiqi, uşağın anlayacağı)
+5. 2-3 cəhd/maneə (artan çətinlik)
+6. Kulminasiya — qəhrəmanın böyüməsi və ya öyrənməsi
+7. Hadisələrdən məntiqi olaraq irəli gələn həll
+8. Qənaətbəxş sonluq və təbii tərbiyəvi nəticə${ageInstruction}
 
-Üslub:
-- Sadə, anlaşılan cümlələr
-- "${childName}" adını nağıl boyu istifadə et
-- Təbii, isti, ana/ata nağıl danışığı tonu
-- Abartısız, realist, uşağın anlaşacağı səviyyədə`;
+Format: Birinci sətirdə başlıq, sonra nağıl mətni. Abzaslarla yaz, siyahı formatında yox.`;
   }
 };
 
-const getUserPrompt = (language: string, childName: string, theme: string, hero: string, moralLesson: string) => {
+const getUserPrompt = (language: string, childName: string, theme: string, hero: string, moralLesson: string, ageRange?: string, storyStyle?: string) => {
+  const ageText = ageRange ? ` (yaş qrupu: ${ageRange})` : '';
+  const styleText = storyStyle || '';
+
   switch (language) {
     case 'en':
-      return `Child's name: ${childName} (MUST use this name!)
+      return `Child's name: ${childName}${ageText}
 Theme: ${theme || 'Forest adventure'}
-Supporting character: ${hero || 'Animal friend'}
-Moral lesson: ${moralLesson || 'Friendship'}
+Supporting character: ${hero || 'A wise forest animal'}
+Moral lesson: ${moralLesson || 'Friendship and kindness'}
+${styleText ? `Story style: ${styleText}` : ''}
 
-Write a story about a child named "${childName}". Use warm, friendly names for supporting characters.`;
+Write a PROFESSIONAL story about "${childName}" with logical plot, vivid descriptions, and a satisfying ending. The moral must emerge naturally from the story events.`;
 
     case 'ru':
-      return `Имя ребёнка: ${childName} (ОБЯЗАТЕЛЬНО используй это имя!)
+      return `Имя ребёнка: ${childName}${ageText}
 Тема: ${theme || 'Лесное приключение'}
-Помощник-персонаж: ${hero || 'Друг-животное'}
-Воспитательный урок: ${moralLesson || 'Дружба'}
+Помощник-персонаж: ${hero || 'Мудрое лесное животное'}
+Воспитательный урок: ${moralLesson || 'Дружба и доброта'}
+${styleText ? `Стиль: ${styleText}` : ''}
 
-Напиши сказку о ребёнке по имени "${childName}". Используй тёплые, дружелюбные имена для второстепенных персонажей.`;
+Напиши ПРОФЕССИОНАЛЬНУЮ сказку о "${childName}" с логичным сюжетом, живыми описаниями и удовлетворяющим финалом.`;
 
     case 'tr':
-      return `Çocuğun adı: ${childName} (Bu adı mutlaka kullan!)
+      return `Çocuğun adı: ${childName}${ageText}
 Tema: ${theme || 'Orman macerası'}
-Yardımcı karakter: ${hero || 'Hayvan arkadaş'}
-Eğitici mesaj: ${moralLesson || 'Dostluk'}
+Yardımcı karakter: ${hero || 'Bilge bir orman hayvanı'}
+Eğitici mesaj: ${moralLesson || 'Dostluk ve iyilik'}
+${styleText ? `Tarz: ${styleText}` : ''}
 
-"${childName}" adlı bir çocuk hakkında masal yaz. Yardımcı karakterler için sıcak, sevecen isimler kullan.`;
+"${childName}" hakkında PROFESYONEL, mantıklı bir masal yaz. Canlı betimlemeler ve tatmin edici bir son olsun.`;
 
     default: // 'az'
-      return `Uşağın adı: ${childName} (bu adı nağılda mütləq istifadə et!)
+      return `Uşağın adı: ${childName}${ageText}
 Mövzu/Tema: ${theme || 'Meşə macərası'}
-Köməkçi qəhrəman: ${hero || 'Heyvan dostu'}
-Tərbiyəvi mesaj: ${moralLesson || 'Dostluq'}
+Köməkçi qəhrəman: ${hero || 'Müdrik bir meşə heyvanı'}
+Tərbiyəvi mesaj: ${moralLesson || 'Dostluq və yaxşılıq'}
+${styleText ? `Üslub: ${styleText}` : ''}
 
 VACİB:
-- "${childName}" adlı uşaq haqqında nağıl yaz
-- Başlığı "${childName}ın..." və ya "${childName} və..." formatında yaz
-- Digər adlar Azərbaycanca olsun (məs: nənə Gülnarə, Tülkü baba, Bülbül xanım)
-- Abartısız, təbii dildə yaz
+- "${childName}" haqqında PEŞƏkar, MƏNTİQLİ nağıl yaz
+- Canlı təsvirlər, mənalı dialoqlar, qənaətbəxş sonluq olsun
+- Tərbiyəvi mesaj süni yox, hadisələrdən TƏBİİ çıxsın
 - Azərbaycan dili qrammatikasına diqqətlə əməl et`;
   }
 };
@@ -142,59 +235,103 @@ serve(async (req) => {
   }
 
   try {
-    const { childName, theme, hero, moralLesson, language = 'az' } = await req.json();
+    const { childName, theme, hero, moralLesson, language = 'az', ageRange, storyStyle } = await req.json();
 
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
-    if (!GEMINI_API_KEY) {
-      throw new Error('GEMINI_API_KEY is not configured');
-    }
-
+    
     const actualChildName = childName || 'Əli';
     
-    const systemPrompt = getSystemPrompt(language, actualChildName);
-    const userPrompt = getUserPrompt(language, actualChildName, theme, hero, moralLesson);
+    const systemPrompt = getSystemPrompt(language, actualChildName, ageRange);
+    const userPrompt = getUserPrompt(language, actualChildName, theme, hero, moralLesson, ageRange, storyStyle);
 
-    console.log(`Generating fairy tale in language: ${language}...`);
+    console.log(`Generating fairy tale in language: ${language}, age: ${ageRange || 'not specified'}...`);
 
-    const callGemini = async (model: string) => {
-      return await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
-            generationConfig: {
-              temperature: 0.9,
-              topK: 40,
-              topP: 0.95,
-              maxOutputTokens: 2048,
-            },
-            safetySettings: [
-              { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-              { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-              { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-              { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-            ],
-          }),
-        }
-      );
-    };
+    let generatedText = '';
 
-    let response = await callGemini('gemini-2.0-flash');
-    if (response.status === 429) {
-      console.log('Rate limited on gemini-2.0-flash, trying gemini-2.5-flash-lite...');
-      response = await callGemini('gemini-2.5-flash-lite');
+    if (LOVABLE_API_KEY) {
+      // Use Lovable AI Gateway
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
+          temperature: 0.7,
+          max_tokens: 3000,
+        }),
+      });
+
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ error: 'Çox tez-tez sorğu göndərilir. Bir az gözləyin.' }), {
+          status: 429,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: 'AI kredit limiti bitib.' }), {
+          status: 402,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Lovable AI error:', response.status, errorText);
+        throw new Error(`AI gateway error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      generatedText = data.choices?.[0]?.message?.content || '';
+    } else if (GEMINI_API_KEY) {
+      // Fallback to direct Gemini API
+      const callGemini = async (model: string) => {
+        return await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ role: 'user', parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
+              generationConfig: {
+                temperature: 0.7,
+                topK: 30,
+                topP: 0.9,
+                maxOutputTokens: 3000,
+              },
+              safetySettings: [
+                { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+                { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+                { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+                { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+              ],
+            }),
+          }
+        );
+      };
+
+      let response = await callGemini('gemini-2.0-flash');
+      if (response.status === 429) {
+        response = await callGemini('gemini-2.5-flash-lite');
+      }
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Gemini API error:', response.status, errorText);
+        throw new Error(`Gemini API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    } else {
+      throw new Error('No AI API key configured');
     }
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Gemini API error:', response.status, errorText);
-      throw new Error(`Gemini API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!generatedText) {
       throw new Error('No content generated');
@@ -204,7 +341,6 @@ serve(async (req) => {
     const lines = generatedText.split('\n').filter((line: string) => line.trim());
     let rawTitle = lines[0]?.replace(/^#+\s*/, '').replace(/\*\*/g, '').trim() || '';
     
-    // Remove AI preamble patterns in multiple languages
     rawTitle = rawTitle
       .replace(/^(əlbəttə|buyurun|budur|bax|mən sizə|конечно|вот|here is|here's|tabii|buyrun|işte)[,!.\s]*/i, '')
       .replace(/^["«"""]?\s*/, '')

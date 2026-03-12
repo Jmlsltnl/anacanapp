@@ -79,6 +79,8 @@ export const useGenerateFairyTale = () => {
       hero?: string;
       moral_lesson?: string;
       language?: string;
+      age_range?: string;
+      story_style?: string;
     }) => {
       if (!user?.id) throw new Error('User not authenticated');
 
@@ -96,6 +98,8 @@ export const useGenerateFairyTale = () => {
             hero: params.hero,
             moralLesson: params.moral_lesson,
             language: params.language || 'az',
+            ageRange: params.age_range,
+            storyStyle: params.story_style,
           }),
         }
       );
