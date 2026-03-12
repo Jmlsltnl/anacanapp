@@ -131,7 +131,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const syncProfileToStore = useCallback(
-    (profileData: Profile | null) => {
+    (profileData: Profile | null, userId?: string) => {
       if (!profileData) {
         setOnboarded(false);
         return;
@@ -161,6 +161,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setOnboarded(true);
       } else {
         setOnboarded(false);
+      }
+
+      // Set analytics user properties for GA + internal tracking
+      if (userId) {
+        import('@/lib/analytics').then(m => {
+          m.analytics.setUserId(userId);
+          m.analytics.setUserProperties({
+            life_stage: profileData.life_stage || 'unknown',
+            is_premium: String(profileData.is_premium || false),
+            role: profileData.life_stage === 'partner' ? 'partner' : 'woman',
+          });
+        }).catch(() => {});
       }
     },
     [setOnboarded, setPartnerCode, setLastPeriodDate, setCycleLength, setPeriodLength, setDueDate, setBabyData, setRole, setLifeStage, setLinkedPartnerId]
