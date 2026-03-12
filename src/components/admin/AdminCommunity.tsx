@@ -518,6 +518,13 @@ const AdminCommunity = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AdminUsageStats 
+        eventNames={['community_post_created', 'community_post_liked']}
+        title="👥 İcma İstifadə Statistikası"
+        showEventData
+        showUsers
+      />
     </div>
   );
 };
