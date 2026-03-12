@@ -279,7 +279,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error;
       const newProfile = data as Profile;
       setProfile(newProfile);
-      syncProfileToStore(newProfile);
+      syncProfileToStore(newProfile, user?.id);
       return { data: newProfile, error: null };
     } catch (error) {
       console.error('Error updating profile:', error);
