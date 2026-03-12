@@ -250,15 +250,19 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     }
 
     if (tool.isLocked && !isPremium) {
+      import('@/lib/analytics').then(m => m.analytics.logPaywallShown(tool.id)).catch(() => {});
       setShowPremiumModal(true);
       return;
     }
 
     if (tool.isPremium && !isPremium) {
+      import('@/lib/analytics').then(m => m.analytics.logPaywallShown(tool.id)).catch(() => {});
       setShowPremiumModal(true);
       return;
     }
 
+    // Track tool opened
+    import('@/lib/analytics').then(m => m.analytics.logToolOpened(tool.id, tool.name)).catch(() => {});
     openTool(tool.id);
   };
 

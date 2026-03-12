@@ -191,6 +191,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
+      // Analytics tracking
+      import('@/lib/analytics').then(m => m.analytics.logLogin('email')).catch(() => {});
       return { data, error: null };
     } catch (error) {
       console.error('Sign in error:', error);
