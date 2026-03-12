@@ -77,14 +77,22 @@ const Index = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   // Reset scroll to top when tab or screen changes
+  // Screen name mapping for clean GA reports
+  const SCREEN_NAME_MAP: Record<string, string> = {
+    home: 'Dashboard', tools: 'ToolsHub', ai: 'AIChat', shop: 'Shop', 
+    cakes: 'Cakes', profile: 'Profile', community: 'Community',
+  };
+
   useEffect(() => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     }
-    // Track screen/tab views
-    const screenName = activeScreen || activeTool || activeTab;
+    // Track screen/tab views with proper naming
+    const rawName = activeScreen || activeTool || activeTab;
+    const screenName = SCREEN_NAME_MAP[rawName || ''] || rawName;
+    const screenClass = activeScreen ? 'Screen' : activeTool ? 'Tools' : 'Tab';
     if (screenName && isAuthenticated) {
-      import('@/lib/analytics').then(m => m.analytics.logScreenView(screenName)).catch(() => {});
+      import('@/lib/analytics').then(m => m.analytics.logScreenView(screenName, screenClass)).catch(() => {});
     }
   }, [activeTab, activeScreen, activeTool, isAuthenticated]);
   
