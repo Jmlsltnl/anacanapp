@@ -276,17 +276,26 @@ serve(async (req) => {
       );
     };
 
-    // Try Gemini 2.5 Pro first, fallback to Flash on rate limit
-    let response = await callGemini('gemini-2.5-pro');
-    if (response.status === 429) {
-      console.log('Gemini Pro rate limited, falling back to Flash...');
-      response = await callGemini('gemini-2.5-flash');
+    // Try models in order with fallback on rate limit (429) or unavailable (503)
+    const models = ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.0-flash'];
+    let response: Response | null = null;
+    
+    for (const model of models) {
+      console.log(`Trying model: ${model}...`);
+      response = await callGemini(model);
+      
+      if (response.status === 429 || response.status === 503) {
+        console.log(`${model} unavailable (${response.status}), trying next...`);
+        await response.text(); // consume body
+        continue;
+      }
+      break;
     }
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Gemini API error:', response.status, errorText);
-      throw new Error(`Gemini API error: ${response.status}`);
+    if (!response || !response.ok) {
+      const errorText = response ? await response.text() : 'All models unavailable';
+      console.error('Gemini API error:', response?.status, errorText);
+      throw new Error(`Gemini API error: ${response?.status || 'unavailable'}`);
     }
 
     const data = await response.json();
