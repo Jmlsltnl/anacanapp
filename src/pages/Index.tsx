@@ -84,9 +84,20 @@ const Index = () => {
   };
 
   useEffect(() => {
+    // Scroll window to top on every navigation change
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+    
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     }
+    
+    // Also reset any overflow containers
+    document.querySelectorAll('.overflow-y-auto, .overflow-auto').forEach((el) => {
+      if (el instanceof HTMLElement) {
+        el.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+      }
+    });
+    
     // Track screen/tab views with proper naming
     const rawName = activeScreen || activeTool || activeTab;
     const screenName = SCREEN_NAME_MAP[rawName || ''] || rawName;
