@@ -84,17 +84,17 @@ const Index = () => {
   };
 
   useEffect(() => {
-    // Scroll window to top on every navigation change
-    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
-    
+    // The app uses fixed inset-0 layout, so window doesn't scroll.
+    // The actual scrollable element is scrollContainerRef.
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+      scrollContainerRef.current.scrollTop = 0;
     }
     
-    // Also reset any overflow containers
-    document.querySelectorAll('.overflow-y-auto, .overflow-auto').forEach((el) => {
+    // Also reset window and any nested scroll containers
+    window.scrollTo(0, 0);
+    document.querySelectorAll('[data-scroll-container], .overflow-y-auto, .overflow-auto').forEach((el) => {
       if (el instanceof HTMLElement) {
-        el.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+        el.scrollTop = 0;
       }
     });
     
