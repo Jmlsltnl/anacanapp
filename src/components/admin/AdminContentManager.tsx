@@ -251,15 +251,40 @@ const AdminContentManager = () => {
 
     setNamesImporting(true);
     try {
+      // Fetch existing names to filter duplicates
+      const { data: existingNames } = await supabase
+        .from('baby_names_db')
+        .select('name, gender');
+
+      const existingSet = new Set(
+        (existingNames || []).map((n: any) => `${n.name.toLowerCase()}|${n.gender}`)
+      );
+
+      const newNames = namesImportData.filter(
+        (n: any) => !existingSet.has(`${n.name.toLowerCase()}|${n.gender}`)
+      );
+
+      const duplicateCount = namesImportData.length - newNames.length;
+
+      if (newNames.length === 0) {
+        toast({
+          title: 'Məlumat',
+          description: `Bütün ${namesImportData.length} ad artıq mövcuddur`,
+        });
+        setShowNamesImport(false);
+        setNamesImportData([]);
+        return;
+      }
+
       const { error } = await supabase
         .from('baby_names_db')
-        .insert(namesImportData);
+        .insert(newNames);
 
       if (error) throw error;
 
       toast({ 
         title: 'Uğurlu!', 
-        description: `${namesImportData.length} ad əlavə edildi` 
+        description: `${newNames.length} yeni ad əlavə edildi${duplicateCount > 0 ? `, ${duplicateCount} təkrar ad keçildi` : ''}` 
       });
       setShowNamesImport(false);
       setNamesImportData([]);
