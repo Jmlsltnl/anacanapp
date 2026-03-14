@@ -322,11 +322,13 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
               </p>
             </div>
 
-        {/* Media Carousel */}
-        {mediaItems.length > 0 && (
-          <div className="px-3 pb-2">
-            <MediaCarousel media={mediaItems} />
-          </div>
+            {/* Media Carousel */}
+            {mediaItems.length > 0 && (
+              <div className="px-3 pb-2">
+                <MediaCarousel media={mediaItems} />
+              </div>
+            )}
+          </>
         )}
 
         {/* Stats */}
