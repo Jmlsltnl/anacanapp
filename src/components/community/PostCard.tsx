@@ -68,17 +68,21 @@ const UserBadge = ({ type }: { type: 'admin' | 'premium' | 'moderator' | null })
 const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
-  
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [reportReason, setReportReason] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(post.content);
   const { isAdmin, user, profile } = useAuth();
   const { toast } = useToast();
 
   const toggleLike = useToggleLike();
   const { data: comments = [], isLoading: commentsLoading, refetch: refetchComments } = usePostComments(post.id);
   const createComment = useCreateComment();
+  const editPost = useEditPost();
+  const deletePost = useDeletePost();
 
   const isOwnPost = user?.id === post.user_id;
+  const isAnonymous = (post as any).is_anonymous === true;
 
   const handleLike = () => {
     hapticFeedback.light();
@@ -99,19 +103,19 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
     setCommentText('');
   };
 
-  const handleDeletePost = async () => {
+  const handleDeletePost = () => {
     if (!confirm('Bu postu silmək istəyirsiniz?')) return;
-    
-    const { error } = await supabase
-      .from('community_posts')
-      .delete()
-      .eq('id', post.id);
+    hapticFeedback.medium();
+    deletePost.mutate(post.id);
+  };
 
-    if (error) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
-    } else {
-      toast({ title: 'Uğurlu', description: 'Post silindi' });
-    }
+  const handleEditPost = () => {
+    const content = editContent.trim();
+    if (!content) return;
+    hapticFeedback.light();
+    editPost.mutate({ postId: post.id, content }, {
+      onSuccess: () => setIsEditing(false),
+    });
   };
 
   const handleReportPost = async () => {
