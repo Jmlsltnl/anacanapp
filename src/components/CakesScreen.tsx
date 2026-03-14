@@ -14,9 +14,17 @@ interface CakesScreenProps {
   initialMonth?: number;
 }
 
+const getOrdinalSuffix = (n: number): string => {
+  const suffixes: Record<number, string> = {
+    1: 'ci', 2: 'ci', 3: 'cü', 4: 'cü', 5: 'ci', 6: 'cı',
+    7: 'ci', 8: 'ci', 9: 'cu', 10: 'cu', 11: 'ci', 12: 'ci',
+  };
+  return suffixes[n] || 'ci';
+};
+
 const MONTHS = Array.from({ length: 12 }, (_, i) => ({
   id: i + 1,
-  label: `${i + 1}-ci ay`,
+  label: `${i + 1}-${getOrdinalSuffix(i + 1)} ay`,
   emoji: ['🎂', '🧁', '🎀', '🌸', '⭐', '🎈', '🌈', '🎪', '🎠', '🎡', '🎆', '🎊'][i],
 }));
 
