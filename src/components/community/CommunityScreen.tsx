@@ -18,20 +18,20 @@ interface CommunityScreenProps {
 }
 
 const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBack }, ref) => {
-  useScrollToTop();
-  useScreenAnalytics('Community', 'Social');
-  
-  const { lifeStage } = useUserStore();
-  const headerKey = `community_header_${lifeStage || 'mommy'}`;
-  const dynamicHeader = useAppSetting(headerKey);
-  const defaultHeader = 'Digər analar ilə əlaqədə olun';
-  const headerText = typeof dynamicHeader === 'string' ? dynamicHeader : defaultHeader;
-
   const [activeTab, setActiveTab] = useState<'feed' | 'groups' | 'my-groups'>('feed');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
+  useScrollToTop([activeTab, selectedGroupId, selectedUserId]);
+  useScreenAnalytics('Community', 'Social');
+
+  const { lifeStage } = useUserStore();
+  const headerKey = `community_header_${lifeStage || 'mommy'}`;
+  const dynamicHeader = useAppSetting(headerKey);
+  const defaultHeader = 'Digər analar ilə əlaqədə olun';
+  const headerText = typeof dynamicHeader === 'string' ? dynamicHeader : defaultHeader;
 
   const { data: groups = [], isLoading: groupsLoading } = useCommunityGroups();
   const { data: memberships = [] } = useUserMemberships();

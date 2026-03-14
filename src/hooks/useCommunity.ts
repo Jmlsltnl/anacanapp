@@ -303,7 +303,19 @@ export const useCreateComment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ postId, content }: { postId: string; content: string }) => {
+    mutationFn: async ({
+      postId,
+      content,
+      parentCommentId,
+      postAuthorId,
+      commenterName,
+    }: {
+      postId: string;
+      content: string;
+      parentCommentId?: string | null;
+      postAuthorId?: string;
+      commenterName?: string;
+    }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
@@ -312,10 +324,29 @@ export const useCreateComment = () => {
         .insert({
           post_id: postId,
           user_id: user.id,
+          parent_comment_id: parentCommentId ?? null,
           content,
         });
 
       if (error) throw error;
+
+      if (postAuthorId && postAuthorId !== user.id) {
+        const preview = content.length > 50 ? `${content.slice(0, 50)}...` : content;
+        const senderName = commenterName?.trim() || 'İstifadəçi';
+
+        const { error: pushError } = await supabase.functions.invoke('send-push-notification', {
+          body: {
+            userId: postAuthorId,
+            title: 'Yeni şərh! 💬',
+            body: `${senderName}: ${preview}`,
+            data: { type: 'comment', postId },
+          },
+        });
+
+        if (pushError) {
+          console.error('Error sending comment notification:', pushError);
+        }
+      }
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['post-comments', variables.postId] });
