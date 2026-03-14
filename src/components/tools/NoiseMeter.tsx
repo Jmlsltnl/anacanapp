@@ -306,9 +306,9 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="w-6 h-6 text-orange-500 shrink-0" />
                   <div className="flex-1">
-                    <h3 className="font-semibold text-orange-600">Mühit gürültülüdür</h3>
+                    <h3 className="font-semibold text-orange-600">Səs səviyyəsi yüksəkdir</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Bu səviyyə dərin yuxu üçün çox gürültülüdür. Ağ səs açım?
+                      Bu səviyyə dərin yuxu üçün çox yüksəkdir. Ağ səs açım?
                     </p>
                     <div className="flex gap-2 mt-3">
                       <Button 
