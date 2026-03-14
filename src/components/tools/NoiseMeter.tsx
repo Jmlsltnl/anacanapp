@@ -177,8 +177,8 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
     if (db < NOISE_THRESHOLDS.ideal) return { label: 'Mükəmməl', color: 'text-green-500', bg: 'bg-green-500' };
     if (db < NOISE_THRESHOLDS.acceptable) return { label: 'Yaxşı', color: 'text-emerald-500', bg: 'bg-emerald-500' };
     if (db < NOISE_THRESHOLDS.warning) return { label: 'Qəbulolunandır', color: 'text-yellow-500', bg: 'bg-yellow-500' };
-    if (db < NOISE_THRESHOLDS.danger) return { label: 'Gürültülü', color: 'text-orange-500', bg: 'bg-orange-500' };
-    return { label: 'Çox gürültülü!', color: 'text-red-500', bg: 'bg-red-500' };
+    if (db < NOISE_THRESHOLDS.danger) return { label: 'Yüksək', color: 'text-orange-500', bg: 'bg-orange-500' };
+    return { label: 'Çox yüksək!', color: 'text-red-500', bg: 'bg-red-500' };
   };
 
   const noiseLevel = getNoiseLevel(currentDb);
@@ -306,9 +306,9 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="w-6 h-6 text-orange-500 shrink-0" />
                   <div className="flex-1">
-                    <h3 className="font-semibold text-orange-600">Mühit gürültülüdür</h3>
+                    <h3 className="font-semibold text-orange-600">Səs səviyyəsi yüksəkdir</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Bu səviyyə dərin yuxu üçün çox gürültülüdür. Ağ səs açım?
+                      Bu səviyyə dərin yuxu üçün çox yüksəkdir. Ağ səs açım?
                     </p>
                     <div className="flex gap-2 mt-3">
                       <Button 
@@ -360,12 +360,12 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
               <div className="flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full bg-orange-500" />
                 <span className="text-sm flex-1">60-70 dB</span>
-                <span className="text-xs text-muted-foreground">Gürültülü</span>
+                <span className="text-xs text-muted-foreground">Yüksək</span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full bg-red-500" />
                 <span className="text-sm flex-1">70+ dB</span>
-                <span className="text-xs text-muted-foreground">Çox gürültülü</span>
+                <span className="text-xs text-muted-foreground">Çox yüksək</span>
               </div>
             </div>
           </CardContent>
