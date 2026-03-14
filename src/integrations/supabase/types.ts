@@ -1763,6 +1763,7 @@ export type Database = {
           group_id: string | null
           id: string
           is_active: boolean | null
+          is_anonymous: boolean
           is_pinned: boolean | null
           likes_count: number | null
           media_urls: string[] | null
@@ -1776,6 +1777,7 @@ export type Database = {
           group_id?: string | null
           id?: string
           is_active?: boolean | null
+          is_anonymous?: boolean
           is_pinned?: boolean | null
           likes_count?: number | null
           media_urls?: string[] | null
@@ -1789,6 +1791,7 @@ export type Database = {
           group_id?: string | null
           id?: string
           is_active?: boolean | null
+          is_anonymous?: boolean
           is_pinned?: boolean | null
           likes_count?: number | null
           media_urls?: string[] | null
