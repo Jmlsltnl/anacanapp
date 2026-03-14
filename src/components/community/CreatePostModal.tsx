@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Image, Video, Send, Loader2, Play, Smile, Hash, AtSign } from 'lucide-react';
+import { X, Image, Video, Send, Loader2, Play, Smile, Hash, AtSign, EyeOff } from 'lucide-react';
 import EmojiPicker, { EmojiClickData, Theme } from 'emoji-picker-react';
 import { CommunityGroup, useCreatePost } from '@/hooks/useCommunity';
 import { Button } from '@/components/ui/button';
