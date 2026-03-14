@@ -287,6 +287,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
     setMediaPreviews([]);
     setShowEmojiPicker(false);
     setShowSuggestions(false);
+    setIsAnonymous(false);
     onClose();
   };
 
