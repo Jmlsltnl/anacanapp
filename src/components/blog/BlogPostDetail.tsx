@@ -246,9 +246,9 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
             e.stopPropagation();
             onBack();
           }}
-          className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center safe-area-top cursor-pointer"
+          className="absolute left-4 z-50 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center cursor-pointer"
+          style={{ top: 'calc(env(safe-area-inset-top, 12px) + 12px)' }}
           whileTap={{ scale: 0.95 }}
-          style={{ pointerEvents: 'auto' }}
         >
           <ArrowLeft className="w-5 h-5 text-white" />
         </motion.button>
