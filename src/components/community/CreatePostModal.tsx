@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Image, Video, Send, Loader2, Play, Smile, Hash, AtSign } from 'lucide-react';
+import { X, Image, Video, Send, Loader2, Play, Smile, Hash, AtSign, EyeOff } from 'lucide-react';
 import EmojiPicker, { EmojiClickData, Theme } from 'emoji-picker-react';
 import { CommunityGroup, useCreatePost } from '@/hooks/useCommunity';
 import { Button } from '@/components/ui/button';
@@ -40,6 +40,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
   const [mediaPreviews, setMediaPreviews] = useState<{ url: string; type: 'image' | 'video' }[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState(false);
   
   // Autocomplete state
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -253,6 +254,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
         groupId: selectedGroupId,
         content: content.trim() || '📷',
         mediaUrls,
+        isAnonymous,
       });
 
       mediaPreviews.forEach(p => URL.revokeObjectURL(p.url));
@@ -285,6 +287,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
     setMediaPreviews([]);
     setShowEmojiPicker(false);
     setShowSuggestions(false);
+    setIsAnonymous(false);
     onClose();
   };
 
@@ -479,6 +482,34 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
               {mediaFiles.length}/4 media əlavə edildi
             </p>
           )}
+
+          {/* Anonymous Toggle */}
+          <button
+            type="button"
+            onClick={() => setIsAnonymous(!isAnonymous)}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+              isAnonymous 
+                ? 'bg-primary/10 border border-primary/30' 
+                : 'bg-muted/50 border border-border hover:bg-muted'
+            }`}
+          >
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+              isAnonymous ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+            }`}>
+              <EyeOff className="w-4 h-4" />
+            </div>
+            <div className="flex-1 text-left">
+              <p className={`text-sm font-semibold ${isAnonymous ? 'text-primary' : 'text-foreground'}`}>
+                Anonim paylaş
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                Adınız və şəkliniz gizlədilir
+              </p>
+            </div>
+            <div className={`w-10 h-6 rounded-full transition-colors ${isAnonymous ? 'bg-primary' : 'bg-border'}`}>
+              <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform mt-0.5 ${isAnonymous ? 'translate-x-4.5 ml-[18px]' : 'translate-x-0.5 ml-0.5'}`} />
+            </div>
+          </button>
 
           {/* Submit Button */}
           <Button

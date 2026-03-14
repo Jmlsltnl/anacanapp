@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, MessageCircle, Share2, MoreHorizontal, ChevronDown, ChevronUp, Send, Trash2, Crown, Shield, Flag } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal, ChevronDown, ChevronUp, Send, Trash2, Crown, Shield, Flag, Pencil, EyeOff } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { az } from 'date-fns/locale';
-import { CommunityPost, useToggleLike, usePostComments, useCreateComment } from '@/hooks/useCommunity';
+import { CommunityPost, useToggleLike, usePostComments, useCreateComment, useEditPost, useDeletePost } from '@/hooks/useCommunity';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { hapticFeedback, nativeShare } from '@/lib/native';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -67,17 +68,21 @@ const UserBadge = ({ type }: { type: 'admin' | 'premium' | 'moderator' | null })
 const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
-  
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [reportReason, setReportReason] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(post.content);
   const { isAdmin, user, profile } = useAuth();
   const { toast } = useToast();
 
   const toggleLike = useToggleLike();
   const { data: comments = [], isLoading: commentsLoading, refetch: refetchComments } = usePostComments(post.id);
   const createComment = useCreateComment();
+  const editPost = useEditPost();
+  const deletePost = useDeletePost();
 
   const isOwnPost = user?.id === post.user_id;
+  const isAnonymous = (post as any).is_anonymous === true;
 
   const handleLike = () => {
     hapticFeedback.light();
@@ -98,19 +103,19 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
     setCommentText('');
   };
 
-  const handleDeletePost = async () => {
+  const handleDeletePost = () => {
     if (!confirm('Bu postu silmək istəyirsiniz?')) return;
-    
-    const { error } = await supabase
-      .from('community_posts')
-      .delete()
-      .eq('id', post.id);
+    hapticFeedback.medium();
+    deletePost.mutate(post.id);
+  };
 
-    if (error) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
-    } else {
-      toast({ title: 'Uğurlu', description: 'Post silindi' });
-    }
+  const handleEditPost = () => {
+    const content = editContent.trim();
+    if (!content) return;
+    hapticFeedback.light();
+    editPost.mutate({ postId: post.id, content }, {
+      onSuccess: () => setIsEditing(false),
+    });
   };
 
   const handleReportPost = async () => {
@@ -194,7 +199,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   const authorBadge = post.author?.badge_type as 'admin' | 'premium' | 'moderator' | null;
 
   const handleAvatarClick = () => {
-    if (post.user_id && onUserClick) {
+    if (post.user_id && onUserClick && !isAnonymous) {
       onUserClick(post.user_id);
     }
   };
@@ -211,24 +216,39 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
       >
         {/* Header */}
         <div className="p-3 flex items-center gap-2">
-          <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.95 }}>
-            <Avatar className="w-9 h-9 cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all">
-              <AvatarImage src={post.author?.avatar_url || undefined} />
-              <AvatarFallback className="bg-primary/10 text-primary font-bold text-sm">
-                {post.author?.name?.charAt(0) || 'İ'}
-              </AvatarFallback>
+          <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.95 }} disabled={isAnonymous}>
+            <Avatar className={`w-9 h-9 ${isAnonymous ? '' : 'cursor-pointer hover:ring-2 hover:ring-primary/50'} transition-all`}>
+              {isAnonymous ? (
+                <AvatarFallback className="bg-muted text-muted-foreground">
+                  <EyeOff className="w-4 h-4" />
+                </AvatarFallback>
+              ) : (
+                <>
+                  <AvatarImage src={post.author?.avatar_url || undefined} />
+                  <AvatarFallback className="bg-primary/10 text-primary font-bold text-sm">
+                    {post.author?.name?.charAt(0) || 'İ'}
+                  </AvatarFallback>
+                </>
+              )}
             </Avatar>
           </motion.button>
           <div className="flex-1">
             <div className="flex items-center gap-1.5">
               <motion.button 
                 onClick={handleAvatarClick}
-                className="font-bold text-foreground text-xs hover:text-primary transition-colors"
+                className={`font-bold text-xs ${isAnonymous ? 'text-muted-foreground italic' : 'text-foreground hover:text-primary'} transition-colors`}
                 whileTap={{ scale: 0.98 }}
+                disabled={isAnonymous}
               >
-                {post.author?.name || 'İstifadəçi'}
+                {isAnonymous ? 'Anonim' : (post.author?.name || 'İstifadəçi')}
               </motion.button>
-              <UserBadge type={authorBadge} />
+              {!isAnonymous && <UserBadge type={authorBadge} />}
+              {isAnonymous && (
+                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-muted text-muted-foreground">
+                  <EyeOff className="w-2.5 h-2.5" />
+                  Anonim
+                </span>
+              )}
             </div>
             <p className="text-[10px] text-muted-foreground">{timeAgo}</p>
           </div>
@@ -239,13 +259,19 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-popover border-border z-50">
+              {isOwnPost && (
+                <DropdownMenuItem onClick={() => { setEditContent(post.content); setIsEditing(true); }} className="text-foreground text-xs">
+                  <Pencil className="w-3.5 h-3.5 mr-1.5" />
+                  Redaktə et
+                </DropdownMenuItem>
+              )}
               {!isOwnPost && (
                 <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-amber-600 text-xs">
                   <Flag className="w-3.5 h-3.5 mr-1.5" />
                   Şikayət et
                 </DropdownMenuItem>
               )}
-              {(isAdmin || isOwnPost) && !isOwnPost && <DropdownMenuSeparator />}
+              {(isAdmin || isOwnPost) && <DropdownMenuSeparator />}
               {(isAdmin || isOwnPost) && (
                 <DropdownMenuItem onClick={handleDeletePost} className="text-red-600 text-xs">
                   <Trash2 className="w-3.5 h-3.5 mr-1.5" />
@@ -256,33 +282,53 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
           </DropdownMenu>
         </div>
 
-        {/* Content with styled hashtags and mentions */}
-        <div className="px-3 pb-2">
-          <p className="text-foreground whitespace-pre-wrap text-sm">
-            {post.content.split(/(\s+)/).map((word, index) => {
-              if (word.startsWith('#')) {
-                return (
-                  <span key={index} className="text-primary font-medium cursor-pointer hover:underline">
-                    {word}
-                  </span>
-                );
-              } else if (word.startsWith('@')) {
-                return (
-                  <span key={index} className="text-blue-500 font-medium cursor-pointer hover:underline">
-                    {word}
-                  </span>
-                );
-              }
-              return word;
-            })}
-          </p>
-        </div>
-
-        {/* Media Carousel */}
-        {mediaItems.length > 0 && (
-          <div className="px-3 pb-2">
-            <MediaCarousel media={mediaItems} />
+        {/* Edit Mode or Content */}
+        {isEditing ? (
+          <div className="px-3 pb-3 space-y-2">
+            <Textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              className="min-h-[80px] rounded-xl resize-none text-sm"
+              autoFocus
+            />
+            <div className="flex gap-2 justify-end">
+              <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)}>Ləğv et</Button>
+              <Button size="sm" onClick={handleEditPost} disabled={!editContent.trim() || editPost.isPending} className="gradient-primary">
+                {editPost.isPending ? 'Saxlanılır...' : 'Yadda saxla'}
+              </Button>
+            </div>
           </div>
+        ) : (
+          <>
+            {/* Content with styled hashtags and mentions */}
+            <div className="px-3 pb-2">
+              <p className="text-foreground whitespace-pre-wrap text-sm">
+                {post.content.split(/(\s+)/).map((word, index) => {
+                  if (word.startsWith('#')) {
+                    return (
+                      <span key={index} className="text-primary font-medium cursor-pointer hover:underline">
+                        {word}
+                      </span>
+                    );
+                  } else if (word.startsWith('@')) {
+                    return (
+                      <span key={index} className="text-blue-500 font-medium cursor-pointer hover:underline">
+                        {word}
+                      </span>
+                    );
+                  }
+                  return word;
+                })}
+              </p>
+            </div>
+
+            {/* Media Carousel */}
+            {mediaItems.length > 0 && (
+              <div className="px-3 pb-2">
+                <MediaCarousel media={mediaItems} />
+              </div>
+            )}
+          </>
         )}
 
         {/* Stats */}
