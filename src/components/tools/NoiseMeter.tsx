@@ -360,12 +360,12 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
               <div className="flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full bg-orange-500" />
                 <span className="text-sm flex-1">60-70 dB</span>
-                <span className="text-xs text-muted-foreground">Gürültülü</span>
+                <span className="text-xs text-muted-foreground">Yüksək</span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full bg-red-500" />
                 <span className="text-sm flex-1">70+ dB</span>
-                <span className="text-xs text-muted-foreground">Çox gürültülü</span>
+                <span className="text-xs text-muted-foreground">Çox yüksək</span>
               </div>
             </div>
           </CardContent>
