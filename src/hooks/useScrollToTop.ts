@@ -1,22 +1,26 @@
-import { useEffect } from 'react';
+import { DependencyList, useLayoutEffect } from 'react';
+import { resetAppScrollPosition } from '@/lib/scroll';
 
 /**
- * Hook that scrolls to top when component mounts.
- * Used to ensure consistent scroll position on navigation.
+ * Hook that scrolls to top on mount or when provided dependencies change.
  */
-export const useScrollToTop = () => {
-  useEffect(() => {
-    // Scroll window to top
-    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
-    
-    // Also find and scroll any overflow containers to top
-    const scrollContainers = document.querySelectorAll('[data-scroll-container], .overflow-y-auto, .overflow-auto');
-    scrollContainers.forEach((container) => {
-      if (container instanceof HTMLElement) {
-        container.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
-      }
+export const useScrollToTop = (deps: DependencyList = []) => {
+  useLayoutEffect(() => {
+    resetAppScrollPosition();
+
+    const rafId = requestAnimationFrame(() => {
+      resetAppScrollPosition();
     });
-  }, []);
+
+    const timeoutId = window.setTimeout(() => {
+      resetAppScrollPosition();
+    }, 60);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.clearTimeout(timeoutId);
+    };
+  }, deps);
 };
 
 export default useScrollToTop;

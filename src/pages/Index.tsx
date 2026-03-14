@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SplashScreen from '@/components/SplashScreen';
 import logoImage from '@/assets/logo.png';
@@ -12,6 +12,7 @@ import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useDeviceToken } from '@/hooks/useDeviceToken';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
+import { resetAppScrollPosition } from '@/lib/scroll';
 
 // Lazy load heavy screens
 const Dashboard = lazy(() => import('@/components/Dashboard'));
@@ -83,21 +84,34 @@ const Index = () => {
     cakes: 'Cakes', profile: 'Profile', community: 'Community',
   };
 
-  useEffect(() => {
-    // The app uses fixed inset-0 layout, so window doesn't scroll.
-    // The actual scrollable element is scrollContainerRef.
+  useLayoutEffect(() => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop = 0;
     }
-    
-    // Also reset window and any nested scroll containers
-    window.scrollTo(0, 0);
-    document.querySelectorAll('[data-scroll-container], .overflow-y-auto, .overflow-auto').forEach((el) => {
-      if (el instanceof HTMLElement) {
-        el.scrollTop = 0;
+
+    resetAppScrollPosition();
+
+    const rafId = requestAnimationFrame(() => {
+      resetAppScrollPosition();
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTop = 0;
       }
     });
-    
+
+    const timeoutId = window.setTimeout(() => {
+      resetAppScrollPosition();
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTop = 0;
+      }
+    }, 80);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.clearTimeout(timeoutId);
+    };
+  }, [activeTab, activeScreen, activeTool]);
+
+  useEffect(() => {
     // Track screen/tab views with proper naming
     const rawName = activeScreen || activeTool || activeTab;
     const screenName = SCREEN_NAME_MAP[rawName || ''] || rawName;
@@ -106,7 +120,7 @@ const Index = () => {
       import('@/lib/analytics').then(m => m.analytics.logScreenView(screenName, screenClass)).catch(() => {});
     }
   }, [activeTab, activeScreen, activeTool, isAuthenticated]);
-  
+
   // Initialize push notification token registration for native apps
   useDeviceToken();
 

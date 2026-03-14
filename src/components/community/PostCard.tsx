@@ -70,13 +70,13 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [reportReason, setReportReason] = useState('');
-  const { isAdmin, user } = useAuth();
+  const { isAdmin, user, profile } = useAuth();
   const { toast } = useToast();
 
   const toggleLike = useToggleLike();
   const { data: comments = [], isLoading: commentsLoading, refetch: refetchComments } = usePostComments(post.id);
   const createComment = useCreateComment();
-  
+
   const isOwnPost = user?.id === post.user_id;
 
   const handleLike = () => {
@@ -85,9 +85,16 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   };
 
   const handleComment = () => {
-    if (!commentText.trim()) return;
+    const content = commentText.trim();
+    if (!content) return;
+
     hapticFeedback.light();
-    createComment.mutate({ postId: post.id, content: commentText.trim() });
+    createComment.mutate({
+      postId: post.id,
+      content,
+      postAuthorId: post.user_id,
+      commenterName: profile?.name || user?.user_metadata?.name || 'İstifadəçi',
+    });
     setCommentText('');
   };
 
@@ -366,6 +373,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
                         key={comment.id}
                         comment={comment}
                         postId={post.id}
+                        postAuthorId={post.user_id}
                         allComments={comments}
                         onRefetch={refetchComments}
                         onUserClick={onUserClick}
