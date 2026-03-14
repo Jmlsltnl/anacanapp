@@ -27,6 +27,13 @@ const HtmlContent = ({ content, className }: HtmlContentProps) => {
           '[&_strong]:font-semibold',
           '[&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-xs [&_code]:font-mono',
           '[&_hr]:my-6 [&_hr]:border-border',
+          // Table styles
+          '[&_table]:w-full [&_table]:text-sm [&_table]:border-collapse',
+          '[&_table]:border [&_table]:border-border [&_table]:rounded-lg [&_table]:overflow-hidden',
+          '[&_thead]:bg-muted/70',
+          '[&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold [&_th]:text-foreground [&_th]:text-xs [&_th]:border-b [&_th]:border-border',
+          '[&_td]:px-3 [&_td]:py-2 [&_td]:text-muted-foreground [&_td]:text-xs [&_td]:border-b [&_td]:border-border',
+          '[&_tr:last-child_td]:border-b-0',
           className
         )}
         dangerouslySetInnerHTML={{ __html: content }}
