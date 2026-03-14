@@ -27,6 +27,7 @@ export interface CommunityPost {
   likes_count: number;
   comments_count: number;
   is_pinned: boolean;
+  is_anonymous: boolean;
   created_at: string;
   author?: {
     name: string;
