@@ -45,22 +45,21 @@ const UserBadge = ({ type }: { type: 'admin' | 'premium' | 'moderator' | null })
   );
 };
 
-const CommentReply = ({ comment, postId, allComments, onRefetch, onUserClick, level = 0 }: CommentReplyProps) => {
+const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, onUserClick, level = 0 }: CommentReplyProps) => {
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [showReplies, setShowReplies] = useState(level === 0);
   const [replyText, setReplyText] = useState('');
   const [isLiking, setIsLiking] = useState(false);
-  const { isAdmin, user } = useAuth();
+  const { isAdmin, user, profile } = useAuth();
   const { toast } = useToast();
   const createComment = useCreateComment();
-  const queryClient = useQueryClient();
 
   // Get replies to this comment
   const replies = allComments.filter(c => c.parent_comment_id === comment.id);
 
   const handleLikeComment = async () => {
     if (!user || isLiking) return;
-    
+
     hapticFeedback.light();
     setIsLiking(true);
 
@@ -81,7 +80,7 @@ const CommentReply = ({ comment, postId, allComments, onRefetch, onUserClick, le
             user_id: user.id,
           });
       }
-      
+
       // Refetch comments to update like status
       onRefetch();
     } catch (error) {
@@ -92,27 +91,25 @@ const CommentReply = ({ comment, postId, allComments, onRefetch, onUserClick, le
   };
 
   const handleReply = async () => {
-    if (!replyText.trim()) return;
-    hapticFeedback.light();
-    
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    const content = replyText.trim();
+    if (!content || !user) return;
 
-    const { error } = await supabase
-      .from('post_comments')
-      .insert({
-        post_id: postId,
-        user_id: user.id,
-        parent_comment_id: comment.id,
-        content: replyText.trim(),
+    hapticFeedback.light();
+
+    try {
+      await createComment.mutateAsync({
+        postId,
+        content,
+        parentCommentId: comment.id,
+        postAuthorId,
+        commenterName: profile?.name || user.user_metadata?.name || 'İstifadəçi',
       });
 
-    if (error) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
-    } else {
       setReplyText('');
       setShowReplyInput(false);
       onRefetch();
+    } catch (error: any) {
+      toast({ title: 'Xəta', description: error.message || 'Şərh əlavə edilə bilmədi', variant: 'destructive' });
     }
   };
 
