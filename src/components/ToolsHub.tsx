@@ -108,50 +108,15 @@ interface ToolsHubProps {
 }
 
 const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
-  useScrollToTop();
-  
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTool, setActiveTool] = useState<string | null>(initialTool);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
-  
 
-  // Preserve ToolsHub scroll position when returning from a tool
-  const toolsListScrollTopRef = useRef<number>(0);
-  const prevActiveToolRef = useRef<string | null>(activeTool);
-
-  const captureToolsListScrollTop = () => {
-    const container = document.querySelector('[data-scroll-container]') as HTMLElement | null;
-    if (container) {
-      toolsListScrollTopRef.current = container.scrollTop;
-    }
-  };
+  useScrollToTop([activeTool]);
 
   const openTool = (toolId: string) => {
-    // Save the current list scroll position before opening a tool
-    if (!activeTool) {
-      captureToolsListScrollTop();
-    }
     setActiveTool(toolId);
   };
-
-  useEffect(() => {
-    const prev = prevActiveToolRef.current;
-
-    // If we just navigated back from a tool to the list, restore list scroll
-    if (prev && !activeTool) {
-      requestAnimationFrame(() => {
-        const container = document.querySelector('[data-scroll-container]') as HTMLElement | null;
-        if (container) {
-          container.scrollTo({
-            top: toolsListScrollTopRef.current,
-            behavior: 'instant' as ScrollBehavior,
-          });
-        }
-      });
-    }
-
-    prevActiveToolRef.current = activeTool;
-  }, [activeTool]);
   const { lifeStage, getPregnancyData } = useUserStore();
   const { profile, isAdmin } = useAuth();
   const { isPremium } = useSubscription();
