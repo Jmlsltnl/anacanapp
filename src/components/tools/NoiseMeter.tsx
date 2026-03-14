@@ -177,8 +177,8 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
     if (db < NOISE_THRESHOLDS.ideal) return { label: 'Mükəmməl', color: 'text-green-500', bg: 'bg-green-500' };
     if (db < NOISE_THRESHOLDS.acceptable) return { label: 'Yaxşı', color: 'text-emerald-500', bg: 'bg-emerald-500' };
     if (db < NOISE_THRESHOLDS.warning) return { label: 'Qəbulolunandır', color: 'text-yellow-500', bg: 'bg-yellow-500' };
-    if (db < NOISE_THRESHOLDS.danger) return { label: 'Gürültülü', color: 'text-orange-500', bg: 'bg-orange-500' };
-    return { label: 'Çox gürültülü!', color: 'text-red-500', bg: 'bg-red-500' };
+    if (db < NOISE_THRESHOLDS.danger) return { label: 'Yüksək', color: 'text-orange-500', bg: 'bg-orange-500' };
+    return { label: 'Çox yüksək!', color: 'text-red-500', bg: 'bg-red-500' };
   };
 
   const noiseLevel = getNoiseLevel(currentDb);
