@@ -40,6 +40,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
   const [mediaPreviews, setMediaPreviews] = useState<{ url: string; type: 'image' | 'video' }[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState(false);
   
   // Autocomplete state
   const [showSuggestions, setShowSuggestions] = useState(false);
