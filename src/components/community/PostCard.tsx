@@ -373,6 +373,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
                         key={comment.id}
                         comment={comment}
                         postId={post.id}
+                        postAuthorId={post.user_id}
                         allComments={comments}
                         onRefetch={refetchComments}
                         onUserClick={onUserClick}

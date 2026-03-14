@@ -272,6 +272,7 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
                       key={reply.id}
                       comment={reply}
                       postId={postId}
+                      postAuthorId={postAuthorId}
                       allComments={allComments}
                       onRefetch={onRefetch}
                       onUserClick={onUserClick}
