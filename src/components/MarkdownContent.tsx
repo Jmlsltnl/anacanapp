@@ -1,4 +1,5 @@
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface MarkdownContentProps {
   content: string;
@@ -7,12 +8,13 @@ interface MarkdownContentProps {
 
 const MarkdownContent = ({ content, variant = 'default' }: MarkdownContentProps) => {
   return (
-    <div className={variant === 'chat' ? 'text-sm leading-relaxed' : 'prose prose-sm max-w-none'}>
+    <div className={variant === 'chat' ? 'text-sm leading-relaxed' : 'prose prose-sm max-w-none dark:prose-invert'}>
       <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
         components={{
-          h1: ({ children }) => <h1 className="text-xl font-bold mt-4 mb-2">{children}</h1>,
-          h2: ({ children }) => <h2 className="text-lg font-bold mt-3 mb-2">{children}</h2>,
-          h3: ({ children }) => <h3 className="text-base font-semibold mt-2 mb-1">{children}</h3>,
+          h1: ({ children }) => <h1 className="text-xl font-bold mt-4 mb-2 text-foreground">{children}</h1>,
+          h2: ({ children }) => <h2 className="text-lg font-bold mt-3 mb-2 text-foreground">{children}</h2>,
+          h3: ({ children }) => <h3 className="text-base font-semibold mt-2 mb-1 text-foreground">{children}</h3>,
           ul: ({ children }) => <ul className="list-disc pl-4 my-2 space-y-1">{children}</ul>,
           ol: ({ children }) => <ol className="list-decimal pl-4 my-2 space-y-1">{children}</ol>,
           li: ({ children }) => <li className="text-sm">{children}</li>,
@@ -23,13 +25,59 @@ const MarkdownContent = ({ content, variant = 'default' }: MarkdownContentProps)
           ),
           p: ({ children }) => <p className="my-1.5">{children}</p>,
           strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-          code: ({ children }) => (
-            <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono">{children}</code>
-          ),
+          em: ({ children }) => <em className="italic">{children}</em>,
+          del: ({ children }) => <del className="line-through text-muted-foreground">{children}</del>,
+          code: ({ children, className }) => {
+            const isBlock = className?.includes('language-');
+            if (isBlock) {
+              return (
+                <code className="block bg-muted p-3 rounded-lg text-xs font-mono overflow-x-auto my-2">
+                  {children}
+                </code>
+              );
+            }
+            return (
+              <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono">{children}</code>
+            );
+          },
+          pre: ({ children }) => <pre className="bg-muted rounded-lg p-3 my-3 overflow-x-auto text-xs">{children}</pre>,
           blockquote: ({ children }) => (
             <blockquote className="border-l-2 border-primary pl-3 my-2 italic text-muted-foreground">
               {children}
             </blockquote>
+          ),
+          hr: () => <hr className="my-4 border-border" />,
+          img: ({ src, alt }) => (
+            <img src={src} alt={alt || ''} className="rounded-xl my-3 max-w-full h-auto" loading="lazy" />
+          ),
+          // Table support
+          table: ({ children }) => (
+            <div className="overflow-x-auto my-3 rounded-lg border border-border">
+              <table className="w-full text-sm border-collapse">{children}</table>
+            </div>
+          ),
+          thead: ({ children }) => (
+            <thead className="bg-muted/70">{children}</thead>
+          ),
+          tbody: ({ children }) => <tbody>{children}</tbody>,
+          tr: ({ children }) => (
+            <tr className="border-b border-border last:border-b-0">{children}</tr>
+          ),
+          th: ({ children }) => (
+            <th className="px-3 py-2 text-left font-semibold text-foreground text-xs">{children}</th>
+          ),
+          td: ({ children }) => (
+            <td className="px-3 py-2 text-muted-foreground text-xs">{children}</td>
+          ),
+          // Task list support (GFM)
+          input: ({ checked, ...props }) => (
+            <input
+              type="checkbox"
+              checked={checked}
+              readOnly
+              className="mr-1.5 rounded border-border accent-primary"
+              {...props}
+            />
           ),
         }}
       >
