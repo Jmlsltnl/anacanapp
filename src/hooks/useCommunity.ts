@@ -166,7 +166,8 @@ export const useGroupPosts = (groupId: string | null) => {
       // Fetch like status for each post (author info is now batched)
       const postsWithDetails = await Promise.all(
         (posts || []).map(async (post: any) => {
-          const authorData = authorMap[post.user_id];
+          const isAnon = post.is_anonymous === true;
+          const authorData = isAnon ? null : authorMap[post.user_id];
 
           // Check if user liked this post
           let isLiked = false;
@@ -182,9 +183,12 @@ export const useGroupPosts = (groupId: string | null) => {
 
           return {
             ...post,
-            author: authorData
-              ? { name: authorData.name || 'İstifadəçi', avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null }
-              : { name: 'İstifadəçi', avatar_url: null, badge_type: null },
+            is_anonymous: isAnon,
+            author: isAnon
+              ? { name: 'Anonim', avatar_url: null, badge_type: null }
+              : authorData
+                ? { name: authorData.name || 'İstifadəçi', avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null }
+                : { name: 'İstifadəçi', avatar_url: null, badge_type: null },
             is_liked: isLiked,
           };
         })
