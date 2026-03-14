@@ -11,11 +11,11 @@ import { hapticFeedback } from '@/lib/native';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useQueryClient } from '@tanstack/react-query';
 
 interface CommentReplyProps {
   comment: PostComment;
   postId: string;
+  postAuthorId: string;
   allComments: PostComment[];
   onRefetch: () => void;
   onUserClick?: (userId: string) => void;
