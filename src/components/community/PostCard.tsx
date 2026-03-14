@@ -199,7 +199,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   const authorBadge = post.author?.badge_type as 'admin' | 'premium' | 'moderator' | null;
 
   const handleAvatarClick = () => {
-    if (post.user_id && onUserClick) {
+    if (post.user_id && onUserClick && !isAnonymous) {
       onUserClick(post.user_id);
     }
   };
