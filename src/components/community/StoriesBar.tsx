@@ -5,6 +5,7 @@ import { UserStoryGroup, useStories } from '@/hooks/useStories';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import StoryViewer from './StoryViewer';
+import StoryCropEditor from './StoryCropEditor';
 import { useToast } from '@/hooks/use-toast';
 
 interface StoriesBarProps {
@@ -19,6 +20,8 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
   const [initialGroupIndex, setInitialGroupIndex] = useState(0);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [cropImageUrl, setCropImageUrl] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleStoryClick = (index: number) => {
@@ -26,17 +29,51 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
     setViewerOpen(true);
   };
 
+  const handleAddMore = () => {
+    setShowCreateModal(true);
+  };
+
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
-    setUploading(true);
     setShowCreateModal(false);
+    const isVideo = file.type.startsWith('video/');
 
+    if (isVideo) {
+      // Videos go directly (no cropping)
+      await uploadAndCreate(file, 'video');
+    } else {
+      // Images: show crop editor
+      setSelectedFile(file);
+      const objectUrl = URL.createObjectURL(file);
+      setCropImageUrl(objectUrl);
+    }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleCropConfirm = async (croppedBlob: Blob) => {
+    setCropImageUrl(null);
+    setSelectedFile(null);
+    const file = new File([croppedBlob], `story_${Date.now()}.jpg`, { type: 'image/jpeg' });
+    await uploadAndCreate(file, 'image');
+  };
+
+  const handleCropCancel = () => {
+    if (cropImageUrl) URL.revokeObjectURL(cropImageUrl);
+    setCropImageUrl(null);
+    setSelectedFile(null);
+  };
+
+  const uploadAndCreate = async (file: File, mediaType: 'image' | 'video') => {
+    if (!user) return;
+    setUploading(true);
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-      const isVideo = file.type.startsWith('video/');
 
       const { error: uploadError } = await supabase.storage
         .from('community-media')
@@ -50,7 +87,7 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
 
       createStory({
         mediaUrl: urlData.publicUrl,
-        mediaType: isVideo ? 'video' : 'image',
+        mediaType,
         groupId: groupId || undefined,
       });
     } catch (error: any) {
@@ -61,9 +98,6 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
       });
     } finally {
       setUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
     }
   };
 
@@ -75,7 +109,7 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
     <>
       <div className="relative">
         <div className="flex gap-3 overflow-x-auto hide-scrollbar py-2 px-1">
-          {/* Add Story Button */}
+          {/* Add Story / Own Story Button */}
           <motion.button
             onClick={() => hasOwnStory ? handleStoryClick(0) : setShowCreateModal(true)}
             className="flex-shrink-0 flex flex-col items-center gap-1"
@@ -105,11 +139,16 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
                   <Plus className="w-6 h-6 text-primary" />
                 )}
               </div>
-              {!hasOwnStory && (
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                  <Plus className="w-4 h-4 text-white" />
-                </div>
-              )}
+              {/* Plus badge: show for adding first story OR adding more stories */}
+              <div
+                className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center border-2 border-card cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowCreateModal(true);
+                }}
+              >
+                <Plus className="w-4 h-4 text-white" />
+              </div>
             </div>
             <span className="text-xs font-medium text-foreground truncate w-16 text-center">
               {hasOwnStory ? 'Sizin' : 'Əlavə et'}
@@ -119,7 +158,7 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
           {/* Other Users' Stories */}
           {storyGroups
             .filter(g => g.user_id !== user?.id)
-            .map((group, index) => (
+            .map((group) => (
               <motion.button
                 key={group.user_id}
                 onClick={() => handleStoryClick(storyGroups.indexOf(group))}
@@ -181,6 +220,17 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
         )}
       </AnimatePresence>
 
+      {/* Crop Editor */}
+      <AnimatePresence>
+        {cropImageUrl && (
+          <StoryCropEditor
+            imageUrl={cropImageUrl}
+            onConfirm={handleCropConfirm}
+            onCancel={handleCropCancel}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Create Story Modal */}
       <AnimatePresence>
         {showCreateModal && (
@@ -224,7 +274,6 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
 
                 <motion.button
                   onClick={() => {
-                    // Camera functionality would require native implementation
                     toast({ title: 'Kamera tezliklə əlavə olunacaq' });
                   }}
                   className="flex flex-col items-center gap-3 p-6 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-2xl border border-blue-500/20"
