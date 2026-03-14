@@ -299,28 +299,28 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
             </div>
           </div>
         ) : (
-
-        {/* Content with styled hashtags and mentions */}
-        <div className="px-3 pb-2">
-          <p className="text-foreground whitespace-pre-wrap text-sm">
-            {post.content.split(/(\s+)/).map((word, index) => {
-              if (word.startsWith('#')) {
-                return (
-                  <span key={index} className="text-primary font-medium cursor-pointer hover:underline">
-                    {word}
-                  </span>
-                );
-              } else if (word.startsWith('@')) {
-                return (
-                  <span key={index} className="text-blue-500 font-medium cursor-pointer hover:underline">
-                    {word}
-                  </span>
-                );
-              }
-              return word;
-            })}
-          </p>
-        </div>
+          <>
+            {/* Content with styled hashtags and mentions */}
+            <div className="px-3 pb-2">
+              <p className="text-foreground whitespace-pre-wrap text-sm">
+                {post.content.split(/(\s+)/).map((word, index) => {
+                  if (word.startsWith('#')) {
+                    return (
+                      <span key={index} className="text-primary font-medium cursor-pointer hover:underline">
+                        {word}
+                      </span>
+                    );
+                  } else if (word.startsWith('@')) {
+                    return (
+                      <span key={index} className="text-blue-500 font-medium cursor-pointer hover:underline">
+                        {word}
+                      </span>
+                    );
+                  }
+                  return word;
+                })}
+              </p>
+            </div>
 
         {/* Media Carousel */}
         {mediaItems.length > 0 && (
