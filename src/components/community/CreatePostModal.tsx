@@ -254,6 +254,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
         groupId: selectedGroupId,
         content: content.trim() || '📷',
         mediaUrls,
+        isAnonymous,
       });
 
       mediaPreviews.forEach(p => URL.revokeObjectURL(p.url));
