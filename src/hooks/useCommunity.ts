@@ -205,7 +205,7 @@ export const useCreatePost = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ groupId, content, mediaUrls }: { groupId: string | null; content: string; mediaUrls?: string[] }) => {
+    mutationFn: async ({ groupId, content, mediaUrls, isAnonymous }: { groupId: string | null; content: string; mediaUrls?: string[]; isAnonymous?: boolean }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
@@ -216,13 +216,68 @@ export const useCreatePost = () => {
           user_id: user.id,
           content,
           media_urls: mediaUrls || [],
-        });
+          is_anonymous: isAnonymous || false,
+        } as any);
 
       if (error) throw error;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['group-posts', variables.groupId] });
       toast({ title: 'Paylaşım əlavə edildi! ✨' });
+    },
+    onError: () => {
+      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+    },
+  });
+};
+
+export const useEditPost = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ postId, content }: { postId: string; content: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('community_posts')
+        .update({ content })
+        .eq('id', postId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['group-posts'] });
+      toast({ title: 'Post redaktə edildi ✏️' });
+    },
+    onError: () => {
+      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+    },
+  });
+};
+
+export const useDeletePost = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (postId: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('community_posts')
+        .delete()
+        .eq('id', postId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['group-posts'] });
+      toast({ title: 'Post silindi 🗑️' });
     },
     onError: () => {
       toast({ title: 'Xəta baş verdi', variant: 'destructive' });
