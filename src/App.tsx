@@ -10,6 +10,8 @@ import Index from "./pages/Index";
 import ResetPassword from "./pages/ResetPassword";
 import LegalPage from "./pages/LegalPage";
 import NotFound from "./pages/NotFound";
+import PaymentSuccess from "./components/payment/PaymentSuccess";
+import PaymentError from "./components/payment/PaymentError";
 
 const queryClient = new QueryClient();
 
