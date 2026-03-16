@@ -7545,6 +7545,83 @@ export type Database = {
           },
         ]
       }
+      user_vitamin_schedules: {
+        Row: {
+          created_at: string
+          days_of_week: number[]
+          icon_emoji: string
+          id: string
+          is_active: boolean
+          notification_enabled: boolean
+          scheduled_time: string
+          updated_at: string
+          user_id: string
+          vitamin_name: string
+        }
+        Insert: {
+          created_at?: string
+          days_of_week?: number[]
+          icon_emoji?: string
+          id?: string
+          is_active?: boolean
+          notification_enabled?: boolean
+          scheduled_time: string
+          updated_at?: string
+          user_id: string
+          vitamin_name: string
+        }
+        Update: {
+          created_at?: string
+          days_of_week?: number[]
+          icon_emoji?: string
+          id?: string
+          is_active?: boolean
+          notification_enabled?: boolean
+          scheduled_time?: string
+          updated_at?: string
+          user_id?: string
+          vitamin_name?: string
+        }
+        Relationships: []
+      }
+      vitamin_intake_logs: {
+        Row: {
+          created_at: string
+          id: string
+          log_date: string
+          schedule_id: string | null
+          taken_at: string
+          user_id: string
+          vitamin_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          log_date?: string
+          schedule_id?: string | null
+          taken_at?: string
+          user_id: string
+          vitamin_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          log_date?: string
+          schedule_id?: string | null
+          taken_at?: string
+          user_id?: string
+          vitamin_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vitamin_intake_logs_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "user_vitamin_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vitamins: {
         Row: {
           benefits: string[] | null
