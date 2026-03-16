@@ -294,6 +294,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
       case 'affiliate': case 'affiliate-products': return <AffiliateProducts onBack={handleBack} />;
       case 'maternity-calculator': case 'maternity': return <MaternityCalculator onBack={handleBack} />;
       case 'teething': case 'teething-tracker': return <TeethingTracker onBack={handleBack} />;
+      case 'vitamin-tracker': case 'vitamins': return <VitaminTracker onBack={handleBack} />;
       default: return null;
     }
   })();
