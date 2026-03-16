@@ -185,6 +185,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminCoupons />;
       case 'analytics':
         return <AdminAnalytics />;
+      case 'epoint':
+        return <AdminEpoint />;
       case 'security':
         return <AdminSecurity />;
       default:
