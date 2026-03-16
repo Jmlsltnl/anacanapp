@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.epoint-payment]
 verify_jwt = false
+
+[functions.send-vitamin-reminders]
+verify_jwt = false

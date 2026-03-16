@@ -5,7 +5,8 @@ import {
   Volume2, Heart, Footprints, ChevronRight,
   Utensils, Activity, ArrowLeft, Camera, Lock, ShoppingCart, LucideIcon, Wrench, BookOpen, ChefHat,
   Stethoscope, Droplet, ImagePlus, Package, Mic, Scan, CloudSun, Gauge, Store,
-  MapPin, Gamepad2, ShieldAlert, BookHeart, Stars, Crown, Ruler, Sparkles, TrendingUp, Zap
+  MapPin, Gamepad2, ShieldAlert, BookHeart, Stars, Crown, Ruler, Sparkles, TrendingUp, Zap,
+  Pill
 } from 'lucide-react';
 import BlogScreen from '@/components/BlogScreen';
 import { useUserStore } from '@/store/userStore';
@@ -42,6 +43,7 @@ const HoroscopeCompatibility = lazy(() => import('./tools/HoroscopeCompatibility
 const BabyGrowthTracker = lazy(() => import('./tools/BabyGrowthTracker'));
 const MaternityCalculator = lazy(() => import('./tools/MaternityCalculator'));
 const TeethingTracker = lazy(() => import('./tools/TeethingTracker'));
+const VitaminTracker = lazy(() => import('./tools/VitaminTracker'));
 const BabyMonthlyAlbum = lazy(() => import('./baby/BabyMonthlyAlbum'));
 import { PremiumModal } from './PremiumModal';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
@@ -97,6 +99,7 @@ const iconMap: Record<string, LucideIcon> = {
   'BookHeart': BookHeart,
   'Stars': Stars,
   'Calculator': Calculator,
+  'Pill': Pill,
 };
 
 // Import Calculator icon
@@ -293,6 +296,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
       case 'affiliate': case 'affiliate-products': return <AffiliateProducts onBack={handleBack} />;
       case 'maternity-calculator': case 'maternity': return <MaternityCalculator onBack={handleBack} />;
       case 'teething': case 'teething-tracker': return <TeethingTracker onBack={handleBack} />;
+      case 'vitamin-tracker': case 'vitamins': return <VitaminTracker onBack={handleBack} />;
       default: return null;
     }
   })();
