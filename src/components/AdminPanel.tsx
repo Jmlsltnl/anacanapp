@@ -58,6 +58,7 @@ import AdminIntroSlides from './admin/AdminIntroSlides';
 import AdminAlbumOrders from './admin/AdminAlbumOrders';
 import AdminCoupons from './admin/AdminCoupons';
 import AdminAnalytics from './admin/AdminAnalytics';
+import AdminEpoint from './admin/AdminEpoint';
 
 interface AdminPanelProps {
   onExit: () => void;
