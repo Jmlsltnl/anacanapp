@@ -267,7 +267,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
       case 'kick': return <KickCounter onBack={handleBack} />;
       case 'contraction': return <ContractionTimer onBack={handleBack} />;
       case 'weight': return <WeightTracker onBack={handleBack} />;
-      case 'whitenoise': return <WhiteNoise onBack={handleBack} />;
+      case 'whitenoise': case 'white-noise': return <WhiteNoise onBack={handleBack} />;
       case 'names': return <BabyNames onBack={handleBack} />;
       case 'hospital': return <HospitalBag onBack={handleBack} />;
       case 'exercise': case 'exercises': return <Exercises onBack={handleBack} />;
