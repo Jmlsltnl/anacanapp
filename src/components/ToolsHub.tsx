@@ -42,6 +42,7 @@ const HoroscopeCompatibility = lazy(() => import('./tools/HoroscopeCompatibility
 const BabyGrowthTracker = lazy(() => import('./tools/BabyGrowthTracker'));
 const MaternityCalculator = lazy(() => import('./tools/MaternityCalculator'));
 const TeethingTracker = lazy(() => import('./tools/TeethingTracker'));
+const VitaminTracker = lazy(() => import('./tools/VitaminTracker'));
 const BabyMonthlyAlbum = lazy(() => import('./baby/BabyMonthlyAlbum'));
 import { PremiumModal } from './PremiumModal';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
