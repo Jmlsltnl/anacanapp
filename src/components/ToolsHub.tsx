@@ -99,6 +99,7 @@ const iconMap: Record<string, LucideIcon> = {
   'BookHeart': BookHeart,
   'Stars': Stars,
   'Calculator': Calculator,
+  'Pill': Pill,
 };
 
 // Import Calculator icon
