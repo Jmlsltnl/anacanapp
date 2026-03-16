@@ -58,6 +58,7 @@ import AdminIntroSlides from './admin/AdminIntroSlides';
 import AdminAlbumOrders from './admin/AdminAlbumOrders';
 import AdminCoupons from './admin/AdminCoupons';
 import AdminAnalytics from './admin/AdminAnalytics';
+import AdminEpoint from './admin/AdminEpoint';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -184,6 +185,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminCoupons />;
       case 'analytics':
         return <AdminAnalytics />;
+      case 'epoint':
+        return <AdminEpoint />;
       case 'security':
         return <AdminSecurity />;
       default:

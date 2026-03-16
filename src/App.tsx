@@ -10,6 +10,8 @@ import Index from "./pages/Index";
 import ResetPassword from "./pages/ResetPassword";
 import LegalPage from "./pages/LegalPage";
 import NotFound from "./pages/NotFound";
+import PaymentSuccess from "./components/payment/PaymentSuccess";
+import PaymentError from "./components/payment/PaymentError";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +28,8 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/legal/:docType" element={<LegalPage />} />
+                <Route path="/payment/success" element={<PaymentSuccess />} />
+                <Route path="/payment/error" element={<PaymentError />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

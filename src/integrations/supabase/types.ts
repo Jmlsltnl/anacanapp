@@ -4818,6 +4818,81 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_transactions: {
+        Row: {
+          amount: number
+          bank_response: string | null
+          bank_transaction: string | null
+          callback_received_at: string | null
+          card_mask: string | null
+          card_name: string | null
+          created_at: string | null
+          currency: string
+          description: string | null
+          epoint_transaction: string | null
+          error_code: string | null
+          error_message: string | null
+          id: string
+          operation_code: string | null
+          order_id: string
+          order_reference_id: string | null
+          order_type: string
+          redirect_url: string | null
+          rrn: string | null
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          bank_response?: string | null
+          bank_transaction?: string | null
+          callback_received_at?: string | null
+          card_mask?: string | null
+          card_name?: string | null
+          created_at?: string | null
+          currency?: string
+          description?: string | null
+          epoint_transaction?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          operation_code?: string | null
+          order_id: string
+          order_reference_id?: string | null
+          order_type?: string
+          redirect_url?: string | null
+          rrn?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          bank_response?: string | null
+          bank_transaction?: string | null
+          callback_received_at?: string | null
+          card_mask?: string | null
+          card_name?: string | null
+          created_at?: string | null
+          currency?: string
+          description?: string | null
+          epoint_transaction?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          operation_code?: string | null
+          order_id?: string
+          order_reference_id?: string | null
+          order_type?: string
+          redirect_url?: string | null
+          rrn?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       photoshoot_backgrounds: {
         Row: {
           category_id: string
