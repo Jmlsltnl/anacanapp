@@ -1,9 +1,9 @@
 import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Users, Plus, Search, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Users, Plus, Search, TrendingUp, Compass, Sparkles } from 'lucide-react';
 import { useCommunityGroups, useUserMemberships } from '@/hooks/useCommunity';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
-import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useUserStore } from '@/store/userStore';
 import { useAppSetting } from '@/hooks/useAppSettings';
 import GroupsList from './GroupsList';
@@ -17,12 +17,19 @@ interface CommunityScreenProps {
   onBack?: () => void;
 }
 
+const tabs = [
+  { id: 'feed', label: 'Lenta', icon: TrendingUp },
+  { id: 'my-groups', label: 'Qruplarım', icon: Sparkles },
+  { id: 'groups', label: 'Kəşf et', icon: Compass },
+] as const;
+
 const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBack }, ref) => {
   const [activeTab, setActiveTab] = useState<'feed' | 'groups' | 'my-groups'>('feed');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [searchFocused, setSearchFocused] = useState(false);
 
   useScrollToTop([activeTab, selectedGroupId, selectedUserId]);
   useScreenAnalytics('Community', 'Social');
@@ -38,14 +45,10 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
 
   const memberGroupIds = new Set(memberships.map(m => m.group_id));
   const myGroups = groups.filter(g => memberGroupIds.has(g.id));
-
   const selectedGroup = groups.find(g => g.id === selectedGroupId);
 
-  const handleUserClick = (userId: string) => {
-    setSelectedUserId(userId);
-  };
+  const handleUserClick = (userId: string) => setSelectedUserId(userId);
 
-  // If viewing a user profile
   if (selectedUserId) {
     return (
       <UserProfileScreen
@@ -55,7 +58,6 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
     );
   }
 
-  // If a group is selected, show its feed
   if (selectedGroupId && selectedGroup) {
     return (
       <GroupFeed
@@ -68,84 +70,100 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   }
 
   return (
-    <div ref={ref} className="min-h-screen pb-24">
+    <div ref={ref} className="min-h-screen pb-24 bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-background border-b border-border/50">
-        <div className="px-3 py-3">
+      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-2xl border-b border-border/30">
+        <div className="px-4 pt-3 pb-2">
+          {/* Title Row */}
           <div className="flex items-center gap-3 mb-3">
             {onBack && (
               <motion.button
                 onClick={onBack}
-                className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center"
-                whileTap={{ scale: 0.95 }}
+                className="w-9 h-9 rounded-full bg-muted/60 flex items-center justify-center hover:bg-muted transition-colors"
+                whileTap={{ scale: 0.9 }}
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="w-4 h-4 text-foreground" />
               </motion.button>
             )}
             <div className="flex-1">
-              <h1 className="text-lg font-black text-foreground">Cəmiyyət</h1>
-              <p className="text-xs text-muted-foreground">{headerText}</p>
+              <h1 className="text-xl font-black text-foreground tracking-tight">Cəmiyyət</h1>
+              <p className="text-[11px] text-muted-foreground mt-0.5">{headerText}</p>
             </div>
           </div>
 
-          {/* Search - only for posts */}
-          <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          {/* Search */}
+          <motion.div
+            className={`relative mb-3 transition-all duration-300 ${searchFocused ? 'scale-[1.02]' : ''}`}
+          >
+            <Search className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200 ${searchFocused ? 'text-primary' : 'text-muted-foreground/60'}`} />
             <input
               type="text"
               placeholder="Postlarda axtar..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-10 pr-3 rounded-xl bg-muted/50 border border-border/50 text-sm outline-none focus:border-primary/50"
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setSearchFocused(false)}
+              className={`w-full h-10 pl-10 pr-4 rounded-2xl bg-muted/40 text-sm outline-none transition-all duration-300 placeholder:text-muted-foreground/50 ${
+                searchFocused
+                  ? 'bg-card border border-primary/30 shadow-[0_0_0_3px_hsl(var(--primary)/0.08)]'
+                  : 'border border-transparent'
+              }`}
             />
-          </div>
+          </motion.div>
 
           {/* Tabs */}
-          <div className="flex gap-2">
-            {[
-              { id: 'feed', label: 'Ümumi', icon: TrendingUp },
-              { id: 'my-groups', label: 'Qruplarım', icon: Users },
-              { id: 'groups', label: 'Bütün Qruplar', icon: Users },
-            ].map((tab) => {
+          <div className="flex gap-1.5 bg-muted/40 rounded-2xl p-1">
+            {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
                 <motion.button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all border ${
+                  className={`relative flex-1 py-2 px-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors duration-200 ${
                     isActive
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'bg-card dark:bg-muted text-muted-foreground dark:text-white border-border/50'
+                      ? 'text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
-                  whileTap={{ scale: 0.98 }}
+                  whileTap={{ scale: 0.97 }}
                 >
-                  <Icon className="w-3.5 h-3.5" />
-                  {tab.label}
+                  {isActive && (
+                    <motion.div
+                      layoutId="community-tab-bg"
+                      className="absolute inset-0 rounded-xl gradient-primary shadow-sm"
+                      transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center gap-1.5">
+                    <Icon className="w-3.5 h-3.5" />
+                    {tab.label}
+                  </span>
                 </motion.button>
               );
             })}
           </div>
 
-          {/* Top Banner Slot */}
-          <BannerSlot placement="community_top" className="mt-3" />
+          {/* Top Banner */}
+          <BannerSlot placement="community_top" className="mt-2" />
         </div>
       </div>
 
       {/* Stories Bar */}
-      <div className="px-3 pt-3 border-b border-border/50 pb-3">
+      <div className="px-4 pt-3 pb-2">
         <StoriesBar groupId={null} />
       </div>
+      <div className="h-px bg-border/30 mx-4" />
 
       {/* Content */}
-      <div className="px-3 pt-3">
+      <div className="px-4 pt-3">
         <AnimatePresence mode="wait">
           {activeTab === 'feed' && (
             <motion.div
               key="feed"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
             >
               <GroupFeed
                 group={null}
@@ -161,9 +179,10 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
           {activeTab === 'groups' && (
             <motion.div
               key="groups"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
             >
               <GroupsList
                 groups={groups}
@@ -178,23 +197,24 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
           {activeTab === 'my-groups' && (
             <motion.div
               key="my-groups"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
             >
               {myGroups.length === 0 ? (
-                <div className="text-center py-8">
-                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
-                    <Users className="w-6 h-6 text-muted-foreground" />
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mx-auto mb-4">
+                    <Users className="w-7 h-7 text-primary" />
                   </div>
-                  <h3 className="font-bold text-foreground mb-1 text-sm">Qruplarınız yoxdur</h3>
-                  <p className="text-xs text-muted-foreground mb-3">
+                  <h3 className="font-bold text-foreground mb-1.5 text-sm">Hələ qrupunuz yoxdur</h3>
+                  <p className="text-xs text-muted-foreground mb-4 max-w-[220px] mx-auto leading-relaxed">
                     Digər analar ilə əlaqə qurmaq üçün qruplara qoşulun
                   </p>
-                  <motion.button 
+                  <motion.button
                     onClick={() => setActiveTab('groups')}
-                    className="px-4 py-2 rounded-xl gradient-primary text-white font-bold text-sm"
-                    whileTap={{ scale: 0.98 }}
+                    className="px-5 py-2.5 rounded-2xl gradient-primary text-primary-foreground font-bold text-sm shadow-sm"
+                    whileTap={{ scale: 0.95 }}
                   >
                     Qrupları kəşf et
                   </motion.button>
@@ -213,17 +233,17 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
         </AnimatePresence>
       </div>
 
-      {/* Floating Action Button for Create Post */}
+      {/* FAB */}
       <motion.button
         onClick={() => setShowCreatePost(true)}
-        className="fixed bottom-24 right-3 w-12 h-12 rounded-full gradient-primary shadow-elevated flex items-center justify-center z-40"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+        className="fixed bottom-24 right-4 w-14 h-14 rounded-2xl gradient-primary shadow-lg shadow-primary/25 flex items-center justify-center z-40"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.9 }}
+        initial={{ scale: 0, rotate: -180 }}
+        animate={{ scale: 1, rotate: 0 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
       >
-        <Plus className="w-5 h-5 text-white" />
+        <Plus className="w-6 h-6 text-primary-foreground" />
       </motion.button>
 
       {/* Create Post Modal */}
