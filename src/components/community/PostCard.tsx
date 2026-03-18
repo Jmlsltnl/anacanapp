@@ -55,8 +55,8 @@ const UserBadge = ({ type }: { type: 'admin' | 'premium' | 'moderator' | null })
   const Icon = badgeConfig.icon;
 
   return (
-    <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-bold ${badgeConfig.className}`}>
-      <Icon className="w-2.5 h-2.5" />
+    <span className={`inline-flex items-center gap-0.5 px-1.5 py-[2px] rounded-md text-[8px] font-extrabold tracking-wide uppercase ${badgeConfig.className}`}>
+      <Icon className="w-2 h-2" />
       {badgeConfig.label}
     </span>
   );
@@ -171,19 +171,23 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
 
   return (
     <>
-      <div className="bg-card rounded-2xl border border-border/20 overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:border-border/40">
+      <motion.div
+        className="bg-card rounded-[20px] border border-border/15 overflow-hidden"
+        whileHover={{ y: -1 }}
+        transition={{ duration: 0.2 }}
+      >
         {/* Header */}
-        <div className="p-3.5 pb-2 flex items-center gap-2.5">
-          <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.95 }} disabled={isAnonymous}>
-            <Avatar className={`w-10 h-10 ${isAnonymous ? '' : 'cursor-pointer ring-2 ring-transparent hover:ring-primary/30'} transition-all`}>
+        <div className="p-4 pb-2.5 flex items-center gap-3">
+          <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.92 }} disabled={isAnonymous}>
+            <Avatar className={`w-11 h-11 ${isAnonymous ? '' : 'cursor-pointer ring-[2.5px] ring-border/20 hover:ring-primary/30'} transition-all duration-300`}>
               {isAnonymous ? (
-                <AvatarFallback className="bg-muted text-muted-foreground">
+                <AvatarFallback className="bg-muted/60 text-muted-foreground">
                   <EyeOff className="w-4 h-4" />
                 </AvatarFallback>
               ) : (
                 <>
                   <AvatarImage src={post.author?.avatar_url || undefined} />
-                  <AvatarFallback className="bg-gradient-to-br from-primary/15 to-accent/15 text-primary font-bold text-sm">
+                  <AvatarFallback className="bg-gradient-to-br from-primary/12 to-accent/12 text-primary font-black text-sm">
                     {post.author?.name?.charAt(0) || 'İ'}
                   </AvatarFallback>
                 </>
@@ -194,7 +198,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
             <div className="flex items-center gap-1.5 flex-wrap">
               <motion.button
                 onClick={handleAvatarClick}
-                className={`font-bold text-[13px] ${isAnonymous ? 'text-muted-foreground italic' : 'text-foreground hover:text-primary'} transition-colors`}
+                className={`font-bold text-[13px] ${isAnonymous ? 'text-muted-foreground italic' : 'text-foreground hover:text-primary'} transition-colors duration-200`}
                 whileTap={{ scale: 0.98 }}
                 disabled={isAnonymous}
               >
@@ -202,37 +206,37 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
               </motion.button>
               {!isAnonymous && <UserBadge type={authorBadge} />}
               {isAnonymous && (
-                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-medium bg-muted text-muted-foreground">
-                  <EyeOff className="w-2.5 h-2.5" />
+                <span className="inline-flex items-center gap-0.5 px-1.5 py-[2px] rounded-md text-[8px] font-semibold bg-muted/50 text-muted-foreground/70">
+                  <EyeOff className="w-2 h-2" />
                   Anonim
                 </span>
               )}
             </div>
-            <p className="text-[10px] text-muted-foreground/70 mt-0.5">{timeAgo}</p>
+            <p className="text-[10px] text-muted-foreground/50 mt-0.5 font-medium">{timeAgo}</p>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="w-8 h-8 rounded-full hover:bg-muted/60 flex items-center justify-center transition-colors">
-                <MoreHorizontal className="w-4 h-4 text-muted-foreground/60" />
+              <button className="w-8 h-8 rounded-xl hover:bg-muted/40 flex items-center justify-center transition-colors duration-200">
+                <MoreHorizontal className="w-4 h-4 text-muted-foreground/40" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-popover border-border z-50 rounded-xl">
+            <DropdownMenuContent align="end" className="bg-popover border-border/30 z-50 rounded-2xl shadow-xl min-w-[160px]">
               {isOwnPost && (
-                <DropdownMenuItem onClick={() => { setEditContent(post.content); setIsEditing(true); }} className="text-foreground text-xs">
-                  <Pencil className="w-3.5 h-3.5 mr-1.5" />
+                <DropdownMenuItem onClick={() => { setEditContent(post.content); setIsEditing(true); }} className="text-foreground text-xs rounded-xl">
+                  <Pencil className="w-3.5 h-3.5 mr-2" />
                   Redaktə et
                 </DropdownMenuItem>
               )}
               {!isOwnPost && (
-                <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-amber-600 text-xs">
-                  <Flag className="w-3.5 h-3.5 mr-1.5" />
+                <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-amber-600 text-xs rounded-xl">
+                  <Flag className="w-3.5 h-3.5 mr-2" />
                   Şikayət et
                 </DropdownMenuItem>
               )}
-              {(isAdmin || isOwnPost) && <DropdownMenuSeparator />}
+              {(isAdmin || isOwnPost) && <DropdownMenuSeparator className="bg-border/20" />}
               {(isAdmin || isOwnPost) && (
-                <DropdownMenuItem onClick={handleDeletePost} className="text-red-600 text-xs">
-                  <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+                <DropdownMenuItem onClick={handleDeletePost} className="text-red-500 text-xs rounded-xl">
+                  <Trash2 className="w-3.5 h-3.5 mr-2" />
                   Postu Sil
                 </DropdownMenuItem>
               )}
@@ -242,16 +246,16 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
 
         {/* Edit Mode or Content */}
         {isEditing ? (
-          <div className="px-3.5 pb-3 space-y-2">
+          <div className="px-4 pb-3 space-y-2.5">
             <Textarea
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
-              className="min-h-[80px] rounded-xl resize-none text-sm"
+              className="min-h-[80px] rounded-2xl resize-none text-sm bg-muted/20 border-border/20"
               autoFocus
             />
             <div className="flex gap-2 justify-end">
-              <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)}>Ləğv et</Button>
-              <Button size="sm" onClick={handleEditPost} disabled={!editContent.trim() || editPost.isPending} className="gradient-primary rounded-xl">
+              <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="rounded-xl text-xs">Ləğv et</Button>
+              <Button size="sm" onClick={handleEditPost} disabled={!editContent.trim() || editPost.isPending} className="gradient-primary rounded-xl text-xs">
                 {editPost.isPending ? 'Saxlanılır...' : 'Yadda saxla'}
               </Button>
             </div>
@@ -259,18 +263,18 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
         ) : (
           <>
             {/* Content */}
-            <div className="px-3.5 pb-2.5">
-              <p className="text-foreground whitespace-pre-wrap text-[13px] leading-relaxed">
+            <div className="px-4 pb-3">
+              <p className="text-foreground/90 whitespace-pre-wrap text-[13px] leading-[1.65]">
                 {post.content.split(/(\s+)/).map((word, index) => {
                   if (word.startsWith('#')) {
                     return (
-                      <span key={index} className="text-primary font-semibold cursor-pointer hover:underline">
+                      <span key={index} className="text-primary font-semibold cursor-pointer hover:underline decoration-primary/30 underline-offset-2">
                         {word}
                       </span>
                     );
                   } else if (word.startsWith('@')) {
                     return (
-                      <span key={index} className="text-blue-500 font-semibold cursor-pointer hover:underline">
+                      <span key={index} className="text-blue-500 font-semibold cursor-pointer hover:underline decoration-blue-500/30 underline-offset-2">
                         {word}
                       </span>
                     );
@@ -282,52 +286,63 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
 
             {/* Media */}
             {mediaItems.length > 0 && (
-              <div className="px-3.5 pb-2.5">
-                <MediaCarousel media={mediaItems} />
+              <div className="px-4 pb-3">
+                <div className="rounded-2xl overflow-hidden">
+                  <MediaCarousel media={mediaItems} />
+                </div>
               </div>
             )}
           </>
         )}
 
         {/* Engagement Stats */}
-        <div className="px-3.5 py-2 flex items-center gap-4 text-[11px] text-muted-foreground/60 font-medium">
-          {post.likes_count > 0 && <span>{post.likes_count} bəyənmə</span>}
-          {post.comments_count > 0 && <span>{post.comments_count} şərh</span>}
-        </div>
+        {(post.likes_count > 0 || post.comments_count > 0) && (
+          <div className="px-4 py-2 flex items-center gap-3 text-[11px] text-muted-foreground/50 font-medium">
+            {post.likes_count > 0 && (
+              <span className="flex items-center gap-1">
+                <span className="w-4 h-4 rounded-full bg-gradient-to-br from-rose-400 to-rose-500 flex items-center justify-center">
+                  <Heart className="w-2 h-2 text-white fill-white" />
+                </span>
+                {post.likes_count}
+              </span>
+            )}
+            {post.comments_count > 0 && <span>{post.comments_count} şərh</span>}
+          </div>
+        )}
 
         {/* Actions */}
-        <div className="px-2 py-1 flex items-center border-t border-border/15">
+        <div className="px-3 py-1.5 flex items-center border-t border-border/10">
           <motion.button
             onClick={handleLike}
-            className={`flex-1 py-2 rounded-xl flex items-center justify-center gap-1.5 transition-all ${
-              post.is_liked ? 'text-rose-500' : 'text-muted-foreground hover:bg-muted/40'
+            className={`flex-1 py-2.5 rounded-2xl flex items-center justify-center gap-1.5 transition-all duration-200 ${
+              post.is_liked ? 'text-rose-500' : 'text-muted-foreground/60 hover:bg-muted/30'
             }`}
-            whileTap={{ scale: 0.92 }}
+            whileTap={{ scale: 0.9 }}
           >
             <motion.div
-              animate={post.is_liked ? { scale: [1, 1.3, 1] } : {}}
-              transition={{ duration: 0.3 }}
+              animate={post.is_liked ? { scale: [1, 1.35, 1] } : {}}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
             >
-              <Heart className={`w-[18px] h-[18px] ${post.is_liked ? 'fill-current' : ''}`} />
+              <Heart className={`w-[17px] h-[17px] ${post.is_liked ? 'fill-current' : ''}`} />
             </motion.div>
-            <span className="text-xs font-semibold">Bəyən</span>
+            <span className="text-[12px] font-bold">Bəyən</span>
           </motion.button>
           <motion.button
             onClick={() => setShowComments(!showComments)}
-            className="flex-1 py-2 rounded-xl flex items-center justify-center gap-1.5 text-muted-foreground hover:bg-muted/40 transition-all"
-            whileTap={{ scale: 0.92 }}
+            className="flex-1 py-2.5 rounded-2xl flex items-center justify-center gap-1.5 text-muted-foreground/60 hover:bg-muted/30 transition-all duration-200"
+            whileTap={{ scale: 0.9 }}
           >
-            <MessageCircle className="w-[18px] h-[18px]" />
-            <span className="text-xs font-semibold">Şərh</span>
-            {showComments ? <ChevronUp className="w-3 h-3 ml-0.5" /> : <ChevronDown className="w-3 h-3 ml-0.5" />}
+            <MessageCircle className="w-[17px] h-[17px]" />
+            <span className="text-[12px] font-bold">Şərh</span>
+            {showComments ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
           </motion.button>
           <motion.button
             onClick={handleShare}
-            className="flex-1 py-2 rounded-xl flex items-center justify-center gap-1.5 text-muted-foreground hover:bg-muted/40 transition-all"
-            whileTap={{ scale: 0.92 }}
+            className="flex-1 py-2.5 rounded-2xl flex items-center justify-center gap-1.5 text-muted-foreground/60 hover:bg-muted/30 transition-all duration-200"
+            whileTap={{ scale: 0.9 }}
           >
-            <Share2 className="w-[18px] h-[18px]" />
-            <span className="text-xs font-semibold">Paylaş</span>
+            <Share2 className="w-[17px] h-[17px]" />
+            <span className="text-[12px] font-bold">Paylaş</span>
           </motion.button>
         </div>
 
@@ -338,35 +353,36 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="border-t border-border/15 overflow-hidden"
+              transition={{ duration: 0.25 }}
+              className="border-t border-border/10 overflow-hidden"
             >
-              <div className="p-3.5 space-y-3">
+              <div className="p-4 space-y-3">
                 {/* Comment Input */}
-                <div className="flex gap-2">
+                <div className="flex gap-2.5">
                   <Input
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     placeholder="Şərh yaz..."
-                    className="flex-1 h-9 rounded-xl text-sm bg-muted/30 border-border/30"
+                    className="flex-1 h-10 rounded-2xl text-[13px] bg-muted/20 border-border/15 focus:border-primary/25 focus:shadow-[0_0_0_3px_hsl(var(--primary)/0.06)]"
                     onKeyPress={(e) => e.key === 'Enter' && handleComment()}
                   />
                   <Button
                     onClick={handleComment}
                     disabled={!commentText.trim() || createComment.isPending}
-                    className="w-9 h-9 rounded-xl gradient-primary p-0"
+                    className="w-10 h-10 rounded-2xl gradient-primary p-0 shadow-[0_2px_8px_-2px_hsl(var(--primary)/0.3)]"
                   >
-                    <Send className="w-3.5 h-3.5 text-primary-foreground" />
+                    <Send className="w-[14px] h-[14px] text-primary-foreground" />
                   </Button>
                 </div>
 
                 {/* Comments */}
                 {commentsLoading ? (
-                  <div className="text-center py-3">
-                    <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+                  <div className="text-center py-4">
+                    <div className="w-5 h-5 border-2 border-primary/40 border-t-primary rounded-full animate-spin mx-auto" />
                   </div>
                 ) : topLevelComments.length === 0 ? (
-                  <div className="text-center py-5">
-                    <p className="text-[11px] text-muted-foreground/60">
+                  <div className="text-center py-6">
+                    <p className="text-[11px] text-muted-foreground/40 font-medium">
                       Hələ şərh yoxdur. İlk şərhi siz yazın! 💭
                     </p>
                   </div>
@@ -389,11 +405,11 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </motion.div>
 
       {/* Report Dialog */}
       <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
-        <DialogContent className="sm:max-w-md max-w-[90vw] rounded-2xl">
+        <DialogContent className="sm:max-w-md max-w-[90vw] rounded-3xl">
           <DialogHeader>
             <DialogTitle>Postu Şikayət Et</DialogTitle>
             <DialogDescription>
@@ -404,7 +420,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
             value={reportReason}
             onChange={(e) => setReportReason(e.target.value)}
             placeholder="Şikayət səbəbi..."
-            className="rounded-xl"
+            className="rounded-2xl"
           />
           <div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={() => setShowReportDialog(false)} className="rounded-xl">
