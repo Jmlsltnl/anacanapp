@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
 
 interface PostSearchFilterProps {
   searchQuery: string;
@@ -10,24 +9,24 @@ interface PostSearchFilterProps {
 
 const PostSearchFilter = ({ sortBy, onSortChange }: PostSearchFilterProps) => {
   return (
-    <div className="flex gap-2 p-3 bg-muted/30 rounded-xl">
-      <span className="text-sm text-muted-foreground self-center">Sırala:</span>
-      <Button
-        variant={sortBy === 'recent' ? 'default' : 'outline'}
-        size="sm"
-        onClick={() => onSortChange('recent')}
-        className="rounded-lg"
-      >
-        Ən son
-      </Button>
-      <Button
-        variant={sortBy === 'popular' ? 'default' : 'outline'}
-        size="sm"
-        onClick={() => onSortChange('popular')}
-        className="rounded-lg"
-      >
-        Populyar
-      </Button>
+    <div className="flex gap-1.5 mb-3">
+      {[
+        { id: 'recent' as const, label: 'Ən son' },
+        { id: 'popular' as const, label: 'Populyar' },
+      ].map((option) => (
+        <motion.button
+          key={option.id}
+          onClick={() => onSortChange(option.id)}
+          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
+            sortBy === option.id
+              ? 'gradient-primary text-primary-foreground shadow-sm'
+              : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+          }`}
+          whileTap={{ scale: 0.95 }}
+        >
+          {option.label}
+        </motion.button>
+      ))}
     </div>
   );
 };

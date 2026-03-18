@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { Users, ChevronRight, UserPlus, UserMinus, Check } from 'lucide-react';
 import { CommunityGroup, useJoinGroup, useLeaveGroup } from '@/hooks/useCommunity';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface GroupsListProps {
@@ -26,15 +25,14 @@ const GroupsList = ({ groups, memberGroupIds, onSelectGroup, searchQuery, isLoad
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-3">
         {[1, 2, 3, 4].map((i) => (
-          <Skeleton key={i} className="h-24 rounded-2xl" />
+          <Skeleton key={i} className="h-20 rounded-2xl" />
         ))}
       </div>
     );
   }
 
-  // Filter and group by type
   const filteredGroups = groups.filter(g =>
     g.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     g.description?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -48,10 +46,10 @@ const GroupsList = ({ groups, memberGroupIds, onSelectGroup, searchQuery, isLoad
   }, {} as Record<string, CommunityGroup[]>);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {Object.entries(groupedByType).map(([type, typeGroups]) => (
         <div key={type}>
-          <h3 className="text-xs font-bold text-muted-foreground mb-2 px-1">
+          <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2.5 px-0.5">
             {GROUP_TYPE_LABELS[type] || type}
           </h3>
           <div className="space-y-2">
@@ -61,85 +59,76 @@ const GroupsList = ({ groups, memberGroupIds, onSelectGroup, searchQuery, isLoad
               return (
                 <motion.div
                   key={group.id}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="bg-card rounded-xl border border-border/50 overflow-hidden shadow-sm"
+                  transition={{ delay: index * 0.04 }}
+                  onClick={() => isMember ? onSelectGroup(group.id) : undefined}
+                  className={`bg-card rounded-2xl border border-border/30 overflow-hidden transition-all duration-200 ${
+                    isMember ? 'cursor-pointer hover:border-primary/20 hover:shadow-md hover:shadow-primary/5' : ''
+                  }`}
                 >
-                  <div className="p-3">
-                    <div className="flex items-start gap-2">
-                      {/* Icon - Fixed size, no overflow */}
-                      <div className="w-10 h-10 min-w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <span className="text-lg leading-none">{group.icon_emoji || '👥'}</span>
+                  <div className="p-3.5">
+                    <div className="flex items-center gap-3">
+                      {/* Icon */}
+                      <div className="w-11 h-11 min-w-11 rounded-xl bg-gradient-to-br from-primary/8 to-accent/8 flex items-center justify-center">
+                        <span className="text-xl leading-none">{group.icon_emoji || '👥'}</span>
                       </div>
-                      
-                      {/* Content - Flexible but truncated */}
-                      <div className="flex-1 min-w-0 pr-1">
-                        <h4 className="font-bold text-foreground text-xs leading-tight line-clamp-2">
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-bold text-foreground text-sm leading-snug line-clamp-1">
                           {group.name}
                         </h4>
                         {group.description && (
-                          <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-2">
+                          <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">
                             {group.description}
                           </p>
                         )}
-                        <div className="flex items-center gap-1 mt-1 text-[10px] text-muted-foreground">
-                          <Users className="w-2.5 h-2.5 flex-shrink-0" />
+                        <div className="flex items-center gap-1 mt-1 text-[10px] text-muted-foreground/70">
+                          <Users className="w-2.5 h-2.5" />
                           <span>{group.member_count} üzv</span>
                         </div>
                       </div>
-                      
-                      {/* Action Button - Fixed width */}
+
+                      {/* Action */}
                       <div className="flex-shrink-0">
                         {isMember ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onSelectGroup(group.id);
-                            }}
-                            className="h-7 px-2 text-[10px] font-medium"
-                          >
-                            <Check className="w-3 h-3 mr-1 text-green-600" />
-                            Üzv
-                          </Button>
+                          <div className="flex items-center gap-1.5">
+                            <span className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-primary/8 text-primary text-[11px] font-semibold">
+                              <Check className="w-3 h-3" />
+                              Üzv
+                            </span>
+                            <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
+                          </div>
                         ) : (
-                          <Button
-                            size="sm"
+                          <motion.button
                             onClick={(e) => {
                               e.stopPropagation();
                               joinGroup.mutate(group.id);
                             }}
                             disabled={joinGroup.isPending}
-                            className="h-7 px-2 text-[10px] font-medium gradient-primary"
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-xl gradient-primary text-primary-foreground text-[11px] font-semibold shadow-sm"
+                            whileTap={{ scale: 0.95 }}
                           >
-                            <UserPlus className="w-3 h-3 mr-1" />
+                            <UserPlus className="w-3 h-3" />
                             Qoşul
-                          </Button>
+                          </motion.button>
                         )}
                       </div>
                     </div>
-                    
-                    {/* Member Actions Row */}
+
+                    {/* Leave action for members */}
                     {isMember && (
-                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/50">
-                        <button
-                          onClick={() => onSelectGroup(group.id)}
-                          className="text-[10px] text-primary font-medium flex items-center gap-0.5 hover:underline"
-                        >
-                          Qrupа keç
-                          <ChevronRight className="w-3 h-3" />
-                        </button>
+                      <div className="flex justify-end mt-2 pt-2 border-t border-border/20">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             leaveGroup.mutate(group.id);
                           }}
                           disabled={leaveGroup.isPending}
-                          className="text-[10px] text-destructive hover:underline"
+                          className="text-[10px] text-muted-foreground/60 hover:text-destructive transition-colors flex items-center gap-0.5"
                         >
-                          <UserMinus className="w-2.5 h-2.5 inline mr-0.5" />
+                          <UserMinus className="w-2.5 h-2.5" />
                           Ayrıl
                         </button>
                       </div>
@@ -153,11 +142,11 @@ const GroupsList = ({ groups, memberGroupIds, onSelectGroup, searchQuery, isLoad
       ))}
 
       {filteredGroups.length === 0 && (
-        <div className="text-center py-8">
-          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
-            <Users className="w-6 h-6 text-muted-foreground" />
+        <div className="text-center py-12">
+          <div className="w-14 h-14 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto mb-3">
+            <Users className="w-6 h-6 text-muted-foreground/60" />
           </div>
-          <p className="text-muted-foreground text-sm">Qrup tapılmadı</p>
+          <p className="text-muted-foreground text-sm font-medium">Qrup tapılmadı</p>
         </div>
       )}
     </div>
