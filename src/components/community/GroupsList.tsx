@@ -25,9 +25,9 @@ const GroupsList = ({ groups, memberGroupIds, onSelectGroup, searchQuery, isLoad
 
   if (isLoading) {
     return (
-      <div className="space-y-3">
+      <div className="space-y-2">
         {[1, 2, 3, 4].map((i) => (
-          <Skeleton key={i} className="h-[76px] rounded-[20px]" />
+          <Skeleton key={i} className="h-[68px] rounded-2xl" />
         ))}
       </div>
     );
@@ -46,93 +46,72 @@ const GroupsList = ({ groups, memberGroupIds, onSelectGroup, searchQuery, isLoad
   }, {} as Record<string, CommunityGroup[]>);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {Object.entries(groupedByType).map(([type, typeGroups]) => (
         <div key={type}>
-          <h3 className="text-[11px] font-extrabold text-muted-foreground/50 uppercase tracking-[0.08em] mb-3 px-1">
+          <h3 className="text-[10px] font-extrabold text-muted-foreground/40 uppercase tracking-[0.1em] mb-2 px-0.5">
             {GROUP_TYPE_LABELS[type] || type}
           </h3>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {typeGroups.map((group, index) => {
               const isMember = memberGroupIds.has(group.id);
-
               return (
                 <motion.div
                   key={group.id}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.04, ease: [0.25, 0.1, 0.25, 1] }}
+                  transition={{ delay: index * 0.03 }}
                   onClick={() => isMember ? onSelectGroup(group.id) : undefined}
-                  className={`bg-card rounded-[20px] border border-border/15 overflow-hidden transition-all duration-250 ${
-                    isMember ? 'cursor-pointer hover:border-primary/15 hover:shadow-[0_8px_24px_-8px_hsl(var(--primary)/0.08)]' : ''
+                  className={`bg-card rounded-2xl border border-border/10 overflow-hidden transition-all duration-200 ${
+                    isMember ? 'cursor-pointer active:scale-[0.99]' : ''
                   }`}
                 >
-                  <div className="p-4">
-                    <div className="flex items-center gap-3.5">
-                      {/* Icon */}
-                      <div className="w-12 h-12 min-w-12 rounded-2xl bg-gradient-to-br from-primary/6 to-accent/4 flex items-center justify-center">
-                        <span className="text-[22px] leading-none">{group.icon_emoji || '👥'}</span>
+                  <div className="p-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 min-w-10 rounded-xl bg-gradient-to-br from-primary/6 to-accent/4 flex items-center justify-center">
+                        <span className="text-lg leading-none">{group.icon_emoji || '👥'}</span>
                       </div>
 
-                      {/* Content */}
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-foreground text-[14px] leading-snug line-clamp-1">
-                          {group.name}
-                        </h4>
+                        <h4 className="font-bold text-foreground text-[13px] leading-tight line-clamp-1">{group.name}</h4>
                         {group.description && (
-                          <p className="text-[11px] text-muted-foreground/60 mt-0.5 line-clamp-1 font-medium">
-                            {group.description}
-                          </p>
+                          <p className="text-[10px] text-muted-foreground/50 mt-[2px] line-clamp-1 font-medium">{group.description}</p>
                         )}
-                        <div className="flex items-center gap-1.5 mt-1.5">
-                          <div className="flex items-center gap-1 text-[10px] text-muted-foreground/40 font-semibold">
-                            <Users className="w-[10px] h-[10px]" />
-                            <span>{group.member_count} üzv</span>
-                          </div>
+                        <div className="flex items-center gap-1 mt-1 text-[9px] text-muted-foreground/35 font-semibold">
+                          <Users className="w-[9px] h-[9px]" />
+                          <span>{group.member_count} üzv</span>
                         </div>
                       </div>
 
-                      {/* Action */}
                       <div className="flex-shrink-0">
                         {isMember ? (
-                          <div className="flex items-center gap-2">
-                            <span className="flex items-center gap-1 px-3 py-[7px] rounded-2xl bg-primary/6 text-primary text-[11px] font-bold">
-                              <Check className="w-3 h-3" />
-                              Üzv
+                          <div className="flex items-center gap-1.5">
+                            <span className="flex items-center gap-0.5 px-2 py-[5px] rounded-lg bg-primary/6 text-primary text-[10px] font-bold">
+                              <Check className="w-2.5 h-2.5" /> Üzv
                             </span>
-                            <ChevronRight className="w-4 h-4 text-muted-foreground/30" />
+                            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/25" />
                           </div>
                         ) : (
                           <motion.button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              joinGroup.mutate(group.id);
-                            }}
+                            onClick={(e) => { e.stopPropagation(); joinGroup.mutate(group.id); }}
                             disabled={joinGroup.isPending}
-                            className="flex items-center gap-1.5 px-4 py-[7px] rounded-2xl gradient-primary text-primary-foreground text-[11px] font-bold shadow-[0_2px_12px_-3px_hsl(var(--primary)/0.35)]"
-                            whileHover={{ y: -1 }}
-                            whileTap={{ scale: 0.94 }}
+                            className="flex items-center gap-1 px-3 py-[5px] rounded-lg gradient-primary text-primary-foreground text-[10px] font-bold shadow-sm"
+                            whileTap={{ scale: 0.93 }}
                           >
-                            <UserPlus className="w-3 h-3" />
-                            Qoşul
+                            <UserPlus className="w-2.5 h-2.5" /> Qoşul
                           </motion.button>
                         )}
                       </div>
                     </div>
 
-                    {/* Leave action for members */}
                     {isMember && (
-                      <div className="flex justify-end mt-2.5 pt-2.5 border-t border-border/10">
+                      <div className="flex justify-end mt-2 pt-2 border-t border-border/8">
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            leaveGroup.mutate(group.id);
-                          }}
+                          onClick={(e) => { e.stopPropagation(); leaveGroup.mutate(group.id); }}
                           disabled={leaveGroup.isPending}
-                          className="text-[10px] text-muted-foreground/40 hover:text-destructive transition-colors duration-200 flex items-center gap-1 font-semibold"
+                          className="text-[9px] text-muted-foreground/30 hover:text-destructive transition-colors flex items-center gap-0.5 font-semibold"
                         >
-                          <UserMinus className="w-2.5 h-2.5" />
-                          Ayrıl
+                          <UserMinus className="w-2 h-2" /> Ayrıl
                         </button>
                       </div>
                     )}
@@ -145,16 +124,12 @@ const GroupsList = ({ groups, memberGroupIds, onSelectGroup, searchQuery, isLoad
       ))}
 
       {filteredGroups.length === 0 && (
-        <motion.div
-          className="text-center py-16"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-        >
-          <div className="w-16 h-16 rounded-[20px] bg-muted/30 flex items-center justify-center mx-auto mb-4">
-            <Users className="w-7 h-7 text-muted-foreground/30" />
+        <div className="text-center py-14">
+          <div className="w-14 h-14 rounded-2xl bg-muted/20 flex items-center justify-center mx-auto mb-3">
+            <Users className="w-6 h-6 text-muted-foreground/25" />
           </div>
-          <p className="text-muted-foreground/50 text-[13px] font-bold">Qrup tapılmadı</p>
-        </motion.div>
+          <p className="text-muted-foreground/40 text-[12px] font-bold">Qrup tapılmadı</p>
+        </div>
       )}
     </div>
   );
