@@ -18,7 +18,7 @@ interface CommunityScreenProps {
 }
 
 const tabs = [
-  { id: 'feed', label: 'Lenta', icon: TrendingUp },
+  { id: 'feed', label: 'Ümumi', icon: TrendingUp },
   { id: 'my-groups', label: 'Qruplarım', icon: Sparkles },
   { id: 'groups', label: 'Kəşf et', icon: Compass },
 ] as const;
