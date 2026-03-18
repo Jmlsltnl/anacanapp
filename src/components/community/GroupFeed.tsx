@@ -23,17 +23,13 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
   const { data: posts = [], isLoading } = useGroupPosts(group?.id || null);
   const { onlineCount, onlineUsers, typingUsers } = useGroupPresence(group?.id || null);
   
-  // Search and filter state - use external query if provided
   const [localSearchQuery, setLocalSearchQuery] = useState('');
   const searchQuery = externalSearchQuery !== undefined ? externalSearchQuery : localSearchQuery;
   const setSearchQuery = setLocalSearchQuery;
   const [sortBy, setSortBy] = useState<'recent' | 'popular'>('recent');
 
-  // Filter and sort posts
   const filteredPosts = useMemo(() => {
     let result = [...posts];
-
-    // Filter by search query
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
       result = result.filter(post => 
@@ -41,68 +37,42 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
         post.author?.name?.toLowerCase().includes(lowerQuery)
       );
     }
-
-    // Sort
     if (sortBy === 'popular') {
       result.sort((a, b) => (b.likes_count + b.comments_count) - (a.likes_count + a.comments_count));
     } else {
       result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     }
-
     return result;
   }, [posts, searchQuery, sortBy]);
 
-  if (isEmbedded) {
-    // Embedded view for general feed
-    return (
-      <div ref={ref} className="space-y-3">
-        {/* Search & Filter */}
-        <PostSearchFilter
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-        />
+  const EmptyState = ({ emoji, text, subtext }: { emoji: string; text: string; subtext: string }) => (
+    <motion.div className="text-center py-14" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/8 to-accent/6 flex items-center justify-center mx-auto mb-4">
+        <span className="text-2xl">{emoji}</span>
+      </div>
+      <h3 className="font-bold text-foreground mb-1 text-[13px]">{text}</h3>
+      <p className="text-[11px] text-muted-foreground/50 mb-4 max-w-[220px] mx-auto">{subtext}</p>
+      {!searchQuery && (
+        <Button onClick={onCreatePost} size="sm" className="gradient-primary text-[11px] h-8 px-4 rounded-xl">
+          <Plus className="w-3.5 h-3.5 mr-1.5" /> Paylaşım yarat
+        </Button>
+      )}
+    </motion.div>
+  );
 
+  if (isEmbedded) {
+    return (
+      <div ref={ref} className="space-y-2.5">
+        <PostSearchFilter searchQuery={searchQuery} onSearchChange={setSearchQuery} sortBy={sortBy} onSortChange={setSortBy} />
         {isLoading ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-40 rounded-2xl" />
-            ))}
+          <div className="space-y-2.5">
+            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-32 rounded-2xl" />)}
           </div>
         ) : filteredPosts.length === 0 ? (
-          <motion.div 
-            className="text-center py-12"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-          >
-            <div className="relative mx-auto w-24 h-24 mb-4">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-pink-500/20 rounded-full animate-pulse" />
-              <div className="absolute inset-2 bg-card rounded-full flex items-center justify-center">
-                <div className="text-4xl">💬</div>
-              </div>
-            </div>
-            <h3 className="font-bold text-foreground mb-2 text-base">
-              {searchQuery ? 'Nəticə tapılmadı' : 'Hələ paylaşım yoxdur'}
-            </h3>
-            <p className="text-sm text-muted-foreground mb-4 max-w-xs mx-auto">
-              {searchQuery ? 'Başqa axtarış sözləri sınayın' : 'İlk paylaşımı siz edin və digər analarla əlaqə qurun!'}
-            </p>
-            {!searchQuery && (
-              <Button onClick={onCreatePost} className="gradient-primary text-sm h-10 px-6">
-                <Plus className="w-4 h-4 mr-2" />
-                Paylaşım yarat
-              </Button>
-            )}
-          </motion.div>
+          <EmptyState emoji="💬" text={searchQuery ? 'Nəticə tapılmadı' : 'Hələ paylaşım yoxdur'} subtext={searchQuery ? 'Başqa axtarış sözləri sınayın' : 'İlk paylaşımı siz edin!'} />
         ) : (
           filteredPosts.map((post, index) => (
-            <motion.div
-              key={post.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-            >
+            <motion.div key={post.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}>
               <PostCard post={post} groupId={group?.id || null} onUserClick={onUserClick} />
             </motion.div>
           ))
@@ -114,105 +84,53 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
   return (
     <div ref={ref} className="min-h-screen pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/50">
-        <div className="px-3 py-3">
-          <div className="flex items-center gap-3">
-            <motion.button
-              onClick={onBack}
-              className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}
-            >
-              <ArrowLeft className="w-4 h-4" />
+      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-2xl border-b border-border/15">
+        <div className="px-4 py-2.5">
+          <div className="flex items-center gap-2.5">
+            <motion.button onClick={onBack} className="w-8 h-8 rounded-xl bg-muted/40 flex items-center justify-center" whileTap={{ scale: 0.9 }}>
+              <ArrowLeft className="w-4 h-4 text-foreground" />
             </motion.button>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="text-xl">{group?.icon_emoji || '👥'}</span>
-                <h1 className="text-lg font-black text-foreground truncate">
-                  {group?.name || 'Ümumi'}
-                </h1>
+                <span className="text-base">{group?.icon_emoji || '👥'}</span>
+                <h1 className="text-[15px] font-black text-foreground truncate">{group?.name || 'Ümumi'}</h1>
               </div>
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Users className="w-3 h-3" />
+              <div className="flex items-center gap-1 text-[10px] text-muted-foreground/50 font-medium">
+                <Users className="w-2.5 h-2.5" />
                 <span>{group?.member_count || 0} üzv</span>
               </div>
             </div>
-            <Button
-              onClick={onCreatePost}
-              className="w-9 h-9 rounded-xl gradient-primary p-0"
-            >
-              <Plus className="w-4 h-4 text-white" />
+            <Button onClick={onCreatePost} className="w-8 h-8 rounded-xl gradient-primary p-0">
+              <Plus className="w-4 h-4 text-primary-foreground" />
             </Button>
           </div>
         </div>
 
-        {/* Presence Bar */}
         {group && (
-          <GroupPresenceBar
-            onlineCount={onlineCount}
-            onlineUsers={onlineUsers}
-            typingUsers={typingUsers}
-          />
+          <GroupPresenceBar onlineCount={onlineCount} onlineUsers={onlineUsers} typingUsers={typingUsers} />
         )}
         
-        {/* Stories */}
         {group && (
-          <div className="px-3 pb-2 border-b border-border/50">
+          <div className="px-4 pb-2 border-b border-border/10">
             <StoriesBar groupId={group.id} />
           </div>
         )}
       </div>
 
-      {/* Search & Filter */}
-      <div className="px-3 pt-3">
-        <PostSearchFilter
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-        />
+      <div className="px-4 pt-3">
+        <PostSearchFilter searchQuery={searchQuery} onSearchChange={setSearchQuery} sortBy={sortBy} onSortChange={setSortBy} />
       </div>
 
-      {/* Feed */}
-      <div className="px-3 pt-3 space-y-3">
+      <div className="px-4 pt-2 space-y-2.5">
         {isLoading ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-40 rounded-2xl" />
-            ))}
+          <div className="space-y-2.5">
+            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-32 rounded-2xl" />)}
           </div>
         ) : filteredPosts.length === 0 ? (
-          <motion.div 
-            className="text-center py-12"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-          >
-            <div className="relative mx-auto w-24 h-24 mb-4">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-pink-500/20 rounded-full animate-pulse" />
-              <div className="absolute inset-2 bg-card rounded-full flex items-center justify-center">
-                <div className="text-4xl">🌟</div>
-              </div>
-            </div>
-            <h3 className="font-bold text-foreground mb-2 text-base">
-              {searchQuery ? 'Nəticə tapılmadı' : 'Hələ paylaşım yoxdur'}
-            </h3>
-            <p className="text-sm text-muted-foreground mb-4 max-w-xs mx-auto">
-              {searchQuery ? 'Başqa axtarış sözləri sınayın' : 'Bu qrupda ilk paylaşımı siz edin və söhbətə başlayın!'}
-            </p>
-            {!searchQuery && (
-              <Button onClick={onCreatePost} className="gradient-primary text-sm h-10 px-6">
-                <Plus className="w-4 h-4 mr-2" />
-                Paylaşım yarat
-              </Button>
-            )}
-          </motion.div>
+          <EmptyState emoji="🌟" text={searchQuery ? 'Nəticə tapılmadı' : 'Hələ paylaşım yoxdur'} subtext={searchQuery ? 'Başqa axtarış sözləri sınayın' : 'Bu qrupda ilk paylaşımı siz edin!'} />
         ) : (
           filteredPosts.map((post, index) => (
-            <motion.div
-              key={post.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-            >
+            <motion.div key={post.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}>
               <PostCard post={post} groupId={group?.id || null} onUserClick={onUserClick} />
             </motion.div>
           ))

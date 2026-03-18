@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, MessageCircle, Share2, MoreHorizontal, ChevronDown, ChevronUp, Send, Trash2, Crown, Shield, Flag, Pencil, EyeOff } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal, Send, Trash2, Crown, Shield, Flag, Pencil, EyeOff, Bookmark } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { CommunityPost, useToggleLike, usePostComments, useCreateComment, useEditPost, useDeletePost } from '@/hooks/useCommunity';
@@ -43,20 +43,17 @@ const getMediaType = (url: string): 'image' | 'video' => {
 
 const UserBadge = ({ type }: { type: 'admin' | 'premium' | 'moderator' | null }) => {
   if (!type) return null;
-
   const config = {
     admin: { label: 'Admin', icon: Shield, className: 'bg-gradient-to-r from-red-500 to-orange-500 text-white' },
     premium: { label: 'Premium', icon: Crown, className: 'bg-gradient-to-r from-amber-400 to-amber-600 text-white' },
     moderator: { label: 'Mod', icon: Shield, className: 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' },
   };
-
   const badgeConfig = config[type];
   if (!badgeConfig) return null;
   const Icon = badgeConfig.icon;
-
   return (
-    <span className={`inline-flex items-center gap-0.5 px-1.5 py-[2px] rounded-md text-[8px] font-extrabold tracking-wide uppercase ${badgeConfig.className}`}>
-      <Icon className="w-2 h-2" />
+    <span className={`inline-flex items-center gap-[2px] px-1.5 py-[1px] rounded-md text-[7px] font-extrabold tracking-wider uppercase ${badgeConfig.className}`}>
+      <Icon className="w-[7px] h-[7px]" />
       {badgeConfig.label}
     </span>
   );
@@ -125,12 +122,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
     }
     const { error } = await (supabase as any)
       .from('post_reports')
-      .insert({
-        post_id: post.id,
-        reporter_id: user.id,
-        reason: reportReason,
-        status: 'pending'
-      });
+      .insert({ post_id: post.id, reporter_id: user.id, reason: reportReason, status: 'pending' });
     if (error) {
       toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
     } else {
@@ -143,51 +135,34 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   const handleShare = async () => {
     const shareText = post.content.substring(0, 100) + (post.content.length > 100 ? '...' : '');
     hapticFeedback.medium();
-    await nativeShare({
-      title: 'Anacan - Paylaşım',
-      text: shareText,
-    });
+    await nativeShare({ title: 'Anacan - Paylaşım', text: shareText });
   };
 
-  const timeAgo = formatDistanceToNow(new Date(post.created_at), {
-    addSuffix: true,
-    locale: az,
-  });
-
-  const mediaItems = (post.media_urls || []).map(url => ({
-    url,
-    type: getMediaType(url),
-  }));
-
+  const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: az });
+  const mediaItems = (post.media_urls || []).map(url => ({ url, type: getMediaType(url) }));
   const authorBadge = post.author?.badge_type as 'admin' | 'premium' | 'moderator' | null;
 
   const handleAvatarClick = () => {
-    if (post.user_id && onUserClick && !isAnonymous) {
-      onUserClick(post.user_id);
-    }
+    if (post.user_id && onUserClick && !isAnonymous) onUserClick(post.user_id);
   };
 
   const topLevelComments = comments.filter(c => !c.parent_comment_id);
 
   return (
     <>
-      <motion.div
-        className="bg-card rounded-[20px] border border-border/15 overflow-hidden"
-        whileHover={{ y: -1 }}
-        transition={{ duration: 0.2 }}
-      >
-        {/* Header */}
-        <div className="p-4 pb-2.5 flex items-center gap-3">
-          <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.92 }} disabled={isAnonymous}>
-            <Avatar className={`w-11 h-11 ${isAnonymous ? '' : 'cursor-pointer ring-[2.5px] ring-border/20 hover:ring-primary/30'} transition-all duration-300`}>
+      <div className="bg-card rounded-2xl border border-border/10 overflow-hidden">
+        {/* Author */}
+        <div className="px-3.5 pt-3 pb-2 flex items-center gap-2.5">
+          <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.93 }} disabled={isAnonymous}>
+            <Avatar className={`w-9 h-9 ${isAnonymous ? '' : 'cursor-pointer ring-2 ring-border/15 hover:ring-primary/25'} transition-all duration-200`}>
               {isAnonymous ? (
-                <AvatarFallback className="bg-muted/60 text-muted-foreground">
-                  <EyeOff className="w-4 h-4" />
+                <AvatarFallback className="bg-muted/40 text-muted-foreground/60">
+                  <EyeOff className="w-3.5 h-3.5" />
                 </AvatarFallback>
               ) : (
                 <>
                   <AvatarImage src={post.author?.avatar_url || undefined} />
-                  <AvatarFallback className="bg-gradient-to-br from-primary/12 to-accent/12 text-primary font-black text-sm">
+                  <AvatarFallback className="bg-gradient-to-br from-primary/10 to-accent/10 text-primary font-black text-xs">
                     {post.author?.name?.charAt(0) || 'İ'}
                   </AvatarFallback>
                 </>
@@ -198,7 +173,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
             <div className="flex items-center gap-1.5 flex-wrap">
               <motion.button
                 onClick={handleAvatarClick}
-                className={`font-bold text-[13px] ${isAnonymous ? 'text-muted-foreground italic' : 'text-foreground hover:text-primary'} transition-colors duration-200`}
+                className={`font-bold text-[12px] leading-tight ${isAnonymous ? 'text-muted-foreground italic' : 'text-foreground hover:text-primary'} transition-colors`}
                 whileTap={{ scale: 0.98 }}
                 disabled={isAnonymous}
               >
@@ -206,88 +181,74 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
               </motion.button>
               {!isAnonymous && <UserBadge type={authorBadge} />}
               {isAnonymous && (
-                <span className="inline-flex items-center gap-0.5 px-1.5 py-[2px] rounded-md text-[8px] font-semibold bg-muted/50 text-muted-foreground/70">
-                  <EyeOff className="w-2 h-2" />
+                <span className="inline-flex items-center gap-[2px] px-1 py-[1px] rounded text-[7px] font-semibold bg-muted/40 text-muted-foreground/50">
+                  <EyeOff className="w-[7px] h-[7px]" />
                   Anonim
                 </span>
               )}
             </div>
-            <p className="text-[10px] text-muted-foreground/50 mt-0.5 font-medium">{timeAgo}</p>
+            <p className="text-[9px] text-muted-foreground/40 mt-[1px] font-medium">{timeAgo}</p>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="w-8 h-8 rounded-xl hover:bg-muted/40 flex items-center justify-center transition-colors duration-200">
-                <MoreHorizontal className="w-4 h-4 text-muted-foreground/40" />
+              <button className="w-7 h-7 rounded-lg hover:bg-muted/30 flex items-center justify-center transition-colors">
+                <MoreHorizontal className="w-3.5 h-3.5 text-muted-foreground/30" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-popover border-border/30 z-50 rounded-2xl shadow-xl min-w-[160px]">
+            <DropdownMenuContent align="end" className="bg-popover border-border/20 z-50 rounded-xl shadow-xl min-w-[140px]">
               {isOwnPost && (
-                <DropdownMenuItem onClick={() => { setEditContent(post.content); setIsEditing(true); }} className="text-foreground text-xs rounded-xl">
-                  <Pencil className="w-3.5 h-3.5 mr-2" />
-                  Redaktə et
+                <DropdownMenuItem onClick={() => { setEditContent(post.content); setIsEditing(true); }} className="text-foreground text-[11px] rounded-lg">
+                  <Pencil className="w-3 h-3 mr-2" /> Redaktə et
                 </DropdownMenuItem>
               )}
               {!isOwnPost && (
-                <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-amber-600 text-xs rounded-xl">
-                  <Flag className="w-3.5 h-3.5 mr-2" />
-                  Şikayət et
+                <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-amber-600 text-[11px] rounded-lg">
+                  <Flag className="w-3 h-3 mr-2" /> Şikayət et
                 </DropdownMenuItem>
               )}
-              {(isAdmin || isOwnPost) && <DropdownMenuSeparator className="bg-border/20" />}
+              {(isAdmin || isOwnPost) && <DropdownMenuSeparator className="bg-border/10" />}
               {(isAdmin || isOwnPost) && (
-                <DropdownMenuItem onClick={handleDeletePost} className="text-red-500 text-xs rounded-xl">
-                  <Trash2 className="w-3.5 h-3.5 mr-2" />
-                  Postu Sil
+                <DropdownMenuItem onClick={handleDeletePost} className="text-destructive text-[11px] rounded-lg">
+                  <Trash2 className="w-3 h-3 mr-2" /> Sil
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
 
-        {/* Edit Mode or Content */}
+        {/* Edit or Content */}
         {isEditing ? (
-          <div className="px-4 pb-3 space-y-2.5">
+          <div className="px-3.5 pb-2.5 space-y-2">
             <Textarea
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
-              className="min-h-[80px] rounded-2xl resize-none text-sm bg-muted/20 border-border/20"
+              className="min-h-[70px] rounded-xl resize-none text-[12px] bg-muted/15 border-border/15"
               autoFocus
             />
-            <div className="flex gap-2 justify-end">
-              <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="rounded-xl text-xs">Ləğv et</Button>
-              <Button size="sm" onClick={handleEditPost} disabled={!editContent.trim() || editPost.isPending} className="gradient-primary rounded-xl text-xs">
-                {editPost.isPending ? 'Saxlanılır...' : 'Yadda saxla'}
+            <div className="flex gap-1.5 justify-end">
+              <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="rounded-lg text-[11px] h-7 px-2.5">Ləğv et</Button>
+              <Button size="sm" onClick={handleEditPost} disabled={!editContent.trim() || editPost.isPending} className="gradient-primary rounded-lg text-[11px] h-7 px-3">
+                {editPost.isPending ? '...' : 'Saxla'}
               </Button>
             </div>
           </div>
         ) : (
           <>
-            {/* Content */}
-            <div className="px-4 pb-3">
-              <p className="text-foreground/90 whitespace-pre-wrap text-[13px] leading-[1.65]">
+            <div className="px-3.5 pb-2">
+              <p className="text-foreground/85 whitespace-pre-wrap text-[12.5px] leading-[1.6]">
                 {post.content.split(/(\s+)/).map((word, index) => {
                   if (word.startsWith('#')) {
-                    return (
-                      <span key={index} className="text-primary font-semibold cursor-pointer hover:underline decoration-primary/30 underline-offset-2">
-                        {word}
-                      </span>
-                    );
+                    return <span key={index} className="text-primary font-semibold">{word}</span>;
                   } else if (word.startsWith('@')) {
-                    return (
-                      <span key={index} className="text-blue-500 font-semibold cursor-pointer hover:underline decoration-blue-500/30 underline-offset-2">
-                        {word}
-                      </span>
-                    );
+                    return <span key={index} className="text-blue-500 font-semibold">{word}</span>;
                   }
                   return word;
                 })}
               </p>
             </div>
-
-            {/* Media */}
             {mediaItems.length > 0 && (
-              <div className="px-4 pb-3">
-                <div className="rounded-2xl overflow-hidden">
+              <div className="px-3.5 pb-2">
+                <div className="rounded-xl overflow-hidden">
                   <MediaCarousel media={mediaItems} />
                 </div>
               </div>
@@ -295,99 +256,84 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
           </>
         )}
 
-        {/* Engagement Stats */}
-        {(post.likes_count > 0 || post.comments_count > 0) && (
-          <div className="px-4 py-2 flex items-center gap-3 text-[11px] text-muted-foreground/50 font-medium">
+        {/* Stats + Actions combined row */}
+        <div className="px-3.5 py-1.5 flex items-center justify-between border-t border-border/8">
+          {/* Stats */}
+          <div className="flex items-center gap-2 text-[10px] text-muted-foreground/40 font-medium">
             {post.likes_count > 0 && (
               <span className="flex items-center gap-1">
-                <span className="w-4 h-4 rounded-full bg-gradient-to-br from-rose-400 to-rose-500 flex items-center justify-center">
-                  <Heart className="w-2 h-2 text-white fill-white" />
-                </span>
+                <Heart className="w-2.5 h-2.5 fill-rose-400 text-rose-400" />
                 {post.likes_count}
               </span>
             )}
             {post.comments_count > 0 && <span>{post.comments_count} şərh</span>}
           </div>
-        )}
 
-        {/* Actions */}
-        <div className="px-3 py-1.5 flex items-center border-t border-border/10">
-          <motion.button
-            onClick={handleLike}
-            className={`flex-1 py-2.5 rounded-2xl flex items-center justify-center gap-1.5 transition-all duration-200 ${
-              post.is_liked ? 'text-rose-500' : 'text-muted-foreground/60 hover:bg-muted/30'
-            }`}
-            whileTap={{ scale: 0.9 }}
-          >
-            <motion.div
-              animate={post.is_liked ? { scale: [1, 1.35, 1] } : {}}
-              transition={{ duration: 0.35, ease: 'easeOut' }}
+          {/* Actions */}
+          <div className="flex items-center gap-0.5">
+            <motion.button
+              onClick={handleLike}
+              className={`p-2 rounded-lg transition-colors ${post.is_liked ? 'text-rose-500' : 'text-muted-foreground/40 active:text-rose-400'}`}
+              whileTap={{ scale: 0.85 }}
             >
-              <Heart className={`w-[17px] h-[17px] ${post.is_liked ? 'fill-current' : ''}`} />
-            </motion.div>
-            <span className="text-[12px] font-bold">Bəyən</span>
-          </motion.button>
-          <motion.button
-            onClick={() => setShowComments(!showComments)}
-            className="flex-1 py-2.5 rounded-2xl flex items-center justify-center gap-1.5 text-muted-foreground/60 hover:bg-muted/30 transition-all duration-200"
-            whileTap={{ scale: 0.9 }}
-          >
-            <MessageCircle className="w-[17px] h-[17px]" />
-            <span className="text-[12px] font-bold">Şərh</span>
-            {showComments ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-          </motion.button>
-          <motion.button
-            onClick={handleShare}
-            className="flex-1 py-2.5 rounded-2xl flex items-center justify-center gap-1.5 text-muted-foreground/60 hover:bg-muted/30 transition-all duration-200"
-            whileTap={{ scale: 0.9 }}
-          >
-            <Share2 className="w-[17px] h-[17px]" />
-            <span className="text-[12px] font-bold">Paylaş</span>
-          </motion.button>
+              <motion.div animate={post.is_liked ? { scale: [1, 1.3, 1] } : {}} transition={{ duration: 0.3 }}>
+                <Heart className={`w-[16px] h-[16px] ${post.is_liked ? 'fill-current' : ''}`} />
+              </motion.div>
+            </motion.button>
+            <motion.button
+              onClick={() => setShowComments(!showComments)}
+              className={`p-2 rounded-lg transition-colors ${showComments ? 'text-primary' : 'text-muted-foreground/40 active:text-primary'}`}
+              whileTap={{ scale: 0.85 }}
+            >
+              <MessageCircle className="w-[16px] h-[16px]" />
+            </motion.button>
+            <motion.button
+              onClick={handleShare}
+              className="p-2 rounded-lg text-muted-foreground/40 active:text-foreground transition-colors"
+              whileTap={{ scale: 0.85 }}
+            >
+              <Share2 className="w-[16px] h-[16px]" />
+            </motion.button>
+          </div>
         </div>
 
-        {/* Comments Section */}
+        {/* Comments */}
         <AnimatePresence>
           {showComments && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="border-t border-border/10 overflow-hidden"
+              transition={{ duration: 0.2 }}
+              className="border-t border-border/8 overflow-hidden"
             >
-              <div className="p-4 space-y-3">
-                {/* Comment Input */}
-                <div className="flex gap-2.5">
+              <div className="p-3.5 space-y-2.5">
+                <div className="flex gap-2">
                   <Input
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     placeholder="Şərh yaz..."
-                    className="flex-1 h-10 rounded-2xl text-[13px] bg-muted/20 border-border/15 focus:border-primary/25 focus:shadow-[0_0_0_3px_hsl(var(--primary)/0.06)]"
+                    className="flex-1 h-8 rounded-lg text-[11px] bg-muted/15 border-border/10"
                     onKeyPress={(e) => e.key === 'Enter' && handleComment()}
                   />
                   <Button
                     onClick={handleComment}
                     disabled={!commentText.trim() || createComment.isPending}
-                    className="w-10 h-10 rounded-2xl gradient-primary p-0 shadow-[0_2px_8px_-2px_hsl(var(--primary)/0.3)]"
+                    className="w-8 h-8 rounded-lg gradient-primary p-0"
                   >
-                    <Send className="w-[14px] h-[14px] text-primary-foreground" />
+                    <Send className="w-3 h-3 text-primary-foreground" />
                   </Button>
                 </div>
-
-                {/* Comments */}
                 {commentsLoading ? (
-                  <div className="text-center py-4">
-                    <div className="w-5 h-5 border-2 border-primary/40 border-t-primary rounded-full animate-spin mx-auto" />
+                  <div className="text-center py-3">
+                    <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
                   </div>
                 ) : topLevelComments.length === 0 ? (
-                  <div className="text-center py-6">
-                    <p className="text-[11px] text-muted-foreground/40 font-medium">
-                      Hələ şərh yoxdur. İlk şərhi siz yazın! 💭
-                    </p>
-                  </div>
+                  <p className="text-center py-4 text-[10px] text-muted-foreground/35 font-medium">
+                    Hələ şərh yoxdur 💭
+                  </p>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     {topLevelComments.map((comment) => (
                       <CommentReply
                         key={comment.id}
@@ -405,30 +351,19 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
             </motion.div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </div>
 
       {/* Report Dialog */}
       <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
-        <DialogContent className="sm:max-w-md max-w-[90vw] rounded-3xl">
+        <DialogContent className="sm:max-w-md max-w-[90vw] rounded-2xl">
           <DialogHeader>
-            <DialogTitle>Postu Şikayət Et</DialogTitle>
-            <DialogDescription>
-              Bu postun niyə uyğunsuz olduğunu bildirin
-            </DialogDescription>
+            <DialogTitle className="text-sm">Postu Şikayət Et</DialogTitle>
+            <DialogDescription className="text-xs">Bu postun niyə uyğunsuz olduğunu bildirin</DialogDescription>
           </DialogHeader>
-          <Textarea
-            value={reportReason}
-            onChange={(e) => setReportReason(e.target.value)}
-            placeholder="Şikayət səbəbi..."
-            className="rounded-2xl"
-          />
+          <Textarea value={reportReason} onChange={(e) => setReportReason(e.target.value)} placeholder="Şikayət səbəbi..." className="rounded-xl text-sm" />
           <div className="flex gap-2 justify-end">
-            <Button variant="outline" onClick={() => setShowReportDialog(false)} className="rounded-xl">
-              Ləğv et
-            </Button>
-            <Button onClick={handleReportPost} className="gradient-primary rounded-xl">
-              Göndər
-            </Button>
+            <Button variant="outline" onClick={() => setShowReportDialog(false)} className="rounded-lg text-xs h-8">Ləğv et</Button>
+            <Button onClick={handleReportPost} className="gradient-primary rounded-lg text-xs h-8">Göndər</Button>
           </div>
         </DialogContent>
       </Dialog>

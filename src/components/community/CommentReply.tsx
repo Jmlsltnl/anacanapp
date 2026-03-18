@@ -22,24 +22,19 @@ interface CommentReplyProps {
   level?: number;
 }
 
-// Badge component for user types
 const UserBadge = ({ type }: { type: 'admin' | 'premium' | 'moderator' | null }) => {
   if (!type) return null;
-  
   const config = {
     admin: { label: 'Admin', icon: Shield, className: 'bg-gradient-to-r from-red-500 to-orange-500 text-white' },
     premium: { label: 'Premium', icon: Crown, className: 'bg-gradient-to-r from-amber-400 to-amber-600 text-white' },
     moderator: { label: 'Mod', icon: Shield, className: 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' },
   };
-
   const badgeConfig = config[type];
   if (!badgeConfig) return null;
-
   const Icon = badgeConfig.icon;
-
   return (
-    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${badgeConfig.className}`}>
-      <Icon className="w-2.5 h-2.5" />
+    <span className={`inline-flex items-center gap-[2px] px-1 py-[1px] rounded text-[7px] font-bold ${badgeConfig.className}`}>
+      <Icon className="w-[7px] h-[7px]" />
       {badgeConfig.label}
     </span>
   );
@@ -54,60 +49,34 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
   const { toast } = useToast();
   const createComment = useCreateComment();
 
-  // Get replies to this comment
   const replies = allComments.filter(c => c.parent_comment_id === comment.id);
 
   const handleLikeComment = async () => {
     if (!user || isLiking) return;
-
     hapticFeedback.light();
     setIsLiking(true);
-
     try {
       if (comment.is_liked) {
-        // Unlike
-        await supabase
-          .from('comment_likes')
-          .delete()
-          .eq('comment_id', comment.id)
-          .eq('user_id', user.id);
+        await supabase.from('comment_likes').delete().eq('comment_id', comment.id).eq('user_id', user.id);
       } else {
-        // Like
-        await supabase
-          .from('comment_likes')
-          .insert({
-            comment_id: comment.id,
-            user_id: user.id,
-          });
+        await supabase.from('comment_likes').insert({ comment_id: comment.id, user_id: user.id });
       }
-
-      // Refetch comments to update like status
       onRefetch();
     } catch (error) {
       console.error('Like error:', error);
-    } finally {
-      setIsLiking(false);
-    }
+    } finally { setIsLiking(false); }
   };
 
   const handleReply = async () => {
     const content = replyText.trim();
     if (!content || !user) return;
-
     hapticFeedback.light();
-
     try {
       await createComment.mutateAsync({
-        postId,
-        content,
-        parentCommentId: comment.id,
-        postAuthorId,
+        postId, content, parentCommentId: comment.id, postAuthorId,
         commenterName: profile?.name || user.user_metadata?.name || 'İstifadəçi',
       });
-
-      setReplyText('');
-      setShowReplyInput(false);
-      onRefetch();
+      setReplyText(''); setShowReplyInput(false); onRefetch();
     } catch (error: any) {
       toast({ title: 'Xəta', description: error.message || 'Şərh əlavə edilə bilmədi', variant: 'destructive' });
     }
@@ -115,106 +84,63 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
 
   const handleDelete = async () => {
     if (!confirm('Bu şərhi silmək istəyirsiniz?')) return;
-    
-    const { error } = await supabase
-      .from('post_comments')
-      .delete()
-      .eq('id', comment.id);
-
-    if (error) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
-    } else {
-      toast({ title: 'Uğurlu', description: 'Şərh silindi' });
-      onRefetch();
-    }
+    const { error } = await supabase.from('post_comments').delete().eq('id', comment.id);
+    if (error) toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+    else { toast({ title: 'Uğurlu', description: 'Şərh silindi' }); onRefetch(); }
   };
 
-  const handleAvatarClick = () => {
-    if (comment.user_id && onUserClick) {
-      onUserClick(comment.user_id);
-    }
-  };
+  const handleAvatarClick = () => { if (comment.user_id && onUserClick) onUserClick(comment.user_id); };
 
-  const timeAgo = formatDistanceToNow(new Date(comment.created_at), {
-    addSuffix: true,
-    locale: az,
-  });
-
-  // Limit nesting to 2 levels
+  const timeAgo = formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: az });
   const canReply = level < 2;
 
   return (
-    <div className={`${level > 0 ? 'ml-8 mt-2' : ''}`}>
-      <div className="flex gap-3">
-        <motion.button 
-          onClick={handleAvatarClick}
-          whileTap={{ scale: 0.95 }}
-          className="flex-shrink-0"
-        >
-          <Avatar className={`${level === 0 ? 'w-8 h-8' : 'w-6 h-6'} cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all`}>
+    <div className={`${level > 0 ? 'ml-7 mt-1.5' : ''}`}>
+      <div className="flex gap-2">
+        <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.95 }} className="flex-shrink-0 mt-0.5">
+          <Avatar className={`${level === 0 ? 'w-7 h-7' : 'w-5 h-5'} cursor-pointer`}>
             <AvatarImage src={comment.author?.avatar_url || undefined} />
-            <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
+            <AvatarFallback className="bg-primary/8 text-primary font-bold text-[8px]">
               {comment.author?.name?.charAt(0) || 'İ'}
             </AvatarFallback>
           </Avatar>
         </motion.button>
-        <div className="flex-1">
-          <div className="bg-muted rounded-xl p-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 flex-wrap">
-                <motion.button
-                  onClick={handleAvatarClick}
-                  className="text-xs font-bold text-foreground hover:text-primary transition-colors"
-                  whileTap={{ scale: 0.98 }}
-                >
-                  {comment.author?.name || 'İstifadəçi'}
-                </motion.button>
-                <UserBadge type={comment.author?.badge_type as any} />
-                <span className="text-xs text-muted-foreground">· {timeAgo}</span>
-              </div>
+        <div className="flex-1 min-w-0">
+          <div className="bg-muted/20 rounded-xl px-2.5 py-2">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <motion.button onClick={handleAvatarClick} className="text-[10px] font-bold text-foreground hover:text-primary transition-colors" whileTap={{ scale: 0.98 }}>
+                {comment.author?.name || 'İstifadəçi'}
+              </motion.button>
+              <UserBadge type={comment.author?.badge_type as any} />
+              <span className="text-[8px] text-muted-foreground/35">· {timeAgo}</span>
               {isAdmin && (
-                <button
-                  onClick={handleDelete}
-                  className="text-red-500 hover:text-red-600 p-1"
-                >
-                  <Trash2 className="w-3 h-3" />
+                <button onClick={handleDelete} className="ml-auto text-destructive/50 hover:text-destructive p-0.5">
+                  <Trash2 className="w-2.5 h-2.5" />
                 </button>
               )}
             </div>
-            <p className="text-sm text-foreground mt-1">{comment.content}</p>
+            <p className="text-[11px] text-foreground/80 mt-0.5 leading-relaxed">{comment.content}</p>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-3 mt-1 ml-1">
-            <motion.button 
-              onClick={handleLikeComment}
-              disabled={isLiking}
-              className={`flex items-center gap-1 text-xs transition-colors ${
-                comment.is_liked 
-                  ? 'text-rose-500' 
-                  : 'text-muted-foreground hover:text-rose-500'
-              }`}
+          <div className="flex items-center gap-2.5 mt-0.5 ml-1">
+            <motion.button
+              onClick={handleLikeComment} disabled={isLiking}
+              className={`flex items-center gap-0.5 text-[9px] transition-colors ${comment.is_liked ? 'text-rose-500' : 'text-muted-foreground/35 active:text-rose-400'}`}
               whileTap={{ scale: 0.9 }}
             >
-              <Heart className={`w-3 h-3 ${comment.is_liked ? 'fill-current' : ''}`} />
+              <Heart className={`w-2.5 h-2.5 ${comment.is_liked ? 'fill-current' : ''}`} />
               <span>{comment.likes_count || 0}</span>
             </motion.button>
             {canReply && (
-              <button
-                onClick={() => setShowReplyInput(!showReplyInput)}
-                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
-              >
-                <Reply className="w-3 h-3" />
-                <span>Cavab</span>
+              <button onClick={() => setShowReplyInput(!showReplyInput)} className="flex items-center gap-0.5 text-[9px] text-muted-foreground/35 active:text-primary transition-colors">
+                <Reply className="w-2.5 h-2.5" /> Cavab
               </button>
             )}
             {replies.length > 0 && (
-              <button
-                onClick={() => setShowReplies(!showReplies)}
-                className="flex items-center gap-1 text-xs text-primary font-medium"
-              >
-                {showReplies ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                <span>{replies.length} cavab</span>
+              <button onClick={() => setShowReplies(!showReplies)} className="flex items-center gap-0.5 text-[9px] text-primary/70 font-semibold">
+                {showReplies ? <ChevronUp className="w-2.5 h-2.5" /> : <ChevronDown className="w-2.5 h-2.5" />}
+                {replies.length} cavab
               </button>
             )}
           </div>
@@ -222,62 +148,28 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
           {/* Reply Input */}
           <AnimatePresence>
             {showReplyInput && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="mt-2 overflow-hidden"
-              >
-                <div className="flex gap-2">
-                  <Input
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    placeholder={`@${comment.author?.name || 'İstifadəçi'} cavab yaz...`}
-                    className="flex-1 h-9 text-sm rounded-lg"
-                    onKeyPress={(e) => e.key === 'Enter' && handleReply()}
-                  />
-                  <Button
-                    onClick={handleReply}
-                    disabled={!replyText.trim()}
-                    size="sm"
-                    className="h-9 w-9 rounded-lg gradient-primary p-0"
-                  >
-                    <Send className="w-3 h-3 text-white" />
+              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="mt-1.5 overflow-hidden">
+                <div className="flex gap-1.5">
+                  <Input value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder={`@${comment.author?.name || 'İstifadəçi'} cavab...`}
+                    className="flex-1 h-7 text-[10px] rounded-lg bg-muted/15 border-border/10" onKeyPress={(e) => e.key === 'Enter' && handleReply()} />
+                  <Button onClick={handleReply} disabled={!replyText.trim()} size="sm" className="h-7 w-7 rounded-lg gradient-primary p-0">
+                    <Send className="w-2.5 h-2.5 text-primary-foreground" />
                   </Button>
-                  <Button
-                    onClick={() => setShowReplyInput(false)}
-                    variant="ghost"
-                    size="sm"
-                    className="h-9 w-9 rounded-lg p-0"
-                  >
-                    <X className="w-3 h-3" />
+                  <Button onClick={() => setShowReplyInput(false)} variant="ghost" size="sm" className="h-7 w-7 rounded-lg p-0">
+                    <X className="w-2.5 h-2.5" />
                   </Button>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Nested Replies */}
+          {/* Nested */}
           <AnimatePresence>
             {showReplies && replies.length > 0 && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden"
-              >
-                <div className="space-y-2 mt-2">
+              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                <div className="space-y-1 mt-1.5">
                   {replies.map((reply) => (
-                    <CommentReply
-                      key={reply.id}
-                      comment={reply}
-                      postId={postId}
-                      postAuthorId={postAuthorId}
-                      allComments={allComments}
-                      onRefetch={onRefetch}
-                      onUserClick={onUserClick}
-                      level={level + 1}
-                    />
+                    <CommentReply key={reply.id} comment={reply} postId={postId} postAuthorId={postAuthorId} allComments={allComments} onRefetch={onRefetch} onUserClick={onUserClick} level={level + 1} />
                   ))}
                 </div>
               </motion.div>
