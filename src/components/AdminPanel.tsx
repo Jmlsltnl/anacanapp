@@ -59,6 +59,7 @@ import AdminAlbumOrders from './admin/AdminAlbumOrders';
 import AdminCoupons from './admin/AdminCoupons';
 import AdminAnalytics from './admin/AdminAnalytics';
 import AdminEpoint from './admin/AdminEpoint';
+import AdminForceUpdate from './admin/AdminForceUpdate';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -187,6 +188,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminAnalytics />;
       case 'epoint':
         return <AdminEpoint />;
+      case 'force-update':
+        return <AdminForceUpdate />;
       case 'security':
         return <AdminSecurity />;
       default:

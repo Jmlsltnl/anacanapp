@@ -11,6 +11,7 @@ import FloatingTimerWidget from '@/components/FloatingTimerWidget';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useDeviceToken } from '@/hooks/useDeviceToken';
+import { useForceUpdate } from '@/hooks/useForceUpdate';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { resetAppScrollPosition } from '@/lib/scroll';
 
@@ -336,6 +337,22 @@ const Index = () => {
           ))}
         </div>
       </div>
+    );
+  }
+
+  // Force Update check
+  const { forceUpdate, isLoading: forceUpdateLoading } = useForceUpdate();
+  if (!forceUpdateLoading && forceUpdate?.enabled) {
+    const ForceUpdateScreen = lazy(() => import('@/components/ForceUpdateScreen'));
+    return (
+      <Suspense fallback={suspenseFallback}>
+        <ForceUpdateScreen
+          title={forceUpdate.title}
+          message={forceUpdate.message}
+          androidUrl={forceUpdate.android_url}
+          iosUrl={forceUpdate.ios_url}
+        />
+      </Suspense>
     );
   }
 

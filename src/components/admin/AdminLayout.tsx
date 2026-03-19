@@ -76,6 +76,7 @@ const menuItems = [
   { id: 'baby-growth', label: 'Böyümə İzləmə', icon: Scale },
   { id: 'teething', label: 'Diş Çıxarma', icon: Sparkles },
   { id: 'epoint', label: 'Epoint Ödəniş', icon: CreditCard },
+  { id: 'force-update', label: 'Force Update', icon: Shield },
   { id: 'settings', label: 'Tənzimləmələr', icon: Settings },
   { id: 'security', label: 'Təhlükəsizlik', icon: Shield },
 ];
