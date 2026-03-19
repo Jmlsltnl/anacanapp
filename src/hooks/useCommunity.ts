@@ -303,6 +303,23 @@ export const useToggleLike = () => {
         await supabase
           .from('post_likes')
           .insert({ post_id: postId, user_id: user.id });
+
+        // Get post author and send in-app notification
+        try {
+          const { data: post } = await supabase.from('community_posts').select('user_id').eq('id', postId).single();
+          if (post && post.user_id !== user.id) {
+            const { data: profile } = await supabase.from('public_profile_cards').select('name').eq('user_id', user.id).single();
+            const likerName = profile?.name || 'İstifadəçi';
+            await supabase.from('notifications').insert({
+              user_id: post.user_id,
+              title: 'Yeni bəyənmə ❤️',
+              message: `${likerName} paylaşımınızı bəyəndi`,
+              notification_type: 'community_like',
+              action_type: 'community_post',
+              action_data: { postId, groupId } as any,
+            });
+          }
+        } catch (e) { console.error('Like notification error:', e); }
       }
     },
     onSuccess: (_, variables) => {
