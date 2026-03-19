@@ -4308,6 +4308,8 @@ export type Database = {
       }
       notifications: {
         Row: {
+          action_data: Json | null
+          action_type: string | null
           created_at: string
           id: string
           is_read: boolean | null
@@ -4317,6 +4319,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          action_data?: Json | null
+          action_type?: string | null
           created_at?: string
           id?: string
           is_read?: boolean | null
@@ -4326,6 +4330,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          action_data?: Json | null
+          action_type?: string | null
           created_at?: string
           id?: string
           is_read?: boolean | null
