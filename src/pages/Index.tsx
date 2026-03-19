@@ -342,7 +342,6 @@ const Index = () => {
   }
 
   // Force Update check
-  const { forceUpdate, isLoading: forceUpdateLoading } = useForceUpdate();
   if (!forceUpdateLoading && forceUpdate?.enabled) {
     const ForceUpdateScreen = lazy(() => import('@/components/ForceUpdateScreen'));
     return (
