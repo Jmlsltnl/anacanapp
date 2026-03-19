@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Image, Video, Send, Loader2, Play, Smile, Hash, AtSign, EyeOff } from 'lucide-react';
+import { useState, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Image, Video, Send, Loader2, Play, Smile, Hash, AtSign, EyeOff, ChevronDown } from 'lucide-react';
 import EmojiPicker, { EmojiClickData, Theme } from 'emoji-picker-react';
 import { CommunityGroup, useCreatePost } from '@/hooks/useCommunity';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/native';
@@ -26,7 +26,6 @@ interface Suggestion {
   avatar?: string;
 }
 
-// Popular hashtags
 const POPULAR_HASHTAGS = [
   'hamiləlik', 'ana', 'körpə', 'sağlamlıq', 'qidalanma',
   'doğuş', 'əmzirmə', 'yuxu', 'inkişaf', 'oyun',
@@ -41,13 +40,10 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
   const [isUploading, setIsUploading] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
-  
-  // Autocomplete state
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [suggestionType, setSuggestionType] = useState<'user' | 'hashtag' | null>(null);
   const [cursorPosition, setCursorPosition] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('');
 
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -57,106 +53,58 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
   const { toast } = useToast();
   const { theme } = useTheme();
 
-  // Search for users using public_profile_cards (bypasses RLS)
   const searchUsers = useCallback(async (term: string) => {
     if (!term) return [];
-    
-    const { data } = await supabase
-      .from('public_profile_cards')
-      .select('user_id, name, avatar_url')
-      .ilike('name', `%${term}%`)
-      .limit(5);
-
-    return (data || []).map(user => ({
-      type: 'user' as const,
-      value: user.name || 'İstifadəçi',
-      display: user.name || 'İstifadəçi',
-      avatar: user.avatar_url,
-    }));
+    const { data } = await supabase.from('public_profile_cards').select('user_id, name, avatar_url').ilike('name', `%${term}%`).limit(5);
+    return (data || []).map(user => ({ type: 'user' as const, value: user.name || 'İstifadəçi', display: user.name || 'İstifadəçi', avatar: user.avatar_url }));
   }, []);
 
-  // Search for hashtags
   const searchHashtags = useCallback((term: string): Suggestion[] => {
-    const filtered = POPULAR_HASHTAGS.filter(tag => 
-      tag.toLowerCase().includes(term.toLowerCase())
-    );
-    return filtered.slice(0, 5).map(tag => ({
-      type: 'hashtag' as const,
-      value: tag,
-      display: `#${tag}`,
-    }));
+    return POPULAR_HASHTAGS.filter(tag => tag.toLowerCase().includes(term.toLowerCase())).slice(0, 5).map(tag => ({ type: 'hashtag' as const, value: tag, display: `#${tag}` }));
   }, []);
 
-  // Handle content change and detect @ or #
   const handleContentChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = e.target.value;
     const cursorPos = e.target.selectionStart;
-    
     setContent(newContent);
     setCursorPosition(cursorPos);
-
-    // Find the word being typed
     const textBeforeCursor = newContent.substring(0, cursorPos);
     const words = textBeforeCursor.split(/\s/);
     const currentWord = words[words.length - 1];
 
     if (currentWord.startsWith('@') && currentWord.length > 1) {
-      const term = currentWord.substring(1);
-      setSearchTerm(term);
       setSuggestionType('user');
-      const userSuggestions = await searchUsers(term);
+      const userSuggestions = await searchUsers(currentWord.substring(1));
       setSuggestions(userSuggestions);
       setShowSuggestions(userSuggestions.length > 0);
     } else if (currentWord.startsWith('#') && currentWord.length > 1) {
-      const term = currentWord.substring(1);
-      setSearchTerm(term);
       setSuggestionType('hashtag');
-      const hashtagSuggestions = searchHashtags(term);
+      const hashtagSuggestions = searchHashtags(currentWord.substring(1));
       setSuggestions(hashtagSuggestions);
       setShowSuggestions(hashtagSuggestions.length > 0);
     } else {
-      setShowSuggestions(false);
-      setSuggestions([]);
-      setSuggestionType(null);
+      setShowSuggestions(false); setSuggestions([]); setSuggestionType(null);
     }
   };
 
-  // Apply suggestion
   const applySuggestion = (suggestion: Suggestion) => {
     const textBeforeCursor = content.substring(0, cursorPosition);
     const textAfterCursor = content.substring(cursorPosition);
-    
-    // Find and replace the current word
     const words = textBeforeCursor.split(/\s/);
-    words[words.length - 1] = suggestion.type === 'hashtag' 
-      ? `#${suggestion.value}` 
-      : `@${suggestion.value}`;
-    
-    const newContent = words.join(' ') + ' ' + textAfterCursor;
-    setContent(newContent);
-    setShowSuggestions(false);
-    setSuggestions([]);
-    
-    // Focus textarea
-    setTimeout(() => {
-      textareaRef.current?.focus();
-    }, 0);
+    words[words.length - 1] = suggestion.type === 'hashtag' ? `#${suggestion.value}` : `@${suggestion.value}`;
+    setContent(words.join(' ') + ' ' + textAfterCursor);
+    setShowSuggestions(false); setSuggestions([]);
+    setTimeout(() => textareaRef.current?.focus(), 0);
   };
 
   const handleEmojiSelect = (emojiData: EmojiClickData) => {
     const emoji = emojiData.emoji;
     const textarea = textareaRef.current;
-    
     if (textarea) {
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
-      const newContent = content.substring(0, start) + emoji + content.substring(end);
-      setContent(newContent);
-      
-      setTimeout(() => {
-        textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
-        textarea.focus();
-      }, 0);
+      setContent(content.substring(0, start) + emoji + content.substring(end));
+      setTimeout(() => { textarea.selectionStart = textarea.selectionEnd = start + emoji.length; textarea.focus(); }, 0);
     } else {
       setContent(prev => prev + emoji);
     }
@@ -166,112 +114,42 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video') => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
-    
-    if (files.length + mediaFiles.length > 4) {
-      toast({
-        title: 'Limit aşıldı',
-        description: 'Maximum 4 fayl yükləyə bilərsiniz',
-        variant: 'destructive'
-      });
-      return;
-    }
-
+    if (files.length + mediaFiles.length > 4) { toast({ title: 'Limit aşıldı', description: 'Maximum 4 fayl', variant: 'destructive' }); return; }
     const maxSize = type === 'video' ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
-    const oversizedFiles = files.filter(f => f.size > maxSize);
-    if (oversizedFiles.length > 0) {
-      toast({
-        title: 'Fayl çox böyükdür',
-        description: type === 'video' ? 'Video maksimum 50MB ola bilər' : 'Şəkil maksimum 10MB ola bilər',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    const newFiles = [...mediaFiles, ...files];
-    setMediaFiles(newFiles);
-    
-    const newPreviews = files.map(file => ({
-      url: URL.createObjectURL(file),
-      type: type,
-    }));
-    setMediaPreviews(prev => [...prev, ...newPreviews]);
-
-    if (e.target) {
-      e.target.value = '';
-    }
+    if (files.some(f => f.size > maxSize)) { toast({ title: 'Fayl çox böyükdür', description: type === 'video' ? 'Max 50MB' : 'Max 10MB', variant: 'destructive' }); return; }
+    setMediaFiles(prev => [...prev, ...files]);
+    setMediaPreviews(prev => [...prev, ...files.map(file => ({ url: URL.createObjectURL(file), type }))]);
+    if (e.target) e.target.value = '';
   };
 
   const uploadMedia = async (): Promise<string[]> => {
     if (mediaFiles.length === 0) return [];
-
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
-
     const urls: string[] = [];
-
     for (const file of mediaFiles) {
       const fileExt = file.name.split('.').pop() || 'jpg';
       const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-      
-      const { error } = await supabase.storage
-        .from('community-media')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (error) {
-        console.error('Upload error:', error);
-        throw new Error(`Fayl yüklənə bilmədi: ${error.message}`);
-      }
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('community-media')
-        .getPublicUrl(fileName);
-
+      const { error } = await supabase.storage.from('community-media').upload(fileName, file, { cacheControl: '3600', upsert: false });
+      if (error) throw new Error(`Fayl yüklənə bilmədi: ${error.message}`);
+      const { data: { publicUrl } } = supabase.storage.from('community-media').getPublicUrl(fileName);
       urls.push(publicUrl);
     }
-
     return urls;
   };
 
   const handleSubmit = async () => {
-    if (!content.trim() && mediaFiles.length === 0) {
-      toast({
-        title: 'Boş paylaşım',
-        description: 'Zəhmət olmasa mətn yazın və ya media əlavə edin',
-        variant: 'destructive'
-      });
-      return;
-    }
-
+    if (!content.trim() && mediaFiles.length === 0) { toast({ title: 'Boş paylaşım', description: 'Mətn yazın və ya media əlavə edin', variant: 'destructive' }); return; }
     hapticFeedback.medium();
     setIsUploading(true);
-
     try {
       const mediaUrls = await uploadMedia();
-      await createPost.mutateAsync({
-        groupId: selectedGroupId,
-        content: content.trim() || '📷',
-        mediaUrls,
-        isAnonymous,
-      });
-
+      await createPost.mutateAsync({ groupId: selectedGroupId, content: content.trim() || '📷', mediaUrls, isAnonymous });
       mediaPreviews.forEach(p => URL.revokeObjectURL(p.url));
-      setContent('');
-      setMediaFiles([]);
-      setMediaPreviews([]);
-      onClose();
+      setContent(''); setMediaFiles([]); setMediaPreviews([]); onClose();
     } catch (error) {
-      console.error('Error creating post:', error);
-      toast({
-        title: 'Xəta baş verdi',
-        description: error instanceof Error ? error.message : 'Paylaşım yaradıla bilmədi',
-        variant: 'destructive'
-      });
-    } finally {
-      setIsUploading(false);
-    }
+      toast({ title: 'Xəta', description: error instanceof Error ? error.message : 'Paylaşım yaradıla bilmədi', variant: 'destructive' });
+    } finally { setIsUploading(false); }
   };
 
   const removeMedia = (index: number) => {
@@ -282,256 +160,186 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
 
   const handleClose = () => {
     mediaPreviews.forEach(p => URL.revokeObjectURL(p.url));
-    setContent('');
-    setMediaFiles([]);
-    setMediaPreviews([]);
-    setShowEmojiPicker(false);
-    setShowSuggestions(false);
-    setIsAnonymous(false);
+    setContent(''); setMediaFiles([]); setMediaPreviews([]); setShowEmojiPicker(false); setShowSuggestions(false); setIsAnonymous(false);
     onClose();
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="sm:max-w-md max-w-[95vw] max-h-[85vh] overflow-y-auto rounded-2xl p-0">
-        <DialogHeader className="p-5 pb-0">
-          <DialogTitle className="text-xl font-black text-foreground text-center">
-            Yeni Paylaşım
-          </DialogTitle>
-        </DialogHeader>
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-end justify-center"
+          onClick={handleClose}
+        >
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 380 }}
+            className="w-full max-w-md bg-card rounded-t-[28px] max-h-[90vh] overflow-y-auto"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 16px) + 20px)' }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-10 h-1 rounded-full bg-border/30" />
+            </div>
 
-        <div className="p-5 pt-4 space-y-4">
-          {/* Group Selector */}
-          <div>
-            <label className="text-sm font-medium text-muted-foreground mb-2 block">
-              Paylaşım yeri
-            </label>
-            <Select
-              value={selectedGroupId || 'public'}
-              onValueChange={(value) => setSelectedGroupId(value === 'public' ? null : value)}
-            >
-              <SelectTrigger className="w-full h-12 rounded-xl bg-muted/50 border-border">
-                <SelectValue placeholder="Qrup seçin" />
-              </SelectTrigger>
-              <SelectContent className="bg-popover border-border z-[100]">
-                <SelectItem value="public">🌍 Ümumi (Hamı görə bilər)</SelectItem>
-                {groups.map((group) => (
-                  <SelectItem key={group.id} value={group.id}>
-                    {group.icon_emoji || '👥'} {group.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-3">
+              <h3 className="text-[17px] font-black text-foreground">Yeni Paylaşım</h3>
+              <button onClick={handleClose} className="w-8 h-8 rounded-full bg-muted/40 flex items-center justify-center">
+                <X className="w-4 h-4 text-muted-foreground/60" />
+              </button>
+            </div>
 
-          {/* Content with Autocomplete */}
-          <div className="relative">
-            <Textarea
-              ref={textareaRef}
-              value={content}
-              onChange={handleContentChange}
-              placeholder="Nə düşünürsünüz? ✨ (@mention, #hashtag)"
-              className="min-h-[120px] rounded-xl resize-none text-base bg-muted/50 border-border focus:border-primary pr-12"
-            />
-            
-            {/* Emoji Picker Button */}
-            <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
-              <PopoverTrigger asChild>
-                <button
-                  type="button"
-                  className="absolute right-3 top-3 w-8 h-8 rounded-lg bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
-                >
-                  <Smile className="w-5 h-5 text-muted-foreground" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 border-0" align="end" side="top">
-                <EmojiPicker
-                  onEmojiClick={handleEmojiSelect}
-                  theme={theme === 'dark' ? Theme.DARK : Theme.LIGHT}
-                  width={300}
-                  height={350}
-                  searchPlaceholder="Emoji axtar..."
-                  previewConfig={{ showPreview: false }}
+            <div className="px-5 space-y-4">
+              {/* Group Selector */}
+              <Select value={selectedGroupId || 'public'} onValueChange={(value) => setSelectedGroupId(value === 'public' ? null : value)}>
+                <SelectTrigger className="w-full h-10 rounded-2xl bg-muted/20 border-border/10 text-[12px] font-medium">
+                  <SelectValue placeholder="Qrup seçin" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border-border z-[100] rounded-xl">
+                  <SelectItem value="public">🌍 Ümumi</SelectItem>
+                  {groups.map((group) => (
+                    <SelectItem key={group.id} value={group.id}>{group.icon_emoji || '👥'} {group.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* Content */}
+              <div className="relative">
+                <Textarea
+                  ref={textareaRef}
+                  value={content}
+                  onChange={handleContentChange}
+                  placeholder="Nə düşünürsünüz? ✨"
+                  className="min-h-[130px] rounded-2xl resize-none text-[14px] bg-muted/10 border-border/10 focus:border-primary/20 pr-12 leading-relaxed"
                 />
-              </PopoverContent>
-            </Popover>
+                <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
+                  <PopoverTrigger asChild>
+                    <button type="button" className="absolute right-3 top-3 w-8 h-8 rounded-full bg-muted/30 hover:bg-muted/50 flex items-center justify-center transition-colors">
+                      <Smile className="w-4 h-4 text-muted-foreground/50" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 border-0" align="end" side="top">
+                    <EmojiPicker onEmojiClick={handleEmojiSelect} theme={theme === 'dark' ? Theme.DARK : Theme.LIGHT} width={300} height={350} searchPlaceholder="Emoji axtar..." previewConfig={{ showPreview: false }} />
+                  </PopoverContent>
+                </Popover>
 
-            {/* Autocomplete Suggestions */}
-            {showSuggestions && suggestions.length > 0 && (
-              <div className="absolute left-0 right-0 top-full mt-1 bg-popover border border-border rounded-xl shadow-lg z-50 overflow-hidden">
-                {suggestions.map((suggestion, index) => (
-                  <button
-                    key={`${suggestion.type}-${suggestion.value}-${index}`}
-                    onClick={() => applySuggestion(suggestion)}
-                    className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-muted transition-colors text-left"
-                  >
-                    {suggestion.type === 'user' ? (
-                      <>
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
-                          {suggestion.avatar ? (
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute left-0 right-0 top-full mt-1 bg-popover border border-border/15 rounded-2xl shadow-lg z-50 overflow-hidden">
+                    {suggestions.map((suggestion, index) => (
+                      <button key={`${suggestion.type}-${suggestion.value}-${index}`} onClick={() => applySuggestion(suggestion)}
+                        className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-muted/50 transition-colors text-left">
+                        <div className="w-7 h-7 rounded-full bg-primary/8 flex items-center justify-center overflow-hidden">
+                          {suggestion.type === 'user' && suggestion.avatar ? (
                             <img src={suggestion.avatar} alt="" className="w-full h-full object-cover" />
+                          ) : suggestion.type === 'user' ? (
+                            <AtSign className="w-3.5 h-3.5 text-primary" />
                           ) : (
-                            <AtSign className="w-4 h-4 text-primary" />
+                            <Hash className="w-3.5 h-3.5 text-primary" />
                           )}
                         </div>
-                        <span className="font-medium">@{suggestion.value}</span>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Hash className="w-4 h-4 text-primary" />
-                        </div>
-                        <span className="font-medium">#{suggestion.value}</span>
-                      </>
-                    )}
+                        <span className="font-medium text-[12px]">{suggestion.type === 'hashtag' ? '#' : '@'}{suggestion.value}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Quick Hashtags */}
+              <div className="flex flex-wrap gap-1.5">
+                {POPULAR_HASHTAGS.slice(0, 5).map(tag => (
+                  <button key={tag} onClick={() => setContent(prev => prev + (prev ? ' ' : '') + `#${tag}`)}
+                    className="px-2.5 py-1 rounded-full bg-muted/20 text-[10px] font-bold text-muted-foreground/50 hover:bg-primary/8 hover:text-primary transition-colors">
+                    #{tag}
                   </button>
                 ))}
               </div>
-            )}
-          </div>
 
-          {/* Quick Hashtags */}
-          <div className="flex flex-wrap gap-2">
-            {POPULAR_HASHTAGS.slice(0, 5).map(tag => (
-              <button
-                key={tag}
-                onClick={() => setContent(prev => prev + (prev ? ' ' : '') + `#${tag}`)}
-                className="px-3 py-1 rounded-full bg-muted text-xs font-medium text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
-              >
-                #{tag}
-              </button>
-            ))}
-          </div>
-
-          {/* Media Previews */}
-          {mediaPreviews.length > 0 && (
-            <div className="grid grid-cols-2 gap-2">
-              {mediaPreviews.map((preview, index) => (
-                <div key={index} className="relative aspect-square rounded-xl overflow-hidden bg-muted">
-                  {preview.type === 'video' ? (
-                    <div className="relative w-full h-full">
-                      <video src={preview.url} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                        <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
-                          <Play className="w-5 h-5 text-foreground ml-0.5" />
+              {/* Media Previews */}
+              {mediaPreviews.length > 0 && (
+                <div className="grid grid-cols-2 gap-2">
+                  {mediaPreviews.map((preview, index) => (
+                    <div key={index} className="relative aspect-square rounded-2xl overflow-hidden bg-muted">
+                      {preview.type === 'video' ? (
+                        <div className="relative w-full h-full">
+                          <video src={preview.url} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                            <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center"><Play className="w-5 h-5 text-foreground ml-0.5" /></div>
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        <img src={preview.url} alt="" className="w-full h-full object-cover" />
+                      )}
+                      <button onClick={() => removeMedia(index)} className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center">
+                        <X className="w-3 h-3 text-white" />
+                      </button>
                     </div>
-                  ) : (
-                    <img src={preview.url} alt="" className="w-full h-full object-cover" />
-                  )}
-                  <button
-                    onClick={() => removeMedia(index)}
-                    className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-colors"
-                  >
-                    <X className="w-4 h-4 text-white" />
-                  </button>
-                  {preview.type === 'video' && (
-                    <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-black/60 rounded text-white text-xs">
-                      Video
-                    </div>
-                  )}
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
+              )}
 
-          {/* Hidden file inputs */}
-          <input
-            ref={imageInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={(e) => handleFileSelect(e, 'image')}
-          />
-          <input
-            ref={videoInputRef}
-            type="file"
-            accept="video/*"
-            className="hidden"
-            onChange={(e) => handleFileSelect(e, 'video')}
-          />
+              <input ref={imageInputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => handleFileSelect(e, 'image')} />
+              <input ref={videoInputRef} type="file" accept="video/*" className="hidden" onChange={(e) => handleFileSelect(e, 'video')} />
 
-          {/* Media Actions */}
-          <div className="flex items-center gap-3 py-2 border-y border-border">
-            <span className="text-sm text-muted-foreground">Əlavə et:</span>
-            
-            <button
-              onClick={() => imageInputRef.current?.click()}
-              disabled={mediaFiles.length >= 4 || isUploading}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted hover:bg-muted/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Image className="w-5 h-5 text-primary" />
-              <span className="text-sm font-medium">Şəkil</span>
-            </button>
-
-            <button
-              onClick={() => videoInputRef.current?.click()}
-              disabled={mediaFiles.length >= 4 || isUploading}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted hover:bg-muted/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Video className="w-5 h-5 text-primary" />
-              <span className="text-sm font-medium">Video</span>
-            </button>
-          </div>
-
-          {/* Media count indicator */}
-          {mediaFiles.length > 0 && (
-            <p className="text-xs text-muted-foreground text-center">
-              {mediaFiles.length}/4 media əlavə edildi
-            </p>
-          )}
-
-          {/* Anonymous Toggle */}
-          <button
-            type="button"
-            onClick={() => setIsAnonymous(!isAnonymous)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-              isAnonymous 
-                ? 'bg-primary/10 border border-primary/30' 
-                : 'bg-muted/50 border border-border hover:bg-muted'
-            }`}
-          >
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-              isAnonymous ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
-            }`}>
-              <EyeOff className="w-4 h-4" />
-            </div>
-            <div className="flex-1 text-left">
-              <p className={`text-sm font-semibold ${isAnonymous ? 'text-primary' : 'text-foreground'}`}>
-                Anonim paylaş
-              </p>
-              <p className="text-[11px] text-muted-foreground">
-                Adınız və şəkliniz gizlədilir
-              </p>
-            </div>
-            <div className={`w-10 h-6 rounded-full transition-colors ${isAnonymous ? 'bg-primary' : 'bg-border'}`}>
-              <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform mt-0.5 ${isAnonymous ? 'translate-x-4.5 ml-[18px]' : 'translate-x-0.5 ml-0.5'}`} />
-            </div>
-          </button>
-
-          {/* Submit Button */}
-          <Button
-            onClick={handleSubmit}
-            disabled={(!content.trim() && mediaFiles.length === 0) || isUploading || createPost.isPending}
-            className="w-full h-12 rounded-xl gradient-primary font-bold text-base"
-          >
-            {isUploading || createPost.isPending ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Yüklənir...</span>
+              {/* Media Actions */}
+              <div className="flex items-center gap-2.5 py-2">
+                <span className="text-[11px] text-muted-foreground/40 font-medium">Əlavə et:</span>
+                <button onClick={() => imageInputRef.current?.click()} disabled={mediaFiles.length >= 4 || isUploading}
+                  className="w-9 h-9 rounded-full bg-primary/6 flex items-center justify-center disabled:opacity-40 transition-colors active:bg-primary/12">
+                  <Image className="w-4 h-4 text-primary/60" />
+                </button>
+                <button onClick={() => videoInputRef.current?.click()} disabled={mediaFiles.length >= 4 || isUploading}
+                  className="w-9 h-9 rounded-full bg-blue-500/6 flex items-center justify-center disabled:opacity-40 transition-colors active:bg-blue-500/12">
+                  <Video className="w-4 h-4 text-blue-500/60" />
+                </button>
+                {mediaFiles.length > 0 && <span className="text-[10px] text-muted-foreground/35 font-medium ml-auto">{mediaFiles.length}/4</span>}
               </div>
-            ) : (
-              <>
-                <Send className="w-5 h-5 mr-2" />
-                Paylaş
-              </>
-            )}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+
+              {/* Anonymous Toggle */}
+              <button
+                type="button"
+                onClick={() => setIsAnonymous(!isAnonymous)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${
+                  isAnonymous ? 'bg-primary/8 border border-primary/20' : 'bg-muted/15 border border-border/10'
+                }`}
+              >
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isAnonymous ? 'bg-primary text-primary-foreground' : 'bg-muted/50 text-muted-foreground/50'}`}>
+                  <EyeOff className="w-4 h-4" />
+                </div>
+                <div className="flex-1 text-left">
+                  <p className={`text-[12px] font-bold ${isAnonymous ? 'text-primary' : 'text-foreground'}`}>Anonim paylaş</p>
+                  <p className="text-[10px] text-muted-foreground/40">Adınız gizlədilir</p>
+                </div>
+                <div className={`w-10 h-6 rounded-full transition-colors ${isAnonymous ? 'bg-primary' : 'bg-border/50'}`}>
+                  <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform mt-0.5 ${isAnonymous ? 'ml-[18px]' : 'ml-0.5'}`} />
+                </div>
+              </button>
+
+              {/* Submit */}
+              <Button
+                onClick={handleSubmit}
+                disabled={(!content.trim() && mediaFiles.length === 0) || isUploading || createPost.isPending}
+                className="w-full h-11 rounded-full gradient-primary font-bold text-[13px] shadow-lg shadow-primary/20"
+              >
+                {isUploading || createPost.isPending ? (
+                  <div className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /><span>Yüklənir...</span></div>
+                ) : (
+                  <><Send className="w-4 h-4 mr-2" />Paylaş</>
+                )}
+              </Button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

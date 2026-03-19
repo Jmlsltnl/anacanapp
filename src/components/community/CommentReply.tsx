@@ -29,13 +29,12 @@ const UserBadge = ({ type }: { type: 'admin' | 'premium' | 'moderator' | null })
     premium: { label: 'Premium', icon: Crown, className: 'bg-gradient-to-r from-amber-400 to-amber-600 text-white' },
     moderator: { label: 'Mod', icon: Shield, className: 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' },
   };
-  const badgeConfig = config[type];
-  if (!badgeConfig) return null;
-  const Icon = badgeConfig.icon;
+  const b = config[type];
+  if (!b) return null;
+  const Icon = b.icon;
   return (
-    <span className={`inline-flex items-center gap-[2px] px-1 py-[1px] rounded text-[7px] font-bold ${badgeConfig.className}`}>
-      <Icon className="w-[7px] h-[7px]" />
-      {badgeConfig.label}
+    <span className={`inline-flex items-center gap-[2px] px-1 py-[1px] rounded text-[7px] font-bold ${b.className}`}>
+      <Icon className="w-[7px] h-[7px]" />{b.label}
     </span>
   );
 };
@@ -48,7 +47,6 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
   const { isAdmin, user, profile } = useAuth();
   const { toast } = useToast();
   const createComment = useCreateComment();
-
   const replies = allComments.filter(c => c.parent_comment_id === comment.id);
 
   const handleLikeComment = async () => {
@@ -90,15 +88,18 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
   };
 
   const handleAvatarClick = () => { if (comment.user_id && onUserClick) onUserClick(comment.user_id); };
-
   const timeAgo = formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: az });
   const canReply = level < 2;
 
   return (
-    <div className={`${level > 0 ? 'ml-7 mt-1.5' : ''}`}>
-      <div className="flex gap-2">
-        <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.95 }} className="flex-shrink-0 mt-0.5">
-          <Avatar className={`${level === 0 ? 'w-7 h-7' : 'w-5 h-5'} cursor-pointer`}>
+    <div className={`relative ${level > 0 ? 'ml-8' : ''}`}>
+      {/* Thread line */}
+      {level > 0 && (
+        <div className="absolute left-[-16px] top-0 bottom-0 w-[2px] bg-border/10 rounded-full" />
+      )}
+      <div className="flex gap-2.5">
+        <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.95 }} className="flex-shrink-0 mt-1">
+          <Avatar className={`${level === 0 ? 'w-8 h-8' : 'w-6 h-6'} cursor-pointer`}>
             <AvatarImage src={comment.author?.avatar_url || undefined} />
             <AvatarFallback className="bg-primary/8 text-primary font-bold text-[8px]">
               {comment.author?.name?.charAt(0) || 'İ'}
@@ -106,39 +107,39 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
           </Avatar>
         </motion.button>
         <div className="flex-1 min-w-0">
-          <div className="bg-muted/20 rounded-xl px-2.5 py-2">
+          <div className="bg-muted/12 rounded-2xl px-3 py-2.5">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <motion.button onClick={handleAvatarClick} className="text-[10px] font-bold text-foreground hover:text-primary transition-colors" whileTap={{ scale: 0.98 }}>
+              <motion.button onClick={handleAvatarClick} className="text-[11px] font-bold text-foreground hover:text-primary transition-colors" whileTap={{ scale: 0.98 }}>
                 {comment.author?.name || 'İstifadəçi'}
               </motion.button>
               <UserBadge type={comment.author?.badge_type as any} />
-              <span className="text-[8px] text-muted-foreground/35">· {timeAgo}</span>
+              <span className="text-[8px] text-muted-foreground/30">· {timeAgo}</span>
               {isAdmin && (
-                <button onClick={handleDelete} className="ml-auto text-destructive/50 hover:text-destructive p-0.5">
+                <button onClick={handleDelete} className="ml-auto text-destructive/40 hover:text-destructive p-0.5">
                   <Trash2 className="w-2.5 h-2.5" />
                 </button>
               )}
             </div>
-            <p className="text-[11px] text-foreground/80 mt-0.5 leading-relaxed">{comment.content}</p>
+            <p className="text-[12px] text-foreground/80 mt-1 leading-relaxed">{comment.content}</p>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2.5 mt-0.5 ml-1">
+          <div className="flex items-center gap-3 mt-1 ml-2">
             <motion.button
               onClick={handleLikeComment} disabled={isLiking}
-              className={`flex items-center gap-0.5 text-[9px] transition-colors ${comment.is_liked ? 'text-rose-500' : 'text-muted-foreground/35 active:text-rose-400'}`}
-              whileTap={{ scale: 0.9 }}
+              className={`flex items-center gap-0.5 text-[9px] transition-colors ${comment.is_liked ? 'text-rose-500' : 'text-muted-foreground/30 active:text-rose-400'}`}
+              whileTap={{ scale: 0.85 }}
             >
-              <Heart className={`w-2.5 h-2.5 ${comment.is_liked ? 'fill-current' : ''}`} />
-              <span>{comment.likes_count || 0}</span>
+              <Heart className={`w-3 h-3 ${comment.is_liked ? 'fill-current' : ''}`} />
+              {(comment.likes_count || 0) > 0 && <span>{comment.likes_count}</span>}
             </motion.button>
             {canReply && (
-              <button onClick={() => setShowReplyInput(!showReplyInput)} className="flex items-center gap-0.5 text-[9px] text-muted-foreground/35 active:text-primary transition-colors">
-                <Reply className="w-2.5 h-2.5" /> Cavab
+              <button onClick={() => setShowReplyInput(!showReplyInput)} className="text-[9px] text-muted-foreground/30 active:text-primary transition-colors font-semibold">
+                Cavab
               </button>
             )}
             {replies.length > 0 && (
-              <button onClick={() => setShowReplies(!showReplies)} className="flex items-center gap-0.5 text-[9px] text-primary/70 font-semibold">
+              <button onClick={() => setShowReplies(!showReplies)} className="flex items-center gap-0.5 text-[9px] text-primary/60 font-bold">
                 {showReplies ? <ChevronUp className="w-2.5 h-2.5" /> : <ChevronDown className="w-2.5 h-2.5" />}
                 {replies.length} cavab
               </button>
@@ -148,26 +149,26 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
           {/* Reply Input */}
           <AnimatePresence>
             {showReplyInput && (
-              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="mt-1.5 overflow-hidden">
-                <div className="flex gap-1.5">
+              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="mt-2 overflow-hidden">
+                <div className="flex gap-2">
                   <Input value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder={`@${comment.author?.name || 'İstifadəçi'} cavab...`}
-                    className="flex-1 h-7 text-[10px] rounded-lg bg-muted/15 border-border/10" onKeyPress={(e) => e.key === 'Enter' && handleReply()} />
-                  <Button onClick={handleReply} disabled={!replyText.trim()} size="sm" className="h-7 w-7 rounded-lg gradient-primary p-0">
-                    <Send className="w-2.5 h-2.5 text-primary-foreground" />
+                    className="flex-1 h-8 text-[11px] rounded-full bg-muted/10 border-border/10 px-3.5" onKeyPress={(e) => e.key === 'Enter' && handleReply()} />
+                  <Button onClick={handleReply} disabled={!replyText.trim()} size="sm" className="h-8 w-8 rounded-full gradient-primary p-0">
+                    <Send className="w-3 h-3 text-primary-foreground" />
                   </Button>
-                  <Button onClick={() => setShowReplyInput(false)} variant="ghost" size="sm" className="h-7 w-7 rounded-lg p-0">
-                    <X className="w-2.5 h-2.5" />
+                  <Button onClick={() => setShowReplyInput(false)} variant="ghost" size="sm" className="h-8 w-8 rounded-full p-0">
+                    <X className="w-3 h-3" />
                   </Button>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Nested */}
+          {/* Nested replies */}
           <AnimatePresence>
             {showReplies && replies.length > 0 && (
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                <div className="space-y-1 mt-1.5">
+                <div className="space-y-2 mt-2">
                   {replies.map((reply) => (
                     <CommentReply key={reply.id} comment={reply} postId={postId} postAuthorId={postAuthorId} allComments={allComments} onRefetch={onRefetch} onUserClick={onUserClick} level={level + 1} />
                   ))}
