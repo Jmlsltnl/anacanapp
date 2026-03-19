@@ -304,19 +304,19 @@ export const useToggleLike = () => {
           .from('post_likes')
           .insert({ post_id: postId, user_id: user.id });
 
-        // Get post author and send in-app notification
+        // Send push notification (which also stores in-app notification)
         try {
           const { data: post } = await supabase.from('community_posts').select('user_id').eq('id', postId).single();
           if (post && post.user_id !== user.id) {
             const { data: profile } = await supabase.from('public_profile_cards').select('name').eq('user_id', user.id).single();
             const likerName = profile?.name || 'İstifadəçi';
-            await supabase.from('notifications').insert({
-              user_id: post.user_id,
-              title: 'Yeni bəyənmə ❤️',
-              message: `${likerName} paylaşımınızı bəyəndi`,
-              notification_type: 'community_like',
-              action_type: 'community_post',
-              action_data: { postId, groupId } as any,
+            await supabase.functions.invoke('send-push-notification', {
+              body: {
+                userId: post.user_id,
+                title: 'Yeni bəyənmə ❤️',
+                body: `${likerName} paylaşımınızı bəyəndi`,
+                data: { type: 'community_like', postId, groupId },
+              },
             });
           }
         } catch (e) { console.error('Like notification error:', e); }
@@ -411,31 +411,17 @@ export const useCreateComment = () => {
         const preview = content.length > 50 ? `${content.slice(0, 50)}...` : content;
         const senderName = commenterName?.trim() || 'İstifadəçi';
 
-        // Push notification
-        const { error: pushError } = await supabase.functions.invoke('send-push-notification', {
-          body: {
-            userId: postAuthorId,
-            title: 'Yeni şərh! 💬',
-            body: `${senderName}: ${preview}`,
-            data: { type: 'comment', postId },
-          },
-        });
-
-        if (pushError) {
-          console.error('Error sending comment notification:', pushError);
-        }
-
-        // In-app notification
+        // Push notification (also stores in-app notification via edge function)
         try {
-          await supabase.from('notifications').insert({
-            user_id: postAuthorId,
-            title: parentCommentId ? 'Yeni cavab 💬' : 'Yeni şərh 💬',
-            message: `${senderName}: ${preview}`,
-            notification_type: parentCommentId ? 'community_reply' : 'community_comment',
-            action_type: 'community_post',
-            action_data: { postId } as any,
+          await supabase.functions.invoke('send-push-notification', {
+            body: {
+              userId: postAuthorId,
+              title: parentCommentId ? 'Yeni cavab 💬' : 'Yeni şərh 💬',
+              body: `${senderName}: ${preview}`,
+              data: { type: parentCommentId ? 'community_reply' : 'community_comment', postId },
+            },
           });
-        } catch (e) { console.error('Comment notification insert error:', e); }
+        } catch (e) { console.error('Comment notification error:', e); }
       }
     },
     onSuccess: (_, variables) => {
