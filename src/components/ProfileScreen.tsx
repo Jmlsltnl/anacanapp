@@ -194,8 +194,12 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
         <div className="absolute -left-10 -bottom-10 w-32 h-32 rounded-full bg-white/5 blur-xl" />
         
         <div className="relative z-10 flex items-center gap-3">
-          <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center text-3xl shadow-lg">
-            {stageInfo.emoji}
+          <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center text-3xl shadow-lg overflow-hidden">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              stageInfo.emoji
+            )}
           </div>
           <div className="flex-1">
             <h2 className="text-lg font-black text-white">{profile?.name || name || 'İstifadəçi'}</h2>
