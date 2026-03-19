@@ -1,135 +1,66 @@
 
 
-# Plan: Multiple UI/UX Fixes and Features
+# Cəmiyyət Səhifəsinin Tam Yenidən Dizaynı
 
-This plan addresses 9 distinct issues across the application.
+## Məqsəd
+Cəmiyyət bölməsini sıfırdan premium, müasir UI/UX ilə yenidən hazırlamaq — Instagram/Threads/Flo-dan ilham alaraq.
 
----
+## Dəyişiklik Ediləcək Fayllar
 
-## 1. Horoscope Calendar Not Fully Visible
+### 1. `CommunityScreen.tsx` — Ana Ekran
+- **Header**: Daha minimal, başlıq + subtitle arasında daha yaxşı kontrast. Glassmorphism `backdrop-blur-3xl` ilə.
+- **Axtarış**: Pill-formasında (`rounded-2xl`), ikon animasiyalı, focus zamanı genişlənən effekt.
+- **Tablar**: Underline-style tab indikatoru (pill əvəzinə). `layoutId` ilə animasiyalı alt xətt. Daha minimalist görünüş.
+- **FAB düyməsi**: Gradient glow effekti ilə, `shadow-[0_8px_32px]` kölgə. Kiçik label əlavəsi ("Paylaş").
+- **Stories hissəsi**: Header-ə inteqrasiya olunmuş, ayrıca separator olmadan.
 
-**Problem**: The `DatePickerWheel` calendar modal renders day cells at fixed `w-10 h-10` which can overflow on smaller screens or within the horoscope's constrained layout.
+### 2. `PostCard.tsx` — Post Kartları
+- **Kart dizaynı**: `shadow-[0_1px_3px_rgba(0,0,0,0.04)]` yumşaq kölgə, `rounded-2xl`, hover zamanı subtle lift.
+- **Avatar**: `w-10 h-10`, online indikatoru (yaşıl nöqtə).
+- **Ad + vaxt**: Bir sətirdə, aralarında `·` separator.
+- **Mətn**: `text-[13px] leading-[1.7]`, daha oxunaqlı.
+- **Media**: `rounded-2xl` ilə, kart kənarlarına qədər uzanan (edge-to-edge within card).
+- **Aksiya sırası**: Like (say ilə birlikdə), Comment (say ilə), Share — Instagram stilində. İkon + say yanyana.
+- **Like animasiyası**: Double-tap to like + heart burst effekti.
+- **Şərhlər bölməsi**: Daha təmiz separator, avatar + bubble stil şərhlər.
 
-**Fix**: Change day cells from fixed `w-10 h-10` to responsive `w-full aspect-square` within the 7-column grid, ensuring the calendar adapts to container width. The modal container (`inset-x-4 max-w-sm`) should be sufficient but the inner grid cells need to be flexible.
+### 3. `StoriesBar.tsx` — Hekayələr
+- **Ölçü**: `w-[62px] h-[62px]` dairəvi (`rounded-full`) — Instagram-a daha yaxın.
+- **Gradient ring**: Baxılmamış olanlar üçün canlı gradient, baxılmışlar üçün `border-2 border-muted/30`.
+- **Ad**: `text-[10px]` ilə aşağıda, bir sətir.
+- **"Əlavə et" düyməsi**: Mavi gradient `+` ikonu ilə.
 
-**Files**: `src/components/ui/date-picker-wheel.tsx`
+### 4. `GroupsList.tsx` — Qruplar
+- **Kart formatı**: Horizontal kart, sol tərəfdə böyük emoji (`w-12 h-12`), sağda info + aksiya.
+- **Üzv sayı**: Avatar stack (3 kiçik avatar üst-üstə) + say.
+- **Qoşul düyməsi**: Daha cəlbedici, `rounded-full` pill forması.
+- **Kateqoriya başlıqları**: Sol xətt ilə (left border accent), daha vizual.
 
----
+### 5. `PostSearchFilter.tsx` — Sort Düymələri
+- **Stil**: Underline-style tabs (pill əvəzinə), daha minimalist.
 
-## 2. Weather Analysis Accuracy
+### 6. `CommentReply.tsx` — Şərhlər
+- **Bubble dizaynı**: Daha yumşaq `bg-muted/12`, `rounded-2xl`.
+- **Thread xətti**: Sol tərəfdə vertikal bağlantı xətti (reply thread line).
+- **Aksiyalar**: Daha kompakt, `text-[9px]`.
 
-**Problem**: The edge function uses Open-Meteo API which can differ from Apple Weather (which uses proprietary data sources). The real weather values (temperature, feels_like, wind) are passed correctly from Open-Meteo but the AI (Gemini) regenerates them in JSON output, potentially returning different numbers than the actual API data.
+### 7. `GroupFeed.tsx` — Qrup Feed
+- **Header**: Blur header, qrupun böyük emoji + üzv sayı.
+- **Empty state**: Lottie-style illustration (CSS ilə), daha cəlbedici.
 
-**Fix**: After parsing Gemini's JSON response, overwrite the numeric weather fields (`temperature`, `feelsLike`, `humidity`, `windSpeed`, `uvIndex`) with the actual Open-Meteo values instead of trusting Gemini's output. This ensures displayed weather data matches the real API data.
+### 8. `CreatePostModal.tsx` — Yeni Post
+- **Bottom sheet formatı**: Dialog əvəzinə aşağıdan sürüşən panel (mövcud cihaz ölçüsünə uyğun).
+- **Textarea**: Daha böyük, placeholder ilə.
+- **Media düymələri**: Dairəvi ikonlar sırası.
+- **Anonim toggle**: Daha kompakt switch.
 
-**Files**: `supabase/functions/weather-clothing/index.ts`
+### 9. `GroupPresenceBar.tsx` — Online İstifadəçilər
+- **Daha kompakt**: Avatarlar kiçik, typing indikatoru inline.
 
----
-
-## 3. First Aid (Həyat Qurtaran SOS) - More Compact Layout
-
-**Problem**: Scenario cards use large `w-16 h-16` icons, `text-lg` titles, generous padding, and large step icons (`w-28 h-28`).
-
-**Fix**: Reduce icon sizes (`w-12 h-12`), title fonts (`text-base`), padding (`p-3`), and step display icon (`w-20 h-20`). Make the overall layout more compact while keeping readability.
-
-**Files**: `src/components/tools/FirstAidGuide.tsx`
-
----
-
-## 4. White Noise Persistent Playback Across Pages
-
-**Problem**: When navigating away from WhiteNoise, the audio stops because the component unmounts and the `AudioContext`/`AudioBufferSourceNode` are destroyed.
-
-**Fix**:
-- Create a global `whiteNoiseStore` (zustand, persisted) that manages a singleton `AudioContext` and active sound state at app level
-- Move audio playback logic (AudioContext, gain node, source node) into a global service/store that persists across navigation
-- Add WhiteNoise to the `FloatingTimerWidget` — when a white-noise timer is active, show a minimal floating widget with play/pause and stop controls
-- When user clicks the floating widget, navigate back to WhiteNoise screen
-
-**Files**: 
-- `src/store/whiteNoiseStore.ts` (new)
-- `src/components/tools/WhiteNoise.tsx` (refactor to use store)
-- `src/components/FloatingTimerWidget.tsx` (add white-noise playback controls)
-- `src/App.tsx` or root layout (mount audio engine globally)
-
----
-
-## 5. Pregnancy Album in Main Section + Baby Monthly Album + Physical Album Orders
-
-**Problem**: Pregnancy Album only accessible from tools. Need: (a) accessible from main dashboard, (b) baby monthly photo album for post-birth, (c) "Order Physical Album" button in both, (d) admin management for album orders with same payment methods as cakes.
-
-**Fix**:
-- Add Pregnancy Album card/widget to Dashboard for `bump` users
-- Create `BabyMonthlyAlbum` component for `mommy` users (upload monthly photos, months 1-12+)
-- Add "Fiziki Albom Sifariş Et" button to both album screens
-- Create `album_orders` DB table with same structure as cake orders
-- Create admin section `AdminAlbumOrders` for managing orders
-- Reuse cake payment methods for album orders
-
-**Files**:
-- `src/components/Dashboard.tsx` (add album widget)
-- `src/components/baby/BabyMonthlyAlbum.tsx` (new)
-- `src/components/tools/PregnancyAlbum.tsx` (add order button)
-- `src/components/shop/AlbumOrderScreen.tsx` (new)
-- `src/components/admin/AdminAlbumOrders.tsx` (new)
-- `src/components/admin/AdminLayout.tsx`, `AdminPanel.tsx` (add menu item)
-- DB migration: `album_orders` table + RLS
-
----
-
-## 6. Shop Screen - More Compact + Fix Back Button
-
-**Problem**: Header back arrow overlaps iOS safe area. Layout has generous spacing.
-
-**Fix**: Add `safe-area-top` padding to the shop header, reduce font sizes (`text-xl` instead of `text-2xl`), reduce spacing (`mb-4` instead of `mb-6`), make product cards more compact.
-
-**Files**: `src/components/ShopScreen.tsx`
-
----
-
-## 7. Legal/Policy Pages - Compact Fonts + Replace "Atlasoon MMC"
-
-**Problem**: Policy pages need smaller fonts. "Atlasoon MMC" text exists in database content.
-
-**Fix**:
-- In `LegalScreen.tsx`, add `text-sm` or `prose-xs` to the document content area
-- For "Atlasoon MMC" → "Anacan MMC": This text is in the database `legal_documents` table content. Will need a data UPDATE query to replace all occurrences.
-
-**Files**: 
-- `src/components/LegalScreen.tsx`
-- DB data update: `UPDATE legal_documents SET content = REPLACE(content, 'Atlasoon MMC', 'Anacan MMC'), content_az = REPLACE(content_az, 'Atlasoon MMC', 'Anacan MMC')`
-
----
-
-## 8. AI Chat - Input Area Below Footer Fix
-
-**Problem**: The AI chat input area uses `height: calc(100dvh - 80px)` which may not account for the bottom navigation bar correctly, causing the input to be hidden.
-
-**Fix**: Adjust the height calculation to properly account for bottom nav + safe area. Use `pb-safe` and ensure the input area has proper `sticky bottom-0` positioning with z-index above the bottom nav, or adjust the container height to exclude the bottom nav.
-
-**Files**: `src/components/AIChatScreen.tsx`
-
----
-
-## 9. "Atlasoon MMC" → "Anacan MMC" in Code
-
-**Problem**: Only found in `src/lib/iap.ts` as app ID references (com.atlasoon.anacan) — these are package IDs and shouldn't be changed. The "Atlasoon MMC" company name text is in the database legal documents.
-
-**Fix**: Database UPDATE to replace company name in legal documents content.
-
----
-
-## Implementation Order
-
-1. Quick UI fixes (calendar, first aid, shop, legal, AI chat) — parallel
-2. Weather accuracy fix (edge function)  
-3. White noise persistence (most complex, new store + refactor)
-4. Album features + ordering system (DB + multiple new components)
-5. Database content update for company name
-
-## Estimated Scope
-- ~12 files modified/created
-- 1 DB migration (album_orders table)
-- 1 DB data update (legal documents)
-- 1 edge function update
+## Texniki Qeydlər
+- Bütün `framer-motion` animasiyaları saxlanılır, spring konfiqurasiyaları təkmilləşdirilir.
+- Mövcud hook-lar və data axını dəyişməz qalır — yalnız vizual layer yenilənir.
+- Tailwind utility klassları ilə, əlavə CSS lazım deyil.
+- 390px viewport-a (mobil) optimallaşdırılmış.
+- Dark/light mode uyğunluğu qorunur.
 
