@@ -72,7 +72,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   return (
     <div ref={ref} className="min-h-screen pb-24 bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/70 backdrop-blur-3xl">
+      <div className="bg-background/70 backdrop-blur-3xl">
         <div className="px-5 pt-4 pb-1">
           <div className="flex items-center gap-3 mb-4">
             {onBack && (
