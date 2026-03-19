@@ -188,6 +188,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminAnalytics />;
       case 'epoint':
         return <AdminEpoint />;
+      case 'force-update':
+        return <AdminForceUpdate />;
       case 'security':
         return <AdminSecurity />;
       default:

@@ -340,6 +340,22 @@ const Index = () => {
     );
   }
 
+  // Force Update check
+  const { forceUpdate, isLoading: forceUpdateLoading } = useForceUpdate();
+  if (!forceUpdateLoading && forceUpdate?.enabled) {
+    const ForceUpdateScreen = lazy(() => import('@/components/ForceUpdateScreen'));
+    return (
+      <Suspense fallback={suspenseFallback}>
+        <ForceUpdateScreen
+          title={forceUpdate.title}
+          message={forceUpdate.message}
+          androidUrl={forceUpdate.android_url}
+          iosUrl={forceUpdate.ios_url}
+        />
+      </Suspense>
+    );
+  }
+
   // Auth screen
   if (!isAuthenticated) {
     return <AuthScreen />;
