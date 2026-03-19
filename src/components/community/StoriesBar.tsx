@@ -68,41 +68,43 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
 
   return (
     <>
-      <div className="flex gap-3 overflow-x-auto hide-scrollbar py-0.5">
+      <div className="flex gap-3.5 overflow-x-auto hide-scrollbar py-1">
         {/* Own Story */}
         <motion.button
           onClick={() => hasOwnStory ? handleStoryClick(0) : setShowCreateModal(true)}
           className="flex-shrink-0 flex flex-col items-center gap-1.5"
-          whileTap={{ scale: 0.93 }}
+          whileTap={{ scale: 0.92 }}
         >
           <div className="relative">
-            <div className={`w-[56px] h-[56px] rounded-[18px] flex items-center justify-center ${
-              hasOwnStory ? 'p-[2px]' : 'bg-muted/30'
-            }`}
-            style={hasOwnStory ? { background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)), hsl(340,80%,60%))' } : undefined}
+            <div
+              className={`w-[62px] h-[62px] rounded-full p-[2.5px] transition-all`}
+              style={hasOwnStory
+                ? { background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)), hsl(340,80%,60%))' }
+                : { background: 'hsl(var(--muted) / 0.3)' }
+              }
             >
-              {hasOwnStory ? (
-                <div className="w-full h-full rounded-[16px] bg-card overflow-hidden flex items-center justify-center">
-                  {profile?.avatar_url ? (
+              <div className="w-full h-full rounded-full bg-card overflow-hidden flex items-center justify-center">
+                {hasOwnStory ? (
+                  profile?.avatar_url ? (
                     <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-sm font-black text-primary">{(profile?.name || 'S').charAt(0).toUpperCase()}</span>
-                  )}
-                </div>
-              ) : (
-                <div className="w-full h-full rounded-[16px] bg-gradient-to-br from-primary/4 to-accent/4 flex items-center justify-center">
-                  <Plus className="w-4 h-4 text-primary/50" />
-                </div>
-              )}
+                    <span className="text-base font-black text-primary">{(profile?.name || 'S').charAt(0).toUpperCase()}</span>
+                  )
+                ) : (
+                  <div className="w-full h-full rounded-full bg-gradient-to-br from-primary/5 to-accent/5 flex items-center justify-center">
+                    <Plus className="w-5 h-5 text-primary/40" />
+                  </div>
+                )}
+              </div>
             </div>
             <div
               className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full gradient-primary flex items-center justify-center border-2 border-background shadow-sm cursor-pointer"
               onClick={(e) => { e.stopPropagation(); setShowCreateModal(true); }}
             >
-              <Plus className="w-2 h-2 text-primary-foreground" strokeWidth={3} />
+              <Plus className="w-2.5 h-2.5 text-primary-foreground" strokeWidth={3} />
             </div>
           </div>
-          <span className="text-[9px] font-bold text-muted-foreground/50 truncate w-[56px] text-center">
+          <span className="text-[10px] font-bold text-muted-foreground/50 truncate w-[62px] text-center leading-tight">
             {hasOwnStory ? 'Sizin' : 'Əlavə et'}
           </span>
         </motion.button>
@@ -113,27 +115,27 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
             key={group.user_id}
             onClick={() => handleStoryClick(storyGroups.indexOf(group))}
             className="flex-shrink-0 flex flex-col items-center gap-1.5"
-            whileTap={{ scale: 0.93 }}
+            whileTap={{ scale: 0.92 }}
           >
             <div
-              className="w-[56px] h-[56px] rounded-[18px] p-[2px] transition-all"
+              className="w-[62px] h-[62px] rounded-full p-[2.5px] transition-all"
               style={{
                 background: group.has_unviewed
                   ? 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)), hsl(340,80%,60%))'
-                  : 'hsl(var(--muted) / 0.3)'
+                  : 'hsl(var(--muted) / 0.25)'
               }}
             >
-              <div className="w-full h-full rounded-[16px] bg-card overflow-hidden">
+              <div className="w-full h-full rounded-full bg-card overflow-hidden">
                 {group.user_avatar ? (
                   <img src={group.user_avatar} alt={group.user_name} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-accent/5">
-                    <span className="text-sm font-black text-primary/60">{group.user_name.charAt(0).toUpperCase()}</span>
+                    <span className="text-base font-black text-primary/50">{group.user_name.charAt(0).toUpperCase()}</span>
                   </div>
                 )}
               </div>
             </div>
-            <span className="text-[9px] font-bold text-muted-foreground/50 truncate w-[56px] text-center">
+            <span className="text-[10px] font-bold text-muted-foreground/50 truncate w-[62px] text-center leading-tight">
               {group.user_name.split(' ')[0]}
             </span>
           </motion.button>
@@ -141,18 +143,15 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
 
         {isLoading && [1, 2, 3].map(i => (
           <div key={i} className="flex flex-col items-center gap-1.5">
-            <div className="w-[56px] h-[56px] rounded-[18px] bg-muted/20 animate-pulse" />
-            <div className="w-8 h-1.5 rounded-full bg-muted/20 animate-pulse" />
+            <div className="w-[62px] h-[62px] rounded-full bg-muted/15 animate-pulse" />
+            <div className="w-9 h-2 rounded-full bg-muted/15 animate-pulse" />
           </div>
         ))}
       </div>
 
       <AnimatePresence>
-        {viewerOpen && (
-          <StoryViewer storyGroups={storyGroups} initialGroupIndex={initialGroupIndex} onClose={() => setViewerOpen(false)} onViewed={markAsViewed} onDelete={deleteStory} />
-        )}
+        {viewerOpen && <StoryViewer storyGroups={storyGroups} initialGroupIndex={initialGroupIndex} onClose={() => setViewerOpen(false)} onViewed={markAsViewed} onDelete={deleteStory} />}
       </AnimatePresence>
-
       <AnimatePresence>
         {cropImageUrl && <StoryCropEditor imageUrl={cropImageUrl} onConfirm={handleCropConfirm} onCancel={handleCropCancel} />}
       </AnimatePresence>
@@ -167,37 +166,37 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
             <motion.div
               initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 400 }}
-              className="w-full max-w-md bg-card rounded-t-[24px]"
+              className="w-full max-w-md bg-card rounded-t-[28px]"
               style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 16px) + 90px)' }}
               onClick={e => e.stopPropagation()}
             >
-              <div className="flex justify-center pt-2.5 pb-1">
-                <div className="w-8 h-1 rounded-full bg-border/30" />
+              <div className="flex justify-center pt-3 pb-1">
+                <div className="w-9 h-1 rounded-full bg-border/30" />
               </div>
-              <div className="p-5">
+              <div className="p-5 pt-3">
                 <div className="flex items-center justify-between mb-5">
-                  <h3 className="text-[15px] font-black text-foreground">Story Əlavə Et</h3>
-                  <button onClick={() => setShowCreateModal(false)} className="w-7 h-7 rounded-lg bg-muted/30 flex items-center justify-center">
-                    <X className="w-3.5 h-3.5 text-muted-foreground/60" />
+                  <h3 className="text-[16px] font-black text-foreground">Story Əlavə Et</h3>
+                  <button onClick={() => setShowCreateModal(false)} className="w-8 h-8 rounded-full bg-muted/40 flex items-center justify-center">
+                    <X className="w-4 h-4 text-muted-foreground/60" />
                   </button>
                 </div>
-                <div className="grid grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-2 gap-3">
                   <motion.button
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex flex-col items-center gap-2.5 p-5 bg-gradient-to-br from-primary/4 to-accent/3 rounded-2xl border border-primary/6 active:border-primary/15 transition-all"
-                    whileTap={{ scale: 0.97 }}
+                    className="flex flex-col items-center gap-3 p-6 bg-gradient-to-br from-primary/5 to-accent/3 rounded-2xl border border-primary/8 active:border-primary/20 transition-all"
+                    whileTap={{ scale: 0.96 }}
                   >
-                    <div className="w-11 h-11 rounded-xl bg-primary/6 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-full bg-primary/8 flex items-center justify-center">
                       <ImageIcon className="w-5 h-5 text-primary/60" />
                     </div>
                     <span className="font-bold text-[12px] text-foreground">Qalereyadan</span>
                   </motion.button>
                   <motion.button
                     onClick={() => toast({ title: 'Kamera tezliklə əlavə olunacaq' })}
-                    className="flex flex-col items-center gap-2.5 p-5 bg-gradient-to-br from-blue-500/4 to-cyan-500/3 rounded-2xl border border-blue-500/6 active:border-blue-500/15 transition-all"
-                    whileTap={{ scale: 0.97 }}
+                    className="flex flex-col items-center gap-3 p-6 bg-gradient-to-br from-blue-500/5 to-cyan-500/3 rounded-2xl border border-blue-500/8 active:border-blue-500/20 transition-all"
+                    whileTap={{ scale: 0.96 }}
                   >
-                    <div className="w-11 h-11 rounded-xl bg-blue-500/6 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-full bg-blue-500/8 flex items-center justify-center">
                       <Camera className="w-5 h-5 text-blue-500/60" />
                     </div>
                     <span className="font-bold text-[12px] text-foreground">Kamera</span>

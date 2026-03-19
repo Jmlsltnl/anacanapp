@@ -9,23 +9,29 @@ interface PostSearchFilterProps {
 
 const PostSearchFilter = ({ sortBy, onSortChange }: PostSearchFilterProps) => {
   return (
-    <div className="flex gap-1 mb-3">
+    <div className="flex gap-1 mb-3 border-b border-border/8 pb-2">
       {[
         { id: 'recent' as const, label: 'Ən son' },
         { id: 'popular' as const, label: 'Populyar' },
       ].map((option) => (
-        <motion.button
+        <button
           key={option.id}
           onClick={() => onSortChange(option.id)}
-          className={`px-3 py-[5px] rounded-lg text-[10px] font-bold transition-all ${
+          className={`relative px-3.5 py-1.5 text-[11px] font-bold transition-colors ${
             sortBy === option.id
-              ? 'gradient-primary text-primary-foreground shadow-sm'
-              : 'bg-muted/20 text-muted-foreground/40 active:bg-muted/35'
+              ? 'text-foreground'
+              : 'text-muted-foreground/35'
           }`}
-          whileTap={{ scale: 0.95 }}
         >
           {option.label}
-        </motion.button>
+          {sortBy === option.id && (
+            <motion.div
+              layoutId="sort-underline"
+              className="absolute bottom-0 left-1 right-1 h-[2px] rounded-full bg-primary"
+              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+            />
+          )}
+        </button>
       ))}
     </div>
   );
