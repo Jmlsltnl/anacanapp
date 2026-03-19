@@ -11,6 +11,7 @@ import FloatingTimerWidget from '@/components/FloatingTimerWidget';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useDeviceToken } from '@/hooks/useDeviceToken';
+import { useForceUpdate } from '@/hooks/useForceUpdate';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { resetAppScrollPosition } from '@/lib/scroll';
 
