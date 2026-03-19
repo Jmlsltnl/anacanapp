@@ -74,6 +74,7 @@ const Index = () => {
   const [toolsResetKey, setToolsResetKey] = useState(0);
   const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, lifeStage } = useUserStore();
   const { isAdmin, loading } = useAuth();
+  const { forceUpdate, isLoading: forceUpdateLoading } = useForceUpdate();
   
   // Ref for scroll container to reset position on navigation
   const scrollContainerRef = useRef<HTMLDivElement>(null);
