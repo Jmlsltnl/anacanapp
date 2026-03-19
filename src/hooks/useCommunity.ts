@@ -411,31 +411,17 @@ export const useCreateComment = () => {
         const preview = content.length > 50 ? `${content.slice(0, 50)}...` : content;
         const senderName = commenterName?.trim() || 'İstifadəçi';
 
-        // Push notification
-        const { error: pushError } = await supabase.functions.invoke('send-push-notification', {
-          body: {
-            userId: postAuthorId,
-            title: 'Yeni şərh! 💬',
-            body: `${senderName}: ${preview}`,
-            data: { type: 'comment', postId },
-          },
-        });
-
-        if (pushError) {
-          console.error('Error sending comment notification:', pushError);
-        }
-
-        // In-app notification
+        // Push notification (also stores in-app notification via edge function)
         try {
-          await supabase.from('notifications').insert({
-            user_id: postAuthorId,
-            title: parentCommentId ? 'Yeni cavab 💬' : 'Yeni şərh 💬',
-            message: `${senderName}: ${preview}`,
-            notification_type: parentCommentId ? 'community_reply' : 'community_comment',
-            action_type: 'community_post',
-            action_data: { postId } as any,
+          await supabase.functions.invoke('send-push-notification', {
+            body: {
+              userId: postAuthorId,
+              title: parentCommentId ? 'Yeni cavab 💬' : 'Yeni şərh 💬',
+              body: `${senderName}: ${preview}`,
+              data: { type: parentCommentId ? 'community_reply' : 'community_comment', postId },
+            },
           });
-        } catch (e) { console.error('Comment notification insert error:', e); }
+        } catch (e) { console.error('Comment notification error:', e); }
       }
     },
     onSuccess: (_, variables) => {
