@@ -74,6 +74,7 @@ const Index = () => {
   const [toolsResetKey, setToolsResetKey] = useState(0);
   const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, lifeStage } = useUserStore();
   const { isAdmin, loading } = useAuth();
+  const { forceUpdate, isLoading: forceUpdateLoading } = useForceUpdate();
   
   // Ref for scroll container to reset position on navigation
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -341,7 +342,6 @@ const Index = () => {
   }
 
   // Force Update check
-  const { forceUpdate, isLoading: forceUpdateLoading } = useForceUpdate();
   if (!forceUpdateLoading && forceUpdate?.enabled) {
     const ForceUpdateScreen = lazy(() => import('@/components/ForceUpdateScreen'));
     return (
