@@ -40,13 +40,26 @@ export const useBabyDailyInfoAdmin = () => {
   const fetchAll = useQuery({
     queryKey: ['baby-daily-info-admin'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from('baby_daily_info')
-        .select('*')
-        .order('day_number', { ascending: true });
+      const allRows: BabyDailyInfo[] = [];
+      let from = 0;
+      const pageSize = 1000;
 
-      if (error) throw error;
-      return (data || []) as BabyDailyInfo[];
+      while (true) {
+        const { data, error } = await (supabase as any)
+          .from('baby_daily_info')
+          .select('*')
+          .order('day_number', { ascending: true })
+          .range(from, from + pageSize - 1);
+
+        if (error) throw error;
+        if (!data || data.length === 0) break;
+
+        allRows.push(...(data as BabyDailyInfo[]));
+        if (data.length < pageSize) break;
+        from += pageSize;
+      }
+
+      return allRows;
     },
   });
 
