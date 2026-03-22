@@ -168,6 +168,40 @@ const AdminRecipes = () => {
     setFormData({ ...formData, image_url: '' });
   };
 
+  // Split CSV text into logical rows, respecting quoted fields with newlines
+  const splitCSVIntoRows = (text: string): string[] => {
+    const rows: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      if (char === '"') {
+        if (inQuotes && i + 1 < text.length && text[i + 1] === '"') {
+          current += '"';
+          i++; // skip escaped quote
+        } else {
+          inQuotes = !inQuotes;
+        }
+        current += char;
+      } else if ((char === '\n' || char === '\r') && !inQuotes) {
+        if (char === '\r' && i + 1 < text.length && text[i + 1] === '\n') {
+          i++; // skip \r\n
+        }
+        if (current.trim()) {
+          rows.push(current);
+        }
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    if (current.trim()) {
+      rows.push(current);
+    }
+    return rows;
+  };
+
   // CSV parsing helper
   const parseCSVLine = (line: string): string[] => {
     const result: string[] = [];
@@ -177,7 +211,12 @@ const AdminRecipes = () => {
     for (let i = 0; i < line.length; i++) {
       const char = line[i];
       if (char === '"') {
-        inQuotes = !inQuotes;
+        if (inQuotes && i + 1 < line.length && line[i + 1] === '"') {
+          current += '"';
+          i++; // skip escaped quote
+        } else {
+          inQuotes = !inQuotes;
+        }
       } else if (char === ',' && !inQuotes) {
         result.push(current.trim());
         current = '';
@@ -197,7 +236,7 @@ const AdminRecipes = () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const text = event.target?.result as string;
-      const lines = text.split('\n').filter(line => line.trim());
+      const lines = splitCSVIntoRows(text);
       
       if (lines.length < 2) {
         toast({ title: 'Xəta', description: 'CSV faylı boşdur', variant: 'destructive' });
