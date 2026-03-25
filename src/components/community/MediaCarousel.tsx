@@ -74,7 +74,7 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
             <img
               src={currentMedia.url}
               alt=""
-              className="w-full h-full object-contain bg-black cursor-pointer"
+              className="w-full h-full object-cover cursor-pointer"
               onClick={() => setShowFullscreen(true)}
             />
           )}
