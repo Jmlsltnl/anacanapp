@@ -60,6 +60,8 @@ import AdminCoupons from './admin/AdminCoupons';
 import AdminAnalytics from './admin/AdminAnalytics';
 import AdminEpoint from './admin/AdminEpoint';
 import AdminForceUpdate from './admin/AdminForceUpdate';
+import AdminLanguages from './admin/AdminLanguages';
+import AdminTranslations from './admin/AdminTranslations';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -192,6 +194,10 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminForceUpdate />;
       case 'security':
         return <AdminSecurity />;
+      case 'languages':
+        return <AdminLanguages />;
+      case 'translations':
+        return <AdminTranslations />;
       default:
         return <AdminDashboard />;
     }

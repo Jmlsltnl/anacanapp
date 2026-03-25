@@ -428,6 +428,48 @@ export type Database = {
         }
         Relationships: []
       }
+      app_languages: {
+        Row: {
+          code: string
+          created_at: string
+          disabled_tools: Json
+          icon_url: string | null
+          id: string
+          is_active: boolean
+          name: string
+          native_name: string
+          regions: Json
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          disabled_tools?: Json
+          icon_url?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          native_name: string
+          regions?: Json
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          disabled_tools?: Json
+          icon_url?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          native_name?: string
+          regions?: Json
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       app_rating_prompts: {
         Row: {
           created_at: string
@@ -7151,6 +7193,44 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      translations: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          lang: string
+          namespace: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          lang: string
+          namespace?: string
+          updated_at?: string
+          value?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          lang?: string
+          namespace?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "translations_lang_fkey"
+            columns: ["lang"]
+            isOneToOne: false
+            referencedRelation: "app_languages"
+            referencedColumns: ["code"]
+          },
+        ]
       }
       trimester_info: {
         Row: {

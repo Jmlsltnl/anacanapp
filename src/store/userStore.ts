@@ -26,6 +26,7 @@ interface UserState {
   babyGender: 'boy' | 'girl' | null;
   babyCount: number;
   multiplesType: 'single' | 'twins' | 'triplets' | 'quadruplets' | null;
+  language: string;
   
   // Partner's woman data (for partner mode)
   partnerWomanData: {
@@ -50,6 +51,7 @@ interface UserState {
   setLinkedPartnerId: (id: string | null) => void;
   setPartnerWomanData: (data: UserState['partnerWomanData']) => void;
   setMultiplesData: (babyCount: number, multiplesType: 'single' | 'twins' | 'triplets' | 'quadruplets') => void;
+  setLanguage: (lang: string) => void;
   logout: () => void;
   
   // Computed
@@ -89,6 +91,7 @@ export const useUserStore = create<UserState>()(
       babyGender: null,
       babyCount: 1,
       multiplesType: null,
+      language: 'az',
       partnerWomanData: null,
 
       setAuth: (isAuth, userId, email, name) => {
@@ -129,6 +132,8 @@ export const useUserStore = create<UserState>()(
 
       setMultiplesData: (babyCount, multiplesType) => set({ babyCount, multiplesType }),
 
+      setLanguage: (lang) => set({ language: lang }),
+
       setPartnerCode: (code) => set({ partnerCode: code }),
 
       setLinkedPartnerId: (id) => set({ linkedPartnerId: id }),
@@ -152,6 +157,7 @@ export const useUserStore = create<UserState>()(
         babyGender: null,
         babyCount: 1,
         multiplesType: null,
+        language: 'az',
         partnerWomanData: null,
       }),
 
@@ -271,6 +277,7 @@ export const useUserStore = create<UserState>()(
         babyGender: state.babyGender,
         babyCount: state.babyCount,
         multiplesType: state.multiplesType,
+        language: state.language,
       }),
     }
   )
