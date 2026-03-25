@@ -490,11 +490,11 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
                       )}
                     </div>
                   </div>
-                </motion.button>
+                </div>
               ))}
             </div>
           )}
-        </AnimatePresence>
+        </div>
 
         {/* Recipe count */}
         {!recipesLoading && filteredRecipes.length > 0 && (
