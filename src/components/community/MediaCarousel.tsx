@@ -41,8 +41,8 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
 
   const currentMedia = media[currentIndex];
 
-  // Instagram post aspect ratio: 4:5 (1080x1350)
-  const aspectRatioClass = "aspect-[4/5]";
+  // Standard fixed height for all media - covers without distortion
+  const mediaContainerClass = "h-[360px]";
 
   // Single media item
   if (media.length === 1) {
