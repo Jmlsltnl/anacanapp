@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useRef, useCallback } from 'react';
+import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Play, Pause, X, Maximize2 } from 'lucide-react';
 
 interface MediaItem {
@@ -16,7 +16,16 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showFullscreen, setShowFullscreen] = useState(false);
+  const [dragY, setDragY] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Swipe down to close fullscreen
+  const handleDragEnd = useCallback((_: any, info: PanInfo) => {
+    if (Math.abs(info.offset.y) > 100 || Math.abs(info.velocity.y) > 500) {
+      setShowFullscreen(false);
+    }
+    setDragY(0);
+  }, []);
 
   if (media.length === 0) return null;
 
