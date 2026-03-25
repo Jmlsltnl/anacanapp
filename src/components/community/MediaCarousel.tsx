@@ -130,8 +130,7 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
               <img
                 src={currentMedia.url}
                 alt=""
-                className="w-full h-full object-cover cursor-pointer"
-                onClick={() => setShowFullscreen(true)}
+              className="w-full h-full object-cover"
               />
             )}
           </motion.div>
