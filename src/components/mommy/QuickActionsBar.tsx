@@ -34,7 +34,7 @@ const QuickActionsBar = ({ onNavigateToTool }: QuickActionsBarProps) => {
   const { data: dbActions = [], isLoading } = useQuickActions('mommy', ageGroup);
 
   const isToolPremium = (toolKey: string): boolean => {
-    const config = toolConfigs.find(t => t.tool_key === toolKey);
+    const config = toolConfigs.find(t => t.tool_id === toolKey);
     if (!config) return false;
     if (config.is_premium) return true;
     if (lifeStage === 'mommy' && config.mommy_locked) return true;
