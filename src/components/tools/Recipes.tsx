@@ -10,6 +10,7 @@ import { useRecipeCategories } from '@/hooks/useDynamicTools';
 import { useUserStore } from '@/store/userStore';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { resetAppScrollPosition } from '@/lib/scroll';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { Input } from '@/components/ui/input';
 import { PremiumModal } from '@/components/PremiumModal';
