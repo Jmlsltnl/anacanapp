@@ -83,16 +83,9 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
             <img
               src={currentMedia.url}
               alt=""
-              className="w-full h-full object-cover cursor-pointer"
-              onClick={() => setShowFullscreen(true)}
+              className="w-full h-full object-cover"
             />
           )}
-          <button
-            onClick={() => setShowFullscreen(true)}
-            className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 flex items-center justify-center text-white"
-          >
-            <Maximize2 className="w-4 h-4" />
-          </button>
         </div>
 
         {/* Fullscreen Modal */}
