@@ -26,6 +26,7 @@ interface UserState {
   babyGender: 'boy' | 'girl' | null;
   babyCount: number;
   multiplesType: 'single' | 'twins' | 'triplets' | 'quadruplets' | null;
+  language: string;
   
   // Partner's woman data (for partner mode)
   partnerWomanData: {
