@@ -194,6 +194,10 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminForceUpdate />;
       case 'security':
         return <AdminSecurity />;
+      case 'languages':
+        return <AdminLanguages />;
+      case 'translations':
+        return <AdminTranslations />;
       default:
         return <AdminDashboard />;
     }
