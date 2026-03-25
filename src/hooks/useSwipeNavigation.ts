@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 
 interface SwipeNavigationOptions {
   onSwipeBack?: () => void;
@@ -9,9 +9,8 @@ interface SwipeNavigationOptions {
 }
 
 /**
- * Edge-only swipe navigation hook.
- * Swipe from left edge → go back, swipe from right edge → go forward.
- * Only triggers when the touch starts within `edgeWidth` px of the screen edge.
+ * iOS-style edge swipe navigation.
+ * Tracks touchmove continuously to avoid scroll containers eating the gesture.
  */
 export const useSwipeNavigation = ({
   onSwipeBack,
@@ -20,73 +19,110 @@ export const useSwipeNavigation = ({
   threshold = 40,
   enabled = true,
 }: SwipeNavigationOptions = {}) => {
-  const startX = useRef(0);
-  const startY = useRef(0);
-  const startTime = useRef(0);
-  const edge = useRef<'left' | 'right' | null>(null);
+  const onSwipeBackRef = useRef(onSwipeBack);
+  const onSwipeForwardRef = useRef(onSwipeForward);
+  
+  // Keep refs in sync without re-registering listeners
+  useEffect(() => {
+    onSwipeBackRef.current = onSwipeBack;
+    onSwipeForwardRef.current = onSwipeForward;
+  }, [onSwipeBack, onSwipeForward]);
 
   useEffect(() => {
     if (!enabled) return;
+
+    let startX = 0;
+    let startY = 0;
+    let maxDeltaX = 0;
+    let edge: 'left' | 'right' | null = null;
+    let settled = false; // once we know it's horizontal vs vertical
 
     const handleTouchStart = (e: TouchEvent) => {
       const x = e.touches[0].clientX;
       const screenW = window.innerWidth;
 
       if (x <= edgeWidth) {
-        edge.current = 'left';
+        edge = 'left';
       } else if (x >= screenW - edgeWidth) {
-        edge.current = 'right';
+        edge = 'right';
       } else {
-        edge.current = null;
+        edge = null;
         return;
       }
 
-      startX.current = x;
-      startY.current = e.touches[0].clientY;
-      startTime.current = Date.now();
+      startX = x;
+      startY = e.touches[0].clientY;
+      maxDeltaX = 0;
+      settled = false;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!edge) return;
+      
+      const x = e.touches[0].clientX;
+      const y = e.touches[0].clientY;
+      const deltaX = Math.abs(x - startX);
+      const deltaY = Math.abs(y - startY);
+
+      // After 10px of movement, decide if this is horizontal or vertical
+      if (!settled && (deltaX > 10 || deltaY > 10)) {
+        if (deltaY > deltaX * 1.2) {
+          // Vertical scroll — abort
+          edge = null;
+          return;
+        }
+        settled = true;
+      }
+
+      if (deltaX > maxDeltaX) {
+        maxDeltaX = deltaX;
+      }
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
-      if (!edge.current) return;
-
-      const touch = e.changedTouches[0];
-      const deltaX = touch.clientX - startX.current;
-      const deltaY = Math.abs(touch.clientY - startY.current);
-      const elapsed = Date.now() - startTime.current;
-
-      // Ignore if too slow, too vertical, or too short
-      if (elapsed > 800 || deltaY > Math.abs(deltaX) || Math.abs(deltaX) < threshold) {
-        edge.current = null;
+      if (!edge || !settled) {
+        edge = null;
         return;
       }
 
-      if (edge.current === 'left' && deltaX > 0) {
-        // Swiped right from left edge → go back
-        if (onSwipeBack) {
-          onSwipeBack();
+      const touch = e.changedTouches[0];
+      const deltaX = touch.clientX - startX;
+
+      if (Math.abs(deltaX) < threshold && maxDeltaX < threshold) {
+        edge = null;
+        return;
+      }
+
+      // Use maxDeltaX as fallback if touchend delta is small (scroll consumed it)
+      const effectiveDelta = Math.abs(deltaX) >= threshold ? deltaX : (edge === 'left' ? maxDeltaX : -maxDeltaX);
+
+      if (edge === 'left' && effectiveDelta > 0) {
+        if (onSwipeBackRef.current) {
+          onSwipeBackRef.current();
         } else {
           window.history.back();
         }
-      } else if (edge.current === 'right' && deltaX < 0) {
-        // Swiped left from right edge → go forward
-        if (onSwipeForward) {
-          onSwipeForward();
+      } else if (edge === 'right' && effectiveDelta < 0) {
+        if (onSwipeForwardRef.current) {
+          onSwipeForwardRef.current();
         } else {
           window.history.forward();
         }
       }
 
-      edge.current = null;
+      edge = null;
     };
 
     document.addEventListener('touchstart', handleTouchStart, { passive: true });
+    document.addEventListener('touchmove', handleTouchMove, { passive: true });
     document.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
       document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchmove', handleTouchMove);
       document.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [onSwipeBack, onSwipeForward, edgeWidth, threshold, enabled]);
+  }, [edgeWidth, threshold, enabled]);
 };
 
 export default useSwipeNavigation;
