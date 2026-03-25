@@ -48,13 +48,13 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
   if (media.length === 1) {
     return (
       <>
-        <div className={`relative ${aspectRatioClass} bg-muted rounded-lg overflow-hidden`}>
+        <div className={`relative ${mediaContainerClass} bg-muted/30 rounded-2xl overflow-hidden`}>
           {currentMedia.type === 'video' ? (
             <div className="relative w-full h-full">
               <video
                 ref={videoRef}
                 src={currentMedia.url}
-                className="w-full h-full object-contain bg-black"
+                className="w-full h-full object-cover"
                 onClick={togglePlay}
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
