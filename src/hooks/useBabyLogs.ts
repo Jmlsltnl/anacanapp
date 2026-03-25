@@ -109,6 +109,46 @@ export const useBabyLogs = () => {
     }
   };
 
+  const updateLog = async (id: string, updates: {
+    start_time?: string;
+    end_time?: string | null;
+    feed_type?: string | null;
+    diaper_type?: string | null;
+    notes?: string | null;
+  }) => {
+    if (!user) return { error: 'No user logged in' };
+    try {
+      const { error } = await supabase
+        .from('baby_logs')
+        .update(updates)
+        .eq('id', id)
+        .eq('user_id', user.id);
+      if (error) throw error;
+      await fetchLogs();
+      return { error: null };
+    } catch (error) {
+      console.error('Error updating baby log:', error);
+      return { error };
+    }
+  };
+
+  const deleteLog = async (id: string) => {
+    if (!user) return { error: 'No user logged in' };
+    try {
+      const { error } = await supabase
+        .from('baby_logs')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
+      if (error) throw error;
+      await fetchLogs();
+      return { error: null };
+    } catch (error) {
+      console.error('Error deleting baby log:', error);
+      return { error };
+    }
+  };
+
   // Get feeding history for last N days
   const getFeedingHistory = useCallback((days: number = 3): Map<string, FeedingHistoryItem[]> => {
     const feedingLogs = logs.filter(l => l.log_type === 'feeding');
