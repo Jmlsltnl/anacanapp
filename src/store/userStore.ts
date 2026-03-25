@@ -51,6 +51,7 @@ interface UserState {
   setLinkedPartnerId: (id: string | null) => void;
   setPartnerWomanData: (data: UserState['partnerWomanData']) => void;
   setMultiplesData: (babyCount: number, multiplesType: 'single' | 'twins' | 'triplets' | 'quadruplets') => void;
+  setLanguage: (lang: string) => void;
   logout: () => void;
   
   // Computed
