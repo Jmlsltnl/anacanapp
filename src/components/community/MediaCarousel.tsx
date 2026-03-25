@@ -15,8 +15,6 @@ interface MediaCarouselProps {
 const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showFullscreen, setShowFullscreen] = useState(false);
-  const [dragY, setDragY] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Swipe down to close fullscreen
