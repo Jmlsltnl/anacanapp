@@ -172,44 +172,26 @@ const Index = () => {
     setActiveTab(tab);
   };
 
-  // Tab navigation order for swipe
-  const tabOrder = role === 'partner' 
-    ? ['home', 'chat', 'ai', 'profile'] 
-    : ['home', 'tools', 'cakes', 'community', 'ai', 'profile'];
-
-  // iOS swipe navigation handler
+  // iOS-style swipe navigation — only navigates back/forward in the screen stack, never switches tabs
   const handleSwipeBack = useCallback(() => {
-    // If in a sub-screen, go back
     if (activeScreen) {
       setActiveScreen(null);
       return;
     }
-    // If in a tool, go back
     if (activeTool && activeTab === 'tools') {
       handleToolBack();
       return;
     }
-    // If mother chat is open, close it
     if (showMotherChat) {
       setShowMotherChat(false);
       return;
     }
-    // Navigate to previous tab
-    const currentIndex = tabOrder.indexOf(activeTab);
-    if (currentIndex > 0) {
-      setActiveTab(tabOrder[currentIndex - 1]);
-    }
-  }, [activeScreen, activeTool, activeTab, showMotherChat, tabOrder, role, toolOpenedFromDashboard, handleToolBack]);
+    // At top level — do nothing (don't switch tabs via swipe)
+  }, [activeScreen, activeTool, activeTab, showMotherChat, toolOpenedFromDashboard, handleToolBack]);
 
   const handleSwipeForward = useCallback(() => {
-    // Navigate to next tab (only when no sub-screen/tool is open)
-    if (!activeScreen && !activeTool && !showMotherChat) {
-      const currentIndex = tabOrder.indexOf(activeTab);
-      if (currentIndex < tabOrder.length - 1) {
-        setActiveTab(tabOrder[currentIndex + 1]);
-      }
-    }
-  }, [activeScreen, activeTool, activeTab, showMotherChat, tabOrder]);
+    // Forward swipe — no-op at top level (iOS behavior)
+  }, []);
 
   // Enable edge-only swipe navigation for back/forward
   useSwipeNavigation({
