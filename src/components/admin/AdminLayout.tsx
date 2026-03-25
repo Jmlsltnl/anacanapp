@@ -146,6 +146,16 @@ const menuGroups: MenuGroup[] = [
     ],
   },
   {
+    id: 'i18n',
+    label: 'Lokalizasiya',
+    emoji: '🌐',
+    icon: Globe,
+    items: [
+      { id: 'languages', label: 'Dillər', icon: Globe },
+      { id: 'translations', label: 'Tərcümələr', icon: BookOpen },
+    ],
+  },
+  {
     id: 'system',
     label: 'Sistem Tənzimləmələri',
     emoji: '⚙️',
