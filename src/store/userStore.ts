@@ -277,6 +277,7 @@ export const useUserStore = create<UserState>()(
         babyGender: state.babyGender,
         babyCount: state.babyCount,
         multiplesType: state.multiplesType,
+        language: state.language,
       }),
     }
   )
