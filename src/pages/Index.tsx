@@ -61,6 +61,13 @@ const pageVariants = {
   exit: { opacity: 0, y: -10 }
 };
 
+type SwipeRestoreState =
+  | { type: 'screen'; value: string }
+  | { type: 'tool'; value: string; fromDashboard: boolean }
+  | { type: 'mother-chat' }
+  | { type: 'user-profile'; value: string }
+  | null;
+
 const Index = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [showIntro, setShowIntro] = useState(false);
@@ -75,14 +82,14 @@ const Index = () => {
   const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, lifeStage } = useUserStore();
   const { isAdmin, loading } = useAuth();
   const { forceUpdate, isLoading: forceUpdateLoading } = useForceUpdate();
-  
-  // Ref for scroll container to reset position on navigation
+
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  
+  const swipeRestoreRef = useRef<SwipeRestoreState>(null);
+
   // Reset scroll to top when tab or screen changes
   // Screen name mapping for clean GA reports
   const SCREEN_NAME_MAP: Record<string, string> = {
-    home: 'Dashboard', tools: 'ToolsHub', ai: 'AIChat', shop: 'Shop', 
+    home: 'Dashboard', tools: 'ToolsHub', ai: 'AIChat', shop: 'Shop',
     cakes: 'Cakes', profile: 'Profile', community: 'Community',
   };
 
@@ -172,25 +179,50 @@ const Index = () => {
     setActiveTab(tab);
   };
 
-  // iOS-style swipe navigation — only navigates back/forward in the screen stack, never switches tabs
+  // iOS-style swipe navigation — only navigates back/forward in the current stack, never switches tabs
   const handleSwipeBack = useCallback(() => {
     if (activeScreen) {
+      swipeRestoreRef.current = { type: 'screen', value: activeScreen };
       setActiveScreen(null);
       return;
     }
-    if (activeTool && activeTab === 'tools') {
-      handleToolBack();
+
+    if (viewingUserId) {
+      swipeRestoreRef.current = { type: 'user-profile', value: viewingUserId };
+      setViewingUserId(null);
       return;
     }
+
     if (showMotherChat) {
+      swipeRestoreRef.current = { type: 'mother-chat' };
       setShowMotherChat(false);
       return;
     }
-    // At top level — do nothing (don't switch tabs via swipe)
-  }, [activeScreen, activeTool, activeTab, showMotherChat, toolOpenedFromDashboard, handleToolBack]);
+
+    if (activeTool && activeTab === 'tools') {
+      swipeRestoreRef.current = { type: 'tool', value: activeTool, fromDashboard: toolOpenedFromDashboard };
+      handleToolBack();
+      return;
+    }
+  }, [activeScreen, viewingUserId, showMotherChat, activeTool, activeTab, toolOpenedFromDashboard, handleToolBack]);
 
   const handleSwipeForward = useCallback(() => {
-    // Forward swipe — no-op at top level (iOS behavior)
+    const restore = swipeRestoreRef.current;
+    if (!restore) return;
+
+    if (restore.type === 'screen') {
+      setActiveScreen(restore.value);
+    } else if (restore.type === 'user-profile') {
+      setViewingUserId(restore.value);
+    } else if (restore.type === 'mother-chat') {
+      setShowMotherChat(true);
+    } else if (restore.type === 'tool') {
+      setActiveTab('tools');
+      setActiveTool(restore.value);
+      setToolOpenedFromDashboard(restore.fromDashboard);
+    }
+
+    swipeRestoreRef.current = null;
   }, []);
 
   // Enable edge-only swipe navigation for back/forward

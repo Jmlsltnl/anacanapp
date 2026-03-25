@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface SwipeNavigationOptions {
   onSwipeBack?: () => void;
@@ -10,7 +10,7 @@ interface SwipeNavigationOptions {
 
 /**
  * iOS-style edge swipe navigation.
- * Tracks touchmove continuously to avoid scroll containers eating the gesture.
+ * Tracks touchmove continuously and also supports fast flicks where touchmove may not fire.
  */
 export const useSwipeNavigation = ({
   onSwipeBack,
@@ -21,8 +21,7 @@ export const useSwipeNavigation = ({
 }: SwipeNavigationOptions = {}) => {
   const onSwipeBackRef = useRef(onSwipeBack);
   const onSwipeForwardRef = useRef(onSwipeForward);
-  
-  // Keep refs in sync without re-registering listeners
+
   useEffect(() => {
     onSwipeBackRef.current = onSwipeBack;
     onSwipeForwardRef.current = onSwipeForward;
@@ -35,7 +34,13 @@ export const useSwipeNavigation = ({
     let startY = 0;
     let maxDeltaX = 0;
     let edge: 'left' | 'right' | null = null;
-    let settled = false; // once we know it's horizontal vs vertical
+    let settled = false;
+
+    const resetGesture = () => {
+      edge = null;
+      settled = false;
+      maxDeltaX = 0;
+    };
 
     const handleTouchStart = (e: TouchEvent) => {
       const x = e.touches[0].clientX;
@@ -46,7 +51,7 @@ export const useSwipeNavigation = ({
       } else if (x >= screenW - edgeWidth) {
         edge = 'right';
       } else {
-        edge = null;
+        resetGesture();
         return;
       }
 
@@ -58,17 +63,15 @@ export const useSwipeNavigation = ({
 
     const handleTouchMove = (e: TouchEvent) => {
       if (!edge) return;
-      
+
       const x = e.touches[0].clientX;
       const y = e.touches[0].clientY;
       const deltaX = Math.abs(x - startX);
       const deltaY = Math.abs(y - startY);
 
-      // After 10px of movement, decide if this is horizontal or vertical
       if (!settled && (deltaX > 10 || deltaY > 10)) {
         if (deltaY > deltaX * 1.2) {
-          // Vertical scroll — abort
-          edge = null;
+          resetGesture();
           return;
         }
         settled = true;
@@ -80,47 +83,56 @@ export const useSwipeNavigation = ({
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
-      if (!edge || !settled) {
-        edge = null;
+      if (!edge) {
+        resetGesture();
         return;
       }
 
       const touch = e.changedTouches[0];
       const deltaX = touch.clientX - startX;
+      const deltaY = touch.clientY - startY;
+      const absDeltaX = Math.abs(deltaX);
+      const absDeltaY = Math.abs(deltaY);
 
-      if (Math.abs(deltaX) < threshold && maxDeltaX < threshold) {
-        edge = null;
+      // Fast flick fallback: resolve direction at touchend even if touchmove never settled.
+      if (!settled) {
+        if (absDeltaX < 12 && maxDeltaX < 12) {
+          resetGesture();
+          return;
+        }
+        if (absDeltaY > absDeltaX * 1.2) {
+          resetGesture();
+          return;
+        }
+        settled = true;
+      }
+
+      if (absDeltaX < threshold && maxDeltaX < threshold) {
+        resetGesture();
         return;
       }
 
-      // Use maxDeltaX as fallback if touchend delta is small (scroll consumed it)
-      const effectiveDelta = Math.abs(deltaX) >= threshold ? deltaX : (edge === 'left' ? maxDeltaX : -maxDeltaX);
+      const effectiveDelta = absDeltaX >= threshold ? deltaX : (edge === 'left' ? maxDeltaX : -maxDeltaX);
 
       if (edge === 'left' && effectiveDelta > 0) {
-        if (onSwipeBackRef.current) {
-          onSwipeBackRef.current();
-        } else {
-          window.history.back();
-        }
+        onSwipeBackRef.current?.();
       } else if (edge === 'right' && effectiveDelta < 0) {
-        if (onSwipeForwardRef.current) {
-          onSwipeForwardRef.current();
-        } else {
-          window.history.forward();
-        }
+        onSwipeForwardRef.current?.();
       }
 
-      edge = null;
+      resetGesture();
     };
 
     document.addEventListener('touchstart', handleTouchStart, { passive: true });
     document.addEventListener('touchmove', handleTouchMove, { passive: true });
     document.addEventListener('touchend', handleTouchEnd, { passive: true });
+    document.addEventListener('touchcancel', resetGesture, { passive: true });
 
     return () => {
       document.removeEventListener('touchstart', handleTouchStart);
       document.removeEventListener('touchmove', handleTouchMove);
       document.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener('touchcancel', resetGesture);
     };
   }, [edgeWidth, threshold, enabled]);
 };
