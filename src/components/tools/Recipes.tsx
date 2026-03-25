@@ -110,15 +110,15 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
 
   const totalTime = (recipe: Recipe) => (recipe.prep_time || 0) + (recipe.cook_time || 0);
 
-  // Recipe Detail View (only for premium users)
+  // Recipe Detail View - scroll to top on open
   if (selectedRecipe && (isPremium || isRecipeFree(selectedRecipe))) {
     return (
-      <div ref={ref} className="min-h-screen bg-background pb-24">
+      <div ref={ref} className="min-h-screen bg-background pb-24" key={`recipe-${selectedRecipe.id}`}>
         {/* Compact sticky header */}
         <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
           <div className="flex items-center gap-3 px-4 py-3">
             <motion.button
-              onClick={() => setSelectedRecipe(null)}
+              onClick={handleBackFromDetail}
               className="w-9 h-9 rounded-full bg-muted flex items-center justify-center"
               whileTap={{ scale: 0.95 }}
             >
