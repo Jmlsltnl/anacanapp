@@ -361,24 +361,24 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ delay: index * 0.05 }}
-                className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
+                className={`flex gap-2 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
               >
-                <div className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center ${
+                <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center ${
                   message.role === 'user' 
                     ? 'bg-primary/10' 
                     : 'gradient-primary'
                 }`}>
                   {message.role === 'user' 
-                    ? <User className="w-5 h-5 text-primary" />
-                    : <Bot className="w-5 h-5 text-white" />
+                    ? <User className="w-3.5 h-3.5 text-primary" />
+                    : <Bot className="w-3.5 h-3.5 text-white" />
                   }
                 </div>
-                <div className={`max-w-[80%] p-4 rounded-2xl ${
+                <div className={`max-w-[80%] px-3 py-2 rounded-2xl ${
                   message.role === 'user'
                     ? 'bg-primary text-primary-foreground rounded-br-md'
                     : 'bg-card border border-border shadow-sm rounded-bl-md'
                 }`}>
-                <div className="text-sm leading-relaxed">
+                <div className="text-[13px] leading-relaxed">
                   {message.role === 'assistant' ? (
                     <MarkdownContent content={message.content} variant="chat" />
                   ) : (
@@ -386,14 +386,14 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
                   )}
                   {message.isStreaming && (
                     <motion.span
-                      className="inline-block w-2 h-4 bg-primary ml-1"
+                      className="inline-block w-1.5 h-3.5 bg-primary ml-1"
                       animate={{ opacity: [1, 0] }}
                       transition={{ duration: 0.5, repeat: Infinity }}
                     />
                   )}
                 </div>
                 {!message.isStreaming && (
-                  <span className="text-[10px] opacity-60 mt-2 block">
+                  <span className="text-[9px] opacity-50 mt-1 block">
                     {message.timestamp.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 )}
