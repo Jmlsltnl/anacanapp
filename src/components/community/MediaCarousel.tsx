@@ -105,28 +105,38 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
               className="fixed inset-0 z-[100] bg-black flex items-center justify-center"
               onClick={() => setShowFullscreen(false)}
             >
-              <button
-                onClick={() => setShowFullscreen(false)}
-                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white z-10"
+              <motion.div
+                drag="y"
+                dragConstraints={{ top: 0, bottom: 0 }}
+                dragElastic={0.7}
+                onDrag={(_, info) => setDragY(info.offset.y)}
+                onDragEnd={handleDragEnd}
+                style={{ opacity: 1 - Math.abs(dragY) / 400 }}
+                className="w-full h-full flex items-center justify-center"
+                onClick={(e) => e.stopPropagation()}
               >
-                <X className="w-6 h-6" />
-              </button>
-              {currentMedia.type === 'video' ? (
-                <video
-                  src={currentMedia.url}
-                  className="max-w-full max-h-full"
-                  controls
-                  autoPlay
-                  onClick={(e) => e.stopPropagation()}
-                />
-              ) : (
-                <img
-                  src={currentMedia.url}
-                  alt=""
-                  className="max-w-full max-h-full object-contain"
-                  onClick={(e) => e.stopPropagation()}
-                />
-              )}
+                <button
+                  onClick={() => setShowFullscreen(false)}
+                  className="absolute right-4 w-11 h-11 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white z-10"
+                  style={{ top: 'calc(env(safe-area-inset-top, 16px) + 8px)' }}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                {currentMedia.type === 'video' ? (
+                  <video
+                    src={currentMedia.url}
+                    className="max-w-full max-h-full"
+                    controls
+                    autoPlay
+                  />
+                ) : (
+                  <img
+                    src={currentMedia.url}
+                    alt=""
+                    className="max-w-full max-h-full object-contain"
+                  />
+                )}
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
