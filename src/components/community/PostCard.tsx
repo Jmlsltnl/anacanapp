@@ -224,10 +224,8 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
               </p>
             </div>
             {mediaItems.length > 0 && (
-              <div className="px-3 pb-2">
-                <div className="rounded-2xl overflow-hidden">
-                  <MediaCarousel media={mediaItems} />
-                </div>
+              <div className="mt-1">
+                <MediaCarousel media={mediaItems} />
               </div>
             )}
             {/* Heart burst animation */}

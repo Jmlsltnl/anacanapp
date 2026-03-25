@@ -41,20 +41,20 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
 
   const currentMedia = media[currentIndex];
 
-  // Instagram post aspect ratio: 4:5 (1080x1350)
-  const aspectRatioClass = "aspect-[4/5]";
+  // Standard fixed height for all media - covers without distortion
+  const mediaContainerClass = "h-[360px]";
 
   // Single media item
   if (media.length === 1) {
     return (
       <>
-        <div className={`relative ${aspectRatioClass} bg-muted rounded-lg overflow-hidden`}>
+        <div className={`relative ${mediaContainerClass} bg-muted/30 rounded-2xl overflow-hidden`}>
           {currentMedia.type === 'video' ? (
             <div className="relative w-full h-full">
               <video
                 ref={videoRef}
                 src={currentMedia.url}
-                className="w-full h-full object-contain bg-black"
+                className="w-full h-full object-cover"
                 onClick={togglePlay}
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
@@ -74,7 +74,7 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
             <img
               src={currentMedia.url}
               alt=""
-              className="w-full h-full object-contain bg-black cursor-pointer"
+              className="w-full h-full object-cover cursor-pointer"
               onClick={() => setShowFullscreen(true)}
             />
           )}
@@ -128,7 +128,7 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
   // Multiple media items - Carousel
   return (
     <>
-      <div className={`relative ${aspectRatioClass} bg-muted rounded-lg overflow-hidden`}>
+      <div className={`relative ${mediaContainerClass} bg-muted/30 rounded-2xl overflow-hidden`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
@@ -143,7 +143,7 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
                 <video
                   ref={videoRef}
                   src={currentMedia.url}
-                  className="w-full h-full object-contain bg-black"
+                  className="w-full h-full object-cover"
                   onClick={togglePlay}
                   onPlay={() => setIsPlaying(true)}
                   onPause={() => setIsPlaying(false)}
@@ -163,7 +163,7 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
               <img
                 src={currentMedia.url}
                 alt=""
-                className="w-full h-full object-contain bg-black cursor-pointer"
+                className="w-full h-full object-cover cursor-pointer"
                 onClick={() => setShowFullscreen(true)}
               />
             )}
