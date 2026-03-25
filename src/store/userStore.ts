@@ -91,6 +91,7 @@ export const useUserStore = create<UserState>()(
       babyGender: null,
       babyCount: 1,
       multiplesType: null,
+      language: 'az',
       partnerWomanData: null,
 
       setAuth: (isAuth, userId, email, name) => {
