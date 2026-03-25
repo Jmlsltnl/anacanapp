@@ -151,8 +151,6 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
                   </>
                 )}
               </Avatar>
-              {/* Online dot */}
-              {!isAnonymous && <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 border-2 border-card" />}
             </div>
           </motion.button>
           <div className="flex-1 min-w-0">
