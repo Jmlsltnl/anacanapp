@@ -36,6 +36,7 @@ import { usePregnancyDayNavigation } from '@/hooks/usePregnancyDayNavigation';
 import { formatDateAz } from '@/lib/date-utils';
 import { getPregnancyDay, getDaysUntilDue, getDaysElapsed, getPregnancyProgress, getTrimester } from '@/lib/pregnancy-utils';
 import FeedingHistoryPanel from '@/components/baby/FeedingHistoryPanel';
+import SleepHistoryPanel from '@/components/baby/SleepHistoryPanel';
 import QuickActionsBar from '@/components/mommy/QuickActionsBar';
 import QuickStatsWidget from '@/components/mommy/QuickStatsWidget';
 import GrowthTrackerWidget from '@/components/mommy/GrowthTrackerWidget';
