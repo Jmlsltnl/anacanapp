@@ -132,6 +132,8 @@ export const useUserStore = create<UserState>()(
 
       setMultiplesData: (babyCount, multiplesType) => set({ babyCount, multiplesType }),
 
+      setLanguage: (lang) => set({ language: lang }),
+
       setPartnerCode: (code) => set({ partnerCode: code }),
 
       setLinkedPartnerId: (id) => set({ linkedPartnerId: id }),
