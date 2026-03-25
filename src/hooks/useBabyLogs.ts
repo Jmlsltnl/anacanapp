@@ -327,6 +327,8 @@ export const useBabyLogs = () => {
     todayLogs,
     loading,
     addLog,
+    updateLog,
+    deleteLog,
     getTodayStats,
     getFeedingHistory,
     getTodayFeedingBreakdown,
