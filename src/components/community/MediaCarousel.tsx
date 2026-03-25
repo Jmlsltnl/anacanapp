@@ -143,7 +143,7 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
                 <video
                   ref={videoRef}
                   src={currentMedia.url}
-                  className="w-full h-full object-contain bg-black"
+                  className="w-full h-full object-cover"
                   onClick={togglePlay}
                   onPlay={() => setIsPlaying(true)}
                   onPause={() => setIsPlaying(false)}
