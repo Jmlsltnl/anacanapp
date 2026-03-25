@@ -82,12 +82,30 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
 
   const isRecipeFree = (recipe: Recipe) => freeRecipeIds.has(recipe.id);
 
+  const [scrollPosition, setScrollPosition] = useState(0);
+
   const handleRecipeClick = (recipe: Recipe) => {
     if (!isPremium && !isRecipeFree(recipe)) {
       setShowPremiumModal(true);
       return;
     }
+    // Save scroll position before navigating to detail
+    const scrollContainer = document.querySelector('[data-scroll-container]');
+    setScrollPosition(scrollContainer?.scrollTop || window.scrollY || 0);
     setSelectedRecipe(recipe);
+  };
+
+  const handleBackFromDetail = () => {
+    setSelectedRecipe(null);
+    // Restore scroll position after returning to list
+    requestAnimationFrame(() => {
+      const scrollContainer = document.querySelector('[data-scroll-container]');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollPosition;
+      } else {
+        window.scrollTo({ top: scrollPosition, behavior: 'auto' });
+      }
+    });
   };
 
   const totalTime = (recipe: Recipe) => (recipe.prep_time || 0) + (recipe.cook_time || 0);
