@@ -398,7 +398,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
         </motion.div>
 
         {/* Recipes Grid */}
-        <AnimatePresence mode="popLayout">
+        <div>
           {recipesLoading ? (
             <div className="grid grid-cols-2 gap-3">
               {[...Array(4)].map((_, i) => (
