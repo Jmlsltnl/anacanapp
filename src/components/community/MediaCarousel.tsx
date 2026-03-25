@@ -128,7 +128,7 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
   // Multiple media items - Carousel
   return (
     <>
-      <div className={`relative ${aspectRatioClass} bg-muted rounded-lg overflow-hidden`}>
+      <div className={`relative ${mediaContainerClass} bg-muted/30 rounded-2xl overflow-hidden`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
