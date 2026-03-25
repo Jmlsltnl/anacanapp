@@ -93,6 +93,10 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
     const scrollContainer = document.querySelector('[data-scroll-container]');
     setScrollPosition(scrollContainer?.scrollTop || window.scrollY || 0);
     setSelectedRecipe(recipe);
+    // Scroll to top for detail view
+    requestAnimationFrame(() => {
+      resetAppScrollPosition();
+    });
   };
 
   const handleBackFromDetail = () => {
