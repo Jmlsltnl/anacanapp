@@ -17,13 +17,6 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Swipe down to close fullscreen
-  const handleDragEnd = useCallback((_: any, info: PanInfo) => {
-    if (Math.abs(info.offset.y) > 100 || Math.abs(info.velocity.y) > 500) {
-      setShowFullscreen(false);
-    }
-    setDragY(0);
-  }, []);
 
   if (media.length === 0) return null;
 
