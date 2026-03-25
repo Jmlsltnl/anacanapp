@@ -103,10 +103,7 @@ const PhotoGalleryViewer = ({
         await Haptics.impact({ style: ImpactStyle.Heavy }).catch(() => {});
         
         toast({
-          title: 'Şəkil yadda saxlanıldı! 📸',
-          description: isIOS 
-            ? 'Şəkil Files tətbiqində və ya paylaşım pəncərəsində əlçatandır' 
-            : 'Şəkil Qalereyaya əlavə edildi',
+          title: 'Şəkil endirildi! 📸',
         });
       } else {
         throw new Error('Download failed');
