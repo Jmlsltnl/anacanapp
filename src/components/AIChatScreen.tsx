@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Sparkles, User, Bot, Loader2, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Send, Sparkles, User, Bot, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -328,36 +328,25 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
 
   return (
     <div ref={ref} className="fixed inset-0 bottom-[80px] flex flex-col bg-gradient-to-b from-background to-muted/20" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-      {/* Header */}
-      <div className="px-5 py-4 border-b border-border bg-card/50 backdrop-blur-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <motion.div 
-              className="w-12 h-12 rounded-2xl gradient-primary flex items-center justify-center shadow-lg"
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <Sparkles className="w-6 h-6 text-white" />
-            </motion.div>
-            <div>
-              <h1 className="font-bold text-lg text-foreground">Anacan.AI</h1>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-xs text-muted-foreground">AI Rəfiqəniz</span>
-              </div>
+      {/* Compact Header */}
+      <div className="px-4 py-2.5 border-b border-border bg-card/50 backdrop-blur-sm flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center">
+            <Sparkles className="w-4.5 h-4.5 text-white" />
+          </div>
+          <div>
+            <h1 className="font-bold text-sm text-foreground">Anacan.AI</h1>
+            <div className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              <span className="text-[10px] text-muted-foreground">Onlayn</span>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={clearChat}>
-            <RefreshCw className="w-5 h-5" />
-          </Button>
         </div>
-      </div>
-
-      {/* Disclaimer Banner */}
-      <div className="px-4 py-2 bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800">
-        <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400">
-          <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
-          <span>Tibbi məsləhətlər yalnız həkim tərəfindən təsdiqlənməlidir</span>
+        <div className="flex items-center gap-1">
+          <span className="text-[10px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 rounded-full">⚕️ Həkim məsləhəti əvəzi deyil</span>
+          <Button variant="ghost" size="icon" className="w-8 h-8" onClick={clearChat}>
+            <RefreshCw className="w-4 h-4" />
+          </Button>
         </div>
       </div>
 

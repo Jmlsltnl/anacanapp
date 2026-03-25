@@ -197,8 +197,8 @@ const Index = () => {
   useSwipeNavigation({
     onSwipeBack: handleSwipeBack,
     onSwipeForward: handleSwipeForward,
-    edgeWidth: 40,
-    threshold: 50,
+    edgeWidth: 55,
+    threshold: 35,
     enabled: isAuthenticated && !showSplash && !showIntro && !showAdmin
   });
 

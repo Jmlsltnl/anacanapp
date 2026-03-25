@@ -398,7 +398,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
         </motion.div>
 
         {/* Recipes Grid */}
-        <AnimatePresence mode="popLayout">
+        <div>
           {recipesLoading ? (
             <div className="grid grid-cols-2 gap-3">
               {[...Array(4)].map((_, i) => (
@@ -426,16 +426,10 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {filteredRecipes.map((recipe, index) => (
-                <motion.button
+              <div
                   key={recipe.id}
                   onClick={() => handleRecipeClick(recipe)}
-                  className="relative bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all text-left group"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ delay: index * 0.05 }}
-                  whileTap={{ scale: 0.98 }}
-                  layout
+                  className="relative bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all text-left group cursor-pointer active:scale-[0.98]"
                 >
                   {/* Lock overlay for non-premium non-free recipes */}
                   {!isPremium && !isRecipeFree(recipe) && (
@@ -496,11 +490,11 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
                       )}
                     </div>
                   </div>
-                </motion.button>
+                </div>
               ))}
             </div>
           )}
-        </AnimatePresence>
+        </div>
 
         {/* Recipe count */}
         {!recipesLoading && filteredRecipes.length > 0 && (

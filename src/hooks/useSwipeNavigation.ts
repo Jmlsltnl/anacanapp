@@ -16,8 +16,8 @@ interface SwipeNavigationOptions {
 export const useSwipeNavigation = ({
   onSwipeBack,
   onSwipeForward,
-  edgeWidth = 30,
-  threshold = 60,
+  edgeWidth = 50,
+  threshold = 40,
   enabled = true,
 }: SwipeNavigationOptions = {}) => {
   const startX = useRef(0);
