@@ -88,51 +88,6 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
           )}
         </div>
 
-        {/* Fullscreen Modal */}
-        <AnimatePresence>
-          {showFullscreen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[100] bg-black flex items-center justify-center"
-              onClick={() => setShowFullscreen(false)}
-            >
-              <motion.div
-                drag="y"
-                dragConstraints={{ top: 0, bottom: 0 }}
-                dragElastic={0.7}
-                onDrag={(_, info) => setDragY(info.offset.y)}
-                onDragEnd={handleDragEnd}
-                style={{ opacity: 1 - Math.abs(dragY) / 400 }}
-                className="w-full h-full flex items-center justify-center"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  onClick={() => setShowFullscreen(false)}
-                  className="absolute right-4 w-11 h-11 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white z-10"
-                  style={{ top: 'calc(env(safe-area-inset-top, 16px) + 8px)' }}
-                >
-                  <X className="w-5 h-5" />
-                </button>
-                {currentMedia.type === 'video' ? (
-                  <video
-                    src={currentMedia.url}
-                    className="max-w-full max-h-full"
-                    controls
-                    autoPlay
-                  />
-                ) : (
-                  <img
-                    src={currentMedia.url}
-                    alt=""
-                    className="max-w-full max-h-full object-contain"
-                  />
-                )}
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </>
     );
   }
