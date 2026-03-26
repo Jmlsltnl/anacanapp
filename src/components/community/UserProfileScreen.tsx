@@ -237,8 +237,20 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
           <div className="text-center p-3 bg-muted/50 rounded-xl">
             <p className="text-2xl font-bold text-foreground">{stats.likesCount}</p>
             <p className="text-xs text-muted-foreground">Bəyənmə</p>
-          </div>
         </div>
+
+        {/* Message Button */}
+        {!isCurrentUser && onSendMessage && profile && (
+          <motion.button
+            onClick={() => onSendMessage(profile.user_id, profile.name, profile.avatar_url)}
+            className="w-full mt-4 flex items-center justify-center gap-2 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-semibold"
+            whileTap={{ scale: 0.97 }}
+          >
+            <MessageCircle className="w-4 h-4" />
+            Mesaj göndər
+          </motion.button>
+        )}
+      </div>
       </div>
 
       {/* Tabs */}
