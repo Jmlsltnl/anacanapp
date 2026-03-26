@@ -47,6 +47,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
 
   const { data: groups = [], isLoading: groupsLoading } = useCommunityGroups();
   const { data: memberships = [] } = useUserMemberships();
+  const { totalUnread } = useDirectMessages();
 
   const memberGroupIds = new Set(memberships.map(m => m.group_id));
   const myGroups = groups.filter(g => memberGroupIds.has(g.id));
@@ -54,8 +55,24 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
 
   const handleUserClick = (userId: string) => setSelectedUserId(userId);
 
+  const handleOpenDmChat = (userId: string, name: string, avatar: string | null) => {
+    setDmChat({ userId, name, avatar });
+    setSelectedUserId(null);
+    setShowConversations(false);
+  };
+
+  // DM Chat screen
+  if (dmChat) {
+    return <DirectMessageScreen userId={dmChat.userId} userName={dmChat.name} userAvatar={dmChat.avatar} onBack={() => setDmChat(null)} />;
+  }
+
+  // Conversations list
+  if (showConversations) {
+    return <ConversationListScreen onBack={() => setShowConversations(false)} onOpenChat={handleOpenDmChat} />;
+  }
+
   if (selectedUserId) {
-    return <UserProfileScreen userId={selectedUserId} onBack={() => setSelectedUserId(null)} />;
+    return <UserProfileScreen userId={selectedUserId} onBack={() => setSelectedUserId(null)} onSendMessage={handleOpenDmChat} />;
   }
 
   // Full screen create post
