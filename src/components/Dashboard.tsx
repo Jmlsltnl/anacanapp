@@ -1711,8 +1711,12 @@ interface DashboardProps {
 const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps) => {
   const { lifeStage, name } = useUserStore();
   const { profile } = useAuth();
-  const { unreadCount } = useUnreadMessages();
+  const { unreadCount: partnerUnread } = useUnreadMessages();
+  const { conversations } = useDirectMessages();
   const { unreadCount: notificationCount } = useNotifications();
+
+  // Combined unread from partner + community DMs
+  const totalUnread = partnerUnread + (conversations?.reduce((sum, c) => sum + c.unread_count, 0) || 0);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
