@@ -31,6 +31,7 @@ const SettingsScreen = lazy(() => import('@/components/SettingsScreen'));
 const CalendarScreen = lazy(() => import('@/components/CalendarScreen'));
 const AdminPanel = lazy(() => import('@/components/AdminPanel'));
 const MotherChatScreen = lazy(() => import('@/components/MotherChatScreen'));
+const MessagesScreen = lazy(() => import('@/components/MessagesScreen'));
 const CommunityScreen = lazy(() => import('@/components/community/CommunityScreen'));
 const ProfileEditScreen = lazy(() => import('@/components/ProfileEditScreen'));
 const HelpScreen = lazy(() => import('@/components/HelpScreen'));
