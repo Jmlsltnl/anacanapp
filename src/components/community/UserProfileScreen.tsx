@@ -34,7 +34,7 @@ interface UserProfileScreenProps {
   onSendMessage?: (userId: string, name: string, avatar: string | null) => void;
 }
 
-const UserProfileScreen = ({ userId, onBack }: UserProfileScreenProps) => {
+const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenProps) => {
   useScrollToTop();
   
   const [profile, setProfile] = useState<UserProfile | null>(null);
