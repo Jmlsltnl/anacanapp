@@ -63,7 +63,7 @@ const ConversationListScreen = ({ onBack, onOpenChat, partnerId }: ConversationL
         </div>
       ) : (
         <div className="divide-y divide-border/30">
-          {conversations.map((conv) => (
+          {allConversations.map((conv) => (
             <motion.button
               key={conv.user_id}
               onClick={() => onOpenChat(conv.user_id, conv.name, conv.avatar_url)}
