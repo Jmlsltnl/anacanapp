@@ -33,6 +33,8 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [searchFocused, setSearchFocused] = useState(false);
+  const [showConversations, setShowConversations] = useState(false);
+  const [dmChat, setDmChat] = useState<{ userId: string; name: string; avatar: string | null } | null>(null);
 
   useScrollToTop([activeTab, selectedGroupId, selectedUserId]);
   useScreenAnalytics('Community', 'Social');
