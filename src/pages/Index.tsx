@@ -414,9 +414,16 @@ const Index = () => {
   if (activeScreen === 'partner-hospital-bag' && role === 'partner') return <Suspense fallback={suspenseFallback}><PartnerHospitalBagScreen onBack={() => setActiveScreen(null)} /></Suspense>;
   if (activeScreen === 'daily-summary' && role === 'partner') return <Suspense fallback={suspenseFallback}><DailySummaryScreen onBack={() => setActiveScreen(null)} /></Suspense>;
 
-  // Mother chat overlay (for woman role)
-  if (showMotherChat && role === 'woman') {
-    return <Suspense fallback={suspenseFallback}><MotherChatScreen onBack={() => setShowMotherChat(false)} /></Suspense>;
+  // Messages screen (unified: partner + community DMs)
+  if (showMotherChat) {
+    return (
+      <Suspense fallback={suspenseFallback}>
+        <MessagesScreen 
+          onBack={() => setShowMotherChat(false)} 
+          partnerId={profile?.linked_partner_id}
+        />
+      </Suspense>
+    );
   }
 
   return (
