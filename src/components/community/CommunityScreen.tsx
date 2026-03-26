@@ -1,16 +1,19 @@
 import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Users, Plus, Search, TrendingUp, Compass, Sparkles, X, Pen } from 'lucide-react';
+import { ArrowLeft, Users, Plus, Search, TrendingUp, Compass, Sparkles, X, Pen, MessageCircle } from 'lucide-react';
 import { useCommunityGroups, useUserMemberships } from '@/hooks/useCommunity';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useUserStore } from '@/store/userStore';
 import { useAppSetting } from '@/hooks/useAppSettings';
+import { useDirectMessages } from '@/hooks/useDirectMessages';
 import GroupsList from './GroupsList';
 import GroupFeed from './GroupFeed';
 import CreatePostScreen from './CreatePostScreen';
 import StoriesBar from './StoriesBar';
 import UserProfileScreen from './UserProfileScreen';
+import ConversationListScreen from './ConversationListScreen';
+import DirectMessageScreen from './DirectMessageScreen';
 import BannerSlot from '@/components/banners/BannerSlot';
 
 interface CommunityScreenProps {
@@ -30,6 +33,8 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [searchFocused, setSearchFocused] = useState(false);
+  const [showConversations, setShowConversations] = useState(false);
+  const [dmChat, setDmChat] = useState<{ userId: string; name: string; avatar: string | null } | null>(null);
 
   useScrollToTop([activeTab, selectedGroupId, selectedUserId]);
   useScreenAnalytics('Community', 'Social');
@@ -42,6 +47,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
 
   const { data: groups = [], isLoading: groupsLoading } = useCommunityGroups();
   const { data: memberships = [] } = useUserMemberships();
+  const { totalUnread } = useDirectMessages();
 
   const memberGroupIds = new Set(memberships.map(m => m.group_id));
   const myGroups = groups.filter(g => memberGroupIds.has(g.id));
@@ -49,8 +55,24 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
 
   const handleUserClick = (userId: string) => setSelectedUserId(userId);
 
+  const handleOpenDmChat = (userId: string, name: string, avatar: string | null) => {
+    setDmChat({ userId, name, avatar });
+    setSelectedUserId(null);
+    setShowConversations(false);
+  };
+
+  // DM Chat screen
+  if (dmChat) {
+    return <DirectMessageScreen userId={dmChat.userId} userName={dmChat.name} userAvatar={dmChat.avatar} onBack={() => setDmChat(null)} />;
+  }
+
+  // Conversations list
+  if (showConversations) {
+    return <ConversationListScreen onBack={() => setShowConversations(false)} onOpenChat={handleOpenDmChat} />;
+  }
+
   if (selectedUserId) {
-    return <UserProfileScreen userId={selectedUserId} onBack={() => setSelectedUserId(null)} />;
+    return <UserProfileScreen userId={selectedUserId} onBack={() => setSelectedUserId(null)} onSendMessage={handleOpenDmChat} />;
   }
 
   // Full screen create post
@@ -84,6 +106,18 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
               <h1 className="text-[22px] font-black text-foreground tracking-tight leading-none">Cəmiyyət</h1>
               <p className="text-[11px] text-muted-foreground/50 mt-1 font-medium">{headerText}</p>
             </div>
+            <motion.button
+              onClick={() => setShowConversations(true)}
+              className="relative w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center"
+              whileTap={{ scale: 0.9 }}
+            >
+              <MessageCircle className="w-4 h-4 text-foreground" />
+              {totalUnread > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 rounded-full bg-primary text-primary-foreground text-[9px] font-bold flex items-center justify-center min-w-[18px] h-[18px]">
+                  {totalUnread > 9 ? '9+' : totalUnread}
+                </span>
+              )}
+            </motion.button>
           </div>
 
           <motion.div className="relative mb-4" animate={{ scale: searchFocused ? 1.01 : 1 }} transition={{ duration: 0.2 }}>
