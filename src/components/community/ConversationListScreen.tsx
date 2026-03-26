@@ -1,17 +1,34 @@
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, MessageCircle, Loader2, Image, Video, Mic } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Loader2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useDirectMessages } from '@/hooks/useDirectMessages';
+import { useDirectMessages, Conversation } from '@/hooks/useDirectMessages';
+import { usePartnerConversation } from '@/hooks/usePartnerConversation';
 import { formatDistanceToNow } from 'date-fns';
 import { az } from 'date-fns/locale';
 
 interface ConversationListScreenProps {
   onBack: () => void;
   onOpenChat: (userId: string, name: string, avatar: string | null) => void;
+  partnerId?: string | null;
 }
 
-const ConversationListScreen = ({ onBack, onOpenChat }: ConversationListScreenProps) => {
+const ConversationListScreen = ({ onBack, onOpenChat, partnerId }: ConversationListScreenProps) => {
   const { conversations, loading } = useDirectMessages();
+  const { messages: partnerMessages, loading: partnerLoading } = usePartnerConversation(partnerId);
+
+  // Merge partner conversation into the list
+  const allConversations = useMemo(() => {
+    const list = [...conversations];
+    if (partnerMessages) {
+      // Check if partner already exists in DM conversations
+      const existingIdx = list.findIndex(c => c.user_id === partnerId);
+      if (existingIdx === -1 && partnerMessages.conversation) {
+        list.unshift(partnerMessages.conversation);
+      }
+    }
+    return list.sort((a, b) => new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime());
+  }, [conversations, partnerMessages, partnerId]);
 
   const getLastMessagePreview = (type: string, content: string | null) => {
     switch (type) {
@@ -32,11 +49,11 @@ const ConversationListScreen = ({ onBack, onOpenChat }: ConversationListScreenPr
         <h1 className="text-lg font-bold text-foreground flex-1">Mesajlar</h1>
       </div>
 
-      {loading ? (
+      {loading || partnerLoading ? (
         <div className="flex items-center justify-center py-16">
           <Loader2 className="w-6 h-6 animate-spin text-primary" />
         </div>
-      ) : conversations.length === 0 ? (
+      ) : allConversations.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
             <MessageCircle className="w-7 h-7 text-primary" />
@@ -46,7 +63,7 @@ const ConversationListScreen = ({ onBack, onOpenChat }: ConversationListScreenPr
         </div>
       ) : (
         <div className="divide-y divide-border/30">
-          {conversations.map((conv) => (
+          {allConversations.map((conv) => (
             <motion.button
               key={conv.user_id}
               onClick={() => onOpenChat(conv.user_id, conv.name, conv.avatar_url)}

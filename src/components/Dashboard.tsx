@@ -21,6 +21,7 @@ import { useAchievements } from '@/hooks/useAchievements';
 import { useWeeklyTips } from '@/hooks/useDynamicContent';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
+import { useDirectMessages } from '@/hooks/useDirectMessages';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useTrimesterTips } from '@/hooks/useTrimesterTips';
@@ -1710,8 +1711,12 @@ interface DashboardProps {
 const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps) => {
   const { lifeStage, name } = useUserStore();
   const { profile } = useAuth();
-  const { unreadCount } = useUnreadMessages();
+  const { unreadCount: partnerUnread } = useUnreadMessages();
+  const { conversations } = useDirectMessages();
   const { unreadCount: notificationCount } = useNotifications();
+
+  // Combined unread from partner + community DMs
+  const totalUnread = partnerUnread + (conversations?.reduce((sum, c) => sum + c.unread_count, 0) || 0);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -1735,25 +1740,23 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
           <h1 className="text-lg font-black text-foreground">{name || 'Xanım'} 👋</h1>
         </div>
         <div className="flex items-center gap-2">
-          {hasPartner && (
-            <motion.button 
-              onClick={onOpenChat}
-              className="w-9 h-9 rounded-xl bg-partner/10 flex items-center justify-center relative"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <MessageCircle className="w-4 h-4 text-partner" />
-              {unreadCount > 0 && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[9px] font-bold text-white flex items-center justify-center"
-                >
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </motion.span>
-              )}
-            </motion.button>
-          )}
+          <motion.button 
+            onClick={onOpenChat}
+            className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center relative"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <MessageCircle className="w-4 h-4 text-primary" />
+            {totalUnread > 0 && (
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[9px] font-bold text-white flex items-center justify-center"
+              >
+                {totalUnread > 9 ? '9+' : totalUnread}
+              </motion.span>
+            )}
+          </motion.button>
           <motion.button 
             className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center relative"
             whileHover={{ scale: 1.05 }}

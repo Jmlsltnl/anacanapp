@@ -31,6 +31,7 @@ const SettingsScreen = lazy(() => import('@/components/SettingsScreen'));
 const CalendarScreen = lazy(() => import('@/components/CalendarScreen'));
 const AdminPanel = lazy(() => import('@/components/AdminPanel'));
 const MotherChatScreen = lazy(() => import('@/components/MotherChatScreen'));
+const MessagesScreen = lazy(() => import('@/components/MessagesScreen'));
 const CommunityScreen = lazy(() => import('@/components/community/CommunityScreen'));
 const ProfileEditScreen = lazy(() => import('@/components/ProfileEditScreen'));
 const HelpScreen = lazy(() => import('@/components/HelpScreen'));
@@ -80,7 +81,7 @@ const Index = () => {
   const [toolOpenedFromDashboard, setToolOpenedFromDashboard] = useState(false);
   const [toolsResetKey, setToolsResetKey] = useState(0);
   const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, lifeStage } = useUserStore();
-  const { isAdmin, loading } = useAuth();
+  const { isAdmin, loading, profile } = useAuth();
   const { forceUpdate, isLoading: forceUpdateLoading } = useForceUpdate();
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -413,9 +414,16 @@ const Index = () => {
   if (activeScreen === 'partner-hospital-bag' && role === 'partner') return <Suspense fallback={suspenseFallback}><PartnerHospitalBagScreen onBack={() => setActiveScreen(null)} /></Suspense>;
   if (activeScreen === 'daily-summary' && role === 'partner') return <Suspense fallback={suspenseFallback}><DailySummaryScreen onBack={() => setActiveScreen(null)} /></Suspense>;
 
-  // Mother chat overlay (for woman role)
-  if (showMotherChat && role === 'woman') {
-    return <Suspense fallback={suspenseFallback}><MotherChatScreen onBack={() => setShowMotherChat(false)} /></Suspense>;
+  // Messages screen (unified: partner + community DMs)
+  if (showMotherChat) {
+    return (
+      <Suspense fallback={suspenseFallback}>
+        <MessagesScreen 
+          onBack={() => setShowMotherChat(false)} 
+          partnerId={profile?.linked_partner_id}
+        />
+      </Suspense>
+    );
   }
 
   return (
