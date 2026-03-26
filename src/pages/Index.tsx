@@ -81,7 +81,7 @@ const Index = () => {
   const [toolOpenedFromDashboard, setToolOpenedFromDashboard] = useState(false);
   const [toolsResetKey, setToolsResetKey] = useState(0);
   const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, lifeStage } = useUserStore();
-  const { isAdmin, loading } = useAuth();
+  const { isAdmin, loading, profile } = useAuth();
   const { forceUpdate, isLoading: forceUpdateLoading } = useForceUpdate();
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
