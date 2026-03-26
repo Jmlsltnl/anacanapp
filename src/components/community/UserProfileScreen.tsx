@@ -31,6 +31,7 @@ interface UserStory {
 interface UserProfileScreenProps {
   userId: string;
   onBack: () => void;
+  onSendMessage?: (userId: string, name: string, avatar: string | null) => void;
 }
 
 const UserProfileScreen = ({ userId, onBack }: UserProfileScreenProps) => {
