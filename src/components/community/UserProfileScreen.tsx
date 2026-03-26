@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Grid3X3, Film, Settings, UserPlus, UserMinus, Crown, Shield } from 'lucide-react';
+import { ArrowLeft, Grid3X3, Film, Settings, UserPlus, UserMinus, Crown, Shield, MessageCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
