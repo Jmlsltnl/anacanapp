@@ -8,6 +8,7 @@ import { az } from 'date-fns/locale';
 interface ConversationListScreenProps {
   onBack: () => void;
   onOpenChat: (userId: string, name: string, avatar: string | null) => void;
+  partnerId?: string | null;
 }
 
 const ConversationListScreen = ({ onBack, onOpenChat }: ConversationListScreenProps) => {
