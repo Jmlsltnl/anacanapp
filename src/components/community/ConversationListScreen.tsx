@@ -53,7 +53,7 @@ const ConversationListScreen = ({ onBack, onOpenChat, partnerId }: ConversationL
         <div className="flex items-center justify-center py-16">
           <Loader2 className="w-6 h-6 animate-spin text-primary" />
         </div>
-      ) : conversations.length === 0 ? (
+      ) : allConversations.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
             <MessageCircle className="w-7 h-7 text-primary" />
