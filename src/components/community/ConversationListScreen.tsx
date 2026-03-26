@@ -1,7 +1,9 @@
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, MessageCircle, Loader2, Image, Video, Mic } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Loader2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useDirectMessages } from '@/hooks/useDirectMessages';
+import { useDirectMessages, Conversation } from '@/hooks/useDirectMessages';
+import { usePartnerConversation } from '@/hooks/usePartnerConversation';
 import { formatDistanceToNow } from 'date-fns';
 import { az } from 'date-fns/locale';
 
