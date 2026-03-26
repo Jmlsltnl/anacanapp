@@ -1,16 +1,19 @@
 import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Users, Plus, Search, TrendingUp, Compass, Sparkles, X, Pen } from 'lucide-react';
+import { ArrowLeft, Users, Plus, Search, TrendingUp, Compass, Sparkles, X, Pen, MessageCircle } from 'lucide-react';
 import { useCommunityGroups, useUserMemberships } from '@/hooks/useCommunity';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useUserStore } from '@/store/userStore';
 import { useAppSetting } from '@/hooks/useAppSettings';
+import { useDirectMessages } from '@/hooks/useDirectMessages';
 import GroupsList from './GroupsList';
 import GroupFeed from './GroupFeed';
 import CreatePostScreen from './CreatePostScreen';
 import StoriesBar from './StoriesBar';
 import UserProfileScreen from './UserProfileScreen';
+import ConversationListScreen from './ConversationListScreen';
+import DirectMessageScreen from './DirectMessageScreen';
 import BannerSlot from '@/components/banners/BannerSlot';
 
 interface CommunityScreenProps {
