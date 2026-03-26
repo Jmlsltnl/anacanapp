@@ -49,7 +49,7 @@ const ConversationListScreen = ({ onBack, onOpenChat, partnerId }: ConversationL
         <h1 className="text-lg font-bold text-foreground flex-1">Mesajlar</h1>
       </div>
 
-      {loading ? (
+      {loading || partnerLoading ? (
         <div className="flex items-center justify-center py-16">
           <Loader2 className="w-6 h-6 animate-spin text-primary" />
         </div>
