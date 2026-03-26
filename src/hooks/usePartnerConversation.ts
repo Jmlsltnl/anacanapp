@@ -21,7 +21,7 @@ export const usePartnerConversation = (partnerId?: string | null) => {
 
     const conversation: Conversation = {
       user_id: partnerId,
-      name: profile?.partner_name || 'Partner',
+      name: (profile as any)?.partner_name || 'Partner',
       avatar_url: null,
       last_message: lastMsg?.content || null,
       last_message_type: lastMsg?.message_type || 'text',
