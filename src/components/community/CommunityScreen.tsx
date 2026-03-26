@@ -106,6 +106,18 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
               <h1 className="text-[22px] font-black text-foreground tracking-tight leading-none">Cəmiyyət</h1>
               <p className="text-[11px] text-muted-foreground/50 mt-1 font-medium">{headerText}</p>
             </div>
+            <motion.button
+              onClick={() => setShowConversations(true)}
+              className="relative w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center"
+              whileTap={{ scale: 0.9 }}
+            >
+              <MessageCircle className="w-4 h-4 text-foreground" />
+              {totalUnread > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 rounded-full bg-primary text-primary-foreground text-[9px] font-bold flex items-center justify-center min-w-[18px] h-[18px]">
+                  {totalUnread > 9 ? '9+' : totalUnread}
+                </span>
+              )}
+            </motion.button>
           </div>
 
           <motion.div className="relative mb-4" animate={{ scale: searchFocused ? 1.01 : 1 }} transition={{ duration: 0.2 }}>
