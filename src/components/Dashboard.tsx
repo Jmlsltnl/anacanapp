@@ -21,6 +21,7 @@ import { useAchievements } from '@/hooks/useAchievements';
 import { useWeeklyTips } from '@/hooks/useDynamicContent';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
+import { useDirectMessages } from '@/hooks/useDirectMessages';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useTrimesterTips } from '@/hooks/useTrimesterTips';
