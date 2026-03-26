@@ -11,8 +11,22 @@ interface ConversationListScreenProps {
   partnerId?: string | null;
 }
 
-const ConversationListScreen = ({ onBack, onOpenChat }: ConversationListScreenProps) => {
+const ConversationListScreen = ({ onBack, onOpenChat, partnerId }: ConversationListScreenProps) => {
   const { conversations, loading } = useDirectMessages();
+  const { messages: partnerMessages, loading: partnerLoading } = usePartnerConversation(partnerId);
+
+  // Merge partner conversation into the list
+  const allConversations = useMemo(() => {
+    const list = [...conversations];
+    if (partnerMessages) {
+      // Check if partner already exists in DM conversations
+      const existingIdx = list.findIndex(c => c.user_id === partnerId);
+      if (existingIdx === -1 && partnerMessages.conversation) {
+        list.unshift(partnerMessages.conversation);
+      }
+    }
+    return list.sort((a, b) => new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime());
+  }, [conversations, partnerMessages, partnerId]);
 
   const getLastMessagePreview = (type: string, content: string | null) => {
     switch (type) {
