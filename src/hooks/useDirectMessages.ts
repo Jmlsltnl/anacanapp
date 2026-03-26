@@ -144,7 +144,7 @@ export const useDirectMessages = (otherUserId?: string) => {
       try {
         await supabase.functions.invoke('send-push-notification', {
           body: {
-            user_id: otherUserId,
+            userId: otherUserId,
             title: 'Yeni mesaj 💬',
             body: type === 'text' ? (content.length > 60 ? content.slice(0, 60) + '...' : content)
               : type === 'image' ? '📷 Şəkil göndərdi'
