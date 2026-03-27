@@ -162,6 +162,17 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
 
             {/* Top: Branding */}
             <div className="text-center pt-6 pb-3 px-5 shrink-0">
+              {showFreeTrial && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="mb-3 mx-auto inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-400/20 border border-emerald-400/30 backdrop-blur-sm"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
+                  <span className="text-xs font-bold text-emerald-200 tracking-wide">{paywallConfig.free_trial_badge}</span>
+                </motion.div>
+              )}
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
