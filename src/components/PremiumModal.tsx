@@ -279,6 +279,11 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
 
             {/* Bottom: CTA + Legal */}
             <div className="shrink-0 px-5 pt-2" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}>
+              {showFreeTrial && (
+                <p className="text-center text-[11px] text-white/80 mb-2 font-medium">
+                  {freeTrialNote}
+                </p>
+              )}
               <Button
                 className="w-full h-12 rounded-2xl bg-white hover:bg-white/95 text-orange-600 font-bold text-sm shadow-xl shadow-black/15 border-0 disabled:opacity-50 transition-all"
                 onClick={handlePurchase}
