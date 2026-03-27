@@ -164,13 +164,40 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
             <div className="text-center pt-6 pb-3 px-5 shrink-0">
               {showFreeTrial && (
                 <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 }}
-                  className="mb-3 mx-auto inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-400/20 border border-emerald-400/30 backdrop-blur-sm"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ type: 'spring', damping: 15, stiffness: 200, delay: 0.1 }}
+                  className="mb-4 mx-auto"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
-                  <span className="text-xs font-bold text-emerald-200 tracking-wide">{paywallConfig.free_trial_badge}</span>
+                  <div className="relative inline-flex flex-col items-center">
+                    <motion.div
+                      animate={{ boxShadow: ['0 0 20px rgba(52,211,153,0.3)', '0 0 40px rgba(52,211,153,0.5)', '0 0 20px rgba(52,211,153,0.3)'] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                      className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500/30 via-emerald-400/25 to-teal-500/30 border border-emerald-400/40 backdrop-blur-md"
+                    >
+                      <div className="flex items-center gap-2">
+                        <motion.div
+                          animate={{ rotate: [0, 15, -15, 0] }}
+                          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                        >
+                          <Sparkles className="w-5 h-5 text-emerald-300" />
+                        </motion.div>
+                        <span className="text-sm font-black text-white tracking-wider">{paywallConfig.free_trial_badge}</span>
+                        <motion.div
+                          animate={{ rotate: [0, -15, 15, 0] }}
+                          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+                        >
+                          <Sparkles className="w-5 h-5 text-emerald-300" />
+                        </motion.div>
+                      </div>
+                    </motion.div>
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: '60%' }}
+                      transition={{ delay: 0.5, duration: 0.6 }}
+                      className="h-0.5 mt-1.5 rounded-full bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent"
+                    />
+                  </div>
                 </motion.div>
               )}
               <motion.div
