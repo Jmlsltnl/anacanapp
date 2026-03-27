@@ -75,9 +75,13 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const allFeatures = [...premiumOnlyFeatures, ...limitedFreeFeatures];
 
   const isCurrentlyMonthly = isPremium && subscription?.plan_type === 'premium';
-  const ctaText = isCurrentlyMonthly && selectedPlan === 'yearly'
-    ? paywallConfig.cta_switch_yearly
-    : isPremium ? paywallConfig.cta_upgrade : paywallConfig.cta_new_user;
+  const showFreeTrial = paywallConfig.free_trial_enabled && !isPremium && isNative;
+  const freeTrialNote = paywallConfig.free_trial_note.replace('{days}', String(paywallConfig.free_trial_days));
+  const ctaText = showFreeTrial
+    ? paywallConfig.free_trial_cta
+    : isCurrentlyMonthly && selectedPlan === 'yearly'
+      ? paywallConfig.cta_switch_yearly
+      : isPremium ? paywallConfig.cta_upgrade : paywallConfig.cta_new_user;
 
   const handlePurchase = useCallback(async () => {
     if (!isNative) {
@@ -158,6 +162,17 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
 
             {/* Top: Branding */}
             <div className="text-center pt-6 pb-3 px-5 shrink-0">
+              {showFreeTrial && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="mb-3 mx-auto inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-400/20 border border-emerald-400/30 backdrop-blur-sm"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
+                  <span className="text-xs font-bold text-emerald-200 tracking-wide">{paywallConfig.free_trial_badge}</span>
+                </motion.div>
+              )}
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
@@ -264,6 +279,11 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
 
             {/* Bottom: CTA + Legal */}
             <div className="shrink-0 px-5 pt-2" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}>
+              {showFreeTrial && (
+                <p className="text-center text-[11px] text-white/80 mb-2 font-medium">
+                  {freeTrialNote}
+                </p>
+              )}
               <Button
                 className="w-full h-12 rounded-2xl bg-white hover:bg-white/95 text-orange-600 font-bold text-sm shadow-xl shadow-black/15 border-0 disabled:opacity-50 transition-all"
                 onClick={handlePurchase}
