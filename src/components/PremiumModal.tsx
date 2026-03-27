@@ -75,9 +75,13 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const allFeatures = [...premiumOnlyFeatures, ...limitedFreeFeatures];
 
   const isCurrentlyMonthly = isPremium && subscription?.plan_type === 'premium';
-  const ctaText = isCurrentlyMonthly && selectedPlan === 'yearly'
-    ? paywallConfig.cta_switch_yearly
-    : isPremium ? paywallConfig.cta_upgrade : paywallConfig.cta_new_user;
+  const showFreeTrial = paywallConfig.free_trial_enabled && !isPremium && isNative;
+  const freeTrialNote = paywallConfig.free_trial_note.replace('{days}', String(paywallConfig.free_trial_days));
+  const ctaText = showFreeTrial
+    ? paywallConfig.free_trial_cta
+    : isCurrentlyMonthly && selectedPlan === 'yearly'
+      ? paywallConfig.cta_switch_yearly
+      : isPremium ? paywallConfig.cta_upgrade : paywallConfig.cta_new_user;
 
   const handlePurchase = useCallback(async () => {
     if (!isNative) {
