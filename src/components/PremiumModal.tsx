@@ -75,7 +75,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const allFeatures = [...premiumOnlyFeatures, ...limitedFreeFeatures];
 
   const isCurrentlyMonthly = isPremium && subscription?.plan_type === 'premium';
-  const showFreeTrial = paywallConfig.free_trial_enabled && !isPremium && isNative;
+  const showFreeTrial = paywallConfig.free_trial_enabled && !isPremium;
   const freeTrialNote = paywallConfig.free_trial_note.replace('{days}', String(paywallConfig.free_trial_days));
   const ctaText = showFreeTrial
     ? paywallConfig.free_trial_cta
