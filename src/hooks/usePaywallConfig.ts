@@ -26,6 +26,12 @@ export interface PaywallConfig {
   cancel_notice: string;
   native_notice: string;
   non_native_notice: string;
+  // Free trial
+  free_trial_enabled: boolean;
+  free_trial_days: number;
+  free_trial_badge: string;
+  free_trial_cta: string;
+  free_trial_note: string;
   // Purchasing states
   purchasing_text: string;
   // Gradient colors
