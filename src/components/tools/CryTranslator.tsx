@@ -321,7 +321,7 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold">Ağlama Tərcüməçisi</h1>
+            <h1 className="text-lg font-bold">Ağlama analizi edək</h1>
             <p className="text-xs text-muted-foreground">AI ilə körpə ağlamasını analiz edin</p>
           </div>
           <Button variant="ghost" size="icon" onClick={() => setShowHistory(!showHistory)} className="relative z-30">

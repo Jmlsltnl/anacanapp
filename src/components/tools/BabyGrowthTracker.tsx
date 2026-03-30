@@ -213,7 +213,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
             <div className="flex-1">
               <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <Baby className="w-5 h-5 text-rose-500" />
-                Böyümə İzləmə
+                İnkişaf izləyicisi
               </h1>
             </div>
             <motion.button
