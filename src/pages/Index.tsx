@@ -14,6 +14,7 @@ import { useDeviceToken } from '@/hooks/useDeviceToken';
 import { useForceUpdate } from '@/hooks/useForceUpdate';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { resetAppScrollPosition } from '@/lib/scroll';
+import { initDeeplinkListener, ParsedDeeplink } from '@/lib/deeplink';
 
 // Lazy load heavy screens
 const Dashboard = lazy(() => import('@/components/Dashboard'));
