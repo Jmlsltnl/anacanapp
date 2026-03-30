@@ -421,6 +421,7 @@ const AdminRecipes = () => {
                   { key: 'prep_time', header: 'Hazırlıq (dəq)' },
                   { key: 'cook_time', header: 'Bişirmə (dəq)' },
                   { key: 'servings', header: 'Porsiya' },
+                  { key: 'calories', header: 'Kalori' },
                   { key: 'ingredients', header: 'İnqredientlər' },
                   { key: 'instructions', header: 'Hazırlanma' },
                   { key: 'image_url', header: 'Şəkil URL' },
