@@ -35,5 +35,8 @@
     "captureInput": true,
     "webContentsDebuggingEnabled": false,
     "backgroundColor": "#FAF7F4"
+  },
+  "server": {
+    "hostname": "app.anacan.az"
   }
 }

@@ -62,6 +62,7 @@ import AdminEpoint from './admin/AdminEpoint';
 import AdminForceUpdate from './admin/AdminForceUpdate';
 import AdminLanguages from './admin/AdminLanguages';
 import AdminTranslations from './admin/AdminTranslations';
+import AdminDeeplinks from './admin/AdminDeeplinks';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -198,6 +199,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminLanguages />;
       case 'translations':
         return <AdminTranslations />;
+      case 'deeplinks':
+        return <AdminDeeplinks />;
       default:
         return <AdminDashboard />;
     }

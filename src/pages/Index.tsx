@@ -14,6 +14,7 @@ import { useDeviceToken } from '@/hooks/useDeviceToken';
 import { useForceUpdate } from '@/hooks/useForceUpdate';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { resetAppScrollPosition } from '@/lib/scroll';
+import { initDeeplinkListener, ParsedDeeplink } from '@/lib/deeplink';
 
 // Lazy load heavy screens
 const Dashboard = lazy(() => import('@/components/Dashboard'));
@@ -133,6 +134,41 @@ const Index = () => {
 
   // Initialize push notification token registration for native apps
   useDeviceToken();
+
+  // ─── Deeplink handler ───
+  const handleDeeplink = useCallback((parsed: ParsedDeeplink) => {
+    console.log('[Deeplink] Handling:', parsed);
+    switch (parsed.action) {
+      case 'tab':
+        setActiveTab(parsed.params.tab);
+        setActiveTool(null);
+        setActiveScreen(null);
+        break;
+      case 'tool':
+        setActiveTab('tools');
+        setActiveTool(parsed.params.tool_id);
+        setToolOpenedFromDashboard(false);
+        break;
+      case 'screen':
+        setActiveScreen(parsed.params.screen);
+        break;
+      case 'messages':
+        setShowMotherChat(true);
+        break;
+      case 'user-profile':
+        setViewingUserId(parsed.params.user_id);
+        break;
+      case 'community-post':
+        setActiveTab('community');
+        // Community screen will handle post_id via state if needed
+        break;
+    }
+  }, []);
+
+  useEffect(() => {
+    const cleanup = initDeeplinkListener(handleDeeplink);
+    return cleanup;
+  }, [handleDeeplink]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
