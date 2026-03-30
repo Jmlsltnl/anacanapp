@@ -608,6 +608,9 @@ const AdminRecipes = () => {
                           <Users className="w-3 h-3" />
                           {recipe.servings} porsiya
                         </span>
+                        {recipe.calories && (
+                          <span className="text-orange-500 font-medium">{recipe.calories} kcal</span>
+                        )}
                         <Badge variant="outline">{categories.find(c => c.id === recipe.category)?.label || recipe.category}</Badge>
                         {(recipe.tags || []).map(t => {
                           const tagInfo = recipeTags.find(rt => rt.tag_id === t);
