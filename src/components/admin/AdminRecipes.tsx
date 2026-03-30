@@ -252,6 +252,7 @@ const AdminRecipes = () => {
         'Hazırlıq (dəq)': 'prep_time',
         'Bişirmə (dəq)': 'cook_time',
         'Porsiya': 'servings',
+        'Kalori': 'calories',
         'İnqredientlər': 'ingredients',
         'Hazırlanma': 'instructions',
         'Şəkil URL': 'image_url',
