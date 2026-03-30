@@ -698,7 +698,7 @@ const AdminRecipes = () => {
                   })}
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-4 gap-3">
                 <Input
                   type="number"
                   placeholder="Hazırlıq (dəq)"
@@ -716,6 +716,12 @@ const AdminRecipes = () => {
                   placeholder="Porsiya"
                   value={formData.servings || ''}
                   onChange={(e) => setFormData({ ...formData, servings: parseInt(e.target.value) })}
+                />
+                <Input
+                  type="number"
+                  placeholder="Kalori (kcal)"
+                  value={formData.calories || ''}
+                  onChange={(e) => setFormData({ ...formData, calories: e.target.value ? parseInt(e.target.value) : null })}
                 />
               </div>
               <div className="space-y-2">
