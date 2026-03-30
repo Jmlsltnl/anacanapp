@@ -271,9 +271,9 @@ const AdminRecipes = () => {
           if (dbField && values[idx]) {
             let value = values[idx].trim().replace(/^"|"$/g, '');
             
-            if (dbField === 'prep_time' || dbField === 'cook_time' || dbField === 'servings') {
+            if (dbField === 'prep_time' || dbField === 'cook_time' || dbField === 'servings' || dbField === 'calories') {
               const numValue = parseInt(value);
-              row[dbField] = isNaN(numValue) ? 0 : numValue;
+              row[dbField] = isNaN(numValue) ? (dbField === 'calories' ? null : 0) : numValue;
             } else if (dbField === 'ingredients' || dbField === 'instructions') {
               const items = value.split(/[;|\n]/).map(s => s.trim()).filter(s => s);
               row[dbField] = items;
