@@ -106,7 +106,7 @@ const AdminBabyGrowth = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Böyümə İzləmə</h1>
+          <h1 className="text-2xl font-bold text-foreground">İnkişaf izləyicisi</h1>
           <p className="text-muted-foreground">Körpə böyümə qeydlərini idarə edin</p>
         </div>
       </div>

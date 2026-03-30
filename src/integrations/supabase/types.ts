@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       admin_recipes: {
         Row: {
+          calories: number | null
           category: string
           cook_time: number | null
           created_at: string
@@ -32,6 +33,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          calories?: number | null
           category?: string
           cook_time?: number | null
           created_at?: string
@@ -48,6 +50,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          calories?: number | null
           category?: string
           cook_time?: number | null
           created_at?: string

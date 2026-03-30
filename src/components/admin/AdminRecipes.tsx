@@ -87,6 +87,7 @@ const AdminRecipes = () => {
       prep_time: 15,
       cook_time: 30,
       servings: 4,
+      calories: null as number | null,
       ingredients: [],
       instructions: [],
       image_url: '',
@@ -251,6 +252,7 @@ const AdminRecipes = () => {
         'Hazırlıq (dəq)': 'prep_time',
         'Bişirmə (dəq)': 'cook_time',
         'Porsiya': 'servings',
+        'Kalori': 'calories',
         'İnqredientlər': 'ingredients',
         'Hazırlanma': 'instructions',
         'Şəkil URL': 'image_url',
@@ -269,9 +271,9 @@ const AdminRecipes = () => {
           if (dbField && values[idx]) {
             let value = values[idx].trim().replace(/^"|"$/g, '');
             
-            if (dbField === 'prep_time' || dbField === 'cook_time' || dbField === 'servings') {
+            if (dbField === 'prep_time' || dbField === 'cook_time' || dbField === 'servings' || dbField === 'calories') {
               const numValue = parseInt(value);
-              row[dbField] = isNaN(numValue) ? 0 : numValue;
+              row[dbField] = isNaN(numValue) ? (dbField === 'calories' ? null : 0) : numValue;
             } else if (dbField === 'ingredients' || dbField === 'instructions') {
               const items = value.split(/[;|\n]/).map(s => s.trim()).filter(s => s);
               row[dbField] = items;
@@ -419,6 +421,7 @@ const AdminRecipes = () => {
                   { key: 'prep_time', header: 'Hazırlıq (dəq)' },
                   { key: 'cook_time', header: 'Bişirmə (dəq)' },
                   { key: 'servings', header: 'Porsiya' },
+                  { key: 'calories', header: 'Kalori' },
                   { key: 'ingredients', header: 'İnqredientlər' },
                   { key: 'instructions', header: 'Hazırlanma' },
                   { key: 'image_url', header: 'Şəkil URL' },
@@ -605,6 +608,9 @@ const AdminRecipes = () => {
                           <Users className="w-3 h-3" />
                           {recipe.servings} porsiya
                         </span>
+                        {recipe.calories && (
+                          <span className="text-orange-500 font-medium">{recipe.calories} kcal</span>
+                        )}
                         <Badge variant="outline">{categories.find(c => c.id === recipe.category)?.label || recipe.category}</Badge>
                         {(recipe.tags || []).map(t => {
                           const tagInfo = recipeTags.find(rt => rt.tag_id === t);
@@ -695,7 +701,7 @@ const AdminRecipes = () => {
                   })}
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-4 gap-3">
                 <Input
                   type="number"
                   placeholder="Hazırlıq (dəq)"
@@ -713,6 +719,12 @@ const AdminRecipes = () => {
                   placeholder="Porsiya"
                   value={formData.servings || ''}
                   onChange={(e) => setFormData({ ...formData, servings: parseInt(e.target.value) })}
+                />
+                <Input
+                  type="number"
+                  placeholder="Kalori (kcal)"
+                  value={formData.calories || ''}
+                  onChange={(e) => setFormData({ ...formData, calories: e.target.value ? parseInt(e.target.value) : null })}
                 />
               </div>
               <div className="space-y-2">

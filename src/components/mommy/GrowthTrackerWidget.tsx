@@ -149,7 +149,7 @@ const GrowthTrackerWidget = () => {
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-400 to-pink-600 flex items-center justify-center">
             <Scale className="w-4 h-4 text-white" />
           </div>
-          <h3 className="font-bold text-sm text-foreground">Böyümə İzləmə</h3>
+          <h3 className="font-bold text-sm text-foreground">İnkişaf izləyicisi</h3>
         </div>
         <motion.button
           onClick={() => setShowInput(!showInput)}

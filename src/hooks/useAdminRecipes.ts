@@ -10,6 +10,7 @@ export interface AdminRecipe {
   prep_time: number | null;
   cook_time: number | null;
   servings: number | null;
+  calories: number | null;
   ingredients: string[];
   instructions: string[];
   image_url: string | null;

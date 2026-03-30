@@ -1238,7 +1238,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           <div className="flex-1">
             <h3 className="font-bold text-sm text-foreground">Xüsusi Tortlar</h3>
             <p className="text-[11px] text-muted-foreground mt-0.5">
-              {babyData.ageInMonths > 0 ? `${Math.floor(babyData.ageInMonths)}-ci ay tortu sifariş edin!` : 'Körpəniz üçün milestone tortları'}
+              {babyData.ageInMonths > 0 ? `${Math.ceil(babyData.ageInMonths)}-ci aylıq tortunu sifariş ver!` : 'Körpəniz üçün milestone tortları'}
             </p>
           </div>
           <ChevronRight className="w-5 h-5 text-pink-400" />
@@ -1307,7 +1307,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
               <Baby className="w-5 h-5 text-white" />
             </div>
             <div className="text-left">
-              <h3 className="font-bold text-sm text-foreground">Qidalanma</h3>
+              <h3 className="font-bold text-sm text-foreground">Qidalanmaya nəzarət edək</h3>
               <p className="text-xs text-muted-foreground">Bu gün: {todayStats.feedingCount} dəfə</p>
             </div>
           </button>

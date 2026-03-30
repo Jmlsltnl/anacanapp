@@ -87,7 +87,7 @@ const menuGroups: MenuGroup[] = [
       { id: 'tools-config', label: 'Alət Konfiqurasiyaları', icon: Settings },
       { id: 'tools', label: 'Alətlər Sıralaması', icon: Wrench },
       { id: 'development-tips', label: 'İnkişaf Tövsiyələri', icon: Lightbulb },
-      { id: 'baby-growth', label: 'Böyümə İzləmə', icon: Scale },
+      { id: 'baby-growth', label: 'İnkişaf izləyicisi', icon: Scale },
       { id: 'teething', label: 'Diş Çıxarma', icon: Sparkles },
       { id: 'crisis-calendar', label: 'Kriz Təqvimi', icon: Calendar },
       { id: 'baby-daily-info', label: 'Günlük Məlumatlar (Ana)', icon: Calendar },
