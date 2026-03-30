@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useInAppPurchase } from '@/hooks/useInAppPurchase';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeft, Crown, CheckCircle, 
