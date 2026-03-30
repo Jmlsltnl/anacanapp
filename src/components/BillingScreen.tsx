@@ -29,11 +29,22 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
   const { toast } = useToast();
   const config = useBillingConfig();
   const { features: dbFeatures } = usePremiumConfig();
+  const { manageSubscriptions, isSupported: isIAPSupported } = useInAppPurchase();
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
 
   const handleCancelSubscription = async () => {
+    // On native platforms, redirect to App Store / Play Store subscription management
+    if (isIAPSupported) {
+      if (!confirm('Abunəliyi ləğv etmək üçün App Store / Google Play abunəlik idarəetmə səhifəsinə yönləndiriləcəksiniz.')) return;
+      setIsCanceling(true);
+      await manageSubscriptions();
+      setIsCanceling(false);
+      return;
+    }
+    
+    // Fallback for web
     if (!confirm('Abunəliyi ləğv etmək istədiyinizə əminsiniz? Cari dövrün sonuna qədər Premium xüsusiyyətlərdən istifadə edə biləcəksiniz.')) return;
     setIsCanceling(true);
     const success = await cancelSubscription();
