@@ -270,7 +270,7 @@ ${customizationText}
 **TECHNICAL REQUIREMENTS**
 **═══════════════════════════════════════════════════════════════════════════**
 
-• Resolution: High quality 2K output
+• Resolution: High quality 1K output
 • Composition: Baby centered, rule of thirds for background elements
 • Lighting: Professional, flattering, matching the scene mood
 • Focus: Sharp on baby's face, soft artistic blur on background
