@@ -154,6 +154,8 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
               <img 
                 src={selectedRecipe.image_url} 
                 alt={selectedRecipe.title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-48 object-cover"
               />
             ) : (
