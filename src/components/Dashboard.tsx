@@ -1238,7 +1238,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           <div className="flex-1">
             <h3 className="font-bold text-sm text-foreground">Xüsusi Tortlar</h3>
             <p className="text-[11px] text-muted-foreground mt-0.5">
-              {babyData.ageInMonths > 0 ? `${Math.ceil(babyData.ageInMonths)}-ci aylıq tortunu sifariş ver!` : 'Körpəniz üçün milestone tortları'}
+              {babyData.ageInMonths > 0 ? `${babyData.ageInMonths + 1}-ci aylıq tortunu sifariş ver!` : 'Körpəniz üçün milestone tortları'}
             </p>
           </div>
           <ChevronRight className="w-5 h-5 text-pink-400" />
