@@ -62,6 +62,7 @@ import AdminEpoint from './admin/AdminEpoint';
 import AdminForceUpdate from './admin/AdminForceUpdate';
 import AdminLanguages from './admin/AdminLanguages';
 import AdminTranslations from './admin/AdminTranslations';
+import AdminDeeplinks from './admin/AdminDeeplinks';
 
 interface AdminPanelProps {
   onExit: () => void;
