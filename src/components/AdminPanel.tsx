@@ -199,6 +199,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminLanguages />;
       case 'translations':
         return <AdminTranslations />;
+      case 'deeplinks':
+        return <AdminDeeplinks />;
       default:
         return <AdminDashboard />;
     }

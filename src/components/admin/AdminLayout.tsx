@@ -166,6 +166,7 @@ const menuGroups: MenuGroup[] = [
       { id: 'legal', label: 'Hüquqi Sənədlər', icon: Scale },
       { id: 'push-notifications', label: 'Push Bildirişləri', icon: Send },
       { id: 'force-update', label: 'Force Update', icon: Shield },
+      { id: 'deeplinks', label: 'Deeplinklər', icon: Globe },
     ],
   },
 ];
