@@ -128,7 +128,7 @@ const outfitDescriptions: Record<string, string> = {
 // ═══════════════════════════════════════════════════════════════════════════════
 const imageStyleConfig: Record<string, { style: string; faceNote: string }> = {
   realistic: {
-    style: "ultra-realistic professional photography, magazine-quality, natural skin texture, studio-grade lighting, 2K resolution",
+    style: "ultra-realistic professional photography, magazine-quality, natural skin texture, studio-grade lighting, 1K resolution",
     faceNote: "CRITICAL: Preserve 100% of the baby's original facial features - exact eye shape, nose structure, lip curves, cheek contours, chin shape. The face must be IDENTICAL and instantly recognizable.",
   },
   "3d_render": {
@@ -270,7 +270,7 @@ ${customizationText}
 **TECHNICAL REQUIREMENTS**
 **═══════════════════════════════════════════════════════════════════════════**
 
-• Resolution: High quality 2K output
+• Resolution: High quality 1K output
 • Composition: Baby centered, rule of thirds for background elements
 • Lighting: Professional, flattering, matching the scene mood
 • Focus: Sharp on baby's face, soft artistic blur on background
