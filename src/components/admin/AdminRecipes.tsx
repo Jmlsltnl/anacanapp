@@ -87,6 +87,7 @@ const AdminRecipes = () => {
       prep_time: 15,
       cook_time: 30,
       servings: 4,
+      calories: null as number | null,
       ingredients: [],
       instructions: [],
       image_url: '',
