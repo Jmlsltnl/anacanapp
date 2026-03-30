@@ -154,6 +154,8 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
               <img 
                 src={selectedRecipe.image_url} 
                 alt={selectedRecipe.title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-48 object-cover"
               />
             ) : (
@@ -433,7 +435,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
                 >
                   {/* Lock overlay for non-premium non-free recipes */}
                   {!isPremium && !isRecipeFree(recipe) && (
-                    <div className="absolute inset-0 bg-background/70 backdrop-blur-[2px] flex items-center justify-center z-10">
+                    <div className="absolute inset-0 bg-background/60 backdrop-blur-md flex items-center justify-center z-10">
                       <div className="flex flex-col items-center gap-1">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
                           <Lock className="w-5 h-5 text-white" />
@@ -449,6 +451,8 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
                       <img 
                         src={recipe.image_url} 
                         alt={recipe.title}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                     ) : (
