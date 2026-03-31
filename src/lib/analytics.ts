@@ -144,7 +144,7 @@ const trackInternal = async (eventName: string, params?: AnalyticsParams) => {
 };
 
 /**
- * Log an analytics event - dual tracks to Firebase + internal DB
+ * Log an analytics event - triple tracks to Firebase + internal DB + Mixpanel
  */
 export const logEvent = async (eventName: AnalyticsEvent, params?: AnalyticsParams): Promise<void> => {
   try {
@@ -161,6 +161,11 @@ export const logEvent = async (eventName: AnalyticsEvent, params?: AnalyticsPara
         webAnalytics.logEvent(webAnalytics.analytics, eventName, params);
       }
     }
+
+    // Mixpanel tracking (non-blocking)
+    import('@/lib/mixpanel').then(({ trackMixpanelEvent }) => {
+      trackMixpanelEvent(eventName, params as Record<string, any>);
+    }).catch(() => {});
 
     // Internal DB tracking (non-blocking)
     trackInternal(eventName, params);

@@ -9,6 +9,10 @@ export const useScreenAnalytics = (screenName: string, screenClass?: string) => 
     import('@/lib/analytics').then(m => 
       m.analytics.logScreenView(screenName, screenClass || screenName)
     ).catch(() => {});
+    // Mixpanel page view
+    import('@/lib/mixpanel').then(({ trackPageView }) => {
+      trackPageView(screenName, { screen_class: screenClass || screenName });
+    }).catch(() => {});
   }, [screenName, screenClass]);
 };
 
