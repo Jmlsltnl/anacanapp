@@ -105,7 +105,8 @@ const AuthScreen = () => {
       }
 
       // Register new partner
-      const { error: registerError } = await signUp(email, password, name || 'Partner');
+      const partnerName = nameInputRef.current?.value || name || 'Partner';
+      const { error: registerError } = await signUp(email, password, partnerName.trim());
       if (registerError) {
         toast({
           title: 'Qeydiyyat alınmadı',
