@@ -266,7 +266,8 @@ const AuthScreen = () => {
           return;
         }
         
-        const { error } = await signUp(email, password, name || email.split('@')[0]);
+        const finalName = nameInputRef.current?.value || name || email.split('@')[0];
+        const { error } = await signUp(email, password, finalName.trim());
         if (error) {
           toast({
             title: 'Qeydiyyat alınmadı',
