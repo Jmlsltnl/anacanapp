@@ -702,6 +702,7 @@ const AuthScreen = () => {
                         <div className="relative group">
                           <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
                           <Input
+                            ref={nameInputRef}
                             type="text"
                             placeholder="Adınız"
                             value={name}
