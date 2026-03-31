@@ -281,6 +281,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setProfile(null);
       setUserRole(null);
       storeLogout();
+      // Reset Mixpanel on logout
+      import('@/lib/mixpanel').then(({ resetMixpanel }) => resetMixpanel()).catch(() => {});
     }
     return { error: null };
   };
