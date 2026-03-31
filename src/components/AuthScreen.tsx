@@ -21,6 +21,7 @@ const AuthScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const nameInputRef = useRef<HTMLInputElement>(null);
   const [partnerCode, setPartnerCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
