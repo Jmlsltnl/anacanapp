@@ -507,7 +507,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                   <img
                     src={sourceImagePreview}
                     alt="Yüklənmiş şəkil"
-                    className="w-full h-56 object-cover rounded-2xl"
+                    className="w-full h-44 object-cover rounded-2xl"
                   />
                   <motion.button
                     onClick={handleRemoveImage}
