@@ -561,7 +561,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
             {/* Free tier info */}
             {!isPremium && (
-              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-4 flex items-start gap-3">
+              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 flex items-start gap-2">
                 <Crown className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
