@@ -50,7 +50,7 @@ const FlowDashboard = () => {
       selectedDay.setHours(0, 0, 0, 0);
       
       // Update local store
-      setLastPeriodDate(today);
+      setLastPeriodDate(selectedDay);
 
       // Sync to database
       if (user?.id) {
