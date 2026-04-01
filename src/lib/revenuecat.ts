@@ -1,5 +1,8 @@
 import { Capacitor } from '@capacitor/core';
 
+// ⚡ FEATURE FLAG: Set to true to enable RevenueCat, false for standard IAP
+export const REVENUECAT_ENABLED = false;
+
 // RevenueCat Configuration
 export const REVENUECAT_CONFIG = {
   API_KEY: 'test_bXWdDDnuTuBrVDYOOviwZDCLvIW',
