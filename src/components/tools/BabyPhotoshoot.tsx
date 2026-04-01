@@ -616,7 +616,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
             {/* Background Selection by Category */}
             {Object.entries(groupedBackgrounds).map(([category, backgrounds]) => (
-              <div key={category} className="bg-card rounded-3xl p-5 shadow-elevated">
+              <div key={category} className="bg-card rounded-2xl p-4 shadow-elevated">
                 <h3 className="font-bold text-foreground mb-3 flex items-center gap-2">
                   {category === 'Realist' && '📷'}
                   {category === 'Estetik' && '✨'}
