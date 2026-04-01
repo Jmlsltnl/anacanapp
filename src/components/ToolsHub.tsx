@@ -350,89 +350,83 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         {/* Top Banner */}
         <BannerSlot placement="tools_top" onNavigate={() => {}} onToolOpen={openTool} className="mb-4" />
 
-        {/* Featured AI Tool - only show if photoshoot is active */}
-        {toolConfigs.some(t => t.tool_id === 'photoshoot') && (
-          <motion.button
-            onClick={() => openTool('photoshoot')}
-            className="w-full relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 p-4 mb-4 text-left shadow-xl"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.15),transparent_60%)]" />
-            <div className="absolute right-0 bottom-0 opacity-10">
-              <Camera className="w-32 h-32 text-white -mr-6 -mb-6" />
-            </div>
-            <div className="relative z-10 flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <Camera className="w-7 h-7 text-white" />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] text-white font-semibold">✨ AI</span>
-                  <span className="px-2 py-0.5 rounded-full bg-amber-400/30 text-[10px] text-amber-200 font-semibold flex items-center gap-1">
-                    <Crown className="w-3 h-3" /> Premium
-                  </span>
-                </div>
-                <h3 className="text-white font-bold text-base">Körpə Fotosessiyası</h3>
-                <p className="text-white/70 text-xs">AI ilə unikal körpə şəkilləri yaradın</p>
-              </div>
-              <ChevronRight className="w-6 h-6 text-white/60" />
-            </div>
-          </motion.button>
-        )}
-
-        {/* Recipes Banner */}
-        <motion.button
-          onClick={() => openTool('recipes')}
-          className="w-full relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 p-4 mb-4 text-left shadow-xl"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(255,255,255,0.15),transparent_60%)]" />
-          <div className="absolute right-0 bottom-0 opacity-10">
-            <ChefHat className="w-32 h-32 text-white -mr-6 -mb-6" />
-          </div>
-          <div className="relative z-10 flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-              <ChefHat className="w-7 h-7 text-white" />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] text-white font-semibold">🍽️ Reseptlər</span>
-                <span className="px-2 py-0.5 rounded-full bg-amber-400/30 text-[10px] text-amber-200 font-semibold flex items-center gap-1">
-                  <Crown className="w-3 h-3" /> Premium
-                </span>
-              </div>
-              <h3 className="text-white font-bold text-base">Sağlam Reseptlər</h3>
-              <p className="text-white/70 text-xs">Hamiləlik və analıq üçün ləzzətli yeməklər</p>
-            </div>
-            <ChevronRight className="w-6 h-6 text-white/60" />
-          </div>
-        </motion.button>
-
-        {/* Quick Access Row - only show active tools */}
+        {/* Hero Tools - DB driven */}
         {(() => {
-          const quickAccessItems = [
-            { id: 'safety', icon: Shield, label: 'Təhlükəsizlik', gradient: 'from-emerald-500 to-teal-500' },
-            { id: 'first-aid', icon: ShieldAlert, label: 'İlk Yardım', gradient: 'from-red-500 to-rose-500' },
-            { id: 'doctors', icon: Stethoscope, label: 'Həkimlər', gradient: 'from-blue-500 to-cyan-500' },
-          ].filter(item => toolConfigs.some(t => t.tool_id === item.id));
+          const heroTools = toolConfigs
+            .filter(t => t.is_hero)
+            .sort((a, b) => (a.hero_order || 0) - (b.hero_order || 0));
           
-          return quickAccessItems.length > 0 ? (
+          return heroTools.map((hero, idx) => {
+            const HeroIcon = iconMap[hero.icon] || Wrench;
+            const displayName = hero.display_name_az || hero.name_az || hero.name;
+            
+            return (
+              <motion.button
+                key={hero.tool_id}
+                onClick={() => openTool(hero.tool_id)}
+                className={`w-full relative overflow-hidden rounded-3xl bg-gradient-to-r ${hero.hero_gradient || 'from-primary to-primary/80'} p-4 mb-3 text-left shadow-xl`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.15),transparent_60%)]" />
+                <div className="absolute right-0 bottom-0 opacity-10">
+                  <HeroIcon className="w-32 h-32 text-white -mr-6 -mb-6" />
+                </div>
+                <div className="relative z-10 flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <HeroIcon className="w-7 h-7 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      {hero.hero_badge && (
+                        <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] text-white font-semibold">{hero.hero_badge}</span>
+                      )}
+                      {hero.is_premium && (
+                        <span className="px-2 py-0.5 rounded-full bg-amber-400/30 text-[10px] text-amber-200 font-semibold flex items-center gap-1">
+                          <Crown className="w-3 h-3" /> Premium
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-white font-bold text-base">{displayName}</h3>
+                    <p className="text-white/70 text-xs">{hero.hero_subtitle || hero.description_az || ''}</p>
+                  </div>
+                  <ChevronRight className="w-6 h-6 text-white/60" />
+                </div>
+              </motion.button>
+            );
+          });
+        })()}
+
+        {/* Quick Access Row - DB driven */}
+        {(() => {
+          const quickAccessItems = toolConfigs
+            .filter(t => t.is_quick_access)
+            .sort((a, b) => (a.quick_access_order || 0) - (b.quick_access_order || 0));
+          
+          if (quickAccessItems.length === 0) return null;
+          
+          return (
             <div className="flex gap-2 mb-4 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4">
-              {quickAccessItems.map((item) => (
-                <motion.button
-                  key={item.id}
-                  onClick={() => openTool(item.id)}
-                  className={`flex-shrink-0 flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-gradient-to-r ${item.gradient} shadow-lg`}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <item.icon className="w-4 h-4 text-white" />
-                  <span className="text-white text-xs font-semibold">{item.label}</span>
-                </motion.button>
+              {quickAccessItems.map((item) => {
+                const QAIcon = iconMap[item.icon] || Wrench;
+                const label = item.display_name_az || item.name_az || item.name;
+                return (
+                  <motion.button
+                    key={item.tool_id}
+                    onClick={() => openTool(item.tool_id)}
+                    className={`flex-shrink-0 flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-gradient-to-r ${item.quick_access_gradient || 'from-primary to-primary/80'} shadow-lg`}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <QAIcon className="w-4 h-4 text-white" />
+                    <span className="text-white text-xs font-semibold">{label}</span>
+                  </motion.button>
+                );
+              })}
+            </div>
+          );
+        })()}
               ))}
             </div>
           ) : null;
