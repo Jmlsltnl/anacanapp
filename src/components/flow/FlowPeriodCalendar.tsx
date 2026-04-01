@@ -241,7 +241,7 @@ const FlowPeriodCalendar = () => {
               animate={{ y: 0 }}
               exit={{ y: 300 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="w-full max-w-md bg-card rounded-t-3xl p-6 pb-10"
+              className="w-full max-w-md bg-card rounded-t-3xl p-6 pb-24"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="w-10 h-1 rounded-full bg-muted-foreground/30 mx-auto mb-4" />
