@@ -42,6 +42,14 @@ interface ToolConfig {
   premium_limit: number;
   display_name_az: string | null;
   description_az: string | null;
+  is_hero: boolean;
+  hero_order: number;
+  hero_gradient: string | null;
+  hero_subtitle: string | null;
+  hero_badge: string | null;
+  is_quick_access: boolean;
+  quick_access_order: number;
+  quick_access_gradient: string | null;
 }
 
 const categoryLabels: Record<string, string> = {
