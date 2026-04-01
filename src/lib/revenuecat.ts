@@ -81,7 +81,7 @@ export async function checkEntitlement(): Promise<{
   productId: string | null;
   willRenew: boolean;
 }> {
-  if (!isNativePlatform()) {
+  if (!REVENUECAT_ENABLED || !isNativePlatform()) {
     return { isPro: false, expiresAt: null, productId: null, willRenew: false };
   }
 
