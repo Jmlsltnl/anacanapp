@@ -245,15 +245,21 @@ const AdminTools = () => {
   };
 
   // Update tool display info
-  const updateToolDisplayInfo = (displayName: string, description: string) => {
+  const updateToolDisplayInfo = (data: { displayName: string; description: string; heroGradient: string; heroSubtitle: string; heroBadge: string; heroOrder: number; quickAccessGradient: string; quickAccessOrder: number }) => {
     if (!editingTool) return;
     
     const newTools = localTools.map(t => {
       if (t.id === editingTool.id) {
         return { 
           ...t, 
-          display_name_az: displayName,
-          description_az: description,
+          display_name_az: data.displayName,
+          description_az: data.description,
+          hero_gradient: data.heroGradient,
+          hero_subtitle: data.heroSubtitle,
+          hero_badge: data.heroBadge,
+          hero_order: data.heroOrder,
+          quick_access_gradient: data.quickAccessGradient,
+          quick_access_order: data.quickAccessOrder,
         };
       }
       return t;
