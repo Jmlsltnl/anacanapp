@@ -439,6 +439,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             m.analytics.setUserId(currentSession.user.id);
             m.analytics.setUserProperties({ life_stage: '' });
           }).catch(() => {});
+          import('@/lib/revenuecat').then(m => m.identifyUser(currentSession.user.id)).catch(() => {});
           void hydrateUser(currentSession.user);
         } else {
           // No session on initial load - user is truly not logged in
