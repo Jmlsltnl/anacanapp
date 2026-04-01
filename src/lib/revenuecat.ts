@@ -196,7 +196,7 @@ export async function presentPaywall(): Promise<{
  * Present RevenueCat Customer Center
  */
 export async function presentCustomerCenter(): Promise<void> {
-  if (!isNativePlatform()) return;
+  if (!REVENUECAT_ENABLED || !isNativePlatform()) return;
 
   try {
     const { RevenueCatUI } = await import('@revenuecat/purchases-capacitor-ui');
