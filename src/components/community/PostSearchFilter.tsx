@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
 
 interface PostSearchFilterProps {
   searchQuery: string;
@@ -10,24 +9,30 @@ interface PostSearchFilterProps {
 
 const PostSearchFilter = ({ sortBy, onSortChange }: PostSearchFilterProps) => {
   return (
-    <div className="flex gap-2 p-3 bg-muted/30 rounded-xl">
-      <span className="text-sm text-muted-foreground self-center">Sırala:</span>
-      <Button
-        variant={sortBy === 'recent' ? 'default' : 'outline'}
-        size="sm"
-        onClick={() => onSortChange('recent')}
-        className="rounded-lg"
-      >
-        Ən son
-      </Button>
-      <Button
-        variant={sortBy === 'popular' ? 'default' : 'outline'}
-        size="sm"
-        onClick={() => onSortChange('popular')}
-        className="rounded-lg"
-      >
-        Populyar
-      </Button>
+    <div className="flex gap-1 mb-3 border-b border-border/8 pb-2">
+      {[
+        { id: 'recent' as const, label: 'Ən son' },
+        { id: 'popular' as const, label: 'Populyar' },
+      ].map((option) => (
+        <button
+          key={option.id}
+          onClick={() => onSortChange(option.id)}
+          className={`relative px-3.5 py-1.5 text-[11px] font-bold transition-colors ${
+            sortBy === option.id
+              ? 'text-foreground'
+              : 'text-muted-foreground/35'
+          }`}
+        >
+          {option.label}
+          {sortBy === option.id && (
+            <motion.div
+              layoutId="sort-underline"
+              className="absolute bottom-0 left-1 right-1 h-[2px] rounded-full bg-primary"
+              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+            />
+          )}
+        </button>
+      ))}
     </div>
   );
 };

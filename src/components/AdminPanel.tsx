@@ -59,6 +59,10 @@ import AdminAlbumOrders from './admin/AdminAlbumOrders';
 import AdminCoupons from './admin/AdminCoupons';
 import AdminAnalytics from './admin/AdminAnalytics';
 import AdminEpoint from './admin/AdminEpoint';
+import AdminForceUpdate from './admin/AdminForceUpdate';
+import AdminLanguages from './admin/AdminLanguages';
+import AdminTranslations from './admin/AdminTranslations';
+import AdminDeeplinks from './admin/AdminDeeplinks';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -187,8 +191,16 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminAnalytics />;
       case 'epoint':
         return <AdminEpoint />;
+      case 'force-update':
+        return <AdminForceUpdate />;
       case 'security':
         return <AdminSecurity />;
+      case 'languages':
+        return <AdminLanguages />;
+      case 'translations':
+        return <AdminTranslations />;
+      case 'deeplinks':
+        return <AdminDeeplinks />;
       default:
         return <AdminDashboard />;
     }

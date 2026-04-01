@@ -446,8 +446,16 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     });
   };
 
-  const nextStep = () => setStep(prev => Math.min(prev + 1, 2));
-  const prevStep = () => setStep(prev => Math.max(prev - 1, 0));
+  const nextStep = () => {
+    setStep(prev => Math.min(prev + 1, 2));
+    window.scrollTo({ top: 0 });
+    document.querySelector('.overflow-y-auto')?.scrollTo({ top: 0 });
+  };
+  const prevStep = () => {
+    setStep(prev => Math.max(prev - 1, 0));
+    window.scrollTo({ top: 0 });
+    document.querySelector('.overflow-y-auto')?.scrollTo({ top: 0 });
+  };
 
   const canProceed = () => {
     switch (step) {

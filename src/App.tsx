@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,8 +13,12 @@ import LegalPage from "./pages/LegalPage";
 import NotFound from "./pages/NotFound";
 import PaymentSuccess from "./components/payment/PaymentSuccess";
 import PaymentError from "./components/payment/PaymentError";
+import { initRevenueCat } from "@/lib/revenuecat";
 
 const queryClient = new QueryClient();
+
+// Initialize RevenueCat on app startup
+initRevenueCat().catch(console.error);
 
 const App = () => (
   <ErrorBoundary>

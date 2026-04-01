@@ -26,6 +26,12 @@ export interface PaywallConfig {
   cancel_notice: string;
   native_notice: string;
   non_native_notice: string;
+  // Free trial
+  free_trial_enabled: boolean;
+  free_trial_days: number;
+  free_trial_badge: string;
+  free_trial_cta: string;
+  free_trial_note: string;
   // Purchasing states
   purchasing_text: string;
   // Gradient colors
@@ -99,6 +105,11 @@ export const defaultPaywallConfig: PaywallConfig = {
   cancel_notice: 'İstənilən vaxt ləğv edə bilərsiniz • Avtomatik yenilənir',
   native_notice: '',
   non_native_notice: 'App Store / Google Play-dən yükləyin',
+  free_trial_enabled: true,
+  free_trial_days: 3,
+  free_trial_badge: '3 GÜN PULSUZ',
+  free_trial_cta: 'Pulsuz Başla',
+  free_trial_note: '{days} gün pulsuz sınayın, sonra avtomatik abunəlik başlayır',
   purchasing_text: 'Emal edilir...',
   gradient_from: '#d97706',
   gradient_via: '#ea580c',

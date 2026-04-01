@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, User, ArrowRight, Users, Eye, EyeOff, Sparkles, ArrowLeft, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ const AuthScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const nameInputRef = useRef<HTMLInputElement>(null);
   const [partnerCode, setPartnerCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -104,7 +105,8 @@ const AuthScreen = () => {
       }
 
       // Register new partner
-      const { error: registerError } = await signUp(email, password, name || 'Partner');
+      const partnerName = nameInputRef.current?.value || name || 'Partner';
+      const { error: registerError } = await signUp(email, password, partnerName.trim());
       if (registerError) {
         toast({
           title: 'Qeydiyyat alınmadı',
@@ -265,7 +267,8 @@ const AuthScreen = () => {
           return;
         }
         
-        const { error } = await signUp(email, password, name || email.split('@')[0]);
+        const finalName = nameInputRef.current?.value || name || email.split('@')[0];
+        const { error } = await signUp(email, password, finalName.trim());
         if (error) {
           toast({
             title: 'Qeydiyyat alınmadı',
@@ -457,6 +460,7 @@ const AuthScreen = () => {
                       <div className="relative group">
                         <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-blue-500" />
                         <Input
+                          ref={nameInputRef}
                           type="text"
                           placeholder="Adınız"
                           value={name}
@@ -698,6 +702,7 @@ const AuthScreen = () => {
                         <div className="relative group">
                           <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
                           <Input
+                            ref={nameInputRef}
                             type="text"
                             placeholder="Adınız"
                             value={name}

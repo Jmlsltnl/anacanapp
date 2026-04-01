@@ -163,7 +163,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setOnboarded(false);
       }
 
-      // Set analytics user properties for GA + internal tracking
+      // Set analytics user properties for GA + internal tracking + Mixpanel
       if (userId) {
         import('@/lib/analytics').then(m => {
           m.analytics.setUserId(userId);
@@ -171,6 +171,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             life_stage: profileData.life_stage || 'unknown',
             is_premium: String(profileData.is_premium || false),
             role: profileData.life_stage === 'partner' ? 'partner' : 'woman',
+          });
+        }).catch(() => {});
+
+        // Mixpanel identification
+        import('@/lib/mixpanel').then(({ identifyUser, setSuperProperties }) => {
+          identifyUser(userId, {
+            $name: profileData.name || undefined,
+            $email: profileData.email || undefined,
+            life_stage: profileData.life_stage || 'unknown',
+            is_premium: profileData.is_premium || false,
+            role: profileData.life_stage === 'partner' ? 'partner' : 'woman',
+            baby_name: profileData.baby_name || undefined,
+            baby_gender: profileData.baby_gender || undefined,
+            badge_type: profileData.badge_type || undefined,
+          });
+          setSuperProperties({
+            life_stage: profileData.life_stage || 'unknown',
+            is_premium: profileData.is_premium || false,
+            user_role: profileData.life_stage === 'partner' ? 'partner' : 'woman',
           });
         }).catch(() => {});
       }
@@ -262,6 +281,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setProfile(null);
       setUserRole(null);
       storeLogout();
+      // Reset Mixpanel on logout
+      import('@/lib/mixpanel').then(({ resetMixpanel }) => resetMixpanel()).catch(() => {});
     }
     return { error: null };
   };
@@ -398,6 +419,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUserRole(null);
         storeLogout();
         finishLoading();
+        import('@/lib/revenuecat').then(m => m.logOutRevenueCat()).catch(() => {});
         return;
       }
 
@@ -417,6 +439,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             m.analytics.setUserId(currentSession.user.id);
             m.analytics.setUserProperties({ life_stage: '' });
           }).catch(() => {});
+          import('@/lib/revenuecat').then(m => m.identifyUser(currentSession.user.id)).catch(() => {});
           void hydrateUser(currentSession.user);
         } else {
           // No session on initial load - user is truly not logged in

@@ -303,6 +303,23 @@ export const useToggleLike = () => {
         await supabase
           .from('post_likes')
           .insert({ post_id: postId, user_id: user.id });
+
+        // Send push notification (which also stores in-app notification)
+        try {
+          const { data: post } = await supabase.from('community_posts').select('user_id').eq('id', postId).single();
+          if (post && post.user_id !== user.id) {
+            const { data: profile } = await supabase.from('public_profile_cards').select('name').eq('user_id', user.id).single();
+            const likerName = profile?.name || 'İstifadəçi';
+            await supabase.functions.invoke('send-push-notification', {
+              body: {
+                userId: post.user_id,
+                title: 'Yeni bəyənmə ❤️',
+                body: `${likerName} paylaşımınızı bəyəndi`,
+                data: { type: 'community_like', postId, groupId },
+              },
+            });
+          }
+        } catch (e) { console.error('Like notification error:', e); }
       }
     },
     onSuccess: (_, variables) => {
@@ -394,18 +411,17 @@ export const useCreateComment = () => {
         const preview = content.length > 50 ? `${content.slice(0, 50)}...` : content;
         const senderName = commenterName?.trim() || 'İstifadəçi';
 
-        const { error: pushError } = await supabase.functions.invoke('send-push-notification', {
-          body: {
-            userId: postAuthorId,
-            title: 'Yeni şərh! 💬',
-            body: `${senderName}: ${preview}`,
-            data: { type: 'comment', postId },
-          },
-        });
-
-        if (pushError) {
-          console.error('Error sending comment notification:', pushError);
-        }
+        // Push notification (also stores in-app notification via edge function)
+        try {
+          await supabase.functions.invoke('send-push-notification', {
+            body: {
+              userId: postAuthorId,
+              title: parentCommentId ? 'Yeni cavab 💬' : 'Yeni şərh 💬',
+              body: `${senderName}: ${preview}`,
+              data: { type: parentCommentId ? 'community_reply' : 'community_comment', postId },
+            },
+          });
+        } catch (e) { console.error('Comment notification error:', e); }
       }
     },
     onSuccess: (_, variables) => {

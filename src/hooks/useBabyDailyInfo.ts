@@ -40,13 +40,26 @@ export const useBabyDailyInfoAdmin = () => {
   const fetchAll = useQuery({
     queryKey: ['baby-daily-info-admin'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from('baby_daily_info')
-        .select('*')
-        .order('day_number', { ascending: true });
+      const allRows: BabyDailyInfo[] = [];
+      let from = 0;
+      const pageSize = 1000;
 
-      if (error) throw error;
-      return (data || []) as BabyDailyInfo[];
+      while (true) {
+        const { data, error } = await (supabase as any)
+          .from('baby_daily_info')
+          .select('*')
+          .order('day_number', { ascending: true })
+          .range(from, from + pageSize - 1);
+
+        if (error) throw error;
+        if (!data || data.length === 0) break;
+
+        allRows.push(...(data as BabyDailyInfo[]));
+        if (data.length < pageSize) break;
+        from += pageSize;
+      }
+
+      return allRows;
     },
   });
 
@@ -98,15 +111,20 @@ export const useBabyDailyInfoAdmin = () => {
     mutationFn: async (items: { day_number: number; info: string }[]) => {
       const results = { success: 0, failed: 0, errors: [] as string[] };
 
-      // Get existing days
-      const { data: existing } = await (supabase as any)
-        .from('baby_daily_info')
-        .select('id, day_number');
-
+      // Get existing days (paginate to avoid 1000-row limit)
       const existingMap = new Map<number, string>();
-      (existing || []).forEach((row: any) => {
-        existingMap.set(row.day_number, row.id);
-      });
+      let from = 0;
+      const pageSize = 1000;
+      while (true) {
+        const { data: page } = await (supabase as any)
+          .from('baby_daily_info')
+          .select('id, day_number')
+          .range(from, from + pageSize - 1);
+        if (!page || page.length === 0) break;
+        page.forEach((row: any) => existingMap.set(row.day_number, row.id));
+        if (page.length < pageSize) break;
+        from += pageSize;
+      }
 
       const toInsert: any[] = [];
       const toUpdate: { id: string; data: any }[] = [];

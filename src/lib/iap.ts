@@ -1,19 +1,20 @@
 import { Capacitor } from '@capacitor/core';
+import { REVENUECAT_CONFIG, RC_PRODUCTS } from './revenuecat';
 
-// Product IDs - App Store Connect və Google Play Console-da yaradılmalı
-// App ID: com.atlasoon.anacan
+// Re-export from revenuecat for backward compatibility
+export { REVENUECAT_CONFIG, RC_PRODUCTS };
+
+// Legacy product IDs (kept for reference, RevenueCat handles mapping)
 export const IAP_PRODUCTS = {
   PREMIUM_MONTHLY: 'com.atlasoon.anacan.premium.monthly',
   PREMIUM_YEARLY: 'com.atlasoon.anacan.premium.yearly',
 } as const;
 
-// Plan IDs for Android subscriptions (Google Play Console-da Base Plan ID)
 export const IAP_PLANS = {
   MONTHLY_PLAN: 'monthly-plan',
   YEARLY_PLAN: 'yearly-plan',
 } as const;
 
-// App configuration
 export const APP_CONFIG = {
   APP_ID: 'com.atlasoon.anacan',
   APP_NAME: 'Anacan',
@@ -36,12 +37,8 @@ export interface IAPTransaction {
   purchaseTime: number;
 }
 
-// Check if running on native platform
-export const isNativePlatform = (): boolean => {
-  return Capacitor.isNativePlatform();
-};
+export const isNativePlatform = (): boolean => Capacitor.isNativePlatform();
 
-// Get current platform
 export const getPlatform = (): 'ios' | 'android' | 'web' => {
   const platform = Capacitor.getPlatform();
   if (platform === 'ios') return 'ios';

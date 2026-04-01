@@ -1,37 +1,44 @@
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowLeft, Bell, Check, Trash2, Calendar, 
-  Heart, Pill, Gift
-} from 'lucide-react';
+import { ArrowLeft, Bell, Check, Trash2, Calendar, Heart, Pill, Gift, MessageCircle, Reply, Megaphone } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 
 interface NotificationsScreenProps {
   onBack: () => void;
+  onNavigateToCommunity?: () => void;
 }
 
-const NotificationsScreen = ({ onBack }: NotificationsScreenProps) => {
+type FilterType = 'all' | 'community' | 'system';
+
+const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScreenProps) => {
   useScrollToTop();
   useScreenAnalytics('Notifications', 'Notifications');
+  const [filter, setFilter] = useState<FilterType>('all');
   
-  const { 
-    notifications, 
-    loading, 
-    unreadCount, 
-    markAsRead, 
-    markAllAsRead, 
-    deleteNotification 
-  } = useNotifications();
+  const { notifications, loading, unreadCount, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
+
+  const communityTypes = ['community_like', 'community_comment', 'community_reply'];
+
+  const filteredNotifications = notifications.filter(n => {
+    if (filter === 'community') return communityTypes.includes(n.notification_type);
+    if (filter === 'system') return !communityTypes.includes(n.notification_type);
+    return true;
+  });
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'reminder': return { icon: Bell, color: 'bg-blue-100 text-blue-600' };
-      case 'appointment': return { icon: Calendar, color: 'bg-violet-100 text-violet-600' };
-      case 'tip': return { icon: Pill, color: 'bg-emerald-100 text-emerald-600' };
-      case 'partner': return { icon: Heart, color: 'bg-pink-100 text-pink-600' };
-      case 'achievement': return { icon: Gift, color: 'bg-amber-100 text-amber-600' };
-      default: return { icon: Bell, color: 'bg-gray-100 text-gray-600' };
+      case 'community_like': return { icon: Heart, color: 'bg-rose-500/10 text-rose-500' };
+      case 'community_comment': return { icon: MessageCircle, color: 'bg-blue-500/10 text-blue-500' };
+      case 'community_reply': return { icon: Reply, color: 'bg-violet-500/10 text-violet-500' };
+      case 'reminder': return { icon: Bell, color: 'bg-blue-500/10 text-blue-500' };
+      case 'appointment': return { icon: Calendar, color: 'bg-violet-500/10 text-violet-500' };
+      case 'tip': return { icon: Pill, color: 'bg-emerald-500/10 text-emerald-500' };
+      case 'partner': return { icon: Heart, color: 'bg-pink-500/10 text-pink-500' };
+      case 'achievement': return { icon: Gift, color: 'bg-amber-500/10 text-amber-500' };
+      case 'push': case 'scheduled': return { icon: Megaphone, color: 'bg-primary/10 text-primary' };
+      default: return { icon: Bell, color: 'bg-muted text-muted-foreground' };
     }
   };
 
@@ -42,119 +49,125 @@ const NotificationsScreen = ({ onBack }: NotificationsScreenProps) => {
     const diffMins = Math.floor(diffMs / (1000 * 60));
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
     if (diffMins < 1) return 'İndicə';
-    if (diffMins < 60) return `${diffMins} dəq əvvəl`;
-    if (diffHours < 24) return `${diffHours} saat əvvəl`;
+    if (diffMins < 60) return `${diffMins} dəq`;
+    if (diffHours < 24) return `${diffHours} saat`;
     if (diffDays === 1) return 'Dünən';
     return date.toLocaleDateString('az-AZ', { day: 'numeric', month: 'short' });
   };
 
+  const handleNotificationClick = (notification: any) => {
+    if (!notification.is_read) markAsRead(notification.id);
+    if (communityTypes.includes(notification.notification_type) && onNavigateToCommunity) {
+      onNavigateToCommunity();
+    }
+  };
+
+  const filters: { id: FilterType; label: string }[] = [
+    { id: 'all', label: 'Hamısı' },
+    { id: 'community', label: 'Cəmiyyət' },
+    { id: 'system', label: 'Sistem' },
+  ];
+
   return (
-    <div className="min-h-screen bg-background pb-24 overflow-y-auto">
-      {/* Header with safe area */}
-      <div className="gradient-primary px-3 pb-4" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}>
-        <div className="flex items-center gap-2 mb-3">
-          <motion.button
-            onClick={onBack}
-            className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}
-          >
-            <ArrowLeft className="w-4 h-4 text-white" />
-          </motion.button>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold text-white">Bildirişlər</h1>
-            <p className="text-white/80 text-xs">{unreadCount} oxunmamış</p>
-          </div>
-          {unreadCount > 0 && (
-            <motion.button
-              onClick={markAllAsRead}
-              className="px-4 py-2 bg-white/20 rounded-full text-white text-sm font-medium"
-              whileTap={{ scale: 0.95 }}
-            >
-              Hamısını oxu
+    <div className="min-h-screen bg-background pb-24">
+      {/* Header */}
+      <div className="sticky top-0 z-40 bg-background/70 backdrop-blur-3xl border-b border-border/10">
+        <div className="px-4 py-3">
+          <div className="flex items-center gap-3">
+            <motion.button onClick={onBack} className="w-9 h-9 rounded-full bg-muted/40 flex items-center justify-center" whileTap={{ scale: 0.9 }}>
+              <ArrowLeft className="w-4 h-4 text-foreground" />
             </motion.button>
-          )}
+            <div className="flex-1">
+              <h1 className="text-[18px] font-black text-foreground">Bildirişlər</h1>
+              {unreadCount > 0 && <p className="text-[10px] text-muted-foreground/50 font-medium">{unreadCount} oxunmamış</p>}
+            </div>
+            {unreadCount > 0 && (
+              <motion.button onClick={markAllAsRead} className="px-3 py-1.5 rounded-full bg-primary/8 text-primary text-[10px] font-bold" whileTap={{ scale: 0.95 }}>
+                <Check className="w-3 h-3 inline mr-1" />Hamısını oxu
+              </motion.button>
+            )}
+          </div>
+
+          {/* Filter tabs */}
+          <div className="flex gap-1 mt-3">
+            {filters.map(f => (
+              <button key={f.id} onClick={() => setFilter(f.id)}
+                className={`relative px-3.5 py-1.5 text-[11px] font-bold transition-colors ${filter === f.id ? 'text-foreground' : 'text-muted-foreground/35'}`}>
+                {f.label}
+                {filter === f.id && (
+                  <motion.div layoutId="notif-filter" className="absolute bottom-0 left-1 right-1 h-[2px] rounded-full bg-primary"
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }} />
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Notifications List */}
-      <div className="px-3 pt-3">
-        <AnimatePresence>
-          {loading ? (
-            <div className="text-center py-12">
-              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+      {/* List */}
+      <div className="px-4 pt-3">
+        {loading ? (
+          <div className="text-center py-16"><div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" /></div>
+        ) : filteredNotifications.length === 0 ? (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
+            <div className="w-16 h-16 rounded-full bg-muted/15 flex items-center justify-center mx-auto mb-3">
+              <Bell className="w-7 h-7 text-muted-foreground/20" />
             </div>
-          ) : notifications.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center py-12"
-            >
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-                <Bell className="w-10 h-10 text-muted-foreground" />
-              </div>
-              <p className="text-muted-foreground">Bildiriş yoxdur</p>
-            </motion.div>
-          ) : (
-            <div className="space-y-2">
-              {notifications.map((notification, index) => {
-                const { icon: Icon, color } = getNotificationIcon(notification.notification_type);
-                return (
-                  <motion.div
-                    key={notification.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ delay: index * 0.05 }}
-                    className={`bg-card rounded-2xl p-4 shadow-card border ${
-                      notification.is_read ? 'border-border/50' : 'border-primary/30 bg-primary/5'
-                    }`}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center flex-shrink-0`}>
-                        <Icon className="w-6 h-6" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <h3 className={`font-semibold ${notification.is_read ? 'text-foreground' : 'text-primary'}`}>
-                            {notification.title}
-                          </h3>
-                          <span className="text-xs text-muted-foreground whitespace-nowrap">
-                            {formatTime(notification.created_at)}
-                          </span>
-                        </div>
-                        <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
-                        
-                        {/* Actions */}
-                        <div className="flex gap-2 mt-3">
-                          {!notification.is_read && (
-                            <motion.button
-                              onClick={() => markAsRead(notification.id)}
-                              className="flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary text-xs font-medium rounded-full"
-                              whileTap={{ scale: 0.95 }}
-                            >
-                              <Check className="w-3 h-3" />
-                              Oxundu
-                            </motion.button>
-                          )}
-                          <motion.button
-                            onClick={() => deleteNotification(notification.id)}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-destructive/10 text-destructive text-xs font-medium rounded-full"
-                            whileTap={{ scale: 0.95 }}
-                          >
-                            <Trash2 className="w-3 h-3" />
-                            Sil
-                          </motion.button>
-                        </div>
-                      </div>
+            <p className="text-[13px] font-bold text-muted-foreground/35">Bildiriş yoxdur</p>
+            <p className="text-[11px] text-muted-foreground/25 mt-1">Yeni bildirişlər burada görünəcək</p>
+          </motion.div>
+        ) : (
+          <div className="space-y-2">
+            {filteredNotifications.map((notification, index) => {
+              const { icon: Icon, color } = getNotificationIcon(notification.notification_type);
+              const isCommunity = communityTypes.includes(notification.notification_type);
+              return (
+                <motion.div
+                  key={notification.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.03 }}
+                  onClick={() => handleNotificationClick(notification)}
+                  className={`bg-card rounded-2xl p-3.5 border transition-all ${
+                    notification.is_read ? 'border-border/8' : 'border-primary/15 bg-primary/3'
+                  } ${isCommunity ? 'cursor-pointer active:scale-[0.99]' : ''}`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`w-10 h-10 rounded-full ${color} flex items-center justify-center flex-shrink-0`}>
+                      <Icon className="w-4.5 h-4.5" />
                     </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          )}
-        </AnimatePresence>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className={`text-[12px] font-bold ${notification.is_read ? 'text-foreground' : 'text-primary'}`}>
+                          {notification.title}
+                        </h3>
+                        <span className="text-[9px] text-muted-foreground/40 whitespace-nowrap font-medium">{formatTime(notification.created_at)}</span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground/60 mt-0.5 leading-relaxed line-clamp-2">{notification.message}</p>
+                      {isCommunity && (
+                        <p className="text-[9px] text-primary/50 font-bold mt-1.5">Görmək üçün toxun →</p>
+                      )}
+                    </div>
+                  </div>
+                  {/* Swipe actions alternative: button row */}
+                  <div className="flex gap-1.5 mt-2.5 ml-13 justify-end">
+                    {!notification.is_read && (
+                      <button onClick={(e) => { e.stopPropagation(); markAsRead(notification.id); }}
+                        className="px-2.5 py-1 rounded-full bg-primary/8 text-primary text-[9px] font-bold">
+                        Oxundu
+                      </button>
+                    )}
+                    <button onClick={(e) => { e.stopPropagation(); deleteNotification(notification.id); }}
+                      className="px-2.5 py-1 rounded-full bg-destructive/8 text-destructive text-[9px] font-bold">
+                      <Trash2 className="w-2.5 h-2.5 inline mr-0.5" />Sil
+                    </button>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

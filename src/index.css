@@ -309,7 +309,8 @@
   }
 
   /* Safe area for mobile - Capacitor */
-  .safe-top {
+  .safe-top,
+  .safe-area-top {
     padding-top: env(safe-area-inset-top, 0px);
   }
 

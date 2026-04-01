@@ -1,27 +1,175 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Calendar, Droplets, Heart, Moon, Sun, Sparkles, 
-  ChevronRight, ChevronLeft, TrendingUp, Zap, 
-  Apple, Dumbbell, Brain, Flame
+  Calendar as CalendarIcon, Droplets, Heart, Moon, Sparkles, 
+  TrendingUp,
+  Apple, Dumbbell, Brain, Flame, CircleDot
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { usePhaseTips, PHASE_INFO, CATEGORY_INFO, MenstrualPhase, TipCategory } from '@/hooks/usePhaseTips';
-import { format, addDays, subDays, differenceInDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns';
+import { format, addDays, differenceInDays } from 'date-fns';
 import { az } from 'date-fns/locale';
-import { useQuery } from '@tanstack/react-query';
+import { Calendar } from '@/components/ui/calendar';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import FlowDailyLogger from './FlowDailyLogger';
 import FlowMoodChart from './FlowMoodChart';
 import FlowCycleStats from './FlowCycleStats';
 import FlowRemindersCard from './FlowRemindersCard';
+import FlowPeriodCalendar from './FlowPeriodCalendar';
 import { getPhaseInfoForDate, getNextPeriodDate, getFertileWindow } from '@/lib/cycle-utils';
 const FlowDashboard = () => {
-  const { getCycleData, cycleLength, periodLength } = useUserStore();
+  const { getCycleData, cycleLength, periodLength, setLastPeriodDate } = useUserStore();
   const cycleData = getCycleData();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   
   const [selectedCategory, setSelectedCategory] = useState<TipCategory | 'all'>('all');
-  const [calendarMonth, setCalendarMonth] = useState(new Date());
+  const [showPeriodConfirm, setShowPeriodConfirm] = useState(false);
+  const [showPeriodEndConfirm, setShowPeriodEndConfirm] = useState(false);
+  const [markingPeriod, setMarkingPeriod] = useState(false);
+  const [periodStartDate, setPeriodStartDate] = useState<Date>(new Date());
+  const [periodEndDate, setPeriodEndDate] = useState<Date>(new Date());
+
+  const handleMarkPeriodStarted = async () => {
+    setMarkingPeriod(true);
+    try {
+      const selectedDay = new Date(periodStartDate);
+      selectedDay.setHours(0, 0, 0, 0);
+      
+      // Update local store
+      setLastPeriodDate(selectedDay);
+
+      // Sync to database
+      if (user?.id) {
+        const dateStr = selectedDay.toISOString().split('T')[0];
+        
+        // Update profile
+        await supabase
+          .from('profiles')
+          .update({ last_period_date: dateStr })
+          .eq('user_id', user.id);
+
+        // Log to cycle_history
+        const { data: lastCycle } = await supabase
+          .from('cycle_history')
+          .select('cycle_number, start_date')
+          .eq('user_id', user.id)
+          .order('cycle_number', { ascending: false })
+          .limit(1)
+          .single();
+
+        const nextCycleNumber = (lastCycle?.cycle_number || 0) + 1;
+        
+        // Close previous cycle if exists
+        if (lastCycle?.start_date) {
+          const prevStart = new Date(lastCycle.start_date);
+          const cycleLengthCalc = differenceInDays(selectedDay, prevStart);
+          await supabase
+            .from('cycle_history')
+            .update({ 
+              end_date: dateStr, 
+              cycle_length: cycleLengthCalc > 0 ? cycleLengthCalc : null 
+            })
+            .eq('user_id', user.id)
+            .eq('cycle_number', lastCycle.cycle_number);
+        }
+
+        // Insert new cycle
+        await supabase
+          .from('cycle_history')
+          .insert({
+            user_id: user.id,
+            cycle_number: nextCycleNumber,
+            start_date: dateStr,
+            period_length: periodLength,
+          });
+
+        queryClient.invalidateQueries({ queryKey: ['cycle-history'] });
+      }
+
+      toast.success('Period başlanğıcı qeyd edildi! 🩸', {
+        description: format(selectedDay, 'd MMMM yyyy', { locale: az }),
+      });
+    } catch (error) {
+      console.error('Error marking period:', error);
+      toast.error('Xəta baş verdi, yenidən cəhd edin');
+    } finally {
+      setMarkingPeriod(false);
+      setShowPeriodConfirm(false);
+    }
+  };
+
+  const handleMarkPeriodEnded = async () => {
+    setMarkingPeriod(true);
+    try {
+      const selectedDay = new Date(periodEndDate);
+      selectedDay.setHours(0, 0, 0, 0);
+
+      if (user?.id && cycleData?.lastPeriodDate) {
+        const lastPeriod = new Date(cycleData.lastPeriodDate);
+        const actualPeriodLength = differenceInDays(selectedDay, lastPeriod) + 1;
+
+        if (actualPeriodLength < 1) {
+          toast.error('Bitiş tarixi başlanğıc tarixindən əvvəl ola bilməz');
+          setMarkingPeriod(false);
+          setShowPeriodEndConfirm(false);
+          return;
+        }
+
+        // Update profile period_length
+        await supabase
+          .from('profiles')
+          .update({ period_length: actualPeriodLength })
+          .eq('user_id', user.id);
+
+        // Update current cycle's period_length in cycle_history
+        const { data: currentCycle } = await supabase
+          .from('cycle_history')
+          .select('cycle_number')
+          .eq('user_id', user.id)
+          .order('cycle_number', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (currentCycle) {
+          await supabase
+            .from('cycle_history')
+            .update({ period_length: actualPeriodLength })
+            .eq('user_id', user.id)
+            .eq('cycle_number', currentCycle.cycle_number);
+        }
+
+        // Update local store
+        useUserStore.getState().setPeriodLength(actualPeriodLength);
+
+        queryClient.invalidateQueries({ queryKey: ['cycle-history'] });
+
+        toast.success('Period bitişi qeyd edildi! ✅', {
+          description: `Period ${actualPeriodLength} gün davam etdi`,
+        });
+      }
+    } catch (error) {
+      console.error('Error marking period end:', error);
+      toast.error('Xəta baş verdi, yenidən cəhd edin');
+    } finally {
+      setMarkingPeriod(false);
+      setShowPeriodEndConfirm(false);
+    }
+  };
 
   // Fetch upcoming labels from app_settings
   const { data: upcomingLabels } = useQuery({
@@ -91,22 +239,6 @@ const FlowDashboard = () => {
     return Math.min(100, (daysInPhase / phaseDays[currentPhase]) * 100);
   };
 
-  // Calendar days
-  const calendarDays = useMemo(() => {
-    const start = startOfMonth(calendarMonth);
-    const end = endOfMonth(calendarMonth);
-    return eachDayOfInterval({ start, end });
-  }, [calendarMonth]);
-
-  // Get day type for calendar using accurate calculation
-  const getDayType = (date: Date) => {
-    const phaseInfo = getPhaseInfoForDate(date, lastPeriodDate, cycleLength, periodLength);
-    
-    if (phaseInfo.isPeriodDay) return 'period';
-    if (phaseInfo.isOvulationDay) return 'ovulation';
-    if (phaseInfo.isFertileDay) return 'fertile';
-    return 'normal';
-  };
 
   const categories: (TipCategory | 'all')[] = ['all', 'nutrition', 'exercise', 'selfcare', 'mood'];
 
@@ -163,7 +295,7 @@ const FlowDashboard = () => {
               <p className="text-white/70 text-[10px]">gün qaldı</p>
             </div>
             <div className="bg-white/15 rounded-xl p-3 text-center">
-              <Calendar className="w-5 h-5 text-white mx-auto mb-1" />
+              <CalendarIcon className="w-5 h-5 text-white mx-auto mb-1" />
               <p className="text-white text-lg font-bold">{cycleLength}</p>
               <p className="text-white/70 text-[10px]">gün tsikl</p>
             </div>
@@ -173,98 +305,36 @@ const FlowDashboard = () => {
               <p className="text-white/70 text-[10px]">gün period</p>
             </div>
           </div>
-        </div>
-      </motion.div>
 
-      {/* Mini Calendar */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        className="bg-card rounded-2xl p-4 border border-border"
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-foreground flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-primary" />
-            Təqvim
-          </h3>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setCalendarMonth(subDays(calendarMonth, 30))}
-              className="p-1 hover:bg-muted rounded-lg"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <span className="text-sm font-medium min-w-[100px] text-center">
-              {format(calendarMonth, 'MMMM yyyy', { locale: az })}
-            </span>
-            <button
-              onClick={() => setCalendarMonth(addDays(calendarMonth, 30))}
-              className="p-1 hover:bg-muted rounded-lg"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Day Labels */}
-        <div className="grid grid-cols-7 gap-1 mb-2">
-          {['B', 'BE', 'Ç', 'ÇA', 'C', 'C', 'Ş'].map((day, i) => (
-            <div key={i} className="text-center text-xs text-muted-foreground font-medium py-1">
-              {day}
-            </div>
-          ))}
-        </div>
-
-        {/* Calendar Grid */}
-        <div className="grid grid-cols-7 gap-1">
-          {/* Empty cells for start of month */}
-          {Array.from({ length: calendarDays[0]?.getDay() || 0 }).map((_, i) => (
-            <div key={`empty-${i}`} className="aspect-square" />
-          ))}
-          
-          {calendarDays.map((day) => {
-            const dayType = getDayType(day);
-            const isToday = isSameDay(day, new Date());
-            
-            return (
-              <motion.div
-                key={day.toISOString()}
-                className={`aspect-square rounded-lg flex items-center justify-center text-xs font-medium relative ${
-                  isToday ? 'ring-2 ring-primary ring-offset-1' : ''
-                } ${
-                  dayType === 'period' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
-                  dayType === 'fertile' ? 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400' :
-                  dayType === 'ovulation' ? 'bg-pink-200 text-pink-800 dark:bg-pink-800/40 dark:text-pink-300' :
-                  'text-foreground hover:bg-muted'
-                }`}
-                whileHover={{ scale: 1.1 }}
+          {/* Period Action Buttons */}
+          <div className="mt-4 flex gap-2">
+            <motion.div className="flex-1" whileTap={{ scale: 0.97 }}>
+              <Button
+                onClick={() => setShowPeriodConfirm(true)}
+                className="w-full bg-white/20 hover:bg-white/30 backdrop-blur text-white border-0 rounded-xl h-12 text-sm font-bold gap-2"
+                variant="outline"
               >
-                {format(day, 'd')}
-                {dayType === 'ovulation' && (
-                  <span className="absolute -top-0.5 -right-0.5 text-[8px]">🌸</span>
-                )}
+                <CircleDot className="w-5 h-5" />
+                Periodum başladı
+              </Button>
+            </motion.div>
+            {currentPhase === 'menstrual' && (
+              <motion.div className="flex-1" whileTap={{ scale: 0.97 }}>
+                <Button
+                  onClick={() => setShowPeriodEndConfirm(true)}
+                  className="w-full bg-white/30 hover:bg-white/40 backdrop-blur text-white border-0 rounded-xl h-12 text-sm font-bold gap-2"
+                  variant="outline"
+                >
+                  ✅ Periodum bitdi
+                </Button>
               </motion.div>
-            );
-          })}
-        </div>
-
-        {/* Legend */}
-        <div className="flex items-center justify-center gap-4 mt-4 pt-3 border-t border-border">
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-red-400" />
-            <span className="text-xs text-muted-foreground">Period</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-pink-400" />
-            <span className="text-xs text-muted-foreground">Məhsuldar</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-sm">🌸</span>
-            <span className="text-xs text-muted-foreground">Ovulyasiya</span>
+            )}
           </div>
         </div>
       </motion.div>
+
+      {/* Interactive Period Calendar (Apple Health style) */}
+      <FlowPeriodCalendar />
 
       {/* Phase Tips Section */}
       <motion.div
@@ -491,6 +561,85 @@ const FlowDashboard = () => {
           <p className="text-xs text-muted-foreground">Məşq İntensivliyi</p>
         </div>
       </motion.div>
+
+      {/* Period Start Confirmation Dialog */}
+      <AlertDialog open={showPeriodConfirm} onOpenChange={(open) => {
+        setShowPeriodConfirm(open);
+        if (open) setPeriodStartDate(new Date());
+      }}>
+        <AlertDialogContent className="max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>🩸 Period başlanğıcı</AlertDialogTitle>
+            <AlertDialogDescription>
+              Periodunuzun başladığı tarixi seçin:
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex justify-center py-2">
+            <Calendar
+              mode="single"
+              selected={periodStartDate}
+              onSelect={(date) => date && setPeriodStartDate(date)}
+              disabled={(date) => date > new Date()}
+              locale={az}
+              className="rounded-xl border pointer-events-auto"
+            />
+          </div>
+          <p className="text-sm text-center text-muted-foreground">
+            Seçilən tarix: <strong>{format(periodStartDate, 'd MMMM yyyy', { locale: az })}</strong>
+          </p>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={markingPeriod}>Ləğv et</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleMarkPeriodStarted}
+              disabled={markingPeriod}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              {markingPeriod ? 'Qeyd edilir...' : 'Qeyd et'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Period End Confirmation Dialog */}
+      <AlertDialog open={showPeriodEndConfirm} onOpenChange={(open) => {
+        setShowPeriodEndConfirm(open);
+        if (open) setPeriodEndDate(new Date());
+      }}>
+        <AlertDialogContent className="max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>✅ Period bitişi</AlertDialogTitle>
+            <AlertDialogDescription>
+              Periodunuzun bitdiyi tarixi seçin:
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex justify-center py-2">
+            <Calendar
+              mode="single"
+              selected={periodEndDate}
+              onSelect={(date) => date && setPeriodEndDate(date)}
+              disabled={(date) => date > new Date() || (cycleData?.lastPeriodDate ? date < new Date(cycleData.lastPeriodDate) : false)}
+              locale={az}
+              className="rounded-xl border pointer-events-auto"
+            />
+          </div>
+          <p className="text-sm text-center text-muted-foreground">
+            Seçilən tarix: <strong>{format(periodEndDate, 'd MMMM yyyy', { locale: az })}</strong>
+            {cycleData?.lastPeriodDate && (
+              <> • Period: <strong>{differenceInDays(periodEndDate, new Date(cycleData.lastPeriodDate)) + 1} gün</strong></>
+            )}
+          </p>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={markingPeriod}>Ləğv et</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleMarkPeriodEnded}
+              disabled={markingPeriod}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {markingPeriod ? 'Qeyd edilir...' : 'Qeyd et'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

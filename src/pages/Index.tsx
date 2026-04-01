@@ -11,8 +11,10 @@ import FloatingTimerWidget from '@/components/FloatingTimerWidget';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useDeviceToken } from '@/hooks/useDeviceToken';
+import { useForceUpdate } from '@/hooks/useForceUpdate';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { resetAppScrollPosition } from '@/lib/scroll';
+import { initDeeplinkListener, ParsedDeeplink } from '@/lib/deeplink';
 
 // Lazy load heavy screens
 const Dashboard = lazy(() => import('@/components/Dashboard'));
@@ -30,6 +32,7 @@ const SettingsScreen = lazy(() => import('@/components/SettingsScreen'));
 const CalendarScreen = lazy(() => import('@/components/CalendarScreen'));
 const AdminPanel = lazy(() => import('@/components/AdminPanel'));
 const MotherChatScreen = lazy(() => import('@/components/MotherChatScreen'));
+const MessagesScreen = lazy(() => import('@/components/MessagesScreen'));
 const CommunityScreen = lazy(() => import('@/components/community/CommunityScreen'));
 const ProfileEditScreen = lazy(() => import('@/components/ProfileEditScreen'));
 const HelpScreen = lazy(() => import('@/components/HelpScreen'));
@@ -60,6 +63,13 @@ const pageVariants = {
   exit: { opacity: 0, y: -10 }
 };
 
+type SwipeRestoreState =
+  | { type: 'screen'; value: string }
+  | { type: 'tool'; value: string; fromDashboard: boolean }
+  | { type: 'mother-chat' }
+  | { type: 'user-profile'; value: string }
+  | null;
+
 const Index = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [showIntro, setShowIntro] = useState(false);
@@ -72,15 +82,16 @@ const Index = () => {
   const [toolOpenedFromDashboard, setToolOpenedFromDashboard] = useState(false);
   const [toolsResetKey, setToolsResetKey] = useState(0);
   const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, lifeStage } = useUserStore();
-  const { isAdmin, loading } = useAuth();
-  
-  // Ref for scroll container to reset position on navigation
+  const { isAdmin, loading, profile } = useAuth();
+  const { forceUpdate, isLoading: forceUpdateLoading } = useForceUpdate();
+
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  
+  const swipeRestoreRef = useRef<SwipeRestoreState>(null);
+
   // Reset scroll to top when tab or screen changes
   // Screen name mapping for clean GA reports
   const SCREEN_NAME_MAP: Record<string, string> = {
-    home: 'Dashboard', tools: 'ToolsHub', ai: 'AIChat', shop: 'Shop', 
+    home: 'Dashboard', tools: 'ToolsHub', ai: 'AIChat', shop: 'Shop',
     cakes: 'Cakes', profile: 'Profile', community: 'Community',
   };
 
@@ -123,6 +134,41 @@ const Index = () => {
 
   // Initialize push notification token registration for native apps
   useDeviceToken();
+
+  // ─── Deeplink handler ───
+  const handleDeeplink = useCallback((parsed: ParsedDeeplink) => {
+    console.log('[Deeplink] Handling:', parsed);
+    switch (parsed.action) {
+      case 'tab':
+        setActiveTab(parsed.params.tab);
+        setActiveTool(null);
+        setActiveScreen(null);
+        break;
+      case 'tool':
+        setActiveTab('tools');
+        setActiveTool(parsed.params.tool_id);
+        setToolOpenedFromDashboard(false);
+        break;
+      case 'screen':
+        setActiveScreen(parsed.params.screen);
+        break;
+      case 'messages':
+        setShowMotherChat(true);
+        break;
+      case 'user-profile':
+        setViewingUserId(parsed.params.user_id);
+        break;
+      case 'community-post':
+        setActiveTab('community');
+        // Community screen will handle post_id via state if needed
+        break;
+    }
+  }, []);
+
+  useEffect(() => {
+    const cleanup = initDeeplinkListener(handleDeeplink);
+    return cleanup;
+  }, [handleDeeplink]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -170,51 +216,58 @@ const Index = () => {
     setActiveTab(tab);
   };
 
-  // Tab navigation order for swipe
-  const tabOrder = role === 'partner' 
-    ? ['home', 'chat', 'ai', 'profile'] 
-    : ['home', 'tools', 'cakes', 'community', 'ai', 'profile'];
-
-  // iOS swipe navigation handler
+  // iOS-style swipe navigation — only navigates back/forward in the current stack, never switches tabs
   const handleSwipeBack = useCallback(() => {
-    // If in a sub-screen, go back
     if (activeScreen) {
+      swipeRestoreRef.current = { type: 'screen', value: activeScreen };
       setActiveScreen(null);
       return;
     }
-    // If in a tool, go back
-    if (activeTool && activeTab === 'tools') {
-      handleToolBack();
+
+    if (viewingUserId) {
+      swipeRestoreRef.current = { type: 'user-profile', value: viewingUserId };
+      setViewingUserId(null);
       return;
     }
-    // If mother chat is open, close it
+
     if (showMotherChat) {
+      swipeRestoreRef.current = { type: 'mother-chat' };
       setShowMotherChat(false);
       return;
     }
-    // Navigate to previous tab
-    const currentIndex = tabOrder.indexOf(activeTab);
-    if (currentIndex > 0) {
-      setActiveTab(tabOrder[currentIndex - 1]);
+
+    if (activeTool && activeTab === 'tools') {
+      swipeRestoreRef.current = { type: 'tool', value: activeTool, fromDashboard: toolOpenedFromDashboard };
+      handleToolBack();
+      return;
     }
-  }, [activeScreen, activeTool, activeTab, showMotherChat, tabOrder, role, toolOpenedFromDashboard, handleToolBack]);
+  }, [activeScreen, viewingUserId, showMotherChat, activeTool, activeTab, toolOpenedFromDashboard, handleToolBack]);
 
   const handleSwipeForward = useCallback(() => {
-    // Navigate to next tab (only when no sub-screen/tool is open)
-    if (!activeScreen && !activeTool && !showMotherChat) {
-      const currentIndex = tabOrder.indexOf(activeTab);
-      if (currentIndex < tabOrder.length - 1) {
-        setActiveTab(tabOrder[currentIndex + 1]);
-      }
+    const restore = swipeRestoreRef.current;
+    if (!restore) return;
+
+    if (restore.type === 'screen') {
+      setActiveScreen(restore.value);
+    } else if (restore.type === 'user-profile') {
+      setViewingUserId(restore.value);
+    } else if (restore.type === 'mother-chat') {
+      setShowMotherChat(true);
+    } else if (restore.type === 'tool') {
+      setActiveTab('tools');
+      setActiveTool(restore.value);
+      setToolOpenedFromDashboard(restore.fromDashboard);
     }
-  }, [activeScreen, activeTool, activeTab, showMotherChat, tabOrder]);
+
+    swipeRestoreRef.current = null;
+  }, []);
 
   // Enable edge-only swipe navigation for back/forward
   useSwipeNavigation({
     onSwipeBack: handleSwipeBack,
     onSwipeForward: handleSwipeForward,
-    edgeWidth: 30,
-    threshold: 60,
+    edgeWidth: 55,
+    threshold: 35,
     enabled: isAuthenticated && !showSplash && !showIntro && !showAdmin
   });
 
@@ -339,6 +392,21 @@ const Index = () => {
     );
   }
 
+  // Force Update check
+  if (!forceUpdateLoading && forceUpdate?.enabled) {
+    const ForceUpdateScreen = lazy(() => import('@/components/ForceUpdateScreen'));
+    return (
+      <Suspense fallback={suspenseFallback}>
+        <ForceUpdateScreen
+          title={forceUpdate.title}
+          message={forceUpdate.message}
+          androidUrl={forceUpdate.android_url}
+          iosUrl={forceUpdate.ios_url}
+        />
+      </Suspense>
+    );
+  }
+
   // Auth screen
   if (!isAuthenticated) {
     return <AuthScreen />;
@@ -360,7 +428,7 @@ const Index = () => {
   }
 
   // Sub-screens
-  if (activeScreen === 'notifications') return <Suspense fallback={suspenseFallback}><NotificationsScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'notifications') return <Suspense fallback={suspenseFallback}><NotificationsScreen onBack={() => setActiveScreen(null)} onNavigateToCommunity={() => { setActiveScreen(null); setActiveTab('community'); }} /></Suspense>;
   if (activeScreen === 'settings') return <Suspense fallback={suspenseFallback}><SettingsScreen onBack={() => setActiveScreen(null)} /></Suspense>;
   if (activeScreen === 'calendar') return <Suspense fallback={suspenseFallback}><CalendarScreen onBack={() => setActiveScreen(null)} /></Suspense>;
   if (activeScreen === 'edit-profile') return <Suspense fallback={suspenseFallback}><ProfileEditScreen onBack={() => setActiveScreen(null)} /></Suspense>;
@@ -382,9 +450,16 @@ const Index = () => {
   if (activeScreen === 'partner-hospital-bag' && role === 'partner') return <Suspense fallback={suspenseFallback}><PartnerHospitalBagScreen onBack={() => setActiveScreen(null)} /></Suspense>;
   if (activeScreen === 'daily-summary' && role === 'partner') return <Suspense fallback={suspenseFallback}><DailySummaryScreen onBack={() => setActiveScreen(null)} /></Suspense>;
 
-  // Mother chat overlay (for woman role)
-  if (showMotherChat && role === 'woman') {
-    return <Suspense fallback={suspenseFallback}><MotherChatScreen onBack={() => setShowMotherChat(false)} /></Suspense>;
+  // Messages screen (unified: partner + community DMs)
+  if (showMotherChat) {
+    return (
+      <Suspense fallback={suspenseFallback}>
+        <MessagesScreen 
+          onBack={() => setShowMotherChat(false)} 
+          partnerId={profile?.linked_partner_id}
+        />
+      </Suspense>
+    );
   }
 
   return (

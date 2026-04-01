@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Grid3X3, Film, Settings, UserPlus, UserMinus, Crown, Shield } from 'lucide-react';
+import { ArrowLeft, Grid3X3, Film, Settings, UserPlus, UserMinus, Crown, Shield, MessageCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -31,9 +31,10 @@ interface UserStory {
 interface UserProfileScreenProps {
   userId: string;
   onBack: () => void;
+  onSendMessage?: (userId: string, name: string, avatar: string | null) => void;
 }
 
-const UserProfileScreen = ({ userId, onBack }: UserProfileScreenProps) => {
+const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenProps) => {
   useScrollToTop();
   
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -236,8 +237,20 @@ const UserProfileScreen = ({ userId, onBack }: UserProfileScreenProps) => {
           <div className="text-center p-3 bg-muted/50 rounded-xl">
             <p className="text-2xl font-bold text-foreground">{stats.likesCount}</p>
             <p className="text-xs text-muted-foreground">Bəyənmə</p>
-          </div>
         </div>
+
+        {/* Message Button */}
+        {!isCurrentUser && onSendMessage && profile && (
+          <motion.button
+            onClick={() => onSendMessage(profile.user_id, profile.name, profile.avatar_url)}
+            className="w-full mt-4 flex items-center justify-center gap-2 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-semibold"
+            whileTap={{ scale: 0.97 }}
+          >
+            <MessageCircle className="w-4 h-4" />
+            Mesaj göndər
+          </motion.button>
+        )}
+      </div>
       </div>
 
       {/* Tabs */}

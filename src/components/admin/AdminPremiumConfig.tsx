@@ -43,7 +43,7 @@ const FreeLimitsTab = () => {
     { key: 'baby_photoshoot_count', label: 'Körpə Fotosessiya (ümumi)', icon: '📸', suffix: 'foto' },
     { key: 'fairy_tale_count_per_day', label: 'Nağıl Generatoru (gün/limit)', icon: '📖', suffix: 'nağıl' },
     { key: 'ai_chat_count_per_day', label: 'AI Çat Mesajları (gün/limit)', icon: '🤖', suffix: 'mesaj' },
-    { key: 'cry_translator_count_per_day', label: 'Ağlama Tərcüməçisi (gün/limit)', icon: '👶', suffix: 'analiz' },
+    { key: 'cry_translator_count_per_day', label: 'Ağlama analizi (gün/limit)', icon: '👶', suffix: 'analiz' },
     { key: 'poop_scanner_count_per_day', label: 'Nəcis Skaneri (gün/limit)', icon: '💩', suffix: 'skan' },
     { key: 'horoscope_count_per_day', label: 'Ulduz Falı (gün/limit)', icon: '⭐', suffix: 'sorğu' },
   ];

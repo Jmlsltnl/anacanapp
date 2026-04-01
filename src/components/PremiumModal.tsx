@@ -24,7 +24,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const {
-    products, isLoading, isPurchasing, error, isSupported,
+    packages, isLoading, isPurchasing, error, isSupported,
     purchaseMonthly, purchaseYearly, restorePurchases,
   } = useInAppPurchase();
 
@@ -56,14 +56,14 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const dbCurrency = premiumPlan?.currency || 'AZN';
   const isNative = isNativePlatform();
 
-  const monthlyProduct = products.find(p => p?.productId?.includes('monthly'));
-  const yearlyProduct = products.find(p => p?.productId?.includes('yearly'));
+  const monthlyProduct = packages.find(p => p?.product?.identifier?.includes('monthly'));
+  const yearlyProduct = packages.find(p => p?.product?.identifier?.includes('yearly'));
 
   const currencySymbol = dbCurrency === 'AZN' ? '₼' : dbCurrency;
-  const monthlyPrice = monthlyProduct?.price || (dbMonthlyPrice ? `${dbMonthlyPrice}` : '9.99');
-  const yearlyPrice = yearlyProduct?.price || (dbYearlyPrice ? `${dbYearlyPrice}` : '79.99');
+  const monthlyPrice = monthlyProduct?.product?.priceString || (dbMonthlyPrice ? `${dbMonthlyPrice}` : '9.99');
+  const yearlyPrice = yearlyProduct?.product?.priceString || (dbYearlyPrice ? `${dbYearlyPrice}` : '79.99');
   const yearlyMonthly = yearlyProduct
-    ? (yearlyProduct.priceAmount / 12).toFixed(2)
+    ? (yearlyProduct.product.price / 12).toFixed(2)
     : (dbYearlyPrice ? (dbYearlyPrice / 12).toFixed(2) : '6.67');
 
   const savingsPercent = dbMonthlyPrice && dbYearlyPrice
@@ -75,9 +75,13 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const allFeatures = [...premiumOnlyFeatures, ...limitedFreeFeatures];
 
   const isCurrentlyMonthly = isPremium && subscription?.plan_type === 'premium';
-  const ctaText = isCurrentlyMonthly && selectedPlan === 'yearly'
-    ? paywallConfig.cta_switch_yearly
-    : isPremium ? paywallConfig.cta_upgrade : paywallConfig.cta_new_user;
+  const showFreeTrial = paywallConfig.free_trial_enabled && !isPremium;
+  const freeTrialNote = paywallConfig.free_trial_note.replace('{days}', String(paywallConfig.free_trial_days));
+  const ctaText = showFreeTrial
+    ? paywallConfig.free_trial_cta
+    : isCurrentlyMonthly && selectedPlan === 'yearly'
+      ? paywallConfig.cta_switch_yearly
+      : isPremium ? paywallConfig.cta_upgrade : paywallConfig.cta_new_user;
 
   const handlePurchase = useCallback(async () => {
     if (!isNative) {
@@ -158,6 +162,44 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
 
             {/* Top: Branding */}
             <div className="text-center pt-6 pb-3 px-5 shrink-0">
+              {showFreeTrial && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ type: 'spring', damping: 15, stiffness: 200, delay: 0.1 }}
+                  className="mb-4 mx-auto"
+                >
+                  <div className="relative inline-flex flex-col items-center">
+                    <motion.div
+                      animate={{ boxShadow: ['0 0 20px rgba(52,211,153,0.3)', '0 0 40px rgba(52,211,153,0.5)', '0 0 20px rgba(52,211,153,0.3)'] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                      className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500/30 via-emerald-400/25 to-teal-500/30 border border-emerald-400/40 backdrop-blur-md"
+                    >
+                      <div className="flex items-center gap-2">
+                        <motion.div
+                          animate={{ rotate: [0, 15, -15, 0] }}
+                          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                        >
+                          <Sparkles className="w-5 h-5 text-emerald-300" />
+                        </motion.div>
+                        <span className="text-sm font-black text-white tracking-wider">{paywallConfig.free_trial_badge}</span>
+                        <motion.div
+                          animate={{ rotate: [0, -15, 15, 0] }}
+                          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+                        >
+                          <Sparkles className="w-5 h-5 text-emerald-300" />
+                        </motion.div>
+                      </div>
+                    </motion.div>
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: '60%' }}
+                      transition={{ delay: 0.5, duration: 0.6 }}
+                      className="h-0.5 mt-1.5 rounded-full bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent"
+                    />
+                  </div>
+                </motion.div>
+              )}
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
@@ -264,6 +306,11 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
 
             {/* Bottom: CTA + Legal */}
             <div className="shrink-0 px-5 pt-2" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}>
+              {showFreeTrial && (
+                <p className="text-center text-[11px] text-white/80 mb-2 font-medium">
+                  {freeTrialNote}
+                </p>
+              )}
               <Button
                 className="w-full h-12 rounded-2xl bg-white hover:bg-white/95 text-orange-600 font-bold text-sm shadow-xl shadow-black/15 border-0 disabled:opacity-50 transition-all"
                 onClick={handlePurchase}

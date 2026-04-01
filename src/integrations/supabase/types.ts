@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       admin_recipes: {
         Row: {
+          calories: number | null
           category: string
           cook_time: number | null
           created_at: string
@@ -32,6 +33,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          calories?: number | null
           category?: string
           cook_time?: number | null
           created_at?: string
@@ -48,6 +50,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          calories?: number | null
           category?: string
           cook_time?: number | null
           created_at?: string
@@ -425,6 +428,48 @@ export type Database = {
           image_url?: string | null
           key?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      app_languages: {
+        Row: {
+          code: string
+          created_at: string
+          disabled_tools: Json
+          icon_url: string | null
+          id: string
+          is_active: boolean
+          name: string
+          native_name: string
+          regions: Json
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          disabled_tools?: Json
+          icon_url?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          native_name: string
+          regions?: Json
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          disabled_tools?: Json
+          icon_url?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          native_name?: string
+          regions?: Json
+          sort_order?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -2307,6 +2352,39 @@ export type Database = {
           token?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      direct_messages: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          is_read: boolean
+          media_url: string | null
+          message_type: string
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          media_url?: string | null
+          message_type?: string
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          media_url?: string | null
+          message_type?: string
+          receiver_id?: string
+          sender_id?: string
         }
         Relationships: []
       }
@@ -4308,6 +4386,8 @@ export type Database = {
       }
       notifications: {
         Row: {
+          action_data: Json | null
+          action_type: string | null
           created_at: string
           id: string
           is_read: boolean | null
@@ -4317,6 +4397,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          action_data?: Json | null
+          action_type?: string | null
           created_at?: string
           id?: string
           is_read?: boolean | null
@@ -4326,6 +4408,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          action_data?: Json | null
+          action_type?: string | null
           created_at?: string
           id?: string
           is_read?: boolean | null
@@ -4889,6 +4973,33 @@ export type Database = {
           rrn?: string | null
           status?: string
           updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      period_day_logs: {
+        Row: {
+          created_at: string
+          flow_intensity: string | null
+          id: string
+          log_date: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          flow_intensity?: string | null
+          id?: string
+          log_date: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          flow_intensity?: string | null
+          id?: string
+          log_date?: string
+          notes?: string | null
           user_id?: string
         }
         Relationships: []
@@ -7145,6 +7256,44 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      translations: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          lang: string
+          namespace: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          lang: string
+          namespace?: string
+          updated_at?: string
+          value?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          lang?: string
+          namespace?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "translations_lang_fkey"
+            columns: ["lang"]
+            isOneToOne: false
+            referencedRelation: "app_languages"
+            referencedColumns: ["code"]
+          },
+        ]
       }
       trimester_info: {
         Row: {

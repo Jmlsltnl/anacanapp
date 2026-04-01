@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Sparkles, User, Bot, Loader2, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Send, Sparkles, User, Bot, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -328,36 +328,25 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
 
   return (
     <div ref={ref} className="fixed inset-0 bottom-[80px] flex flex-col bg-gradient-to-b from-background to-muted/20" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-      {/* Header */}
-      <div className="px-5 py-4 border-b border-border bg-card/50 backdrop-blur-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <motion.div 
-              className="w-12 h-12 rounded-2xl gradient-primary flex items-center justify-center shadow-lg"
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <Sparkles className="w-6 h-6 text-white" />
-            </motion.div>
-            <div>
-              <h1 className="font-bold text-lg text-foreground">Anacan.AI</h1>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-xs text-muted-foreground">AI Rəfiqəniz</span>
-              </div>
+      {/* Compact Header */}
+      <div className="px-4 py-2.5 border-b border-border bg-card/50 backdrop-blur-sm flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center">
+            <Sparkles className="w-4.5 h-4.5 text-white" />
+          </div>
+          <div>
+            <h1 className="font-bold text-sm text-foreground">Anacan.AI</h1>
+            <div className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              <span className="text-[10px] text-muted-foreground">Onlayn</span>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={clearChat}>
-            <RefreshCw className="w-5 h-5" />
-          </Button>
         </div>
-      </div>
-
-      {/* Disclaimer Banner */}
-      <div className="px-4 py-2 bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800">
-        <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400">
-          <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
-          <span>Tibbi məsləhətlər yalnız həkim tərəfindən təsdiqlənməlidir</span>
+        <div className="flex items-center gap-1">
+          <span className="text-[10px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 rounded-full">⚕️ Həkim məsləhəti əvəzi deyil</span>
+          <Button variant="ghost" size="icon" className="w-8 h-8" onClick={clearChat}>
+            <RefreshCw className="w-4 h-4" />
+          </Button>
         </div>
       </div>
 
@@ -372,24 +361,24 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ delay: index * 0.05 }}
-                className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
+                className={`flex gap-2 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
               >
-                <div className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center ${
+                <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center ${
                   message.role === 'user' 
                     ? 'bg-primary/10' 
                     : 'gradient-primary'
                 }`}>
                   {message.role === 'user' 
-                    ? <User className="w-5 h-5 text-primary" />
-                    : <Bot className="w-5 h-5 text-white" />
+                    ? <User className="w-3.5 h-3.5 text-primary" />
+                    : <Bot className="w-3.5 h-3.5 text-white" />
                   }
                 </div>
-                <div className={`max-w-[80%] p-4 rounded-2xl ${
+                <div className={`max-w-[80%] px-3 py-2 rounded-2xl ${
                   message.role === 'user'
                     ? 'bg-primary text-primary-foreground rounded-br-md'
                     : 'bg-card border border-border shadow-sm rounded-bl-md'
                 }`}>
-                <div className="text-sm leading-relaxed">
+                <div className="text-[13px] leading-relaxed">
                   {message.role === 'assistant' ? (
                     <MarkdownContent content={message.content} variant="chat" />
                   ) : (
@@ -397,14 +386,14 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
                   )}
                   {message.isStreaming && (
                     <motion.span
-                      className="inline-block w-2 h-4 bg-primary ml-1"
+                      className="inline-block w-1.5 h-3.5 bg-primary ml-1"
                       animate={{ opacity: [1, 0] }}
                       transition={{ duration: 0.5, repeat: Infinity }}
                     />
                   )}
                 </div>
                 {!message.isStreaming && (
-                  <span className="text-[10px] opacity-60 mt-2 block">
+                  <span className="text-[9px] opacity-50 mt-1 block">
                     {message.timestamp.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 )}

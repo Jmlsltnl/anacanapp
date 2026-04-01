@@ -10,6 +10,7 @@ import { useRecipeCategories } from '@/hooks/useDynamicTools';
 import { useUserStore } from '@/store/userStore';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { resetAppScrollPosition } from '@/lib/scroll';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { Input } from '@/components/ui/input';
 import { PremiumModal } from '@/components/PremiumModal';
@@ -82,25 +83,47 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
 
   const isRecipeFree = (recipe: Recipe) => freeRecipeIds.has(recipe.id);
 
+  const [scrollPosition, setScrollPosition] = useState(0);
+
   const handleRecipeClick = (recipe: Recipe) => {
     if (!isPremium && !isRecipeFree(recipe)) {
       setShowPremiumModal(true);
       return;
     }
+    // Save scroll position before navigating to detail
+    const scrollContainer = document.querySelector('[data-scroll-container]');
+    setScrollPosition(scrollContainer?.scrollTop || window.scrollY || 0);
     setSelectedRecipe(recipe);
+    // Scroll to top for detail view
+    requestAnimationFrame(() => {
+      resetAppScrollPosition();
+    });
+  };
+
+  const handleBackFromDetail = () => {
+    setSelectedRecipe(null);
+    // Restore scroll position after returning to list
+    requestAnimationFrame(() => {
+      const scrollContainer = document.querySelector('[data-scroll-container]');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollPosition;
+      } else {
+        window.scrollTo({ top: scrollPosition, behavior: 'auto' });
+      }
+    });
   };
 
   const totalTime = (recipe: Recipe) => (recipe.prep_time || 0) + (recipe.cook_time || 0);
 
-  // Recipe Detail View (only for premium users)
+  // Recipe Detail View - scroll to top on open
   if (selectedRecipe && (isPremium || isRecipeFree(selectedRecipe))) {
     return (
-      <div ref={ref} className="min-h-screen bg-background pb-24">
+      <div ref={ref} className="min-h-screen bg-background pb-24" key={`recipe-${selectedRecipe.id}`}>
         {/* Compact sticky header */}
         <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
           <div className="flex items-center gap-3 px-4 py-3">
             <motion.button
-              onClick={() => setSelectedRecipe(null)}
+              onClick={handleBackFromDetail}
               className="w-9 h-9 rounded-full bg-muted flex items-center justify-center"
               whileTap={{ scale: 0.95 }}
             >
@@ -131,6 +154,8 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
               <img 
                 src={selectedRecipe.image_url} 
                 alt={selectedRecipe.title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-48 object-cover"
               />
             ) : (
@@ -375,7 +400,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
         </motion.div>
 
         {/* Recipes Grid */}
-        <AnimatePresence mode="popLayout">
+        <div>
           {recipesLoading ? (
             <div className="grid grid-cols-2 gap-3">
               {[...Array(4)].map((_, i) => (
@@ -403,20 +428,14 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {filteredRecipes.map((recipe, index) => (
-                <motion.button
+              <div
                   key={recipe.id}
                   onClick={() => handleRecipeClick(recipe)}
-                  className="relative bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all text-left group"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ delay: index * 0.05 }}
-                  whileTap={{ scale: 0.98 }}
-                  layout
+                  className="relative bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all text-left group cursor-pointer active:scale-[0.98]"
                 >
                   {/* Lock overlay for non-premium non-free recipes */}
                   {!isPremium && !isRecipeFree(recipe) && (
-                    <div className="absolute inset-0 bg-background/70 backdrop-blur-[2px] flex items-center justify-center z-10">
+                    <div className="absolute inset-0 bg-background/60 backdrop-blur-md flex items-center justify-center z-10">
                       <div className="flex flex-col items-center gap-1">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
                           <Lock className="w-5 h-5 text-white" />
@@ -432,6 +451,8 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
                       <img 
                         src={recipe.image_url} 
                         alt={recipe.title}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                     ) : (
@@ -473,11 +494,11 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
                       )}
                     </div>
                   </div>
-                </motion.button>
+                </div>
               ))}
             </div>
           )}
-        </AnimatePresence>
+        </div>
 
         {/* Recipe count */}
         {!recipesLoading && filteredRecipes.length > 0 && (

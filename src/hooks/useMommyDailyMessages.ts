@@ -35,12 +35,26 @@ export const useMommyDailyMessagesAdmin = () => {
   const fetchAll = useQuery({
     queryKey: ['mommy-daily-messages-admin'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from('mommy_daily_messages')
-        .select('*')
-        .order('day_number', { ascending: true });
-      if (error) throw error;
-      return (data || []) as MommyDailyMessage[];
+      const allRows: MommyDailyMessage[] = [];
+      let from = 0;
+      const pageSize = 1000;
+
+      while (true) {
+        const { data, error } = await (supabase as any)
+          .from('mommy_daily_messages')
+          .select('*')
+          .order('day_number', { ascending: true })
+          .range(from, from + pageSize - 1);
+
+        if (error) throw error;
+        if (!data || data.length === 0) break;
+
+        allRows.push(...(data as MommyDailyMessage[]));
+        if (data.length < pageSize) break;
+        from += pageSize;
+      }
+
+      return allRows;
     },
   });
 
@@ -81,9 +95,19 @@ export const useMommyDailyMessagesAdmin = () => {
   const bulkImport = useMutation({
     mutationFn: async (items: { day_number: number; message: string }[]) => {
       const results = { success: 0, failed: 0, errors: [] as string[] };
-      const { data: existing } = await (supabase as any).from('mommy_daily_messages').select('id, day_number');
       const existingMap = new Map<number, string>();
-      (existing || []).forEach((row: any) => existingMap.set(row.day_number, row.id));
+      let from = 0;
+      const pageSize = 1000;
+      while (true) {
+        const { data: page } = await (supabase as any)
+          .from('mommy_daily_messages')
+          .select('id, day_number')
+          .range(from, from + pageSize - 1);
+        if (!page || page.length === 0) break;
+        page.forEach((row: any) => existingMap.set(row.day_number, row.id));
+        if (page.length < pageSize) break;
+        from += pageSize;
+      }
 
       const toInsert: any[] = [];
       const toUpdate: { id: string; data: any }[] = [];

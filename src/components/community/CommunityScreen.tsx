@@ -1,21 +1,30 @@
 import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Users, Plus, Search, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Users, Plus, Search, TrendingUp, Compass, Sparkles, X, Pen, MessageCircle } from 'lucide-react';
 import { useCommunityGroups, useUserMemberships } from '@/hooks/useCommunity';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
-import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useUserStore } from '@/store/userStore';
 import { useAppSetting } from '@/hooks/useAppSettings';
+import { useDirectMessages } from '@/hooks/useDirectMessages';
 import GroupsList from './GroupsList';
 import GroupFeed from './GroupFeed';
-import CreatePostModal from './CreatePostModal';
+import CreatePostScreen from './CreatePostScreen';
 import StoriesBar from './StoriesBar';
 import UserProfileScreen from './UserProfileScreen';
+import ConversationListScreen from './ConversationListScreen';
+import DirectMessageScreen from './DirectMessageScreen';
 import BannerSlot from '@/components/banners/BannerSlot';
 
 interface CommunityScreenProps {
   onBack?: () => void;
 }
+
+const tabs = [
+  { id: 'feed', label: 'Ümumi', icon: TrendingUp },
+  { id: 'my-groups', label: 'Qruplarım', icon: Sparkles },
+  { id: 'groups', label: 'Kəşf et', icon: Compass },
+] as const;
 
 const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBack }, ref) => {
   const [activeTab, setActiveTab] = useState<'feed' | 'groups' | 'my-groups'>('feed');
@@ -23,6 +32,9 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [showConversations, setShowConversations] = useState(false);
+  const [dmChat, setDmChat] = useState<{ userId: string; name: string; avatar: string | null } | null>(null);
 
   useScrollToTop([activeTab, selectedGroupId, selectedUserId]);
   useScreenAnalytics('Community', 'Social');
@@ -35,27 +47,39 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
 
   const { data: groups = [], isLoading: groupsLoading } = useCommunityGroups();
   const { data: memberships = [] } = useUserMemberships();
+  const { totalUnread } = useDirectMessages();
 
   const memberGroupIds = new Set(memberships.map(m => m.group_id));
   const myGroups = groups.filter(g => memberGroupIds.has(g.id));
-
   const selectedGroup = groups.find(g => g.id === selectedGroupId);
 
-  const handleUserClick = (userId: string) => {
-    setSelectedUserId(userId);
+  const handleUserClick = (userId: string) => setSelectedUserId(userId);
+
+  const handleOpenDmChat = (userId: string, name: string, avatar: string | null) => {
+    setDmChat({ userId, name, avatar });
+    setSelectedUserId(null);
+    setShowConversations(false);
   };
 
-  // If viewing a user profile
-  if (selectedUserId) {
-    return (
-      <UserProfileScreen
-        userId={selectedUserId}
-        onBack={() => setSelectedUserId(null)}
-      />
-    );
+  // DM Chat screen
+  if (dmChat) {
+    return <DirectMessageScreen userId={dmChat.userId} userName={dmChat.name} userAvatar={dmChat.avatar} onBack={() => setDmChat(null)} />;
   }
 
-  // If a group is selected, show its feed
+  // Conversations list
+  if (showConversations) {
+    return <ConversationListScreen onBack={() => setShowConversations(false)} onOpenChat={handleOpenDmChat} />;
+  }
+
+  if (selectedUserId) {
+    return <UserProfileScreen userId={selectedUserId} onBack={() => setSelectedUserId(null)} onSendMessage={handleOpenDmChat} />;
+  }
+
+  // Full screen create post
+  if (showCreatePost) {
+    return <CreatePostScreen onBack={() => setShowCreatePost(false)} groupId={selectedGroupId} groups={myGroups} />;
+  }
+
   if (selectedGroupId && selectedGroup) {
     return (
       <GroupFeed
@@ -68,171 +92,127 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   }
 
   return (
-    <div ref={ref} className="min-h-screen pb-24">
+    <div ref={ref} className="min-h-screen pb-24 bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-background border-b border-border/50">
-        <div className="px-3 py-3">
-          <div className="flex items-center gap-3 mb-3">
+      <div className="bg-background/70 backdrop-blur-3xl">
+        <div className="px-5 pt-4 pb-1">
+          <div className="flex items-center gap-3 mb-4">
             {onBack && (
-              <motion.button
-                onClick={onBack}
-                className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center"
-                whileTap={{ scale: 0.95 }}
-              >
-                <ArrowLeft className="w-4 h-4" />
+              <motion.button onClick={onBack} className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center active:bg-muted/70 transition-colors" whileTap={{ scale: 0.9 }}>
+                <ArrowLeft className="w-4 h-4 text-foreground" />
               </motion.button>
             )}
             <div className="flex-1">
-              <h1 className="text-lg font-black text-foreground">Cəmiyyət</h1>
-              <p className="text-xs text-muted-foreground">{headerText}</p>
+              <h1 className="text-[22px] font-black text-foreground tracking-tight leading-none">Cəmiyyət</h1>
+              <p className="text-[11px] text-muted-foreground/50 mt-1 font-medium">{headerText}</p>
             </div>
+            <motion.button
+              onClick={() => setShowConversations(true)}
+              className="relative w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center"
+              whileTap={{ scale: 0.9 }}
+            >
+              <MessageCircle className="w-4 h-4 text-foreground" />
+              {totalUnread > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 rounded-full bg-primary text-primary-foreground text-[9px] font-bold flex items-center justify-center min-w-[18px] h-[18px]">
+                  {totalUnread > 9 ? '9+' : totalUnread}
+                </span>
+              )}
+            </motion.button>
           </div>
 
-          {/* Search - only for posts */}
-          <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <motion.div className="relative mb-4" animate={{ scale: searchFocused ? 1.01 : 1 }} transition={{ duration: 0.2 }}>
+            <Search className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-300 ${searchFocused ? 'text-primary' : 'text-muted-foreground/30'}`} />
             <input
               type="text"
-              placeholder="Postlarda axtar..."
+              placeholder="Axtar..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-10 pr-3 rounded-xl bg-muted/50 border border-border/50 text-sm outline-none focus:border-primary/50"
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setSearchFocused(false)}
+              className={`w-full h-10 pl-10 pr-9 rounded-2xl text-[13px] font-medium outline-none transition-all duration-300 placeholder:text-muted-foreground/30 ${
+                searchFocused ? 'bg-card border border-primary/25 shadow-[0_0_0_4px_hsl(var(--primary)/0.06)]' : 'bg-muted/20 border border-transparent'
+              }`}
             />
-          </div>
+            <AnimatePresence>
+              {searchQuery && (
+                <motion.button initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-muted/60 flex items-center justify-center">
+                  <X className="w-2.5 h-2.5 text-muted-foreground/70" />
+                </motion.button>
+              )}
+            </AnimatePresence>
+          </motion.div>
 
-          {/* Tabs */}
-          <div className="flex gap-2">
-            {[
-              { id: 'feed', label: 'Ümumi', icon: TrendingUp },
-              { id: 'my-groups', label: 'Qruplarım', icon: Users },
-              { id: 'groups', label: 'Bütün Qruplar', icon: Users },
-            ].map((tab) => {
-              const Icon = tab.icon;
+          <div className="flex border-b border-border/10">
+            {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
-                <motion.button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all border ${
-                    isActive
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'bg-card dark:bg-muted text-muted-foreground dark:text-white border-border/50'
-                  }`}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Icon className="w-3.5 h-3.5" />
+                <button key={tab.id} onClick={() => setActiveTab(tab.id as any)}
+                  className={`relative flex-1 pb-2.5 pt-1 text-[12px] font-bold flex items-center justify-center gap-1.5 transition-colors ${isActive ? 'text-foreground' : 'text-muted-foreground/40'}`}>
+                  <tab.icon className="w-3.5 h-3.5" />
                   {tab.label}
-                </motion.button>
+                  {isActive && (
+                    <motion.div layoutId="community-tab-underline" className="absolute bottom-0 left-2 right-2 h-[2.5px] rounded-full bg-primary"
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }} />
+                  )}
+                </button>
               );
             })}
           </div>
 
-          {/* Top Banner Slot */}
-          <BannerSlot placement="community_top" className="mt-3" />
+          <BannerSlot placement="community_top" className="mt-2" />
         </div>
       </div>
 
-      {/* Stories Bar */}
-      <div className="px-3 pt-3 border-b border-border/50 pb-3">
+      <div className="px-5 pt-3 pb-2">
         <StoriesBar groupId={null} />
       </div>
 
-      {/* Content */}
-      <div className="px-3 pt-3">
+      <div className="px-4 pt-1">
         <AnimatePresence mode="wait">
           {activeTab === 'feed' && (
-            <motion.div
-              key="feed"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
-              <GroupFeed
-                group={null}
-                onBack={() => {}}
-                onCreatePost={() => setShowCreatePost(true)}
-                isEmbedded
-                onUserClick={handleUserClick}
-                externalSearchQuery={searchQuery}
-              />
+            <motion.div key="feed" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.2 }}>
+              <GroupFeed group={null} onBack={() => {}} onCreatePost={() => setShowCreatePost(true)} isEmbedded onUserClick={handleUserClick} externalSearchQuery={searchQuery} />
             </motion.div>
           )}
-
           {activeTab === 'groups' && (
-            <motion.div
-              key="groups"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
-              <GroupsList
-                groups={groups}
-                memberGroupIds={memberGroupIds}
-                onSelectGroup={setSelectedGroupId}
-                searchQuery={searchQuery}
-                isLoading={groupsLoading}
-              />
+            <motion.div key="groups" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.2 }}>
+              <GroupsList groups={groups} memberGroupIds={memberGroupIds} onSelectGroup={setSelectedGroupId} searchQuery={searchQuery} isLoading={groupsLoading} />
             </motion.div>
           )}
-
           {activeTab === 'my-groups' && (
-            <motion.div
-              key="my-groups"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
+            <motion.div key="my-groups" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.2 }}>
               {myGroups.length === 0 ? (
-                <div className="text-center py-8">
-                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
-                    <Users className="w-6 h-6 text-muted-foreground" />
+                <div className="text-center py-16">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/10 to-accent/8 flex items-center justify-center mx-auto mb-4">
+                    <Users className="w-7 h-7 text-primary/50" />
                   </div>
-                  <h3 className="font-bold text-foreground mb-1 text-sm">Qruplarınız yoxdur</h3>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Digər analar ilə əlaqə qurmaq üçün qruplara qoşulun
-                  </p>
-                  <motion.button 
-                    onClick={() => setActiveTab('groups')}
-                    className="px-4 py-2 rounded-xl gradient-primary text-white font-bold text-sm"
-                    whileTap={{ scale: 0.98 }}
-                  >
+                  <h3 className="font-bold text-foreground mb-1.5 text-[14px]">Hələ qrupunuz yoxdur</h3>
+                  <p className="text-[12px] text-muted-foreground/40 mb-6 max-w-[220px] mx-auto leading-relaxed">Digər analar ilə əlaqə qurmaq üçün qruplara qoşulun</p>
+                  <motion.button onClick={() => setActiveTab('groups')} className="px-6 py-2.5 rounded-full gradient-primary text-primary-foreground font-bold text-[12px] shadow-lg shadow-primary/20" whileTap={{ scale: 0.95 }}>
                     Qrupları kəşf et
                   </motion.button>
                 </div>
               ) : (
-                <GroupsList
-                  groups={myGroups}
-                  memberGroupIds={memberGroupIds}
-                  onSelectGroup={setSelectedGroupId}
-                  searchQuery={searchQuery}
-                  isLoading={false}
-                />
+                <GroupsList groups={myGroups} memberGroupIds={memberGroupIds} onSelectGroup={setSelectedGroupId} searchQuery={searchQuery} isLoading={false} />
               )}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Floating Action Button for Create Post */}
       <motion.button
         onClick={() => setShowCreatePost(true)}
-        className="fixed bottom-24 right-3 w-12 h-12 rounded-full gradient-primary shadow-elevated flex items-center justify-center z-40"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+        className="fixed bottom-24 right-5 flex items-center gap-2 px-5 py-3 rounded-full gradient-primary shadow-[0_8px_32px_-4px_hsl(var(--primary)/0.5)] z-40"
+        whileTap={{ scale: 0.9 }}
+        whileHover={{ scale: 1.03 }}
+        initial={{ scale: 0, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
       >
-        <Plus className="w-5 h-5 text-white" />
+        <Pen className="w-4 h-4 text-primary-foreground" strokeWidth={2.5} />
+        <span className="text-[12px] font-bold text-primary-foreground">Paylaş</span>
       </motion.button>
-
-      {/* Create Post Modal */}
-      <CreatePostModal
-        isOpen={showCreatePost}
-        onClose={() => setShowCreatePost(false)}
-        groupId={selectedGroupId}
-        groups={myGroups}
-      />
     </div>
   );
 });

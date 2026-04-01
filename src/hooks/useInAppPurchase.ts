@@ -1,261 +1,200 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Capacitor } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
-import { IAP_PRODUCTS, IAP_PLANS, IAPProduct, IAPTransaction, isNativePlatform } from '@/lib/iap';
+import {
+  isNativePlatform,
+  initRevenueCat,
+  identifyUser,
+  checkEntitlement,
+  getOfferings,
+  purchasePackage,
+  restorePurchases as rcRestore,
+  presentPaywall,
+  presentCustomerCenter,
+  RC_PRODUCTS,
+  REVENUECAT_CONFIG,
+} from '@/lib/revenuecat';
+
+export interface RCPackage {
+  identifier: string;
+  packageType: string;
+  product: {
+    identifier: string;
+    title: string;
+    description: string;
+    priceString: string;
+    price: number;
+    currencyCode: string;
+  };
+  _raw: any; // full package object for purchasePackage
+}
 
 interface UseInAppPurchaseReturn {
-  products: IAPProduct[];
+  packages: RCPackage[];
   isLoading: boolean;
   isPurchasing: boolean;
   error: string | null;
   isSupported: boolean;
+  isPro: boolean;
+  purchaseByIdentifier: (identifier: string) => Promise<boolean>;
   purchaseMonthly: () => Promise<boolean>;
   purchaseYearly: () => Promise<boolean>;
+  purchaseLifetime: () => Promise<boolean>;
   restorePurchases: () => Promise<boolean>;
-  manageSubscriptions: () => Promise<void>;
+  showPaywall: () => Promise<boolean>;
+  showCustomerCenter: () => Promise<void>;
+  refreshEntitlements: () => Promise<void>;
 }
 
 export function useInAppPurchase(): UseInAppPurchaseReturn {
   const { user } = useAuth();
-  const [products, setProducts] = useState<IAPProduct[]>([]);
+  const [packages, setPackages] = useState<RCPackage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSupported, setIsSupported] = useState(false);
-  const [NativePurchases, setNativePurchases] = useState<any>(null);
+  const [isPro, setIsPro] = useState(false);
 
-  // Initialize IAP
+  // Initialize RevenueCat
   useEffect(() => {
-    const initializeIAP = async () => {
+    const init = async () => {
       if (!isNativePlatform()) {
         setIsLoading(false);
         return;
       }
 
       try {
-        // Dynamically import the plugin only on native platforms
-        const { NativePurchases: NP, PURCHASE_TYPE } = await import('@capgo/native-purchases');
-        setNativePurchases(NP);
+        await initRevenueCat(user?.id);
+        if (user?.id) await identifyUser(user.id);
 
-        // Check if billing is supported
-        const { isBillingSupported } = await NP.isBillingSupported();
-        setIsSupported(isBillingSupported);
+        setIsSupported(true);
 
-        if (!isBillingSupported) {
-          setError('Ödəniş sistemi dəstəklənmir');
-          setIsLoading(false);
-          return;
-        }
+        // Check entitlements
+        const ent = await checkEntitlement();
+        setIsPro(ent.isPro);
 
-        // Load products
-        const { products: loadedProducts } = await NP.getProducts({
-          productIdentifiers: [IAP_PRODUCTS.PREMIUM_MONTHLY, IAP_PRODUCTS.PREMIUM_YEARLY],
-          productType: PURCHASE_TYPE.SUBS,
-        });
-
-        const formattedProducts: IAPProduct[] = loadedProducts.map((p: any) => ({
-          productId: p.productId,
-          title: p.title,
-          description: p.description,
-          price: p.price,
-          priceAmount: p.priceAmountMicros / 1000000,
-          currency: p.priceCurrencyCode,
-        }));
-
-        setProducts(formattedProducts);
-
-        // Set up transaction listener for iOS
-        if (Capacitor.getPlatform() === 'ios') {
-          NP.addListener('purchaseCompleted' as any, (event: any) => {
-            if (event?.transaction) {
-              handleTransaction(event.transaction);
-            }
-          });
+        // Load offerings
+        const offerings = await getOfferings();
+        if (offerings?.current?.availablePackages) {
+          const pkgs: RCPackage[] = offerings.current.availablePackages.map((pkg: any) => ({
+            identifier: pkg.identifier,
+            packageType: pkg.packageType,
+            product: {
+              identifier: pkg.product?.identifier || '',
+              title: pkg.product?.title || '',
+              description: pkg.product?.description || '',
+              priceString: pkg.product?.priceString || '',
+              price: pkg.product?.price || 0,
+              currencyCode: pkg.product?.currencyCode || '',
+            },
+            _raw: pkg,
+          }));
+          setPackages(pkgs);
         }
       } catch (err) {
-        console.error('IAP initialization error:', err);
+        console.error('RevenueCat init error:', err);
         setError('Ödəniş sistemi yüklənə bilmədi');
       } finally {
         setIsLoading(false);
       }
     };
 
-    initializeIAP();
+    init();
+  }, [user?.id]);
 
-    return () => {
-      // Cleanup listener
-      if (NativePurchases && Capacitor.getPlatform() === 'ios') {
-        NativePurchases.removeAllListeners();
-      }
-    };
-  }, []);
-
-  const handleTransaction = useCallback(async (transaction: IAPTransaction) => {
-    console.log('Transaction updated:', transaction);
-    await processTransaction(transaction);
-  }, [user]);
-
-  const processTransaction = async (transaction: IAPTransaction) => {
+  const syncWithDatabase = useCallback(async (isPro: boolean, productId?: string) => {
     if (!user) return;
-
     try {
-      // Determine plan type from product ID
-      const planType = transaction.productId === IAP_PRODUCTS.PREMIUM_YEARLY 
-        ? 'premium_plus' 
-        : 'premium';
+      const planType = productId?.includes('yearly') || productId?.includes('lifetime')
+        ? 'premium_plus' : 'premium';
 
-      // Calculate expiration date
       const expiresAt = new Date();
-      if (transaction.productId === IAP_PRODUCTS.PREMIUM_YEARLY) {
+      if (productId?.includes('lifetime')) {
+        expiresAt.setFullYear(expiresAt.getFullYear() + 100);
+      } else if (productId?.includes('yearly')) {
         expiresAt.setFullYear(expiresAt.getFullYear() + 1);
       } else {
         expiresAt.setMonth(expiresAt.getMonth() + 1);
       }
 
-      // Update subscription in database
-      const { error: subError } = await supabase
+      await supabase
         .from('subscriptions')
         .upsert({
           user_id: user.id,
-          plan_type: planType,
-          status: 'active',
+          plan_type: isPro ? planType : 'free',
+          status: isPro ? 'active' : 'expired',
           started_at: new Date().toISOString(),
           expires_at: expiresAt.toISOString(),
         }, { onConflict: 'user_id' });
 
-      if (subError) throw subError;
-
-      // Update profile premium status
       await supabase
         .from('profiles')
-        .update({ 
-          is_premium: true,
-          premium_until: expiresAt.toISOString(),
+        .update({
+          is_premium: isPro,
+          premium_until: isPro ? expiresAt.toISOString() : null,
         })
         .eq('user_id', user.id);
-
-      // Validate on server (optional - for receipt validation)
-      await validatePurchaseOnServer(transaction);
     } catch (err) {
-      console.error('Error processing transaction:', err);
+      console.error('DB sync error:', err);
     }
-  };
+  }, [user]);
 
-  const validatePurchaseOnServer = async (transaction: IAPTransaction) => {
-    try {
-      await supabase.functions.invoke('validate-purchase', {
-        body: {
-          transactionId: transaction.transactionId,
-          productId: transaction.productId,
-          receipt: transaction.receipt,
-          purchaseToken: transaction.purchaseToken,
-          platform: Capacitor.getPlatform(),
-        },
-      });
-    } catch (err) {
-      console.error('Server validation error:', err);
-      // Don't throw - local processing already succeeded
-    }
-  };
-
-  const executePurchase = async (productId: string, planId: string): Promise<boolean> => {
-    if (!NativePurchases) {
-      console.error('IAP: NativePurchases plugin not loaded');
-      setError('Ödəniş sistemi yüklənməyib. Tətbiqi yenidən başladın.');
-      return false;
-    }
-    if (!isSupported) {
-      console.error('IAP: Billing not supported on this device');
-      setError('Bu cihazda ödəniş dəstəklənmir.');
-      return false;
-    }
-
+  const executePurchase = useCallback(async (pkg: RCPackage): Promise<boolean> => {
     setIsPurchasing(true);
     setError(null);
 
     try {
-      const { PURCHASE_TYPE } = await import('@capgo/native-purchases');
-      
-      console.log('IAP: Starting purchase for', productId, 'plan:', planId);
-      
-      const purchaseOptions: any = {
-        productIdentifier: productId,
-        productType: PURCHASE_TYPE.SUBS,
-        quantity: 1,
-      };
+      const result = await purchasePackage(pkg._raw);
 
-      // planIdentifier is required for Android subscriptions, ignored on iOS
-      if (planId) {
-        purchaseOptions.planIdentifier = planId;
-      }
-
-      // Only pass appAccountToken if user is logged in (must be valid UUID on iOS)
-      if (user?.id) {
-        purchaseOptions.appAccountToken = user.id;
-      }
-
-      console.log('IAP: Purchase options:', JSON.stringify(purchaseOptions));
-      
-      const result = await NativePurchases.purchaseProduct(purchaseOptions);
-      
-      console.log('IAP: Raw purchase result:', JSON.stringify(result));
-      
-      // Handle both direct transaction and wrapped response
-      const transaction = result?.transactionId ? result : result?.transaction;
-
-      console.log('IAP: Parsed transaction:', JSON.stringify(transaction));
-
-      if (transaction && transaction.transactionId) {
-        await processTransaction(transaction);
-        return true;
-      } else {
-        console.error('IAP: No valid transaction returned', transaction);
-        setError('Alış tamamlana bilmədi. Yenidən cəhd edin.');
+      if (result.error === 'USER_CANCELLED') {
+        setError(null);
         return false;
       }
-    } catch (err: any) {
-      console.error('IAP: Purchase error:', err, JSON.stringify(err));
-      if (err?.code === 'USER_CANCELLED' || err?.message?.includes('cancel')) {
-        setError(null);
-      } else {
-        setError(`Alış zamanı xəta: ${err?.message || 'Naməlum xəta'}`);
+
+      if (result.success) {
+        setIsPro(true);
+        await syncWithDatabase(true, pkg.product.identifier);
+        import('@/lib/analytics').then(m => m.analytics.logPremiumSubscribed(pkg.identifier)).catch(() => {});
+        return true;
       }
+
+      setError(result.error || 'Alış tamamlana bilmədi. Yenidən cəhd edin.');
+      return false;
+    } catch (err: any) {
+      console.error('Purchase error:', err);
+      setError(`Alış zamanı xəta: ${err?.message || 'Naməlum xəta'}`);
       return false;
     } finally {
       setIsPurchasing(false);
     }
-  };
+  }, [syncWithDatabase]);
 
-  const purchaseMonthly = async (): Promise<boolean> => {
-    return executePurchase(IAP_PRODUCTS.PREMIUM_MONTHLY, IAP_PLANS.MONTHLY_PLAN);
-  };
+  const purchaseByIdentifier = useCallback(async (identifier: string): Promise<boolean> => {
+    const pkg = packages.find(p =>
+      p.identifier === identifier ||
+      p.product.identifier.includes(identifier)
+    );
+    if (!pkg) {
+      setError('Məhsul tapılmadı');
+      return false;
+    }
+    return executePurchase(pkg);
+  }, [packages, executePurchase]);
 
-  const purchaseYearly = async (): Promise<boolean> => {
-    return executePurchase(IAP_PRODUCTS.PREMIUM_YEARLY, IAP_PLANS.YEARLY_PLAN);
-  };
+  const purchaseMonthly = useCallback(() => purchaseByIdentifier(RC_PRODUCTS.MONTHLY), [purchaseByIdentifier]);
+  const purchaseYearly = useCallback(() => purchaseByIdentifier(RC_PRODUCTS.YEARLY), [purchaseByIdentifier]);
+  const purchaseLifetime = useCallback(() => purchaseByIdentifier(RC_PRODUCTS.LIFETIME), [purchaseByIdentifier]);
 
-  const restorePurchases = async (): Promise<boolean> => {
-    if (!NativePurchases || !isSupported) return false;
-
+  const handleRestore = useCallback(async (): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
-
     try {
-      await NativePurchases.restorePurchases();
-      
-      const { PURCHASE_TYPE } = await import('@capgo/native-purchases');
-      const { purchases } = await NativePurchases.getPurchases({
-        productType: PURCHASE_TYPE.SUBS,
-      });
-
-      if (purchases && purchases.length > 0) {
-        // Process the most recent purchase
-        const latestPurchase = purchases[purchases.length - 1];
-        await processTransaction(latestPurchase);
+      const result = await rcRestore();
+      if (result.success) {
+        setIsPro(true);
+        await syncWithDatabase(true);
         return true;
       }
-      
       return false;
     } catch (err) {
       console.error('Restore error:', err);
@@ -264,27 +203,47 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [syncWithDatabase]);
 
-  const manageSubscriptions = async (): Promise<void> => {
-    if (!NativePurchases || !isSupported) return;
-
-    try {
-      await NativePurchases.manageSubscriptions();
-    } catch (err) {
-      console.error('Manage subscriptions error:', err);
+  const showPaywall = useCallback(async (): Promise<boolean> => {
+    const result = await presentPaywall();
+    if (result.didPurchase) {
+      setIsPro(true);
+      await syncWithDatabase(true);
+      return true;
     }
-  };
+    return false;
+  }, [syncWithDatabase]);
+
+  const showCustomerCenter = useCallback(async () => {
+    await presentCustomerCenter();
+    // Refresh entitlements after customer center closes
+    await refreshEntitlements();
+  }, []);
+
+  const refreshEntitlements = useCallback(async () => {
+    const ent = await checkEntitlement();
+    setIsPro(ent.isPro);
+    if (!ent.isPro && isPro) {
+      // User lost entitlement, sync DB
+      await syncWithDatabase(false);
+    }
+  }, [isPro, syncWithDatabase]);
 
   return {
-    products,
+    packages,
     isLoading,
     isPurchasing,
     error,
     isSupported,
+    isPro,
+    purchaseByIdentifier,
     purchaseMonthly,
     purchaseYearly,
-    restorePurchases,
-    manageSubscriptions,
+    purchaseLifetime,
+    restorePurchases: handleRestore,
+    showPaywall,
+    showCustomerCenter,
+    refreshEntitlements,
   };
 }

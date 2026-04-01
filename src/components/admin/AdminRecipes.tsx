@@ -87,6 +87,7 @@ const AdminRecipes = () => {
       prep_time: 15,
       cook_time: 30,
       servings: 4,
+      calories: null as number | null,
       ingredients: [],
       instructions: [],
       image_url: '',
@@ -168,6 +169,40 @@ const AdminRecipes = () => {
     setFormData({ ...formData, image_url: '' });
   };
 
+  // Split CSV text into logical rows, respecting quoted fields with newlines
+  const splitCSVIntoRows = (text: string): string[] => {
+    const rows: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      if (char === '"') {
+        if (inQuotes && i + 1 < text.length && text[i + 1] === '"') {
+          current += '"';
+          i++; // skip escaped quote
+        } else {
+          inQuotes = !inQuotes;
+        }
+        current += char;
+      } else if ((char === '\n' || char === '\r') && !inQuotes) {
+        if (char === '\r' && i + 1 < text.length && text[i + 1] === '\n') {
+          i++; // skip \r\n
+        }
+        if (current.trim()) {
+          rows.push(current);
+        }
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    if (current.trim()) {
+      rows.push(current);
+    }
+    return rows;
+  };
+
   // CSV parsing helper
   const parseCSVLine = (line: string): string[] => {
     const result: string[] = [];
@@ -177,7 +212,12 @@ const AdminRecipes = () => {
     for (let i = 0; i < line.length; i++) {
       const char = line[i];
       if (char === '"') {
-        inQuotes = !inQuotes;
+        if (inQuotes && i + 1 < line.length && line[i + 1] === '"') {
+          current += '"';
+          i++; // skip escaped quote
+        } else {
+          inQuotes = !inQuotes;
+        }
       } else if (char === ',' && !inQuotes) {
         result.push(current.trim());
         current = '';
@@ -197,7 +237,7 @@ const AdminRecipes = () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const text = event.target?.result as string;
-      const lines = text.split('\n').filter(line => line.trim());
+      const lines = splitCSVIntoRows(text);
       
       if (lines.length < 2) {
         toast({ title: 'Xəta', description: 'CSV faylı boşdur', variant: 'destructive' });
@@ -212,6 +252,7 @@ const AdminRecipes = () => {
         'Hazırlıq (dəq)': 'prep_time',
         'Bişirmə (dəq)': 'cook_time',
         'Porsiya': 'servings',
+        'Kalori': 'calories',
         'İnqredientlər': 'ingredients',
         'Hazırlanma': 'instructions',
         'Şəkil URL': 'image_url',
@@ -230,9 +271,9 @@ const AdminRecipes = () => {
           if (dbField && values[idx]) {
             let value = values[idx].trim().replace(/^"|"$/g, '');
             
-            if (dbField === 'prep_time' || dbField === 'cook_time' || dbField === 'servings') {
+            if (dbField === 'prep_time' || dbField === 'cook_time' || dbField === 'servings' || dbField === 'calories') {
               const numValue = parseInt(value);
-              row[dbField] = isNaN(numValue) ? 0 : numValue;
+              row[dbField] = isNaN(numValue) ? (dbField === 'calories' ? null : 0) : numValue;
             } else if (dbField === 'ingredients' || dbField === 'instructions') {
               const items = value.split(/[;|\n]/).map(s => s.trim()).filter(s => s);
               row[dbField] = items;
@@ -380,6 +421,7 @@ const AdminRecipes = () => {
                   { key: 'prep_time', header: 'Hazırlıq (dəq)' },
                   { key: 'cook_time', header: 'Bişirmə (dəq)' },
                   { key: 'servings', header: 'Porsiya' },
+                  { key: 'calories', header: 'Kalori' },
                   { key: 'ingredients', header: 'İnqredientlər' },
                   { key: 'instructions', header: 'Hazırlanma' },
                   { key: 'image_url', header: 'Şəkil URL' },
@@ -566,6 +608,9 @@ const AdminRecipes = () => {
                           <Users className="w-3 h-3" />
                           {recipe.servings} porsiya
                         </span>
+                        {recipe.calories && (
+                          <span className="text-orange-500 font-medium">{recipe.calories} kcal</span>
+                        )}
                         <Badge variant="outline">{categories.find(c => c.id === recipe.category)?.label || recipe.category}</Badge>
                         {(recipe.tags || []).map(t => {
                           const tagInfo = recipeTags.find(rt => rt.tag_id === t);
@@ -656,7 +701,7 @@ const AdminRecipes = () => {
                   })}
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-4 gap-3">
                 <Input
                   type="number"
                   placeholder="Hazırlıq (dəq)"
@@ -674,6 +719,12 @@ const AdminRecipes = () => {
                   placeholder="Porsiya"
                   value={formData.servings || ''}
                   onChange={(e) => setFormData({ ...formData, servings: parseInt(e.target.value) })}
+                />
+                <Input
+                  type="number"
+                  placeholder="Kalori (kcal)"
+                  value={formData.calories || ''}
+                  onChange={(e) => setFormData({ ...formData, calories: e.target.value ? parseInt(e.target.value) : null })}
                 />
               </div>
               <div className="space-y-2">
