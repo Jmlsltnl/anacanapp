@@ -54,7 +54,7 @@ const FlowDashboard = () => {
 
       // Sync to database
       if (user?.id) {
-        const todayStr = today.toISOString().split('T')[0];
+        const dateStr = selectedDay.toISOString().split('T')[0];
         
         // Update profile
         await supabase
