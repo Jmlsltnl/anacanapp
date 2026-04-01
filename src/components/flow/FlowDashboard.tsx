@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Calendar, Droplets, Heart, Moon, Sparkles, 
+  Calendar as CalendarIcon, Droplets, Heart, Moon, Sparkles, 
   TrendingUp,
   Apple, Dumbbell, Brain, Flame, CircleDot
 } from 'lucide-react';
@@ -9,6 +9,7 @@ import { useUserStore } from '@/store/userStore';
 import { usePhaseTips, PHASE_INFO, CATEGORY_INFO, MenstrualPhase, TipCategory } from '@/hooks/usePhaseTips';
 import { format, addDays, differenceInDays } from 'date-fns';
 import { az } from 'date-fns/locale';
+import { Calendar } from '@/components/ui/calendar';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -40,24 +41,26 @@ const FlowDashboard = () => {
   const [showPeriodConfirm, setShowPeriodConfirm] = useState(false);
   const [showPeriodEndConfirm, setShowPeriodEndConfirm] = useState(false);
   const [markingPeriod, setMarkingPeriod] = useState(false);
+  const [periodStartDate, setPeriodStartDate] = useState<Date>(new Date());
+  const [periodEndDate, setPeriodEndDate] = useState<Date>(new Date());
 
   const handleMarkPeriodStarted = async () => {
     setMarkingPeriod(true);
     try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const selectedDay = new Date(periodStartDate);
+      selectedDay.setHours(0, 0, 0, 0);
       
       // Update local store
-      setLastPeriodDate(today);
+      setLastPeriodDate(selectedDay);
 
       // Sync to database
       if (user?.id) {
-        const todayStr = today.toISOString().split('T')[0];
+        const dateStr = selectedDay.toISOString().split('T')[0];
         
         // Update profile
         await supabase
           .from('profiles')
-          .update({ last_period_date: todayStr })
+          .update({ last_period_date: dateStr })
           .eq('user_id', user.id);
 
         // Log to cycle_history
@@ -74,11 +77,11 @@ const FlowDashboard = () => {
         // Close previous cycle if exists
         if (lastCycle?.start_date) {
           const prevStart = new Date(lastCycle.start_date);
-          const cycleLengthCalc = differenceInDays(today, prevStart);
+          const cycleLengthCalc = differenceInDays(selectedDay, prevStart);
           await supabase
             .from('cycle_history')
             .update({ 
-              end_date: todayStr, 
+              end_date: dateStr, 
               cycle_length: cycleLengthCalc > 0 ? cycleLengthCalc : null 
             })
             .eq('user_id', user.id)
@@ -91,7 +94,7 @@ const FlowDashboard = () => {
           .insert({
             user_id: user.id,
             cycle_number: nextCycleNumber,
-            start_date: todayStr,
+            start_date: dateStr,
             period_length: periodLength,
           });
 
@@ -99,7 +102,7 @@ const FlowDashboard = () => {
       }
 
       toast.success('Period başlanğıcı qeyd edildi! 🩸', {
-        description: format(today, 'd MMMM yyyy', { locale: az }),
+        description: format(selectedDay, 'd MMMM yyyy', { locale: az }),
       });
     } catch (error) {
       console.error('Error marking period:', error);
@@ -113,12 +116,17 @@ const FlowDashboard = () => {
   const handleMarkPeriodEnded = async () => {
     setMarkingPeriod(true);
     try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const selectedDay = new Date(periodEndDate);
+      selectedDay.setHours(0, 0, 0, 0);
 
       if (user?.id && cycleData?.lastPeriodDate) {
         const lastPeriod = new Date(cycleData.lastPeriodDate);
-        const actualPeriodLength = differenceInDays(today, lastPeriod) + 1;
+        const actualPeriodLength = differenceInDays(selectedDay, lastPeriod) + 1;
+
+        if (actualPeriodLength < 1) {
+          toast.error('Bitiş tarixi başlanğıc tarixindən əvvəl ola bilməz');
+          return;
+        }
 
         // Update profile period_length
         await supabase
@@ -285,7 +293,7 @@ const FlowDashboard = () => {
               <p className="text-white/70 text-[10px]">gün qaldı</p>
             </div>
             <div className="bg-white/15 rounded-xl p-3 text-center">
-              <Calendar className="w-5 h-5 text-white mx-auto mb-1" />
+              <CalendarIcon className="w-5 h-5 text-white mx-auto mb-1" />
               <p className="text-white text-lg font-bold">{cycleLength}</p>
               <p className="text-white/70 text-[10px]">gün tsikl</p>
             </div>
@@ -553,15 +561,30 @@ const FlowDashboard = () => {
       </motion.div>
 
       {/* Period Start Confirmation Dialog */}
-      <AlertDialog open={showPeriodConfirm} onOpenChange={setShowPeriodConfirm}>
-        <AlertDialogContent>
+      <AlertDialog open={showPeriodConfirm} onOpenChange={(open) => {
+        setShowPeriodConfirm(open);
+        if (open) setPeriodStartDate(new Date());
+      }}>
+        <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
-            <AlertDialogTitle>🩸 Periodum başladı</AlertDialogTitle>
+            <AlertDialogTitle>🩸 Period başlanğıcı</AlertDialogTitle>
             <AlertDialogDescription>
-              Bu gün ({format(new Date(), 'd MMMM yyyy', { locale: az })}) period başlanğıcı olaraq qeyd edilsin? 
-              Bu, tsikl hesablamalarınızı yeniləyəcək.
+              Periodunuzun başladığı tarixi seçin:
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="flex justify-center py-2">
+            <Calendar
+              mode="single"
+              selected={periodStartDate}
+              onSelect={(date) => date && setPeriodStartDate(date)}
+              disabled={(date) => date > new Date()}
+              locale={az}
+              className="rounded-xl border pointer-events-auto"
+            />
+          </div>
+          <p className="text-sm text-center text-muted-foreground">
+            Seçilən tarix: <strong>{format(periodStartDate, 'd MMMM yyyy', { locale: az })}</strong>
+          </p>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={markingPeriod}>Ləğv et</AlertDialogCancel>
             <AlertDialogAction 
@@ -569,24 +592,40 @@ const FlowDashboard = () => {
               disabled={markingPeriod}
               className="bg-red-500 hover:bg-red-600"
             >
-              {markingPeriod ? 'Qeyd edilir...' : 'Bəli, qeyd et'}
+              {markingPeriod ? 'Qeyd edilir...' : 'Qeyd et'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       {/* Period End Confirmation Dialog */}
-      <AlertDialog open={showPeriodEndConfirm} onOpenChange={setShowPeriodEndConfirm}>
-        <AlertDialogContent>
+      <AlertDialog open={showPeriodEndConfirm} onOpenChange={(open) => {
+        setShowPeriodEndConfirm(open);
+        if (open) setPeriodEndDate(new Date());
+      }}>
+        <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
-            <AlertDialogTitle>✅ Periodum bitdi</AlertDialogTitle>
+            <AlertDialogTitle>✅ Period bitişi</AlertDialogTitle>
             <AlertDialogDescription>
-              Periodunuz bu gün ({format(new Date(), 'd MMMM yyyy', { locale: az })}) bitdi olaraq qeyd edilsin?
-              {cycleData?.lastPeriodDate && (
-                <> Period müddəti: <strong>{differenceInDays(new Date(), new Date(cycleData.lastPeriodDate)) + 1} gün</strong></>
-              )}
+              Periodunuzun bitdiyi tarixi seçin:
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="flex justify-center py-2">
+            <Calendar
+              mode="single"
+              selected={periodEndDate}
+              onSelect={(date) => date && setPeriodEndDate(date)}
+              disabled={(date) => date > new Date() || (cycleData?.lastPeriodDate ? date < new Date(cycleData.lastPeriodDate) : false)}
+              locale={az}
+              className="rounded-xl border pointer-events-auto"
+            />
+          </div>
+          <p className="text-sm text-center text-muted-foreground">
+            Seçilən tarix: <strong>{format(periodEndDate, 'd MMMM yyyy', { locale: az })}</strong>
+            {cycleData?.lastPeriodDate && (
+              <> • Period: <strong>{differenceInDays(periodEndDate, new Date(cycleData.lastPeriodDate)) + 1} gün</strong></>
+            )}
+          </p>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={markingPeriod}>Ləğv et</AlertDialogCancel>
             <AlertDialogAction 
@@ -594,7 +633,7 @@ const FlowDashboard = () => {
               disabled={markingPeriod}
               className="bg-green-600 hover:bg-green-700"
             >
-              {markingPeriod ? 'Qeyd edilir...' : 'Bəli, bitdi'}
+              {markingPeriod ? 'Qeyd edilir...' : 'Qeyd et'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
