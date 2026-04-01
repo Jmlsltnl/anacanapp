@@ -46,8 +46,8 @@ const FlowDashboard = () => {
   const handleMarkPeriodStarted = async () => {
     setMarkingPeriod(true);
     try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const selectedDay = new Date(periodStartDate);
+      selectedDay.setHours(0, 0, 0, 0);
       
       // Update local store
       setLastPeriodDate(today);
