@@ -268,7 +268,7 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
         )}
       >
         {/* Header */}
-        <div className="p-3 border-b border-border flex items-center justify-between gap-2 shrink-0">
+        <div className="p-3 border-b border-border flex items-center justify-between gap-2 shrink-0 safe-area-top">
           <AnimatePresence>
             {sidebarOpen && (
               <motion.div
