@@ -115,12 +115,17 @@ const FlowDashboard = () => {
   const handleMarkPeriodEnded = async () => {
     setMarkingPeriod(true);
     try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const selectedDay = new Date(periodEndDate);
+      selectedDay.setHours(0, 0, 0, 0);
 
       if (user?.id && cycleData?.lastPeriodDate) {
         const lastPeriod = new Date(cycleData.lastPeriodDate);
-        const actualPeriodLength = differenceInDays(today, lastPeriod) + 1;
+        const actualPeriodLength = differenceInDays(selectedDay, lastPeriod) + 1;
+
+        if (actualPeriodLength < 1) {
+          toast.error('Bitiş tarixi başlanğıc tarixindən əvvəl ola bilməz');
+          return;
+        }
 
         // Update profile period_length
         await supabase
