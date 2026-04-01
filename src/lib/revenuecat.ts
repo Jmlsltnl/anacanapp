@@ -160,7 +160,7 @@ export async function restorePurchases(): Promise<{
   success: boolean;
   customerInfo?: any;
 }> {
-  if (!isNativePlatform()) return { success: false };
+  if (!REVENUECAT_ENABLED || !isNativePlatform()) return { success: false };
 
   try {
     const { Purchases } = await import('@revenuecat/purchases-capacitor');
