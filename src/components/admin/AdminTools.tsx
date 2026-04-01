@@ -448,9 +448,15 @@ const AdminTools = () => {
                               {tool.is_premium && (
                                 <Crown className="w-4 h-4 text-amber-500" />
                               )}
+                              {tool.is_hero && (
+                                <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 bg-violet-50 text-violet-600 border-violet-200">Hero</Badge>
+                              )}
+                              {tool.is_quick_access && (
+                                <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 bg-blue-50 text-blue-600 border-blue-200">QA</Badge>
+                              )}
                             </div>
-                            <p className="text-xs text-muted-foreground truncate">
-                              {tool.description_az || tool.tool_id}
+                            <p className="text-[10px] text-muted-foreground font-mono truncate">
+                              ID: {tool.tool_id}
                             </p>
                           </div>
 
