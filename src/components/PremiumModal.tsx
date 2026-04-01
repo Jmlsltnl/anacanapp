@@ -24,7 +24,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const {
-    products, isLoading, isPurchasing, error, isSupported,
+    packages, isLoading, isPurchasing, error, isSupported,
     purchaseMonthly, purchaseYearly, restorePurchases,
   } = useInAppPurchase();
 

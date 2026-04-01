@@ -40,7 +40,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
     if (isIAPSupported) {
       if (!confirm('Abunəliyi ləğv etmək üçün App Store / Google Play abunəlik idarəetmə səhifəsinə yönləndiriləcəksiniz.')) return;
       setIsCanceling(true);
-      await manageSubscriptions();
+      await showCustomerCenter();
       setIsCanceling(false);
       return;
     }

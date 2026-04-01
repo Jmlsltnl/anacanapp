@@ -180,8 +180,9 @@ export async function presentPaywall(): Promise<{
 
   try {
     const { RevenueCatUI } = await import('@revenuecat/purchases-capacitor-ui');
+    const { PAYWALL_RESULT } = await import('@revenuecat/purchases-capacitor-ui');
     const result = await RevenueCatUI.presentPaywall();
-    return { didPurchase: result?.result === 'purchased' || result?.result === 'restored' };
+    return { didPurchase: result?.result === PAYWALL_RESULT.PURCHASED || result?.result === PAYWALL_RESULT.RESTORED };
   } catch (err) {
     console.error('RevenueCat paywall error:', err);
     return { didPurchase: false };
