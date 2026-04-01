@@ -111,7 +111,9 @@ export async function getOfferings() {
 
   try {
     const { Purchases } = await import('@revenuecat/purchases-capacitor');
-    const { offerings } = await Purchases.getOfferings();
+    const result = await Purchases.getOfferings();
+    // Workaround: TS types say PurchasesOfferings directly, but runtime wraps in { offerings }
+    const offerings = ('offerings' in result) ? (result as any).offerings : result;
     return offerings;
   } catch (err) {
     console.error('RevenueCat offerings error:', err);
