@@ -419,6 +419,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUserRole(null);
         storeLogout();
         finishLoading();
+        import('@/lib/revenuecat').then(m => m.logOutRevenueCat()).catch(() => {});
         return;
       }
 
