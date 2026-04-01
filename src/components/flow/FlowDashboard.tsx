@@ -40,6 +40,8 @@ const FlowDashboard = () => {
   const [showPeriodConfirm, setShowPeriodConfirm] = useState(false);
   const [showPeriodEndConfirm, setShowPeriodEndConfirm] = useState(false);
   const [markingPeriod, setMarkingPeriod] = useState(false);
+  const [periodStartDate, setPeriodStartDate] = useState<Date>(new Date());
+  const [periodEndDate, setPeriodEndDate] = useState<Date>(new Date());
 
   const handleMarkPeriodStarted = async () => {
     setMarkingPeriod(true);
