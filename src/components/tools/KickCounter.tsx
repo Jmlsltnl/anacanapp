@@ -94,23 +94,23 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
         </div>
       </div>
 
-      <div className="px-3 pt-3">
+      <div className="px-3 pt-2">
         {/* Main Counter Card */}
         <motion.div
-          className="bg-card rounded-2xl p-4 shadow-elevated border border-border/50 mb-3"
+          className="bg-card rounded-2xl p-3 shadow-elevated border border-border/50 mb-3"
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
         >
           {/* Timer */}
-          <div className="text-center mb-6">
-            <p className="text-muted-foreground text-sm font-medium mb-1">Keçən vaxt</p>
-            <p className="text-4xl font-black text-foreground font-mono">{formatTime(time)}</p>
+          <div className="text-center mb-4">
+            <p className="text-muted-foreground text-xs font-medium mb-0.5">Keçən vaxt</p>
+            <p className="text-3xl font-black text-foreground font-mono">{formatTime(time)}</p>
           </div>
 
           {/* Kick Button */}
           <motion.button
             onClick={handleKick}
-            className="w-48 h-48 mx-auto rounded-full gradient-primary flex flex-col items-center justify-center shadow-glow mb-6 relative overflow-hidden"
+            className="w-36 h-36 mx-auto rounded-full gradient-primary flex flex-col items-center justify-center shadow-glow mb-4 relative overflow-hidden"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
           >
