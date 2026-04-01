@@ -30,11 +30,84 @@ import FlowCycleStats from './FlowCycleStats';
 import FlowRemindersCard from './FlowRemindersCard';
 import { getPhaseInfoForDate, getNextPeriodDate, getFertileWindow } from '@/lib/cycle-utils';
 const FlowDashboard = () => {
-  const { getCycleData, cycleLength, periodLength } = useUserStore();
+  const { getCycleData, cycleLength, periodLength, setLastPeriodDate } = useUserStore();
   const cycleData = getCycleData();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   
   const [selectedCategory, setSelectedCategory] = useState<TipCategory | 'all'>('all');
   const [calendarMonth, setCalendarMonth] = useState(new Date());
+  const [showPeriodConfirm, setShowPeriodConfirm] = useState(false);
+  const [markingPeriod, setMarkingPeriod] = useState(false);
+
+  const handleMarkPeriodStarted = async () => {
+    setMarkingPeriod(true);
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Update local store
+      setLastPeriodDate(today);
+
+      // Sync to database
+      if (user?.id) {
+        const todayStr = today.toISOString().split('T')[0];
+        
+        // Update profile
+        await supabase
+          .from('profiles')
+          .update({ last_period_date: todayStr })
+          .eq('user_id', user.id);
+
+        // Log to cycle_history
+        const { data: lastCycle } = await supabase
+          .from('cycle_history')
+          .select('cycle_number, start_date')
+          .eq('user_id', user.id)
+          .order('cycle_number', { ascending: false })
+          .limit(1)
+          .single();
+
+        const nextCycleNumber = (lastCycle?.cycle_number || 0) + 1;
+        
+        // Close previous cycle if exists
+        if (lastCycle?.start_date) {
+          const prevStart = new Date(lastCycle.start_date);
+          const cycleLengthCalc = differenceInDays(today, prevStart);
+          await supabase
+            .from('cycle_history')
+            .update({ 
+              end_date: todayStr, 
+              cycle_length: cycleLengthCalc > 0 ? cycleLengthCalc : null 
+            })
+            .eq('user_id', user.id)
+            .eq('cycle_number', lastCycle.cycle_number);
+        }
+
+        // Insert new cycle
+        await supabase
+          .from('cycle_history')
+          .insert({
+            user_id: user.id,
+            cycle_number: nextCycleNumber,
+            start_date: todayStr,
+            period_length: periodLength,
+          });
+
+        queryClient.invalidateQueries({ queryKey: ['cycle-history'] });
+      }
+
+      toast.success('Period başlanğıcı qeyd edildi! 🩸', {
+        description: format(today, 'd MMMM yyyy', { locale: az }),
+      });
+    } catch (error) {
+      console.error('Error marking period:', error);
+      toast.error('Xəta baş verdi, yenidən cəhd edin');
+    } finally {
+      setMarkingPeriod(false);
+      setShowPeriodConfirm(false);
+    }
+  };
 
   // Fetch upcoming labels from app_settings
   const { data: upcomingLabels } = useQuery({
