@@ -132,35 +132,35 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
           </p>
 
           {/* Controls */}
-          <div className="flex gap-4">
+          <div className="flex gap-3">
             {isActive ? (
               <motion.button
                 onClick={handleStop}
-                className="flex-1 h-14 rounded-2xl bg-destructive text-white font-bold flex items-center justify-center gap-2"
+                className="flex-1 h-12 rounded-xl bg-destructive text-white font-bold flex items-center justify-center gap-2"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <Pause className="w-5 h-5" />
+                <Pause className="w-4 h-4" />
                 Dayandır
               </motion.button>
             ) : (
               <motion.button
                 onClick={() => setIsActive(true)}
-                className="flex-1 h-14 rounded-2xl gradient-primary text-white font-bold flex items-center justify-center gap-2 shadow-button"
+                className="flex-1 h-12 rounded-xl gradient-primary text-white font-bold flex items-center justify-center gap-2 shadow-button"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <Play className="w-5 h-5" />
+                <Play className="w-4 h-4" />
                 Başla
               </motion.button>
             )}
             <motion.button
               onClick={handleReset}
-              className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center"
+              className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <RotateCcw className="w-5 h-5 text-muted-foreground" />
+              <RotateCcw className="w-4 h-4 text-muted-foreground" />
             </motion.button>
           </div>
         </motion.div>
