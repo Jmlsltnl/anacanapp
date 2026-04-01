@@ -839,21 +839,21 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="gradient-primary px-4 pt-4 pb-6 rounded-b-[1.5rem] flex-shrink-0">
-        <div className="flex items-center gap-4 mb-4">
+      <div className="gradient-primary px-3 pt-2 pb-4 rounded-b-[1.5rem] flex-shrink-0 safe-top">
+        <div className="flex items-center gap-3 mb-3">
           <motion.button
             onClick={onBack}
-            className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
             whileTap={{ scale: 0.95 }}
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">Körpə Fotosessiyası</h1>
-            <p className="text-white/80 text-sm">AI ilə sehrli fotolar</p>
+            <h1 className="text-lg font-bold text-white">Körpə Fotosessiyası</h1>
+            <p className="text-white/70 text-xs">AI ilə sehrli fotolar</p>
           </div>
           {isPremium && (
-            <div className="bg-amber-400 text-amber-900 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+            <div className="bg-amber-400 text-amber-900 px-2.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1">
               <Crown className="w-3 h-3" />
               Premium
             </div>
@@ -861,16 +861,16 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
         </div>
 
         {/* Step Indicator */}
-        <div className="flex items-center justify-center gap-4 mt-4">
+        <div className="flex items-center justify-center gap-4">
           {stepTitles.map((title, index) => (
             <motion.button
               key={index}
               onClick={() => setStep(index)}
-              className={`flex flex-col items-center gap-1 ${
+              className={`flex flex-col items-center gap-0.5 ${
                 step === index ? 'opacity-100' : 'opacity-50'
               }`}
             >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs ${
                 step === index
                   ? 'bg-white text-primary'
                   : step > index
@@ -879,7 +879,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
               }`}>
                 {index + 1}
               </div>
-              <span className="text-[10px] text-white font-medium">{title}</span>
+              <span className="text-[9px] text-white font-medium">{title}</span>
             </motion.button>
           ))}
         </div>
