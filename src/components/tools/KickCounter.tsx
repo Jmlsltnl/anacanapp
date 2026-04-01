@@ -77,19 +77,19 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="gradient-primary px-3 pt-3 pb-4 safe-top relative z-20">
+      <div className="gradient-primary px-3 pt-2 pb-3 safe-top relative z-20">
         <div className="flex items-center gap-2 relative z-20">
           <motion.button
             onClick={onBack}
-            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold text-white">Təpik Sayğacı</h1>
-            <p className="text-white/80 text-xs">Körpə hərəkətlərini izləyin</p>
+            <h1 className="text-base font-bold text-white">Təpik Sayğacı</h1>
+            <p className="text-white/80 text-[10px]">Körpə hərəkətlərini izləyin</p>
           </div>
         </div>
       </div>
