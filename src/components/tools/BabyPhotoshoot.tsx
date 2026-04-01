@@ -480,10 +480,10 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="space-y-5"
+            className="space-y-3"
           >
             {/* Image Upload */}
-            <div className="bg-card rounded-3xl p-5 shadow-elevated">
+            <div className="bg-card rounded-2xl p-4 shadow-elevated">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Upload className="w-5 h-5 text-primary" />
