@@ -141,23 +141,23 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
           {!isActive ? (
             <motion.button
               onClick={handleStart}
-              className="w-full h-14 rounded-xl gradient-primary text-white font-bold flex items-center justify-center gap-2 shadow-button"
+              className="w-full h-12 rounded-xl gradient-primary text-white font-bold flex items-center justify-center gap-2 shadow-button"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <Play className="w-5 h-5" />
+              <Play className="w-4 h-4" />
               Sancı başladı
             </motion.button>
           ) : (
             <motion.button
               onClick={handleStop}
-              className="w-full h-14 rounded-xl bg-red-500 text-white font-bold flex items-center justify-center gap-2 shadow-lg"
+              className="w-full h-12 rounded-xl bg-red-500 text-white font-bold flex items-center justify-center gap-2 shadow-lg"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               animate={{ scale: [1, 1.02, 1] }}
               transition={{ duration: 0.5, repeat: Infinity }}
             >
-              <Square className="w-5 h-5" />
+              <Square className="w-4 h-4" />
               Sancı bitdi
             </motion.button>
           )}
