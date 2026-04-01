@@ -439,7 +439,7 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
         sidebarOpen ? 'lg:ml-[280px]' : 'lg:ml-[72px]'
       )}>
         {/* Top Bar */}
-        <header className="h-14 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40 flex items-center justify-between px-4 sm:px-6 shrink-0">
+        <header className="h-14 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40 flex items-center justify-between px-4 sm:px-6 shrink-0 safe-area-top">
           <div className="flex items-center gap-3 flex-1">
             <Button
               variant="ghost"
