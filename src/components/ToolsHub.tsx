@@ -46,7 +46,7 @@ const TeethingTracker = lazy(() => import('./tools/TeethingTracker'));
 const VitaminTracker = lazy(() => import('./tools/VitaminTracker'));
 const BabyMonthlyAlbum = lazy(() => import('./baby/BabyMonthlyAlbum'));
 import { PremiumModal } from './PremiumModal';
-import { useScrollToTop } from '@/hooks/useScrollToTop';
+
 import { useToast } from '@/hooks/use-toast';
 import { useToolConfigs, ToolConfig } from '@/hooks/useDynamicTools';
 import BannerSlot from '@/components/banners/BannerSlot';
