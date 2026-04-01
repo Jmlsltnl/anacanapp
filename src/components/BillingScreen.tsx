@@ -30,7 +30,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
   const { toast } = useToast();
   const config = useBillingConfig();
   const { features: dbFeatures } = usePremiumConfig();
-  const { manageSubscriptions, isSupported: isIAPSupported } = useInAppPurchase();
+  const { showCustomerCenter, isSupported: isIAPSupported } = useInAppPurchase();
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
