@@ -96,7 +96,7 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
         </div>
       </div>
 
-      <div className="px-3 pt-3">
+      <div className="px-3 pt-2">
         {/* 5-1-1 Alert */}
         <AnimatePresence>
           {stats.is511 && (
@@ -104,14 +104,14 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="bg-red-100 dark:bg-red-950/50 border-2 border-red-200 dark:border-red-800 rounded-xl p-3 mb-3 flex items-center gap-3"
+              className="bg-red-100 dark:bg-red-950/50 border-2 border-red-200 dark:border-red-800 rounded-xl p-2.5 mb-2 flex items-center gap-2"
             >
-              <div className="w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center">
-                <AlertCircle className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 rounded-lg bg-red-500 flex items-center justify-center">
+                <AlertCircle className="w-4 h-4 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-red-700 dark:text-red-400 text-sm">Xəstəxanaya getmə vaxtı!</h3>
-                <p className="text-xs text-red-600 dark:text-red-300">5-1-1 qaydası: Sancılar 5 dəqiqədən bir, 1 dəqiqə davam edir</p>
+                <h3 className="font-bold text-red-700 dark:text-red-400 text-xs">Xəstəxanaya getmə vaxtı!</h3>
+                <p className="text-[10px] text-red-600 dark:text-red-300">5-1-1 qaydası: Sancılar 5 dəqiqədən bir, 1 dəqiqə davam edir</p>
               </div>
             </motion.div>
           )}
@@ -119,17 +119,17 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
 
         {/* Main Timer Card */}
         <motion.div
-          className="bg-card rounded-2xl p-4 shadow-elevated border border-border/50 mb-4"
+          className="bg-card rounded-2xl p-3 shadow-elevated border border-border/50 mb-3"
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
         >
           {/* Timer Display */}
-          <div className="text-center mb-6">
-            <p className="text-muted-foreground text-xs font-medium mb-1">
+          <div className="text-center mb-4">
+            <p className="text-muted-foreground text-xs font-medium mb-0.5">
               {isActive ? 'Sancı müddəti' : 'Hazır'}
             </p>
             <motion.p 
-              className={`text-6xl font-black font-mono ${isActive ? 'text-primary' : 'text-foreground'}`}
+              className={`text-5xl font-black font-mono ${isActive ? 'text-primary' : 'text-foreground'}`}
               animate={isActive ? { scale: [1, 1.02, 1] } : {}}
               transition={{ duration: 1, repeat: isActive ? Infinity : 0 }}
             >
