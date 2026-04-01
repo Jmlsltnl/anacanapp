@@ -179,7 +179,7 @@ export async function restorePurchases(): Promise<{
 export async function presentPaywall(): Promise<{
   didPurchase: boolean;
 }> {
-  if (!isNativePlatform()) return { didPurchase: false };
+  if (!REVENUECAT_ENABLED || !isNativePlatform()) return { didPurchase: false };
 
   try {
     const { RevenueCatUI } = await import('@revenuecat/purchases-capacitor-ui');
