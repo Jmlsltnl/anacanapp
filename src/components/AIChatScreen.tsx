@@ -329,7 +329,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <div ref={ref} className="fixed inset-0 bottom-[80px] flex flex-col bg-gradient-to-b from-background to-muted/20" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
       {/* Compact Header */}
-      <div className="px-4 py-2.5 border-b border-border bg-card/50 backdrop-blur-sm flex items-center justify-between">
+      <div className="px-4 py-2.5 border-b border-border bg-card/50 backdrop-blur-sm flex items-center justify-between safe-area-top">
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center">
             <Sparkles className="w-4.5 h-4.5 text-white" />
