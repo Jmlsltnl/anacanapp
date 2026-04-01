@@ -552,8 +552,8 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                     }`}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <span className="text-4xl">{option.emoji}</span>
-                    <span className="font-bold">{option.name}</span>
+                    <span className="text-3xl">{option.emoji}</span>
+                    <span className="font-semibold text-sm">{option.name}</span>
                   </motion.button>
                 ))}
               </div>
