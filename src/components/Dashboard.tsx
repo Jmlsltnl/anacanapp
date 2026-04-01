@@ -1665,8 +1665,6 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           <div ref={feedingSummaryRef}>
             <FeedingHistoryPanel />
           </div>
-          {/* Sleep History Panel */}
-          <SleepHistoryPanel />
           <div className="flex items-center justify-between p-2.5 bg-emerald-50 dark:bg-emerald-500/15 rounded-xl border border-emerald-100 dark:border-emerald-500/20">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
