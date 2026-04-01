@@ -586,6 +586,14 @@ const AdminTools = () => {
           <Edit2 className="w-4 h-4" />
           <span>Redaktə - ad və açıqlamanı dəyişin</span>
         </div>
+        <div className="flex items-center gap-2">
+          <Star className="w-4 h-4 text-violet-500" />
+          <span>Hero - böyük banner kimi göstər</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Zap className="w-4 h-4 text-blue-500" />
+          <span>QA - sürətli giriş sırasında göstər</span>
+        </div>
       </div>
 
       {/* Edit Tool Dialog */}
