@@ -50,7 +50,7 @@ export async function initRevenueCat(appUserID?: string): Promise<void> {
  * Identify user in RevenueCat (call after login)
  */
 export async function identifyUser(appUserID: string): Promise<void> {
-  if (!isNativePlatform()) return;
+  if (!REVENUECAT_ENABLED || !isNativePlatform()) return;
   try {
     const { Purchases } = await import('@revenuecat/purchases-capacitor');
     await Purchases.logIn({ appUserID });
