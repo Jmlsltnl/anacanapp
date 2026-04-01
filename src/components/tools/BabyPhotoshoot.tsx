@@ -582,17 +582,17 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="space-y-5"
+            className="space-y-3"
           >
             {/* Image Style Selection */}
-            <div className="bg-card rounded-3xl p-5 shadow-elevated">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-purple-500" />
+            <div className="bg-card rounded-2xl p-4 shadow-elevated">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-purple-500" />
                 </div>
                 <div>
-                  <h2 className="font-bold text-foreground">Şəkil Növü</h2>
-                  <p className="text-xs text-muted-foreground">Foto stilini seçin</p>
+                  <h2 className="font-semibold text-sm text-foreground">Şəkil Növü</h2>
+                  <p className="text-[10px] text-muted-foreground">Foto stilini seçin</p>
                 </div>
               </div>
               <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
