@@ -259,6 +259,18 @@ const FlowDashboard = () => {
               <p className="text-white/70 text-[10px]">gün period</p>
             </div>
           </div>
+
+          {/* Period Started Button */}
+          <motion.div className="mt-4" whileTap={{ scale: 0.97 }}>
+            <Button
+              onClick={() => setShowPeriodConfirm(true)}
+              className="w-full bg-white/20 hover:bg-white/30 backdrop-blur text-white border-0 rounded-xl h-12 text-sm font-bold gap-2"
+              variant="outline"
+            >
+              <CircleDot className="w-5 h-5" />
+              Periodum bu gün başladı
+            </Button>
+          </motion.div>
         </div>
       </motion.div>
 
