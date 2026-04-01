@@ -63,7 +63,7 @@ export async function identifyUser(appUserID: string): Promise<void> {
  * Log out user from RevenueCat (call after logout)
  */
 export async function logOutRevenueCat(): Promise<void> {
-  if (!isNativePlatform()) return;
+  if (!REVENUECAT_ENABLED || !isNativePlatform()) return;
   try {
     const { Purchases } = await import('@revenuecat/purchases-capacitor');
     await Purchases.logOut();
