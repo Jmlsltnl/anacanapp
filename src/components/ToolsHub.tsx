@@ -114,10 +114,11 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTool, setActiveTool] = useState<string | null>(initialTool);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
-
-  useScrollToTop([activeTool]);
+  const scrollPositionRef = useRef(0);
 
   const openTool = (toolId: string) => {
+    // Save scroll position before opening tool
+    scrollPositionRef.current = window.scrollY || document.documentElement.scrollTop;
     setActiveTool(toolId);
   };
   const { lifeStage, getPregnancyData } = useUserStore();
