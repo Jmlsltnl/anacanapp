@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Calendar, Droplets, Heart, Moon, Sun, Sparkles, 
-  ChevronRight, ChevronLeft, TrendingUp, Zap, 
+  Calendar, Droplets, Heart, Moon, Sparkles, 
+  TrendingUp,
   Apple, Dumbbell, Brain, Flame, CircleDot
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
