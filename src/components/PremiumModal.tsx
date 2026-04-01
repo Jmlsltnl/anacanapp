@@ -24,7 +24,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const {
-    products, isLoading, isPurchasing, error, isSupported,
+    packages, isLoading, isPurchasing, error, isSupported,
     purchaseMonthly, purchaseYearly, restorePurchases,
   } = useInAppPurchase();
 
@@ -56,14 +56,14 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const dbCurrency = premiumPlan?.currency || 'AZN';
   const isNative = isNativePlatform();
 
-  const monthlyProduct = products.find(p => p?.productId?.includes('monthly'));
-  const yearlyProduct = products.find(p => p?.productId?.includes('yearly'));
+  const monthlyProduct = packages.find(p => p?.product?.identifier?.includes('monthly'));
+  const yearlyProduct = packages.find(p => p?.product?.identifier?.includes('yearly'));
 
   const currencySymbol = dbCurrency === 'AZN' ? '₼' : dbCurrency;
-  const monthlyPrice = monthlyProduct?.price || (dbMonthlyPrice ? `${dbMonthlyPrice}` : '9.99');
-  const yearlyPrice = yearlyProduct?.price || (dbYearlyPrice ? `${dbYearlyPrice}` : '79.99');
+  const monthlyPrice = monthlyProduct?.product?.priceString || (dbMonthlyPrice ? `${dbMonthlyPrice}` : '9.99');
+  const yearlyPrice = yearlyProduct?.product?.priceString || (dbYearlyPrice ? `${dbYearlyPrice}` : '79.99');
   const yearlyMonthly = yearlyProduct
-    ? (yearlyProduct.priceAmount / 12).toFixed(2)
+    ? (yearlyProduct.product.price / 12).toFixed(2)
     : (dbYearlyPrice ? (dbYearlyPrice / 12).toFixed(2) : '6.67');
 
   const savingsPercent = dbMonthlyPrice && dbYearlyPrice

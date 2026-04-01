@@ -30,7 +30,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
   const { toast } = useToast();
   const config = useBillingConfig();
   const { features: dbFeatures } = usePremiumConfig();
-  const { manageSubscriptions, isSupported: isIAPSupported } = useInAppPurchase();
+  const { showCustomerCenter, isSupported: isIAPSupported } = useInAppPurchase();
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
@@ -40,7 +40,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
     if (isIAPSupported) {
       if (!confirm('Abunəliyi ləğv etmək üçün App Store / Google Play abunəlik idarəetmə səhifəsinə yönləndiriləcəksiniz.')) return;
       setIsCanceling(true);
-      await manageSubscriptions();
+      await showCustomerCenter();
       setIsCanceling(false);
       return;
     }
