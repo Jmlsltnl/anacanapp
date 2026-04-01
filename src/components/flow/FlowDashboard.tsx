@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Calendar, Droplets, Heart, Moon, Sparkles, 
+  Calendar as CalendarIcon, Droplets, Heart, Moon, Sparkles, 
   TrendingUp,
   Apple, Dumbbell, Brain, Flame, CircleDot
 } from 'lucide-react';
@@ -9,6 +9,7 @@ import { useUserStore } from '@/store/userStore';
 import { usePhaseTips, PHASE_INFO, CATEGORY_INFO, MenstrualPhase, TipCategory } from '@/hooks/usePhaseTips';
 import { format, addDays, differenceInDays } from 'date-fns';
 import { az } from 'date-fns/locale';
+import { Calendar } from '@/components/ui/calendar';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
