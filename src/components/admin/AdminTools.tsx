@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Wrench, Search, Save, RefreshCw, ChevronDown, ChevronUp, 
-  Power, PowerOff, Eye, EyeOff, Lock, Unlock, Crown, Edit2, X, Check
+  Power, PowerOff, Eye, EyeOff, Lock, Unlock, Crown, Edit2, X, Check,
+  Star, Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -42,6 +43,14 @@ interface ToolConfig {
   premium_limit: number;
   display_name_az: string | null;
   description_az: string | null;
+  is_hero: boolean;
+  hero_order: number;
+  hero_gradient: string | null;
+  hero_subtitle: string | null;
+  hero_badge: string | null;
+  is_quick_access: boolean;
+  quick_access_order: number;
+  quick_access_gradient: string | null;
 }
 
 const categoryLabels: Record<string, string> = {
@@ -276,6 +285,14 @@ const AdminTools = () => {
             premium_limit: tool.premium_limit,
             display_name_az: tool.display_name_az,
             description_az: tool.description_az,
+            is_hero: tool.is_hero,
+            hero_order: tool.hero_order,
+            is_quick_access: tool.is_quick_access,
+            quick_access_order: tool.quick_access_order,
+            quick_access_gradient: tool.quick_access_gradient,
+            hero_gradient: tool.hero_gradient,
+            hero_subtitle: tool.hero_subtitle,
+            hero_badge: tool.hero_badge,
           })
           .eq('id', tool.id);
         
@@ -432,22 +449,58 @@ const AdminTools = () => {
                               {tool.is_premium && (
                                 <Crown className="w-4 h-4 text-amber-500" />
                               )}
+                              {tool.is_hero && (
+                                <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 bg-violet-50 text-violet-600 border-violet-200">Hero</Badge>
+                              )}
+                              {tool.is_quick_access && (
+                                <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 bg-blue-50 text-blue-600 border-blue-200">QA</Badge>
+                              )}
                             </div>
-                            <p className="text-xs text-muted-foreground truncate">
-                              {tool.description_az || tool.tool_id}
+                            <p className="text-[10px] text-muted-foreground font-mono truncate">
+                              ID: {tool.tool_id}
                             </p>
                           </div>
 
                           {/* Action buttons */}
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            {/* Hero toggle */}
+                            <Button
+                              variant={tool.is_hero ? 'default' : 'ghost'}
+                              size="icon"
+                              className={`h-7 w-7 ${tool.is_hero ? 'bg-violet-500 hover:bg-violet-600' : ''}`}
+                              onClick={() => {
+                                const newTools = localTools.map(t => t.id === tool.id ? { ...t, is_hero: !t.is_hero } : t);
+                                setLocalTools(newTools);
+                                setHasChanges(true);
+                              }}
+                              title="Hero banner"
+                            >
+                              <Star className="w-3.5 h-3.5" />
+                            </Button>
+
+                            {/* Quick Access toggle */}
+                            <Button
+                              variant={tool.is_quick_access ? 'default' : 'ghost'}
+                              size="icon"
+                              className={`h-7 w-7 ${tool.is_quick_access ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
+                              onClick={() => {
+                                const newTools = localTools.map(t => t.id === tool.id ? { ...t, is_quick_access: !t.is_quick_access } : t);
+                                setLocalTools(newTools);
+                                setHasChanges(true);
+                              }}
+                              title="Sürətli giriş"
+                            >
+                              <Zap className="w-3.5 h-3.5" />
+                            </Button>
+
                             {/* Edit button */}
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8"
+                              className="h-7 w-7"
                               onClick={() => setEditingTool(tool)}
                             >
-                              <Edit2 className="w-4 h-4" />
+                              <Edit2 className="w-3.5 h-3.5" />
                             </Button>
 
                             {/* Premium button */}
@@ -532,6 +585,14 @@ const AdminTools = () => {
         <div className="flex items-center gap-2">
           <Edit2 className="w-4 h-4" />
           <span>Redaktə - ad və açıqlamanı dəyişin</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Star className="w-4 h-4 text-violet-500" />
+          <span>Hero - böyük banner kimi göstər</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Zap className="w-4 h-4 text-blue-500" />
+          <span>QA - sürətli giriş sırasında göstər</span>
         </div>
       </div>
 
