@@ -677,6 +677,31 @@ const FlowDashboard = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Period End Confirmation Dialog */}
+      <AlertDialog open={showPeriodEndConfirm} onOpenChange={setShowPeriodEndConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>✅ Periodum bitdi</AlertDialogTitle>
+            <AlertDialogDescription>
+              Periodunuz bu gün ({format(new Date(), 'd MMMM yyyy', { locale: az })}) bitdi olaraq qeyd edilsin?
+              {cycleData?.lastPeriodDate && (
+                <> Period müddəti: <strong>{differenceInDays(new Date(), new Date(cycleData.lastPeriodDate)) + 1} gün</strong></>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={markingPeriod}>Ləğv et</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleMarkPeriodEnded}
+              disabled={markingPeriod}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {markingPeriod ? 'Qeyd edilir...' : 'Bəli, bitdi'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
