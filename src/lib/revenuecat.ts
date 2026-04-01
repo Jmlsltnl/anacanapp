@@ -110,7 +110,7 @@ export async function checkEntitlement(): Promise<{
  * Get available offerings/packages
  */
 export async function getOfferings() {
-  if (!isNativePlatform()) return null;
+  if (!REVENUECAT_ENABLED || !isNativePlatform()) return null;
 
   try {
     const { Purchases } = await import('@revenuecat/purchases-capacitor');
