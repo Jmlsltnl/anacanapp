@@ -69,24 +69,24 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className={`${stats.is511 ? 'bg-gradient-to-r from-red-500 to-rose-600' : 'gradient-primary'} px-3 pt-3 pb-4 safe-top transition-colors relative z-20`}>
-        <div className="flex items-center gap-3 relative z-20">
+      <div className={`${stats.is511 ? 'bg-gradient-to-r from-red-500 to-rose-600' : 'gradient-primary'} px-3 pt-2 pb-3 safe-top transition-colors relative z-20`}>
+        <div className="flex items-center gap-2 relative z-20">
           <motion.button
             onClick={onBack}
-            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold text-white">Sancı Ölçən</h1>
-            <p className="text-white/80 text-xs">5-1-1 qaydası ilə izləyin</p>
+            <h1 className="text-base font-bold text-white">Sancı Ölçən</h1>
+            <p className="text-white/80 text-[10px]">5-1-1 qaydası ilə izləyin</p>
           </div>
           {contractions.length > 0 && (
             <motion.button
               onClick={clearAll}
-              className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
+              className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
