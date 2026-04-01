@@ -132,8 +132,8 @@ export async function purchasePackage(packageToPurchase: any): Promise<{
   customerInfo?: any;
   error?: string;
 }> {
-  if (!isNativePlatform()) {
-    return { success: false, error: 'Not on native platform' };
+  if (!REVENUECAT_ENABLED || !isNativePlatform()) {
+    return { success: false, error: 'RevenueCat is disabled or not on native platform' };
   }
 
   try {
