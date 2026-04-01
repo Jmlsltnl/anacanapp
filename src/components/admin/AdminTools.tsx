@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Wrench, Search, Save, RefreshCw, ChevronDown, ChevronUp, 
-  Power, PowerOff, Eye, EyeOff, Lock, Unlock, Crown, Edit2, X, Check
+  Power, PowerOff, Eye, EyeOff, Lock, Unlock, Crown, Edit2, X, Check,
+  Star, Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
