@@ -59,7 +59,7 @@ const FlowDashboard = () => {
         // Update profile
         await supabase
           .from('profiles')
-          .update({ last_period_date: todayStr })
+          .update({ last_period_date: dateStr })
           .eq('user_id', user.id);
 
         // Log to cycle_history
@@ -76,11 +76,11 @@ const FlowDashboard = () => {
         // Close previous cycle if exists
         if (lastCycle?.start_date) {
           const prevStart = new Date(lastCycle.start_date);
-          const cycleLengthCalc = differenceInDays(today, prevStart);
+          const cycleLengthCalc = differenceInDays(selectedDay, prevStart);
           await supabase
             .from('cycle_history')
             .update({ 
-              end_date: todayStr, 
+              end_date: dateStr, 
               cycle_length: cycleLengthCalc > 0 ? cycleLengthCalc : null 
             })
             .eq('user_id', user.id)
@@ -93,7 +93,7 @@ const FlowDashboard = () => {
           .insert({
             user_id: user.id,
             cycle_number: nextCycleNumber,
-            start_date: todayStr,
+            start_date: dateStr,
             period_length: periodLength,
           });
 
@@ -101,7 +101,7 @@ const FlowDashboard = () => {
       }
 
       toast.success('Period başlanğıcı qeyd edildi! 🩸', {
-        description: format(today, 'd MMMM yyyy', { locale: az }),
+        description: format(selectedDay, 'd MMMM yyyy', { locale: az }),
       });
     } catch (error) {
       console.error('Error marking period:', error);
