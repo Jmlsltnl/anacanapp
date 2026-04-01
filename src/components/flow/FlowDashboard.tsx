@@ -561,15 +561,30 @@ const FlowDashboard = () => {
       </motion.div>
 
       {/* Period Start Confirmation Dialog */}
-      <AlertDialog open={showPeriodConfirm} onOpenChange={setShowPeriodConfirm}>
-        <AlertDialogContent>
+      <AlertDialog open={showPeriodConfirm} onOpenChange={(open) => {
+        setShowPeriodConfirm(open);
+        if (open) setPeriodStartDate(new Date());
+      }}>
+        <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
-            <AlertDialogTitle>🩸 Periodum başladı</AlertDialogTitle>
+            <AlertDialogTitle>🩸 Period başlanğıcı</AlertDialogTitle>
             <AlertDialogDescription>
-              Bu gün ({format(new Date(), 'd MMMM yyyy', { locale: az })}) period başlanğıcı olaraq qeyd edilsin? 
-              Bu, tsikl hesablamalarınızı yeniləyəcək.
+              Periodunuzun başladığı tarixi seçin:
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="flex justify-center py-2">
+            <Calendar
+              mode="single"
+              selected={periodStartDate}
+              onSelect={(date) => date && setPeriodStartDate(date)}
+              disabled={(date) => date > new Date()}
+              locale={az}
+              className="rounded-xl border pointer-events-auto"
+            />
+          </div>
+          <p className="text-sm text-center text-muted-foreground">
+            Seçilən tarix: <strong>{format(periodStartDate, 'd MMMM yyyy', { locale: az })}</strong>
+          </p>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={markingPeriod}>Ləğv et</AlertDialogCancel>
             <AlertDialogAction 
@@ -577,24 +592,40 @@ const FlowDashboard = () => {
               disabled={markingPeriod}
               className="bg-red-500 hover:bg-red-600"
             >
-              {markingPeriod ? 'Qeyd edilir...' : 'Bəli, qeyd et'}
+              {markingPeriod ? 'Qeyd edilir...' : 'Qeyd et'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       {/* Period End Confirmation Dialog */}
-      <AlertDialog open={showPeriodEndConfirm} onOpenChange={setShowPeriodEndConfirm}>
-        <AlertDialogContent>
+      <AlertDialog open={showPeriodEndConfirm} onOpenChange={(open) => {
+        setShowPeriodEndConfirm(open);
+        if (open) setPeriodEndDate(new Date());
+      }}>
+        <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
-            <AlertDialogTitle>✅ Periodum bitdi</AlertDialogTitle>
+            <AlertDialogTitle>✅ Period bitişi</AlertDialogTitle>
             <AlertDialogDescription>
-              Periodunuz bu gün ({format(new Date(), 'd MMMM yyyy', { locale: az })}) bitdi olaraq qeyd edilsin?
-              {cycleData?.lastPeriodDate && (
-                <> Period müddəti: <strong>{differenceInDays(new Date(), new Date(cycleData.lastPeriodDate)) + 1} gün</strong></>
-              )}
+              Periodunuzun bitdiyi tarixi seçin:
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="flex justify-center py-2">
+            <Calendar
+              mode="single"
+              selected={periodEndDate}
+              onSelect={(date) => date && setPeriodEndDate(date)}
+              disabled={(date) => date > new Date() || (cycleData?.lastPeriodDate ? date < new Date(cycleData.lastPeriodDate) : false)}
+              locale={az}
+              className="rounded-xl border pointer-events-auto"
+            />
+          </div>
+          <p className="text-sm text-center text-muted-foreground">
+            Seçilən tarix: <strong>{format(periodEndDate, 'd MMMM yyyy', { locale: az })}</strong>
+            {cycleData?.lastPeriodDate && (
+              <> • Period: <strong>{differenceInDays(periodEndDate, new Date(cycleData.lastPeriodDate)) + 1} gün</strong></>
+            )}
+          </p>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={markingPeriod}>Ləğv et</AlertDialogCancel>
             <AlertDialogAction 
@@ -602,7 +633,7 @@ const FlowDashboard = () => {
               disabled={markingPeriod}
               className="bg-green-600 hover:bg-green-700"
             >
-              {markingPeriod ? 'Qeyd edilir...' : 'Bəli, bitdi'}
+              {markingPeriod ? 'Qeyd edilir...' : 'Qeyd et'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
