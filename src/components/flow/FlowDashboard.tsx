@@ -293,7 +293,7 @@ const FlowDashboard = () => {
               <p className="text-white/70 text-[10px]">gün qaldı</p>
             </div>
             <div className="bg-white/15 rounded-xl p-3 text-center">
-              <Calendar className="w-5 h-5 text-white mx-auto mb-1" />
+              <CalendarIcon className="w-5 h-5 text-white mx-auto mb-1" />
               <p className="text-white text-lg font-bold">{cycleLength}</p>
               <p className="text-white/70 text-[10px]">gün tsikl</p>
             </div>
