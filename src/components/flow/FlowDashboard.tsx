@@ -589,6 +589,29 @@ const FlowDashboard = () => {
           <p className="text-xs text-muted-foreground">Məşq İntensivliyi</p>
         </div>
       </motion.div>
+
+      {/* Period Start Confirmation Dialog */}
+      <AlertDialog open={showPeriodConfirm} onOpenChange={setShowPeriodConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>🩸 Periodum başladı</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bu gün ({format(new Date(), 'd MMMM yyyy', { locale: az })}) period başlanğıcı olaraq qeyd edilsin? 
+              Bu, tsikl hesablamalarınızı yeniləyəcək.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={markingPeriod}>Ləğv et</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleMarkPeriodStarted}
+              disabled={markingPeriod}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              {markingPeriod ? 'Qeyd edilir...' : 'Bəli, qeyd et'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
