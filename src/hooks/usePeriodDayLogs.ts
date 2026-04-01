@@ -142,9 +142,13 @@ async function syncPeriodLogsToProfile(userId: string, queryClient: any) {
       })
       .eq('user_id', userId);
 
-    // Update local store
-    useUserStore.getState().setLastPeriodDate(new Date(periodStart));
-    useUserStore.getState().setPeriodLength(periodLength);
+    // Update local store (batch to avoid multiple re-renders)
+    const store = useUserStore.getState();
+    const currentLPD = store.lastPeriodDate ? new Date(store.lastPeriodDate).toISOString().split('T')[0] : null;
+    if (currentLPD !== periodStart || store.periodLength !== periodLength) {
+      store.setLastPeriodDate(new Date(periodStart));
+      store.setPeriodLength(periodLength);
+    }
 
     // Update or insert cycle_history for this period
     const { data: lastCycle } = await supabase
