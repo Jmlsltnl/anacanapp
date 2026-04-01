@@ -125,6 +125,8 @@ const FlowDashboard = () => {
 
         if (actualPeriodLength < 1) {
           toast.error('Bitiş tarixi başlanğıc tarixindən əvvəl ola bilməz');
+          setMarkingPeriod(false);
+          setShowPeriodEndConfirm(false);
           return;
         }
 

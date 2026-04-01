@@ -83,11 +83,10 @@ export const useTogglePeriodDay = () => {
         return { action: 'added' as const, date: dateStr };
       }
     },
-    onSuccess: async (result) => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['period-day-logs'] });
-
-      // After toggling, recalculate cycle data from logged period days
-      await syncPeriodLogsToProfile(user!.id, queryClient);
+      // Sync in background without awaiting to avoid re-render loops
+      syncPeriodLogsToProfile(user!.id, queryClient).catch(console.error);
     },
   });
 };
@@ -143,9 +142,13 @@ async function syncPeriodLogsToProfile(userId: string, queryClient: any) {
       })
       .eq('user_id', userId);
 
-    // Update local store
-    useUserStore.getState().setLastPeriodDate(new Date(periodStart));
-    useUserStore.getState().setPeriodLength(periodLength);
+    // Update local store (batch to avoid multiple re-renders)
+    const store = useUserStore.getState();
+    const currentLPD = store.lastPeriodDate ? new Date(store.lastPeriodDate).toISOString().split('T')[0] : null;
+    if (currentLPD !== periodStart || store.periodLength !== periodLength) {
+      store.setLastPeriodDate(new Date(periodStart));
+      store.setPeriodLength(periodLength);
+    }
 
     // Update or insert cycle_history for this period
     const { data: lastCycle } = await supabase
