@@ -3,25 +3,111 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Calendar, Droplets, Heart, Moon, Sun, Sparkles, 
   ChevronRight, ChevronLeft, TrendingUp, Zap, 
-  Apple, Dumbbell, Brain, Flame
+  Apple, Dumbbell, Brain, Flame, CircleDot
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { usePhaseTips, PHASE_INFO, CATEGORY_INFO, MenstrualPhase, TipCategory } from '@/hooks/usePhaseTips';
 import { format, addDays, subDays, differenceInDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns';
 import { az } from 'date-fns/locale';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import FlowDailyLogger from './FlowDailyLogger';
 import FlowMoodChart from './FlowMoodChart';
 import FlowCycleStats from './FlowCycleStats';
 import FlowRemindersCard from './FlowRemindersCard';
 import { getPhaseInfoForDate, getNextPeriodDate, getFertileWindow } from '@/lib/cycle-utils';
 const FlowDashboard = () => {
-  const { getCycleData, cycleLength, periodLength } = useUserStore();
+  const { getCycleData, cycleLength, periodLength, setLastPeriodDate } = useUserStore();
   const cycleData = getCycleData();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   
   const [selectedCategory, setSelectedCategory] = useState<TipCategory | 'all'>('all');
   const [calendarMonth, setCalendarMonth] = useState(new Date());
+  const [showPeriodConfirm, setShowPeriodConfirm] = useState(false);
+  const [markingPeriod, setMarkingPeriod] = useState(false);
+
+  const handleMarkPeriodStarted = async () => {
+    setMarkingPeriod(true);
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Update local store
+      setLastPeriodDate(today);
+
+      // Sync to database
+      if (user?.id) {
+        const todayStr = today.toISOString().split('T')[0];
+        
+        // Update profile
+        await supabase
+          .from('profiles')
+          .update({ last_period_date: todayStr })
+          .eq('user_id', user.id);
+
+        // Log to cycle_history
+        const { data: lastCycle } = await supabase
+          .from('cycle_history')
+          .select('cycle_number, start_date')
+          .eq('user_id', user.id)
+          .order('cycle_number', { ascending: false })
+          .limit(1)
+          .single();
+
+        const nextCycleNumber = (lastCycle?.cycle_number || 0) + 1;
+        
+        // Close previous cycle if exists
+        if (lastCycle?.start_date) {
+          const prevStart = new Date(lastCycle.start_date);
+          const cycleLengthCalc = differenceInDays(today, prevStart);
+          await supabase
+            .from('cycle_history')
+            .update({ 
+              end_date: todayStr, 
+              cycle_length: cycleLengthCalc > 0 ? cycleLengthCalc : null 
+            })
+            .eq('user_id', user.id)
+            .eq('cycle_number', lastCycle.cycle_number);
+        }
+
+        // Insert new cycle
+        await supabase
+          .from('cycle_history')
+          .insert({
+            user_id: user.id,
+            cycle_number: nextCycleNumber,
+            start_date: todayStr,
+            period_length: periodLength,
+          });
+
+        queryClient.invalidateQueries({ queryKey: ['cycle-history'] });
+      }
+
+      toast.success('Period başlanğıcı qeyd edildi! 🩸', {
+        description: format(today, 'd MMMM yyyy', { locale: az }),
+      });
+    } catch (error) {
+      console.error('Error marking period:', error);
+      toast.error('Xəta baş verdi, yenidən cəhd edin');
+    } finally {
+      setMarkingPeriod(false);
+      setShowPeriodConfirm(false);
+    }
+  };
 
   // Fetch upcoming labels from app_settings
   const { data: upcomingLabels } = useQuery({
@@ -173,6 +259,18 @@ const FlowDashboard = () => {
               <p className="text-white/70 text-[10px]">gün period</p>
             </div>
           </div>
+
+          {/* Period Started Button */}
+          <motion.div className="mt-4" whileTap={{ scale: 0.97 }}>
+            <Button
+              onClick={() => setShowPeriodConfirm(true)}
+              className="w-full bg-white/20 hover:bg-white/30 backdrop-blur text-white border-0 rounded-xl h-12 text-sm font-bold gap-2"
+              variant="outline"
+            >
+              <CircleDot className="w-5 h-5" />
+              Periodum bu gün başladı
+            </Button>
+          </motion.div>
         </div>
       </motion.div>
 
@@ -491,6 +589,29 @@ const FlowDashboard = () => {
           <p className="text-xs text-muted-foreground">Məşq İntensivliyi</p>
         </div>
       </motion.div>
+
+      {/* Period Start Confirmation Dialog */}
+      <AlertDialog open={showPeriodConfirm} onOpenChange={setShowPeriodConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>🩸 Periodum başladı</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bu gün ({format(new Date(), 'd MMMM yyyy', { locale: az })}) period başlanğıcı olaraq qeyd edilsin? 
+              Bu, tsikl hesablamalarınızı yeniləyəcək.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={markingPeriod}>Ləğv et</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleMarkPeriodStarted}
+              disabled={markingPeriod}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              {markingPeriod ? 'Qeyd edilir...' : 'Bəli, qeyd et'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
