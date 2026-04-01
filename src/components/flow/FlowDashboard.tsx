@@ -1,13 +1,13 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Calendar, Droplets, Heart, Moon, Sun, Sparkles, 
-  ChevronRight, ChevronLeft, TrendingUp, Zap, 
+  Calendar, Droplets, Heart, Moon, Sparkles, 
+  TrendingUp,
   Apple, Dumbbell, Brain, Flame, CircleDot
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { usePhaseTips, PHASE_INFO, CATEGORY_INFO, MenstrualPhase, TipCategory } from '@/hooks/usePhaseTips';
-import { format, addDays, subDays, differenceInDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns';
+import { format, addDays, differenceInDays } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -28,6 +28,7 @@ import FlowDailyLogger from './FlowDailyLogger';
 import FlowMoodChart from './FlowMoodChart';
 import FlowCycleStats from './FlowCycleStats';
 import FlowRemindersCard from './FlowRemindersCard';
+import FlowPeriodCalendar from './FlowPeriodCalendar';
 import { getPhaseInfoForDate, getNextPeriodDate, getFertileWindow } from '@/lib/cycle-utils';
 const FlowDashboard = () => {
   const { getCycleData, cycleLength, periodLength, setLastPeriodDate } = useUserStore();
@@ -36,7 +37,6 @@ const FlowDashboard = () => {
   const queryClient = useQueryClient();
   
   const [selectedCategory, setSelectedCategory] = useState<TipCategory | 'all'>('all');
-  const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [showPeriodConfirm, setShowPeriodConfirm] = useState(false);
   const [showPeriodEndConfirm, setShowPeriodEndConfirm] = useState(false);
   const [markingPeriod, setMarkingPeriod] = useState(false);
@@ -229,22 +229,6 @@ const FlowDashboard = () => {
     return Math.min(100, (daysInPhase / phaseDays[currentPhase]) * 100);
   };
 
-  // Calendar days
-  const calendarDays = useMemo(() => {
-    const start = startOfMonth(calendarMonth);
-    const end = endOfMonth(calendarMonth);
-    return eachDayOfInterval({ start, end });
-  }, [calendarMonth]);
-
-  // Get day type for calendar using accurate calculation
-  const getDayType = (date: Date) => {
-    const phaseInfo = getPhaseInfoForDate(date, lastPeriodDate, cycleLength, periodLength);
-    
-    if (phaseInfo.isPeriodDay) return 'period';
-    if (phaseInfo.isOvulationDay) return 'ovulation';
-    if (phaseInfo.isFertileDay) return 'fertile';
-    return 'normal';
-  };
 
   const categories: (TipCategory | 'all')[] = ['all', 'nutrition', 'exercise', 'selfcare', 'mood'];
 
@@ -339,95 +323,8 @@ const FlowDashboard = () => {
         </div>
       </motion.div>
 
-      {/* Mini Calendar */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        className="bg-card rounded-2xl p-4 border border-border"
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-foreground flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-primary" />
-            Təqvim
-          </h3>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setCalendarMonth(subDays(calendarMonth, 30))}
-              className="p-1 hover:bg-muted rounded-lg"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <span className="text-sm font-medium min-w-[100px] text-center">
-              {format(calendarMonth, 'MMMM yyyy', { locale: az })}
-            </span>
-            <button
-              onClick={() => setCalendarMonth(addDays(calendarMonth, 30))}
-              className="p-1 hover:bg-muted rounded-lg"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Day Labels */}
-        <div className="grid grid-cols-7 gap-1 mb-2">
-          {['B', 'BE', 'Ç', 'ÇA', 'C', 'C', 'Ş'].map((day, i) => (
-            <div key={i} className="text-center text-xs text-muted-foreground font-medium py-1">
-              {day}
-            </div>
-          ))}
-        </div>
-
-        {/* Calendar Grid */}
-        <div className="grid grid-cols-7 gap-1">
-          {/* Empty cells for start of month */}
-          {Array.from({ length: calendarDays[0]?.getDay() || 0 }).map((_, i) => (
-            <div key={`empty-${i}`} className="aspect-square" />
-          ))}
-          
-          {calendarDays.map((day) => {
-            const dayType = getDayType(day);
-            const isToday = isSameDay(day, new Date());
-            
-            return (
-              <motion.div
-                key={day.toISOString()}
-                className={`aspect-square rounded-lg flex items-center justify-center text-xs font-medium relative ${
-                  isToday ? 'ring-2 ring-primary ring-offset-1' : ''
-                } ${
-                  dayType === 'period' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
-                  dayType === 'fertile' ? 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400' :
-                  dayType === 'ovulation' ? 'bg-pink-200 text-pink-800 dark:bg-pink-800/40 dark:text-pink-300' :
-                  'text-foreground hover:bg-muted'
-                }`}
-                whileHover={{ scale: 1.1 }}
-              >
-                {format(day, 'd')}
-                {dayType === 'ovulation' && (
-                  <span className="absolute -top-0.5 -right-0.5 text-[8px]">🌸</span>
-                )}
-              </motion.div>
-            );
-          })}
-        </div>
-
-        {/* Legend */}
-        <div className="flex items-center justify-center gap-4 mt-4 pt-3 border-t border-border">
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-red-400" />
-            <span className="text-xs text-muted-foreground">Period</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-pink-400" />
-            <span className="text-xs text-muted-foreground">Məhsuldar</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-sm">🌸</span>
-            <span className="text-xs text-muted-foreground">Ovulyasiya</span>
-          </div>
-        </div>
-      </motion.div>
+      {/* Interactive Period Calendar (Apple Health style) */}
+      <FlowPeriodCalendar />
 
       {/* Phase Tips Section */}
       <motion.div

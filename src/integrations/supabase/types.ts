@@ -4977,6 +4977,33 @@ export type Database = {
         }
         Relationships: []
       }
+      period_day_logs: {
+        Row: {
+          created_at: string
+          flow_intensity: string | null
+          id: string
+          log_date: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          flow_intensity?: string | null
+          id?: string
+          log_date: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          flow_intensity?: string | null
+          id?: string
+          log_date?: string
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       photoshoot_backgrounds: {
         Row: {
           category_id: string
