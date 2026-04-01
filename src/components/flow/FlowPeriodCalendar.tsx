@@ -15,8 +15,8 @@ const FLOW_OPTIONS = [
 ];
 
 const FlowPeriodCalendar = () => {
-  const { cycleLength, periodLength } = useUserStore();
-  const cycleData = useUserStore(s => s.getCycleData());
+  const { cycleLength, periodLength, getCycleData } = useUserStore();
+  const cycleData = getCycleData();
   const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showFlowPicker, setShowFlowPicker] = useState(false);
