@@ -484,13 +484,13 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
           >
             {/* Image Upload */}
             <div className="bg-card rounded-2xl p-4 shadow-elevated">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Upload className="w-5 h-5 text-primary" />
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Upload className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                  <h2 className="font-bold text-foreground">Körpənin Şəklini Yükləyin</h2>
-                  <p className="text-xs text-muted-foreground">Üzü aydın görünən foto seçin</p>
+                  <h2 className="font-semibold text-sm text-foreground">Körpənin Şəklini Yükləyin</h2>
+                  <p className="text-[10px] text-muted-foreground">Üzü aydın görünən foto seçin</p>
                 </div>
               </div>
 
