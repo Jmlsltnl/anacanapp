@@ -229,22 +229,6 @@ const FlowDashboard = () => {
     return Math.min(100, (daysInPhase / phaseDays[currentPhase]) * 100);
   };
 
-  // Calendar days
-  const calendarDays = useMemo(() => {
-    const start = startOfMonth(calendarMonth);
-    const end = endOfMonth(calendarMonth);
-    return eachDayOfInterval({ start, end });
-  }, [calendarMonth]);
-
-  // Get day type for calendar using accurate calculation
-  const getDayType = (date: Date) => {
-    const phaseInfo = getPhaseInfoForDate(date, lastPeriodDate, cycleLength, periodLength);
-    
-    if (phaseInfo.isPeriodDay) return 'period';
-    if (phaseInfo.isOvulationDay) return 'ovulation';
-    if (phaseInfo.isFertileDay) return 'fertile';
-    return 'normal';
-  };
 
   const categories: (TipCategory | 'all')[] = ['all', 'nutrition', 'exercise', 'selfcare', 'mood'];
 
