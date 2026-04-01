@@ -38,6 +38,7 @@ const FlowDashboard = () => {
   const [selectedCategory, setSelectedCategory] = useState<TipCategory | 'all'>('all');
   const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [showPeriodConfirm, setShowPeriodConfirm] = useState(false);
+  const [showPeriodEndConfirm, setShowPeriodEndConfirm] = useState(false);
   const [markingPeriod, setMarkingPeriod] = useState(false);
 
   const handleMarkPeriodStarted = async () => {
