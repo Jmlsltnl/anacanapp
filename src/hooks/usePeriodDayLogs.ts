@@ -83,11 +83,10 @@ export const useTogglePeriodDay = () => {
         return { action: 'added' as const, date: dateStr };
       }
     },
-    onSuccess: async (result) => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['period-day-logs'] });
-
-      // After toggling, recalculate cycle data from logged period days
-      await syncPeriodLogsToProfile(user!.id, queryClient);
+      // Sync in background without awaiting to avoid re-render loops
+      syncPeriodLogsToProfile(user!.id, queryClient).catch(console.error);
     },
   });
 };
