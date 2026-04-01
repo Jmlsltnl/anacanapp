@@ -480,17 +480,17 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="space-y-5"
+            className="space-y-3"
           >
             {/* Image Upload */}
-            <div className="bg-card rounded-3xl p-5 shadow-elevated">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Upload className="w-5 h-5 text-primary" />
+            <div className="bg-card rounded-2xl p-4 shadow-elevated">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Upload className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                  <h2 className="font-bold text-foreground">Körpənin Şəklini Yükləyin</h2>
-                  <p className="text-xs text-muted-foreground">Üzü aydın görünən foto seçin</p>
+                  <h2 className="font-semibold text-sm text-foreground">Körpənin Şəklini Yükləyin</h2>
+                  <p className="text-[10px] text-muted-foreground">Üzü aydın görünən foto seçin</p>
                 </div>
               </div>
 
@@ -507,7 +507,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                   <img
                     src={sourceImagePreview}
                     alt="Yüklənmiş şəkil"
-                    className="w-full h-56 object-cover rounded-2xl"
+                    className="w-full h-44 object-cover rounded-2xl"
                   />
                   <motion.button
                     onClick={handleRemoveImage}
@@ -520,11 +520,11 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
               ) : (
                 <motion.button
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full h-56 border-2 border-dashed border-primary/30 rounded-2xl flex flex-col items-center justify-center gap-4 hover:border-primary/50 hover:bg-primary/5 transition-all"
+                  className="w-full h-44 border-2 border-dashed border-primary/30 rounded-2xl flex flex-col items-center justify-center gap-3 hover:border-primary/50 hover:bg-primary/5 transition-all"
                   whileTap={{ scale: 0.98 }}
                 >
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-                    <Camera className="w-8 h-8 text-primary" />
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                      <Camera className="w-6 h-6 text-primary" />
                   </div>
                   <div className="text-center">
                     <p className="font-bold text-foreground">Şəkil seçin</p>
@@ -535,8 +535,8 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             </div>
 
             {/* Gender Selection */}
-            <div className="bg-card rounded-3xl p-5 shadow-elevated">
-              <h2 className="font-bold text-foreground mb-4">Cinsiyyət Seçin</h2>
+            <div className="bg-card rounded-2xl p-4 shadow-elevated">
+              <h2 className="font-semibold text-sm text-foreground mb-3">Cinsiyyət Seçin</h2>
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { id: 'boy', name: 'Oğlan', emoji: '👦', color: 'from-blue-400 to-blue-600' },
@@ -545,15 +545,15 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                   <motion.button
                     key={option.id}
                     onClick={() => setCustomization(prev => ({ ...prev, gender: option.id as any, background: '', outfit: 'keep' }))}
-                    className={`p-5 rounded-2xl flex flex-col items-center gap-2 transition-all ${
+                    className={`p-3 rounded-xl flex flex-col items-center gap-1.5 transition-all ${
                       customization.gender === option.id
                         ? `bg-gradient-to-br ${option.color} text-white shadow-lg scale-105`
                         : 'bg-muted hover:bg-muted/80'
                     }`}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <span className="text-4xl">{option.emoji}</span>
-                    <span className="font-bold">{option.name}</span>
+                    <span className="text-3xl">{option.emoji}</span>
+                    <span className="font-semibold text-sm">{option.name}</span>
                   </motion.button>
                 ))}
               </div>
@@ -561,7 +561,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
             {/* Free tier info */}
             {!isPremium && (
-              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-4 flex items-start gap-3">
+              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 flex items-start gap-2">
                 <Crown className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
@@ -582,17 +582,17 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="space-y-5"
+            className="space-y-3"
           >
             {/* Image Style Selection */}
-            <div className="bg-card rounded-3xl p-5 shadow-elevated">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-purple-500" />
+            <div className="bg-card rounded-2xl p-4 shadow-elevated">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-purple-500" />
                 </div>
                 <div>
-                  <h2 className="font-bold text-foreground">Şəkil Növü</h2>
-                  <p className="text-xs text-muted-foreground">Foto stilini seçin</p>
+                  <h2 className="font-semibold text-sm text-foreground">Şəkil Növü</h2>
+                  <p className="text-[10px] text-muted-foreground">Foto stilini seçin</p>
                 </div>
               </div>
               <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
@@ -616,7 +616,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
             {/* Background Selection by Category */}
             {Object.entries(groupedBackgrounds).map(([category, backgrounds]) => (
-              <div key={category} className="bg-card rounded-3xl p-5 shadow-elevated">
+              <div key={category} className="bg-card rounded-2xl p-4 shadow-elevated">
                 <h3 className="font-bold text-foreground mb-3 flex items-center gap-2">
                   {category === 'Realist' && '📷'}
                   {category === 'Estetik' && '✨'}
@@ -839,21 +839,21 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="gradient-primary px-4 pt-4 pb-6 rounded-b-[1.5rem] flex-shrink-0">
-        <div className="flex items-center gap-4 mb-4">
+      <div className="gradient-primary px-3 pt-2 pb-4 rounded-b-[1.5rem] flex-shrink-0 safe-top">
+        <div className="flex items-center gap-3 mb-3">
           <motion.button
             onClick={onBack}
-            className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
             whileTap={{ scale: 0.95 }}
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">Körpə Fotosessiyası</h1>
-            <p className="text-white/80 text-sm">AI ilə sehrli fotolar</p>
+            <h1 className="text-lg font-bold text-white">Körpə Fotosessiyası</h1>
+            <p className="text-white/70 text-xs">AI ilə sehrli fotolar</p>
           </div>
           {isPremium && (
-            <div className="bg-amber-400 text-amber-900 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+            <div className="bg-amber-400 text-amber-900 px-2.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1">
               <Crown className="w-3 h-3" />
               Premium
             </div>
@@ -861,16 +861,16 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
         </div>
 
         {/* Step Indicator */}
-        <div className="flex items-center justify-center gap-4 mt-4">
+        <div className="flex items-center justify-center gap-4">
           {stepTitles.map((title, index) => (
             <motion.button
               key={index}
               onClick={() => setStep(index)}
-              className={`flex flex-col items-center gap-1 ${
+              className={`flex flex-col items-center gap-0.5 ${
                 step === index ? 'opacity-100' : 'opacity-50'
               }`}
             >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs ${
                 step === index
                   ? 'bg-white text-primary'
                   : step > index
@@ -879,7 +879,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
               }`}>
                 {index + 1}
               </div>
-              <span className="text-[10px] text-white font-medium">{title}</span>
+              <span className="text-[9px] text-white font-medium">{title}</span>
             </motion.button>
           ))}
         </div>
