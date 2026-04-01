@@ -249,6 +249,10 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         onBack();
       } else {
         setActiveTool(null);
+        // Restore scroll position after React re-renders
+        requestAnimationFrame(() => {
+          window.scrollTo(0, scrollPositionRef.current);
+        });
       }
     } else if (onBack) {
       onBack();
