@@ -462,15 +462,45 @@ const AdminTools = () => {
                           </div>
 
                           {/* Action buttons */}
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            {/* Hero toggle */}
+                            <Button
+                              variant={tool.is_hero ? 'default' : 'ghost'}
+                              size="icon"
+                              className={`h-7 w-7 ${tool.is_hero ? 'bg-violet-500 hover:bg-violet-600' : ''}`}
+                              onClick={() => {
+                                const newTools = localTools.map(t => t.id === tool.id ? { ...t, is_hero: !t.is_hero } : t);
+                                setLocalTools(newTools);
+                                setHasChanges(true);
+                              }}
+                              title="Hero banner"
+                            >
+                              <Star className="w-3.5 h-3.5" />
+                            </Button>
+
+                            {/* Quick Access toggle */}
+                            <Button
+                              variant={tool.is_quick_access ? 'default' : 'ghost'}
+                              size="icon"
+                              className={`h-7 w-7 ${tool.is_quick_access ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
+                              onClick={() => {
+                                const newTools = localTools.map(t => t.id === tool.id ? { ...t, is_quick_access: !t.is_quick_access } : t);
+                                setLocalTools(newTools);
+                                setHasChanges(true);
+                              }}
+                              title="Sürətli giriş"
+                            >
+                              <Zap className="w-3.5 h-3.5" />
+                            </Button>
+
                             {/* Edit button */}
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8"
+                              className="h-7 w-7"
                               onClick={() => setEditingTool(tool)}
                             >
-                              <Edit2 className="w-4 h-4" />
+                              <Edit2 className="w-3.5 h-3.5" />
                             </Button>
 
                             {/* Premium button */}
