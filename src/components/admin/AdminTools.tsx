@@ -245,15 +245,21 @@ const AdminTools = () => {
   };
 
   // Update tool display info
-  const updateToolDisplayInfo = (displayName: string, description: string) => {
+  const updateToolDisplayInfo = (data: { displayName: string; description: string; heroGradient: string; heroSubtitle: string; heroBadge: string; heroOrder: number; quickAccessGradient: string; quickAccessOrder: number }) => {
     if (!editingTool) return;
     
     const newTools = localTools.map(t => {
       if (t.id === editingTool.id) {
         return { 
           ...t, 
-          display_name_az: displayName,
-          description_az: description,
+          display_name_az: data.displayName,
+          description_az: data.description,
+          hero_gradient: data.heroGradient,
+          hero_subtitle: data.heroSubtitle,
+          hero_badge: data.heroBadge,
+          hero_order: data.heroOrder,
+          quick_access_gradient: data.quickAccessGradient,
+          quick_access_order: data.quickAccessOrder,
         };
       }
       return t;
@@ -639,20 +645,50 @@ const AdminTools = () => {
 };
 
 // Edit Tool Form Component
+interface EditToolFormData {
+  displayName: string;
+  description: string;
+  heroGradient: string;
+  heroSubtitle: string;
+  heroBadge: string;
+  heroOrder: number;
+  quickAccessGradient: string;
+  quickAccessOrder: number;
+}
+
 const EditToolForm = ({ 
   tool, 
   onSave, 
   onCancel 
 }: { 
   tool: ToolConfig; 
-  onSave: (name: string, desc: string) => void; 
+  onSave: (data: EditToolFormData) => void; 
   onCancel: () => void;
 }) => {
   const [displayName, setDisplayName] = useState(tool.display_name_az || tool.name_az || tool.name);
   const [description, setDescription] = useState(tool.description_az || '');
+  const [heroGradient, setHeroGradient] = useState(tool.hero_gradient || 'from-primary to-primary/80');
+  const [heroSubtitle, setHeroSubtitle] = useState(tool.hero_subtitle || '');
+  const [heroBadge, setHeroBadge] = useState(tool.hero_badge || '');
+  const [heroOrder, setHeroOrder] = useState(tool.hero_order || 0);
+  const [quickAccessGradient, setQuickAccessGradient] = useState(tool.quick_access_gradient || 'from-primary to-primary/80');
+  const [quickAccessOrder, setQuickAccessOrder] = useState(tool.quick_access_order || 0);
+
+  const gradientPresets = [
+    { label: 'Primary', value: 'from-primary to-primary/80' },
+    { label: 'Yaşıl', value: 'from-emerald-500 to-teal-600' },
+    { label: 'Mavi', value: 'from-blue-500 to-indigo-600' },
+    { label: 'Bənövşəyi', value: 'from-purple-500 to-violet-600' },
+    { label: 'Çəhrayı', value: 'from-pink-500 to-rose-600' },
+    { label: 'Narıncı', value: 'from-orange-500 to-amber-600' },
+    { label: 'Qırmızı', value: 'from-red-500 to-rose-600' },
+    { label: 'Teal', value: 'from-teal-500 to-cyan-600' },
+    { label: 'Göy-yaşıl', value: 'from-cyan-500 to-blue-600' },
+  ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+      {/* Basic Info */}
       <div>
         <Label>Görünən Ad (AZ)</Label>
         <Input
@@ -667,15 +703,116 @@ const EditToolForm = ({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Alət haqqında qısa açıqlama"
-          rows={3}
+          rows={2}
         />
       </div>
+
+      {/* Hero Settings */}
+      {tool.is_hero && (
+        <div className="border rounded-lg p-3 space-y-3 bg-violet-50/50 dark:bg-violet-900/10">
+          <p className="text-sm font-semibold text-violet-700 dark:text-violet-300 flex items-center gap-1.5">
+            <Star className="w-4 h-4" /> Hero Banner Ayarları
+          </p>
+          
+          <div>
+            <Label className="text-xs">Hero Sırası</Label>
+            <Input
+              type="number"
+              min={0}
+              value={heroOrder}
+              onChange={(e) => setHeroOrder(parseInt(e.target.value) || 0)}
+              className="h-8"
+            />
+          </div>
+
+          <div>
+            <Label className="text-xs">Hero Alt Yazı</Label>
+            <Input
+              value={heroSubtitle}
+              onChange={(e) => setHeroSubtitle(e.target.value)}
+              placeholder="Banner alt yazısı"
+              className="h-8"
+            />
+          </div>
+
+          <div>
+            <Label className="text-xs">Hero Badge (etiket)</Label>
+            <Input
+              value={heroBadge}
+              onChange={(e) => setHeroBadge(e.target.value)}
+              placeholder="Məs: YENİ, ✨ Populyar"
+              className="h-8"
+            />
+          </div>
+
+          <div>
+            <Label className="text-xs">Gradient Rəngi</Label>
+            <Select value={heroGradient} onValueChange={setHeroGradient}>
+              <SelectTrigger className="h-8">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {gradientPresets.map(g => (
+                  <SelectItem key={g.value} value={g.value}>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-4 h-4 rounded bg-gradient-to-r ${g.value}`} />
+                      {g.label}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className={`mt-1.5 h-6 rounded-lg bg-gradient-to-r ${heroGradient}`} />
+          </div>
+        </div>
+      )}
+
+      {/* Quick Access Settings */}
+      {tool.is_quick_access && (
+        <div className="border rounded-lg p-3 space-y-3 bg-blue-50/50 dark:bg-blue-900/10">
+          <p className="text-sm font-semibold text-blue-700 dark:text-blue-300 flex items-center gap-1.5">
+            <Zap className="w-4 h-4" /> Sürətli Giriş Ayarları
+          </p>
+          
+          <div>
+            <Label className="text-xs">Sürətli Giriş Sırası</Label>
+            <Input
+              type="number"
+              min={0}
+              value={quickAccessOrder}
+              onChange={(e) => setQuickAccessOrder(parseInt(e.target.value) || 0)}
+              className="h-8"
+            />
+          </div>
+
+          <div>
+            <Label className="text-xs">Gradient Rəngi</Label>
+            <Select value={quickAccessGradient} onValueChange={setQuickAccessGradient}>
+              <SelectTrigger className="h-8">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {gradientPresets.map(g => (
+                  <SelectItem key={g.value} value={g.value}>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-4 h-4 rounded bg-gradient-to-r ${g.value}`} />
+                      {g.label}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className={`mt-1.5 h-6 rounded-lg bg-gradient-to-r ${quickAccessGradient}`} />
+          </div>
+        </div>
+      )}
+
       <DialogFooter>
         <Button variant="outline" onClick={onCancel}>
           <X className="w-4 h-4 mr-1" />
           Ləğv et
         </Button>
-        <Button onClick={() => onSave(displayName, description)}>
+        <Button onClick={() => onSave({ displayName, description, heroGradient, heroSubtitle, heroBadge, heroOrder, quickAccessGradient, quickAccessOrder })}>
           <Check className="w-4 h-4 mr-1" />
           Yadda saxla
         </Button>
