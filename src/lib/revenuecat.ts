@@ -29,7 +29,7 @@ export const getPlatform = (): 'ios' | 'android' | 'web' => {
  * Initialize RevenueCat SDK. Call once at app startup on native platforms.
  */
 export async function initRevenueCat(appUserID?: string): Promise<void> {
-  if (!isNativePlatform()) return;
+  if (!REVENUECAT_ENABLED || !isNativePlatform()) return;
 
   try {
     const { Purchases, LOG_LEVEL } = await import('@revenuecat/purchases-capacitor');
