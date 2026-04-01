@@ -122,12 +122,12 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
                 transition={{ duration: 0.5, repeat: Infinity }}
               />
             )}
-            <Footprints className="w-16 h-16 text-white mb-2" />
-            <span className="text-6xl font-black text-white">{kicks}</span>
+             <Footprints className="w-12 h-12 text-white mb-1" />
+            <span className="text-5xl font-black text-white">{kicks}</span>
           </motion.button>
 
           {/* Message */}
-          <p className="text-center text-muted-foreground font-medium mb-6">
+          <p className="text-center text-muted-foreground text-sm font-medium mb-4">
             {getKickMessage()}
           </p>
 
