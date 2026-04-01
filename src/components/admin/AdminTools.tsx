@@ -284,6 +284,14 @@ const AdminTools = () => {
             premium_limit: tool.premium_limit,
             display_name_az: tool.display_name_az,
             description_az: tool.description_az,
+            is_hero: tool.is_hero,
+            hero_order: tool.hero_order,
+            is_quick_access: tool.is_quick_access,
+            quick_access_order: tool.quick_access_order,
+            quick_access_gradient: tool.quick_access_gradient,
+            hero_gradient: tool.hero_gradient,
+            hero_subtitle: tool.hero_subtitle,
+            hero_badge: tool.hero_badge,
           })
           .eq('id', tool.id);
         
