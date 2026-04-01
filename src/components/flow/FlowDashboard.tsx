@@ -110,6 +110,57 @@ const FlowDashboard = () => {
     }
   };
 
+  const handleMarkPeriodEnded = async () => {
+    setMarkingPeriod(true);
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (user?.id && cycleData?.lastPeriodDate) {
+        const lastPeriod = new Date(cycleData.lastPeriodDate);
+        const actualPeriodLength = differenceInDays(today, lastPeriod) + 1;
+
+        // Update profile period_length
+        await supabase
+          .from('profiles')
+          .update({ period_length: actualPeriodLength })
+          .eq('user_id', user.id);
+
+        // Update current cycle's period_length in cycle_history
+        const { data: currentCycle } = await supabase
+          .from('cycle_history')
+          .select('cycle_number')
+          .eq('user_id', user.id)
+          .order('cycle_number', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (currentCycle) {
+          await supabase
+            .from('cycle_history')
+            .update({ period_length: actualPeriodLength })
+            .eq('user_id', user.id)
+            .eq('cycle_number', currentCycle.cycle_number);
+        }
+
+        // Update local store
+        useUserStore.getState().setPeriodLength(actualPeriodLength);
+
+        queryClient.invalidateQueries({ queryKey: ['cycle-history'] });
+
+        toast.success('Period bitişi qeyd edildi! ✅', {
+          description: `Period ${actualPeriodLength} gün davam etdi`,
+        });
+      }
+    } catch (error) {
+      console.error('Error marking period end:', error);
+      toast.error('Xəta baş verdi, yenidən cəhd edin');
+    } finally {
+      setMarkingPeriod(false);
+      setShowPeriodEndConfirm(false);
+    }
+  };
+
   // Fetch upcoming labels from app_settings
   const { data: upcomingLabels } = useQuery({
     queryKey: ['flow-upcoming-labels'],
