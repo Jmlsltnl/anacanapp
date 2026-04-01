@@ -38,6 +38,7 @@ const FlowDashboard = () => {
   const [selectedCategory, setSelectedCategory] = useState<TipCategory | 'all'>('all');
   const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [showPeriodConfirm, setShowPeriodConfirm] = useState(false);
+  const [showPeriodEndConfirm, setShowPeriodEndConfirm] = useState(false);
   const [markingPeriod, setMarkingPeriod] = useState(false);
 
   const handleMarkPeriodStarted = async () => {
@@ -106,6 +107,57 @@ const FlowDashboard = () => {
     } finally {
       setMarkingPeriod(false);
       setShowPeriodConfirm(false);
+    }
+  };
+
+  const handleMarkPeriodEnded = async () => {
+    setMarkingPeriod(true);
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (user?.id && cycleData?.lastPeriodDate) {
+        const lastPeriod = new Date(cycleData.lastPeriodDate);
+        const actualPeriodLength = differenceInDays(today, lastPeriod) + 1;
+
+        // Update profile period_length
+        await supabase
+          .from('profiles')
+          .update({ period_length: actualPeriodLength })
+          .eq('user_id', user.id);
+
+        // Update current cycle's period_length in cycle_history
+        const { data: currentCycle } = await supabase
+          .from('cycle_history')
+          .select('cycle_number')
+          .eq('user_id', user.id)
+          .order('cycle_number', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (currentCycle) {
+          await supabase
+            .from('cycle_history')
+            .update({ period_length: actualPeriodLength })
+            .eq('user_id', user.id)
+            .eq('cycle_number', currentCycle.cycle_number);
+        }
+
+        // Update local store
+        useUserStore.getState().setPeriodLength(actualPeriodLength);
+
+        queryClient.invalidateQueries({ queryKey: ['cycle-history'] });
+
+        toast.success('Period bitişi qeyd edildi! ✅', {
+          description: `Period ${actualPeriodLength} gün davam etdi`,
+        });
+      }
+    } catch (error) {
+      console.error('Error marking period end:', error);
+      toast.error('Xəta baş verdi, yenidən cəhd edin');
+    } finally {
+      setMarkingPeriod(false);
+      setShowPeriodEndConfirm(false);
     }
   };
 
@@ -260,17 +312,30 @@ const FlowDashboard = () => {
             </div>
           </div>
 
-          {/* Period Started Button */}
-          <motion.div className="mt-4" whileTap={{ scale: 0.97 }}>
-            <Button
-              onClick={() => setShowPeriodConfirm(true)}
-              className="w-full bg-white/20 hover:bg-white/30 backdrop-blur text-white border-0 rounded-xl h-12 text-sm font-bold gap-2"
-              variant="outline"
-            >
-              <CircleDot className="w-5 h-5" />
-              Periodum bu gün başladı
-            </Button>
-          </motion.div>
+          {/* Period Action Buttons */}
+          <div className="mt-4 flex gap-2">
+            <motion.div className="flex-1" whileTap={{ scale: 0.97 }}>
+              <Button
+                onClick={() => setShowPeriodConfirm(true)}
+                className="w-full bg-white/20 hover:bg-white/30 backdrop-blur text-white border-0 rounded-xl h-12 text-sm font-bold gap-2"
+                variant="outline"
+              >
+                <CircleDot className="w-5 h-5" />
+                Periodum başladı
+              </Button>
+            </motion.div>
+            {currentPhase === 'menstrual' && (
+              <motion.div className="flex-1" whileTap={{ scale: 0.97 }}>
+                <Button
+                  onClick={() => setShowPeriodEndConfirm(true)}
+                  className="w-full bg-white/30 hover:bg-white/40 backdrop-blur text-white border-0 rounded-xl h-12 text-sm font-bold gap-2"
+                  variant="outline"
+                >
+                  ✅ Periodum bitdi
+                </Button>
+              </motion.div>
+            )}
+          </div>
         </div>
       </motion.div>
 
@@ -608,6 +673,31 @@ const FlowDashboard = () => {
               className="bg-red-500 hover:bg-red-600"
             >
               {markingPeriod ? 'Qeyd edilir...' : 'Bəli, qeyd et'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Period End Confirmation Dialog */}
+      <AlertDialog open={showPeriodEndConfirm} onOpenChange={setShowPeriodEndConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>✅ Periodum bitdi</AlertDialogTitle>
+            <AlertDialogDescription>
+              Periodunuz bu gün ({format(new Date(), 'd MMMM yyyy', { locale: az })}) bitdi olaraq qeyd edilsin?
+              {cycleData?.lastPeriodDate && (
+                <> Period müddəti: <strong>{differenceInDays(new Date(), new Date(cycleData.lastPeriodDate)) + 1} gün</strong></>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={markingPeriod}>Ləğv et</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleMarkPeriodEnded}
+              disabled={markingPeriod}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {markingPeriod ? 'Qeyd edilir...' : 'Bəli, bitdi'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
