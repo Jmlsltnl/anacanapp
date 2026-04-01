@@ -427,10 +427,6 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
             </div>
           );
         })()}
-              ))}
-            </div>
-          ) : null;
-        })()}
 
         {/* Tools Count Header */}
         <div className="flex items-center justify-between mb-3">
