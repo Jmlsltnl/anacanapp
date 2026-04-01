@@ -312,17 +312,30 @@ const FlowDashboard = () => {
             </div>
           </div>
 
-          {/* Period Started Button */}
-          <motion.div className="mt-4" whileTap={{ scale: 0.97 }}>
-            <Button
-              onClick={() => setShowPeriodConfirm(true)}
-              className="w-full bg-white/20 hover:bg-white/30 backdrop-blur text-white border-0 rounded-xl h-12 text-sm font-bold gap-2"
-              variant="outline"
-            >
-              <CircleDot className="w-5 h-5" />
-              Periodum bu gün başladı
-            </Button>
-          </motion.div>
+          {/* Period Action Buttons */}
+          <div className="mt-4 flex gap-2">
+            <motion.div className="flex-1" whileTap={{ scale: 0.97 }}>
+              <Button
+                onClick={() => setShowPeriodConfirm(true)}
+                className="w-full bg-white/20 hover:bg-white/30 backdrop-blur text-white border-0 rounded-xl h-12 text-sm font-bold gap-2"
+                variant="outline"
+              >
+                <CircleDot className="w-5 h-5" />
+                Periodum başladı
+              </Button>
+            </motion.div>
+            {currentPhase === 'menstrual' && (
+              <motion.div className="flex-1" whileTap={{ scale: 0.97 }}>
+                <Button
+                  onClick={() => setShowPeriodEndConfirm(true)}
+                  className="w-full bg-white/30 hover:bg-white/40 backdrop-blur text-white border-0 rounded-xl h-12 text-sm font-bold gap-2"
+                  variant="outline"
+                >
+                  ✅ Periodum bitdi
+                </Button>
+              </motion.div>
+            )}
+          </div>
         </div>
       </motion.div>
 
