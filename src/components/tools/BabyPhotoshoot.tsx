@@ -545,7 +545,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                   <motion.button
                     key={option.id}
                     onClick={() => setCustomization(prev => ({ ...prev, gender: option.id as any, background: '', outfit: 'keep' }))}
-                    className={`p-5 rounded-2xl flex flex-col items-center gap-2 transition-all ${
+                    className={`p-3 rounded-xl flex flex-col items-center gap-1.5 transition-all ${
                       customization.gender === option.id
                         ? `bg-gradient-to-br ${option.color} text-white shadow-lg scale-105`
                         : 'bg-muted hover:bg-muted/80'
