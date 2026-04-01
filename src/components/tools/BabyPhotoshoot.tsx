@@ -535,8 +535,8 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             </div>
 
             {/* Gender Selection */}
-            <div className="bg-card rounded-3xl p-5 shadow-elevated">
-              <h2 className="font-bold text-foreground mb-4">Cinsiyyət Seçin</h2>
+            <div className="bg-card rounded-2xl p-4 shadow-elevated">
+              <h2 className="font-semibold text-sm text-foreground mb-3">Cinsiyyət Seçin</h2>
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { id: 'boy', name: 'Oğlan', emoji: '👦', color: 'from-blue-400 to-blue-600' },
