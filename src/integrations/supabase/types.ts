@@ -7161,10 +7161,16 @@ export type Database = {
           flow_active: boolean | null
           flow_locked: boolean | null
           flow_order: number | null
+          hero_badge: string | null
+          hero_gradient: string | null
+          hero_order: number | null
+          hero_subtitle: string | null
           icon: string
           id: string
           is_active: boolean | null
+          is_hero: boolean | null
           is_premium: boolean | null
+          is_quick_access: boolean | null
           life_stages: string[] | null
           min_week: number | null
           mommy_active: boolean | null
@@ -7178,6 +7184,8 @@ export type Database = {
           partner_name_az: string | null
           premium_limit: number | null
           premium_type: string | null
+          quick_access_gradient: string | null
+          quick_access_order: number | null
           requires_partner: boolean | null
           sort_order: number | null
           tool_id: string
@@ -7197,10 +7205,16 @@ export type Database = {
           flow_active?: boolean | null
           flow_locked?: boolean | null
           flow_order?: number | null
+          hero_badge?: string | null
+          hero_gradient?: string | null
+          hero_order?: number | null
+          hero_subtitle?: string | null
           icon?: string
           id?: string
           is_active?: boolean | null
+          is_hero?: boolean | null
           is_premium?: boolean | null
+          is_quick_access?: boolean | null
           life_stages?: string[] | null
           min_week?: number | null
           mommy_active?: boolean | null
@@ -7214,6 +7228,8 @@ export type Database = {
           partner_name_az?: string | null
           premium_limit?: number | null
           premium_type?: string | null
+          quick_access_gradient?: string | null
+          quick_access_order?: number | null
           requires_partner?: boolean | null
           sort_order?: number | null
           tool_id: string
@@ -7233,10 +7249,16 @@ export type Database = {
           flow_active?: boolean | null
           flow_locked?: boolean | null
           flow_order?: number | null
+          hero_badge?: string | null
+          hero_gradient?: string | null
+          hero_order?: number | null
+          hero_subtitle?: string | null
           icon?: string
           id?: string
           is_active?: boolean | null
+          is_hero?: boolean | null
           is_premium?: boolean | null
+          is_quick_access?: boolean | null
           life_stages?: string[] | null
           min_week?: number | null
           mommy_active?: boolean | null
@@ -7250,6 +7272,8 @@ export type Database = {
           partner_name_az?: string | null
           premium_limit?: number | null
           premium_type?: string | null
+          quick_access_gradient?: string | null
+          quick_access_order?: number | null
           requires_partner?: boolean | null
           sort_order?: number | null
           tool_id?: string
