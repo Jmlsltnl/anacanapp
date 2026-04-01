@@ -28,6 +28,7 @@ import FlowDailyLogger from './FlowDailyLogger';
 import FlowMoodChart from './FlowMoodChart';
 import FlowCycleStats from './FlowCycleStats';
 import FlowRemindersCard from './FlowRemindersCard';
+import FlowPeriodCalendar from './FlowPeriodCalendar';
 import { getPhaseInfoForDate, getNextPeriodDate, getFertileWindow } from '@/lib/cycle-utils';
 const FlowDashboard = () => {
   const { getCycleData, cycleLength, periodLength, setLastPeriodDate } = useUserStore();
