@@ -308,10 +308,10 @@
     color: hsl(var(--foreground));
   }
 
-  /* Safe area for mobile - Capacitor */
+  /* Safe area for mobile - Capacitor — compact: only the inset itself */
   .safe-top,
   .safe-area-top {
-    padding-top: env(safe-area-inset-top, 0px);
+    padding-top: env(safe-area-inset-top, 0px) !important;
   }
 
   .safe-bottom {
