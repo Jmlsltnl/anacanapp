@@ -127,7 +127,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: az });
   const mediaItems = (post.media_urls || []).map(url => ({ url, type: getMediaType(url) }));
   const authorBadge = post.author?.badge_type as 'admin' | 'premium' | 'moderator' | null;
-  const handleAvatarClick = () => { if (post.user_id && onUserClick && !isAnonymous) onUserClick(post.user_id); };
+  const handleAvatarClick = () => { if (post.user_id && onUserClick && (!isAnonymous || isAdmin)) onUserClick(post.user_id); };
   const topLevelComments = comments.filter(c => !c.parent_comment_id);
 
   return (
@@ -139,11 +139,16 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
       >
         {/* Author row */}
         <div className="px-4 pt-3.5 pb-2 flex items-center gap-3">
-          <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.9 }} disabled={isAnonymous}>
+          <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.9 }} disabled={isAnonymous && !isAdmin}>
             <div className="relative">
-              <Avatar className={`w-10 h-10 ${isAnonymous ? '' : 'cursor-pointer ring-2 ring-border/10 hover:ring-primary/30'} transition-all`}>
-                {isAnonymous ? (
+              <Avatar className={`w-10 h-10 ${(isAnonymous && !isAdmin) ? '' : 'cursor-pointer ring-2 ring-border/10 hover:ring-primary/30'} transition-all`}>
+                {isAnonymous && !isAdmin ? (
                   <AvatarFallback className="bg-muted/30 text-muted-foreground/50"><EyeOff className="w-4 h-4" /></AvatarFallback>
+                ) : isAnonymous && isAdmin ? (
+                  <>
+                    <AvatarImage src={post.author?.avatar_url || undefined} />
+                    <AvatarFallback className="bg-gradient-to-br from-primary/15 to-accent/10 text-primary font-black text-xs">{post.author?.name?.charAt(0) || 'İ'}</AvatarFallback>
+                  </>
                 ) : (
                   <>
                     <AvatarImage src={post.author?.avatar_url || undefined} />
@@ -157,13 +162,21 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
             <div className="flex items-center gap-1.5 flex-wrap">
               <motion.button
                 onClick={handleAvatarClick}
-                className={`font-bold text-[13px] leading-tight ${isAnonymous ? 'text-muted-foreground italic' : 'text-foreground hover:text-primary'} transition-colors`}
+                className={`font-bold text-[13px] leading-tight ${isAnonymous && !isAdmin ? 'text-muted-foreground italic' : 'text-foreground hover:text-primary'} transition-colors`}
                 whileTap={{ scale: 0.98 }}
-                disabled={isAnonymous}
+                disabled={isAnonymous && !isAdmin}
               >
-                {isAnonymous ? 'Anonim' : (post.author?.name || 'İstifadəçi')}
+                {isAnonymous ? (
+                  isAdmin ? (
+                    <span className="flex items-center gap-1">
+                      <span className="text-muted-foreground italic">Anonim</span>
+                      <span className="text-[11px] text-primary/70 font-medium">({post.author?.name || 'İstifadəçi'})</span>
+                    </span>
+                  ) : 'Anonim'
+                ) : (post.author?.name || 'İstifadəçi')}
               </motion.button>
               {!isAnonymous && <UserBadge type={authorBadge} />}
+              {isAnonymous && isAdmin && <UserBadge type={authorBadge} />}
               <span className="text-[10px] text-muted-foreground/35 font-medium">· {timeAgo}</span>
             </div>
             {isAnonymous && (
