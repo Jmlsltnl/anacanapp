@@ -308,10 +308,10 @@
     color: hsl(var(--foreground));
   }
 
-  /* Safe area for mobile - Capacitor — compact: only the inset itself */
+  /* Safe area for mobile - Capacitor — minimal: just enough for status bar */
   .safe-top,
   .safe-area-top {
-    padding-top: env(safe-area-inset-top, 0px) !important;
+    padding-top: max(0.25rem, env(safe-area-inset-top, 0px));
   }
 
   .safe-bottom {
