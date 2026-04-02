@@ -325,9 +325,9 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     <div className="min-h-screen bg-gradient-to-b from-muted/30 to-background pb-24">
       {/* Minimal Header */}
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl">
-        <div className="px-4 pt-1 pb-2 safe-area-top">
+        <div className="px-4 pb-2 safe-area-top">
           {/* Search Bar with integrated title */}
-          <div className="flex items-center gap-3 mb-3">
+          <div className="flex items-center gap-3 mb-2">
             <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${stageInfo.color} flex items-center justify-center shadow-md flex-shrink-0`}>
               <span className="text-lg">{stageInfo.emoji}</span>
             </div>
