@@ -91,7 +91,7 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
   return (
     <div className="min-h-screen bg-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
       {/* Header */}
-      <div className="gradient-primary px-3 pt-3 pb-4 safe-top relative z-20">
+      <div className="gradient-primary px-3 pb-3 safe-top relative z-20">
         <div className="flex items-center gap-2 mb-2 relative z-20">
           <motion.button
             onClick={onBack}

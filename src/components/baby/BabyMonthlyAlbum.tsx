@@ -107,7 +107,7 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
   return (
     <div className="min-h-screen bg-background pb-24">
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 py-3 safe-area-top">
+        <div className="px-4 pb-2 safe-area-top">
           <div className="flex items-center gap-3">
             <motion.button onClick={onBack} className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center" whileTap={{ scale: 0.95 }}>
               <ArrowLeft className="w-5 h-5" />
