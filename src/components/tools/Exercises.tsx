@@ -73,7 +73,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
     <div className="min-h-screen bg-background pb-24">
       {/* Compact Header */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 py-3 safe-area-top">
+        <div className="px-4 pb-2 safe-area-top">
           <div className="flex items-center gap-3">
             <motion.button
               onClick={selectedExercise ? () => { setSelectedExerciseId(null); setCurrentStep(0); } : onBack}

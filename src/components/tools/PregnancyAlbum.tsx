@@ -487,7 +487,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-black flex flex-col"
           >
-            <div className="flex items-center justify-between p-4 safe-area-top">
+            <div className="flex items-center justify-between px-4 pb-3 safe-area-top">
               <Button 
                 variant="ghost" 
                 size="icon" 

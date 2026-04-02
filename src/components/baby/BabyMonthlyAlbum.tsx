@@ -107,7 +107,7 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
   return (
     <div className="min-h-screen bg-background pb-24">
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 py-3 safe-area-top">
+        <div className="px-4 pb-2 safe-area-top">
           <div className="flex items-center gap-3">
             <motion.button onClick={onBack} className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center" whileTap={{ scale: 0.95 }}>
               <ArrowLeft className="w-5 h-5" />
@@ -171,7 +171,7 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-black flex flex-col"
           >
-            <div className="flex items-center justify-between p-4 safe-area-top">
+            <div className="flex items-center justify-between px-4 pb-3 safe-area-top">
               <Button variant="ghost" size="icon" onClick={() => setViewingPhoto(null)} className="text-white hover:bg-white/20">
                 <X className="w-6 h-6" />
               </Button>

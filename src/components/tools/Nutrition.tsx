@@ -333,8 +333,8 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
   return (
     <div ref={ref} className="min-h-screen bg-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
       {/* Minimalist Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50 safe-area-top">
-        <div className="px-4 py-3">
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
+        <div className="px-4 pb-2 safe-area-top">
           <div className="flex items-center gap-3">
             <motion.button
               onClick={onBack}

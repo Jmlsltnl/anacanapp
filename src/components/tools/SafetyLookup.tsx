@@ -105,8 +105,8 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
   return (
     <div ref={ref} className="min-h-screen bg-background pb-24 overflow-x-hidden">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50 safe-area-top">
-        <div className="px-4 py-2.5">
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
+        <div className="px-4 pb-2 safe-area-top">
           <div className="flex items-center gap-2.5">
             <button onClick={onBack} className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
               <ArrowLeft className="w-4 h-4 text-foreground" />
