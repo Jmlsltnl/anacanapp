@@ -308,10 +308,10 @@
     color: hsl(var(--foreground));
   }
 
-  /* Safe area for mobile - Capacitor — minimal: just enough for status bar */
+  /* Safe area for mobile - Capacitor — uses margin so it doesn't stack with padding */
   .safe-top,
   .safe-area-top {
-    padding-top: max(0.25rem, env(safe-area-inset-top, 0px));
+    padding-top: env(safe-area-inset-top, 0px);
   }
 
   .safe-bottom {
