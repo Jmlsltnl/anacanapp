@@ -127,7 +127,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: az });
   const mediaItems = (post.media_urls || []).map(url => ({ url, type: getMediaType(url) }));
   const authorBadge = post.author?.badge_type as 'admin' | 'premium' | 'moderator' | null;
-  const handleAvatarClick = () => { if (post.user_id && onUserClick && !isAnonymous) onUserClick(post.user_id); };
+  const handleAvatarClick = () => { if (post.user_id && onUserClick && (!isAnonymous || isAdmin)) onUserClick(post.user_id); };
   const topLevelComments = comments.filter(c => !c.parent_comment_id);
 
   return (
