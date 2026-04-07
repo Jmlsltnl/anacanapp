@@ -407,7 +407,10 @@ const AdminPhotoshoot = () => {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-6 w-full">
+        <TabsList className="grid grid-cols-7 w-full">
+          <TabsTrigger value="gallery" className="gap-1 text-xs">
+            <Camera className="w-3.5 h-3.5" /> Qalereya
+          </TabsTrigger>
           <TabsTrigger value="image-styles" className="gap-1 text-xs">
             <Sparkles className="w-3.5 h-3.5" /> Şəkil Növü
           </TabsTrigger>
