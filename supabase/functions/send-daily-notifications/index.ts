@@ -49,17 +49,39 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Check current time - only send between 9:00 and 00:00 Baku time (UTC+4)
+    // Calculate current Baku time (UTC+4)
     const now = new Date();
-    const currentHour = now.getUTCHours() + 4;
-    const adjustedHour = currentHour >= 24 ? currentHour - 24 : currentHour;
+    const bakuOffsetMs = 4 * 60 * 60 * 1000;
+    const bakuNow = new Date(now.getTime() + bakuOffsetMs);
+    const currentHour = bakuNow.getUTCHours();
+    const currentMinute = bakuNow.getUTCMinutes();
+    const currentTimeStr = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`;
 
     let body: { manual?: boolean } = {};
     try { body = await req.json(); } catch { /* No body */ }
 
-    if (!body.manual && (adjustedHour < 9 || adjustedHour >= 24)) {
+    if (!body.manual && (currentHour < 9 || currentHour >= 24)) {
       return new Response(
         JSON.stringify({ message: 'Outside notification hours', skipped: true }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Determine which send_time slot we're in (within ±5 min window)
+    const timeSlots = ['09:00', '14:00', '19:00'];
+    const matchingSlot = timeSlots.find(slot => {
+      const [h, m] = slot.split(':').map(Number);
+      const slotMinutes = h * 60 + m;
+      const currentMinutes = currentHour * 60 + currentMinute;
+      return Math.abs(currentMinutes - slotMinutes) <= 5;
+    });
+
+    // For manual triggers, send all pending; for cron, only matching slot
+    const activeSendTime = body.manual ? null : matchingSlot;
+
+    if (!body.manual && !matchingSlot) {
+      return new Response(
+        JSON.stringify({ message: `Not a notification time slot. Current: ${currentTimeStr}`, skipped: true }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
