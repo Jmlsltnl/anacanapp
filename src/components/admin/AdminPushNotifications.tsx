@@ -655,7 +655,19 @@ const PregnancyDayNotificationsTab = () => {
                       : 'bg-yellow-500/10 border-yellow-500/30'
                     : 'bg-muted/30 border-dashed'
                 }`}
-                onClick={() => hasNotifications ? handleEdit(dayNotifications[0]) : handleCreate(day)}
+                onClick={() => {
+                  if (hasNotifications) {
+                    if (dayNotifications.length > 1) {
+                      setSelectedDay(day);
+                      setSelectedDayNotifs(dayNotifications);
+                      setDayListDialog(true);
+                    } else {
+                      handleEdit(dayNotifications[0]);
+                    }
+                  } else {
+                    handleCreate(day);
+                  }
+                }}
               >
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-1 mb-1">
