@@ -29,6 +29,7 @@ interface DayNotification {
   title: string;
   body: string;
   emoji: string;
+  send_time: string;
   is_active: boolean;
 }
 
