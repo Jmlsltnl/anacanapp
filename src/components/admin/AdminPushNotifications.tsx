@@ -520,7 +520,7 @@ const PregnancyDayNotificationsTab = () => {
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4">
         <Card className="p-4 text-center">
-          <div className="text-3xl font-bold text-primary">{notifications.length}</div>
+          <div className="text-3xl font-bold text-primary">{notificationsByDay.size}</div>
           <div className="text-sm text-muted-foreground">Əlavə Edilib</div>
         </Card>
         <Card className="p-4 text-center">
@@ -532,7 +532,7 @@ const PregnancyDayNotificationsTab = () => {
           <div className="text-sm text-muted-foreground">Aktiv</div>
         </Card>
         <Card className="p-4 text-center">
-          <div className="text-3xl font-bold text-muted-foreground">{TOTAL_DAYS - notifications.length}</div>
+          <div className="text-3xl font-bold text-muted-foreground">{TOTAL_DAYS - notificationsByDay.size}</div>
           <div className="text-sm text-muted-foreground">Boş Gün</div>
         </Card>
       </div>
@@ -1861,7 +1861,7 @@ const MommyDayNotificationsTab = () => {
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4">
         <Card className="p-4 text-center">
-          <div className="text-3xl font-bold text-primary">{notifications.length}</div>
+          <div className="text-3xl font-bold text-primary">{notificationsByDay.size}</div>
           <div className="text-sm text-muted-foreground">Əlavə Edilib</div>
         </Card>
         <Card className="p-4 text-center">
@@ -1874,7 +1874,7 @@ const MommyDayNotificationsTab = () => {
         </Card>
         <Card className="p-4 text-center">
           <div className="text-3xl font-bold text-muted-foreground">
-            {new Set(Array.from({ length: TOTAL_DAYS }, (_, i) => i + 1).filter(d => !notificationsByDay.has(d))).size}
+            {TOTAL_DAYS - notificationsByDay.size}
           </div>
           <div className="text-sm text-muted-foreground">Boş Gün</div>
         </Card>
