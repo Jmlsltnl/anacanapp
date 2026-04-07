@@ -29,6 +29,7 @@ interface DayNotification {
   title: string;
   body: string;
   emoji: string;
+  send_time: string;
   is_active: boolean;
 }
 
@@ -49,17 +50,39 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Check current time - only send between 9:00 and 00:00 Baku time (UTC+4)
+    // Calculate current Baku time (UTC+4)
     const now = new Date();
-    const currentHour = now.getUTCHours() + 4;
-    const adjustedHour = currentHour >= 24 ? currentHour - 24 : currentHour;
+    const bakuOffsetMs = 4 * 60 * 60 * 1000;
+    const bakuNow = new Date(now.getTime() + bakuOffsetMs);
+    const currentHour = bakuNow.getUTCHours();
+    const currentMinute = bakuNow.getUTCMinutes();
+    const currentTimeStr = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`;
 
     let body: { manual?: boolean } = {};
     try { body = await req.json(); } catch { /* No body */ }
 
-    if (!body.manual && (adjustedHour < 9 || adjustedHour >= 24)) {
+    if (!body.manual && (currentHour < 9 || currentHour >= 24)) {
       return new Response(
         JSON.stringify({ message: 'Outside notification hours', skipped: true }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Determine which send_time slot we're in (within ±5 min window)
+    const timeSlots = ['09:00', '14:00', '19:00'];
+    const matchingSlot = timeSlots.find(slot => {
+      const [h, m] = slot.split(':').map(Number);
+      const slotMinutes = h * 60 + m;
+      const currentMinutes = currentHour * 60 + currentMinute;
+      return Math.abs(currentMinutes - slotMinutes) <= 5;
+    });
+
+    // For manual triggers, send all pending; for cron, only matching slot
+    const activeSendTime = body.manual ? null : matchingSlot;
+
+    if (!body.manual && !matchingSlot) {
+      return new Response(
+        JSON.stringify({ message: `Not a notification time slot. Current: ${currentTimeStr}`, skipped: true }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -79,11 +102,11 @@ Deno.serve(async (req) => {
     const { data: scheduledNotifications } = await supabase
       .from('scheduled_notifications').select('*').eq('is_active', true).order('priority', { ascending: true });
 
-    // Get ALL pregnancy day notifications (multiple per day allowed)
-    const { data: pregnancyNotifications } = await supabase
-      .from('pregnancy_day_notifications').select('*').eq('is_active', true);
+    // Get pregnancy day notifications - filter by send_time if we have an active slot
+    let pregnancyQuery = supabase.from('pregnancy_day_notifications').select('*').eq('is_active', true);
+    if (activeSendTime) pregnancyQuery = pregnancyQuery.eq('send_time', activeSendTime);
+    const { data: pregnancyNotifications } = await pregnancyQuery;
 
-    // Group by day_number - multiple notifications per day
     const pregnancyNotifsByDay = new Map<number, DayNotification[]>();
     pregnancyNotifications?.forEach((n: DayNotification) => {
       const existing = pregnancyNotifsByDay.get(n.day_number) || [];
@@ -91,9 +114,10 @@ Deno.serve(async (req) => {
       pregnancyNotifsByDay.set(n.day_number, existing);
     });
 
-    // Get ALL mommy day notifications (multiple per day allowed)
-    const { data: mommyNotifications } = await supabase
-      .from('mommy_day_notifications').select('*').eq('is_active', true);
+    // Get mommy day notifications - filter by send_time if we have an active slot
+    let mommyQuery = supabase.from('mommy_day_notifications').select('*').eq('is_active', true);
+    if (activeSendTime) mommyQuery = mommyQuery.eq('send_time', activeSendTime);
+    const { data: mommyNotifications } = await mommyQuery;
 
     const mommyNotifsByDay = new Map<number, DayNotification[]>();
     mommyNotifications?.forEach((n: DayNotification) => {
@@ -290,6 +314,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true, sent: sentCount, eligible: eligibleUsers.length,
+        currentTime: currentTimeStr, activeSlot: activeSendTime || 'manual',
         pregnancyDaysAvailable: pregnancyNotifsByDay.size,
         mommyDaysAvailable: mommyNotifsByDay.size,
         results: results.slice(0, 20),
