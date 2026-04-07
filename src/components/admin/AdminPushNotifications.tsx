@@ -1977,7 +1977,19 @@ const MommyDayNotificationsTab = () => {
                     ? allActive ? 'bg-green-500/10 border-green-500/30' : 'bg-yellow-500/10 border-yellow-500/30'
                     : 'bg-muted/30 border-dashed'
                 }`}
-                onClick={() => hasNotifications ? handleEdit(dayNotifications[0]) : handleCreate(day)}
+                onClick={() => {
+                  if (hasNotifications) {
+                    if (dayNotifications.length > 1) {
+                      setSelectedDay(day);
+                      setSelectedDayNotifs(dayNotifications);
+                      setDayListDialog(true);
+                    } else {
+                      handleEdit(dayNotifications[0]);
+                    }
+                  } else {
+                    handleCreate(day);
+                  }
+                }}
               >
                 <div className="text-center">
                   <Badge variant="outline" className="text-[10px] px-1 mb-1">A{month}</Badge>
