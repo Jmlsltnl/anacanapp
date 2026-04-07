@@ -102,11 +102,11 @@ Deno.serve(async (req) => {
     const { data: scheduledNotifications } = await supabase
       .from('scheduled_notifications').select('*').eq('is_active', true).order('priority', { ascending: true });
 
-    // Get ALL pregnancy day notifications (multiple per day allowed)
-    const { data: pregnancyNotifications } = await supabase
-      .from('pregnancy_day_notifications').select('*').eq('is_active', true);
+    // Get pregnancy day notifications - filter by send_time if we have an active slot
+    let pregnancyQuery = supabase.from('pregnancy_day_notifications').select('*').eq('is_active', true);
+    if (activeSendTime) pregnancyQuery = pregnancyQuery.eq('send_time', activeSendTime);
+    const { data: pregnancyNotifications } = await pregnancyQuery;
 
-    // Group by day_number - multiple notifications per day
     const pregnancyNotifsByDay = new Map<number, DayNotification[]>();
     pregnancyNotifications?.forEach((n: DayNotification) => {
       const existing = pregnancyNotifsByDay.get(n.day_number) || [];
@@ -114,9 +114,10 @@ Deno.serve(async (req) => {
       pregnancyNotifsByDay.set(n.day_number, existing);
     });
 
-    // Get ALL mommy day notifications (multiple per day allowed)
-    const { data: mommyNotifications } = await supabase
-      .from('mommy_day_notifications').select('*').eq('is_active', true);
+    // Get mommy day notifications - filter by send_time if we have an active slot
+    let mommyQuery = supabase.from('mommy_day_notifications').select('*').eq('is_active', true);
+    if (activeSendTime) mommyQuery = mommyQuery.eq('send_time', activeSendTime);
+    const { data: mommyNotifications } = await mommyQuery;
 
     const mommyNotifsByDay = new Map<number, DayNotification[]>();
     mommyNotifications?.forEach((n: DayNotification) => {
