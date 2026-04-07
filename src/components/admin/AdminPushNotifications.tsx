@@ -833,7 +833,7 @@ const PregnancyDayNotificationsTab = () => {
                         setDayListDialog(false);
                         handleEdit(notif);
                       }}>
-                        <Pencil className="h-3.5 w-3.5" />
+                        <Edit className="h-3.5 w-3.5" />
                       </Button>
                       <Button size="sm" variant="destructive" className="h-8 w-8 p-0" onClick={() => {
                         setDayListDialog(false);
