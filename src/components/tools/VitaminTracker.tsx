@@ -4,6 +4,7 @@ import { ArrowLeft, Plus, Pill, Check, Clock, Bell, BellOff, Trash2, X, ChevronD
 import { useVitaminSchedules, VitaminSchedule } from '@/hooks/useVitaminSchedules';
 import { toast } from 'sonner';
 import { hapticFeedback } from '@/lib/native';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 
 interface VitaminTrackerProps {
   onBack?: () => void;
