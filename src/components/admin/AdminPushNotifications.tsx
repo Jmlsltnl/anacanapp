@@ -298,6 +298,9 @@ const PregnancyDayNotificationsTab = () => {
   const [searchDay, setSearchDay] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
   const [editDialog, setEditDialog] = useState(false);
+  const [dayListDialog, setDayListDialog] = useState(false);
+  const [selectedDayNotifs, setSelectedDayNotifs] = useState<typeof notifications>([]);
+  const [selectedDay, setSelectedDay] = useState(0);
   const [deleteDialog, setDeleteDialog] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -652,7 +655,19 @@ const PregnancyDayNotificationsTab = () => {
                       : 'bg-yellow-500/10 border-yellow-500/30'
                     : 'bg-muted/30 border-dashed'
                 }`}
-                onClick={() => hasNotifications ? handleEdit(dayNotifications[0]) : handleCreate(day)}
+                onClick={() => {
+                  if (hasNotifications) {
+                    if (dayNotifications.length > 1) {
+                      setSelectedDay(day);
+                      setSelectedDayNotifs(dayNotifications);
+                      setDayListDialog(true);
+                    } else {
+                      handleEdit(dayNotifications[0]);
+                    }
+                  } else {
+                    handleCreate(day);
+                  }
+                }}
               >
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-1 mb-1">
@@ -783,6 +798,60 @@ const PregnancyDayNotificationsTab = () => {
                 {editingId ? 'Yenilə' : 'Yarat'}
               </Button>
             </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Day List Dialog - shows all notifications for a day */}
+      <Dialog open={dayListDialog} onOpenChange={setDayListDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Baby className="h-5 w-5 text-orange-500" />
+              Gün {selectedDay} - Həftə {getWeekNumber(selectedDay)} ({selectedDayNotifs.length} bildiriş)
+            </DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="max-h-[400px]">
+            <div className="space-y-3">
+              {selectedDayNotifs.map((notif) => (
+                <Card key={notif.id} className="p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Badge variant="outline" className="text-xs">{notif.send_time}</Badge>
+                        {notif.is_active ? (
+                          <Badge className="text-xs bg-green-500/20 text-green-700 border-0">Aktiv</Badge>
+                        ) : (
+                          <Badge className="text-xs bg-yellow-500/20 text-yellow-700 border-0">Deaktiv</Badge>
+                        )}
+                      </div>
+                      <p className="font-medium text-sm truncate">{notif.title}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-2">{notif.body}</p>
+                    </div>
+                    <div className="flex gap-1 shrink-0">
+                      <Button size="sm" variant="outline" className="h-8 w-8 p-0" onClick={() => {
+                        setDayListDialog(false);
+                        handleEdit(notif);
+                      }}>
+                        <Edit className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button size="sm" variant="destructive" className="h-8 w-8 p-0" onClick={() => {
+                        setDayListDialog(false);
+                        setDeleteDialog(notif.id);
+                      }}>
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </ScrollArea>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDayListDialog(false)}>Bağla</Button>
+            <Button onClick={() => { setDayListDialog(false); handleCreate(selectedDay); }}>
+              <Plus className="h-4 w-4 mr-1" /> Yeni Bildiriş
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1555,6 +1624,9 @@ const MommyDayNotificationsTab = () => {
   const [searchDay, setSearchDay] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
   const [editDialog, setEditDialog] = useState(false);
+  const [dayListDialog, setDayListDialog] = useState(false);
+  const [selectedDayNotifs, setSelectedDayNotifs] = useState<typeof notifications>([]);
+  const [selectedDay, setSelectedDay] = useState(1);
   const [deleteDialog, setDeleteDialog] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -1905,7 +1977,19 @@ const MommyDayNotificationsTab = () => {
                     ? allActive ? 'bg-green-500/10 border-green-500/30' : 'bg-yellow-500/10 border-yellow-500/30'
                     : 'bg-muted/30 border-dashed'
                 }`}
-                onClick={() => hasNotifications ? handleEdit(dayNotifications[0]) : handleCreate(day)}
+                onClick={() => {
+                  if (hasNotifications) {
+                    if (dayNotifications.length > 1) {
+                      setSelectedDay(day);
+                      setSelectedDayNotifs(dayNotifications);
+                      setDayListDialog(true);
+                    } else {
+                      handleEdit(dayNotifications[0]);
+                    }
+                  } else {
+                    handleCreate(day);
+                  }
+                }}
               >
                 <div className="text-center">
                   <Badge variant="outline" className="text-[10px] px-1 mb-1">A{month}</Badge>
@@ -1998,6 +2082,60 @@ const MommyDayNotificationsTab = () => {
             )}
             <Button onClick={handleSave} disabled={createNotification.isPending || updateNotification.isPending}>
               {editingId ? 'Yenilə' : 'Yarat'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Day List Dialog - shows all notifications for a day */}
+      <Dialog open={dayListDialog} onOpenChange={setDayListDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Heart className="h-5 w-5 text-red-500" />
+              Gün {selectedDay} - Ay {getMonthNumber(selectedDay)} ({selectedDayNotifs.length} bildiriş)
+            </DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="max-h-[400px]">
+            <div className="space-y-3">
+              {selectedDayNotifs.map((notif) => (
+                <Card key={notif.id} className="p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Badge variant="outline" className="text-xs">{notif.send_time}</Badge>
+                        {notif.is_active ? (
+                          <Badge className="text-xs bg-green-500/20 text-green-700 border-0">Aktiv</Badge>
+                        ) : (
+                          <Badge className="text-xs bg-yellow-500/20 text-yellow-700 border-0">Deaktiv</Badge>
+                        )}
+                      </div>
+                      <p className="font-medium text-sm truncate">{notif.title}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-2">{notif.body}</p>
+                    </div>
+                    <div className="flex gap-1 shrink-0">
+                      <Button size="sm" variant="outline" className="h-8 w-8 p-0" onClick={() => {
+                        setDayListDialog(false);
+                        handleEdit(notif);
+                      }}>
+                        <Edit className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button size="sm" variant="destructive" className="h-8 w-8 p-0" onClick={() => {
+                        setDayListDialog(false);
+                        setDeleteDialog(notif.id);
+                      }}>
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </ScrollArea>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDayListDialog(false)}>Bağla</Button>
+            <Button onClick={() => { setDayListDialog(false); handleCreate(selectedDay); }}>
+              <Plus className="h-4 w-4 mr-1" /> Yeni Bildiriş
             </Button>
           </DialogFooter>
         </DialogContent>
