@@ -314,6 +314,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true, sent: sentCount, eligible: eligibleUsers.length,
+        currentTime: currentTimeStr, activeSlot: activeSendTime || 'manual',
         pregnancyDaysAvailable: pregnancyNotifsByDay.size,
         mommyDaysAvailable: mommyNotifsByDay.size,
         results: results.slice(0, 20),
