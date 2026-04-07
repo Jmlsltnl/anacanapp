@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from '@/components/ui/textarea';
 import AdminUsageStats from './AdminUsageStats';
+import AdminPhotoGallery from './AdminPhotoGallery';
 
 interface EditingItem {
   id: string;
@@ -1000,6 +1001,9 @@ const AdminPhotoshoot = () => {
               ))
             )}
           </div>
+        </TabsContent>
+        <TabsContent value="gallery">
+          <AdminPhotoGallery />
         </TabsContent>
       </Tabs>
 
