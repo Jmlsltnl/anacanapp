@@ -4,6 +4,7 @@ import { ArrowLeft, Plus, Pill, Check, Clock, Bell, BellOff, Trash2, X, ChevronD
 import { useVitaminSchedules, VitaminSchedule } from '@/hooks/useVitaminSchedules';
 import { toast } from 'sonner';
 import { hapticFeedback } from '@/lib/native';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 
 interface VitaminTrackerProps {
   onBack?: () => void;
@@ -27,6 +28,7 @@ const VITAMIN_PRESETS = [
 const DAY_LABELS = ['B', 'B.e', 'Ç.a', 'Ç', 'C.a', 'C', 'Ş'];
 
 const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
+  useScreenAnalytics('VitaminTracker', 'Tools');
   const {
     schedules, isLoading, addSchedule, updateSchedule, deleteSchedule,
     logIntake, undoIntake, isVitaminTakenToday, getIntakeLog,

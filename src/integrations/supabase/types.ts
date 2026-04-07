@@ -957,24 +957,30 @@ export type Database = {
         Row: {
           background_theme: string
           created_at: string
+          customization: Json | null
           id: string
           prompt: string
+          source_image_path: string | null
           storage_path: string
           user_id: string
         }
         Insert: {
           background_theme: string
           created_at?: string
+          customization?: Json | null
           id?: string
           prompt: string
+          source_image_path?: string | null
           storage_path: string
           user_id: string
         }
         Update: {
           background_theme?: string
           created_at?: string
+          customization?: Json | null
           id?: string
           prompt?: string
+          source_image_path?: string | null
           storage_path?: string
           user_id?: string
         }
