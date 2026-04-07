@@ -1624,6 +1624,9 @@ const MommyDayNotificationsTab = () => {
   const [searchDay, setSearchDay] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
   const [editDialog, setEditDialog] = useState(false);
+  const [dayListDialog, setDayListDialog] = useState(false);
+  const [selectedDayNotifs, setSelectedDayNotifs] = useState<typeof notifications>([]);
+  const [selectedDay, setSelectedDay] = useState(1);
   const [deleteDialog, setDeleteDialog] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
