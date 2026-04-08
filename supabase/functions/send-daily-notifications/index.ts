@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
     }
 
     // Determine which send_time slot we're in (within ±5 min window)
-    const timeSlots = ['09:00', '10:00', '14:00', '15:00', '19:00', '20:00'];
+    const timeSlots = ['09:00', '14:00'];
     const matchingSlot = timeSlots.find(slot => {
       const [h, m] = slot.split(':').map(Number);
       const slotMinutes = h * 60 + m;
