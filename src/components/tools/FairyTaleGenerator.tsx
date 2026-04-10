@@ -84,7 +84,12 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
   useScreenAnalytics('FairyTaleGenerator', 'Tools');
   const [selectedTale, setSelectedTale] = useState<FairyTale | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [createMode, setCreateMode] = useState<'wizard' | 'direct'>('wizard');
   const [createStep, setCreateStep] = useState(1);
+  const [customPrompt, setCustomPrompt] = useState('');
+  const [directChildName, setDirectChildName] = useState('');
+  const [directLanguage, setDirectLanguage] = useState('az');
+  const [directAgeRange, setDirectAgeRange] = useState('3-5');
   const [formData, setFormData] = useState({
     child_name: '',
     theme: '',
