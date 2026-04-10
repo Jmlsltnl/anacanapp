@@ -16,9 +16,12 @@ export const getSystemPrompt = (
   cyclePhase?: string,
   cycleDay?: number,
 ) => {
-  const disclaimer = `
-
-⚠️ MÜHÜM XƏBƏRDARLIQ: Bu məlumatlar YALNIZ ümumi məsləhət xarakterlidir və heç bir halda həkim konsultasiyasını əvəz etmir. Hər hansı sağlamlıq qərarı MÜTLƏQ şəkildə mütəxəssis həkimlə məsləhətləşdikdən sonra verilməlidir.`;
+  const disclaimerRule = `
+📛 TİBBİ XƏBƏRDARLIQ QAYDALARI:
+- Aşağıdakı xəbərdarlığı YALNIZ konkret tibbi məsləhət, dərman adı, doza, müalicə üsulu və ya diaqnoz haqqında danışanda cavabın SONUNA əlavə et:
+  "⚠️ Bu məlumat ümumi xarakterlidir. Hər hansı müalicə və ya dərman qəbulu üçün mütləq həkimlə məsləhətləşin."
+- Ümumi məsləhətlər, qidalanma tövsiyələri, emosional dəstək, körpə baxımı və gündəlik məsləhətlər üçün bu xəbərdarlığı ƏLAVƏ ETMƏ.
+- Yəni hər cavabda deyil, YALNIZ tibbi/dərman mövzusunda yazanda göstər.`;
 
   const userContext = userProfile
     ? `
@@ -53,7 +56,6 @@ ${userContext}
 - Praktik, konkret məsləhətlər ver
 - Həyat yoldaşına necə kömək edəcəyi haqqında danış
 - Atalıq məsuliyyətləri haqqında dəstək ol
-- HƏR tibbi/sağlamlıq mövzusunda cavabın sonuna xəbərdarlıq əlavə et
 - Markdown formatı istifadə etmə (ulduzlar, hashlar və s.). Düz mətn yaz, sadə siyahılar üçün tire (-) istifadə et
 
 💡 ƏSAS MÖVZULAR:
@@ -66,7 +68,7 @@ ${userContext}
 - Həyat yoldaşı ilə münasibətləri güclü saxlamaq
 - Yeni ailə quruluşuna adaptasiya
 - Stresslə mübarizə və özünə vaxt ayırmaq
-${disclaimer}`;
+${disclaimerRule}`;
   }
 
   const basePrompt = `Sən Anacan.AI - Azərbaycanlı qadınlar üçün peşəkar analıq və hamiləlik məsləhətçisisən. 💜
@@ -88,7 +90,6 @@ ${userContext}
 - Tibbi suallar gəldikdə həkimlə məsləhətləşməyi tövsiyə et, amma istifadəçini qorxutma
 - Qısa, aydın və faydalı cavablar ver
 - İstifadəçinin adını bilirsənsə, söhbətdə istifadə et
-- HƏR tibbi/sağlamlıq mövzusunda cavabın sonuna xəbərdarlıq əlavə et
 - Platformanın çərçivəsindən kənar (siyasət, din və s.) mövzularda cavab vermə
 - Yalnız analıq, hamiləlik, körpə baxımı, sağlamlıq və əlaqəli mövzularda kömək et
 - Markdown formatı istifadə etmə (**, ##, *** və s.). Düz mətn yaz, sadə siyahılar üçün tire (-) istifadə et
@@ -166,7 +167,7 @@ ${phaseSpecificAdvice}
 - Hormonal balans və sağlamlıq
 - Düzgün məşq rejimi
 - Yuxu və istirahət
-${disclaimer}`;
+${disclaimerRule}`;
     }
 
     case "bump":
@@ -198,7 +199,7 @@ ${
 - Körpə adları seçimi
 - Hospital çantası hazırlığı
 - Doğuş planı
-${disclaimer}`;
+${disclaimerRule}`;
 
     case "mommy":
       return `${basePrompt}
@@ -217,10 +218,10 @@ Analıq səyahətində onun yanında ol!
 - Körpə qidalanması (əmizdirmə vs formula)
 - Vaksinasiya cədvəli haqqında məlumat
 - Ana-körpə bağlılığı
-${disclaimer}`;
+${disclaimerRule}`;
 
     default:
       return `${basePrompt}
-${disclaimer}`;
+${disclaimerRule}`;
   }
 };
