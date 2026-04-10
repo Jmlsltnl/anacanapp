@@ -235,8 +235,12 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     openTool(tool.id);
   };
 
-  // Filter by search and category
+  // Get hero tool IDs to exclude from grid
+  const heroToolIds = new Set(toolConfigs.filter(t => t.is_hero).map(t => t.tool_id));
+
+  // Filter by search and category, exclude hero tools from grid
   const filteredTools = tools.filter(tool => {
+    if (heroToolIds.has(tool.id)) return false;
     const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tool.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
