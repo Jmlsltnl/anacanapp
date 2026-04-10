@@ -82,7 +82,7 @@ Deno.serve(async (req) => {
       },
     };
 
-    const models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.0-flash-lite"];
+    const models = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
     const endpoint = stream ? "streamGenerateContent" : "generateContent";
     
     let response: Response | null = null;
@@ -111,11 +111,11 @@ Deno.serve(async (req) => {
         );
       }
       
-      if (response.status >= 500) {
-        continue; // Try next model
+      if (response.status >= 500 || response.status === 404) {
+        continue; // Try next model on server error or retired model
       }
       
-      // For other errors (4xx), don't retry
+      // For other errors (4xx except 404), don't retry
       break;
     }
 
