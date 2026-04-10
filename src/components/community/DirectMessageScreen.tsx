@@ -124,7 +124,7 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
   return (
     <div className="flex flex-col h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-3 flex items-center gap-3">
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-3 flex items-center gap-3 safe-area-top">
         <motion.button onClick={onBack} className="w-9 h-9 rounded-full bg-muted flex items-center justify-center" whileTap={{ scale: 0.9 }}>
           <ArrowLeft className="w-4 h-4" />
         </motion.button>
