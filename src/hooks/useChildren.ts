@@ -204,7 +204,6 @@ export const useChildren = () => {
 
   const getChildAge = useCallback((child: Child) => {
     const age = getRealCalendarAge(child.birth_date);
-    const age = getRealCalendarAge(child.birth_date);
     const weeks = Math.floor(age.totalDays / 7);
 
     return {
