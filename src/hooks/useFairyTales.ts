@@ -75,12 +75,13 @@ export const useGenerateFairyTale = () => {
   return useMutation({
     mutationFn: async (params: {
       child_name: string;
-      theme: string;
+      theme?: string;
       hero?: string;
       moral_lesson?: string;
       language?: string;
       age_range?: string;
       story_style?: string;
+      custom_prompt?: string;
     }) => {
       if (!user?.id) throw new Error('User not authenticated');
 
@@ -100,6 +101,7 @@ export const useGenerateFairyTale = () => {
             language: params.language || 'az',
             ageRange: params.age_range,
             storyStyle: params.story_style,
+            customPrompt: params.custom_prompt,
           }),
         }
       );

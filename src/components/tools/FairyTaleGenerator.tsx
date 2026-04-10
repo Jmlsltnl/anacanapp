@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { ArrowLeft, Sparkles, BookOpen, Heart, Trash2, Loader2, Wand2, Clock, Star, BookOpenCheck, Globe, X, Baby } from 'lucide-react';
+import { ArrowLeft, Sparkles, BookOpen, Heart, Trash2, Loader2, Wand2, Clock, Star, BookOpenCheck, Globe, X, Baby, PenLine, ListChecks } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
@@ -83,7 +84,12 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
   useScreenAnalytics('FairyTaleGenerator', 'Tools');
   const [selectedTale, setSelectedTale] = useState<FairyTale | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [createMode, setCreateMode] = useState<'wizard' | 'direct'>('wizard');
   const [createStep, setCreateStep] = useState(1);
+  const [customPrompt, setCustomPrompt] = useState('');
+  const [directChildName, setDirectChildName] = useState('');
+  const [directLanguage, setDirectLanguage] = useState('az');
+  const [directAgeRange, setDirectAgeRange] = useState('3-5');
   const [formData, setFormData] = useState({
     child_name: '',
     theme: '',
@@ -102,6 +108,28 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
   const incrementPlayCount = useIncrementPlayCount();
 
   const handleGenerate = async () => {
+    if (createMode === 'direct') {
+      if (!customPrompt.trim()) {
+        toast.error('Nağıl təsviri yazılmalıdır');
+        return;
+      }
+      try {
+        const result = await generateTale.mutateAsync({
+          child_name: directChildName || 'Uşaq',
+          language: directLanguage,
+          age_range: directAgeRange,
+          custom_prompt: customPrompt,
+        });
+        setShowCreate(false);
+        setSelectedTale(result);
+        setCustomPrompt('');
+        setDirectChildName('');
+      } catch (error) {
+        // Error handled in hook
+      }
+      return;
+    }
+
     if (!formData.child_name || !formData.theme) {
       toast.error('Uşağın adı və mövzu seçilməlidir');
       return;
@@ -129,6 +157,9 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
   const resetCreate = () => {
     setShowCreate(false);
     setCreateStep(1);
+    setCreateMode('wizard');
+    setCustomPrompt('');
+    setDirectChildName('');
     setFormData({ child_name: '', theme: '', hero: '', moral_lesson: '', language: 'az', age_range: '3-5', story_style: '' });
   };
 
@@ -343,13 +374,131 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
             </DialogTitle>
           </DialogHeader>
 
-          <Progress value={(createStep / 5) * 100} className="mb-4" />
-          <p className="text-xs text-muted-foreground text-center mb-4">
-            Addım {createStep} / 5
-          </p>
+          {/* Mode Toggle */}
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setCreateMode('wizard')}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                createMode === 'wizard'
+                  ? 'bg-primary text-primary-foreground shadow-md'
+                  : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+              }`}
+            >
+              <ListChecks className="h-4 w-4" />
+              Seçimlə
+            </button>
+            <button
+              onClick={() => setCreateMode('direct')}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                createMode === 'direct'
+                  ? 'bg-primary text-primary-foreground shadow-md'
+                  : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+              }`}
+            >
+              <PenLine className="h-4 w-4" />
+              Sərbəst yaz
+            </button>
+          </div>
 
-          <AnimatePresence mode="wait">
-            {/* Step 1: Name, Language, Age */}
+          {createMode === 'direct' ? (
+            /* Direct Prompt Mode */
+            <motion.div
+              key="direct"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-4"
+            >
+              <div>
+                <Label className="text-base font-semibold">Uşağın adı</Label>
+                <p className="text-xs text-muted-foreground mb-2">İstəyə bağlı - nağılda istifadə olunacaq</p>
+                <Input
+                  value={directChildName}
+                  onChange={(e) => setDirectChildName(e.target.value)}
+                  placeholder="Məsələn: Aysel, Murad..."
+                />
+              </div>
+
+              <div>
+                <Label className="text-base font-semibold">Nağıl təsviri *</Label>
+                <p className="text-xs text-muted-foreground mb-2">Nağılın necə olmasını istədiyinizi yazın</p>
+                <Textarea
+                  value={customPrompt}
+                  onChange={(e) => setCustomPrompt(e.target.value)}
+                  placeholder="Məsələn: 1 yaşına hazırlaşan balaca aslan haqqında nağıl yaz, meşədə dostları ilə ad günü keçirsin..."
+                  rows={4}
+                  className="resize-none"
+                />
+              </div>
+
+              {/* Language & Age */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-sm font-medium">Dil</Label>
+                  <div className="grid grid-cols-2 gap-1 mt-1">
+                    {LANGUAGES.map(lang => (
+                      <button
+                        key={lang.code}
+                        type="button"
+                        onClick={() => setDirectLanguage(lang.code)}
+                        className={`p-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1 ${
+                          directLanguage === lang.code
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted hover:bg-muted/80'
+                        }`}
+                      >
+                        <span>{lang.flag}</span>
+                        {lang.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Yaş</Label>
+                  <div className="grid grid-cols-2 gap-1 mt-1">
+                    {AGE_RANGES.map(age => (
+                      <button
+                        key={age.value}
+                        type="button"
+                        onClick={() => setDirectAgeRange(age.value)}
+                        className={`p-1.5 rounded-lg text-xs text-center transition-all ${
+                          directAgeRange === age.value
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted hover:bg-muted/80'
+                        }`}
+                      >
+                        {age.emoji} {age.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600"
+                onClick={handleGenerate}
+                disabled={generateTale.isPending || !customPrompt.trim()}
+              >
+                {generateTale.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Sehr hazırlanır...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Nağıl Yarat
+                  </>
+                )}
+              </Button>
+            </motion.div>
+          ) : (
+            /* Wizard Mode */
+            <>
+              <Progress value={(createStep / 5) * 100} className="mb-4" />
+              <p className="text-xs text-muted-foreground text-center mb-4">
+                Addım {createStep} / 5
+              </p>
+              <AnimatePresence mode="wait">
             {createStep === 1 && (
               <motion.div
                 key="step1"
@@ -640,6 +789,8 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
               </motion.div>
             )}
           </AnimatePresence>
+            </>
+          )}
         </DialogContent>
       </Dialog>
 
