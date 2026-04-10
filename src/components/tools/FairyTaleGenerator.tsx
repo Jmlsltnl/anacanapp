@@ -498,6 +498,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
               <p className="text-xs text-muted-foreground text-center mb-4">
                 Addım {createStep} / 5
               </p>
+              <AnimatePresence mode="wait">
             {createStep === 1 && (
               <motion.div
                 key="step1"
