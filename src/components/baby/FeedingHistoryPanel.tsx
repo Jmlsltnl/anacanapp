@@ -259,7 +259,12 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                               <div className="flex items-center gap-2">
                                 <span className="text-sm">{getFeedTypeEmoji(item.feedType)}</span>
                                 <div>
-                                  <p className="text-xs font-medium text-foreground">{getFeedTypeLabel(item.feedType)}</p>
+                                  <p className="text-xs font-medium text-foreground">
+                                    {getFeedTypeLabel(item.feedType)}
+                                    {item.feedType === 'formula' && item.notes && item.notes.includes('ml') && (
+                                      <span className="ml-1 text-blue-600 dark:text-blue-400 font-bold">({item.notes})</span>
+                                    )}
+                                  </p>
                                   <p className="text-[10px] text-muted-foreground">
                                     {format(item.startTime, 'HH:mm')}
                                     {item.endTime && ` - ${format(item.endTime, 'HH:mm')}`}

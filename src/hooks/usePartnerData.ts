@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
-import { getPregnancyWeek, getDaysUntilDue as calcDaysUntilDue, getDaysElapsed } from '@/lib/pregnancy-utils';
+import { getPregnancyWeek, getDaysUntilDue as calcDaysUntilDue, getDaysElapsed, getRealCalendarAge } from '@/lib/pregnancy-utils';
 
 export interface PartnerWomanData {
   id: string;
@@ -123,8 +123,7 @@ export const usePartnerData = () => {
     if (!partnerProfile?.baby_birth_date || partnerProfile.life_stage !== 'mommy') {
       return 0;
     }
-    const birthDate = new Date(partnerProfile.baby_birth_date);
-    return Math.floor((Date.now() - birthDate.getTime()) / (1000 * 60 * 60 * 24));
+    return getRealCalendarAge(partnerProfile.baby_birth_date).totalDays;
   };
 
   return {

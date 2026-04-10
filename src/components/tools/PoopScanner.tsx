@@ -153,13 +153,12 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
       if (profile?.baby_birth_date) {
         const birthDate = new Date(profile.baby_birth_date);
         const today = new Date();
-        const diffTime = today.getTime() - birthDate.getTime();
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        const ageMonths = Math.floor(diffDays / 30);
+        const { getRealCalendarAge } = await import('@/lib/pregnancy-utils');
+        const age = getRealCalendarAge(profile.baby_birth_date);
         babyContext = {
           babyName: profile.baby_name || 'Körpə',
-          babyAgeMonths: ageMonths,
-          babyAgeDays: diffDays,
+          babyAgeMonths: age.months,
+          babyAgeDays: age.totalDays,
           babyGender: profile.baby_gender
         };
       }

@@ -1,10 +1,60 @@
 /**
- * Centralized pregnancy calculation utilities
+ * Centralized pregnancy & baby age calculation utilities
  * All pregnancy-related date calculations should use these functions
  * to ensure consistency across the entire platform.
  */
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+/**
+ * Calculate baby age using real calendar months (not 30-day approximation).
+ * Returns exact months and remaining days based on actual calendar.
+ */
+export const getRealCalendarAge = (birthDate: Date | string | null): {
+  months: number;
+  days: number;
+  totalDays: number;
+  years: number;
+  remainingMonths: number;
+  displayText: string;
+} => {
+  if (!birthDate) return { months: 0, days: 0, totalDays: 0, years: 0, remainingMonths: 0, displayText: '' };
+  
+  const birth = startOfDay(new Date(birthDate));
+  const now = startOfDay(new Date());
+  
+  // Calculate total days
+  const totalDays = Math.floor((now.getTime() - birth.getTime()) / MS_PER_DAY);
+  
+  // Calculate full months using real calendar
+  let months = 0;
+  const tempDate = new Date(birth);
+  
+  while (true) {
+    const nextMonth = new Date(tempDate);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    if (nextMonth > now) break;
+    months++;
+    tempDate.setMonth(tempDate.getMonth() + 1);
+  }
+  
+  // Remaining days after full months
+  const days = Math.floor((now.getTime() - tempDate.getTime()) / MS_PER_DAY);
+  
+  const years = Math.floor(months / 12);
+  const remainingMonths = months % 12;
+  
+  let displayText = '';
+  if (years > 0) {
+    displayText = `${years} yaş${remainingMonths > 0 ? ` ${remainingMonths} ay` : ''}`;
+  } else if (months > 0) {
+    displayText = `${months} ay ${days} gün`;
+  } else {
+    displayText = `${totalDays} gün`;
+  }
+  
+  return { months, days, totalDays, years, remainingMonths, displayText };
+};
 const PREGNANCY_DURATION_DAYS = 280; // Standard pregnancy duration from LMP
 
 const startOfDay = (date: Date) => {

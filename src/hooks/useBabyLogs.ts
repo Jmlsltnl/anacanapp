@@ -23,6 +23,7 @@ export interface FeedingHistoryItem {
   endTime: Date | null;
   durationSeconds: number;
   date: string;
+  notes: string | null;
 }
 
 export const useBabyLogs = () => {
@@ -195,6 +196,7 @@ export const useBabyLogs = () => {
         endTime,
         durationSeconds,
         date: dateStr,
+        notes: log.notes,
       });
       historyMap.set(dateStr, existingItems);
     });
