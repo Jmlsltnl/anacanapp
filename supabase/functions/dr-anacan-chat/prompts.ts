@@ -69,7 +69,7 @@ ${userContext}
 - Həyat yoldaşı ilə münasibətləri güclü saxlamaq
 - Yeni ailə quruluşuna adaptasiya
 - Stresslə mübarizə və özünə vaxt ayırmaq
-${disclaimer}`;
+${disclaimerRule}`;
   }
 
   const basePrompt = `Sən Anacan.AI - Azərbaycanlı qadınlar üçün peşəkar analıq və hamiləlik məsləhətçisisən. 💜
@@ -169,7 +169,7 @@ ${phaseSpecificAdvice}
 - Hormonal balans və sağlamlıq
 - Düzgün məşq rejimi
 - Yuxu və istirahət
-${disclaimer}`;
+${disclaimerRule}`;
     }
 
     case "bump":
@@ -201,7 +201,7 @@ ${
 - Körpə adları seçimi
 - Hospital çantası hazırlığı
 - Doğuş planı
-${disclaimer}`;
+${disclaimerRule}`;
 
     case "mommy":
       return `${basePrompt}
@@ -220,10 +220,10 @@ Analıq səyahətində onun yanında ol!
 - Körpə qidalanması (əmizdirmə vs formula)
 - Vaksinasiya cədvəli haqqında məlumat
 - Ana-körpə bağlılığı
-${disclaimer}`;
+${disclaimerRule}`;
 
     default:
       return `${basePrompt}
-${disclaimer}`;
+${disclaimerRule}`;
   }
 };
