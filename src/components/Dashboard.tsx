@@ -816,15 +816,6 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
     return () => clearInterval(interval);
   }, []);
 
-  // Show setup prompt if baby data is missing
-  if (!babyData) {
-    return (
-      <div className="flex items-center justify-center p-8 min-h-[200px]">
-        <p className="text-muted-foreground text-sm animate-pulse">Yüklənir...</p>
-      </div>
-    );
-  }
-
   // Use all dynamic milestones from hook - with carousel if > 5
   const allMilestones = MILESTONES.map(m => ({
     ...m,
@@ -833,11 +824,9 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   }));
   
   // Paginate milestones (5 per page)
-  // Auto-advance: find first page with uncompleted milestones
   const milestonesPerPage = 5;
   const totalMilestonePages = Math.ceil(allMilestones.length / milestonesPerPage);
   
-  // Auto-set initial page to first page with incomplete milestones
   const getInitialMilestonePage = () => {
     for (let page = 0; page < totalMilestonePages; page++) {
       const pageItems = allMilestones.slice(page * milestonesPerPage, (page + 1) * milestonesPerPage);
@@ -862,6 +851,15 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   useEffect(() => {
     setMilestonePageIndex(getInitialMilestonePage());
   }, []);
+
+  // Show setup prompt if baby data is missing
+  if (!babyData) {
+    return (
+      <div className="flex items-center justify-center p-8 min-h-[200px]">
+        <p className="text-muted-foreground text-sm animate-pulse">Yüklənir...</p>
+      </div>
+    );
+  }
   
   const displayMilestones = allMilestones.slice(
     milestonePageIndex * milestonesPerPage, 
