@@ -235,7 +235,7 @@ serve(async (req) => {
   }
 
   try {
-    const { childName, theme, hero, moralLesson, language = 'az', ageRange, storyStyle } = await req.json();
+    const { childName, theme, hero, moralLesson, language = 'az', ageRange, storyStyle, customPrompt } = await req.json();
 
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
     if (!GEMINI_API_KEY) {
@@ -244,8 +244,17 @@ serve(async (req) => {
     
     const actualChildName = childName || 'Əli';
     
-    const systemPrompt = getSystemPrompt(language, actualChildName, ageRange);
-    const userPrompt = getUserPrompt(language, actualChildName, theme, hero, moralLesson, ageRange, storyStyle);
+    let systemPrompt: string;
+    let userPrompt: string;
+
+    if (customPrompt) {
+      // Direct prompt mode - user writes their own prompt
+      systemPrompt = getSystemPrompt(language, actualChildName, ageRange);
+      userPrompt = `${customPrompt}\n\nVACİB: Nağılın birinci sətri BAŞLIQ olmalıdır. Sonra nağıl mətni gəlsin.`;
+    } else {
+      systemPrompt = getSystemPrompt(language, actualChildName, ageRange);
+      userPrompt = getUserPrompt(language, actualChildName, theme, hero, moralLesson, ageRange, storyStyle);
+    }
 
     console.log(`Generating fairy tale in language: ${language}, age: ${ageRange || 'not specified'}...`);
 
