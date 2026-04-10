@@ -13,6 +13,7 @@ import { hapticFeedback } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useBabyLogs } from '@/hooks/useBabyLogs';
+import { useMealLogs } from '@/hooks/useMealLogs';
 import { useAuth } from '@/hooks/useAuth';
 import { useKickSessions } from '@/hooks/useKickSessions';
 import { useWeightEntries } from '@/hooks/useWeightEntries';
