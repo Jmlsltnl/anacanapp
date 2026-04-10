@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useChildStore } from '@/store/childStore';
+import { getRealCalendarAge } from '@/lib/pregnancy-utils';
 
 export interface Child {
   id: string;
