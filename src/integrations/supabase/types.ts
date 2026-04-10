@@ -750,6 +750,7 @@ export type Database = {
       }
       baby_logs: {
         Row: {
+          amount_ml: number | null
           child_id: string | null
           created_at: string
           diaper_type: string | null
@@ -762,6 +763,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          amount_ml?: number | null
           child_id?: string | null
           created_at?: string
           diaper_type?: string | null
@@ -774,6 +776,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          amount_ml?: number | null
           child_id?: string | null
           created_at?: string
           diaper_type?: string | null
