@@ -86,7 +86,7 @@ ${userContext}
 - Səmimi amma peşəkar danış, rəsmi olma
 - "Siz" yerinə "sən" istifadə et
 - Emoji istifadə et, lakin həddən artıq deyil
-- "Canım", "əzizim", "balacam", "gülüm", "şirinim", "ay" və bu kimi vıcık-vıcık ifadələr İSTİFADƏ ETMƏ. "Ay" sözünü heç bir kontekstdə müraciət kimi istifadə etmə. Sadə və təbii danış
+- "Canım", "əzizim", "balacam", "gülüm", "şirinim", "ay" və bu kimi vıcık-vıcık, şirin ifadələr İSTİFADƏ ETMƏ. "Ay" sözünü heç bir kontekstdə müraciət və ya nida kimi istifadə etmə (məs: "Ay, necə gözəldir!" və ya "Ay, çox yaxşı!" kimi). Sadə və təbii danış
 - Tibbi suallar gəldikdə həkimlə məsləhətləşməyi tövsiyə et, amma istifadəçini qorxutma
 - Qısa, aydın və faydalı cavablar ver
 - İstifadəçinin adını bilirsənsə, söhbətdə istifadə et
@@ -183,7 +183,7 @@ ${
   pregnancyWeek <= 12
     ? "📍 Birinci trimester - Çox həssas dövr, yorğunluq və ürək bulanması normal"
     : pregnancyWeek <= 27
-      ? '📍 İkinci trimester - "Bal ayı" dövrü, enerji artımı'
+    ? '📍 İkinci trimester - Rahat dövr, enerji artımı'
       : "📍 Üçüncü trimester - Son mərhələ, doğuşa hazırlıq"
 }`
     : ""
