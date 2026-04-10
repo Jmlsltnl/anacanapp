@@ -88,17 +88,25 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
     setLocationError(null);
 
     try {
-      // Request location permission first
-      const permission = await requestLocationPermission();
-      
-      if (!permission.granted) {
-        setLocationError('Məkan icazəsi lazımdır. Parametrlərdən icazə verin.');
-        return;
-      }
+      let latitude: number;
+      let longitude: number;
 
-      // Get user location using our permission-aware helper
-      const position = await getCurrentPosition();
-      const { latitude, longitude } = position.coords;
+      try {
+        const permission = await requestLocationPermission();
+        if (!permission.granted) {
+          // Fallback to Baku coordinates
+          latitude = 40.4093;
+          longitude = 49.8671;
+        } else {
+          const position = await getCurrentPosition();
+          latitude = position.coords.latitude;
+          longitude = position.coords.longitude;
+        }
+      } catch {
+        // Fallback to Baku if geolocation fails entirely
+        latitude = 40.4093;
+        longitude = 49.8671;
+      }
 
       // Get user context for AI
       const userContext = getUserContext();
@@ -117,25 +125,17 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
         setCityName(data.cityName);
         setAdvice(data.advice);
       } else {
-        throw new Error(data.error);
+        throw new Error(data.error || 'Hava məlumatı alınmadı');
       }
     } catch (error: any) {
       console.error('Weather fetch error:', error);
-      
-      if (error.message?.includes('permission') || error.message?.includes('denied')) {
-        setLocationError('Məkan icazəsi rədd edildi. Parametrlərdən icazə verin.');
-      } else if (error.code === 1) {
-        setLocationError('Məkan icazəsi rədd edildi. Parametrlərdən icazə verin.');
-      } else if (error.code === 2) {
-        setLocationError('Məkan təyin edilə bilmədi. Yenidən cəhd edin.');
-      } else if (error.code === 3) {
-        setLocationError('Məkan sorğusu vaxt aşımına uğradı.');
-      } else {
-        setLocationError('Hava məlumatı alınarkən xəta baş verdi.');
-      }
+      const errorMsg = error.message?.includes('permission') || error.message?.includes('denied')
+        ? 'Məkan icazəsi rədd edildi. Parametrlərdən icazə verin.'
+        : 'Hava məlumatı alınarkən xəta baş verdi.';
+      setLocationError(errorMsg);
       toast({
         title: 'Xəta',
-        description: locationError || 'Yenidən cəhd edin',
+        description: errorMsg,
         variant: 'destructive'
       });
     } finally {
