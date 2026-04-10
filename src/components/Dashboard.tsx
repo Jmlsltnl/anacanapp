@@ -768,6 +768,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   const { unlockAchievement, getTotalPoints } = useAchievements();
   const { activeTimers, startTimer, stopTimer, getElapsedSeconds, getActiveTimer } = useTimerStore();
   const { todayLogs, addLog, getTodayStats, refetch } = useBabyLogs();
+  const { todayLogs: todayMealLogs } = useMealLogs();
   const { children, selectedChild, hasChildren, hasMultipleChildren, getChildAge } = useChildren();
   
   // Derive baby data from selectedChild for multi-child support
