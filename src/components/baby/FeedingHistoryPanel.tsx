@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, Clock, ArrowLeft, ArrowRight, Baby, Pencil, Trash2, X, Check } from 'lucide-react';
 import { useBabyLogs, FeedingHistoryItem } from '@/hooks/useBabyLogs';
+import { useMealLogs } from '@/hooks/useMealLogs';
 import { format, isToday, isYesterday } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
