@@ -203,7 +203,7 @@ export const useChildren = () => {
   }, [user, selectedChild, fetchChildren]);
 
   const getChildAge = useCallback((child: Child) => {
-    const { getRealCalendarAge } = require('@/lib/pregnancy-utils');
+    const age = getRealCalendarAge(child.birth_date);
     const age = getRealCalendarAge(child.birth_date);
     const weeks = Math.floor(age.totalDays / 7);
 
