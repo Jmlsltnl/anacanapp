@@ -833,8 +833,36 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   }));
   
   // Paginate milestones (5 per page)
+  // Auto-advance: find first page with uncompleted milestones
   const milestonesPerPage = 5;
   const totalMilestonePages = Math.ceil(allMilestones.length / milestonesPerPage);
+  
+  // Auto-set initial page to first page with incomplete milestones
+  const getInitialMilestonePage = () => {
+    for (let page = 0; page < totalMilestonePages; page++) {
+      const pageItems = allMilestones.slice(page * milestonesPerPage, (page + 1) * milestonesPerPage);
+      if (pageItems.some(m => !m.achieved)) return page;
+    }
+    return 0;
+  };
+
+  // Auto-advance when all on current page are completed
+  useEffect(() => {
+    const currentPageItems = allMilestones.slice(
+      milestonePageIndex * milestonesPerPage,
+      (milestonePageIndex + 1) * milestonesPerPage
+    );
+    const allCompleted = currentPageItems.length > 0 && currentPageItems.every(m => m.achieved);
+    if (allCompleted && milestonePageIndex < totalMilestonePages - 1) {
+      setMilestonePageIndex(milestonePageIndex + 1);
+    }
+  }, [allMilestones.map(m => m.achieved).join(',')]);
+
+  // Set initial page on mount
+  useEffect(() => {
+    setMilestonePageIndex(getInitialMilestonePage());
+  }, []);
+  
   const displayMilestones = allMilestones.slice(
     milestonePageIndex * milestonesPerPage, 
     (milestonePageIndex + 1) * milestonesPerPage
@@ -1236,29 +1264,31 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
       {/* Quick Actions Bar */}
       <QuickActionsBar onNavigateToTool={onNavigateToTool} />
 
-      {/* Cakes Widget - navigate to cakes tab */}
-      <motion.div
-        className="bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-500/10 dark:to-rose-500/10 rounded-2xl p-4 border border-pink-200/50 dark:border-pink-500/20 shadow-card cursor-pointer"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.12 }}
-        whileHover={{ y: -2 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={() => onNavigateToTool?.('cakes')}
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center shadow-lg">
-            <span className="text-2xl">🎂</span>
+      {/* Cakes Widget - navigate to cakes tab, hide after 12 months */}
+      {babyData.ageInMonths < 12 && (
+        <motion.div
+          className="bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-500/10 dark:to-rose-500/10 rounded-2xl p-4 border border-pink-200/50 dark:border-pink-500/20 shadow-card cursor-pointer"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.12 }}
+          whileHover={{ y: -2 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => onNavigateToTool?.('cakes')}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center shadow-lg">
+              <span className="text-2xl">🎂</span>
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-sm text-foreground">Xüsusi Tortlar</h3>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                {babyData.ageInMonths > 0 ? `${babyData.ageInMonths + 1}-ci aylıq tortunu sifariş ver!` : 'Körpəniz üçün milestone tortları'}
+              </p>
+            </div>
+            <ChevronRight className="w-5 h-5 text-pink-400" />
           </div>
-          <div className="flex-1">
-            <h3 className="font-bold text-sm text-foreground">Xüsusi Tortlar</h3>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              {babyData.ageInMonths > 0 ? `${babyData.ageInMonths + 1}-ci aylıq tortunu sifariş ver!` : 'Körpəniz üçün milestone tortları'}
-            </p>
-          </div>
-          <ChevronRight className="w-5 h-5 text-pink-400" />
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
 
       {/* Sleep Tracker */}
       <motion.div
@@ -1751,11 +1781,13 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         </div>
       </motion.div>
 
-      {/* Baby Crisis Calendar Widget */}
-      <BabyCrisisWidget 
-        babyAgeWeeks={Math.floor(babyData.ageInDays / 7)} 
-        babyName={babyData.name} 
-      />
+      {/* Baby Crisis Calendar Widget - hide after week 75 (last crisis ends) */}
+      {Math.floor(babyData.ageInDays / 7) <= 75 && (
+        <BabyCrisisWidget 
+          babyAgeWeeks={Math.floor(babyData.ageInDays / 7)} 
+          babyName={babyData.name} 
+        />
+      )}
 
       {/* Weekly Stats Overview */}
       <QuickStatsWidget />
