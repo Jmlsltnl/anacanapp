@@ -964,9 +964,9 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
     }
   };
 
-  // Calculate exact age in months and days
-  const exactMonths = Math.floor(babyData.ageInDays / 30);
-  const remainingDays = babyData.ageInDays % 30;
+  // Calculate exact age using real calendar months
+  const exactMonths = babyData.ageInMonths;
+  const remainingDays = (babyData as any).ageRemainingDays ?? (babyData.ageInDays % 30);
 
   return (
     <div className="space-y-3">
