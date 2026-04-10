@@ -202,27 +202,18 @@ export const useChildren = () => {
   }, [user, selectedChild, fetchChildren]);
 
   const getChildAge = useCallback((child: Child) => {
-    const birth = new Date(child.birth_date);
-    const now = new Date();
-    
-    const diffMs = now.getTime() - birth.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const months = Math.floor(diffDays / 30.44);
-    const weeks = Math.floor(diffDays / 7);
-    const years = Math.floor(months / 12);
-    const remainingMonths = months % 12;
+    const { getRealCalendarAge } = require('@/lib/pregnancy-utils');
+    const age = getRealCalendarAge(child.birth_date);
+    const weeks = Math.floor(age.totalDays / 7);
 
     return {
-      days: diffDays,
+      days: age.totalDays,
       weeks,
-      months,
-      years,
-      remainingMonths,
-      displayText: years > 0 
-        ? `${years} yaş ${remainingMonths > 0 ? remainingMonths + ' ay' : ''}`
-        : months > 0 
-          ? `${months} aylıq`
-          : `${weeks} həftəlik`,
+      months: age.months,
+      years: age.years,
+      remainingMonths: age.remainingMonths,
+      remainingDays: age.days,
+      displayText: age.displayText,
     };
   }, []);
 
