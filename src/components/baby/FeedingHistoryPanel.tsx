@@ -191,13 +191,13 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                       <p className="text-[10px] text-muted-foreground">bu gün</p>
                     </div>
                   )}
-                  {todayBreakdown.solidCount > 0 && (
+                  {effectiveSolidCount > 0 && (
                     <div className="bg-orange-100/50 dark:bg-orange-500/15 rounded-xl p-2.5 text-center border border-orange-100 dark:border-orange-500/20">
                       <div className="flex items-center justify-center gap-1 mb-1">
                         <span className="text-lg">🥣</span>
-                        <span className="text-xs font-semibold text-foreground">Bərk qida</span>
+                        <span className="text-xs font-semibold text-foreground">Əlavə qida</span>
                       </div>
-                      <p className="text-sm font-bold text-orange-600 dark:text-orange-400">{todayBreakdown.solidCount} dəfə</p>
+                      <p className="text-sm font-bold text-orange-600 dark:text-orange-400">{effectiveSolidCount} dəfə</p>
                       <p className="text-[10px] text-muted-foreground">bu gün</p>
                     </div>
                   )}
