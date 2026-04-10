@@ -13,7 +13,7 @@ import { hapticFeedback } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useBabyLogs } from '@/hooks/useBabyLogs';
-import { useMealLogs } from '@/hooks/useMealLogs';
+
 import { useAuth } from '@/hooks/useAuth';
 import { useKickSessions } from '@/hooks/useKickSessions';
 import { useWeightEntries } from '@/hooks/useWeightEntries';
@@ -768,7 +768,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   const { unlockAchievement, getTotalPoints } = useAchievements();
   const { activeTimers, startTimer, stopTimer, getElapsedSeconds, getActiveTimer } = useTimerStore();
   const { todayLogs, addLog, getTodayStats, refetch } = useBabyLogs();
-  const { todayLogs: todayMealLogs } = useMealLogs();
+  
   const { children, selectedChild, hasChildren, hasMultipleChildren, getChildAge } = useChildren();
   
   // Derive baby data from selectedChild for multi-child support
@@ -804,6 +804,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   const [showFormulaMLInput, setShowFormulaMLInput] = useState(false);
   const [formulaML, setFormulaML] = useState('');
   const formulaMLPresets = [30, 60, 90, 120, 150, 180];
+  const [showSolidFoodInput, setShowSolidFoodInput] = useState(false);
+  const [solidFoodName, setSolidFoodName] = useState('');
   const leftFeedTimer = getActiveTimer('feeding', 'left');
   const rightFeedTimer = getActiveTimer('feeding', 'right');
   
@@ -926,20 +928,26 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
     }
   };
 
-  const addFeeding = async (type: 'formula' | 'solid', amountMl?: number) => {
+  const addFeeding = async (type: 'formula' | 'solid', amountMl?: number, foodName?: string) => {
     await hapticFeedback.medium();
+    let notes: string | undefined;
+    if (type === 'formula' && amountMl) notes = `${amountMl} ml`;
+    if (type === 'solid' && foodName) notes = foodName;
+    
     await addLog({
       log_type: 'feeding',
       feed_type: type,
-      notes: type === 'formula' && amountMl ? `${amountMl} ml` : undefined,
+      notes,
     });
     setShowFeedingModal(false);
     setShowFormulaMLInput(false);
     setFormulaML('');
+    setShowSolidFoodInput(false);
+    setSolidFoodName('');
     
     const typeLabels = {
       formula: amountMl ? `Süd əvəzedicisi ${amountMl} ml 🍼` : 'Süd əvəzedicisi 🍼',
-      solid: 'Əlavə qida 🥣'
+      solid: foodName ? `${foodName} 🥣` : 'Əlavə qida 🥣'
     };
     toast({ title: `${typeLabels[type]} qeyd edildi!` });
   };
@@ -1353,7 +1361,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             </div>
             <div className="text-left">
               <h3 className="font-bold text-sm text-foreground">Qidalanmaya nəzarət</h3>
-              <p className="text-xs text-muted-foreground">Bu gün: {todayStats.feedingCount + todayMealLogs.length} dəfə</p>
+              <p className="text-xs text-muted-foreground">Bu gün: {todayStats.feedingCount} dəfə</p>
             </div>
           </button>
           <motion.button
@@ -1415,10 +1423,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 <span className="text-xs font-medium text-blue-700">Süd Əvəzedicisi</span>
               </motion.button>
               <motion.button
-                onClick={() => {
-                  setShowFeedingModal(false);
-                  onNavigateToTool?.('nutrition');
-                }}
+                onClick={() => setShowSolidFoodInput(true)}
                 className="p-3 rounded-xl bg-orange-50 border-2 border-orange-200 flex flex-col items-center gap-1"
                 whileTap={{ scale: 0.95 }}
               >
@@ -1473,6 +1478,48 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 </motion.button>
                 <motion.button
                   onClick={() => { setShowFormulaMLInput(false); setFormulaML(''); }}
+                  className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-xs"
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Ləğv
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Solid Food Input */}
+        <AnimatePresence>
+          {showSolidFoodInput && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="bg-orange-50 rounded-xl p-3 mb-2 border border-orange-200"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-lg">🥣</span>
+                <span className="text-sm font-semibold text-orange-700">Nə yeməl verdiniz?</span>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={solidFoodName}
+                  onChange={(e) => setSolidFoodName(e.target.value)}
+                  placeholder="Məs: balkabaqlı püre"
+                  className="flex-1 px-3 py-1.5 rounded-lg border border-orange-200 text-sm bg-white"
+                />
+                <motion.button
+                  onClick={() => {
+                    if (solidFoodName.trim()) addFeeding('solid', undefined, solidFoodName.trim());
+                  }}
+                  className="px-4 py-1.5 rounded-lg bg-orange-500 text-white text-xs font-bold"
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Qeyd et
+                </motion.button>
+                <motion.button
+                  onClick={() => { setShowSolidFoodInput(false); setSolidFoodName(''); }}
                   className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-xs"
                   whileTap={{ scale: 0.95 }}
                 >
