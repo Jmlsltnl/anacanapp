@@ -69,7 +69,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
   return (
     <div className="min-h-screen bg-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
       {/* Header */}
-      <div className="bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 px-4 pt-4 pb-6 safe-top relative z-20">
+      <div className="bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 px-4 pb-4 safe-top relative z-20">
         <div className="flex items-center gap-3 mb-3">
           <motion.button
             onClick={onBack}

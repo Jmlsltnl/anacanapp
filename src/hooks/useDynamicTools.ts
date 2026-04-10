@@ -376,6 +376,15 @@ export interface ToolConfig {
   premium_type: string;
   premium_limit: number;
   display_name_az: string | null;
+  // Hero & quick access
+  is_hero: boolean;
+  hero_order: number;
+  hero_gradient: string | null;
+  hero_subtitle: string | null;
+  hero_badge: string | null;
+  is_quick_access: boolean;
+  quick_access_order: number;
+  quick_access_gradient: string | null;
 }
 
 export const useToolConfigs = (lifeStage?: string) => {

@@ -750,6 +750,7 @@ export type Database = {
       }
       baby_logs: {
         Row: {
+          amount_ml: number | null
           child_id: string | null
           created_at: string
           diaper_type: string | null
@@ -762,6 +763,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          amount_ml?: number | null
           child_id?: string | null
           created_at?: string
           diaper_type?: string | null
@@ -774,6 +776,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          amount_ml?: number | null
           child_id?: string | null
           created_at?: string
           diaper_type?: string | null
@@ -957,24 +960,30 @@ export type Database = {
         Row: {
           background_theme: string
           created_at: string
+          customization: Json | null
           id: string
           prompt: string
+          source_image_path: string | null
           storage_path: string
           user_id: string
         }
         Insert: {
           background_theme: string
           created_at?: string
+          customization?: Json | null
           id?: string
           prompt: string
+          source_image_path?: string | null
           storage_path: string
           user_id: string
         }
         Update: {
           background_theme?: string
           created_at?: string
+          customization?: Json | null
           id?: string
           prompt?: string
+          source_image_path?: string | null
           storage_path?: string
           user_id?: string
         }
@@ -7161,10 +7170,16 @@ export type Database = {
           flow_active: boolean | null
           flow_locked: boolean | null
           flow_order: number | null
+          hero_badge: string | null
+          hero_gradient: string | null
+          hero_order: number | null
+          hero_subtitle: string | null
           icon: string
           id: string
           is_active: boolean | null
+          is_hero: boolean | null
           is_premium: boolean | null
+          is_quick_access: boolean | null
           life_stages: string[] | null
           min_week: number | null
           mommy_active: boolean | null
@@ -7178,6 +7193,8 @@ export type Database = {
           partner_name_az: string | null
           premium_limit: number | null
           premium_type: string | null
+          quick_access_gradient: string | null
+          quick_access_order: number | null
           requires_partner: boolean | null
           sort_order: number | null
           tool_id: string
@@ -7197,10 +7214,16 @@ export type Database = {
           flow_active?: boolean | null
           flow_locked?: boolean | null
           flow_order?: number | null
+          hero_badge?: string | null
+          hero_gradient?: string | null
+          hero_order?: number | null
+          hero_subtitle?: string | null
           icon?: string
           id?: string
           is_active?: boolean | null
+          is_hero?: boolean | null
           is_premium?: boolean | null
+          is_quick_access?: boolean | null
           life_stages?: string[] | null
           min_week?: number | null
           mommy_active?: boolean | null
@@ -7214,6 +7237,8 @@ export type Database = {
           partner_name_az?: string | null
           premium_limit?: number | null
           premium_type?: string | null
+          quick_access_gradient?: string | null
+          quick_access_order?: number | null
           requires_partner?: boolean | null
           sort_order?: number | null
           tool_id: string
@@ -7233,10 +7258,16 @@ export type Database = {
           flow_active?: boolean | null
           flow_locked?: boolean | null
           flow_order?: number | null
+          hero_badge?: string | null
+          hero_gradient?: string | null
+          hero_order?: number | null
+          hero_subtitle?: string | null
           icon?: string
           id?: string
           is_active?: boolean | null
+          is_hero?: boolean | null
           is_premium?: boolean | null
+          is_quick_access?: boolean | null
           life_stages?: string[] | null
           min_week?: number | null
           mommy_active?: boolean | null
@@ -7250,6 +7281,8 @@ export type Database = {
           partner_name_az?: string | null
           premium_limit?: number | null
           premium_type?: string | null
+          quick_access_gradient?: string | null
+          quick_access_order?: number | null
           requires_partner?: boolean | null
           sort_order?: number | null
           tool_id?: string

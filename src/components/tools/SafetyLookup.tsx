@@ -67,8 +67,9 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
       const diffDays = Math.floor((Date.now() - new Date(profile.last_period_date).getTime()) / 86400000);
       userContext.pregnancyWeek = Math.floor(diffDays / 7);
     } else if (profile?.life_stage === 'mommy' && profile?.baby_birth_date) {
-      const diffDays = Math.floor((Date.now() - new Date(profile.baby_birth_date).getTime()) / 86400000);
-      userContext.babyAgeMonths = Math.floor(diffDays / 30);
+      const { getRealCalendarAge } = await import('@/lib/pregnancy-utils');
+      const age = getRealCalendarAge(profile.baby_birth_date);
+      userContext.babyAgeMonths = age.months;
       userContext.babyName = profile.baby_name;
     }
     setAiLoading(true);
@@ -105,8 +106,8 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
   return (
     <div ref={ref} className="min-h-screen bg-background pb-24 overflow-x-hidden">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50 safe-area-top">
-        <div className="px-4 py-2.5">
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
+        <div className="px-4 pb-2 safe-area-top">
           <div className="flex items-center gap-2.5">
             <button onClick={onBack} className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
               <ArrowLeft className="w-4 h-4 text-foreground" />

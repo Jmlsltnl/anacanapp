@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Wrench, Search, Save, RefreshCw, ChevronDown, ChevronUp, 
-  Power, PowerOff, Eye, EyeOff, Lock, Unlock, Crown, Edit2, X, Check
+  Power, PowerOff, Eye, EyeOff, Lock, Unlock, Crown, Edit2, X, Check,
+  Star, Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -42,6 +43,14 @@ interface ToolConfig {
   premium_limit: number;
   display_name_az: string | null;
   description_az: string | null;
+  is_hero: boolean;
+  hero_order: number;
+  hero_gradient: string | null;
+  hero_subtitle: string | null;
+  hero_badge: string | null;
+  is_quick_access: boolean;
+  quick_access_order: number;
+  quick_access_gradient: string | null;
 }
 
 const categoryLabels: Record<string, string> = {
@@ -236,15 +245,21 @@ const AdminTools = () => {
   };
 
   // Update tool display info
-  const updateToolDisplayInfo = (displayName: string, description: string) => {
+  const updateToolDisplayInfo = (data: { displayName: string; description: string; heroGradient: string; heroSubtitle: string; heroBadge: string; heroOrder: number; quickAccessGradient: string; quickAccessOrder: number }) => {
     if (!editingTool) return;
     
     const newTools = localTools.map(t => {
       if (t.id === editingTool.id) {
         return { 
           ...t, 
-          display_name_az: displayName,
-          description_az: description,
+          display_name_az: data.displayName,
+          description_az: data.description,
+          hero_gradient: data.heroGradient,
+          hero_subtitle: data.heroSubtitle,
+          hero_badge: data.heroBadge,
+          hero_order: data.heroOrder,
+          quick_access_gradient: data.quickAccessGradient,
+          quick_access_order: data.quickAccessOrder,
         };
       }
       return t;
@@ -276,6 +291,14 @@ const AdminTools = () => {
             premium_limit: tool.premium_limit,
             display_name_az: tool.display_name_az,
             description_az: tool.description_az,
+            is_hero: tool.is_hero,
+            hero_order: tool.hero_order,
+            is_quick_access: tool.is_quick_access,
+            quick_access_order: tool.quick_access_order,
+            quick_access_gradient: tool.quick_access_gradient,
+            hero_gradient: tool.hero_gradient,
+            hero_subtitle: tool.hero_subtitle,
+            hero_badge: tool.hero_badge,
           })
           .eq('id', tool.id);
         
@@ -432,22 +455,58 @@ const AdminTools = () => {
                               {tool.is_premium && (
                                 <Crown className="w-4 h-4 text-amber-500" />
                               )}
+                              {tool.is_hero && (
+                                <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 bg-violet-50 text-violet-600 border-violet-200">Hero</Badge>
+                              )}
+                              {tool.is_quick_access && (
+                                <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 bg-blue-50 text-blue-600 border-blue-200">QA</Badge>
+                              )}
                             </div>
-                            <p className="text-xs text-muted-foreground truncate">
-                              {tool.description_az || tool.tool_id}
+                            <p className="text-[10px] text-muted-foreground font-mono truncate">
+                              ID: {tool.tool_id}
                             </p>
                           </div>
 
                           {/* Action buttons */}
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            {/* Hero toggle */}
+                            <Button
+                              variant={tool.is_hero ? 'default' : 'ghost'}
+                              size="icon"
+                              className={`h-7 w-7 ${tool.is_hero ? 'bg-violet-500 hover:bg-violet-600' : ''}`}
+                              onClick={() => {
+                                const newTools = localTools.map(t => t.id === tool.id ? { ...t, is_hero: !t.is_hero } : t);
+                                setLocalTools(newTools);
+                                setHasChanges(true);
+                              }}
+                              title="Hero banner"
+                            >
+                              <Star className="w-3.5 h-3.5" />
+                            </Button>
+
+                            {/* Quick Access toggle */}
+                            <Button
+                              variant={tool.is_quick_access ? 'default' : 'ghost'}
+                              size="icon"
+                              className={`h-7 w-7 ${tool.is_quick_access ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
+                              onClick={() => {
+                                const newTools = localTools.map(t => t.id === tool.id ? { ...t, is_quick_access: !t.is_quick_access } : t);
+                                setLocalTools(newTools);
+                                setHasChanges(true);
+                              }}
+                              title="Sürətli giriş"
+                            >
+                              <Zap className="w-3.5 h-3.5" />
+                            </Button>
+
                             {/* Edit button */}
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8"
+                              className="h-7 w-7"
                               onClick={() => setEditingTool(tool)}
                             >
-                              <Edit2 className="w-4 h-4" />
+                              <Edit2 className="w-3.5 h-3.5" />
                             </Button>
 
                             {/* Premium button */}
@@ -533,6 +592,14 @@ const AdminTools = () => {
           <Edit2 className="w-4 h-4" />
           <span>Redaktə - ad və açıqlamanı dəyişin</span>
         </div>
+        <div className="flex items-center gap-2">
+          <Star className="w-4 h-4 text-violet-500" />
+          <span>Hero - böyük banner kimi göstər</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Zap className="w-4 h-4 text-blue-500" />
+          <span>QA - sürətli giriş sırasında göstər</span>
+        </div>
       </div>
 
       {/* Edit Tool Dialog */}
@@ -578,20 +645,50 @@ const AdminTools = () => {
 };
 
 // Edit Tool Form Component
+interface EditToolFormData {
+  displayName: string;
+  description: string;
+  heroGradient: string;
+  heroSubtitle: string;
+  heroBadge: string;
+  heroOrder: number;
+  quickAccessGradient: string;
+  quickAccessOrder: number;
+}
+
 const EditToolForm = ({ 
   tool, 
   onSave, 
   onCancel 
 }: { 
   tool: ToolConfig; 
-  onSave: (name: string, desc: string) => void; 
+  onSave: (data: EditToolFormData) => void; 
   onCancel: () => void;
 }) => {
   const [displayName, setDisplayName] = useState(tool.display_name_az || tool.name_az || tool.name);
   const [description, setDescription] = useState(tool.description_az || '');
+  const [heroGradient, setHeroGradient] = useState(tool.hero_gradient || 'from-primary to-primary/80');
+  const [heroSubtitle, setHeroSubtitle] = useState(tool.hero_subtitle || '');
+  const [heroBadge, setHeroBadge] = useState(tool.hero_badge || '');
+  const [heroOrder, setHeroOrder] = useState(tool.hero_order || 0);
+  const [quickAccessGradient, setQuickAccessGradient] = useState(tool.quick_access_gradient || 'from-primary to-primary/80');
+  const [quickAccessOrder, setQuickAccessOrder] = useState(tool.quick_access_order || 0);
+
+  const gradientPresets = [
+    { label: 'Primary', value: 'from-primary to-primary/80' },
+    { label: 'Yaşıl', value: 'from-emerald-500 to-teal-600' },
+    { label: 'Mavi', value: 'from-blue-500 to-indigo-600' },
+    { label: 'Bənövşəyi', value: 'from-purple-500 to-violet-600' },
+    { label: 'Çəhrayı', value: 'from-pink-500 to-rose-600' },
+    { label: 'Narıncı', value: 'from-orange-500 to-amber-600' },
+    { label: 'Qırmızı', value: 'from-red-500 to-rose-600' },
+    { label: 'Teal', value: 'from-teal-500 to-cyan-600' },
+    { label: 'Göy-yaşıl', value: 'from-cyan-500 to-blue-600' },
+  ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+      {/* Basic Info */}
       <div>
         <Label>Görünən Ad (AZ)</Label>
         <Input
@@ -606,15 +703,116 @@ const EditToolForm = ({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Alət haqqında qısa açıqlama"
-          rows={3}
+          rows={2}
         />
       </div>
+
+      {/* Hero Settings */}
+      {tool.is_hero && (
+        <div className="border rounded-lg p-3 space-y-3 bg-violet-50/50 dark:bg-violet-900/10">
+          <p className="text-sm font-semibold text-violet-700 dark:text-violet-300 flex items-center gap-1.5">
+            <Star className="w-4 h-4" /> Hero Banner Ayarları
+          </p>
+          
+          <div>
+            <Label className="text-xs">Hero Sırası</Label>
+            <Input
+              type="number"
+              min={0}
+              value={heroOrder}
+              onChange={(e) => setHeroOrder(parseInt(e.target.value) || 0)}
+              className="h-8"
+            />
+          </div>
+
+          <div>
+            <Label className="text-xs">Hero Alt Yazı</Label>
+            <Input
+              value={heroSubtitle}
+              onChange={(e) => setHeroSubtitle(e.target.value)}
+              placeholder="Banner alt yazısı"
+              className="h-8"
+            />
+          </div>
+
+          <div>
+            <Label className="text-xs">Hero Badge (etiket)</Label>
+            <Input
+              value={heroBadge}
+              onChange={(e) => setHeroBadge(e.target.value)}
+              placeholder="Məs: YENİ, ✨ Populyar"
+              className="h-8"
+            />
+          </div>
+
+          <div>
+            <Label className="text-xs">Gradient Rəngi</Label>
+            <Select value={heroGradient} onValueChange={setHeroGradient}>
+              <SelectTrigger className="h-8">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {gradientPresets.map(g => (
+                  <SelectItem key={g.value} value={g.value}>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-4 h-4 rounded bg-gradient-to-r ${g.value}`} />
+                      {g.label}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className={`mt-1.5 h-6 rounded-lg bg-gradient-to-r ${heroGradient}`} />
+          </div>
+        </div>
+      )}
+
+      {/* Quick Access Settings */}
+      {tool.is_quick_access && (
+        <div className="border rounded-lg p-3 space-y-3 bg-blue-50/50 dark:bg-blue-900/10">
+          <p className="text-sm font-semibold text-blue-700 dark:text-blue-300 flex items-center gap-1.5">
+            <Zap className="w-4 h-4" /> Sürətli Giriş Ayarları
+          </p>
+          
+          <div>
+            <Label className="text-xs">Sürətli Giriş Sırası</Label>
+            <Input
+              type="number"
+              min={0}
+              value={quickAccessOrder}
+              onChange={(e) => setQuickAccessOrder(parseInt(e.target.value) || 0)}
+              className="h-8"
+            />
+          </div>
+
+          <div>
+            <Label className="text-xs">Gradient Rəngi</Label>
+            <Select value={quickAccessGradient} onValueChange={setQuickAccessGradient}>
+              <SelectTrigger className="h-8">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {gradientPresets.map(g => (
+                  <SelectItem key={g.value} value={g.value}>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-4 h-4 rounded bg-gradient-to-r ${g.value}`} />
+                      {g.label}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className={`mt-1.5 h-6 rounded-lg bg-gradient-to-r ${quickAccessGradient}`} />
+          </div>
+        </div>
+      )}
+
       <DialogFooter>
         <Button variant="outline" onClick={onCancel}>
           <X className="w-4 h-4 mr-1" />
           Ləğv et
         </Button>
-        <Button onClick={() => onSave(displayName, description)}>
+        <Button onClick={() => onSave({ displayName, description, heroGradient, heroSubtitle, heroBadge, heroOrder, quickAccessGradient, quickAccessOrder })}>
           <Check className="w-4 h-4 mr-1" />
           Yadda saxla
         </Button>

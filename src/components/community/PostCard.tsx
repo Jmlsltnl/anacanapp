@@ -127,7 +127,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: az });
   const mediaItems = (post.media_urls || []).map(url => ({ url, type: getMediaType(url) }));
   const authorBadge = post.author?.badge_type as 'admin' | 'premium' | 'moderator' | null;
-  const handleAvatarClick = () => { if (post.user_id && onUserClick && !isAnonymous) onUserClick(post.user_id); };
+  const handleAvatarClick = () => { if (post.user_id && onUserClick && (!isAnonymous || isAdmin)) onUserClick(post.user_id); };
   const topLevelComments = comments.filter(c => !c.parent_comment_id);
 
   return (
@@ -139,11 +139,16 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
       >
         {/* Author row */}
         <div className="px-4 pt-3.5 pb-2 flex items-center gap-3">
-          <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.9 }} disabled={isAnonymous}>
+          <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.9 }} disabled={isAnonymous && !isAdmin}>
             <div className="relative">
-              <Avatar className={`w-10 h-10 ${isAnonymous ? '' : 'cursor-pointer ring-2 ring-border/10 hover:ring-primary/30'} transition-all`}>
-                {isAnonymous ? (
+              <Avatar className={`w-10 h-10 ${(isAnonymous && !isAdmin) ? '' : 'cursor-pointer ring-2 ring-border/10 hover:ring-primary/30'} transition-all`}>
+                {isAnonymous && !isAdmin ? (
                   <AvatarFallback className="bg-muted/30 text-muted-foreground/50"><EyeOff className="w-4 h-4" /></AvatarFallback>
+                ) : isAnonymous && isAdmin ? (
+                  <>
+                    <AvatarImage src={post.author?.avatar_url || undefined} />
+                    <AvatarFallback className="bg-gradient-to-br from-primary/15 to-accent/10 text-primary font-black text-xs">{post.author?.name?.charAt(0) || 'İ'}</AvatarFallback>
+                  </>
                 ) : (
                   <>
                     <AvatarImage src={post.author?.avatar_url || undefined} />
@@ -157,14 +162,22 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
             <div className="flex items-center gap-1.5 flex-wrap">
               <motion.button
                 onClick={handleAvatarClick}
-                className={`font-bold text-[13px] leading-tight ${isAnonymous ? 'text-muted-foreground italic' : 'text-foreground hover:text-primary'} transition-colors`}
+                className={`font-bold text-[14px] leading-tight ${isAnonymous && !isAdmin ? 'text-muted-foreground italic' : 'text-foreground hover:text-primary'} transition-colors`}
                 whileTap={{ scale: 0.98 }}
-                disabled={isAnonymous}
+                disabled={isAnonymous && !isAdmin}
               >
-                {isAnonymous ? 'Anonim' : (post.author?.name || 'İstifadəçi')}
+                {isAnonymous ? (
+                  isAdmin ? (
+                    <span className="flex items-center gap-1">
+                      <span className="text-muted-foreground italic">Anonim</span>
+                      <span className="text-[11px] text-primary/70 font-medium">({post.author?.name || 'İstifadəçi'})</span>
+                    </span>
+                  ) : 'Anonim'
+                ) : (post.author?.name || 'İstifadəçi')}
               </motion.button>
               {!isAnonymous && <UserBadge type={authorBadge} />}
-              <span className="text-[10px] text-muted-foreground/35 font-medium">· {timeAgo}</span>
+              {isAnonymous && isAdmin && <UserBadge type={authorBadge} />}
+              <span className="text-[11px] text-muted-foreground/35 font-medium">· {timeAgo}</span>
             </div>
             {isAnonymous && (
               <span className="inline-flex items-center gap-[2px] px-1 py-[1px] rounded text-[7px] font-semibold bg-muted/30 text-muted-foreground/40 mt-0.5">
@@ -213,10 +226,11 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
         ) : (
           <div onClick={handleDoubleTap} className="relative">
             <div className="px-4 pb-2.5">
-              <p className="text-foreground/90 whitespace-pre-wrap text-[13px] leading-[1.7]">
+              <p className="text-foreground/90 whitespace-pre-wrap text-[14px] leading-[1.7]">
                 {post.content.split(/(\s+)/).map((word, index) => {
                   if (word.startsWith('#')) return <span key={index} className="text-primary font-semibold">{word}</span>;
                   if (word.startsWith('@')) return <span key={index} className="text-blue-500 font-semibold">{word}</span>;
+                  if (/^https?:\/\/\S+/.test(word)) return <a key={index} href={word} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline break-all" onClick={(e) => e.stopPropagation()}>{word}</a>;
                   return word;
                 })}
               </p>
@@ -250,11 +264,11 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
               <motion.div animate={post.is_liked ? { scale: [1, 1.3, 1] } : {}} transition={{ duration: 0.3 }}>
                 <Heart className={`w-[22px] h-[22px] transition-colors ${post.is_liked ? 'fill-rose-500 text-rose-500' : 'text-foreground/60'}`} />
               </motion.div>
-              {post.likes_count > 0 && <span className={`text-[12px] font-bold ${post.is_liked ? 'text-rose-500' : 'text-foreground/50'}`}>{post.likes_count}</span>}
+              {post.likes_count > 0 && <span className={`text-[13px] font-bold ${post.is_liked ? 'text-rose-500' : 'text-foreground/50'}`}>{post.likes_count}</span>}
             </motion.button>
             <motion.button onClick={() => setShowComments(!showComments)} className="flex items-center gap-1.5" whileTap={{ scale: 0.8 }}>
               <MessageCircle className={`w-[21px] h-[21px] transition-colors ${showComments ? 'text-primary' : 'text-foreground/60'}`} />
-              {post.comments_count > 0 && <span className="text-[12px] font-bold text-foreground/50">{post.comments_count}</span>}
+              {post.comments_count > 0 && <span className="text-[13px] font-bold text-foreground/50">{post.comments_count}</span>}
             </motion.button>
             <motion.button onClick={handleShare} whileTap={{ scale: 0.8 }}>
               <Share2 className="w-[20px] h-[20px] text-foreground/60" />

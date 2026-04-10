@@ -449,6 +449,26 @@ Deno.serve(async (req) => {
 
     const fileName = `${user.id}/${Date.now()}-${backgroundTheme}.${imageFormat}`;
     
+    // Also save the source (original) image
+    let sourceImagePath: string | null = null;
+    try {
+      const srcBinary = Uint8Array.from(atob(imageBase64), (c) => c.charCodeAt(0));
+      const srcFileName = `${user.id}/originals/${Date.now()}-source.${mimeType.split("/")[1] || "jpeg"}`;
+      const { error: srcUploadError } = await supabase.storage
+        .from("baby-photos")
+        .upload(srcFileName, srcBinary, {
+          contentType: mimeType,
+          upsert: false,
+        });
+      if (!srcUploadError) {
+        sourceImagePath = srcFileName;
+      } else {
+        console.warn("Source image upload failed:", srcUploadError);
+      }
+    } catch (srcErr) {
+      console.warn("Failed to save source image:", srcErr);
+    }
+
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from("baby-photos")
       .upload(fileName, binaryData, {
@@ -468,12 +488,14 @@ Deno.serve(async (req) => {
       .from("baby-photos")
       .getPublicUrl(fileName);
 
-    // Save to database
+    // Save to database with source image path and customization
     const { data: photoRecord, error: dbError } = await supabase.from("baby_photos").insert({
       user_id: user.id,
       storage_path: fileName,
       background_theme: backgroundTheme,
       prompt: masterPrompt.substring(0, 500),
+      source_image_path: sourceImagePath,
+      customization: customization || {},
     }).select().single();
 
     if (dbError) {

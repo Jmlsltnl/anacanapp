@@ -82,29 +82,51 @@ Deno.serve(async (req) => {
       },
     };
 
-    const geminiModel = "gemini-2.5-flash";
+    const models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.0-flash-lite"];
     const endpoint = stream ? "streamGenerateContent" : "generateContent";
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:${endpoint}?${stream ? "alt=sse&" : ""}key=${GEMINI_API_KEY}`,
-      {
+    
+    let response: Response | null = null;
+    let lastError = "";
+    
+    for (const model of models) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:${endpoint}?${stream ? "alt=sse&" : ""}key=${GEMINI_API_KEY}`;
+      response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(geminiBody),
-      },
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Gemini API error:", response.status, errorText);
-
+      });
+      
+      if (response.ok) {
+        console.log(`Using model: ${model}`);
+        break;
+      }
+      
+      lastError = await response.text();
+      console.error(`Model ${model} failed: ${response.status}`, lastError);
+      
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limit exceeded. Please try again later.", success: false }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
+      
+      if (response.status >= 500) {
+        continue; // Try next model
+      }
+      
+      // For other errors (4xx), don't retry
+      break;
+    }
 
-      throw new Error(`Gemini API error: ${response.status}`);
+    if (!response || !response.ok) {
+      return new Response(
+        JSON.stringify({ 
+          message: "Bağışlayın, xidmət müvəqqəti əlçatmazdır. Zəhmət olmasa bir az sonra yenidən cəhd edin.", 
+          success: true 
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
     }
 
     // Streaming: transform Gemini SSE to OpenAI-compatible SSE format

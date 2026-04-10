@@ -20,10 +20,9 @@ interface CommunityScreenProps {
   onBack?: () => void;
 }
 
+// Groups temporarily disabled
 const tabs = [
   { id: 'feed', label: 'Ümumi', icon: TrendingUp },
-  { id: 'my-groups', label: 'Qruplarım', icon: Sparkles },
-  { id: 'groups', label: 'Kəşf et', icon: Compass },
 ] as const;
 
 const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBack }, ref) => {
@@ -143,23 +142,6 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
             </AnimatePresence>
           </motion.div>
 
-          <div className="flex border-b border-border/10">
-            {tabs.map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id as any)}
-                  className={`relative flex-1 pb-2.5 pt-1 text-[12px] font-bold flex items-center justify-center gap-1.5 transition-colors ${isActive ? 'text-foreground' : 'text-muted-foreground/40'}`}>
-                  <tab.icon className="w-3.5 h-3.5" />
-                  {tab.label}
-                  {isActive && (
-                    <motion.div layoutId="community-tab-underline" className="absolute bottom-0 left-2 right-2 h-[2.5px] rounded-full bg-primary"
-                      transition={{ type: 'spring', stiffness: 500, damping: 30 }} />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
           <BannerSlot placement="community_top" className="mt-2" />
         </div>
       </div>
@@ -168,37 +150,22 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
         <StoriesBar groupId={null} />
       </div>
 
+      {/* Facebook-style post input */}
+      <div className="px-4 pt-1 pb-2">
+        <motion.button
+          onClick={() => setShowCreatePost(true)}
+          className="w-full flex items-center gap-3 bg-card rounded-2xl border border-border/10 p-3 active:bg-muted/30 transition-colors"
+          whileTap={{ scale: 0.98 }}
+        >
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/15 to-accent/10 flex items-center justify-center flex-shrink-0">
+            <Pen className="w-4 h-4 text-primary" />
+          </div>
+          <span className="text-[14px] text-muted-foreground/40 font-medium">Nə düşünürsünüz?</span>
+        </motion.button>
+      </div>
+
       <div className="px-4 pt-1">
-        <AnimatePresence mode="wait">
-          {activeTab === 'feed' && (
-            <motion.div key="feed" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.2 }}>
-              <GroupFeed group={null} onBack={() => {}} onCreatePost={() => setShowCreatePost(true)} isEmbedded onUserClick={handleUserClick} externalSearchQuery={searchQuery} />
-            </motion.div>
-          )}
-          {activeTab === 'groups' && (
-            <motion.div key="groups" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.2 }}>
-              <GroupsList groups={groups} memberGroupIds={memberGroupIds} onSelectGroup={setSelectedGroupId} searchQuery={searchQuery} isLoading={groupsLoading} />
-            </motion.div>
-          )}
-          {activeTab === 'my-groups' && (
-            <motion.div key="my-groups" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.2 }}>
-              {myGroups.length === 0 ? (
-                <div className="text-center py-16">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/10 to-accent/8 flex items-center justify-center mx-auto mb-4">
-                    <Users className="w-7 h-7 text-primary/50" />
-                  </div>
-                  <h3 className="font-bold text-foreground mb-1.5 text-[14px]">Hələ qrupunuz yoxdur</h3>
-                  <p className="text-[12px] text-muted-foreground/40 mb-6 max-w-[220px] mx-auto leading-relaxed">Digər analar ilə əlaqə qurmaq üçün qruplara qoşulun</p>
-                  <motion.button onClick={() => setActiveTab('groups')} className="px-6 py-2.5 rounded-full gradient-primary text-primary-foreground font-bold text-[12px] shadow-lg shadow-primary/20" whileTap={{ scale: 0.95 }}>
-                    Qrupları kəşf et
-                  </motion.button>
-                </div>
-              ) : (
-                <GroupsList groups={myGroups} memberGroupIds={memberGroupIds} onSelectGroup={setSelectedGroupId} searchQuery={searchQuery} isLoading={false} />
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <GroupFeed group={null} onBack={() => {}} onCreatePost={() => setShowCreatePost(true)} isEmbedded onUserClick={handleUserClick} externalSearchQuery={searchQuery} />
       </div>
 
       <motion.button

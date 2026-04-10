@@ -308,7 +308,7 @@
     color: hsl(var(--foreground));
   }
 
-  /* Safe area for mobile - Capacitor */
+  /* Safe area for mobile - Capacitor — uses margin so it doesn't stack with padding */
   .safe-top,
   .safe-area-top {
     padding-top: env(safe-area-inset-top, 0px);

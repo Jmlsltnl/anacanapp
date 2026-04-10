@@ -152,7 +152,7 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
     <div className="min-h-screen bg-background pb-24">
       {/* Compact Header */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 pt-4 pb-3 safe-area-top">
+        <div className="px-4 pb-2 safe-area-top">
           <div className="flex items-center gap-3 mb-3">
             <motion.button
               onClick={onBack}

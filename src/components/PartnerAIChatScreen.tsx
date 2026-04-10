@@ -177,10 +177,16 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     }
   }, [historyLoading, savedMessages, user, isInitialized]);
 
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    requestAnimationFrame(() => {
+      if (scrollRef.current) {
+        const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        if (viewport) {
+          viewport.scrollTop = viewport.scrollHeight;
+        }
+      }
+    });
   }, [messages]);
 
   const handleQuickQuestion = (question: string) => {

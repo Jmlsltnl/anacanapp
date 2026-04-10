@@ -13,18 +13,36 @@ export interface MommyDayNotification {
   updated_at: string;
 }
 
+const fetchAllMommyNotifications = async (): Promise<MommyDayNotification[]> => {
+  const PAGE_SIZE = 1000;
+  let allData: MommyDayNotification[] = [];
+  let from = 0;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data, error } = await supabase
+      .from('mommy_day_notifications')
+      .select('*')
+      .order('day_number', { ascending: true })
+      .range(from, from + PAGE_SIZE - 1);
+
+    if (error) throw error;
+    if (data && data.length > 0) {
+      allData = allData.concat(data as MommyDayNotification[]);
+      from += PAGE_SIZE;
+      hasMore = data.length === PAGE_SIZE;
+    } else {
+      hasMore = false;
+    }
+  }
+
+  return allData;
+};
+
 export const useMommyDayNotifications = () => {
   return useQuery({
     queryKey: ['mommy-day-notifications'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('mommy_day_notifications')
-        .select('*')
-        .order('day_number', { ascending: true });
-
-      if (error) throw error;
-      return data as MommyDayNotification[];
-    },
+    queryFn: fetchAllMommyNotifications,
   });
 };
 

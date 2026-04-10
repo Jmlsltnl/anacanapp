@@ -107,36 +107,6 @@ const QuickStatsWidget = () => {
         </div>
       </div>
       
-      {/* Mini Chart - Sleep hours per day */}
-      <div className="bg-muted/30 rounded-xl p-3">
-        <p className="text-[10px] text-muted-foreground mb-2 font-medium">Həftəlik yuxu (saat)</p>
-        <div className="flex items-end justify-between h-12 gap-1">
-          {weeklyStats.map((day, idx) => {
-            const maxHours = 16;
-            const height = day.sleepHours > 0 ? `${Math.min((day.sleepHours / maxHours) * 100, 100)}%` : '4px';
-            const isToday = idx === 6;
-            
-            return (
-              <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
-                <motion.div
-                  className={`w-full rounded-t ${
-                    isToday 
-                      ? 'bg-primary' 
-                      : 'bg-violet-300 dark:bg-violet-500/50'
-                  }`}
-                  style={{ height }}
-                  initial={{ height: 0 }}
-                  animate={{ height }}
-                  transition={{ delay: 0.2 + idx * 0.05 }}
-                />
-                <span className={`text-[9px] ${isToday ? 'text-primary font-bold' : 'text-muted-foreground'}`}>
-                  {getDayLabel(day.date)}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
     </motion.div>
   );
 };

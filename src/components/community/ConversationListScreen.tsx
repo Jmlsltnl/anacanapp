@@ -42,7 +42,7 @@ const ConversationListScreen = ({ onBack, onOpenChat, partnerId }: ConversationL
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border/50 px-5 py-4 flex items-center gap-3">
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border/50 px-5 py-4 flex items-center gap-3 safe-area-top">
         <motion.button onClick={onBack} className="w-9 h-9 rounded-full bg-muted flex items-center justify-center" whileTap={{ scale: 0.9 }}>
           <ArrowLeft className="w-4 h-4" />
         </motion.button>

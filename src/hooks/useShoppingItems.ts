@@ -48,6 +48,17 @@ export const useShoppingItems = () => {
     try {
       const isPartner = profile?.life_stage === 'partner';
       
+      // Get partner's user_id
+      let partnerUserId: string | null = null;
+      if (profile?.linked_partner_id) {
+        const { data: partnerProfile } = await supabase
+          .from('profiles')
+          .select('user_id')
+          .eq('id', profile.linked_partner_id)
+          .single();
+        partnerUserId = partnerProfile?.user_id || null;
+      }
+
       const { data, error } = await supabase
         .from('shopping_items')
         .insert({
@@ -55,9 +66,7 @@ export const useShoppingItems = () => {
           quantity: item.quantity || 1,
           priority: item.priority || 'medium',
           user_id: user.id,
-          partner_id: profile?.linked_partner_id ? 
-            (await supabase.from('profiles').select('user_id').eq('id', profile.linked_partner_id).single()).data?.user_id 
-            : null,
+          partner_id: partnerUserId,
           added_by: isPartner ? 'partner' : 'woman'
         })
         .select()
@@ -65,11 +74,43 @@ export const useShoppingItems = () => {
 
       if (error) throw error;
       
+      // Send push notification to partner (max 1/day)
+      if (partnerUserId) {
+        await notifyPartnerAboutShopping(partnerUserId, item.name);
+      }
+
       await fetchItems();
       return { data, error: null };
     } catch (error) {
       console.error('Error adding shopping item:', error);
       return { data: null, error };
+    }
+  };
+
+  const notifyPartnerAboutShopping = async (partnerUserId: string, itemName: string) => {
+    try {
+      // Check if we already sent a shopping notification today
+      const today = new Date().toISOString().split('T')[0];
+      const storageKey = `shopping_notif_${today}`;
+      
+      if (localStorage.getItem(storageKey)) {
+        return; // Already notified today
+      }
+
+      const adderName = profile?.name || 'Partnyorun';
+
+      await supabase.functions.invoke('send-push-notification', {
+        body: {
+          userId: partnerUserId,
+          title: '🛒 Alışveriş siyahısına əlavə',
+          body: `${adderName} "${itemName}" əlavə etdi. Siyahını yoxla!`,
+          data: { type: 'shopping_list' }
+        }
+      });
+
+      localStorage.setItem(storageKey, '1');
+    } catch (err) {
+      console.error('Error sending shopping notification:', err);
     }
   };
 

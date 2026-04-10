@@ -218,13 +218,12 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
         if (profile?.baby_birth_date) {
           const birthDate = new Date(profile.baby_birth_date);
           const today = new Date();
-          const diffTime = today.getTime() - birthDate.getTime();
-          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-          const ageMonths = Math.floor(diffDays / 30);
+          const { getRealCalendarAge } = await import('@/lib/pregnancy-utils');
+          const age = getRealCalendarAge(profile.baby_birth_date);
           babyContext = {
             babyName: profile.baby_name || 'Körpə',
-            babyAgeMonths: ageMonths,
-            babyAgeDays: diffDays,
+            babyAgeMonths: age.months,
+            babyAgeDays: age.totalDays,
             babyGender: profile.baby_gender
           };
         }
@@ -315,7 +314,7 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-card border-b border-border/50 px-4 py-3 safe-area-top">
+      <div className="sticky top-0 z-20 bg-card border-b border-border/50 px-4 pb-2 safe-area-top">
         <div className="flex items-center gap-3 relative z-20">
           <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0 relative z-30">
             <ArrowLeft className="w-5 h-5" />

@@ -69,24 +69,24 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className={`${stats.is511 ? 'bg-gradient-to-r from-red-500 to-rose-600' : 'gradient-primary'} px-3 pt-3 pb-4 safe-top transition-colors relative z-20`}>
-        <div className="flex items-center gap-3 relative z-20">
+      <div className={`${stats.is511 ? 'bg-gradient-to-r from-red-500 to-rose-600' : 'gradient-primary'} px-3 pt-2 pb-3 safe-top transition-colors relative z-20`}>
+        <div className="flex items-center gap-2 relative z-20">
           <motion.button
             onClick={onBack}
-            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold text-white">Sancı Ölçən</h1>
-            <p className="text-white/80 text-xs">5-1-1 qaydası ilə izləyin</p>
+            <h1 className="text-base font-bold text-white">Sancı Ölçən</h1>
+            <p className="text-white/80 text-[10px]">5-1-1 qaydası ilə izləyin</p>
           </div>
           {contractions.length > 0 && (
             <motion.button
               onClick={clearAll}
-              className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
+              className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -96,7 +96,7 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
         </div>
       </div>
 
-      <div className="px-3 pt-3">
+      <div className="px-3 pt-2">
         {/* 5-1-1 Alert */}
         <AnimatePresence>
           {stats.is511 && (
@@ -104,14 +104,14 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="bg-red-100 dark:bg-red-950/50 border-2 border-red-200 dark:border-red-800 rounded-xl p-3 mb-3 flex items-center gap-3"
+              className="bg-red-100 dark:bg-red-950/50 border-2 border-red-200 dark:border-red-800 rounded-xl p-2.5 mb-2 flex items-center gap-2"
             >
-              <div className="w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center">
-                <AlertCircle className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 rounded-lg bg-red-500 flex items-center justify-center">
+                <AlertCircle className="w-4 h-4 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-red-700 dark:text-red-400 text-sm">Xəstəxanaya getmə vaxtı!</h3>
-                <p className="text-xs text-red-600 dark:text-red-300">5-1-1 qaydası: Sancılar 5 dəqiqədən bir, 1 dəqiqə davam edir</p>
+                <h3 className="font-bold text-red-700 dark:text-red-400 text-xs">Xəstəxanaya getmə vaxtı!</h3>
+                <p className="text-[10px] text-red-600 dark:text-red-300">5-1-1 qaydası: Sancılar 5 dəqiqədən bir, 1 dəqiqə davam edir</p>
               </div>
             </motion.div>
           )}
@@ -119,17 +119,17 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
 
         {/* Main Timer Card */}
         <motion.div
-          className="bg-card rounded-2xl p-4 shadow-elevated border border-border/50 mb-4"
+          className="bg-card rounded-2xl p-3 shadow-elevated border border-border/50 mb-3"
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
         >
           {/* Timer Display */}
-          <div className="text-center mb-6">
-            <p className="text-muted-foreground text-xs font-medium mb-1">
+          <div className="text-center mb-4">
+            <p className="text-muted-foreground text-xs font-medium mb-0.5">
               {isActive ? 'Sancı müddəti' : 'Hazır'}
             </p>
             <motion.p 
-              className={`text-6xl font-black font-mono ${isActive ? 'text-primary' : 'text-foreground'}`}
+              className={`text-5xl font-black font-mono ${isActive ? 'text-primary' : 'text-foreground'}`}
               animate={isActive ? { scale: [1, 1.02, 1] } : {}}
               transition={{ duration: 1, repeat: isActive ? Infinity : 0 }}
             >
@@ -141,23 +141,23 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
           {!isActive ? (
             <motion.button
               onClick={handleStart}
-              className="w-full h-14 rounded-xl gradient-primary text-white font-bold flex items-center justify-center gap-2 shadow-button"
+              className="w-full h-12 rounded-xl gradient-primary text-white font-bold flex items-center justify-center gap-2 shadow-button"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <Play className="w-5 h-5" />
+              <Play className="w-4 h-4" />
               Sancı başladı
             </motion.button>
           ) : (
             <motion.button
               onClick={handleStop}
-              className="w-full h-14 rounded-xl bg-red-500 text-white font-bold flex items-center justify-center gap-2 shadow-lg"
+              className="w-full h-12 rounded-xl bg-red-500 text-white font-bold flex items-center justify-center gap-2 shadow-lg"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               animate={{ scale: [1, 1.02, 1] }}
               transition={{ duration: 0.5, repeat: Infinity }}
             >
-              <Square className="w-5 h-5" />
+              <Square className="w-4 h-4" />
               Sancı bitdi
             </motion.button>
           )}

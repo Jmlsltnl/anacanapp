@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, Clock, ArrowLeft, ArrowRight, Baby, Pencil, Trash2, X, Check } from 'lucide-react';
 import { useBabyLogs, FeedingHistoryItem } from '@/hooks/useBabyLogs';
+
 import { format, isToday, isYesterday } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
@@ -52,6 +53,7 @@ interface FeedingHistoryPanelProps {
 const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpanded = false }: FeedingHistoryPanelProps) => {
   const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
   const { getFeedingHistory, getTodayFeedingBreakdown, deleteLog, updateLog } = useBabyLogs();
+  
   const { toast } = useToast();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editStartTime, setEditStartTime] = useState('');
@@ -189,7 +191,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                     <div className="bg-orange-100/50 dark:bg-orange-500/15 rounded-xl p-2.5 text-center border border-orange-100 dark:border-orange-500/20">
                       <div className="flex items-center justify-center gap-1 mb-1">
                         <span className="text-lg">🥣</span>
-                        <span className="text-xs font-semibold text-foreground">Bərk qida</span>
+                        <span className="text-xs font-semibold text-foreground">Əlavə qida</span>
                       </div>
                       <p className="text-sm font-bold text-orange-600 dark:text-orange-400">{todayBreakdown.solidCount} dəfə</p>
                       <p className="text-[10px] text-muted-foreground">bu gün</p>
@@ -197,6 +199,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                   )}
                 </div>
               )}
+
 
               {historyArray.map(([date, items]) => (
                 <div key={date} className="space-y-1.5">
@@ -259,7 +262,12 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                               <div className="flex items-center gap-2">
                                 <span className="text-sm">{getFeedTypeEmoji(item.feedType)}</span>
                                 <div>
-                                  <p className="text-xs font-medium text-foreground">{getFeedTypeLabel(item.feedType)}</p>
+                                  <p className="text-xs font-medium text-foreground">
+                                    {item.feedType === 'solid' && item.notes ? item.notes : getFeedTypeLabel(item.feedType)}
+                                    {item.feedType === 'formula' && item.notes && item.notes.includes('ml') && (
+                                      <span className="ml-1 text-blue-600 dark:text-blue-400 font-bold">({item.notes})</span>
+                                    )}
+                                  </p>
                                   <p className="text-[10px] text-muted-foreground">
                                     {format(item.startTime, 'HH:mm')}
                                     {item.endTime && ` - ${format(item.endTime, 'HH:mm')}`}

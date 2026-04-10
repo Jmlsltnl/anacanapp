@@ -77,40 +77,40 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="gradient-primary px-3 pt-3 pb-4 safe-top relative z-20">
+      <div className="gradient-primary px-3 pt-2 pb-3 safe-top relative z-20">
         <div className="flex items-center gap-2 relative z-20">
           <motion.button
             onClick={onBack}
-            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold text-white">Təpik Sayğacı</h1>
-            <p className="text-white/80 text-xs">Körpə hərəkətlərini izləyin</p>
+            <h1 className="text-base font-bold text-white">Təpik Sayğacı</h1>
+            <p className="text-white/80 text-[10px]">Körpə hərəkətlərini izləyin</p>
           </div>
         </div>
       </div>
 
-      <div className="px-3 pt-3">
+      <div className="px-3 pt-2">
         {/* Main Counter Card */}
         <motion.div
-          className="bg-card rounded-2xl p-4 shadow-elevated border border-border/50 mb-3"
+          className="bg-card rounded-2xl p-3 shadow-elevated border border-border/50 mb-3"
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
         >
           {/* Timer */}
-          <div className="text-center mb-6">
-            <p className="text-muted-foreground text-sm font-medium mb-1">Keçən vaxt</p>
-            <p className="text-4xl font-black text-foreground font-mono">{formatTime(time)}</p>
+          <div className="text-center mb-4">
+            <p className="text-muted-foreground text-xs font-medium mb-0.5">Keçən vaxt</p>
+            <p className="text-3xl font-black text-foreground font-mono">{formatTime(time)}</p>
           </div>
 
           {/* Kick Button */}
           <motion.button
             onClick={handleKick}
-            className="w-48 h-48 mx-auto rounded-full gradient-primary flex flex-col items-center justify-center shadow-glow mb-6 relative overflow-hidden"
+            className="w-36 h-36 mx-auto rounded-full gradient-primary flex flex-col items-center justify-center shadow-glow mb-4 relative overflow-hidden"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -122,52 +122,52 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
                 transition={{ duration: 0.5, repeat: Infinity }}
               />
             )}
-            <Footprints className="w-16 h-16 text-white mb-2" />
-            <span className="text-6xl font-black text-white">{kicks}</span>
+             <Footprints className="w-12 h-12 text-white mb-1" />
+            <span className="text-5xl font-black text-white">{kicks}</span>
           </motion.button>
 
           {/* Message */}
-          <p className="text-center text-muted-foreground font-medium mb-6">
+          <p className="text-center text-muted-foreground text-sm font-medium mb-4">
             {getKickMessage()}
           </p>
 
           {/* Controls */}
-          <div className="flex gap-4">
+          <div className="flex gap-3">
             {isActive ? (
               <motion.button
                 onClick={handleStop}
-                className="flex-1 h-14 rounded-2xl bg-destructive text-white font-bold flex items-center justify-center gap-2"
+                className="flex-1 h-12 rounded-xl bg-destructive text-white font-bold flex items-center justify-center gap-2"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <Pause className="w-5 h-5" />
+                <Pause className="w-4 h-4" />
                 Dayandır
               </motion.button>
             ) : (
               <motion.button
                 onClick={() => setIsActive(true)}
-                className="flex-1 h-14 rounded-2xl gradient-primary text-white font-bold flex items-center justify-center gap-2 shadow-button"
+                className="flex-1 h-12 rounded-xl gradient-primary text-white font-bold flex items-center justify-center gap-2 shadow-button"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <Play className="w-5 h-5" />
+                <Play className="w-4 h-4" />
                 Başla
               </motion.button>
             )}
             <motion.button
               onClick={handleReset}
-              className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center"
+              className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <RotateCcw className="w-5 h-5 text-muted-foreground" />
+              <RotateCcw className="w-4 h-4 text-muted-foreground" />
             </motion.button>
           </div>
         </motion.div>
 
         {/* Today's Stats */}
         <motion.div
-          className="bg-primary/5 dark:bg-primary/10 rounded-3xl p-5 mb-6 border border-primary/20"
+          className="bg-primary/5 dark:bg-primary/10 rounded-2xl p-4 mb-4 border border-primary/20"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}

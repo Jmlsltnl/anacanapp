@@ -164,7 +164,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Compact Header */}
-      <div className="sticky top-0 z-20 bg-card border-b border-border/50 px-4 py-3 safe-area-top">
+      <div className="sticky top-0 z-20 bg-card border-b border-border/50 px-4 pb-2 safe-area-top">
         <div className="flex items-center gap-3 mb-3 relative z-30">
           <Button variant="ghost" size="icon" onClick={onBack} className="relative z-30">
             <ArrowLeft className="w-5 h-5" />
