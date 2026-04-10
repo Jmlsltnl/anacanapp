@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { ArrowLeft, Sparkles, BookOpen, Heart, Trash2, Loader2, Wand2, Clock, Star, BookOpenCheck, Globe, X, Baby } from 'lucide-react';
+import { ArrowLeft, Sparkles, BookOpen, Heart, Trash2, Loader2, Wand2, Clock, Star, BookOpenCheck, Globe, X, Baby, PenLine, ListChecks } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
