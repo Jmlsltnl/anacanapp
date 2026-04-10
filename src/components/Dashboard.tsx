@@ -799,6 +799,9 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   
   // Feeding tracking with live timer
   const [showFeedingModal, setShowFeedingModal] = useState(false);
+  const [showFormulaMLInput, setShowFormulaMLInput] = useState(false);
+  const [formulaML, setFormulaML] = useState('');
+  const formulaMLPresets = [30, 60, 90, 120, 150, 180];
   const leftFeedTimer = getActiveTimer('feeding', 'left');
   const rightFeedTimer = getActiveTimer('feeding', 'right');
   
@@ -895,19 +898,31 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
     }
   };
 
-  const addFeeding = async (type: 'formula' | 'solid') => {
+  const addFeeding = async (type: 'formula' | 'solid', amountMl?: number) => {
     await hapticFeedback.medium();
     await addLog({
       log_type: 'feeding',
       feed_type: type,
+      notes: type === 'formula' && amountMl ? `${amountMl} ml` : undefined,
     });
     setShowFeedingModal(false);
+    setShowFormulaMLInput(false);
+    setFormulaML('');
     
     const typeLabels = {
-      formula: 'Süd əvəzedicisi 🍼',
+      formula: amountMl ? `Süd əvəzedicisi ${amountMl} ml 🍼` : 'Süd əvəzedicisi 🍼',
       solid: 'Əlavə qida 🥣'
     };
     toast({ title: `${typeLabels[type]} qeyd edildi!` });
+  };
+
+  const handleFormulaClick = () => {
+    setShowFormulaMLInput(true);
+  };
+
+  const submitFormula = () => {
+    const ml = parseInt(formulaML);
+    addFeeding('formula', ml > 0 ? ml : undefined);
   };
 
   const addDiaper = async (type: 'wet' | 'dirty' | 'both') => {
