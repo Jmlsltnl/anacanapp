@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, Clock, ArrowLeft, ArrowRight, Baby, Pencil, Trash2, X, Check } from 'lucide-react';
 import { useBabyLogs, FeedingHistoryItem } from '@/hooks/useBabyLogs';
+import { useMealLogs } from '@/hooks/useMealLogs';
 import { format, isToday, isYesterday } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
@@ -52,6 +53,7 @@ interface FeedingHistoryPanelProps {
 const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpanded = false }: FeedingHistoryPanelProps) => {
   const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
   const { getFeedingHistory, getTodayFeedingBreakdown, deleteLog, updateLog } = useBabyLogs();
+  const { todayLogs: todayMealLogs } = useMealLogs();
   const { toast } = useToast();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editStartTime, setEditStartTime] = useState('');
@@ -65,7 +67,11 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
   const todayBreakdown = getTodayFeedingBreakdown;
   const historyArray = Array.from(feedingHistory.entries());
 
-  const totalFeedings = todayBreakdown.leftCount + todayBreakdown.rightCount + todayBreakdown.formulaCount + todayBreakdown.solidCount;
+  // Include meal_logs count as "solid" equivalent
+  const mealLogCount = todayMealLogs.length;
+  const effectiveSolidCount = todayBreakdown.solidCount + mealLogCount;
+
+  const totalFeedings = todayBreakdown.leftCount + todayBreakdown.rightCount + todayBreakdown.formulaCount + effectiveSolidCount;
   const hasAnyFeedings = totalFeedings > 0;
 
   const buildSummaryText = () => {
@@ -74,7 +80,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
       parts.push(`🤱 ${todayBreakdown.leftCount + todayBreakdown.rightCount}`);
     }
     if (todayBreakdown.formulaCount > 0) parts.push(`🍼 ${todayBreakdown.formulaCount}`);
-    if (todayBreakdown.solidCount > 0) parts.push(`🥣 ${todayBreakdown.solidCount}`);
+    if (effectiveSolidCount > 0) parts.push(`🥣 ${effectiveSolidCount}`);
     return parts.length > 0 ? parts.join(' · ') : 'Qeyd yoxdur';
   };
 
@@ -185,16 +191,41 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                       <p className="text-[10px] text-muted-foreground">bu gün</p>
                     </div>
                   )}
-                  {todayBreakdown.solidCount > 0 && (
+                  {effectiveSolidCount > 0 && (
                     <div className="bg-orange-100/50 dark:bg-orange-500/15 rounded-xl p-2.5 text-center border border-orange-100 dark:border-orange-500/20">
                       <div className="flex items-center justify-center gap-1 mb-1">
                         <span className="text-lg">🥣</span>
-                        <span className="text-xs font-semibold text-foreground">Bərk qida</span>
+                        <span className="text-xs font-semibold text-foreground">Əlavə qida</span>
                       </div>
-                      <p className="text-sm font-bold text-orange-600 dark:text-orange-400">{todayBreakdown.solidCount} dəfə</p>
+                      <p className="text-sm font-bold text-orange-600 dark:text-orange-400">{effectiveSolidCount} dəfə</p>
                       <p className="text-[10px] text-muted-foreground">bu gün</p>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Meal logs from Nutrition tool for today */}
+              {todayMealLogs.length > 0 && (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-semibold text-foreground">🥣 Əlavə qida (bu gün)</p>
+                    <p className="text-[10px] text-muted-foreground">{todayMealLogs.length} yeməl</p>
+                  </div>
+                  <div className="space-y-1">
+                    {todayMealLogs.map((meal) => (
+                      <div key={meal.id} className="flex items-center justify-between bg-white/60 dark:bg-card/60 rounded-lg px-2.5 py-1.5 border border-transparent dark:border-border/30">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">🥣</span>
+                          <div>
+                            <p className="text-xs font-medium text-foreground">{meal.food_name}</p>
+                            <p className="text-[10px] text-muted-foreground">
+                              {format(new Date(meal.logged_at), 'HH:mm')} · {meal.calories} kkal
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 

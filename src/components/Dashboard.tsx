@@ -13,6 +13,7 @@ import { hapticFeedback } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useBabyLogs } from '@/hooks/useBabyLogs';
+import { useMealLogs } from '@/hooks/useMealLogs';
 import { useAuth } from '@/hooks/useAuth';
 import { useKickSessions } from '@/hooks/useKickSessions';
 import { useWeightEntries } from '@/hooks/useWeightEntries';
@@ -767,6 +768,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   const { unlockAchievement, getTotalPoints } = useAchievements();
   const { activeTimers, startTimer, stopTimer, getElapsedSeconds, getActiveTimer } = useTimerStore();
   const { todayLogs, addLog, getTodayStats, refetch } = useBabyLogs();
+  const { todayLogs: todayMealLogs } = useMealLogs();
   const { children, selectedChild, hasChildren, hasMultipleChildren, getChildAge } = useChildren();
   
   // Derive baby data from selectedChild for multi-child support
@@ -1350,8 +1352,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
               <Baby className="w-5 h-5 text-white" />
             </div>
             <div className="text-left">
-              <h3 className="font-bold text-sm text-foreground"><h3 className="font-bold text-sm text-foreground">Qidalanmaya nəzarət</h3></h3>
-              <p className="text-xs text-muted-foreground">Bu gün: {todayStats.feedingCount} dəfə</p>
+              <h3 className="font-bold text-sm text-foreground">Qidalanmaya nəzarət</h3>
+              <p className="text-xs text-muted-foreground">Bu gün: {todayStats.feedingCount + todayMealLogs.length} dəfə</p>
             </div>
           </button>
           <motion.button
@@ -1371,34 +1373,39 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
               exit={{ opacity: 0, height: 0 }}
               className="grid grid-cols-2 gap-2 mb-3"
             >
-              <motion.button
-                onClick={() => toggleFeeding('left')}
-                className={`p-3 rounded-xl flex flex-col items-center gap-1 ${
-                  leftFeedTimer 
-                    ? 'bg-pink-500 border-2 border-pink-600 text-white' 
-                    : 'bg-pink-50 border-2 border-pink-200'
-                }`}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span className="text-2xl">🤱</span>
-                <span className={`text-sm font-medium ${leftFeedTimer ? 'text-white' : 'text-pink-700'}`}>
-                  {leftFeedTimer ? formatDuration(getElapsedSeconds(leftFeedTimer.id)) : 'Sol Sinə'}
-                </span>
-              </motion.button>
-              <motion.button
-                onClick={() => toggleFeeding('right')}
-                className={`p-3 rounded-xl flex flex-col items-center gap-1 ${
-                  rightFeedTimer 
-                    ? 'bg-pink-500 border-2 border-pink-600 text-white' 
-                    : 'bg-pink-50 border-2 border-pink-200'
-                }`}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span className="text-2xl">🤱</span>
-                <span className={`text-sm font-medium ${rightFeedTimer ? 'text-white' : 'text-pink-700'}`}>
-                  {rightFeedTimer ? formatDuration(getElapsedSeconds(rightFeedTimer.id)) : 'Sağ Sinə'}
-                </span>
-              </motion.button>
+              {/* Breastfeeding buttons - hide after 12 months */}
+              {babyData && babyData.ageInMonths < 12 && (
+                <>
+                  <motion.button
+                    onClick={() => toggleFeeding('left')}
+                    className={`p-3 rounded-xl flex flex-col items-center gap-1 ${
+                      leftFeedTimer 
+                        ? 'bg-pink-500 border-2 border-pink-600 text-white' 
+                        : 'bg-pink-50 border-2 border-pink-200'
+                    }`}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span className="text-2xl">🤱</span>
+                    <span className={`text-sm font-medium ${leftFeedTimer ? 'text-white' : 'text-pink-700'}`}>
+                      {leftFeedTimer ? formatDuration(getElapsedSeconds(leftFeedTimer.id)) : 'Sol Sinə'}
+                    </span>
+                  </motion.button>
+                  <motion.button
+                    onClick={() => toggleFeeding('right')}
+                    className={`p-3 rounded-xl flex flex-col items-center gap-1 ${
+                      rightFeedTimer 
+                        ? 'bg-pink-500 border-2 border-pink-600 text-white' 
+                        : 'bg-pink-50 border-2 border-pink-200'
+                    }`}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span className="text-2xl">🤱</span>
+                    <span className={`text-sm font-medium ${rightFeedTimer ? 'text-white' : 'text-pink-700'}`}>
+                      {rightFeedTimer ? formatDuration(getElapsedSeconds(rightFeedTimer.id)) : 'Sağ Sinə'}
+                    </span>
+                  </motion.button>
+                </>
+              )}
               <motion.button
                 onClick={handleFormulaClick}
                 className="p-3 rounded-xl bg-blue-50 border-2 border-blue-200 flex flex-col items-center gap-1"
@@ -1408,7 +1415,10 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 <span className="text-xs font-medium text-blue-700">Süd Əvəzedicisi</span>
               </motion.button>
               <motion.button
-                onClick={() => addFeeding('solid')}
+                onClick={() => {
+                  setShowFeedingModal(false);
+                  onNavigateToTool?.('nutrition');
+                }}
                 className="p-3 rounded-xl bg-orange-50 border-2 border-orange-200 flex flex-col items-center gap-1"
                 whileTap={{ scale: 0.95 }}
               >
