@@ -1352,7 +1352,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
               <Baby className="w-5 h-5 text-white" />
             </div>
             <div className="text-left">
-              <h3 className="font-bold text-sm text-foreground"><h3 className="font-bold text-sm text-foreground">Qidalanmaya nəzarət</h3></h3>
+              <h3 className="font-bold text-sm text-foreground">Qidalanmaya nəzarət</h3>
               <p className="text-xs text-muted-foreground">Bu gün: {todayStats.feedingCount + todayMealLogs.length} dəfə</p>
             </div>
           </button>
