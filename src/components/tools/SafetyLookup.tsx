@@ -67,8 +67,9 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
       const diffDays = Math.floor((Date.now() - new Date(profile.last_period_date).getTime()) / 86400000);
       userContext.pregnancyWeek = Math.floor(diffDays / 7);
     } else if (profile?.life_stage === 'mommy' && profile?.baby_birth_date) {
-      const diffDays = Math.floor((Date.now() - new Date(profile.baby_birth_date).getTime()) / 86400000);
-      userContext.babyAgeMonths = Math.floor(diffDays / 30);
+      const { getRealCalendarAge } = await import('@/lib/pregnancy-utils');
+      const age = getRealCalendarAge(profile.baby_birth_date);
+      userContext.babyAgeMonths = age.months;
       userContext.babyName = profile.baby_name;
     }
     setAiLoading(true);
