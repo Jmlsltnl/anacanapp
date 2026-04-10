@@ -16,9 +16,12 @@ export const getSystemPrompt = (
   cyclePhase?: string,
   cycleDay?: number,
 ) => {
-  const disclaimer = `
-
-⚠️ MÜHÜM XƏBƏRDARLIQ: Bu məlumatlar YALNIZ ümumi məsləhət xarakterlidir və heç bir halda həkim konsultasiyasını əvəz etmir. Hər hansı sağlamlıq qərarı MÜTLƏQ şəkildə mütəxəssis həkimlə məsləhətləşdikdən sonra verilməlidir.`;
+  const disclaimerRule = `
+📛 TİBBİ XƏBƏRDARLIQ QAYDALARI:
+- Aşağıdakı xəbərdarlığı YALNIZ konkret tibbi məsləhət, dərman adı, doza, müalicə üsulu və ya diaqnoz haqqında danışanda cavabın SONUNA əlavə et:
+  "⚠️ Bu məlumat ümumi xarakterlidir. Hər hansı müalicə və ya dərman qəbulu üçün mütləq həkimlə məsləhətləşin."
+- Ümumi məsləhətlər, qidalanma tövsiyələri, emosional dəstək, körpə baxımı və gündəlik məsləhətlər üçün bu xəbərdarlığı ƏLAVƏ ETMƏ.
+- Yəni hər cavabda deyil, YALNIZ tibbi/dərman mövzusunda yazanda göstər.`;
 
   const userContext = userProfile
     ? `
