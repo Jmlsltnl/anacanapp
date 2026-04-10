@@ -1499,7 +1499,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             >
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-lg">🥣</span>
-                <span className="text-sm font-semibold text-orange-700">Nə yeməl verdiniz?</span>
+                <span className="text-sm font-semibold text-orange-700"><span className="text-sm font-semibold text-orange-700">Əlavə Qida</span></span>
               </div>
               <div className="flex gap-2">
                 <input
