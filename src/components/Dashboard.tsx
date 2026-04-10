@@ -1372,7 +1372,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 </span>
               </motion.button>
               <motion.button
-                onClick={() => addFeeding('formula')}
+                onClick={handleFormulaClick}
                 className="p-3 rounded-xl bg-blue-50 border-2 border-blue-200 flex flex-col items-center gap-1"
                 whileTap={{ scale: 0.95 }}
               >
@@ -1387,6 +1387,60 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 <span className="text-xl">🥣</span>
                 <span className="text-xs font-medium text-orange-700">Əlavə Qida</span>
               </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Formula ML Input Modal */}
+        <AnimatePresence>
+          {showFormulaMLInput && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="bg-blue-50 rounded-xl p-3 mb-2 border border-blue-200"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-lg">🍼</span>
+                <span className="text-sm font-semibold text-blue-700">Neçə ml?</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {formulaMLPresets.map(ml => (
+                  <motion.button
+                    key={ml}
+                    onClick={() => addFeeding('formula', ml)}
+                    className="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-700 text-xs font-bold border border-blue-200"
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {ml} ml
+                  </motion.button>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  value={formulaML}
+                  onChange={(e) => setFormulaML(e.target.value)}
+                  placeholder="Digər (ml)"
+                  className="flex-1 px-3 py-1.5 rounded-lg border border-blue-200 text-sm bg-white"
+                  min="1"
+                  max="500"
+                />
+                <motion.button
+                  onClick={submitFormula}
+                  className="px-4 py-1.5 rounded-lg bg-blue-500 text-white text-xs font-bold"
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Qeyd et
+                </motion.button>
+                <motion.button
+                  onClick={() => { setShowFormulaMLInput(false); setFormulaML(''); }}
+                  className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-xs"
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Ləğv
+                </motion.button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
