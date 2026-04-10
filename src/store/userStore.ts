@@ -240,18 +240,17 @@ export const useUserStore = create<UserState>()(
         const { babyBirthDate, babyName, babyGender } = get();
         if (!babyBirthDate || !babyName || !babyGender) return null;
 
-        const today = new Date();
-        const birthDate = new Date(babyBirthDate);
-        const ageInDays = Math.floor((today.getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24));
-        const ageInMonths = Math.floor(ageInDays / 30.44);
+        const { getRealCalendarAge } = require('@/lib/pregnancy-utils');
+        const age = getRealCalendarAge(babyBirthDate);
 
         return {
           id: 'baby-1',
           name: babyName,
-          birthDate,
+          birthDate: new Date(babyBirthDate),
           gender: babyGender,
-          ageInDays,
-          ageInMonths,
+          ageInDays: age.totalDays,
+          ageInMonths: age.months,
+          ageRemainingDays: age.days,
         };
       },
     }),
