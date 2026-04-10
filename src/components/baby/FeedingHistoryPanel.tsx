@@ -204,6 +204,31 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                 </div>
               )}
 
+              {/* Meal logs from Nutrition tool for today */}
+              {todayMealLogs.length > 0 && (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-semibold text-foreground">🥣 Əlavə qida (bu gün)</p>
+                    <p className="text-[10px] text-muted-foreground">{todayMealLogs.length} yeməl</p>
+                  </div>
+                  <div className="space-y-1">
+                    {todayMealLogs.map((meal) => (
+                      <div key={meal.id} className="flex items-center justify-between bg-white/60 dark:bg-card/60 rounded-lg px-2.5 py-1.5 border border-transparent dark:border-border/30">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">🥣</span>
+                          <div>
+                            <p className="text-xs font-medium text-foreground">{meal.food_name}</p>
+                            <p className="text-[10px] text-muted-foreground">
+                              {format(new Date(meal.logged_at), 'HH:mm')} · {meal.calories} kkal
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {historyArray.map(([date, items]) => (
                 <div key={date} className="space-y-1.5">
                   <div className="flex items-center justify-between">
