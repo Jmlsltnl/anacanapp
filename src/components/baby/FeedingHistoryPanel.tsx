@@ -263,7 +263,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                                 <span className="text-sm">{getFeedTypeEmoji(item.feedType)}</span>
                                 <div>
                                   <p className="text-xs font-medium text-foreground">
-                                    {getFeedTypeLabel(item.feedType)}
+                                    {item.feedType === 'solid' && item.notes ? item.notes : getFeedTypeLabel(item.feedType)}
                                     {item.feedType === 'formula' && item.notes && item.notes.includes('ml') && (
                                       <span className="ml-1 text-blue-600 dark:text-blue-400 font-bold">({item.notes})</span>
                                     )}
