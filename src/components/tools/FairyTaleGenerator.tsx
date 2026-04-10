@@ -789,6 +789,8 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
               </motion.div>
             )}
           </AnimatePresence>
+            </>
+          )}
         </DialogContent>
       </Dialog>
 
