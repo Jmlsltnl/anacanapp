@@ -325,9 +325,9 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     <div className="min-h-screen bg-gradient-to-b from-muted/30 to-background pb-24">
       {/* Minimal Header */}
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl">
-        <div className="px-4 pb-2 safe-area-top">
+        <div className="px-4 pt-2 pb-2 safe-area-top">
           {/* Search Bar with integrated title */}
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3">
             <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${stageInfo.color} flex items-center justify-center shadow-md flex-shrink-0`}>
               <span className="text-lg">{stageInfo.emoji}</span>
             </div>
@@ -342,7 +342,6 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
               />
             </div>
           </div>
-
         </div>
       </div>
 
@@ -399,34 +398,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
           });
         })()}
 
-        {/* Quick Access Row - DB driven */}
-        {(() => {
-          const quickAccessItems = toolConfigs
-            .filter(t => t.is_quick_access)
-            .sort((a, b) => (a.quick_access_order || 0) - (b.quick_access_order || 0));
-          
-          if (quickAccessItems.length === 0) return null;
-          
-          return (
-            <div className="flex gap-2 mb-4 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4">
-              {quickAccessItems.map((item) => {
-                const QAIcon = iconMap[item.icon] || Wrench;
-                const label = item.display_name_az || item.name_az || item.name;
-                return (
-                  <motion.button
-                    key={item.tool_id}
-                    onClick={() => openTool(item.tool_id)}
-                    className={`flex-shrink-0 flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-gradient-to-r ${item.quick_access_gradient || 'from-primary to-primary/80'} shadow-lg`}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <QAIcon className="w-4 h-4 text-white" />
-                    <span className="text-white text-xs font-semibold">{label}</span>
-                  </motion.button>
-                );
-              })}
-            </div>
-          );
-        })()}
+        {/* Quick Access Row removed - only hero banners shown */}
 
         {/* Tools Count Header */}
         <div className="flex items-center justify-between mb-3">

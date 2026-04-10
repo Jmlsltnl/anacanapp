@@ -479,19 +479,25 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
                     </motion.button>
                   </div>
 
-                  {/* Recipe Info */}
                   <div className="p-3">
                     <h3 className="font-bold text-sm text-foreground line-clamp-2 mb-1">{recipe.title}</h3>
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                         {recipe.category}
                       </span>
-                      {recipe.servings && (
-                        <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                          <Users className="w-3 h-3" />
-                          {recipe.servings}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-1.5">
+                        {!isRecipeFree(recipe) && (
+                          <span className="flex items-center gap-0.5 text-[9px] font-bold text-amber-500">
+                            <Crown className="w-3 h-3" />
+                          </span>
+                        )}
+                        {recipe.servings && (
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                            <Users className="w-3 h-3" />
+                            {recipe.servings}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
