@@ -1864,26 +1864,7 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
               </motion.span>
             )}
           </motion.button>
-          <motion.button 
-            className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center relative"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (onNavigate) onNavigate('notifications');
-            }}
-          >
-            <Bell className="w-4 h-4 text-primary" />
-            {notificationCount > 0 && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[9px] font-bold text-white flex items-center justify-center"
-              >
-                {notificationCount > 9 ? '9+' : notificationCount}
-              </motion.span>
-            )}
-          </motion.button>
+          {/* Notification bell temporarily disabled */}
         </div>
       </motion.div>
 
