@@ -53,6 +53,7 @@ interface FeedingHistoryPanelProps {
 const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpanded = false }: FeedingHistoryPanelProps) => {
   const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
   const { getFeedingHistory, getTodayFeedingBreakdown, deleteLog, updateLog } = useBabyLogs();
+  const { todayLogs: todayMealLogs } = useMealLogs();
   const { toast } = useToast();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editStartTime, setEditStartTime] = useState('');
@@ -66,7 +67,11 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
   const todayBreakdown = getTodayFeedingBreakdown;
   const historyArray = Array.from(feedingHistory.entries());
 
-  const totalFeedings = todayBreakdown.leftCount + todayBreakdown.rightCount + todayBreakdown.formulaCount + todayBreakdown.solidCount;
+  // Include meal_logs count as "solid" equivalent
+  const mealLogCount = todayMealLogs.length;
+  const effectiveSolidCount = todayBreakdown.solidCount + mealLogCount;
+
+  const totalFeedings = todayBreakdown.leftCount + todayBreakdown.rightCount + todayBreakdown.formulaCount + effectiveSolidCount;
   const hasAnyFeedings = totalFeedings > 0;
 
   const buildSummaryText = () => {
@@ -75,7 +80,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
       parts.push(`🤱 ${todayBreakdown.leftCount + todayBreakdown.rightCount}`);
     }
     if (todayBreakdown.formulaCount > 0) parts.push(`🍼 ${todayBreakdown.formulaCount}`);
-    if (todayBreakdown.solidCount > 0) parts.push(`🥣 ${todayBreakdown.solidCount}`);
+    if (effectiveSolidCount > 0) parts.push(`🥣 ${effectiveSolidCount}`);
     return parts.length > 0 ? parts.join(' · ') : 'Qeyd yoxdur';
   };
 
