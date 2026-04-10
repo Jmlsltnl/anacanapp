@@ -108,6 +108,28 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
   const incrementPlayCount = useIncrementPlayCount();
 
   const handleGenerate = async () => {
+    if (createMode === 'direct') {
+      if (!customPrompt.trim()) {
+        toast.error('Nağıl təsviri yazılmalıdır');
+        return;
+      }
+      try {
+        const result = await generateTale.mutateAsync({
+          child_name: directChildName || 'Uşaq',
+          language: directLanguage,
+          age_range: directAgeRange,
+          custom_prompt: customPrompt,
+        });
+        setShowCreate(false);
+        setSelectedTale(result);
+        setCustomPrompt('');
+        setDirectChildName('');
+      } catch (error) {
+        // Error handled in hook
+      }
+      return;
+    }
+
     if (!formData.child_name || !formData.theme) {
       toast.error('Uşağın adı və mövzu seçilməlidir');
       return;
@@ -135,6 +157,9 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
   const resetCreate = () => {
     setShowCreate(false);
     setCreateStep(1);
+    setCreateMode('wizard');
+    setCustomPrompt('');
+    setDirectChildName('');
     setFormData({ child_name: '', theme: '', hero: '', moral_lesson: '', language: 'az', age_range: '3-5', story_style: '' });
   };
 
