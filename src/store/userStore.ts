@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { LifeStage, UserRole, DailyLog, CycleData, PregnancyData, BabyData } from '@/types/anacan';
 import { FRUIT_SIZES } from '@/types/anacan';
-import { getPregnancyWeek, getDayInWeek, getTrimester, calculateDueDate } from '@/lib/pregnancy-utils';
+import { getPregnancyWeek, getDayInWeek, getTrimester, calculateDueDate, getRealCalendarAge } from '@/lib/pregnancy-utils';
 
 interface UserState {
   isAuthenticated: boolean;
@@ -240,7 +240,6 @@ export const useUserStore = create<UserState>()(
         const { babyBirthDate, babyName, babyGender } = get();
         if (!babyBirthDate || !babyName || !babyGender) return null;
 
-        const { getRealCalendarAge } = require('@/lib/pregnancy-utils');
         const age = getRealCalendarAge(babyBirthDate);
 
         return {
