@@ -63,6 +63,7 @@ import AdminForceUpdate from './admin/AdminForceUpdate';
 import AdminLanguages from './admin/AdminLanguages';
 import AdminTranslations from './admin/AdminTranslations';
 import AdminDeeplinks from './admin/AdminDeeplinks';
+import AdminCrashReports from './admin/AdminCrashReports';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -201,6 +202,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminTranslations />;
       case 'deeplinks':
         return <AdminDeeplinks />;
+      case 'crash-reports':
+        return <AdminCrashReports />;
       default:
         return <AdminDashboard />;
     }
