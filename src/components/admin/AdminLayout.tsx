@@ -167,6 +167,7 @@ const menuGroups: MenuGroup[] = [
       { id: 'push-notifications', label: 'Push Bildirişləri', icon: Send },
       { id: 'force-update', label: 'Force Update', icon: Shield },
       { id: 'deeplinks', label: 'Deeplinklər', icon: Globe },
+      { id: 'crash-reports', label: 'Crash Reports', icon: AlertTriangle },
     ],
   },
 ];
