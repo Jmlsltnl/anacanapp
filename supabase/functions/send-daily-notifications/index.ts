@@ -96,7 +96,10 @@ Deno.serve(async (req) => {
       );
     }
 
+    console.log(`[send-daily-notifications] Started. bakuTime=${currentTimeStr} activeSlot=${activeSendTime || 'manual'} manual=${!!body.manual}`);
+
     const { accessToken, projectId } = await getFirebaseAccessToken(saJson);
+    console.log(`[send-daily-notifications] Got Firebase access token, project=${projectId}`);
 
     // Get active scheduled notifications
     const { data: scheduledNotifications } = await supabase
