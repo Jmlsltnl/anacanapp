@@ -200,14 +200,12 @@ Deno.serve(async (req) => {
     let sentCount = 0;
     const results: Array<{ userId: string; success: boolean; type?: string; day?: number; error?: string }> = [];
 
-    for (const user of eligibleUsers) {
+    const processUser = async (user: UserForNotification) => {
       const userTokens = tokens.filter((t: DeviceToken) => t.user_id === user.user_id);
-      if (!userTokens.length) continue;
+      if (!userTokens.length) return;
 
-      // Collect all notifications to send for this user
       const notificationsToSend: Array<{ title: string; body: string; id: string; type: string; day?: number }> = [];
 
-      // Priority 1a: pregnancy day notifications (ALL for the user's current day)
       if (user.life_stage === 'bump' && user.last_period_date) {
         const pregnancyDay = calculatePregnancyDay(user.last_period_date);
         if (pregnancyDay !== null) {
@@ -218,16 +216,13 @@ Deno.serve(async (req) => {
               notificationsToSend.push({
                 id: dn.id,
                 title: `${dn.emoji || ''} ${dn.title}`.trim(),
-                body: dn.body,
-                type: 'pregnancy_day',
-                day: pregnancyDay,
+                body: dn.body, type: 'pregnancy_day', day: pregnancyDay,
               });
             }
           }
         }
       }
 
-      // Priority 1b: mommy day notifications (ALL for the child's current day)
       if (user.life_stage === 'mommy') {
         const userChildren = children?.filter((c: any) => c.user_id === user.user_id) || [];
         if (userChildren.length > 0 && userChildren[0].birth_date) {
@@ -244,9 +239,7 @@ Deno.serve(async (req) => {
                 notificationsToSend.push({
                   id: dn.id,
                   title: `${dn.emoji || ''} ${dn.title}`.trim(),
-                  body: dn.body,
-                  type: 'mommy_day',
-                  day: childAgeDays,
+                  body: dn.body, type: 'mommy_day', day: childAgeDays,
                 });
               }
             }
@@ -254,7 +247,6 @@ Deno.serve(async (req) => {
         }
       }
 
-      // Priority 2: scheduled notifications (only if no day-specific notifications were found at all for this day)
       if (notificationsToSend.length === 0 && scheduledNotifications?.length) {
         const match = scheduledNotifications.find((n: ScheduledNotification) => {
           if (n.target_audience === 'all') return true;
@@ -270,9 +262,7 @@ Deno.serve(async (req) => {
         }
       }
 
-      // Send all collected notifications
       for (const notif of notificationsToSend) {
-        let sent = false;
         for (const deviceToken of userTokens) {
           const result = await sendFCMv1(accessToken, projectId, deviceToken.token, notif.title, notif.body, {
             type: notif.type, notification_id: notif.id,
@@ -280,20 +270,14 @@ Deno.serve(async (req) => {
 
           if (result.success) {
             sentCount++;
-            sent = true;
             results.push({ userId: user.user_id, success: true, type: notif.type, day: notif.day });
-
             await supabase.from('notification_send_log').insert({
               user_id: user.user_id,
               notification_id: notif.type === 'scheduled' ? notif.id : null,
-              title: notif.title,
-              body: notif.body,
-              status: 'sent',
-              source_type: notif.type,
-              source_notification_id: notif.id,
+              title: notif.title, body: notif.body, status: 'sent',
+              source_type: notif.type, source_notification_id: notif.id,
             });
-
-            break; // sent to one device is enough
+            break;
           } else {
             results.push({ userId: user.user_id, success: false, error: result.error });
             if (result.unregistered) {
@@ -302,6 +286,14 @@ Deno.serve(async (req) => {
           }
         }
       }
+    };
+
+    // Parallel batches of 25 users for speed
+    const concurrency = 25;
+    for (let i = 0; i < eligibleUsers.length; i += concurrency) {
+      const batch = eligibleUsers.slice(i, i + concurrency);
+      await Promise.all(batch.map(processUser));
+      console.log(`[send-daily-notifications] Processed ${Math.min(i + concurrency, eligibleUsers.length)}/${eligibleUsers.length}, sent so far: ${sentCount}`);
     }
 
     // Update last_push_sent_at for users who got notifications
