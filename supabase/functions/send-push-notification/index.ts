@@ -90,8 +90,11 @@ Deno.serve(async (req) => {
         results.push({ token: token.substring(0, 20) + '...', success: true });
       } else {
         failureCount++;
-        results.push({ token: token.substring(0, 20) + '...', success: false, error: result.error });
+        results.push({ token: token.substring(0, 20) + '...', success: false, error: result.error, errorCode: result.errorCode });
+        // Only delete tokens that FCM definitively reports as dead (UNREGISTERED / NOT_FOUND).
+        // Transient errors (INVALID_ARGUMENT, QUOTA_EXCEEDED, UNAVAILABLE, INTERNAL) keep the token.
         if (result.unregistered) {
+          console.log(`[send-push-notification] Removing dead token (code=${result.errorCode}): ...${token.slice(-12)}`);
           await supabase.from('device_tokens').delete().eq('token', token);
         }
       }

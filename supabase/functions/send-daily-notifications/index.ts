@@ -297,7 +297,9 @@ Deno.serve(async (req) => {
             break;
           } else {
             results.push({ userId: user.user_id, success: false, error: result.error });
+            // Only delete tokens that FCM definitively flags as dead.
             if (result.unregistered) {
+              console.log(`[send-daily-notifications] Removing dead token (code=${result.errorCode}): ...${deviceToken.token.slice(-12)}`);
               await supabase.from('device_tokens').delete().eq('token', deviceToken.token);
             }
           }
