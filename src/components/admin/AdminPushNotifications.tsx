@@ -40,6 +40,7 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import PushDiagnosticsCard from './PushDiagnosticsCard';
 
 const audienceLabels: Record<string, { label: string; icon: any; color: string }> = {
   all: { label: 'Hamı', icon: Users, color: 'bg-blue-500' },
