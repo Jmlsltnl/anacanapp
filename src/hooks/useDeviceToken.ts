@@ -11,82 +11,53 @@ export const useDeviceToken = () => {
   const [error, setError] = useState<string | null>(null);
   const registrationAttempted = useRef(false);
 
-  // Save token to database
+  // Save token using safe upsert. Never delete other tokens until the new one is committed.
   const saveTokenToDatabase = useCallback(async (deviceToken: string, userId: string) => {
     try {
       const platform = Capacitor.getPlatform();
-      console.log('[DeviceToken] Saving token to database:', {
+      const platformValue = platform === 'ios' ? 'ios' : 'android';
+      const deviceName = `${platform} - ${navigator.userAgent.substring(0, 50)}`;
+
+      console.log('[DeviceToken] Upserting token:', {
         userId,
-        platform,
-        tokenPreview: deviceToken.substring(0, 20) + '...',
+        platform: platformValue,
+        tokenSuffix: '...' + deviceToken.slice(-12),
       });
 
-      // First check if token already exists
-      const { data: existing } = await supabase
+      // 1) Safe upsert on (user_id, token) — never destroys an existing live token.
+      const { error: upsertError } = await supabase
         .from('device_tokens')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('token', deviceToken)
-        .single();
+        .upsert(
+          {
+            user_id: userId,
+            token: deviceToken,
+            platform: platformValue,
+            device_name: deviceName,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'user_id,token' }
+        );
 
-      if (existing) {
-        console.log('[DeviceToken] Token already exists, updating timestamp');
-        const { error: updateError } = await supabase
-          .from('device_tokens')
-          .update({ updated_at: new Date().toISOString() })
-          .eq('id', existing.id);
-
-        if (updateError) {
-          console.error('[DeviceToken] Update error:', updateError);
-        }
-        return true;
+      if (upsertError) {
+        console.error('[DeviceToken] Upsert error:', upsertError);
+        return false;
       }
 
-      // Delete old tokens for this user on same platform (keep only latest)
-      await supabase
+      // 2) Only AFTER success, clean up any STALE tokens for this user on this platform
+      //    (different token strings — not the one we just saved).
+      const { error: cleanupError } = await supabase
         .from('device_tokens')
         .delete()
         .eq('user_id', userId)
-        .eq('platform', platform === 'ios' ? 'ios' : 'android');
+        .eq('platform', platformValue)
+        .neq('token', deviceToken);
 
-      // Insert new token
-      const { error: insertError } = await supabase
-        .from('device_tokens')
-        .insert({
-          user_id: userId,
-          token: deviceToken,
-          platform: platform === 'ios' ? 'ios' : 'android',
-          device_name: `${platform} - ${navigator.userAgent.substring(0, 50)}`,
-        });
-
-      if (insertError) {
-        console.error('[DeviceToken] Insert error:', insertError);
-        
-        // If duplicate key error, try upsert
-        if (insertError.code === '23505') {
-          console.log('[DeviceToken] Duplicate detected, trying upsert...');
-          const { error: upsertError } = await supabase
-            .from('device_tokens')
-            .upsert({
-              user_id: userId,
-              token: deviceToken,
-              platform: platform === 'ios' ? 'ios' : 'android',
-              device_name: `${platform} - ${navigator.userAgent.substring(0, 50)}`,
-              updated_at: new Date().toISOString(),
-            }, {
-              onConflict: 'user_id,token',
-            });
-
-          if (upsertError) {
-            console.error('[DeviceToken] Upsert error:', upsertError);
-            return false;
-          }
-        } else {
-          return false;
-        }
+      if (cleanupError) {
+        // Non-fatal — the new token is already saved.
+        console.warn('[DeviceToken] Stale-token cleanup warning:', cleanupError);
       }
 
-      console.log('[DeviceToken] Token saved successfully!');
+      console.log('[DeviceToken] Token saved successfully');
       return true;
     } catch (err) {
       console.error('[DeviceToken] Exception saving token:', err);
@@ -116,15 +87,11 @@ export const useDeviceToken = () => {
     setError(null);
 
     const platform = Capacitor.getPlatform();
-    console.log('[DeviceToken] Starting registration process...');
-    console.log('[DeviceToken] Platform:', platform);
-    console.log('[DeviceToken] User ID:', user.id);
+    console.log('[DeviceToken] Starting registration. Platform:', platform, 'User:', user.id);
 
     try {
-      // Use @capacitor-firebase/messaging for proper FCM token on both platforms
       const { FirebaseMessaging } = await import('@capacitor-firebase/messaging');
 
-      // Check current permission status
       let permStatus = await FirebaseMessaging.checkPermissions();
       console.log('[DeviceToken] Current permission:', permStatus.receive);
 
@@ -142,7 +109,6 @@ export const useDeviceToken = () => {
         return null;
       }
 
-      // Get FCM token directly - this returns a proper FCM token on BOTH iOS and Android
       console.log('[DeviceToken] Getting FCM token...');
       const tokenResult = await FirebaseMessaging.getToken();
       const deviceToken = tokenResult.token;
@@ -154,29 +120,26 @@ export const useDeviceToken = () => {
         return null;
       }
 
-      console.log('[DeviceToken] FCM token received:', deviceToken.substring(0, 30) + '...');
+      console.log('[DeviceToken] FCM token received: ...' + deviceToken.slice(-12));
       setToken(deviceToken);
 
-      // Save to database
       const saved = await saveTokenToDatabase(deviceToken, user.id);
       if (!saved) {
         setError('Token alındı amma saxlanmadı');
       }
 
-      // Listen for token refresh
+      // Token refresh listener
       FirebaseMessaging.addListener('tokenReceived', async (newTokenData) => {
         const newToken = newTokenData.token;
-        console.log('[DeviceToken] Token refreshed:', newToken.substring(0, 30) + '...');
+        console.log('[DeviceToken] Token refreshed: ...' + newToken.slice(-12));
         setToken(newToken);
         await saveTokenToDatabase(newToken, user.id);
       });
 
-      // Listen for push notifications received in foreground
       FirebaseMessaging.addListener('notificationReceived', (notification) => {
         console.log('[DeviceToken] Push received in foreground:', notification);
       });
 
-      // Listen for push notification action
       FirebaseMessaging.addListener('notificationActionPerformed', (action) => {
         console.log('[DeviceToken] Push action performed:', action);
       });
@@ -186,17 +149,17 @@ export const useDeviceToken = () => {
 
     } catch (err: any) {
       console.error('[DeviceToken] Registration exception:', err);
-      
+
       // Fallback to @capacitor/push-notifications if Firebase Messaging fails
       console.log('[DeviceToken] Trying fallback with @capacitor/push-notifications...');
       try {
         const { PushNotifications } = await import('@capacitor/push-notifications');
-        
+
         let permStatus = await PushNotifications.checkPermissions();
         if (permStatus.receive === 'prompt') {
           permStatus = await PushNotifications.requestPermissions();
         }
-        
+
         if (permStatus.receive !== 'granted') {
           setError('Push notification permission denied');
           setLoading(false);
@@ -204,7 +167,7 @@ export const useDeviceToken = () => {
         }
 
         await PushNotifications.removeAllListeners();
-        
+
         return new Promise<string | null>((resolve) => {
           const timeout = setTimeout(() => {
             console.log('[DeviceToken] Fallback registration timeout');
@@ -215,7 +178,7 @@ export const useDeviceToken = () => {
           PushNotifications.addListener('registration', async (tokenData) => {
             clearTimeout(timeout);
             const fallbackToken = tokenData.value;
-            console.log('[DeviceToken] Fallback token received:', fallbackToken.substring(0, 30) + '...');
+            console.log('[DeviceToken] Fallback token received: ...' + fallbackToken.slice(-12));
             setToken(fallbackToken);
             await saveTokenToDatabase(fallbackToken, user.id);
             setLoading(false);
@@ -258,15 +221,14 @@ export const useDeviceToken = () => {
       } else {
         console.log('[DeviceToken] Device unregistered');
       }
-      
-      // Also delete FCM token from Firebase
+
       try {
         const { FirebaseMessaging } = await import('@capacitor-firebase/messaging');
         await FirebaseMessaging.deleteToken();
       } catch {
         // Ignore if Firebase Messaging not available
       }
-      
+
       setToken(null);
       registrationAttempted.current = false;
     } catch (err) {
