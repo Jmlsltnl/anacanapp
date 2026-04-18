@@ -113,8 +113,9 @@ Deno.serve(async (req) => {
           failedCount++;
           // Log first 5 errors for debugging
           if (errors.length < 5) {
-            errors.push(`${deviceToken.platform}|${deviceToken.token.slice(-8)}|${result.error}`);
+            errors.push(`${deviceToken.platform}|${deviceToken.token.slice(-8)}|code=${result.errorCode || '?'}|${result.error}`);
           }
+          // Only delete tokens that FCM definitively reports as dead.
           if (result.unregistered) {
             await supabase.from('device_tokens').delete().eq('token', deviceToken.token);
           }

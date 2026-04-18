@@ -40,6 +40,7 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import PushDiagnosticsCard from './PushDiagnosticsCard';
 
 const audienceLabels: Record<string, { label: string; icon: any; color: string }> = {
   all: { label: 'Hamı', icon: Users, color: 'bg-blue-500' },
@@ -61,6 +62,8 @@ const AdminPushNotifications = () => {
         </p>
       </div>
 
+
+      <PushDiagnosticsCard />
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="scheduled" className="flex items-center gap-2">

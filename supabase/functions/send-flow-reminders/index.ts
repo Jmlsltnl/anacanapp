@@ -184,6 +184,8 @@ Deno.serve(async (req) => {
 
           break;
         } else if (result.unregistered) {
+          // Only delete on definitive dead-token codes (UNREGISTERED / NOT_FOUND).
+          console.log(`[send-flow-reminders] Removing dead token (code=${result.errorCode}): ...${deviceToken.token.slice(-12)}`);
           await supabase.from('device_tokens').delete().eq('token', deviceToken.token);
         }
       }
