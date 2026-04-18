@@ -61,6 +61,8 @@ const AdminPushNotifications = () => {
         </p>
       </div>
 
+
+      <PushDiagnosticsCard />
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="scheduled" className="flex items-center gap-2">
