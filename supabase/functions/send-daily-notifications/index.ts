@@ -58,23 +58,23 @@ Deno.serve(async (req) => {
     const currentMinute = bakuNow.getUTCMinutes();
     const currentTimeStr = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`;
 
-    let body: { manual?: boolean } = {};
+    let body: { manual?: boolean; userId?: string; skipDedup?: boolean } = {};
     try { body = await req.json(); } catch { /* No body */ }
 
-    if (!body.manual && (currentHour < 9 || currentHour >= 24)) {
+    if (!body.manual && (currentHour < 9 || currentHour >= 22)) {
       return new Response(
-        JSON.stringify({ message: 'Outside notification hours', skipped: true }),
+        JSON.stringify({ message: 'Outside notification hours', skipped: true, currentTime: currentTimeStr }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Determine which send_time slot we're in (within ±5 min window)
+    // Determine which send_time slot we're in (within ±15 min window — tolerates cron lag/cold starts)
     const timeSlots = ['09:00', '14:00'];
     const matchingSlot = timeSlots.find(slot => {
       const [h, m] = slot.split(':').map(Number);
       const slotMinutes = h * 60 + m;
       const currentMinutes = currentHour * 60 + currentMinute;
-      return Math.abs(currentMinutes - slotMinutes) <= 5;
+      return Math.abs(currentMinutes - slotMinutes) <= 15;
     });
 
     // For manual triggers, send all pending; for cron, only matching slot
