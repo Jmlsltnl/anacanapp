@@ -129,42 +129,59 @@ Deno.serve(async (req) => {
       mommyNotifsByDay.set(n.day_number, existing);
     });
 
-    // Get users
-    const { data: profiles } = await supabase
+    // Get users — optionally filter by single userId for debugging
+    let profilesQuery = supabase
       .from('profiles').select('user_id, life_stage, role, due_date, last_period_date');
+    if (body.userId) profilesQuery = profilesQuery.eq('user_id', body.userId);
+    const { data: profiles } = await profilesQuery;
 
-    const { data: children } = await supabase
+    let childrenQuery = supabase
       .from('user_children').select('user_id, birth_date').order('birth_date', { ascending: false });
+    if (body.userId) childrenQuery = childrenQuery.eq('user_id', body.userId);
+    const { data: children } = await childrenQuery;
 
-    const { data: preferences } = await supabase
+    let prefsQuery = supabase
       .from('user_preferences').select('user_id, push_enabled, daily_push_enabled');
+    if (body.userId) prefsQuery = prefsQuery.eq('user_id', body.userId);
+    const { data: preferences } = await prefsQuery;
 
-    const { data: tokens } = await supabase
+    let tokensQuery = supabase
       .from('device_tokens').select('token, user_id, platform');
+    if (body.userId) tokensQuery = tokensQuery.eq('user_id', body.userId);
+    const { data: tokens } = await tokensQuery;
 
     if (!tokens?.length) {
       return new Response(
-        JSON.stringify({ message: 'No device tokens', sent: 0 }),
+        JSON.stringify({ message: 'No device tokens', sent: 0, userId: body.userId || null }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Get today's already sent notifications to prevent duplicates
-    const todayStart = new Date();
-    todayStart.setUTCHours(0, 0, 0, 0);
-    const { data: todaySentLogs } = await supabase
+    // Get today's already sent notifications to prevent duplicates — use Baku-local day boundary.
+    // bakuNow is already shifted by +4h, so its UTC midnight === Baku midnight in the original UTC clock.
+    const bakuMidnight = new Date(bakuNow);
+    bakuMidnight.setUTCHours(0, 0, 0, 0);
+    // Convert back to real UTC instant by subtracting the +4h shift we added earlier.
+    const todayStart = new Date(bakuMidnight.getTime() - bakuOffsetMs);
+
+    let dedupQuery = supabase
       .from('notification_send_log')
       .select('user_id, source_type, source_notification_id')
       .gte('sent_at', todayStart.toISOString())
       .eq('status', 'sent');
+    if (body.userId) dedupQuery = dedupQuery.eq('user_id', body.userId);
+    const { data: todaySentLogs } = await dedupQuery;
 
-    // Build a set of "userId:sourceType:sourceNotifId" for dedup
+    // Build a set of "userId:sourceType:sourceNotifId" for dedup.
+    // skipDedup=true (test mode) → empty set, so resend is allowed.
     const alreadySent = new Set<string>();
-    todaySentLogs?.forEach((log: any) => {
-      if (log.source_type && log.source_notification_id) {
-        alreadySent.add(`${log.user_id}:${log.source_type}:${log.source_notification_id}`);
-      }
-    });
+    if (!body.skipDedup) {
+      todaySentLogs?.forEach((log: any) => {
+        if (log.source_type && log.source_notification_id) {
+          alreadySent.add(`${log.user_id}:${log.source_type}:${log.source_notification_id}`);
+        }
+      });
+    }
 
     // Build user map
     const userMap = new Map<string, UserForNotification>();
