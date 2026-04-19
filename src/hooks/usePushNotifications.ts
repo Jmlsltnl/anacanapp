@@ -34,9 +34,9 @@ export const usePushNotifications = () => {
         .from('user_preferences')
         .select('push_enabled, push_messages, push_likes, push_comments, push_community')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('Error fetching push settings:', error);
       }
 

@@ -61,9 +61,17 @@ Deno.serve(async (req) => {
       throw new Error("Invalid messages format");
     }
 
+    // Require explicit lifeStage so flow/mommy users don't get a "bump" persona by mistake.
+    // Fall back to "bump" only when truly unknown, and log a warning so we can spot misuse.
+    let resolvedLifeStage = lifeStage;
+    if (!resolvedLifeStage) {
+      console.warn("dr-anacan-chat: lifeStage missing from request — defaulting to 'bump'. Caller should always send lifeStage.");
+      resolvedLifeStage = "bump";
+    }
+
     const systemPrompt = isWeightAnalysis
       ? `Sən çəki məsləhətçisisən. QAYDALAR: Salamlama yoxdur. "Canım", "əzizim", "balacam" kimi ifadələr İSTİFADƏ ETMƏ. Disclaimer/xəbərdarlıq yoxdur. Birbaşa 1-2 cümlə ilə praktik məsləhət ver. Yalnız Azərbaycan dilində.`
-      : getSystemPrompt(lifeStage || "bump", pregnancyWeek, isPartner, userProfile, cyclePhase, cycleDay);
+      : getSystemPrompt(resolvedLifeStage, pregnancyWeek, isPartner, userProfile, cyclePhase, cycleDay);
 
     // Convert OpenAI-style messages to Gemini format
     const geminiContents = messages.map((msg: ChatMessage) => ({
@@ -173,6 +181,13 @@ Deno.serve(async (req) => {
             }
           } catch (err) {
             console.error("Stream transform error:", err);
+            // CRITICAL: always emit [DONE] so the frontend exits its streaming state,
+            // otherwise the user sees the "yazılır..." indicator forever.
+            try {
+              controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+            } catch {
+              // controller might already be closed
+            }
             controller.close();
           }
         },

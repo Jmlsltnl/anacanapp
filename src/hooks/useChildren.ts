@@ -61,7 +61,7 @@ export const useChildren = () => {
           .from('profiles')
           .select('baby_name, baby_birth_date, baby_gender')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (!profileError && profileRow?.baby_name && profileRow?.baby_birth_date) {
           const normalizedGender: 'boy' | 'girl' =
@@ -83,7 +83,7 @@ export const useChildren = () => {
               sort_order: 0,
             })
             .select('*')
-            .single();
+            .maybeSingle();
 
           if (!insertError && inserted) {
             const insertedChild = inserted as Child;
@@ -147,7 +147,7 @@ export const useChildren = () => {
           sort_order: children.length,
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (!error && data) {
         await fetchChildren();

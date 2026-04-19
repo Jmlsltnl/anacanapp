@@ -229,8 +229,8 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
                       : m
                   ));
                 }
-              } catch {
-                // Skip invalid JSON
+              } catch (parseErr) {
+                console.warn('AIChatScreen: skipped unparseable SSE chunk', parseErr);
               }
             }
           }
@@ -246,7 +246,9 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
                 const parsed = JSON.parse(data);
                 const content = parsed.choices?.[0]?.delta?.content || '';
                 if (content) fullContent += content;
-              } catch { /* ignore */ }
+              } catch (parseErr) {
+                console.warn('AIChatScreen: skipped trailing unparseable SSE chunk', parseErr);
+              }
             }
           }
         }
