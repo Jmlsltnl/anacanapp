@@ -5,6 +5,7 @@ import { useFavoriteNames } from '@/hooks/useFavoriteNames';
 import { useBabyNames } from '@/hooks/useDynamicContent';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { tr } from "@/lib/tr";
 
 interface BabyNamesProps {
   onBack: () => void;
@@ -78,7 +79,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Ad və ya məna axtarın..."
+              placeholder={tr("babynames_ad_ve_ya_mena_axtarin_30a88e", "Ad və ya məna axtarın...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full h-10 pl-10 pr-4 rounded-xl bg-muted/50 text-foreground placeholder:text-muted-foreground text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all"
@@ -88,9 +89,9 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
           {/* Gender Filter Pills */}
           <div className="flex gap-2">
             {[
-              { id: 'all', label: 'Hamısı', color: 'primary' },
-              { id: 'boy', label: 'Oğlan', color: 'blue' },
-              { id: 'girl', label: 'Qız', color: 'pink' },
+              { id: 'all', label: tr("babynames_hamisi_c73c4d", 'Hamısı'), color: 'primary' },
+              { id: 'boy', label: tr("babynames_oglan_e9715e", 'Oğlan'), color: 'blue' },
+              { id: 'girl', label: tr("babynames_qiz_79bf6b", 'Qız'), color: 'pink' },
             ].map((filter) => (
               <motion.button
                 key={filter.id}

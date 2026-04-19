@@ -19,6 +19,7 @@ import { usePlaceCategories, usePlaceAmenities, FALLBACK_CATEGORIES, FALLBACK_AM
 import { toast } from 'sonner';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { tr } from "@/lib/tr";
 
 interface MomFriendlyMapProps {
   onBack: () => void;
@@ -192,7 +193,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Məkan axtar..."
+            placeholder={tr("momfriendlymap_mekan_axtar_8b889d", "Məkan axtar...")}
             className="pl-10 h-10 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30"
           />
         </div>
@@ -410,7 +411,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
               <Input
                 value={newPlace.name}
                 onChange={(e) => setNewPlace({ ...newPlace, name: e.target.value, name_az: e.target.value })}
-                placeholder="Məsələn: Port Baku Mall"
+                placeholder={tr("momfriendlymap_meselen_port_baku_mall_760801", "Məsələn: Port Baku Mall")}
                 className="mt-1.5 bg-muted/50"
               />
             </div>
@@ -419,7 +420,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
               <Input
                 value={newPlace.address_az || ''}
                 onChange={(e) => setNewPlace({ ...newPlace, address_az: e.target.value })}
-                placeholder="Bakı, Neftçilər prospekti"
+                placeholder={tr("momfriendlymap_baki_neftciler_prospekti_a5d7c0", "Bakı, Neftçilər prospekti")}
                 className="mt-1.5 bg-muted/50"
               />
             </div>
@@ -594,7 +595,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                           <Textarea
                             value={reviewComment}
                             onChange={(e) => setReviewComment(e.target.value)}
-                            placeholder="Təcrübənizi paylaşın..."
+                            placeholder={tr("momfriendlymap_tecrubenizi_paylasin_aeca62", "Təcrübənizi paylaşın...")}
                             className="bg-muted/50 resize-none"
                             rows={3}
                           />

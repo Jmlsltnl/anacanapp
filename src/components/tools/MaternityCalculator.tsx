@@ -13,6 +13,7 @@ import { useMaternityBenefits } from '@/hooks/useMaternityBenefits';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import MarkdownContent from '@/components/MarkdownContent';
+import { tr } from "@/lib/tr";
 
 interface MaternityCalculatorProps {
   onBack: () => void;
@@ -40,20 +41,20 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
   const pregnancyTypes = [
     { 
       value: 'normal', 
-      label: 'Normal hamiləlik', 
-      description: '126 gün (70+56)',
+      label: tr("maternitycalculator_normal_hamilelik_fa223b", 'Normal hamiləlik'), 
+      description: tr("maternitycalculator_126_gun_70_56_9d7bc1", '126 gün (70+56)'),
       icon: '👶'
     },
     { 
       value: 'complicated', 
-      label: 'Ağır doğuş', 
-      description: '140 gün (70+70)',
+      label: tr("maternitycalculator_agir_dogus_3e1a6b", 'Ağır doğuş'), 
+      description: tr("maternitycalculator_140_gun_70_70_197a87", '140 gün (70+70)'),
       icon: '🏥'
     },
     { 
       value: 'multiple', 
-      label: 'Çoxdöllü hamiləlik', 
-      description: '194 gün (84+110)',
+      label: tr("maternitycalculator_coxdollu_hamilelik_e3c1aa", 'Çoxdöllü hamiləlik'), 
+      description: tr("maternitycalculator_194_gun_84_110_52cf0f", '194 gün (84+110)'),
       icon: '👶👶'
     },
   ];
@@ -136,7 +137,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                   type="number"
                   value={salary}
                   onChange={(e) => setSalary(e.target.value)}
-                  placeholder="Məsələn: 800"
+                  placeholder={tr("maternitycalculator_meselen_800_4effcf", "Məsələn: 800")}
                   className="h-14 text-lg pr-16"
                 />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">

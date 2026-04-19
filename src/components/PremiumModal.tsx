@@ -8,6 +8,7 @@ import { usePremiumConfig } from '@/hooks/usePremiumConfig';
 import { usePaywallConfig } from '@/hooks/usePaywallConfig';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSubscription } from '@/hooks/useSubscription';
+import { tr } from "@/lib/tr";
 
 interface PremiumModalProps {
   isOpen: boolean;
@@ -85,7 +86,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
 
   const handlePurchase = useCallback(async () => {
     if (!isNative) {
-      toast({ title: 'Premium mövcud deyil', description: 'Premium almaq üçün mobil tətbiqi yükləyin.', variant: 'destructive' });
+      toast({ title: tr("premiummodal_premium_movcud_deyil_821534", 'Premium mövcud deyil'), description: tr("premiummodal_premium_almaq_ucun_mobil_tetbiqi_yukleyi_8f5604", 'Premium almaq üçün mobil tətbiqi yükləyin.'), variant: 'destructive' });
       return;
     }
     import('@/lib/analytics').then(m => m.analytics.logPaywallClicked(feature || 'general', selectedPlan)).catch(() => {});
@@ -93,7 +94,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
     const success = await purchaseFn();
     if (success) {
       import('@/lib/analytics').then(m => m.analytics.logPremiumSubscribed(selectedPlan)).catch(() => {});
-      toast({ title: 'Premium aktivləşdirildi! 🎉', description: 'İndi bütün xüsusiyyətlərdən istifadə edə bilərsiniz.' });
+      toast({ title: tr("premiummodal_premium_aktivlesdirildi_eb58f2", 'Premium aktivləşdirildi! 🎉'), description: tr("premiummodal_i_ndi_butun_xususiyyetlerden_istifade_ed_20a814", 'İndi bütün xüsusiyyətlərdən istifadə edə bilərsiniz.') });
       onClose();
     }
   }, [isNative, selectedPlan, purchaseYearly, purchaseMonthly, toast, onClose]);
@@ -101,10 +102,10 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const handleRestore = useCallback(async () => {
     const success = await restorePurchases();
     if (success) {
-      toast({ title: 'Alışlar bərpa edildi', description: 'Premium abunəliyiniz aktivləşdirildi.' });
+      toast({ title: tr("premiummodal_alislar_berpa_edildi_42cc61", 'Alışlar bərpa edildi'), description: tr("premiummodal_premium_abuneliyiniz_aktivlesdirildi_edabd7", 'Premium abunəliyiniz aktivləşdirildi.') });
       onClose();
     } else {
-      toast({ title: 'Alış tapılmadı', description: 'Əvvəlki premium abunəlik tapılmadı.', variant: 'destructive' });
+      toast({ title: tr("premiummodal_alis_tapilmadi_a77421", 'Alış tapılmadı'), description: tr("premiummodal_evvelki_premium_abunelik_tapilmadi_88feae", 'Əvvəlki premium abunəlik tapılmadı.'), variant: 'destructive' });
     }
   }, [restorePurchases, toast, onClose]);
 
@@ -155,7 +156,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
               className="absolute top-3 right-4 w-8 h-8 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center hover:bg-white/25 transition-colors z-10"
               style={{ marginTop: 'env(safe-area-inset-top, 0px)' }}
               disabled={isPurchasing}
-              aria-label="Bağla"
+              aria-label={tr("premiummodal_bagla_84bdc9", "Bağla")}
             >
               <X className="w-4 h-4 text-white" />
             </button>

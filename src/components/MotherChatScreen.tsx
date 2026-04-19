@@ -9,6 +9,7 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import ChatMediaUpload from '@/components/chat/ChatMediaUpload';
 import ChatMessageBubble from '@/components/chat/ChatMessageBubble';
+import { tr } from "@/lib/tr";
 
 interface ChatMessage {
   id: string;
@@ -151,8 +152,8 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
-        title: 'Xəta',
-        description: 'Mesaj göndərilə bilmədi',
+        title: tr("motherchatscreen_xeta_3cdbb6", 'Xəta'),
+        description: tr("motherchatscreen_mesaj_gonderile_bilmedi_0cd095", 'Mesaj göndərilə bilmədi'),
         variant: 'destructive',
       });
     }
@@ -382,7 +383,7 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-            placeholder="Mesaj yazın..."
+            placeholder={tr("motherchatscreen_mesaj_yazin_e69f84", "Mesaj yazın...")}
             className="flex-1 h-12 px-4 rounded-2xl bg-muted text-sm outline-none border-2 border-transparent focus:border-primary/30 transition-colors"
           />
           <motion.button

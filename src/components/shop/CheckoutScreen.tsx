@@ -8,6 +8,7 @@ import { useCart } from '@/hooks/useOrders';
 import { useCouponValidator } from '@/hooks/useCoupons';
 import CouponInput from './CouponInput';
 import { toast } from '@/hooks/use-toast';
+import { tr } from "@/lib/tr";
 
 interface CheckoutScreenProps {
   onBack: () => void;
@@ -35,7 +36,7 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.phone || !formData.address) {
-      toast({ title: 'Xəta', description: 'Zəhmət olmasa bütün məlumatları doldurun', variant: 'destructive' });
+      toast({ title: tr("checkoutscreen_xeta_3cdbb6", 'Xəta'), description: tr("checkoutscreen_zehmet_olmasa_butun_melumatlari_doldurun_9a9a4a", 'Zəhmət olmasa bütün məlumatları doldurun'), variant: 'destructive' });
       return;
     }
 
@@ -58,7 +59,7 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      toast({ title: 'Xəta', description: 'Sifariş yaradılmadı', variant: 'destructive' });
+      toast({ title: tr("checkoutscreen_xeta_3cdbb6", 'Xəta'), description: tr("checkoutscreen_sifaris_yaradilmadi_025f3b", 'Sifariş yaradılmadı'), variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -95,8 +96,8 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
             <MapPin className="w-4 h-4 text-primary" />
             Çatdırılma Ünvanı
           </h2>
-          <Input placeholder="Şəhər" value={formData.city} onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))} className="h-11" />
-          <Textarea placeholder="Ünvan (küçə, bina, mənzil)" value={formData.address} onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))} rows={2} />
+          <Input placeholder={tr("checkoutscreen_seher_5f373c", "Şəhər")} value={formData.city} onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))} className="h-11" />
+          <Textarea placeholder={tr("checkoutscreen_unvan_kuce_bina_menzil_ad3ef6", "Ünvan (küçə, bina, mənzil)")} value={formData.address} onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))} rows={2} />
         </div>
 
         <div className="space-y-3">
@@ -104,7 +105,7 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
             <Truck className="w-4 h-4 text-primary" />
             Əlavə Qeydlər
           </h2>
-          <Textarea placeholder="Kuryerə mesaj (istəyə bağlı)" value={formData.notes} onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))} rows={2} />
+          <Textarea placeholder={tr("checkoutscreen_kuryere_mesaj_isteye_bagli_56df8d", "Kuryerə mesaj (istəyə bağlı)")} value={formData.notes} onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))} rows={2} />
         </div>
 
         {/* Coupon */}

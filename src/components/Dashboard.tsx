@@ -63,6 +63,7 @@ import FetusMonth6 from '@/assets/fetus/month-6.svg';
 import FetusMonth7 from '@/assets/fetus/month-7.svg';
 import FetusMonth8 from '@/assets/fetus/month-8.svg';
 import FetusMonth9 from '@/assets/fetus/month-9.svg';
+import { tr } from "@/lib/tr";
 
 const FETUS_IMAGES: { [key: number]: string } = {
   1: FetusMonth1,
@@ -247,12 +248,12 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
   const getTrimesterInfo = (trimester: number) => {
     switch (trimester) {
       case 1:
-        return { title: '1-ci Trimester Tövsiyələri', emoji: '🌱' };
+        return { title: tr("dashboard_1_ci_trimester_tovsiyeleri_0a4c84", '1-ci Trimester Tövsiyələri'), emoji: '🌱' };
       case 2:
-        return { title: '2-ci Trimester Tövsiyələri', emoji: '🌸' };
+        return { title: tr("dashboard_2_ci_trimester_tovsiyeleri_16e100", '2-ci Trimester Tövsiyələri'), emoji: '🌸' };
       case 3:
       default:
-        return { title: '3-cü Trimester Tövsiyələri', emoji: '🍼' };
+        return { title: tr("dashboard_3_cu_trimester_tovsiyeleri_93f711", '3-cü Trimester Tövsiyələri'), emoji: '🍼' };
     }
   };
   
@@ -302,7 +303,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
     // Add a quick single-kick session for tracking
     await addSession(1, 0);
     toast({
-      title: "Təpik qeyd edildi! 👶",
+      title: tr("dashboard_tepik_qeyd_edildi_284f06", "Təpik qeyd edildi! 👶"),
       description: `Bu gün ${kickCount + 1} təpik`,
     });
   };
@@ -311,7 +312,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
     await hapticFeedback.light();
     await updateWaterIntake(1);
     toast({
-      title: "Su əlavə edildi! 💧",
+      title: tr("dashboard_su_elave_edildi_7b894d", "Su əlavə edildi! 💧"),
       description: `${waterCount + 1}/8 stəkan`,
     });
   };
@@ -502,11 +503,11 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
         <h3 className="text-sm font-bold text-foreground mb-2">Körpənin inkişafı</h3>
         <div className="flex justify-around">
           {[
-            { icon: '👀', label: 'Göz', active: weeklyDevelopment.eyes },
+            { icon: '👀', label: tr("dashboard_goz_fbc05e", 'Göz'), active: weeklyDevelopment.eyes },
             { icon: '👂', label: 'Qulaq', active: weeklyDevelopment.ears },
             { icon: '✋', label: 'Barmaq', active: weeklyDevelopment.fingers },
-            { icon: '🦶', label: 'Təpik', active: weeklyDevelopment.kicks },
-            { icon: '💇', label: 'Saç', active: weeklyDevelopment.hair },
+            { icon: '🦶', label: tr("dashboard_tepik_9a873a", 'Təpik'), active: weeklyDevelopment.kicks },
+            { icon: '💇', label: tr("dashboard_sac_a09eaa", 'Saç'), active: weeklyDevelopment.hair },
           ].map((item, index) => (
             <motion.div 
               key={item.label}
@@ -656,8 +657,8 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           color="bg-primary/10 dark:bg-primary/20 text-primary" 
           onClick={() => {
             toast({
-              title: "Vitamin Xatırlatması 💊",
-              description: "Prenatal vitamininizi günlük qəbul etməyi unutmayın. Folat, D vitamini və dəmir vacibdir!",
+              title: tr("dashboard_vitamin_xatirlatmasi_b8a490", "Vitamin Xatırlatması 💊"),
+              description: tr("dashboard_prenatal_vitamininizi_gunluk_qebul_etmey_c8cba3", "Prenatal vitamininizi günlük qəbul etməyi unutmayın. Folat, D vitamini və dəmir vacibdir!"),
             });
             if (onNavigateToTool) onNavigateToTool('nutrition');
           }}
@@ -893,7 +894,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
     } else {
       // Start sleep
       startTimer('sleep');
-      toast({ title: "Yuxu başladı! 😴", description: "Bitirmək üçün yenidən basın" });
+      toast({ title: tr("dashboard_yuxu_basladi_b503f7", "Yuxu başladı! 😴"), description: tr("dashboard_bitirmek_ucun_yeniden_basin_37b592", "Bitirmək üçün yenidən basın") });
     }
   };
 
@@ -1464,7 +1465,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                   type="number"
                   value={formulaML}
                   onChange={(e) => setFormulaML(e.target.value)}
-                  placeholder="Digər (ml)"
+                  placeholder={tr("dashboard_diger_ml_da1e7f", "Digər (ml)")}
                   className="flex-1 px-3 py-1.5 rounded-lg border border-blue-200 text-sm bg-white"
                   min="1"
                   max="500"
@@ -1506,7 +1507,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                   type="text"
                   value={solidFoodName}
                   onChange={(e) => setSolidFoodName(e.target.value)}
-                  placeholder="Məs: balkabaqlı püre"
+                  placeholder={tr("dashboard_mes_balkabaqli_pure_27f08d", "Məs: balkabaqlı püre")}
                   className="flex-1 px-3 py-1.5 rounded-lg border border-orange-200 text-sm bg-white"
                 />
                 <motion.button

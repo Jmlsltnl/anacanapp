@@ -13,6 +13,7 @@ import { az } from 'date-fns/locale';
 import { nativeShare } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { tr } from "@/lib/tr";
 import {
   Carousel,
   CarouselContent,
@@ -91,7 +92,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
     });
     
     if (success) {
-      toast({ title: 'Paylaşıldı!' });
+      toast({ title: tr("affiliateproductdetail_paylasildi_c7d9ef", 'Paylaşıldı!') });
     }
   };
 

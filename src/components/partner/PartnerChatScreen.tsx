@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import ChatMediaUpload from '@/components/chat/ChatMediaUpload';
 import ChatMessageBubble from '@/components/chat/ChatMessageBubble';
+import { tr } from "@/lib/tr";
 
 interface ChatMessage {
   id: string;
@@ -131,8 +132,8 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
-        title: 'Xəta',
-        description: 'Mesaj göndərilə bilmədi',
+        title: tr("partnerchatscreen_xeta_3cdbb6", 'Xəta'),
+        description: tr("partnerchatscreen_mesaj_gonderile_bilmedi_0cd095", 'Mesaj göndərilə bilmədi'),
         variant: 'destructive',
       });
     }
@@ -340,7 +341,7 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-            placeholder="Mesaj yazın..."
+            placeholder={tr("partnerchatscreen_mesaj_yazin_e69f84", "Mesaj yazın...")}
             className="flex-1 h-12 px-4 rounded-2xl bg-muted text-sm outline-none border-2 border-transparent focus:border-primary/30 transition-colors"
           />
           <motion.button

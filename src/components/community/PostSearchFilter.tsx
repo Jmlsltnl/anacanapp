@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from "@/lib/tr";
 
 interface PostSearchFilterProps {
   searchQuery: string;
@@ -11,7 +12,7 @@ const PostSearchFilter = ({ sortBy, onSortChange }: PostSearchFilterProps) => {
   return (
     <div className="flex gap-1 mb-3 border-b border-border/8 pb-2">
       {[
-        { id: 'recent' as const, label: 'Ən son' },
+        { id: 'recent' as const, label: tr("postsearchfilter_en_son_473654", 'Ən son') },
         { id: 'popular' as const, label: 'Populyar' },
       ].map((option) => (
         <button

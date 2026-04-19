@@ -11,6 +11,7 @@ import { hapticFeedback } from '@/lib/native';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { tr } from "@/lib/tr";
 
 interface CommentReplyProps {
   comment: PostComment;
@@ -76,15 +77,15 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
       });
       setReplyText(''); setShowReplyInput(false); onRefetch();
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message || 'Şərh əlavə edilə bilmədi', variant: 'destructive' });
+      toast({ title: tr("commentreply_xeta_3cdbb6", 'Xəta'), description: error.message || 'Şərh əlavə edilə bilmədi', variant: 'destructive' });
     }
   };
 
   const handleDelete = async () => {
     if (!confirm('Bu şərhi silmək istəyirsiniz?')) return;
     const { error } = await supabase.from('post_comments').delete().eq('id', comment.id);
-    if (error) toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
-    else { toast({ title: 'Uğurlu', description: 'Şərh silindi' }); onRefetch(); }
+    if (error) toast({ title: tr("commentreply_xeta_3cdbb6", 'Xəta'), description: error.message, variant: 'destructive' });
+    else { toast({ title: tr("commentreply_ugurlu_7fe64c", 'Uğurlu'), description: tr("commentreply_serh_silindi_59cfe5", 'Şərh silindi') }); onRefetch(); }
   };
 
   const handleAvatarClick = () => { if (comment.user_id && onUserClick) onUserClick(comment.user_id); };

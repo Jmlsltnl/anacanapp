@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Trophy, Target, Heart, MessageCircle, Star, Zap } from 'lucide-react';
 import { usePartnerStats } from '@/hooks/usePartnerStats';
+import { tr } from "@/lib/tr";
 
 const PartnerQuickStats = () => {
   const { stats, loading } = usePartnerStats();
@@ -19,14 +20,14 @@ const PartnerQuickStats = () => {
     {
       icon: Trophy,
       value: stats.totalPoints,
-      label: 'Ümumi Xal',
+      label: tr("partnerquickstats_umumi_xal_3ce85a", 'Ümumi Xal'),
       gradient: 'from-amber-500 to-orange-600',
       delay: 0,
     },
     {
       icon: Target,
       value: stats.completedMissions,
-      label: 'Tamamlanmış',
+      label: tr("partnerquickstats_tamamlanmis_e36252", 'Tamamlanmış'),
       gradient: 'from-emerald-500 to-teal-600',
       delay: 0.05,
     },

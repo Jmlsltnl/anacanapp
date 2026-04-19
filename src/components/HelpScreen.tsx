@@ -15,6 +15,7 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
+import { tr } from "@/lib/tr";
 
 interface HelpScreenProps {
   onBack: () => void;
@@ -50,7 +51,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
     label: cat.name_az || cat.name,
     emoji: cat.emoji,
   })) || [
-    { id: 'general', label: 'Ümumi sual', emoji: '❓' },
+    { id: 'general', label: tr("helpscreen_umumi_sual_e1c5ee", 'Ümumi sual'), emoji: '❓' },
   ];
 
   const getStatusIcon = (status: SupportTicket['status']) => {
@@ -74,8 +75,8 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
   const handleSubmitTicket = async () => {
     if (!newTicket.subject.trim() || !newTicket.message.trim()) {
       toast({
-        title: 'Xəta',
-        description: 'Mövzu və mesaj daxil edin',
+        title: tr("helpscreen_xeta_3cdbb6", 'Xəta'),
+        description: tr("helpscreen_movzu_ve_mesaj_daxil_edin_b27c43", 'Mövzu və mesaj daxil edin'),
         variant: 'destructive'
       });
       return;
@@ -92,14 +93,14 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
 
     if (result.error) {
       toast({
-        title: 'Xəta',
-        description: 'Müraciət göndərilə bilmədi',
+        title: tr("helpscreen_xeta_3cdbb6", 'Xəta'),
+        description: tr("helpscreen_muraciet_gonderile_bilmedi_2fc6c2", 'Müraciət göndərilə bilmədi'),
         variant: 'destructive'
       });
     } else {
       toast({
-        title: 'Uğurlu!',
-        description: 'Müraciətiniz göndərildi',
+        title: tr("helpscreen_ugurlu_5c0191", 'Uğurlu!'),
+        description: tr("helpscreen_muracietiniz_gonderildi_2337db", 'Müraciətiniz göndərildi'),
       });
       setNewTicket({ subject: '', message: '', category: 'general' });
       setShowNewTicket(false);
@@ -117,8 +118,8 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
       setReplyMessage('');
     } else {
       toast({
-        title: 'Xəta',
-        description: 'Mesaj göndərilə bilmədi',
+        title: tr("helpscreen_xeta_3cdbb6", 'Xəta'),
+        description: tr("helpscreen_mesaj_gonderile_bilmedi_0cd095", 'Mesaj göndərilə bilmədi'),
         variant: 'destructive'
       });
     }
@@ -227,7 +228,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
               <Textarea
                 value={replyMessage}
                 onChange={(e) => setReplyMessage(e.target.value)}
-                placeholder="Mesajınızı yazın..."
+                placeholder={tr("helpscreen_mesajinizi_yazin_21d48f", "Mesajınızı yazın...")}
                 rows={1}
                 className="flex-1 min-h-[44px] max-h-[120px] resize-none"
                 onKeyDown={(e) => {
@@ -286,8 +287,8 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
         <div className="bg-card rounded-2xl p-1.5 flex gap-1 shadow-lg">
           {[
             { id: 'faq', label: 'SSS' },
-            { id: 'contact', label: 'Əlaqə' },
-            { id: 'tickets', label: 'Müraciətlər' },
+            { id: 'contact', label: tr("helpscreen_elaqe_07e6a8", 'Əlaqə') },
+            { id: 'tickets', label: tr("helpscreen_muracietler_215f40", 'Müraciətlər') },
           ].map(tab => (
             <button
               key={tab.id}
@@ -459,7 +460,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                       <Input
                         value={newTicket.subject}
                         onChange={(e) => setNewTicket({...newTicket, subject: e.target.value})}
-                        placeholder="Müraciətinizin mövzusu"
+                        placeholder={tr("helpscreen_muracietinizin_movzusu_d111c4", "Müraciətinizin mövzusu")}
                       />
                     </div>
 
@@ -468,7 +469,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                       <Textarea
                         value={newTicket.message}
                         onChange={(e) => setNewTicket({...newTicket, message: e.target.value})}
-                        placeholder="Probleminizi ətraflı təsvir edin..."
+                        placeholder={tr("helpscreen_probleminizi_etrafli_tesvir_edin_2c4a86", "Probleminizi ətraflı təsvir edin...")}
                         rows={4}
                       />
                     </div>

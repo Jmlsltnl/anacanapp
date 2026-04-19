@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
 import { useAuth } from '@/hooks/useAuth';
 import { hapticFeedback } from '@/lib/native';
+import { tr } from "@/lib/tr";
 
 interface DirectMessageScreenProps {
   userId: string;
@@ -202,7 +203,7 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
               value={text}
               onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendText())}
-              placeholder="Mesaj yazın..."
+              placeholder={tr("directmessagescreen_mesaj_yazin_e69f84", "Mesaj yazın...")}
               className="flex-1 h-10 px-3.5 rounded-full bg-muted/50 border border-border/30 text-sm outline-none placeholder:text-muted-foreground/40 focus:border-primary/30"
             />
 

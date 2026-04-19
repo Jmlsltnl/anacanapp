@@ -21,6 +21,7 @@ import BannerSlot from '@/components/banners/BannerSlot';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { tr } from "@/lib/tr";
 
 interface ProfileScreenProps {
   onNavigate?: (screen: string) => void;
@@ -44,13 +45,13 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   const [childForm, setChildForm] = useState<{ name: string; birth_date: string; gender: 'boy' | 'girl' }>({ name: '', birth_date: '', gender: 'boy' });
 
   const genderOptions = [
-    { value: 'boy', label: 'Oğlan', emoji: '👦' },
-    { value: 'girl', label: 'Qız', emoji: '👧' },
+    { value: 'boy', label: tr("profilescreen_oglan_e9715e", 'Oğlan'), emoji: '👦' },
+    { value: 'girl', label: tr("profilescreen_qiz_79bf6b", 'Qız'), emoji: '👧' },
   ];
 
   const handleAddChild = async () => {
     if (!childForm.name || !childForm.birth_date) {
-      toast({ title: 'Ad və doğum tarixi tələb olunur', variant: 'destructive' });
+      toast({ title: tr("profilescreen_ad_ve_dogum_tarixi_teleb_olunur_bdab04", 'Ad və doğum tarixi tələb olunur'), variant: 'destructive' });
       return;
     }
     const child = await addChild({
@@ -75,7 +76,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
       avatar_emoji: genderOptions.find(g => g.value === childForm.gender)?.emoji || '👶',
     });
     if (success) {
-      toast({ title: 'Yeniləndi' });
+      toast({ title: tr("profilescreen_yenilendi_d10a01", 'Yeniləndi') });
       setEditingChild(null);
       setChildForm({ name: '', birth_date: '', gender: 'boy' });
     }
@@ -94,14 +95,14 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   };
 
   const menuItems = [
-    { id: 'billing', icon: CreditCard, label: 'Abunəliyim' },
-    { id: 'notifications', icon: Bell, label: 'Bildirişlər', badge: unreadCount > 0 ? String(unreadCount) : undefined },
-    { id: 'appearance', icon: Palette, label: 'Görünüş' },
-    { id: 'calendar', icon: Calendar, label: 'Təqvim Ayarları' },
+    { id: 'billing', icon: CreditCard, label: tr("profilescreen_abuneliyim_f6c8ed", 'Abunəliyim') },
+    { id: 'notifications', icon: Bell, label: tr("profilescreen_bildirisler_54eb88", 'Bildirişlər'), badge: unreadCount > 0 ? String(unreadCount) : undefined },
+    { id: 'appearance', icon: Palette, label: tr("profilescreen_gorunus_165fe3", 'Görünüş') },
+    { id: 'calendar', icon: Calendar, label: tr("profilescreen_teqvim_ayarlari_012790", 'Təqvim Ayarları') },
     { id: 'privacy', icon: Shield, label: 'Gizlilik' },
-    { id: 'help', icon: HelpCircle, label: 'Yardım' },
+    { id: 'help', icon: HelpCircle, label: tr("profilescreen_yardim_da857a", 'Yardım') },
     ...(isAdmin ? [
-      { id: 'shop', icon: ShoppingCart, label: 'Mağaza (Test)', badge: 'Beta' },
+      { id: 'shop', icon: ShoppingCart, label: tr("profilescreen_magaza_test_72b060", 'Mağaza (Test)'), badge: 'Beta' },
       { id: 'admin', icon: ShieldCheck, label: 'Admin Panel', badge: 'Admin' }
     ] : []),
   ];
@@ -123,8 +124,8 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
 
     if (success) {
       toast({
-        title: 'Paylaşıldı!',
-        description: 'Partnyor kodu uğurla paylaşıldı.',
+        title: tr("profilescreen_paylasildi_c7d9ef", 'Paylaşıldı!'),
+        description: tr("profilescreen_partnyor_kodu_ugurla_paylasildi_d66277", 'Partnyor kodu uğurla paylaşıldı.'),
       });
     }
   };
@@ -132,8 +133,8 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   const handleLogout = async () => {
     await signOut();
     toast({
-      title: 'Çıxış edildi',
-      description: 'Uğurla çıxış etdiniz.',
+      title: tr("profilescreen_cixis_edildi_fb4a43", 'Çıxış edildi'),
+      description: tr("profilescreen_ugurla_cixis_etdiniz_9e8d3c", 'Uğurla çıxış etdiniz.'),
     });
   };
 
@@ -509,7 +510,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
               <Input
                 value={childForm.name}
                 onChange={(e) => setChildForm(p => ({ ...p, name: e.target.value }))}
-                placeholder="Körpənin adı"
+                placeholder={tr("profilescreen_korpenin_adi_8a4e9e", "Körpənin adı")}
               />
             </div>
             <div>
@@ -629,12 +630,12 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
           <h2 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Hüquqi</h2>
         </div>
         {[
-          { id: 'legal/privacy_policy', icon: FileText, label: 'Gizlilik Siyasəti' },
-          { id: 'legal/terms_of_service', icon: Scale, label: 'İstifadə Şərtləri' },
-          { id: 'legal/disclaimer', icon: AlertCircle, label: 'Məsuliyyətdən İmtina Bəyanatı' },
-          { id: 'legal/refund_policy', icon: RotateCcw, label: 'Geri Qaytarma Siyasəti' },
+          { id: 'legal/privacy_policy', icon: FileText, label: tr("profilescreen_gizlilik_siyaseti_dc3f28", 'Gizlilik Siyasəti') },
+          { id: 'legal/terms_of_service', icon: Scale, label: tr("profilescreen_i_stifade_sertleri_fbbe3d", 'İstifadə Şərtləri') },
+          { id: 'legal/disclaimer', icon: AlertCircle, label: tr("profilescreen_mesuliyyetden_i_mtina_beyanati_857abd", 'Məsuliyyətdən İmtina Bəyanatı') },
+          { id: 'legal/refund_policy', icon: RotateCcw, label: tr("profilescreen_geri_qaytarma_siyaseti_767324", 'Geri Qaytarma Siyasəti') },
           { id: 'legal/gdpr_ccpa', icon: Shield, label: 'GDPR / CCPA' },
-          { id: 'legal/data_usage', icon: Database, label: 'Məlumat İstifadəsi' },
+          { id: 'legal/data_usage', icon: Database, label: tr("profilescreen_melumat_i_stifadesi_af1211", 'Məlumat İstifadəsi') },
         ].map((item, index, arr) => {
           const Icon = item.icon;
           return (

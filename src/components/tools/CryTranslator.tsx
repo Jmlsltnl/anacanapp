@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { requestMicrophonePermission } from '@/lib/permissions';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { tr } from "@/lib/tr";
 
 interface CryTranslatorProps {
   onBack: () => void;
@@ -27,14 +28,14 @@ type AnalysisStage = 'idle' | 'recording' | 'processing' | 'analyzing' | 'comple
 const cryTypeLabels: Record<string, { label: string; emoji: string; color: string }> = {
   hungry: { label: 'Ac', emoji: '🍼', color: 'from-orange-500 to-amber-500' },
   tired: { label: 'Yuxulu', emoji: '😴', color: 'from-indigo-500 to-purple-500' },
-  pain: { label: 'Ağrı', emoji: '😢', color: 'from-red-500 to-rose-500' },
-  discomfort: { label: 'Narahatlıq', emoji: '😣', color: 'from-yellow-500 to-orange-500' },
+  pain: { label: tr("crytranslator_agri_76d612", 'Ağrı'), emoji: '😢', color: 'from-red-500 to-rose-500' },
+  discomfort: { label: tr("crytranslator_narahatliq_33f05c", 'Narahatlıq'), emoji: '😣', color: 'from-yellow-500 to-orange-500' },
   colic: { label: 'Kolik', emoji: '😫', color: 'from-purple-500 to-pink-500' },
-  attention: { label: 'Diqqət istəyir', emoji: '🤗', color: 'from-blue-500 to-cyan-500' },
-  overstimulated: { label: 'Həddən artıq yorulub', emoji: '🥱', color: 'from-gray-500 to-slate-500' },
-  sick: { label: 'Xəstəlik', emoji: '🤒', color: 'from-rose-600 to-red-600' },
-  no_cry_detected: { label: 'Ağlama aşkarlanmadı', emoji: '🔇', color: 'from-gray-400 to-gray-500' },
-  false_positive: { label: 'Saxta səs', emoji: '📺', color: 'from-amber-400 to-orange-500' },
+  attention: { label: tr("crytranslator_diqqet_isteyir_d50473", 'Diqqət istəyir'), emoji: '🤗', color: 'from-blue-500 to-cyan-500' },
+  overstimulated: { label: tr("crytranslator_hedden_artiq_yorulub_7849bb", 'Həddən artıq yorulub'), emoji: '🥱', color: 'from-gray-500 to-slate-500' },
+  sick: { label: tr("crytranslator_xestelik_7c06be", 'Xəstəlik'), emoji: '🤒', color: 'from-rose-600 to-red-600' },
+  no_cry_detected: { label: tr("crytranslator_aglama_askarlanmadi_15a23e", 'Ağlama aşkarlanmadı'), emoji: '🔇', color: 'from-gray-400 to-gray-500' },
+  false_positive: { label: tr("crytranslator_saxta_ses_3db067", 'Saxta səs'), emoji: '📺', color: 'from-amber-400 to-orange-500' },
 };
 
 const stageMessages: Record<AnalysisStage, string> = {
@@ -102,8 +103,8 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
       
       if (!permission.granted) {
         toast({
-          title: 'Mikrofon icazəsi lazımdır',
-          description: 'Parametrlərdən mikrofon icazəsini aktivləşdirin',
+          title: tr("crytranslator_mikrofon_icazesi_lazimdir_711293", 'Mikrofon icazəsi lazımdır'),
+          description: tr("crytranslator_parametrlerden_mikrofon_icazesini_aktivl_f7008f", 'Parametrlərdən mikrofon icazəsini aktivləşdirin'),
           variant: 'destructive'
         });
         return;
@@ -160,14 +161,14 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
       
       if (error.name === 'NotAllowedError' || error.message?.includes('permission')) {
         toast({
-          title: 'Mikrofon icazəsi lazımdır',
-          description: 'Parametrlərdən mikrofon icazəsini aktivləşdirin',
+          title: tr("crytranslator_mikrofon_icazesi_lazimdir_711293", 'Mikrofon icazəsi lazımdır'),
+          description: tr("crytranslator_parametrlerden_mikrofon_icazesini_aktivl_f7008f", 'Parametrlərdən mikrofon icazəsini aktivləşdirin'),
           variant: 'destructive'
         });
       } else {
         toast({
-          title: 'Mikrofon xətası',
-          description: 'Mikrofona giriş icazəsi verin',
+          title: tr("crytranslator_mikrofon_xetasi_5f83b3", 'Mikrofon xətası'),
+          description: tr("crytranslator_mikrofona_giris_icazesi_verin_9b0425", 'Mikrofona giriş icazəsi verin'),
           variant: 'destructive'
         });
       }
@@ -182,8 +183,8 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
     
     if (recordingTime < 3) {
       toast({
-        title: 'Çox qısa',
-        description: 'Minimum 3 saniyə səs yazın',
+        title: tr("crytranslator_cox_qisa_12bf93", 'Çox qısa'),
+        description: tr("crytranslator_minimum_3_saniye_ses_yazin_1b5970", 'Minimum 3 saniyə səs yazın'),
         variant: 'destructive'
       });
       mediaRecorderRef.current.stop();
@@ -260,8 +261,8 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
       console.error('Analysis error:', error);
       setStage('error');
       toast({
-        title: 'Analiz xətası',
-        description: 'Yenidən cəhd edin',
+        title: tr("crytranslator_analiz_xetasi_daba4a", 'Analiz xətası'),
+        description: tr("crytranslator_yeniden_cehd_edin_0040c9", 'Yenidən cəhd edin'),
         variant: 'destructive'
       });
     }

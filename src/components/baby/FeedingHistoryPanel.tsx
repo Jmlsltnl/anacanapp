@@ -6,6 +6,7 @@ import { useBabyLogs, FeedingHistoryItem } from '@/hooks/useBabyLogs';
 import { format, isToday, isYesterday } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
+import { tr } from "@/lib/tr";
 
 const formatDuration = (seconds: number): string => {
   if (seconds <= 0) return '-';
@@ -86,7 +87,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
       toast({ title: 'Qeyd silindi' });
       setDeletingId(null);
     } else {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("feedinghistorypanel_xeta_bas_verdi_f22fba", 'Xəta baş verdi'), variant: 'destructive' });
     }
   };
 
@@ -112,10 +113,10 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
 
     const result = await updateLog(item.id, updates);
     if (!result.error) {
-      toast({ title: 'Qeyd yeniləndi' });
+      toast({ title: tr("feedinghistorypanel_qeyd_yenilendi_816afb", 'Qeyd yeniləndi') });
       setEditingId(null);
     } else {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("feedinghistorypanel_xeta_bas_verdi_f22fba", 'Xəta baş verdi'), variant: 'destructive' });
     }
   };
 

@@ -31,6 +31,7 @@ import {
 import { format, subDays } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { tr } from "@/lib/tr";
 
 interface MentalHealthTrackerProps {
   onBack: () => void;
@@ -376,7 +377,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                   <Textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    placeholder="İstəyirsinizsə, qısa qeyd əlavə edin..."
+                    placeholder={tr("mentalhealthtracker_i_steyirsinizse_qisa_qeyd_elave_edin_9043bb", "İstəyirsinizsə, qısa qeyd əlavə edin...")}
                     className="h-16 resize-none rounded-2xl border-2"
                   />
                 </div>

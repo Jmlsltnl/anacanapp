@@ -15,6 +15,7 @@ import UserProfileScreen from './UserProfileScreen';
 import ConversationListScreen from './ConversationListScreen';
 import DirectMessageScreen from './DirectMessageScreen';
 import BannerSlot from '@/components/banners/BannerSlot';
+import { tr } from "@/lib/tr";
 
 interface CommunityScreenProps {
   onBack?: () => void;
@@ -22,7 +23,7 @@ interface CommunityScreenProps {
 
 // Groups temporarily disabled
 const tabs = [
-  { id: 'feed', label: 'Ümumi', icon: TrendingUp },
+  { id: 'feed', label: tr("communityscreen_umumi_1b5521", 'Ümumi'), icon: TrendingUp },
 ] as const;
 
 const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBack }, ref) => {

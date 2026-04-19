@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { getPhaseInfoForDate, getCycleDayForDate } from '@/lib/cycle-utils';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths } from 'date-fns';
 import { az } from 'date-fns/locale';
+import { tr } from "@/lib/tr";
 
 interface CalendarScreenProps {
   onBack: () => void;
@@ -72,7 +73,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
     // Check for mood logs
     const dayLog = logs.find(l => l.log_date === dateStr);
     if (dayLog?.mood) {
-      events.push({ type: 'mood', label: 'Əhval qeyd', color: 'bg-fuchsia-500' });
+      events.push({ type: 'mood', label: tr("calendarscreen_ehval_qeyd_aa4f19", 'Əhval qeyd'), color: 'bg-fuchsia-500' });
     }
 
     // Cycle-based events for flow stage
@@ -86,7 +87,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
       if (phaseInfo.isOvulationDay) {
         events.push({ type: 'ovulation', label: 'Ovulyasiya', color: 'bg-amber-500' });
       } else if (phaseInfo.isFertileDay && !phaseInfo.isPeriodDay) {
-        events.push({ type: 'fertile', label: 'Fertil gün', color: 'bg-emerald-500' });
+        events.push({ type: 'fertile', label: tr("calendarscreen_fertil_gun_653ae1", 'Fertil gün'), color: 'bg-emerald-500' });
       }
     }
 
@@ -94,7 +95,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
     if (lifeStage === 'bump' && pregData?.dueDate) {
       const dueDate = new Date(pregData.dueDate);
       if (isSameDay(day, dueDate)) {
-        events.push({ type: 'appointment', label: 'Doğuş tarixi', color: 'bg-violet-500' });
+        events.push({ type: 'appointment', label: tr("calendarscreen_dogus_tarixi_e2caea", 'Doğuş tarixi'), color: 'bg-violet-500' });
       }
     }
 
@@ -436,7 +437,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
               <div className="mb-4">
                 <label className="text-sm font-medium text-foreground mb-2 block">Başlıq</label>
                 <Input
-                  placeholder="Həkim müayinəsi"
+                  placeholder={tr("calendarscreen_hekim_muayinesi_78c373", "Həkim müayinəsi")}
                   value={newEventTitle}
                   onChange={(e) => setNewEventTitle(e.target.value)}
                   className="h-12 rounded-xl"
@@ -448,8 +449,8 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
                 <div className="flex gap-2">
                   {[
                     { id: 'appointment', label: 'Randevu', icon: '📅' },
-                    { id: 'pill', label: 'Dərman', icon: '💊' },
-                    { id: 'reminder', label: 'Xatırlatma', icon: '🔔' },
+                    { id: 'pill', label: tr("calendarscreen_derman_8b4b27", 'Dərman'), icon: '💊' },
+                    { id: 'reminder', label: tr("calendarscreen_xatirlatma_3f3c48", 'Xatırlatma'), icon: '🔔' },
                   ].map(type => (
                     <button
                       key={type.id}

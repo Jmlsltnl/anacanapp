@@ -14,6 +14,7 @@ import { FRUIT_SIZES } from '@/types/anacan';
 import { useToast } from '@/hooks/use-toast';
 import { useAISuggestedQuestions } from '@/hooks/useDynamicTools';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { tr } from "@/lib/tr";
 
 interface Message {
   id: string;
@@ -104,35 +105,35 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       {
         id: '1',
         icon: Heart,
-        title: 'Emosional dəstək',
+        title: tr("partneraichatscreen_emosional_destek_5ffaed", 'Emosional dəstək'),
         question: `${partnerName} bu gün əhvalı pisdirsə, onu necə dəstəkləyə bilərəm?`,
         color: 'from-pink-500 to-rose-600'
       },
       {
         id: '2',
         icon: Home,
-        title: 'Ev işləri',
+        title: tr("partneraichatscreen_ev_isleri_b4425e", 'Ev işləri'),
         question: 'Hamiləlik dövründə hansı ev işlərini mən öhdəmə götürməliyəm?',
         color: 'from-blue-500 to-indigo-600'
       },
       {
         id: '3',
         icon: Stethoscope,
-        title: 'Həkim vizitləri',
+        title: tr("partneraichatscreen_hekim_vizitleri_abadf5", 'Həkim vizitləri'),
         question: 'Həkim görüşlərində mən necə faydalı ola bilərəm? Hansı sualları verməliyəm?',
         color: 'from-emerald-500 to-teal-600'
       },
       {
         id: '4',
         icon: Gift,
-        title: 'Sürprizlər',
+        title: tr("partneraichatscreen_surprizler_422463", 'Sürprizlər'),
         question: `${partnerName}ı sevindirmək üçün hansı kiçik sürprizlər edə bilərəm?`,
         color: 'from-amber-500 to-orange-600'
       },
       {
         id: '5',
         icon: Baby,
-        title: 'Doğuşa hazırlıq',
+        title: tr("partneraichatscreen_dogusa_hazirliq_c83258", 'Doğuşa hazırlıq'),
         question: 'Doğuş günü üçün necə hazırlaşmalıyam? Nələr etməliyəm?',
         color: 'from-violet-500 to-purple-600'
       },
@@ -327,8 +328,8 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     } catch (error) {
       console.error('Chat error:', error);
       toast({
-        title: 'Xəta',
-        description: 'Mesaj göndərilə bilmədi. Yenidən cəhd et.',
+        title: tr("partneraichatscreen_xeta_3cdbb6", 'Xəta'),
+        description: tr("partneraichatscreen_mesaj_gonderile_bilmedi_yeniden_cehd_et_20d76e", 'Mesaj göndərilə bilmədi. Yenidən cəhd et.'),
         variant: 'destructive'
       });
       
@@ -505,7 +506,7 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Sualını yaz..."
+              placeholder={tr("partneraichatscreen_sualini_yaz_49c69d", "Sualını yaz...")}
               className="min-h-[48px] max-h-[120px] pr-4 resize-none rounded-2xl border-2 focus:border-partner/50"
               disabled={isLoading}
             />

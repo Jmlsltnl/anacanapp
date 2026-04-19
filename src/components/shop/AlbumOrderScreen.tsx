@@ -11,6 +11,7 @@ import { usePaymentMethods } from '@/hooks/usePaymentMethods';
 import { useCouponValidator } from '@/hooks/useCoupons';
 import CouponInput from './CouponInput';
 import { useToast } from '@/hooks/use-toast';
+import { tr } from "@/lib/tr";
 
 interface AlbumOrderScreenProps {
   albumType: 'pregnancy' | 'baby';
@@ -20,14 +21,14 @@ interface AlbumOrderScreenProps {
 const albumInfo = {
   pregnancy: {
     emoji: '📸',
-    title: 'Hamiləlik Albomu',
-    description: 'Hamiləlik dövründəki bütün xatirələriniz professional şəkildə çap edilərək fiziki albom halında sizə çatdırılacaq.',
+    title: tr("albumorderscreen_hamilelik_albomu_6f1559", 'Hamiləlik Albomu'),
+    description: tr("albumorderscreen_hamilelik_dovrundeki_butun_xatireleriniz_43538c", 'Hamiləlik dövründəki bütün xatirələriniz professional şəkildə çap edilərək fiziki albom halında sizə çatdırılacaq.'),
     features: ['Yüksək keyfiyyətli çap', 'Premium qalın səhifələr', 'Davamlı üzlük', 'Fərdi dizayn'],
   },
   baby: {
     emoji: '👶',
-    title: 'Körpə Albomu',
-    description: 'Körpənizin ilk 12 ayındakı şəkilləri professional albom şəklində əbədiləşdirin.',
+    title: tr("albumorderscreen_korpe_albomu_42d4c6", 'Körpə Albomu'),
+    description: tr("albumorderscreen_korpenizin_ilk_12_ayindaki_sekilleri_pro_f7f19c", 'Körpənizin ilk 12 ayındakı şəkilləri professional albom şəklində əbədiləşdirin.'),
     features: ['12 aylıq xatirələr', 'Premium çap keyfiyyəti', 'Həssas rəng təsviri', 'Xüsusi qablaşdırma'],
   },
 };
@@ -53,15 +54,15 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
 
   const handleSubmit = async () => {
     if (!user) {
-      toast({ title: 'Hesabınıza daxil olun', variant: 'destructive' });
+      toast({ title: tr("albumorderscreen_hesabiniza_daxil_olun_2c437b", 'Hesabınıza daxil olun'), variant: 'destructive' });
       return;
     }
     if (!name.trim() || !phone.trim()) {
-      toast({ title: 'Ad və telefon mütləq doldurulmalıdır', variant: 'destructive' });
+      toast({ title: tr("albumorderscreen_ad_ve_telefon_mutleq_doldurulmalidir_7fdd41", 'Ad və telefon mütləq doldurulmalıdır'), variant: 'destructive' });
       return;
     }
     if (!address.trim()) {
-      toast({ title: 'Çatdırılma ünvanını daxil edin', variant: 'destructive' });
+      toast({ title: tr("albumorderscreen_catdirilma_unvanini_daxil_edin_895f4d", 'Çatdırılma ünvanını daxil edin'), variant: 'destructive' });
       return;
     }
 
@@ -91,7 +92,7 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
       if (error) throw error;
       setSuccess(true);
     } catch (err) {
-      toast({ title: 'Xəta baş verdi', description: 'Yenidən cəhd edin', variant: 'destructive' });
+      toast({ title: tr("albumorderscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'), description: tr("albumorderscreen_yeniden_cehd_edin_0040c9", 'Yenidən cəhd edin'), variant: 'destructive' });
     } finally {
       setSubmitting(false);
     }
@@ -161,7 +162,7 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
           </h2>
           <div>
             <Label className="text-xs text-muted-foreground">Ad, Soyad *</Label>
-            <Input value={name} onChange={e => setName(e.target.value)} placeholder="Adınızı daxil edin" className="rounded-xl mt-1 h-11" />
+            <Input value={name} onChange={e => setName(e.target.value)} placeholder={tr("albumorderscreen_adinizi_daxil_edin_bd2b57", "Adınızı daxil edin")} className="rounded-xl mt-1 h-11" />
           </div>
           <div>
             <Label className="text-xs text-muted-foreground">Telefon nömrəsi *</Label>
@@ -177,11 +178,11 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
           </h2>
           <div>
             <Label className="text-xs text-muted-foreground">Şəhər</Label>
-            <Input value={city} onChange={e => setCity(e.target.value)} placeholder="Şəhər" className="rounded-xl mt-1 h-11" />
+            <Input value={city} onChange={e => setCity(e.target.value)} placeholder={tr("albumorderscreen_seher_5f373c", "Şəhər")} className="rounded-xl mt-1 h-11" />
           </div>
           <div>
             <Label className="text-xs text-muted-foreground">Ünvan (küçə, bina, mənzil) *</Label>
-            <Textarea value={address} onChange={e => setAddress(e.target.value)} placeholder="Tam ünvanınızı yazın" className="rounded-xl mt-1" rows={2} />
+            <Textarea value={address} onChange={e => setAddress(e.target.value)} placeholder={tr("albumorderscreen_tam_unvaninizi_yazin_0106c0", "Tam ünvanınızı yazın")} className="rounded-xl mt-1" rows={2} />
           </div>
         </div>
 
@@ -191,7 +192,7 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
             <FileText className="w-4 h-4 text-primary" />
             Əlavə Qeydlər
           </h2>
-          <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Xüsusi istəklər, mesaj və s. (istəyə bağlı)" className="rounded-xl" rows={2} />
+          <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder={tr("albumorderscreen_xususi_istekler_mesaj_ve_s_isteye_bagli_ba89dd", "Xüsusi istəklər, mesaj və s. (istəyə bağlı)")} className="rounded-xl" rows={2} />
         </div>
 
         {/* Payment Methods */}

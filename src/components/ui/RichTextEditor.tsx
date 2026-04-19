@@ -15,6 +15,7 @@ import { useEffect, useCallback, useRef, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { tr } from "@/lib/tr";
 
 // Simple markdown to HTML converter for legacy content
 const markdownToHtml = (md: string): string => {
@@ -192,37 +193,37 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', 
 
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 p-1.5 border-b border-border bg-muted/30">
-        <MenuButton onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')} title="Qalın">
+        <MenuButton onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')} title={tr("richtexteditor_qalin_c4d6bc", "Qalın")}>
           <Bold size={s} />
         </MenuButton>
         <MenuButton onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive('italic')} title="Kursiv">
           <Italic size={s} />
         </MenuButton>
-        <MenuButton onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive('underline')} title="Altıxətli">
+        <MenuButton onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive('underline')} title={tr("richtexteditor_altixetli_c40fd6", "Altıxətli")}>
           <UnderlineIcon size={s} />
         </MenuButton>
-        <MenuButton onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive('strike')} title="Üstüxətli">
+        <MenuButton onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive('strike')} title={tr("richtexteditor_ustuxetli_f3d1e5", "Üstüxətli")}>
           <Strikethrough size={s} />
         </MenuButton>
 
         <div className="w-px h-5 bg-border mx-1" />
 
-        <MenuButton onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} active={editor.isActive('heading', { level: 1 })} title="Başlıq 1">
+        <MenuButton onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} active={editor.isActive('heading', { level: 1 })} title={tr("richtexteditor_basliq_1_4e0712", "Başlıq 1")}>
           <Heading1 size={s} />
         </MenuButton>
-        <MenuButton onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive('heading', { level: 2 })} title="Başlıq 2">
+        <MenuButton onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive('heading', { level: 2 })} title={tr("richtexteditor_basliq_2_2e5cb2", "Başlıq 2")}>
           <Heading2 size={s} />
         </MenuButton>
-        <MenuButton onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} active={editor.isActive('heading', { level: 3 })} title="Başlıq 3">
+        <MenuButton onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} active={editor.isActive('heading', { level: 3 })} title={tr("richtexteditor_basliq_3_36375a", "Başlıq 3")}>
           <Heading3 size={s} />
         </MenuButton>
 
         <div className="w-px h-5 bg-border mx-1" />
 
-        <MenuButton onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive('bulletList')} title="Siyahı">
+        <MenuButton onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive('bulletList')} title={tr("richtexteditor_siyahi_f04aac", "Siyahı")}>
           <List size={s} />
         </MenuButton>
-        <MenuButton onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive('orderedList')} title="Nömrəli siyahı">
+        <MenuButton onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive('orderedList')} title={tr("richtexteditor_nomreli_siyahi_0adbc6", "Nömrəli siyahı")}>
           <ListOrdered size={s} />
         </MenuButton>
         <MenuButton onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive('blockquote')} title="Sitat">
@@ -231,7 +232,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', 
         <MenuButton onClick={() => editor.chain().focus().toggleCodeBlock().run()} active={editor.isActive('codeBlock')} title="Kod">
           <Code size={s} />
         </MenuButton>
-        <MenuButton onClick={() => editor.chain().focus().setHorizontalRule().run()} title="Xətt">
+        <MenuButton onClick={() => editor.chain().focus().setHorizontalRule().run()} title={tr("richtexteditor_xett_c1e83c", "Xətt")}>
           <Minus size={s} />
         </MenuButton>
 
@@ -243,7 +244,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', 
         <MenuButton onClick={() => editor.chain().focus().setTextAlign('center').run()} active={editor.isActive({ textAlign: 'center' })} title="Ortaya">
           <AlignCenter size={s} />
         </MenuButton>
-        <MenuButton onClick={() => editor.chain().focus().setTextAlign('right').run()} active={editor.isActive({ textAlign: 'right' })} title="Sağa">
+        <MenuButton onClick={() => editor.chain().focus().setTextAlign('right').run()} active={editor.isActive({ textAlign: 'right' })} title={tr("richtexteditor_saga_804f56", "Sağa")}>
           <AlignRight size={s} />
         </MenuButton>
 
@@ -252,7 +253,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', 
         <MenuButton onClick={addLink} active={editor.isActive('link')} title="Link">
           <LinkIcon size={s} />
         </MenuButton>
-        <MenuButton onClick={onImageButtonClick} title="Şəkil yüklə">
+        <MenuButton onClick={onImageButtonClick} title={tr("richtexteditor_sekil_yukle_0577d2", "Şəkil yüklə")}>
           <Upload size={s} />
         </MenuButton>
 
@@ -261,7 +262,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', 
         <MenuButton onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} title="Geri al">
           <Undo size={s} />
         </MenuButton>
-        <MenuButton onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} title="İrəli">
+        <MenuButton onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} title={tr("richtexteditor_i_reli_3bc432", "İrəli")}>
           <Redo size={s} />
         </MenuButton>
       </div>

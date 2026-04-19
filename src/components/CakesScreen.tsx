@@ -8,6 +8,7 @@ import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import CakeDetailScreen from '@/components/cakes/CakeDetailScreen';
 import CakeCartDrawer from '@/components/cakes/CakeCartDrawer';
 import CakeOrderForm from '@/components/cakes/CakeOrderForm';
+import { tr } from "@/lib/tr";
 
 interface CakesScreenProps {
   onBack?: () => void;
@@ -137,7 +138,7 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
         <input
           type="text"
-          placeholder="Tort axtarın..."
+          placeholder={tr("cakesscreen_tort_axtarin_f26a97", "Tort axtarın...")}
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
           className="w-full h-12 pl-12 pr-4 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-sm transition-all outline-none"

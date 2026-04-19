@@ -16,6 +16,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { tr } from "@/lib/tr";
 import {
   Dialog,
   DialogContent,
@@ -136,7 +137,7 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
               </DialogHeader>
               <div className="space-y-4 pt-4">
                 <Input
-                  placeholder="Əşya adı"
+                  placeholder={tr("partnerhospitalbagscreen_esya_adi_176586", "Əşya adı")}
                   value={newItemName}
                   onChange={(e) => setNewItemName(e.target.value)}
                 />

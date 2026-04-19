@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import MediaCarousel from './MediaCarousel';
 import CommentReply from './CommentReply';
+import { tr } from "@/lib/tr";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
@@ -112,16 +113,16 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   };
 
   const handleReportPost = async () => {
-    if (!reportReason.trim()) { toast({ title: 'Xəta', description: 'Şikayət səbəbini qeyd edin', variant: 'destructive' }); return; }
-    if (!user) { toast({ title: 'Xəta', description: 'Giriş etməlisiniz', variant: 'destructive' }); return; }
+    if (!reportReason.trim()) { toast({ title: tr("postcard_xeta_3cdbb6", 'Xəta'), description: tr("postcard_sikayet_sebebini_qeyd_edin_9d11b9", 'Şikayət səbəbini qeyd edin'), variant: 'destructive' }); return; }
+    if (!user) { toast({ title: tr("postcard_xeta_3cdbb6", 'Xəta'), description: tr("postcard_giris_etmelisiniz_6c2220", 'Giriş etməlisiniz'), variant: 'destructive' }); return; }
     const { error } = await (supabase as any).from('post_reports').insert({ post_id: post.id, reporter_id: user.id, reason: reportReason, status: 'pending' });
-    if (error) { toast({ title: 'Xəta', description: error.message, variant: 'destructive' }); }
-    else { toast({ title: 'Şikayət göndərildi', description: 'Şikayətiniz yoxlanılacaq' }); setShowReportDialog(false); setReportReason(''); }
+    if (error) { toast({ title: tr("postcard_xeta_3cdbb6", 'Xəta'), description: error.message, variant: 'destructive' }); }
+    else { toast({ title: tr("postcard_sikayet_gonderildi_b7b528", 'Şikayət göndərildi'), description: tr("postcard_sikayetiniz_yoxlanilacaq_ad512c", 'Şikayətiniz yoxlanılacaq') }); setShowReportDialog(false); setReportReason(''); }
   };
 
   const handleShare = async () => {
     hapticFeedback.medium();
-    await nativeShare({ title: 'Anacan - Paylaşım', text: post.content.substring(0, 100) + (post.content.length > 100 ? '...' : '') });
+    await nativeShare({ title: tr("postcard_anacan_paylasim_9618d9", 'Anacan - Paylaşım'), text: post.content.substring(0, 100) + (post.content.length > 100 ? '...' : '') });
   };
 
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: az });
@@ -291,7 +292,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
                   <Input
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
-                    placeholder="Şərh yaz..."
+                    placeholder={tr("postcard_serh_yaz_54a89a", "Şərh yaz...")}
                     className="flex-1 h-9 rounded-full text-[12px] bg-muted/15 border-border/10 px-4"
                     onKeyPress={(e) => e.key === 'Enter' && handleComment()}
                   />
@@ -325,7 +326,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
             <DialogTitle className="text-sm">Postu Şikayət Et</DialogTitle>
             <DialogDescription className="text-xs">Bu postun niyə uyğunsuz olduğunu bildirin</DialogDescription>
           </DialogHeader>
-          <Textarea value={reportReason} onChange={(e) => setReportReason(e.target.value)} placeholder="Şikayət səbəbi..." className="rounded-xl text-sm" />
+          <Textarea value={reportReason} onChange={(e) => setReportReason(e.target.value)} placeholder={tr("postcard_sikayet_sebebi_a49b6b", "Şikayət səbəbi...")} className="rounded-xl text-sm" />
           <div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={() => setShowReportDialog(false)} className="rounded-lg text-xs h-8">Ləğv et</Button>
             <Button onClick={handleReportPost} className="gradient-primary rounded-lg text-xs h-8">Göndər</Button>
