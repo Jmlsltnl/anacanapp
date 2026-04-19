@@ -8172,48 +8172,7 @@ export type Database = {
       }
     }
     Views: {
-      payment_methods_public: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          description_az: string | null
-          icon: string | null
-          id: string | null
-          is_active: boolean | null
-          label: string | null
-          label_az: string | null
-          method_key: string | null
-          sort_order: number | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          description_az?: string | null
-          icon?: string | null
-          id?: string | null
-          is_active?: boolean | null
-          label?: string | null
-          label_az?: string | null
-          method_key?: string | null
-          sort_order?: number | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          description_az?: string | null
-          icon?: string | null
-          id?: string | null
-          is_active?: boolean | null
-          label?: string | null
-          label_az?: string | null
-          method_key?: string | null
-          sort_order?: number | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       find_partner_by_code: {
@@ -8222,6 +8181,22 @@ export type Database = {
           id: string
           name: string
           user_id: string
+        }[]
+      }
+      get_active_payment_methods: {
+        Args: never
+        Returns: {
+          created_at: string
+          description: string
+          description_az: string
+          icon: string
+          id: string
+          is_active: boolean
+          label: string
+          label_az: string
+          method_key: string
+          sort_order: number
+          updated_at: string
         }[]
       }
       get_baby_crisis: {
