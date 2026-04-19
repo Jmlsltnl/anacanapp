@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ReactNode } from 'react';
 import { Button } from './button';
+import { tr } from "@/lib/tr";
 
 interface EmptyStateProps {
   emoji: string;
@@ -112,12 +113,12 @@ const EmptyState = ({
 const NoPostsEmptyState = ({ onCreatePost }: { onCreatePost?: () => void }) => (
   <EmptyState
     emoji="💬"
-    title={t("empty-state_hele_paylasim_yoxdur_a0a7fa", "Hələ paylaşım yoxdur")}
+    title={tr("empty-state_hele_paylasim_yoxdur_a0a7fa", "Hələ paylaşım yoxdur")}
     description="İlk paylaşımı siz edin və digər analarla əlaqə qurun!"
     action={
       onCreatePost
         ? {
-            label: t("empty-state_paylasim_yarat_69bdcd", 'Paylaşım yarat'),
+            label: tr("empty-state_paylasim_yarat_69bdcd", 'Paylaşım yarat'),
             onClick: onCreatePost,
           }
         : undefined
@@ -128,7 +129,7 @@ const NoPostsEmptyState = ({ onCreatePost }: { onCreatePost?: () => void }) => (
 const NoCommentsEmptyState = () => (
   <EmptyState
     emoji="💭"
-    title={t("empty-state_hele_serh_yoxdur_1dfc90", "Hələ şərh yoxdur")}
+    title={tr("empty-state_hele_serh_yoxdur_1dfc90", "Hələ şərh yoxdur")}
     description="Bu paylaşım üçün ilk şərhi siz yazın."
     variant="minimal"
   />
@@ -137,7 +138,7 @@ const NoCommentsEmptyState = () => (
 const NoSearchResultsEmptyState = () => (
   <EmptyState
     emoji="🔍"
-    title={t("empty-state_netice_tapilmadi_4b1b52", "Nəticə tapılmadı")}
+    title={tr("empty-state_netice_tapilmadi_4b1b52", "Nəticə tapılmadı")}
     description="Başqa axtarış sözləri sınayın."
     variant="minimal"
   />
@@ -164,7 +165,7 @@ const NoGroupsEmptyState = () => (
 const NoNotificationsEmptyState = () => (
   <EmptyState
     emoji="🔔"
-    title={t("empty-state_bildiris_yoxdur_6ccf4d", "Bildiriş yoxdur")}
+    title={tr("empty-state_bildiris_yoxdur_6ccf4d", "Bildiriş yoxdur")}
     description="Yeni bildirişləriniz burada görünəcək."
     variant="minimal"
   />
