@@ -15,15 +15,8 @@ async function createSignature(privateKey: string, data: string): Promise<string
   return btoa(String.fromCharCode(...hashArray));
 }
 
-// Helper: base64 encode
-function base64Encode(str: string): string {
-  return btoa(str);
-}
-
-// Helper: base64 decode
-function base64Decode(str: string): string {
-  return atob(str);
-}
+function base64Encode(str: string): string { return btoa(str); }
+function base64Decode(str: string): string { return atob(str); }
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -32,11 +25,47 @@ Deno.serve(async (req) => {
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
   try {
     const url = new URL(req.url);
     const action = url.searchParams.get('action') || 'create';
+
+    // ===== Authenticate caller for user-facing actions (skip only for callback) =====
+    let authenticatedUserId: string | null = null;
+    let isAdmin = false;
+
+    if (action !== 'callback') {
+      const authHeader = req.headers.get('Authorization');
+      if (!authHeader?.startsWith('Bearer ')) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      const token = authHeader.replace('Bearer ', '');
+      const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: userData, error: userErr } = await userClient.auth.getUser(token);
+      if (userErr || !userData?.user) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      authenticatedUserId = userData.user.id;
+
+      // Check admin role for privileged actions
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', authenticatedUserId)
+        .eq('role', 'admin')
+        .maybeSingle();
+      isAdmin = !!roleData;
+    }
 
     // Get Epoint keys from app_settings
     const { data: settingsData } = await supabase
@@ -55,7 +84,6 @@ Deno.serve(async (req) => {
 
     const publicKey = settings['epoint_public_key'];
     const privateKey = settings['epoint_private_key'];
-    const isTestMode = settings['epoint_mode'] === 'test';
 
     if (!publicKey || !privateKey) {
       return new Response(JSON.stringify({ error: 'Epoint açarları konfiqurasiya olunmayıb' }), {
@@ -69,19 +97,22 @@ Deno.serve(async (req) => {
     // ===== ACTION: CREATE PAYMENT =====
     if (action === 'create') {
       const body = await req.json();
-      const { amount, orderType, orderReferenceId, description, userId, successUrl, errorUrl } = body;
+      const { amount, orderType, orderReferenceId, description, successUrl, errorUrl } = body;
 
-      if (!amount || !userId) {
-        return new Response(JSON.stringify({ error: 'Məbləğ və istifadəçi ID tələb olunur' }), {
+      // SECURITY: ignore any client-supplied userId; use the authenticated one
+      const userId = authenticatedUserId!;
+
+      // Validate amount
+      const amt = parseFloat(amount);
+      if (!amt || isNaN(amt) || amt <= 0 || amt > 10000) {
+        return new Response(JSON.stringify({ error: 'Etibarsız məbləğ' }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
 
-      // Generate unique order_id
       const orderId = `ANA-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 
-      // Create transaction record
       const { data: txn, error: txnError } = await supabase
         .from('payment_transactions')
         .insert({
@@ -89,7 +120,7 @@ Deno.serve(async (req) => {
           order_type: orderType || 'general',
           order_reference_id: orderReferenceId || null,
           order_id: orderId,
-          amount: parseFloat(amount),
+          amount: amt,
           currency: 'AZN',
           description: description || `Anacan ödənişi - ${orderId}`,
           status: 'pending',
@@ -105,10 +136,9 @@ Deno.serve(async (req) => {
         });
       }
 
-      // Build Epoint data
       const jsonString = JSON.stringify({
         public_key: publicKey,
-        amount: parseFloat(amount).toFixed(2),
+        amount: amt.toFixed(2),
         currency: 'AZN',
         language: 'az',
         order_id: orderId,
@@ -120,7 +150,6 @@ Deno.serve(async (req) => {
       const data = base64Encode(jsonString);
       const signature = await createSignature(privateKey, data);
 
-      // Send request to Epoint
       const formData = new URLSearchParams();
       formData.append('data', data);
       formData.append('signature', signature);
@@ -134,7 +163,6 @@ Deno.serve(async (req) => {
       const epointResult = await epointRes.json();
 
       if (epointResult.status === 'success' && epointResult.redirect_url) {
-        // Update transaction with Epoint transaction ID
         await supabase
           .from('payment_transactions')
           .update({
@@ -153,7 +181,6 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       } else {
-        // Update transaction as failed
         await supabase
           .from('payment_transactions')
           .update({
@@ -172,7 +199,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    // ===== ACTION: CALLBACK (result_url) =====
+    // ===== ACTION: CALLBACK (result_url from Epoint) =====
     if (action === 'callback') {
       const formData = await req.formData();
       const data = formData.get('data') as string;
@@ -182,33 +209,20 @@ Deno.serve(async (req) => {
         return new Response('Missing data or signature', { status: 400 });
       }
 
-      // Verify signature
       const expectedSignature = await createSignature(privateKey, data);
       if (expectedSignature !== signature) {
-        console.error('Signature mismatch!', { expected: expectedSignature, received: signature });
+        console.error('Signature mismatch on callback');
         return new Response('Invalid signature', { status: 403 });
       }
 
-      // Decode data
       const resultJson = JSON.parse(base64Decode(data));
-      console.log('Epoint callback result:', resultJson);
+      console.log('Epoint callback received for order:', resultJson.order_id);
 
       const {
-        order_id,
-        status,
-        code,
-        message,
-        transaction,
-        bank_transaction,
-        bank_response,
-        operation_code,
-        rrn,
-        card_name,
-        card_mask,
-        amount,
+        order_id, status, code, message, transaction, bank_transaction,
+        bank_response, operation_code, rrn, card_name, card_mask,
       } = resultJson;
 
-      // Update transaction
       const updateData: Record<string, any> = {
         status: status === 'success' ? 'success' : 'failed',
         epoint_transaction: transaction || null,
@@ -228,11 +242,8 @@ Deno.serve(async (req) => {
         .update(updateData)
         .eq('order_id', order_id);
 
-      if (updateError) {
-        console.error('Error updating transaction:', updateError);
-      }
+      if (updateError) console.error('Error updating transaction');
 
-      // If payment successful, update the related order
       if (status === 'success' && order_id) {
         const { data: txnData } = await supabase
           .from('payment_transactions')
@@ -252,30 +263,40 @@ Deno.serve(async (req) => {
               .update({ payment_status: 'paid', payment_method: 'epoint_card' })
               .eq('id', txnData.order_reference_id);
           }
-          // Add more order types as needed
         }
       }
 
       return new Response('OK', { status: 200 });
     }
 
-    // ===== ACTION: GET STATUS =====
+    // ===== ACTION: GET STATUS (auth required + ownership check) =====
     if (action === 'status') {
       const body = await req.json();
       const { transaction } = body;
 
-      if (!transaction) {
+      if (!transaction || typeof transaction !== 'string') {
         return new Response(JSON.stringify({ error: 'Əməliyyat ID tələb olunur' }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
 
-      const jsonString = JSON.stringify({
-        public_key: publicKey,
-        transaction: transaction,
-      });
+      // Verify caller owns this transaction (or is admin)
+      if (!isAdmin) {
+        const { data: ownership } = await supabase
+          .from('payment_transactions')
+          .select('user_id')
+          .eq('epoint_transaction', transaction)
+          .maybeSingle();
+        if (!ownership || ownership.user_id !== authenticatedUserId) {
+          return new Response(JSON.stringify({ error: 'Forbidden' }), {
+            status: 403,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+      }
 
+      const jsonString = JSON.stringify({ public_key: publicKey, transaction });
       const data = base64Encode(jsonString);
       const signature = await createSignature(privateKey, data);
 
@@ -290,28 +311,31 @@ Deno.serve(async (req) => {
       });
 
       const statusResult = await statusRes.json();
-
       return new Response(JSON.stringify(statusResult), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // ===== ACTION: REFUND =====
+    // ===== ACTION: REFUND (admin only) =====
     if (action === 'refund') {
+      if (!isAdmin) {
+        return new Response(JSON.stringify({ error: 'Forbidden — admin only' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
       const body = await req.json();
       const { transaction, amount: refundAmount } = body;
 
-      if (!transaction) {
+      if (!transaction || typeof transaction !== 'string') {
         return new Response(JSON.stringify({ error: 'Əməliyyat ID tələb olunur' }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
 
-      const jsonData: Record<string, any> = {
-        public_key: publicKey,
-        transaction: transaction,
-      };
+      const jsonData: Record<string, any> = { public_key: publicKey, transaction };
 
       if (refundAmount) {
         jsonData.amount = parseFloat(refundAmount).toFixed(2);
@@ -334,7 +358,6 @@ Deno.serve(async (req) => {
 
       const refundResult = await refundRes.json();
 
-      // Update transaction status if refund successful
       if (refundResult.status === 'success') {
         await supabase
           .from('payment_transactions')

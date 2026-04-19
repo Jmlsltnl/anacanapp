@@ -22,13 +22,13 @@ export const usePaymentMethods = () => {
 
   const fetchMethods = async () => {
     try {
-      const { data, error } = await supabase
-        .from('payment_methods')
-        .select('*')
-        .order('sort_order', { ascending: true });
+      // Use safe RPC that excludes sensitive `config` column from public reads
+      const { data, error } = await supabase.rpc('get_active_payment_methods' as any);
 
       if (error) throw error;
-      setMethods((data || []) as unknown as PaymentMethod[]);
+      // `config` is intentionally not returned; default to empty object for type compatibility
+      const normalized = (data || []).map((m: any) => ({ ...m, config: {} }));
+      setMethods(normalized as PaymentMethod[]);
     } catch (error) {
       console.error('Error fetching payment methods:', error);
     } finally {
