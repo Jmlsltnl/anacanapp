@@ -12,7 +12,7 @@ import { differenceInDays, differenceInMonths } from 'date-fns';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 
 interface SmartPlayBoxProps {
   onBack: () => void;
@@ -45,11 +45,10 @@ const SKILL_ICONS: Record<string, string> = {
 const DIFFICULTY_LABELS: Record<string, { label: string; color: string }> = {
   easy: { label: 'Asan', color: 'bg-green-100 text-green-700' },
   medium: { label: 'Orta', color: 'bg-amber-100 text-amber-700' },
-  hard: { label: t("smartplaybox_cetin_4bf032", 'Çətin'), color: 'bg-red-100 text-red-700' },
+  hard: { label: tr("smartplaybox_cetin_4bf032", 'Çətin'), color: 'bg-red-100 text-red-700' },
 };
 
 const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
-  const { t } = useTranslation();
   useScreenAnalytics('SmartPlayBox', 'Tools');
   const { profile } = useAuthContext();
   const [selectedActivity, setSelectedActivity] = useState<PlayActivity | null>(null);

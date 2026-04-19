@@ -15,7 +15,7 @@ import { useSurprises } from '@/hooks/useSurprises';
 import { useSurpriseIdeas } from '@/hooks/useDynamicConfig';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 
 interface SurpriseIdea {
   id: string;
@@ -47,7 +47,6 @@ const ICON_MAP: Record<string, any> = {
 };
 
 const SurpriseTab = () => {
-  const { t } = useTranslation();
   const { toast } = useToast();
   const { profile } = useAuth();
   const { partnerProfile } = usePartnerData();
@@ -72,16 +71,16 @@ const SurpriseTab = () => {
 
   // Build categories dynamically from data
   const categories = useMemo(() => {
-    const baseCategories = [{ id: 'all', label: t("surprisetab_hamisi_c73c4d", 'Hamısı'), emoji: '✨' }];
+    const baseCategories = [{ id: 'all', label: tr("surprisetab_hamisi_c73c4d", 'Hamısı'), emoji: '✨' }];
     const uniqueCategories = new Set(surpriseIdeasData?.map(s => s.category) || []);
     
     const categoryLabels: Record<string, { label: string; emoji: string }> = {
       romantic: { label: 'Romantik', emoji: '❤️' },
-      care: { label: t("surprisetab_qaygi_868e7d", 'Qayğı'), emoji: '🤗' },
-      adventure: { label: t("surprisetab_macera_bc3bdc", 'Macəra'), emoji: '🌟' },
-      gift: { label: t("surprisetab_hediyye_8578f3", 'Hədiyyə'), emoji: '🎁' },
-      creative: { label: t("surprisetab_yaradici_28b2b1", 'Yaradıcı'), emoji: '🎨' },
-      fun: { label: t("surprisetab_eylence_43d0e0", 'Əyləncə'), emoji: '🎉' },
+      care: { label: tr("surprisetab_qaygi_868e7d", 'Qayğı'), emoji: '🤗' },
+      adventure: { label: tr("surprisetab_macera_bc3bdc", 'Macəra'), emoji: '🌟' },
+      gift: { label: tr("surprisetab_hediyye_8578f3", 'Hədiyyə'), emoji: '🎁' },
+      creative: { label: tr("surprisetab_yaradici_28b2b1", 'Yaradıcı'), emoji: '🎨' },
+      fun: { label: tr("surprisetab_eylence_43d0e0", 'Əyləncə'), emoji: '🎉' },
     };
     
     uniqueCategories.forEach(cat => {
@@ -164,7 +163,7 @@ const SurpriseTab = () => {
       }
 
       toast({
-        title: t("surprisetab_surpriz_planlandi_0e685c", 'Sürpriz planlandı! 🎉'),
+        title: tr("surprisetab_surpriz_planlandi_0e685c", 'Sürpriz planlandı! 🎉'),
         description: `${selectedSurprise.title} - ${format(new Date(planningDate), 'd MMMM yyyy', { locale: az })}`,
       });
 
@@ -193,7 +192,7 @@ const SurpriseTab = () => {
           await supabase.from('notifications').insert({
             user_id: partnerProfile.user_id,
             notification_type: 'surprise',
-            title: t("surprisetab_surpriz_tamamlandi_ff52dd", 'Sürpriz Tamamlandı! 🎁'),
+            title: tr("surprisetab_surpriz_tamamlandi_ff52dd", 'Sürpriz Tamamlandı! 🎁'),
             message: `${profile.name || 'Həyat yoldaşın'} sənin üçün "${title}" sürprizini tamamladı! ${emoji}`,
           });
         } catch (err) {
@@ -212,7 +211,7 @@ const SurpriseTab = () => {
     await hapticFeedback.light();
     await deleteSurprise(id);
     toast({
-      title: t("surprisetab_surpriz_silindi_095181", 'Sürpriz silindi'),
+      title: tr("surprisetab_surpriz_silindi_095181", 'Sürpriz silindi'),
     });
   };
 
@@ -486,7 +485,7 @@ const SurpriseTab = () => {
                   <textarea
                     value={planningNotes}
                     onChange={(e) => setPlanningNotes(e.target.value)}
-                    placeholder={t("surprisetab_xususi_qeydler_6c6d1f", "Xüsusi qeydlər...")}
+                    placeholder={tr("surprisetab_xususi_qeydler_6c6d1f", "Xüsusi qeydlər...")}
                     className="w-full h-24 px-4 py-3 rounded-xl bg-muted/50 border-2 border-transparent focus:border-partner/30 outline-none resize-none"
                   />
                 </div>

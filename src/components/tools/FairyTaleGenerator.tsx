@@ -15,74 +15,73 @@ import MarkdownContent from '@/components/MarkdownContent';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 
 interface FairyTaleGeneratorProps {
   onBack: () => void;
 }
 
 const MORAL_LESSONS = [
-  { value: 'sharing', label: t("fairytalegenerator_bolusmek_df3fa9", 'Bölüşmək'), emoji: '🤝' },
-  { value: 'kindness', label: t("fairytalegenerator_mehribanliq_7e25e6", 'Mehribanlıq'), emoji: '💕' },
-  { value: 'bravery', label: t("fairytalegenerator_cesaret_326b71", 'Cəsarət'), emoji: '🦁' },
-  { value: 'honesty', label: t("fairytalegenerator_durustluk_3d6ddb", 'Dürüstlük'), emoji: '✨' },
-  { value: 'brushing_teeth', label: t("fairytalegenerator_dis_fircalamaq_da9acc", 'Diş fırçalamaq'), emoji: '🦷' },
-  { value: 'eating_vegetables', label: t("fairytalegenerator_terevez_yemek_888a56", 'Tərəvəz yemək'), emoji: '🥦' },
+  { value: 'sharing', label: tr("fairytalegenerator_bolusmek_df3fa9", 'Bölüşmək'), emoji: '🤝' },
+  { value: 'kindness', label: tr("fairytalegenerator_mehribanliq_7e25e6", 'Mehribanlıq'), emoji: '💕' },
+  { value: 'bravery', label: tr("fairytalegenerator_cesaret_326b71", 'Cəsarət'), emoji: '🦁' },
+  { value: 'honesty', label: tr("fairytalegenerator_durustluk_3d6ddb", 'Dürüstlük'), emoji: '✨' },
+  { value: 'brushing_teeth', label: tr("fairytalegenerator_dis_fircalamaq_da9acc", 'Diş fırçalamaq'), emoji: '🦷' },
+  { value: 'eating_vegetables', label: tr("fairytalegenerator_terevez_yemek_888a56", 'Tərəvəz yemək'), emoji: '🥦' },
   { value: 'sleeping', label: 'Yatmaq', emoji: '😴' },
   { value: 'friendship', label: 'Dostluq', emoji: '👫' },
-  { value: 'patience', label: t("fairytalegenerator_sebir_831276", 'Səbir'), emoji: '🧘' },
-  { value: 'gratitude', label: t("fairytalegenerator_minnetdarliq_31b225", 'Minnətdarlıq'), emoji: '🙏' },
-  { value: 'responsibility', label: t("fairytalegenerator_mesuliyyet_6e6cbe", 'Məsuliyyət'), emoji: '🎯' },
-  { value: 'respect', label: t("fairytalegenerator_hormet_45e147", 'Hörmət'), emoji: '🙌' },
-  { value: 'teamwork', label: t("fairytalegenerator_birlikde_is_01f136", 'Birlikdə iş'), emoji: '🤜🤛' },
-  { value: 'self_confidence', label: t("fairytalegenerator_ozune_inam_9828d6", 'Özünə inam'), emoji: '💪' },
-  { value: 'helping_others', label: t("fairytalegenerator_basqalarina_komek_d0e8f6", 'Başqalarına kömək'), emoji: '🫶' },
-  { value: 'nature_love', label: t("fairytalegenerator_tebiet_sevgisi_801736", 'Təbiət sevgisi'), emoji: '🌿' },
+  { value: 'patience', label: tr("fairytalegenerator_sebir_831276", 'Səbir'), emoji: '🧘' },
+  { value: 'gratitude', label: tr("fairytalegenerator_minnetdarliq_31b225", 'Minnətdarlıq'), emoji: '🙏' },
+  { value: 'responsibility', label: tr("fairytalegenerator_mesuliyyet_6e6cbe", 'Məsuliyyət'), emoji: '🎯' },
+  { value: 'respect', label: tr("fairytalegenerator_hormet_45e147", 'Hörmət'), emoji: '🙌' },
+  { value: 'teamwork', label: tr("fairytalegenerator_birlikde_is_01f136", 'Birlikdə iş'), emoji: '🤜🤛' },
+  { value: 'self_confidence', label: tr("fairytalegenerator_ozune_inam_9828d6", 'Özünə inam'), emoji: '💪' },
+  { value: 'helping_others', label: tr("fairytalegenerator_basqalarina_komek_d0e8f6", 'Başqalarına kömək'), emoji: '🫶' },
+  { value: 'nature_love', label: tr("fairytalegenerator_tebiet_sevgisi_801736", 'Təbiət sevgisi'), emoji: '🌿' },
 ];
 
 const HERO_SUGGESTIONS = [
-  { emoji: '🧸', label: t("fairytalegenerator_ayi_balasi_f0fdaa", 'Ayı Balası') },
+  { emoji: '🧸', label: tr("fairytalegenerator_ayi_balasi_f0fdaa", 'Ayı Balası') },
   { emoji: '🦄', label: 'Unicorn' },
-  { emoji: '🐰', label: t("fairytalegenerator_dovsan_a53a5c", 'Dovşan') },
-  { emoji: '🦋', label: t("fairytalegenerator_kepenek_d4da32", 'Kəpənək') },
-  { emoji: '🐱', label: t("fairytalegenerator_pisik_be8848", 'Pişik') },
-  { emoji: '🦊', label: t("fairytalegenerator_tulku_c6f151", 'Tülkü') },
+  { emoji: '🐰', label: tr("fairytalegenerator_dovsan_a53a5c", 'Dovşan') },
+  { emoji: '🦋', label: tr("fairytalegenerator_kepenek_d4da32", 'Kəpənək') },
+  { emoji: '🐱', label: tr("fairytalegenerator_pisik_be8848", 'Pişik') },
+  { emoji: '🦊', label: tr("fairytalegenerator_tulku_c6f151", 'Tülkü') },
   { emoji: '🐶', label: 'Bala it' },
   { emoji: '🌟', label: 'Ulduz' },
-  { emoji: '🐢', label: t("fairytalegenerator_tisbaga_c66f32", 'Tısbağa') },
-  { emoji: '🦉', label: t("fairytalegenerator_bayqus_d690dd", 'Bayquş') },
-  { emoji: '🐝', label: t("fairytalegenerator_ari_b3e5dd", 'Arı') },
+  { emoji: '🐢', label: tr("fairytalegenerator_tisbaga_c66f32", 'Tısbağa') },
+  { emoji: '🦉', label: tr("fairytalegenerator_bayqus_d690dd", 'Bayquş') },
+  { emoji: '🐝', label: tr("fairytalegenerator_ari_b3e5dd", 'Arı') },
   { emoji: '🦅', label: 'Qartal' },
   { emoji: '🐿️', label: 'Sincab' },
   { emoji: '🐬', label: 'Delfin' },
-  { emoji: '🦜', label: t("fairytalegenerator_tutuqusu_d3f34f", 'Tutuquşu') },
-  { emoji: '🐉', label: t("fairytalegenerator_ejdaha_b4feca", 'Əjdaha') },
+  { emoji: '🦜', label: tr("fairytalegenerator_tutuqusu_d3f34f", 'Tutuquşu') },
+  { emoji: '🐉', label: tr("fairytalegenerator_ejdaha_b4feca", 'Əjdaha') },
 ];
 
 const AGE_RANGES = [
-  { value: '0-2', label: t("fairytalegenerator_0_2_yas_0fca24", '0-2 yaş'), emoji: '👶', desc: 'Çox sadə' },
-  { value: '3-5', label: t("fairytalegenerator_3_5_yas_023631", '3-5 yaş'), emoji: '🧒', desc: 'Sadə' },
-  { value: '6-9', label: t("fairytalegenerator_6_9_yas_345fa4", '6-9 yaş'), emoji: '👧', desc: 'Orta' },
-  { value: '10-12', label: t("fairytalegenerator_10_12_yas_c393ca", '10-12 yaş'), emoji: '🧑', desc: 'Mürəkkəb' },
+  { value: '0-2', label: tr("fairytalegenerator_0_2_yas_0fca24", '0-2 yaş'), emoji: '👶', desc: 'Çox sadə' },
+  { value: '3-5', label: tr("fairytalegenerator_3_5_yas_023631", '3-5 yaş'), emoji: '🧒', desc: 'Sadə' },
+  { value: '6-9', label: tr("fairytalegenerator_6_9_yas_345fa4", '6-9 yaş'), emoji: '👧', desc: 'Orta' },
+  { value: '10-12', label: tr("fairytalegenerator_10_12_yas_c393ca", '10-12 yaş'), emoji: '🧑', desc: 'Mürəkkəb' },
 ];
 
 const STORY_STYLES = [
   { value: '', label: 'Klassik', emoji: '📖' },
-  { value: 'funny', label: t("fairytalegenerator_gulmeli_8f7f56", 'Gülməli'), emoji: '😂' },
-  { value: 'adventure', label: t("fairytalegenerator_macera_bc3bdc", 'Macəra'), emoji: '🗺️' },
-  { value: 'educational', label: t("fairytalegenerator_oyredici_b51c23", 'Öyrədici'), emoji: '🎓' },
+  { value: 'funny', label: tr("fairytalegenerator_gulmeli_8f7f56", 'Gülməli'), emoji: '😂' },
+  { value: 'adventure', label: tr("fairytalegenerator_macera_bc3bdc", 'Macəra'), emoji: '🗺️' },
+  { value: 'educational', label: tr("fairytalegenerator_oyredici_b51c23", 'Öyrədici'), emoji: '🎓' },
   { value: 'lullaby', label: 'Laylay', emoji: '🌙' },
 ];
 
 const LANGUAGES = [
-  { code: 'az', label: t("fairytalegenerator_azerbaycan_733e93", 'Azərbaycan'), flag: '🇦🇿' },
+  { code: 'az', label: tr("fairytalegenerator_azerbaycan_733e93", 'Azərbaycan'), flag: '🇦🇿' },
   { code: 'en', label: 'English', flag: '🇬🇧' },
   { code: 'ru', label: 'Русский', flag: '🇷🇺' },
-  { code: 'tr', label: t("fairytalegenerator_turkce_299adc", 'Türkçe'), flag: '🇹🇷' },
+  { code: 'tr', label: tr("fairytalegenerator_turkce_299adc", 'Türkçe'), flag: '🇹🇷' },
 ];
 
 const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
-  const { t } = useTranslation();
   useScreenAnalytics('FairyTaleGenerator', 'Tools');
   const [selectedTale, setSelectedTale] = useState<FairyTale | null>(null);
   const [showCreate, setShowCreate] = useState(false);
@@ -416,7 +415,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 <Input
                   value={directChildName}
                   onChange={(e) => setDirectChildName(e.target.value)}
-                  placeholder={t("fairytalegenerator_meselen_aysel_murad_bdd8a0", "Məsələn: Aysel, Murad...")}
+                  placeholder={tr("fairytalegenerator_meselen_aysel_murad_bdd8a0", "Məsələn: Aysel, Murad...")}
                 />
               </div>
 
@@ -426,7 +425,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 <Textarea
                   value={customPrompt}
                   onChange={(e) => setCustomPrompt(e.target.value)}
-                  placeholder={t("fairytalegenerator_meselen_1_yasina_hazirlasan_balaca_aslan_e692b9", "Məsələn: 1 yaşına hazırlaşan balaca aslan haqqında nağıl yaz, meşədə dostları ilə ad günü keçirsin...")}
+                  placeholder={tr("fairytalegenerator_meselen_1_yasina_hazirlasan_balaca_aslan_e692b9", "Məsələn: 1 yaşına hazırlaşan balaca aslan haqqında nağıl yaz, meşədə dostları ilə ad günü keçirsin...")}
                   rows={4}
                   className="resize-none"
                 />
@@ -515,7 +514,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                   <Input
                     value={formData.child_name}
                     onChange={(e) => setFormData({ ...formData, child_name: e.target.value })}
-                    placeholder={t("fairytalegenerator_meselen_aysel_murad_leman_2ed3da", "Məsələn: Aysel, Murad, Ləman...")}
+                    placeholder={tr("fairytalegenerator_meselen_aysel_murad_leman_2ed3da", "Məsələn: Aysel, Murad, Ləman...")}
                     className="text-lg"
                     autoFocus
                   />
@@ -671,7 +670,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                   <Input
                     value={formData.hero}
                     onChange={(e) => setFormData({ ...formData, hero: e.target.value })}
-                    placeholder={t("fairytalegenerator_ve_ya_ozunuz_yazin_cb37bc", "Və ya özünüz yazın...")}
+                    placeholder={tr("fairytalegenerator_ve_ya_ozunuz_yazin_cb37bc", "Və ya özünüz yazın...")}
                   />
                 </div>
 

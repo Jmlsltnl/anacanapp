@@ -15,7 +15,7 @@ import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,7 +32,6 @@ interface SettingsScreenProps {
 }
 
 const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
-  const { t } = useTranslation();
   useScrollToTop();
   useScreenAnalytics('Settings', 'Settings');
   
@@ -66,15 +65,15 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
     try {
       const tables = [
         { name: 'profiles', label: 'Profil' },
-        { name: 'daily_logs', label: t("settingsscreen_gundelik_qeydler_285ea0", 'Gündəlik qeydlər') },
+        { name: 'daily_logs', label: tr("settingsscreen_gundelik_qeydler_285ea0", 'Gündəlik qeydlər') },
         { name: 'appointments', label: 'Randevular' },
-        { name: 'baby_growth', label: t("settingsscreen_korpe_inkisafi_8816ce", 'Körpə inkişafı') },
-        { name: 'baby_logs', label: t("settingsscreen_korpe_qeydleri_8d99a2", 'Körpə qeydləri') },
-        { name: 'weight_entries', label: t("settingsscreen_ceki_qeydleri_43f237", 'Çəki qeydləri') },
+        { name: 'baby_growth', label: tr("settingsscreen_korpe_inkisafi_8816ce", 'Körpə inkişafı') },
+        { name: 'baby_logs', label: tr("settingsscreen_korpe_qeydleri_8d99a2", 'Körpə qeydləri') },
+        { name: 'weight_entries', label: tr("settingsscreen_ceki_qeydleri_43f237", 'Çəki qeydləri') },
         { name: 'cycle_history', label: 'Tsikl tarixi' },
-        { name: 'kick_sessions', label: t("settingsscreen_tepik_sessiyalari_87edad", 'Təpik sessiyaları') },
-        { name: 'contractions', label: t("settingsscreen_buzusmeler_1ec368", 'Büzüşmələr') },
-        { name: 'blood_sugar_logs', label: t("settingsscreen_qan_sekeri_c922e6", 'Qan şəkəri') },
+        { name: 'kick_sessions', label: tr("settingsscreen_tepik_sessiyalari_87edad", 'Təpik sessiyaları') },
+        { name: 'contractions', label: tr("settingsscreen_buzusmeler_1ec368", 'Büzüşmələr') },
+        { name: 'blood_sugar_logs', label: tr("settingsscreen_qan_sekeri_c922e6", 'Qan şəkəri') },
       ];
 
       const exportData: Record<string, any> = {
@@ -457,7 +456,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
                   type="text"
                   value={deleteConfirmText}
                   onChange={(e) => setDeleteConfirmText(e.target.value)}
-                  placeholder={t("settingsscreen_si_l_903c4d", "SİL")}
+                  placeholder={tr("settingsscreen_si_l_903c4d", "SİL")}
                   className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm font-mono text-center tracking-widest"
                 />
               </div>

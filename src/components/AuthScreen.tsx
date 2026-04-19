@@ -9,14 +9,13 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppBranding, getBrandingUrl } from '@/hooks/useAppBranding';
 import { useAppSetting } from '@/hooks/useAppSettings';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 
 type AuthMode = 'login' | 'register' | 'forgot-password';
 type PartnerAuthMode = 'login' | 'register';
 type MainView = 'main' | 'partner';
 
 const AuthScreen = () => {
-  const { t } = useTranslation();
   const [mainView, setMainView] = useState<MainView>('main');
   const [mode, setMode] = useState<AuthMode>('login');
   const [partnerMode, setPartnerMode] = useState<PartnerAuthMode>('register');
@@ -52,8 +51,8 @@ const AuthScreen = () => {
     try {
       if (!email || !password) {
         toast({
-          title: t("authscreen_melumat_teleb_olunur_a6d6a7", 'Məlumat tələb olunur'),
-          description: t("authscreen_e_mail_ve_sifre_daxil_edin_07e5e3", 'E-mail və şifrə daxil edin.'),
+          title: tr("authscreen_melumat_teleb_olunur_a6d6a7", 'Məlumat tələb olunur'),
+          description: tr("authscreen_e_mail_ve_sifre_daxil_edin_07e5e3", 'E-mail və şifrə daxil edin.'),
           variant: 'destructive',
         });
         setIsLoading(false);
@@ -65,14 +64,14 @@ const AuthScreen = () => {
         const { error: authError } = await signIn(email, password);
         if (authError) {
           toast({
-            title: t("authscreen_giris_alinmadi_e321fa", 'Giriş alınmadı'),
-            description: t("authscreen_e_mail_ve_ya_sifre_yanlisdir_1ef792", 'E-mail və ya şifrə yanlışdır.'),
+            title: tr("authscreen_giris_alinmadi_e321fa", 'Giriş alınmadı'),
+            description: tr("authscreen_e_mail_ve_ya_sifre_yanlisdir_1ef792", 'E-mail və ya şifrə yanlışdır.'),
             variant: 'destructive',
           });
         } else {
           toast({
-            title: t("authscreen_xos_geldiniz_96d761", 'Xoş gəldiniz! 👋'),
-            description: t("authscreen_partnyor_paneline_daxil_oldunuz_0fc533", 'Partnyor panelinə daxil oldunuz.'),
+            title: tr("authscreen_xos_geldiniz_96d761", 'Xoş gəldiniz! 👋'),
+            description: tr("authscreen_partnyor_paneline_daxil_oldunuz_0fc533", 'Partnyor panelinə daxil oldunuz.'),
           });
         }
         setIsLoading(false);
@@ -82,8 +81,8 @@ const AuthScreen = () => {
       // ── Registration flow: validate partner code ──
       if (!partnerCode.startsWith('ANACAN-') || partnerCode.length < 10) {
         toast({
-          title: t("authscreen_kod_yanlisdir_64b48f", 'Kod yanlışdır'),
-          description: t("authscreen_zehmet_olmasa_duzgun_partnyor_kodu_daxil_cface0", 'Zəhmət olmasa düzgün partnyor kodu daxil edin.'),
+          title: tr("authscreen_kod_yanlisdir_64b48f", 'Kod yanlışdır'),
+          description: tr("authscreen_zehmet_olmasa_duzgun_partnyor_kodu_daxil_cface0", 'Zəhmət olmasa düzgün partnyor kodu daxil edin.'),
           variant: 'destructive',
         });
         setIsLoading(false);
@@ -98,8 +97,8 @@ const AuthScreen = () => {
 
       if (findError || !partnerProfile) {
         toast({
-          title: t("authscreen_partnyor_tapilmadi_1239a8", 'Partnyor tapılmadı'),
-          description: t("authscreen_bu_kodla_partnyor_tapilmadi_kodu_yoxlayi_a94376", 'Bu kodla partnyor tapılmadı. Kodu yoxlayın.'),
+          title: tr("authscreen_partnyor_tapilmadi_1239a8", 'Partnyor tapılmadı'),
+          description: tr("authscreen_bu_kodla_partnyor_tapilmadi_kodu_yoxlayi_a94376", 'Bu kodla partnyor tapılmadı. Kodu yoxlayın.'),
           variant: 'destructive',
         });
         setIsLoading(false);
@@ -111,8 +110,8 @@ const AuthScreen = () => {
       const { error: registerError } = await signUp(email, password, partnerName.trim());
       if (registerError) {
         toast({
-          title: t("authscreen_qeydiyyat_alinmadi_982f04", 'Qeydiyyat alınmadı'),
-          description: t("authscreen_bu_e_mail_artiq_qeydiyyatdan_kecib_1bdd66", 'Bu e-mail artıq qeydiyyatdan keçib.'),
+          title: tr("authscreen_qeydiyyat_alinmadi_982f04", 'Qeydiyyat alınmadı'),
+          description: tr("authscreen_bu_e_mail_artiq_qeydiyyatdan_kecib_1bdd66", 'Bu e-mail artıq qeydiyyatdan keçib.'),
           variant: 'destructive',
         });
         setIsLoading(false);
@@ -128,8 +127,8 @@ const AuthScreen = () => {
       
       if (!currentUserId) {
         toast({
-          title: t("authscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
-          description: t("authscreen_sessiya_tapilmadi_yeniden_cehd_edin_651207", 'Sessiya tapılmadı. Yenidən cəhd edin.'),
+          title: tr("authscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
+          description: tr("authscreen_sessiya_tapilmadi_yeniden_cehd_edin_651207", 'Sessiya tapılmadı. Yenidən cəhd edin.'),
           variant: 'destructive',
         });
         setIsLoading(false);
@@ -145,8 +144,8 @@ const AuthScreen = () => {
       
       if (profileError || !myProfile) {
         toast({
-          title: t("authscreen_profil_xetasi_4b403e", 'Profil xətası'),
-          description: t("authscreen_profiliniz_yaradilarken_xeta_bas_verdi_y_2bdc7b", 'Profiliniz yaradılarkən xəta baş verdi. Yenidən cəhd edin.'),
+          title: tr("authscreen_profil_xetasi_4b403e", 'Profil xətası'),
+          description: tr("authscreen_profiliniz_yaradilarken_xeta_bas_verdi_y_2bdc7b", 'Profiliniz yaradılarkən xəta baş verdi. Yenidən cəhd edin.'),
           variant: 'destructive',
         });
         setIsLoading(false);
@@ -165,8 +164,8 @@ const AuthScreen = () => {
       if (updateMyError) {
         console.error('Error updating my profile:', updateMyError);
         toast({
-          title: t("authscreen_baglanti_xetasi_e97fbc", 'Bağlantı xətası'),
-          description: t("authscreen_partnyor_ile_baglanti_qurula_bilmedi_d95403", 'Partnyor ilə bağlantı qurula bilmədi.'),
+          title: tr("authscreen_baglanti_xetasi_e97fbc", 'Bağlantı xətası'),
+          description: tr("authscreen_partnyor_ile_baglanti_qurula_bilmedi_d95403", 'Partnyor ilə bağlantı qurula bilmədi.'),
           variant: 'destructive',
         });
         setIsLoading(false);
@@ -181,7 +180,7 @@ const AuthScreen = () => {
       });
       
       toast({
-        title: t("authscreen_ugurla_baglandiniz_62b079", 'Uğurla bağlandınız! 🎉'),
+        title: tr("authscreen_ugurla_baglandiniz_62b079", 'Uğurla bağlandınız! 🎉'),
         description: `${partnerProfile.name} ilə əlaqələndirildiniz.`,
       });
       
@@ -190,8 +189,8 @@ const AuthScreen = () => {
     } catch (error) {
       console.error('Partner auth error:', error);
       toast({
-        title: t("authscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
-        description: t("authscreen_yeniden_cehd_edin_18c03c", 'Yenidən cəhd edin.'),
+        title: tr("authscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
+        description: tr("authscreen_yeniden_cehd_edin_18c03c", 'Yenidən cəhd edin.'),
         variant: 'destructive',
       });
     }
@@ -207,8 +206,8 @@ const AuthScreen = () => {
       if (mode === 'forgot-password') {
         if (!email) {
           toast({
-            title: t("authscreen_e_mail_teleb_olunur_29dbb5", 'E-mail tələb olunur'),
-            description: t("authscreen_zehmet_olmasa_e_mail_unvaninizi_daxil_ed_281019", 'Zəhmət olmasa e-mail ünvanınızı daxil edin.'),
+            title: tr("authscreen_e_mail_teleb_olunur_29dbb5", 'E-mail tələb olunur'),
+            description: tr("authscreen_zehmet_olmasa_e_mail_unvaninizi_daxil_ed_281019", 'Zəhmət olmasa e-mail ünvanınızı daxil edin.'),
             variant: 'destructive',
           });
           setIsLoading(false);
@@ -221,14 +220,14 @@ const AuthScreen = () => {
 
         if (error) {
           toast({
-            title: t("authscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
-            description: t("authscreen_sifre_berpa_linki_gonderile_bilmedi_898ae3", 'Şifrə bərpa linki göndərilə bilmədi.'),
+            title: tr("authscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
+            description: tr("authscreen_sifre_berpa_linki_gonderile_bilmedi_898ae3", 'Şifrə bərpa linki göndərilə bilmədi.'),
             variant: 'destructive',
           });
         } else {
           toast({
-            title: t("authscreen_link_gonderildi_9e4f3d", 'Link göndərildi! 📧'),
-            description: t("authscreen_e_mail_unvaniniza_sifre_berpa_linki_gond_f42b2e", 'E-mail ünvanınıza şifrə bərpa linki göndərildi.'),
+            title: tr("authscreen_link_gonderildi_9e4f3d", 'Link göndərildi! 📧'),
+            description: tr("authscreen_e_mail_unvaniniza_sifre_berpa_linki_gond_f42b2e", 'E-mail ünvanınıza şifrə bərpa linki göndərildi.'),
           });
           setMode('login');
           setEmail('');
@@ -236,8 +235,8 @@ const AuthScreen = () => {
       } else if (mode === 'login') {
         if (!email || !password) {
           toast({
-            title: t("authscreen_melumat_teleb_olunur_a6d6a7", 'Məlumat tələb olunur'),
-            description: t("authscreen_e_mail_ve_sifre_daxil_edin_07e5e3", 'E-mail və şifrə daxil edin.'),
+            title: tr("authscreen_melumat_teleb_olunur_a6d6a7", 'Məlumat tələb olunur'),
+            description: tr("authscreen_e_mail_ve_sifre_daxil_edin_07e5e3", 'E-mail və şifrə daxil edin.'),
             variant: 'destructive',
           });
           setIsLoading(false);
@@ -247,22 +246,22 @@ const AuthScreen = () => {
         const { error } = await signIn(email, password);
         if (error) {
           toast({
-            title: t("authscreen_giris_alinmadi_e321fa", 'Giriş alınmadı'),
-            description: t("authscreen_e_mail_ve_ya_sifre_yanlisdir_1ef792", 'E-mail və ya şifrə yanlışdır.'),
+            title: tr("authscreen_giris_alinmadi_e321fa", 'Giriş alınmadı'),
+            description: tr("authscreen_e_mail_ve_ya_sifre_yanlisdir_1ef792", 'E-mail və ya şifrə yanlışdır.'),
             variant: 'destructive',
           });
         } else {
           toast({
-            title: t("authscreen_xos_geldiniz_96d761", 'Xoş gəldiniz! 👋'),
-            description: t("authscreen_anacan_a_xos_geldiniz_f08b39", 'Anacan-a xoş gəldiniz!'),
+            title: tr("authscreen_xos_geldiniz_96d761", 'Xoş gəldiniz! 👋'),
+            description: tr("authscreen_anacan_a_xos_geldiniz_f08b39", 'Anacan-a xoş gəldiniz!'),
           });
         }
       } else {
         // Register
         if (!email || !password) {
           toast({
-            title: t("authscreen_melumat_teleb_olunur_a6d6a7", 'Məlumat tələb olunur'),
-            description: t("authscreen_e_mail_ve_sifre_daxil_edin_07e5e3", 'E-mail və şifrə daxil edin.'),
+            title: tr("authscreen_melumat_teleb_olunur_a6d6a7", 'Məlumat tələb olunur'),
+            description: tr("authscreen_e_mail_ve_sifre_daxil_edin_07e5e3", 'E-mail və şifrə daxil edin.'),
             variant: 'destructive',
           });
           setIsLoading(false);
@@ -273,22 +272,22 @@ const AuthScreen = () => {
         const { error } = await signUp(email, password, finalName.trim());
         if (error) {
           toast({
-            title: t("authscreen_qeydiyyat_alinmadi_982f04", 'Qeydiyyat alınmadı'),
-            description: t("authscreen_bu_e_mail_artiq_qeydiyyatdan_kecib_1bdd66", 'Bu e-mail artıq qeydiyyatdan keçib.'),
+            title: tr("authscreen_qeydiyyat_alinmadi_982f04", 'Qeydiyyat alınmadı'),
+            description: tr("authscreen_bu_e_mail_artiq_qeydiyyatdan_kecib_1bdd66", 'Bu e-mail artıq qeydiyyatdan keçib.'),
             variant: 'destructive',
           });
         } else {
           toast({
-            title: t("authscreen_qeydiyyat_ugurludur_47a91b", 'Qeydiyyat uğurludur! 🎉'),
-            description: t("authscreen_anacan_a_xos_geldiniz_f08b39", 'Anacan-a xoş gəldiniz!'),
+            title: tr("authscreen_qeydiyyat_ugurludur_47a91b", 'Qeydiyyat uğurludur! 🎉'),
+            description: tr("authscreen_anacan_a_xos_geldiniz_f08b39", 'Anacan-a xoş gəldiniz!'),
           });
         }
       }
     } catch (error) {
       console.error('Auth error:', error);
       toast({
-        title: t("authscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
-        description: t("authscreen_yeniden_cehd_edin_18c03c", 'Yenidən cəhd edin.'),
+        title: tr("authscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
+        description: tr("authscreen_yeniden_cehd_edin_18c03c", 'Yenidən cəhd edin.'),
         variant: 'destructive',
       });
     }
@@ -302,8 +301,8 @@ const AuthScreen = () => {
       const { error } = await signInWithGoogle();
       if (error) {
         toast({
-          title: t("authscreen_google_ile_giris_alinmadi_2d7d46", 'Google ilə giriş alınmadı'),
-          description: t("authscreen_yeniden_cehd_edin_18c03c", 'Yenidən cəhd edin.'),
+          title: tr("authscreen_google_ile_giris_alinmadi_2d7d46", 'Google ilə giriş alınmadı'),
+          description: tr("authscreen_yeniden_cehd_edin_18c03c", 'Yenidən cəhd edin.'),
           variant: 'destructive',
         });
       }
@@ -319,8 +318,8 @@ const AuthScreen = () => {
       const { error } = await signInWithApple();
       if (error) {
         toast({
-          title: t("authscreen_apple_ile_giris_alinmadi_6f9b3a", 'Apple ilə giriş alınmadı'),
-          description: t("authscreen_yeniden_cehd_edin_18c03c", 'Yenidən cəhd edin.'),
+          title: tr("authscreen_apple_ile_giris_alinmadi_6f9b3a", 'Apple ilə giriş alınmadı'),
+          description: tr("authscreen_yeniden_cehd_edin_18c03c", 'Yenidən cəhd edin.'),
           variant: 'destructive',
         });
       }
@@ -418,7 +417,7 @@ const AuthScreen = () => {
               <div className="flex gap-2 mb-7 p-1.5 bg-muted rounded-2xl">
                 {[
                   { id: 'register', label: 'Qeydiyyat' },
-                  { id: 'login', label: t("authscreen_giris_1ffbd7", 'Giriş') },
+                  { id: 'login', label: tr("authscreen_giris_1ffbd7", 'Giriş') },
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -464,7 +463,7 @@ const AuthScreen = () => {
                         <Input
                           ref={nameInputRef}
                           type="text"
-                          placeholder={t("authscreen_adiniz_b3e84a", "Adınız")}
+                          placeholder={tr("authscreen_adiniz_b3e84a", "Adınız")}
                           value={name}
                           onChange={(e) => setName(e.target.value)}
                           className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all"
@@ -491,7 +490,7 @@ const AuthScreen = () => {
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-blue-500" />
                       <Input
                         type={showPassword ? 'text' : 'password'}
-                        placeholder={t("authscreen_sifre_6771ac", "Şifrə")}
+                        placeholder={tr("authscreen_sifre_6771ac", "Şifrə")}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="pl-12 pr-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all"
@@ -638,7 +637,7 @@ const AuthScreen = () => {
             {/* Mode Tabs */}
             <div className="flex gap-2 mb-7 p-1.5 bg-muted rounded-2xl">
               {[
-                { id: 'login', label: t("authscreen_giris_1ffbd7", 'Giriş') },
+                { id: 'login', label: tr("authscreen_giris_1ffbd7", 'Giriş') },
                 { id: 'register', label: 'Qeydiyyat' },
               ].map((tab) => (
                 <button
@@ -706,7 +705,7 @@ const AuthScreen = () => {
                           <Input
                             ref={nameInputRef}
                             type="text"
-                            placeholder={t("authscreen_adiniz_b3e84a", "Adınız")}
+                            placeholder={tr("authscreen_adiniz_b3e84a", "Adınız")}
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all"
@@ -733,7 +732,7 @@ const AuthScreen = () => {
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
                         <Input
                           type={showPassword ? 'text' : 'password'}
-                          placeholder={t("authscreen_sifre_6771ac", "Şifrə")}
+                          placeholder={tr("authscreen_sifre_6771ac", "Şifrə")}
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           className="pl-12 pr-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all"

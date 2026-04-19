@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useFlowDailyLog, useSaveFlowDailyLog, useFlowSymptoms, FlowDailyLog } from '@/hooks/useFlowDailyLogs';
 import { toast } from 'sonner';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 
 interface FlowDailyLoggerProps {
   date?: Date;
@@ -22,35 +22,35 @@ interface FlowDailyLoggerProps {
 }
 
 const MOOD_OPTIONS = [
-  { value: 1, emoji: '😢', label: t("flowdailylogger_cox_pis_e041c5", 'Çox pis'), color: 'bg-red-100 border-red-300 text-red-700' },
+  { value: 1, emoji: '😢', label: tr("flowdailylogger_cox_pis_e041c5", 'Çox pis'), color: 'bg-red-100 border-red-300 text-red-700' },
   { value: 2, emoji: '😔', label: 'Pis', color: 'bg-orange-100 border-orange-300 text-orange-700' },
   { value: 3, emoji: '😐', label: 'Normal', color: 'bg-yellow-100 border-yellow-300 text-yellow-700' },
-  { value: 4, emoji: '😊', label: t("flowdailylogger_yaxsi_9d8595", 'Yaxşı'), color: 'bg-green-100 border-green-300 text-green-700' },
-  { value: 5, emoji: '🥰', label: t("flowdailylogger_ela_720a0e", 'Əla'), color: 'bg-pink-100 border-pink-300 text-pink-700' },
+  { value: 4, emoji: '😊', label: tr("flowdailylogger_yaxsi_9d8595", 'Yaxşı'), color: 'bg-green-100 border-green-300 text-green-700' },
+  { value: 5, emoji: '🥰', label: tr("flowdailylogger_ela_720a0e", 'Əla'), color: 'bg-pink-100 border-pink-300 text-pink-700' },
 ];
 
 const ENERGY_OPTIONS = [
-  { value: 1, icon: CloudRain, label: t("flowdailylogger_cox_asagi_e45510", 'Çox aşağı'), color: 'text-slate-400' },
-  { value: 2, icon: Meh, label: t("flowdailylogger_asagi_1c27f1", 'Aşağı'), color: 'text-slate-500' },
+  { value: 1, icon: CloudRain, label: tr("flowdailylogger_cox_asagi_e45510", 'Çox aşağı'), color: 'text-slate-400' },
+  { value: 2, icon: Meh, label: tr("flowdailylogger_asagi_1c27f1", 'Aşağı'), color: 'text-slate-500' },
   { value: 3, icon: Sun, label: 'Normal', color: 'text-yellow-500' },
-  { value: 4, icon: Zap, label: t("flowdailylogger_yuksek_492584", 'Yüksək'), color: 'text-orange-500' },
-  { value: 5, icon: Sparkles, label: t("flowdailylogger_cox_yuksek_c4d475", 'Çox yüksək'), color: 'text-amber-500' },
+  { value: 4, icon: Zap, label: tr("flowdailylogger_yuksek_492584", 'Yüksək'), color: 'text-orange-500' },
+  { value: 5, icon: Sparkles, label: tr("flowdailylogger_cox_yuksek_c4d475", 'Çox yüksək'), color: 'text-amber-500' },
 ];
 
 const FLOW_OPTIONS = [
   { value: 'none', label: 'Yoxdur', emoji: '⚪', color: 'bg-slate-100' },
-  { value: 'spotting', label: t("flowdailylogger_lekelenme_8e7b1e", 'Ləkələnmə'), emoji: '🔵', color: 'bg-blue-100' },
-  { value: 'light', label: t("flowdailylogger_yungul_2a8010", 'Yüngül'), emoji: '🩸', color: 'bg-red-100' },
+  { value: 'spotting', label: tr("flowdailylogger_lekelenme_8e7b1e", 'Ləkələnmə'), emoji: '🔵', color: 'bg-blue-100' },
+  { value: 'light', label: tr("flowdailylogger_yungul_2a8010", 'Yüngül'), emoji: '🩸', color: 'bg-red-100' },
   { value: 'medium', label: 'Orta', emoji: '🩸🩸', color: 'bg-red-200' },
-  { value: 'heavy', label: t("flowdailylogger_guclu_0fda31", 'Güclü'), emoji: '🩸🩸🩸', color: 'bg-red-300' },
+  { value: 'heavy', label: tr("flowdailylogger_guclu_0fda31", 'Güclü'), emoji: '🩸🩸🩸', color: 'bg-red-300' },
 ];
 
 const SLEEP_QUALITY = [
-  { value: 1, label: t("flowdailylogger_cox_pis_e041c5", 'Çox pis'), emoji: '😫' },
+  { value: 1, label: tr("flowdailylogger_cox_pis_e041c5", 'Çox pis'), emoji: '😫' },
   { value: 2, label: 'Pis', emoji: '😴' },
   { value: 3, label: 'Normal', emoji: '😐' },
-  { value: 4, label: t("flowdailylogger_yaxsi_9d8595", 'Yaxşı'), emoji: '😌' },
-  { value: 5, label: t("flowdailylogger_ela_720a0e", 'Əla'), emoji: '😇' },
+  { value: 4, label: tr("flowdailylogger_yaxsi_9d8595", 'Yaxşı'), emoji: '😌' },
+  { value: 5, label: tr("flowdailylogger_ela_720a0e", 'Əla'), emoji: '😇' },
 ];
 
 const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDailyLoggerProps) => {
@@ -91,7 +91,6 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
   }, [existingLog]);
 
   const toggleSymptom = (symptomKey: string) => {
-  const { t } = useTranslation();
     setFormData(prev => ({
       ...prev,
       symptoms: prev.symptoms?.includes(symptomKey)
@@ -355,7 +354,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
                 <Textarea
                   value={formData.notes ?? ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value || null }))}
-                  placeholder={t("flowdailylogger_bu_gun_haqqinda_qeydlerinizi_yazin_eca8f7", "Bu gün haqqında qeydlərinizi yazın...")}
+                  placeholder={tr("flowdailylogger_bu_gun_haqqinda_qeydlerinizi_yazin_eca8f7", "Bu gün haqqında qeydlərinizi yazın...")}
                   rows={3}
                 />
               </div>

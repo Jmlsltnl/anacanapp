@@ -3,17 +3,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Moon, Baby, Volume2, Square, Clock, X, VolumeX } from 'lucide-react';
 import { useTimerStore, type TimerType } from '@/store/timerStore';
 import { useWhiteNoiseStore } from '@/store/whiteNoiseStore';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 
 const timerConfig: Record<TimerType, { icon: typeof Moon; color: string; label: string }> = {
   sleep: { icon: Moon, color: 'text-indigo-500', label: 'Yuxu' },
-  feeding: { icon: Baby, color: 'text-rose-500', label: t("floatingtimerwidget_emizdirme_20d46a", 'Əmizdirmə') },
+  feeding: { icon: Baby, color: 'text-rose-500', label: tr("floatingtimerwidget_emizdirme_20d46a", 'Əmizdirmə') },
   diaper: { icon: Clock, color: 'text-amber-500', label: 'Bez' },
-  'white-noise': { icon: Volume2, color: 'text-emerald-500', label: t("floatingtimerwidget_kuy_sesi_7b0cd5", 'Küy Səsi') },
+  'white-noise': { icon: Volume2, color: 'text-emerald-500', label: tr("floatingtimerwidget_kuy_sesi_7b0cd5", 'Küy Səsi') },
 };
 
 const formatTime = (totalSeconds: number) => {
-  const { t } = useTranslation();
   const h = Math.floor(totalSeconds / 3600);
   const m = Math.floor((totalSeconds % 3600) / 60);
   const s = totalSeconds % 60;

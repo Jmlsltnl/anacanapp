@@ -10,7 +10,7 @@ import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import CartDrawer from '@/components/shop/CartDrawer';
 import CheckoutScreen from '@/components/shop/CheckoutScreen';
 import OrderSuccessScreen from '@/components/shop/OrderSuccessScreen';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 
 interface ShopScreenProps {
   onBack?: () => void;
@@ -40,7 +40,6 @@ interface ProductDisplay {
 }
 
 const ShopScreen = ({ onBack }: ShopScreenProps) => {
-  const { t } = useTranslation();
   useScrollToTop();
   useScreenAnalytics('Shop', 'Shop');
   
@@ -259,7 +258,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <input
           type="text"
-          placeholder={t("shopscreen_mehsul_axtarin_7356a7", "Məhsul axtarın...")}
+          placeholder={tr("shopscreen_mehsul_axtarin_7356a7", "Məhsul axtarın...")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full h-10 pl-10 pr-4 rounded-xl bg-muted/50 border border-transparent focus:border-primary/30 text-sm transition-all outline-none"

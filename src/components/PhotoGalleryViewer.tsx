@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { isNative, nativeShare, saveImageToGallery, isIOS } from '@/lib/native';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,7 +42,6 @@ const PhotoGalleryViewer = ({
   onClose,
   onDelete 
 }: PhotoGalleryViewerProps) => {
-  const { t } = useTranslation();
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isZoomed, setIsZoomed] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -105,7 +104,7 @@ const PhotoGalleryViewer = ({
         await Haptics.impact({ style: ImpactStyle.Heavy }).catch(() => {});
         
         toast({
-          title: t("photogalleryviewer_sekil_endirildi_0b4a05", 'Şəkil endirildi! 📸'),
+          title: tr("photogalleryviewer_sekil_endirildi_0b4a05", 'Şəkil endirildi! 📸'),
         });
       } else {
         throw new Error('Download failed');
@@ -113,8 +112,8 @@ const PhotoGalleryViewer = ({
     } catch (error) {
       console.error('Download error:', error);
       toast({
-        title: t("photogalleryviewer_xeta_3cdbb6", 'Xəta'),
-        description: t("photogalleryviewer_sekil_yuklenerken_xeta_bas_verdi_16a2d0", 'Şəkil yüklənərkən xəta baş verdi'),
+        title: tr("photogalleryviewer_xeta_3cdbb6", 'Xəta'),
+        description: tr("photogalleryviewer_sekil_yuklenerken_xeta_bas_verdi_16a2d0", 'Şəkil yüklənərkən xəta baş verdi'),
         variant: 'destructive',
       });
     } finally {
@@ -127,14 +126,14 @@ const PhotoGalleryViewer = ({
     handleHaptic();
 
     const shared = await nativeShare({
-      title: t("photogalleryviewer_korpe_fotosu_770c1a", 'Körpə Fotosu'),
+      title: tr("photogalleryviewer_korpe_fotosu_770c1a", 'Körpə Fotosu'),
       text: 'Anacan ilə yaradılmış körpə fotosu',
       url: currentPhoto.url,
     });
 
     if (shared) {
       toast({
-        title: t("photogalleryviewer_paylasildi_40c74e", 'Paylaşıldı! 🎉'),
+        title: tr("photogalleryviewer_paylasildi_40c74e", 'Paylaşıldı! 🎉'),
       });
     }
   };
@@ -154,12 +153,12 @@ const PhotoGalleryViewer = ({
       
       toast({
         title: 'Silindi! 🗑️',
-        description: t("photogalleryviewer_foto_ugurla_silindi_a3226a", 'Foto uğurla silindi'),
+        description: tr("photogalleryviewer_foto_ugurla_silindi_a3226a", 'Foto uğurla silindi'),
       });
     } catch (error) {
       toast({
-        title: t("photogalleryviewer_xeta_3cdbb6", 'Xəta'),
-        description: t("photogalleryviewer_foto_silinerken_xeta_bas_verdi_6359b2", 'Foto silinərkən xəta baş verdi'),
+        title: tr("photogalleryviewer_xeta_3cdbb6", 'Xəta'),
+        description: tr("photogalleryviewer_foto_silinerken_xeta_bas_verdi_6359b2", 'Foto silinərkən xəta baş verdi'),
         variant: 'destructive',
       });
     } finally {

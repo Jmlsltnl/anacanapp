@@ -11,7 +11,7 @@ import { hapticFeedback } from '@/lib/native';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 
 interface CommentReplyProps {
   comment: PostComment;
@@ -24,7 +24,6 @@ interface CommentReplyProps {
 }
 
 const UserBadge = ({ type }: { type: 'admin' | 'premium' | 'moderator' | null }) => {
-  const { t } = useTranslation();
   if (!type) return null;
   const config = {
     admin: { label: 'Admin', icon: Shield, className: 'bg-gradient-to-r from-red-500 to-orange-500 text-white' },
@@ -42,7 +41,6 @@ const UserBadge = ({ type }: { type: 'admin' | 'premium' | 'moderator' | null })
 };
 
 const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, onUserClick, level = 0 }: CommentReplyProps) => {
-  const { t } = useTranslation();
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [showReplies, setShowReplies] = useState(level === 0);
   const [replyText, setReplyText] = useState('');
@@ -79,15 +77,15 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
       });
       setReplyText(''); setShowReplyInput(false); onRefetch();
     } catch (error: any) {
-      toast({ title: t("commentreply_xeta_3cdbb6", 'Xəta'), description: error.message || 'Şərh əlavə edilə bilmədi', variant: 'destructive' });
+      toast({ title: tr("commentreply_xeta_3cdbb6", 'Xəta'), description: error.message || 'Şərh əlavə edilə bilmədi', variant: 'destructive' });
     }
   };
 
   const handleDelete = async () => {
     if (!confirm('Bu şərhi silmək istəyirsiniz?')) return;
     const { error } = await supabase.from('post_comments').delete().eq('id', comment.id);
-    if (error) toast({ title: t("commentreply_xeta_3cdbb6", 'Xəta'), description: error.message, variant: 'destructive' });
-    else { toast({ title: t("commentreply_ugurlu_7fe64c", 'Uğurlu'), description: t("commentreply_serh_silindi_59cfe5", 'Şərh silindi') }); onRefetch(); }
+    if (error) toast({ title: tr("commentreply_xeta_3cdbb6", 'Xəta'), description: error.message, variant: 'destructive' });
+    else { toast({ title: tr("commentreply_ugurlu_7fe64c", 'Uğurlu'), description: tr("commentreply_serh_silindi_59cfe5", 'Şərh silindi') }); onRefetch(); }
   };
 
   const handleAvatarClick = () => { if (comment.user_id && onUserClick) onUserClick(comment.user_id); };

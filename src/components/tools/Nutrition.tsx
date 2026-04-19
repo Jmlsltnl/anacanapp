@@ -15,7 +15,7 @@ import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import VitaminsTab from './VitaminsTab';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 
 interface NutritionProps {
   onBack: () => void;
@@ -79,7 +79,6 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
   
   // Filter foods by selected meal type using meal_types array directly
   const getFilteredFoods = (mealId: string) => {
-  const { t } = useTranslation();
     return allCommonFoods.filter(f => {
       if (!f.meal_types || f.meal_types.length === 0) return true;
       return f.meal_types.includes(mealId);
@@ -301,7 +300,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                     <Input
                       value={customFood.name}
                       onChange={e => setCustomFood({ ...customFood, name: e.target.value })}
-                      placeholder={t("nutrition_mes_plov_afdcf0", "məs. Plov")}
+                      placeholder={tr("nutrition_mes_plov_afdcf0", "məs. Plov")}
                       className="h-9 text-sm"
                     />
                   </div>
@@ -311,7 +310,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                       type="number"
                       value={customFood.calories}
                       onChange={e => setCustomFood({ ...customFood, calories: e.target.value })}
-                      placeholder={t("nutrition_mes_350_eee901", "məs. 350")}
+                      placeholder={tr("nutrition_mes_350_eee901", "məs. 350")}
                       className="h-9 text-sm"
                     />
                   </div>
@@ -385,9 +384,9 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
       <div className="px-3 -mt-3">
         <div className="bg-card rounded-xl p-1 flex gap-0.5 shadow-lg">
           {[
-            { id: 'log', label: t("nutrition_yemek_b1fd56", 'Yemək') },
-            { id: 'vitamins', label: t("nutrition_vitaminler_e49129", 'Vitaminlər') },
-            { id: 'tips', label: t("nutrition_tovsiyeler_17a8f7", 'Tövsiyələr') },
+            { id: 'log', label: tr("nutrition_yemek_b1fd56", 'Yemək') },
+            { id: 'vitamins', label: tr("nutrition_vitaminler_e49129", 'Vitaminlər') },
+            { id: 'tips', label: tr("nutrition_tovsiyeler_17a8f7", 'Tövsiyələr') },
             { id: 'water', label: 'Su' },
           ].map(tab => (
             <button

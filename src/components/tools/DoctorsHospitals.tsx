@@ -13,7 +13,7 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { Skeleton } from '@/components/ui/skeleton';
 import ProviderReviews from './doctors/ProviderReviews';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 
 interface DoctorsHospitalsProps {
   onBack: () => void;
@@ -54,14 +54,14 @@ interface HealthcareProvider {
 }
 
 const providerTypeLabels: Record<string, { label: string; icon: typeof Stethoscope }> = {
-  hospital: { label: t("doctorshospitals_xestexana_04539b", 'Xəstəxana'), icon: Building2 },
+  hospital: { label: tr("doctorshospitals_xestexana_04539b", 'Xəstəxana'), icon: Building2 },
   clinic: { label: 'Klinika', icon: Building2 },
-  doctor: { label: t("doctorshospitals_hekim_c127f7", 'Həkim'), icon: User },
+  doctor: { label: tr("doctorshospitals_hekim_c127f7", 'Həkim'), icon: User },
 };
 
 const specialtyCategories = [
-  { id: 'all', label: t("doctorshospitals_hamisi_c73c4d", 'Hamısı'), emoji: '✨' },
-  { id: 'hospital', label: t("doctorshospitals_xestexana_04539b", 'Xəstəxana'), emoji: '🏥' },
+  { id: 'all', label: tr("doctorshospitals_hamisi_c73c4d", 'Hamısı'), emoji: '✨' },
+  { id: 'hospital', label: tr("doctorshospitals_xestexana_04539b", 'Xəstəxana'), emoji: '🏥' },
   { id: 'gynecology', label: 'Ginekologiya', emoji: '👩‍⚕️' },
   { id: 'ivf', label: 'IVF', emoji: '🔬' },
   { id: 'pediatrics', label: 'Pediatriya', emoji: '👶' },
@@ -79,7 +79,6 @@ const dayLabels: Record<string, string> = {
 };
 
 const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
-  const { t } = useTranslation();
   useScrollToTop();
   useScreenAnalytics('DoctorsHospitals', 'Tools');
   
@@ -176,7 +175,7 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder={t("doctorshospitals_hekim_xestexana_axtar_be2094", "Həkim, xəstəxana axtar...")}
+              placeholder={tr("doctorshospitals_hekim_xestexana_axtar_be2094", "Həkim, xəstəxana axtar...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full h-10 pl-10 pr-3 rounded-xl bg-muted border-0 text-sm transition-all outline-none focus:ring-2 focus:ring-primary/20"

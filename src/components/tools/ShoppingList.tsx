@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { formatRelativeDateAz } from '@/lib/date-utils';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 
 interface ShoppingListProps {
   onBack: () => void;
@@ -33,7 +33,6 @@ const priorityLabels = {
 };
 
 const ShoppingList = ({ onBack }: ShoppingListProps) => {
-  const { t } = useTranslation();
   useScrollToTop();
   useScreenAnalytics('ShoppingList', 'Tools');
   
@@ -69,13 +68,13 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
 
     if (result.error) {
       toast({
-        title: t("shoppinglist_xeta_3cdbb6", 'Xəta'),
-        description: t("shoppinglist_mehsul_elave_edile_bilmedi_47a41c", 'Məhsul əlavə edilə bilmədi'),
+        title: tr("shoppinglist_xeta_3cdbb6", 'Xəta'),
+        description: tr("shoppinglist_mehsul_elave_edile_bilmedi_47a41c", 'Məhsul əlavə edilə bilmədi'),
         variant: 'destructive'
       });
     } else {
       setNewItemName('');
-      toast({ title: t("shoppinglist_mehsul_elave_edildi_db41ff", 'Məhsul əlavə edildi!') });
+      toast({ title: tr("shoppinglist_mehsul_elave_edildi_db41ff", 'Məhsul əlavə edildi!') });
     }
   };
 
@@ -145,7 +144,7 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
             <Input
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
-              placeholder={t("shoppinglist_mehsul_adi_a5d2df", "Məhsul adı...")}
+              placeholder={tr("shoppinglist_mehsul_adi_a5d2df", "Məhsul adı...")}
               onKeyPress={(e) => e.key === 'Enter' && handleAddItem()}
               className="flex-1 h-9 text-sm"
             />

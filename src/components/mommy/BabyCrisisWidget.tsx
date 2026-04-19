@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, ChevronRight, Calendar, Clock, Sparkles, X, Check, Lightbulb } from 'lucide-react';
 import { useBabyCrisisPeriods, BabyCrisisPeriod, useCurrentBabyCrisis, useUpcomingBabyCrises } from '@/hooks/useBabyCrisisPeriods';
 import { hapticFeedback } from '@/lib/native';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 
 interface BabyCrisisWidgetProps {
   babyAgeWeeks: number;
@@ -16,7 +16,7 @@ const severityConfig = {
     bgColor: 'bg-amber-50 dark:bg-amber-500/10',
     borderColor: 'border-amber-200 dark:border-amber-500/30',
     textColor: 'text-amber-700 dark:text-amber-400',
-    label: t("babycrisiswidget_yungul_2a8010", 'Yüngül')
+    label: tr("babycrisiswidget_yungul_2a8010", 'Yüngül')
   },
   medium: { 
     color: 'from-orange-400 to-amber-500', 
@@ -30,12 +30,11 @@ const severityConfig = {
     bgColor: 'bg-rose-50 dark:bg-rose-500/10',
     borderColor: 'border-rose-200 dark:border-rose-500/30',
     textColor: 'text-rose-700 dark:text-rose-400',
-    label: t("babycrisiswidget_i_ntensiv_45a63b", 'İntensiv')
+    label: tr("babycrisiswidget_i_ntensiv_45a63b", 'İntensiv')
   },
 };
 
 const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => {
-  const { t } = useTranslation();
   const [showFullCalendar, setShowFullCalendar] = useState(false);
   const [selectedCrisis, setSelectedCrisis] = useState<BabyCrisisPeriod | null>(null);
   

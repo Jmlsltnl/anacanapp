@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useNoiseThresholdsDB } from '@/hooks/useMentalHealthData';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 
 interface NoiseMeterProps {
   onBack: () => void;
@@ -24,7 +24,6 @@ const FALLBACK_NOISE_THRESHOLDS = {
 };
 
 const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
-  const { t } = useTranslation();
   useScrollToTop();
   useScreenAnalytics('NoiseMeter', 'Tools');
   
@@ -140,8 +139,8 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
       
     } catch (error) {
       toast({
-        title: t("noisemeter_mikrofon_xetasi_5f83b3", 'Mikrofon xətası'),
-        description: t("noisemeter_mikrofona_giris_icazesi_verin_9b0425", 'Mikrofona giriş icazəsi verin'),
+        title: tr("noisemeter_mikrofon_xetasi_5f83b3", 'Mikrofon xətası'),
+        description: tr("noisemeter_mikrofona_giris_icazesi_verin_9b0425", 'Mikrofona giriş icazəsi verin'),
         variant: 'destructive'
       });
     }
@@ -176,11 +175,11 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
   }, []);
 
   const getNoiseLevel = (db: number) => {
-    if (db < NOISE_THRESHOLDS.ideal) return { label: t("noisemeter_mukemmel_ae2244", 'Mükəmməl'), color: 'text-green-500', bg: 'bg-green-500' };
-    if (db < NOISE_THRESHOLDS.acceptable) return { label: t("noisemeter_yaxsi_9d8595", 'Yaxşı'), color: 'text-emerald-500', bg: 'bg-emerald-500' };
-    if (db < NOISE_THRESHOLDS.warning) return { label: t("noisemeter_qebulolunandir_0cab62", 'Qəbulolunandır'), color: 'text-yellow-500', bg: 'bg-yellow-500' };
-    if (db < NOISE_THRESHOLDS.danger) return { label: t("noisemeter_yuksek_492584", 'Yüksək'), color: 'text-orange-500', bg: 'bg-orange-500' };
-    return { label: t("noisemeter_cox_yuksek_86dadc", 'Çox yüksək!'), color: 'text-red-500', bg: 'bg-red-500' };
+    if (db < NOISE_THRESHOLDS.ideal) return { label: tr("noisemeter_mukemmel_ae2244", 'Mükəmməl'), color: 'text-green-500', bg: 'bg-green-500' };
+    if (db < NOISE_THRESHOLDS.acceptable) return { label: tr("noisemeter_yaxsi_9d8595", 'Yaxşı'), color: 'text-emerald-500', bg: 'bg-emerald-500' };
+    if (db < NOISE_THRESHOLDS.warning) return { label: tr("noisemeter_qebulolunandir_0cab62", 'Qəbulolunandır'), color: 'text-yellow-500', bg: 'bg-yellow-500' };
+    if (db < NOISE_THRESHOLDS.danger) return { label: tr("noisemeter_yuksek_492584", 'Yüksək'), color: 'text-orange-500', bg: 'bg-orange-500' };
+    return { label: tr("noisemeter_cox_yuksek_86dadc", 'Çox yüksək!'), color: 'text-red-500', bg: 'bg-red-500' };
   };
 
   const noiseLevel = getNoiseLevel(currentDb);
@@ -258,7 +257,7 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
               {/* Status Label */}
               <div className={`mt-4 px-4 py-2 rounded-full ${noiseLevel.bg}/20`}>
                 <span className={`font-semibold ${noiseLevel.color}`}>
-                  {isListening ? noiseLevel.label: t("noisemeter_olcum_basladilmayib_46107a", 'Ölçüm başladılmayıb')}
+                  {isListening ? noiseLevel.label: tr("noisemeter_olcum_basladilmayib_46107a", 'Ölçüm başladılmayıb')}
                 </span>
               </div>
 

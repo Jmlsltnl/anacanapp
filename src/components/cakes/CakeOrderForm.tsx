@@ -9,7 +9,7 @@ import { useCakeOrders } from '@/hooks/useCakes';
 import { useCakeCart } from '@/hooks/useCakeCart';
 import { usePaymentMethods, type PaymentMethod } from '@/hooks/usePaymentMethods';
 import { supabase } from '@/integrations/supabase/client';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 
 interface CakeOrderFormProps {
   onBack: () => void;
@@ -17,7 +17,6 @@ interface CakeOrderFormProps {
 }
 
 const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
-  const { t } = useTranslation();
   const { toast } = useToast();
   const { createOrder } = useCakeOrders();
   const { items, totalPrice, clearCart } = useCakeCart();
@@ -71,19 +70,19 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
   const validateCard = () => {
     const digits = cardData.number.replace(/\s/g, '');
     if (digits.length < 16) {
-      toast({ title: t("cakeorderform_xeta_3cdbb6", 'Xəta'), description: t("cakeorderform_kart_nomresi_16_reqem_olmalidir_b9c9c8", 'Kart nömrəsi 16 rəqəm olmalıdır'), variant: 'destructive' });
+      toast({ title: tr("cakeorderform_xeta_3cdbb6", 'Xəta'), description: tr("cakeorderform_kart_nomresi_16_reqem_olmalidir_b9c9c8", 'Kart nömrəsi 16 rəqəm olmalıdır'), variant: 'destructive' });
       return false;
     }
     if (cardData.expiry.length < 5) {
-      toast({ title: t("cakeorderform_xeta_3cdbb6", 'Xəta'), description: t("cakeorderform_son_istifade_tarixi_duzgun_deyil_2e2746", 'Son istifadə tarixi düzgün deyil'), variant: 'destructive' });
+      toast({ title: tr("cakeorderform_xeta_3cdbb6", 'Xəta'), description: tr("cakeorderform_son_istifade_tarixi_duzgun_deyil_2e2746", 'Son istifadə tarixi düzgün deyil'), variant: 'destructive' });
       return false;
     }
     if (cardData.cvv.length < 3) {
-      toast({ title: t("cakeorderform_xeta_3cdbb6", 'Xəta'), description: t("cakeorderform_cvv_duzgun_deyil_90757f", 'CVV düzgün deyil'), variant: 'destructive' });
+      toast({ title: tr("cakeorderform_xeta_3cdbb6", 'Xəta'), description: tr("cakeorderform_cvv_duzgun_deyil_90757f", 'CVV düzgün deyil'), variant: 'destructive' });
       return false;
     }
     if (!cardData.holder.trim()) {
-      toast({ title: t("cakeorderform_xeta_3cdbb6", 'Xəta'), description: t("cakeorderform_kart_sahibinin_adi_teleb_olunur_e035f1", 'Kart sahibinin adı tələb olunur'), variant: 'destructive' });
+      toast({ title: tr("cakeorderform_xeta_3cdbb6", 'Xəta'), description: tr("cakeorderform_kart_sahibinin_adi_teleb_olunur_e035f1", 'Kart sahibinin adı tələb olunur'), variant: 'destructive' });
       return false;
     }
     return true;
@@ -95,11 +94,11 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
     
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
     if (!allowedTypes.includes(file.type)) {
-      toast({ title: t("cakeorderform_xeta_3cdbb6", 'Xəta'), description: t("cakeorderform_yalniz_sekil_jpg_png_ve_ya_pdf_yukleye_b_40df31", 'Yalnız şəkil (JPG, PNG) və ya PDF yükləyə bilərsiniz'), variant: 'destructive' });
+      toast({ title: tr("cakeorderform_xeta_3cdbb6", 'Xəta'), description: tr("cakeorderform_yalniz_sekil_jpg_png_ve_ya_pdf_yukleye_b_40df31", 'Yalnız şəkil (JPG, PNG) və ya PDF yükləyə bilərsiniz'), variant: 'destructive' });
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      toast({ title: t("cakeorderform_xeta_3cdbb6", 'Xəta'), description: t("cakeorderform_fayl_max_10mb_ola_biler_145df4", 'Fayl max 10MB ola bilər'), variant: 'destructive' });
+      toast({ title: tr("cakeorderform_xeta_3cdbb6", 'Xəta'), description: tr("cakeorderform_fayl_max_10mb_ola_biler_145df4", 'Fayl max 10MB ola bilər'), variant: 'destructive' });
       return;
     }
 
@@ -112,10 +111,10 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
       const { data: { publicUrl } } = supabase.storage.from('assets').getPublicUrl(`payment-proofs/${fileName}`);
       setProofUrl(publicUrl);
       setProofFileName(file.name);
-      toast({ title: t("cakeorderform_fayl_yuklendi_e6d838", 'Fayl yükləndi ✓') });
+      toast({ title: tr("cakeorderform_fayl_yuklendi_e6d838", 'Fayl yükləndi ✓') });
     } catch (error) {
       console.error('Upload error:', error);
-      toast({ title: t("cakeorderform_yukleme_xetasi_eebca5", 'Yükləmə xətası'), variant: 'destructive' });
+      toast({ title: tr("cakeorderform_yukleme_xetasi_eebca5", 'Yükləmə xətası'), variant: 'destructive' });
     } finally {
       setUploadingProof(false);
     }
@@ -123,20 +122,20 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
 
   const handleSubmit = async () => {
     if (!formData.customer_name.trim()) {
-      toast({ title: t("cakeorderform_xeta_3cdbb6", 'Xəta'), description: t("cakeorderform_musteri_adi_teleb_olunur_fc1733", 'Müştəri adı tələb olunur'), variant: 'destructive' });
+      toast({ title: tr("cakeorderform_xeta_3cdbb6", 'Xəta'), description: tr("cakeorderform_musteri_adi_teleb_olunur_fc1733", 'Müştəri adı tələb olunur'), variant: 'destructive' });
       return;
     }
     if (!formData.contact_phone.trim()) {
-      toast({ title: t("cakeorderform_xeta_3cdbb6", 'Xəta'), description: t("cakeorderform_elaqe_nomresi_teleb_olunur_1c55b7", 'Əlaqə nömrəsi tələb olunur'), variant: 'destructive' });
+      toast({ title: tr("cakeorderform_xeta_3cdbb6", 'Xəta'), description: tr("cakeorderform_elaqe_nomresi_teleb_olunur_1c55b7", 'Əlaqə nömrəsi tələb olunur'), variant: 'destructive' });
       return;
     }
     if (items.length === 0) {
-      toast({ title: t("cakeorderform_xeta_3cdbb6", 'Xəta'), description: t("cakeorderform_sebet_bosdur_ff5b34", 'Səbət boşdur'), variant: 'destructive' });
+      toast({ title: tr("cakeorderform_xeta_3cdbb6", 'Xəta'), description: tr("cakeorderform_sebet_bosdur_ff5b34", 'Səbət boşdur'), variant: 'destructive' });
       return;
     }
     if (paymentMethod === 'card_simulated' && !validateCard()) return;
     if (paymentMethod === 'c2c_transfer' && !proofUrl) {
-      toast({ title: t("cakeorderform_xeta_3cdbb6", 'Xəta'), description: t("cakeorderform_zehmet_olmasa_kocurme_tesdiqini_yukleyin_526cd2", 'Zəhmət olmasa köçürmə təsdiqini yükləyin'), variant: 'destructive' });
+      toast({ title: tr("cakeorderform_xeta_3cdbb6", 'Xəta'), description: tr("cakeorderform_zehmet_olmasa_kocurme_tesdiqini_yukleyin_526cd2", 'Zəhmət olmasa köçürmə təsdiqini yükləyin'), variant: 'destructive' });
       return;
     }
 
@@ -192,10 +191,10 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
       }
 
       clearCart();
-      toast({ title: t("cakeorderform_sifaris_gonderildi_712bb6", 'Sifariş göndərildi! 🎂') });
+      toast({ title: tr("cakeorderform_sifaris_gonderildi_712bb6", 'Sifariş göndərildi! 🎂') });
       onSuccess();
     } else {
-      toast({ title: t("cakeorderform_xeta_3cdbb6", 'Xəta'), description: t("cakeorderform_sifaris_gonderile_bilmedi_52b41e", 'Sifariş göndərilə bilmədi'), variant: 'destructive' });
+      toast({ title: tr("cakeorderform_xeta_3cdbb6", 'Xəta'), description: tr("cakeorderform_sifaris_gonderile_bilmedi_52b41e", 'Sifariş göndərilə bilmədi'), variant: 'destructive' });
     }
     setSubmitting(false);
   };
@@ -238,9 +237,9 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
 
   const getMethodLabel = (method: PaymentMethod) => {
     switch (method.method_key) {
-      case 'cash': return { title: t("cakeorderform_nagd_fdeb10", 'Nağd'), sub: 'Çatdırılmada ödə' };
+      case 'cash': return { title: tr("cakeorderform_nagd_fdeb10", 'Nağd'), sub: 'Çatdırılmada ödə' };
       case 'card_simulated': return { title: 'Kart', sub: 'Onlayn ödəniş' };
-      case 'c2c_transfer': return { title: t("cakeorderform_kocurme_0a57a0", 'Köçürmə'), sub: 'Kartdan karta' };
+      case 'c2c_transfer': return { title: tr("cakeorderform_kocurme_0a57a0", 'Köçürmə'), sub: 'Kartdan karta' };
       default: return { title: method.label_az || method.label, sub: method.description_az || '' };
     }
   };
@@ -280,11 +279,11 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
       <div className="space-y-4">
         <div>
           <Label className="text-sm font-semibold">Müştəri adı *</Label>
-          <Input value={formData.customer_name} onChange={e => setFormData({ ...formData, customer_name: e.target.value })} placeholder={t("cakeorderform_adinizi_daxil_edin_bd2b57", "Adınızı daxil edin")} className="mt-1" />
+          <Input value={formData.customer_name} onChange={e => setFormData({ ...formData, customer_name: e.target.value })} placeholder={tr("cakeorderform_adinizi_daxil_edin_bd2b57", "Adınızı daxil edin")} className="mt-1" />
         </div>
         <div>
           <Label className="text-sm font-semibold">Uşağın adı</Label>
-          <Input value={formData.child_name} onChange={e => setFormData({ ...formData, child_name: e.target.value })} placeholder={t("cakeorderform_korpenin_adi_8a4e9e", "Körpənin adı")} className="mt-1" />
+          <Input value={formData.child_name} onChange={e => setFormData({ ...formData, child_name: e.target.value })} placeholder={tr("cakeorderform_korpenin_adi_8a4e9e", "Körpənin adı")} className="mt-1" />
         </div>
         <div>
           <Label className="text-sm font-semibold">Əlaqə nömrəsi *</Label>
@@ -296,11 +295,11 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
         </div>
         <div>
           <Label className="text-sm font-semibold">Çatdırılma ünvanı</Label>
-          <Input value={formData.delivery_address} onChange={e => setFormData({ ...formData, delivery_address: e.target.value })} placeholder={t("cakeorderform_unvani_daxil_edin_b8da41", "Ünvanı daxil edin")} className="mt-1" />
+          <Input value={formData.delivery_address} onChange={e => setFormData({ ...formData, delivery_address: e.target.value })} placeholder={tr("cakeorderform_unvani_daxil_edin_b8da41", "Ünvanı daxil edin")} className="mt-1" />
         </div>
         <div>
           <Label className="text-sm font-semibold">Əlavə qeydlər</Label>
-          <textarea value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} placeholder={t("cakeorderform_xususi_istekler_allergiya_ve_s_49d429", "Xüsusi istəklər, allergiya və s.")} className="mt-1 w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm" />
+          <textarea value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} placeholder={tr("cakeorderform_xususi_istekler_allergiya_ve_s_49d429", "Xüsusi istəklər, allergiya və s.")} className="mt-1 w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm" />
         </div>
 
         {/* Payment Method */}

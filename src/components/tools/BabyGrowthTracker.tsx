@@ -16,7 +16,7 @@ import { useChildren } from '@/hooks/useChildren';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 
 interface BabyGrowthTrackerProps {
   onBack: () => void;
@@ -35,7 +35,6 @@ interface BabyGrowthEntry {
 }
 
 const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
-  const { t } = useTranslation();
   useScreenAnalytics('BabyGrowthTracker', 'Tools');
   const { user } = useAuth();
   const { selectedChild } = useChildren();
@@ -92,8 +91,8 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
     
     if (isNaN(weight) && isNaN(height) && isNaN(head)) {
       toast({
-        title: t("babygrowthtracker_xeta_3cdbb6", 'Xəta'),
-        description: t("babygrowthtracker_en_azi_bir_olcu_daxil_edin_bfceff", 'Ən azı bir ölçü daxil edin'),
+        title: tr("babygrowthtracker_xeta_3cdbb6", 'Xəta'),
+        description: tr("babygrowthtracker_en_azi_bir_olcu_daxil_edin_bfceff", 'Ən azı bir ölçü daxil edin'),
         variant: 'destructive'
       });
       return;
@@ -115,7 +114,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
           .eq('id', editingEntry.id);
         
         if (error) throw error;
-        toast({ title: t("babygrowthtracker_olcu_yenilendi_163440", 'Ölçü yeniləndi! 📏') });
+        toast({ title: tr("babygrowthtracker_olcu_yenilendi_163440", 'Ölçü yeniləndi! 📏') });
       } else {
         const { error } = await supabase
           .from('baby_growth')
@@ -130,7 +129,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
           });
         
         if (error) throw error;
-        toast({ title: t("babygrowthtracker_yeni_olcu_elave_edildi_a55e91", 'Yeni ölçü əlavə edildi! 📏') });
+        toast({ title: tr("babygrowthtracker_yeni_olcu_elave_edildi_a55e91", 'Yeni ölçü əlavə edildi! 📏') });
       }
       
       resetForm();
@@ -138,7 +137,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
     } catch (error) {
       console.error('Error saving growth entry:', error);
       toast({
-        title: t("babygrowthtracker_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
+        title: tr("babygrowthtracker_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
         variant: 'destructive'
       });
     }
@@ -154,11 +153,11 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
         .eq('id', id);
       
       if (error) throw error;
-      toast({ title: t("babygrowthtracker_olcu_silindi_cbd1ac", 'Ölçü silindi') });
+      toast({ title: tr("babygrowthtracker_olcu_silindi_cbd1ac", 'Ölçü silindi') });
       fetchEntries();
     } catch (error) {
       toast({
-        title: t("babygrowthtracker_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
+        title: tr("babygrowthtracker_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
         variant: 'destructive'
       });
     }
@@ -476,7 +475,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
               <Input
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder={t("babygrowthtracker_hekim_yoxlamasi_vaksinasiya_6ce4a0", "Həkim yoxlaması, vaksinasiya...")}
+                placeholder={tr("babygrowthtracker_hekim_yoxlamasi_vaksinasiya_6ce4a0", "Həkim yoxlaması, vaksinasiya...")}
                 className="bg-muted/50"
               />
             </div>

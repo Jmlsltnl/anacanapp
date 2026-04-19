@@ -5,7 +5,7 @@ import { useVitaminSchedules, VitaminSchedule } from '@/hooks/useVitaminSchedule
 import { toast } from 'sonner';
 import { hapticFeedback } from '@/lib/native';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 
 interface VitaminTrackerProps {
   onBack?: () => void;
@@ -29,7 +29,6 @@ const VITAMIN_PRESETS = [
 const DAY_LABELS = ['B', 'B.e', 'Ç.a', 'Ç', 'C.a', 'C', 'Ş'];
 
 const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
-  const { t } = useTranslation();
   useScreenAnalytics('VitaminTracker', 'Tools');
   const {
     schedules, isLoading, addSchedule, updateSchedule, deleteSchedule,
@@ -319,7 +318,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
                   <input
                     value={newVitamin.name}
                     onChange={e => setNewVitamin(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder={t("vitamintracker_mes_folat_d_vitamini_6e4ad1", "Məs: Folat, D vitamini...")}
+                    placeholder={tr("vitamintracker_mes_folat_d_vitamini_6e4ad1", "Məs: Folat, D vitamini...")}
                     className="flex-1 h-11 px-3 rounded-xl bg-muted/60 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20"
                   />
                 </div>

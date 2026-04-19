@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { ReactNode } from 'react';
 import { Button } from './button';
-import { useTranslation } from "@/hooks/useTranslation";
 
 interface EmptyStateProps {
   emoji: string;
@@ -24,7 +23,6 @@ const EmptyState = ({
   variant = 'default',
   className = '',
 }: EmptyStateProps) => {
-  const { t } = useTranslation();
   return (
     <motion.div
       className={`text-center py-12 px-4 ${className}`}

@@ -8,7 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 import AlbumOrderScreen from '@/components/shop/AlbumOrderScreen';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 
 interface BabyMonthlyAlbumProps {
   onBack: () => void;
@@ -27,7 +27,6 @@ const monthLabels = Array.from({ length: 12 }, (_, i) => ({
 }));
 
 const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
-  const { t } = useTranslation();
   useScrollToTop();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -72,10 +71,10 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
       const path = `${user.id}/month-${uploadMonth}-${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from('baby-album').upload(path, file);
       if (error) throw error;
-      toast({ title: t("babymonthlyalbum_sekil_yuklendi_0c2f85", 'Şəkil yükləndi!') });
+      toast({ title: tr("babymonthlyalbum_sekil_yuklendi_0c2f85", 'Şəkil yükləndi!') });
       queryClient.invalidateQueries({ queryKey: ['baby-album-photos'] });
     } catch (err) {
-      toast({ title: t("babymonthlyalbum_xeta_3cdbb6", 'Xəta'), description: t("babymonthlyalbum_sekil_yuklene_bilmedi_3c275f", 'Şəkil yüklənə bilmədi'), variant: 'destructive' });
+      toast({ title: tr("babymonthlyalbum_xeta_3cdbb6", 'Xəta'), description: tr("babymonthlyalbum_sekil_yuklene_bilmedi_3c275f", 'Şəkil yüklənə bilmədi'), variant: 'destructive' });
     } finally {
       setUploading(false);
       setUploadMonth(null);
@@ -88,11 +87,11 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
     try {
       const { error } = await supabase.storage.from('baby-album').remove([`${user.id}/${photo.name}`]);
       if (error) throw error;
-      toast({ title: t("babymonthlyalbum_sekil_silindi_efe8e8", 'Şəkil silindi') });
+      toast({ title: tr("babymonthlyalbum_sekil_silindi_efe8e8", 'Şəkil silindi') });
       setViewingPhoto(null);
       queryClient.invalidateQueries({ queryKey: ['baby-album-photos'] });
     } catch (err) {
-      toast({ title: t("babymonthlyalbum_xeta_3cdbb6", 'Xəta'), description: t("babymonthlyalbum_sekil_siline_bilmedi_e563ea", 'Şəkil silinə bilmədi'), variant: 'destructive' });
+      toast({ title: tr("babymonthlyalbum_xeta_3cdbb6", 'Xəta'), description: tr("babymonthlyalbum_sekil_siline_bilmedi_e563ea", 'Şəkil silinə bilmədi'), variant: 'destructive' });
     }
   };
 

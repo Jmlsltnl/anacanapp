@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { calculateDueDate, calculateLMPFromDueDate, getPregnancyWeek, getDayInWeek } from '@/lib/pregnancy-utils';
 import type { LifeStage } from '@/types/anacan';
-import { useTranslation } from "@/hooks/useTranslation";
+import { tr } from "@/lib/tr";
 
 interface ProfileEditScreenProps {
   onBack: () => void;
@@ -23,7 +23,6 @@ interface ProfileEditScreenProps {
 type DateInputMode = 'lmp' | 'dueDate';
 
 const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
-  const { t } = useTranslation();
   useScrollToTop();
   
   const { user, profile, updateProfile } = useAuth();
@@ -122,9 +121,9 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
         .getPublicUrl(filePath);
 
       setFormData(prev => ({ ...prev, avatar_url: urlData.publicUrl }));
-      toast({ title: t("profileeditscreen_sekil_yuklendi_0c2f85", 'Şəkil yükləndi!') });
+      toast({ title: tr("profileeditscreen_sekil_yuklendi_0c2f85", 'Şəkil yükləndi!') });
     } catch (error: any) {
-      toast({ title: t("profileeditscreen_xeta_3cdbb6", 'Xəta'), description: error.message, variant: 'destructive' });
+      toast({ title: tr("profileeditscreen_xeta_3cdbb6", 'Xəta'), description: error.message, variant: 'destructive' });
     } finally {
       setUploading(false);
     }
@@ -213,10 +212,10 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
       // Refresh auth profile
       await updateProfile({ name: formData.name });
 
-      toast({ title: t("profileeditscreen_profil_yenilendi_ad61ca", 'Profil yeniləndi!') });
+      toast({ title: tr("profileeditscreen_profil_yenilendi_ad61ca", 'Profil yeniləndi!') });
       onBack();
     } catch (error: any) {
-      toast({ title: t("profileeditscreen_xeta_3cdbb6", 'Xəta'), description: error.message, variant: 'destructive' });
+      toast({ title: tr("profileeditscreen_xeta_3cdbb6", 'Xəta'), description: error.message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -297,7 +296,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
             <Input
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder={t("profileeditscreen_adiniz_b3e84a", "Adınız")}
+              placeholder={tr("profileeditscreen_adiniz_b3e84a", "Adınız")}
             />
           </div>
 
@@ -306,7 +305,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
             <Textarea
               value={formData.bio}
               onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-              placeholder={t("profileeditscreen_ozunuz_haqqinda_qisa_melumat_1a283c", "Özünüz haqqında qısa məlumat...")}
+              placeholder={tr("profileeditscreen_ozunuz_haqqinda_qisa_melumat_1a283c", "Özünüz haqqında qısa məlumat...")}
               rows={3}
             />
           </div>
@@ -428,7 +427,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                 <Input
                   value={formData.baby_name}
                   onChange={(e) => setFormData(prev => ({ ...prev, baby_name: e.target.value }))}
-                  placeholder={t("profileeditscreen_korpenin_adi_8a4e9e", "Körpənin adı")}
+                  placeholder={tr("profileeditscreen_korpenin_adi_8a4e9e", "Körpənin adı")}
                 />
               </div>
             </>
@@ -466,7 +465,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                 <Input
                   value={formData.baby_name}
                   onChange={(e) => setFormData(prev => ({ ...prev, baby_name: e.target.value }))}
-                  placeholder={t("profileeditscreen_korpenin_adi_8a4e9e", "Körpənin adı")}
+                  placeholder={tr("profileeditscreen_korpenin_adi_8a4e9e", "Körpənin adı")}
                 />
               </div>
               <div className="space-y-2">
@@ -484,7 +483,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                   onValueChange={(value) => setFormData(prev => ({ ...prev, baby_gender: value as 'boy' | 'girl' }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder={t("profileeditscreen_secin_5c0c8d", "Seçin")} />
+                    <SelectValue placeholder={tr("profileeditscreen_secin_5c0c8d", "Seçin")} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="boy">👦 Oğlan</SelectItem>
