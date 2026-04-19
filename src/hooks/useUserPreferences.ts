@@ -48,14 +48,14 @@ export const useUserPreferences = () => {
     try {
       const { data, error } = await supabase
         .from('user_preferences')
-        .insert({
+        .upsert({
           user_id: user.id,
           white_noise_volume: 70,
           white_noise_timer: null,
           last_white_noise_sound: null,
-        })
+        }, { onConflict: 'user_id' })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       if (data) setPreferences(data);
@@ -73,7 +73,7 @@ export const useUserPreferences = () => {
         .update(updates)
         .eq('user_id', user.id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       if (data) setPreferences(data);

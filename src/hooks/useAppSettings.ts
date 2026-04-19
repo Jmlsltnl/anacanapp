@@ -55,7 +55,7 @@ export const useUpdateAppSetting = () => {
         .from('app_settings')
         .select('id')
         .eq('key', key)
-        .single();
+        .maybeSingle();
 
       if (existing) {
         const { error } = await supabase
