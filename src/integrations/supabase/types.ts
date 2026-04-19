@@ -8183,6 +8183,22 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_active_payment_methods: {
+        Args: never
+        Returns: {
+          created_at: string
+          description: string
+          description_az: string
+          icon: string
+          id: string
+          is_active: boolean
+          label: string
+          label_az: string
+          method_key: string
+          sort_order: number
+          updated_at: string
+        }[]
+      }
       get_baby_crisis: {
         Args: { baby_age_weeks: number }
         Returns: {
