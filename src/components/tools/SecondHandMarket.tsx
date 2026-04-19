@@ -18,6 +18,7 @@ import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { useTranslation } from "@/hooks/useTranslation";
 interface SecondHandMarketProps {
   onBack: () => void;
 }
@@ -45,13 +46,13 @@ const categories = [
   { id: 'stroller', label: 'Araba', emoji: '👶', color: 'from-violet-500 to-purple-600' },
   { id: 'feeding', label: 'Qidalanma', emoji: '🍼', color: 'from-emerald-500 to-green-600' },
   { id: 'hygiene', label: 'Gigiyena', emoji: '🛁', color: 'from-cyan-500 to-teal-600' },
-  { id: 'other', label: 'Digər', emoji: '📦', color: 'from-gray-500 to-slate-600' },
+  { id: 'other', label: t("secondhandmarket_diger_293b3a", 'Digər'), emoji: '📦', color: 'from-gray-500 to-slate-600' },
 ];
 
 const conditions = [
   { id: 'new', label: 'Yeni', color: 'bg-emerald-500', textColor: 'text-emerald-600' },
   { id: 'like_new', label: 'Yeni kimi', color: 'bg-green-500', textColor: 'text-green-600' },
-  { id: 'good', label: 'Yaxşı', color: 'bg-blue-500', textColor: 'text-blue-600' },
+  { id: 'good', label: t("secondhandmarket_yaxsi_9d8595", 'Yaxşı'), color: 'bg-blue-500', textColor: 'text-blue-600' },
   { id: 'fair', label: 'Normal', color: 'bg-amber-500', textColor: 'text-amber-600' },
 ];
 
@@ -60,6 +61,7 @@ const ageRanges = [
 ];
 
 const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
+  const { t } = useTranslation();
   useScrollToTop();
   useScreenAnalytics('SecondHandMarket', 'Tools');
   
@@ -124,8 +126,8 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
       setListings(data || []);
     } catch (error) {
       toast({
-        title: 'Xəta',
-        description: 'Elanlar yüklənə bilmədi',
+        title: t("secondhandmarket_xeta_3cdbb6", 'Xəta'),
+        description: t("secondhandmarket_elanlar_yuklene_bilmedi_3af806", 'Elanlar yüklənə bilmədi'),
         variant: 'destructive'
       });
     } finally {
@@ -160,12 +162,12 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
       }
       
       setUploadedImages(prev => [...prev, ...newImages]);
-      toast({ title: 'Şəkillər yükləndi!' });
+      toast({ title: t("secondhandmarket_sekiller_yuklendi_5f1633", 'Şəkillər yükləndi!') });
     } catch (error) {
       console.error('Image upload error:', error);
       toast({
-        title: 'Xəta',
-        description: 'Şəkil yüklənə bilmədi',
+        title: t("secondhandmarket_xeta_3cdbb6", 'Xəta'),
+        description: t("secondhandmarket_sekil_yuklene_bilmedi_3c275f", 'Şəkil yüklənə bilmədi'),
         variant: 'destructive'
       });
     } finally {
@@ -183,8 +185,8 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
   const handleCreateListing = async () => {
     if (!profile?.user_id) {
       toast({
-        title: 'Xəta',
-        description: 'Elan yaratmaq üçün daxil olun',
+        title: t("secondhandmarket_xeta_3cdbb6", 'Xəta'),
+        description: t("secondhandmarket_elan_yaratmaq_ucun_daxil_olun_264bf1", 'Elan yaratmaq üçün daxil olun'),
         variant: 'destructive'
       });
       return;
@@ -192,8 +194,8 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
 
     if (!formData.title.trim()) {
       toast({
-        title: 'Xəta',
-        description: 'Başlıq daxil edin',
+        title: t("secondhandmarket_xeta_3cdbb6", 'Xəta'),
+        description: t("secondhandmarket_basliq_daxil_edin_edf2fd", 'Başlıq daxil edin'),
         variant: 'destructive'
       });
       return;
@@ -220,8 +222,8 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
       if (error) throw error;
 
       toast({
-        title: 'Uğurlu!',
-        description: 'Elan yaradıldı və təsdiq üçün göndərildi',
+        title: t("secondhandmarket_ugurlu_5c0191", 'Uğurlu!'),
+        description: t("secondhandmarket_elan_yaradildi_ve_tesdiq_ucun_gonderildi_2869bb", 'Elan yaradıldı və təsdiq üçün göndərildi'),
       });
       
       setShowCreateModal(false);
@@ -229,8 +231,8 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
       loadListings();
     } catch (error) {
       toast({
-        title: 'Xəta',
-        description: 'Elan yaradıla bilmədi',
+        title: t("secondhandmarket_xeta_3cdbb6", 'Xəta'),
+        description: t("secondhandmarket_elan_yaradila_bilmedi_9b2414", 'Elan yaradıla bilmədi'),
         variant: 'destructive'
       });
     } finally {
@@ -287,8 +289,8 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
       await loadContactMessages(contactListing);
     } catch (error) {
       toast({
-        title: 'Xəta',
-        description: 'Mesaj göndərilə bilmədi',
+        title: t("secondhandmarket_xeta_3cdbb6", 'Xəta'),
+        description: t("secondhandmarket_mesaj_gonderile_bilmedi_0cd095", 'Mesaj göndərilə bilmədi'),
         variant: 'destructive'
       });
     } finally {
@@ -615,7 +617,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             <div>
               <label className="text-sm font-medium mb-1.5 block">Başlıq *</label>
               <Input
-                placeholder="Məsələn: 0-3 ay oğlan geyimləri"
+                placeholder={t("secondhandmarket_meselen_0_3_ay_oglan_geyimleri_55b327", "Məsələn: 0-3 ay oğlan geyimləri")}
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="bg-muted/50"
@@ -625,7 +627,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             <div>
               <label className="text-sm font-medium mb-1.5 block">Təsvir</label>
               <Textarea
-                placeholder="Əşya haqqında məlumat..."
+                placeholder={t("secondhandmarket_esya_haqqinda_melumat_9e2aa1", "Əşya haqqında məlumat...")}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
@@ -734,7 +736,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             <div>
               <label className="text-sm font-medium mb-1.5 block">Şəhər</label>
               <Input
-                placeholder="Məsələn: Bakı"
+                placeholder={t("secondhandmarket_meselen_baki_425cda", "Məsələn: Bakı")}
                 value={formData.location_city}
                 onChange={(e) => setFormData({ ...formData, location_city: e.target.value })}
                 className="bg-muted/50"
@@ -934,7 +936,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
               {/* Message input */}
               <div className="flex gap-2">
                 <Input
-                  placeholder="Mesajınızı yazın..."
+                  placeholder={t("secondhandmarket_mesajinizi_yazin_21d48f", "Mesajınızı yazın...")}
                   value={contactMessage}
                   onChange={(e) => setContactMessage(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}

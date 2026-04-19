@@ -15,6 +15,7 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { PremiumModal } from '@/components/PremiumModal';
 import PhotoGalleryViewer from '@/components/PhotoGalleryViewer';
+import { useTranslation } from "@/hooks/useTranslation";
 import { 
   usePhotoshootBackgrounds, 
   usePhotoshootEyeColors, 
@@ -250,13 +251,14 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
   }, [user]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const { t } = useTranslation();
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
       toast({
-        title: 'Fayl çox böyükdür',
-        description: 'Maksimum 5MB şəkil yükləyə bilərsiniz',
+        title: t("babyphotoshoot_fayl_cox_boyukdur_f5cf61", 'Fayl çox böyükdür'),
+        description: t("babyphotoshoot_maksimum_5mb_sekil_yukleye_bilersiniz_6129b3", 'Maksimum 5MB şəkil yükləyə bilərsiniz'),
         variant: 'destructive',
       });
       return;
@@ -264,8 +266,8 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
     if (!file.type.startsWith('image/')) {
       toast({
-        title: 'Yanlış fayl tipi',
-        description: 'Yalnız şəkil faylları yükləyə bilərsiniz',
+        title: t("babyphotoshoot_yanlis_fayl_tipi_96b7fc", 'Yanlış fayl tipi'),
+        description: t("babyphotoshoot_yalniz_sekil_fayllari_yukleye_bilersiniz_ed2541", 'Yalnız şəkil faylları yükləyə bilərsiniz'),
         variant: 'destructive',
       });
       return;
@@ -309,8 +311,8 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
   const handleGenerate = async () => {
     if (!customization.background) {
       toast({
-        title: 'Fon seçin',
-        description: 'Zəhmət olmasa bir fon seçin',
+        title: t("babyphotoshoot_fon_secin_4449cc", 'Fon seçin'),
+        description: t("babyphotoshoot_zehmet_olmasa_bir_fon_secin_270d75", 'Zəhmət olmasa bir fon seçin'),
         variant: 'destructive',
       });
       return;
@@ -318,8 +320,8 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
     if (!sourceImage) {
       toast({
-        title: 'Şəkil yükləyin',
-        description: 'Zəhmət olmasa körpənin şəklini yükləyin',
+        title: t("babyphotoshoot_sekil_yukleyin_1e520a", 'Şəkil yükləyin'),
+        description: t("babyphotoshoot_zehmet_olmasa_korpenin_seklini_yukleyin_cfd8d4", 'Zəhmət olmasa körpənin şəklini yükləyin'),
         variant: 'destructive',
       });
       return;
@@ -372,14 +374,14 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
         } catch {}
 
         toast({
-          title: 'Foto hazırdır! 📸',
-          description: 'Yeni foto uğurla yaradıldı',
+          title: t("babyphotoshoot_foto_hazirdir_5183c4", 'Foto hazırdır! 📸'),
+          description: t("babyphotoshoot_yeni_foto_ugurla_yaradildi_849a22", 'Yeni foto uğurla yaradıldı'),
         });
       }
     } catch (error: any) {
       console.error('Generation error:', error);
       toast({
-        title: 'Xəta baş verdi',
+        title: t("babyphotoshoot_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
         description: error.message || 'Foto yaradıla bilmədi',
         variant: 'destructive',
       });
@@ -401,13 +403,13 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
       toast({
         title: 'Foto silindi',
-        description: 'Foto uğurla silindi',
+        description: t("babyphotoshoot_foto_ugurla_silindi_a3226a", 'Foto uğurla silindi'),
       });
     } catch (error) {
       console.error('Delete error:', error);
       toast({
-        title: 'Xəta',
-        description: 'Foto silinə bilmədi',
+        title: t("babyphotoshoot_xeta_3cdbb6", 'Xəta'),
+        description: t("babyphotoshoot_foto_siline_bilmedi_55a923", 'Foto silinə bilmədi'),
         variant: 'destructive',
       });
     }
@@ -425,13 +427,13 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
       document.body.removeChild(link);
 
       toast({
-        title: 'Yükləndi! 📥',
-        description: 'Şəkil müvəffəqiyyətlə endirildi',
+        title: t("babyphotoshoot_yuklendi_1691f7", 'Yükləndi! 📥'),
+        description: t("babyphotoshoot_sekil_muveffeqiyyetle_endirildi_c853ad", 'Şəkil müvəffəqiyyətlə endirildi'),
       });
     } catch (error) {
       toast({
-        title: 'Xəta',
-        description: 'Foto yüklənə bilmədi',
+        title: t("babyphotoshoot_xeta_3cdbb6", 'Xəta'),
+        description: t("babyphotoshoot_foto_yuklene_bilmedi_3d96c3", 'Foto yüklənə bilmədi'),
         variant: 'destructive',
       });
     }
@@ -440,7 +442,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
   const handleShare = async (url: string) => {
     const { nativeShare } = await import('@/lib/native');
     await nativeShare({
-      title: 'Körpə Fotosessiyası',
+      title: t("babyphotoshoot_korpe_fotosessiyasi_546576", 'Körpə Fotosessiyası'),
       text: 'Anacan tətbiqində yaradılmış körpə fotosu',
       url: url,
     });

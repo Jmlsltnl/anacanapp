@@ -31,6 +31,7 @@ import LiveActivityCard from './partner/LiveActivityCard';
 import PartnerQuickStats from './partner/PartnerQuickStats';
 import SyncedFeaturesGrid from './partner/SyncedFeaturesGrid';
 import PartnerMissionsCard from './partner/PartnerMissionsCard';
+import { useTranslation } from "@/hooks/useTranslation";
 
 // Quick Action Button
 const QuickAction = ({ icon: Icon, label, gradient, onClick }: {
@@ -57,6 +58,7 @@ interface PartnerDashboardProps {
 }
 
 const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
+  const { t } = useTranslation();
   useScrollToTop();
   
   const { name } = useUserStore();
@@ -127,7 +129,7 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
     if (newItem.trim()) {
       await addItem({ name: newItem, quantity: 1, priority: 'medium' });
       setNewItem('');
-      toast({ title: 'Məhsul əlavə edildi! 🛒' });
+      toast({ title: t("partnerdashboard_mehsul_elave_edildi_4c8d9f", 'Məhsul əlavə edildi! 🛒') });
     }
   };
 
@@ -143,7 +145,7 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
           content: '❤️',
         });
         toast({
-          title: '💕 Sevgi göndərildi!',
+          title: t("partnerdashboard_sevgi_gonderildi_4284b1", '💕 Sevgi göndərildi!'),
           description: `${womanName} bildiriş alacaq`,
         });
       } catch (err) {
@@ -151,8 +153,8 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
       }
     } else {
       toast({
-        title: 'Partner bağlantısı yoxdur',
-        description: 'Əvvəlcə partner kodunu bağlayın',
+        title: t("partnerdashboard_partner_baglantisi_yoxdur_d0c7c6", 'Partner bağlantısı yoxdur'),
+        description: t("partnerdashboard_evvelce_partner_kodunu_baglayin_9a5906", 'Əvvəlcə partner kodunu bağlayın'),
         variant: 'destructive',
       });
     }
@@ -170,7 +172,7 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
           content: loveMessage,
         });
         toast({
-          title: '💌 Mesaj göndərildi!',
+          title: t("partnerdashboard_mesaj_gonderildi_dca65e", '💌 Mesaj göndərildi!'),
           description: loveMessage,
         });
         setLoveMessage('');
@@ -295,11 +297,11 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
       <div className="px-4 -mt-6 relative z-20">
         <div className="bg-card rounded-2xl p-1.5 flex gap-1 shadow-xl border border-border/50">
           {[
-            { id: 'home', label: 'Əsas', icon: Home },
-            { id: 'missions', label: 'Tapşırıq', icon: Target },
+            { id: 'home', label: t("partnerdashboard_esas_6d87f7", 'Əsas'), icon: Home },
+            { id: 'missions', label: t("partnerdashboard_tapsiriq_d827b6", 'Tapşırıq'), icon: Target },
             { id: 'stats', label: 'Statistika', icon: BarChart3 },
-            { id: 'surprise', label: 'Sürpriz', icon: Gift },
-            { id: 'shopping', label: 'Siyahı', icon: ShoppingCart },
+            { id: 'surprise', label: t("partnerdashboard_surpriz_67b2b2", 'Sürpriz'), icon: Gift },
+            { id: 'shopping', label: t("partnerdashboard_siyahi_f04aac", 'Siyahı'), icon: ShoppingCart },
           ].map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -381,7 +383,7 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
                     type="text"
                     value={loveMessage}
                     onChange={(e) => setLoveMessage(e.target.value)}
-                    placeholder="Sevgi mesajı yaz..."
+                    placeholder={t("partnerdashboard_sevgi_mesaji_yaz_54b43a", "Sevgi mesajı yaz...")}
                     className="flex-1 h-12 px-4 rounded-xl bg-muted/50 text-sm outline-none border-2 border-transparent focus:border-partner/30 transition-colors"
                   />
                   <motion.button
@@ -501,7 +503,7 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
                   type="text"
                   value={newItem}
                   onChange={(e) => setNewItem(e.target.value)}
-                  placeholder="Yeni məhsul əlavə et..."
+                  placeholder={t("partnerdashboard_yeni_mehsul_elave_et_3d6c73", "Yeni məhsul əlavə et...")}
                   className="flex-1 h-12 px-4 rounded-xl bg-muted/50 text-sm outline-none border-2 border-transparent focus:border-teal-500/30"
                 />
                 <motion.button

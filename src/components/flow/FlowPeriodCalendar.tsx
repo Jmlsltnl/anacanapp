@@ -7,14 +7,16 @@ import { useUserStore } from '@/store/userStore';
 import { usePeriodDayLogs, useTogglePeriodDay } from '@/hooks/usePeriodDayLogs';
 import { getPhaseInfoForDate } from '@/lib/cycle-utils';
 import { toast } from 'sonner';
+import { useTranslation } from "@/hooks/useTranslation";
 
 const FLOW_OPTIONS = [
-  { key: 'light', label: 'Yüngül', emoji: '💧', color: 'bg-red-200 dark:bg-red-900/30' },
+  { key: 'light', label: t("flowperiodcalendar_yungul_2a8010", 'Yüngül'), emoji: '💧', color: 'bg-red-200 dark:bg-red-900/30' },
   { key: 'medium', label: 'Orta', emoji: '💧💧', color: 'bg-red-300 dark:bg-red-800/40' },
-  { key: 'heavy', label: 'Güclü', emoji: '💧💧💧', color: 'bg-red-400 dark:bg-red-700/50' },
+  { key: 'heavy', label: t("flowperiodcalendar_guclu_0fda31", 'Güclü'), emoji: '💧💧💧', color: 'bg-red-400 dark:bg-red-700/50' },
 ];
 
 const FlowPeriodCalendar = () => {
+  const { t } = useTranslation();
   const { cycleLength, periodLength, getCycleData } = useUserStore();
   const cycleData = getCycleData();
   const [calendarMonth, setCalendarMonth] = useState(new Date());

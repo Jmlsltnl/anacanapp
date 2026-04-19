@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useProviderReviews } from '@/hooks/useProviderReviews';
 import { formatDistanceToNow } from 'date-fns';
 import { az } from 'date-fns/locale';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ProviderReviewsProps {
   providerId: string;
@@ -12,6 +13,7 @@ interface ProviderReviewsProps {
 }
 
 const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => {
+  const { t } = useTranslation();
   const { reviews, userReview, isLoading, submitReview, deleteReview, isAuthenticated } = useProviderReviews(providerId);
   const [rating, setRating] = useState(userReview?.rating || 0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -96,7 +98,7 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Təcrübənizi bölüşün (istəyə bağlı)..."
+              placeholder={t("providerreviews_tecrubenizi_bolusun_isteye_bagli_3f9da1", "Təcrübənizi bölüşün (istəyə bağlı)...")}
               className="w-full p-3 rounded-xl bg-muted border-0 text-sm resize-none h-24 outline-none focus:ring-2 focus:ring-primary/20"
             />
 

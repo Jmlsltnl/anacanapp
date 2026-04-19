@@ -15,6 +15,7 @@ import UserProfileScreen from './UserProfileScreen';
 import ConversationListScreen from './ConversationListScreen';
 import DirectMessageScreen from './DirectMessageScreen';
 import BannerSlot from '@/components/banners/BannerSlot';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface CommunityScreenProps {
   onBack?: () => void;
@@ -22,7 +23,7 @@ interface CommunityScreenProps {
 
 // Groups temporarily disabled
 const tabs = [
-  { id: 'feed', label: 'Ümumi', icon: TrendingUp },
+  { id: 'feed', label: t("communityscreen_umumi_1b5521", 'Ümumi'), icon: TrendingUp },
 ] as const;
 
 const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBack }, ref) => {
@@ -55,6 +56,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   const handleUserClick = (userId: string) => setSelectedUserId(userId);
 
   const handleOpenDmChat = (userId: string, name: string, avatar: string | null) => {
+  const { t } = useTranslation();
     setDmChat({ userId, name, avatar });
     setSelectedUserId(null);
     setShowConversations(false);

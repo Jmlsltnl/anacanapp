@@ -7,12 +7,14 @@ import { supabase } from '@/integrations/supabase/client';
 import StoryViewer from './StoryViewer';
 import StoryCropEditor from './StoryCropEditor';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface StoriesBarProps {
   groupId?: string | null;
 }
 
 const StoriesBar = ({ groupId }: StoriesBarProps) => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const { toast } = useToast();
   const { storyGroups, isLoading, createStory, isCreating, markAsViewed, deleteStory } = useStories(groupId);
@@ -59,7 +61,7 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
       const { data: urlData } = supabase.storage.from('community-media').getPublicUrl(fileName);
       createStory({ mediaUrl: urlData.publicUrl, mediaType, groupId: groupId || undefined });
     } catch (error: any) {
-      toast({ title: 'Yükləmə xətası', description: error.message, variant: 'destructive' });
+      toast({ title: t("storiesbar_yukleme_xetasi_eebca5", 'Yükləmə xətası'), description: error.message, variant: 'destructive' });
     } finally { setUploading(false); }
   };
 
@@ -192,7 +194,7 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
                     <span className="font-bold text-[12px] text-foreground">Qalereyadan</span>
                   </motion.button>
                   <motion.button
-                    onClick={() => toast({ title: 'Kamera tezliklə əlavə olunacaq' })}
+                    onClick={() => toast({ title: t("storiesbar_kamera_tezlikle_elave_olunacaq_0a3aad", 'Kamera tezliklə əlavə olunacaq') })}
                     className="flex flex-col items-center gap-3 p-6 bg-gradient-to-br from-blue-500/5 to-cyan-500/3 rounded-2xl border border-blue-500/8 active:border-blue-500/20 transition-all"
                     whileTap={{ scale: 0.96 }}
                   >

@@ -7,10 +7,12 @@ import {
 } from 'lucide-react';
 import { usePartnerMessages, PartnerMessage } from '@/hooks/usePartnerMessages';
 import { useAuth } from '@/hooks/useAuth';
+import { useTranslation } from "@/hooks/useTranslation";
 
 type NotificationFilter = 'all' | 'mood_update' | 'contraction_started' | 'contraction_511' | 'kick_session' | 'water_goal' | 'love' | 'text';
 
 const NotificationsTab = () => {
+  const { t } = useTranslation();
   const { messages, markAsRead } = usePartnerMessages();
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,19 +21,19 @@ const NotificationsTab = () => {
   const [dateRange, setDateRange] = useState<'all' | 'today' | 'week' | 'month'>('all');
 
   const filters: { id: NotificationFilter; label: string; icon: any; color: string }[] = [
-    { id: 'all', label: 'Hamısı', icon: Bell, color: 'bg-gray-100 text-gray-600' },
-    { id: 'mood_update', label: 'Əhval', icon: Smile, color: 'bg-violet-100 text-violet-600' },
-    { id: 'contraction_started', label: 'Sancı', icon: Activity, color: 'bg-amber-100 text-amber-600' },
+    { id: 'all', label: t("notificationstab_hamisi_c73c4d", 'Hamısı'), icon: Bell, color: 'bg-gray-100 text-gray-600' },
+    { id: 'mood_update', label: t("notificationstab_ehval_0457f9", 'Əhval'), icon: Smile, color: 'bg-violet-100 text-violet-600' },
+    { id: 'contraction_started', label: t("notificationstab_sanci_350c2d", 'Sancı'), icon: Activity, color: 'bg-amber-100 text-amber-600' },
     { id: 'contraction_511', label: '5-1-1', icon: AlertCircle, color: 'bg-red-100 text-red-600' },
-    { id: 'kick_session', label: 'Təpik', icon: Footprints, color: 'bg-blue-100 text-blue-600' },
+    { id: 'kick_session', label: t("notificationstab_tepik_9a873a", 'Təpik'), icon: Footprints, color: 'bg-blue-100 text-blue-600' },
     { id: 'water_goal', label: 'Su', icon: Droplets, color: 'bg-cyan-100 text-cyan-600' },
     { id: 'love', label: 'Sevgi', icon: Heart, color: 'bg-pink-100 text-pink-600' },
   ];
 
   const dateRanges: { id: typeof dateRange; label: string }[] = [
-    { id: 'all', label: 'Hamısı' },
-    { id: 'today', label: 'Bu gün' },
-    { id: 'week', label: 'Bu həftə' },
+    { id: 'all', label: t("notificationstab_hamisi_c73c4d", 'Hamısı') },
+    { id: 'today', label: t("notificationstab_bu_gun_786fd4", 'Bu gün') },
+    { id: 'week', label: t("notificationstab_bu_hefte_a5f60b", 'Bu həftə') },
     { id: 'month', label: 'Bu ay' },
   ];
 
@@ -101,7 +103,7 @@ const NotificationsTab = () => {
         return { 
           icon: Heart, 
           color: 'bg-pink-100 text-pink-600',
-          title: 'Sevgi göndərdi ❤️',
+          title: t("notificationstab_sevgi_gonderdi_8206b9", 'Sevgi göndərdi ❤️'),
           body: 'Partnyorunuz sizə sevgi göndərdi'
         };
       case 'mood_update':
@@ -122,7 +124,7 @@ const NotificationsTab = () => {
         return { 
           icon: AlertCircle, 
           color: 'bg-red-100 text-red-600',
-          title: '⚠️ 5-1-1 Qaydası!',
+          title: t("notificationstab_5_1_1_qaydasi_976061", '⚠️ 5-1-1 Qaydası!'),
           body: 'Xəstəxanaya getmə vaxtı ola bilər!'
         };
       case 'kick_session':
@@ -192,7 +194,7 @@ const NotificationsTab = () => {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Bildirişlərdə axtar..."
+          placeholder={t("notificationstab_bildirislerde_axtar_ecd1e2", "Bildirişlərdə axtar...")}
           className="w-full h-11 pl-10 pr-10 rounded-xl bg-muted text-sm outline-none"
         />
         {searchQuery && (

@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { takePhoto, pickFromGallery, requestCameraPermission } from '@/lib/permissions';
 import { Capacitor } from '@capacitor/core';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface PoopScannerProps {
   onBack: () => void;
@@ -26,16 +27,17 @@ interface PoopAnalysis {
 }
 
 const colorLabels: Record<string, { label: string; emoji: string }> = {
-  brown: { label: 'Qəhvəyi', emoji: '🟤' },
-  yellow: { label: 'Sarı', emoji: '🟡' },
-  green: { label: 'Yaşıl', emoji: '🟢' },
+  brown: { label: t("poopscanner_qehveyi_b14379", 'Qəhvəyi'), emoji: '🟤' },
+  yellow: { label: t("poopscanner_sari_30ba0d", 'Sarı'), emoji: '🟡' },
+  green: { label: t("poopscanner_yasil_b257f4", 'Yaşıl'), emoji: '🟢' },
   black: { label: 'Qara', emoji: '⚫' },
-  red: { label: 'Qırmızı', emoji: '🔴' },
-  white: { label: 'Ağ/Solğun', emoji: '⚪' },
-  unknown: { label: 'Naməlum', emoji: '❓' },
+  red: { label: t("poopscanner_qirmizi_ea111d", 'Qırmızı'), emoji: '🔴' },
+  white: { label: t("poopscanner_ag_solgun_984851", 'Ağ/Solğun'), emoji: '⚪' },
+  unknown: { label: t("poopscanner_namelum_134662", 'Naməlum'), emoji: '❓' },
 };
 
 const PoopScanner = ({ onBack }: PoopScannerProps) => {
+  const { t } = useTranslation();
   useScreenAnalytics('PoopScanner', 'Tools');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -71,8 +73,8 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
     // Check file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       toast({
-        title: 'Fayl çox böyükdür',
-        description: 'Maksimum 10MB şəkil seçin',
+        title: t("poopscanner_fayl_cox_boyukdur_f5cf61", 'Fayl çox böyükdür'),
+        description: t("poopscanner_maksimum_10mb_sekil_secin_caf529", 'Maksimum 10MB şəkil seçin'),
         variant: 'destructive'
       });
       return;
@@ -102,8 +104,8 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
       
       if (errorMsg.includes('permission') || errorMsg.includes('denied')) {
         toast({
-          title: 'Kamera icazəsi lazımdır',
-          description: 'Tətbiq parametrlərindən kamera icazəsini aktivləşdirin',
+          title: t("poopscanner_kamera_icazesi_lazimdir_a300cc", 'Kamera icazəsi lazımdır'),
+          description: t("poopscanner_tetbiq_parametrlerinden_kamera_icazesini_7a6f09", 'Tətbiq parametrlərindən kamera icazəsini aktivləşdirin'),
           variant: 'destructive'
         });
       } else if (!errorMsg.includes('cancel')) {
@@ -129,8 +131,8 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
       
       if (errorMsg.includes('permission') || errorMsg.includes('denied')) {
         toast({
-          title: 'Şəkil icazəsi lazımdır',
-          description: 'Tətbiq parametrlərindən foto kitabxanası icazəsini aktivləşdirin',
+          title: t("poopscanner_sekil_icazesi_lazimdir_ce5b8c", 'Şəkil icazəsi lazımdır'),
+          description: t("poopscanner_tetbiq_parametrlerinden_foto_kitabxanasi_f9ffae", 'Tətbiq parametrlərindən foto kitabxanası icazəsini aktivləşdirin'),
           variant: 'destructive'
         });
       } else if (!errorMsg.includes('cancel')) {
@@ -176,7 +178,7 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
         // Check if image was valid for analysis
         if (data.isValidImage === false) {
           toast({
-            title: 'Şəkil uyğun deyil',
+            title: t("poopscanner_sekil_uygun_deyil_ec1a66", 'Şəkil uyğun deyil'),
             description: data.validation?.message || 'Bu şəkil körpə bezi deyil. Düzgün şəkil seçin.',
             variant: 'destructive'
           });
@@ -193,8 +195,8 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
       }
     } catch (error) {
       toast({
-        title: 'Analiz xətası',
-        description: 'Yenidən cəhd edin',
+        title: t("poopscanner_analiz_xetasi_daba4a", 'Analiz xətası'),
+        description: t("poopscanner_yeniden_cehd_edin_0040c9", 'Yenidən cəhd edin'),
         variant: 'destructive'
       });
     } finally {

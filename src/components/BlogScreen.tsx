@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
 import BlogPostDetail from '@/components/blog/BlogPostDetail';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface BlogScreenProps {
   onBack: () => void;
@@ -24,6 +25,7 @@ interface BlogScreenProps {
 }
 
 const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
+  const { t } = useTranslation();
   useScrollToTop();
   useScreenAnalytics('Blog', 'Content');
   
@@ -163,7 +165,7 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
                 setSearchQuery(e.target.value);
                 setShowSaved(false);
               }}
-              placeholder="Məqalə axtar..."
+              placeholder={t("blogscreen_meqale_axtar_0441c1", "Məqalə axtar...")}
               className="pl-10 h-10 rounded-xl bg-muted border-0 text-sm"
             />
           </div>

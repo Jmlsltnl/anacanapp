@@ -11,12 +11,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface PrivacyScreenProps {
   onBack: () => void;
 }
 
 const PrivacyScreen = ({ onBack }: PrivacyScreenProps) => {
+  const { t } = useTranslation();
   useScrollToTop();
   
   const { user, signOut } = useAuth();
@@ -33,13 +35,13 @@ const PrivacyScreen = ({ onBack }: PrivacyScreenProps) => {
 
   const handleToggle = (key: keyof typeof privacySettings) => {
     setPrivacySettings(prev => ({ ...prev, [key]: !prev[key] }));
-    toast({ title: 'Ayar yeniləndi' });
+    toast({ title: t("privacyscreen_ayar_yenilendi_f0f876", 'Ayar yeniləndi') });
   };
 
   const handleExportData = async () => {
     if (!user) return;
 
-    toast({ title: 'Məlumatlar hazırlanır...', description: 'Bu bir neçə saniyə çəkə bilər.' });
+    toast({ title: t("privacyscreen_melumatlar_hazirlanir_482381", 'Məlumatlar hazırlanır...'), description: t("privacyscreen_bu_bir_nece_saniye_ceke_biler_49b373", 'Bu bir neçə saniyə çəkə bilər.') });
     
     try {
       // Fetch user data
@@ -64,9 +66,9 @@ const PrivacyScreen = ({ onBack }: PrivacyScreenProps) => {
       a.click();
       URL.revokeObjectURL(url);
 
-      toast({ title: 'Məlumatlar yükləndi!' });
+      toast({ title: t("privacyscreen_melumatlar_yuklendi_f04800", 'Məlumatlar yükləndi!') });
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: t("privacyscreen_xeta_3cdbb6", 'Xəta'), description: error.message, variant: 'destructive' });
     }
   };
 
@@ -84,9 +86,9 @@ const PrivacyScreen = ({ onBack }: PrivacyScreenProps) => {
       // Sign out
       await signOut();
       
-      toast({ title: 'Hesab silindi', description: 'Məlumatlarınız birdəfəlik silindi.' });
+      toast({ title: 'Hesab silindi', description: t("privacyscreen_melumatlariniz_birdefelik_silindi_8f69e7", 'Məlumatlarınız birdəfəlik silindi.') });
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: t("privacyscreen_xeta_3cdbb6", 'Xəta'), description: error.message, variant: 'destructive' });
     } finally {
       setDeleting(false);
       setShowDeleteDialog(false);
@@ -96,26 +98,26 @@ const PrivacyScreen = ({ onBack }: PrivacyScreenProps) => {
   const privacyOptions = [
     {
       icon: Eye,
-      title: 'Profil görünürlüyü',
-      description: 'Digər istifadəçilər profilinizi görə bilər',
+      title: t("privacyscreen_profil_gorunurluyu_deeea5", 'Profil görünürlüyü'),
+      description: t("privacyscreen_diger_istifadeciler_profilinizi_gore_bil_f3544c", 'Digər istifadəçilər profilinizi görə bilər'),
       key: 'profileVisible' as const,
     },
     {
       icon: UserX,
-      title: 'Cəmiyyətdə göstər',
-      description: 'Post və story-ləriniz digərlərinə görünür',
+      title: t("privacyscreen_cemiyyetde_goster_3e9674", 'Cəmiyyətdə göstər'),
+      description: t("privacyscreen_post_ve_story_leriniz_digerlerine_gorunu_cf12e6", 'Post və story-ləriniz digərlərinə görünür'),
       key: 'showInCommunity' as const,
     },
     {
       icon: Lock,
-      title: 'Mesajlara icazə ver',
-      description: 'Digər istifadəçilər sizə mesaj göndərə bilər',
+      title: t("privacyscreen_mesajlara_icaze_ver_99d96f", 'Mesajlara icazə ver'),
+      description: t("privacyscreen_diger_istifadeciler_size_mesaj_gondere_b_c1b1fc", 'Digər istifadəçilər sizə mesaj göndərə bilər'),
       key: 'allowMessages' as const,
     },
     {
       icon: Shield,
-      title: 'Analitik məlumat paylaş',
-      description: 'Anonim istifadə məlumatlarını paylaşın',
+      title: t("privacyscreen_analitik_melumat_paylas_7971ff", 'Analitik məlumat paylaş'),
+      description: t("privacyscreen_anonim_istifade_melumatlarini_paylasin_835e3a", 'Anonim istifadə məlumatlarını paylaşın'),
       key: 'shareAnalytics' as const,
     },
   ];

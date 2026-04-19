@@ -9,6 +9,7 @@ import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface SafetyLookupProps {
   onBack: () => void;
@@ -49,17 +50,18 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
   }), [filteredItems]);
 
   const getStatusConfig = (status: string) => {
+  const { t } = useTranslation();
     switch (status) {
-      case 'safe': return { gradient: 'from-emerald-500 to-green-600', lightBg: 'bg-emerald-50 dark:bg-emerald-950/40', border: 'border-emerald-200/60 dark:border-emerald-800/60', text: 'text-emerald-700 dark:text-emerald-300', icon: ShieldCheck, label: 'Təhlükəsiz', emoji: '✅' };
-      case 'warning': return { gradient: 'from-amber-500 to-orange-600', lightBg: 'bg-amber-50 dark:bg-amber-950/40', border: 'border-amber-200/60 dark:border-amber-800/60', text: 'text-amber-700 dark:text-amber-300', icon: ShieldAlert, label: 'Ehtiyatlı', emoji: '⚠️' };
-      case 'danger': return { gradient: 'from-red-500 to-rose-600', lightBg: 'bg-red-50 dark:bg-red-950/40', border: 'border-red-200/60 dark:border-red-800/60', text: 'text-red-700 dark:text-red-300', icon: ShieldX, label: 'Təhlükəli', emoji: '🚫' };
-      default: return { gradient: 'from-gray-500 to-gray-600', lightBg: 'bg-muted', border: 'border-border', text: 'text-muted-foreground', icon: Shield, label: 'Naməlum', emoji: '❓' };
+      case 'safe': return { gradient: 'from-emerald-500 to-green-600', lightBg: 'bg-emerald-50 dark:bg-emerald-950/40', border: 'border-emerald-200/60 dark:border-emerald-800/60', text: 'text-emerald-700 dark:text-emerald-300', icon: ShieldCheck, label: t("safetylookup_tehlukesiz_1f31cb", 'Təhlükəsiz'), emoji: '✅' };
+      case 'warning': return { gradient: 'from-amber-500 to-orange-600', lightBg: 'bg-amber-50 dark:bg-amber-950/40', border: 'border-amber-200/60 dark:border-amber-800/60', text: 'text-amber-700 dark:text-amber-300', icon: ShieldAlert, label: t("safetylookup_ehtiyatli_ba7ebe", 'Ehtiyatlı'), emoji: '⚠️' };
+      case 'danger': return { gradient: 'from-red-500 to-rose-600', lightBg: 'bg-red-50 dark:bg-red-950/40', border: 'border-red-200/60 dark:border-red-800/60', text: 'text-red-700 dark:text-red-300', icon: ShieldX, label: t("safetylookup_tehlukeli_056934", 'Təhlükəli'), emoji: '🚫' };
+      default: return { gradient: 'from-gray-500 to-gray-600', lightBg: 'bg-muted', border: 'border-border', text: 'text-muted-foreground', icon: Shield, label: t("safetylookup_namelum_134662", 'Naməlum'), emoji: '❓' };
     }
   };
 
   const handleAISearch = async () => {
     if (!searchQuery.trim() || searchQuery.trim().length < 2) {
-      toast({ title: 'Ən azı 2 simvol yazın', variant: 'destructive' });
+      toast({ title: t("safetylookup_en_azi_2_simvol_yazin_f08b6d", 'Ən azı 2 simvol yazın'), variant: 'destructive' });
       return;
     }
     let userContext: any = { lifeStage: profile?.life_stage };
@@ -81,12 +83,12 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
       if (data?.success && data?.item) {
         await queryClient.invalidateQueries({ queryKey: ['safety_items'] });
         setSelectedItem(data.item);
-        toast({ title: 'AI ilə tapıldı! ✨', description: `${data.item.name_az} bazaya əlavə edildi` });
+        toast({ title: t("safetylookup_ai_ile_tapildi_5c2d49", 'AI ilə tapıldı! ✨'), description: `${data.item.name_az} bazaya əlavə edildi` });
       } else {
-        toast({ title: 'Heç nə tapılmadı', variant: 'destructive' });
+        toast({ title: t("safetylookup_hec_ne_tapilmadi_6a4eca", 'Heç nə tapılmadı'), variant: 'destructive' });
       }
     } catch (error: any) {
-      toast({ title: 'Xəta baş verdi', description: error.message, variant: 'destructive' });
+      toast({ title: t("safetylookup_xeta_bas_verdi_f22fba", 'Xəta baş verdi'), description: error.message, variant: 'destructive' });
     } finally {
       setAiLoading(false);
     }
@@ -121,7 +123,7 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Nə yoxlamaq istəyirsiniz?"
+              placeholder={t("safetylookup_ne_yoxlamaq_isteyirsiniz_33ce31", "Nə yoxlamaq istəyirsiniz?")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full h-9 pl-8 pr-3 rounded-lg bg-muted border border-border text-sm outline-none focus:ring-1 focus:ring-primary/30"

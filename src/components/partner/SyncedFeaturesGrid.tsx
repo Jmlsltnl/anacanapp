@@ -6,6 +6,7 @@ import {
 import { usePartnerHospitalBag } from '@/hooks/usePartnerHospitalBag';
 import { useDailySummary } from '@/hooks/useDailySummary';
 import { useSurprises } from '@/hooks/useSurprises';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface SyncedFeaturesGridProps {
   onNavigate: (screen: string) => void;
@@ -13,6 +14,7 @@ interface SyncedFeaturesGridProps {
 }
 
 const SyncedFeaturesGrid = ({ onNavigate, onTabChange }: SyncedFeaturesGridProps) => {
+  const { t } = useTranslation();
   const { checkedCount, totalCount, getProgress } = usePartnerHospitalBag();
   const { todaySummary } = useDailySummary();
   const { plannedSurprises, totalPoints } = useSurprises();
@@ -20,7 +22,7 @@ const SyncedFeaturesGrid = ({ onNavigate, onTabChange }: SyncedFeaturesGridProps
   const features = [
     {
       id: 'hospital-bag',
-      title: 'Xəstəxana Çantası',
+      title: t("syncedfeaturesgrid_xestexana_cantasi_045078", 'Xəstəxana Çantası'),
       subtitle: `${checkedCount}/${totalCount} hazır`,
       icon: Package,
       gradient: 'from-teal-500 to-emerald-600',
@@ -29,7 +31,7 @@ const SyncedFeaturesGrid = ({ onNavigate, onTabChange }: SyncedFeaturesGridProps
     },
     {
       id: 'daily-summary',
-      title: 'Gündəlik Xülasə',
+      title: t("syncedfeaturesgrid_gundelik_xulase_3d07a5", 'Gündəlik Xülasə'),
       subtitle: todaySummary ? 'Bugün göndərildi' : 'Gözləyir...',
       icon: FileText,
       gradient: 'from-purple-500 to-violet-600',
@@ -38,7 +40,7 @@ const SyncedFeaturesGrid = ({ onNavigate, onTabChange }: SyncedFeaturesGridProps
     },
     {
       id: 'name-voting',
-      title: 'Ad Seçimi',
+      title: t("syncedfeaturesgrid_ad_secimi_465d2a", 'Ad Seçimi'),
       subtitle: 'Swipe ilə seç',
       icon: Vote,
       gradient: 'from-pink-500 to-rose-600',
@@ -46,7 +48,7 @@ const SyncedFeaturesGrid = ({ onNavigate, onTabChange }: SyncedFeaturesGridProps
     },
     {
       id: 'weekly-stats',
-      title: 'Həftəlik Statistika',
+      title: t("syncedfeaturesgrid_heftelik_statistika_292953", 'Həftəlik Statistika'),
       subtitle: 'Əhval & aktivlik',
       icon: BarChart3,
       gradient: 'from-cyan-500 to-blue-600',
@@ -54,7 +56,7 @@ const SyncedFeaturesGrid = ({ onNavigate, onTabChange }: SyncedFeaturesGridProps
     },
     {
       id: 'surprises',
-      title: 'Sürpriz Planla',
+      title: t("syncedfeaturesgrid_surpriz_planla_d495ce", 'Sürpriz Planla'),
       subtitle: plannedSurprises.length > 0 ? `${plannedSurprises.length} planlanıb` : 'Planlaşdır',
       icon: Gift,
       gradient: 'from-amber-500 to-orange-600',
@@ -63,7 +65,7 @@ const SyncedFeaturesGrid = ({ onNavigate, onTabChange }: SyncedFeaturesGridProps
     },
     {
       id: 'sos',
-      title: 'SOS Xəbərdarlıq',
+      title: t("syncedfeaturesgrid_sos_xeberdarliq_6bd6d8", 'SOS Xəbərdarlıq'),
       subtitle: 'Təcili bildiriş',
       icon: AlertTriangle,
       gradient: 'from-red-500 to-rose-700',

@@ -14,6 +14,7 @@ import { useAffiliateProducts, useSavedProducts, AffiliateProduct } from '@/hook
 import AffiliateProductCard from './affiliate/AffiliateProductCard';
 import AffiliateProductDetail from './affiliate/AffiliateProductDetail';
 import SavedProductsList from './affiliate/SavedProductsList';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface AffiliateProductsProps {
   onBack: () => void;
@@ -29,6 +30,7 @@ const categoryLabels: Record<string, string> = {
 };
 
 const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
+  const { t } = useTranslation();
   useScrollToTop();
   useScreenAnalytics('AffiliateProducts', 'Tools');
   
@@ -134,7 +136,7 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Məhsul axtar..."
+            placeholder={t("affiliateproducts_mehsul_axtar_580a05", "Məhsul axtar...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full h-10 pl-9 pr-3 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-sm transition-all outline-none"

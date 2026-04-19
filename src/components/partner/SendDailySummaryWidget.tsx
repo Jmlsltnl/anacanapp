@@ -5,6 +5,7 @@ import { useDailySummary } from '@/hooks/useDailySummary';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from "@/hooks/useTranslation";
 
 const SendDailySummaryWidget: React.FC = () => {
   const { profile } = useAuth();
@@ -31,14 +32,14 @@ const SendDailySummaryWidget: React.FC = () => {
 
     if (result.error) {
       toast({
-        title: 'Xəta baş verdi',
+        title: t("senddailysummarywidget_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
         description: String(result.error),
         variant: 'destructive',
       });
     } else {
       toast({
-        title: '📊 Xülasə göndərildi!',
-        description: 'Partnyorunuz bugünkü xülasəni aldı',
+        title: t("senddailysummarywidget_xulase_gonderildi_edc840", '📊 Xülasə göndərildi!'),
+        description: t("senddailysummarywidget_partnyorunuz_bugunku_xulaseni_aldi_f6793e", 'Partnyorunuz bugünkü xülasəni aldı'),
       });
     }
   };

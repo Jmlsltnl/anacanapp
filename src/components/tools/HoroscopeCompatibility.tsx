@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface HoroscopeCompatibilityProps {
   onBack: () => void;
@@ -96,10 +97,11 @@ const TIME_OPTIONS = Array.from({ length: 24 }, (_, h) =>
 const STEPS = [
   { id: 1, title: 'Ana', icon: User, emoji: '👩' },
   { id: 2, title: 'Ata', icon: User, emoji: '👨' },
-  { id: 3, title: 'Körpə', icon: Baby, emoji: '👶' },
+  { id: 3, title: t("horoscopecompatibility_korpe_fa2b51", 'Körpə'), icon: Baby, emoji: '👶' },
 ];
 
 const HoroscopeCompatibility = ({ onBack }: HoroscopeCompatibilityProps) => {
+  const { t } = useTranslation();
   useScreenAnalytics('HoroscopeCompatibility', 'Tools');
   const { profile } = useAuthContext();
   const [currentStep, setCurrentStep] = useState(1);
@@ -303,7 +305,7 @@ Anacan tətbiqi ilə yaradılıb 💜`;
                   minYear={new Date().getFullYear()}
                   maxYear={new Date().getFullYear() + 1}
                   disabled={(date) => date < new Date()}
-                  placeholder="Gözlənilən tarix seçin"
+                  placeholder={t("horoscopecompatibility_gozlenilen_tarix_secin_fdf25e", "Gözlənilən tarix seçin")}
                 />
               </div>
             ) : (
@@ -413,7 +415,7 @@ Anacan tətbiqi ilə yaradılıb 💜`;
 
           {analysisResult.analysis.familyDynamics && (
             <AnalysisCard
-              title="Ailə Dinamikası"
+              title={t("horoscopecompatibility_aile_dinamikasi_ee22f4", "Ailə Dinamikası")}
               icon={<Users className="h-5 w-5 text-purple-500" />}
               content={analysisResult.analysis.familyDynamics}
               color="from-purple-500/10 to-pink-500/10"
@@ -422,7 +424,7 @@ Anacan tətbiqi ilə yaradılıb 💜`;
 
           {analysisResult.analysis.momBabyConnection && analysisResult.charts.baby && (
             <AnalysisCard
-              title="Ana-Körpə Kosmik Bağı"
+              title={t("horoscopecompatibility_ana_korpe_kosmik_bagi_deb848", "Ana-Körpə Kosmik Bağı")}
               icon={<Heart className="h-5 w-5 text-pink-500" />}
               content={analysisResult.analysis.momBabyConnection}
               color="from-pink-500/10 to-red-500/10"
@@ -431,7 +433,7 @@ Anacan tətbiqi ilə yaradılıb 💜`;
 
           {analysisResult.analysis.parentCompatibility && analysisResult.charts.dad && (
             <AnalysisCard
-              title="Valideynlər Uyğunluğu"
+              title={t("horoscopecompatibility_valideynler_uygunlugu_27180e", "Valideynlər Uyğunluğu")}
               icon={<Zap className="h-5 w-5 text-amber-500" />}
               content={analysisResult.analysis.parentCompatibility}
               color="from-amber-500/10 to-orange-500/10"
@@ -772,7 +774,7 @@ const PersonInput = ({
           value={data.birthDate}
           onChange={(date) => setData({ ...data, birthDate: date })}
           disabled={(date) => date > new Date()}
-          placeholder="Doğum tarixini seçin"
+          placeholder={t("horoscopecompatibility_dogum_tarixini_secin_825730", "Doğum tarixini seçin")}
         />
       </div>
 
@@ -804,7 +806,7 @@ const PersonInput = ({
                 onValueChange={(value) => setData({ ...data, birthTime: value })}
               >
                 <SelectTrigger className="w-full h-12 rounded-xl">
-                  <SelectValue placeholder="Saat seçin" />
+                  <SelectValue placeholder={t("horoscopecompatibility_saat_secin_c24ec4", "Saat seçin")} />
                 </SelectTrigger>
                 <SelectContent className="max-h-60">
                   {TIME_OPTIONS.map(time => (

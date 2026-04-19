@@ -5,21 +5,22 @@ import { useHospitalBag } from '@/hooks/useHospitalBag';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { Progress } from '@/components/ui/progress';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface HospitalBagProps {
   onBack: () => void;
 }
 
 const categoryConfig = {
-  documents: { label: 'Sənədlər', emoji: '📄', icon: FileText, color: 'from-amber-500 to-orange-500' },
-  mom: { label: 'Ana üçün', emoji: '👩', icon: Package, color: 'from-pink-500 to-rose-500' },
-  baby: { label: 'Körpə üçün', emoji: '👶', icon: Baby, color: 'from-blue-500 to-cyan-500' },
+  documents: { label: t("hospitalbag_senedler_d60b5e", 'Sənədlər'), emoji: '📄', icon: FileText, color: 'from-amber-500 to-orange-500' },
+  mom: { label: t("hospitalbag_ana_ucun_8f885e", 'Ana üçün'), emoji: '👩', icon: Package, color: 'from-pink-500 to-rose-500' },
+  baby: { label: t("hospitalbag_korpe_ucun_27c058", 'Körpə üçün'), emoji: '👶', icon: Baby, color: 'from-blue-500 to-cyan-500' },
 };
 
 const priorityConfig = {
-  1: { label: 'Çox Vacib', color: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400', dot: '🔴' },
+  1: { label: t("hospitalbag_cox_vacib_c4e66f", 'Çox Vacib'), color: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400', dot: '🔴' },
   2: { label: 'Orta', color: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400', dot: '🟡' },
-  3: { label: 'İstəyə bağlı', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400', dot: '🟢' },
+  3: { label: t("hospitalbag_i_steye_bagli_43582b", 'İstəyə bağlı'), color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400', dot: '🟢' },
 };
 
 const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, ref) => {
@@ -31,10 +32,10 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
 
   const categories = [
-    { id: 'all', label: 'Hamısı', emoji: '👜' },
-    { id: 'documents', label: 'Sənədlər', emoji: '📄' },
+    { id: 'all', label: t("hospitalbag_hamisi_c73c4d", 'Hamısı'), emoji: '👜' },
+    { id: 'documents', label: t("hospitalbag_senedler_d60b5e", 'Sənədlər'), emoji: '📄' },
     { id: 'mom', label: 'Ana', emoji: '👩' },
-    { id: 'baby', label: 'Körpə', emoji: '👶' },
+    { id: 'baby', label: t("hospitalbag_korpe_fa2b51", 'Körpə'), emoji: '👶' },
   ];
 
   const filteredItems = activeCategory === 'all' 
@@ -65,6 +66,7 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
   }
 
   const renderItem = (item: typeof items[0], index: number) => {
+  const { t } = useTranslation();
     const priority = item.priority || 2;
     const pConfig = priorityConfig[priority as keyof typeof priorityConfig];
     const isExpanded = expandedItem === item.item_id;

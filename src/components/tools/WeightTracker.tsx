@@ -11,6 +11,7 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDateAz, formatTimeAz } from '@/lib/date-utils';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface WeightTrackerProps {
   onBack: () => void;
@@ -50,6 +51,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
   }, [recommendations, trimester]);
   
   const getStatus = () => {
+  const { t } = useTranslation();
     if (totalGain < recommended.min) return { status: 'low', text: 'Az', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-900/30', gradient: 'from-amber-400 to-orange-500' };
     if (totalGain > recommended.max) return { status: 'high', text: 'Çox', color: 'text-red-600 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-900/30', gradient: 'from-red-400 to-rose-500' };
     return { status: 'normal', text: 'Normal', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-100 dark:bg-emerald-900/30', gradient: 'from-emerald-400 to-green-500' };
@@ -145,7 +147,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            title="Başlanğıc çəkidən fərq"
+            title={t("weighttracker_baslangic_cekiden_ferq_8a58c5", "Başlanğıc çəkidən fərq")}
           >
             <Activity className="w-5 h-5 mx-auto mb-1 text-cyan-500" />
             <p className="text-2xl font-black text-cyan-600 dark:text-cyan-400">{totalGain >= 0 ? '+' : ''}{totalGain.toFixed(1)}</p>

@@ -13,12 +13,14 @@ import { useTeething, BabyTooth } from '@/hooks/useTeething';
 import { useChildren } from '@/hooks/useChildren';
 import ChildSelector from '@/components/mommy/ChildSelector';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface TeethingTrackerProps {
   onBack: () => void;
 }
 
 const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
+  const { t } = useTranslation();
   useScreenAnalytics('TeethingTracker', 'Tools');
   const { selectedChild, hasChildren, hasMultipleChildren, getChildAge } = useChildren();
   const { 
@@ -445,7 +447,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
                 <Textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Hər hansı qeyd əlavə edin..."
+                  placeholder={t("teethingtracker_her_hansi_qeyd_elave_edin_9c35e2", "Hər hansı qeyd əlavə edin...")}
                   rows={2}
                 />
               </div>

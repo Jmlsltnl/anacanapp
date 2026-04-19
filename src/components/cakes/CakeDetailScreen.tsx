@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { type Cake } from '@/hooks/useCakes';
 import { useCakeCart } from '@/hooks/useCakeCart';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface CakeDetailScreenProps {
   cake: Cake;
@@ -15,6 +16,7 @@ interface CakeDetailScreenProps {
 }
 
 const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { addToCart, totalItems } = useCakeCart();
   const [quantity, setQuantity] = useState(1);
@@ -37,7 +39,7 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
 
   const handleAddToCart = () => {
     addToCart(cake, quantity, showCustomFields ? customFields : {});
-    toast({ title: 'Səbətə əlavə edildi! 🎂', description: `${cake.name} x${quantity}` });
+    toast({ title: t("cakedetailscreen_sebete_elave_edildi_e0f576", 'Səbətə əlavə edildi! 🎂'), description: `${cake.name} x${quantity}` });
   };
 
   const goToPrev = useCallback(() => {

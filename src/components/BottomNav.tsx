@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Home, Compass, MessageCircle, User, Users, Cake } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface BottomNavProps {
   activeTab: string;
@@ -10,22 +11,23 @@ interface BottomNavProps {
 }
 
 const womanTabs = [
-  { id: 'home', label: 'Əsas', icon: Home },
-  { id: 'tools', label: 'Alətlər', icon: Compass },
+  { id: 'home', label: t("bottomnav_esas_6d87f7", 'Əsas'), icon: Home },
+  { id: 'tools', label: t("bottomnav_aletler_4778b4", 'Alətlər'), icon: Compass },
   { id: 'cakes', label: 'Tortlar', icon: Cake },
-  { id: 'community', label: 'Cəmiyyət', icon: Users },
+  { id: 'community', label: t("bottomnav_cemiyyet_2dc44d", 'Cəmiyyət'), icon: Users },
   { id: 'ai', label: 'Anacan.AI', icon: MessageCircle },
   { id: 'profile', label: 'Profil', icon: User },
 ];
 
 const partnerTabs = [
-  { id: 'home', label: 'Əsas', icon: Home },
+  { id: 'home', label: t("bottomnav_esas_6d87f7", 'Əsas'), icon: Home },
   { id: 'chat', label: 'Mesajlar', icon: MessageCircle },
-  { id: 'ai', label: 'Məsləhət', icon: Compass },
+  { id: 'ai', label: t("bottomnav_meslehet_9a0892", 'Məsləhət'), icon: Compass },
   { id: 'profile', label: 'Profil', icon: User },
 ];
 
 const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps) => {
+  const { t } = useTranslation();
   const { lifeStage } = useUserStore();
   const { unreadCount } = useUnreadMessages();
   

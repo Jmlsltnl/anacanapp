@@ -17,12 +17,14 @@ import { useBillingConfig } from '@/hooks/usePaywallConfig';
 import { usePremiumConfig } from '@/hooks/usePremiumConfig';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface BillingScreenProps {
   onBack: () => void;
 }
 
 const BillingScreen = ({ onBack }: BillingScreenProps) => {
+  const { t } = useTranslation();
   useScrollToTop();
   
   const { profile } = useAuth();
@@ -50,8 +52,8 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
     setIsCanceling(true);
     const success = await cancelSubscription();
     toast(success 
-      ? { title: 'Abunəlik ləğv edildi', description: 'Cari dövrün sonuna qədər Premium istifadə edə bilərsiniz.' }
-      : { title: 'Xəta', description: 'Abunəliyi ləğv etmək mümkün olmadı.', variant: 'destructive' }
+      ? { title: t("billingscreen_abunelik_legv_edildi_0023e9", 'Abunəlik ləğv edildi'), description: t("billingscreen_cari_dovrun_sonuna_qeder_premium_istifad_e3e35c", 'Cari dövrün sonuna qədər Premium istifadə edə bilərsiniz.') }
+      : { title: t("billingscreen_xeta_3cdbb6", 'Xəta'), description: t("billingscreen_abuneliyi_legv_etmek_mumkun_olmadi_413b1f", 'Abunəliyi ləğv etmək mümkün olmadı.'), variant: 'destructive' }
     );
     setIsCanceling(false);
   };
@@ -60,8 +62,8 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
     setIsRestoring(true);
     const success = await restoreSubscription();
     toast(success
-      ? { title: 'Abunəlik bərpa edildi', description: 'Premium abunəliyiniz yenidən aktivdir.' }
-      : { title: 'Xəta', description: 'Abunəliyi bərpa etmək mümkün olmadı.', variant: 'destructive' }
+      ? { title: t("billingscreen_abunelik_berpa_edildi_1b680a", 'Abunəlik bərpa edildi'), description: t("billingscreen_premium_abuneliyiniz_yeniden_aktivdir_2f1843", 'Premium abunəliyiniz yenidən aktivdir.') }
+      : { title: t("billingscreen_xeta_3cdbb6", 'Xəta'), description: t("billingscreen_abuneliyi_berpa_etmek_mumkun_olmadi_3a4a58", 'Abunəliyi bərpa etmək mümkün olmadı.'), variant: 'destructive' }
     );
     setIsRestoring(false);
   };

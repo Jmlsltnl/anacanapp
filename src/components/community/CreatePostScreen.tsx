@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
 import { useTheme } from 'next-themes';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface CreatePostScreenProps {
   onBack: () => void;
@@ -32,6 +33,7 @@ const POPULAR_HASHTAGS = [
 ];
 
 const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) => {
+  const { t } = useTranslation();
   const [content, setContent] = useState('');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(groupId);
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
@@ -110,9 +112,9 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video') => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
-    if (files.length + mediaFiles.length > 4) { toast({ title: 'Limit aşıldı', description: 'Maximum 4 fayl', variant: 'destructive' }); return; }
+    if (files.length + mediaFiles.length > 4) { toast({ title: t("createpostscreen_limit_asildi_30a129", 'Limit aşıldı'), description: 'Maximum 4 fayl', variant: 'destructive' }); return; }
     const maxSize = type === 'video' ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
-    if (files.some(f => f.size > maxSize)) { toast({ title: 'Fayl çox böyükdür', description: type === 'video' ? 'Max 50MB' : 'Max 10MB', variant: 'destructive' }); return; }
+    if (files.some(f => f.size > maxSize)) { toast({ title: t("createpostscreen_fayl_cox_boyukdur_f5cf61", 'Fayl çox böyükdür'), description: type === 'video' ? 'Max 50MB' : 'Max 10MB', variant: 'destructive' }); return; }
     setMediaFiles(prev => [...prev, ...files]);
     setMediaPreviews(prev => [...prev, ...files.map(file => ({ url: URL.createObjectURL(file), type }))]);
     if (e.target) e.target.value = '';
@@ -135,7 +137,7 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
   };
 
   const handleSubmit = async () => {
-    if (!content.trim() && mediaFiles.length === 0) { toast({ title: 'Boş paylaşım', description: 'Mətn yazın və ya media əlavə edin', variant: 'destructive' }); return; }
+    if (!content.trim() && mediaFiles.length === 0) { toast({ title: t("createpostscreen_bos_paylasim_47b52d", 'Boş paylaşım'), description: t("createpostscreen_metn_yazin_ve_ya_media_elave_edin_18fa25", 'Mətn yazın və ya media əlavə edin'), variant: 'destructive' }); return; }
     hapticFeedback.medium();
     setIsUploading(true);
     try {
@@ -145,7 +147,7 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
       setContent(''); setMediaFiles([]); setMediaPreviews([]);
       onBack();
     } catch (error) {
-      toast({ title: 'Xəta', description: error instanceof Error ? error.message : 'Paylaşım yaradıla bilmədi', variant: 'destructive' });
+      toast({ title: t("createpostscreen_xeta_3cdbb6", 'Xəta'), description: error instanceof Error ? error.message: t("createpostscreen_paylasim_yaradila_bilmedi_6354b1", 'Paylaşım yaradıla bilmədi'), variant: 'destructive' });
     } finally { setIsUploading(false); }
   };
 
@@ -182,7 +184,7 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
         {/* Group Selector */}
         <Select value={selectedGroupId || 'public'} onValueChange={(value) => setSelectedGroupId(value === 'public' ? null : value)}>
           <SelectTrigger className="w-full h-10 rounded-2xl bg-muted/15 border-border/10 text-[12px] font-medium">
-            <SelectValue placeholder="Qrup seçin" />
+            <SelectValue placeholder={t("createpostscreen_qrup_secin_8e26b9", "Qrup seçin")} />
           </SelectTrigger>
           <SelectContent className="bg-popover border-border z-[100] rounded-xl">
             <SelectItem value="public">🌍 Ümumi</SelectItem>
@@ -198,7 +200,7 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
             ref={textareaRef}
             value={content}
             onChange={handleContentChange}
-            placeholder="Nə düşünürsünüz? ✨"
+            placeholder={t("createpostscreen_ne_dusunursunuz_474859", "Nə düşünürsünüz? ✨")}
             className="min-h-[180px] rounded-2xl resize-none text-[14px] bg-muted/8 border-border/10 focus:border-primary/20 pr-12 leading-relaxed"
             autoFocus
           />

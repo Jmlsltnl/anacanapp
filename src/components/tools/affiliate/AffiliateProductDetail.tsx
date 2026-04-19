@@ -13,6 +13,7 @@ import { az } from 'date-fns/locale';
 import { nativeShare } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useTranslation } from "@/hooks/useTranslation";
 import {
   Carousel,
   CarouselContent,
@@ -40,6 +41,7 @@ const platformLabels: Record<string, string> = {
 };
 
 const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps) => {
+  const { t } = useTranslation();
   useScrollToTop();
   
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -91,7 +93,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
     });
     
     if (success) {
-      toast({ title: 'Paylaşıldı!' });
+      toast({ title: t("affiliateproductdetail_paylasildi_c7d9ef", 'Paylaşıldı!') });
     }
   };
 

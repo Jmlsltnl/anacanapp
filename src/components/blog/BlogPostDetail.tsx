@@ -17,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import RelatedPosts from './RelatedPosts';
 import MarkdownContent from '@/components/MarkdownContent';
 import HtmlContent from '@/components/ui/HtmlContent';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface BlogPostDetailProps {
   post: BlogPost;
@@ -27,6 +28,7 @@ interface BlogPostDetailProps {
 }
 
 const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: BlogPostDetailProps) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const {
@@ -50,7 +52,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
 
   const handleAddComment = async () => {
     if (!user) {
-      toast({ title: 'Giriş edin', description: 'Şərh yazmaq üçün hesabınıza daxil olun' });
+      toast({ title: t("blogpostdetail_giris_edin_3be3d2", 'Giriş edin'), description: t("blogpostdetail_serh_yazmaq_ucun_hesabiniza_daxil_olun_409134", 'Şərh yazmaq üçün hesabınıza daxil olun') });
       return;
     }
     if (!newComment.trim()) return;
@@ -61,13 +63,13 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
 
     if (!result.error) {
       setNewComment('');
-      toast({ title: 'Şərh əlavə edildi!' });
+      toast({ title: t("blogpostdetail_serh_elave_edildi_192ac0", 'Şərh əlavə edildi!') });
     }
   };
 
   const handleReply = async (parentId: string) => {
     if (!user) {
-      toast({ title: 'Giriş edin', description: 'Cavab yazmaq üçün hesabınıza daxil olun' });
+      toast({ title: t("blogpostdetail_giris_edin_3be3d2", 'Giriş edin'), description: t("blogpostdetail_cavab_yazmaq_ucun_hesabiniza_daxil_olun_04a03d", 'Cavab yazmaq üçün hesabınıza daxil olun') });
       return;
     }
     if (!replyContent.trim()) return;
@@ -79,7 +81,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
     if (!result.error) {
       setReplyContent('');
       setReplyingTo(null);
-      toast({ title: 'Cavab əlavə edildi!' });
+      toast({ title: t("blogpostdetail_cavab_elave_edildi_b44ba8", 'Cavab əlavə edildi!') });
     }
   };
 
@@ -171,7 +173,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
               <Textarea
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
-                placeholder="Cavabınızı yazın..."
+                placeholder={t("blogpostdetail_cavabinizi_yazin_2cda33", "Cavabınızı yazın...")}
                 className="text-sm min-h-[60px] rounded-xl bg-muted/50"
               />
               <div className="flex flex-col gap-1">

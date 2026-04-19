@@ -31,12 +31,14 @@ import {
 import { format, subDays } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface MentalHealthTrackerProps {
   onBack: () => void;
 }
 
 const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
+  const { t } = useTranslation();
   useScrollToTop();
   useScreenAnalytics('MentalHealthTracker', 'Tools');
   
@@ -376,7 +378,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                   <Textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    placeholder="İstəyirsinizsə, qısa qeyd əlavə edin..."
+                    placeholder={t("mentalhealthtracker_i_steyirsinizse_qisa_qeyd_elave_edin_9043bb", "İstəyirsinizsə, qısa qeyd əlavə edin...")}
                     className="h-16 resize-none rounded-2xl border-2"
                   />
                 </div>

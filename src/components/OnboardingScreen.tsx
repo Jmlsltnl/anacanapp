@@ -11,6 +11,7 @@ import { useOnboardingStages, useMultiplesOptions, FALLBACK_STAGES, FALLBACK_MUL
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { supabase } from '@/integrations/supabase/client';
 import type { LifeStage } from '@/types/anacan';
+import { useTranslation } from "@/hooks/useTranslation";
 
 // Icon mapping for dynamic stages
 const iconMap: Record<string, React.ComponentType<any>> = {
@@ -20,6 +21,7 @@ const iconMap: Record<string, React.ComponentType<any>> = {
 };
 
 const OnboardingScreen = () => {
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [selectedStage, setSelectedStage] = useState<LifeStage | null>(null);
   const [dateInput, setDateInput] = useState('');
@@ -126,8 +128,8 @@ const OnboardingScreen = () => {
 
             if (error) {
               toast({
-                title: 'Xəta baş verdi',
-                description: 'Məlumatlar saxlanıla bilmədi',
+                title: t("onboardingscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
+                description: t("onboardingscreen_melumatlar_saxlanila_bilmedi_a65916", 'Məlumatlar saxlanıla bilmədi'),
                 variant: 'destructive',
               });
               setIsSaving(false);
@@ -178,8 +180,8 @@ const OnboardingScreen = () => {
 
             if (error) {
               toast({
-                title: 'Xəta baş verdi',
-                description: 'Məlumatlar saxlanıla bilmədi',
+                title: t("onboardingscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
+                description: t("onboardingscreen_melumatlar_saxlanila_bilmedi_a65916", 'Məlumatlar saxlanıla bilmədi'),
                 variant: 'destructive',
               });
               setIsSaving(false);
@@ -213,8 +215,8 @@ const OnboardingScreen = () => {
 
             if (error) {
               toast({
-                title: 'Xəta baş verdi',
-                description: 'Məlumatlar saxlanıla bilmədi',
+                title: t("onboardingscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
+                description: t("onboardingscreen_melumatlar_saxlanila_bilmedi_a65916", 'Məlumatlar saxlanıla bilmədi'),
                 variant: 'destructive',
               });
               setIsSaving(false);
@@ -234,14 +236,14 @@ const OnboardingScreen = () => {
         }
 
         toast({
-          title: 'Uğurla saxlanıldı! 🎉',
-          description: 'Profiliniz hazırdır',
+          title: t("onboardingscreen_ugurla_saxlanildi_27f111", 'Uğurla saxlanıldı! 🎉'),
+          description: t("onboardingscreen_profiliniz_hazirdir_7fc314", 'Profiliniz hazırdır'),
         });
       } catch (err) {
         console.error('Onboarding error:', err);
         toast({
-          title: 'Xəta baş verdi',
-          description: 'Bir xəta baş verdi',
+          title: t("onboardingscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
+          description: t("onboardingscreen_bir_xeta_bas_verdi_3a783a", 'Bir xəta baş verdi'),
           variant: 'destructive',
         });
       } finally {
@@ -496,8 +498,8 @@ const OnboardingScreen = () => {
                       </label>
                       <div className="flex gap-4">
                         {[
-                          { id: 'boy', label: 'Oğlan', emoji: '👦', gradient: 'from-blue-500 to-indigo-600' },
-                          { id: 'girl', label: 'Qız', emoji: '👧', gradient: 'from-pink-500 to-rose-600' },
+                          { id: 'boy', label: t("onboardingscreen_oglan_e9715e", 'Oğlan'), emoji: '👦', gradient: 'from-blue-500 to-indigo-600' },
+                          { id: 'girl', label: t("onboardingscreen_qiz_79bf6b", 'Qız'), emoji: '👧', gradient: 'from-pink-500 to-rose-600' },
                         ].map((g) => (
                           <motion.button
                             key={g.id}

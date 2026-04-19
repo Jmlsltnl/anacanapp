@@ -11,12 +11,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface PartnerPrivacyScreenProps {
   onBack: () => void;
 }
 
 const PartnerPrivacyScreen = ({ onBack }: PartnerPrivacyScreenProps) => {
+  const { t } = useTranslation();
   useScrollToTop();
   
   const { user, signOut } = useAuth();
@@ -32,13 +34,13 @@ const PartnerPrivacyScreen = ({ onBack }: PartnerPrivacyScreenProps) => {
 
   const handleToggle = (key: keyof typeof privacySettings) => {
     setPrivacySettings(prev => ({ ...prev, [key]: !prev[key] }));
-    toast({ title: 'Ayar yeniləndi' });
+    toast({ title: t("partnerprivacyscreen_ayar_yenilendi_f0f876", 'Ayar yeniləndi') });
   };
 
   const handleExportData = async () => {
     if (!user) return;
 
-    toast({ title: 'Məlumatlar hazırlanır...', description: 'Bu bir neçə saniyə çəkə bilər.' });
+    toast({ title: t("partnerprivacyscreen_melumatlar_hazirlanir_482381", 'Məlumatlar hazırlanır...'), description: t("partnerprivacyscreen_bu_bir_nece_saniye_ceke_biler_49b373", 'Bu bir neçə saniyə çəkə bilər.') });
     
     try {
       const { data: profile } = await supabase.from('profiles').select('*').eq('user_id', user.id).single();
@@ -62,9 +64,9 @@ const PartnerPrivacyScreen = ({ onBack }: PartnerPrivacyScreenProps) => {
       a.click();
       URL.revokeObjectURL(url);
 
-      toast({ title: 'Məlumatlar yükləndi!' });
+      toast({ title: t("partnerprivacyscreen_melumatlar_yuklendi_f04800", 'Məlumatlar yükləndi!') });
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: t("partnerprivacyscreen_xeta_3cdbb6", 'Xəta'), description: error.message, variant: 'destructive' });
     }
   };
 
@@ -80,9 +82,9 @@ const PartnerPrivacyScreen = ({ onBack }: PartnerPrivacyScreenProps) => {
       
       await signOut();
       
-      toast({ title: 'Hesab silindi', description: 'Məlumatlarınız birdəfəlik silindi.' });
+      toast({ title: 'Hesab silindi', description: t("partnerprivacyscreen_melumatlariniz_birdefelik_silindi_8f69e7", 'Məlumatlarınız birdəfəlik silindi.') });
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: t("partnerprivacyscreen_xeta_3cdbb6", 'Xəta'), description: error.message, variant: 'destructive' });
     } finally {
       setDeleting(false);
       setShowDeleteDialog(false);
@@ -92,20 +94,20 @@ const PartnerPrivacyScreen = ({ onBack }: PartnerPrivacyScreenProps) => {
   const privacyOptions = [
     {
       icon: Shield,
-      title: 'Analitik məlumat paylaş',
-      description: 'Anonim istifadə məlumatlarını paylaşın',
+      title: t("partnerprivacyscreen_analitik_melumat_paylas_7971ff", 'Analitik məlumat paylaş'),
+      description: t("partnerprivacyscreen_anonim_istifade_melumatlarini_paylasin_835e3a", 'Anonim istifadə məlumatlarını paylaşın'),
       key: 'shareAnalytics' as const,
     },
     {
       icon: Lock,
-      title: 'Məkan paylaşımı',
-      description: 'Həyat yoldaşınız məkanınızı görə bilər',
+      title: t("partnerprivacyscreen_mekan_paylasimi_bf6566", 'Məkan paylaşımı'),
+      description: t("partnerprivacyscreen_heyat_yoldasiniz_mekaninizi_gore_biler_0fb295", 'Həyat yoldaşınız məkanınızı görə bilər'),
       key: 'locationSharing' as const,
     },
     {
       icon: Shield,
-      title: 'Bildiriş səsləri',
-      description: 'Bildiriş gəldikdə səs çıxsın',
+      title: t("partnerprivacyscreen_bildiris_sesleri_fc9269", 'Bildiriş səsləri'),
+      description: t("partnerprivacyscreen_bildiris_geldikde_ses_cixsin_a3a866", 'Bildiriş gəldikdə səs çıxsın'),
       key: 'notificationSounds' as const,
     },
   ];

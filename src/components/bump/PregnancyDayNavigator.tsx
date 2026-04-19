@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Crown, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface PregnancyDayNavigatorProps {
   currentActualDay: number; // The real/current pregnancy day
@@ -18,6 +19,7 @@ const PregnancyDayNavigator = ({
   isPremium,
   maxDays = 280,
 }: PregnancyDayNavigatorProps) => {
+  const { t } = useTranslation();
   const FREE_RANGE = 3; // Free users can go ±3 days
 
   // Calculate navigation limits
@@ -136,7 +138,7 @@ const PregnancyDayNavigator = ({
             exit={{ scale: 0, opacity: 0 }}
             className="w-8 h-8 rounded-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 flex items-center justify-center ml-1"
             whileTap={{ scale: 0.9 }}
-            title="Bu günə qayıt"
+            title={t("pregnancydaynavigator_bu_gune_qayit_9c007f", "Bu günə qayıt")}
           >
             <RotateCcw className="w-4 h-4" />
           </motion.button>

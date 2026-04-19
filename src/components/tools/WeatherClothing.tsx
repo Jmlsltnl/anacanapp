@@ -14,6 +14,7 @@ import { useUserStore } from '@/store/userStore';
 import { differenceInMonths, differenceInDays } from 'date-fns';
 import { getPregnancyWeek } from '@/lib/pregnancy-utils';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface WeatherClothingProps {
   onBack: () => void;
@@ -41,6 +42,7 @@ interface WeatherAdvice {
 }
 
 const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
+  const { t } = useTranslation();
   useScreenAnalytics('WeatherClothing', 'Tools');
   const [isLoading, setIsLoading] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -134,7 +136,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
         : 'Hava məlumatı alınarkən xəta baş verdi.';
       setLocationError(errorMsg);
       toast({
-        title: 'Xəta',
+        title: t("weatherclothing_xeta_3cdbb6", 'Xəta'),
         description: errorMsg,
         variant: 'destructive'
       });

@@ -4,6 +4,7 @@ import { ArrowLeft, Bell, Check, Trash2, Calendar, Heart, Pill, Gift, MessageCir
 import { useNotifications } from '@/hooks/useNotifications';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface NotificationsScreenProps {
   onBack: () => void;
@@ -13,6 +14,7 @@ interface NotificationsScreenProps {
 type FilterType = 'all' | 'community' | 'system';
 
 const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScreenProps) => {
+  const { t } = useTranslation();
   useScrollToTop();
   useScreenAnalytics('Notifications', 'Notifications');
   const [filter, setFilter] = useState<FilterType>('all');
@@ -64,8 +66,8 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
   };
 
   const filters: { id: FilterType; label: string }[] = [
-    { id: 'all', label: 'Hamısı' },
-    { id: 'community', label: 'Cəmiyyət' },
+    { id: 'all', label: t("notificationsscreen_hamisi_c73c4d", 'Hamısı') },
+    { id: 'community', label: t("notificationsscreen_cemiyyet_2dc44d", 'Cəmiyyət') },
     { id: 'system', label: 'Sistem' },
   ];
 

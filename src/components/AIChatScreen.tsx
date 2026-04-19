@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAISuggestedQuestions } from '@/hooks/useDynamicTools';
 import { getPregnancyDay } from '@/lib/pregnancy-utils';
 import MarkdownContent from './MarkdownContent';
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface Message {
   id: string;
@@ -50,6 +51,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   
   // Get dynamic fruit data from unified source
   const getDynamicFruitName = () => {
+  const { t } = useTranslation();
     if (!pregnancyData || lifeStage !== 'bump') return null;
     
     const fruitData = getDynamicFruitData(
@@ -280,8 +282,8 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     } catch (error) {
       console.error('Chat error:', error);
       toast({
-        title: 'Xəta',
-        description: 'Mesaj göndərilə bilmədi. Yenidən cəhd edin.',
+        title: t("aichatscreen_xeta_3cdbb6", 'Xəta'),
+        description: t("aichatscreen_mesaj_gonderile_bilmedi_yeniden_cehd_edi_aa6662", 'Mesaj göndərilə bilmədi. Yenidən cəhd edin.'),
         variant: 'destructive'
       });
       
@@ -444,7 +446,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Anacan.AI-yə sualınızı yazın..."
+              placeholder={t("aichatscreen_anacan_ai_ye_sualinizi_yazin_927a37", "Anacan.AI-yə sualınızı yazın...")}
               className="min-h-[40px] max-h-[100px] pr-4 resize-none rounded-xl border-2 focus:border-primary/50 text-sm py-2"
               disabled={isLoading}
             />
