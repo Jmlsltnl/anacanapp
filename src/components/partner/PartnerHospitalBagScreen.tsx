@@ -37,6 +37,7 @@ interface PartnerHospitalBagScreenProps {
 }
 
 const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onBack }) => {
+  const { t } = useTranslation();
   const { 
     items, 
     loading, 

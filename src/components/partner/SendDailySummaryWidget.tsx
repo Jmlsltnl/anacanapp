@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from "@/hooks/useTranslation";
 
 const SendDailySummaryWidget: React.FC = () => {
+  const { t } = useTranslation();
   const { profile } = useAuth();
   const { generateAndSendSummary, todaySummary, updateSummarySilently } = useDailySummary();
   const { toast } = useToast();

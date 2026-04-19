@@ -53,6 +53,7 @@ interface WhiteNoiseProps {
 }
 
 const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoiseComponent({ onBack }, ref) {
+  const { t } = useTranslation();
   useScrollToTop();
   useScreenAnalytics('WhiteNoise', 'Tools');
   

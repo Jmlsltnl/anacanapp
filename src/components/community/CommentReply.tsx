@@ -42,6 +42,7 @@ const UserBadge = ({ type }: { type: 'admin' | 'premium' | 'moderator' | null })
 };
 
 const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, onUserClick, level = 0 }: CommentReplyProps) => {
+  const { t } = useTranslation();
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [showReplies, setShowReplies] = useState(level === 0);
   const [replyText, setReplyText] = useState('');

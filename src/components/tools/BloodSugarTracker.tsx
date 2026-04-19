@@ -65,6 +65,7 @@ const getReadingStatus = (value: number, type: string) => {
 };
 
 const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
+  const { t } = useTranslation();
   useScrollToTop();
   useScreenAnalytics('BloodSugarTracker', 'Tools');
   

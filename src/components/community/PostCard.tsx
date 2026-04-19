@@ -53,6 +53,7 @@ const UserBadge = ({ type }: { type: 'admin' | 'premium' | 'moderator' | null })
 };
 
 const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
+  const { t } = useTranslation();
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [showReportDialog, setShowReportDialog] = useState(false);
