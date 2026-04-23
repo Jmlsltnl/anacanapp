@@ -61,8 +61,8 @@ export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremi
 
         {/* Free trial highlight */}
         <div className="flex justify-center -mt-3 relative z-10">
-          <div className="px-5 py-1.5 bg-green-500 rounded-full shadow-lg">
-            <span className="text-xs font-bold text-white">🎁 İLK 3 GÜN TAMAMILƏ PULSUZ</span>
+          <div className="px-5 py-1.5 bg-white dark:bg-card rounded-full shadow-lg border border-border/50">
+            <span className="text-xs font-bold text-foreground">🎁 İLK 3 GÜN TAMAMILƏ PULSUZ</span>
           </div>
         </div>
 
