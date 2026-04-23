@@ -419,6 +419,7 @@ const Index = () => {
   }
 
   // Reverse Trial Funnel - only dev/web, not partner, not native
+  // hasCompletedFunnel defaults to true; set to false only during onboarding completion
   if (!hasCompletedFunnel && !isNative && role !== 'partner') {
     const ReverseTrialFunnel = lazy(() => import('@/components/funnel/ReverseTrialFunnel'));
     return (
