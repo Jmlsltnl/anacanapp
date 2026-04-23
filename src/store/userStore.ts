@@ -8,6 +8,7 @@ interface UserState {
   isAuthenticated: boolean;
   isOnboarded: boolean;
   hasSeenIntro: boolean;
+  hasCompletedFunnel: boolean;
   userId: string | null;
   email: string | null;
   name: string | null;
