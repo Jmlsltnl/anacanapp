@@ -9,6 +9,7 @@ import BottomNav from '@/components/BottomNav';
 import AppRatingPrompt from '@/components/AppRatingPrompt';
 import FloatingTimerWidget from '@/components/FloatingTimerWidget';
 import { useUserStore } from '@/store/userStore';
+import { isNative } from '@/lib/native';
 import { useAuth } from '@/hooks/useAuth';
 import { useDeviceToken } from '@/hooks/useDeviceToken';
 import { useForceUpdate } from '@/hooks/useForceUpdate';
@@ -81,7 +82,7 @@ const Index = () => {
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [toolOpenedFromDashboard, setToolOpenedFromDashboard] = useState(false);
   const [toolsResetKey, setToolsResetKey] = useState(0);
-  const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, lifeStage } = useUserStore();
+  const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, lifeStage, hasCompletedFunnel, setFunnelCompleted } = useUserStore();
   const { isAdmin, loading, profile } = useAuth();
   const { forceUpdate, isLoading: forceUpdateLoading } = useForceUpdate();
 
@@ -415,6 +416,16 @@ const Index = () => {
   // Onboarding - Partners skip onboarding (they don't need phase selection)
   if (!isOnboarded && role !== 'partner') {
     return <OnboardingScreen />;
+  }
+
+  // Reverse Trial Funnel - only dev/web, not partner, not native
+  if (!hasCompletedFunnel && !isNative && role !== 'partner') {
+    const ReverseTrialFunnel = lazy(() => import('@/components/funnel/ReverseTrialFunnel'));
+    return (
+      <Suspense fallback={suspenseFallback}>
+        <ReverseTrialFunnel onComplete={() => setFunnelCompleted(true)} />
+      </Suspense>
+    );
   }
 
   // Admin Panel
