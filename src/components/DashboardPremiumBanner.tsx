@@ -24,9 +24,10 @@ const SAVINGS_PCT = Math.round((1 - YEARLY_MONTHLY / MONTHLY_PRICE) * 100);
 export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremiumBannerProps) {
   const { isPremium } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<'yearly' | 'monthly'>('yearly');
+  const shouldHideBanner = isPremium && !import.meta.env.DEV;
 
-  // Don't show to premium users
-  if (isPremium) return null;
+  // Keep visible in dev so the paywall can be tested even on premium/dev accounts.
+  if (shouldHideBanner) return null;
 
   return (
     <motion.div
