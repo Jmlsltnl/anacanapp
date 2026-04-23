@@ -32,7 +32,7 @@ const OnboardingScreen = () => {
   const [periodLength, setPeriodLength] = useState(5);
   const [isSaving, setIsSaving] = useState(false);
   
-  const { setLifeStage, setLastPeriodDate, setBabyData, setOnboarded, setDueDate, setMultiplesData, setCycleLength: setStoreCycleLength, setPeriodLength: setStorePeriodLength } = useUserStore();
+  const { setLifeStage, setLastPeriodDate, setBabyData, setOnboarded, setDueDate, setMultiplesData, setCycleLength: setStoreCycleLength, setPeriodLength: setStorePeriodLength, setFunnelCompleted } = useUserStore();
   const { updateProfile } = useAuth();
   const { toast } = useToast();
   const { autoJoin } = useAutoJoinGroups();
@@ -152,6 +152,7 @@ const OnboardingScreen = () => {
             setBabyData(new Date(dateInput), babyName, babyGender, babyCount, multiplesType);
             setMultiplesData(babyCount, multiplesType);
             setLifeStage(selectedStage);
+            setFunnelCompleted(false);
             setOnboarded(true);
 
             // Auto-join relevant community groups
@@ -192,6 +193,7 @@ const OnboardingScreen = () => {
             setDueDate(dueDate);
             setMultiplesData(babyCount, multiplesType);
             setLifeStage(selectedStage);
+            setFunnelCompleted(false);
             setOnboarded(true);
 
             // Auto-join relevant community groups
@@ -227,6 +229,7 @@ const OnboardingScreen = () => {
             setStoreCycleLength(cycleLength);
             setStorePeriodLength(periodLength);
             setLifeStage(selectedStage!);
+            setFunnelCompleted(false);
             setOnboarded(true);
 
             // Auto-join general groups
