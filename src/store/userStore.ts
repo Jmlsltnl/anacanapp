@@ -41,6 +41,7 @@ interface UserState {
   setAuth: (isAuth: boolean, userId?: string, email?: string, name?: string) => void;
   setOnboarded: (isOnboarded: boolean) => void;
   setHasSeenIntro: (hasSeen: boolean) => void;
+  setFunnelCompleted: (v: boolean) => void;
   setLifeStage: (stage: LifeStage) => void;
   setRole: (role: UserRole) => void;
   setLastPeriodDate: (date: Date) => void;
@@ -76,6 +77,7 @@ export const useUserStore = create<UserState>()(
       isAuthenticated: false,
       isOnboarded: false,
       hasSeenIntro: false,
+      hasCompletedFunnel: false,
       userId: null,
       email: null,
       name: null,
@@ -110,6 +112,7 @@ export const useUserStore = create<UserState>()(
       setOnboarded: (isOnboarded) => set({ isOnboarded }),
 
       setHasSeenIntro: (hasSeen) => set({ hasSeenIntro: hasSeen }),
+      setFunnelCompleted: (v) => set({ hasCompletedFunnel: v }),
 
       setLifeStage: (stage) => set({ lifeStage: stage }),
 
@@ -144,6 +147,7 @@ export const useUserStore = create<UserState>()(
       logout: () => set({
         isAuthenticated: false,
         isOnboarded: false,
+        hasCompletedFunnel: false,
         userId: null,
         email: null,
         name: null,
@@ -260,6 +264,7 @@ export const useUserStore = create<UserState>()(
         isAuthenticated: state.isAuthenticated,
         isOnboarded: state.isOnboarded,
         hasSeenIntro: state.hasSeenIntro,
+        hasCompletedFunnel: state.hasCompletedFunnel,
         userId: state.userId,
         email: state.email,
         name: state.name,
