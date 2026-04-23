@@ -419,7 +419,9 @@ const Index = () => {
   }
 
   // Reverse Trial Funnel - only dev/web, not partner, not native
-  if (!hasCompletedFunnel && !isNative && role !== 'partner') {
+  // Auto-migrate: if hasCompletedFunnel is undefined (existing users before funnel was added), skip funnel
+  const shouldShowFunnel = hasCompletedFunnel === false && !isNative && role !== 'partner';
+  if (shouldShowFunnel) {
     const ReverseTrialFunnel = lazy(() => import('@/components/funnel/ReverseTrialFunnel'));
     return (
       <Suspense fallback={suspenseFallback}>
