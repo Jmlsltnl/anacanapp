@@ -51,6 +51,7 @@ import SendDailySummaryWidget from '@/components/partner/SendDailySummaryWidget'
 import RecentBlogPosts from '@/components/dashboard/RecentBlogPosts';
 import FlowDashboard from '@/components/flow/FlowDashboard';
 import BirthOnboardingModal from '@/components/BirthOnboardingModal';
+import DashboardPremiumBanner from '@/components/DashboardPremiumBanner';
 import PregnancyDayNavigator from '@/components/bump/PregnancyDayNavigator';
 
 // Fetus images by month
@@ -1928,6 +1929,9 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
 
       {/* Recent Blog Posts - filtered by life stage (partner uses bump stage content) */}
       {onNavigate && <RecentBlogPosts onNavigate={onNavigate} lifeStage={lifeStage === 'partner' ? 'bump' : lifeStage} />}
+
+      {/* Dashboard Premium Paywall Banner */}
+      <DashboardPremiumBanner />
 
       {/* Bottom Banner Slot */}
       <BannerSlot placement="home_bottom" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mt-4" />
