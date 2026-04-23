@@ -77,7 +77,7 @@ export const useUserStore = create<UserState>()(
       isAuthenticated: false,
       isOnboarded: false,
       hasSeenIntro: false,
-      hasCompletedFunnel: false,
+      hasCompletedFunnel: true, // Default true so existing users skip; set to false during onboarding
       userId: null,
       email: null,
       name: null,
