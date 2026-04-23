@@ -9,10 +9,13 @@ interface DashboardPremiumBannerProps {
 }
 
 const BENEFITS = [
-  { icon: '🤖', text: 'Limitsiz AI Bələdçi' },
-  { icon: '🎵', text: 'Yuxu Səsləri & Meditasiya' },
-  { icon: '📊', text: 'Fərdi Həftəlik Hesabat' },
+  { icon: '🤖', text: 'AI Bələdçi' },
+  { icon: '🎵', text: 'Yuxu Səsləri' },
   { icon: '📸', text: 'AI Fotosessiya' },
+  { icon: '📊', text: 'Həftəlik Hesabat' },
+  { icon: '💊', text: 'Vitamin İzləyici' },
+  { icon: '🍽️', text: 'Qidalanma Planı' },
+  { icon: '📖', text: 'Nağıl Generatoru' },
   { icon: '🚫', text: 'Reklamsız Təcrübə' },
 ];
 
@@ -69,7 +72,7 @@ export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremi
         {/* Content */}
         <div className="px-5 pt-5 pb-5">
           {/* Benefits grid */}
-          <div className="grid grid-cols-2 gap-2 mb-5">
+          <div className="grid grid-cols-2 gap-1.5 mb-4">
             {BENEFITS.map((b, i) => (
               <motion.div
                 key={b.text}
@@ -78,8 +81,8 @@ export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremi
                 transition={{ delay: 0.4 + i * 0.08 }}
                 className="flex items-center gap-2 py-1.5"
               >
-                <span className="text-base">{b.icon}</span>
-                <span className="text-xs font-medium text-foreground">{b.text}</span>
+                <span className="text-sm">{b.icon}</span>
+                <span className="text-[11px] font-medium text-foreground">{b.text}</span>
               </motion.div>
             ))}
           </div>
