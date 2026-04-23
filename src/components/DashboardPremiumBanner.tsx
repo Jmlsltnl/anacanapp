@@ -9,7 +9,7 @@ interface DashboardPremiumBannerProps {
 }
 
 const BENEFITS = [
-  { icon: '🤖', text: 'Limitsiz AI Asistan' },
+  { icon: '🤖', text: 'Limitsiz AI Bələdçi' },
   { icon: '🎵', text: 'Yuxu Səsləri & Meditasiya' },
   { icon: '📊', text: 'Fərdi Həftəlik Hesabat' },
   { icon: '📸', text: 'AI Fotosessiya' },
@@ -55,7 +55,7 @@ export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremi
               <Crown className="w-5 h-5 text-white" />
               <span className="text-lg font-bold text-white">Anacan Premium</span>
             </div>
-            <p className="text-xs text-white/80">Tam imkanlar · Sınırsız giriş</p>
+            <p className="text-xs text-white/80">Tam imkanlar · Limitsiz giriş</p>
           </div>
         </div>
 
@@ -139,7 +139,7 @@ export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremi
             {[1,2,3,4,5].map(i => (
               <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
             ))}
-            <span className="text-[10px] text-muted-foreground ml-1">10,000+ ana tərəfindən seçildi</span>
+            <span className="text-[10px] text-muted-foreground ml-1">1,000+ qadın tərəfindən seçildi</span>
           </div>
         </div>
       </div>
