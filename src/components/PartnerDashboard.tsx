@@ -341,8 +341,8 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
               exit={{ opacity: 0, y: -20 }}
               className="space-y-5"
             >
-              {/* Live Activity */}
-              <LiveActivityCard />
+              {/* Live Activity — yalnız hamiləlik mərhələsi üçün */}
+              {lifeStage === 'bump' && <LiveActivityCard />}
 
               {/* New Messages Banner */}
               {getUnreadCount() > 0 && (
@@ -428,7 +428,7 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
                   <QuickAction 
                     icon={MessageCircle} 
                     label="Canlı chat" 
-                    gradient="bg-gradient-to-br from-partner to-indigo-600"
+                    gradient="bg-gradient-to-br from-partner to-partner-dark"
                     onClick={() => setShowChat(true)}
                   />
                   <QuickAction 
