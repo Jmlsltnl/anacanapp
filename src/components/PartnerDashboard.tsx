@@ -63,7 +63,7 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
   const { name } = useUserStore();
   const { toast } = useToast();
   const { profile } = useAuth();
-  const { partnerProfile, partnerDailyLog, loading: partnerLoading, getPregnancyWeek, getDaysUntilDue, getBabyAgeDays } = usePartnerData();
+  const { partnerProfile, partnerDailyLog, loading: partnerLoading, getPregnancyWeek, getDaysUntilDue, getBabyAgeDays, getCyclePhaseInfo, getDaysUntilNextPeriod } = usePartnerData();
   const { items: shoppingItems, addItem, toggleItem, loading: shoppingLoading } = useShoppingItems();
   const { messages, markAsRead, getUnreadCount } = usePartnerMessages();
   const { level, totalPoints } = usePartnerMissions();
@@ -208,26 +208,29 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
     );
   }
 
-  // No partner linked state
+  // No partner linked state — branded empty state
   if (!partnerProfile) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-partner/20 to-background flex flex-col items-center justify-center p-8 text-center">
+      <div className="min-h-screen bg-gradient-to-b from-partner/15 via-orange-50/40 to-background flex flex-col items-center justify-center p-8 text-center">
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          className="w-24 h-24 rounded-full bg-partner/20 flex items-center justify-center mb-6"
+          transition={{ type: 'spring', stiffness: 200 }}
+          className="w-28 h-28 rounded-full bg-gradient-to-br from-partner to-partner-dark flex items-center justify-center mb-6 shadow-2xl shadow-partner/30"
         >
-          <Heart className="w-12 h-12 text-partner" />
+          <Heart className="w-14 h-14 text-white fill-white/30" />
         </motion.div>
-        <h1 className="text-2xl font-black mb-2">Partner Bağlantısı Yoxdur</h1>
-        <p className="text-muted-foreground mb-6">
-          Həyat yoldaşınızın partner kodunu daxil edərək qeydiyyatdan keçin
+        <h1 className="text-2xl font-black mb-2">Hələ bağlanmamısınız</h1>
+        <p className="text-muted-foreground mb-6 max-w-sm">
+          Həyat yoldaşınızın Anacan tətbiqindəki partnyor kodunu daxil edib bağlanın — bütün məlumatlar real vaxtda sinxronlaşacaq.
         </p>
-        <div className="bg-card rounded-2xl p-6 shadow-lg border border-border/50">
-          <p className="text-sm text-muted-foreground mb-2">Qeydiyyat zamanı partner kodunu daxil etdiniz?</p>
-          <p className="text-xs text-muted-foreground">
-            Bağlantı yaradılması üçün bir neçə saniyə gözləyin və səhifəni yeniləyin.
-          </p>
+        <div className="bg-card rounded-2xl p-6 shadow-lg border border-border/50 max-w-sm">
+          <p className="text-sm font-medium mb-2">📲 Necə bağlanmalı?</p>
+          <ol className="text-xs text-muted-foreground text-left space-y-1.5 list-decimal list-inside">
+            <li>Həyat yoldaşınızdan onun profilindəki partnyor kodunu istəyin</li>
+            <li>Profil bölməsinə keçərək kodu daxil edin</li>
+            <li>Bir neçə saniyə içində bağlantı yaranacaq</li>
+          </ol>
         </div>
       </div>
     );
@@ -243,7 +246,7 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
       />
 
       {/* Hero Header */}
-      <div className="bg-gradient-to-br from-partner via-indigo-600 to-violet-700 px-4 pt-3 pb-16 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-partner via-[#FF9A6C] to-[#FFB088] px-4 pt-3 pb-16 relative overflow-hidden">
         {/* Decorative elements */}
         <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-white/10 blur-3xl" />
         <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-pink-500/20 blur-3xl" />
@@ -284,6 +287,10 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
             currentWeek={currentWeek}
             daysUntilDue={daysUntilDue}
             babyAgeDays={babyAgeDays}
+            babyName={partnerProfile?.baby_name}
+            babyGender={partnerProfile?.baby_gender}
+            cyclePhase={getCyclePhaseInfo()}
+            daysUntilNextPeriod={getDaysUntilNextPeriod()}
             weekData={weekData}
             onSendLove={sendLove}
             onOpenNotifications={() => setActiveTab('notifications')}
