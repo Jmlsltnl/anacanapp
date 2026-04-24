@@ -1,168 +1,76 @@
 
+# P1 — Partnyor Modulu: Kritik Düzəlişlər
 
-## Reverse Trial Funnel — Yenilənmiş Plan
-
-Onboarding bitdikdən sonra, Dashboard-dan əvvəl göstəriləcək psixoloji əsaslı satış qıfı. Yalnız dev/web-də aktiv (native-də skip). Partnyor xaric hər üç mərhələ (flow, bump, mommy) üçün fərdi məzmun.
-
----
-
-### Əsas Prinsip: Bildiyimizi Soruşmuruq
-
-Store-da artıq olan məlumatlar (hamiləlik həftəsi, tsikl uzunluğu, körpə yaşı, ad, cins) **birbaşa əks olunur** — sual kimi soruşulmur. Quiz yalnız **emosional/psixoloji** suallardan ibarətdir.
+Bu mərhələdə yalnız **dağıdıcı / istifadəçinin gözünə çarpan** problemləri həll edirik. Refaktor və yeni funksiyalar (P2/P3) sonrakı mərhələlərə saxlanılır.
 
 ---
 
-### Axın (9 addım)
+## 1. Mərhələ-spesifik Hero Card (ən vacib)
 
-**Mərhələ 1: Emosional Bağ (Quiz)**
+**Problem:** Hazırda `PartnerHeroCard` yalnız `bump` üçün düzgün məlumat göstərir. `mommy` mərhələsində qadın üçün "X həftəlik hamilə" və ya boş meyvə kartı görünə bilər; `flow` mərhələsi isə tamamilə nəzərə alınmır.
 
-3-4 psixoloji sual, hər biri `lifeStage`-ə uyğun:
+**Həll:**
+- `PartnerHeroCard.tsx` daxilində `lifeStage`-ə görə üç ayrı görünüş bloku:
+  - **bump** → mövcud həftə + meyvə + due date geri sayım (qalır)
+  - **mommy** → körpə adı, yaşı (ay/gün — `getRealCalendarAge`), körpə cinsiyyət emoji-si, "Bu gün anaya necə dəstək olum?" CTA
+  - **flow** → tsikl günü / faza (menstruasiya/follikulyar/ovulyasiya/luteal), növbəti menstruasiyaya neçə gün, dəstək tövsiyəsi
+- `PartnerDashboard.tsx`-də `babyAgeDays` artıq hesablanır — sadəcə hero-ya ötürürük; tsikl günü üçün `usePartnerData`-ya `getCycleDay()` köməkçisi əlavə edilir (mövcud `pregnancy-utils` məntiqindən istifadə edərək).
 
-**bump:**
-- "Hamiləliyiniz haqqında ən çox nə narahat edir?" → Doğuş qorxusu / Körpənin sağlamlığı / Bədən dəyişiklikləri / Maddi məsələlər
-- "Gecələr yuxunuz necədir?" → Rahat yatıram / Tez-tez oyanıram / Demək olar yata bilmirəm
-- "Ətrafınızdan kifayət qədər dəstək alırsınız?" → Bəli, çox / Qismən / Demək olar heç
-- "Gündəlik stres səviyyəniz necədir?" → Aşağı / Orta / Yüksək / Çox yüksək
+## 2. Mərhələyə uyğun olmayan widget-lərin gizlədilməsi
 
-**mommy:**
-- "Analıqda ən çox hansı mövzu sizi yorur?" → Yuxusuzluq / Tənhalıq hissi / Körpənin qidalanması / Öz vaxtımın olmaması
-- "Doğuşdan sonra özünüzü emosional olaraq necə hiss edirsiniz?" → Güclü və xoşbəxt / Bəzən çətin / Çox çətin günlərim olur
-- "Körpənizin inkişafı haqqında narahatlıqlarınız var?" → Xeyr, hər şey yaxşıdır / Bəzi suallarım var / Ciddi narahatlıqlarım var
+**Problem:** "Xəstəxana çantası" (`PartnerHospitalBagScreen`), hamiləliyə aid `LiveActivityCard`, və "Doğuşa hazırlıq" tipli kartlar `mommy` istifadəçisinin partnyoruna da göstərilir — mənasızdır.
 
-**flow:**
-- "Menstruasiya dövründə ən çox nə sizi narahat edir?" → Fiziki ağrılar / Əhval dəyişiklikləri / Qeyri-müntəzəmlik / Heç biri
-- "Reproduktiv sağlamlığınızla bağlı məlumatlılıq səviyyəniz?" → Çox bilirəm / Orta / Az bilirəm
-- "Tsiklinizi düzgün izləmək sizin üçün nə qədər vacibdir?" → Çox vacib / Orta / O qədər də yox
+**Həll:** `PartnerDashboard.tsx` daxilində `home` tab render-ində `lifeStage`-ə əsasən şərti göstərilmə:
+- `bump` → Xəstəxana çantası, həftəlik inkişaf, doğuşa hazırlıq
+- `mommy` → Körpə günlük xülasəsi (yuxu/qidalanma sayı), bez xatırlatması, "Ana üçün istirahət təklifi"
+- `flow` → Tsikl xülasəsi, simptomlar əsaslı dəstək tövsiyələri
 
----
+## 3. Brend rəngi uyğunlaşdırması (bənövşəyi → Coral Orange)
 
-**Mərhələ 2: Analiz Animasiyası (3-4 saniyə)**
+**Problem:** `from-partner` (bənövşəyi-mavi gradient) tətbiqin əsas brendi olan **Coral Orange (#F28155)** ilə ziddiyyət təşkil edir.
 
-Fake loading: "Məlumatlarınız analiz edilir..." ilə fırlanan animasiya. Store-dan gələn real data (ad, həftə/yaş) birbaşa göstərilir:
-- bump: "{Ad}, {X}-ci həftə, {trimester}-ci trimester"
-- mommy: "{Ad}, {körpə adı} — {X} aylıq"  
-- flow: "{Ad}, tsikl: {X} gün"
+**Həll:** Partnyor səhifələrindəki gradient-ləri brend rənginə uyğun isti palitra ilə əvəz edirik:
+- Hero arxa fon: `from-[#F28155] via-[#FF9A6C] to-[#FFB088]` (Coral Orange + soft peach)
+- Aksent: müvafiq olaraq `text-orange-50`, `border-white/20` saxlanılır
+- Tab bar aktiv vəziyyəti: `from-partner` → `from-[#F28155] to-[#FF9A6C]`
+- `PartnerMissionsCard`, `PartnerQuickStats`, `SyncedFeaturesGrid` faylları da yenilənir
 
-CSS keyframe animasiyası: progress 0% → 30% → 80% → 100%, sonra avtomatik keçid.
+> Qeyd: `from-partner` Tailwind dəyişənini saxlayırıq, sadəcə `tailwind.config.ts`-də onu Coral Orange tonuna yenidən təyin edirik — bu, bütün partnyor UI-ı bir dəfəyə yeniləyir və regressiya riskini azaldır.
 
----
+## 4. Realtime subscription performans düzəlişi
 
-**Mərhələ 3: Fərdi Nəticələr (Diaqnoz)**
+**Problem:** `usePartnerData.ts` daxilindəki realtime kanal `daily_logs` cədvəlinin **bütün** dəyişikliklərini dinləyir — başqa istifadəçilərin loqları da partnyorun fetch-ini tetikləyir (lazımsız trafik və yanlış re-render).
 
-Quiz cavablarına əsasən **real statistika ilə diaqnoz**:
-
-Nümunə (bump, "Yuxusuzluq" + "Yüksək stres" seçilib):
-> "{Ad}, {X}-ci həftədə olan hamilə qadınların 78%-i yuxu problemləri yaşayır. Stress səviyyəniz yüksəkdir — bu, 3-cü trimestrdə çox yayılmış haldır. Siz tək deyilsiniz."
-
-Hər simptom/cavab kombinasiyası üçün əvvəlcədən hazırlanmış 2-3 cümlə. Barnum effekti ilə empati yaradır.
-
----
-
-**Mərhələ 4: Tətbiq Necə Kömək Edir**
-
-Quiz-dən gələn "ağrı nöqtələri"nə 1:1 həll mapping-i. Hər həll real app funksiyasıdır:
-
-| Ağrı nöqtəsi | Premium Həll | tool_id |
-|---|---|---|
-| Yuxusuzluq | Yuxu Səsləri + Ağ Küy | white-noise |
-| Stres/Narahatlıq | 24/7 Anacan.AI Asistan | ai-chat |
-| Bədən dəyişiklikləri | Çəki İzləyicisi | weight-tracker |
-| Doğuş qorxusu | Xəstəxana Çantası + Həkim Hesabatı | hospital-bag |
-| Qidalanma | Vitamin İzləyicisi + Qidalanma | vitamin-tracker |
-| Körpə inkişafı | İnkişaf İzləyicisi | baby-growth |
-| Tənhalıq | Ana Cəmiyyəti + Partnyor Bağlantısı | community |
-| Əhval dəyişikliyi | Əhval Gündəliyi + Mental Sağlamlıq | mood-diary |
-| Qeyri-müntəzəm tsikl | Period Təqvimi + Tsikl Analizi | flow-calendar |
-
-Hər kart: emoji + gradient + 1 cümlə izah. `is_premium` olan funksiyalar Crown icon ilə işarələnir.
-
----
-
-**Mərhələ 5: Rəylər (Sosial Sübut)**
-
-`lifeStage`-ə uyğun hardcoded rəylər (3 ədəd, karusel):
-
-bump: "27 həftədə başladım, Anacan sayəsində hamiləliyimi stressiz keçirdim" — Günel, 32 həftə ★★★★★
-mommy: "Körpəmin yuxu cədvəlini izləmək həyatımı dəyişdi" — Aytən, 4 aylıq ana ★★★★★
-flow: "Tsiklimi izləməyə başlayandan bəri bədənimi daha yaxşı tanıyıram" — Ləman ★★★★★
-
----
-
-**Mərhələ 6: Funksiyalar Vitrin**
-
-Tətbiqin 4 unikal xüsusiyyəti, phone-frame mockup stilində:
-1. AI Fotosessiya — körpənizin professional fotolarını yaradın
-2. Partnyor Hesabı — həyat yoldaşınızı bağlayın, birlikdə izləyin
-3. 24/7 AI Asistan — istənilən sualınıza cavab
-4. Həftəlik İnkişaf — körpənizin/hamiləliyin həftəlik hesabatı
-
-Hər biri gradient kart + böyük emoji + 1 cümlə. Swipe karusel.
-
----
-
-**Mərhələ 7: Fərdi Plan**
-
-Store-dan ad + lifeStage data istifadə edərək vizual roadmap:
-
-> "{Ad}, sizin üçün hazırladığımız plan:"
-
-SVG/CSS xətt qrafiki: Sol (indi — stressli) → Sağ (6 ay sonra — rahat). 3 milestone nöqtəsi:
-- Həftə 1: "Tsikl/hamiləlik izləməyə başla"
-- Ay 1: "Stres səviyyəsini azalt"
-- Ay 3: "Tam nəzarətdə ol"
-
-Böyük CTA: "Planımı Əldə Et"
-
----
-
-**Mərhələ 8: Paywall**
-
-Mövcud `PremiumModal` məntiqini yenidən istifadə edir (`usePremiumConfig` + `usePaywallConfig`):
-- İllik plan xüsusi çərçivədə ("Ən sərfəli")
-- Aylıq plan standart
-- "İstədiyin an ləğv et" zəmanət yazısı
-- "3 gün pulsuz sına" (əgər `free_trial_enabled`)
-- X düyməsinə basıldıqda → Mərhələ 9
-
----
-
-**Mərhələ 9: Exit-Intent (Endirimli Paywall)**
-
-Paywall-dan çıxmağa cəhd edəndə popup:
-> "Gözləyin! Yalnız bu gün üçün — ilk 3 gün tamamilə pulsuz!"
-
-FOMO elementi: "Bu təklif yalnız 1 dəfə göstərilir"
-İki düymə:
-- "Pulsuz Başla" → purchase flow
-- "Xeyr, davam et" → `setFunnelCompleted(true)`, Dashboard-a keçid
-
----
-
-### Texniki Detallar
-
-**Yeni fayllar:**
-- `src/components/funnel/ReverseTrialFunnel.tsx` — 9 addımlı wrapper, AnimatePresence
-- `src/components/funnel/steps/QuizStep.tsx`
-- `src/components/funnel/steps/AnalysisStep.tsx`
-- `src/components/funnel/steps/ResultsStep.tsx`
-- `src/components/funnel/steps/HowAppHelpsStep.tsx`
-- `src/components/funnel/steps/ReviewsStep.tsx`
-- `src/components/funnel/steps/FeaturesStep.tsx`
-- `src/components/funnel/steps/CustomPlanStep.tsx`
-- `src/components/funnel/steps/PaywallStep.tsx`
-- `src/components/funnel/steps/DiscountedPaywallStep.tsx`
-- `src/components/funnel/funnelData.ts` — quiz sualları, simptom→feature mapping, rəylər
-
-**Store dəyişikliyi (`userStore.ts`):**
-- `hasCompletedFunnel: boolean` (persist)
-- `setFunnelCompleted(v: boolean)`
-
-**Routing (`Index.tsx`):**
-```text
-if (isOnboarded && !hasCompletedFunnel && !isNative && role !== 'partner') {
-  return <ReverseTrialFunnel onComplete={() => setFunnelCompleted(true)} />;
-}
+**Həll:** Subscription-a server-side filter əlavə edirik:
+```ts
+{ event: '*', schema: 'public', table: 'daily_logs', filter: `user_id=eq.${partnerData.user_id}` }
 ```
+Eyni şəkildə `usePartnerStats.ts`-də `partner_messages` və `partner_missions` üçün də `sender_id`/`user_id` filtri əlavə olunur.
 
-**Dizayn:** Coral Orange (#F28155), Warm Beige (#FAF7F4), framer-motion keçidləri, progress bar, safe-area padding, max-w-md mx-auto, mobile-first.
+## 5. Boş vəziyyət (partnyor bağlı deyil)
 
+**Problem:** `linked_partner_id` yoxdursa, dashboard "Həyat yoldaşın" + boş data ilə qarışıq görünür.
+
+**Həll:** Əgər `profile.linked_partner_id` yoxdursa, yalnız bağlama təlimatı (mövcud partnyor kodu paylaşma axını ilə) və brend-uyğun boş vəziyyət kartı göstərilir; digər widget-lər tamamilə gizlədilir.
+
+---
+
+## Toxunulacaq fayllar
+
+1. `src/components/partner/PartnerHeroCard.tsx` — mərhələ-spesifik render
+2. `src/components/PartnerDashboard.tsx` — şərti widget göstərmə + boş vəziyyət
+3. `src/hooks/usePartnerData.ts` — realtime filter + `getCycleDay()` köməkçisi
+4. `src/hooks/usePartnerStats.ts` — realtime filter
+5. `tailwind.config.ts` — `partner` rəngini Coral Orange-a uyğunlaşdırma
+
+---
+
+## Bu planda **OLMAYAN** (sonraya saxlanılır)
+
+- ❌ `PartnerDashboard.tsx`-in 580 sətirdən modullara bölünməsi (P2)
+- ❌ Onboarding tour (P2)
+- ❌ AI Bələdçi partnyor üçün (P3)
+- ❌ Xatirələr / Memories timeline (P3)
+- ❌ Points/Levels üçün vahid hook (P2)
+
+Təsdiq verirsinizsə, default rejimə keçərək bu 5 faylı tətbiq edim.
