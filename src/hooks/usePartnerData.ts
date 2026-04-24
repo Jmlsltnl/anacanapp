@@ -167,5 +167,7 @@ export const usePartnerData = () => {
     getPregnancyWeek: getPartnerPregnancyWeek,
     getDaysUntilDue: getPartnerDaysUntilDue,
     getBabyAgeDays,
+    getCyclePhaseInfo,
+    getDaysUntilNextPeriod,
   };
 };
