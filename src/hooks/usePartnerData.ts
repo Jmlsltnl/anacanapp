@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { getPregnancyWeek, getDaysUntilDue as calcDaysUntilDue, getDaysElapsed, getRealCalendarAge } from '@/lib/pregnancy-utils';
+import { getPhaseInfoForDate, type CyclePhaseInfo } from '@/lib/cycle-utils';
 
 export interface PartnerWomanData {
   id: string;
