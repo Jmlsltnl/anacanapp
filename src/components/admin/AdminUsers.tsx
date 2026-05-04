@@ -52,6 +52,11 @@ const AdminUsers = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [roleDialogOpen, setRoleDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<'admin' | 'moderator' | 'user'>('user');
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
