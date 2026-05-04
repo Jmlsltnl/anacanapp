@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, MoreVertical, Shield, User, Trash2, Edit, Crown } from 'lucide-react';
+import { Search, Filter, MoreVertical, Shield, User, Trash2, Edit, Crown, KeyRound, Eye, EyeOff } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -52,6 +52,11 @@ const AdminUsers = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [roleDialogOpen, setRoleDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<'admin' | 'moderator' | 'user'>('user');
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -164,6 +169,35 @@ const AdminUsers = () => {
         description: 'Rol təyin edilə bilmədi',
         variant: 'destructive'
       });
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!selectedUser) return;
+    if (newPassword.length < 8) {
+      toast({ title: 'Xəta', description: 'Şifrə ən azı 8 simvol olmalıdır', variant: 'destructive' });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ title: 'Xəta', description: 'Şifrələr uyğun gəlmir', variant: 'destructive' });
+      return;
+    }
+    setChangingPassword(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-change-user-password', {
+        body: { user_id: selectedUser.user_id, new_password: newPassword },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      toast({ title: 'Uğurlu', description: `${selectedUser.name} üçün şifrə yeniləndi` });
+      setPasswordDialogOpen(false);
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      console.error('Error changing password:', err);
+      toast({ title: 'Xəta', description: err?.message || 'Şifrə yenilənə bilmədi', variant: 'destructive' });
+    } finally {
+      setChangingPassword(false);
     }
   };
 
@@ -340,6 +374,15 @@ const AdminUsers = () => {
                               <Shield className="w-4 h-4 mr-2" />
                               Rol təyin et
                             </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                              setSelectedUser(user);
+                              setNewPassword('');
+                              setConfirmPassword('');
+                              setPasswordDialogOpen(true);
+                            }}>
+                              <KeyRound className="w-4 h-4 mr-2" />
+                              Şifrəni dəyiş
+                            </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem className="text-destructive">
                               <Trash2 className="w-4 h-4 mr-2" />
@@ -463,6 +506,74 @@ const AdminUsers = () => {
 
               <Button className="w-full" onClick={handleAssignRole}>
                 Rolu Təyin Et
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Password Dialog */}
+      <Dialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>İstifadəçinin şifrəsini dəyiş</DialogTitle>
+          </DialogHeader>
+          {selectedUser && (
+            <div className="space-y-4 mt-4">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-primary font-bold">
+                    {selectedUser.name?.charAt(0).toUpperCase() || 'U'}
+                  </span>
+                </div>
+                <div>
+                  <p className="font-medium">{selectedUser.name}</p>
+                  <p className="text-sm text-muted-foreground">{selectedUser.email}</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-2 block">Yeni şifrə</label>
+                <div className="relative">
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Ən azı 8 simvol"
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-2 block">Şifrəni təsdiqlə</label>
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Yeni şifrəni təkrar daxil edin"
+                />
+              </div>
+
+              <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                <p className="text-sm text-amber-600 dark:text-amber-400">
+                  ⚠️ İstifadəçi yeni şifrə ilə yenidən daxil olmalı olacaq.
+                </p>
+              </div>
+
+              <Button
+                className="w-full"
+                onClick={handleChangePassword}
+                disabled={changingPassword || !newPassword || !confirmPassword}
+              >
+                {changingPassword ? 'Yenilənir...' : 'Şifrəni Dəyiş'}
               </Button>
             </div>
           )}
