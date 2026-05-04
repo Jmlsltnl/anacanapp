@@ -374,6 +374,15 @@ const AdminUsers = () => {
                               <Shield className="w-4 h-4 mr-2" />
                               Rol təyin et
                             </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                              setSelectedUser(user);
+                              setNewPassword('');
+                              setConfirmPassword('');
+                              setPasswordDialogOpen(true);
+                            }}>
+                              <KeyRound className="w-4 h-4 mr-2" />
+                              Şifrəni dəyiş
+                            </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem className="text-destructive">
                               <Trash2 className="w-4 h-4 mr-2" />
