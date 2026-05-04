@@ -172,6 +172,35 @@ const AdminUsers = () => {
     }
   };
 
+  const handleChangePassword = async () => {
+    if (!selectedUser) return;
+    if (newPassword.length < 8) {
+      toast({ title: 'Xəta', description: 'Şifrə ən azı 8 simvol olmalıdır', variant: 'destructive' });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ title: 'Xəta', description: 'Şifrələr uyğun gəlmir', variant: 'destructive' });
+      return;
+    }
+    setChangingPassword(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-change-user-password', {
+        body: { user_id: selectedUser.user_id, new_password: newPassword },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      toast({ title: 'Uğurlu', description: `${selectedUser.name} üçün şifrə yeniləndi` });
+      setPasswordDialogOpen(false);
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      console.error('Error changing password:', err);
+      toast({ title: 'Xəta', description: err?.message || 'Şifrə yenilənə bilmədi', variant: 'destructive' });
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   const filteredUsers = users.filter(user =>
     user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.email?.toLowerCase().includes(searchQuery.toLowerCase())
