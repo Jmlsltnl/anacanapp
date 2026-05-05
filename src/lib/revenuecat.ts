@@ -54,13 +54,13 @@ export async function initRevenueCat(appUserID?: string): Promise<void> {
 
     await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
     await Purchases.configure({
-      apiKey: REVENUECAT_CONFIG.API_KEY,
+      apiKey: getApiKey(),
       appUserID: appUserID || undefined,
     });
 
-    console.log('RevenueCat SDK configured successfully');
+    console.log('[RevenueCat] SDK configured successfully on', Capacitor.getPlatform());
   } catch (err) {
-    console.error('RevenueCat init error:', err);
+    console.error('[RevenueCat] init error:', err);
   }
 }
 
