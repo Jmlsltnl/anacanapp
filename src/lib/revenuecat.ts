@@ -8,7 +8,7 @@ export const REVENUECAT_ENABLED = true;
 // Get them from: RevenueCat Dashboard → Project Settings → API Keys → Public app-specific
 export const REVENUECAT_CONFIG = {
   // Android Google Play public key (starts with "goog_")
-  ANDROID_API_KEY: 'goog_REPLACE_WITH_ANDROID_KEY',
+  ANDROID_API_KEY: 'goog_oMjcZonQOQKsqInQGZdfeBeJEDg',
   // iOS App Store public key (starts with "appl_")
   IOS_API_KEY: 'appl_QFkRqVsmtObOxwBjvTUKChSFubL',
   // Fallback (used if platform-specific is not set) — keep for backwards compat
