@@ -129,7 +129,7 @@ export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremi
 
           {/* CTA */}
           <Button
-            onClick={onOpenPremium}
+            onClick={handleOpen}
             className="w-full h-12 rounded-2xl text-sm font-bold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/20"
           >
             <Sparkles className="w-4 h-4 mr-1" />
