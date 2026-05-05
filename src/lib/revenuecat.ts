@@ -4,10 +4,28 @@ import { Capacitor } from '@capacitor/core';
 export const REVENUECAT_ENABLED = true;
 
 // RevenueCat Configuration
+// NOTE: RevenueCat requires PLATFORM-SPECIFIC public API keys (Android & iOS).
+// Get them from: RevenueCat Dashboard → Project Settings → API Keys → Public app-specific
 export const REVENUECAT_CONFIG = {
+  // Android Google Play public key (starts with "goog_")
+  ANDROID_API_KEY: 'goog_REPLACE_WITH_ANDROID_KEY',
+  // iOS App Store public key (starts with "appl_")
+  IOS_API_KEY: 'appl_REPLACE_WITH_IOS_KEY',
+  // Fallback (used if platform-specific is not set) — keep for backwards compat
   API_KEY: 'test_bXWdDDnuTuBrVDYOOviwZDCLvIW',
   ENTITLEMENT_ID: 'Anacan LLC Pro',
 } as const;
+
+function getApiKey(): string {
+  const platform = Capacitor.getPlatform();
+  if (platform === 'android' && !REVENUECAT_CONFIG.ANDROID_API_KEY.startsWith('goog_REPLACE')) {
+    return REVENUECAT_CONFIG.ANDROID_API_KEY;
+  }
+  if (platform === 'ios' && !REVENUECAT_CONFIG.IOS_API_KEY.startsWith('appl_REPLACE')) {
+    return REVENUECAT_CONFIG.IOS_API_KEY;
+  }
+  return REVENUECAT_CONFIG.API_KEY;
+}
 
 // Product identifiers (must match RevenueCat dashboard)
 export const RC_PRODUCTS = {
