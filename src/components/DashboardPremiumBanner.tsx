@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Crown, Sparkles, Check, ChevronRight, Shield, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSubscription } from '@/hooks/useSubscription';
+import { PremiumModal } from '@/components/PremiumModal';
 
 interface DashboardPremiumBannerProps {
   onOpenPremium?: () => void;
