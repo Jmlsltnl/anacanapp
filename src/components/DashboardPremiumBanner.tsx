@@ -153,6 +153,7 @@ export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremi
           </div>
         </div>
       </div>
+      <PremiumModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </motion.div>
   );
 }
