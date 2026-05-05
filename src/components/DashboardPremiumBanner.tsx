@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Crown, Sparkles, Check, ChevronRight, Shield, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSubscription } from '@/hooks/useSubscription';
+import { PremiumModal } from '@/components/PremiumModal';
 
 interface DashboardPremiumBannerProps {
   onOpenPremium?: () => void;
@@ -27,7 +28,13 @@ const SAVINGS_PCT = Math.round((1 - YEARLY_MONTHLY / MONTHLY_PRICE) * 100);
 export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremiumBannerProps) {
   const { isPremium } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<'yearly' | 'monthly'>('yearly');
+  const [modalOpen, setModalOpen] = useState(false);
   const shouldHideBanner = isPremium && !import.meta.env.DEV;
+
+  const handleOpen = () => {
+    if (onOpenPremium) onOpenPremium();
+    else setModalOpen(true);
+  };
 
   // Keep visible in dev so the paywall can be tested even on premium/dev accounts.
   if (shouldHideBanner) return null;
@@ -122,7 +129,7 @@ export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremi
 
           {/* CTA */}
           <Button
-            onClick={onOpenPremium}
+            onClick={handleOpen}
             className="w-full h-12 rounded-2xl text-sm font-bold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/20"
           >
             <Sparkles className="w-4 h-4 mr-1" />
@@ -146,6 +153,7 @@ export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremi
           </div>
         </div>
       </div>
+      <PremiumModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </motion.div>
   );
 }
