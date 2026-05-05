@@ -10,7 +10,7 @@ export const REVENUECAT_CONFIG = {
   // Android Google Play public key (starts with "goog_")
   ANDROID_API_KEY: 'goog_REPLACE_WITH_ANDROID_KEY',
   // iOS App Store public key (starts with "appl_")
-  IOS_API_KEY: 'appl_REPLACE_WITH_IOS_KEY',
+  IOS_API_KEY: 'appl_QFkRqVsmtObOxwBjvTUKChSFubL',
   // Fallback (used if platform-specific is not set) — keep for backwards compat
   API_KEY: 'test_bXWdDDnuTuBrVDYOOviwZDCLvIW',
   ENTITLEMENT_ID: 'Anacan LLC Pro',
