@@ -13,6 +13,7 @@ import LegalPage from "./pages/LegalPage";
 import NotFound from "./pages/NotFound";
 import PaymentSuccess from "./components/payment/PaymentSuccess";
 import PaymentError from "./components/payment/PaymentError";
+import RevenueCatDebug from "./pages/RevenueCatDebug";
 import { initRevenueCat } from "@/lib/revenuecat";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
                 <Route path="/legal/:docType" element={<LegalPage />} />
                 <Route path="/payment/success" element={<PaymentSuccess />} />
                 <Route path="/payment/error" element={<PaymentError />} />
+                <Route path="/debug/revenuecat" element={<RevenueCatDebug />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
