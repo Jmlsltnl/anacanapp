@@ -122,13 +122,24 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
     await hapticFeedback.light();
 
     try {
+      const content = newMessage.trim();
       await supabase.from('partner_messages').insert({
         sender_id: user.id,
         receiver_id: partnerProfile.user_id,
         message_type: 'text',
-        content: newMessage.trim(),
+        content,
       });
       setNewMessage('');
+
+      // Fire-and-forget FCM push so receiver gets notified even if app is closed
+      supabase.functions.invoke('send-push-notification', {
+        body: {
+          userId: partnerProfile.user_id,
+          title: `${profile?.name || 'Partnyor'} 💌`,
+          body: content.slice(0, 80),
+          data: { type: 'partner_message' },
+        },
+      }).catch((e) => console.warn('Push invoke failed:', e));
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
