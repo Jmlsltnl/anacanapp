@@ -30,26 +30,6 @@ import PartnerQuickStats from './partner/PartnerQuickStats';
 import SyncedFeaturesGrid from './partner/SyncedFeaturesGrid';
 import { tr } from "@/lib/tr";
 
-// Quick Action Button
-const QuickAction = ({ icon: Icon, label, gradient, onClick }: {
-  icon: any;
-  label: string;
-  gradient: string;
-  onClick?: () => void;
-}) => (
-  <motion.button
-    onClick={onClick}
-    className={`${gradient} rounded-2xl p-4 flex flex-col items-center gap-2 shadow-lg flex-1`}
-    whileHover={{ scale: 1.02, y: -2 }}
-    whileTap={{ scale: 0.95 }}
-  >
-    <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-      <Icon className="w-6 h-6 text-white" />
-    </div>
-    <span className="text-white font-medium text-xs">{label}</span>
-  </motion.button>
-);
-
 interface PartnerDashboardProps {
   onNavigate?: (screen: string) => void;
 }
