@@ -63,11 +63,8 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
   const { partnerProfile, partnerDailyLog, loading: partnerLoading, getPregnancyWeek, getDaysUntilDue, getBabyAgeDays, getCyclePhaseInfo, getDaysUntilNextPeriod } = usePartnerData();
   const { items: shoppingItems, addItem, toggleItem, loading: shoppingLoading } = useShoppingItems();
   const { messages, markAsRead, getUnreadCount } = usePartnerMessages();
-  const { level, totalPoints } = usePartnerMissions();
-  const [activeTab, setActiveTab] = useState<'home' | 'missions' | 'shopping' | 'notifications' | 'stats' | 'surprise'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'shopping' | 'notifications' | 'stats' | 'surprise'>('home');
   const [showChat, setShowChat] = useState(false);
-  const [showLevelUp, setShowLevelUp] = useState(false);
-  const previousLevelRef = useRef(level);
 
   const [newItem, setNewItem] = useState('');
   const [loveMessage, setLoveMessage] = useState('');
