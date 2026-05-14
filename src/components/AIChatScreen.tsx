@@ -364,13 +364,13 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       <ScrollArea className="flex-1 px-4 py-4" ref={scrollRef}>
         <div className="space-y-4 pb-4">
           <AnimatePresence>
-            {messages.map((message, index) => (
+            {messages.map((message) => (
               <motion.div
                 key={message.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ delay: index * 0.05 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.18 }}
                 className={`flex gap-2 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
               >
                 <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center ${
