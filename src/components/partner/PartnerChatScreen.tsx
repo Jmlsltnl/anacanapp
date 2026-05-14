@@ -325,12 +325,12 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
       </div>
 
       {/* Quick Messages */}
-      <div className="px-4 py-2 flex gap-2 overflow-x-auto scrollbar-hide flex-shrink-0 border-t border-border/50">
+      <div className="px-3 py-1.5 flex gap-1.5 overflow-x-auto scrollbar-hide flex-shrink-0">
         {quickMessages.map(msg => (
           <motion.button
             key={msg}
             onClick={() => sendQuickMessage(msg)}
-            className="px-3 py-1.5 bg-muted rounded-full text-xs font-medium whitespace-nowrap"
+            className="px-2.5 py-1 bg-muted rounded-full text-[11px] font-medium whitespace-nowrap"
             whileTap={{ scale: 0.95 }}
           >
             {msg}
@@ -340,10 +340,10 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
 
       {/* Input */}
       <div
-        className="p-3 bg-card border-t border-border flex-shrink-0"
-        style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 12px)' }}
+        className="px-2 pt-2 bg-card border-t border-border flex-shrink-0"
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)' }}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-end gap-1.5">
           <ChatMediaUpload onUpload={sendMediaMessage} />
           <input
             type="text"
@@ -351,16 +351,15 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
             placeholder={tr("partnerchatscreen_mesaj_yazin_e69f84", "Mesaj yazın...")}
-            className="flex-1 h-12 px-4 rounded-2xl bg-muted text-sm outline-none border-2 border-transparent focus:border-primary/30 transition-colors"
+            className="flex-1 h-10 px-3.5 rounded-full bg-muted text-sm outline-none border border-transparent focus:border-primary/40 transition-colors"
           />
           <motion.button
             onClick={sendMessage}
             disabled={!newMessage.trim()}
-            className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center disabled:opacity-50"
-            whileHover={{ scale: 1.05 }}
+            className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-40"
             whileTap={{ scale: 0.95 }}
           >
-            <Send className="w-5 h-5" />
+            <Send className="w-4 h-4" />
           </motion.button>
         </div>
       </div>
