@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Home, Compass, MessageCircle, User, Users, Cake } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
+import { useUnreadCommunityPosts } from '@/hooks/useUnreadCommunityPosts';
 import { tr } from "@/lib/tr";
 
 interface BottomNavProps {
