@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Save, Key, Sparkles, Settings2, RefreshCw, Moon, Sun, Users } from 'lucide-react';
+import { Save, Key, Sparkles, Settings2, RefreshCw, Moon, Sun, Users, Baby } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
