@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { isNative, isIOS, isAndroid } from '@/lib/native';
 import { Capacitor } from '@capacitor/core';
+import { toast } from 'sonner';
 
 export const useDeviceToken = () => {
   const { user } = useAuth();
@@ -10,6 +11,7 @@ export const useDeviceToken = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const registrationAttempted = useRef(false);
+  const registeredUserId = useRef<string | null>(null);
 
   // Save token using safe upsert. Never delete other tokens until the new one is committed.
   const saveTokenToDatabase = useCallback(async (deviceToken: string, userId: string) => {
