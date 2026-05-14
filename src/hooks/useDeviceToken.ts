@@ -254,21 +254,24 @@ export const useDeviceToken = () => {
     }
   }, [user, token]);
 
-  // Auto-register on mount if native and user exists
-  useEffect(() => {
-    if (user && isNative && !registrationAttempted.current) {
-      console.log('[DeviceToken] Auto-registering on mount...');
-      registerDevice();
-    }
-  }, [user, registerDevice]);
-
-  // Reset registration flag when user changes
+  // Auto-register on mount if native and user exists; reset on user change
   useEffect(() => {
     if (!user) {
       registrationAttempted.current = false;
+      registeredUserId.current = null;
       setToken(null);
+      return;
     }
-  }, [user]);
+    // If user changed (different account logged in), force re-register so token attaches to new user
+    if (registeredUserId.current && registeredUserId.current !== user.id) {
+      console.log('[DeviceToken] User changed, resetting registration');
+      registrationAttempted.current = false;
+    }
+    if (isNative && !registrationAttempted.current) {
+      registeredUserId.current = user.id;
+      registerDevice();
+    }
+  }, [user, registerDevice]);
 
   return {
     token,
