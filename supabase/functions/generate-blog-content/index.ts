@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { requireAdmin } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,6 +12,10 @@ serve(async (req) => {
   }
 
   try {
+    // Admin-only: blog content generation.
+    const adminCheck = await requireAdmin(req);
+    if (adminCheck.error) return adminCheck.error;
+
     const { title, category } = await req.json();
 
     if (!title) {
