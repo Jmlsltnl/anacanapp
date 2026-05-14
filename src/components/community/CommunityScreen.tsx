@@ -7,7 +7,7 @@ import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useUserStore } from '@/store/userStore';
 import { useAppSetting } from '@/hooks/useAppSettings';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
-import { useUnreadCommunityPosts } from '@/hooks/useUnreadCommunityPosts';
+
 import GroupsList from './GroupsList';
 import GroupFeed from './GroupFeed';
 import CreatePostScreen from './CreatePostScreen';
