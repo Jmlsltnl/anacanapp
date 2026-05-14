@@ -214,6 +214,45 @@ const AdminSettings = () => {
             </Card>
           </motion.div>
 
+          {/* Mommy Hero Variant */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.04 }}
+          >
+            <Card className="p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 rounded-lg bg-pink-500/10">
+                  <Baby className="w-5 h-5 text-pink-500" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">Mommy Hero Dizaynı</h3>
+                  <p className="text-sm text-muted-foreground">Mommy panelinin yuxarı şəkilli kartının görünüşü</p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium mb-2 block text-foreground">Aktiv variant</label>
+                <Select
+                  value={getSettingValue('mommy_hero_variant', 'classic')}
+                  onValueChange={(value) => updateSetting('mommy_hero_variant', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="classic">Classic — Mövcud (Coral Glassmorphism)</SelectItem>
+                    <SelectItem value="aurora">Aurora — Premium tünd, qızılı halqa</SelectItem>
+                    <SelectItem value="storybook">Storybook — Pastel uşaq kitabı stili</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Dəyişiklik bütün istifadəçilər üçün dərhal tətbiq olunur.
+                </p>
+              </div>
+            </Card>
+          </motion.div>
+
           {/* Theme Settings */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
