@@ -65,26 +65,15 @@ const MommyHeroMinimalCard = ({ babyData, exactMonths, remainingDays, babyIllust
         </div>
       </div>
 
-      {/* Stat row */}
-      <div className="relative grid grid-cols-3 border-t border-black/5">
-        {[
-          { label: 'Gün', value: babyData.ageInDays },
-          { label: 'Həftə', value: Math.floor(babyData.ageInDays / 7) },
-          { label: 'Ay', value: exactMonths || 0 },
-        ].map((stat, i) => (
-          <div
-            key={stat.label}
-            className={`p-3 text-center ${i < 2 ? 'border-r border-black/5' : ''}`}
-          >
-            <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
-              {stat.label}
-            </div>
-            <div className="text-base font-black text-foreground tabular-nums mt-0.5 flex items-center justify-center gap-1">
-              {stat.value}
-              {i === 0 && <TrendingUp className="w-3 h-3 text-[hsl(15,80%,55%)]" />}
-            </div>
-          </div>
-        ))}
+      {/* Subtle footer with single complementary metric */}
+      <div className="relative flex items-center justify-between px-4 py-2.5 border-t border-black/5 bg-[hsl(15,30%,98%)]">
+        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
+          <TrendingUp className="w-3 h-3 text-[hsl(15,80%,55%)]" />
+          {Math.floor(babyData.ageInDays / 7)} həftəlik səyahət
+        </div>
+        <div className="text-[10px] font-bold uppercase tracking-wider text-[hsl(15,80%,55%)]">
+          {babyData.ageInDays}. gün
+        </div>
       </div>
     </motion.div>
   );
