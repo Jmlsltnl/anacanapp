@@ -241,9 +241,14 @@ const AdminSettings = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="classic">Classic — Mövcud (Coral Glassmorphism)</SelectItem>
+                    <SelectItem value="classic">Classic — Coral glassmorphism (mövcud)</SelectItem>
                     <SelectItem value="aurora">Aurora — Premium tünd, qızılı halqa</SelectItem>
                     <SelectItem value="storybook">Storybook — Pastel uşaq kitabı stili</SelectItem>
+                    <SelectItem value="polaroid">Polaroid — Peanut tərzi əyilmiş foto + washi</SelectItem>
+                    <SelectItem value="minimal">Minimal Card — Flo/Clue ağ kart + statistika</SelectItem>
+                    <SelectItem value="mesh">Mesh — Apple-vari mesh gradient + üzən foto</SelectItem>
+                    <SelectItem value="story">Story — Instagram story tərzi tam ekran</SelectItem>
+                    <SelectItem value="bento">Bento — Apple bento qrid (foto + statistika)</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
