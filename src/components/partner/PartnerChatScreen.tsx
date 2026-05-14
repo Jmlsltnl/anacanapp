@@ -233,40 +233,35 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
   });
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col" style={{ height: '100dvh' }}>
-      {/* Header - Same as Mother Chat */}
-      <div className="gradient-primary px-5 pb-4 pt-[max(env(safe-area-inset-top),12px)] flex-shrink-0">
-        <div className="flex items-center gap-4">
+    <div className="fixed inset-0 z-[60] bg-background flex flex-col" style={{ height: '100dvh' }}>
+      {/* Minimal Header */}
+      <div className="bg-card border-b border-border px-3 pb-2 pt-[max(env(safe-area-inset-top),10px)] flex-shrink-0">
+        <div className="flex items-center gap-2">
           <motion.button
             onClick={onBack}
-            className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-full hover:bg-muted flex items-center justify-center"
             whileTap={{ scale: 0.95 }}
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-5 h-5 text-foreground" />
           </motion.button>
-          <div className="flex items-center gap-3 flex-1">
-            <motion.div 
-              className="w-10 h-10 rounded-full bg-pink-400/30 flex items-center justify-center text-xl"
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
+          <div className="flex items-center gap-2.5 flex-1 min-w-0">
+            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-lg">
               {partnerProfile?.life_stage === 'bump' ? '🤰' : partnerProfile?.life_stage === 'mommy' ? '👩‍🍼' : '👩'}
-            </motion.div>
-            <div>
-              <h1 className="text-lg font-bold text-white">{partnerProfile?.name || 'Partner'}</h1>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-white/70 text-xs">Online</span>
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-sm font-semibold text-foreground truncate">{partnerProfile?.name || 'Partner'}</h1>
+              <div className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                <span className="text-muted-foreground text-[10px]">Online</span>
               </div>
             </div>
           </div>
           <motion.button
             onClick={sendLove}
-            className="w-10 h-10 rounded-full bg-pink-500/30 flex items-center justify-center"
-            whileHover={{ scale: 1.1 }}
+            className="w-9 h-9 rounded-full hover:bg-pink-50 dark:hover:bg-pink-900/20 flex items-center justify-center"
             whileTap={{ scale: 0.9 }}
           >
-            <Heart className="w-5 h-5 text-white fill-white" />
+            <Heart className="w-4 h-4 text-pink-500 fill-pink-500" />
           </motion.button>
         </div>
       </div>
