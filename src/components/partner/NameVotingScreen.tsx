@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence, PanInfo } from 'framer-motion';
-import { ArrowLeft, Heart, X, Star, Sparkles, Check, Users } from 'lucide-react';
-import { useNameVoting, MatchedName } from '@/hooks/useNameVoting';
+import React, { useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Heart, Search, Sparkles, Users } from 'lucide-react';
 import { useFavoriteNames } from '@/hooks/useFavoriteNames';
-import { Button } from '@/components/ui/button';
+import { usePartnerFavoriteNames } from '@/hooks/usePartnerFavoriteNames';
+import { useBabyNames } from '@/hooks/useDynamicContent';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -11,351 +11,210 @@ interface NameVotingScreenProps {
   onBack: () => void;
 }
 
+const genderLabels: Record<string, string> = {
+  boy: 'Oğlan',
+  girl: 'Qız',
+  unisex: 'Uniseks',
+};
+
 const NameVotingScreen: React.FC<NameVotingScreenProps> = ({ onBack }) => {
-  const { favorites } = useFavoriteNames();
-  const { 
-    myVotes, 
-    vote, 
-    getMatchedNames, 
-    hasVoted, 
-    getMyVote,
-    likedNames,
-    matchCount 
-  } = useNameVoting();
+  const { favorites, toggleFavorite, isFavorite } = useFavoriteNames();
+  const { partnerFavorites } = usePartnerFavoriteNames();
+  const { data: names = [] } = useBabyNames();
+  const [search, setSearch] = useState('');
+  const [genderFilter, setGenderFilter] = useState<'all' | 'boy' | 'girl'>('all');
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState<'left' | 'right' | 'up' | null>(null);
+  const partnerFavSet = useMemo(
+    () => new Set(partnerFavorites.map(f => f.name)),
+    [partnerFavorites]
+  );
 
-  // Get names that haven't been voted on yet
-  const unvotedNames = favorites.filter(f => !hasVoted(f.name));
-  const currentName = unvotedNames[currentIndex];
-  const matches = getMatchedNames();
+  const matches = useMemo(
+    () => favorites.filter(f => partnerFavSet.has(f.name)),
+    [favorites, partnerFavSet]
+  );
 
-  const handleVote = async (voteType: 'like' | 'dislike' | 'superlike') => {
-    if (!currentName) return;
-
-    setDirection(voteType === 'dislike' ? 'left' : voteType === 'superlike' ? 'up' : 'right');
-    
-    await vote(
-      currentName.name,
-      currentName.gender,
-      voteType,
-      currentName.meaning || undefined,
-      currentName.origin || undefined
-    );
-
-    setTimeout(() => {
-      setDirection(null);
-      if (currentIndex < unvotedNames.length - 1) {
-        setCurrentIndex(prev => prev + 1);
-      }
-    }, 300);
-  };
-
-  const handleDragEnd = (event: any, info: PanInfo) => {
-    const threshold = 100;
-    
-    if (info.offset.x > threshold) {
-      handleVote('like');
-    } else if (info.offset.x < -threshold) {
-      handleVote('dislike');
-    } else if (info.offset.y < -threshold) {
-      handleVote('superlike');
+  // Combined pool: all baby names + partner favorites that are not in main list
+  const pool = useMemo(() => {
+    const seen = new Set<string>();
+    const arr: any[] = [];
+    for (const n of names) {
+      if (seen.has(n.name)) continue;
+      seen.add(n.name);
+      arr.push({
+        name: n.name,
+        gender: n.gender,
+        meaning: n.meaning_az || n.meaning,
+        origin: n.origin,
+      });
     }
-  };
+    for (const f of partnerFavorites) {
+      if (seen.has(f.name)) continue;
+      seen.add(f.name);
+      arr.push(f);
+    }
+    return arr;
+  }, [names, partnerFavorites]);
 
-  const cardVariants = {
-    initial: { scale: 0.95, opacity: 0 },
-    animate: { scale: 1, opacity: 1 },
-    exit: (direction: 'left' | 'right' | 'up' | null) => ({
-      x: direction === 'left' ? -300 : direction === 'right' ? 300 : 0,
-      y: direction === 'up' ? -300 : 0,
-      opacity: 0,
-      rotate: direction === 'left' ? -20 : direction === 'right' ? 20 : 0,
-    }),
-  };
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase();
+    return pool.filter(n => {
+      const matchSearch = !q || n.name.toLowerCase().includes(q) || (n.meaning || '').toLowerCase().includes(q);
+      const matchGender = genderFilter === 'all' || n.gender === genderFilter || n.gender === 'unisex';
+      return matchSearch && matchGender;
+    });
+  }, [pool, search, genderFilter]);
 
-  const genderColors = {
-    boy: 'from-blue-400 to-blue-600',
-    girl: 'from-pink-400 to-pink-600',
-    unisex: 'from-purple-400 to-purple-600',
-  };
-
-  const genderLabels = {
-    boy: 'Oğlan',
-    girl: 'Qız',
-    unisex: 'Uniseks',
+  const NameRow = ({ n }: { n: any }) => {
+    const fav = isFavorite(n.name);
+    const partnerFav = partnerFavSet.has(n.name);
+    const isMatch = fav && partnerFav;
+    return (
+      <motion.div
+        layout
+        className={`flex items-center gap-3 p-3 rounded-xl border ${
+          isMatch ? 'bg-pink-50 dark:bg-pink-900/10 border-pink-300 dark:border-pink-800' : 'bg-card border-border/40'
+        }`}
+      >
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
+          n.gender === 'boy' ? 'bg-blue-100 dark:bg-blue-900/30'
+          : n.gender === 'girl' ? 'bg-pink-100 dark:bg-pink-900/30'
+          : 'bg-violet-100 dark:bg-violet-900/30'
+        }`}>
+          {n.gender === 'boy' ? '👦' : n.gender === 'girl' ? '👧' : '✨'}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-foreground truncate">{n.name}</h3>
+            {isMatch && (
+              <Badge className="bg-pink-500 text-white text-[10px] px-1.5 py-0 h-5">
+                <Sparkles className="w-2.5 h-2.5 mr-0.5" />
+                Match
+              </Badge>
+            )}
+          </div>
+          {n.meaning && (
+            <p className="text-xs text-muted-foreground truncate">{n.meaning}</p>
+          )}
+          <div className="flex items-center gap-2 mt-0.5">
+            <span className="text-[10px] text-muted-foreground">{genderLabels[n.gender] || n.gender}</span>
+            {partnerFav && (
+              <span className="text-[10px] text-pink-600 dark:text-pink-400 flex items-center gap-0.5">
+                <Heart className="w-2.5 h-2.5 fill-current" /> Partnyor
+              </span>
+            )}
+          </div>
+        </div>
+        <motion.button
+          onClick={() => toggleFavorite(n.name, n.gender, n.meaning, n.origin)}
+          whileTap={{ scale: 0.85 }}
+          className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+            fav ? 'bg-pink-100 dark:bg-pink-900/30' : 'bg-muted/50'
+          }`}
+        >
+          <Heart className={`w-5 h-5 ${fav ? 'text-pink-500 fill-pink-500' : 'text-muted-foreground'}`} />
+        </motion.button>
+      </motion.div>
+    );
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 pb-24">
+    <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50">
-        <div className="flex items-center justify-between p-4">
-          <button onClick={onBack} className="p-2 -ml-2 rounded-full hover:bg-muted">
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          <h1 className="text-lg font-bold">Ad Səsverməsi</h1>
-          <div className="flex items-center gap-2">
-            {matchCount > 0 && (
-              <Badge className="bg-gradient-to-r from-pink-500 to-red-500 text-white">
+      <div className="sticky top-0 z-10 bg-card border-b border-border/50">
+        <div className="px-4 pt-[max(env(safe-area-inset-top),12px)] pb-3">
+          <div className="flex items-center gap-3">
+            <button onClick={onBack} className="w-9 h-9 rounded-xl bg-muted/60 flex items-center justify-center">
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div className="flex-1">
+              <h1 className="text-lg font-bold">Ad Seçimi</h1>
+              <p className="text-[11px] text-muted-foreground">Hər ikiniz bəyəndikdə match olur</p>
+            </div>
+            {matches.length > 0 && (
+              <Badge className="bg-pink-500 text-white">
                 <Sparkles className="w-3 h-3 mr-1" />
-                {matchCount} match
+                {matches.length}
               </Badge>
             )}
           </div>
         </div>
       </div>
 
-      <Tabs defaultValue="vote" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mx-4 max-w-[calc(100%-2rem)]">
-          <TabsTrigger value="vote">Səs ver</TabsTrigger>
+      <Tabs defaultValue="browse" className="w-full">
+        <TabsList className="grid grid-cols-3 mx-4 mt-3 max-w-[calc(100%-2rem)]">
+          <TabsTrigger value="browse">Adları Bəyən</TabsTrigger>
+          <TabsTrigger value="mine">Sevimlilərim ({favorites.length})</TabsTrigger>
           <TabsTrigger value="matches">
-            Uyğunlar
-            {matchCount > 0 && (
-              <span className="ml-1 px-1.5 py-0.5 text-xs bg-pink-500 text-white rounded-full">
-                {matchCount}
+            Match
+            {matches.length > 0 && (
+              <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-pink-500 text-white rounded-full">
+                {matches.length}
               </span>
             )}
           </TabsTrigger>
-          <TabsTrigger value="my-votes">Seçimlərim</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="vote" className="px-4 mt-4">
+        <TabsContent value="browse" className="px-4 mt-3 space-y-3">
+          {/* Search + filter */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Ad və ya məna axtarın..."
+              className="w-full h-10 pl-10 pr-4 rounded-xl bg-muted/50 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+          <div className="flex gap-2">
+            {(['all', 'boy', 'girl'] as const).map(g => (
+              <button
+                key={g}
+                onClick={() => setGenderFilter(g)}
+                className={`flex-1 py-2 rounded-xl text-sm font-medium ${
+                  genderFilter === g ? 'bg-primary text-primary-foreground' : 'bg-muted/50 text-muted-foreground'
+                }`}
+              >
+                {g === 'all' ? 'Hamısı' : g === 'boy' ? 'Oğlan' : 'Qız'}
+              </button>
+            ))}
+          </div>
+          <div className="space-y-2">
+            {filtered.slice(0, 200).map(n => (
+              <NameRow key={n.name} n={n} />
+            ))}
+            {filtered.length === 0 && (
+              <div className="text-center py-12 text-sm text-muted-foreground">Ad tapılmadı</div>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="mine" className="px-4 mt-3 space-y-2">
           {favorites.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <Heart className="w-16 h-16 text-muted-foreground/30 mb-4" />
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                Sevimlilər yoxdur
-              </h3>
-              <p className="text-muted-foreground text-sm max-w-xs">
-                Əvvəlcə "Körpə Adları" alətindən bəzi adları sevimlilərə əlavə edin
-              </p>
-            </div>
-          ) : unvotedNames.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <Check className="w-16 h-16 text-green-500 mb-4" />
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                Bütün adlara səs verdiniz!
-              </h3>
-              <p className="text-muted-foreground text-sm max-w-xs">
-                "Uyğunlar" bölməsindən partnyorunuzla ortaq seçimlərinizi görün
-              </p>
+            <div className="flex flex-col items-center py-16 text-center">
+              <Heart className="w-12 h-12 text-muted-foreground/30 mb-3" />
+              <p className="text-sm text-muted-foreground">Hələ ad seçməmisiniz</p>
             </div>
           ) : (
-            <div className="relative h-[400px] flex items-center justify-center">
-              <AnimatePresence mode="wait" custom={direction}>
-                {currentName && (
-                  <motion.div
-                    key={currentName.name}
-                    custom={direction}
-                    variants={cardVariants}
-                    initial="initial"
-                    animate="animate"
-                    exit="exit"
-                    drag
-                    dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                    dragElastic={0.7}
-                    onDragEnd={handleDragEnd}
-                    className={`absolute w-full max-w-sm bg-gradient-to-br ${
-                      genderColors[currentName.gender as keyof typeof genderColors]
-                    } rounded-3xl shadow-2xl cursor-grab active:cursor-grabbing`}
-                  >
-                    <div className="p-8 text-white text-center">
-                      <div className="text-6xl font-bold mb-4">{currentName.name}</div>
-                      <Badge 
-                        variant="secondary" 
-                        className="bg-white/20 text-white border-0 mb-4"
-                      >
-                        {genderLabels[currentName.gender as keyof typeof genderLabels]}
-                      </Badge>
-                      {currentName.meaning && (
-                        <p className="text-white/80 text-sm mb-2">
-                          "{currentName.meaning}"
-                        </p>
-                      )}
-                      {currentName.origin && (
-                        <p className="text-white/60 text-xs">
-                          Mənşə: {currentName.origin}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Swipe indicators */}
-                    <div className="absolute inset-0 pointer-events-none">
-                      <motion.div
-                        className="absolute left-4 top-1/2 -translate-y-1/2 px-4 py-2 bg-red-500 rounded-lg text-white font-bold"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 0, scale: 0.8 }}
-                      >
-                        NOPE
-                      </motion.div>
-                      <motion.div
-                        className="absolute right-4 top-1/2 -translate-y-1/2 px-4 py-2 bg-green-500 rounded-lg text-white font-bold"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 0, scale: 0.8 }}
-                      >
-                        LIKE
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Progress indicator */}
-              <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-1">
-                {unvotedNames.slice(0, 10).map((_, idx) => (
-                  <div
-                    key={idx}
-                    className={`w-2 h-2 rounded-full transition-colors ${
-                      idx === currentIndex ? 'bg-primary' : 'bg-muted'
-                    }`}
-                  />
-                ))}
-                {unvotedNames.length > 10 && (
-                  <span className="text-xs text-muted-foreground ml-2">
-                    +{unvotedNames.length - 10}
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Vote buttons */}
-          {currentName && (
-            <div className="flex justify-center gap-4 mt-8">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => handleVote('dislike')}
-                className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center shadow-lg"
-              >
-                <X className="w-8 h-8 text-red-500" />
-              </motion.button>
-
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => handleVote('superlike')}
-                className="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shadow-lg"
-              >
-                <Star className="w-7 h-7 text-blue-500" />
-              </motion.button>
-
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => handleVote('like')}
-                className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shadow-lg"
-              >
-                <Heart className="w-8 h-8 text-green-500" />
-              </motion.button>
-            </div>
+            favorites.map(f => <NameRow key={f.name} n={f} />)
           )}
         </TabsContent>
 
-        <TabsContent value="matches" className="px-4 mt-4">
+        <TabsContent value="matches" className="px-4 mt-3 space-y-2">
           {matches.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <Users className="w-16 h-16 text-muted-foreground/30 mb-4" />
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                Hələlik uyğunluq yoxdur
-              </h3>
-              <p className="text-muted-foreground text-sm max-w-xs">
-                Siz və partnyorunuz eyni adı bəyəndikdə burada görünəcək
+            <div className="flex flex-col items-center py-16 text-center">
+              <Users className="w-12 h-12 text-muted-foreground/30 mb-3" />
+              <p className="text-sm font-medium">Hələ match yoxdur</p>
+              <p className="text-xs text-muted-foreground mt-1 max-w-xs">
+                Hər ikiniz eyni adı bəyəndikdə burada görünəcək
               </p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {matches.map((match) => (
-                <MatchCard key={match.name} match={match} />
-              ))}
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="my-votes" className="px-4 mt-4">
-          {likedNames.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <Heart className="w-16 h-16 text-muted-foreground/30 mb-4" />
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                Hələ heç bir ada səs verməmisiniz
-              </h3>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {likedNames.map((v) => (
-                <div
-                  key={v.name}
-                  className="flex items-center justify-between p-4 bg-card rounded-xl border border-border"
-                >
-                  <div>
-                    <div className="font-semibold">{v.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {genderLabels[v.gender as keyof typeof genderLabels]}
-                    </div>
-                  </div>
-                  <Badge
-                    variant={v.vote === 'superlike' ? 'default' : 'secondary'}
-                    className={v.vote === 'superlike' ? 'bg-blue-500' : ''}
-                  >
-                    {v.vote === 'superlike' ? (
-                      <Star className="w-3 h-3 mr-1" />
-                    ) : (
-                      <Heart className="w-3 h-3 mr-1" />
-                    )}
-                    {v.vote === 'superlike' ? 'Super' : 'Bəyəndim'}
-                  </Badge>
-                </div>
-              ))}
-            </div>
+            matches.map(f => <NameRow key={f.name} n={f} />)
           )}
         </TabsContent>
       </Tabs>
     </div>
-  );
-};
-
-const MatchCard: React.FC<{ match: MatchedName }> = ({ match }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`p-4 rounded-xl border ${
-        match.isSuperMatch
-          ? 'bg-gradient-to-r from-pink-500/10 to-purple-500/10 border-pink-500/30'
-          : 'bg-card border-border'
-      }`}
-    >
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-bold">{match.name}</span>
-            {match.isSuperMatch && (
-              <Badge className="bg-gradient-to-r from-pink-500 to-purple-500 text-white border-0">
-                <Sparkles className="w-3 h-3 mr-1" />
-                Super Match!
-              </Badge>
-            )}
-          </div>
-          {match.meaning && (
-            <p className="text-sm text-muted-foreground mt-1">"{match.meaning}"</p>
-          )}
-        </div>
-        <div className="flex gap-1">
-          {match.myVote === 'superlike' ? (
-            <Star className="w-5 h-5 text-blue-500 fill-blue-500" />
-          ) : (
-            <Heart className="w-5 h-5 text-green-500 fill-green-500" />
-          )}
-          {match.partnerVote === 'superlike' ? (
-            <Star className="w-5 h-5 text-blue-500 fill-blue-500" />
-          ) : (
-            <Heart className="w-5 h-5 text-green-500 fill-green-500" />
-          )}
-        </div>
-      </div>
-    </motion.div>
   );
 };
 
