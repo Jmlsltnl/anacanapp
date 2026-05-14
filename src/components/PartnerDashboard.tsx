@@ -105,13 +105,7 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
     ? getDynamicFruitData(fruitImages, pregnancyDay, currentWeek, dayContent)
     : null;
 
-  // Track level changes for celebration
-  useEffect(() => {
-    if (level > previousLevelRef.current && previousLevelRef.current > 0) {
-      setShowLevelUp(true);
-    }
-    previousLevelRef.current = level;
-  }, [level]);
+
 
   const toggleShoppingItem = async (id: string) => {
     await hapticFeedback.light();
