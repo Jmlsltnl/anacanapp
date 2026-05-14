@@ -396,31 +396,6 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
                 </div>
               </motion.div>
 
-              {/* Quick Actions */}
-              <div>
-                <h2 className="font-bold text-lg mb-3">Sürətli Hərəkətlər</h2>
-                <div className="flex gap-3">
-                  <QuickAction 
-                    icon={Heart} 
-                    label="Sevgi göndər" 
-                    gradient="bg-gradient-to-br from-pink-500 to-rose-600"
-                    onClick={sendLove}
-                  />
-                  <QuickAction 
-                    icon={MessageCircle} 
-                    label="Canlı chat" 
-                    gradient="bg-gradient-to-br from-partner to-partner-dark"
-                    onClick={() => setShowChat(true)}
-                  />
-                  <QuickAction 
-                    icon={Gift} 
-                    label="Sürpriz planla" 
-                    gradient="bg-gradient-to-br from-amber-500 to-orange-600"
-                    onClick={() => setActiveTab('surprise')}
-                  />
-                </div>
-              </div>
-
               {/* Synced Features Grid */}
               <SyncedFeaturesGrid 
                 onNavigate={onNavigate || (() => {})} 
@@ -446,17 +421,6 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
 
               {/* Quick Stats */}
               <PartnerQuickStats />
-            </motion.div>
-          )}
-
-          {activeTab === 'missions' && (
-            <motion.div
-              key="missions"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <PartnerMissionsCard showAll />
             </motion.div>
           )}
 
