@@ -1,4 +1,4 @@
-import { useState, forwardRef, useEffect } from 'react';
+import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Users, Plus, Search, TrendingUp, Compass, Sparkles, X, Pen, MessageCircle } from 'lucide-react';
 import { useCommunityGroups, useUserMemberships } from '@/hooks/useCommunity';
@@ -7,7 +7,7 @@ import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useUserStore } from '@/store/userStore';
 import { useAppSetting } from '@/hooks/useAppSettings';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
-import { useUnreadCommunityPosts } from '@/hooks/useUnreadCommunityPosts';
+
 import GroupsList from './GroupsList';
 import GroupFeed from './GroupFeed';
 import CreatePostScreen from './CreatePostScreen';
@@ -40,8 +40,8 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   useScrollToTop([activeTab, selectedGroupId, selectedUserId]);
   useScreenAnalytics('Community', 'Social');
 
-  const { markCommunitySeen } = useUnreadCommunityPosts();
-  useEffect(() => { markCommunitySeen(); }, [markCommunitySeen]);
+  // Note: do NOT auto mark-all-seen here. Posts are marked individually as
+  // they enter the viewport in GroupFeed via the SeenObserver wrapper.
 
   const { lifeStage } = useUserStore();
   const headerKey = `community_header_${lifeStage || 'mommy'}`;

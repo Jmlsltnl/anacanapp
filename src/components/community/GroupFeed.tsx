@@ -4,6 +4,7 @@ import { ArrowLeft, Plus, Users } from 'lucide-react';
 import { CommunityGroup, useGroupPosts } from '@/hooks/useCommunity';
 import { useGroupPresence } from '@/hooks/useGroupPresence';
 import PostCard from './PostCard';
+import PostSeenObserver from './PostSeenObserver';
 import GroupPresenceBar from './GroupPresenceBar';
 import StoriesBar from './StoriesBar';
 import PostSearchFilter from './PostSearchFilter';
@@ -73,7 +74,9 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
         ) : (
           filteredPosts.map((post, index) => (
             <motion.div key={post.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }}>
-              <PostCard post={post} groupId={group?.id || null} onUserClick={onUserClick} />
+              <PostSeenObserver postId={post.id} createdAt={post.created_at} postUserId={post.user_id}>
+                <PostCard post={post} groupId={group?.id || null} onUserClick={onUserClick} />
+              </PostSeenObserver>
             </motion.div>
           ))
         )}
@@ -131,7 +134,9 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
         ) : (
           filteredPosts.map((post, index) => (
             <motion.div key={post.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }}>
-              <PostCard post={post} groupId={group?.id || null} onUserClick={onUserClick} />
+              <PostSeenObserver postId={post.id} createdAt={post.created_at} postUserId={post.user_id}>
+                <PostCard post={post} groupId={group?.id || null} onUserClick={onUserClick} />
+              </PostSeenObserver>
             </motion.div>
           ))
         )}
