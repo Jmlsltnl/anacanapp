@@ -46,6 +46,7 @@ import DevelopmentTipsWidget from '@/components/mommy/DevelopmentTipsWidget';
 import BabyCrisisWidget from '@/components/mommy/BabyCrisisWidget';
 import ChildSelector from '@/components/mommy/ChildSelector';
 import TeethingWidget from '@/components/mommy/TeethingWidget';
+import MommyHero from '@/components/mommy/hero/MommyHero';
 import BannerSlot from '@/components/banners/BannerSlot';
 import SendDailySummaryWidget from '@/components/partner/SendDailySummaryWidget';
 import RecentBlogPosts from '@/components/dashboard/RecentBlogPosts';
