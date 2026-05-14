@@ -301,7 +301,7 @@ const Index = () => {
         case 'ai':
           return (
             <motion.div key="partner-ai" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full">
-              <PartnerAIChatScreen />
+              <PartnerAIPremiumGate />
             </motion.div>
           );
         case 'profile':
