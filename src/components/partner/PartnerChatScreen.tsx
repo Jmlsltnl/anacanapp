@@ -318,8 +318,8 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Quick Messages - Same as Mother Chat */}
-      <div className="px-4 py-2 flex gap-2 overflow-x-auto scrollbar-hide">
+      {/* Quick Messages */}
+      <div className="px-4 py-2 flex gap-2 overflow-x-auto scrollbar-hide flex-shrink-0 border-t border-border/50">
         {quickMessages.map(msg => (
           <motion.button
             key={msg}
@@ -332,8 +332,11 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
         ))}
       </div>
 
-      {/* Input - Same as Mother Chat */}
-      <div className="p-4 bg-card border-t border-border safe-bottom">
+      {/* Input */}
+      <div
+        className="p-3 bg-card border-t border-border flex-shrink-0"
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 12px)' }}
+      >
         <div className="flex items-center gap-2">
           <ChatMediaUpload onUpload={sendMediaMessage} />
           <input
