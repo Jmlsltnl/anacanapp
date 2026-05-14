@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Sparkles, Calendar, Heart } from 'lucide-react';
+import { Sparkles, Heart, Star } from 'lucide-react';
 import type { MommyHeroProps } from './MommyHeroClassic';
 
 /**
@@ -65,40 +65,40 @@ const MommyHeroBento = ({ babyData, exactMonths, remainingDays, babyIllustration
         </div>
       </motion.div>
 
-      {/* Small tile 1 - days */}
+      {/* Small tile 1 - milestone */}
       <motion.div
         className="relative col-span-1 row-span-1 rounded-[1.5rem] bg-[hsl(15,90%,95%)] p-3 flex flex-col justify-between overflow-hidden"
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <Calendar className="w-4 h-4 text-[hsl(15,80%,50%)]" />
+        <Star className="w-4 h-4 text-[hsl(15,80%,50%)] fill-current" />
         <div>
           <div className="text-xl font-black text-[hsl(15,55%,25%)] tabular-nums leading-none">
-            {babyData.ageInDays}
+            {weeks}
           </div>
           <div className="text-[9px] font-bold uppercase tracking-wider text-[hsl(15,55%,40%)]/70 mt-0.5">
-            Gün
+            Həftə
           </div>
         </div>
       </motion.div>
 
-      {/* Small tile 2 - weeks */}
+      {/* Small tile 2 - daily affirmation */}
       <motion.div
         className="relative col-span-2 row-span-1 rounded-[1.5rem] bg-gradient-to-br from-[hsl(340,90%,90%)] to-[hsl(15,90%,92%)] p-3 flex items-center justify-between overflow-hidden"
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
       >
-        <div>
+        <div className="min-w-0">
           <div className="text-[9px] font-bold uppercase tracking-wider text-[hsl(15,55%,30%)]/70">
-            Həftə
+            Bu gün
           </div>
-          <div className="text-2xl font-black text-[hsl(15,55%,25%)] tabular-nums leading-none mt-0.5">
-            {weeks}
+          <div className="text-[13px] font-black text-[hsl(15,55%,25%)] leading-tight mt-0.5 truncate">
+            Sevgi ilə böyüyür ✨
           </div>
         </div>
-        <div className="w-9 h-9 rounded-full bg-white/70 backdrop-blur-sm flex items-center justify-center shadow-sm">
+        <div className="w-9 h-9 rounded-full bg-white/70 backdrop-blur-sm flex items-center justify-center shadow-sm shrink-0 ml-2">
           <Heart className="w-4 h-4 text-[hsl(340,80%,55%)] fill-current" />
         </div>
       </motion.div>

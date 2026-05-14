@@ -90,12 +90,7 @@ const MommyHeroStory = ({ babyData, exactMonths, remainingDays, babyIllustration
         </motion.h2>
         <div className="flex items-center gap-2 mt-1.5">
           <div className="px-2.5 py-1 rounded-full bg-white/25 backdrop-blur-md border border-white/40">
-            <span className="text-[11px] font-bold text-white drop-shadow">{ageLabel}</span>
-          </div>
-          <div className="px-2.5 py-1 rounded-full bg-white/25 backdrop-blur-md border border-white/40">
-            <span className="text-[11px] font-bold text-white drop-shadow">
-              {babyData.ageInDays}. gün ✨
-            </span>
+            <span className="text-[11px] font-bold text-white drop-shadow">{ageLabel} ✨</span>
           </div>
         </div>
       </div>

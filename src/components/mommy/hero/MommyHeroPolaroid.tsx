@@ -34,7 +34,7 @@ const MommyHeroPolaroid = ({ babyData, exactMonths, remainingDays, babyIllustrat
       {/* Date stamp top-left */}
       <div className="absolute top-4 left-5 z-10">
         <p className="text-[9px] font-bold tracking-[0.3em] uppercase text-[hsl(15,40%,40%)]/60">
-          Mommy · Day {babyData.ageInDays}
+          Mommy diary
         </p>
         <div className="w-10 h-px bg-[hsl(15,40%,40%)]/30 mt-1" />
       </div>
@@ -79,11 +79,8 @@ const MommyHeroPolaroid = ({ babyData, exactMonths, remainingDays, babyIllustrat
           </p>
 
           <div className="flex items-center gap-2 mt-3">
-            <div className="px-2.5 py-1 rounded-full bg-white/80 border border-[hsl(15,40%,80%)] text-[10px] font-bold text-[hsl(15,55%,30%)]">
-              {ageLabel}
-            </div>
             <div className="px-2.5 py-1 rounded-full bg-[hsl(15,80%,60%)] text-[10px] font-bold text-white shadow-sm">
-              {babyData.ageInDays} gün
+              {ageLabel}
             </div>
           </div>
         </div>
