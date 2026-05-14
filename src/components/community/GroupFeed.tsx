@@ -4,6 +4,7 @@ import { ArrowLeft, Plus, Users } from 'lucide-react';
 import { CommunityGroup, useGroupPosts } from '@/hooks/useCommunity';
 import { useGroupPresence } from '@/hooks/useGroupPresence';
 import PostCard from './PostCard';
+import PostSeenObserver from './PostSeenObserver';
 import GroupPresenceBar from './GroupPresenceBar';
 import StoriesBar from './StoriesBar';
 import PostSearchFilter from './PostSearchFilter';
