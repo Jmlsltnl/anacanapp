@@ -233,40 +233,35 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
   });
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col" style={{ height: '100dvh' }}>
-      {/* Header - Same as Mother Chat */}
-      <div className="gradient-primary px-5 pb-4 pt-[max(env(safe-area-inset-top),12px)] flex-shrink-0">
-        <div className="flex items-center gap-4">
+    <div className="fixed inset-0 z-[60] bg-background flex flex-col" style={{ height: '100dvh' }}>
+      {/* Minimal Header */}
+      <div className="bg-card border-b border-border px-3 pb-2 pt-[max(env(safe-area-inset-top),10px)] flex-shrink-0">
+        <div className="flex items-center gap-2">
           <motion.button
             onClick={onBack}
-            className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-9 h-9 rounded-full hover:bg-muted flex items-center justify-center"
             whileTap={{ scale: 0.95 }}
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-5 h-5 text-foreground" />
           </motion.button>
-          <div className="flex items-center gap-3 flex-1">
-            <motion.div 
-              className="w-10 h-10 rounded-full bg-pink-400/30 flex items-center justify-center text-xl"
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
+          <div className="flex items-center gap-2.5 flex-1 min-w-0">
+            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-lg">
               {partnerProfile?.life_stage === 'bump' ? '🤰' : partnerProfile?.life_stage === 'mommy' ? '👩‍🍼' : '👩'}
-            </motion.div>
-            <div>
-              <h1 className="text-lg font-bold text-white">{partnerProfile?.name || 'Partner'}</h1>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-white/70 text-xs">Online</span>
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-sm font-semibold text-foreground truncate">{partnerProfile?.name || 'Partner'}</h1>
+              <div className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                <span className="text-muted-foreground text-[10px]">Online</span>
               </div>
             </div>
           </div>
           <motion.button
             onClick={sendLove}
-            className="w-10 h-10 rounded-full bg-pink-500/30 flex items-center justify-center"
-            whileHover={{ scale: 1.1 }}
+            className="w-9 h-9 rounded-full hover:bg-pink-50 dark:hover:bg-pink-900/20 flex items-center justify-center"
             whileTap={{ scale: 0.9 }}
           >
-            <Heart className="w-5 h-5 text-white fill-white" />
+            <Heart className="w-4 h-4 text-pink-500 fill-pink-500" />
           </motion.button>
         </div>
       </div>
@@ -330,12 +325,12 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
       </div>
 
       {/* Quick Messages */}
-      <div className="px-4 py-2 flex gap-2 overflow-x-auto scrollbar-hide flex-shrink-0 border-t border-border/50">
+      <div className="px-3 py-1.5 flex gap-1.5 overflow-x-auto scrollbar-hide flex-shrink-0">
         {quickMessages.map(msg => (
           <motion.button
             key={msg}
             onClick={() => sendQuickMessage(msg)}
-            className="px-3 py-1.5 bg-muted rounded-full text-xs font-medium whitespace-nowrap"
+            className="px-2.5 py-1 bg-muted rounded-full text-[11px] font-medium whitespace-nowrap"
             whileTap={{ scale: 0.95 }}
           >
             {msg}
@@ -345,10 +340,10 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
 
       {/* Input */}
       <div
-        className="p-3 bg-card border-t border-border flex-shrink-0"
-        style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 12px)' }}
+        className="px-2 pt-2 bg-card border-t border-border flex-shrink-0"
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)' }}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-end gap-1.5">
           <ChatMediaUpload onUpload={sendMediaMessage} />
           <input
             type="text"
@@ -356,16 +351,15 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
             placeholder={tr("partnerchatscreen_mesaj_yazin_e69f84", "Mesaj yazın...")}
-            className="flex-1 h-12 px-4 rounded-2xl bg-muted text-sm outline-none border-2 border-transparent focus:border-primary/30 transition-colors"
+            className="flex-1 h-10 px-3.5 rounded-full bg-muted text-sm outline-none border border-transparent focus:border-primary/40 transition-colors"
           />
           <motion.button
             onClick={sendMessage}
             disabled={!newMessage.trim()}
-            className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center disabled:opacity-50"
-            whileHover={{ scale: 1.05 }}
+            className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-40"
             whileTap={{ scale: 0.95 }}
           >
-            <Send className="w-5 h-5" />
+            <Send className="w-4 h-4" />
           </motion.button>
         </div>
       </div>
