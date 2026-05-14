@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Heart, Bell, ShoppingCart, MessageCircle, 
-  Gift, Plus, Home, Target, Send, BarChart3
+  Gift, Plus, Home, Send, BarChart3
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { hapticFeedback } from '@/lib/native';
@@ -11,7 +11,6 @@ import { useShoppingItems } from '@/hooks/useShoppingItems';
 import { useAuth } from '@/hooks/useAuth';
 import { usePartnerData } from '@/hooks/usePartnerData';
 import { usePartnerMessages } from '@/hooks/usePartnerMessages';
-import { usePartnerMissions } from '@/hooks/usePartnerMissions';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useDailyTip } from '@/hooks/usePartnerDailyTips';
@@ -24,34 +23,12 @@ import PartnerChatScreen from './partner/PartnerChatScreen';
 import WeeklyStatsTab from './partner/WeeklyStatsTab';
 import NotificationsTab from './partner/NotificationsTab';
 import SurpriseTab from './partner/SurpriseTab';
-import LevelUpCelebration from './partner/LevelUpCelebration';
 import SOSButton from './partner/SOSButton';
 import PartnerHeroCard from './partner/PartnerHeroCard';
 import LiveActivityCard from './partner/LiveActivityCard';
 import PartnerQuickStats from './partner/PartnerQuickStats';
 import SyncedFeaturesGrid from './partner/SyncedFeaturesGrid';
-import PartnerMissionsCard from './partner/PartnerMissionsCard';
 import { tr } from "@/lib/tr";
-
-// Quick Action Button
-const QuickAction = ({ icon: Icon, label, gradient, onClick }: {
-  icon: any;
-  label: string;
-  gradient: string;
-  onClick?: () => void;
-}) => (
-  <motion.button
-    onClick={onClick}
-    className={`${gradient} rounded-2xl p-4 flex flex-col items-center gap-2 shadow-lg flex-1`}
-    whileHover={{ scale: 1.02, y: -2 }}
-    whileTap={{ scale: 0.95 }}
-  >
-    <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-      <Icon className="w-6 h-6 text-white" />
-    </div>
-    <span className="text-white font-medium text-xs">{label}</span>
-  </motion.button>
-);
 
 interface PartnerDashboardProps {
   onNavigate?: (screen: string) => void;
@@ -66,11 +43,8 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
   const { partnerProfile, partnerDailyLog, loading: partnerLoading, getPregnancyWeek, getDaysUntilDue, getBabyAgeDays, getCyclePhaseInfo, getDaysUntilNextPeriod } = usePartnerData();
   const { items: shoppingItems, addItem, toggleItem, loading: shoppingLoading } = useShoppingItems();
   const { messages, markAsRead, getUnreadCount } = usePartnerMessages();
-  const { level, totalPoints } = usePartnerMissions();
-  const [activeTab, setActiveTab] = useState<'home' | 'missions' | 'shopping' | 'notifications' | 'stats' | 'surprise'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'shopping' | 'notifications' | 'stats' | 'surprise'>('home');
   const [showChat, setShowChat] = useState(false);
-  const [showLevelUp, setShowLevelUp] = useState(false);
-  const previousLevelRef = useRef(level);
 
   const [newItem, setNewItem] = useState('');
   const [loveMessage, setLoveMessage] = useState('');
@@ -111,13 +85,7 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
     ? getDynamicFruitData(fruitImages, pregnancyDay, currentWeek, dayContent)
     : null;
 
-  // Track level changes for celebration
-  useEffect(() => {
-    if (level > previousLevelRef.current && previousLevelRef.current > 0) {
-      setShowLevelUp(true);
-    }
-    previousLevelRef.current = level;
-  }, [level]);
+
 
   const toggleShoppingItem = async (id: string) => {
     await hapticFeedback.light();
@@ -238,13 +206,6 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
 
   return (
     <div className="pb-4 bg-background min-h-screen">
-      {/* Level Up Celebration */}
-      <LevelUpCelebration 
-        show={showLevelUp} 
-        level={level} 
-        onClose={() => setShowLevelUp(false)} 
-      />
-
       {/* Hero Header */}
       <div className="bg-gradient-to-br from-partner via-[#FF9A6C] to-[#FFB088] px-4 pt-3 pb-16 relative overflow-hidden">
         {/* Decorative elements */}
@@ -304,8 +265,8 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
         <div className="bg-card rounded-2xl p-1.5 flex gap-1 shadow-xl border border-border/50">
           {[
             { id: 'home', label: tr("partnerdashboard_esas_6d87f7", 'Əsas'), icon: Home },
-            { id: 'missions', label: tr("partnerdashboard_tapsiriq_d827b6", 'Tapşırıq'), icon: Target },
             { id: 'stats', label: 'Statistika', icon: BarChart3 },
+            { id: 'notifications', label: 'Bildiriş', icon: Bell },
             { id: 'surprise', label: tr("partnerdashboard_surpriz_67b2b2", 'Sürpriz'), icon: Gift },
             { id: 'shopping', label: tr("partnerdashboard_siyahi_f04aac", 'Siyahı'), icon: ShoppingCart },
           ].map(tab => {
@@ -415,31 +376,6 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
                 </div>
               </motion.div>
 
-              {/* Quick Actions */}
-              <div>
-                <h2 className="font-bold text-lg mb-3">Sürətli Hərəkətlər</h2>
-                <div className="flex gap-3">
-                  <QuickAction 
-                    icon={Heart} 
-                    label="Sevgi göndər" 
-                    gradient="bg-gradient-to-br from-pink-500 to-rose-600"
-                    onClick={sendLove}
-                  />
-                  <QuickAction 
-                    icon={MessageCircle} 
-                    label="Canlı chat" 
-                    gradient="bg-gradient-to-br from-partner to-partner-dark"
-                    onClick={() => setShowChat(true)}
-                  />
-                  <QuickAction 
-                    icon={Gift} 
-                    label="Sürpriz planla" 
-                    gradient="bg-gradient-to-br from-amber-500 to-orange-600"
-                    onClick={() => setActiveTab('surprise')}
-                  />
-                </div>
-              </div>
-
               {/* Synced Features Grid */}
               <SyncedFeaturesGrid 
                 onNavigate={onNavigate || (() => {})} 
@@ -465,17 +401,6 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
 
               {/* Quick Stats */}
               <PartnerQuickStats />
-            </motion.div>
-          )}
-
-          {activeTab === 'missions' && (
-            <motion.div
-              key="missions"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <PartnerMissionsCard showAll />
             </motion.div>
           )}
 

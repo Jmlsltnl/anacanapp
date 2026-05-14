@@ -22,7 +22,7 @@ const Dashboard = lazy(() => import('@/components/Dashboard'));
 const PartnerDashboard = lazy(() => import('@/components/PartnerDashboard'));
 const ToolsHub = lazy(() => import('@/components/ToolsHub'));
 const AIChatScreen = lazy(() => import('@/components/AIChatScreen'));
-const PartnerAIChatScreen = lazy(() => import('@/components/PartnerAIChatScreen'));
+const PartnerAIPremiumGate = lazy(() => import('@/components/partner/PartnerAIPremiumGate'));
 const PartnerChatScreen = lazy(() => import('@/components/partner/PartnerChatScreen'));
 const ShopScreen = lazy(() => import('@/components/ShopScreen'));
 const CakesScreen = lazy(() => import('@/components/CakesScreen'));
@@ -301,7 +301,7 @@ const Index = () => {
         case 'ai':
           return (
             <motion.div key="partner-ai" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full">
-              <PartnerAIChatScreen />
+              <PartnerAIPremiumGate />
             </motion.div>
           );
         case 'profile':

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Crown, Sparkles, Check, ChevronRight, Shield, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useUserStore } from '@/store/userStore';
 import { PremiumModal } from '@/components/PremiumModal';
 
 interface DashboardPremiumBannerProps {
@@ -27,9 +28,11 @@ const SAVINGS_PCT = Math.round((1 - YEARLY_MONTHLY / MONTHLY_PRICE) * 100);
 
 export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremiumBannerProps) {
   const { isPremium } = useSubscription();
+  const role = useUserStore(s => s.role);
   const [selectedPlan, setSelectedPlan] = useState<'yearly' | 'monthly'>('yearly');
   const [modalOpen, setModalOpen] = useState(false);
-  const shouldHideBanner = isPremium && !import.meta.env.DEV;
+  // Partnyora premium satışı yoxdur — yalnız qadın üçün premium upsell göstərilir.
+  const shouldHideBanner = role === 'partner' || (isPremium && !import.meta.env.DEV);
 
   const handleOpen = () => {
     if (onOpenPremium) onOpenPremium();
