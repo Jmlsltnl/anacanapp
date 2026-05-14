@@ -1,4 +1,4 @@
-import { useState, forwardRef, useEffect } from 'react';
+import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Users, Plus, Search, TrendingUp, Compass, Sparkles, X, Pen, MessageCircle } from 'lucide-react';
 import { useCommunityGroups, useUserMemberships } from '@/hooks/useCommunity';
