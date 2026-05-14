@@ -40,8 +40,8 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   useScrollToTop([activeTab, selectedGroupId, selectedUserId]);
   useScreenAnalytics('Community', 'Social');
 
-  const { markCommunitySeen } = useUnreadCommunityPosts();
-  useEffect(() => { markCommunitySeen(); }, [markCommunitySeen]);
+  // Note: do NOT auto mark-all-seen here. Posts are marked individually as
+  // they enter the viewport in GroupFeed via the SeenObserver wrapper.
 
   const { lifeStage } = useUserStore();
   const headerKey = `community_header_${lifeStage || 'mommy'}`;
