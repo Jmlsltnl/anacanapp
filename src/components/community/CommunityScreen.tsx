@@ -40,6 +40,9 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   useScrollToTop([activeTab, selectedGroupId, selectedUserId]);
   useScreenAnalytics('Community', 'Social');
 
+  const { markCommunitySeen } = useUnreadCommunityPosts();
+  useEffect(() => { markCommunitySeen(); }, [markCommunitySeen]);
+
   const { lifeStage } = useUserStore();
   const headerKey = `community_header_${lifeStage || 'mommy'}`;
   const dynamicHeader = useAppSetting(headerKey);
