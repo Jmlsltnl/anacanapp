@@ -285,8 +285,8 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
         <div className="bg-card rounded-2xl p-1.5 flex gap-1 shadow-xl border border-border/50">
           {[
             { id: 'home', label: tr("partnerdashboard_esas_6d87f7", 'Əsas'), icon: Home },
-            { id: 'missions', label: tr("partnerdashboard_tapsiriq_d827b6", 'Tapşırıq'), icon: Target },
             { id: 'stats', label: 'Statistika', icon: BarChart3 },
+            { id: 'notifications', label: 'Bildiriş', icon: Bell },
             { id: 'surprise', label: tr("partnerdashboard_surpriz_67b2b2", 'Sürpriz'), icon: Gift },
             { id: 'shopping', label: tr("partnerdashboard_siyahi_f04aac", 'Siyahı'), icon: ShoppingCart },
           ].map(tab => {
