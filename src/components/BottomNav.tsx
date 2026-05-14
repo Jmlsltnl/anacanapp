@@ -68,6 +68,9 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
             const isActive = activeTab === tab.id;
             // Show badge on chat tab for unread messages (both partner and woman)
             const showBadge = (tab.id === 'chat' || (tab.id === 'home' && !isPartner)) && unreadCount > 0;
+            // Community unread posts badge (woman only)
+            const showCommunityBadge = tab.id === 'community' && !isPartner && communityUnread > 0;
+            const communityBadgeText = communityUnread > 99 ? '99+' : String(communityUnread);
             
             return (
               <motion.button
