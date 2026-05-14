@@ -30,6 +30,7 @@ const partnerTabs = [
 const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps) => {
   const { lifeStage } = useUserStore();
   const { unreadCount } = useUnreadMessages();
+  const { unreadCount: communityUnread } = useUnreadCommunityPosts();
   
   const getActiveColor = () => {
     switch (lifeStage) {
