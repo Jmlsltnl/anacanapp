@@ -212,6 +212,10 @@ serve(async (req) => {
   }
 
   try {
+    const auth = await requireUser(req);
+    if (auth.error) return auth.error;
+
+
     const { 
       mom_birth_date, 
       mom_birth_time, 
