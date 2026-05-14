@@ -62,6 +62,9 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const cronErr = requireCronSecret(req);
+    if (cronErr) return cronErr;
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
