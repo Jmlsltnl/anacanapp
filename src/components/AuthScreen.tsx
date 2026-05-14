@@ -15,6 +15,27 @@ type AuthMode = 'login' | 'register' | 'forgot-password';
 type PartnerAuthMode = 'login' | 'register';
 type MainView = 'main' | 'partner';
 
+function getSignupErrorMessage(error: any): string {
+  const code = error?.code || '';
+  const msg = (error?.message || '').toLowerCase();
+  if (code === 'weak_password' || msg.includes('weak') || msg.includes('pwned')) {
+    return 'Şifrə çox zəifdir və ya sızdırılmış şifrələr siyahısındadır. Daha güclü, unikal bir şifrə seçin (ən azı 8 simvol, böyük/kiçik hərf, rəqəm və simvol).';
+  }
+  if (code === 'user_already_exists' || code === 'email_exists' || msg.includes('already registered') || msg.includes('already exists') || msg.includes('user already')) {
+    return 'Bu e-mail artıq qeydiyyatdan keçib. Giriş edin və ya şifrəni unutmusunuzsa bərpa edin.';
+  }
+  if (code === 'invalid_email' || msg.includes('invalid email') || msg.includes('email address')) {
+    return 'E-mail ünvanı düzgün deyil.';
+  }
+  if (code === 'over_email_send_rate_limit' || msg.includes('rate limit')) {
+    return 'Çox sayda cəhd edildi. Bir az sonra yenidən cəhd edin.';
+  }
+  if (msg.includes('password') && msg.includes('characters')) {
+    return 'Şifrə ən azı 6 simvoldan ibarət olmalıdır.';
+  }
+  return error?.message || 'Qeydiyyat zamanı xəta baş verdi. Yenidən cəhd edin.';
+}
+
 const AuthScreen = () => {
   const [mainView, setMainView] = useState<MainView>('main');
   const [mode, setMode] = useState<AuthMode>('login');
@@ -110,8 +131,8 @@ const AuthScreen = () => {
       const { error: registerError } = await signUp(email, password, partnerName.trim());
       if (registerError) {
         toast({
-          title: tr("authscreen_qeydiyyat_alinmadi_982f04", 'Qeydiyyat alınmadı'),
-          description: tr("authscreen_bu_e_mail_artiq_qeydiyyatdan_kecib_1bdd66", 'Bu e-mail artıq qeydiyyatdan keçib.'),
+          title: 'Qeydiyyat alınmadı',
+          description: getSignupErrorMessage(registerError),
           variant: 'destructive',
         });
         setIsLoading(false);
@@ -272,8 +293,8 @@ const AuthScreen = () => {
         const { error } = await signUp(email, password, finalName.trim());
         if (error) {
           toast({
-            title: tr("authscreen_qeydiyyat_alinmadi_982f04", 'Qeydiyyat alınmadı'),
-            description: tr("authscreen_bu_e_mail_artiq_qeydiyyatdan_kecib_1bdd66", 'Bu e-mail artıq qeydiyyatdan keçib.'),
+            title: 'Qeydiyyat alınmadı',
+            description: getSignupErrorMessage(error),
             variant: 'destructive',
           });
         } else {
