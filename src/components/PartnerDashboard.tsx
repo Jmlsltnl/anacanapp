@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Heart, Bell, ShoppingCart, MessageCircle, 
-  Gift, Plus, Home, Target, Send, BarChart3
+  Gift, Plus, Home, Send, BarChart3
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { hapticFeedback } from '@/lib/native';
@@ -11,7 +11,6 @@ import { useShoppingItems } from '@/hooks/useShoppingItems';
 import { useAuth } from '@/hooks/useAuth';
 import { usePartnerData } from '@/hooks/usePartnerData';
 import { usePartnerMessages } from '@/hooks/usePartnerMessages';
-import { usePartnerMissions } from '@/hooks/usePartnerMissions';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useDailyTip } from '@/hooks/usePartnerDailyTips';
@@ -24,13 +23,11 @@ import PartnerChatScreen from './partner/PartnerChatScreen';
 import WeeklyStatsTab from './partner/WeeklyStatsTab';
 import NotificationsTab from './partner/NotificationsTab';
 import SurpriseTab from './partner/SurpriseTab';
-import LevelUpCelebration from './partner/LevelUpCelebration';
 import SOSButton from './partner/SOSButton';
 import PartnerHeroCard from './partner/PartnerHeroCard';
 import LiveActivityCard from './partner/LiveActivityCard';
 import PartnerQuickStats from './partner/PartnerQuickStats';
 import SyncedFeaturesGrid from './partner/SyncedFeaturesGrid';
-import PartnerMissionsCard from './partner/PartnerMissionsCard';
 import { tr } from "@/lib/tr";
 
 // Quick Action Button
