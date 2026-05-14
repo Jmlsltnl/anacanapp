@@ -105,13 +105,13 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     
     switch (lifeStage) {
       case 'flow':
-        return `Salam${userName}! 👋 Mən Anacan.AI, sizin sağlamlıq rəfiqənizəm. Menstrual tsikliniz, simptomlarınız və ya ümumi sağlamlığınız haqqında suallarınız varsa, kömək etməkdən məmnun olaram! 💜`;
+        return `Salam${userName}. Mən Anacan.AI. Menstrual tsikl, simptomlar və ümumi sağlamlıq üzrə suallarınıza peşəkar cavab verməyə hazıram.`;
       case 'bump':
-        return `Salam, əziz ana${userName}! 🤰 Mən Anacan.AI. ${pregnancyData ? `Hamiləliyin ${pregnancyData.currentWeek}-ci həftəsindəsiniz - körpəniz ${dynamicFruit || pregnancyData.babySize.fruit} böyüklüyündədir! ` : ''}Hamiləliyiniz haqqında hər hansı sualınız varsa, buradayam! 🌸`;
+        return `Salam${userName}. Mən Anacan.AI. ${pregnancyData ? `Hazırda hamiləliyin ${pregnancyData.currentWeek}-ci həftəsindəsiniz; körpəniz təxminən ${dynamicFruit || pregnancyData.babySize.fruit} böyüklüyündədir. ` : ''}Hamiləlik dövrü ilə bağlı suallarınızı verə bilərsiniz.`;
       case 'mommy':
-        return `Salam, əziz ana${userName}! 👶 Mən Anacan.AI. Körpə baxımı, əmizdirmə, yuxu qaydaları və ya doğuşdan sonra bərpa haqqında suallarınız varsa, sizə kömək etməyə hazıram! 💕`;
+        return `Salam${userName}. Mən Anacan.AI. Körpə baxımı, əmizdirmə, yuxu rejimi və doğuşdan sonrakı bərpa ilə bağlı suallarınıza dəstək olmağa hazıram.`;
       default:
-        return `Salam${userName}! 👋 Mən Anacan.AI, sizin AI rəfiqənizəm. Sizə necə kömək edə bilərəm?`;
+        return `Salam${userName}. Mən Anacan.AI. Sizə necə kömək edə bilərəm?`;
     }
   };
 
@@ -364,13 +364,13 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       <ScrollArea className="flex-1 px-4 py-4" ref={scrollRef}>
         <div className="space-y-4 pb-4">
           <AnimatePresence>
-            {messages.map((message, index) => (
+            {messages.map((message) => (
               <motion.div
                 key={message.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ delay: index * 0.05 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.18 }}
                 className={`flex gap-2 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
               >
                 <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center ${

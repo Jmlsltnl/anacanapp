@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Home, Compass, MessageCircle, User, Users, Cake } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
+import { useUnreadCommunityPosts } from '@/hooks/useUnreadCommunityPosts';
 import { tr } from "@/lib/tr";
 
 interface BottomNavProps {
@@ -29,6 +30,7 @@ const partnerTabs = [
 const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps) => {
   const { lifeStage } = useUserStore();
   const { unreadCount } = useUnreadMessages();
+  const { unreadCount: communityUnread } = useUnreadCommunityPosts();
   
   const getActiveColor = () => {
     switch (lifeStage) {
@@ -66,6 +68,9 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
             const isActive = activeTab === tab.id;
             // Show badge on chat tab for unread messages (both partner and woman)
             const showBadge = (tab.id === 'chat' || (tab.id === 'home' && !isPartner)) && unreadCount > 0;
+            // Community unread posts badge (woman only)
+            const showCommunityBadge = tab.id === 'community' && !isPartner && communityUnread > 0;
+            const communityBadgeText = communityUnread > 99 ? '99+' : String(communityUnread);
             
             return (
               <motion.button
@@ -110,6 +115,16 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
                       className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-destructive rounded-full text-[8px] font-bold text-white flex items-center justify-center z-20"
                     >
                       {unreadCount > 9 ? '9+' : unreadCount}
+                    </motion.span>
+                  )}
+                  {/* Community unread posts badge */}
+                  {showCommunityBadge && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-red-500 rounded-full text-[9px] font-bold text-white flex items-center justify-center z-20 shadow-sm"
+                    >
+                      {communityBadgeText}
                     </motion.span>
                   )}
                 </motion.div>

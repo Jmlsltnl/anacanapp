@@ -413,14 +413,16 @@ const Index = () => {
     return <AuthScreen />;
   }
 
-  // Onboarding - Partners skip onboarding (they don't need phase selection)
-  if (!isOnboarded && role !== 'partner') {
+  // Partners NEVER see standard onboarding or the funnel — detect via either role or life_stage
+  const isPartnerUser = role === 'partner' || lifeStage === 'partner';
+
+  // Onboarding - Partners skip onboarding entirely
+  if (!isOnboarded && !isPartnerUser) {
     return <OnboardingScreen />;
   }
 
   // Reverse Trial Funnel - only dev/web, not partner, not native
-  // hasCompletedFunnel defaults to true; set to false only during onboarding completion
-  if (!hasCompletedFunnel && !isNative && role !== 'partner') {
+  if (!hasCompletedFunnel && !isNative && !isPartnerUser) {
     const ReverseTrialFunnel = lazy(() => import('@/components/funnel/ReverseTrialFunnel'));
     return (
       <Suspense fallback={suspenseFallback}>

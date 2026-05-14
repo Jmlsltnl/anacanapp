@@ -403,10 +403,10 @@ const PartnerAIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
             {messages.map((message, index) => (
               <motion.div
                 key={message.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ delay: index * 0.05 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.18 }}
                 className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
               >
                 <div className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center ${

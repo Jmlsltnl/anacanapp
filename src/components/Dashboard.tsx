@@ -1631,90 +1631,6 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         </div>
       </motion.div>
 
-      {/* Milestones with Carousel */}
-      <motion.div 
-        className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.25 }}
-      >
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-base font-bold text-foreground">İnkişaf mərhələləri</h3>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-primary font-bold">
-              {allMilestones.filter(m => m.achieved).length}/{allMilestones.length}
-            </span>
-            {/* Carousel navigation */}
-            {hasMoreMilestones && (
-              <div className="flex gap-1">
-                <motion.button
-                  onClick={() => setMilestonePageIndex(p => Math.max(0, p - 1))}
-                  disabled={milestonePageIndex === 0}
-                  className="w-6 h-6 rounded-full bg-muted flex items-center justify-center disabled:opacity-40"
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <ChevronRight className="w-3 h-3 rotate-180" />
-                </motion.button>
-                <motion.button
-                  onClick={() => setMilestonePageIndex(p => Math.min(totalMilestonePages - 1, p + 1))}
-                  disabled={milestonePageIndex === totalMilestonePages - 1}
-                  className="w-6 h-6 rounded-full bg-muted flex items-center justify-center disabled:opacity-40"
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <ChevronRight className="w-3 h-3" />
-                </motion.button>
-              </div>
-            )}
-          </div>
-        </div>
-        
-        {/* Page indicator */}
-        {hasMoreMilestones && (
-          <div className="flex justify-center gap-1 mb-3">
-            {Array.from({ length: totalMilestonePages }).map((_, i) => (
-              <div
-                key={i}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === milestonePageIndex ? 'w-4 bg-primary' : 'w-1.5 bg-muted'
-                }`}
-              />
-            ))}
-          </div>
-        )}
-        
-        <div className="flex justify-between overflow-hidden">
-          {displayMilestones.map((milestone, index) => (
-            <motion.button 
-              key={milestone.id}
-              onClick={() => handleMilestoneClick(milestone.id)}
-              className="text-center flex-1"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.05 + index * 0.05 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <div className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center text-lg mb-1 relative ${
-                milestone.achieved 
-                  ? 'bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg' 
-                  : 'bg-muted opacity-60'
-              }`}>
-                {milestone.emoji}
-                {milestone.achieved && (
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                    <Check className="w-2.5 h-2.5 text-white" />
-                  </div>
-                )}
-              </div>
-              <span className={`text-[10px] line-clamp-1 ${
-                milestone.achieved ? 'text-foreground font-medium' : 'text-muted-foreground'
-              }`}>
-                {milestone.label}
-              </span>
-            </motion.button>
-          ))}
-        </div>
-      </motion.div>
-
       {/* Today's Summary */}
       <motion.div 
         className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
@@ -1835,6 +1751,90 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
               <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{todayStats.diaperCount} dəfə</span>
             </div>
           </div>
+        </div>
+      </motion.div>
+
+      {/* Milestones with Carousel */}
+      <motion.div 
+        className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.25 }}
+      >
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-base font-bold text-foreground">İnkişaf mərhələləri</h3>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-primary font-bold">
+              {allMilestones.filter(m => m.achieved).length}/{allMilestones.length}
+            </span>
+            {/* Carousel navigation */}
+            {hasMoreMilestones && (
+              <div className="flex gap-1">
+                <motion.button
+                  onClick={() => setMilestonePageIndex(p => Math.max(0, p - 1))}
+                  disabled={milestonePageIndex === 0}
+                  className="w-6 h-6 rounded-full bg-muted flex items-center justify-center disabled:opacity-40"
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <ChevronRight className="w-3 h-3 rotate-180" />
+                </motion.button>
+                <motion.button
+                  onClick={() => setMilestonePageIndex(p => Math.min(totalMilestonePages - 1, p + 1))}
+                  disabled={milestonePageIndex === totalMilestonePages - 1}
+                  className="w-6 h-6 rounded-full bg-muted flex items-center justify-center disabled:opacity-40"
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <ChevronRight className="w-3 h-3" />
+                </motion.button>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Page indicator */}
+        {hasMoreMilestones && (
+          <div className="flex justify-center gap-1 mb-3">
+            {Array.from({ length: totalMilestonePages }).map((_, i) => (
+              <div
+                key={i}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === milestonePageIndex ? 'w-4 bg-primary' : 'w-1.5 bg-muted'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+        
+        <div className="flex justify-between overflow-hidden">
+          {displayMilestones.map((milestone, index) => (
+            <motion.button 
+              key={milestone.id}
+              onClick={() => handleMilestoneClick(milestone.id)}
+              className="text-center flex-1"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.05 + index * 0.05 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <div className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center text-lg mb-1 relative ${
+                milestone.achieved 
+                  ? 'bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg' 
+                  : 'bg-muted opacity-60'
+              }`}>
+                {milestone.emoji}
+                {milestone.achieved && (
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                    <Check className="w-2.5 h-2.5 text-white" />
+                  </div>
+                )}
+              </div>
+              <span className={`text-[10px] line-clamp-1 ${
+                milestone.achieved ? 'text-foreground font-medium' : 'text-muted-foreground'
+              }`}>
+                {milestone.label}
+              </span>
+            </motion.button>
+          ))}
         </div>
       </motion.div>
 
