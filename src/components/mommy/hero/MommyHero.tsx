@@ -2,8 +2,25 @@ import { useAppSetting } from '@/hooks/useAppSettings';
 import MommyHeroClassic, { MommyHeroProps } from './MommyHeroClassic';
 import MommyHeroAurora from './MommyHeroAurora';
 import MommyHeroStorybook from './MommyHeroStorybook';
+import MommyHeroPolaroid from './MommyHeroPolaroid';
+import MommyHeroMinimalCard from './MommyHeroMinimalCard';
+import MommyHeroMesh from './MommyHeroMesh';
+import MommyHeroStory from './MommyHeroStory';
+import MommyHeroBento from './MommyHeroBento';
 
-export type MommyHeroVariant = 'classic' | 'aurora' | 'storybook';
+export type MommyHeroVariant =
+  | 'classic'
+  | 'aurora'
+  | 'storybook'
+  | 'polaroid'
+  | 'minimal'
+  | 'mesh'
+  | 'story'
+  | 'bento';
+
+const VARIANTS: MommyHeroVariant[] = [
+  'classic', 'aurora', 'storybook', 'polaroid', 'minimal', 'mesh', 'story', 'bento',
+];
 
 /**
  * Reads the selected variant from app_settings.mommy_hero_variant
@@ -12,14 +29,20 @@ export type MommyHeroVariant = 'classic' | 'aurora' | 'storybook';
  */
 const MommyHero = (props: MommyHeroProps) => {
   const variantSetting = useAppSetting('mommy_hero_variant');
-  const variant: MommyHeroVariant =
-    variantSetting === 'aurora' || variantSetting === 'storybook'
-      ? variantSetting
-      : 'classic';
+  const variant: MommyHeroVariant = VARIANTS.includes(variantSetting as MommyHeroVariant)
+    ? (variantSetting as MommyHeroVariant)
+    : 'classic';
 
-  if (variant === 'aurora') return <MommyHeroAurora {...props} />;
-  if (variant === 'storybook') return <MommyHeroStorybook {...props} />;
-  return <MommyHeroClassic {...props} />;
+  switch (variant) {
+    case 'aurora':    return <MommyHeroAurora {...props} />;
+    case 'storybook': return <MommyHeroStorybook {...props} />;
+    case 'polaroid':  return <MommyHeroPolaroid {...props} />;
+    case 'minimal':   return <MommyHeroMinimalCard {...props} />;
+    case 'mesh':      return <MommyHeroMesh {...props} />;
+    case 'story':     return <MommyHeroStory {...props} />;
+    case 'bento':     return <MommyHeroBento {...props} />;
+    default:          return <MommyHeroClassic {...props} />;
+  }
 };
 
 export default MommyHero;
