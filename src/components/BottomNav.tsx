@@ -117,6 +117,16 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </motion.span>
                   )}
+                  {/* Community unread posts badge */}
+                  {showCommunityBadge && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-red-500 rounded-full text-[9px] font-bold text-white flex items-center justify-center z-20 shadow-sm"
+                    >
+                      {communityBadgeText}
+                    </motion.span>
+                  )}
                 </motion.div>
                 
                 <motion.span 
