@@ -126,6 +126,29 @@ const AuthScreen = () => {
         return;
       }
 
+      // Verify the code owner has an ACTIVE PREMIUM subscription — partner mode is premium-only
+      const { data: ownerSub } = await supabase
+        .from('subscriptions')
+        .select('plan_type, status, expires_at')
+        .eq('user_id', partnerProfile.user_id)
+        .maybeSingle();
+
+      const ownerIsPremium =
+        ownerSub &&
+        (ownerSub.plan_type === 'premium' || ownerSub.plan_type === 'premium_plus') &&
+        (ownerSub.status === 'active' ||
+          (ownerSub.status === 'cancelled' && ownerSub.expires_at && new Date(ownerSub.expires_at) > new Date()));
+
+      if (!ownerIsPremium) {
+        toast({
+          title: 'Partnyor modu Premium-dur',
+          description: 'Bu kodun sahibi Premium abunəliyə malik olmalıdır. Həyat yoldaşınızdan Premium aktivləşdirməsini xahiş edin.',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
+      }
+
       // Register new partner
       const partnerName = nameInputRef.current?.value || name || 'Partner';
       const { error: registerError } = await signUp(email, password, partnerName.trim());

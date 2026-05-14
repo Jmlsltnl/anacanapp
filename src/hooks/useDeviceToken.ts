@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { isNative, isIOS, isAndroid } from '@/lib/native';
 import { Capacitor } from '@capacitor/core';
+import { toast } from 'sonner';
 
 export const useDeviceToken = () => {
   const { user } = useAuth();
@@ -10,6 +11,7 @@ export const useDeviceToken = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const registrationAttempted = useRef(false);
+  const registeredUserId = useRef<string | null>(null);
 
   // Save token using safe upsert. Never delete other tokens until the new one is committed.
   const saveTokenToDatabase = useCallback(async (deviceToken: string, userId: string) => {
@@ -138,10 +140,26 @@ export const useDeviceToken = () => {
 
       FirebaseMessaging.addListener('notificationReceived', (notification) => {
         console.log('[DeviceToken] Push received in foreground:', notification);
+        // Show in-app toast so user is not blind to incoming notifications
+        const title = notification?.notification?.title || 'Yeni bildiriş';
+        const body = notification?.notification?.body || '';
+        toast(title, { description: body });
       });
 
       FirebaseMessaging.addListener('notificationActionPerformed', (action) => {
         console.log('[DeviceToken] Push action performed:', action);
+        // Route based on data.type using global hash navigation
+        try {
+          const data: any = action?.notification?.data || {};
+          const type = data.type;
+          if (typeof window === 'undefined') return;
+          if (type === 'message' || type === 'partner_message') window.location.hash = '#/?tab=chat';
+          else if (type === 'comment' || type === 'like' || type === 'community') window.location.hash = '#/?tab=community';
+          else if (type === 'premium_expired') window.location.hash = '#/?tab=profile';
+          else if (data.deeplink) window.location.href = data.deeplink;
+        } catch (e) {
+          console.warn('[DeviceToken] Routing failed:', e);
+        }
       });
 
       setLoading(false);
@@ -236,21 +254,24 @@ export const useDeviceToken = () => {
     }
   }, [user, token]);
 
-  // Auto-register on mount if native and user exists
-  useEffect(() => {
-    if (user && isNative && !registrationAttempted.current) {
-      console.log('[DeviceToken] Auto-registering on mount...');
-      registerDevice();
-    }
-  }, [user, registerDevice]);
-
-  // Reset registration flag when user changes
+  // Auto-register on mount if native and user exists; reset on user change
   useEffect(() => {
     if (!user) {
       registrationAttempted.current = false;
+      registeredUserId.current = null;
       setToken(null);
+      return;
     }
-  }, [user]);
+    // If user changed (different account logged in), force re-register so token attaches to new user
+    if (registeredUserId.current && registeredUserId.current !== user.id) {
+      console.log('[DeviceToken] User changed, resetting registration');
+      registrationAttempted.current = false;
+    }
+    if (isNative && !registrationAttempted.current) {
+      registeredUserId.current = user.id;
+      registerDevice();
+    }
+  }, [user, registerDevice]);
 
   return {
     token,

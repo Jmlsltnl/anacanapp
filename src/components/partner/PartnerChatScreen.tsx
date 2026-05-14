@@ -122,13 +122,24 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
     await hapticFeedback.light();
 
     try {
+      const content = newMessage.trim();
       await supabase.from('partner_messages').insert({
         sender_id: user.id,
         receiver_id: partnerProfile.user_id,
         message_type: 'text',
-        content: newMessage.trim(),
+        content,
       });
       setNewMessage('');
+
+      // Fire-and-forget FCM push so receiver gets notified even if app is closed
+      supabase.functions.invoke('send-push-notification', {
+        body: {
+          userId: partnerProfile.user_id,
+          title: `${profile?.name || 'Partnyor'} 💌`,
+          body: content.slice(0, 80),
+          data: { type: 'partner_message' },
+        },
+      }).catch((e) => console.warn('Push invoke failed:', e));
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
@@ -222,9 +233,9 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
   });
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="fixed inset-0 z-50 bg-background flex flex-col" style={{ height: '100dvh' }}>
       {/* Header - Same as Mother Chat */}
-      <div className="gradient-primary px-5 pb-4 safe-top">
+      <div className="gradient-primary px-5 pb-4 pt-[max(env(safe-area-inset-top),12px)] flex-shrink-0">
         <div className="flex items-center gap-4">
           <motion.button
             onClick={onBack}
@@ -318,8 +329,8 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Quick Messages - Same as Mother Chat */}
-      <div className="px-4 py-2 flex gap-2 overflow-x-auto scrollbar-hide">
+      {/* Quick Messages */}
+      <div className="px-4 py-2 flex gap-2 overflow-x-auto scrollbar-hide flex-shrink-0 border-t border-border/50">
         {quickMessages.map(msg => (
           <motion.button
             key={msg}
@@ -332,8 +343,11 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
         ))}
       </div>
 
-      {/* Input - Same as Mother Chat */}
-      <div className="p-4 bg-card border-t border-border safe-bottom">
+      {/* Input */}
+      <div
+        className="p-3 bg-card border-t border-border flex-shrink-0"
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 12px)' }}
+      >
         <div className="flex items-center gap-2">
           <ChatMediaUpload onUpload={sendMediaMessage} />
           <input
