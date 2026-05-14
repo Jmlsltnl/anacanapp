@@ -1,76 +1,79 @@
+# Anacan – Yeni dəyişikliklər planı
 
-# P1 — Partnyor Modulu: Kritik Düzəlişlər
-
-Bu mərhələdə yalnız **dağıdıcı / istifadəçinin gözünə çarpan** problemləri həll edirik. Refaktor və yeni funksiyalar (P2/P3) sonrakı mərhələlərə saxlanılır.
-
----
-
-## 1. Mərhələ-spesifik Hero Card (ən vacib)
-
-**Problem:** Hazırda `PartnerHeroCard` yalnız `bump` üçün düzgün məlumat göstərir. `mommy` mərhələsində qadın üçün "X həftəlik hamilə" və ya boş meyvə kartı görünə bilər; `flow` mərhələsi isə tamamilə nəzərə alınmır.
-
-**Həll:**
-- `PartnerHeroCard.tsx` daxilində `lifeStage`-ə görə üç ayrı görünüş bloku:
-  - **bump** → mövcud həftə + meyvə + due date geri sayım (qalır)
-  - **mommy** → körpə adı, yaşı (ay/gün — `getRealCalendarAge`), körpə cinsiyyət emoji-si, "Bu gün anaya necə dəstək olum?" CTA
-  - **flow** → tsikl günü / faza (menstruasiya/follikulyar/ovulyasiya/luteal), növbəti menstruasiyaya neçə gün, dəstək tövsiyəsi
-- `PartnerDashboard.tsx`-də `babyAgeDays` artıq hesablanır — sadəcə hero-ya ötürürük; tsikl günü üçün `usePartnerData`-ya `getCycleDay()` köməkçisi əlavə edilir (mövcud `pregnancy-utils` məntiqindən istifadə edərək).
-
-## 2. Mərhələyə uyğun olmayan widget-lərin gizlədilməsi
-
-**Problem:** "Xəstəxana çantası" (`PartnerHospitalBagScreen`), hamiləliyə aid `LiveActivityCard`, və "Doğuşa hazırlıq" tipli kartlar `mommy` istifadəçisinin partnyoruna da göstərilir — mənasızdır.
-
-**Həll:** `PartnerDashboard.tsx` daxilində `home` tab render-ində `lifeStage`-ə əsasən şərti göstərilmə:
-- `bump` → Xəstəxana çantası, həftəlik inkişaf, doğuşa hazırlıq
-- `mommy` → Körpə günlük xülasəsi (yuxu/qidalanma sayı), bez xatırlatması, "Ana üçün istirahət təklifi"
-- `flow` → Tsikl xülasəsi, simptomlar əsaslı dəstək tövsiyələri
-
-## 3. Brend rəngi uyğunlaşdırması (bənövşəyi → Coral Orange)
-
-**Problem:** `from-partner` (bənövşəyi-mavi gradient) tətbiqin əsas brendi olan **Coral Orange (#F28155)** ilə ziddiyyət təşkil edir.
-
-**Həll:** Partnyor səhifələrindəki gradient-ləri brend rənginə uyğun isti palitra ilə əvəz edirik:
-- Hero arxa fon: `from-[#F28155] via-[#FF9A6C] to-[#FFB088]` (Coral Orange + soft peach)
-- Aksent: müvafiq olaraq `text-orange-50`, `border-white/20` saxlanılır
-- Tab bar aktiv vəziyyəti: `from-partner` → `from-[#F28155] to-[#FF9A6C]`
-- `PartnerMissionsCard`, `PartnerQuickStats`, `SyncedFeaturesGrid` faylları da yenilənir
-
-> Qeyd: `from-partner` Tailwind dəyişənini saxlayırıq, sadəcə `tailwind.config.ts`-də onu Coral Orange tonuna yenidən təyin edirik — bu, bütün partnyor UI-ı bir dəfəyə yeniləyir və regressiya riskini azaldır.
-
-## 4. Realtime subscription performans düzəlişi
-
-**Problem:** `usePartnerData.ts` daxilindəki realtime kanal `daily_logs` cədvəlinin **bütün** dəyişikliklərini dinləyir — başqa istifadəçilərin loqları da partnyorun fetch-ini tetikləyir (lazımsız trafik və yanlış re-render).
-
-**Həll:** Subscription-a server-side filter əlavə edirik:
-```ts
-{ event: '*', schema: 'public', table: 'daily_logs', filter: `user_id=eq.${partnerData.user_id}` }
-```
-Eyni şəkildə `usePartnerStats.ts`-də `partner_messages` və `partner_missions` üçün də `sender_id`/`user_id` filtri əlavə olunur.
-
-## 5. Boş vəziyyət (partnyor bağlı deyil)
-
-**Problem:** `linked_partner_id` yoxdursa, dashboard "Həyat yoldaşın" + boş data ilə qarışıq görünür.
-
-**Həll:** Əgər `profile.linked_partner_id` yoxdursa, yalnız bağlama təlimatı (mövcud partnyor kodu paylaşma axını ilə) və brend-uyğun boş vəziyyət kartı göstərilir; digər widget-lər tamamilə gizlədilir.
+Bu planda 6 ayrı dəyişiklik var. Hamısı bir-birindən asılı olmayan kiçik təkmilləşdirmələrdir.
 
 ---
 
-## Toxunulacaq fayllar
+## 1) Anacan.AI tonu və scroll problemi
 
-1. `src/components/partner/PartnerHeroCard.tsx` — mərhələ-spesifik render
-2. `src/components/PartnerDashboard.tsx` — şərti widget göstərmə + boş vəziyyət
-3. `src/hooks/usePartnerData.ts` — realtime filter + `getCycleDay()` köməkçisi
-4. `src/hooks/usePartnerStats.ts` — realtime filter
-5. `tailwind.config.ts` — `partner` rəngini Coral Orange-a uyğunlaşdırma
+**Problem 1 — Ton:** AI bəzən "Ay [ad]", "əziz ana", "rəfiqənizəm" kimi qeyri-formal müraciətlər istifadə edir. Daha peşəkar olmalıdır.
+
+**Problem 2 — Scroll:** Yeni mesaj yazılanda ekran "ən başa" sıçrayır. Səbəb: `AIChatScreen.tsx`-da `motion.div` üçün `transition={{ delay: index * 0.05 }}` hər mesaj üçün təxir verir, və yeni mesaj əlavə olunanda bütün mesajlar yenidən aşağıdan-yuxarı animasiya ilə render olunur — bu vizual "yuxarıya qaçma" hissi yaradır.
+
+**Düzəliş:**
+- `supabase/functions/dr-anacan-chat/prompts.ts` — system prompt-da "Ay", "əziz ana", "canım", "rəfiqə" kimi söz/müraciətləri qadağan et; "siz" formasında, peşəkar tonda cavab vermək tələbi əlavə et.
+- `src/components/AIChatScreen.tsx`:
+  - Welcome mesajlarından "əziz ana", "sağlamlıq rəfiqənizəm", "AI rəfiqənizəm" sözlərini çıxart, neytral peşəkar formaya gətir.
+  - `motion.div`-dən `transition={{ delay: index * 0.05 }}` çıxar — sadəcə qısa fade-in qalsın.
+  - Eyni dəyişikliyi `PartnerAIChatScreen.tsx`-də də et.
 
 ---
 
-## Bu planda **OLMAYAN** (sonraya saxlanılır)
+## 2) Bütün alətləri Premium et
 
-- ❌ `PartnerDashboard.tsx`-in 580 sətirdən modullara bölünməsi (P2)
-- ❌ Onboarding tour (P2)
-- ❌ AI Bələdçi partnyor üçün (P3)
-- ❌ Xatirələr / Memories timeline (P3)
-- ❌ Points/Levels üçün vahid hook (P2)
+**Problem:** Hazırda yalnız bəzi alətlər premiumdur. Sizin istəyiniz: **Alətlər bölməsindəki bütün alətlər premium** olsun, premium olmayanlar istifadə edə bilməsinlər və hər yerdə (ana ekran, dashboard widget, daxili giriş nöqtələri) premium nişanı görünsün.
 
-Təsdiq verirsinizsə, default rejimə keçərək bu 5 faylı tətbiq edim.
+**Düzəliş:**
+- `tool_configs` cədvəlində bütün alətləri tək migrasiya ilə `is_premium = true` et.
+- `useDynamicTools` hook-u onsuz da `is_premium` oxuyur; `ToolsScreen` və alət kartları üçün premium kilid göstərir — kodda əlavə dəyişiklik tələb olunmur, sadəcə DB yenilənməsi.
+- Əgər hansısa alət `useDynamicTools`-dan kənar (sabit/hardcoded) açılırsa, onu da `usePremiumGate` (və ya mövcud `useSubscription`) yoxlaması ilə qoru.
+
+---
+
+## 3) Partnyor profili onboarding görməməlidir
+
+**Problem:** `life_stage = 'partner'` olan istifadəçi standart bump/mommy/flow onboarding-lərini görür.
+
+**Düzəliş:**
+- `OnboardingScreen` (və ya əsas onboarding router) içində `lifeStage === 'partner'` olduqda **hər hansı onboarding addımı göstərmədən** birbaşa partnyor ana ekranına yönləndir.
+- Partnyor üçün ayrı tip onboarding əgər varsa, onu da skip et — partnyor heç bir onboarding görməməlidir.
+
+---
+
+## 4) Cəmiyyət iconu üzərində oxunmamış post sayı (qırmızı badge)
+
+**Problem:** Yeni cəmiyyət postları gəldikdə bottom-nav-dakı "Cəmiyyət" iconunda heç bir göstərici yoxdur.
+
+**Düzəliş:**
+- Yeni hook: `useUnreadCommunityPosts` — istifadəçinin son `community_posts.last_seen_at` (yeni `user_preferences` sütunu) tarixindən sonra yaradılmış postların sayını qaytarır.
+- Migrasiya: `user_preferences` cədvəlinə `community_last_seen_at timestamptz` sütunu əlavə et.
+- `BottomNav.tsx`-da Cəmiyyət iconunun üst sağında qırmızı yuvarlaq badge (sayla) göstər; say > 99 olarsa "99+".
+- İstifadəçi Cəmiyyət ekranını açanda `community_last_seen_at` indi vaxtına yenilənir → say sıfırlanır.
+
+---
+
+## 5) Cəmiyyətdə "Qruplar" tab-ını müvəqqəti gizlət
+
+**Düzəliş:**
+- `CommunityScreen.tsx`-da Qruplar tab/section-ını gizlət (silmə, sadəcə şərt ilə render etmə — `const SHOW_GROUPS = false;` flag).
+- Default açılış tab-ı "Feed" olsun.
+- `GroupsList`, `GroupFeed` faylları silinmir — gələcəkdə flag ilə açıla bilər.
+
+---
+
+## 6) Dashboard – "İnkişaf mərhələləri" və "Bugünkü Xülasə" widget yerlərini dəyişmək
+
+**Problem:** Hazırda `Dashboard.tsx`-da əvvəlcə "İnkişaf mərhələləri" (sətr ~1634), sonra "Today's Summary" (sətr ~1718) gəlir. Sizin istəyiniz: yerlər dəyişdirilsin — əvvəlcə Xülasə, sonra İnkişaf mərhələləri.
+
+**Düzəliş:**
+- `Dashboard.tsx`-da iki bloku yerini dəyişdir (Today's Summary blokunu Milestones-dən yuxarı çək).
+
+---
+
+## Texniki qeydlər
+
+- Migrasiyalar (DB):
+  1. `UPDATE tool_configs SET is_premium = true;`
+  2. `ALTER TABLE user_preferences ADD COLUMN community_last_seen_at timestamptz;`
+- Edge function `dr-anacan-chat` avtomatik yenidən deploy olunur.
+- Yoxlama: APK/preview-də (a) AI welcome mesajı, (b) yeni mesaj scroll davranışı, (c) alətlərin kilidli görünüşü, (d) Cəmiyyət badge-i, (e) Dashboard widget sırası.
