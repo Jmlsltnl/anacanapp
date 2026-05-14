@@ -272,8 +272,8 @@ const AuthScreen = () => {
         const { error } = await signUp(email, password, finalName.trim());
         if (error) {
           toast({
-            title: tr("authscreen_qeydiyyat_alinmadi_982f04", 'Qeydiyyat alınmadı'),
-            description: tr("authscreen_bu_e_mail_artiq_qeydiyyatdan_kecib_1bdd66", 'Bu e-mail artıq qeydiyyatdan keçib.'),
+            title: 'Qeydiyyat alınmadı',
+            description: getSignupErrorMessage(error),
             variant: 'destructive',
           });
         } else {
