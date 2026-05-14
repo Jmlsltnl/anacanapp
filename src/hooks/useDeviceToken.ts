@@ -140,10 +140,26 @@ export const useDeviceToken = () => {
 
       FirebaseMessaging.addListener('notificationReceived', (notification) => {
         console.log('[DeviceToken] Push received in foreground:', notification);
+        // Show in-app toast so user is not blind to incoming notifications
+        const title = notification?.notification?.title || 'Yeni bildiriş';
+        const body = notification?.notification?.body || '';
+        toast(title, { description: body });
       });
 
       FirebaseMessaging.addListener('notificationActionPerformed', (action) => {
         console.log('[DeviceToken] Push action performed:', action);
+        // Route based on data.type using global hash navigation
+        try {
+          const data: any = action?.notification?.data || {};
+          const type = data.type;
+          if (typeof window === 'undefined') return;
+          if (type === 'message' || type === 'partner_message') window.location.hash = '#/?tab=chat';
+          else if (type === 'comment' || type === 'like' || type === 'community') window.location.hash = '#/?tab=community';
+          else if (type === 'premium_expired') window.location.hash = '#/?tab=profile';
+          else if (data.deeplink) window.location.href = data.deeplink;
+        } catch (e) {
+          console.warn('[DeviceToken] Routing failed:', e);
+        }
       });
 
       setLoading(false);
