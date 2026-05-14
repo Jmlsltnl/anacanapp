@@ -7621,6 +7621,7 @@ export type Database = {
       }
       user_preferences: {
         Row: {
+          community_last_seen_at: string | null
           created_at: string
           daily_push_enabled: boolean | null
           exercise_days: number[] | null
@@ -7648,6 +7649,7 @@ export type Database = {
           white_noise_volume: number | null
         }
         Insert: {
+          community_last_seen_at?: string | null
           created_at?: string
           daily_push_enabled?: boolean | null
           exercise_days?: number[] | null
@@ -7675,6 +7677,7 @@ export type Database = {
           white_noise_volume?: number | null
         }
         Update: {
+          community_last_seen_at?: string | null
           created_at?: string
           daily_push_enabled?: boolean | null
           exercise_days?: number[] | null
