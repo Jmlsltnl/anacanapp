@@ -32,6 +32,7 @@ interface ChatRequest {
 }
 
 import { getSystemPrompt } from "./prompts.ts";
+import { requireUser } from "../_shared/auth.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -39,6 +40,10 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Require authenticated caller — prevents abuse of Gemini quota.
+    const auth = await requireUser(req);
+    if (auth.error) return auth.error;
+
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     if (!GEMINI_API_KEY) {
       console.error("GEMINI_API_KEY not configured");
