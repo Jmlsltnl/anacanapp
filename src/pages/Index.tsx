@@ -421,14 +421,27 @@ const Index = () => {
     return <OnboardingScreen />;
   }
 
-  // Reverse Trial Funnel - only dev/web, not partner, not native
-  if (!hasCompletedFunnel && !isNative && !isPartnerUser) {
+  // Reverse Trial Funnel - only dev/web, not partner, not native, not premium,
+  // and only shown ONCE per user account (persisted in localStorage by user id).
+  const isPremiumProfile = profile?.is_premium === true;
+  const paywallSeenKey = user?.id ? `paywall_seen_${user.id}` : null;
+  const paywallAlreadySeen = paywallSeenKey ? localStorage.getItem(paywallSeenKey) === '1' : false;
+  if (!hasCompletedFunnel && !paywallAlreadySeen && !isPremiumProfile && !isNative && !isPartnerUser) {
     const ReverseTrialFunnel = lazy(() => import('@/components/funnel/ReverseTrialFunnel'));
     return (
       <Suspense fallback={suspenseFallback}>
-        <ReverseTrialFunnel onComplete={() => setFunnelCompleted(true)} />
+        <ReverseTrialFunnel onComplete={() => {
+          if (paywallSeenKey) {
+            try { localStorage.setItem(paywallSeenKey, '1'); } catch {}
+          }
+          setFunnelCompleted(true);
+        }} />
       </Suspense>
     );
+  }
+  // If user is premium or already saw the paywall, persist completion to skip future checks
+  if ((isPremiumProfile || paywallAlreadySeen) && !hasCompletedFunnel) {
+    setFunnelCompleted(true);
   }
 
   // Admin Panel
