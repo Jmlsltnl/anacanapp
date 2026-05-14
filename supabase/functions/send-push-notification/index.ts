@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
+import { requireUser } from '../_shared/auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,6 +20,10 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Require authenticated caller — prevents anonymous push spam.
+    const auth = await requireUser(req);
+    if (auth.error) return auth.error;
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''

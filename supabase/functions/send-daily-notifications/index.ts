@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
+import { requireCronSecret, requireAdmin } from '../_shared/auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -45,6 +46,13 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Auth: cron secret OR admin user (for manual triggers from admin UI).
+    const cronErr = requireCronSecret(req);
+    if (cronErr) {
+      const adminCheck = await requireAdmin(req);
+      if (adminCheck.error) return adminCheck.error;
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''

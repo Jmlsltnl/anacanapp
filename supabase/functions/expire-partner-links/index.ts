@@ -4,14 +4,18 @@
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
+import { requireCronSecret } from '../_shared/auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-cron-secret',
 };
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
+
+  const cronErr = requireCronSecret(req);
+  if (cronErr) return cronErr;
 
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',

@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
+import { requireAdmin } from '../_shared/auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,6 +19,10 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Admin-only: bulk push to all users.
+    const adminCheck = await requireAdmin(req);
+    if (adminCheck.error) return adminCheck.error;
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
