@@ -222,9 +222,9 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
   });
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="fixed inset-0 z-50 bg-background flex flex-col" style={{ height: '100dvh' }}>
       {/* Header - Same as Mother Chat */}
-      <div className="gradient-primary px-5 pb-4 safe-top">
+      <div className="gradient-primary px-5 pb-4 pt-[max(env(safe-area-inset-top),12px)] flex-shrink-0">
         <div className="flex items-center gap-4">
           <motion.button
             onClick={onBack}
