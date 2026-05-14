@@ -226,13 +226,6 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
 
   return (
     <div className="pb-4 bg-background min-h-screen">
-      {/* Level Up Celebration */}
-      <LevelUpCelebration 
-        show={showLevelUp} 
-        level={level} 
-        onClose={() => setShowLevelUp(false)} 
-      />
-
       {/* Hero Header */}
       <div className="bg-gradient-to-br from-partner via-[#FF9A6C] to-[#FFB088] px-4 pt-3 pb-16 relative overflow-hidden">
         {/* Decorative elements */}
