@@ -403,22 +403,75 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
           </motion.div>
         )}
 
-        {/* Payment history */}
+        {/* Payment history (real RevenueCat data) */}
         {isPremium && subscription && (
           <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }} className="bg-card rounded-2xl p-4 border border-border/50 shadow-sm">
-            <h3 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
-              <CreditCard className="w-3.5 h-3.5 text-muted-foreground" />{config.payment_title}
-            </h3>
-            <div className="flex items-center justify-between p-3 bg-muted/40 rounded-xl">
-              <div>
-                <p className="font-semibold text-foreground text-sm">{planName}</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">{format(new Date(subscription.started_at), 'd MMM yyyy', { locale: az })}</p>
-              </div>
-              <div className="text-right">
-                <p className="font-bold text-foreground text-sm">{planPrice}</p>
-                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">{config.paid_label}</span>
-              </div>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                <CreditCard className="w-3.5 h-3.5 text-muted-foreground" />{config.payment_title}
+              </h3>
+              <button
+                onClick={fetchPaymentHistory}
+                disabled={loadingPayments}
+                className="text-muted-foreground hover:text-foreground"
+                aria-label="Yenilə"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${loadingPayments ? 'animate-spin' : ''}`} />
+              </button>
             </div>
+
+            <div className="space-y-2">
+              {payments.length === 0 ? (
+                <div className="flex items-center justify-between p-3 bg-muted/40 rounded-xl">
+                  <div>
+                    <p className="font-semibold text-foreground text-sm">{planName}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      {format(new Date(subscription.started_at), 'd MMM yyyy', { locale: az })}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-foreground text-sm">{planPrice}</p>
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">{config.paid_label}</span>
+                  </div>
+                </div>
+              ) : (
+                payments.map((p, i) => {
+                  const isYearly = p.productId.toLowerCase().includes('year') || p.productId.toLowerCase().includes('annual');
+                  const itemLabel =
+                    p.type === 'original' ? 'İlk alış'
+                    : p.type === 'next' ? 'Növbəti yenilənmə'
+                    : 'Avtomatik yenilənmə';
+                  return (
+                    <div key={`${p.productId}-${p.date}-${i}`} className="flex items-center justify-between p-3 bg-muted/40 rounded-xl">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-foreground text-sm truncate">
+                          {isYearly ? 'İllik Premium' : 'Aylıq Premium'}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          {format(new Date(p.date), 'd MMM yyyy, HH:mm', { locale: az })} · {itemLabel}
+                        </p>
+                      </div>
+                      <div className="text-right shrink-0 ml-2">
+                        {p.type === 'next' ? (
+                          <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold">Planlı</span>
+                        ) : (
+                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">{config.paid_label}</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {isIAPSupported && (
+              <button
+                onClick={async () => { await showCustomerCenter(); fetchPaymentHistory(); }}
+                className="w-full mt-3 text-[11px] text-primary font-semibold hover:underline"
+              >
+                Tam tarixçəni mağazada aç →
+              </button>
+            )}
           </motion.div>
         )}
 
