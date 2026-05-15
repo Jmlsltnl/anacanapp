@@ -232,12 +232,19 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
         if (error) throw error;
 
-        const photosWithUrls = (data || []).map(photo => ({
-          id: photo.id,
-          url: supabase.storage.from('baby-photos').getPublicUrl(photo.storage_path).data.publicUrl,
-          theme: photo.background_theme,
-          createdAt: photo.created_at,
-        }));
+        const photosWithUrls = await Promise.all(
+          (data || []).map(async (photo) => {
+            const { data: signed } = await supabase.storage
+              .from('baby-photos')
+              .createSignedUrl(photo.storage_path, 60 * 60 * 24);
+            return {
+              id: photo.id,
+              url: signed?.signedUrl || '',
+              theme: photo.background_theme,
+              createdAt: photo.created_at,
+            };
+          })
+        );
 
         setPhotos(photosWithUrls);
       } catch (error) {
