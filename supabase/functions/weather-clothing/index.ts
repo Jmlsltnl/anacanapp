@@ -143,16 +143,8 @@ ${userContext.pregnancyWeek >= 20 ? '- Hamilə qadınlar daha tez istiləyir, bu
 `;
     }
 
-    // Use Gemini to generate personalized advice
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `Sən körpə və ana üçün hava və geyim məsləhətçisisən. Azərbaycan dilində cavab ver.
+    // Use Gemini to generate personalized advice (with model fallback)
+    const promptText = `Sən körpə və ana üçün hava və geyim məsləhətçisisən. Azərbaycan dilində cavab ver.
 
 ${userContextPrompt}
 
@@ -182,8 +174,6 @@ TAPŞIRIQ: Bu hava şəraitində${userContext?.babyAgeMonths !== undefined ? ` $
 6. Külək şiddətli isə, xəbərdarlıq ver
 7. Yaş/həftəyə xas xüsusi tövsiyələr əlavə et
 
-ÖNƏMLİ: Körpənin DƏQIQ yaşına uyğun tövsiyə ver. Məsələn 1 aylıq körpə ilə 18 aylıq körpənin ehtiyacları çox fərqlidir.
-
 CAVAB FORMATI (STRICT JSON):
 {
   "temperature": ${current.temperature_2m},
@@ -192,30 +182,43 @@ CAVAB FORMATI (STRICT JSON):
   "windSpeed": ${current.wind_speed_10m},
   "uvIndex": ${current.uv_index},
   "weatherDescription": "hava təsviri (qısa)",
-  "clothingAdvice": "BAYIRDA konkret geyim tövsiyəsi - ${userContext?.babyAgeMonths !== undefined ? `${userContext.babyAgeMonths} aylıq körpə üçün xüsusi` : userContext?.pregnancyWeek ? `hamilə ana üçün xüsusi` : 'körpə üçün'} (3-4 cümlə)",
+  "clothingAdvice": "BAYIRDA konkret geyim tövsiyəsi (3-4 cümlə)",
   "clothingItems": ["geyim 1", "geyim 2", "geyim 3", "geyim 4"],
-  "indoorClothingAdvice": "Ev daxilində geyim tövsiyəsi - yaşa uyğun (2-3 cümlə)",
+  "indoorClothingAdvice": "Ev daxilində geyim tövsiyəsi (2-3 cümlə)",
   "indoorClothingItems": ["ev geyimi 1", "ev geyimi 2", "ev geyimi 3"],
   "idealRoomTemperature": "optimal otaq temperaturu aralığı (məs: 20-22°C)",
-  "roomTemperatureAdvice": "Otaq temperaturu haqqında ətraflı məsləhət - yaşa uyğun (2-3 cümlə)",
+  "roomTemperatureAdvice": "Otaq temperaturu haqqında ətraflı məsləhət (2-3 cümlə)",
   "warnings": ["xəbərdarlıq 1", "xəbərdarlıq 2"],
   "pollenWarning": "pollen xəbərdarlığı və ya null",
   "uvWarning": "UV xəbərdarlığı və ya null",
-  "outdoorAdvice": "Bayırda gəzmə tövsiyəsi (yaş/həftəyə uyğun)",
-  "safeToGoOut": true/false,
+  "outdoorAdvice": "Bayırda gəzmə tövsiyəsi",
+  "safeToGoOut": true,
   "alertLevel": "safe|caution|warning|danger"
-}`
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 1500,
-          }
-        })
-      }
-    );
+}`;
 
-    if (!geminiResponse.ok) {
+    const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
+    let geminiResponse: Response | null = null;
+    for (const model of models) {
+      geminiResponse = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: promptText }] }],
+            generationConfig: { temperature: 0.3, maxOutputTokens: 1500 },
+          }),
+        }
+      );
+      if (geminiResponse.ok) {
+        console.log(`weather-clothing using model: ${model}`);
+        break;
+      }
+      const errText = await geminiResponse.text();
+      console.error(`weather-clothing model ${model} failed: ${geminiResponse.status}`, errText);
+    }
+
+    if (!geminiResponse || !geminiResponse.ok) {
       throw new Error('AI analysis failed');
     }
 

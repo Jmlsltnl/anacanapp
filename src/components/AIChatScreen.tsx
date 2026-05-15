@@ -13,6 +13,7 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { useAISuggestedQuestions } from '@/hooks/useDynamicTools';
 import { getPregnancyDay } from '@/lib/pregnancy-utils';
 import MarkdownContent from './MarkdownContent';
@@ -167,12 +168,16 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
         content: userMessage.content
       });
 
-      // Use fetch for streaming support
+      // Use fetch for streaming support — must use the user's session JWT, not the anon key
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Sessiya tapılmadı. Yenidən daxil olun.');
+      }
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dr-anacan-chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          'Authorization': `Bearer ${session.access_token}`,
           'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
         body: JSON.stringify({
