@@ -71,9 +71,32 @@ const AdminPhotoGallery = () => {
 
   useEffect(() => { fetchPhotos(); }, [page]);
 
+  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const signAll = async () => {
+      const paths = new Set<string>();
+      photos.forEach(p => {
+        if (p.storage_path) paths.add(p.storage_path);
+        if (p.source_image_path) paths.add(p.source_image_path);
+      });
+      const entries: Record<string, string> = {};
+      await Promise.all(
+        Array.from(paths).map(async (path) => {
+          const { data } = await supabase.storage
+            .from('baby-photos')
+            .createSignedUrl(path, 60 * 60);
+          if (data?.signedUrl) entries[path] = data.signedUrl;
+        })
+      );
+      setSignedUrls(entries);
+    };
+    if (photos.length > 0) signAll();
+  }, [photos]);
+
   const getPublicUrl = (path: string | null) => {
     if (!path) return null;
-    return supabase.storage.from('baby-photos').getPublicUrl(path).data.publicUrl;
+    return signedUrls[path] || null;
   };
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
