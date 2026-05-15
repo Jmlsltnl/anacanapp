@@ -43,6 +43,65 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
+  const [payments, setPayments] = useState<PaymentEntry[]>([]);
+  const [loadingPayments, setLoadingPayments] = useState(false);
+
+  // Fetch real purchase history from RevenueCat
+  const fetchPaymentHistory = async () => {
+    if (!isNativePlatform()) return;
+    setLoadingPayments(true);
+    try {
+      const { Purchases } = await import('@revenuecat/purchases-capacitor');
+      const { customerInfo } = await Purchases.getCustomerInfo();
+      const entries: PaymentEntry[] = [];
+      const allPurchases = (customerInfo as any).allPurchaseDatesByProduct || {};
+      const allExpirations = (customerInfo as any).allExpirationDatesByProduct || {};
+      const activeEntitlements = customerInfo.entitlements?.active || {};
+
+      // Original purchase (first ever)
+      const original = (customerInfo as any).originalPurchaseDate;
+      if (original) {
+        entries.push({ productId: 'original', date: original, type: 'original' });
+      }
+
+      // Latest purchase per product (each renewal observed by SDK)
+      Object.entries(allPurchases).forEach(([productId, date]) => {
+        if (!date) return;
+        // Skip duplicates of original
+        if (original && new Date(date as string).getTime() === new Date(original).getTime()) return;
+        entries.push({ productId, date: date as string, type: 'renewal' });
+      });
+
+      // Next renewal (upcoming auto-renewal)
+      Object.values(activeEntitlements).forEach((ent: any) => {
+        if (ent?.expirationDate && ent.willRenew) {
+          entries.push({
+            productId: ent.productIdentifier || 'next',
+            date: ent.expirationDate,
+            type: 'next',
+            willRenew: true,
+          });
+        }
+      });
+
+      // Sort newest first, but keep "next" last
+      entries.sort((a, b) => {
+        if (a.type === 'next' && b.type !== 'next') return 1;
+        if (b.type === 'next' && a.type !== 'next') return -1;
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      });
+
+      setPayments(entries);
+    } catch (err) {
+      console.error('Failed to load payment history:', err);
+    } finally {
+      setLoadingPayments(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPaymentHistory();
+  }, []);
 
   const handleCancelSubscription = async () => {
     // On native platforms, redirect to App Store / Play Store subscription management
