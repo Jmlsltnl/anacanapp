@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useInAppPurchase } from '@/hooks/useInAppPurchase';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeft, Crown, CheckCircle, 
   XCircle, Sparkles, AlertTriangle, Loader2, RotateCcw,
   Zap, Shield, CreditCard, icons, Calendar, TrendingUp,
-  Lock, Star, ChevronRight
+  Lock, Star, ChevronRight, RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -15,9 +15,17 @@ import { useToast } from '@/hooks/use-toast';
 import { PremiumModal } from '@/components/PremiumModal';
 import { useBillingConfig } from '@/hooks/usePaywallConfig';
 import { usePremiumConfig } from '@/hooks/usePremiumConfig';
+import { isNativePlatform } from '@/lib/revenuecat';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { tr } from "@/lib/tr";
+
+interface PaymentEntry {
+  productId: string;
+  date: string; // ISO
+  type: 'original' | 'renewal' | 'next';
+  willRenew?: boolean;
+}
 
 interface BillingScreenProps {
   onBack: () => void;
