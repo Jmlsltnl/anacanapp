@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Crown, Check, Shield, X, Sparkles, Loader2 } from 'lucide-react';
 import { useInAppPurchase } from '@/hooks/useInAppPurchase';
