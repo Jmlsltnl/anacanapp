@@ -5,6 +5,7 @@ import { useBabyLogs } from '@/hooks/useBabyLogs';
 import { format, isToday, isYesterday } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
+import { tr } from "@/lib/tr";
 
 const formatDuration = (minutes: number): string => {
   if (minutes <= 0) return '-';
@@ -82,7 +83,7 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
       toast({ title: 'Yuxu qeydi silindi' });
       setDeletingId(null);
     } else {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("sleephistorypanel_xeta_bas_verdi_f22fba", 'Xəta baş verdi'), variant: 'destructive' });
     }
   };
 
@@ -105,10 +106,10 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
     }
     const result = await updateLog(log.id, updates);
     if (!result.error) {
-      toast({ title: 'Yuxu qeydi yeniləndi' });
+      toast({ title: tr("sleephistorypanel_yuxu_qeydi_yenilendi_26a02f", 'Yuxu qeydi yeniləndi') });
       setEditingId(null);
     } else {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("sleephistorypanel_xeta_bas_verdi_f22fba", 'Xəta baş verdi'), variant: 'destructive' });
     }
   };
 

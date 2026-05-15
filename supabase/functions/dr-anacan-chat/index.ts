@@ -32,6 +32,7 @@ interface ChatRequest {
 }
 
 import { getSystemPrompt } from "./prompts.ts";
+import { requireUser } from "../_shared/auth.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -39,6 +40,10 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Require authenticated caller — prevents abuse of Gemini quota.
+    const auth = await requireUser(req);
+    if (auth.error) return auth.error;
+
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     if (!GEMINI_API_KEY) {
       console.error("GEMINI_API_KEY not configured");
@@ -61,9 +66,17 @@ Deno.serve(async (req) => {
       throw new Error("Invalid messages format");
     }
 
+    // Require explicit lifeStage so flow/mommy users don't get a "bump" persona by mistake.
+    // Fall back to "bump" only when truly unknown, and log a warning so we can spot misuse.
+    let resolvedLifeStage = lifeStage;
+    if (!resolvedLifeStage) {
+      console.warn("dr-anacan-chat: lifeStage missing from request — defaulting to 'bump'. Caller should always send lifeStage.");
+      resolvedLifeStage = "bump";
+    }
+
     const systemPrompt = isWeightAnalysis
       ? `Sən çəki məsləhətçisisən. QAYDALAR: Salamlama yoxdur. "Canım", "əzizim", "balacam" kimi ifadələr İSTİFADƏ ETMƏ. Disclaimer/xəbərdarlıq yoxdur. Birbaşa 1-2 cümlə ilə praktik məsləhət ver. Yalnız Azərbaycan dilində.`
-      : getSystemPrompt(lifeStage || "bump", pregnancyWeek, isPartner, userProfile, cyclePhase, cycleDay);
+      : getSystemPrompt(resolvedLifeStage, pregnancyWeek, isPartner, userProfile, cyclePhase, cycleDay);
 
     // Convert OpenAI-style messages to Gemini format
     const geminiContents = messages.map((msg: ChatMessage) => ({
@@ -82,7 +95,7 @@ Deno.serve(async (req) => {
       },
     };
 
-    const models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.0-flash-lite"];
+    const models = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
     const endpoint = stream ? "streamGenerateContent" : "generateContent";
     
     let response: Response | null = null;
@@ -111,11 +124,11 @@ Deno.serve(async (req) => {
         );
       }
       
-      if (response.status >= 500) {
-        continue; // Try next model
+      if (response.status >= 500 || response.status === 404) {
+        continue; // Try next model on server error or retired model
       }
       
-      // For other errors (4xx), don't retry
+      // For other errors (4xx except 404), don't retry
       break;
     }
 
@@ -173,6 +186,13 @@ Deno.serve(async (req) => {
             }
           } catch (err) {
             console.error("Stream transform error:", err);
+            // CRITICAL: always emit [DONE] so the frontend exits its streaming state,
+            // otherwise the user sees the "yazılır..." indicator forever.
+            try {
+              controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+            } catch {
+              // controller might already be closed
+            }
             controller.close();
           }
         },

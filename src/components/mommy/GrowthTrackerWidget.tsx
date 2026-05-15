@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useChildren } from '@/hooks/useChildren';
 import { differenceInMonths } from 'date-fns';
+import { tr } from "@/lib/tr";
 
 interface BabyGrowthEntry {
   id: string;
@@ -90,8 +91,8 @@ const GrowthTrackerWidget = () => {
     
     if (isNaN(weight) && isNaN(height)) {
       toast({
-        title: 'Məlumat daxil edin',
-        description: 'Çəki və ya boy daxil edin',
+        title: tr("growthtrackerwidget_melumat_daxil_edin_2ab80a", 'Məlumat daxil edin'),
+        description: tr("growthtrackerwidget_ceki_ve_ya_boy_daxil_edin_10a689", 'Çəki və ya boy daxil edin'),
         variant: 'destructive',
       });
       return;
@@ -125,13 +126,13 @@ const GrowthTrackerWidget = () => {
       setShowInput(false);
       
       toast({
-        title: 'Ölçü yadda saxlandı! 📏',
+        title: tr("growthtrackerwidget_olcu_yadda_saxlandi_3c8d60", 'Ölçü yadda saxlandı! 📏'),
         description: `${!isNaN(weight) ? `${weight} kq` : ''} ${!isNaN(height) ? `${height} sm` : ''}`,
       });
     } catch (error) {
       console.error('Error adding growth entry:', error);
       toast({
-        title: 'Xəta baş verdi',
+        title: tr("growthtrackerwidget_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
         variant: 'destructive',
       });
     }

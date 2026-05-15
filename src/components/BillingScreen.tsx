@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useInAppPurchase } from '@/hooks/useInAppPurchase';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeft, Crown, CheckCircle, 
   XCircle, Sparkles, AlertTriangle, Loader2, RotateCcw,
   Zap, Shield, CreditCard, icons, Calendar, TrendingUp,
-  Lock, Star, ChevronRight
+  Lock, Star, ChevronRight, RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -15,8 +15,17 @@ import { useToast } from '@/hooks/use-toast';
 import { PremiumModal } from '@/components/PremiumModal';
 import { useBillingConfig } from '@/hooks/usePaywallConfig';
 import { usePremiumConfig } from '@/hooks/usePremiumConfig';
+import { isNativePlatform } from '@/lib/revenuecat';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
+import { tr } from "@/lib/tr";
+
+interface PaymentEntry {
+  productId: string;
+  date: string; // ISO
+  type: 'original' | 'renewal' | 'next';
+  willRenew?: boolean;
+}
 
 interface BillingScreenProps {
   onBack: () => void;
@@ -34,6 +43,65 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
+  const [payments, setPayments] = useState<PaymentEntry[]>([]);
+  const [loadingPayments, setLoadingPayments] = useState(false);
+
+  // Fetch real purchase history from RevenueCat
+  const fetchPaymentHistory = async () => {
+    if (!isNativePlatform()) return;
+    setLoadingPayments(true);
+    try {
+      const { Purchases } = await import('@revenuecat/purchases-capacitor');
+      const { customerInfo } = await Purchases.getCustomerInfo();
+      const entries: PaymentEntry[] = [];
+      const allPurchases = (customerInfo as any).allPurchaseDatesByProduct || {};
+      const allExpirations = (customerInfo as any).allExpirationDatesByProduct || {};
+      const activeEntitlements = customerInfo.entitlements?.active || {};
+
+      // Original purchase (first ever)
+      const original = (customerInfo as any).originalPurchaseDate;
+      if (original) {
+        entries.push({ productId: 'original', date: original, type: 'original' });
+      }
+
+      // Latest purchase per product (each renewal observed by SDK)
+      Object.entries(allPurchases).forEach(([productId, date]) => {
+        if (!date) return;
+        // Skip duplicates of original
+        if (original && new Date(date as string).getTime() === new Date(original).getTime()) return;
+        entries.push({ productId, date: date as string, type: 'renewal' });
+      });
+
+      // Next renewal (upcoming auto-renewal)
+      Object.values(activeEntitlements).forEach((ent: any) => {
+        if (ent?.expirationDate && ent.willRenew) {
+          entries.push({
+            productId: ent.productIdentifier || 'next',
+            date: ent.expirationDate,
+            type: 'next',
+            willRenew: true,
+          });
+        }
+      });
+
+      // Sort newest first, but keep "next" last
+      entries.sort((a, b) => {
+        if (a.type === 'next' && b.type !== 'next') return 1;
+        if (b.type === 'next' && a.type !== 'next') return -1;
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      });
+
+      setPayments(entries);
+    } catch (err) {
+      console.error('Failed to load payment history:', err);
+    } finally {
+      setLoadingPayments(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPaymentHistory();
+  }, []);
 
   const handleCancelSubscription = async () => {
     // On native platforms, redirect to App Store / Play Store subscription management
@@ -50,8 +118,8 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
     setIsCanceling(true);
     const success = await cancelSubscription();
     toast(success 
-      ? { title: 'Abunəlik ləğv edildi', description: 'Cari dövrün sonuna qədər Premium istifadə edə bilərsiniz.' }
-      : { title: 'Xəta', description: 'Abunəliyi ləğv etmək mümkün olmadı.', variant: 'destructive' }
+      ? { title: tr("billingscreen_abunelik_legv_edildi_0023e9", 'Abunəlik ləğv edildi'), description: tr("billingscreen_cari_dovrun_sonuna_qeder_premium_istifad_e3e35c", 'Cari dövrün sonuna qədər Premium istifadə edə bilərsiniz.') }
+      : { title: tr("billingscreen_xeta_3cdbb6", 'Xəta'), description: tr("billingscreen_abuneliyi_legv_etmek_mumkun_olmadi_413b1f", 'Abunəliyi ləğv etmək mümkün olmadı.'), variant: 'destructive' }
     );
     setIsCanceling(false);
   };
@@ -60,8 +128,8 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
     setIsRestoring(true);
     const success = await restoreSubscription();
     toast(success
-      ? { title: 'Abunəlik bərpa edildi', description: 'Premium abunəliyiniz yenidən aktivdir.' }
-      : { title: 'Xəta', description: 'Abunəliyi bərpa etmək mümkün olmadı.', variant: 'destructive' }
+      ? { title: tr("billingscreen_abunelik_berpa_edildi_1b680a", 'Abunəlik bərpa edildi'), description: tr("billingscreen_premium_abuneliyiniz_yeniden_aktivdir_2f1843", 'Premium abunəliyiniz yenidən aktivdir.') }
+      : { title: tr("billingscreen_xeta_3cdbb6", 'Xəta'), description: tr("billingscreen_abuneliyi_berpa_etmek_mumkun_olmadi_3a4a58", 'Abunəliyi bərpa etmək mümkün olmadı.'), variant: 'destructive' }
     );
     setIsRestoring(false);
   };
@@ -335,22 +403,75 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
           </motion.div>
         )}
 
-        {/* Payment history */}
+        {/* Payment history (real RevenueCat data) */}
         {isPremium && subscription && (
           <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }} className="bg-card rounded-2xl p-4 border border-border/50 shadow-sm">
-            <h3 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
-              <CreditCard className="w-3.5 h-3.5 text-muted-foreground" />{config.payment_title}
-            </h3>
-            <div className="flex items-center justify-between p-3 bg-muted/40 rounded-xl">
-              <div>
-                <p className="font-semibold text-foreground text-sm">{planName}</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">{format(new Date(subscription.started_at), 'd MMM yyyy', { locale: az })}</p>
-              </div>
-              <div className="text-right">
-                <p className="font-bold text-foreground text-sm">{planPrice}</p>
-                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">{config.paid_label}</span>
-              </div>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                <CreditCard className="w-3.5 h-3.5 text-muted-foreground" />{config.payment_title}
+              </h3>
+              <button
+                onClick={fetchPaymentHistory}
+                disabled={loadingPayments}
+                className="text-muted-foreground hover:text-foreground"
+                aria-label="Yenilə"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${loadingPayments ? 'animate-spin' : ''}`} />
+              </button>
             </div>
+
+            <div className="space-y-2">
+              {payments.length === 0 ? (
+                <div className="flex items-center justify-between p-3 bg-muted/40 rounded-xl">
+                  <div>
+                    <p className="font-semibold text-foreground text-sm">{planName}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      {format(new Date(subscription.started_at), 'd MMM yyyy', { locale: az })}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-foreground text-sm">{planPrice}</p>
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">{config.paid_label}</span>
+                  </div>
+                </div>
+              ) : (
+                payments.map((p, i) => {
+                  const isYearly = p.productId.toLowerCase().includes('year') || p.productId.toLowerCase().includes('annual');
+                  const itemLabel =
+                    p.type === 'original' ? 'İlk alış'
+                    : p.type === 'next' ? 'Növbəti yenilənmə'
+                    : 'Avtomatik yenilənmə';
+                  return (
+                    <div key={`${p.productId}-${p.date}-${i}`} className="flex items-center justify-between p-3 bg-muted/40 rounded-xl">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-foreground text-sm truncate">
+                          {isYearly ? 'İllik Premium' : 'Aylıq Premium'}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          {format(new Date(p.date), 'd MMM yyyy, HH:mm', { locale: az })} · {itemLabel}
+                        </p>
+                      </div>
+                      <div className="text-right shrink-0 ml-2">
+                        {p.type === 'next' ? (
+                          <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold">Planlı</span>
+                        ) : (
+                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">{config.paid_label}</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {isIAPSupported && (
+              <button
+                onClick={async () => { await showCustomerCenter(); fetchPaymentHistory(); }}
+                className="w-full mt-3 text-[11px] text-primary font-semibold hover:underline"
+              >
+                Tam tarixçəni mağazada aç →
+              </button>
+            )}
           </motion.div>
         )}
 

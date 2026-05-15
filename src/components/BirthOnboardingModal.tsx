@@ -16,6 +16,7 @@ import { az } from 'date-fns/locale';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { tr } from "@/lib/tr";
 
 interface BirthOnboardingModalProps {
   isOpen: boolean;
@@ -45,14 +46,14 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
   const totalSteps = 4;
   
   const deliveryOptions = [
-    { value: 'natural', label: 'Təbii doğuş', emoji: '🌸', description: 'Vaginal doğuş' },
-    { value: 'cesarean', label: 'Qeysəriyyə', emoji: '🏥', description: 'Sezaryen əməliyyatı' },
-    { value: 'assisted', label: 'Köməkli doğuş', emoji: '🩺', description: 'Vakuum/forseps' },
+    { value: 'natural', label: tr("birthonboardingmodal_tebii_dogus_d7dea2", 'Təbii doğuş'), emoji: '🌸', description: tr("birthonboardingmodal_vaginal_dogus_e137c8", 'Vaginal doğuş') },
+    { value: 'cesarean', label: tr("birthonboardingmodal_qeyseriyye_d8c1b4", 'Qeysəriyyə'), emoji: '🏥', description: tr("birthonboardingmodal_sezaryen_emeliyyati_120bc4", 'Sezaryen əməliyyatı') },
+    { value: 'assisted', label: tr("birthonboardingmodal_komekli_dogus_9ccc60", 'Köməkli doğuş'), emoji: '🩺', description: 'Vakuum/forseps' },
   ];
   
   const handleComplete = async () => {
     if (!user || !birthDate || !babyName.trim()) {
-      toast({ title: 'Xəta', description: 'Zəruri sahələri doldurun', variant: 'destructive' });
+      toast({ title: tr("birthonboardingmodal_xeta_3cdbb6", 'Xəta'), description: tr("birthonboardingmodal_zeruri_saheleri_doldurun_ab6828", 'Zəruri sahələri doldurun'), variant: 'destructive' });
       return;
     }
     
@@ -101,7 +102,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
       setLifeStage('mommy');
       
       toast({
-        title: 'Təbrik edirik! 🎉',
+        title: tr("birthonboardingmodal_tebrik_edirik_4dc427", 'Təbrik edirik! 🎉'),
         description: `${babyName} dünyaya xoş gəldi! Analıq səyahətinizə başlayırıq.`,
       });
       
@@ -109,7 +110,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
     } catch (error: any) {
       console.error('Birth onboarding error:', error);
       toast({ 
-        title: 'Xəta baş verdi', 
+        title: tr("birthonboardingmodal_xeta_bas_verdi_f22fba", 'Xəta baş verdi'), 
         description: error.message, 
         variant: 'destructive' 
       });
@@ -255,7 +256,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                   <Input
                     value={babyName}
                     onChange={e => setBabyName(e.target.value)}
-                    placeholder="Körpənin adını daxil edin"
+                    placeholder={tr("birthonboardingmodal_korpenin_adini_daxil_edin_7deaac", "Körpənin adını daxil edin")}
                     className="h-14 text-lg text-center font-medium"
                     autoFocus
                   />
@@ -263,8 +264,8 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                   {/* Gender Selection */}
                   <div className="grid grid-cols-2 gap-3 mt-4">
                     {[
-                      { value: 'boy', label: 'Oğlan', emoji: '👦', color: 'bg-blue-100 dark:bg-blue-950/50 border-blue-300' },
-                      { value: 'girl', label: 'Qız', emoji: '👧', color: 'bg-pink-100 dark:bg-pink-950/50 border-pink-300' },
+                      { value: 'boy', label: tr("birthonboardingmodal_oglan_e9715e", 'Oğlan'), emoji: '👦', color: 'bg-blue-100 dark:bg-blue-950/50 border-blue-300' },
+                      { value: 'girl', label: tr("birthonboardingmodal_qiz_79bf6b", 'Qız'), emoji: '👧', color: 'bg-pink-100 dark:bg-pink-950/50 border-pink-300' },
                     ].map(option => (
                       <motion.button
                         key={option.value}

@@ -4,6 +4,7 @@ import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
+import { tr } from "@/lib/tr";
 
 interface AppearanceScreenProps {
   onBack: () => void;
@@ -30,22 +31,22 @@ const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
   const themeOptions = [
     {
       id: 'light',
-      label: 'Açıq rejim',
-      description: 'Klassik açıq rənglər',
+      label: tr("appearancescreen_aciq_rejim_800daa", 'Açıq rejim'),
+      description: tr("appearancescreen_klassik_aciq_rengler_7c8359", 'Klassik açıq rənglər'),
       icon: Sun,
       preview: 'bg-gradient-to-br from-amber-50 to-orange-100',
     },
     {
       id: 'dark',
-      label: 'Qaranlıq rejim',
-      description: 'Gözlərə rahat qaranlıq tema',
+      label: tr("appearancescreen_qaranliq_rejim_ef2f9f", 'Qaranlıq rejim'),
+      description: tr("appearancescreen_gozlere_rahat_qaranliq_tema_4d59d5", 'Gözlərə rahat qaranlıq tema'),
       icon: Moon,
       preview: 'bg-gradient-to-br from-slate-800 to-slate-900',
     },
     {
       id: 'system',
       label: 'Sistem',
-      description: 'Cihazınızın ayarına uyğun',
+      description: tr("appearancescreen_cihazinizin_ayarina_uygun_9b4fa7", 'Cihazınızın ayarına uyğun'),
       icon: Monitor,
       preview: 'bg-gradient-to-r from-amber-100 via-slate-300 to-slate-800',
     },

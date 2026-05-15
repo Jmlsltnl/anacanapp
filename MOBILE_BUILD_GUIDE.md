@@ -68,7 +68,7 @@ npx cap open ios
 
 Xcode-da:
 1. Signing & Capabilities → Team seçin
-2. Bundle Identifier: `app.lovable.anacan`
+2. Bundle Identifier: `com.atlasoon.anacan`
 3. Product → Run
 
 ### Production Build:
@@ -82,8 +82,8 @@ Xcode-da:
 1. App Store Connect → Subscriptions
 2. Subscription Group yaradın: "Anacan Premium"
 3. Məhsullar əlavə edin:
-   - `app.lovable.anacan.premium.monthly` - $9.99/ay
-   - `app.lovable.anacan.premium.yearly` - $79.99/il
+   - `com.atlasoon.anacan.premium.monthly` - $9.99/ay
+   - `com.atlasoon.anacan.premium.yearly` - $79.99/il
 4. Sandbox testçilər əlavə edin
 
 ---
@@ -111,11 +111,11 @@ Android Studio-da:
 
 1. Play Console → Products → Subscriptions
 2. Məhsullar əlavə edin:
-   - Product ID: `app.lovable.anacan.premium.monthly`
+   - Product ID: `com.atlasoon.anacan.premium.monthly`
    - Base Plan ID: `monthly-plan`
    - Qiymət: $9.99/ay
    
-   - Product ID: `app.lovable.anacan.premium.yearly`
+   - Product ID: `com.atlasoon.anacan.premium.yearly`
    - Base Plan ID: `yearly-plan`
    - Qiymət: $79.99/il
 3. Internal Testing track-ə testçilər əlavə edin
@@ -128,7 +128,7 @@ Hal-hazırda hot-reload üçün konfiqurasiya edilib. **Production build-dən ə
 
 ```json
 {
-  "appId": "app.lovable.anacan",
+  "appId": "com.atlasoon.anacan",
   "appName": "Anacan",
   "webDir": "dist"
 }

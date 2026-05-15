@@ -6,14 +6,15 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useChildren, Child } from '@/hooks/useChildren';
 import { toast } from 'sonner';
+import { tr } from "@/lib/tr";
 
 interface ChildSelectorProps {
   compact?: boolean;
 }
 
 const genderOptions = [
-  { value: 'boy', label: 'Oğlan', emoji: '👦' },
-  { value: 'girl', label: 'Qız', emoji: '👧' },
+  { value: 'boy', label: tr("childselector_oglan_e9715e", 'Oğlan'), emoji: '👦' },
+  { value: 'girl', label: tr("childselector_qiz_79bf6b", 'Qız'), emoji: '👧' },
 ];
 
 const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
@@ -106,7 +107,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
             <Input
               value={formData.name}
               onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
-              placeholder="Körpənin adı"
+              placeholder={tr("childselector_korpenin_adi_8a4e9e", "Körpənin adı")}
             />
           </div>
           <div>

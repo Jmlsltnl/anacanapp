@@ -1,3 +1,5 @@
+import DOMPurify from 'dompurify';
+import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 
 interface HtmlContentProps {
@@ -7,7 +9,18 @@ interface HtmlContentProps {
 
 const HtmlContent = ({ content, className }: HtmlContentProps) => {
   const isHtml = content.trim().startsWith('<') || /<[a-z][\s\S]*>/i.test(content);
-  
+
+  // Sanitize HTML to prevent XSS attacks. Strips <script>, <iframe>,
+  // event handlers (on*), and javascript: URIs while keeping safe formatting.
+  const sanitized = useMemo(() => {
+    if (!isHtml) return '';
+    return DOMPurify.sanitize(content, {
+      FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input', 'style'],
+      FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'onchange', 'onsubmit'],
+      ALLOW_DATA_ATTR: false,
+    });
+  }, [content, isHtml]);
+
   if (isHtml) {
     return (
       <div 
@@ -36,7 +49,7 @@ const HtmlContent = ({ content, className }: HtmlContentProps) => {
           '[&_tr:last-child_td]:border-b-0',
           className
         )}
-        dangerouslySetInnerHTML={{ __html: content }}
+        dangerouslySetInnerHTML={{ __html: sanitized }}
       />
     );
   }

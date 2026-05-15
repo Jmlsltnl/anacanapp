@@ -84,15 +84,15 @@ export const usePartnerStats = () => {
     if (!user) return;
 
     const channel = supabase
-      .channel('partner-stats-updates')
+      .channel(`partner-stats-${user.id}`)
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'partner_missions' },
+        { event: '*', schema: 'public', table: 'partner_missions', filter: `user_id=eq.${user.id}` },
         () => fetchStats()
       )
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'partner_messages' },
+        { event: 'INSERT', schema: 'public', table: 'partner_messages', filter: `sender_id=eq.${user.id}` },
         () => fetchStats()
       )
       .subscribe();

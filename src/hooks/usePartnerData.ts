@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { getPregnancyWeek, getDaysUntilDue as calcDaysUntilDue, getDaysElapsed, getRealCalendarAge } from '@/lib/pregnancy-utils';
+import { getPhaseInfoForDate, type CyclePhaseInfo } from '@/lib/cycle-utils';
 
 export interface PartnerWomanData {
   id: string;
@@ -79,18 +80,23 @@ export const usePartnerData = () => {
   useEffect(() => {
     fetchPartnerData();
 
-    // Set up realtime subscription for partner's daily logs
+    // Set up realtime subscription for partner's daily logs (filtered to this partner only)
     if (profile?.linked_partner_id) {
       const channel = supabase
-        .channel('partner-logs')
+        .channel(`partner-logs-${profile.linked_partner_id}`)
         .on(
           'postgres_changes',
           { 
             event: '*', 
             schema: 'public', 
-            table: 'daily_logs'
+            table: 'daily_logs',
           },
-          () => {
+          (payload: any) => {
+            // Client-side guard: only refetch when this partner's log changes
+            const changedUserId = payload?.new?.user_id || payload?.old?.user_id;
+            if (changedUserId && partnerProfile?.user_id && changedUserId !== partnerProfile.user_id) {
+              return;
+            }
             fetchPartnerData();
           }
         )
@@ -100,7 +106,7 @@ export const usePartnerData = () => {
         supabase.removeChannel(channel);
       };
     }
-  }, [profile?.linked_partner_id]);
+  }, [profile?.linked_partner_id, partnerProfile?.user_id]);
 
   // Calculate pregnancy week if partner is in 'bump' stage - using centralized utility
   const getPartnerPregnancyWeek = (): number => {
@@ -126,6 +132,32 @@ export const usePartnerData = () => {
     return getRealCalendarAge(partnerProfile.baby_birth_date).totalDays;
   };
 
+  // Get cycle phase info for 'flow' stage
+  const getCyclePhaseInfo = (): CyclePhaseInfo | null => {
+    if (!partnerProfile?.last_period_date || partnerProfile.life_stage !== 'flow') {
+      return null;
+    }
+    return getPhaseInfoForDate(
+      new Date(),
+      new Date(partnerProfile.last_period_date),
+      partnerProfile.cycle_length || 28,
+      partnerProfile.period_length || 5
+    );
+  };
+
+  // Days until next period for 'flow' stage
+  const getDaysUntilNextPeriod = (): number => {
+    if (!partnerProfile?.last_period_date || partnerProfile.life_stage !== 'flow') {
+      return 0;
+    }
+    const cycleLength = partnerProfile.cycle_length || 28;
+    const lmp = new Date(partnerProfile.last_period_date);
+    const today = new Date();
+    const daysSince = Math.floor((today.getTime() - lmp.getTime()) / (1000 * 60 * 60 * 24));
+    const daysIntoCycle = ((daysSince % cycleLength) + cycleLength) % cycleLength;
+    return Math.max(0, cycleLength - daysIntoCycle);
+  };
+
   return {
     partnerProfile,
     partnerDailyLog,
@@ -135,5 +167,7 @@ export const usePartnerData = () => {
     getPregnancyWeek: getPartnerPregnancyWeek,
     getDaysUntilDue: getPartnerDaysUntilDue,
     getBabyAgeDays,
+    getCyclePhaseInfo,
+    getDaysUntilNextPeriod,
   };
 };

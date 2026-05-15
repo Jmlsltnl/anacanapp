@@ -14,6 +14,7 @@ import { useUserStore } from '@/store/userStore';
 import { differenceInMonths, differenceInDays } from 'date-fns';
 import { getPregnancyWeek } from '@/lib/pregnancy-utils';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
+import { tr } from "@/lib/tr";
 
 interface WeatherClothingProps {
   onBack: () => void;
@@ -134,7 +135,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
         : 'Hava məlumatı alınarkən xəta baş verdi.';
       setLocationError(errorMsg);
       toast({
-        title: 'Xəta',
+        title: tr("weatherclothing_xeta_3cdbb6", 'Xəta'),
         description: errorMsg,
         variant: 'destructive'
       });

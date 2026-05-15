@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
+import { requireCronSecret } from '../_shared/auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -61,6 +62,9 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const cronErr = requireCronSecret(req);
+    if (cronErr) return cronErr;
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -184,6 +188,8 @@ Deno.serve(async (req) => {
 
           break;
         } else if (result.unregistered) {
+          // Only delete on definitive dead-token codes (UNREGISTERED / NOT_FOUND).
+          console.log(`[send-flow-reminders] Removing dead token (code=${result.errorCode}): ...${deviceToken.token.slice(-12)}`);
           await supabase.from('device_tokens').delete().eq('token', deviceToken.token);
         }
       }

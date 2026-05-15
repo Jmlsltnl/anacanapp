@@ -2025,6 +2025,48 @@ export type Database = {
         }
         Relationships: []
       }
+      crash_reports: {
+        Row: {
+          app_version: string | null
+          component_stack: string | null
+          created_at: string
+          error_message: string
+          error_stack: string | null
+          extra_data: Json | null
+          id: string
+          platform: string | null
+          url: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          app_version?: string | null
+          component_stack?: string | null
+          created_at?: string
+          error_message: string
+          error_stack?: string | null
+          extra_data?: Json | null
+          id?: string
+          platform?: string | null
+          url?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          app_version?: string | null
+          component_stack?: string | null
+          created_at?: string
+          error_message?: string
+          error_stack?: string | null
+          extra_data?: Json | null
+          id?: string
+          platform?: string | null
+          url?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       cry_analyses: {
         Row: {
           analysis_result: Json
@@ -7579,6 +7621,7 @@ export type Database = {
       }
       user_preferences: {
         Row: {
+          community_last_seen_at: string | null
           created_at: string
           daily_push_enabled: boolean | null
           exercise_days: number[] | null
@@ -7606,6 +7649,7 @@ export type Database = {
           white_noise_volume: number | null
         }
         Insert: {
+          community_last_seen_at?: string | null
           created_at?: string
           daily_push_enabled?: boolean | null
           exercise_days?: number[] | null
@@ -7633,6 +7677,7 @@ export type Database = {
           white_noise_volume?: number | null
         }
         Update: {
+          community_last_seen_at?: string | null
           created_at?: string
           daily_push_enabled?: boolean | null
           exercise_days?: number[] | null
@@ -8139,6 +8184,22 @@ export type Database = {
           id: string
           name: string
           user_id: string
+        }[]
+      }
+      get_active_payment_methods: {
+        Args: never
+        Returns: {
+          created_at: string
+          description: string
+          description_az: string
+          icon: string
+          id: string
+          is_active: boolean
+          label: string
+          label_az: string
+          method_key: string
+          sort_order: number
+          updated_at: string
         }[]
       }
       get_baby_crisis: {

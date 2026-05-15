@@ -9,6 +9,7 @@ import BottomNav from '@/components/BottomNav';
 import AppRatingPrompt from '@/components/AppRatingPrompt';
 import FloatingTimerWidget from '@/components/FloatingTimerWidget';
 import { useUserStore } from '@/store/userStore';
+import { isNative } from '@/lib/native';
 import { useAuth } from '@/hooks/useAuth';
 import { useDeviceToken } from '@/hooks/useDeviceToken';
 import { useForceUpdate } from '@/hooks/useForceUpdate';
@@ -21,7 +22,7 @@ const Dashboard = lazy(() => import('@/components/Dashboard'));
 const PartnerDashboard = lazy(() => import('@/components/PartnerDashboard'));
 const ToolsHub = lazy(() => import('@/components/ToolsHub'));
 const AIChatScreen = lazy(() => import('@/components/AIChatScreen'));
-const PartnerAIChatScreen = lazy(() => import('@/components/PartnerAIChatScreen'));
+const PartnerAIPremiumGate = lazy(() => import('@/components/partner/PartnerAIPremiumGate'));
 const PartnerChatScreen = lazy(() => import('@/components/partner/PartnerChatScreen'));
 const ShopScreen = lazy(() => import('@/components/ShopScreen'));
 const CakesScreen = lazy(() => import('@/components/CakesScreen'));
@@ -81,8 +82,8 @@ const Index = () => {
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [toolOpenedFromDashboard, setToolOpenedFromDashboard] = useState(false);
   const [toolsResetKey, setToolsResetKey] = useState(0);
-  const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, lifeStage } = useUserStore();
-  const { isAdmin, loading, profile } = useAuth();
+  const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, lifeStage, hasCompletedFunnel, setFunnelCompleted } = useUserStore();
+  const { isAdmin, loading, profile, user } = useAuth();
   const { forceUpdate, isLoading: forceUpdateLoading } = useForceUpdate();
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -300,7 +301,7 @@ const Index = () => {
         case 'ai':
           return (
             <motion.div key="partner-ai" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full">
-              <PartnerAIChatScreen />
+              <PartnerAIPremiumGate />
             </motion.div>
           );
         case 'profile':
@@ -412,9 +413,35 @@ const Index = () => {
     return <AuthScreen />;
   }
 
-  // Onboarding - Partners skip onboarding (they don't need phase selection)
-  if (!isOnboarded && role !== 'partner') {
+  // Partners NEVER see standard onboarding or the funnel — detect via either role or life_stage
+  const isPartnerUser = role === 'partner' || lifeStage === 'partner';
+
+  // Onboarding - Partners skip onboarding entirely
+  if (!isOnboarded && !isPartnerUser) {
     return <OnboardingScreen />;
+  }
+
+  // Reverse Trial Funnel - only dev/web, not partner, not native, not premium,
+  // and only shown ONCE per user account (persisted in localStorage by user id).
+  const isPremiumProfile = profile?.is_premium === true;
+  const paywallSeenKey = user?.id ? `paywall_seen_${user.id}` : null;
+  const paywallAlreadySeen = paywallSeenKey ? localStorage.getItem(paywallSeenKey) === '1' : false;
+  if (!hasCompletedFunnel && !paywallAlreadySeen && !isPremiumProfile && !isNative && !isPartnerUser) {
+    const ReverseTrialFunnel = lazy(() => import('@/components/funnel/ReverseTrialFunnel'));
+    return (
+      <Suspense fallback={suspenseFallback}>
+        <ReverseTrialFunnel onComplete={() => {
+          if (paywallSeenKey) {
+            try { localStorage.setItem(paywallSeenKey, '1'); } catch {}
+          }
+          setFunnelCompleted(true);
+        }} />
+      </Suspense>
+    );
+  }
+  // If user is premium or already saw the paywall, persist completion to skip future checks
+  if ((isPremiumProfile || paywallAlreadySeen) && !hasCompletedFunnel) {
+    setFunnelCompleted(true);
   }
 
   // Admin Panel

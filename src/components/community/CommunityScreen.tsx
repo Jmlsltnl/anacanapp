@@ -7,6 +7,7 @@ import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useUserStore } from '@/store/userStore';
 import { useAppSetting } from '@/hooks/useAppSettings';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
+
 import GroupsList from './GroupsList';
 import GroupFeed from './GroupFeed';
 import CreatePostScreen from './CreatePostScreen';
@@ -15,6 +16,7 @@ import UserProfileScreen from './UserProfileScreen';
 import ConversationListScreen from './ConversationListScreen';
 import DirectMessageScreen from './DirectMessageScreen';
 import BannerSlot from '@/components/banners/BannerSlot';
+import { tr } from "@/lib/tr";
 
 interface CommunityScreenProps {
   onBack?: () => void;
@@ -22,7 +24,7 @@ interface CommunityScreenProps {
 
 // Groups temporarily disabled
 const tabs = [
-  { id: 'feed', label: 'Ümumi', icon: TrendingUp },
+  { id: 'feed', label: tr("communityscreen_umumi_1b5521", 'Ümumi'), icon: TrendingUp },
 ] as const;
 
 const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBack }, ref) => {
@@ -37,6 +39,9 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
 
   useScrollToTop([activeTab, selectedGroupId, selectedUserId]);
   useScreenAnalytics('Community', 'Social');
+
+  // Note: do NOT auto mark-all-seen here. Posts are marked individually as
+  // they enter the viewport in GroupFeed via the SeenObserver wrapper.
 
   const { lifeStage } = useUserStore();
   const headerKey = `community_header_${lifeStage || 'mommy'}`;

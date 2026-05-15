@@ -2,6 +2,8 @@ import { motion } from 'framer-motion';
 import { Home, Compass, MessageCircle, User, Users, Cake } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
+import { useUnreadCommunityPosts } from '@/hooks/useUnreadCommunityPosts';
+import { tr } from "@/lib/tr";
 
 interface BottomNavProps {
   activeTab: string;
@@ -10,24 +12,25 @@ interface BottomNavProps {
 }
 
 const womanTabs = [
-  { id: 'home', label: 'Əsas', icon: Home },
-  { id: 'tools', label: 'Alətlər', icon: Compass },
+  { id: 'home', label: tr("bottomnav_esas_6d87f7", 'Əsas'), icon: Home },
+  { id: 'tools', label: tr("bottomnav_aletler_4778b4", 'Alətlər'), icon: Compass },
   { id: 'cakes', label: 'Tortlar', icon: Cake },
-  { id: 'community', label: 'Cəmiyyət', icon: Users },
+  { id: 'community', label: tr("bottomnav_cemiyyet_2dc44d", 'Cəmiyyət'), icon: Users },
   { id: 'ai', label: 'Anacan.AI', icon: MessageCircle },
   { id: 'profile', label: 'Profil', icon: User },
 ];
 
 const partnerTabs = [
-  { id: 'home', label: 'Əsas', icon: Home },
+  { id: 'home', label: tr("bottomnav_esas_6d87f7", 'Əsas'), icon: Home },
   { id: 'chat', label: 'Mesajlar', icon: MessageCircle },
-  { id: 'ai', label: 'Məsləhət', icon: Compass },
+  { id: 'ai', label: tr("bottomnav_meslehet_9a0892", 'Məsləhət'), icon: Compass },
   { id: 'profile', label: 'Profil', icon: User },
 ];
 
 const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps) => {
   const { lifeStage } = useUserStore();
   const { unreadCount } = useUnreadMessages();
+  const { unreadCount: communityUnread } = useUnreadCommunityPosts();
   
   const getActiveColor = () => {
     switch (lifeStage) {
@@ -65,6 +68,9 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
             const isActive = activeTab === tab.id;
             // Show badge on chat tab for unread messages (both partner and woman)
             const showBadge = (tab.id === 'chat' || (tab.id === 'home' && !isPartner)) && unreadCount > 0;
+            // Community unread posts badge (woman only)
+            const showCommunityBadge = tab.id === 'community' && !isPartner && communityUnread > 0;
+            const communityBadgeText = communityUnread > 99 ? '99+' : String(communityUnread);
             
             return (
               <motion.button
@@ -109,6 +115,16 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
                       className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-destructive rounded-full text-[8px] font-bold text-white flex items-center justify-center z-20"
                     >
                       {unreadCount > 9 ? '9+' : unreadCount}
+                    </motion.span>
+                  )}
+                  {/* Community unread posts badge */}
+                  {showCommunityBadge && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-red-500 rounded-full text-[9px] font-bold text-white flex items-center justify-center z-20 shadow-sm"
+                    >
+                      {communityBadgeText}
                     </motion.span>
                   )}
                 </motion.div>

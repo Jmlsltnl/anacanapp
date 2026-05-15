@@ -46,11 +46,13 @@ import DevelopmentTipsWidget from '@/components/mommy/DevelopmentTipsWidget';
 import BabyCrisisWidget from '@/components/mommy/BabyCrisisWidget';
 import ChildSelector from '@/components/mommy/ChildSelector';
 import TeethingWidget from '@/components/mommy/TeethingWidget';
+import MommyHero from '@/components/mommy/hero/MommyHero';
 import BannerSlot from '@/components/banners/BannerSlot';
 import SendDailySummaryWidget from '@/components/partner/SendDailySummaryWidget';
 import RecentBlogPosts from '@/components/dashboard/RecentBlogPosts';
 import FlowDashboard from '@/components/flow/FlowDashboard';
 import BirthOnboardingModal from '@/components/BirthOnboardingModal';
+import DashboardPremiumBanner from '@/components/DashboardPremiumBanner';
 import PregnancyDayNavigator from '@/components/bump/PregnancyDayNavigator';
 
 // Fetus images by month
@@ -63,6 +65,7 @@ import FetusMonth6 from '@/assets/fetus/month-6.svg';
 import FetusMonth7 from '@/assets/fetus/month-7.svg';
 import FetusMonth8 from '@/assets/fetus/month-8.svg';
 import FetusMonth9 from '@/assets/fetus/month-9.svg';
+import { tr } from "@/lib/tr";
 
 const FETUS_IMAGES: { [key: number]: string } = {
   1: FetusMonth1,
@@ -247,12 +250,12 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
   const getTrimesterInfo = (trimester: number) => {
     switch (trimester) {
       case 1:
-        return { title: '1-ci Trimester Tövsiyələri', emoji: '🌱' };
+        return { title: tr("dashboard_1_ci_trimester_tovsiyeleri_0a4c84", '1-ci Trimester Tövsiyələri'), emoji: '🌱' };
       case 2:
-        return { title: '2-ci Trimester Tövsiyələri', emoji: '🌸' };
+        return { title: tr("dashboard_2_ci_trimester_tovsiyeleri_16e100", '2-ci Trimester Tövsiyələri'), emoji: '🌸' };
       case 3:
       default:
-        return { title: '3-cü Trimester Tövsiyələri', emoji: '🍼' };
+        return { title: tr("dashboard_3_cu_trimester_tovsiyeleri_93f711", '3-cü Trimester Tövsiyələri'), emoji: '🍼' };
     }
   };
   
@@ -302,7 +305,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
     // Add a quick single-kick session for tracking
     await addSession(1, 0);
     toast({
-      title: "Təpik qeyd edildi! 👶",
+      title: tr("dashboard_tepik_qeyd_edildi_284f06", "Təpik qeyd edildi! 👶"),
       description: `Bu gün ${kickCount + 1} təpik`,
     });
   };
@@ -311,7 +314,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
     await hapticFeedback.light();
     await updateWaterIntake(1);
     toast({
-      title: "Su əlavə edildi! 💧",
+      title: tr("dashboard_su_elave_edildi_7b894d", "Su əlavə edildi! 💧"),
       description: `${waterCount + 1}/8 stəkan`,
     });
   };
@@ -502,11 +505,11 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
         <h3 className="text-sm font-bold text-foreground mb-2">Körpənin inkişafı</h3>
         <div className="flex justify-around">
           {[
-            { icon: '👀', label: 'Göz', active: weeklyDevelopment.eyes },
+            { icon: '👀', label: tr("dashboard_goz_fbc05e", 'Göz'), active: weeklyDevelopment.eyes },
             { icon: '👂', label: 'Qulaq', active: weeklyDevelopment.ears },
             { icon: '✋', label: 'Barmaq', active: weeklyDevelopment.fingers },
-            { icon: '🦶', label: 'Təpik', active: weeklyDevelopment.kicks },
-            { icon: '💇', label: 'Saç', active: weeklyDevelopment.hair },
+            { icon: '🦶', label: tr("dashboard_tepik_9a873a", 'Təpik'), active: weeklyDevelopment.kicks },
+            { icon: '💇', label: tr("dashboard_sac_a09eaa", 'Saç'), active: weeklyDevelopment.hair },
           ].map((item, index) => (
             <motion.div 
               key={item.label}
@@ -656,8 +659,8 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           color="bg-primary/10 dark:bg-primary/20 text-primary" 
           onClick={() => {
             toast({
-              title: "Vitamin Xatırlatması 💊",
-              description: "Prenatal vitamininizi günlük qəbul etməyi unutmayın. Folat, D vitamini və dəmir vacibdir!",
+              title: tr("dashboard_vitamin_xatirlatmasi_b8a490", "Vitamin Xatırlatması 💊"),
+              description: tr("dashboard_prenatal_vitamininizi_gunluk_qebul_etmey_c8cba3", "Prenatal vitamininizi günlük qəbul etməyi unutmayın. Folat, D vitamini və dəmir vacibdir!"),
             });
             if (onNavigateToTool) onNavigateToTool('nutrition');
           }}
@@ -893,7 +896,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
     } else {
       // Start sleep
       startTimer('sleep');
-      toast({ title: "Yuxu başladı! 😴", description: "Bitirmək üçün yenidən basın" });
+      toast({ title: tr("dashboard_yuxu_basladi_b503f7", "Yuxu başladı! 😴"), description: tr("dashboard_bitirmek_ucun_yeniden_basin_37b592", "Bitirmək üçün yenidən basın") });
     }
   };
 
@@ -1021,134 +1024,17 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
 
   return (
     <div className="space-y-3">
-      {/* Premium Baby Hero Card - Modern Glassmorphism Design */}
-      <motion.div 
-        className="relative overflow-hidden rounded-[2rem]"
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        {/* Background gradient layers */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-[hsl(12,80%,48%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/15 via-transparent to-transparent" />
-        
-        {/* Decorative orbs */}
-        <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute -bottom-20 -left-20 w-48 h-48 rounded-full bg-black/5 blur-2xl" />
-        
-        <div className="relative z-10 p-4 pt-5">
-          {/* Top section with name and age */}
-          <motion.div 
-            className="flex items-center justify-between mb-4"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <div>
-              <h2 className="text-2xl font-black text-white tracking-tight">{babyData.name}</h2>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-white/70 text-sm">
-                  {exactMonths > 0 ? (
-                    <span className="font-medium">
-                      <span className="text-white font-bold">{exactMonths}</span> ay{' '}
-                      {remainingDays > 0 && (
-                        <>
-                          <span className="text-white font-bold">{remainingDays}</span> gün
-                        </>
-                      )}
-                    </span>
-                  ) : (
-                    <span className="font-medium">
-                      <span className="text-white font-bold">{babyData.ageInDays}</span> günlük
-                    </span>
-                  )}
-                </span>
-              </div>
-            </div>
-            
-            {/* Age badge - pill style */}
-            <motion.div 
-              className="bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-2 shadow-lg"
-              initial={{ scale: 0, rotate: -10 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-            >
-              <div className="text-center">
-                <span className="text-2xl font-black text-primary">{exactMonths || babyData.ageInDays}</span>
-                <span className="text-xs font-bold text-primary/70 ml-0.5">{exactMonths > 0 ? 'ay' : 'gün'}</span>
-              </div>
-            </motion.div>
-          </motion.div>
-
-          {/* Center: Large Baby Illustration - Premium Design */}
-          <motion.div 
-            className="flex justify-center mb-5"
-            animate={{ y: [0, -6, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <div className="relative">
-              {/* Outer glow effect */}
-              <div className="absolute -inset-4 bg-white/20 rounded-full blur-3xl" />
-              <div className="absolute -inset-2 bg-white/15 rounded-full blur-xl animate-pulse-soft" />
-              
-              {/* Premium border container with gradient */}
-              <div className="relative p-1 rounded-[2rem] bg-gradient-to-br from-white/80 via-white/50 to-white/30 shadow-2xl">
-                {/* Inner container */}
-                <div className="relative w-44 h-44 rounded-[1.75rem] bg-white/30 backdrop-blur-md p-1 overflow-hidden">
-                  {/* Shine effect on border */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent rounded-[1.75rem]" />
-                  
-                  {/* Image wrapper with inner glow */}
-                  <div className="relative w-full h-full rounded-[1.5rem] bg-gradient-to-br from-white/60 via-white/40 to-white/20 overflow-hidden flex items-center justify-center shadow-inner">
-                    {/* Radial gradient background */}
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_white_0%,_transparent_70%)] opacity-50" />
-                    
-                    <img 
-                      src={babyIllustration} 
-                      alt={`${babyData.ageInMonths} aylıq körpə`}
-                      className="relative z-10 w-full h-full object-contain p-2 drop-shadow-2xl scale-105"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/placeholder.svg';
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              {/* Animated ring around the image */}
-              <motion.div 
-                className="absolute -inset-3 rounded-full border-2 border-dashed border-white/30"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-              />
-              
-              {/* Floating sparkle decorations */}
-              <motion.div 
-                className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow-lg text-lg"
-                animate={{ rotate: [0, 15, 0], scale: [1, 1.15, 1] }}
-                transition={{ duration: 3, repeat: Infinity }}
-              >
-                ✨
-              </motion.div>
-              <motion.div 
-                className="absolute -bottom-2 -left-2 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center shadow-lg text-sm"
-                animate={{ rotate: [0, -15, 0], scale: [1, 1.2, 1] }}
-                transition={{ duration: 2.5, repeat: Infinity, delay: 0.5 }}
-              >
-                💫
-              </motion.div>
-              <motion.div 
-                className="absolute top-1/2 -right-4 w-6 h-6 rounded-full bg-white/80 flex items-center justify-center shadow-md text-xs"
-                animate={{ x: [0, 3, 0], opacity: [0.8, 1, 0.8] }}
-                transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-              >
-                🌟
-              </motion.div>
-            </div>
-          </motion.div>
-
-        </div>
-      </motion.div>
+      {/* Premium Baby Hero Card — variant chosen via app_settings.mommy_hero_variant */}
+      <MommyHero
+        babyData={{
+          name: babyData.name,
+          ageInMonths: babyData.ageInMonths,
+          ageInDays: babyData.ageInDays,
+        }}
+        exactMonths={exactMonths}
+        remainingDays={remainingDays}
+        babyIllustration={babyIllustration}
+      />
 
       {/* Bu günün məlumatları */}
       {dailyInfo && (
@@ -1464,7 +1350,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                   type="number"
                   value={formulaML}
                   onChange={(e) => setFormulaML(e.target.value)}
-                  placeholder="Digər (ml)"
+                  placeholder={tr("dashboard_diger_ml_da1e7f", "Digər (ml)")}
                   className="flex-1 px-3 py-1.5 rounded-lg border border-blue-200 text-sm bg-white"
                   min="1"
                   max="500"
@@ -1506,7 +1392,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                   type="text"
                   value={solidFoodName}
                   onChange={(e) => setSolidFoodName(e.target.value)}
-                  placeholder="Məs: balkabaqlı püre"
+                  placeholder={tr("dashboard_mes_balkabaqli_pure_27f08d", "Məs: balkabaqlı püre")}
                   className="flex-1 px-3 py-1.5 rounded-lg border border-orange-200 text-sm bg-white"
                 />
                 <motion.button
@@ -1625,90 +1511,6 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 {new Date(log.start_time).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* Milestones with Carousel */}
-      <motion.div 
-        className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.25 }}
-      >
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-base font-bold text-foreground">İnkişaf mərhələləri</h3>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-primary font-bold">
-              {allMilestones.filter(m => m.achieved).length}/{allMilestones.length}
-            </span>
-            {/* Carousel navigation */}
-            {hasMoreMilestones && (
-              <div className="flex gap-1">
-                <motion.button
-                  onClick={() => setMilestonePageIndex(p => Math.max(0, p - 1))}
-                  disabled={milestonePageIndex === 0}
-                  className="w-6 h-6 rounded-full bg-muted flex items-center justify-center disabled:opacity-40"
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <ChevronRight className="w-3 h-3 rotate-180" />
-                </motion.button>
-                <motion.button
-                  onClick={() => setMilestonePageIndex(p => Math.min(totalMilestonePages - 1, p + 1))}
-                  disabled={milestonePageIndex === totalMilestonePages - 1}
-                  className="w-6 h-6 rounded-full bg-muted flex items-center justify-center disabled:opacity-40"
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <ChevronRight className="w-3 h-3" />
-                </motion.button>
-              </div>
-            )}
-          </div>
-        </div>
-        
-        {/* Page indicator */}
-        {hasMoreMilestones && (
-          <div className="flex justify-center gap-1 mb-3">
-            {Array.from({ length: totalMilestonePages }).map((_, i) => (
-              <div
-                key={i}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === milestonePageIndex ? 'w-4 bg-primary' : 'w-1.5 bg-muted'
-                }`}
-              />
-            ))}
-          </div>
-        )}
-        
-        <div className="flex justify-between overflow-hidden">
-          {displayMilestones.map((milestone, index) => (
-            <motion.button 
-              key={milestone.id}
-              onClick={() => handleMilestoneClick(milestone.id)}
-              className="text-center flex-1"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.05 + index * 0.05 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <div className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center text-lg mb-1 relative ${
-                milestone.achieved 
-                  ? 'bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg' 
-                  : 'bg-muted opacity-60'
-              }`}>
-                {milestone.emoji}
-                {milestone.achieved && (
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                    <Check className="w-2.5 h-2.5 text-white" />
-                  </div>
-                )}
-              </div>
-              <span className={`text-[10px] line-clamp-1 ${
-                milestone.achieved ? 'text-foreground font-medium' : 'text-muted-foreground'
-              }`}>
-                {milestone.label}
-              </span>
-            </motion.button>
           ))}
         </div>
       </motion.div>
@@ -1836,6 +1638,90 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         </div>
       </motion.div>
 
+      {/* Milestones with Carousel */}
+      <motion.div 
+        className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.25 }}
+      >
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-base font-bold text-foreground">İnkişaf mərhələləri</h3>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-primary font-bold">
+              {allMilestones.filter(m => m.achieved).length}/{allMilestones.length}
+            </span>
+            {/* Carousel navigation */}
+            {hasMoreMilestones && (
+              <div className="flex gap-1">
+                <motion.button
+                  onClick={() => setMilestonePageIndex(p => Math.max(0, p - 1))}
+                  disabled={milestonePageIndex === 0}
+                  className="w-6 h-6 rounded-full bg-muted flex items-center justify-center disabled:opacity-40"
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <ChevronRight className="w-3 h-3 rotate-180" />
+                </motion.button>
+                <motion.button
+                  onClick={() => setMilestonePageIndex(p => Math.min(totalMilestonePages - 1, p + 1))}
+                  disabled={milestonePageIndex === totalMilestonePages - 1}
+                  className="w-6 h-6 rounded-full bg-muted flex items-center justify-center disabled:opacity-40"
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <ChevronRight className="w-3 h-3" />
+                </motion.button>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Page indicator */}
+        {hasMoreMilestones && (
+          <div className="flex justify-center gap-1 mb-3">
+            {Array.from({ length: totalMilestonePages }).map((_, i) => (
+              <div
+                key={i}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === milestonePageIndex ? 'w-4 bg-primary' : 'w-1.5 bg-muted'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+        
+        <div className="flex justify-between overflow-hidden">
+          {displayMilestones.map((milestone, index) => (
+            <motion.button 
+              key={milestone.id}
+              onClick={() => handleMilestoneClick(milestone.id)}
+              className="text-center flex-1"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.05 + index * 0.05 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <div className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center text-lg mb-1 relative ${
+                milestone.achieved 
+                  ? 'bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg' 
+                  : 'bg-muted opacity-60'
+              }`}>
+                {milestone.emoji}
+                {milestone.achieved && (
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                    <Check className="w-2.5 h-2.5 text-white" />
+                  </div>
+                )}
+              </div>
+              <span className={`text-[10px] line-clamp-1 ${
+                milestone.achieved ? 'text-foreground font-medium' : 'text-muted-foreground'
+              }`}>
+                {milestone.label}
+              </span>
+            </motion.button>
+          ))}
+        </div>
+      </motion.div>
+
       {/* Baby Crisis Calendar Widget - hide after week 75 (last crisis ends) */}
       {Math.floor(babyData.ageInDays / 7) <= 75 && (
         <BabyCrisisWidget 
@@ -1927,6 +1813,9 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
 
       {/* Recent Blog Posts - filtered by life stage (partner uses bump stage content) */}
       {onNavigate && <RecentBlogPosts onNavigate={onNavigate} lifeStage={lifeStage === 'partner' ? 'bump' : lifeStage} />}
+
+      {/* Dashboard Premium Paywall Banner */}
+      <DashboardPremiumBanner />
 
       {/* Bottom Banner Slot */}
       <BannerSlot placement="home_bottom" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mt-4" />

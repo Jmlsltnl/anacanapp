@@ -21,6 +21,7 @@ import BannerSlot from '@/components/banners/BannerSlot';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { tr } from "@/lib/tr";
 
 interface ProfileScreenProps {
   onNavigate?: (screen: string) => void;
@@ -44,13 +45,13 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   const [childForm, setChildForm] = useState<{ name: string; birth_date: string; gender: 'boy' | 'girl' }>({ name: '', birth_date: '', gender: 'boy' });
 
   const genderOptions = [
-    { value: 'boy', label: 'Oğlan', emoji: '👦' },
-    { value: 'girl', label: 'Qız', emoji: '👧' },
+    { value: 'boy', label: tr("profilescreen_oglan_e9715e", 'Oğlan'), emoji: '👦' },
+    { value: 'girl', label: tr("profilescreen_qiz_79bf6b", 'Qız'), emoji: '👧' },
   ];
 
   const handleAddChild = async () => {
     if (!childForm.name || !childForm.birth_date) {
-      toast({ title: 'Ad və doğum tarixi tələb olunur', variant: 'destructive' });
+      toast({ title: tr("profilescreen_ad_ve_dogum_tarixi_teleb_olunur_bdab04", 'Ad və doğum tarixi tələb olunur'), variant: 'destructive' });
       return;
     }
     const child = await addChild({
@@ -75,7 +76,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
       avatar_emoji: genderOptions.find(g => g.value === childForm.gender)?.emoji || '👶',
     });
     if (success) {
-      toast({ title: 'Yeniləndi' });
+      toast({ title: tr("profilescreen_yenilendi_d10a01", 'Yeniləndi') });
       setEditingChild(null);
       setChildForm({ name: '', birth_date: '', gender: 'boy' });
     }
@@ -94,14 +95,14 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   };
 
   const menuItems = [
-    { id: 'billing', icon: CreditCard, label: 'Abunəliyim' },
-    { id: 'notifications', icon: Bell, label: 'Bildirişlər', badge: unreadCount > 0 ? String(unreadCount) : undefined },
-    { id: 'appearance', icon: Palette, label: 'Görünüş' },
-    { id: 'calendar', icon: Calendar, label: 'Təqvim Ayarları' },
+    { id: 'billing', icon: CreditCard, label: tr("profilescreen_abuneliyim_f6c8ed", 'Abunəliyim') },
+    { id: 'notifications', icon: Bell, label: tr("profilescreen_bildirisler_54eb88", 'Bildirişlər'), badge: unreadCount > 0 ? String(unreadCount) : undefined },
+    { id: 'appearance', icon: Palette, label: tr("profilescreen_gorunus_165fe3", 'Görünüş') },
+    { id: 'calendar', icon: Calendar, label: tr("profilescreen_teqvim_ayarlari_012790", 'Təqvim Ayarları') },
     { id: 'privacy', icon: Shield, label: 'Gizlilik' },
-    { id: 'help', icon: HelpCircle, label: 'Yardım' },
+    { id: 'help', icon: HelpCircle, label: tr("profilescreen_yardim_da857a", 'Yardım') },
     ...(isAdmin ? [
-      { id: 'shop', icon: ShoppingCart, label: 'Mağaza (Test)', badge: 'Beta' },
+      { id: 'shop', icon: ShoppingCart, label: tr("profilescreen_magaza_test_72b060", 'Mağaza (Test)'), badge: 'Beta' },
       { id: 'admin', icon: ShieldCheck, label: 'Admin Panel', badge: 'Admin' }
     ] : []),
   ];
@@ -123,8 +124,8 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
 
     if (success) {
       toast({
-        title: 'Paylaşıldı!',
-        description: 'Partnyor kodu uğurla paylaşıldı.',
+        title: tr("profilescreen_paylasildi_c7d9ef", 'Paylaşıldı!'),
+        description: tr("profilescreen_partnyor_kodu_ugurla_paylasildi_d66277", 'Partnyor kodu uğurla paylaşıldı.'),
       });
     }
   };
@@ -132,8 +133,8 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   const handleLogout = async () => {
     await signOut();
     toast({
-      title: 'Çıxış edildi',
-      description: 'Uğurla çıxış etdiniz.',
+      title: tr("profilescreen_cixis_edildi_fb4a43", 'Çıxış edildi'),
+      description: tr("profilescreen_ugurla_cixis_etdiniz_9e8d3c", 'Uğurla çıxış etdiniz.'),
     });
   };
 
@@ -274,7 +275,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
       {/* Partner Code */}
       {role === 'woman' && (
         <motion.div
-          className="bg-card rounded-2xl p-4 mb-3 shadow-card border border-border/50"
+          className="bg-card rounded-2xl p-4 mb-3 shadow-card border border-border/50 relative overflow-hidden"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.25 }}
@@ -285,31 +286,53 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
                 <Heart className="w-4 h-4 text-partner" />
               </div>
               <div>
-                <h3 className="font-bold text-foreground text-sm">Partnyor Kodu</h3>
-                <p className="text-[10px] text-muted-foreground">Həyat yoldaşınızla paylaşın</p>
+                <h3 className="font-bold text-foreground text-sm flex items-center gap-1.5">
+                  Partnyor Kodu
+                  {!isPremium && <Crown className="w-3.5 h-3.5 text-amber-500" />}
+                </h3>
+                <p className="text-[10px] text-muted-foreground">
+                  {isPremium ? 'Həyat yoldaşınızla paylaşın' : 'Premium ilə partnyorunuzu dəvət edin'}
+                </p>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-3 p-3 bg-muted rounded-2xl">
-            <code className="flex-1 text-center font-mono font-bold text-lg tracking-wider text-foreground">
+          <div className="flex items-center gap-3 p-3 bg-muted rounded-2xl relative">
+            <code
+              className={`flex-1 text-center font-mono font-bold text-lg tracking-wider text-foreground ${
+                !isPremium ? 'blur-sm select-none' : ''
+              }`}
+            >
               {partnerCode}
             </code>
-            <motion.button
-              onClick={copyPartnerCode}
-              className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <Copy className="w-5 h-5 text-primary" />
-            </motion.button>
-            <motion.button
-              onClick={sharePartnerCode}
-              className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <Share2 className="w-5 h-5 text-white" />
-            </motion.button>
+            {isPremium ? (
+              <>
+                <motion.button
+                  onClick={copyPartnerCode}
+                  className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Copy className="w-5 h-5 text-primary" />
+                </motion.button>
+                <motion.button
+                  onClick={sharePartnerCode}
+                  className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Share2 className="w-5 h-5 text-white" />
+                </motion.button>
+              </>
+            ) : (
+              <motion.button
+                onClick={() => setShowPremiumModal(true)}
+                className="absolute inset-0 rounded-2xl flex items-center justify-center bg-gradient-to-r from-amber-500/90 to-orange-500/90 text-white font-bold text-sm gap-2"
+                whileTap={{ scale: 0.97 }}
+              >
+                <Crown className="w-4 h-4" />
+                Premium ilə aç
+              </motion.button>
+            )}
           </div>
 
           {/* Partner Info Button */}
@@ -509,7 +532,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
               <Input
                 value={childForm.name}
                 onChange={(e) => setChildForm(p => ({ ...p, name: e.target.value }))}
-                placeholder="Körpənin adı"
+                placeholder={tr("profilescreen_korpenin_adi_8a4e9e", "Körpənin adı")}
               />
             </div>
             <div>
@@ -629,12 +652,12 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
           <h2 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Hüquqi</h2>
         </div>
         {[
-          { id: 'legal/privacy_policy', icon: FileText, label: 'Gizlilik Siyasəti' },
-          { id: 'legal/terms_of_service', icon: Scale, label: 'İstifadə Şərtləri' },
-          { id: 'legal/disclaimer', icon: AlertCircle, label: 'Məsuliyyətdən İmtina Bəyanatı' },
-          { id: 'legal/refund_policy', icon: RotateCcw, label: 'Geri Qaytarma Siyasəti' },
+          { id: 'legal/privacy_policy', icon: FileText, label: tr("profilescreen_gizlilik_siyaseti_dc3f28", 'Gizlilik Siyasəti') },
+          { id: 'legal/terms_of_service', icon: Scale, label: tr("profilescreen_i_stifade_sertleri_fbbe3d", 'İstifadə Şərtləri') },
+          { id: 'legal/disclaimer', icon: AlertCircle, label: tr("profilescreen_mesuliyyetden_i_mtina_beyanati_857abd", 'Məsuliyyətdən İmtina Bəyanatı') },
+          { id: 'legal/refund_policy', icon: RotateCcw, label: tr("profilescreen_geri_qaytarma_siyaseti_767324", 'Geri Qaytarma Siyasəti') },
           { id: 'legal/gdpr_ccpa', icon: Shield, label: 'GDPR / CCPA' },
-          { id: 'legal/data_usage', icon: Database, label: 'Məlumat İstifadəsi' },
+          { id: 'legal/data_usage', icon: Database, label: tr("profilescreen_melumat_i_stifadesi_af1211", 'Məlumat İstifadəsi') },
         ].map((item, index, arr) => {
           const Icon = item.icon;
           return (

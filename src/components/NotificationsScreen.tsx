@@ -4,6 +4,7 @@ import { ArrowLeft, Bell, Check, Trash2, Calendar, Heart, Pill, Gift, MessageCir
 import { useNotifications } from '@/hooks/useNotifications';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
+import { tr } from "@/lib/tr";
 
 interface NotificationsScreenProps {
   onBack: () => void;
@@ -64,8 +65,8 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
   };
 
   const filters: { id: FilterType; label: string }[] = [
-    { id: 'all', label: 'Hamısı' },
-    { id: 'community', label: 'Cəmiyyət' },
+    { id: 'all', label: tr("notificationsscreen_hamisi_c73c4d", 'Hamısı') },
+    { id: 'community', label: tr("notificationsscreen_cemiyyet_2dc44d", 'Cəmiyyət') },
     { id: 'system', label: 'Sistem' },
   ];
 

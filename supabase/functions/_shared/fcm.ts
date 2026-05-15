@@ -61,7 +61,7 @@ export async function sendFCMv1(
   title: string,
   body: string,
   data?: Record<string, string>
-): Promise<{ success: boolean; error?: string; unregistered?: boolean }> {
+): Promise<{ success: boolean; error?: string; unregistered?: boolean; errorCode?: string; httpStatus?: number }> {
   const fcmUrl = `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`;
 
   const message: any = {
@@ -96,12 +96,36 @@ export async function sendFCMv1(
   });
 
   if (res.ok) {
-    return { success: true };
+    return { success: true, httpStatus: res.status };
   }
 
   const errBody = await res.json().catch(() => ({}));
-  const errCode = errBody?.error?.details?.[0]?.errorCode || errBody?.error?.status || '';
-  const unregistered = errCode === 'UNREGISTERED' || errCode === 'INVALID_ARGUMENT';
+  const errCode: string =
+    errBody?.error?.details?.[0]?.errorCode ||
+    errBody?.error?.status ||
+    '';
 
-  return { success: false, error: JSON.stringify(errBody), unregistered };
+  // ONLY treat the token as truly dead for these specific codes.
+  // INVALID_ARGUMENT is NOT included — Google can return it for transient reasons
+  // (malformed payload, temporary backend issues) and we'd lose live tokens.
+  const PERMANENT_DEAD_CODES = new Set([
+    'UNREGISTERED',
+    'NOT_FOUND',
+    'INVALID_REGISTRATION',
+    'MISMATCH_SENDER_ID',
+  ]);
+  const unregistered = PERMANENT_DEAD_CODES.has(errCode);
+
+  const tokenSuffix = deviceToken.slice(-12);
+  console.log(
+    `[FCM] send failed http=${res.status} code=${errCode || 'UNKNOWN'} unregistered=${unregistered} token=...${tokenSuffix}`
+  );
+
+  return {
+    success: false,
+    error: JSON.stringify(errBody),
+    unregistered,
+    errorCode: errCode,
+    httpStatus: res.status,
+  };
 }

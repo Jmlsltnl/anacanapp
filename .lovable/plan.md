@@ -1,52 +1,79 @@
+# Anacan – Yeni dəyişikliklər planı
 
+Bu planda 6 ayrı dəyişiklik var. Hamısı bir-birindən asılı olmayan kiçik təkmilləşdirmələrdir.
 
-# ANACAN Pitch Deck -- Detalli Wireframe
+---
 
-Movcud pitch deck mezmunundan ve tetbiqin aktiv funksionalligindan istifade ederek, 16 slaydliq profesional pitch deck wireframe-i Markdown formatinda hazirlayacam ve `/mnt/documents/` qovluguna yazacam.
+## 1) Anacan.AI tonu və scroll problemi
 
-## Slayd Strukturu (16 slayd)
+**Problem 1 — Ton:** AI bəzən "Ay [ad]", "əziz ana", "rəfiqənizəm" kimi qeyri-formal müraciətlər istifadə edir. Daha peşəkar olmalıdır.
 
-| # | Slayd | Esas Mesaj |
-|---|-------|-----------|
-| 1 | Cover | Brend, tagline, round info |
-| 2 | Problem | 4 esas problem -- parcalanmis tecube, dil bariyeri, partnyor izolasiyasi, lokal ekosistem yoxdur |
-| 3 | Solution | 4 modul: Flow, Bump, Mommy, Partner -- her birinin esas funksiyalari |
-| 4 | Product Deep Dive | 30+ aletin kategoriyalar uzre bolgusu -- real tetbiqdeki aktiv aletler (AI fotosessiya, aglama analizi, necis skaneri, reseptler, kontraksiyon taymer ve s.) |
-| 5 | AI-Powered Features | Gemini inteqrasiya, AI meslehetci, aglama tercumecisi, necis skaneri, hava-geyim tovsiyesi, nagil generatoru, AI fotosessiya |
-| 6 | Market Opportunity | TAM/SAM/SOM, AZ bazar statistikasi, FemTech benchmarklar |
-| 7 | Competitive Landscape | Flo/Clue/BabyCenter muqayise cedveli, 5 reqabet ustunluyu |
-| 8 | Business Model | 4 gelir menbesi: Freemium, E-commerce, Reklam, B2B |
-| 9 | Traction | MVP hazir, 30+ alet, admin CMS, push notifications, odenish sistemi, Mixpanel analytics, deeplink sistemi |
-| 10 | User Journey & Retention | Omur boyu istifadeci dongusu, retention driverlari, LTV hesablamasi |
-| 11 | Go-to-Market | 3 fazali strategiya, kesb kanallari |
-| 12 | Financial Projections | 3 illik proqnoz, unit economics |
-| 13 | Global Expansion | AZ -> Turkiye -> Merkezi Asiya -> MENA xaritesi |
-| 14 | Social Impact | Maternal saglamliq, mental saglamliq, gender beraberliyi, SDG uygunlugu |
-| 15 | The Ask | $150K bolgusu, 18 ayliq milestone-lar |
-| 16 | Contact / CTA | Elaqe, CTA |
+**Problem 2 — Scroll:** Yeni mesaj yazılanda ekran "ən başa" sıçrayır. Səbəb: `AIChatScreen.tsx`-da `motion.div` üçün `transition={{ delay: index * 0.05 }}` hər mesaj üçün təxir verir, və yeni mesaj əlavə olunanda bütün mesajlar yenidən aşağıdan-yuxarı animasiya ilə render olunur — bu vizual "yuxarıya qaçma" hissi yaradır.
 
-## Wireframe-e Daxil Edilecek Mezmun
+**Düzəliş:**
+- `supabase/functions/dr-anacan-chat/prompts.ts` — system prompt-da "Ay", "əziz ana", "canım", "rəfiqə" kimi söz/müraciətləri qadağan et; "siz" formasında, peşəkar tonda cavab vermək tələbi əlavə et.
+- `src/components/AIChatScreen.tsx`:
+  - Welcome mesajlarından "əziz ana", "sağlamlıq rəfiqənizəm", "AI rəfiqənizəm" sözlərini çıxart, neytral peşəkar formaya gətir.
+  - `motion.div`-dən `transition={{ delay: index * 0.05 }}` çıxar — sadəcə qısa fade-in qalsın.
+  - Eyni dəyişikliyi `PartnerAIChatScreen.tsx`-də də et.
 
-Her slayd ucun:
-- **Layout** (vizual yerlesme tesviri)
-- **Basliq & Alt basliq**
-- **Esas mezmun bloklari** (metn, reqemler, qrafik/diaqram tesviri)
-- **Vizual qeydler** (rengler, ikonlar, stil tovsiyesi)
-- **Speaker Notes** (presenter ucun qeydler)
+---
 
-Tetbiqdeki butun aktiv modullar ve aletler neze alinacaq:
-- 35+ alet (ToolsHub-dan)
-- 4 heyat merhelesi (Flow, Bump, Mommy, Partner)
-- AI inteqrasiyalar (Gemini 2.5 Pro/Flash, 3.1 Flash Image)
-- E-commerce (tortlar, albom, affiliate, ikinci el)
-- Community (qruplar, bloglar, stories)
-- Analytics (Mixpanel, Firebase)
-- Deeplink sistemi
+## 2) Bütün alətləri Premium et
 
-## Texniki Icra
+**Problem:** Hazırda yalnız bəzi alətlər premiumdur. Sizin istəyiniz: **Alətlər bölməsindəki bütün alətlər premium** olsun, premium olmayanlar istifadə edə bilməsinlər və hər yerdə (ana ekran, dashboard widget, daxili giriş nöqtələri) premium nişanı görünsün.
 
-- `/mnt/documents/anacan-pitch-deck-wireframe.md` faylina yazilacaq
-- Azerbaycan dilinde, investorlar ucun professional dilde
-- Her slayd ucun ASCII layout diaqrami daxil edilecek
-- Muqayise cedvelleri GFM formatinda
+**Düzəliş:**
+- `tool_configs` cədvəlində bütün alətləri tək migrasiya ilə `is_premium = true` et.
+- `useDynamicTools` hook-u onsuz da `is_premium` oxuyur; `ToolsScreen` və alət kartları üçün premium kilid göstərir — kodda əlavə dəyişiklik tələb olunmur, sadəcə DB yenilənməsi.
+- Əgər hansısa alət `useDynamicTools`-dan kənar (sabit/hardcoded) açılırsa, onu da `usePremiumGate` (və ya mövcud `useSubscription`) yoxlaması ilə qoru.
 
+---
+
+## 3) Partnyor profili onboarding görməməlidir
+
+**Problem:** `life_stage = 'partner'` olan istifadəçi standart bump/mommy/flow onboarding-lərini görür.
+
+**Düzəliş:**
+- `OnboardingScreen` (və ya əsas onboarding router) içində `lifeStage === 'partner'` olduqda **hər hansı onboarding addımı göstərmədən** birbaşa partnyor ana ekranına yönləndir.
+- Partnyor üçün ayrı tip onboarding əgər varsa, onu da skip et — partnyor heç bir onboarding görməməlidir.
+
+---
+
+## 4) Cəmiyyət iconu üzərində oxunmamış post sayı (qırmızı badge)
+
+**Problem:** Yeni cəmiyyət postları gəldikdə bottom-nav-dakı "Cəmiyyət" iconunda heç bir göstərici yoxdur.
+
+**Düzəliş:**
+- Yeni hook: `useUnreadCommunityPosts` — istifadəçinin son `community_posts.last_seen_at` (yeni `user_preferences` sütunu) tarixindən sonra yaradılmış postların sayını qaytarır.
+- Migrasiya: `user_preferences` cədvəlinə `community_last_seen_at timestamptz` sütunu əlavə et.
+- `BottomNav.tsx`-da Cəmiyyət iconunun üst sağında qırmızı yuvarlaq badge (sayla) göstər; say > 99 olarsa "99+".
+- İstifadəçi Cəmiyyət ekranını açanda `community_last_seen_at` indi vaxtına yenilənir → say sıfırlanır.
+
+---
+
+## 5) Cəmiyyətdə "Qruplar" tab-ını müvəqqəti gizlət
+
+**Düzəliş:**
+- `CommunityScreen.tsx`-da Qruplar tab/section-ını gizlət (silmə, sadəcə şərt ilə render etmə — `const SHOW_GROUPS = false;` flag).
+- Default açılış tab-ı "Feed" olsun.
+- `GroupsList`, `GroupFeed` faylları silinmir — gələcəkdə flag ilə açıla bilər.
+
+---
+
+## 6) Dashboard – "İnkişaf mərhələləri" və "Bugünkü Xülasə" widget yerlərini dəyişmək
+
+**Problem:** Hazırda `Dashboard.tsx`-da əvvəlcə "İnkişaf mərhələləri" (sətr ~1634), sonra "Today's Summary" (sətr ~1718) gəlir. Sizin istəyiniz: yerlər dəyişdirilsin — əvvəlcə Xülasə, sonra İnkişaf mərhələləri.
+
+**Düzəliş:**
+- `Dashboard.tsx`-da iki bloku yerini dəyişdir (Today's Summary blokunu Milestones-dən yuxarı çək).
+
+---
+
+## Texniki qeydlər
+
+- Migrasiyalar (DB):
+  1. `UPDATE tool_configs SET is_premium = true;`
+  2. `ALTER TABLE user_preferences ADD COLUMN community_last_seen_at timestamptz;`
+- Edge function `dr-anacan-chat` avtomatik yenidən deploy olunur.
+- Yoxlama: APK/preview-də (a) AI welcome mesajı, (b) yeni mesaj scroll davranışı, (c) alətlərin kilidli görünüşü, (d) Cəmiyyət badge-i, (e) Dashboard widget sırası.

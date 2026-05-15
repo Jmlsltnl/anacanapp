@@ -16,6 +16,7 @@ import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
+import { tr } from "@/lib/tr";
 
 interface PregnancyAlbumProps {
   onBack: () => void;
@@ -36,10 +37,10 @@ interface AlbumPhoto {
 const monthLabels = [
   { month: 1, weeks: '1-4', label: '1-ci ay', emoji: '🌱' },
   { month: 2, weeks: '5-8', label: '2-ci ay', emoji: '🌿' },
-  { month: 3, weeks: '9-13', label: '3-cü ay', emoji: '🌳' },
-  { month: 4, weeks: '14-17', label: '4-cü ay', emoji: '🍋' },
+  { month: 3, weeks: '9-13', label: tr("pregnancyalbum_3_cu_ay_cd62b6", '3-cü ay'), emoji: '🌳' },
+  { month: 4, weeks: '14-17', label: tr("pregnancyalbum_4_cu_ay_e2b0d2", '4-cü ay'), emoji: '🍋' },
   { month: 5, weeks: '18-21', label: '5-ci ay', emoji: '🥭' },
-  { month: 6, weeks: '22-26', label: '6-cı ay', emoji: '🥥' },
+  { month: 6, weeks: '22-26', label: tr("pregnancyalbum_6_ci_ay_c17c71", '6-cı ay'), emoji: '🥥' },
   { month: 7, weeks: '27-30', label: '7-ci ay', emoji: '🍉' },
   { month: 8, weeks: '31-35', label: '8-ci ay', emoji: '🎃' },
   { month: 9, weeks: '36-40', label: '9-cu ay', emoji: '👶' },
@@ -144,12 +145,12 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
       setCaption('');
       setReplacingPhotoId(null);
       setViewingPhoto(null);
-      toast({ title: 'Şəkil əlavə edildi', description: 'Hamiləlik albomuna şəkil əlavə edildi' });
+      toast({ title: tr("pregnancyalbum_sekil_elave_edildi_a2085a", 'Şəkil əlavə edildi'), description: tr("pregnancyalbum_hamilelik_albomuna_sekil_elave_edildi_bf00fa", 'Hamiləlik albomuna şəkil əlavə edildi') });
     },
     onError: (error) => {
       console.error('Upload error:', error);
       setReplacingPhotoId(null);
-      toast({ title: 'Xəta', description: 'Şəkil yüklənə bilmədi', variant: 'destructive' });
+      toast({ title: tr("pregnancyalbum_xeta_3cdbb6", 'Xəta'), description: tr("pregnancyalbum_sekil_yuklene_bilmedi_3c275f", 'Şəkil yüklənə bilmədi'), variant: 'destructive' });
     },
     onSettled: () => {
       setUploading(false);
@@ -172,7 +173,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
       queryClient.invalidateQueries({ queryKey: ['pregnancy-album-photos'] });
       setViewingPhoto(null);
       setShowActionSheet(null);
-      toast({ title: 'Silindi', description: 'Şəkil albomdan silindi' });
+      toast({ title: 'Silindi', description: tr("pregnancyalbum_sekil_albomdan_silindi_0f180a", 'Şəkil albomdan silindi') });
     },
   });
 
@@ -187,7 +188,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pregnancy-album-photos'] });
       setEditingCaption(false);
-      toast({ title: 'Yeniləndi' });
+      toast({ title: tr("pregnancyalbum_yenilendi_d10a01", 'Yeniləndi') });
     },
   });
 
@@ -540,7 +541,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                     type="text"
                     value={caption}
                     onChange={(e) => setCaption(e.target.value)}
-                    placeholder="Başlıq əlavə edin..."
+                    placeholder={tr("pregnancyalbum_basliq_elave_edin_082901", "Başlıq əlavə edin...")}
                     className="flex-1 h-10 px-3 rounded-lg bg-white/10 text-white placeholder:text-white/50 outline-none"
                     autoFocus
                   />

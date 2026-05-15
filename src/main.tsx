@@ -3,6 +3,10 @@ import App from "./App.tsx";
 import "./index.css";
 import { initializeNativeFeatures } from "./lib/native";
 import { initMixpanel } from "./lib/mixpanel";
+import { initCrashReporter } from "./lib/crashReporter";
+
+// Initialize crash reporter first (catches all errors from this point)
+initCrashReporter();
 
 // Initialize Mixpanel analytics
 initMixpanel();

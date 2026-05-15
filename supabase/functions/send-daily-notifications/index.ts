@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
+import { requireCronSecret, requireAdmin } from '../_shared/auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -45,6 +46,20 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Auth: cron secret OR service-role/anon Bearer (used by pg_cron) OR admin user.
+    const cronErr = requireCronSecret(req);
+    if (cronErr) {
+      const authHeader = req.headers.get('Authorization') || '';
+      const token = authHeader.replace(/^Bearer\s+/i, '');
+      const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+      const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
+      const isCronBearer = token && (token === serviceKey || token === anonKey);
+      if (!isCronBearer) {
+        const adminCheck = await requireAdmin(req);
+        if (adminCheck.error) return adminCheck.error;
+      }
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -58,23 +73,23 @@ Deno.serve(async (req) => {
     const currentMinute = bakuNow.getUTCMinutes();
     const currentTimeStr = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`;
 
-    let body: { manual?: boolean } = {};
+    let body: { manual?: boolean; userId?: string; skipDedup?: boolean } = {};
     try { body = await req.json(); } catch { /* No body */ }
 
-    if (!body.manual && (currentHour < 9 || currentHour >= 24)) {
+    if (!body.manual && (currentHour < 9 || currentHour >= 22)) {
       return new Response(
-        JSON.stringify({ message: 'Outside notification hours', skipped: true }),
+        JSON.stringify({ message: 'Outside notification hours', skipped: true, currentTime: currentTimeStr }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Determine which send_time slot we're in (within ±5 min window)
+    // Determine which send_time slot we're in (within ±15 min window — tolerates cron lag/cold starts)
     const timeSlots = ['09:00', '14:00'];
     const matchingSlot = timeSlots.find(slot => {
       const [h, m] = slot.split(':').map(Number);
       const slotMinutes = h * 60 + m;
       const currentMinutes = currentHour * 60 + currentMinute;
-      return Math.abs(currentMinutes - slotMinutes) <= 5;
+      return Math.abs(currentMinutes - slotMinutes) <= 15;
     });
 
     // For manual triggers, send all pending; for cron, only matching slot
@@ -96,7 +111,10 @@ Deno.serve(async (req) => {
       );
     }
 
+    console.log(`[send-daily-notifications] Started. bakuTime=${currentTimeStr} activeSlot=${activeSendTime || 'manual'} manual=${!!body.manual}`);
+
     const { accessToken, projectId } = await getFirebaseAccessToken(saJson);
+    console.log(`[send-daily-notifications] Got Firebase access token, project=${projectId}`);
 
     // Get active scheduled notifications
     const { data: scheduledNotifications } = await supabase
@@ -126,42 +144,59 @@ Deno.serve(async (req) => {
       mommyNotifsByDay.set(n.day_number, existing);
     });
 
-    // Get users
-    const { data: profiles } = await supabase
+    // Get users — optionally filter by single userId for debugging
+    let profilesQuery = supabase
       .from('profiles').select('user_id, life_stage, role, due_date, last_period_date');
+    if (body.userId) profilesQuery = profilesQuery.eq('user_id', body.userId);
+    const { data: profiles } = await profilesQuery;
 
-    const { data: children } = await supabase
+    let childrenQuery = supabase
       .from('user_children').select('user_id, birth_date').order('birth_date', { ascending: false });
+    if (body.userId) childrenQuery = childrenQuery.eq('user_id', body.userId);
+    const { data: children } = await childrenQuery;
 
-    const { data: preferences } = await supabase
+    let prefsQuery = supabase
       .from('user_preferences').select('user_id, push_enabled, daily_push_enabled');
+    if (body.userId) prefsQuery = prefsQuery.eq('user_id', body.userId);
+    const { data: preferences } = await prefsQuery;
 
-    const { data: tokens } = await supabase
+    let tokensQuery = supabase
       .from('device_tokens').select('token, user_id, platform');
+    if (body.userId) tokensQuery = tokensQuery.eq('user_id', body.userId);
+    const { data: tokens } = await tokensQuery;
 
     if (!tokens?.length) {
       return new Response(
-        JSON.stringify({ message: 'No device tokens', sent: 0 }),
+        JSON.stringify({ message: 'No device tokens', sent: 0, userId: body.userId || null }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Get today's already sent notifications to prevent duplicates
-    const todayStart = new Date();
-    todayStart.setUTCHours(0, 0, 0, 0);
-    const { data: todaySentLogs } = await supabase
+    // Get today's already sent notifications to prevent duplicates — use Baku-local day boundary.
+    // bakuNow is already shifted by +4h, so its UTC midnight === Baku midnight in the original UTC clock.
+    const bakuMidnight = new Date(bakuNow);
+    bakuMidnight.setUTCHours(0, 0, 0, 0);
+    // Convert back to real UTC instant by subtracting the +4h shift we added earlier.
+    const todayStart = new Date(bakuMidnight.getTime() - bakuOffsetMs);
+
+    let dedupQuery = supabase
       .from('notification_send_log')
       .select('user_id, source_type, source_notification_id')
       .gte('sent_at', todayStart.toISOString())
       .eq('status', 'sent');
+    if (body.userId) dedupQuery = dedupQuery.eq('user_id', body.userId);
+    const { data: todaySentLogs } = await dedupQuery;
 
-    // Build a set of "userId:sourceType:sourceNotifId" for dedup
+    // Build a set of "userId:sourceType:sourceNotifId" for dedup.
+    // skipDedup=true (test mode) → empty set, so resend is allowed.
     const alreadySent = new Set<string>();
-    todaySentLogs?.forEach((log: any) => {
-      if (log.source_type && log.source_notification_id) {
-        alreadySent.add(`${log.user_id}:${log.source_type}:${log.source_notification_id}`);
-      }
-    });
+    if (!body.skipDedup) {
+      todaySentLogs?.forEach((log: any) => {
+        if (log.source_type && log.source_notification_id) {
+          alreadySent.add(`${log.user_id}:${log.source_type}:${log.source_notification_id}`);
+        }
+      });
+    }
 
     // Build user map
     const userMap = new Map<string, UserForNotification>();
@@ -197,14 +232,12 @@ Deno.serve(async (req) => {
     let sentCount = 0;
     const results: Array<{ userId: string; success: boolean; type?: string; day?: number; error?: string }> = [];
 
-    for (const user of eligibleUsers) {
+    const processUser = async (user: UserForNotification) => {
       const userTokens = tokens.filter((t: DeviceToken) => t.user_id === user.user_id);
-      if (!userTokens.length) continue;
+      if (!userTokens.length) return;
 
-      // Collect all notifications to send for this user
       const notificationsToSend: Array<{ title: string; body: string; id: string; type: string; day?: number }> = [];
 
-      // Priority 1a: pregnancy day notifications (ALL for the user's current day)
       if (user.life_stage === 'bump' && user.last_period_date) {
         const pregnancyDay = calculatePregnancyDay(user.last_period_date);
         if (pregnancyDay !== null) {
@@ -215,16 +248,13 @@ Deno.serve(async (req) => {
               notificationsToSend.push({
                 id: dn.id,
                 title: `${dn.emoji || ''} ${dn.title}`.trim(),
-                body: dn.body,
-                type: 'pregnancy_day',
-                day: pregnancyDay,
+                body: dn.body, type: 'pregnancy_day', day: pregnancyDay,
               });
             }
           }
         }
       }
 
-      // Priority 1b: mommy day notifications (ALL for the child's current day)
       if (user.life_stage === 'mommy') {
         const userChildren = children?.filter((c: any) => c.user_id === user.user_id) || [];
         if (userChildren.length > 0 && userChildren[0].birth_date) {
@@ -241,9 +271,7 @@ Deno.serve(async (req) => {
                 notificationsToSend.push({
                   id: dn.id,
                   title: `${dn.emoji || ''} ${dn.title}`.trim(),
-                  body: dn.body,
-                  type: 'mommy_day',
-                  day: childAgeDays,
+                  body: dn.body, type: 'mommy_day', day: childAgeDays,
                 });
               }
             }
@@ -251,7 +279,6 @@ Deno.serve(async (req) => {
         }
       }
 
-      // Priority 2: scheduled notifications (only if no day-specific notifications were found at all for this day)
       if (notificationsToSend.length === 0 && scheduledNotifications?.length) {
         const match = scheduledNotifications.find((n: ScheduledNotification) => {
           if (n.target_audience === 'all') return true;
@@ -267,9 +294,7 @@ Deno.serve(async (req) => {
         }
       }
 
-      // Send all collected notifications
       for (const notif of notificationsToSend) {
-        let sent = false;
         for (const deviceToken of userTokens) {
           const result = await sendFCMv1(accessToken, projectId, deviceToken.token, notif.title, notif.body, {
             type: notif.type, notification_id: notif.id,
@@ -277,28 +302,32 @@ Deno.serve(async (req) => {
 
           if (result.success) {
             sentCount++;
-            sent = true;
             results.push({ userId: user.user_id, success: true, type: notif.type, day: notif.day });
-
             await supabase.from('notification_send_log').insert({
               user_id: user.user_id,
               notification_id: notif.type === 'scheduled' ? notif.id : null,
-              title: notif.title,
-              body: notif.body,
-              status: 'sent',
-              source_type: notif.type,
-              source_notification_id: notif.id,
+              title: notif.title, body: notif.body, status: 'sent',
+              source_type: notif.type, source_notification_id: notif.id,
             });
-
-            break; // sent to one device is enough
+            break;
           } else {
             results.push({ userId: user.user_id, success: false, error: result.error });
+            // Only delete tokens that FCM definitively flags as dead.
             if (result.unregistered) {
+              console.log(`[send-daily-notifications] Removing dead token (code=${result.errorCode}): ...${deviceToken.token.slice(-12)}`);
               await supabase.from('device_tokens').delete().eq('token', deviceToken.token);
             }
           }
         }
       }
+    };
+
+    // Parallel batches of 25 users for speed
+    const concurrency = 25;
+    for (let i = 0; i < eligibleUsers.length; i += concurrency) {
+      const batch = eligibleUsers.slice(i, i + concurrency);
+      await Promise.all(batch.map(processUser));
+      console.log(`[send-daily-notifications] Processed ${Math.min(i + concurrency, eligibleUsers.length)}/${eligibleUsers.length}, sent so far: ${sentCount}`);
     }
 
     // Update last_push_sent_at for users who got notifications

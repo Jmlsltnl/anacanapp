@@ -16,6 +16,7 @@ import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { useToast } from '@/hooks/use-toast';
 import { format, isToday, isYesterday, subDays, startOfDay } from 'date-fns';
 import { az } from 'date-fns/locale';
+import { tr } from "@/lib/tr";
 
 interface BloodSugarTrackerProps {
   onBack: () => void;
@@ -33,32 +34,32 @@ interface BloodSugarLog {
 }
 
 const readingTypes = [
-  { id: 'fasting', label: 'Aclıq', emoji: '🌅', description: 'Səhər tezdən, yeməkdən əvvəl' },
-  { id: 'before_meal', label: 'Yeməkdən əvvəl', emoji: '🍽️', description: 'Yeməkdən 30 dəq əvvəl' },
-  { id: 'after_meal', label: 'Yeməkdən sonra', emoji: '⏰', description: 'Yeməkdən 2 saat sonra' },
-  { id: 'bedtime', label: 'Yatmazdan əvvəl', emoji: '🌙', description: 'Gecə yatmaq üçün' },
-  { id: 'random', label: 'Təsadüfi', emoji: '📊', description: 'İstənilən vaxt' },
+  { id: 'fasting', label: tr("bloodsugartracker_acliq_b6d5ee", 'Aclıq'), emoji: '🌅', description: tr("bloodsugartracker_seher_tezden_yemekden_evvel_3f58e4", 'Səhər tezdən, yeməkdən əvvəl') },
+  { id: 'before_meal', label: tr("bloodsugartracker_yemekden_evvel_167a3d", 'Yeməkdən əvvəl'), emoji: '🍽️', description: tr("bloodsugartracker_yemekden_30_deq_evvel_266704", 'Yeməkdən 30 dəq əvvəl') },
+  { id: 'after_meal', label: tr("bloodsugartracker_yemekden_sonra_56238e", 'Yeməkdən sonra'), emoji: '⏰', description: tr("bloodsugartracker_yemekden_2_saat_sonra_c59165", 'Yeməkdən 2 saat sonra') },
+  { id: 'bedtime', label: tr("bloodsugartracker_yatmazdan_evvel_a457fa", 'Yatmazdan əvvəl'), emoji: '🌙', description: tr("bloodsugartracker_gece_yatmaq_ucun_34ca83", 'Gecə yatmaq üçün') },
+  { id: 'random', label: tr("bloodsugartracker_tesadufi_98c20c", 'Təsadüfi'), emoji: '📊', description: tr("bloodsugartracker_i_stenilen_vaxt_ec15be", 'İstənilən vaxt') },
 ];
 
 const mealContexts = [
-  { id: 'breakfast', label: 'Səhər yeməyi', emoji: '🥞' },
+  { id: 'breakfast', label: tr("bloodsugartracker_seher_yemeyi_b82929", 'Səhər yeməyi'), emoji: '🥞' },
   { id: 'lunch', label: 'Nahar', emoji: '🍲' },
-  { id: 'dinner', label: 'Şam yeməyi', emoji: '🍛' },
-  { id: 'snack', label: 'Qəlyanaltı', emoji: '🍎' },
+  { id: 'dinner', label: tr("bloodsugartracker_sam_yemeyi_6002e9", 'Şam yeməyi'), emoji: '🍛' },
+  { id: 'snack', label: tr("bloodsugartracker_qelyanalti_42fb71", 'Qəlyanaltı'), emoji: '🍎' },
 ];
 
 // Blood sugar level thresholds (mg/dL)
 const getReadingStatus = (value: number, type: string) => {
   if (type === 'fasting') {
-    if (value < 70) return { status: 'low', label: 'Aşağı', color: 'text-blue-600', bg: 'bg-blue-500/10' };
+    if (value < 70) return { status: 'low', label: tr("bloodsugartracker_asagi_1c27f1", 'Aşağı'), color: 'text-blue-600', bg: 'bg-blue-500/10' };
     if (value <= 95) return { status: 'normal', label: 'Normal', color: 'text-green-600', bg: 'bg-green-500/10' };
-    if (value <= 125) return { status: 'elevated', label: 'Yüksəlmiş', color: 'text-amber-600', bg: 'bg-amber-500/10' };
-    return { status: 'high', label: 'Yüksək', color: 'text-red-600', bg: 'bg-red-500/10' };
+    if (value <= 125) return { status: 'elevated', label: tr("bloodsugartracker_yukselmis_1fee34", 'Yüksəlmiş'), color: 'text-amber-600', bg: 'bg-amber-500/10' };
+    return { status: 'high', label: tr("bloodsugartracker_yuksek_492584", 'Yüksək'), color: 'text-red-600', bg: 'bg-red-500/10' };
   } else {
-    if (value < 70) return { status: 'low', label: 'Aşağı', color: 'text-blue-600', bg: 'bg-blue-500/10' };
+    if (value < 70) return { status: 'low', label: tr("bloodsugartracker_asagi_1c27f1", 'Aşağı'), color: 'text-blue-600', bg: 'bg-blue-500/10' };
     if (value <= 140) return { status: 'normal', label: 'Normal', color: 'text-green-600', bg: 'bg-green-500/10' };
-    if (value <= 180) return { status: 'elevated', label: 'Yüksəlmiş', color: 'text-amber-600', bg: 'bg-amber-500/10' };
-    return { status: 'high', label: 'Yüksək', color: 'text-red-600', bg: 'bg-red-500/10' };
+    if (value <= 180) return { status: 'elevated', label: tr("bloodsugartracker_yukselmis_1fee34", 'Yüksəlmiş'), color: 'text-amber-600', bg: 'bg-amber-500/10' };
+    return { status: 'high', label: tr("bloodsugartracker_yuksek_492584", 'Yüksək'), color: 'text-red-600', bg: 'bg-red-500/10' };
   }
 };
 
@@ -114,10 +115,10 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
       setSelectedType('random');
       setSelectedMeal(null);
       setNotes('');
-      toast({ title: 'Qeyd əlavə edildi', description: 'Qan şəkəri səviyyəsi uğurla qeyd edildi' });
+      toast({ title: tr("bloodsugartracker_qeyd_elave_edildi_c5012e", 'Qeyd əlavə edildi'), description: tr("bloodsugartracker_qan_sekeri_seviyyesi_ugurla_qeyd_edildi_cb5736", 'Qan şəkəri səviyyəsi uğurla qeyd edildi') });
     },
     onError: () => {
-      toast({ title: 'Xəta', description: 'Qeyd əlavə edilə bilmədi', variant: 'destructive' });
+      toast({ title: tr("bloodsugartracker_xeta_3cdbb6", 'Xəta'), description: tr("bloodsugartracker_qeyd_elave_edile_bilmedi_c1e5e5", 'Qeyd əlavə edilə bilmədi'), variant: 'destructive' });
     },
   });
 
@@ -345,7 +346,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
                 inputMode="decimal"
                 value={newReading}
                 onChange={(e) => setNewReading(e.target.value)}
-                placeholder="Məsələn: 95"
+                placeholder={tr("bloodsugartracker_meselen_95_23137b", "Məsələn: 95")}
                 className="w-full h-14 px-4 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-2xl font-bold text-center transition-all outline-none"
               />
               {newReading && (
@@ -407,7 +408,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Əlavə qeydlər..."
+                placeholder={tr("bloodsugartracker_elave_qeydler_c55f23", "Əlavə qeydlər...")}
                 className="w-full h-20 px-3 py-2 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-sm resize-none transition-all outline-none"
               />
             </div>

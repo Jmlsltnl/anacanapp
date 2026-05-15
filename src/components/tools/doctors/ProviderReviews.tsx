@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useProviderReviews } from '@/hooks/useProviderReviews';
 import { formatDistanceToNow } from 'date-fns';
 import { az } from 'date-fns/locale';
+import { tr } from "@/lib/tr";
 
 interface ProviderReviewsProps {
   providerId: string;
@@ -96,7 +97,7 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Təcrübənizi bölüşün (istəyə bağlı)..."
+              placeholder={tr("providerreviews_tecrubenizi_bolusun_isteye_bagli_3f9da1", "Təcrübənizi bölüşün (istəyə bağlı)...")}
               className="w-full p-3 rounded-xl bg-muted border-0 text-sm resize-none h-24 outline-none focus:ring-2 focus:ring-primary/20"
             />
 

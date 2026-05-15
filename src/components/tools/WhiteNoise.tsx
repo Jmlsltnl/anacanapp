@@ -8,6 +8,7 @@ import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { PremiumModal } from '@/components/PremiumModal';
 import { useWhiteNoiseSounds, WhiteNoiseSound } from '@/hooks/useDynamicConfig';
 import { useWhiteNoiseStore } from '@/store/whiteNoiseStore';
+import { tr } from "@/lib/tr";
 
 interface Sound {
   id: string;
@@ -22,24 +23,24 @@ interface Sound {
 // Noise type metadata
 const noiseTypes = [
   { 
-    id: 'white', label: 'Bəyaz Küy', subtitle: 'Sakitləşdirici',
-    description: 'Ana bətnindəki səsə bənzər monoton fon', emoji: '⚪',
+    id: 'white', label: tr("whitenoise_beyaz_kuy_3acf2d", 'Bəyaz Küy'), subtitle: 'Sakitləşdirici',
+    description: tr("whitenoise_ana_betnindeki_sese_benzer_monoton_fon_8d1144", 'Ana bətnindəki səsə bənzər monoton fon'), emoji: '⚪',
     gradient: 'from-slate-100 to-gray-200 dark:from-slate-800 dark:to-gray-900',
     borderColor: 'border-slate-300 dark:border-slate-700',
     textColor: 'text-slate-700 dark:text-slate-300',
     badgeColor: 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300',
   },
   { 
-    id: 'pink', label: 'Çəhrayı Küy', subtitle: 'Təbiət effekti',
-    description: 'Yüngül yağış və yarpaq xışıltısı kimi', emoji: '🌸',
+    id: 'pink', label: tr("whitenoise_cehrayi_kuy_68573d", 'Çəhrayı Küy'), subtitle: 'Təbiət effekti',
+    description: tr("whitenoise_yungul_yagis_ve_yarpaq_xisiltisi_kimi_d5aea8", 'Yüngül yağış və yarpaq xışıltısı kimi'), emoji: '🌸',
     gradient: 'from-pink-50 to-rose-100 dark:from-pink-900/30 dark:to-rose-900/20',
     borderColor: 'border-pink-300 dark:border-pink-800',
     textColor: 'text-pink-700 dark:text-pink-300',
     badgeColor: 'bg-pink-200 dark:bg-pink-800 text-pink-700 dark:text-pink-300',
   },
   { 
-    id: 'brown', label: 'Qəhvəyi Küy', subtitle: 'Dərin yuxu',
-    description: 'Dərin və boğuq səslər — şəlalə, göy gurultusu', emoji: '🟤',
+    id: 'brown', label: tr("whitenoise_qehveyi_kuy_f8e3c6", 'Qəhvəyi Küy'), subtitle: 'Dərin yuxu',
+    description: tr("whitenoise_derin_ve_boguq_sesler_selale_goy_gurultu_47382e", 'Dərin və boğuq səslər — şəlalə, göy gurultusu'), emoji: '🟤',
     gradient: 'from-amber-50 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/20',
     borderColor: 'border-amber-300 dark:border-amber-800',
     textColor: 'text-amber-800 dark:text-amber-300',
@@ -223,14 +224,14 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
   const timerOptions = isPremium 
     ? [
         { value: null, label: 'Limitsiz', icon: '∞' },
-        { value: 15, label: '15 dəq', icon: '15' },
-        { value: 30, label: '30 dəq', icon: '30' },
+        { value: 15, label: tr("whitenoise_15_deq_3ce4c1", '15 dəq'), icon: '15' },
+        { value: 30, label: tr("whitenoise_30_deq_15eb1f", '30 dəq'), icon: '30' },
         { value: 60, label: '1 saat', icon: '60' },
       ]
     : [
-        { value: 10, label: '10 dəq', icon: '10' },
-        { value: 15, label: '15 dəq', icon: '15' },
-        { value: 20, label: '20 dəq', icon: '20' },
+        { value: 10, label: tr("whitenoise_10_deq_b4f9fd", '10 dəq'), icon: '10' },
+        { value: 15, label: tr("whitenoise_15_deq_3ce4c1", '15 dəq'), icon: '15' },
+        { value: 20, label: tr("whitenoise_20_deq_fb3505", '20 dəq'), icon: '20' },
       ];
 
   if (prefsLoading || soundsLoading) {

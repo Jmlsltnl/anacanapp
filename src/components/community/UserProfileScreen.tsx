@@ -10,6 +10,7 @@ import PostCard from './PostCard';
 import { CommunityPost } from '@/hooks/useCommunity';
 import { formatDistanceToNow } from 'date-fns';
 import { az } from 'date-fns/locale';
+import { tr } from "@/lib/tr";
 
 interface UserProfile {
   user_id: string;
@@ -135,7 +136,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
   const getLifeStageLabel = (stage: string | null) => {
     switch (stage) {
       case 'flow': return { label: 'Flow', color: 'bg-pink-100 text-pink-700' };
-      case 'bump': return { label: 'Hamilə', color: 'bg-orange-100 text-orange-700' };
+      case 'bump': return { label: tr("userprofilescreen_hamile_0080af", 'Hamilə'), color: 'bg-orange-100 text-orange-700' };
       case 'mommy': return { label: 'Ana', color: 'bg-purple-100 text-purple-700' };
       case 'partner': return { label: 'Partner', color: 'bg-blue-100 text-blue-700' };
       default: return null;

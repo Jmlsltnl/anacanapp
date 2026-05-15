@@ -10,6 +10,7 @@ import { useMoodOptions, useSymptoms } from '@/hooks/useDynamicConfig';
 import { useUserStore } from '@/store/userStore';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { tr } from "@/lib/tr";
 
 interface MoodDiaryProps {
   onBack: () => void;
@@ -33,11 +34,11 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
   const moodEmojis = useMemo(() => {
     if (!dbMoods || dbMoods.length === 0) {
       return [
-        { value: 1, emoji: '😢', label: 'Çox pis', color: 'bg-red-100 border-red-300' },
+        { value: 1, emoji: '😢', label: tr("mooddiary_cox_pis_e041c5", 'Çox pis'), color: 'bg-red-100 border-red-300' },
         { value: 2, emoji: '😔', label: 'Pis', color: 'bg-orange-100 border-orange-300' },
         { value: 3, emoji: '😐', label: 'Normal', color: 'bg-yellow-100 border-yellow-300' },
-        { value: 4, emoji: '🙂', label: 'Yaxşı', color: 'bg-lime-100 border-lime-300' },
-        { value: 5, emoji: '😊', label: 'Əla', color: 'bg-green-100 border-green-300' },
+        { value: 4, emoji: '🙂', label: tr("mooddiary_yaxsi_9d8595", 'Yaxşı'), color: 'bg-lime-100 border-lime-300' },
+        { value: 5, emoji: '😊', label: tr("mooddiary_ela_720a0e", 'Əla'), color: 'bg-green-100 border-green-300' },
       ];
     }
     return dbMoods.map(m => ({
@@ -51,9 +52,9 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
   const symptomOptions = useMemo(() => {
     if (!dbSymptoms || dbSymptoms.length === 0) {
       return [
-        { id: 'tired', label: 'Yorğunluq', emoji: '😴' },
-        { id: 'nausea', label: 'Ürəkbulanma', emoji: '🤢' },
-        { id: 'headache', label: 'Baş ağrısı', emoji: '🤕' },
+        { id: 'tired', label: tr("mooddiary_yorgunluq_c68d62", 'Yorğunluq'), emoji: '😴' },
+        { id: 'nausea', label: tr("mooddiary_urekbulanma_a42830", 'Ürəkbulanma'), emoji: '🤢' },
+        { id: 'headache', label: tr("mooddiary_bas_agrisi_ff6f4c", 'Baş ağrısı'), emoji: '🤕' },
       ];
     }
     return dbSymptoms.map(s => ({
@@ -163,7 +164,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
         <div className="bg-card rounded-xl p-1 flex gap-1 shadow-lg">
           {[
             { id: 'log', label: 'Qeyd', icon: Plus },
-            { id: 'history', label: 'Tarixçə', icon: Calendar },
+            { id: 'history', label: tr("mooddiary_tarixce_b09a14", 'Tarixçə'), icon: Calendar },
             { id: 'insights', label: 'Analiz', icon: TrendingUp },
           ].map(tab => {
             const Icon = tab.icon;
@@ -256,7 +257,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Bu gün haqqında yazmaq istədikləriniz..."
+                  placeholder={tr("mooddiary_bu_gun_haqqinda_yazmaq_istedikleriniz_1e2d2d", "Bu gün haqqında yazmaq istədikləriniz...")}
                   className="w-full h-24 p-4 rounded-2xl bg-muted/30 resize-none outline-none focus:ring-2 focus:ring-primary/20"
                 />
               </div>

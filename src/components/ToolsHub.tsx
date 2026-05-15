@@ -104,6 +104,7 @@ const iconMap: Record<string, LucideIcon> = {
 
 // Import Calculator icon
 import { Calculator } from 'lucide-react';
+import { tr } from "@/lib/tr";
 
 interface ToolsHubProps {
   initialTool?: string | null;
@@ -316,10 +317,10 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
 
   const getLifeStageInfo = () => {
     switch (lifeStage) {
-      case 'flow': return { label: 'Dövriyyə', emoji: '🌸', color: 'from-pink-500 to-rose-600' };
-      case 'bump': return { label: 'Hamiləlik', emoji: '🤰', color: 'from-primary to-orange-500' };
-      case 'mommy': return { label: 'Analıq', emoji: '👶', color: 'from-teal-500 to-cyan-600' };
-      default: return { label: 'Alətlər', emoji: '✨', color: 'from-primary to-orange-500' };
+      case 'flow': return { label: tr("toolshub_dovriyye_f65b93", 'Dövriyyə'), emoji: '🌸', color: 'from-pink-500 to-rose-600' };
+      case 'bump': return { label: tr("toolshub_hamilelik_e86feb", 'Hamiləlik'), emoji: '🤰', color: 'from-primary to-orange-500' };
+      case 'mommy': return { label: tr("toolshub_analiq_9e762d", 'Analıq'), emoji: '👶', color: 'from-teal-500 to-cyan-600' };
+      default: return { label: tr("toolshub_aletler_4778b4", 'Alətlər'), emoji: '✨', color: 'from-primary to-orange-500' };
     }
   };
 
@@ -339,7 +340,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="text"
-                placeholder="Alət axtarın..."
+                placeholder={tr("toolshub_alet_axtarin_fad58b", "Alət axtarın...")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full h-10 pl-10 pr-4 rounded-full bg-muted/60 text-foreground placeholder:text-muted-foreground text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all"

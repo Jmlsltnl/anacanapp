@@ -51,7 +51,6 @@ export const useEpointPayment = () => {
           orderType: request.orderType,
           orderReferenceId: request.orderReferenceId,
           description: request.description,
-          userId: user.id,
           successUrl: request.successUrl || `${window.location.origin}/payment/success`,
           errorUrl: request.errorUrl || `${window.location.origin}/payment/error`,
         }),

@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { requireUser } from "../_shared/auth.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -235,6 +236,9 @@ serve(async (req) => {
   }
 
   try {
+    const auth = await requireUser(req);
+    if (auth.error) return auth.error;
+
     const { childName, theme, hero, moralLesson, language = 'az', ageRange, storyStyle, customPrompt } = await req.json();
 
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');

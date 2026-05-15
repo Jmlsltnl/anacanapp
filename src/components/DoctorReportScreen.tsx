@@ -9,6 +9,7 @@ import { useUserStore } from '@/store/userStore';
 import { useToast } from '@/hooks/use-toast';
 import { useHealthReport } from '@/hooks/useHealthReport';
 import { useChildren } from '@/hooks/useChildren';
+import { tr } from "@/lib/tr";
 
 interface DoctorReportScreenProps {
   onBack: () => void;
@@ -38,49 +39,49 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
   } : null;
 
   const periods = [
-    { id: '1week', label: '1 Həftə' },
+    { id: '1week', label: tr("doctorreportscreen_1_hefte_6d1cb4", '1 Həftə') },
     { id: '1month', label: '1 Ay' },
     { id: '3months', label: '3 Ay' },
-    { id: 'all', label: 'Hamısı' },
+    { id: 'all', label: tr("doctorreportscreen_hamisi_c73c4d", 'Hamısı') },
   ];
 
   const handleDownload = () => {
     toast({
-      title: 'Hesabat hazırlanır...',
-      description: 'PDF faylı bir neçə saniyəyə hazır olacaq.',
+      title: tr("doctorreportscreen_hesabat_hazirlanir_37c97d", 'Hesabat hazırlanır...'),
+      description: tr("doctorreportscreen_pdf_fayli_bir_nece_saniyeye_hazir_olacaq_0304da", 'PDF faylı bir neçə saniyəyə hazır olacaq.'),
     });
   };
 
   const handleShare = () => {
     toast({
-      title: 'Paylaşım',
-      description: 'Hesabat həkiminizə göndərildi.',
+      title: tr("doctorreportscreen_paylasim_791727", 'Paylaşım'),
+      description: tr("doctorreportscreen_hesabat_hekiminize_gonderildi_bf58ee", 'Hesabat həkiminizə göndərildi.'),
     });
   };
 
   const getStageSpecificData = () => {
     if (lifeStage === 'flow' && cycleData) {
       return [
-        { label: 'Dövrə uzunluğu', value: `${cycleData.cycleLength} gün`, icon: Calendar },
+        { label: tr("doctorreportscreen_dovre_uzunlugu_c81215", 'Dövrə uzunluğu'), value: `${cycleData.cycleLength} gün`, icon: Calendar },
         { label: 'Menstruasiya', value: `${cycleData.periodLength} gün`, icon: Droplets },
         { label: 'Cari faza', value: cycleData.phase, icon: Activity },
-        { label: 'Dövrənin günü', value: `${cycleData.currentDay}`, icon: Heart },
+        { label: tr("doctorreportscreen_dovrenin_gunu_7549f2", 'Dövrənin günü'), value: `${cycleData.currentDay}`, icon: Heart },
       ];
     }
     if (lifeStage === 'bump' && pregData) {
       return [
-        { label: 'Hamiləlik həftəsi', value: `${pregData.currentWeek} həftə`, icon: Calendar },
+        { label: tr("doctorreportscreen_hamilelik_heftesi_c9e362", 'Hamiləlik həftəsi'), value: `${pregData.currentWeek} həftə`, icon: Calendar },
         { label: 'Trimester', value: `${pregData.trimester}-cü`, icon: Activity },
-        { label: 'Körpə ölçüsü', value: pregData.babySize.fruit, icon: Heart },
-        { label: 'Təxmini doğuş', value: pregData.dueDate?.toLocaleDateString('az-AZ'), icon: Calendar },
+        { label: tr("doctorreportscreen_korpe_olcusu_cccfc2", 'Körpə ölçüsü'), value: pregData.babySize.fruit, icon: Heart },
+        { label: tr("doctorreportscreen_texmini_dogus_98eb77", 'Təxmini doğuş'), value: pregData.dueDate?.toLocaleDateString('az-AZ'), icon: Calendar },
       ];
     }
     if (lifeStage === 'mommy' && babyData) {
       return [
-        { label: 'Körpənin adı', value: babyData.name, icon: Heart },
-        { label: 'Yaş', value: babyData.ageInMonths > 0 ? `${babyData.ageInMonths} ay` : `${babyData.ageInDays} gün`, icon: Calendar },
-        { label: 'Doğum tarixi', value: babyData.birthDate.toLocaleDateString('az-AZ'), icon: Calendar },
-        { label: 'Cinsiyyət', value: babyData.gender === 'boy' ? 'Oğlan' : 'Qız', icon: Activity },
+        { label: tr("doctorreportscreen_korpenin_adi_8a4e9e", 'Körpənin adı'), value: babyData.name, icon: Heart },
+        { label: tr("doctorreportscreen_yas_95595b", 'Yaş'), value: babyData.ageInMonths > 0 ? `${babyData.ageInMonths} ay` : `${babyData.ageInDays} gün`, icon: Calendar },
+        { label: tr("doctorreportscreen_dogum_tarixi_d96907", 'Doğum tarixi'), value: babyData.birthDate.toLocaleDateString('az-AZ'), icon: Calendar },
+        { label: tr("doctorreportscreen_cinsiyyet_1526fb", 'Cinsiyyət'), value: babyData.gender === 'boy' ? 'Oğlan' : 'Qız', icon: Activity },
       ];
     }
     return [];
@@ -239,7 +240,7 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
         >
           <h3 className="font-bold mb-4">Həkim üçün Qeydlər</h3>
           <textarea
-            placeholder="Həkiminiz üçün əlavə qeydlər yazın..."
+            placeholder={tr("doctorreportscreen_hekiminiz_ucun_elave_qeydler_yazin_2bd3dc", "Həkiminiz üçün əlavə qeydlər yazın...")}
             className="w-full h-24 p-4 rounded-2xl bg-muted/50 resize-none outline-none focus:ring-2 focus:ring-primary/20"
           />
         </motion.div>

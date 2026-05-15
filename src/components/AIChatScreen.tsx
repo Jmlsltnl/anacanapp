@@ -13,9 +13,11 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { useAISuggestedQuestions } from '@/hooks/useDynamicTools';
 import { getPregnancyDay } from '@/lib/pregnancy-utils';
 import MarkdownContent from './MarkdownContent';
+import { tr } from "@/lib/tr";
 
 interface Message {
   id: string;
@@ -104,13 +106,13 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     
     switch (lifeStage) {
       case 'flow':
-        return `Salam${userName}! 👋 Mən Anacan.AI, sizin sağlamlıq rəfiqənizəm. Menstrual tsikliniz, simptomlarınız və ya ümumi sağlamlığınız haqqında suallarınız varsa, kömək etməkdən məmnun olaram! 💜`;
+        return `Salam${userName}. Mən Anacan.AI. Menstrual tsikl, simptomlar və ümumi sağlamlıq üzrə suallarınıza peşəkar cavab verməyə hazıram.`;
       case 'bump':
-        return `Salam, əziz ana${userName}! 🤰 Mən Anacan.AI. ${pregnancyData ? `Hamiləliyin ${pregnancyData.currentWeek}-ci həftəsindəsiniz - körpəniz ${dynamicFruit || pregnancyData.babySize.fruit} böyüklüyündədir! ` : ''}Hamiləliyiniz haqqında hər hansı sualınız varsa, buradayam! 🌸`;
+        return `Salam${userName}. Mən Anacan.AI. ${pregnancyData ? `Hazırda hamiləliyin ${pregnancyData.currentWeek}-ci həftəsindəsiniz; körpəniz təxminən ${dynamicFruit || pregnancyData.babySize.fruit} böyüklüyündədir. ` : ''}Hamiləlik dövrü ilə bağlı suallarınızı verə bilərsiniz.`;
       case 'mommy':
-        return `Salam, əziz ana${userName}! 👶 Mən Anacan.AI. Körpə baxımı, əmizdirmə, yuxu qaydaları və ya doğuşdan sonra bərpa haqqında suallarınız varsa, sizə kömək etməyə hazıram! 💕`;
+        return `Salam${userName}. Mən Anacan.AI. Körpə baxımı, əmizdirmə, yuxu rejimi və doğuşdan sonrakı bərpa ilə bağlı suallarınıza dəstək olmağa hazıram.`;
       default:
-        return `Salam${userName}! 👋 Mən Anacan.AI, sizin AI rəfiqənizəm. Sizə necə kömək edə bilərəm?`;
+        return `Salam${userName}. Mən Anacan.AI. Sizə necə kömək edə bilərəm?`;
     }
   };
 
@@ -166,12 +168,16 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
         content: userMessage.content
       });
 
-      // Use fetch for streaming support
+      // Use fetch for streaming support — must use the user's session JWT, not the anon key
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Sessiya tapılmadı. Yenidən daxil olun.');
+      }
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dr-anacan-chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          'Authorization': `Bearer ${session.access_token}`,
           'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
         body: JSON.stringify({
@@ -229,8 +235,8 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
                       : m
                   ));
                 }
-              } catch {
-                // Skip invalid JSON
+              } catch (parseErr) {
+                console.warn('AIChatScreen: skipped unparseable SSE chunk', parseErr);
               }
             }
           }
@@ -246,7 +252,9 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
                 const parsed = JSON.parse(data);
                 const content = parsed.choices?.[0]?.delta?.content || '';
                 if (content) fullContent += content;
-              } catch { /* ignore */ }
+              } catch (parseErr) {
+                console.warn('AIChatScreen: skipped trailing unparseable SSE chunk', parseErr);
+              }
             }
           }
         }
@@ -278,8 +286,8 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     } catch (error) {
       console.error('Chat error:', error);
       toast({
-        title: 'Xəta',
-        description: 'Mesaj göndərilə bilmədi. Yenidən cəhd edin.',
+        title: tr("aichatscreen_xeta_3cdbb6", 'Xəta'),
+        description: tr("aichatscreen_mesaj_gonderile_bilmedi_yeniden_cehd_edi_aa6662", 'Mesaj göndərilə bilmədi. Yenidən cəhd edin.'),
         variant: 'destructive'
       });
       
@@ -361,13 +369,13 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       <ScrollArea className="flex-1 px-4 py-4" ref={scrollRef}>
         <div className="space-y-4 pb-4">
           <AnimatePresence>
-            {messages.map((message, index) => (
+            {messages.map((message) => (
               <motion.div
                 key={message.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ delay: index * 0.05 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.18 }}
                 className={`flex gap-2 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
               >
                 <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center ${
@@ -442,7 +450,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Anacan.AI-yə sualınızı yazın..."
+              placeholder={tr("aichatscreen_anacan_ai_ye_sualinizi_yazin_927a37", "Anacan.AI-yə sualınızı yazın...")}
               className="min-h-[40px] max-h-[100px] pr-4 resize-none rounded-xl border-2 focus:border-primary/50 text-sm py-2"
               disabled={isLoading}
             />

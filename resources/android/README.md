@@ -34,12 +34,12 @@ npx @capacitor/assets generate --android
 
 ### IAP (In-App Purchase) Product IDs:
 
-1. **Aylıq Premium**: `app.lovable.anacan.premium.monthly`
+1. **Aylıq Premium**: `com.atlasoon.anacan.premium.monthly`
    - Tip: Subscription
    - Qiymət: $9.99 / ay
    - Base Plan ID: `monthly-plan`
 
-2. **İllik Premium**: `app.lovable.anacan.premium.yearly`
+2. **İllik Premium**: `com.atlasoon.anacan.premium.yearly`
    - Tip: Subscription
    - Qiymət: $79.99 / il
    - Base Plan ID: `yearly-plan`
