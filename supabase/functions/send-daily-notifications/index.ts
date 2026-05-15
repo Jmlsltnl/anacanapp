@@ -46,11 +46,18 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Auth: cron secret OR admin user (for manual triggers from admin UI).
+    // Auth: cron secret OR service-role/anon Bearer (used by pg_cron) OR admin user.
     const cronErr = requireCronSecret(req);
     if (cronErr) {
-      const adminCheck = await requireAdmin(req);
-      if (adminCheck.error) return adminCheck.error;
+      const authHeader = req.headers.get('Authorization') || '';
+      const token = authHeader.replace(/^Bearer\s+/i, '');
+      const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+      const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
+      const isCronBearer = token && (token === serviceKey || token === anonKey);
+      if (!isCronBearer) {
+        const adminCheck = await requireAdmin(req);
+        if (adminCheck.error) return adminCheck.error;
+      }
     }
 
     const supabase = createClient(
