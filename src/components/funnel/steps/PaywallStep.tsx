@@ -20,8 +20,27 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
     isSupported,
     purchaseMonthly,
     purchaseYearly,
+    showPaywall,
     error,
   } = useInAppPurchase();
+
+  // ⚡ All paywalls must come from RevenueCat. Auto-present on native.
+  const presentedRef = useRef(false);
+  useEffect(() => {
+    if (presentedRef.current) return;
+    if (!isNativePlatform() || !isSupported) return;
+    presentedRef.current = true;
+    (async () => {
+      const purchased = await showPaywall();
+      if (purchased) {
+        toast({ title: 'Premium aktivləşdi 🎉', description: '3 günlük pulsuz dövrünüz başladı' });
+        onPurchase(selectedPlan);
+      } else {
+        onClose();
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSupported]);
 
   // Find packages from RevenueCat offerings
   const monthlyPkg = useMemo(
