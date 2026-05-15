@@ -26,8 +26,29 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const {
     packages, isLoading, isPurchasing, error, isSupported,
-    purchaseMonthly, purchaseYearly, restorePurchases,
+    purchaseMonthly, purchaseYearly, restorePurchases, showPaywall,
   } = useInAppPurchase();
+
+  const isNative = isNativePlatform();
+
+  // ⚡ All paywalls must come from RevenueCat. On native, immediately present
+  // the RevenueCat native paywall and skip the custom UI entirely.
+  useEffect(() => {
+    if (!isOpen || !isNative || !isSupported) return;
+    let cancelled = false;
+    (async () => {
+      const purchased = await showPaywall();
+      if (cancelled) return;
+      if (purchased) {
+        toast({
+          title: tr("premiummodal_premium_aktivlesdirildi_eb58f2", 'Premium aktivləşdirildi! 🎉'),
+          description: tr("premiummodal_i_ndi_butun_xususiyyetlerden_istifade_ed_20a814", 'İndi bütün xüsusiyyətlərdən istifadə edə bilərsiniz.'),
+        });
+      }
+      onClose();
+    })();
+    return () => { cancelled = true; };
+  }, [isOpen, isNative, isSupported, showPaywall, onClose, toast]);
 
   useEffect(() => {
     if (isPremium && subscription?.plan_type === 'premium') setSelectedPlan('yearly');
@@ -55,7 +76,6 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const dbMonthlyPrice = premiumPlan?.price_monthly;
   const dbYearlyPrice = premiumPlan?.price_yearly;
   const dbCurrency = premiumPlan?.currency || 'AZN';
-  const isNative = isNativePlatform();
 
   const monthlyProduct = packages.find(p => p?.product?.identifier?.includes('monthly'));
   const yearlyProduct = packages.find(p => p?.product?.identifier?.includes('yearly'));
