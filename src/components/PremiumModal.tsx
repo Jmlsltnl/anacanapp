@@ -76,7 +76,6 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const dbMonthlyPrice = premiumPlan?.price_monthly;
   const dbYearlyPrice = premiumPlan?.price_yearly;
   const dbCurrency = premiumPlan?.currency || 'AZN';
-  const isNative = isNativePlatform();
 
   const monthlyProduct = packages.find(p => p?.product?.identifier?.includes('monthly'));
   const yearlyProduct = packages.find(p => p?.product?.identifier?.includes('yearly'));
