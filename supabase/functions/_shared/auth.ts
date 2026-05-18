@@ -15,23 +15,24 @@ export async function requireUser(req: Request): Promise<
       }),
     };
   }
+  const token = authHeader.replace('Bearer ', '');
+  // Use service role client + getUser(token) — works regardless of JWT signing-key configuration.
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_ANON_KEY')!,
-    { global: { headers: { Authorization: authHeader } } }
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   );
-  const token = authHeader.replace('Bearer ', '');
-  const { data, error } = await supabase.auth.getClaims(token);
-  if (error || !data?.claims?.sub) {
+  const { data, error } = await supabase.auth.getUser(token);
+  if (error || !data?.user?.id) {
+    console.log('[auth] getUser failed:', error?.message);
     return {
       user: null,
-      error: new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      error: new Response(JSON.stringify({ error: 'Unauthorized', detail: error?.message }), {
         status: 401,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       }),
     };
   }
-  return { user: { id: data.claims.sub, email: data.claims.email ?? null }, error: null };
+  return { user: { id: data.user.id, email: data.user.email ?? null }, error: null };
 }
 
 export async function requireAdmin(req: Request): Promise<
