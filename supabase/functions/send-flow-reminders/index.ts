@@ -62,8 +62,15 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const cronErr = requireCronSecret(req);
-    if (cronErr) return cronErr;
+    // Accept either cron secret (scheduled) OR admin user (manual trigger from admin panel)
+    const hasCronHeader = !!req.headers.get('x-cron-secret');
+    if (hasCronHeader) {
+      const cronErr = requireCronSecret(req);
+      if (cronErr) return cronErr;
+    } else {
+      const adminCheck = await requireAdmin(req);
+      if (adminCheck.error) return adminCheck.error;
+    }
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
