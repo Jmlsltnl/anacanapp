@@ -64,19 +64,22 @@ export async function requireAdmin(req: Request): Promise<
 }
 
 export function requireCronSecret(req: Request): Response | null {
+  // Accept EITHER:
+  //   1) x-cron-secret header matching CRON_SECRET env, OR
+  //   2) Authorization: Bearer <SUPABASE_ANON_KEY|SUPABASE_SERVICE_ROLE_KEY>
+  //      (pg_cron / net.http_post sends this format)
   const expected = Deno.env.get('CRON_SECRET');
-  if (!expected) {
-    return new Response(JSON.stringify({ error: 'CRON_SECRET not configured' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-    });
-  }
   const got = req.headers.get('x-cron-secret');
-  if (got !== expected) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-    });
-  }
-  return null;
+  if (expected && got && got === expected) return null;
+
+  const authHeader = req.headers.get('Authorization') || '';
+  const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+  const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+  if (token && (token === anonKey || token === serviceKey)) return null;
+
+  return new Response(JSON.stringify({ error: 'Unauthorized (cron)' }), {
+    status: 401,
+    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+  });
 }
