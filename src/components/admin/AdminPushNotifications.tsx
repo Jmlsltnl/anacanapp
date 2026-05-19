@@ -64,6 +64,7 @@ const AdminPushNotifications = () => {
       </div>
 
 
+      <NotificationOpsCard />
       <PushDiagnosticsCard />
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-5">
