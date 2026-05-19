@@ -71,6 +71,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+    runSupabase = supabase;
 
     // Calculate current Baku time (UTC+4)
     const now = new Date();
@@ -83,7 +84,11 @@ Deno.serve(async (req) => {
     let body: { manual?: boolean; userId?: string; skipDedup?: boolean } = {};
     try { body = await req.json(); } catch { /* No body */ }
 
+    const triggeredBy = body.manual ? (body.userId ? 'admin-test' : 'admin') : 'cron';
+
     if (!body.manual && (currentHour < 9 || currentHour >= 22)) {
+      runId = await startRunLog(supabase, 'send-daily-notifications', triggeredBy, currentTimeStr, null);
+      await finishRunLog(supabase, runId, { status: 'success', sent_count: 0, skipped_count: 1, reasons: { outside_hours: 1 } });
       return new Response(
         JSON.stringify({ message: 'Outside notification hours', skipped: true, currentTime: currentTimeStr }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -102,7 +107,10 @@ Deno.serve(async (req) => {
     // For manual triggers, send all pending; for cron, only matching slot
     const activeSendTime = body.manual ? null : matchingSlot;
 
+    runId = await startRunLog(supabase, 'send-daily-notifications', triggeredBy, currentTimeStr, activeSendTime || (body.manual ? 'manual' : null));
+
     if (!body.manual && !matchingSlot) {
+      await finishRunLog(supabase, runId, { status: 'success', sent_count: 0, skipped_count: 1, reasons: { no_slot_match: 1 } });
       return new Response(
         JSON.stringify({ message: `Not a notification time slot. Current: ${currentTimeStr}`, skipped: true }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -112,6 +120,7 @@ Deno.serve(async (req) => {
     // Get Firebase access token
     const saJson = Deno.env.get('FIREBASE_SERVICE_ACCOUNT_JSON');
     if (!saJson) {
+      await finishRunLog(supabase, runId, { status: 'error', error_message: 'Firebase service account not configured' });
       return new Response(
         JSON.stringify({ error: 'Firebase service account not configured' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
