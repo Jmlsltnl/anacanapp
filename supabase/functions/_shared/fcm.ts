@@ -105,16 +105,25 @@ export async function sendFCMv1(
     errBody?.error?.status ||
     '';
 
-  // ONLY treat the token as truly dead for these specific codes.
-  // INVALID_ARGUMENT is NOT included — Google can return it for transient reasons
-  // (malformed payload, temporary backend issues) and we'd lose live tokens.
+  // Treat the token as truly dead for these specific codes.
   const PERMANENT_DEAD_CODES = new Set([
     'UNREGISTERED',
     'NOT_FOUND',
     'INVALID_REGISTRATION',
     'MISMATCH_SENDER_ID',
   ]);
-  const unregistered = PERMANENT_DEAD_CODES.has(errCode);
+  let unregistered = PERMANENT_DEAD_CODES.has(errCode);
+
+  // INVALID_ARGUMENT is usually transient (payload issues), BUT when FCM
+  // specifically flags `message.token` as invalid, the token itself is dead.
+  if (!unregistered && errCode === 'INVALID_ARGUMENT') {
+    const violations =
+      errBody?.error?.details?.find((d: any) => Array.isArray(d?.fieldViolations))
+        ?.fieldViolations ?? [];
+    if (violations.some((v: any) => v?.field === 'message.token')) {
+      unregistered = true;
+    }
+  }
 
   const tokenSuffix = deviceToken.slice(-12);
   console.log(
