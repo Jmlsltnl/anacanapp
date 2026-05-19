@@ -250,7 +250,7 @@ Deno.serve(async (req) => {
 
     const processUser = async (user: UserForNotification) => {
       const userTokens = tokens.filter((t: DeviceToken) => t.user_id === user.user_id);
-      if (!userTokens.length) return;
+      if (!userTokens.length) { skippedCount++; bumpReason(reasons, 'no_device_token'); return; }
 
       const notificationsToSend: Array<{ title: string; body: string; id: string; type: string; day?: number }> = [];
 
