@@ -1,6 +1,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
 import { requireCronSecret, requireAdmin } from '../_shared/auth.ts';
+import { startRunLog, finishRunLog, logFailedSend, bumpReason } from '../_shared/notif-logging.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -61,27 +62,43 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  let runId: string | null = null;
+  let runSupabase: any = null;
+  const reasons: Record<string, number> = {};
+  let failedCount = 0;
+  let skippedCount = 0;
+
   try {
     // Accept scheduled calls (cron secret / project key) OR admin user (manual trigger from admin panel)
     const cronErr = requireCronSecret(req);
+    let triggeredBy = 'cron';
     if (cronErr) {
       const adminCheck = await requireAdmin(req);
       if (adminCheck.error) return adminCheck.error;
+      triggeredBy = 'admin';
     }
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+    runSupabase = supabase;
 
     const now = new Date();
     const currentHour = now.getUTCHours() + 4;
     const adjustedHour = currentHour >= 24 ? currentHour - 24 : currentHour;
+    const bakuMinute = now.getUTCMinutes();
+    const bakuTimeStr = `${String(adjustedHour).padStart(2, '0')}:${String(bakuMinute).padStart(2, '0')}`;
 
-    let body: { manual?: boolean } = {};
+    let body: { manual?: boolean; userId?: string } = {};
     try { body = await req.json(); } catch { /* No body */ }
 
+    if (body.manual && body.userId) triggeredBy = 'admin-test';
+
+    runId = await startRunLog(supabase, 'send-flow-reminders', triggeredBy, bakuTimeStr, body.manual ? 'manual' : null);
+
     if (!body.manual && (adjustedHour < 9 || adjustedHour >= 22)) {
+      await finishRunLog(supabase, runId, { status: 'success', skipped_count: 1, reasons: { outside_hours: 1 } });
       return new Response(
         JSON.stringify({ message: 'Outside notification hours', skipped: true }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -90,6 +107,7 @@ Deno.serve(async (req) => {
 
     const saJson = Deno.env.get('FIREBASE_SERVICE_ACCOUNT_JSON');
     if (!saJson) {
+      await finishRunLog(supabase, runId, { status: 'error', error_message: 'Firebase SA not configured' });
       return new Response(
         JSON.stringify({ error: 'Firebase service account not configured' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -98,23 +116,29 @@ Deno.serve(async (req) => {
 
     const { accessToken, projectId } = await getFirebaseAccessToken(saJson);
 
-    const { data: reminders } = await supabase
-      .from('flow_reminders').select('*').eq('is_enabled', true);
+    let remindersQuery = supabase.from('flow_reminders').select('*').eq('is_enabled', true);
+    if (body.userId) remindersQuery = remindersQuery.eq('user_id', body.userId);
+    const { data: reminders } = await remindersQuery;
 
     if (!reminders?.length) {
+      await finishRunLog(supabase, runId, { status: 'success', skipped_count: 1, reasons: { no_active_reminders: 1 } });
       return new Response(
         JSON.stringify({ message: 'No active flow reminders', sent: 0 }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const { data: profiles } = await supabase
+    let profilesQuery = supabase
       .from('profiles').select('user_id, life_stage, last_period_date, cycle_length, period_length').eq('life_stage', 'flow');
+    if (body.userId) profilesQuery = profilesQuery.eq('user_id', body.userId);
+    const { data: profiles } = await profilesQuery;
 
-    const { data: tokens } = await supabase
-      .from('device_tokens').select('token, user_id, platform');
+    let tokensQuery = supabase.from('device_tokens').select('token, user_id, platform');
+    if (body.userId) tokensQuery = tokensQuery.eq('user_id', body.userId);
+    const { data: tokens } = await tokensQuery;
 
     if (!tokens?.length) {
+      await finishRunLog(supabase, runId, { status: 'success', skipped_count: 1, reasons: { no_device_tokens: 1 } });
       return new Response(
         JSON.stringify({ message: 'No device tokens', sent: 0 }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -135,7 +159,7 @@ Deno.serve(async (req) => {
 
     for (const reminder of reminders as FlowReminder[]) {
       const profile = profileMap.get(reminder.user_id);
-      if (!profile?.last_period_date) continue;
+      if (!profile?.last_period_date) { skippedCount++; bumpReason(reasons, 'flow_no_lmp'); continue; }
 
       const cycleLength = profile.cycle_length || 28;
       const periodLength = profile.period_length || 5;
@@ -169,14 +193,22 @@ Deno.serve(async (req) => {
           break;
       }
 
-      if (!shouldSend) continue;
+      // For admin test: bypass shouldSend / time-of-day window.
+      if (!shouldSend && !body.manual) { skippedCount++; bumpReason(reasons, `flow_off_schedule:${reminder.reminder_type}`); continue; }
 
       const reminderHour = parseInt(reminder.time_of_day?.split(':')[0] || '9');
-      if (Math.abs(adjustedHour - reminderHour) > 1) continue;
+      if (!body.manual && Math.abs(adjustedHour - reminderHour) > 1) { skippedCount++; bumpReason(reasons, 'flow_wrong_hour'); continue; }
+
+      if (body.manual) {
+        notificationTitle = notificationTitle || `[TEST] Flow • ${reminder.reminder_type}`;
+        notificationBody = notificationBody || 'Test bildirişi (admin paneli)';
+      }
 
       const userTokens = tokensByUser.get(reminder.user_id);
-      if (!userTokens?.length) continue;
+      if (!userTokens?.length) { skippedCount++; bumpReason(reasons, 'no_device_token'); continue; }
 
+      let delivered = false;
+      let lastErr: { code?: string; msg?: string } = {};
       for (const deviceToken of userTokens) {
         const result = await sendFCMv1(accessToken, projectId, deviceToken.token, notificationTitle, notificationBody, {
           type: 'flow_reminder', reminder_type: reminder.reminder_type,
@@ -184,29 +216,59 @@ Deno.serve(async (req) => {
 
         if (result.success) {
           sentCount++;
+          delivered = true;
           results.push({ userId: reminder.user_id, type: reminder.reminder_type, success: true });
 
           await supabase.from('notification_send_log').insert({
             user_id: reminder.user_id, title: notificationTitle, body: notificationBody, status: 'sent',
+            notification_type: 'flow_reminder', source_type: 'flow_reminder', source_notification_id: reminder.id,
           });
 
           break;
-        } else if (result.unregistered) {
-          // Only delete on definitive dead-token codes (UNREGISTERED / NOT_FOUND).
-          console.log(`[send-flow-reminders] Removing dead token (code=${result.errorCode}): ...${deviceToken.token.slice(-12)}`);
-          await supabase.from('device_tokens').delete().eq('token', deviceToken.token);
+        } else {
+          lastErr = { code: result.errorCode, msg: result.error };
+          if (result.unregistered) {
+            console.log(`[send-flow-reminders] Removing dead token (code=${result.errorCode}): ...${deviceToken.token.slice(-12)}`);
+            await supabase.from('device_tokens').delete().eq('token', deviceToken.token);
+          }
         }
+      }
+      if (!delivered) {
+        failedCount++;
+        bumpReason(reasons, `fcm:${lastErr.code || 'unknown'}`);
+        await logFailedSend(supabase, {
+          user_id: reminder.user_id,
+          notification_type: 'flow_reminder',
+          source_type: 'flow_reminder',
+          source_notification_id: reminder.id,
+          title: notificationTitle,
+          body: notificationBody,
+          reason: lastErr.msg || 'FCM send failed',
+          error_code: lastErr.code,
+        });
       }
     }
 
     console.log(`Flow reminders sent: ${sentCount}`);
 
+    await finishRunLog(supabase, runId, {
+      status: 'success',
+      sent_count: sentCount,
+      failed_count: failedCount,
+      skipped_count: skippedCount,
+      eligible_count: reminders.length,
+      reasons,
+    });
+
     return new Response(
-      JSON.stringify({ success: true, sent: sentCount, totalReminders: reminders.length, results: results.slice(0, 10) }),
+      JSON.stringify({ success: true, sent: sentCount, failed: failedCount, skipped: skippedCount, reasons, totalReminders: reminders.length, results: results.slice(0, 10) }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (err) {
     console.error('Error in send-flow-reminders:', err);
+    if (runSupabase && runId) {
+      await finishRunLog(runSupabase, runId, { status: 'error', error_message: err instanceof Error ? err.message : String(err) });
+    }
     return new Response(
       JSON.stringify({ error: err instanceof Error ? err.message : 'Unknown error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
