@@ -311,6 +311,8 @@ Deno.serve(async (req) => {
       }
 
       for (const notif of notificationsToSend) {
+        let delivered = false;
+        let lastErr: { code?: string; msg?: string } = {};
         for (const deviceToken of userTokens) {
           const result = await sendFCMv1(accessToken, projectId, deviceToken.token, notif.title, notif.body, {
             type: notif.type, notification_id: notif.id,
@@ -318,15 +320,18 @@ Deno.serve(async (req) => {
 
           if (result.success) {
             sentCount++;
+            delivered = true;
             results.push({ userId: user.user_id, success: true, type: notif.type, day: notif.day });
             await supabase.from('notification_send_log').insert({
               user_id: user.user_id,
               notification_id: notif.type === 'scheduled' ? notif.id : null,
               title: notif.title, body: notif.body, status: 'sent',
               source_type: notif.type, source_notification_id: notif.id,
+              notification_type: notif.type,
             });
             break;
           } else {
+            lastErr = { code: result.errorCode, msg: result.error };
             results.push({ userId: user.user_id, success: false, error: result.error });
             // Only delete tokens that FCM definitively flags as dead.
             if (result.unregistered) {
@@ -335,6 +340,28 @@ Deno.serve(async (req) => {
             }
           }
         }
+        if (!delivered) {
+          failedCount++;
+          bumpReason(reasons, `fcm:${lastErr.code || 'unknown'}`);
+          await logFailedSend(supabase, {
+            user_id: user.user_id,
+            notification_type: notif.type,
+            source_type: notif.type,
+            source_notification_id: notif.id,
+            title: notif.title,
+            body: notif.body,
+            reason: lastErr.msg || 'FCM send failed',
+            error_code: lastErr.code,
+          });
+        }
+      }
+
+      if (notificationsToSend.length === 0) {
+        skippedCount++;
+        // Categorise why this user got nothing
+        if (user.life_stage === 'bump' && !user.last_period_date) bumpReason(reasons, 'bump_no_lmp');
+        else if (user.life_stage === 'mommy' && !children?.some((c: any) => c.user_id === user.user_id)) bumpReason(reasons, 'mommy_no_children');
+        else bumpReason(reasons, 'no_matching_content');
       }
     };
 
