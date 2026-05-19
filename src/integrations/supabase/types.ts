@@ -4391,11 +4391,68 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_run_log: {
+        Row: {
+          active_slot: string | null
+          baku_time: string | null
+          eligible_count: number | null
+          ended_at: string | null
+          error_message: string | null
+          failed_count: number
+          function_name: string
+          id: string
+          payload: Json | null
+          reasons: Json
+          sent_count: number
+          skipped_count: number
+          started_at: string
+          status: string
+          triggered_by: string | null
+        }
+        Insert: {
+          active_slot?: string | null
+          baku_time?: string | null
+          eligible_count?: number | null
+          ended_at?: string | null
+          error_message?: string | null
+          failed_count?: number
+          function_name: string
+          id?: string
+          payload?: Json | null
+          reasons?: Json
+          sent_count?: number
+          skipped_count?: number
+          started_at?: string
+          status?: string
+          triggered_by?: string | null
+        }
+        Update: {
+          active_slot?: string | null
+          baku_time?: string | null
+          eligible_count?: number | null
+          ended_at?: string | null
+          error_message?: string | null
+          failed_count?: number
+          function_name?: string
+          id?: string
+          payload?: Json | null
+          reasons?: Json
+          sent_count?: number
+          skipped_count?: number
+          started_at?: string
+          status?: string
+          triggered_by?: string | null
+        }
+        Relationships: []
+      }
       notification_send_log: {
         Row: {
           body: string
+          error_code: string | null
           id: string
           notification_id: string | null
+          notification_type: string | null
+          reason: string | null
           sent_at: string | null
           source_notification_id: string | null
           source_type: string | null
@@ -4405,8 +4462,11 @@ export type Database = {
         }
         Insert: {
           body: string
+          error_code?: string | null
           id?: string
           notification_id?: string | null
+          notification_type?: string | null
+          reason?: string | null
           sent_at?: string | null
           source_notification_id?: string | null
           source_type?: string | null
@@ -4416,8 +4476,11 @@ export type Database = {
         }
         Update: {
           body?: string
+          error_code?: string | null
           id?: string
           notification_id?: string | null
+          notification_type?: string | null
+          reason?: string | null
           sent_at?: string | null
           source_notification_id?: string | null
           source_type?: string | null
@@ -8233,6 +8296,7 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_notification_admin_status: { Args: never; Returns: Json }
       get_user_linked_partner_id: {
         Args: { _user_id: string }
         Returns: string

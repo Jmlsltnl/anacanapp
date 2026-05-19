@@ -1,6 +1,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
 import { requireCronSecret, requireAdmin } from '../_shared/auth.ts';
+import { startRunLog, finishRunLog, logFailedSend, bumpReason } from '../_shared/notif-logging.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -45,6 +46,12 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  let runId: string | null = null;
+  let runSupabase: any = null;
+  const reasons: Record<string, number> = {};
+  let skippedCount = 0;
+  let failedCount = 0;
+
   try {
     // Auth: cron secret OR service-role/anon Bearer (used by pg_cron) OR admin user.
     const cronErr = requireCronSecret(req);
@@ -64,6 +71,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+    runSupabase = supabase;
 
     // Calculate current Baku time (UTC+4)
     const now = new Date();
@@ -76,7 +84,11 @@ Deno.serve(async (req) => {
     let body: { manual?: boolean; userId?: string; skipDedup?: boolean } = {};
     try { body = await req.json(); } catch { /* No body */ }
 
+    const triggeredBy = body.manual ? (body.userId ? 'admin-test' : 'admin') : 'cron';
+
     if (!body.manual && (currentHour < 9 || currentHour >= 22)) {
+      runId = await startRunLog(supabase, 'send-daily-notifications', triggeredBy, currentTimeStr, null);
+      await finishRunLog(supabase, runId, { status: 'success', sent_count: 0, skipped_count: 1, reasons: { outside_hours: 1 } });
       return new Response(
         JSON.stringify({ message: 'Outside notification hours', skipped: true, currentTime: currentTimeStr }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -95,7 +107,10 @@ Deno.serve(async (req) => {
     // For manual triggers, send all pending; for cron, only matching slot
     const activeSendTime = body.manual ? null : matchingSlot;
 
+    runId = await startRunLog(supabase, 'send-daily-notifications', triggeredBy, currentTimeStr, activeSendTime || (body.manual ? 'manual' : null));
+
     if (!body.manual && !matchingSlot) {
+      await finishRunLog(supabase, runId, { status: 'success', sent_count: 0, skipped_count: 1, reasons: { no_slot_match: 1 } });
       return new Response(
         JSON.stringify({ message: `Not a notification time slot. Current: ${currentTimeStr}`, skipped: true }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -105,6 +120,7 @@ Deno.serve(async (req) => {
     // Get Firebase access token
     const saJson = Deno.env.get('FIREBASE_SERVICE_ACCOUNT_JSON');
     if (!saJson) {
+      await finishRunLog(supabase, runId, { status: 'error', error_message: 'Firebase service account not configured' });
       return new Response(
         JSON.stringify({ error: 'Firebase service account not configured' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -234,7 +250,7 @@ Deno.serve(async (req) => {
 
     const processUser = async (user: UserForNotification) => {
       const userTokens = tokens.filter((t: DeviceToken) => t.user_id === user.user_id);
-      if (!userTokens.length) return;
+      if (!userTokens.length) { skippedCount++; bumpReason(reasons, 'no_device_token'); return; }
 
       const notificationsToSend: Array<{ title: string; body: string; id: string; type: string; day?: number }> = [];
 
@@ -295,6 +311,8 @@ Deno.serve(async (req) => {
       }
 
       for (const notif of notificationsToSend) {
+        let delivered = false;
+        let lastErr: { code?: string; msg?: string } = {};
         for (const deviceToken of userTokens) {
           const result = await sendFCMv1(accessToken, projectId, deviceToken.token, notif.title, notif.body, {
             type: notif.type, notification_id: notif.id,
@@ -302,15 +320,18 @@ Deno.serve(async (req) => {
 
           if (result.success) {
             sentCount++;
+            delivered = true;
             results.push({ userId: user.user_id, success: true, type: notif.type, day: notif.day });
             await supabase.from('notification_send_log').insert({
               user_id: user.user_id,
               notification_id: notif.type === 'scheduled' ? notif.id : null,
               title: notif.title, body: notif.body, status: 'sent',
               source_type: notif.type, source_notification_id: notif.id,
+              notification_type: notif.type,
             });
             break;
           } else {
+            lastErr = { code: result.errorCode, msg: result.error };
             results.push({ userId: user.user_id, success: false, error: result.error });
             // Only delete tokens that FCM definitively flags as dead.
             if (result.unregistered) {
@@ -319,6 +340,28 @@ Deno.serve(async (req) => {
             }
           }
         }
+        if (!delivered) {
+          failedCount++;
+          bumpReason(reasons, `fcm:${lastErr.code || 'unknown'}`);
+          await logFailedSend(supabase, {
+            user_id: user.user_id,
+            notification_type: notif.type,
+            source_type: notif.type,
+            source_notification_id: notif.id,
+            title: notif.title,
+            body: notif.body,
+            reason: lastErr.msg || 'FCM send failed',
+            error_code: lastErr.code,
+          });
+        }
+      }
+
+      if (notificationsToSend.length === 0) {
+        skippedCount++;
+        // Categorise why this user got nothing
+        if (user.life_stage === 'bump' && !user.last_period_date) bumpReason(reasons, 'bump_no_lmp');
+        else if (user.life_stage === 'mommy' && !children?.some((c: any) => c.user_id === user.user_id)) bumpReason(reasons, 'mommy_no_children');
+        else bumpReason(reasons, 'no_matching_content');
       }
     };
 
@@ -340,9 +383,19 @@ Deno.serve(async (req) => {
 
     console.log(`Daily notifications sent: ${sentCount}`);
 
+    await finishRunLog(supabase, runId, {
+      status: 'success',
+      sent_count: sentCount,
+      failed_count: failedCount,
+      skipped_count: skippedCount,
+      eligible_count: eligibleUsers.length,
+      reasons,
+    });
+
     return new Response(
       JSON.stringify({
         success: true, sent: sentCount, eligible: eligibleUsers.length,
+        failed: failedCount, skipped: skippedCount, reasons,
         currentTime: currentTimeStr, activeSlot: activeSendTime || 'manual',
         pregnancyDaysAvailable: pregnancyNotifsByDay.size,
         mommyDaysAvailable: mommyNotifsByDay.size,
@@ -352,6 +405,13 @@ Deno.serve(async (req) => {
     );
   } catch (err) {
     console.error('Error in send-daily-notifications:', err);
+    if (runSupabase && runId) {
+      await finishRunLog(runSupabase, runId, {
+        status: 'error',
+        sent_count: 0,
+        error_message: err instanceof Error ? err.message : String(err),
+      });
+    }
     return new Response(
       JSON.stringify({ error: err instanceof Error ? err.message : 'Unknown error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
