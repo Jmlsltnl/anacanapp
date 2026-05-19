@@ -63,20 +63,80 @@ export async function requireAdmin(req: Request): Promise<
   return { userId: r.user.id, error: null };
 }
 
+function parseSecretValues(raw?: string | null): string[] {
+  if (!raw) return [];
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((value): value is string => typeof value === 'string' && value.length > 0);
+    }
+    if (parsed && typeof parsed === 'object') {
+      return Object.values(parsed).filter((value): value is string => typeof value === 'string' && value.length > 0);
+    }
+  } catch {
+    // Fall back to delimiter-based parsing.
+  }
+
+  return raw
+    .split(/[\s,]+/)
+    .map((value) => value.trim())
+    .filter(Boolean);
+}
+
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  const parts = token.split('.');
+  if (parts.length !== 3) return null;
+
+  try {
+    const normalized = parts[1]
+      .replace(/-/g, '+')
+      .replace(/_/g, '/')
+      .padEnd(Math.ceil(parts[1].length / 4) * 4, '=');
+
+    return JSON.parse(atob(normalized));
+  } catch {
+    return null;
+  }
+}
+
+function isProjectRoleKey(token: string): boolean {
+  const payload = decodeJwtPayload(token);
+  const projectUrl = Deno.env.get('SUPABASE_URL');
+  if (!payload || !projectUrl) return false;
+
+  let projectRef = '';
+  try {
+    projectRef = new URL(projectUrl).hostname.split('.')[0] || '';
+  } catch {
+    return false;
+  }
+
+  return payload.iss === 'supabase'
+    && payload.ref === projectRef
+    && (payload.role === 'anon' || payload.role === 'service_role');
+}
+
 export function requireCronSecret(req: Request): Response | null {
   // Accept EITHER:
   //   1) x-cron-secret header matching CRON_SECRET env, OR
-  //   2) Authorization: Bearer <SUPABASE_ANON_KEY|SUPABASE_SERVICE_ROLE_KEY>
+  //   2) Authorization/apikey matching the project's publishable or service key
   //      (pg_cron / net.http_post sends this format)
   const expected = Deno.env.get('CRON_SECRET');
   const got = req.headers.get('x-cron-secret');
   if (expected && got && got === expected) return null;
 
-  const authHeader = req.headers.get('Authorization') || '';
-  const token = authHeader.replace(/^Bearer\s+/i, '').trim();
-  const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
-  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-  if (token && (token === anonKey || token === serviceKey)) return null;
+  const authHeader = req.headers.get('Authorization') || req.headers.get('authorization') || '';
+  const token = (authHeader.replace(/^Bearer\s+/i, '').trim() || req.headers.get('apikey') || '').trim();
+  const acceptedKeys = new Set([
+    ...parseSecretValues(Deno.env.get('SUPABASE_ANON_KEY')),
+    ...parseSecretValues(Deno.env.get('SUPABASE_PUBLISHABLE_KEY')),
+    ...parseSecretValues(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS')),
+    ...parseSecretValues(Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')),
+    ...parseSecretValues(Deno.env.get('SUPABASE_SECRET_KEYS')),
+  ]);
+
+  if (token && (acceptedKeys.has(token) || isProjectRoleKey(token))) return null;
 
   return new Response(JSON.stringify({ error: 'Unauthorized (cron)' }), {
     status: 401,
