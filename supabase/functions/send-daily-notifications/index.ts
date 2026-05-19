@@ -83,13 +83,13 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Determine which send_time slot we're in (within ±15 min window — tolerates cron lag/cold starts)
-    const timeSlots = ['09:00', '14:00'];
+    // Determine which send_time slot we're in (within ±45 min window — matches stored :30 schedules and cron-on-the-hour execution)
+    const timeSlots = ['09:30', '10:30', '14:30', '15:30', '19:30'];
     const matchingSlot = timeSlots.find(slot => {
       const [h, m] = slot.split(':').map(Number);
       const slotMinutes = h * 60 + m;
       const currentMinutes = currentHour * 60 + currentMinute;
-      return Math.abs(currentMinutes - slotMinutes) <= 15;
+      return Math.abs(currentMinutes - slotMinutes) <= 45;
     });
 
     // For manual triggers, send all pending; for cron, only matching slot

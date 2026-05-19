@@ -62,12 +62,9 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Accept either cron secret (scheduled) OR admin user (manual trigger from admin panel)
-    const hasCronHeader = !!req.headers.get('x-cron-secret');
-    if (hasCronHeader) {
-      const cronErr = requireCronSecret(req);
-      if (cronErr) return cronErr;
-    } else {
+    // Accept scheduled calls (cron secret / project key) OR admin user (manual trigger from admin panel)
+    const cronErr = requireCronSecret(req);
+    if (cronErr) {
       const adminCheck = await requireAdmin(req);
       if (adminCheck.error) return adminCheck.error;
     }
