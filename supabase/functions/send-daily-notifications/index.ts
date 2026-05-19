@@ -1,6 +1,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
 import { requireCronSecret, requireAdmin } from '../_shared/auth.ts';
+import { startRunLog, finishRunLog, logFailedSend, bumpReason } from '../_shared/notif-logging.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
