@@ -46,6 +46,12 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  let runId: string | null = null;
+  let runSupabase: any = null;
+  const reasons: Record<string, number> = {};
+  let skippedCount = 0;
+  let failedCount = 0;
+
   try {
     // Auth: cron secret OR service-role/anon Bearer (used by pg_cron) OR admin user.
     const cronErr = requireCronSecret(req);
