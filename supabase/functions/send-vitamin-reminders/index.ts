@@ -21,10 +21,12 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Get current time + 5 minutes window
-    // We look for vitamins scheduled between now+4min and now+6min (1-minute cron window)
+    // Get current Baku time + 5 minutes window
+    // We look for vitamins scheduled between now+4min and now+6min (5-minute cron window)
     const now = new Date();
-    const targetTime = new Date(now.getTime() + 5 * 60 * 1000);
+    const bakuOffsetMs = 4 * 60 * 60 * 1000;
+    const bakuNow = new Date(now.getTime() + bakuOffsetMs);
+    const targetTime = new Date(bakuNow.getTime() + 5 * 60 * 1000);
     const targetHour = targetTime.getUTCHours().toString().padStart(2, '0');
     const targetMinute = targetTime.getUTCMinutes().toString().padStart(2, '0');
     const targetTimeStr = `${targetHour}:${targetMinute}:00`;
@@ -35,7 +37,7 @@ Deno.serve(async (req) => {
     const timeMin = `${targetTimeMinus.getUTCHours().toString().padStart(2, '0')}:${targetTimeMinus.getUTCMinutes().toString().padStart(2, '0')}:00`;
     const timeMax = `${targetTimePlus.getUTCHours().toString().padStart(2, '0')}:${targetTimePlus.getUTCMinutes().toString().padStart(2, '0')}:00`;
 
-    const currentDayOfWeek = now.getUTCDay(); // 0=Sunday
+    const currentDayOfWeek = bakuNow.getUTCDay(); // 0=Sunday in Baku local time
 
     console.log(`Checking vitamin reminders for time range ${timeMin}-${timeMax}, day: ${currentDayOfWeek}`);
 
@@ -65,7 +67,7 @@ Deno.serve(async (req) => {
     console.log(`Found ${schedules.length} vitamin reminders to process`);
 
     // Check which users already took their vitamin today
-    const today = now.toISOString().split('T')[0];
+    const today = bakuNow.toISOString().split('T')[0];
     const scheduleIds = schedules.map(s => s.id);
     
     const { data: takenLogs } = await supabase
