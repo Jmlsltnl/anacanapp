@@ -383,9 +383,19 @@ Deno.serve(async (req) => {
 
     console.log(`Daily notifications sent: ${sentCount}`);
 
+    await finishRunLog(supabase, runId, {
+      status: 'success',
+      sent_count: sentCount,
+      failed_count: failedCount,
+      skipped_count: skippedCount,
+      eligible_count: eligibleUsers.length,
+      reasons,
+    });
+
     return new Response(
       JSON.stringify({
         success: true, sent: sentCount, eligible: eligibleUsers.length,
+        failed: failedCount, skipped: skippedCount, reasons,
         currentTime: currentTimeStr, activeSlot: activeSendTime || 'manual',
         pregnancyDaysAvailable: pregnancyNotifsByDay.size,
         mommyDaysAvailable: mommyNotifsByDay.size,
@@ -395,6 +405,13 @@ Deno.serve(async (req) => {
     );
   } catch (err) {
     console.error('Error in send-daily-notifications:', err);
+    if (runSupabase && runId) {
+      await finishRunLog(runSupabase, runId, {
+        status: 'error',
+        sent_count: 0,
+        error_message: err instanceof Error ? err.message : String(err),
+      });
+    }
     return new Response(
       JSON.stringify({ error: err instanceof Error ? err.message : 'Unknown error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
