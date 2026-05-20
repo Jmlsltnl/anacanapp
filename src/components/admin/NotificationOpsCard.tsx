@@ -62,7 +62,7 @@ function cronUtcHoursToBaku(schedule: string): { utc: string; baku: string; allH
 }
 
 const EXPECTED_BAKU_HOURS: Record<string, number[]> = {
-  'send-daily-notifications-slots': [9, 10, 14, 15, 19],
+  'send-daily-notifications-slots': [9, 10, 12, 14, 15, 19],
   'send-flow-reminders-every-hour': [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
 };
 
