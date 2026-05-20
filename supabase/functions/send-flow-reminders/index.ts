@@ -33,6 +33,15 @@ interface DeviceToken {
   platform: string;
 }
 
+function parseBakuTimeToMinutes(value: string | null | undefined): number | null {
+  if (!value) return null;
+  const [rawHour = '0', rawMinute = '0'] = value.split(':');
+  const hour = Number(rawHour);
+  const minute = Number(rawMinute);
+  if (Number.isNaN(hour) || Number.isNaN(minute)) return null;
+  return hour * 60 + minute;
+}
+
 function getCycleInfo(lastPeriodDate: string, cycleLength: number, periodLength: number) {
   const today = new Date();
   const lmp = new Date(lastPeriodDate);
@@ -85,10 +94,12 @@ Deno.serve(async (req) => {
     runSupabase = supabase;
 
     const now = new Date();
-    const currentHour = now.getUTCHours() + 4;
-    const adjustedHour = currentHour >= 24 ? currentHour - 24 : currentHour;
-    const bakuMinute = now.getUTCMinutes();
+    const bakuOffsetMs = 4 * 60 * 60 * 1000;
+    const bakuNow = new Date(now.getTime() + bakuOffsetMs);
+    const adjustedHour = bakuNow.getUTCHours();
+    const bakuMinute = bakuNow.getUTCMinutes();
     const bakuTimeStr = `${String(adjustedHour).padStart(2, '0')}:${String(bakuMinute).padStart(2, '0')}`;
+    const bakuMinutes = adjustedHour * 60 + bakuMinute;
 
     let body: { manual?: boolean; userId?: string } = {};
     try { body = await req.json(); } catch { /* No body */ }
@@ -196,8 +207,12 @@ Deno.serve(async (req) => {
       // For admin test: bypass shouldSend / time-of-day window.
       if (!shouldSend && !body.manual) { skippedCount++; bumpReason(reasons, `flow_off_schedule:${reminder.reminder_type}`); continue; }
 
-      const reminderHour = parseInt(reminder.time_of_day?.split(':')[0] || '9');
-      if (!body.manual && Math.abs(adjustedHour - reminderHour) > 1) { skippedCount++; bumpReason(reasons, 'flow_wrong_hour'); continue; }
+      const reminderMinutes = parseBakuTimeToMinutes(reminder.time_of_day);
+      if (!body.manual && (reminderMinutes === null || Math.abs(bakuMinutes - reminderMinutes) > 15)) {
+        skippedCount++;
+        bumpReason(reasons, 'flow_wrong_time_window');
+        continue;
+      }
 
       if (body.manual) {
         notificationTitle = notificationTitle || `[TEST] Flow • ${reminder.reminder_type}`;
