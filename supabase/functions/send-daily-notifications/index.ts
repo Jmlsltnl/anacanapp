@@ -41,6 +41,35 @@ interface DeviceToken {
   platform: string;
 }
 
+interface DailyRunSlot {
+  runAt: string;
+  contentTimes: string[];
+}
+
+function normalizeTimeLabel(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const [rawHour = '0', rawMinute = '0'] = value.split(':');
+  const hour = Number(rawHour);
+  const minute = Number(rawMinute);
+  if (Number.isNaN(hour) || Number.isNaN(minute)) return null;
+  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+}
+
+function toMinutes(value: string): number {
+  const normalized = normalizeTimeLabel(value);
+  if (!normalized) return -1;
+  const [hour, minute] = normalized.split(':').map(Number);
+  return hour * 60 + minute;
+}
+
+const DAILY_RUN_SLOTS: DailyRunSlot[] = [
+  { runAt: '09:00', contentTimes: ['09:00', '09:30'] },
+  { runAt: '10:00', contentTimes: ['10:00', '10:30'] },
+  { runAt: '14:00', contentTimes: ['14:00', '14:30'] },
+  { runAt: '15:00', contentTimes: ['15:00', '15:30'] },
+  { runAt: '19:00', contentTimes: ['19:00', '19:30'] },
+];
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -95,17 +124,19 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Determine which send_time slot we're in (within ±45 min window — matches stored :30 schedules and cron-on-the-hour execution)
-    const timeSlots = ['09:30', '10:30', '14:30', '15:30', '19:30'];
-    const matchingSlot = timeSlots.find(slot => {
-      const [h, m] = slot.split(':').map(Number);
-      const slotMinutes = h * 60 + m;
-      const currentMinutes = currentHour * 60 + currentMinute;
-      return Math.abs(currentMinutes - slotMinutes) <= 45;
-    });
+    // Match the current cron run to the nearest expected Baku delivery slot.
+    // Each run can cover both exact-hour and legacy half-hour content times.
+    const currentMinutes = currentHour * 60 + currentMinute;
+    const matchingSlot = DAILY_RUN_SLOTS
+      .map((slot) => ({ slot, diff: Math.abs(currentMinutes - toMinutes(slot.runAt)) }))
+      .filter(({ diff }) => diff <= 40)
+      .sort((a, b) => a.diff - b.diff)[0]?.slot ?? null;
 
     // For manual triggers, send all pending; for cron, only matching slot
-    const activeSendTime = body.manual ? null : matchingSlot;
+    const activeSendTime = body.manual ? null : matchingSlot?.runAt ?? null;
+    const activeContentTimes = body.manual
+      ? null
+      : new Set((matchingSlot?.contentTimes ?? []).map((value) => normalizeTimeLabel(value)).filter(Boolean) as string[]);
 
     runId = await startRunLog(supabase, 'send-daily-notifications', triggeredBy, currentTimeStr, activeSendTime || (body.manual ? 'manual' : null));
 
@@ -132,29 +163,30 @@ Deno.serve(async (req) => {
     const { accessToken, projectId } = await getFirebaseAccessToken(saJson);
     console.log(`[send-daily-notifications] Got Firebase access token, project=${projectId}`);
 
-    // Get active scheduled notifications
+     // Get active scheduled notifications
     const { data: scheduledNotifications } = await supabase
       .from('scheduled_notifications').select('*').eq('is_active', true).order('priority', { ascending: true });
 
-    // Get pregnancy day notifications - filter by send_time if we have an active slot
-    let pregnancyQuery = supabase.from('pregnancy_day_notifications').select('*').eq('is_active', true);
-    if (activeSendTime) pregnancyQuery = pregnancyQuery.eq('send_time', activeSendTime);
-    const { data: pregnancyNotifications } = await pregnancyQuery;
+    // Get day-based notifications and normalize send_time in code so both 09:00 and 09:30 style values work.
+    const { data: pregnancyNotifications } = await supabase
+      .from('pregnancy_day_notifications').select('*').eq('is_active', true);
 
     const pregnancyNotifsByDay = new Map<number, DayNotification[]>();
     pregnancyNotifications?.forEach((n: DayNotification) => {
+      const normalizedTime = normalizeTimeLabel(n.send_time);
+      if (activeContentTimes && (!normalizedTime || !activeContentTimes.has(normalizedTime))) return;
       const existing = pregnancyNotifsByDay.get(n.day_number) || [];
       existing.push(n);
       pregnancyNotifsByDay.set(n.day_number, existing);
     });
 
-    // Get mommy day notifications - filter by send_time if we have an active slot
-    let mommyQuery = supabase.from('mommy_day_notifications').select('*').eq('is_active', true);
-    if (activeSendTime) mommyQuery = mommyQuery.eq('send_time', activeSendTime);
-    const { data: mommyNotifications } = await mommyQuery;
+    const { data: mommyNotifications } = await supabase
+      .from('mommy_day_notifications').select('*').eq('is_active', true);
 
     const mommyNotifsByDay = new Map<number, DayNotification[]>();
     mommyNotifications?.forEach((n: DayNotification) => {
+      const normalizedTime = normalizeTimeLabel(n.send_time);
+      if (activeContentTimes && (!normalizedTime || !activeContentTimes.has(normalizedTime))) return;
       const existing = mommyNotifsByDay.get(n.day_number) || [];
       existing.push(n);
       mommyNotifsByDay.set(n.day_number, existing);
@@ -182,6 +214,7 @@ Deno.serve(async (req) => {
     const { data: tokens } = await tokensQuery;
 
     if (!tokens?.length) {
+      await finishRunLog(supabase, runId, { status: 'success', sent_count: 0, skipped_count: 1, reasons: { no_device_token: 1 } });
       return new Response(
         JSON.stringify({ message: 'No device tokens', sent: 0, userId: body.userId || null }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -252,7 +285,7 @@ Deno.serve(async (req) => {
       const userTokens = tokens.filter((t: DeviceToken) => t.user_id === user.user_id);
       if (!userTokens.length) { skippedCount++; bumpReason(reasons, 'no_device_token'); return; }
 
-      const notificationsToSend: Array<{ title: string; body: string; id: string; type: string; day?: number }> = [];
+      const notificationsToSend: Array<{ title: string; body: string; id: string; type: string; sourceType?: string; day?: number }> = [];
 
       if (user.life_stage === 'bump' && user.last_period_date) {
         const pregnancyDay = calculatePregnancyDay(user.last_period_date);
@@ -296,16 +329,19 @@ Deno.serve(async (req) => {
       }
 
       if (notificationsToSend.length === 0 && scheduledNotifications?.length) {
-        const match = scheduledNotifications.find((n: ScheduledNotification) => {
+        const matches = (scheduledNotifications || []).filter((n: ScheduledNotification) => {
           if (n.target_audience === 'all') return true;
           if (n.target_audience === user.life_stage) return true;
           if (n.target_audience === 'partner' && user.role === 'partner') return true;
           return false;
         });
+        const slotIndex = activeSendTime ? Math.max(DAILY_RUN_SLOTS.findIndex((slot) => slot.runAt === activeSendTime), 0) : 0;
+        const match = matches.length ? matches[slotIndex % matches.length] : null;
+        const scheduledSourceType = activeSendTime ? `scheduled:${activeSendTime}` : 'scheduled';
         if (match) {
-          const dedupKey = `${user.user_id}:scheduled:${match.id}`;
+          const dedupKey = `${user.user_id}:${scheduledSourceType}:${match.id}`;
           if (!alreadySent.has(dedupKey)) {
-            notificationsToSend.push({ id: match.id, title: match.title, body: match.body, type: 'scheduled' });
+            notificationsToSend.push({ id: match.id, title: match.title, body: match.body, type: 'scheduled', sourceType: scheduledSourceType });
           }
         }
       }
@@ -326,7 +362,7 @@ Deno.serve(async (req) => {
               user_id: user.user_id,
               notification_id: notif.type === 'scheduled' ? notif.id : null,
               title: notif.title, body: notif.body, status: 'sent',
-              source_type: notif.type, source_notification_id: notif.id,
+              source_type: notif.sourceType ?? notif.type, source_notification_id: notif.id,
               notification_type: notif.type,
             });
             break;
@@ -346,7 +382,7 @@ Deno.serve(async (req) => {
           await logFailedSend(supabase, {
             user_id: user.user_id,
             notification_type: notif.type,
-            source_type: notif.type,
+            source_type: notif.sourceType ?? notif.type,
             source_notification_id: notif.id,
             title: notif.title,
             body: notif.body,
