@@ -1050,6 +1050,7 @@ const RecentFlowLogs = () => {
         const { data, error } = await supabase
           .from('notification_send_log')
           .select('*')
+          .or('source_type.eq.flow_reminder,notification_type.eq.flow_reminder')
           .order('sent_at', { ascending: false })
           .limit(20);
 
