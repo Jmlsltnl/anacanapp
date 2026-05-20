@@ -65,6 +65,7 @@ function toMinutes(value: string): number {
 const DAILY_RUN_SLOTS: DailyRunSlot[] = [
   { runAt: '09:00', contentTimes: ['09:00', '09:30'] },
   { runAt: '10:00', contentTimes: ['10:00', '10:30'] },
+  { runAt: '12:00', contentTimes: ['12:00', '12:30'] },
   { runAt: '14:00', contentTimes: ['14:00', '14:30'] },
   { runAt: '15:00', contentTimes: ['15:00', '15:30'] },
   { runAt: '19:00', contentTimes: ['19:00', '19:30'] },
