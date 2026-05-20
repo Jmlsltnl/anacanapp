@@ -42,6 +42,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import PushDiagnosticsCard from './PushDiagnosticsCard';
 import NotificationOpsCard from './NotificationOpsCard';
+import BulkTimeManager from './BulkTimeManager';
 
 const audienceLabels: Record<string, { label: string; icon: any; color: string }> = {
   all: { label: 'Hamı', icon: Users, color: 'bg-blue-500' },
@@ -67,7 +68,7 @@ const AdminPushNotifications = () => {
       <NotificationOpsCard />
       <PushDiagnosticsCard />
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="scheduled" className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
             Gündəlik
@@ -87,6 +88,10 @@ const AdminPushNotifications = () => {
           <TabsTrigger value="bulk" className="flex items-center gap-2">
             <Zap className="h-4 w-4" />
             Bulk
+          </TabsTrigger>
+          <TabsTrigger value="time-manager" className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            Saat dəyiş.
           </TabsTrigger>
         </TabsList>
 
@@ -108,6 +113,10 @@ const AdminPushNotifications = () => {
 
         <TabsContent value="bulk" className="mt-6">
           <BulkPushTab />
+        </TabsContent>
+
+        <TabsContent value="time-manager" className="mt-6">
+          <BulkTimeManager />
         </TabsContent>
       </Tabs>
     </div>
