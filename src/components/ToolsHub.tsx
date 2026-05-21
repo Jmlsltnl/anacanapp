@@ -373,7 +373,9 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
           
           return heroTools.map((hero, idx) => {
             const HeroIcon = iconMap[hero.icon] || Wrench;
-            const displayName = hero.display_name_az || hero.name_az || hero.name;
+            const displayName = isEn
+              ? ((hero as any).display_name || hero.name)
+              : (hero.display_name_az || hero.name_az || hero.name);
             
             return (
               <motion.button
