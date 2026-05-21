@@ -181,7 +181,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         isLocked: getLockedStatus(config),
       };
     });
-  }, [toolConfigs, hasPartner, lifeStage]);
+  }, [toolConfigs, hasPartner, lifeStage, isEn]);
 
   // Set initial tool from props on mount
   useEffect(() => {
