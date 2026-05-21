@@ -42,6 +42,7 @@ interface UseInAppPurchaseReturn {
   purchaseLifetime: () => Promise<boolean>;
   restorePurchases: () => Promise<boolean>;
   showPaywall: () => Promise<boolean>;
+  showPaywallSafe: () => Promise<{ didPurchase: boolean; available: boolean }>;
   showCustomerCenter: () => Promise<void>;
   refreshEntitlements: () => Promise<void>;
 }
