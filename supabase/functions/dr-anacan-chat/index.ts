@@ -60,6 +60,7 @@ Deno.serve(async (req) => {
       isWeightAnalysis,
       cyclePhase,
       cycleDay,
+      language = "az",
     } = (await req.json()) as ChatRequest;
 
     if (!messages || !Array.isArray(messages)) {
@@ -74,9 +75,13 @@ Deno.serve(async (req) => {
       resolvedLifeStage = "bump";
     }
 
-    const systemPrompt = isWeightAnalysis
-      ? `Sən çəki məsləhətçisisən. QAYDALAR: Salamlama yoxdur. "Canım", "əzizim", "balacam" kimi ifadələr İSTİFADƏ ETMƏ. Disclaimer/xəbərdarlıq yoxdur. Birbaşa 1-2 cümlə ilə praktik məsləhət ver. Yalnız Azərbaycan dilində.`
-      : getSystemPrompt(resolvedLifeStage, pregnancyWeek, isPartner, userProfile, cyclePhase, cycleDay);
+    const langInstruction = language === "en"
+      ? `\n\nIMPORTANT: Reply ONLY in English. Keep the same professional tone, no "honey/sweetie" endearments, no markdown decorators, no medical disclaimer headers.`
+      : "";
+
+    const systemPrompt = (isWeightAnalysis
+      ? `Sən çəki məsləhətçisisən. QAYDALAR: Salamlama yoxdur. "Canım", "əzizim", "balacam" kimi ifadələr İSTİFADƏ ETMƏ. Disclaimer/xəbərdarlıq yoxdur. Birbaşa 1-2 cümlə ilə praktik məsləhət ver. ${language === "en" ? "Reply ONLY in English." : "Yalnız Azərbaycan dilində."}`
+      : getSystemPrompt(resolvedLifeStage, pregnancyWeek, isPartner, userProfile, cyclePhase, cycleDay)) + langInstruction;
 
     // Convert OpenAI-style messages to Gemini format
     const geminiContents = messages.map((msg: ChatMessage) => ({
