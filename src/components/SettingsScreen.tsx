@@ -200,7 +200,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
           >
             <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
-          <h1 className="text-lg font-bold text-white">Tənzimləmələr</h1>
+          <h1 className="text-lg font-bold text-white">{tr("settingsscreen_tenzimlemeler_085659", "Tənzimləmələr")}</h1>
         </div>
       </div>
 
@@ -215,8 +215,8 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
             <div className="flex items-center gap-3">
               <Smartphone className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               <div>
-                <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Web rejimində çalışırsınız</p>
-                <p className="text-xs text-amber-600 dark:text-amber-400">Bildirişlər yalnız mobil tətbiqdə işləyir</p>
+                <p className="text-sm font-medium text-amber-800 dark:text-amber-200">{tr("settingsscreen_web_rejiminde_calisirsiniz_157028", "Web rejimində çalışırsınız")}</p>
+                <p className="text-xs text-amber-600 dark:text-amber-400">{tr("settingsscreen_bildirisler_yalniz_mobil_tetbiqde_isleyi_64cd56", "Bildirişlər yalnız mobil tətbiqdə işləyir")}</p>
               </div>
             </div>
           </motion.div>
@@ -225,22 +225,22 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
         {/* Notifications */}
         <div className="bg-card rounded-2xl overflow-hidden shadow-card border border-border/50">
           <div className="px-3 pt-3 pb-1">
-            <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Bildirişlər</h2>
+            <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{tr("settingsscreen_bildirisler_54eb88", "Bildirişlər")}</h2>
           </div>
-          <SettingRow icon={Bell} label="Bildirişlər" description="Bütün bildirişləri aktivləşdirin">
+          <SettingRow icon={Bell} label={tr("settingsscreen_bildirisler_54eb88", "Bildirişlər")} description={tr("settingsscreen_butun_bildirisleri_aktivlesdirin_beb91d", "Bütün bildirişləri aktivləşdirin")}>
             <Switch 
               checked={settings.notifications_enabled} 
               onCheckedChange={(checked) => updateSetting('notifications_enabled', checked)} 
             />
           </SettingRow>
-          <SettingRow icon={Volume2} label="Səs" description="Bildiriş səsləri">
+          <SettingRow icon={Volume2} label={tr("settingsscreen_ses_9b06b5", "Səs")} description={tr("settingsscreen_bildiris_sesleri_fc9269", "Bildiriş səsləri")}>
             <Switch 
               checked={settings.sound_enabled} 
               onCheckedChange={(checked) => updateSetting('sound_enabled', checked)} 
               disabled={!settings.notifications_enabled}
             />
           </SettingRow>
-          <SettingRow icon={Vibrate} label="Titrəmə" description="Titrəmə bildirişləri">
+          <SettingRow icon={Vibrate} label={tr("settingsscreen_titreme_6c5b87", "Titrəmə")} description={tr("settingsscreen_titreme_bildirisleri_bdf642", "Titrəmə bildirişləri")}>
             <Switch 
               checked={settings.vibration_enabled} 
               onCheckedChange={(checked) => updateSetting('vibration_enabled', checked)} 
@@ -272,8 +272,8 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
             <>
               <SettingRow 
                 icon={Moon} 
-                label="Başlama vaxtı" 
-                description="Bildirişlər susacaq"
+                label={tr("settingsscreen_baslama_vaxti_b3791d", "Başlama vaxtı")} 
+                description={tr("settingsscreen_bildirisler_susacaq_c5cd6d", "Bildirişlər susacaq")}
                 onClick={() => setShowTimeEdit(true)}
               >
                 <div className="flex items-center gap-2">
@@ -289,8 +289,8 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
               </SettingRow>
               <SettingRow 
                 icon={Sun} 
-                label="Bitmə vaxtı" 
-                description="Bildirişlər yenidən başlayacaq"
+                label={tr("settingsscreen_bitme_vaxti_624d01", "Bitmə vaxtı")} 
+                description={tr("settingsscreen_bildirisler_yeniden_baslayacaq_37c49d", "Bildirişlər yenidən başlayacaq")}
               >
                 <div className="flex items-center gap-2">
                   <input
@@ -310,23 +310,23 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
         {/* Reminders */}
         <div className="bg-card rounded-3xl overflow-hidden shadow-card border border-border/50">
           <div className="px-4 pt-4 pb-2">
-            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Xatırlatmalar</h2>
+            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">{tr("settingsscreen_xatirlatmalar_ddd8e7", "Xatırlatmalar")}</h2>
           </div>
-          <SettingRow icon={Droplets} label="Su xatırlatması" description="Hər 2 saatda bir (08:00-20:00)">
+          <SettingRow icon={Droplets} label={tr("settingsscreen_su_xatirlatmasi_ca127e", "Su xatırlatması")} description={tr("settingsscreen_her_2_saatda_bir_08_00_20_00_bc7ea9", "Hər 2 saatda bir (08:00-20:00)")}>
             <Switch 
               checked={settings.water_reminder} 
               onCheckedChange={(checked) => updateSetting('water_reminder', checked)} 
               disabled={!settings.notifications_enabled}
             />
           </SettingRow>
-          <SettingRow icon={Pill} label="Vitamin xatırlatması" description={`Hər gün saat ${settings.vitamin_time}`}>
+          <SettingRow icon={Pill} label={tr("settingsscreen_vitamin_xatirlatmasi_531a3d", "Vitamin xatırlatması")} description={`Hər gün saat ${settings.vitamin_time}`}>
             <Switch 
               checked={settings.vitamin_reminder} 
               onCheckedChange={(checked) => updateSetting('vitamin_reminder', checked)} 
               disabled={!settings.notifications_enabled}
             />
           </SettingRow>
-          <SettingRow icon={Dumbbell} label="Məşq xatırlatması" description="B.e., Ç., C. günləri saat 10:00">
+          <SettingRow icon={Dumbbell} label={tr("settingsscreen_mesq_xatirlatmasi_399c4f", "Məşq xatırlatması")} description={tr("settingsscreen_b_e_c_c_gunleri_saat_10_00_40d25b", "B.e., Ç., C. günləri saat 10:00")}>
             <Switch 
               checked={settings.exercise_reminder} 
               onCheckedChange={(checked) => updateSetting('exercise_reminder', checked)} 
@@ -338,9 +338,9 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
         {/* Push Notification Settings */}
         <div className="bg-card rounded-3xl overflow-hidden shadow-card border border-border/50">
           <div className="px-4 pt-4 pb-2">
-            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Push Bildirişləri</h2>
+            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">{tr("settingsscreen_push_bildirisleri_c44832", "Push Bildirişləri")}</h2>
           </div>
-          <SettingRow icon={Bell} label="Push bildirişlər" description="Tətbiq bağlı olsa belə bildiriş alın">
+          <SettingRow icon={Bell} label={tr("settingsscreen_push_bildirisler_e7cb34", "Push bildirişlər")} description={tr("settingsscreen_tetbiq_bagli_olsa_bele_bildiris_alin_01f6eb", "Tətbiq bağlı olsa belə bildiriş alın")}>
             <Switch 
               checked={pushSettings.push_enabled} 
               onCheckedChange={(checked) => {
@@ -349,28 +349,28 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
               }}
             />
           </SettingRow>
-          <SettingRow icon={MessageCircle} label="Mesaj bildirişləri" description="Yeni mesajlar üçün bildiriş">
+          <SettingRow icon={MessageCircle} label={tr("settingsscreen_mesaj_bildirisleri_c8fd7b", "Mesaj bildirişləri")} description={tr("settingsscreen_yeni_mesajlar_ucun_bildiris_e7e1c9", "Yeni mesajlar üçün bildiriş")}>
             <Switch 
               checked={pushSettings.push_messages} 
               onCheckedChange={(checked) => updatePushSetting('push_messages', checked)} 
               disabled={!pushSettings.push_enabled}
             />
           </SettingRow>
-          <SettingRow icon={Heart} label="Bəyənmə bildirişləri" description="Paylaşımlarınıza bəyənmə">
+          <SettingRow icon={Heart} label={tr("settingsscreen_beyenme_bildirisleri_a6b18f", "Bəyənmə bildirişləri")} description={tr("settingsscreen_paylasimlariniza_beyenme_734537", "Paylaşımlarınıza bəyənmə")}>
             <Switch 
               checked={pushSettings.push_likes} 
               onCheckedChange={(checked) => updatePushSetting('push_likes', checked)} 
               disabled={!pushSettings.push_enabled}
             />
           </SettingRow>
-          <SettingRow icon={MessageCircle} label="Şərh bildirişləri" description="Paylaşımlarınıza şərhlər">
+          <SettingRow icon={MessageCircle} label={tr("settingsscreen_serh_bildirisleri_6588b5", "Şərh bildirişləri")} description={tr("settingsscreen_paylasimlariniza_serhler_ad5c16", "Paylaşımlarınıza şərhlər")}>
             <Switch 
               checked={pushSettings.push_comments} 
               onCheckedChange={(checked) => updatePushSetting('push_comments', checked)} 
               disabled={!pushSettings.push_enabled}
             />
           </SettingRow>
-          <SettingRow icon={Users} label="Cəmiyyət bildirişləri" description="Qrup fəaliyyətləri">
+          <SettingRow icon={Users} label={tr("settingsscreen_cemiyyet_bildirisleri_fa4a16", "Cəmiyyət bildirişləri")} description={tr("settingsscreen_qrup_fealiyyetleri_4d13e7", "Qrup fəaliyyətləri")}>
             <Switch 
               checked={pushSettings.push_community} 
               onCheckedChange={(checked) => updatePushSetting('push_community', checked)} 
@@ -382,7 +382,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
         {/* Appearance */}
         <div className="bg-card rounded-3xl overflow-hidden shadow-card border border-border/50">
           <div className="px-4 pt-4 pb-2">
-            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Görünüş</h2>
+            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">{tr("settingsscreen_gorunus_165fe3", "Görünüş")}</h2>
           </div>
           <div className="px-3 pb-3">
             <LanguageSelector />
@@ -392,15 +392,15 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
         {/* Privacy & Data */}
         <div className="bg-card rounded-3xl overflow-hidden shadow-card border border-border/50">
           <div className="px-4 pt-4 pb-2">
-            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Məxfilik və Məlumat</h2>
+            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">{tr("settingsscreen_mexfilik_ve_melumat_f15bb1", "Məxfilik və Məlumat")}</h2>
           </div>
-          <SettingRow icon={Lock} label="Şifrə ilə qoruma" description="Tətbiqi qoruyun" onClick={() => toast.info('Tezliklə əlavə olunacaq')}>
+          <SettingRow icon={Lock} label={tr("settingsscreen_sifre_ile_qoruma_152a0e", "Şifrə ilə qoruma")} description={tr("settingsscreen_tetbiqi_qoruyun_bc5bce", "Tətbiqi qoruyun")} onClick={() => toast.info('Tezliklə əlavə olunacaq')}>
             <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </SettingRow>
           <SettingRow 
             icon={Download} 
-            label="Məlumat ixracı" 
-            description="Bütün məlumatlarınızı JSON formatında yükləyin" 
+            label={tr("settingsscreen_melumat_ixraci_988684", "Məlumat ixracı")} 
+            description={tr("settingsscreen_butun_melumatlarinizi_json_formatinda_yu_0c02e5", "Bütün məlumatlarınızı JSON formatında yükləyin")} 
             onClick={isExporting ? undefined : handleDataExport}
           >
             {isExporting ? (
@@ -411,8 +411,8 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
           </SettingRow>
           <SettingRow 
             icon={Trash2} 
-            label="Hesabı sil" 
-            description="Bütün məlumatları geri dönməz şəkildə silin" 
+            label={tr("settingsscreen_hesabi_sil_95d759", "Hesabı sil")} 
+            description={tr("settingsscreen_butun_melumatlari_geri_donmez_sekilde_si_35b4d6", "Bütün məlumatları geri dönməz şəkildə silin")} 
             onClick={() => setShowDeleteDialog(true)}
             danger
           >
@@ -435,23 +435,23 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
               <div className="w-12 h-12 rounded-2xl bg-destructive/10 flex items-center justify-center">
                 <AlertTriangle className="w-6 h-6 text-destructive" />
               </div>
-              <AlertDialogTitle className="text-lg">Hesabı sil</AlertDialogTitle>
+              <AlertDialogTitle className="text-lg">{tr("settingsscreen_hesabi_sil_95d759", "Hesabı sil")}</AlertDialogTitle>
             </div>
             <AlertDialogDescription className="text-sm space-y-3">
               <p>
-                Bu əməliyyat <strong className="text-destructive">geri qaytarıla bilməz</strong>. 
+                Bu əməliyyat <strong className="text-destructive">{tr("settingsscreen_geri_qaytarila_bilmez_700864", "geri qaytarıla bilməz")}</strong>. 
                 Hesabınız və bütün məlumatlarınız həmişəlik silinəcək:
               </p>
               <ul className="list-disc list-inside space-y-1 text-xs text-muted-foreground">
-                <li>Profil məlumatları</li>
-                <li>Bütün qeydlər və izləmə tarixçəsi</li>
-                <li>Cəmiyyət paylaşımları və şərhlər</li>
-                <li>AI söhbət tarixçəsi</li>
-                <li>Premium abunəlik (əgər varsa)</li>
+                <li>{tr("settingsscreen_profil_melumatlari_82c76c", "Profil məlumatları")}</li>
+                <li>{tr("settingsscreen_butun_qeydler_ve_izleme_tarixcesi_5544e4", "Bütün qeydlər və izləmə tarixçəsi")}</li>
+                <li>{tr("settingsscreen_cemiyyet_paylasimlari_ve_serhler_655338", "Cəmiyyət paylaşımları və şərhlər")}</li>
+                <li>{tr("settingsscreen_ai_sohbet_tarixcesi_9acf70", "AI söhbət tarixçəsi")}</li>
+                <li>{tr("settingsscreen_premium_abunelik_eger_varsa_ce1645", "Premium abunəlik (əgər varsa)")}</li>
               </ul>
               <div className="pt-2">
                 <p className="text-xs font-medium text-foreground mb-2">
-                  Təsdiqləmək üçün <strong>"SİL"</strong> yazın:
+                  Təsdiqləmək üçün <strong>{tr("settingsscreen_sil_27792d", "\"SİL\"")}</strong> yazın:
                 </p>
                 <input
                   type="text"
