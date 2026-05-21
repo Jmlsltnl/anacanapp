@@ -103,7 +103,21 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const getWelcomeMessage = () => {
     const userName = name ? `, ${name}` : '';
     const dynamicFruit = getDynamicFruitName();
-    
+    const lang = useUserStore.getState().language || 'az';
+
+    if (lang === 'en') {
+      switch (lifeStage) {
+        case 'flow':
+          return `Hello${userName}. I'm Anacan.AI. I'm ready to professionally answer your questions about menstrual cycles, symptoms, and general health.`;
+        case 'bump':
+          return `Hello${userName}. I'm Anacan.AI. ${pregnancyData ? `You're currently in week ${pregnancyData.currentWeek} of pregnancy; your baby is about the size of a ${dynamicFruit || pregnancyData.babySize.fruit}. ` : ''}You can ask any questions about your pregnancy.`;
+        case 'mommy':
+          return `Hello${userName}. I'm Anacan.AI. I'm here to support you with questions about baby care, breastfeeding, sleep routines and postpartum recovery.`;
+        default:
+          return `Hello${userName}. I'm Anacan.AI. How can I help you?`;
+      }
+    }
+
     switch (lifeStage) {
       case 'flow':
         return `Salam${userName}. Mən Anacan.AI. Menstrual tsikl, simptomlar və ümumi sağlamlıq üzrə suallarınıza peşəkar cavab verməyə hazıram.`;
@@ -115,6 +129,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
         return `Salam${userName}. Mən Anacan.AI. Sizə necə kömək edə bilərəm?`;
     }
   };
+
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
