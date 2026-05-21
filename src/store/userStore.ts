@@ -28,8 +28,6 @@ interface UserState {
   babyCount: number;
   multiplesType: 'single' | 'twins' | 'triplets' | 'quadruplets' | null;
   language: string;
-  i18nVersion: number;
-  bumpI18n: () => void;
   
   // Partner's woman data (for partner mode)
   partnerWomanData: {
@@ -97,8 +95,6 @@ export const useUserStore = create<UserState>()(
       babyCount: 1,
       multiplesType: null,
       language: 'az',
-      i18nVersion: 0,
-      bumpI18n: () => set((s) => ({ i18nVersion: s.i18nVersion + 1 })),
       partnerWomanData: null,
 
       setAuth: (isAuth, userId, email, name) => {
