@@ -26,6 +26,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import LanguageSelector from '@/components/LanguageSelector';
 
 interface SettingsScreenProps {
   onBack: () => void;
