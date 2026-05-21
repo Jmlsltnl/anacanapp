@@ -407,7 +407,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
                       )}
                     </div>
                     <h3 className="text-white font-bold text-base">{displayName}</h3>
-                    <p className="text-white/70 text-xs">{hero.hero_subtitle || hero.description_az || ''}</p>
+                    <p className="text-white/70 text-xs">{hero.hero_subtitle || (isEn ? (hero.description || hero.description_az) : hero.description_az) || ''}</p>
                   </div>
                   <ChevronRight className="w-6 h-6 text-white/60" />
                 </div>
