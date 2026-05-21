@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -54,7 +55,7 @@ export const useAdminOnboardingStages = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['onboarding-stages-admin'] });
       queryClient.invalidateQueries({ queryKey: ['onboarding-stages'] });
-      toast({ title: 'Mərhələ əlavə edildi' });
+      toast({ title: tr("useadminonboarding_merhele_elave_edildi_5bc49c", "Mərhələ əlavə edildi") });
     },
   });
 
@@ -66,7 +67,7 @@ export const useAdminOnboardingStages = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['onboarding-stages-admin'] });
       queryClient.invalidateQueries({ queryKey: ['onboarding-stages'] });
-      toast({ title: 'Mərhələ yeniləndi' });
+      toast({ title: tr("useadminonboarding_merhele_yenilendi_18f4f3", "Mərhələ yeniləndi") });
     },
   });
 
@@ -78,7 +79,7 @@ export const useAdminOnboardingStages = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['onboarding-stages-admin'] });
       queryClient.invalidateQueries({ queryKey: ['onboarding-stages'] });
-      toast({ title: 'Mərhələ silindi' });
+      toast({ title: tr("useadminonboarding_merhele_silindi_fb7d94", "Mərhələ silindi") });
     },
   });
 
@@ -110,7 +111,7 @@ export const useAdminMultiplesOptions = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['multiples-options-admin'] });
       queryClient.invalidateQueries({ queryKey: ['multiples-options'] });
-      toast({ title: 'Seçim əlavə edildi' });
+      toast({ title: tr("useadminonboarding_secim_elave_edildi_c68c1c", "Seçim əlavə edildi") });
     },
   });
 
@@ -122,7 +123,7 @@ export const useAdminMultiplesOptions = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['multiples-options-admin'] });
       queryClient.invalidateQueries({ queryKey: ['multiples-options'] });
-      toast({ title: 'Seçim yeniləndi' });
+      toast({ title: tr("useadminonboarding_secim_yenilendi_9d5d1b", "Seçim yeniləndi") });
     },
   });
 
@@ -134,7 +135,7 @@ export const useAdminMultiplesOptions = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['multiples-options-admin'] });
       queryClient.invalidateQueries({ queryKey: ['multiples-options'] });
-      toast({ title: 'Seçim silindi' });
+      toast({ title: tr("useadminonboarding_secim_silindi_78ce04", "Seçim silindi") });
     },
   });
 

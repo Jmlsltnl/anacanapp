@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Star, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -147,7 +148,7 @@ const LevelUpCelebration = ({ show, level, onClose }: LevelUpCelebrationProps) =
                   <span className="text-white font-black text-2xl">{level}</span>
                 </div>
                 <div className="text-left">
-                  <p className="text-white/70 text-sm">Səviyyə</p>
+                  <p className="text-white/70 text-sm">{tr("levelupcelebration_seviyye_8266e7", "Səviyyə")}</p>
                   <p className="text-white font-bold text-xl">Level {level}</p>
                 </div>
               </motion.div>

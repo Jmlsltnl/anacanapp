@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
@@ -102,7 +103,7 @@ export const useShoppingItems = () => {
       await supabase.functions.invoke('send-push-notification', {
         body: {
           userId: partnerUserId,
-          title: '🛒 Alışveriş siyahısına əlavə',
+          title: tr("useshoppingitems_alisveris_siyahisina_elave_5d9c87", "🛒 Alışveriş siyahısına əlavə"),
           body: `${adderName} "${itemName}" əlavə etdi. Siyahını yoxla!`,
           data: { type: 'shopping_list' }
         }

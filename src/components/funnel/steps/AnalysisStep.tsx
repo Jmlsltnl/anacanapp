@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 
 interface AnalysisStepProps {
@@ -8,10 +9,10 @@ interface AnalysisStepProps {
 }
 
 const STAGES = [
-  { pct: 15, label: 'Məlumatlar toplanır...' },
-  { pct: 45, label: 'Fərdi profil yaradılır...' },
-  { pct: 75, label: 'AI analiz aparır...' },
-  { pct: 100, label: 'Hazırdır! ✨' },
+  { pct: 15, label: tr("analysisstep_melumatlar_toplanir_20c57a", "Məlumatlar toplanır...") },
+  { pct: 45, label: tr("analysisstep_ferdi_profil_yaradilir_608df0", "Fərdi profil yaradılır...") },
+  { pct: 75, label: tr("analysisstep_ai_analiz_aparir_0a8204", "AI analiz aparır...") },
+  { pct: 100, label: tr("analysisstep_hazirdir_7750a8", "Hazırdır! ✨") },
 ];
 
 export default function AnalysisStep({ userName, contextLine, onComplete }: AnalysisStepProps) {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
@@ -127,10 +128,10 @@ export const useAllOrders = () => {
 
       if (error) throw error;
       
-      toast({ title: 'Status yeniləndi' });
+      toast({ title: tr("useorders_status_yenilendi_890662", "Status yeniləndi") });
       fetchAllOrders();
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("useorders_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     }
   };
 
@@ -184,7 +185,7 @@ export const useCart = () => {
 
   const addToCart = async (productId: string, quantity: number = 1) => {
     if (!user) {
-      toast({ title: 'Giriş edin', description: 'Səbətə əlavə etmək üçün daxil olun' });
+      toast({ title: tr("useorders_giris_edin_3be3d2", "Giriş edin"), description: tr("useorders_sebete_elave_etmek_ucun_daxil_olun_db21c6", "Səbətə əlavə etmək üçün daxil olun") });
       return;
     }
 
@@ -211,10 +212,10 @@ export const useCart = () => {
         if (error) throw error;
       }
 
-      toast({ title: 'Səbətə əlavə edildi!' });
+      toast({ title: tr("useorders_sebete_elave_edildi_633b0b", "Səbətə əlavə edildi!") });
       fetchCart();
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("useorders_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     }
   };
 
@@ -233,7 +234,7 @@ export const useCart = () => {
       if (error) throw error;
       fetchCart();
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("useorders_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     }
   };
 
@@ -248,7 +249,7 @@ export const useCart = () => {
       toast({ title: 'Silindi' });
       fetchCart();
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("useorders_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     }
   };
 
@@ -311,10 +312,10 @@ export const useCart = () => {
       // Clear cart
       await clearCart();
 
-      toast({ title: 'Sifariş yaradıldı!', description: `Sifariş nömrəsi: ${order.order_number}` });
+      toast({ title: tr("useorders_sifaris_yaradildi_6c3ee9", "Sifariş yaradıldı!"), description: `Sifariş nömrəsi: ${order.order_number}` });
       return order;
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("useorders_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
       return null;
     }
   };

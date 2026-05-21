@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -86,7 +87,7 @@ export const useAdminEPDSQuestions = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-epds-questions'] });
       queryClient.invalidateQueries({ queryKey: ['epds-questions'] });
-      toast({ title: 'Sual əlavə edildi' });
+      toast({ title: tr("useadminmentalhealth_sual_elave_edildi_2d000b", "Sual əlavə edildi") });
     },
   });
 
@@ -98,7 +99,7 @@ export const useAdminEPDSQuestions = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-epds-questions'] });
       queryClient.invalidateQueries({ queryKey: ['epds-questions'] });
-      toast({ title: 'Sual yeniləndi' });
+      toast({ title: tr("useadminmentalhealth_sual_yenilendi_786899", "Sual yeniləndi") });
     },
   });
 
@@ -142,7 +143,7 @@ export const useAdminMoodLevels = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-mood-levels'] });
       queryClient.invalidateQueries({ queryKey: ['mood-levels'] });
-      toast({ title: 'Əhval səviyyəsi əlavə edildi' });
+      toast({ title: tr("useadminmentalhealth_ehval_seviyyesi_elave_edildi_b321b6", "Əhval səviyyəsi əlavə edildi") });
     },
   });
 
@@ -154,7 +155,7 @@ export const useAdminMoodLevels = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-mood-levels'] });
       queryClient.invalidateQueries({ queryKey: ['mood-levels'] });
-      toast({ title: 'Əhval səviyyəsi yeniləndi' });
+      toast({ title: tr("useadminmentalhealth_ehval_seviyyesi_yenilendi_26939a", "Əhval səviyyəsi yeniləndi") });
     },
   });
 
@@ -166,7 +167,7 @@ export const useAdminMoodLevels = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-mood-levels'] });
       queryClient.invalidateQueries({ queryKey: ['mood-levels'] });
-      toast({ title: 'Əhval səviyyəsi silindi' });
+      toast({ title: tr("useadminmentalhealth_ehval_seviyyesi_silindi_802b1e", "Əhval səviyyəsi silindi") });
     },
   });
 
@@ -198,7 +199,7 @@ export const useAdminBreathingExercises = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-breathing-exercises'] });
       queryClient.invalidateQueries({ queryKey: ['breathing-exercises'] });
-      toast({ title: 'Nəfəs məşqi əlavə edildi' });
+      toast({ title: tr("useadminmentalhealth_nefes_mesqi_elave_edildi_0f4266", "Nəfəs məşqi əlavə edildi") });
     },
   });
 
@@ -210,7 +211,7 @@ export const useAdminBreathingExercises = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-breathing-exercises'] });
       queryClient.invalidateQueries({ queryKey: ['breathing-exercises'] });
-      toast({ title: 'Nəfəs məşqi yeniləndi' });
+      toast({ title: tr("useadminmentalhealth_nefes_mesqi_yenilendi_61bfcc", "Nəfəs məşqi yeniləndi") });
     },
   });
 
@@ -222,7 +223,7 @@ export const useAdminBreathingExercises = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-breathing-exercises'] });
       queryClient.invalidateQueries({ queryKey: ['breathing-exercises'] });
-      toast({ title: 'Nəfəs məşqi silindi' });
+      toast({ title: tr("useadminmentalhealth_nefes_mesqi_silindi_4bf0db", "Nəfəs məşqi silindi") });
     },
   });
 
@@ -254,7 +255,7 @@ export const useAdminNoiseThresholds = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-noise-thresholds'] });
       queryClient.invalidateQueries({ queryKey: ['noise-thresholds'] });
-      toast({ title: 'Səs hədd əlavə edildi' });
+      toast({ title: tr("useadminmentalhealth_ses_hedd_elave_edildi_b3723a", "Səs hədd əlavə edildi") });
     },
   });
 
@@ -266,7 +267,7 @@ export const useAdminNoiseThresholds = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-noise-thresholds'] });
       queryClient.invalidateQueries({ queryKey: ['noise-thresholds'] });
-      toast({ title: 'Səs hədd yeniləndi' });
+      toast({ title: tr("useadminmentalhealth_ses_hedd_yenilendi_66ecc6", "Səs hədd yeniləndi") });
     },
   });
 
@@ -278,7 +279,7 @@ export const useAdminNoiseThresholds = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-noise-thresholds'] });
       queryClient.invalidateQueries({ queryKey: ['noise-thresholds'] });
-      toast({ title: 'Səs hədd silindi' });
+      toast({ title: tr("useadminmentalhealth_ses_hedd_silindi_041844", "Səs hədd silindi") });
     },
   });
 
@@ -326,7 +327,7 @@ export const useAdminMentalHealthResources = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-mental-health-resources'] });
       queryClient.invalidateQueries({ queryKey: ['mental-health-resources'] });
-      toast({ title: 'Resurs əlavə edildi' });
+      toast({ title: tr("useadminmentalhealth_resurs_elave_edildi_5dd590", "Resurs əlavə edildi") });
     },
   });
 
@@ -338,7 +339,7 @@ export const useAdminMentalHealthResources = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-mental-health-resources'] });
       queryClient.invalidateQueries({ queryKey: ['mental-health-resources'] });
-      toast({ title: 'Resurs yeniləndi' });
+      toast({ title: tr("useadminmentalhealth_resurs_yenilendi_710694", "Resurs yeniləndi") });
     },
   });
 

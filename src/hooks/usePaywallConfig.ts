@@ -1,5 +1,6 @@
 import { useAppSetting, useUpdateAppSetting } from '@/hooks/useAppSettings';
 
+import { tr } from '@/lib/tr';
 export interface PaywallConfig {
   // Branding
   title: string;
@@ -83,11 +84,11 @@ export interface BillingConfig {
 
 export const defaultPaywallConfig: PaywallConfig = {
   title: 'Anacan Premium',
-  subtitle: 'Tam təcrübə · Sınırsız imkanlar',
+  subtitle: tr("usepaywallconfig_tam_tecrube_sinirsiz_imkanlar_ce3376", "Tam təcrübə · Sınırsız imkanlar"),
   pills: [
     { icon: 'Zap', text: 'Limitsiz' },
-    { icon: 'Shield', text: 'Reklamsız' },
-    { icon: 'Sparkles', text: 'AI dəstəyi' },
+    { icon: 'Shield', text: tr("usepaywallconfig_reklamsiz_cc4ba5", "Reklamsız") },
+    { icon: 'Sparkles', text: tr("usepaywallconfig_ai_desteyi_934e62", "AI dəstəyi") },
   ],
   cta_new_user: 'Premium-a Keç',
   cta_upgrade: 'Planı Yenilə',
@@ -130,9 +131,9 @@ export const defaultBillingConfig: BillingConfig = {
   features_title: 'Planınıza daxildir',
   features: [
     { icon: 'Zap', text: 'Limitsiz AI' },
-    { icon: 'Shield', text: 'Reklamsız' },
+    { icon: 'Shield', text: tr("usepaywallconfig_reklamsiz_cc4ba5", "Reklamsız") },
     { icon: 'Crown', text: 'Premium fonlar' },
-    { icon: 'Sparkles', text: 'Prioritet dəstək' },
+    { icon: 'Sparkles', text: tr("usepaywallconfig_prioritet_destek_3f6f91", "Prioritet dəstək") },
   ],
   upgrade_cta: 'İllik Plana Keç',
   upgrade_savings: '{percent}% qənaət',

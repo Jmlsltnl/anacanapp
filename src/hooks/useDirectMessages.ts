@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
@@ -161,7 +162,7 @@ export const useDirectMessages = (otherUserId?: string) => {
       return data;
     } catch (err: any) {
       console.error('Error sending DM:', err);
-      toast({ title: 'Mesaj göndərilmədi', description: err.message, variant: 'destructive' });
+      toast({ title: tr("usedirectmessages_mesaj_gonderilmedi_7df412", "Mesaj göndərilmədi"), description: err.message, variant: 'destructive' });
       return null;
     }
   };

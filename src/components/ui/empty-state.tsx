@@ -114,7 +114,7 @@ const NoPostsEmptyState = ({ onCreatePost }: { onCreatePost?: () => void }) => (
   <EmptyState
     emoji="💬"
     title={tr("empty-state_hele_paylasim_yoxdur_a0a7fa", "Hələ paylaşım yoxdur")}
-    description="İlk paylaşımı siz edin və digər analarla əlaqə qurun!"
+    description={tr("empty-state_ilk_paylasimi_siz_edin_ve_diger_analarla_420445", "İlk paylaşımı siz edin və digər analarla əlaqə qurun!")}
     action={
       onCreatePost
         ? {
@@ -130,7 +130,7 @@ const NoCommentsEmptyState = () => (
   <EmptyState
     emoji="💭"
     title={tr("empty-state_hele_serh_yoxdur_1dfc90", "Hələ şərh yoxdur")}
-    description="Bu paylaşım üçün ilk şərhi siz yazın."
+    description={tr("empty-state_bu_paylasim_ucun_ilk_serhi_siz_yazin_da02d2", "Bu paylaşım üçün ilk şərhi siz yazın.")}
     variant="minimal"
   />
 );
@@ -139,7 +139,7 @@ const NoSearchResultsEmptyState = () => (
   <EmptyState
     emoji="🔍"
     title={tr("empty-state_netice_tapilmadi_4b1b52", "Nəticə tapılmadı")}
-    description="Başqa axtarış sözləri sınayın."
+    description={tr("empty-state_basqa_axtaris_sozleri_sinayin_fd5484", "Başqa axtarış sözləri sınayın.")}
     variant="minimal"
   />
 );
@@ -148,7 +148,7 @@ const NoStoriesEmptyState = () => (
   <EmptyState
     emoji="📸"
     title="Story yoxdur"
-    description="Hələ ki, heç kim story paylaşmayıb."
+    description={tr("empty-state_hele_ki_hec_kim_story_paylasmayib_81525f", "Hələ ki, heç kim story paylaşmayıb.")}
     variant="minimal"
   />
 );
@@ -157,7 +157,7 @@ const NoGroupsEmptyState = () => (
   <EmptyState
     emoji="👥"
     title="Qrup yoxdur"
-    description="Sizə uyğun qruplar tezliklə əlavə olunacaq."
+    description={tr("empty-state_size_uygun_qruplar_tezlikle_elave_olunac_a9d784", "Sizə uyğun qruplar tezliklə əlavə olunacaq.")}
     variant="gradient"
   />
 );
@@ -166,7 +166,7 @@ const NoNotificationsEmptyState = () => (
   <EmptyState
     emoji="🔔"
     title={tr("empty-state_bildiris_yoxdur_6ccf4d", "Bildiriş yoxdur")}
-    description="Yeni bildirişləriniz burada görünəcək."
+    description={tr("empty-state_yeni_bildirisleriniz_burada_gorunecek_4bba6f", "Yeni bildirişləriniz burada görünəcək.")}
     variant="minimal"
   />
 );

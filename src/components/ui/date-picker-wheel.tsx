@@ -1,4 +1,5 @@
 import * as React from "react";
+import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Calendar, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -322,7 +323,7 @@ export function DatePickerWheel({
             <Calendar className="h-5 w-5 text-primary" />
           </div>
           <div className="flex flex-col items-start">
-            <span className="text-xs text-muted-foreground">Doğum tarixi</span>
+            <span className="text-xs text-muted-foreground">{tr("date-picker-wheel_dogum_tarixi_d96907", "Doğum tarixi")}</span>
             <span className={cn("font-medium", value ? "text-foreground" : "text-muted-foreground")}>
               {value ? format(value, "d MMMM yyyy", { locale: az }) : placeholder}
             </span>
@@ -359,7 +360,7 @@ export function DatePickerWheel({
                     <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
                       <Calendar className="h-4 w-4 text-primary" />
                     </div>
-                    <span className="font-semibold">Tarix seçin</span>
+                    <span className="font-semibold">{tr("date-picker-wheel_tarix_secin_3377b4", "Tarix seçin")}</span>
                   </div>
                   <Button
                     variant="ghost"

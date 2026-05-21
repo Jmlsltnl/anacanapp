@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -38,7 +39,7 @@ export const useAdminPartnerTips = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['partner-daily-tips-admin'] });
       queryClient.invalidateQueries({ queryKey: ['partner-daily-tips'] });
-      toast({ title: 'Məsləhət əlavə edildi' });
+      toast({ title: tr("useadminpartnertips_meslehet_elave_edildi_4a4cbc", "Məsləhət əlavə edildi") });
     },
   });
 
@@ -50,7 +51,7 @@ export const useAdminPartnerTips = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['partner-daily-tips-admin'] });
       queryClient.invalidateQueries({ queryKey: ['partner-daily-tips'] });
-      toast({ title: 'Məsləhət yeniləndi' });
+      toast({ title: tr("useadminpartnertips_meslehet_yenilendi_289f83", "Məsləhət yeniləndi") });
     },
   });
 
@@ -62,7 +63,7 @@ export const useAdminPartnerTips = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['partner-daily-tips-admin'] });
       queryClient.invalidateQueries({ queryKey: ['partner-daily-tips'] });
-      toast({ title: 'Məsləhət silindi' });
+      toast({ title: tr("useadminpartnertips_meslehet_silindi_0a5099", "Məsləhət silindi") });
     },
   });
 

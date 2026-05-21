@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
@@ -204,7 +205,7 @@ export const useDailySummary = () => {
         message_type: 'daily_summary',
         content: JSON.stringify({
           type: 'daily_summary',
-          title: '📊 Gündəlik Xülasə',
+          title: tr("usedailysummary_gundelik_xulase_42932d", "📊 Gündəlik Xülasə"),
           body: `Əhval: ${moodText} | Su: ${dailyLog?.water_intake || 0}ml | Təpiklər: ${totalKicks}`,
           summary: data,
           timestamp: new Date().toISOString()

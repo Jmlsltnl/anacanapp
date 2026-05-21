@@ -1,5 +1,6 @@
 import type { LifeStage } from '@/types/anacan';
 
+import { tr } from '@/lib/tr';
 export interface QuizQuestion {
   id: string;
   question: string;
@@ -33,100 +34,100 @@ export const QUIZ_QUESTIONS: Record<LifeStage, QuizQuestion[]> = {
   bump: [
     {
       id: 'worry',
-      question: 'Hamiləliyiniz haqqında ən çox nə narahat edir?',
+      question: tr("funneldata_hamileliyiniz_haqqinda_en_cox_ne_narahat_2b74c9", "Hamiləliyiniz haqqında ən çox nə narahat edir?"),
       options: [
-        { id: 'birth_fear', label: 'Doğuş qorxusu', emoji: '😰' },
-        { id: 'baby_health', label: 'Körpənin sağlamlığı', emoji: '🤱' },
-        { id: 'body_changes', label: 'Bədən dəyişiklikləri', emoji: '🪞' },
-        { id: 'financial', label: 'Maddi məsələlər', emoji: '💰' },
+        { id: 'birth_fear', label: tr("funneldata_dogus_qorxusu_172b00", "Doğuş qorxusu"), emoji: '😰' },
+        { id: 'baby_health', label: tr("funneldata_korpenin_saglamligi_c767da", "Körpənin sağlamlığı"), emoji: '🤱' },
+        { id: 'body_changes', label: tr("funneldata_beden_deyisiklikleri_33b640", "Bədən dəyişiklikləri"), emoji: '🪞' },
+        { id: 'financial', label: tr("funneldata_maddi_meseleler_f6a8d9", "Maddi məsələlər"), emoji: '💰' },
       ],
     },
     {
       id: 'sleep',
-      question: 'Gecələr yuxunuz necədir?',
+      question: tr("funneldata_geceler_yuxunuz_necedir_b33006", "Gecələr yuxunuz necədir?"),
       options: [
-        { id: 'good', label: 'Rahat yatıram', emoji: '😴' },
-        { id: 'interrupted', label: 'Tez-tez oyanıram', emoji: '😵‍💫' },
-        { id: 'bad', label: 'Demək olar yata bilmirəm', emoji: '🥱' },
+        { id: 'good', label: tr("funneldata_rahat_yatiram_0a68b9", "Rahat yatıram"), emoji: '😴' },
+        { id: 'interrupted', label: tr("funneldata_tez_tez_oyaniram_0f221b", "Tez-tez oyanıram"), emoji: '😵‍💫' },
+        { id: 'bad', label: tr("funneldata_demek_olar_yata_bilmirem_10aaf6", "Demək olar yata bilmirəm"), emoji: '🥱' },
       ],
     },
     {
       id: 'support',
-      question: 'Ətrafınızdan kifayət qədər dəstək alırsınız?',
+      question: tr("funneldata_etrafinizdan_kifayet_qeder_destek_alirsi_a6308d", "Ətrafınızdan kifayət qədər dəstək alırsınız?"),
       options: [
-        { id: 'yes', label: 'Bəli, çox', emoji: '💕' },
-        { id: 'partial', label: 'Qismən', emoji: '🤔' },
-        { id: 'no', label: 'Demək olar heç', emoji: '😔' },
+        { id: 'yes', label: tr("funneldata_beli_cox_96d658", "Bəli, çox"), emoji: '💕' },
+        { id: 'partial', label: tr("funneldata_qismen_825ca6", "Qismən"), emoji: '🤔' },
+        { id: 'no', label: tr("funneldata_demek_olar_hec_3133dc", "Demək olar heç"), emoji: '😔' },
       ],
     },
     {
       id: 'stress',
-      question: 'Gündəlik stres səviyyəniz necədir?',
+      question: tr("funneldata_gundelik_stres_seviyyeniz_necedir_88a723", "Gündəlik stres səviyyəniz necədir?"),
       options: [
-        { id: 'low', label: 'Aşağı', emoji: '😌' },
+        { id: 'low', label: tr("funneldata_asagi_1c27f1", "Aşağı"), emoji: '😌' },
         { id: 'medium', label: 'Orta', emoji: '😐' },
-        { id: 'high', label: 'Yüksək', emoji: '😣' },
-        { id: 'very_high', label: 'Çox yüksək', emoji: '🤯' },
+        { id: 'high', label: tr("funneldata_yuksek_492584", "Yüksək"), emoji: '😣' },
+        { id: 'very_high', label: tr("funneldata_cox_yuksek_c4d475", "Çox yüksək"), emoji: '🤯' },
       ],
     },
   ],
   mommy: [
     {
       id: 'struggle',
-      question: 'Analıqda ən çox hansı mövzu sizi yorur?',
+      question: tr("funneldata_analiqda_en_cox_hansi_movzu_sizi_yorur_c719dc", "Analıqda ən çox hansı mövzu sizi yorur?"),
       options: [
         { id: 'sleep', label: 'Yuxusuzluq', emoji: '😴' },
-        { id: 'loneliness', label: 'Tənhalıq hissi', emoji: '💔' },
-        { id: 'feeding', label: 'Körpənin qidalanması', emoji: '🍼' },
-        { id: 'no_time', label: 'Öz vaxtımın olmaması', emoji: '⏰' },
+        { id: 'loneliness', label: tr("funneldata_tenhaliq_hissi_d0e57e", "Tənhalıq hissi"), emoji: '💔' },
+        { id: 'feeding', label: tr("funneldata_korpenin_qidalanmasi_a1d9db", "Körpənin qidalanması"), emoji: '🍼' },
+        { id: 'no_time', label: tr("funneldata_oz_vaxtimin_olmamasi_a3f3e9", "Öz vaxtımın olmaması"), emoji: '⏰' },
       ],
     },
     {
       id: 'emotional',
-      question: 'Doğuşdan sonra özünüzü emosional olaraq necə hiss edirsiniz?',
+      question: tr("funneldata_dogusdan_sonra_ozunuzu_emosional_olaraq__9508b7", "Doğuşdan sonra özünüzü emosional olaraq necə hiss edirsiniz?"),
       options: [
-        { id: 'strong', label: 'Güclü və xoşbəxt', emoji: '💪' },
-        { id: 'sometimes_hard', label: 'Bəzən çətin', emoji: '🥲' },
-        { id: 'very_hard', label: 'Çox çətin günlərim olur', emoji: '😢' },
+        { id: 'strong', label: tr("funneldata_guclu_ve_xosbext_b21c78", "Güclü və xoşbəxt"), emoji: '💪' },
+        { id: 'sometimes_hard', label: tr("funneldata_bezen_cetin_f90a21", "Bəzən çətin"), emoji: '🥲' },
+        { id: 'very_hard', label: tr("funneldata_cox_cetin_gunlerim_olur_63086f", "Çox çətin günlərim olur"), emoji: '😢' },
       ],
     },
     {
       id: 'development',
-      question: 'Körpənizin inkişafı haqqında narahatlıqlarınız var?',
+      question: tr("funneldata_korpenizin_inkisafi_haqqinda_narahatliql_be54e9", "Körpənizin inkişafı haqqında narahatlıqlarınız var?"),
       options: [
-        { id: 'none', label: 'Xeyr, hər şey yaxşıdır', emoji: '✅' },
-        { id: 'some', label: 'Bəzi suallarım var', emoji: '🤔' },
-        { id: 'serious', label: 'Ciddi narahatlıqlarım var', emoji: '😟' },
+        { id: 'none', label: tr("funneldata_xeyr_her_sey_yaxsidir_72925d", "Xeyr, hər şey yaxşıdır"), emoji: '✅' },
+        { id: 'some', label: tr("funneldata_bezi_suallarim_var_479fd7", "Bəzi suallarım var"), emoji: '🤔' },
+        { id: 'serious', label: tr("funneldata_ciddi_narahatliqlarim_var_a287d8", "Ciddi narahatlıqlarım var"), emoji: '😟' },
       ],
     },
   ],
   flow: [
     {
       id: 'pain',
-      question: 'Menstruasiya dövründə ən çox nə sizi narahat edir?',
+      question: tr("funneldata_menstruasiya_dovrunde_en_cox_ne_sizi_nar_7e0928", "Menstruasiya dövründə ən çox nə sizi narahat edir?"),
       options: [
-        { id: 'physical', label: 'Fiziki ağrılar', emoji: '😣' },
-        { id: 'mood', label: 'Əhval dəyişiklikləri', emoji: '🎭' },
-        { id: 'irregular', label: 'Qeyri-müntəzəmlik', emoji: '📅' },
-        { id: 'none', label: 'Heç biri', emoji: '😊' },
+        { id: 'physical', label: tr("funneldata_fiziki_agrilar_fa1134", "Fiziki ağrılar"), emoji: '😣' },
+        { id: 'mood', label: tr("funneldata_ehval_deyisiklikleri_67202f", "Əhval dəyişiklikləri"), emoji: '🎭' },
+        { id: 'irregular', label: tr("funneldata_qeyri_muntezemlik_9e36dc", "Qeyri-müntəzəmlik"), emoji: '📅' },
+        { id: 'none', label: tr("funneldata_hec_biri_dd2cee", "Heç biri"), emoji: '😊' },
       ],
     },
     {
       id: 'awareness',
-      question: 'Reproduktiv sağlamlığınızla bağlı məlumatlılıq səviyyəniz?',
+      question: tr("funneldata_reproduktiv_saglamliginizla_bagli_meluma_287540", "Reproduktiv sağlamlığınızla bağlı məlumatlılıq səviyyəniz?"),
       options: [
-        { id: 'high', label: 'Çox bilirəm', emoji: '🧠' },
+        { id: 'high', label: tr("funneldata_cox_bilirem_b798d9", "Çox bilirəm"), emoji: '🧠' },
         { id: 'medium', label: 'Orta', emoji: '📖' },
-        { id: 'low', label: 'Az bilirəm', emoji: '🤷‍♀️' },
+        { id: 'low', label: tr("funneldata_az_bilirem_0f191a", "Az bilirəm"), emoji: '🤷‍♀️' },
       ],
     },
     {
       id: 'importance',
-      question: 'Tsiklinizi düzgün izləmək sizin üçün nə qədər vacibdir?',
+      question: tr("funneldata_tsiklinizi_duzgun_izlemek_sizin_ucun_ne__46b605", "Tsiklinizi düzgün izləmək sizin üçün nə qədər vacibdir?"),
       options: [
-        { id: 'very', label: 'Çox vacib', emoji: '⭐' },
+        { id: 'very', label: tr("funneldata_cox_vacib_24d1a3", "Çox vacib"), emoji: '⭐' },
         { id: 'medium', label: 'Orta', emoji: '👌' },
-        { id: 'low', label: 'O qədər də yox', emoji: '🤷‍♀️' },
+        { id: 'low', label: tr("funneldata_o_qeder_de_yox_e54ae3", "O qədər də yox"), emoji: '🤷‍♀️' },
       ],
     },
   ],
@@ -213,47 +214,47 @@ export const RESULTS_TEMPLATES: Record<LifeStage, (name: string, weekOrAge: numb
 // ─── Reviews ───
 export const REVIEWS: Record<LifeStage, Review[]> = {
   bump: [
-    { name: 'Günel', context: '32 həftə', text: 'Anacan sayəsində hamiləliyimi stressiz keçirdim. Həftəlik hesabatlar çox faydalıdır!', rating: 5 },
-    { name: 'Aynur', context: '28 həftə', text: 'AI Asistan gecə 3-də belə suallarıma cavab verir. Həqiqi dost kimi!', rating: 5 },
-    { name: 'Nigar', context: '36 həftə', text: 'Partnyor hesabı ilə həyat yoldaşım da hər şeyi izləyir. Əla fikir!', rating: 5 },
+    { name: tr("funneldata_gunel_ad877a", "Günel"), context: '32 həftə', text: tr("funneldata_anacan_sayesinde_hamileliyimi_stressiz_k_f5652f", "Anacan sayəsində hamiləliyimi stressiz keçirdim. Həftəlik hesabatlar çox faydalıdır!"), rating: 5 },
+    { name: 'Aynur', context: '28 həftə', text: tr("funneldata_ai_asistan_gece_3_de_bele_suallarima_cav_7eac40", "AI Asistan gecə 3-də belə suallarıma cavab verir. Həqiqi dost kimi!"), rating: 5 },
+    { name: 'Nigar', context: '36 həftə', text: tr("funneldata_partnyor_hesabi_ile_heyat_yoldasim_da_he_0b0bd4", "Partnyor hesabı ilə həyat yoldaşım da hər şeyi izləyir. Əla fikir!"), rating: 5 },
   ],
   mommy: [
-    { name: 'Aytən', context: '4 aylıq ana', text: 'Körpəmin yuxu cədvəlini izləmək həyatımı dəyişdi. Artıq nə vaxt oyanacağını bilirəm.', rating: 5 },
-    { name: 'Səbinə', context: '7 aylıq ana', text: 'İnkişaf izləyicisi sayəsində körpəmin hər addımını qeyd edirəm.', rating: 5 },
-    { name: 'Lamiyə', context: '2 aylıq ana', text: 'Doğuşdan sonra çox çətin idi, amma AI Asistan və cəmiyyət mənə güc verdi.', rating: 5 },
+    { name: tr("funneldata_ayten_cb2a8e", "Aytən"), context: '4 aylıq ana', text: tr("funneldata_korpemin_yuxu_cedvelini_izlemek_heyatimi_1ec80e", "Körpəmin yuxu cədvəlini izləmək həyatımı dəyişdi. Artıq nə vaxt oyanacağını bilirəm."), rating: 5 },
+    { name: tr("funneldata_sebine_310bef", "Səbinə"), context: '7 aylıq ana', text: tr("funneldata_inkisaf_izleyicisi_sayesinde_korpemin_he_148227", "İnkişaf izləyicisi sayəsində körpəmin hər addımını qeyd edirəm."), rating: 5 },
+    { name: tr("funneldata_lamiye_fbb845", "Lamiyə"), context: '2 aylıq ana', text: tr("funneldata_dogusdan_sonra_cox_cetin_idi_amma_ai_asi_49ef0d", "Doğuşdan sonra çox çətin idi, amma AI Asistan və cəmiyyət mənə güc verdi."), rating: 5 },
   ],
   flow: [
-    { name: 'Ləman', context: 'Aktiv istifadəçi', text: 'Tsiklimi izləməyə başlayandan bəri bədənimi daha yaxşı tanıyıram.', rating: 5 },
-    { name: 'Fidan', context: '6 aydır istifadə edir', text: 'Ovulyasiya günlərini dəqiq bilirəm. Planlaşdırma çox asanlaşdı!', rating: 5 },
-    { name: 'Günay', context: 'Premium istifadəçi', text: 'Vitamin izləyicisi və qidalanma məsləhətləri əvəzsizdir.', rating: 5 },
+    { name: tr("funneldata_leman_566115", "Ləman"), context: 'Aktiv istifadəçi', text: tr("funneldata_tsiklimi_izlemeye_baslayandan_beri_beden_6ddd52", "Tsiklimi izləməyə başlayandan bəri bədənimi daha yaxşı tanıyıram."), rating: 5 },
+    { name: 'Fidan', context: '6 aydır istifadə edir', text: tr("funneldata_ovulyasiya_gunlerini_deqiq_bilirem_planl_bf94ea", "Ovulyasiya günlərini dəqiq bilirəm. Planlaşdırma çox asanlaşdı!"), rating: 5 },
+    { name: tr("funneldata_gunay_38e69c", "Günay"), context: 'Premium istifadəçi', text: tr("funneldata_vitamin_izleyicisi_ve_qidalanma_meslehet_a8ec35", "Vitamin izləyicisi və qidalanma məsləhətləri əvəzsizdir."), rating: 5 },
   ],
   partner: [],
 };
 
 // ─── Feature Showcase ───
 export const FEATURES: Feature[] = [
-  { title: 'AI Fotosessiya', description: 'Körpənizin professional fotolarını süni intellekt ilə yaradın', emoji: '📸' },
-  { title: 'Partnyor Hesabı', description: 'Həyat yoldaşınızı bağlayın, birlikdə izləyin', emoji: '💑' },
-  { title: '24/7 AI Asistan', description: 'İstənilən sualınıza dərhal cavab alın', emoji: '🤖' },
-  { title: 'Həftəlik Hesabat', description: 'Hamiləliyin və ya körpənin həftəlik inkişaf hesabatı', emoji: '📊' },
+  { title: 'AI Fotosessiya', description: tr("funneldata_korpenizin_professional_fotolarini_suni__ec1b0b", "Körpənizin professional fotolarını süni intellekt ilə yaradın"), emoji: '📸' },
+  { title: tr("funneldata_partnyor_hesabi_ba746f", "Partnyor Hesabı"), description: tr("funneldata_heyat_yoldasinizi_baglayin_birlikde_izle_762187", "Həyat yoldaşınızı bağlayın, birlikdə izləyin"), emoji: '💑' },
+  { title: '24/7 AI Asistan', description: tr("funneldata_istenilen_sualiniza_derhal_cavab_alin_8938d5", "İstənilən sualınıza dərhal cavab alın"), emoji: '🤖' },
+  { title: tr("funneldata_heftelik_hesabat_283d76", "Həftəlik Hesabat"), description: tr("funneldata_hamileliyin_ve_ya_korpenin_heftelik_inki_ad5912", "Hamiləliyin və ya körpənin həftəlik inkişaf hesabatı"), emoji: '📊' },
 ];
 
 // ─── Milestone Plan ───
 export const PLAN_MILESTONES: Record<LifeStage, { week: string; label: string }[]> = {
   bump: [
-    { week: 'Həftə 1', label: 'Hamiləlik izləməyə başla' },
-    { week: 'Ay 1', label: 'Stres səviyyəsini azalt' },
-    { week: 'Ay 3', label: 'Doğuşa tam hazır ol' },
+    { week: 'Həftə 1', label: tr("funneldata_hamilelik_izlemeye_basla_5c2941", "Hamiləlik izləməyə başla") },
+    { week: 'Ay 1', label: tr("funneldata_stres_seviyyesini_azalt_6bf5de", "Stres səviyyəsini azalt") },
+    { week: 'Ay 3', label: tr("funneldata_dogusa_tam_hazir_ol_58a0df", "Doğuşa tam hazır ol") },
   ],
   mommy: [
-    { week: 'Həftə 1', label: 'Körpə izləməyə başla' },
+    { week: 'Həftə 1', label: tr("funneldata_korpe_izlemeye_basla_bd8634", "Körpə izləməyə başla") },
     { week: 'Ay 1', label: 'Rutin qur, rahatla' },
-    { week: 'Ay 3', label: 'Tam nəzarətdə ol' },
+    { week: 'Ay 3', label: tr("funneldata_tam_nezaretde_ol_2630cf", "Tam nəzarətdə ol") },
   ],
   flow: [
-    { week: 'Həftə 1', label: 'Tsikl izləməyə başla' },
-    { week: 'Ay 1', label: 'Bədənini tanı' },
-    { week: 'Ay 3', label: 'Sağlamlığını idarə et' },
+    { week: 'Həftə 1', label: tr("funneldata_tsikl_izlemeye_basla_3faf9b", "Tsikl izləməyə başla") },
+    { week: 'Ay 1', label: tr("funneldata_bedenini_tani_dca5a1", "Bədənini tanı") },
+    { week: 'Ay 3', label: tr("funneldata_saglamligini_idare_et_1680af", "Sağlamlığını idarə et") },
   ],
   partner: [],
 };

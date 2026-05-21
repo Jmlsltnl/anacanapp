@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { 
   Droplets, Dumbbell, Smile, TrendingUp, 
   TrendingDown, Minus, Flame
@@ -53,7 +54,7 @@ const WeeklyStatsTab = () => {
   if (!stats) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">Statistika yüklənə bilmədi</p>
+        <p className="text-muted-foreground">{tr("weeklystatstab_statistika_yuklene_bilmedi_96ee1b", "Statistika yüklənə bilmədi")}</p>
       </div>
     );
   }
@@ -67,7 +68,7 @@ const WeeklyStatsTab = () => {
       exit={{ opacity: 0, x: 20 }}
       className="space-y-4"
     >
-      <h2 className="font-bold text-lg">Həftəlik Statistika</h2>
+      <h2 className="font-bold text-lg">{tr("weeklystatstab_heftelik_statistika_292953", "Həftəlik Statistika")}</h2>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 gap-3">
@@ -78,7 +79,7 @@ const WeeklyStatsTab = () => {
         >
           <Droplets className="w-6 h-6 mb-2 opacity-80" />
           <p className="text-2xl font-black">{(stats.totalWater / 1000).toFixed(1)}L</p>
-          <p className="text-white/70 text-sm">Ümumi su</p>
+          <p className="text-white/70 text-sm">{tr("weeklystatstab_umumi_su_88c3c9", "Ümumi su")}</p>
         </motion.div>
 
         <motion.div
@@ -89,7 +90,7 @@ const WeeklyStatsTab = () => {
         >
           <Dumbbell className="w-6 h-6 mb-2 opacity-80" />
           <p className="text-2xl font-black">{stats.exerciseCount}</p>
-          <p className="text-white/70 text-sm">Məşq sayı</p>
+          <p className="text-white/70 text-sm">{tr("weeklystatstab_mesq_sayi_fabe6b", "Məşq sayı")}</p>
         </motion.div>
 
         <motion.div
@@ -116,7 +117,7 @@ const WeeklyStatsTab = () => {
             {moodTrend === 'stable' && <Minus className="w-4 h-4" />}
           </div>
           <p className="text-2xl font-black">{stats.avgMood.toFixed(1)}</p>
-          <p className="text-white/70 text-sm">Orta əhval</p>
+          <p className="text-white/70 text-sm">{tr("weeklystatstab_orta_ehval_1f8ef9", "Orta əhval")}</p>
         </motion.div>
       </div>
 
@@ -127,7 +128,7 @@ const WeeklyStatsTab = () => {
         transition={{ delay: 0.2 }}
         className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
       >
-        <h3 className="font-bold text-foreground mb-4">Əhval Dəyişiklikləri</h3>
+        <h3 className="font-bold text-foreground mb-4">{tr("weeklystatstab_ehval_deyisiklikleri_7de49c", "Əhval Dəyişiklikləri")}</h3>
         <div className="flex justify-between items-end h-32 gap-1">
           {stats.dailyMoods.map((day, idx) => {
             const height = day.mood ? `${(day.mood / 5) * 100}%` : '10%';
@@ -165,7 +166,7 @@ const WeeklyStatsTab = () => {
         transition={{ delay: 0.25 }}
         className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
       >
-        <h3 className="font-bold text-foreground mb-4">Su İçmə (ml)</h3>
+        <h3 className="font-bold text-foreground mb-4">{tr("weeklystatstab_su_icme_ml_1d5ae9", "Su İçmə (ml)")}</h3>
         <div className="flex justify-between items-end h-24 gap-1">
           {stats.dailyMoods.map((day, idx) => {
             const maxWater = 2500;
@@ -197,9 +198,9 @@ const WeeklyStatsTab = () => {
         </div>
         <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
           <div className="w-3 h-3 rounded bg-cyan-500 dark:bg-cyan-400" />
-          <span>Hədəfə çatdı (2L+)</span>
+          <span>{tr("weeklystatstab_hedefe_catdi_2l_23ea87", "Hədəfə çatdı (2L+)")}</span>
           <div className="w-3 h-3 rounded bg-cyan-300 dark:bg-cyan-600 ml-2" />
-          <span>Hədəf altı</span>
+          <span>{tr("weeklystatstab_hedef_alti_2de340", "Hədəf altı")}</span>
         </div>
       </motion.div>
 
@@ -210,7 +211,7 @@ const WeeklyStatsTab = () => {
         transition={{ delay: 0.3 }}
         className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
       >
-        <h3 className="font-bold text-foreground mb-4">Məşqlər</h3>
+        <h3 className="font-bold text-foreground mb-4">{tr("weeklystatstab_mesqler_603be9", "Məşqlər")}</h3>
         <div className="flex justify-between items-end h-24 gap-1">
           {stats.exerciseData.map((day, idx) => {
             const maxMinutes = 60;

@@ -1,4 +1,5 @@
 import React from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeft, 
@@ -64,7 +65,7 @@ const DailySummaryScreen: React.FC<DailySummaryScreenProps> = ({ onBack }) => {
           <button onClick={onBack} className="p-2 -ml-2 rounded-full hover:bg-muted">
             <ArrowLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-lg font-bold">Gündəlik Xülasə</h1>
+          <h1 className="text-lg font-bold">{tr("dailysummaryscreen_gundelik_xulase_3d07a5", "Gündəlik Xülasə")}</h1>
           <div className="w-10" />
         </div>
       </div>
@@ -154,7 +155,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
             {getMoodEmoji(summary.mood)}
           </div>
           <div>
-            <div className="text-sm text-muted-foreground">Əhval</div>
+            <div className="text-sm text-muted-foreground">{tr("dailysummaryscreen_ehval_0457f9", "Əhval")}</div>
             <div className="font-medium">{getMoodLabel(summary.mood)}</div>
           </div>
         </div>
@@ -174,7 +175,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
             <div className="text-lg font-bold text-pink-600 dark:text-pink-400">
               {summary.kick_count}
             </div>
-            <div className="text-xs text-muted-foreground">Təpik</div>
+            <div className="text-xs text-muted-foreground">{tr("dailysummaryscreen_tepik_9a873a", "Təpik")}</div>
           </div>
 
           <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-3 text-center">
@@ -182,7 +183,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
             <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
               {summary.contraction_count}
             </div>
-            <div className="text-xs text-muted-foreground">Sancı</div>
+            <div className="text-xs text-muted-foreground">{tr("dailysummaryscreen_sanci_350c2d", "Sancı")}</div>
           </div>
         </div>
 
@@ -203,7 +204,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
         {/* Notes */}
         {summary.notes && (
           <div>
-            <div className="text-sm text-muted-foreground mb-1">Qeydlər</div>
+            <div className="text-sm text-muted-foreground mb-1">{tr("dailysummaryscreen_qeydler_a7a98b", "Qeydlər")}</div>
             <p className="text-sm">{summary.notes}</p>
           </div>
         )}

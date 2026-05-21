@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
@@ -107,8 +108,8 @@ export const useBabyMilestones = () => {
 
         setMilestones(prev => prev.filter(m => m.id !== existing.id));
         toast({
-          title: 'Mərhələ silindi',
-          description: 'İnkişaf mərhələsi silindi',
+          title: tr("usebabymilestones_merhele_silindi_fb7d94", "Mərhələ silindi"),
+          description: tr("usebabymilestones_inkisaf_merhelesi_silindi_6e6a48", "İnkişaf mərhələsi silindi"),
         });
       } else {
         // Add milestone
@@ -137,8 +138,8 @@ export const useBabyMilestones = () => {
     } catch (error) {
       console.error('Error toggling milestone:', error);
       toast({
-        title: 'Xəta',
-        description: 'Mərhələ qeyd edilə bilmədi',
+        title: tr("usebabymilestones_xeta_3cdbb6", "Xəta"),
+        description: tr("usebabymilestones_merhele_qeyd_edile_bilmedi_b2cb1f", "Mərhələ qeyd edilə bilmədi"),
         variant: 'destructive',
       });
     }

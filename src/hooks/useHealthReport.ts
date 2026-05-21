@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { tr } from '@/lib/tr';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -108,14 +109,14 @@ export const useHealthReport = (period: string = '1month'): HealthReportData => 
       const firstWeight = weightEntries[0]?.weight || latestWeight;
       const weightChange = latestWeight - firstWeight;
       result.push({
-        label: 'Orta çəki',
+        label: tr("usehealthreport_orta_ceki_9c02ad", "Orta çəki"),
         value: `${latestWeight.toFixed(1)} kq`,
         trend: weightChange >= 0 ? `+${weightChange.toFixed(1)} kq` : `${weightChange.toFixed(1)} kq`,
         positive: profile?.life_stage === 'bump' ? weightChange >= 0 : weightChange <= 0,
       });
     } else {
       result.push({
-        label: 'Orta çəki',
+        label: tr("usehealthreport_orta_ceki_9c02ad", "Orta çəki"),
         value: 'Məlumat yoxdur',
         trend: '-',
         positive: true,
@@ -135,14 +136,14 @@ export const useHealthReport = (period: string = '1month'): HealthReportData => 
       const waterChange = firstHalfAvg > 0 ? ((secondHalfAvg - firstHalfAvg) / firstHalfAvg * 100) : 0;
       
       result.push({
-        label: 'Su qəbulu',
+        label: tr("usehealthreport_su_qebulu_db1f3e", "Su qəbulu"),
         value: `${avgWater.toFixed(1)} stəkan/gün`,
         trend: waterChange >= 0 ? `+${waterChange.toFixed(0)}%` : `${waterChange.toFixed(0)}%`,
         positive: waterChange >= 0,
       });
     } else {
       result.push({
-        label: 'Su qəbulu',
+        label: tr("usehealthreport_su_qebulu_db1f3e", "Su qəbulu"),
         value: 'Məlumat yoxdur',
         trend: '-',
         positive: true,
@@ -158,7 +159,7 @@ export const useHealthReport = (period: string = '1month'): HealthReportData => 
         const moodText = moodLabels[Math.round(avgMood) - 1] || 'Normal';
         
         result.push({
-          label: 'Orta əhval',
+          label: tr("usehealthreport_orta_ehval_1f8ef9", "Orta əhval"),
           value: moodText,
           trend: avgMood >= 3.5 ? '😊' : avgMood >= 2.5 ? '😐' : '😔',
           positive: avgMood >= 3,
@@ -172,7 +173,7 @@ export const useHealthReport = (period: string = '1month'): HealthReportData => 
     const exercisePerWeek = exerciseLogs.length / weeksInPeriod;
     
     result.push({
-      label: 'Məşqlər',
+      label: tr("usehealthreport_mesqler_603be9", "Məşqlər"),
       value: `${exercisePerWeek.toFixed(1)} dəfə/həftə`,
       trend: exercisePerWeek >= 3 ? 'Əla!' : exercisePerWeek >= 1 ? 'Yaxşı' : 'Artırın',
       positive: exercisePerWeek >= 2,
