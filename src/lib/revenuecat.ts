@@ -1,9 +1,12 @@
 import { Capacitor } from '@capacitor/core';
 
-// ⚡ FEATURE FLAG: Set to true to enable RevenueCat, false for standard IAP
-// Disabled to prevent Android native crash when RevenueCat UI / offerings
-// are not fully configured. Custom paywall UI is used instead.
-export const REVENUECAT_ENABLED = false;
+// ⚡ FEATURE FLAG: RevenueCat enabled for full IAP + Paywall support.
+// REQUIREMENTS for Android:
+//   1. After pulling this code, run: npm install && npx cap sync android
+//   2. Configure a Paywall in RevenueCat Dashboard → Paywalls (otherwise
+//      presentPaywall() silently no-ops and the JS custom UI is used).
+//   3. Ensure offerings & products are set in RevenueCat Dashboard.
+export const REVENUECAT_ENABLED = true;
 
 // RevenueCat Configuration
 // NOTE: RevenueCat requires PLATFORM-SPECIFIC public API keys (Android & iOS).
