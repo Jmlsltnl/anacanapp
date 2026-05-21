@@ -207,12 +207,26 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
 
   const showPaywall = useCallback(async (): Promise<boolean> => {
     const result = await presentPaywall();
+    // If RC paywall is not available (plugin missing / no paywall configured),
+    // signal caller to keep the custom modal open. We return false here; the
+    // caller checks `result.available` only when needed.
+    if (!result.available) return false;
     if (result.didPurchase) {
       setIsPro(true);
       await syncWithDatabase(true);
       return true;
     }
     return false;
+  }, [syncWithDatabase]);
+
+  // Expose whether the native paywall flow is actually available
+  const showPaywallSafe = useCallback(async (): Promise<{ didPurchase: boolean; available: boolean }> => {
+    const result = await presentPaywall();
+    if (result.available && result.didPurchase) {
+      setIsPro(true);
+      await syncWithDatabase(true);
+    }
+    return result;
   }, [syncWithDatabase]);
 
   const showCustomerCenter = useCallback(async () => {
