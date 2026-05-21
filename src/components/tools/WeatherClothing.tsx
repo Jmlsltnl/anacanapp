@@ -198,7 +198,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                       <Baby className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium">Körpənin yaşı</p>
+                      <p className="text-sm font-medium">{tr("weatherclothing_korpenin_yasi_1dfff9", "Körpənin yaşı")}</p>
                       <p className="text-xs text-muted-foreground">
                         {userContext.babyAgeMonths} ay ({userContext.babyAgeDays} gün)
                       </p>
@@ -210,7 +210,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                       <User className="w-5 h-5 text-pink-500" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium">Hamiləlik həftəsi</p>
+                      <p className="text-sm font-medium">{tr("weatherclothing_hamilelik_heftesi_c9e362", "Hamiləlik həftəsi")}</p>
                       <p className="text-xs text-muted-foreground">{userContext.pregnancyWeek}. həftə</p>
                     </div>
                   </>
@@ -229,7 +229,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
             >
               <CloudSun className="w-16 h-16 text-primary mb-4" />
             </motion.div>
-            <p className="text-muted-foreground">Məkan təyin edilir...</p>
+            <p className="text-muted-foreground">{tr("weatherclothing_mekan_teyin_edilir_526792", "Məkan təyin edilir...")}</p>
           </div>
         )}
 
@@ -240,7 +240,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
               <div className="flex items-start gap-3">
                 <AlertTriangle className="w-6 h-6 text-destructive shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-destructive">Məkan xətası</h3>
+                  <h3 className="font-semibold text-destructive">{tr("weatherclothing_mekan_xetasi_bd9e1d", "Məkan xətası")}</h3>
                   <p className="text-sm text-muted-foreground mt-1">{locationError}</p>
                   <Button variant="outline" size="sm" className="mt-3" onClick={fetchWeather}>
                     Yenidən cəhd et
@@ -289,12 +289,12 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                   <div className="grid grid-cols-3 gap-2 mt-4">
                     <div className="bg-blue-500/10 rounded-xl p-3 text-center">
                       <Droplets className="w-5 h-5 mx-auto text-blue-500" />
-                      <p className="text-xs text-muted-foreground mt-1">Rütubət</p>
+                      <p className="text-xs text-muted-foreground mt-1">{tr("weatherclothing_rutubet_3d8e74", "Rütubət")}</p>
                       <p className="font-bold text-sm">{advice.humidity}%</p>
                     </div>
                     <div className="bg-cyan-500/10 rounded-xl p-3 text-center">
                       <Wind className="w-5 h-5 mx-auto text-cyan-500" />
-                      <p className="text-xs text-muted-foreground mt-1">Külək</p>
+                      <p className="text-xs text-muted-foreground mt-1">{tr("weatherclothing_kulek_cc8bf6", "Külək")}</p>
                       <p className="font-bold text-sm">{Math.round(advice.windSpeed)} km/h</p>
                     </div>
                     <div className="bg-orange-500/10 rounded-xl p-3 text-center">
@@ -347,7 +347,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                       <div className="bg-purple-500/10 rounded-xl p-3 mb-3">
                         <div className="flex items-center gap-2 mb-1">
                           <Thermometer className="w-4 h-4 text-purple-600" />
-                          <span className="font-semibold text-sm text-purple-700">İdeal otaq temperaturu</span>
+                          <span className="font-semibold text-sm text-purple-700">{tr("weatherclothing_ideal_otaq_temperaturu_6bf977", "İdeal otaq temperaturu")}</span>
                         </div>
                         <p className="text-2xl font-bold text-purple-600">{advice.idealRoomTemperature}</p>
                         {advice.roomTemperatureAdvice && (
@@ -419,7 +419,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                     <div className="flex items-start gap-3">
                       <Flower2 className="w-5 h-5 text-yellow-600 shrink-0" />
                       <div>
-                        <h3 className="font-semibold text-yellow-700">Polen Xəbərdarlığı</h3>
+                        <h3 className="font-semibold text-yellow-700">{tr("weatherclothing_polen_xeberdarligi_1ae540", "Polen Xəbərdarlığı")}</h3>
                         <p className="text-sm text-muted-foreground mt-1">{advice.pollenWarning}</p>
                       </div>
                     </div>
@@ -434,7 +434,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                     <div className="flex items-start gap-3">
                       <Shield className="w-5 h-5 text-orange-600 shrink-0" />
                       <div>
-                        <h3 className="font-semibold text-orange-700">UV Xəbərdarlığı</h3>
+                        <h3 className="font-semibold text-orange-700">{tr("weatherclothing_uv_xeberdarligi_327432", "UV Xəbərdarlığı")}</h3>
                         <p className="text-sm text-muted-foreground mt-1">{advice.uvWarning}</p>
                       </div>
                     </div>

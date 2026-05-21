@@ -241,8 +241,8 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold">Nəcis Skaneri</h1>
-            <p className="text-xs text-muted-foreground">AI ilə körpə nəcisini analiz edin</p>
+            <h1 className="text-lg font-bold">{tr("poopscanner_necis_skaneri_dadd90", "Nəcis Skaneri")}</h1>
+            <p className="text-xs text-muted-foreground">{tr("poopscanner_ai_ile_korpe_necisini_analiz_edin_06fb84", "AI ilə körpə nəcisini analiz edin")}</p>
           </div>
           <Button variant="ghost" size="icon" onClick={() => setShowHistory(!showHistory)} className="relative z-30">
             <History className="w-5 h-5" />

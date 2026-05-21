@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Search, MessageSquare, Ban, Trash2, AlertTriangle, Check, Flag, XCircle, CheckCircle, Image, Video } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -129,7 +130,7 @@ const AdminModeration = () => {
       
       setPosts(data.map(p => ({ 
         ...p, 
-        author: profileMap[p.user_id] || { name: 'İstifadəçi', avatar_url: null }
+        author: profileMap[p.user_id] || { name: tr("adminmoderation_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null }
       })));
     }
   };
@@ -147,7 +148,7 @@ const AdminModeration = () => {
       
       setComments(data.map(c => ({ 
         ...c, 
-        author: profileMap[c.user_id] || { name: 'İstifadəçi', avatar_url: null }
+        author: profileMap[c.user_id] || { name: tr("adminmoderation_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null }
       })));
     }
   };
@@ -164,7 +165,7 @@ const AdminModeration = () => {
 
       const blocksWithUsers = data.map(block => ({
         ...block,
-        user: profileMap[block.user_id] || { name: 'İstifadəçi', avatar_url: null },
+        user: profileMap[block.user_id] || { name: tr("adminmoderation_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null },
       }));
       setBlocks(blocksWithUsers);
     }
@@ -195,16 +196,16 @@ const AdminModeration = () => {
       .eq('id', reportId);
 
     if (error) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminmoderation_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
       return;
     }
 
     // If reviewed, also delete the post
     if (action === 'reviewed' && postId) {
       await supabase.from('community_posts').delete().eq('id', postId);
-      toast({ title: 'Uğurlu', description: 'Şikayət yoxlanıldı və post silindi' });
+      toast({ title: tr("adminmoderation_ugurlu_7fe64c", "Uğurlu"), description: tr("adminmoderation_sikayet_yoxlanildi_ve_post_silindi_7319cc", "Şikayət yoxlanıldı və post silindi") });
     } else {
-      toast({ title: 'Uğurlu', description: 'Şikayət rədd edildi' });
+      toast({ title: tr("adminmoderation_ugurlu_7fe64c", "Uğurlu"), description: tr("adminmoderation_sikayet_redd_edildi_309b57", "Şikayət rədd edildi") });
     }
     fetchReports();
     fetchPosts();
@@ -219,9 +220,9 @@ const AdminModeration = () => {
       .eq('id', postId);
 
     if (error) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminmoderation_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: 'Uğurlu', description: 'Post silindi' });
+      toast({ title: tr("adminmoderation_ugurlu_7fe64c", "Uğurlu"), description: 'Post silindi' });
       fetchPosts();
     }
   };
@@ -235,16 +236,16 @@ const AdminModeration = () => {
       .eq('id', commentId);
 
     if (error) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminmoderation_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: 'Uğurlu', description: 'Şərh silindi' });
+      toast({ title: tr("adminmoderation_ugurlu_7fe64c", "Uğurlu"), description: tr("adminmoderation_serh_silindi_59cfe5", "Şərh silindi") });
       fetchComments();
     }
   };
 
   const blockUser = async () => {
     if (!blockUserId || !blockReason) {
-      toast({ title: 'Xəta', description: 'Bütün sahələri doldurun', variant: 'destructive' });
+      toast({ title: tr("adminmoderation_xeta_3cdbb6", "Xəta"), description: tr("adminmoderation_butun_saheleri_doldurun_3a413d", "Bütün sahələri doldurun"), variant: 'destructive' });
       return;
     }
 
@@ -262,9 +263,9 @@ const AdminModeration = () => {
       });
 
     if (error) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminmoderation_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: 'Uğurlu', description: 'İstifadəçi bloklandı' });
+      toast({ title: tr("adminmoderation_ugurlu_7fe64c", "Uğurlu"), description: tr("adminmoderation_istifadeci_bloklandi_189b51", "İstifadəçi bloklandı") });
       setShowBlockModal(false);
       setBlockUserId('');
       setBlockReason('');
@@ -281,9 +282,9 @@ const AdminModeration = () => {
       .eq('id', blockId);
 
     if (error) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminmoderation_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: 'Uğurlu', description: 'Blok açıldı' });
+      toast({ title: tr("adminmoderation_ugurlu_7fe64c", "Uğurlu"), description: tr("adminmoderation_blok_acildi_d339d9", "Blok açıldı") });
       fetchBlocks();
     }
   };
@@ -321,7 +322,7 @@ const AdminModeration = () => {
         <TabsList className="grid grid-cols-4 w-full mb-6">
           <TabsTrigger value="reports" className="flex items-center gap-2">
             <Flag className="w-4 h-4" />
-            <span className="hidden sm:inline">Şikayətlər</span>
+            <span className="hidden sm:inline">{tr("adminmoderation_sikayetler_4ad77f", "Şikayətlər")}</span>
             {pendingReports.length > 0 && (
               <Badge variant="destructive" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
                 {pendingReports.length}
@@ -334,7 +335,7 @@ const AdminModeration = () => {
           </TabsTrigger>
           <TabsTrigger value="comments" className="flex items-center gap-2">
             <MessageSquare className="w-4 h-4" />
-            <span className="hidden sm:inline">Şərhlər</span>
+            <span className="hidden sm:inline">{tr("adminmoderation_serhler_30d5d9", "Şərhlər")}</span>
           </TabsTrigger>
           <TabsTrigger value="blocks" className="flex items-center gap-2">
             <Ban className="w-4 h-4" />
@@ -365,7 +366,7 @@ const AdminModeration = () => {
               {reports.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <Flag className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Heç bir şikayət yoxdur</p>
+                  <p>{tr("adminmoderation_hec_bir_sikayet_yoxdur_a67bd4", "Heç bir şikayət yoxdur")}</p>
                 </div>
               ) : (
                 reports.map((report) => (
@@ -414,7 +415,7 @@ const AdminModeration = () => {
                             )}
                           </div>
                           <div className="text-sm">
-                            <span className="text-muted-foreground">Şikayət edən: </span>
+                            <span className="text-muted-foreground">{tr("adminmoderation_sikayet_eden_17501b", "Şikayət edən:")}</span>
                             <span className="font-medium">{report.reporter?.name || 'İstifadəçi'}</span>
                           </div>
                         </div>
@@ -434,7 +435,7 @@ const AdminModeration = () => {
                                 )}
                               </div>
                               <div className="text-sm">
-                                <span className="text-muted-foreground">Post müəllifi: </span>
+                                <span className="text-muted-foreground">{tr("adminmoderation_post_muellifi_f1677f", "Post müəllifi:")}</span>
                                 <span className="font-medium">{report.postAuthor?.name || 'İstifadəçi'}</span>
                               </div>
                             </div>
@@ -470,7 +471,7 @@ const AdminModeration = () => {
                         {/* Report description if any */}
                         {report.description && (
                           <div className="mt-3 p-2 bg-amber-50 dark:bg-amber-950/30 rounded-lg">
-                            <p className="text-xs text-muted-foreground mb-1">Əlavə qeyd:</p>
+                            <p className="text-xs text-muted-foreground mb-1">{tr("adminmoderation_elave_qeyd_58e864", "Əlavə qeyd:")}</p>
                             <p className="text-sm">{report.description}</p>
                           </div>
                         )}
@@ -482,7 +483,7 @@ const AdminModeration = () => {
                             size="icon"
                             onClick={() => handleReportAction(report.id, 'reviewed', report.post_id)}
                             className="text-green-600 hover:bg-green-100"
-                            title="Şikayəti qəbul et və postu sil"
+                            title={tr("adminmoderation_sikayeti_qebul_et_ve_postu_sil_45452a", "Şikayəti qəbul et və postu sil")}
                           >
                             <CheckCircle className="w-5 h-5" />
                           </Button>
@@ -491,7 +492,7 @@ const AdminModeration = () => {
                             size="icon"
                             onClick={() => handleReportAction(report.id, 'dismissed')}
                             className="text-red-600 hover:bg-red-100"
-                            title="Şikayəti rədd et"
+                            title={tr("adminmoderation_sikayeti_redd_et_184bc2", "Şikayəti rədd et")}
                           >
                             <XCircle className="w-5 h-5" />
                           </Button>
@@ -671,11 +672,11 @@ const AdminModeration = () => {
       <Dialog open={showBlockModal} onOpenChange={setShowBlockModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>İstifadəçini Blokla</DialogTitle>
+            <DialogTitle>{tr("adminmoderation_istifadecini_blokla_160336", "İstifadəçini Blokla")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Blok Növü</label>
+              <label className="text-sm font-medium">{tr("adminmoderation_blok_novu_57af90", "Blok Növü")}</label>
               <div className="flex gap-2">
                 <Button
                   variant={blockType === 'community' ? 'default' : 'outline'}
@@ -694,11 +695,11 @@ const AdminModeration = () => {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Səbəb</label>
+              <label className="text-sm font-medium">{tr("adminmoderation_sebeb_7b51f1", "Səbəb")}</label>
               <Textarea 
                 value={blockReason}
                 onChange={(e) => setBlockReason(e.target.value)}
-                placeholder="Bloklama səbəbini yazın..."
+                placeholder={tr("adminmoderation_bloklama_sebebini_yazin_994a8a", "Bloklama səbəbini yazın...")}
                 rows={3}
               />
             </div>

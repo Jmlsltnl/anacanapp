@@ -1,4 +1,5 @@
 import { useState, forwardRef, useMemo } from 'react';
+import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Clock, 
@@ -104,7 +105,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
           >
             <Check className="w-5 h-5 mx-auto mb-1 text-cyan-500" />
             <p className="text-2xl font-black text-cyan-600 dark:text-cyan-400">{todayStats.completedCount}</p>
-            <p className="text-xs text-cyan-600/70 dark:text-cyan-400/70 font-medium">Bu gün</p>
+            <p className="text-xs text-cyan-600/70 dark:text-cyan-400/70 font-medium">{tr("exercises_bu_gun_786fd4", "Bu gün")}</p>
           </motion.div>
           <motion.div
             className="bg-orange-50 dark:bg-orange-500/10 rounded-2xl p-3 text-center border border-orange-100 dark:border-orange-500/20"
@@ -124,7 +125,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
           >
             <Trophy className="w-5 h-5 mx-auto mb-1 text-amber-500" />
             <p className="text-2xl font-black text-amber-600 dark:text-amber-400">{streak}</p>
-            <p className="text-xs text-amber-600/70 dark:text-amber-400/70 font-medium">Gün ardıcıl</p>
+            <p className="text-xs text-amber-600/70 dark:text-amber-400/70 font-medium">{tr("exercises_gun_ardicil_42e659", "Gün ardıcıl")}</p>
           </motion.div>
         </div>
       </div>
@@ -149,8 +150,8 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
                     <Star className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-amber-800 dark:text-amber-200">Günün tövsiyəsi</h3>
-                    <p className="text-sm text-amber-700 dark:text-amber-300">20 dəq gəzinti + Kegel məşqləri</p>
+                    <h3 className="font-bold text-amber-800 dark:text-amber-200">{tr("exercises_gunun_tovsiyesi_f10d9b", "Günün tövsiyəsi")}</h3>
+                    <p className="text-sm text-amber-700 dark:text-amber-300">{tr("exercises_20_deq_gezinti_kegel_mesqleri_797636", "20 dəq gəzinti + Kegel məşqləri")}</p>
                   </div>
                   <div className="px-3 py-1 rounded-full bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200 text-xs font-bold">
                     Tövsiyə
@@ -173,8 +174,8 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
                   <div className="w-20 h-20 rounded-3xl bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center mx-auto mb-4">
                     <Dumbbell className="w-10 h-10 text-cyan-500" />
                   </div>
-                  <p className="font-bold text-foreground mb-1">Məşq tapılmadı</p>
-                  <p className="text-sm text-muted-foreground">Admin paneldən məşq əlavə edin</p>
+                  <p className="font-bold text-foreground mb-1">{tr("exercises_mesq_tapilmadi_088b54", "Məşq tapılmadı")}</p>
+                  <p className="text-sm text-muted-foreground">{tr("exercises_admin_panelden_mesq_elave_edin_acce7f", "Admin paneldən məşq əlavə edin")}</p>
                 </motion.div>
               ) : (
                 <div className="space-y-3">
@@ -264,7 +265,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
                       <Clock className="w-5 h-5 text-cyan-600" />
                     </div>
                     <p className="font-bold text-foreground">{selectedExercise.duration}</p>
-                    <p className="text-[10px] text-muted-foreground">dəqiqə</p>
+                    <p className="text-[10px] text-muted-foreground">{tr("exercises_deqiqe_94641a", "dəqiqə")}</p>
                   </div>
                   <div className="text-center">
                     <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mx-auto mb-1">
@@ -280,7 +281,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
                     <p className="font-bold text-foreground capitalize">
                       {selectedExercise.level === 'easy' ? 'Asan' : selectedExercise.level === 'medium' ? 'Orta' : 'Çətin'}
                     </p>
-                    <p className="text-[10px] text-muted-foreground">səviyyə</p>
+                    <p className="text-[10px] text-muted-foreground">{tr("exercises_seviyye_f242cf", "səviyyə")}</p>
                   </div>
                 </div>
 

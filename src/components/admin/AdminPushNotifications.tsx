@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { tr } from '@/lib/tr';
 import { Bell, Plus, Trash2, Edit, Send, Users, Baby, Heart, Moon, Clock, Calendar, Zap, Search, ChevronLeft, ChevronRight, Loader2, Filter, RefreshCw, Upload, Download, FileText, FileDown } from 'lucide-react';
 import { exportToCSV } from '@/utils/csvExport';
 import { Button } from '@/components/ui/button';
@@ -45,9 +46,9 @@ import NotificationOpsCard from './NotificationOpsCard';
 import BulkTimeManager from './BulkTimeManager';
 
 const audienceLabels: Record<string, { label: string; icon: any; color: string }> = {
-  all: { label: 'Hamı', icon: Users, color: 'bg-blue-500' },
+  all: { label: tr("adminpushnotifications_hami_c33b89", "Hamı"), icon: Users, color: 'bg-blue-500' },
   flow: { label: 'Menstruasiya', icon: Moon, color: 'bg-pink-500' },
-  bump: { label: 'Hamilə', icon: Baby, color: 'bg-orange-500' },
+  bump: { label: tr("adminpushnotifications_hamile_0080af", "Hamilə"), icon: Baby, color: 'bg-orange-500' },
   mommy: { label: 'Ana', icon: Heart, color: 'bg-red-500' },
   partner: { label: 'Partnyor', icon: Users, color: 'bg-purple-500' },
 };
@@ -58,7 +59,7 @@ const AdminPushNotifications = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Push Bildirişləri</h2>
+        <h2 className="text-2xl font-bold">{tr("adminpushnotifications_push_bildirisleri_c44832", "Push Bildirişləri")}</h2>
         <p className="text-muted-foreground">
           Bütün push notification sistemini buradan idarə edin
         </p>
@@ -226,8 +227,8 @@ const ScheduledNotificationsTab = () => {
           <div className="flex items-start gap-3">
             <Clock className="h-5 w-5 text-blue-500 mt-0.5" />
             <div>
-              <h4 className="font-medium text-blue-600 dark:text-blue-400">Avtomatik Göndərmə</h4>
-              <p className="text-sm text-muted-foreground">09:00-00:00 arası, 2-3 saat fasilə ilə</p>
+              <h4 className="font-medium text-blue-600 dark:text-blue-400">{tr("adminpushnotifications_avtomatik_gonderme_306caf", "Avtomatik Göndərmə")}</h4>
+              <p className="text-sm text-muted-foreground">{tr("adminpushnotifications_09_00_00_00_arasi_2_3_saat_fasile_ile_098729", "09:00-00:00 arası, 2-3 saat fasilə ilə")}</p>
             </div>
           </div>
         </Card>
@@ -535,11 +536,11 @@ const PregnancyDayNotificationsTab = () => {
       <div className="grid grid-cols-4 gap-4">
         <Card className="p-4 text-center">
           <div className="text-3xl font-bold text-primary">{notificationsByDay.size}</div>
-          <div className="text-sm text-muted-foreground">Əlavə Edilib</div>
+          <div className="text-sm text-muted-foreground">{tr("adminpushnotifications_elave_edilib_6b8aee", "Əlavə Edilib")}</div>
         </Card>
         <Card className="p-4 text-center">
           <div className="text-3xl font-bold text-orange-500">{TOTAL_DAYS}</div>
-          <div className="text-sm text-muted-foreground">Toplam Gün</div>
+          <div className="text-sm text-muted-foreground">{tr("adminpushnotifications_toplam_gun_a8eb5b", "Toplam Gün")}</div>
         </Card>
         <Card className="p-4 text-center">
           <div className="text-3xl font-bold text-green-500">{notifications.filter(n => n.is_active).length}</div>
@@ -547,7 +548,7 @@ const PregnancyDayNotificationsTab = () => {
         </Card>
         <Card className="p-4 text-center">
           <div className="text-3xl font-bold text-muted-foreground">{TOTAL_DAYS - notificationsByDay.size}</div>
-          <div className="text-sm text-muted-foreground">Boş Gün</div>
+          <div className="text-sm text-muted-foreground">{tr("adminpushnotifications_bos_gun_2cbd8e", "Boş Gün")}</div>
         </Card>
       </div>
 
@@ -558,7 +559,7 @@ const PregnancyDayNotificationsTab = () => {
             <FileText className="h-5 w-5 text-primary" />
             <div>
               <h4 className="font-medium">CSV Import</h4>
-              <p className="text-sm text-muted-foreground">Bildirişləri toplu şəkildə CSV ilə əlavə edin (0-293 gün)</p>
+              <p className="text-sm text-muted-foreground">{tr("adminpushnotifications_bildirisleri_toplu_sekilde_csv_ile_elave_b35d22", "Bildirişləri toplu şəkildə CSV ilə əlavə edin (0-293 gün)")}</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -609,7 +610,7 @@ const PregnancyDayNotificationsTab = () => {
         <div className="flex items-center gap-2 flex-1">
           <Search className="h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Gün nömrəsi axtar (0-293)..."
+            placeholder={tr("adminpushnotifications_gun_nomresi_axtar_0_293_97f2cb", "Gün nömrəsi axtar (0-293)...")}
             value={searchDay}
             onChange={(e) => setSearchDay(e.target.value.replace(/\D/g, ''))}
             className="max-w-[200px]"
@@ -711,7 +712,7 @@ const PregnancyDayNotificationsTab = () => {
       <div className="flex items-center gap-6 text-sm text-muted-foreground">
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded bg-green-500/20 border border-green-500/30" />
-          <span>Əlavə Edilib</span>
+          <span>{tr("adminpushnotifications_elave_edilib_6b8aee", "Əlavə Edilib")}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded bg-yellow-500/20 border border-yellow-500/30" />
@@ -719,7 +720,7 @@ const PregnancyDayNotificationsTab = () => {
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded bg-muted/30 border border-dashed" />
-          <span>Boş</span>
+          <span>{tr("adminpushnotifications_bos_485510", "Boş")}</span>
         </div>
       </div>
 
@@ -736,7 +737,7 @@ const PregnancyDayNotificationsTab = () => {
           <div className="space-y-4">
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label>Gün Nömrəsi</Label>
+                <Label>{tr("adminpushnotifications_gun_nomresi_760508", "Gün Nömrəsi")}</Label>
                 <Input
                   type="number"
                   min={0}
@@ -747,7 +748,7 @@ const PregnancyDayNotificationsTab = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Göndərmə Saatı</Label>
+                <Label>{tr("adminpushnotifications_gonderme_saati_110747", "Göndərmə Saatı")}</Label>
                 <Input
                   type="time"
                   value={form.send_time}
@@ -766,20 +767,20 @@ const PregnancyDayNotificationsTab = () => {
             </div>
 
             <div className="space-y-2">
-              <Label>Başlıq</Label>
+              <Label>{tr("adminpushnotifications_basliq_e1f6c5", "Başlıq")}</Label>
               <Input
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
-                placeholder="Hamiləliyin 14-cü günü 🌟"
+                placeholder={tr("adminpushnotifications_hamileliyin_14_cu_gunu_f5a6b8", "Hamiləliyin 14-cü günü 🌟")}
               />
             </div>
 
             <div className="space-y-2">
-              <Label>Mətn</Label>
+              <Label>{tr("adminpushnotifications_metn_6e9f0f", "Mətn")}</Label>
               <Textarea
                 value={form.body}
                 onChange={(e) => setForm({ ...form, body: e.target.value })}
-                placeholder="Bu gün körpəniz inkişaf edir..."
+                placeholder={tr("adminpushnotifications_bu_gun_korpeniz_inkisaf_edir_6c0ca6", "Bu gün körpəniz inkişaf edir...")}
                 rows={4}
               />
             </div>
@@ -807,7 +808,7 @@ const PregnancyDayNotificationsTab = () => {
               </Button>
             )}
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setEditDialog(false)}>Ləğv et</Button>
+              <Button variant="outline" onClick={() => setEditDialog(false)}>{tr("adminpushnotifications_legv_et_b5e49c", "Ləğv et")}</Button>
               <Button onClick={handleSave} disabled={createNotification.isPending || updateNotification.isPending}>
                 {editingId ? 'Yenilə' : 'Yarat'}
               </Button>
@@ -862,7 +863,7 @@ const PregnancyDayNotificationsTab = () => {
             </div>
           </ScrollArea>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDayListDialog(false)}>Bağla</Button>
+            <Button variant="outline" onClick={() => setDayListDialog(false)}>{tr("adminpushnotifications_bagla_84bdc9", "Bağla")}</Button>
             <Button onClick={() => { setDayListDialog(false); handleCreate(selectedDay); }}>
               <Plus className="h-4 w-4 mr-1" /> Yeni Bildiriş
             </Button>
@@ -890,14 +891,14 @@ const FlowRemindersTab = () => {
   const [loadingStats, setLoadingStats] = useState(true);
 
   const reminderTypeLabels: Record<string, { label: string; emoji: string; color: string }> = {
-    period_start: { label: 'Period Başlanğıcı', emoji: '🔴', color: 'bg-rose-500' },
+    period_start: { label: tr("adminpushnotifications_period_baslangici_9350e0", "Period Başlanğıcı"), emoji: '🔴', color: 'bg-rose-500' },
     period_end: { label: 'Period Sonu', emoji: '✅', color: 'bg-green-500' },
     ovulation: { label: 'Ovulyasiya', emoji: '🌸', color: 'bg-amber-500' },
-    fertile_start: { label: 'Məhsuldar Başlanğıc', emoji: '💕', color: 'bg-pink-500' },
-    fertile_end: { label: 'Məhsuldar Son', emoji: '📅', color: 'bg-purple-500' },
-    pms: { label: 'PMS Dövrü', emoji: '⚡', color: 'bg-orange-500' },
-    pill: { label: 'Həb Xatırlatması', emoji: '💊', color: 'bg-blue-500' },
-    custom: { label: 'Xüsusi', emoji: '🔔', color: 'bg-gray-500' },
+    fertile_start: { label: tr("adminpushnotifications_mehsuldar_baslangic_3b55fd", "Məhsuldar Başlanğıc"), emoji: '💕', color: 'bg-pink-500' },
+    fertile_end: { label: tr("adminpushnotifications_mehsuldar_son_863628", "Məhsuldar Son"), emoji: '📅', color: 'bg-purple-500' },
+    pms: { label: tr("adminpushnotifications_pms_dovru_16f417", "PMS Dövrü"), emoji: '⚡', color: 'bg-orange-500' },
+    pill: { label: tr("adminpushnotifications_heb_xatirlatmasi_e3e934", "Həb Xatırlatması"), emoji: '💊', color: 'bg-blue-500' },
+    custom: { label: tr("adminpushnotifications_xususi_1055b8", "Xüsusi"), emoji: '🔔', color: 'bg-gray-500' },
   };
 
   const loadStats = async () => {
@@ -963,7 +964,7 @@ const FlowRemindersTab = () => {
         <div className="flex items-start gap-3">
           <Moon className="h-5 w-5 text-pink-500 mt-0.5" />
           <div>
-            <h4 className="font-medium text-pink-600 dark:text-pink-400">Flow Xatırlatmaları</h4>
+            <h4 className="font-medium text-pink-600 dark:text-pink-400">{tr("adminpushnotifications_flow_xatirlatmalari_bc121b", "Flow Xatırlatmaları")}</h4>
             <p className="text-sm text-muted-foreground">
               İstifadəçilərin yaratdığı period, ovulyasiya və fertil gün xatırlatmaları. 
               Avtomatik olaraq hər saat yoxlanılır və göndərilir.
@@ -976,7 +977,7 @@ const FlowRemindersTab = () => {
       <div className="grid grid-cols-3 gap-4">
         <Card className="p-4 text-center">
           <div className="text-3xl font-bold text-primary">{reminderStats?.total || 0}</div>
-          <div className="text-sm text-muted-foreground">Toplam Xatırlatma</div>
+          <div className="text-sm text-muted-foreground">{tr("adminpushnotifications_toplam_xatirlatma_9e142e", "Toplam Xatırlatma")}</div>
         </Card>
         <Card className="p-4 text-center">
           <div className="text-3xl font-bold text-green-500">{reminderStats?.enabledCount || 0}</div>
@@ -986,13 +987,13 @@ const FlowRemindersTab = () => {
           <div className="text-3xl font-bold text-muted-foreground">
             {Object.keys(reminderStats?.byType || {}).length}
           </div>
-          <div className="text-sm text-muted-foreground">Fərqli Növ</div>
+          <div className="text-sm text-muted-foreground">{tr("adminpushnotifications_ferqli_nov_e00aaa", "Fərqli Növ")}</div>
         </Card>
       </div>
 
       {/* Reminder Types Breakdown */}
       <Card className="p-4">
-        <h3 className="font-bold mb-4">Xatırlatma Növlərinə Görə</h3>
+        <h3 className="font-bold mb-4">{tr("adminpushnotifications_xatirlatma_novlerine_gore_83d441", "Xatırlatma Növlərinə Görə")}</h3>
         <div className="grid grid-cols-2 gap-3">
           {Object.entries(reminderTypeLabels).map(([type, info]) => {
             const count = reminderStats?.byType[type] || 0;
@@ -1032,7 +1033,7 @@ const FlowRemindersTab = () => {
 
       {/* Recent Logs */}
       <Card className="p-4">
-        <h3 className="font-bold mb-4">Son Göndərilən Flow Xatırlatmaları</h3>
+        <h3 className="font-bold mb-4">{tr("adminpushnotifications_son_gonderilen_flow_xatirlatmalari_5d3406", "Son Göndərilən Flow Xatırlatmaları")}</h3>
         <RecentFlowLogs />
       </Card>
     </div>
@@ -1067,11 +1068,11 @@ const RecentFlowLogs = () => {
   }, []);
 
   if (loading) {
-    return <div className="text-center py-4 text-muted-foreground">Yüklənir...</div>;
+    return <div className="text-center py-4 text-muted-foreground">{tr("adminpushnotifications_yuklenir_5557de", "Yüklənir...")}</div>;
   }
 
   if (logs.length === 0) {
-    return <div className="text-center py-4 text-muted-foreground">Hələ heç bir loq yoxdur</div>;
+    return <div className="text-center py-4 text-muted-foreground">{tr("adminpushnotifications_hele_hec_bir_loq_yoxdur_f39f35", "Hələ heç bir loq yoxdur")}</div>;
   }
 
   return (
@@ -1198,9 +1199,9 @@ const BulkPushTab = () => {
   }
 
   const audienceOptions = [
-    { value: 'all', label: '🌍 Hamı', color: 'bg-blue-500' },
+    { value: 'all', label: tr("adminpushnotifications_hami_e07585", "🌍 Hamı"), color: 'bg-blue-500' },
     { value: 'flow', label: '🌙 Menstruasiya', color: 'bg-pink-500' },
-    { value: 'bump', label: '🤰 Hamilə', color: 'bg-orange-500' },
+    { value: 'bump', label: tr("adminpushnotifications_hamile_b562bf", "🤰 Hamilə"), color: 'bg-orange-500' },
     { value: 'mommy', label: '👩‍👧 Ana', color: 'bg-red-500' },
     { value: 'partner', label: '💑 Partnyor', color: 'bg-purple-500' },
   ];
@@ -1209,7 +1210,7 @@ const BulkPushTab = () => {
     <div className="space-y-6">
       {/* Global Stats */}
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-lg font-semibold">Push Statistikası</h3>
+        <h3 className="text-lg font-semibold">{tr("adminpushnotifications_push_statistikasi_c99aca", "Push Statistikası")}</h3>
         <div className="flex gap-2">
           <Button 
             variant="outline" 
@@ -1228,21 +1229,21 @@ const BulkPushTab = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="p-4 text-center">
           <div className="text-3xl font-bold text-primary">{stats?.total_users || 0}</div>
-          <div className="text-sm text-muted-foreground">Ümumi İstifadəçi</div>
+          <div className="text-sm text-muted-foreground">{tr("adminpushnotifications_umumi_istifadeci_bae9ad", "Ümumi İstifadəçi")}</div>
         </Card>
         <Card className="p-4 text-center">
           <div className="text-3xl font-bold text-green-500">{stats?.users_with_tokens || 0}</div>
-          <div className="text-sm text-muted-foreground">Qeydiyyatlı Cihaz</div>
+          <div className="text-sm text-muted-foreground">{tr("adminpushnotifications_qeydiyyatli_cihaz_94133b", "Qeydiyyatlı Cihaz")}</div>
         </Card>
         <Card className="p-4 text-center">
           <div className="text-3xl font-bold text-yellow-500">
             {stats?.total_users ? Math.round((stats.users_with_tokens / stats.total_users) * 100) : 0}%
           </div>
-          <div className="text-sm text-muted-foreground">Əhatə Dairəsi</div>
+          <div className="text-sm text-muted-foreground">{tr("adminpushnotifications_ehate_dairesi_ada093", "Əhatə Dairəsi")}</div>
         </Card>
         <Card className="p-4 text-center">
           <div className="text-3xl font-bold text-blue-500">{history.length}</div>
-          <div className="text-sm text-muted-foreground">Göndərilmiş Kampaniya</div>
+          <div className="text-sm text-muted-foreground">{tr("adminpushnotifications_gonderilmis_kampaniya_2c34f3", "Göndərilmiş Kampaniya")}</div>
         </Card>
       </div>
 
@@ -1250,7 +1251,7 @@ const BulkPushTab = () => {
       {showDevices && (
         <Card className="p-4">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-medium">Qeydiyyatlı Cihazlar</h4>
+            <h4 className="font-medium">{tr("adminpushnotifications_qeydiyyatli_cihazlar_4c85f5", "Qeydiyyatlı Cihazlar")}</h4>
             <Button variant="ghost" size="sm" onClick={loadDevices} disabled={loadingDevices}>
               {loadingDevices ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
             </Button>
@@ -1262,8 +1263,8 @@ const BulkPushTab = () => {
           ) : devices.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>Heç bir cihaz qeydiyyatda deyil</p>
-              <p className="text-xs mt-1">İstifadəçilər mobil tətbiqi açmalı və bildiriş icazəsi verməlidir</p>
+              <p>{tr("adminpushnotifications_hec_bir_cihaz_qeydiyyatda_deyil_75d504", "Heç bir cihaz qeydiyyatda deyil")}</p>
+              <p className="text-xs mt-1">{tr("adminpushnotifications_istifadeciler_mobil_tetbiqi_acmali_ve_bi_b0748a", "İstifadəçilər mobil tətbiqi açmalı və bildiriş icazəsi verməlidir")}</p>
             </div>
           ) : (
             <ScrollArea className="h-64">
@@ -1365,7 +1366,7 @@ const BulkPushTab = () => {
           </div>
 
           <div className="space-y-2">
-            <Label>Hədəf Auditoriya</Label>
+            <Label>{tr("adminpushnotifications_hedef_auditoriya_50154d", "Hədəf Auditoriya")}</Label>
             <Select value={form.target_audience} onValueChange={(v) => setForm({ ...form, target_audience: v })}>
               <SelectTrigger>
                 <SelectValue />
@@ -1381,20 +1382,20 @@ const BulkPushTab = () => {
           </div>
 
           <div className="space-y-2">
-            <Label>Başlıq</Label>
+            <Label>{tr("adminpushnotifications_basliq_e1f6c5", "Başlıq")}</Label>
             <Input
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              placeholder="🎉 Xüsusi Xəbər!"
+              placeholder={tr("adminpushnotifications_xususi_xeber_00380f", "🎉 Xüsusi Xəbər!")}
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Mətn</Label>
+            <Label>{tr("adminpushnotifications_metn_6e9f0f", "Mətn")}</Label>
             <Textarea
               value={form.body}
               onChange={(e) => setForm({ ...form, body: e.target.value })}
-              placeholder="Bütün istifadəçilərə göndəriləcək mesaj..."
+              placeholder={tr("adminpushnotifications_butun_istifadecilere_gonderilecek_mesaj_75e61e", "Bütün istifadəçilərə göndəriləcək mesaj...")}
               rows={4}
             />
           </div>
@@ -1429,12 +1430,12 @@ const BulkPushTab = () => {
 
       {/* History */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">Göndərilmə Tarixçəsi</h3>
+        <h3 className="text-lg font-semibold mb-4">{tr("adminpushnotifications_gonderilme_tarixcesi_929970", "Göndərilmə Tarixçəsi")}</h3>
         
         {history.length === 0 ? (
           <Card className="p-8 text-center">
             <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">Hələ heç bir bulk bildiriş göndərilməyib</p>
+            <p className="text-muted-foreground">{tr("adminpushnotifications_hele_hec_bir_bulk_bildiris_gonderilmeyib_74a908", "Hələ heç bir bulk bildiriş göndərilməyib")}</p>
           </Card>
         ) : (
           <div className="space-y-3">
@@ -1508,8 +1509,8 @@ const LoadingSpinner = () => (
 const EmptyState = ({ onAdd }: { onAdd: () => void }) => (
   <Card className="p-8 text-center">
     <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-    <h3 className="font-medium mb-2">Bildiriş Yoxdur</h3>
-    <p className="text-sm text-muted-foreground mb-4">Gündəlik avtomatik bildirişlər əlavə edin</p>
+    <h3 className="font-medium mb-2">{tr("adminpushnotifications_bildiris_yoxdur_806a42", "Bildiriş Yoxdur")}</h3>
+    <p className="text-sm text-muted-foreground mb-4">{tr("adminpushnotifications_gundelik_avtomatik_bildirisler_elave_edi_c1a864", "Gündəlik avtomatik bildirişlər əlavə edin")}</p>
     <Button onClick={onAdd}>
       <Plus className="h-4 w-4 mr-2" />
       İlk Bildirişi Yarat
@@ -1542,33 +1543,33 @@ const NotificationDialog = ({
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label>Başlıq</Label>
+          <Label>{tr("adminpushnotifications_basliq_e1f6c5", "Başlıq")}</Label>
           <Input
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
-            placeholder="Günün Xatırlatması 💧"
+            placeholder={tr("adminpushnotifications_gunun_xatirlatmasi_ec465f", "Günün Xatırlatması 💧")}
           />
         </div>
 
         <div className="space-y-2">
-          <Label>Mətn</Label>
+          <Label>{tr("adminpushnotifications_metn_6e9f0f", "Mətn")}</Label>
           <Textarea
             value={form.body}
             onChange={(e) => setForm({ ...form, body: e.target.value })}
-            placeholder="Su içməyi unutma!"
+            placeholder={tr("adminpushnotifications_su_icmeyi_unutma_6feca5", "Su içməyi unutma!")}
             rows={3}
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>Hədəf Auditoriya</Label>
+            <Label>{tr("adminpushnotifications_hedef_auditoriya_50154d", "Hədəf Auditoriya")}</Label>
             <Select value={form.target_audience} onValueChange={(v) => setForm({ ...form, target_audience: v })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Hamı</SelectItem>
+                <SelectItem value="all">{tr("adminpushnotifications_hami_c33b89", "Hamı")}</SelectItem>
                 <SelectItem value="flow">Menstruasiya</SelectItem>
-                <SelectItem value="bump">Hamilə</SelectItem>
+                <SelectItem value="bump">{tr("adminpushnotifications_hamile_0080af", "Hamilə")}</SelectItem>
                 <SelectItem value="mommy">Ana</SelectItem>
                 <SelectItem value="partner">Partnyor</SelectItem>
               </SelectContent>
@@ -1597,7 +1598,7 @@ const NotificationDialog = ({
       </div>
 
       <DialogFooter>
-        <Button variant="outline" onClick={() => onOpenChange(false)}>Ləğv et</Button>
+        <Button variant="outline" onClick={() => onOpenChange(false)}>{tr("adminpushnotifications_legv_et_b5e49c", "Ləğv et")}</Button>
         <Button onClick={onSave} disabled={isLoading}>
           {isEditing ? 'Yenilə' : 'Yarat'}
         </Button>
@@ -1618,11 +1619,11 @@ const DeleteConfirmDialog = ({
   <AlertDialog open={open} onOpenChange={onOpenChange}>
     <AlertDialogContent>
       <AlertDialogHeader>
-        <AlertDialogTitle>Bildirişi Silmək?</AlertDialogTitle>
-        <AlertDialogDescription>Bu əməliyyat geri qaytarıla bilməz.</AlertDialogDescription>
+        <AlertDialogTitle>{tr("adminpushnotifications_bildirisi_silmek_d3457f", "Bildirişi Silmək?")}</AlertDialogTitle>
+        <AlertDialogDescription>{tr("adminpushnotifications_bu_emeliyyat_geri_qaytarila_bilmez_b4fea8", "Bu əməliyyat geri qaytarıla bilməz.")}</AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel>Ləğv et</AlertDialogCancel>
+        <AlertDialogCancel>{tr("adminpushnotifications_legv_et_b5e49c", "Ləğv et")}</AlertDialogCancel>
         <AlertDialogAction onClick={onConfirm} className="bg-red-500 hover:bg-red-600">Sil</AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>
@@ -1877,11 +1878,11 @@ const MommyDayNotificationsTab = () => {
       <div className="grid grid-cols-4 gap-4">
         <Card className="p-4 text-center">
           <div className="text-3xl font-bold text-primary">{notificationsByDay.size}</div>
-          <div className="text-sm text-muted-foreground">Əlavə Edilib</div>
+          <div className="text-sm text-muted-foreground">{tr("adminpushnotifications_elave_edilib_6b8aee", "Əlavə Edilib")}</div>
         </Card>
         <Card className="p-4 text-center">
           <div className="text-3xl font-bold text-red-500">{TOTAL_DAYS}</div>
-          <div className="text-sm text-muted-foreground">Toplam Gün</div>
+          <div className="text-sm text-muted-foreground">{tr("adminpushnotifications_toplam_gun_a8eb5b", "Toplam Gün")}</div>
         </Card>
         <Card className="p-4 text-center">
           <div className="text-3xl font-bold text-green-500">{notifications.filter(n => n.is_active).length}</div>
@@ -1891,7 +1892,7 @@ const MommyDayNotificationsTab = () => {
           <div className="text-3xl font-bold text-muted-foreground">
             {TOTAL_DAYS - notificationsByDay.size}
           </div>
-          <div className="text-sm text-muted-foreground">Boş Gün</div>
+          <div className="text-sm text-muted-foreground">{tr("adminpushnotifications_bos_gun_2cbd8e", "Boş Gün")}</div>
         </Card>
       </div>
 
@@ -1902,7 +1903,7 @@ const MommyDayNotificationsTab = () => {
             <FileText className="h-5 w-5 text-primary" />
             <div>
               <h4 className="font-medium">CSV Import</h4>
-              <p className="text-sm text-muted-foreground">Ana bildirişlərini toplu şəkildə CSV ilə əlavə edin (1-1460 gün)</p>
+              <p className="text-sm text-muted-foreground">{tr("adminpushnotifications_ana_bildirislerini_toplu_sekilde_csv_ile_0ba35f", "Ana bildirişlərini toplu şəkildə CSV ilə əlavə edin (1-1460 gün)")}</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -1947,7 +1948,7 @@ const MommyDayNotificationsTab = () => {
         <div className="flex items-center gap-2 flex-1">
           <Search className="h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Gün nömrəsi axtar (1-1460)..."
+            placeholder={tr("adminpushnotifications_gun_nomresi_axtar_1_1460_126dce", "Gün nömrəsi axtar (1-1460)...")}
             value={searchDay}
             onChange={(e) => setSearchDay(e.target.value.replace(/\D/g, ''))}
             className="max-w-[200px]"
@@ -1956,7 +1957,7 @@ const MommyDayNotificationsTab = () => {
             max={1460}
           />
           {searchDay && (
-            <Button variant="ghost" size="sm" onClick={() => setSearchDay('')}>Sıfırla</Button>
+            <Button variant="ghost" size="sm" onClick={() => setSearchDay('')}>{tr("adminpushnotifications_sifirla_60125d", "Sıfırla")}</Button>
           )}
         </div>
 
@@ -2030,7 +2031,7 @@ const MommyDayNotificationsTab = () => {
       <div className="flex items-center gap-6 text-sm text-muted-foreground">
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded bg-green-500/20 border border-green-500/30" />
-          <span>Əlavə Edilib</span>
+          <span>{tr("adminpushnotifications_elave_edilib_6b8aee", "Əlavə Edilib")}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded bg-yellow-500/20 border border-yellow-500/30" />
@@ -2038,7 +2039,7 @@ const MommyDayNotificationsTab = () => {
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded bg-muted/30 border border-dashed" />
-          <span>Boş</span>
+          <span>{tr("adminpushnotifications_bos_485510", "Boş")}</span>
         </div>
       </div>
 
@@ -2055,13 +2056,13 @@ const MommyDayNotificationsTab = () => {
           <div className="space-y-4">
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label>Gün Nömrəsi</Label>
+                <Label>{tr("adminpushnotifications_gun_nomresi_760508", "Gün Nömrəsi")}</Label>
                 <Input type="number" min={1} max={1460} value={form.day_number}
                   onChange={(e) => setForm({ ...form, day_number: parseInt(e.target.value) || 1 })}
                   disabled={!!editingId} />
               </div>
               <div className="space-y-2">
-                <Label>Göndərmə Saatı</Label>
+                <Label>{tr("adminpushnotifications_gonderme_saati_110747", "Göndərmə Saatı")}</Label>
                 <Input type="time" value={form.send_time}
                   onChange={(e) => setForm({ ...form, send_time: e.target.value })} />
               </div>
@@ -2072,14 +2073,14 @@ const MommyDayNotificationsTab = () => {
             </div>
 
             <div className="space-y-2">
-              <Label>Başlıq</Label>
-              <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Bildiriş başlığı..." />
+              <Label>{tr("adminpushnotifications_basliq_e1f6c5", "Başlıq")}</Label>
+              <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder={tr("adminpushnotifications_bildiris_basligi_c2a3c5", "Bildiriş başlığı...")} />
             </div>
 
             <div className="space-y-2">
-              <Label>Mətn</Label>
+              <Label>{tr("adminpushnotifications_metn_6e9f0f", "Mətn")}</Label>
               <Textarea value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })}
-                placeholder="Bildiriş mətni..." rows={4} />
+                placeholder={tr("adminpushnotifications_bildiris_metni_412bd0", "Bildiriş mətni...")} rows={4} />
             </div>
 
             <div className="flex items-center gap-2">
@@ -2089,7 +2090,7 @@ const MommyDayNotificationsTab = () => {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditDialog(false)}>Ləğv et</Button>
+            <Button variant="outline" onClick={() => setEditDialog(false)}>{tr("adminpushnotifications_legv_et_b5e49c", "Ləğv et")}</Button>
             {editingId && (
               <Button variant="destructive" onClick={() => { setEditDialog(false); setDeleteDialog(editingId); }}>
                 <Trash2 className="h-4 w-4 mr-1" /> Sil
@@ -2148,7 +2149,7 @@ const MommyDayNotificationsTab = () => {
             </div>
           </ScrollArea>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDayListDialog(false)}>Bağla</Button>
+            <Button variant="outline" onClick={() => setDayListDialog(false)}>{tr("adminpushnotifications_bagla_84bdc9", "Bağla")}</Button>
             <Button onClick={() => { setDayListDialog(false); handleCreate(selectedDay); }}>
               <Plus className="h-4 w-4 mr-1" /> Yeni Bildiriş
             </Button>

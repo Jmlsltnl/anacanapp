@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { ChevronRight, Clock, Eye, BookOpen } from 'lucide-react';
 import { useBlog, BlogPost, BlogLifeStage } from '@/hooks/useBlog';
 import { formatDistanceToNow } from 'date-fns';
@@ -119,7 +120,7 @@ const RecentBlogPosts = ({ onNavigate, lifeStage }: RecentBlogPostsProps) => {
           <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
             <BookOpen className="w-4 h-4 text-primary" />
           </div>
-          <h3 className="font-bold text-foreground">Son Məqalələr</h3>
+          <h3 className="font-bold text-foreground">{tr("recentblogposts_son_meqaleler_0618a6", "Son Məqalələr")}</h3>
         </div>
         <motion.button
           onClick={() => onNavigate('blog')}

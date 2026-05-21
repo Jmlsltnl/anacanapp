@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Save, Key, Sparkles, Settings2, RefreshCw, Moon, Sun, Users, Baby } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -23,7 +24,7 @@ interface AppSetting {
 }
 
 const aiModels = [
-  { id: 'google/gemini-2.5-flash', name: 'Gemini 2.5 Flash (Tövsiyyə olunan)' },
+  { id: 'google/gemini-2.5-flash', name: tr("adminsettings_gemini_2_5_flash_tovsiyye_olunan_be1e47", "Gemini 2.5 Flash (Tövsiyyə olunan)") },
   { id: 'google/gemini-2.5-pro', name: 'Gemini 2.5 Pro' },
   { id: 'google/gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' },
   { id: 'openai/gpt-5-mini', name: 'GPT-5 Mini' },
@@ -102,14 +103,14 @@ const AdminSettings = () => {
 
       await fetchSettings();
       toast({
-        title: 'Uğurlu',
+        title: tr("adminsettings_ugurlu_7fe64c", "Uğurlu"),
         description: 'Tənzimləmələr yadda saxlanıldı'
       });
     } catch (error) {
       console.error('Error saving settings:', error);
       toast({
-        title: 'Xəta',
-        description: 'Tənzimləmələr yadda saxlanıla bilmədi',
+        title: tr("adminsettings_xeta_3cdbb6", "Xəta"),
+        description: tr("adminsettings_tenzimlemeler_yadda_saxlanila_bilmedi_f9bdcb", "Tənzimləmələr yadda saxlanıla bilmədi"),
         variant: 'destructive'
       });
     } finally {
@@ -131,8 +132,8 @@ const AdminSettings = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Tənzimləmələr</h1>
-          <p className="text-muted-foreground">Tətbiq konfiqurasiyalarını idarə edin</p>
+          <h1 className="text-2xl font-bold text-foreground">{tr("adminsettings_tenzimlemeler_085659", "Tənzimləmələr")}</h1>
+          <p className="text-muted-foreground">{tr("adminsettings_tetbiq_konfiqurasiyalarini_idare_edin_d01841", "Tətbiq konfiqurasiyalarını idarə edin")}</p>
         </div>
         <Button onClick={handleSave} disabled={saving} className="gap-2">
           {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -157,8 +158,8 @@ const AdminSettings = () => {
                   <Users className="w-5 h-5 text-purple-500" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">Həyat Mərhələləri</h3>
-                  <p className="text-sm text-muted-foreground">Qeydiyyat zamanı göstəriləcək mərhələlər</p>
+                  <h3 className="font-semibold text-foreground">{tr("adminsettings_heyat_merheleleri_c9d7f6", "Həyat Mərhələləri")}</h3>
+                  <p className="text-sm text-muted-foreground">{tr("adminsettings_qeydiyyat_zamani_gosterilecek_merheleler_0d58d9", "Qeydiyyat zamanı göstəriləcək mərhələlər")}</p>
                 </div>
               </div>
 
@@ -167,7 +168,7 @@ const AdminSettings = () => {
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">🌸</span>
                     <div>
-                      <label className="text-sm font-medium text-foreground">Flow - Dövr İzləmə</label>
+                      <label className="text-sm font-medium text-foreground">{tr("adminsettings_flow_dovr_izleme_92cd60", "Flow - Dövr İzləmə")}</label>
                       <p className="text-xs text-muted-foreground">
                         Menstruasiya izləmə rejimi
                       </p>
@@ -183,7 +184,7 @@ const AdminSettings = () => {
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">🤰</span>
                     <div>
-                      <label className="text-sm font-medium text-foreground">Bump - Hamiləlik</label>
+                      <label className="text-sm font-medium text-foreground">{tr("adminsettings_bump_hamilelik_de436a", "Bump - Hamiləlik")}</label>
                       <p className="text-xs text-muted-foreground">
                         Hamiləlik izləmə rejimi
                       </p>
@@ -199,7 +200,7 @@ const AdminSettings = () => {
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">👶</span>
                     <div>
-                      <label className="text-sm font-medium text-foreground">Mommy - Analıq</label>
+                      <label className="text-sm font-medium text-foreground">{tr("adminsettings_mommy_analiq_4d3d41", "Mommy - Analıq")}</label>
                       <p className="text-xs text-muted-foreground">
                         Körpə izləmə rejimi
                       </p>
@@ -226,8 +227,8 @@ const AdminSettings = () => {
                   <Baby className="w-5 h-5 text-pink-500" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">Mommy Hero Dizaynı</h3>
-                  <p className="text-sm text-muted-foreground">Mommy panelinin yuxarı şəkilli kartının görünüşü</p>
+                  <h3 className="font-semibold text-foreground">{tr("adminsettings_mommy_hero_dizayni_603f42", "Mommy Hero Dizaynı")}</h3>
+                  <p className="text-sm text-muted-foreground">{tr("adminsettings_mommy_panelinin_yuxari_sekilli_kartinin__a903d6", "Mommy panelinin yuxarı şəkilli kartının görünüşü")}</p>
                 </div>
               </div>
 
@@ -241,13 +242,13 @@ const AdminSettings = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="classic">Classic — Coral glassmorphism (mövcud)</SelectItem>
-                    <SelectItem value="aurora">Aurora — Premium tünd, qızılı halqa</SelectItem>
-                    <SelectItem value="storybook">Storybook — Pastel uşaq kitabı stili</SelectItem>
-                    <SelectItem value="polaroid">Polaroid — Peanut tərzi əyilmiş foto + washi</SelectItem>
-                    <SelectItem value="minimal">Minimal Card — Flo/Clue ağ kart + statistika</SelectItem>
-                    <SelectItem value="mesh">Mesh — Apple-vari mesh gradient + üzən foto</SelectItem>
-                    <SelectItem value="story">Story — Instagram story tərzi tam ekran</SelectItem>
+                    <SelectItem value="classic">{tr("adminsettings_classic_coral_glassmorphism_movcud_8ff4ae", "Classic — Coral glassmorphism (mövcud)")}</SelectItem>
+                    <SelectItem value="aurora">{tr("adminsettings_aurora_premium_tund_qizili_halqa_de8559", "Aurora — Premium tünd, qızılı halqa")}</SelectItem>
+                    <SelectItem value="storybook">{tr("adminsettings_storybook_pastel_usaq_kitabi_stili_d21718", "Storybook — Pastel uşaq kitabı stili")}</SelectItem>
+                    <SelectItem value="polaroid">{tr("adminsettings_polaroid_peanut_terzi_eyilmis_foto_washi_621108", "Polaroid — Peanut tərzi əyilmiş foto + washi")}</SelectItem>
+                    <SelectItem value="minimal">{tr("adminsettings_minimal_card_flo_clue_ag_kart_statistika_1b051e", "Minimal Card — Flo/Clue ağ kart + statistika")}</SelectItem>
+                    <SelectItem value="mesh">{tr("adminsettings_mesh_apple_vari_mesh_gradient_uzen_foto_081739", "Mesh — Apple-vari mesh gradient + üzən foto")}</SelectItem>
+                    <SelectItem value="story">{tr("adminsettings_story_instagram_story_terzi_tam_ekran_5c22a0", "Story — Instagram story tərzi tam ekran")}</SelectItem>
                     <SelectItem value="bento">Bento — Apple bento qrid (foto + statistika)</SelectItem>
                   </SelectContent>
                 </Select>
@@ -270,8 +271,8 @@ const AdminSettings = () => {
                   <Moon className="w-5 h-5 text-indigo-500" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">Tema Tənzimləmələri</h3>
-                  <p className="text-sm text-muted-foreground">Qaranlıq rejim və görünüş</p>
+                  <h3 className="font-semibold text-foreground">{tr("adminsettings_tema_tenzimlemeleri_3033b7", "Tema Tənzimləmələri")}</h3>
+                  <p className="text-sm text-muted-foreground">{tr("adminsettings_qaranliq_rejim_ve_gorunus_41b1f9", "Qaranlıq rejim və görünüş")}</p>
                 </div>
               </div>
 
@@ -282,7 +283,7 @@ const AdminSettings = () => {
                       <Moon className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground">Qaranlıq Rejim</label>
+                      <label className="text-sm font-medium text-foreground">{tr("adminsettings_qaranliq_rejim_29c427", "Qaranlıq Rejim")}</label>
                       <p className="text-xs text-muted-foreground">
                         İstifadəçilər qaranlıq rejimi aktiv edə bilsin
                       </p>
@@ -309,8 +310,8 @@ const AdminSettings = () => {
                   <Sparkles className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">AI Tənzimləmələri</h3>
-                  <p className="text-sm text-muted-foreground">Anacan.AI modeli və parametrləri</p>
+                  <h3 className="font-semibold text-foreground">{tr("adminsettings_ai_tenzimlemeleri_7d8f40", "AI Tənzimləmələri")}</h3>
+                  <p className="text-sm text-muted-foreground">{tr("adminsettings_anacan_ai_modeli_ve_parametrleri_d1304d", "Anacan.AI modeli və parametrləri")}</p>
                 </div>
               </div>
 
@@ -352,14 +353,14 @@ const AdminSettings = () => {
                   <Settings2 className="w-5 h-5 text-blue-500" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">Tətbiq Tənzimləmələri</h3>
-                  <p className="text-sm text-muted-foreground">Ümumi tətbiq parametrləri</p>
+                  <h3 className="font-semibold text-foreground">{tr("adminsettings_tetbiq_tenzimlemeleri_75a82e", "Tətbiq Tənzimləmələri")}</h3>
+                  <p className="text-sm text-muted-foreground">{tr("adminsettings_umumi_tetbiq_parametrleri_499e36", "Ümumi tətbiq parametrləri")}</p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block text-foreground">Tətbiq Versiyası</label>
+                  <label className="text-sm font-medium mb-2 block text-foreground">{tr("adminsettings_tetbiq_versiyasi_9f0928", "Tətbiq Versiyası")}</label>
                   <Input
                     value={getSettingValue('app_version', '1.0.0')}
                     onChange={(e) => updateSetting('app_version', e.target.value)}
@@ -368,7 +369,7 @@ const AdminSettings = () => {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-sm font-medium text-foreground">Təmir Rejimi</label>
+                    <label className="text-sm font-medium text-foreground">{tr("adminsettings_temir_rejimi_f48428", "Təmir Rejimi")}</label>
                     <p className="text-xs text-muted-foreground">
                       Aktiv olduqda istifadəçilər tətbiqə daxil ola bilməz
                     </p>
@@ -380,7 +381,7 @@ const AdminSettings = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block text-foreground">Maksimum Günlük Qeyd</label>
+                  <label className="text-sm font-medium mb-2 block text-foreground">{tr("adminsettings_maksimum_gunluk_qeyd_92e635", "Maksimum Günlük Qeyd")}</label>
                   <Input
                     type="number"
                     value={getSettingValue('max_daily_logs', 30)}
@@ -406,8 +407,8 @@ const AdminSettings = () => {
                   <Key className="w-5 h-5 text-green-500" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">API Açarları</h3>
-                  <p className="text-sm text-muted-foreground">Xarici xidmət inteqrasiyaları</p>
+                  <h3 className="font-semibold text-foreground">{tr("adminsettings_api_acarlari_9a04ed", "API Açarları")}</h3>
+                  <p className="text-sm text-muted-foreground">{tr("adminsettings_xarici_xidmet_inteqrasiyalari_e295ae", "Xarici xidmət inteqrasiyaları")}</p>
                 </div>
               </div>
 
@@ -416,7 +417,7 @@ const AdminSettings = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium text-foreground">Lovable AI Gateway</p>
-                      <p className="text-sm text-muted-foreground">AI funksionallığı üçün</p>
+                      <p className="text-sm text-muted-foreground">{tr("adminsettings_ai_funksionalligi_ucun_d7ee26", "AI funksionallığı üçün")}</p>
                     </div>
                     <span className="text-sm text-green-500 font-medium">✓ Aktiv</span>
                   </div>
@@ -426,7 +427,7 @@ const AdminSettings = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium text-foreground">Supabase</p>
-                      <p className="text-sm text-muted-foreground">Database və Auth</p>
+                      <p className="text-sm text-muted-foreground">{tr("adminsettings_database_ve_auth_d103d0", "Database və Auth")}</p>
                     </div>
                     <span className="text-sm text-green-500 font-medium">✓ Aktiv</span>
                   </div>

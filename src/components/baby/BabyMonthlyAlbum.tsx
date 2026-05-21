@@ -114,8 +114,8 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
               <ArrowLeft className="w-5 h-5" />
             </motion.button>
             <div className="flex-1">
-              <h1 className="text-lg font-bold">Körpə Albomu</h1>
-              <p className="text-xs text-muted-foreground">Hər ay bir xatirə</p>
+              <h1 className="text-lg font-bold">{tr("babymonthlyalbum_korpe_albomu_42d4c6", "Körpə Albomu")}</h1>
+              <p className="text-xs text-muted-foreground">{tr("babymonthlyalbum_her_ay_bir_xatire_4ca0e9", "Hər ay bir xatirə")}</p>
             </div>
             <Button size="sm" variant="outline" className="rounded-xl gap-1.5" onClick={() => setShowOrder(true)}>
               <ShoppingBag className="w-4 h-4" />
@@ -256,7 +256,7 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
                   }}
                 >
                   <RefreshCw className="w-5 h-5 text-blue-500" />
-                  <span className="text-xs font-medium">Dəyişdir</span>
+                  <span className="text-xs font-medium">{tr("babymonthlyalbum_deyisdir_aca175", "Dəyişdir")}</span>
                 </Button>
 
                 <Button
@@ -289,7 +289,7 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
           <div className="bg-card rounded-2xl p-6 text-center">
             <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-2" />
-            <p className="font-medium text-sm">Yüklənir...</p>
+            <p className="font-medium text-sm">{tr("babymonthlyalbum_yuklenir_5557de", "Yüklənir...")}</p>
           </div>
         </div>
       )}

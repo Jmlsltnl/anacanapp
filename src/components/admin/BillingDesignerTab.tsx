@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Save, Plus, Trash2, Loader2, Crown, Palette, Type, MousePointer, FileText, Sparkles, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -40,10 +41,10 @@ const BillingDesignerTab = () => {
   const handleSave = async () => {
     try {
       await update(config);
-      toast({ title: 'Abunəlik səhifəsi konfiqurasiyası saxlanıldı ✓' });
+      toast({ title: tr("billingdesignertab_abunelik_sehifesi_konfiqurasiyasi_saxlan_dfa67c", "Abunəlik səhifəsi konfiqurasiyası saxlanıldı ✓") });
       setHasChanges(false);
     } catch {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("billingdesignertab_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   };
 
@@ -72,75 +73,75 @@ const BillingDesignerTab = () => {
       </div>
 
       {/* Header */}
-      <Section title="Başlıq və Plan Adları" icon={Type}>
+      <Section title={tr("billingdesignertab_basliq_ve_plan_adlari_fb450b", "Başlıq və Plan Adları")} icon={Type}>
         <div>
-          <Label>Səhifə Başlığı</Label>
+          <Label>{tr("billingdesignertab_sehife_basligi_1ebf3e", "Səhifə Başlığı")}</Label>
           <Input value={config.page_title} onChange={e => updateField('page_title', e.target.value)} />
         </div>
         <div className="grid grid-cols-3 gap-2">
           <div>
-            <Label className="text-xs">Pulsuz plan adı</Label>
+            <Label className="text-xs">{tr("billingdesignertab_pulsuz_plan_adi_00a719", "Pulsuz plan adı")}</Label>
             <Input value={config.free_plan_name} onChange={e => updateField('free_plan_name', e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs">Aylıq plan adı</Label>
+            <Label className="text-xs">{tr("billingdesignertab_ayliq_plan_adi_74afd4", "Aylıq plan adı")}</Label>
             <Input value={config.premium_monthly_name} onChange={e => updateField('premium_monthly_name', e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs">İllik plan adı</Label>
+            <Label className="text-xs">{tr("billingdesignertab_illik_plan_adi_0fae97", "İllik plan adı")}</Label>
             <Input value={config.premium_yearly_name} onChange={e => updateField('premium_yearly_name', e.target.value)} />
           </div>
         </div>
       </Section>
 
       {/* Status Badges */}
-      <Section title="Status Etiketləri" icon={Crown}>
+      <Section title={tr("billingdesignertab_status_etiketleri_8906da", "Status Etiketləri")} icon={Crown}>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Label className="text-xs">Aktiv badge</Label>
             <Input value={config.active_badge} onChange={e => updateField('active_badge', e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs">Ləğv badge</Label>
+            <Label className="text-xs">{tr("billingdesignertab_legv_badge_e31165", "Ləğv badge")}</Label>
             <Input value={config.cancelled_badge} onChange={e => updateField('cancelled_badge', e.target.value)} />
           </div>
         </div>
       </Section>
 
       {/* Date Labels */}
-      <Section title="Tarix Etiketləri" icon={FileText}>
+      <Section title={tr("billingdesignertab_tarix_etiketleri_ce8135", "Tarix Etiketləri")} icon={FileText}>
         <div className="grid grid-cols-3 gap-2">
           <div>
-            <Label className="text-xs">Başlama</Label>
+            <Label className="text-xs">{tr("billingdesignertab_baslama_9f32b6", "Başlama")}</Label>
             <Input value={config.start_date_label} onChange={e => updateField('start_date_label', e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs">Yenilənmə</Label>
+            <Label className="text-xs">{tr("billingdesignertab_yenilenme_8e3032", "Yenilənmə")}</Label>
             <Input value={config.renewal_label} onChange={e => updateField('renewal_label', e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs">Bitmə</Label>
+            <Label className="text-xs">{tr("billingdesignertab_bitme_f6de2a", "Bitmə")}</Label>
             <Input value={config.expiry_label} onChange={e => updateField('expiry_label', e.target.value)} />
           </div>
         </div>
         <div>
-          <Label className="text-xs">Ləğv bildirişi</Label>
+          <Label className="text-xs">{tr("billingdesignertab_legv_bildirisi_274b32", "Ləğv bildirişi")}</Label>
           <Input value={config.cancelled_notice} onChange={e => updateField('cancelled_notice', e.target.value)} />
           <p className="text-[10px] text-muted-foreground mt-0.5">{'{date}'} — tarix ilə əvəz olunur</p>
         </div>
       </Section>
 
       {/* Features */}
-      <Section title="Üstünlüklər" icon={Sparkles}>
+      <Section title={tr("billingdesignertab_ustunlukler_6e0ad9", "Üstünlüklər")} icon={Sparkles}>
         <div>
-          <Label className="text-xs">Bölmə başlığı</Label>
+          <Label className="text-xs">{tr("billingdesignertab_bolme_basligi_a972ec", "Bölmə başlığı")}</Label>
           <Input value={config.features_title} onChange={e => updateField('features_title', e.target.value)} />
         </div>
         <div className="space-y-2">
           {config.features.map((feat, i) => (
             <div key={i} className="flex items-center gap-2">
               <Input value={feat.icon} onChange={e => updateFeature(i, 'icon', e.target.value)} className="w-24" placeholder="Icon" />
-              <Input value={feat.text} onChange={e => updateFeature(i, 'text', e.target.value)} className="flex-1" placeholder="Mətn" />
+              <Input value={feat.text} onChange={e => updateFeature(i, 'text', e.target.value)} className="flex-1" placeholder={tr("billingdesignertab_metn_6e9f0f", "Mətn")} />
               <Button variant="ghost" size="icon" onClick={() => removeFeature(i)} className="shrink-0">
                 <Trash2 className="w-4 h-4 text-destructive" />
               </Button>
@@ -153,65 +154,65 @@ const BillingDesignerTab = () => {
       </Section>
 
       {/* CTA Buttons */}
-      <Section title="Düymə Mətnləri" icon={MousePointer}>
+      <Section title={tr("billingdesignertab_duyme_metnleri_147868", "Düymə Mətnləri")} icon={MousePointer}>
         <div className="grid gap-3">
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <Label className="text-xs">Yüksəltmə CTA</Label>
+              <Label className="text-xs">{tr("billingdesignertab_yukseltme_cta_cb2fe8", "Yüksəltmə CTA")}</Label>
               <Input value={config.upgrade_cta} onChange={e => updateField('upgrade_cta', e.target.value)} />
             </div>
             <div>
-              <Label className="text-xs">Qənaət mətni</Label>
+              <Label className="text-xs">{tr("billingdesignertab_qenaet_metni_17412a", "Qənaət mətni")}</Label>
               <Input value={config.upgrade_savings} onChange={e => updateField('upgrade_savings', e.target.value)} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <Label className="text-xs">Bərpa CTA</Label>
+              <Label className="text-xs">{tr("billingdesignertab_berpa_cta_7a62cb", "Bərpa CTA")}</Label>
               <Input value={config.restore_cta} onChange={e => updateField('restore_cta', e.target.value)} />
             </div>
             <div>
-              <Label className="text-xs">Ləğv CTA</Label>
+              <Label className="text-xs">{tr("billingdesignertab_legv_cta_d2b58c", "Ləğv CTA")}</Label>
               <Input value={config.cancel_cta} onChange={e => updateField('cancel_cta', e.target.value)} />
             </div>
           </div>
           <div>
-            <Label className="text-xs">Premium-a keç CTA</Label>
+            <Label className="text-xs">{tr("billingdesignertab_premium_a_kec_cta_482f4d", "Premium-a keç CTA")}</Label>
             <Input value={config.get_premium_cta} onChange={e => updateField('get_premium_cta', e.target.value)} />
           </div>
         </div>
       </Section>
 
       {/* Payment & Support */}
-      <Section title="Ödəniş və Dəstək" icon={CreditCard}>
+      <Section title={tr("billingdesignertab_odenis_ve_destek_9e9d73", "Ödəniş və Dəstək")} icon={CreditCard}>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label className="text-xs">Ödəniş başlığı</Label>
+            <Label className="text-xs">{tr("billingdesignertab_odenis_basligi_a9eb1c", "Ödəniş başlığı")}</Label>
             <Input value={config.payment_title} onChange={e => updateField('payment_title', e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs">Ödənildi mətni</Label>
+            <Label className="text-xs">{tr("billingdesignertab_odenildi_metni_b47c40", "Ödənildi mətni")}</Label>
             <Input value={config.paid_label} onChange={e => updateField('paid_label', e.target.value)} />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label className="text-xs">Dəstək mətni</Label>
+            <Label className="text-xs">{tr("billingdesignertab_destek_metni_2cc9d9", "Dəstək mətni")}</Label>
             <Input value={config.support_text} onChange={e => updateField('support_text', e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs">Dəstək email</Label>
+            <Label className="text-xs">{tr("billingdesignertab_destek_email_207ed0", "Dəstək email")}</Label>
             <Input value={config.support_email} onChange={e => updateField('support_email', e.target.value)} />
           </div>
         </div>
       </Section>
 
       {/* Gradient Colors */}
-      <Section title="Header Rəngləri" icon={Palette}>
-        <p className="text-xs text-muted-foreground mb-2">Premium istifadəçi üçün</p>
+      <Section title={tr("billingdesignertab_header_rengleri_66cc09", "Header Rəngləri")} icon={Palette}>
+        <p className="text-xs text-muted-foreground mb-2">{tr("billingdesignertab_premium_istifadeci_ucun_ac15a0", "Premium istifadəçi üçün")}</p>
         <div className="grid grid-cols-3 gap-3">
           <div>
-            <Label className="text-xs">Başlanğıc</Label>
+            <Label className="text-xs">{tr("billingdesignertab_baslangic_e9d2d5", "Başlanğıc")}</Label>
             <div className="flex items-center gap-2">
               <input type="color" value={config.header_gradient_from} onChange={e => updateField('header_gradient_from', e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0" />
               <Input value={config.header_gradient_from} onChange={e => updateField('header_gradient_from', e.target.value)} className="text-xs" />
@@ -234,10 +235,10 @@ const BillingDesignerTab = () => {
         </div>
         <div className="h-10 rounded-xl" style={{ background: `linear-gradient(to right, ${config.header_gradient_from}, ${config.header_gradient_via}, ${config.header_gradient_to})` }} />
 
-        <p className="text-xs text-muted-foreground mb-2 mt-3">Pulsuz istifadəçi üçün</p>
+        <p className="text-xs text-muted-foreground mb-2 mt-3">{tr("billingdesignertab_pulsuz_istifadeci_ucun_80ea44", "Pulsuz istifadəçi üçün")}</p>
         <div className="grid grid-cols-3 gap-3">
           <div>
-            <Label className="text-xs">Başlanğıc</Label>
+            <Label className="text-xs">{tr("billingdesignertab_baslangic_e9d2d5", "Başlanğıc")}</Label>
             <div className="flex items-center gap-2">
               <input type="color" value={config.header_free_from} onChange={e => updateField('header_free_from', e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0" />
               <Input value={config.header_free_from} onChange={e => updateField('header_free_from', e.target.value)} className="text-xs" />

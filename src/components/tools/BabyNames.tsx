@@ -61,7 +61,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </motion.button>
             <div className="flex-1">
-              <h1 className="text-lg font-bold text-foreground">Körpə Adları</h1>
+              <h1 className="text-lg font-bold text-foreground">{tr("babynames_korpe_adlari_357880", "Körpə Adları")}</h1>
             </div>
             <motion.button
               onClick={getRandomName}
@@ -235,8 +235,8 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
               <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-3">
                 <Search className="w-7 h-7 text-muted-foreground/50" />
               </div>
-              <p className="font-semibold text-foreground mb-1">Ad tapılmadı</p>
-              <p className="text-sm text-muted-foreground">Axtarış sorğusunu dəyişin</p>
+              <p className="font-semibold text-foreground mb-1">{tr("babynames_ad_tapilmadi_cf4c7a", "Ad tapılmadı")}</p>
+              <p className="text-sm text-muted-foreground">{tr("babynames_axtaris_sorgusunu_deyisin_992b5e", "Axtarış sorğusunu dəyişin")}</p>
             </motion.div>
           )}
         </div>
@@ -298,13 +298,13 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
               <div className="p-5">
                 {/* Meaning */}
                 <div className="mb-4">
-                  <p className="text-xs text-muted-foreground mb-1">Mənası</p>
+                  <p className="text-xs text-muted-foreground mb-1">{tr("babynames_menasi_83a157", "Mənası")}</p>
                   <p className="text-base font-medium text-foreground">{selectedName.meaning_az || selectedName.meaning || 'Məlumat yoxdur'}</p>
                 </div>
 
                 {/* Popularity */}
                 <div className="flex items-center justify-between mb-5 p-3 bg-muted/50 rounded-xl">
-                  <span className="text-sm text-muted-foreground">Populyarlıq</span>
+                  <span className="text-sm text-muted-foreground">{tr("babynames_populyarliq_1501b1", "Populyarlıq")}</span>
                   <div className="flex items-center gap-2">
                     <div className="w-20 h-2 bg-muted rounded-full overflow-hidden">
                       <motion.div 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { 
   Search, Filter, Check, X, Trash2, Edit, Eye, 
   Loader2, Package, Clock, CheckCircle, XCircle, AlertCircle
@@ -64,13 +65,13 @@ const categories = [
   { id: 'stroller', label: 'Araba', emoji: '👶' },
   { id: 'feeding', label: 'Qidalanma', emoji: '🍼' },
   { id: 'hygiene', label: 'Gigiyena', emoji: '🛁' },
-  { id: 'other', label: 'Digər', emoji: '📦' },
+  { id: 'other', label: tr("adminmarketplace_diger_293b3a", "Digər"), emoji: '📦' },
 ];
 
 const conditions = [
   { id: 'new', label: 'Yeni', color: 'bg-green-500' },
   { id: 'like_new', label: 'Yeni kimi', color: 'bg-emerald-500' },
-  { id: 'good', label: 'Yaxşı', color: 'bg-blue-500' },
+  { id: 'good', label: tr("adminmarketplace_yaxsi_9d8595", "Yaxşı"), color: 'bg-blue-500' },
   { id: 'fair', label: 'Normal', color: 'bg-yellow-500' },
 ];
 
@@ -79,10 +80,10 @@ const ageRanges = [
 ];
 
 const statusLabels: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  pending: { label: 'Gözləyir', color: 'bg-yellow-500', icon: <Clock className="w-4 h-4" /> },
+  pending: { label: tr("adminmarketplace_gozleyir_9ac18a", "Gözləyir"), color: 'bg-yellow-500', icon: <Clock className="w-4 h-4" /> },
   active: { label: 'Aktiv', color: 'bg-green-500', icon: <CheckCircle className="w-4 h-4" /> },
-  rejected: { label: 'Rədd edildi', color: 'bg-red-500', icon: <XCircle className="w-4 h-4" /> },
-  sold: { label: 'Satıldı', color: 'bg-blue-500', icon: <Package className="w-4 h-4" /> },
+  rejected: { label: tr("adminmarketplace_redd_edildi_c40149", "Rədd edildi"), color: 'bg-red-500', icon: <XCircle className="w-4 h-4" /> },
+  sold: { label: tr("adminmarketplace_satildi_6a6109", "Satıldı"), color: 'bg-blue-500', icon: <Package className="w-4 h-4" /> },
   inactive: { label: 'Deaktiv', color: 'bg-gray-500', icon: <AlertCircle className="w-4 h-4" /> },
 };
 
@@ -149,13 +150,13 @@ const AdminMarketplace = () => {
       
       setIsMarketplaceEnabled(newStatus);
       toast({
-        title: 'Uğurlu!',
+        title: tr("adminmarketplace_ugurlu_5c0191", "Uğurlu!"),
         description: `Bazar ${newStatus ? 'aktivləşdirildi' : 'deaktiv edildi'}`,
       });
     } catch (error) {
       toast({
-        title: 'Xəta',
-        description: 'Status dəyişdirilə bilmədi',
+        title: tr("adminmarketplace_xeta_3cdbb6", "Xəta"),
+        description: tr("adminmarketplace_status_deyisdirile_bilmedi_de921f", "Status dəyişdirilə bilmədi"),
         variant: 'destructive'
       });
     }
@@ -183,8 +184,8 @@ const AdminMarketplace = () => {
       setListings(data || []);
     } catch (error) {
       toast({
-        title: 'Xəta',
-        description: 'Elanlar yüklənə bilmədi',
+        title: tr("adminmarketplace_xeta_3cdbb6", "Xəta"),
+        description: tr("adminmarketplace_elanlar_yuklene_bilmedi_3af806", "Elanlar yüklənə bilmədi"),
         variant: 'destructive'
       });
     } finally {
@@ -208,14 +209,14 @@ const AdminMarketplace = () => {
       if (error) throw error;
       
       toast({
-        title: 'Uğurlu!',
-        description: 'Elan təsdiqləndi',
+        title: tr("adminmarketplace_ugurlu_5c0191", "Uğurlu!"),
+        description: tr("adminmarketplace_elan_tesdiqlendi_9bfd19", "Elan təsdiqləndi"),
       });
       loadListings();
     } catch (error) {
       toast({
-        title: 'Xəta',
-        description: 'Elan təsdiqlənə bilmədi',
+        title: tr("adminmarketplace_xeta_3cdbb6", "Xəta"),
+        description: tr("adminmarketplace_elan_tesdiqlene_bilmedi_c7a56a", "Elan təsdiqlənə bilmədi"),
         variant: 'destructive'
       });
     } finally {
@@ -241,8 +242,8 @@ const AdminMarketplace = () => {
       if (error) throw error;
       
       toast({
-        title: 'Uğurlu!',
-        description: 'Elan rədd edildi',
+        title: tr("adminmarketplace_ugurlu_5c0191", "Uğurlu!"),
+        description: tr("adminmarketplace_elan_redd_edildi_54979d", "Elan rədd edildi"),
       });
       setShowRejectModal(false);
       setRejectReason('');
@@ -250,8 +251,8 @@ const AdminMarketplace = () => {
       loadListings();
     } catch (error) {
       toast({
-        title: 'Xəta',
-        description: 'Elan rədd edilə bilmədi',
+        title: tr("adminmarketplace_xeta_3cdbb6", "Xəta"),
+        description: tr("adminmarketplace_elan_redd_edile_bilmedi_1e60a6", "Elan rədd edilə bilmədi"),
         variant: 'destructive'
       });
     } finally {
@@ -271,14 +272,14 @@ const AdminMarketplace = () => {
       if (error) throw error;
       
       toast({
-        title: 'Uğurlu!',
+        title: tr("adminmarketplace_ugurlu_5c0191", "Uğurlu!"),
         description: 'Elan silindi',
       });
       loadListings();
     } catch (error) {
       toast({
-        title: 'Xəta',
-        description: 'Elan silinə bilmədi',
+        title: tr("adminmarketplace_xeta_3cdbb6", "Xəta"),
+        description: tr("adminmarketplace_elan_siline_bilmedi_38864f", "Elan silinə bilmədi"),
         variant: 'destructive'
       });
     }
@@ -324,16 +325,16 @@ const AdminMarketplace = () => {
       if (error) throw error;
       
       toast({
-        title: 'Uğurlu!',
-        description: 'Elan yeniləndi',
+        title: tr("adminmarketplace_ugurlu_5c0191", "Uğurlu!"),
+        description: tr("adminmarketplace_elan_yenilendi_b02130", "Elan yeniləndi"),
       });
       setShowEditModal(false);
       setSelectedListing(null);
       loadListings();
     } catch (error) {
       toast({
-        title: 'Xəta',
-        description: 'Elan yenilənə bilmədi',
+        title: tr("adminmarketplace_xeta_3cdbb6", "Xəta"),
+        description: tr("adminmarketplace_elan_yenilene_bilmedi_310c74", "Elan yenilənə bilmədi"),
         variant: 'destructive'
       });
     } finally {
@@ -364,8 +365,8 @@ const AdminMarketplace = () => {
       {/* Header with Toggle */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">İkinci Əl Bazarı</h1>
-          <p className="text-muted-foreground">Elanları idarə edin</p>
+          <h1 className="text-2xl font-bold">{tr("adminmarketplace_ikinci_el_bazari_ad9f9f", "İkinci Əl Bazarı")}</h1>
+          <p className="text-muted-foreground">{tr("adminmarketplace_elanlari_idare_edin_6f0fd9", "Elanları idarə edin")}</p>
         </div>
         
         <div className="flex items-center gap-4">
@@ -392,7 +393,7 @@ const AdminMarketplace = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold">{pendingCount}</p>
-                <p className="text-xs text-muted-foreground">Gözləyir</p>
+                <p className="text-xs text-muted-foreground">{tr("adminmarketplace_gozleyir_9ac18a", "Gözləyir")}</p>
               </div>
             </div>
           </CardContent>
@@ -420,7 +421,7 @@ const AdminMarketplace = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold">{rejectedCount}</p>
-                <p className="text-xs text-muted-foreground">Rədd edildi</p>
+                <p className="text-xs text-muted-foreground">{tr("adminmarketplace_redd_edildi_c40149", "Rədd edildi")}</p>
               </div>
             </div>
           </CardContent>
@@ -434,7 +435,7 @@ const AdminMarketplace = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold">{listings.length}</p>
-                <p className="text-xs text-muted-foreground">Cəmi</p>
+                <p className="text-xs text-muted-foreground">{tr("adminmarketplace_cemi_84214a", "Cəmi")}</p>
               </div>
             </div>
           </CardContent>
@@ -460,11 +461,11 @@ const AdminMarketplace = () => {
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Bütün statuslar</SelectItem>
-                <SelectItem value="pending">Gözləyir</SelectItem>
+                <SelectItem value="all">{tr("adminmarketplace_butun_statuslar_ec4501", "Bütün statuslar")}</SelectItem>
+                <SelectItem value="pending">{tr("adminmarketplace_gozleyir_9ac18a", "Gözləyir")}</SelectItem>
                 <SelectItem value="active">Aktiv</SelectItem>
-                <SelectItem value="rejected">Rədd edildi</SelectItem>
-                <SelectItem value="sold">Satıldı</SelectItem>
+                <SelectItem value="rejected">{tr("adminmarketplace_redd_edildi_c40149", "Rədd edildi")}</SelectItem>
+                <SelectItem value="sold">{tr("adminmarketplace_satildi_6a6109", "Satıldı")}</SelectItem>
                 <SelectItem value="inactive">Deaktiv</SelectItem>
               </SelectContent>
             </Select>
@@ -474,7 +475,7 @@ const AdminMarketplace = () => {
                 <SelectValue placeholder="Kateqoriya" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Bütün kateqoriyalar</SelectItem>
+                <SelectItem value="all">{tr("adminmarketplace_butun_kateqoriyalar_ada67d", "Bütün kateqoriyalar")}</SelectItem>
                 {categories.map(cat => (
                   <SelectItem key={cat.id} value={cat.id}>
                     {cat.emoji} {cat.label}
@@ -499,7 +500,7 @@ const AdminMarketplace = () => {
           ) : filteredListings.length === 0 ? (
             <div className="text-center py-12">
               <Package className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-              <p className="text-muted-foreground">Elan tapılmadı</p>
+              <p className="text-muted-foreground">{tr("adminmarketplace_elan_tapilmadi_2b9b15", "Elan tapılmadı")}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -508,10 +509,10 @@ const AdminMarketplace = () => {
                   <TableRow>
                     <TableHead>Elan</TableHead>
                     <TableHead>Kateqoriya</TableHead>
-                    <TableHead>Qiymət</TableHead>
+                    <TableHead>{tr("adminmarketplace_qiymet_54c4f3", "Qiymət")}</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Tarix</TableHead>
-                    <TableHead className="text-right">Əməliyyatlar</TableHead>
+                    <TableHead className="text-right">{tr("adminmarketplace_emeliyyatlar_54d70c", "Əməliyyatlar")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -628,7 +629,7 @@ const AdminMarketplace = () => {
       <Dialog open={showDetailModal} onOpenChange={setShowDetailModal}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Elan Detalları</DialogTitle>
+            <DialogTitle>{tr("adminmarketplace_elan_detallari_0ae834", "Elan Detalları")}</DialogTitle>
           </DialogHeader>
           
           {selectedListing && (
@@ -648,21 +649,21 @@ const AdminMarketplace = () => {
                   <p className="font-medium">{getCategoryInfo(selectedListing.category).label}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Vəziyyət</p>
+                  <p className="text-sm text-muted-foreground">{tr("adminmarketplace_veziyyet_f0e993", "Vəziyyət")}</p>
                   <p className="font-medium">{getConditionInfo(selectedListing.condition).label}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Qiymət</p>
+                  <p className="text-sm text-muted-foreground">{tr("adminmarketplace_qiymet_54c4f3", "Qiymət")}</p>
                   <p className="font-medium">
                     {selectedListing.is_free ? 'Pulsuz' : `${selectedListing.price} ₼`}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Yaş aralığı</p>
+                  <p className="text-sm text-muted-foreground">{tr("adminmarketplace_yas_araligi_2e277e", "Yaş aralığı")}</p>
                   <p className="font-medium">{selectedListing.age_range || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Şəhər</p>
+                  <p className="text-sm text-muted-foreground">{tr("adminmarketplace_seher_5f373c", "Şəhər")}</p>
                   <p className="font-medium">{selectedListing.location_city || '-'}</p>
                 </div>
                 <div>
@@ -698,7 +699,7 @@ const AdminMarketplace = () => {
       <Dialog open={showRejectModal} onOpenChange={setShowRejectModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Elanı rədd et</DialogTitle>
+            <DialogTitle>{tr("adminmarketplace_elani_redd_et_2c1ddd", "Elanı rədd et")}</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4">
@@ -707,7 +708,7 @@ const AdminMarketplace = () => {
             </p>
             
             <Textarea
-              placeholder="Rədd səbəbi..."
+              placeholder={tr("adminmarketplace_redd_sebebi_c8a02b", "Rədd səbəbi...")}
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               rows={3}
@@ -738,12 +739,12 @@ const AdminMarketplace = () => {
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Elanı redaktə et</DialogTitle>
+            <DialogTitle>{tr("adminmarketplace_elani_redakte_et_cb4cd1", "Elanı redaktə et")}</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium mb-1 block">Başlıq</label>
+              <label className="text-sm font-medium mb-1 block">{tr("adminmarketplace_basliq_e1f6c5", "Başlıq")}</label>
               <Input
                 value={editForm.title}
                 onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
@@ -751,7 +752,7 @@ const AdminMarketplace = () => {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-1 block">Təsvir</label>
+              <label className="text-sm font-medium mb-1 block">{tr("adminmarketplace_tesvir_f85651", "Təsvir")}</label>
               <Textarea
                 value={editForm.description}
                 onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
@@ -779,7 +780,7 @@ const AdminMarketplace = () => {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-2 block">Vəziyyət</label>
+              <label className="text-sm font-medium mb-2 block">{tr("adminmarketplace_veziyyet_f0e993", "Vəziyyət")}</label>
               <Select 
                 value={editForm.condition} 
                 onValueChange={(v) => setEditForm({ ...editForm, condition: v })}
@@ -798,13 +799,13 @@ const AdminMarketplace = () => {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-2 block">Yaş aralığı</label>
+              <label className="text-sm font-medium mb-2 block">{tr("adminmarketplace_yas_araligi_2e277e", "Yaş aralığı")}</label>
               <Select 
                 value={editForm.age_range} 
                 onValueChange={(v) => setEditForm({ ...editForm, age_range: v })}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Seçin" />
+                  <SelectValue placeholder={tr("adminmarketplace_secin_5c0c8d", "Seçin")} />
                 </SelectTrigger>
                 <SelectContent>
                   {ageRanges.map(age => (
@@ -815,7 +816,7 @@ const AdminMarketplace = () => {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-2 block">Qiymət</label>
+              <label className="text-sm font-medium mb-2 block">{tr("adminmarketplace_qiymet_54c4f3", "Qiymət")}</label>
               <div className="flex gap-2 items-center">
                 <Switch
                   checked={editForm.is_free}
@@ -837,7 +838,7 @@ const AdminMarketplace = () => {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-1 block">Şəhər</label>
+              <label className="text-sm font-medium mb-1 block">{tr("adminmarketplace_seher_5f373c", "Şəhər")}</label>
               <Input
                 value={editForm.location_city}
                 onChange={(e) => setEditForm({ ...editForm, location_city: e.target.value })}
@@ -854,10 +855,10 @@ const AdminMarketplace = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pending">Gözləyir</SelectItem>
+                  <SelectItem value="pending">{tr("adminmarketplace_gozleyir_9ac18a", "Gözləyir")}</SelectItem>
                   <SelectItem value="active">Aktiv</SelectItem>
-                  <SelectItem value="rejected">Rədd edildi</SelectItem>
-                  <SelectItem value="sold">Satıldı</SelectItem>
+                  <SelectItem value="rejected">{tr("adminmarketplace_redd_edildi_c40149", "Rədd edildi")}</SelectItem>
+                  <SelectItem value="sold">{tr("adminmarketplace_satildi_6a6109", "Satıldı")}</SelectItem>
                   <SelectItem value="inactive">Deaktiv</SelectItem>
                 </SelectContent>
               </Select>

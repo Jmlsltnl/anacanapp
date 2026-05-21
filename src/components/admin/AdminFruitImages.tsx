@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Upload, Trash2, Image, RefreshCw, Info } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -118,7 +119,7 @@ const AdminFruitImages = () => {
       if (dbError) throw dbError;
 
       toast({
-        title: 'Uğurlu!',
+        title: tr("adminfruitimages_ugurlu_5c0191", "Uğurlu!"),
         description: `Həftə ${weekNumber} üçün şəkil yükləndi`,
       });
 
@@ -126,7 +127,7 @@ const AdminFruitImages = () => {
     } catch (error: any) {
       console.error('Error uploading image:', error);
       toast({
-        title: 'Xəta',
+        title: tr("adminfruitimages_xeta_3cdbb6", "Xəta"),
         description: error.message || 'Şəkil yüklənə bilmədi',
         variant: 'destructive',
       });
@@ -146,15 +147,15 @@ const AdminFruitImages = () => {
 
       toast({
         title: 'Silindi',
-        description: 'Şəkil silindi, emoji göstəriləcək',
+        description: tr("adminfruitimages_sekil_silindi_emoji_gosterilecek_383b6a", "Şəkil silindi, emoji göstəriləcək"),
       });
 
       fetchFruitImages();
     } catch (error: any) {
       console.error('Error deleting image:', error);
       toast({
-        title: 'Xəta',
-        description: 'Şəkil silinə bilmədi',
+        title: tr("adminfruitimages_xeta_3cdbb6", "Xəta"),
+        description: tr("adminfruitimages_sekil_siline_bilmedi_e563ea", "Şəkil silinə bilmədi"),
         variant: 'destructive',
       });
     }
@@ -167,7 +168,7 @@ const AdminFruitImages = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Körpə Ölçüsü Şəkilləri</h1>
+          <h1 className="text-2xl font-bold text-foreground">{tr("adminfruitimages_korpe_olcusu_sekilleri_103ec8", "Körpə Ölçüsü Şəkilləri")}</h1>
           <p className="text-muted-foreground">
             Hamiləlik Kontentindəki meyvə adlarına uyğun şəkillər yükləyin.
           </p>
@@ -183,9 +184,9 @@ const AdminFruitImages = () => {
         <div className="flex items-start gap-3">
           <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
           <div>
-            <p className="font-medium text-blue-800 dark:text-blue-200">Məlumat mənbəyi</p>
+            <p className="font-medium text-blue-800 dark:text-blue-200">{tr("adminfruitimages_melumat_menbeyi_afbb10", "Məlumat mənbəyi")}</p>
             <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-              Meyvə adları <strong>"Hamiləlik Kontenti"</strong> bölməsindəki <strong>"Meyvə ölçüsü"</strong> sütunundan gəlir. 
+              Meyvə adları <strong>{tr("adminfruitimages_hamilelik_kontenti_05bc13", "\"Hamiləlik Kontenti\"")}</strong>{tr("adminfruitimages_bolmesindeki_a4ae5e", "bölməsindəki")}<strong>{tr("adminfruitimages_meyve_olcusu_7b1bfe", "\"Meyvə ölçüsü\"")}</strong> sütunundan gəlir. 
               Burada yalnız şəkillər idarə olunur.
             </p>
           </div>
@@ -240,7 +241,7 @@ const AdminFruitImages = () => {
                         )}
                       </p>
                     ) : (
-                      <p className="text-xs text-muted-foreground italic">Meyvə təyin edilməyib</p>
+                      <p className="text-xs text-muted-foreground italic">{tr("adminfruitimages_meyve_teyin_edilmeyib_5b0950", "Meyvə təyin edilməyib")}</p>
                     )}
                   </div>
 
@@ -289,7 +290,7 @@ const AdminFruitImages = () => {
         <div className="flex items-start gap-3">
           <Image className="w-5 h-5 text-primary mt-0.5" />
           <div>
-            <p className="font-medium text-foreground">Şəkil formatı tövsiyəsi</p>
+            <p className="font-medium text-foreground">{tr("adminfruitimages_sekil_formati_tovsiyesi_7c1b4d", "Şəkil formatı tövsiyəsi")}</p>
             <p className="text-sm text-muted-foreground mt-1">
               PNG və ya WebP formatında, 200x200px ölçüsündə şəffaf fon ilə şəkillər tövsiyə olunur.
             </p>

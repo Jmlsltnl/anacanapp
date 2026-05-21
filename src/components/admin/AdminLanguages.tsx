@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -125,14 +126,14 @@ const AdminLanguages = () => {
 
   const [editForm, setEditForm] = useState<Record<string, string>>({});
 
-  if (isLoading) return <div className="p-4">Yüklənir...</div>;
+  if (isLoading) return <div className="p-4">{tr("adminlanguages_yuklenir_5557de", "Yüklənir...")}</div>;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Globe className="w-6 h-6 text-primary" />
-          <h2 className="text-2xl font-bold">Dil İdarəetməsi</h2>
+          <h2 className="text-2xl font-bold">{tr("adminlanguages_dil_idareetmesi_fd660e", "Dil İdarəetməsi")}</h2>
         </div>
         <Button onClick={() => setShowAdd(!showAdd)} size="sm">
           <Plus className="w-4 h-4 mr-1" /> Yeni Dil
@@ -156,11 +157,11 @@ const AdminLanguages = () => {
                 <Input value={newLang.native_name} onChange={e => setNewLang(p => ({ ...p, native_name: e.target.value }))} placeholder="English" />
               </div>
               <div>
-                <Label>Bölgələr (vergüllə)</Label>
+                <Label>{tr("adminlanguages_bolgeler_vergulle_ae07f8", "Bölgələr (vergüllə)")}</Label>
                 <Input value={newLang.regions} onChange={e => setNewLang(p => ({ ...p, regions: e.target.value }))} placeholder="US,GB,AU" />
               </div>
               <div className="col-span-2">
-                <Label>Deaktiv alətlər (vergüllə, boş saxlaya bilərsiniz)</Label>
+                <Label>{tr("adminlanguages_deaktiv_aletler_vergulle_bos_saxlaya_bil_705444", "Deaktiv alətlər (vergüllə, boş saxlaya bilərsiniz)")}</Label>
                 <Input value={newLang.disabled_tools} onChange={e => setNewLang(p => ({ ...p, disabled_tools: e.target.value }))} placeholder="cakes,maternity" />
               </div>
             </div>

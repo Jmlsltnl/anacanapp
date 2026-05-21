@@ -81,7 +81,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
           </motion.button>
           <div className="flex-1">
             <h1 className="text-xl font-bold text-white">Dekret Kalkulyatoru</h1>
-            <p className="text-white/80 text-sm">Müavinət hesablama</p>
+            <p className="text-white/80 text-sm">{tr("maternitycalculator_muavinet_hesablama_ebc288", "Müavinət hesablama")}</p>
           </div>
           <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
             <Calculator className="w-6 h-6 text-white" />
@@ -117,7 +117,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                   <p className="font-bold text-amber-900 dark:text-amber-100 text-lg">
                     {config?.birthBenefit} AZN
                   </p>
-                  <p className="text-sm text-amber-700 dark:text-amber-300">Birdəfəlik doğum müavinəti</p>
+                  <p className="text-sm text-amber-700 dark:text-amber-300">{tr("maternitycalculator_birdefelik_dogum_muavineti_2b3fe1", "Birdəfəlik doğum müavinəti")}</p>
                 </div>
               </div>
             </motion.div>
@@ -215,7 +215,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                   {/* Total Result Card */}
                   <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white">
                     <div className="flex items-center justify-between mb-4">
-                      <p className="text-white/80">Ümumi müavinət</p>
+                      <p className="text-white/80">{tr("maternitycalculator_umumi_muavinet_3ef09d", "Ümumi müavinət")}</p>
                       <CheckCircle2 className="w-6 h-6" />
                     </div>
                     <p className="text-4xl font-black mb-1">
@@ -237,27 +237,27 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                     
                     <div className="divide-y divide-border">
                       <div className="flex justify-between items-center p-4">
-                        <span className="text-muted-foreground">Orta günlük əmək haqqı</span>
+                        <span className="text-muted-foreground">{tr("maternitycalculator_orta_gunluk_emek_haqqi_39d8be", "Orta günlük əmək haqqı")}</span>
                         <span className="font-semibold">{result.dailySalary.toFixed(2)} ₼</span>
                       </div>
                       <div className="flex justify-between items-center p-4">
-                        <span className="text-muted-foreground">Doğuşdan əvvəl</span>
+                        <span className="text-muted-foreground">{tr("maternitycalculator_dogusdan_evvel_027ef3", "Doğuşdan əvvəl")}</span>
                         <span className="font-semibold">{result.daysBefore} gün</span>
                       </div>
                       <div className="flex justify-between items-center p-4">
-                        <span className="text-muted-foreground">Doğuşdan sonra</span>
+                        <span className="text-muted-foreground">{tr("maternitycalculator_dogusdan_sonra_cf6a0d", "Doğuşdan sonra")}</span>
                         <span className="font-semibold">{result.daysAfter} gün</span>
                       </div>
                       <div className="flex justify-between items-center p-4 bg-muted/30">
-                        <span className="text-muted-foreground">Cəmi məzuniyyət</span>
+                        <span className="text-muted-foreground">{tr("maternitycalculator_cemi_mezuniyyet_93196a", "Cəmi məzuniyyət")}</span>
                         <span className="font-bold text-primary">{result.totalLeaveDays} gün</span>
                       </div>
                       <div className="flex justify-between items-center p-4">
-                        <span className="text-muted-foreground">Dekret ödənişi</span>
+                        <span className="text-muted-foreground">{tr("maternitycalculator_dekret_odenisi_af1939", "Dekret ödənişi")}</span>
                         <span className="font-semibold">{result.maternityBenefit.toLocaleString('az-AZ')} ₼</span>
                       </div>
                       <div className="flex justify-between items-center p-4">
-                        <span className="text-muted-foreground">Doğum müavinəti</span>
+                        <span className="text-muted-foreground">{tr("maternitycalculator_dogum_muavineti_22766f", "Doğum müavinəti")}</span>
                         <span className="font-semibold">{result.birthBenefit} ₼</span>
                       </div>
                     </div>
@@ -320,8 +320,8 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
               <div className="flex items-center gap-3">
                 <HelpCircle className="w-5 h-5 text-primary" />
                 <div>
-                  <p className="font-medium">Əlavə məlumat üçün</p>
-                  <p className="text-sm text-muted-foreground">DSMF qaynar xətti: <strong>142</strong></p>
+                  <p className="font-medium">{tr("maternitycalculator_elave_melumat_ucun_9e3dfc", "Əlavə məlumat üçün")}</p>
+                  <p className="text-sm text-muted-foreground">{tr("maternitycalculator_dsmf_qaynar_xetti_d8e628", "DSMF qaynar xətti:")}<strong>142</strong></p>
                 </div>
               </div>
             </div>

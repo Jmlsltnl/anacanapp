@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { ArrowLeft, FileText, Shield, Scale, AlertTriangle, CreditCard, Database, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -83,7 +84,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <h1 className="text-lg font-semibold">Hüquqi Sənədlər</h1>
+        <h1 className="text-lg font-semibold">{tr("legalscreen_huquqi_senedler_ca8c60", "Hüquqi Sənədlər")}</h1>
       </div>
 
       <ScrollArea className="flex-1">

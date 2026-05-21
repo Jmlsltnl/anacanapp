@@ -192,7 +192,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div>
-              <h1 className="text-lg font-semibold">Diş Çıxarma İzləyicisi</h1>
+              <h1 className="text-lg font-semibold">{tr("teethingtracker_dis_cixarma_izleyicisi_109c3d", "Diş Çıxarma İzləyicisi")}</h1>
               <p className="text-xs text-muted-foreground">
                 {selectedChild?.name || 'Körpənizin'} dişlərini izləyin
               </p>
@@ -226,13 +226,13 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
                   <Sparkles className="w-5 h-5 text-pink-500" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium">Çıxan Dişlər</p>
+                  <p className="text-sm font-medium">{tr("teethingtracker_cixan_disler_ab71e7", "Çıxan Dişlər")}</p>
                   <p className="text-2xl font-bold text-pink-600">{emergedCount} / {totalTeeth}</p>
                 </div>
               </div>
               <div className="text-right">
                 <p className="text-3xl font-bold text-pink-600">{Math.round(progress)}%</p>
-                <p className="text-xs text-muted-foreground">tamamlandı</p>
+                <p className="text-xs text-muted-foreground">{tr("teethingtracker_tamamlandi_d6728f", "tamamlandı")}</p>
               </div>
             </div>
             <Progress value={progress} className="h-2" />
@@ -246,12 +246,12 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               <Heart className="w-4 h-4 text-rose-500" />
               Diş Diaqramı
             </CardTitle>
-            <p className="text-xs text-muted-foreground">Dişə toxunaraq qeyd edin</p>
+            <p className="text-xs text-muted-foreground">{tr("teethingtracker_dise_toxunaraq_qeyd_edin_65aadb", "Dişə toxunaraq qeyd edin")}</p>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Upper Jaw */}
             <div className="space-y-2">
-              <p className="text-xs text-center text-muted-foreground font-medium">Yuxarı Çənə</p>
+              <p className="text-xs text-center text-muted-foreground font-medium">{tr("teethingtracker_yuxari_cene_589483", "Yuxarı Çənə")}</p>
               <div className="bg-gradient-to-b from-rose-100/80 via-rose-50/50 to-transparent dark:from-rose-900/30 dark:via-rose-950/20 rounded-t-[80px] p-5 pt-8 border-x-2 border-t-2 border-rose-200/50 dark:border-rose-800/30">
                 {renderToothDiagram(upperTeeth, 'upper')}
               </div>
@@ -274,18 +274,18 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               <div className="bg-gradient-to-t from-rose-100/80 via-rose-50/50 to-transparent dark:from-rose-900/30 dark:via-rose-950/20 rounded-b-[80px] p-5 pb-8 border-x-2 border-b-2 border-rose-200/50 dark:border-rose-800/30">
                 {renderToothDiagram(lowerTeeth, 'lower')}
               </div>
-              <p className="text-xs text-center text-muted-foreground font-medium">Aşağı Çənə</p>
+              <p className="text-xs text-center text-muted-foreground font-medium">{tr("teethingtracker_asagi_cene_78719d", "Aşağı Çənə")}</p>
             </div>
 
             {/* Legend */}
             <div className="flex justify-center gap-8 pt-4 border-t border-border/50">
               <div className="flex items-center gap-2">
                 <div className="w-5 h-6 rounded-t-md rounded-b-[30%] bg-gradient-to-b from-pink-300 to-pink-400 border-2 border-pink-200 shadow-sm" />
-                <span className="text-xs font-medium">Çıxıb</span>
+                <span className="text-xs font-medium">{tr("teethingtracker_cixib_f2099b", "Çıxıb")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-5 h-6 rounded-t-md rounded-b-[30%] bg-gradient-to-b from-gray-200 to-gray-300 border-2 border-gray-300" />
-                <span className="text-xs font-medium">Çıxmayıb</span>
+                <span className="text-xs font-medium">{tr("teethingtracker_cixmayib_d90dc0", "Çıxmayıb")}</span>
               </div>
             </div>
           </CardContent>
@@ -294,7 +294,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
         {/* Tabs for Tips and Symptoms */}
         <Tabs defaultValue="tips" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="tips">Qulluq Məsləhətləri</TabsTrigger>
+            <TabsTrigger value="tips">{tr("teethingtracker_qulluq_meslehetleri_1be08c", "Qulluq Məsləhətləri")}</TabsTrigger>
             <TabsTrigger value="symptoms">Simptomlar</TabsTrigger>
           </TabsList>
 
@@ -384,13 +384,13 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               {/* Tooth Info */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-muted/50 rounded-lg p-3 text-center">
-                  <p className="text-xs text-muted-foreground">Tipik çıxma yaşı</p>
+                  <p className="text-xs text-muted-foreground">{tr("teethingtracker_tipik_cixma_yasi_1c2740", "Tipik çıxma yaşı")}</p>
                   <p className="font-medium">
                     {selectedTooth.typical_emergence_months_min}-{selectedTooth.typical_emergence_months_max} ay
                   </p>
                 </div>
                 <div className="bg-muted/50 rounded-lg p-3 text-center">
-                  <p className="text-xs text-muted-foreground">Diş növü</p>
+                  <p className="text-xs text-muted-foreground">{tr("teethingtracker_dis_novu_07a451", "Diş növü")}</p>
                   <p className="font-medium">
                     {selectedTooth.tooth_type === 'incisor' ? 'Kəsici' : 
                      selectedTooth.tooth_type === 'canine' ? 'Köpək dişi' : 'Azı dişi'}

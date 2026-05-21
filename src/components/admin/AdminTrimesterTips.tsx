@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { useTrimesterTipsAdmin, TrimesterTip } from '@/hooks/useTrimesterTips';
 import { useTrimesterInfo, FALLBACK_TRIMESTER_INFO } from '@/hooks/useTrimesterInfo';
 import { Button } from '@/components/ui/button';
@@ -33,28 +34,28 @@ const AdminTrimesterTips = () => {
 
   const handleCreate = async () => {
     if (!newTip.tip_text?.trim()) {
-      toast({ title: 'Xəta', description: 'Tövsiyə mətni boş ola bilməz', variant: 'destructive' });
+      toast({ title: tr("admintrimestertips_xeta_3cdbb6", "Xəta"), description: tr("admintrimestertips_tovsiye_metni_bos_ola_bilmez_9e61ba", "Tövsiyə mətni boş ola bilməz"), variant: 'destructive' });
       return;
     }
 
     try {
       await createTip.mutateAsync(newTip);
-      toast({ title: 'Uğurlu', description: 'Tövsiyə əlavə edildi' });
+      toast({ title: tr("admintrimestertips_ugurlu_7fe64c", "Uğurlu"), description: tr("admintrimestertips_tovsiye_elave_edildi_e7f6c2", "Tövsiyə əlavə edildi") });
       setNewTip({ trimester: 1, icon: '💡', tip_text: '', sort_order: 0, is_active: true });
       setIsAdding(false);
     } catch (error) {
-      toast({ title: 'Xəta', description: 'Tövsiyə əlavə edilmədi', variant: 'destructive' });
+      toast({ title: tr("admintrimestertips_xeta_3cdbb6", "Xəta"), description: tr("admintrimestertips_tovsiye_elave_edilmedi_6c02db", "Tövsiyə əlavə edilmədi"), variant: 'destructive' });
     }
   };
 
   const handleUpdate = async (id: string) => {
     try {
       await updateTip.mutateAsync({ id, ...editForm });
-      toast({ title: 'Uğurlu', description: 'Tövsiyə yeniləndi' });
+      toast({ title: tr("admintrimestertips_ugurlu_7fe64c", "Uğurlu"), description: tr("admintrimestertips_tovsiye_yenilendi_21ab84", "Tövsiyə yeniləndi") });
       setEditingId(null);
       setEditForm({});
     } catch (error) {
-      toast({ title: 'Xəta', description: 'Tövsiyə yenilənmədi', variant: 'destructive' });
+      toast({ title: tr("admintrimestertips_xeta_3cdbb6", "Xəta"), description: tr("admintrimestertips_tovsiye_yenilenmedi_35385b", "Tövsiyə yenilənmədi"), variant: 'destructive' });
     }
   };
 
@@ -63,9 +64,9 @@ const AdminTrimesterTips = () => {
     
     try {
       await deleteTip.mutateAsync(id);
-      toast({ title: 'Uğurlu', description: 'Tövsiyə silindi' });
+      toast({ title: tr("admintrimestertips_ugurlu_7fe64c", "Uğurlu"), description: tr("admintrimestertips_tovsiye_silindi_0b982c", "Tövsiyə silindi") });
     } catch (error) {
-      toast({ title: 'Xəta', description: 'Tövsiyə silinmədi', variant: 'destructive' });
+      toast({ title: tr("admintrimestertips_xeta_3cdbb6", "Xəta"), description: tr("admintrimestertips_tovsiye_silinmedi_d81e33", "Tövsiyə silinmədi"), variant: 'destructive' });
     }
   };
 
@@ -88,8 +89,8 @@ const AdminTrimesterTips = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Trimester Tövsiyələri</h2>
-          <p className="text-muted-foreground">Hər trimester üçün xüsusi tövsiyələri idarə edin</p>
+          <h2 className="text-2xl font-bold">{tr("admintrimestertips_trimester_tovsiyeleri_bf9d05", "Trimester Tövsiyələri")}</h2>
+          <p className="text-muted-foreground">{tr("admintrimestertips_her_trimester_ucun_xususi_tovsiyeleri_id_2b4d22", "Hər trimester üçün xüsusi tövsiyələri idarə edin")}</p>
         </div>
         <Button onClick={() => setIsAdding(true)} disabled={isAdding}>
           <Plus className="w-4 h-4 mr-2" />
@@ -101,7 +102,7 @@ const AdminTrimesterTips = () => {
       {isAdding && (
         <Card className="border-primary/30 bg-primary/5">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Yeni Tövsiyə Əlavə Et</CardTitle>
+            <CardTitle className="text-lg">{tr("admintrimestertips_yeni_tovsiye_elave_et_783455", "Yeni Tövsiyə Əlavə Et")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -124,7 +125,7 @@ const AdminTrimesterTips = () => {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>İkon (emoji)</Label>
+                <Label>{tr("admintrimestertips_ikon_emoji_39cbd9", "İkon (emoji)")}</Label>
                 <Input
                   value={newTip.icon}
                   onChange={(e) => setNewTip({ ...newTip, icon: e.target.value })}
@@ -132,7 +133,7 @@ const AdminTrimesterTips = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Sıralama</Label>
+                <Label>{tr("admintrimestertips_siralama_9e1268", "Sıralama")}</Label>
                 <Input
                   type="number"
                   value={newTip.sort_order}
@@ -141,11 +142,11 @@ const AdminTrimesterTips = () => {
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Tövsiyə Mətni</Label>
+              <Label>{tr("admintrimestertips_tovsiye_metni_783e3d", "Tövsiyə Mətni")}</Label>
               <Textarea
                 value={newTip.tip_text}
                 onChange={(e) => setNewTip({ ...newTip, tip_text: e.target.value })}
-                placeholder="Tövsiyə mətnini daxil edin..."
+                placeholder={tr("admintrimestertips_tovsiye_metnini_daxil_edin_a87ccc", "Tövsiyə mətnini daxil edin...")}
                 rows={2}
               />
             </div>
@@ -198,14 +199,14 @@ const AdminTrimesterTips = () => {
                       <div className="space-y-3">
                         <div className="grid grid-cols-2 gap-3">
                           <div className="space-y-1">
-                            <Label className="text-xs">İkon</Label>
+                            <Label className="text-xs">{tr("admintrimestertips_ikon_6e73fc", "İkon")}</Label>
                             <Input
                               value={editForm.icon}
                               onChange={(e) => setEditForm({ ...editForm, icon: e.target.value })}
                             />
                           </div>
                           <div className="space-y-1">
-                            <Label className="text-xs">Sıralama</Label>
+                            <Label className="text-xs">{tr("admintrimestertips_siralama_9e1268", "Sıralama")}</Label>
                             <Input
                               type="number"
                               value={editForm.sort_order}
@@ -214,7 +215,7 @@ const AdminTrimesterTips = () => {
                           </div>
                         </div>
                         <div className="space-y-1">
-                          <Label className="text-xs">Mətn</Label>
+                          <Label className="text-xs">{tr("admintrimestertips_metn_6e9f0f", "Mətn")}</Label>
                           <Textarea
                             value={editForm.tip_text}
                             onChange={(e) => setEditForm({ ...editForm, tip_text: e.target.value })}

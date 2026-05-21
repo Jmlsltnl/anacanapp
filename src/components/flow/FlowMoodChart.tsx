@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { TrendingUp, Smile, Zap, Heart } from 'lucide-react';
 import { format, subDays, parseISO } from 'date-fns';
@@ -91,7 +92,7 @@ const FlowMoodChart = () => {
           <TrendingUp className="w-5 h-5 text-purple-500" />
           Əhval Qrafiki
         </h3>
-        <span className="text-xs text-muted-foreground">Son 14 gün</span>
+        <span className="text-xs text-muted-foreground">{tr("flowmoodchart_son_14_gun_6be43a", "Son 14 gün")}</span>
       </div>
 
       {/* Stats Summary */}
@@ -99,7 +100,7 @@ const FlowMoodChart = () => {
         <div className="bg-pink-50 dark:bg-pink-900/20 rounded-xl p-3 text-center">
           <Smile className="w-5 h-5 text-pink-500 mx-auto mb-1" />
           <p className="text-lg font-bold text-foreground">{averages.mood}</p>
-          <p className="text-[10px] text-muted-foreground">Orta Əhval</p>
+          <p className="text-[10px] text-muted-foreground">{tr("flowmoodchart_orta_ehval_d444a0", "Orta Əhval")}</p>
         </div>
         <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 text-center">
           <Zap className="w-5 h-5 text-amber-500 mx-auto mb-1" />
@@ -109,7 +110,7 @@ const FlowMoodChart = () => {
         <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-3 text-center">
           <Heart className="w-5 h-5 text-indigo-500 mx-auto mb-1" />
           <p className="text-lg font-bold text-foreground">{averages.totalLogs}</p>
-          <p className="text-[10px] text-muted-foreground">Qeyd Sayı</p>
+          <p className="text-[10px] text-muted-foreground">{tr("flowmoodchart_qeyd_sayi_3b2708", "Qeyd Sayı")}</p>
         </div>
       </div>
 
@@ -175,7 +176,7 @@ const FlowMoodChart = () => {
       <div className="flex items-center justify-center gap-4 mt-3 pt-3 border-t border-border">
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-full bg-pink-500" />
-          <span className="text-xs text-muted-foreground">Əhval</span>
+          <span className="text-xs text-muted-foreground">{tr("flowmoodchart_ehval_0457f9", "Əhval")}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-full bg-amber-500" />

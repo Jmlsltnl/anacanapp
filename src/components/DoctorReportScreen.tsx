@@ -100,8 +100,8 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
             <ArrowLeft className="w-5 h-5 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">Həkim Hesabatı</h1>
-            <p className="text-white/80 text-sm">Sağlamlıq məlumatlarınız</p>
+            <h1 className="text-xl font-bold text-white">{tr("doctorreportscreen_hekim_hesabati_0525fc", "Həkim Hesabatı")}</h1>
+            <p className="text-white/80 text-sm">{tr("doctorreportscreen_saglamliq_melumatlariniz_fc569c", "Sağlamlıq məlumatlarınız")}</p>
           </div>
         </div>
       </div>
@@ -150,7 +150,7 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
               whileTap={{ scale: 0.95 }}
             >
               <Download className="w-6 h-6 text-primary" />
-              <span className="text-xs font-medium">Yüklə</span>
+              <span className="text-xs font-medium">{tr("doctorreportscreen_yukle_2b8e67", "Yüklə")}</span>
             </motion.button>
             <motion.button
               onClick={handleShare}
@@ -158,7 +158,7 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
               whileTap={{ scale: 0.95 }}
             >
               <Share2 className="w-6 h-6 text-primary" />
-              <span className="text-xs font-medium">Paylaş</span>
+              <span className="text-xs font-medium">{tr("doctorreportscreen_paylas_b4be3b", "Paylaş")}</span>
             </motion.button>
             <motion.button
               className="flex flex-col items-center gap-2 p-4 bg-muted rounded-2xl"
@@ -177,7 +177,7 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
         >
-          <h3 className="font-bold mb-4">Əsas Məlumatlar</h3>
+          <h3 className="font-bold mb-4">{tr("doctorreportscreen_esas_melumatlar_56bfed", "Əsas Məlumatlar")}</h3>
           <div className="grid grid-cols-2 gap-3">
             {getStageSpecificData().map((item, index) => {
               const Icon = item.icon;
@@ -204,7 +204,7 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <h3 className="font-bold mb-4">Sağlamlıq Trendləri</h3>
+          <h3 className="font-bold mb-4">{tr("doctorreportscreen_saglamliq_trendleri_5c9dd9", "Sağlamlıq Trendləri")}</h3>
           {healthLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -238,7 +238,7 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          <h3 className="font-bold mb-4">Həkim üçün Qeydlər</h3>
+          <h3 className="font-bold mb-4">{tr("doctorreportscreen_hekim_ucun_qeydler_052b91", "Həkim üçün Qeydlər")}</h3>
           <textarea
             placeholder={tr("doctorreportscreen_hekiminiz_ucun_elave_qeydler_yazin_2bd3dc", "Həkiminiz üçün əlavə qeydlər yazın...")}
             className="w-full h-24 p-4 rounded-2xl bg-muted/50 resize-none outline-none focus:ring-2 focus:ring-primary/20"

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Plus, Edit, Trash2, Search, Pill, Check, X, Leaf } from 'lucide-react';
 import { useVitaminsAdmin, Vitamin } from '@/hooks/useVitamins';
@@ -146,7 +147,7 @@ const AdminVitamins = () => {
             <Pill className="w-5 h-5 text-primary" />
             Vitaminlər
           </h1>
-          <p className="text-sm text-muted-foreground">Həftəlik vitamin tövsiyələrini idarə edin</p>
+          <p className="text-sm text-muted-foreground">{tr("adminvitamins_heftelik_vitamin_tovsiyelerini_idare_edi_d31541", "Həftəlik vitamin tövsiyələrini idarə edin")}</p>
         </div>
         <Button onClick={openCreateModal} size="sm">
           <Plus className="w-4 h-4 mr-1" />
@@ -167,13 +168,13 @@ const AdminVitamins = () => {
         </div>
         <Select value={filterStage} onValueChange={setFilterStage}>
           <SelectTrigger className="w-32 h-9">
-            <SelectValue placeholder="Mərhələ" />
+            <SelectValue placeholder={tr("adminvitamins_merhele_0e09aa", "Mərhələ")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Hamısı</SelectItem>
-            <SelectItem value="bump">Hamiləlik</SelectItem>
+            <SelectItem value="all">{tr("adminvitamins_hamisi_c73c4d", "Hamısı")}</SelectItem>
+            <SelectItem value="bump">{tr("adminvitamins_hamilelik_e86feb", "Hamiləlik")}</SelectItem>
             <SelectItem value="mommy">Anacan</SelectItem>
-            <SelectItem value="flow">Ümumi</SelectItem>
+            <SelectItem value="flow">{tr("adminvitamins_umumi_1b5521", "Ümumi")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -211,7 +212,7 @@ const AdminVitamins = () => {
                     {vitamin.life_stage === 'bump' ? 'Hamiləlik' : vitamin.life_stage === 'mommy' ? 'Anacan' : 'Ümumi'}
                   </span>
                   {vitamin.trimester && vitamin.trimester.length === 3 && (
-                    <span className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/30 rounded text-purple-700 dark:text-purple-400">Hər üç trimester</span>
+                    <span className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/30 rounded text-purple-700 dark:text-purple-400">{tr("adminvitamins_her_uc_trimester_ceff3a", "Hər üç trimester")}</span>
                   )}
                   {vitamin.trimester && vitamin.trimester.length > 0 && vitamin.trimester.length < 3 && (
                     <span className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/30 rounded text-purple-700 dark:text-purple-400">
@@ -241,7 +242,7 @@ const AdminVitamins = () => {
         {filteredVitamins.length === 0 && (
           <div className="text-center py-12 text-muted-foreground">
             <Leaf className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>Vitamin tapılmadı</p>
+            <p>{tr("adminvitamins_vitamin_tapilmadi_f35170", "Vitamin tapılmadı")}</p>
           </div>
         )}
       </div>
@@ -276,31 +277,31 @@ const AdminVitamins = () => {
             </div>
 
             <div>
-              <label className="text-xs text-muted-foreground mb-1 block">Təsvir (AZ)</label>
+              <label className="text-xs text-muted-foreground mb-1 block">{tr("adminvitamins_tesvir_az_2c237a", "Təsvir (AZ)")}</label>
               <Textarea
                 value={formData.description_az}
                 onChange={e => setFormData({ ...formData, description_az: e.target.value })}
-                placeholder="Vitaminin faydaları haqqında..."
+                placeholder={tr("adminvitamins_vitaminin_faydalari_haqqinda_a3e855", "Vitaminin faydaları haqqında...")}
                 rows={2}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Faydaları (hər sətirdə 1)</label>
+                <label className="text-xs text-muted-foreground mb-1 block">{tr("adminvitamins_faydalari_her_setirde_1_872e37", "Faydaları (hər sətirdə 1)")}</label>
                 <Textarea
                   value={formData.benefits}
                   onChange={e => setFormData({ ...formData, benefits: e.target.value })}
-                  placeholder="Sümük sağlamlığı&#10;İmmun sistem dəstəyi"
+                  placeholder={tr("adminvitamins_sumuk_saglamligi_10_immun_sistem_desteyi_54fc6a", "Sümük sağlamlığı&#10;İmmun sistem dəstəyi")}
                   rows={3}
                 />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Qida mənbələri (hər sətirdə 1)</label>
+                <label className="text-xs text-muted-foreground mb-1 block">{tr("adminvitamins_qida_menbeleri_her_setirde_1_197057", "Qida mənbələri (hər sətirdə 1)")}</label>
                 <Textarea
                   value={formData.food_sources}
                   onChange={e => setFormData({ ...formData, food_sources: e.target.value })}
-                  placeholder="Süd məhsulları&#10;Balıq&#10;Yumurta"
+                  placeholder={tr("adminvitamins_sud_mehsullari_10_baliq_10_yumurta_e6328b", "Süd məhsulları&#10;Balıq&#10;Yumurta")}
                   rows={3}
                 />
               </div>
@@ -312,7 +313,7 @@ const AdminVitamins = () => {
                 <Input
                   value={formData.dosage}
                   onChange={e => setFormData({ ...formData, dosage: e.target.value })}
-                  placeholder="400 IU/gün"
+                  placeholder={tr("adminvitamins_400_iu_gun_74a3aa", "400 IU/gün")}
                   className="h-9"
                 />
               </div>
@@ -326,7 +327,7 @@ const AdminVitamins = () => {
                 />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Sıra</label>
+                <label className="text-xs text-muted-foreground mb-1 block">{tr("adminvitamins_sira_421c5f", "Sıra")}</label>
                 <Input
                   type="number"
                   value={formData.sort_order}
@@ -338,7 +339,7 @@ const AdminVitamins = () => {
 
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Həftə (başlanğıc)</label>
+                <label className="text-xs text-muted-foreground mb-1 block">{tr("adminvitamins_hefte_baslangic_3fb153", "Həftə (başlanğıc)")}</label>
                 <Input
                   type="number"
                   value={formData.week_start}
@@ -348,7 +349,7 @@ const AdminVitamins = () => {
                 />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Həftə (son)</label>
+                <label className="text-xs text-muted-foreground mb-1 block">{tr("adminvitamins_hefte_son_078eb1", "Həftə (son)")}</label>
                 <Input
                   type="number"
                   value={formData.week_end}
@@ -358,12 +359,12 @@ const AdminVitamins = () => {
                 />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Trimestrlər</label>
+                <label className="text-xs text-muted-foreground mb-1 block">{tr("adminvitamins_trimestrler_3800f5", "Trimestrlər")}</label>
                 <div className="flex flex-wrap gap-2">
                   {[
                     { value: 1, label: '1-ci' },
                     { value: 2, label: '2-ci' },
-                    { value: 3, label: '3-cü' },
+                    { value: 3, label: tr("adminvitamins_3_cu_af0141", "3-cü") },
                   ].map(t => (
                     <button
                       key={t.value}
@@ -386,34 +387,34 @@ const AdminVitamins = () => {
                   ))}
                 </div>
                 {formData.trimesters.length === 3 && (
-                  <p className="text-[10px] text-primary mt-1">✓ Hər üç trimester seçildi</p>
+                  <p className="text-[10px] text-primary mt-1">{tr("adminvitamins_her_uc_trimester_secildi_3c6bfa", "✓ Hər üç trimester seçildi")}</p>
                 )}
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Mərhələ</label>
+                <label className="text-xs text-muted-foreground mb-1 block">{tr("adminvitamins_merhele_0e09aa", "Mərhələ")}</label>
                 <Select value={formData.life_stage} onValueChange={v => setFormData({ ...formData, life_stage: v })}>
                   <SelectTrigger className="h-9">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="bump">Hamiləlik</SelectItem>
+                    <SelectItem value="bump">{tr("adminvitamins_hamilelik_e86feb", "Hamiləlik")}</SelectItem>
                     <SelectItem value="mommy">Anacan</SelectItem>
-                    <SelectItem value="flow">Ümumi</SelectItem>
+                    <SelectItem value="flow">{tr("adminvitamins_umumi_1b5521", "Ümumi")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Əhəmiyyət</label>
+                <label className="text-xs text-muted-foreground mb-1 block">{tr("adminvitamins_ehemiyyet_bfefa3", "Əhəmiyyət")}</label>
                 <Select value={formData.importance} onValueChange={v => setFormData({ ...formData, importance: v })}>
                   <SelectTrigger className="h-9">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="essential">Vacib</SelectItem>
-                    <SelectItem value="recommended">Tövsiyə</SelectItem>
+                    <SelectItem value="recommended">{tr("adminvitamins_tovsiye_712d0f", "Tövsiyə")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

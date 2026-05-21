@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, Edit, Trash2, Eye, EyeOff, Star, Search,
@@ -50,10 +51,10 @@ const AdminBlog = () => {
   });
 
   const lifeStageOptions: { value: BlogLifeStage; label: string; emoji: string }[] = [
-    { value: 'all', label: 'Hamısı üçün', emoji: '🌐' },
-    { value: 'flow', label: 'Menstruasiya dövrü', emoji: '🩸' },
-    { value: 'bump', label: 'Hamiləlik dövrü', emoji: '🤰' },
-    { value: 'mommy', label: 'Ana (körpə baxımı)', emoji: '👶' }
+    { value: 'all', label: tr("adminblog_hamisi_ucun_2e4cd9", "Hamısı üçün"), emoji: '🌐' },
+    { value: 'flow', label: tr("adminblog_menstruasiya_dovru_a5852d", "Menstruasiya dövrü"), emoji: '🩸' },
+    { value: 'bump', label: tr("adminblog_hamilelik_dovru_57af7a", "Hamiləlik dövrü"), emoji: '🤰' },
+    { value: 'mommy', label: tr("adminblog_ana_korpe_baximi_6b209a", "Ana (körpə baxımı)"), emoji: '👶' }
   ];
 
   const [newCategory, setNewCategory] = useState({
@@ -69,8 +70,8 @@ const AdminBlog = () => {
   const generateAIContent = async () => {
     if (!formData.title.trim()) {
       toast({
-        title: 'Başlıq tələb olunur',
-        description: 'Məzmun yaratmaq üçün əvvəlcə başlıq daxil edin',
+        title: tr("adminblog_basliq_teleb_olunur_097c6f", "Başlıq tələb olunur"),
+        description: tr("adminblog_mezmun_yaratmaq_ucun_evvelce_basliq_daxi_74a245", "Məzmun yaratmaq üçün əvvəlcə başlıq daxil edin"),
         variant: 'destructive'
       });
       return;
@@ -97,15 +98,15 @@ const AdminBlog = () => {
         }));
 
         toast({
-          title: 'Məzmun yaradıldı!',
+          title: tr("adminblog_mezmun_yaradildi_23a0d1", "Məzmun yaradıldı!"),
           description: 'AI tərəfindən məqalə mətni hazırlandı'
         });
       }
     } catch (error) {
       console.error('AI content generation error:', error);
       toast({
-        title: 'Xəta',
-        description: 'Məzmun yaradıla bilmədi. Yenidən cəhd edin.',
+        title: tr("adminblog_xeta_3cdbb6", "Xəta"),
+        description: tr("adminblog_mezmun_yaradila_bilmedi_yeniden_cehd_edi_0c4bf4", "Məzmun yaradıla bilmədi. Yenidən cəhd edin."),
         variant: 'destructive'
       });
     } finally {
@@ -132,8 +133,8 @@ const AdminBlog = () => {
     // Validate file type
     if (!file.type.startsWith('image/')) {
       toast({
-        title: 'Xəta',
-        description: 'Yalnız şəkil faylları yüklənə bilər',
+        title: tr("adminblog_xeta_3cdbb6", "Xəta"),
+        description: tr("adminblog_yalniz_sekil_fayllari_yuklene_biler_f67b23", "Yalnız şəkil faylları yüklənə bilər"),
         variant: 'destructive'
       });
       return;
@@ -142,8 +143,8 @@ const AdminBlog = () => {
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast({
-        title: 'Xəta',
-        description: 'Şəkil 5MB-dan böyük olmamalıdır',
+        title: tr("adminblog_xeta_3cdbb6", "Xəta"),
+        description: tr("adminblog_sekil_5mb_dan_boyuk_olmamalidir_ebe774", "Şəkil 5MB-dan böyük olmamalıdır"),
         variant: 'destructive'
       });
       return;
@@ -167,14 +168,14 @@ const AdminBlog = () => {
 
       setFormData({ ...formData, cover_image_url: publicUrl });
       toast({
-        title: 'Uğurlu!',
+        title: tr("adminblog_ugurlu_5c0191", "Uğurlu!"),
         description: 'Şəkil yükləndi'
       });
     } catch (error) {
       console.error('Upload error:', error);
       toast({
-        title: 'Xəta',
-        description: 'Şəkil yüklənə bilmədi',
+        title: tr("adminblog_xeta_3cdbb6", "Xəta"),
+        description: tr("adminblog_sekil_yuklene_bilmedi_3c275f", "Şəkil yüklənə bilmədi"),
         variant: 'destructive'
       });
     } finally {
@@ -246,8 +247,8 @@ const AdminBlog = () => {
   const handleSave = async () => {
     if (!formData.title.trim() || !formData.content.trim()) {
       toast({
-        title: 'Xəta',
-        description: 'Başlıq və məzmun tələb olunur',
+        title: tr("adminblog_xeta_3cdbb6", "Xəta"),
+        description: tr("adminblog_basliq_ve_mezmun_teleb_olunur_02f6f5", "Başlıq və məzmun tələb olunur"),
         variant: 'destructive'
       });
       return;
@@ -267,13 +268,13 @@ const AdminBlog = () => {
 
     if (result.error) {
       toast({
-        title: 'Xəta',
-        description: 'Məqalə saxlanıla bilmədi',
+        title: tr("adminblog_xeta_3cdbb6", "Xəta"),
+        description: tr("adminblog_meqale_saxlanila_bilmedi_a6aa8c", "Məqalə saxlanıla bilmədi"),
         variant: 'destructive'
       });
     } else {
       toast({
-        title: 'Uğurlu!',
+        title: tr("adminblog_ugurlu_5c0191", "Uğurlu!"),
         description: editingPost ? 'Məqalə yeniləndi' : 'Məqalə yaradıldı'
       });
       resetForm();
@@ -307,8 +308,8 @@ const AdminBlog = () => {
   const handleSaveCategory = async () => {
     if (!newCategory.name.trim()) {
       toast({
-        title: 'Xəta',
-        description: 'Kateqoriya adı tələb olunur',
+        title: tr("adminblog_xeta_3cdbb6", "Xəta"),
+        description: tr("adminblog_kateqoriya_adi_teleb_olunur_5a978b", "Kateqoriya adı tələb olunur"),
         variant: 'destructive'
       });
       return;
@@ -323,7 +324,7 @@ const AdminBlog = () => {
 
     if (!result.error) {
       toast({
-        title: 'Uğurlu!',
+        title: tr("adminblog_ugurlu_5c0191", "Uğurlu!"),
         description: 'Kateqoriya yaradıldı'
       });
       setNewCategory({ name: '', slug: '', description: '', icon: '📝', color: '#f28155' });
@@ -336,7 +337,7 @@ const AdminBlog = () => {
     const usageCount = postCategories.filter(pc => pc.category_id === id).length;
     if (usageCount > 0) {
       toast({
-        title: 'Xəta',
+        title: tr("adminblog_xeta_3cdbb6", "Xəta"),
         description: `Bu kateqoriya ${usageCount} məqalədə istifadə olunur. Əvvəlcə məqalələrdən çıxarın.`,
         variant: 'destructive'
       });
@@ -347,7 +348,7 @@ const AdminBlog = () => {
       const result = await deleteCategory(id);
       if (result.error) {
         toast({
-          title: 'Xəta',
+          title: tr("adminblog_xeta_3cdbb6", "Xəta"),
           description: result.error instanceof Error ? result.error.message : 'Kateqoriya silinə bilmədi',
           variant: 'destructive'
         });
@@ -414,8 +415,8 @@ const AdminBlog = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Bloq İdarəsi</h1>
-          <p className="text-muted-foreground">Məqalələr və kateqoriyaları idarə edin</p>
+          <h1 className="text-2xl font-bold text-foreground">{tr("adminblog_bloq_idaresi_c3982a", "Bloq İdarəsi")}</h1>
+          <p className="text-muted-foreground">{tr("adminblog_meqaleler_ve_kateqoriyalari_idare_edin_b8bb21", "Məqalələr və kateqoriyaları idarə edin")}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => setShowCategoryModal(true)}>
@@ -473,7 +474,7 @@ const AdminBlog = () => {
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Məqalə axtar..."
+              placeholder={tr("adminblog_meqale_axtar_0441c1", "Məqalə axtar...")}
               className="pl-10"
             />
           </div>
@@ -587,7 +588,7 @@ const AdminBlog = () => {
           {filteredPosts.length === 0 && (
             <div className="text-center py-12">
               <div className="text-5xl mb-4">📝</div>
-              <p className="text-muted-foreground">Hələ məqalə yoxdur</p>
+              <p className="text-muted-foreground">{tr("adminblog_hele_meqale_yoxdur_b92aa5", "Hələ məqalə yoxdur")}</p>
             </div>
           )}
         </>
@@ -668,11 +669,11 @@ const AdminBlog = () => {
               <div className="p-6 space-y-6">
                 {/* Title */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Başlıq *</label>
+                  <label className="text-sm font-medium mb-2 block">{tr("adminblog_basliq_3dfed8", "Başlıq *")}</label>
                   <Input
                     value={formData.title}
                     onChange={(e) => handleTitleChange(e.target.value)}
-                    placeholder="Məqalənin başlığı"
+                    placeholder={tr("adminblog_meqalenin_basligi_b374b6", "Məqalənin başlığı")}
                   />
                 </div>
 
@@ -689,7 +690,7 @@ const AdminBlog = () => {
                 {/* Cover Image */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-sm font-medium">Örtük Şəkli</label>
+                    <label className="text-sm font-medium">{tr("adminblog_ortuk_sekli_8db3d9", "Örtük Şəkli")}</label>
                     <div className="flex gap-1 bg-muted rounded-lg p-1">
                       <button
                         type="button"
@@ -731,12 +732,12 @@ const AdminBlog = () => {
                         {uploadingImage ? (
                           <div className="flex flex-col items-center">
                             <Loader2 className="w-8 h-8 text-muted-foreground animate-spin mb-2" />
-                            <span className="text-sm text-muted-foreground">Yüklənir...</span>
+                            <span className="text-sm text-muted-foreground">{tr("adminblog_yuklenir_5557de", "Yüklənir...")}</span>
                           </div>
                         ) : (
                           <div className="flex flex-col items-center">
                             <Upload className="w-8 h-8 text-muted-foreground mb-2" />
-                            <span className="text-sm text-muted-foreground">Şəkil seçin və ya sürükləyin</span>
+                            <span className="text-sm text-muted-foreground">{tr("adminblog_sekil_secin_ve_ya_surukleyin_f64ddf", "Şəkil seçin və ya sürükləyin")}</span>
                             <span className="text-xs text-muted-foreground mt-1">PNG, JPG (max 5MB)</span>
                           </div>
                         )}
@@ -795,13 +796,13 @@ const AdminBlog = () => {
                     })}
                   </div>
                   {selectedCategoryIds.length === 0 && (
-                    <p className="text-xs text-muted-foreground mt-1">Ən azı bir kateqoriya seçin</p>
+                    <p className="text-xs text-muted-foreground mt-1">{tr("adminblog_en_azi_bir_kateqoriya_secin_fb6100", "Ən azı bir kateqoriya seçin")}</p>
                   )}
                 </div>
 
                 {/* Reading Time */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Oxuma müddəti (dəq)</label>
+                  <label className="text-sm font-medium mb-2 block">{tr("adminblog_oxuma_muddeti_deq_d2ba9d", "Oxuma müddəti (dəq)")}</label>
                   <Input
                     type="number"
                     value={formData.reading_time}
@@ -813,11 +814,11 @@ const AdminBlog = () => {
 
                 {/* Excerpt */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Qısa Təsvir</label>
+                  <label className="text-sm font-medium mb-2 block">{tr("adminblog_qisa_tesvir_15ed14", "Qısa Təsvir")}</label>
                   <Textarea
                     value={formData.excerpt}
                     onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                    placeholder="Məqalənin qısa təsviri..."
+                    placeholder={tr("adminblog_meqalenin_qisa_tesviri_deb19e", "Məqalənin qısa təsviri...")}
                     rows={2}
                   />
                 </div>
@@ -825,7 +826,7 @@ const AdminBlog = () => {
                 {/* Content */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-sm font-medium">Məzmun *</label>
+                    <label className="text-sm font-medium">{tr("adminblog_mezmun_a0f970", "Məzmun *")}</label>
                     <Button
                       type="button"
                       variant="outline"
@@ -850,7 +851,7 @@ const AdminBlog = () => {
                   <RichTextEditor
                     content={formData.content}
                     onChange={(html) => setFormData({ ...formData, content: html })}
-                    placeholder="Məqalənin tam məzmunu... (və ya AI ilə yaradın)"
+                    placeholder={tr("adminblog_meqalenin_tam_mezmunu_ve_ya_ai_ile_yarad_c3e94e", "Məqalənin tam məzmunu... (və ya AI ilə yaradın)")}
                     disabled={generatingContent}
                   />
                   {generatingContent && (
@@ -862,7 +863,7 @@ const AdminBlog = () => {
 
                 {/* Tags */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Etiketlər</label>
+                  <label className="text-sm font-medium mb-2 block">{tr("adminblog_etiketler_62df02", "Etiketlər")}</label>
                   <div className="flex gap-2 mb-2 flex-wrap">
                     {formData.tags.map(tag => (
                       <Badge key={tag} variant="secondary" className="cursor-pointer" onClick={() => handleRemoveTag(tag)}>
@@ -885,7 +886,7 @@ const AdminBlog = () => {
 
                 {/* Author */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Müəllif adı</label>
+                  <label className="text-sm font-medium mb-2 block">{tr("adminblog_muellif_adi_7c7b8c", "Müəllif adı")}</label>
                   <Input
                     value={formData.author_name}
                     onChange={(e) => setFormData({ ...formData, author_name: e.target.value })}
@@ -895,7 +896,7 @@ const AdminBlog = () => {
 
                 {/* Life Stage Selector */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Hədəf Mərhələsi</label>
+                  <label className="text-sm font-medium mb-2 block">{tr("adminblog_hedef_merhelesi_8d7484", "Hədəf Mərhələsi")}</label>
                   <div className="flex flex-wrap gap-2">
                     {lifeStageOptions.map(option => (
                       <button
@@ -925,14 +926,14 @@ const AdminBlog = () => {
                       checked={formData.is_featured}
                       onCheckedChange={(checked) => setFormData({ ...formData, is_featured: checked })}
                     />
-                    <span className="text-sm">Önə çıxan</span>
+                    <span className="text-sm">{tr("adminblog_one_cixan_8d97eb", "Önə çıxan")}</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <Switch
                       checked={formData.is_published}
                       onCheckedChange={(checked) => setFormData({ ...formData, is_published: checked })}
                     />
-                    <span className="text-sm">Dərc et</span>
+                    <span className="text-sm">{tr("adminblog_derc_et_e745f0", "Dərc et")}</span>
                   </label>
                 </div>
               </div>
@@ -978,12 +979,12 @@ const AdminBlog = () => {
                   <Input
                     value={newCategory.name}
                     onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value, slug: generateSlug(e.target.value) })}
-                    placeholder="Kateqoriya adı"
+                    placeholder={tr("adminblog_kateqoriya_adi_d93080", "Kateqoriya adı")}
                   />
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Emoji İkon</label>
+                  <label className="text-sm font-medium mb-2 block">{tr("adminblog_emoji_ikon_8590a0", "Emoji İkon")}</label>
                   <Input
                     value={newCategory.icon}
                     onChange={(e) => setNewCategory({ ...newCategory, icon: e.target.value })}
@@ -992,7 +993,7 @@ const AdminBlog = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Rəng</label>
+                  <label className="text-sm font-medium mb-2 block">{tr("adminblog_reng_8c6bc5", "Rəng")}</label>
                   <div className="flex gap-2">
                     <Input
                       type="color"
@@ -1009,11 +1010,11 @@ const AdminBlog = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Təsvir</label>
+                  <label className="text-sm font-medium mb-2 block">{tr("adminblog_tesvir_f85651", "Təsvir")}</label>
                   <Textarea
                     value={newCategory.description}
                     onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
-                    placeholder="Kateqoriya haqqında qısa məlumat"
+                    placeholder={tr("adminblog_kateqoriya_haqqinda_qisa_melumat_6098a9", "Kateqoriya haqqında qısa məlumat")}
                     rows={2}
                   />
                 </div>
@@ -1041,7 +1042,7 @@ const AdminBlog = () => {
 
       <AdminUsageStats 
         eventNames={['blog_read', 'blog_liked', 'blog_saved']}
-        title="📝 Bloq İstifadə Statistikası"
+        title={tr("adminblog_bloq_istifade_statistikasi_53968f", "📝 Bloq İstifadə Statistikası")}
         showEventData
         showUsers
       />

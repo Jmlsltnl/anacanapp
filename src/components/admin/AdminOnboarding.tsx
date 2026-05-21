@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Sparkles, Plus, Pencil, Trash2, Search, Baby } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -107,8 +108,8 @@ const AdminOnboarding = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Qeydiyyat Mərhələləri</h1>
-          <p className="text-muted-foreground">Onboarding seçimlərini idarə edin</p>
+          <h1 className="text-2xl font-bold text-foreground">{tr("adminonboarding_qeydiyyat_merheleleri_5979e2", "Qeydiyyat Mərhələləri")}</h1>
+          <p className="text-muted-foreground">{tr("adminonboarding_onboarding_secimlerini_idare_edin_48ee89", "Onboarding seçimlərini idarə edin")}</p>
         </div>
       </div>
 
@@ -121,7 +122,7 @@ const AdminOnboarding = () => {
             </div>
             <div>
               <p className="text-2xl font-bold">{stages.data?.length || 0}</p>
-              <p className="text-xs text-muted-foreground">Mərhələlər</p>
+              <p className="text-xs text-muted-foreground">{tr("adminonboarding_merheleler_5eb66e", "Mərhələlər")}</p>
             </div>
           </div>
         </Card>
@@ -132,7 +133,7 @@ const AdminOnboarding = () => {
             </div>
             <div>
               <p className="text-2xl font-bold">{multiples.data?.length || 0}</p>
-              <p className="text-xs text-muted-foreground">Çoxluq Seçimləri</p>
+              <p className="text-xs text-muted-foreground">{tr("adminonboarding_coxluq_secimleri_53cde3", "Çoxluq Seçimləri")}</p>
             </div>
           </div>
         </Card>
@@ -143,7 +144,7 @@ const AdminOnboarding = () => {
             </div>
             <div>
               <p className="text-2xl font-bold">{stages.data?.filter(s => s.is_active).length || 0}</p>
-              <p className="text-xs text-muted-foreground">Aktiv Mərhələ</p>
+              <p className="text-xs text-muted-foreground">{tr("adminonboarding_aktiv_merhele_f4c424", "Aktiv Mərhələ")}</p>
             </div>
           </div>
         </Card>
@@ -154,7 +155,7 @@ const AdminOnboarding = () => {
             </div>
             <div>
               <p className="text-2xl font-bold">{multiples.data?.filter(m => m.is_active).length || 0}</p>
-              <p className="text-xs text-muted-foreground">Aktiv Çoxluq</p>
+              <p className="text-xs text-muted-foreground">{tr("adminonboarding_aktiv_coxluq_564cca", "Aktiv Çoxluq")}</p>
             </div>
           </div>
         </Card>
@@ -163,8 +164,8 @@ const AdminOnboarding = () => {
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="stages">Həyat Mərhələləri</TabsTrigger>
-          <TabsTrigger value="multiples">Çoxluq Seçimləri</TabsTrigger>
+          <TabsTrigger value="stages">{tr("adminonboarding_heyat_merheleleri_c9d7f6", "Həyat Mərhələləri")}</TabsTrigger>
+          <TabsTrigger value="multiples">{tr("adminonboarding_coxluq_secimleri_53cde3", "Çoxluq Seçimləri")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="stages" className="space-y-4">
@@ -181,9 +182,9 @@ const AdminOnboarding = () => {
             </CardHeader>
             <CardContent>
               {stages.isLoading ? (
-                <div className="text-center py-8 text-muted-foreground">Yüklənir...</div>
+                <div className="text-center py-8 text-muted-foreground">{tr("adminonboarding_yuklenir_5557de", "Yüklənir...")}</div>
               ) : (stages.data?.length || 0) === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">Mərhələ tapılmadı</div>
+                <div className="text-center py-8 text-muted-foreground">{tr("adminonboarding_merhele_tapilmadi_32ebcd", "Mərhələ tapılmadı")}</div>
               ) : (
                 <div className="space-y-3">
                   {stages.data?.map((stage, index) => (
@@ -242,9 +243,9 @@ const AdminOnboarding = () => {
             </CardHeader>
             <CardContent>
               {multiples.isLoading ? (
-                <div className="text-center py-8 text-muted-foreground">Yüklənir...</div>
+                <div className="text-center py-8 text-muted-foreground">{tr("adminonboarding_yuklenir_5557de", "Yüklənir...")}</div>
               ) : (multiples.data?.length || 0) === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">Seçim tapılmadı</div>
+                <div className="text-center py-8 text-muted-foreground">{tr("adminonboarding_secim_tapilmadi_f906d4", "Seçim tapılmadı")}</div>
               ) : (
                 <div className="space-y-3">
                   {multiples.data?.map((option, index) => (
@@ -310,36 +311,36 @@ const AdminOnboarding = () => {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Input
-                placeholder="Başlıq (EN)"
+                placeholder={tr("adminonboarding_basliq_en_4ac905", "Başlıq (EN)")}
                 value={stageFormData.title || ''}
                 onChange={(e) => setStageFormData({ ...stageFormData, title: e.target.value })}
               />
               <Input
-                placeholder="Başlıq (AZ)"
+                placeholder={tr("adminonboarding_basliq_az_3e294a", "Başlıq (AZ)")}
                 value={stageFormData.title_az || ''}
                 onChange={(e) => setStageFormData({ ...stageFormData, title_az: e.target.value })}
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Input
-                placeholder="Alt başlıq (EN)"
+                placeholder={tr("adminonboarding_alt_basliq_en_bb08aa", "Alt başlıq (EN)")}
                 value={stageFormData.subtitle || ''}
                 onChange={(e) => setStageFormData({ ...stageFormData, subtitle: e.target.value })}
               />
               <Input
-                placeholder="Alt başlıq (AZ)"
+                placeholder={tr("adminonboarding_alt_basliq_az_fe8faa", "Alt başlıq (AZ)")}
                 value={stageFormData.subtitle_az || ''}
                 onChange={(e) => setStageFormData({ ...stageFormData, subtitle_az: e.target.value })}
               />
             </div>
             <Textarea
-              placeholder="Təsvir (AZ)"
+              placeholder={tr("adminonboarding_tesvir_az_2c237a", "Təsvir (AZ)")}
               value={stageFormData.description_az || ''}
               onChange={(e) => setStageFormData({ ...stageFormData, description_az: e.target.value })}
             />
             <div className="grid grid-cols-2 gap-3">
               <Input
-                placeholder="İkon adı (Baby, Heart, Calendar)"
+                placeholder={tr("adminonboarding_ikon_adi_baby_heart_calendar_e2a7df", "İkon adı (Baby, Heart, Calendar)")}
                 value={stageFormData.icon_name || ''}
                 onChange={(e) => setStageFormData({ ...stageFormData, icon_name: e.target.value })}
               />
@@ -351,7 +352,7 @@ const AdminOnboarding = () => {
             </div>
             <Input
               type="number"
-              placeholder="Sıra"
+              placeholder={tr("adminonboarding_sira_421c5f", "Sıra")}
               value={stageFormData.sort_order || 0}
               onChange={(e) => setStageFormData({ ...stageFormData, sort_order: parseInt(e.target.value) })}
             />
@@ -408,13 +409,13 @@ const AdminOnboarding = () => {
             <div className="grid grid-cols-2 gap-3">
               <Input
                 type="number"
-                placeholder="Uşaq sayı"
+                placeholder={tr("adminonboarding_usaq_sayi_04c015", "Uşaq sayı")}
                 value={multipleFormData.baby_count || 1}
                 onChange={(e) => setMultipleFormData({ ...multipleFormData, baby_count: parseInt(e.target.value) })}
               />
               <Input
                 type="number"
-                placeholder="Sıra"
+                placeholder={tr("adminonboarding_sira_421c5f", "Sıra")}
                 value={multipleFormData.sort_order || 0}
                 onChange={(e) => setMultipleFormData({ ...multipleFormData, sort_order: parseInt(e.target.value) })}
               />

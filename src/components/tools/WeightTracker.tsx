@@ -52,7 +52,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
   
   const getStatus = () => {
     if (totalGain < recommended.min) return { status: 'low', text: 'Az', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-900/30', gradient: 'from-amber-400 to-orange-500' };
-    if (totalGain > recommended.max) return { status: 'high', text: 'Çox', color: 'text-red-600 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-900/30', gradient: 'from-red-400 to-rose-500' };
+    if (totalGain > recommended.max) return { status: 'high', text: tr("weighttracker_cox_72c890", "Çox"), color: 'text-red-600 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-900/30', gradient: 'from-red-400 to-rose-500' };
     return { status: 'normal', text: 'Normal', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-100 dark:bg-emerald-900/30', gradient: 'from-emerald-400 to-green-500' };
   };
 
@@ -139,7 +139,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
           >
             <Scale className="w-5 h-5 mx-auto mb-1 text-emerald-500" />
             <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{currentWeight}</p>
-            <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70 font-medium">Hazırkı (kg)</p>
+            <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70 font-medium">{tr("weighttracker_hazirki_kg_426054", "Hazırkı (kg)")}</p>
           </motion.div>
           <motion.div
             className="bg-cyan-50 dark:bg-cyan-500/10 rounded-2xl p-3 text-center border border-cyan-100 dark:border-cyan-500/20"
@@ -150,7 +150,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
           >
             <Activity className="w-5 h-5 mx-auto mb-1 text-cyan-500" />
             <p className="text-2xl font-black text-cyan-600 dark:text-cyan-400">{totalGain >= 0 ? '+' : ''}{totalGain.toFixed(1)}</p>
-            <p className="text-xs text-cyan-600/70 dark:text-cyan-400/70 font-medium">Fərq (kg)</p>
+            <p className="text-xs text-cyan-600/70 dark:text-cyan-400/70 font-medium">{tr("weighttracker_ferq_kg_8bd06d", "Fərq (kg)")}</p>
           </motion.div>
           <motion.div
             className="bg-violet-50 dark:bg-violet-500/10 rounded-2xl p-3 text-center border border-violet-100 dark:border-violet-500/20"
@@ -160,7 +160,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
           >
             <Target className="w-5 h-5 mx-auto mb-1 text-violet-500" />
             <p className="text-2xl font-black text-violet-600 dark:text-violet-400">{recommended.min}-{recommended.max}</p>
-            <p className="text-xs text-violet-600/70 dark:text-violet-400/70 font-medium">Tövsiyə (kg)</p>
+            <p className="text-xs text-violet-600/70 dark:text-violet-400/70 font-medium">{tr("weighttracker_tovsiye_kg_6a77a1", "Tövsiyə (kg)")}</p>
           </motion.div>
         </div>
         {/* Status Card */}
@@ -176,7 +176,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
               {status.status === 'high' && <TrendingUp className="w-8 h-8 text-white" />}
             </div>
             <div className="flex-1">
-              <p className="text-sm text-muted-foreground">Çəki statusu</p>
+              <p className="text-sm text-muted-foreground">{tr("weighttracker_ceki_statusu_d932ab", "Çəki statusu")}</p>
               <h3 className="text-2xl font-black text-foreground">{status.text}</h3>
               <p className="text-xs text-muted-foreground mt-1">
                 Başlanğıc: {startWeight} kg → İndi: {currentWeight} kg
@@ -188,7 +188,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
           <div className="mt-4">
             <div className="flex justify-between text-xs text-muted-foreground mb-1">
               <span>{recommended.min} kg</span>
-              <span>Tövsiyə olunan aralıq</span>
+              <span>{tr("weighttracker_tovsiye_olunan_araliq_4810a8", "Tövsiyə olunan aralıq")}</span>
               <span>{recommended.max} kg</span>
             </div>
             <div className="h-3 bg-muted rounded-full overflow-hidden relative">
@@ -375,7 +375,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
                 <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
                   <Trash2 className="w-8 h-8 text-red-500" />
                 </div>
-                <h2 className="text-xl font-bold text-foreground text-center mb-2">Tarixçəni sıfırla</h2>
+                <h2 className="text-xl font-bold text-foreground text-center mb-2">{tr("weighttracker_tarixceni_sifirla_577dd6", "Tarixçəni sıfırla")}</h2>
                 <p className="text-sm text-muted-foreground text-center mb-6">
                   Bütün çəki qeydləri silinəcək. Bu əməliyyat geri qaytarıla bilməz.
                 </p>
@@ -435,8 +435,8 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
               </div>
               
               <div className="p-6">
-                <h2 className="text-xl font-bold text-foreground mb-2 text-center">Çəki əlavə et</h2>
-                <p className="text-sm text-muted-foreground text-center mb-6">Bugünkü çəkinizi daxil edin</p>
+                <h2 className="text-xl font-bold text-foreground mb-2 text-center">{tr("weighttracker_ceki_elave_et_252a47", "Çəki əlavə et")}</h2>
+                <p className="text-sm text-muted-foreground text-center mb-6">{tr("weighttracker_bugunku_cekinizi_daxil_edin_24f734", "Bugünkü çəkinizi daxil edin")}</p>
                 
                 <div className="mb-6">
                   <div className="relative">

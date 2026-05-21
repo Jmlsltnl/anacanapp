@@ -197,7 +197,7 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
             <ArrowLeft className="w-4 h-4" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold">Xəstəxana Çantası</h1>
+            <h1 className="text-lg font-bold">{tr("hospitalbag_xestexana_cantasi_045078", "Xəstəxana Çantası")}</h1>
           </div>
           <div className="text-right">
             <span className="text-sm font-bold text-primary">{checkedCount}/{totalCount}</span>
@@ -208,7 +208,7 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
         <div className="px-4 pb-3">
           <Progress value={progress} className="h-2" />
           <div className="flex justify-between mt-1">
-            <span className="text-[10px] text-muted-foreground">36-cı həftədən hazır olmalıdır</span>
+            <span className="text-[10px] text-muted-foreground">{tr("hospitalbag_36_ci_hefteden_hazir_olmalidir_7990d9", "36-cı həftədən hazır olmalıdır")}</span>
             <span className="text-[10px] font-medium text-primary">{progress.toFixed(0)}%</span>
           </div>
         </div>
@@ -271,8 +271,8 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
             className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 text-center text-white mt-4"
           >
             <div className="text-4xl mb-2">🎉</div>
-            <h3 className="text-lg font-bold">Təbrik edirik!</h3>
-            <p className="text-white/80 mt-1 text-sm">Çantanız hazırdır. Xoşbəxt doğuş!</p>
+            <h3 className="text-lg font-bold">{tr("hospitalbag_tebrik_edirik_ba71c0", "Təbrik edirik!")}</h3>
+            <p className="text-white/80 mt-1 text-sm">{tr("hospitalbag_cantaniz_hazirdir_xosbext_dogus_279a30", "Çantanız hazırdır. Xoşbəxt doğuş!")}</p>
           </motion.div>
         )}
       </div>

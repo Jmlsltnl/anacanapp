@@ -173,7 +173,7 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
         {uploading ? (
           <div className="flex items-center justify-center gap-2 py-2">
             <Loader2 className="w-5 h-5 animate-spin text-primary" />
-            <span className="text-xs text-muted-foreground">Yüklənir...</span>
+            <span className="text-xs text-muted-foreground">{tr("directmessagescreen_yuklenir_5557de", "Yüklənir...")}</span>
           </div>
         ) : isRecording ? (
           <div className="flex items-center gap-3 py-1">
@@ -240,7 +240,7 @@ const MessageBubble = ({ message, isMe, formatTime }: { message: any; isMe: bool
     return (
       <div className={`max-w-[72%] rounded-2xl overflow-hidden ${isMe ? 'rounded-br-md' : 'rounded-bl-md'}`}>
         <a href={message.media_url} target="_blank" rel="noopener noreferrer">
-          <img src={message.media_url} alt="Şəkil" className="max-w-full max-h-56 object-cover" loading="lazy" />
+          <img src={message.media_url} alt={tr("directmessagescreen_sekil_43e2e3", "Şəkil")} className="max-w-full max-h-56 object-cover" loading="lazy" />
         </a>
         <div className={`px-3 py-1 ${isMe ? 'bg-primary' : 'bg-muted'}`}>
           <p className={`text-[10px] ${isMe ? 'text-primary-foreground/60' : 'text-muted-foreground'}`}>{formatTime(message.created_at)}</p>

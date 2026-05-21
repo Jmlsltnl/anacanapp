@@ -23,11 +23,11 @@ const ICON_MAP: Record<string, LucideIcon> = {
 };
 
 const FALLBACK_SLIDES = [
-  { id: '1', title: tr("appintroduction_anacan_a_xos_geldiniz_297592", 'Anacan-a Xoş Gəldiniz'), subtitle: 'Sağlamlığınız üçün ən yaxşı yoldaş', description: tr("appintroduction_menstruasiya_hamilelik_ve_analiq_dovrler_d2bc72", 'Menstruasiya, hamiləlik və analıq dövrlərində sizinlə birlikdə olacaq şəxsi köməkçiniz.'), icon_name: 'Heart', gradient: 'from-pink-500 to-rose-600', bg_decor: 'bg-pink-100 dark:bg-pink-900/20' },
-  { id: '2', title: tr("appintroduction_dovrunuzu_i_zleyin_4ad8b9", 'Dövrünüzü İzləyin'), subtitle: 'Ağıllı tsikl izləmə', description: tr("appintroduction_menstruasiya_tsiklinizi_ovulyasiyani_ve__5d8ab1", 'Menstruasiya tsiklinizi, ovulyasiyanı və bərəkətli günlərinizi dəqiq izləyin.'), icon_name: 'Calendar', gradient: 'from-purple-500 to-violet-600', bg_decor: 'bg-purple-100 dark:bg-purple-900/20' },
-  { id: '3', title: tr("appintroduction_hamilelik_yolculugu_21d366", 'Hamiləlik Yolçuluğu'), subtitle: 'Həftə-həftə bələdçi', description: tr("appintroduction_korpenizin_boyumesini_izleyin_heftelik_m_b5524b", 'Körpənizin böyüməsini izləyin, həftəlik məsləhətlər alın və doğuma hazırlaşın.'), icon_name: 'Baby', gradient: 'from-blue-500 to-cyan-600', bg_decor: 'bg-blue-100 dark:bg-blue-900/20' },
-  { id: '4', title: 'Anacan.AI', subtitle: '24/7 şəxsi məsləhətçi', description: tr("appintroduction_suallarinizi_sorusun_saglamliq_haqqinda__b0b456", 'Suallarınızı soruşun, sağlamlıq haqqında məlumat alın.'), icon_name: 'MessageCircle', gradient: 'from-emerald-500 to-teal-600', bg_decor: 'bg-emerald-100 dark:bg-emerald-900/20' },
-  { id: '5', title: tr("appintroduction_cemiyyet_2dc44d", 'Cəmiyyət'), subtitle: 'Tək deyilsiniz', description: tr("appintroduction_diger_analarla_elaqe_qurun_tecrubelerini_9c1f5a", 'Digər analarla əlaqə qurun, təcrübələrinizi paylaşın və dəstək alın.'), icon_name: 'Users', gradient: 'from-orange-500 to-amber-600', bg_decor: 'bg-orange-100 dark:bg-orange-900/20' },
+  { id: '1', title: tr("appintroduction_anacan_a_xos_geldiniz_297592", 'Anacan-a Xoş Gəldiniz'), subtitle: tr("appintroduction_saglamliginiz_ucun_en_yaxsi_yoldas_14de09", "Sağlamlığınız üçün ən yaxşı yoldaş"), description: tr("appintroduction_menstruasiya_hamilelik_ve_analiq_dovrler_d2bc72", 'Menstruasiya, hamiləlik və analıq dövrlərində sizinlə birlikdə olacaq şəxsi köməkçiniz.'), icon_name: 'Heart', gradient: 'from-pink-500 to-rose-600', bg_decor: 'bg-pink-100 dark:bg-pink-900/20' },
+  { id: '2', title: tr("appintroduction_dovrunuzu_i_zleyin_4ad8b9", 'Dövrünüzü İzləyin'), subtitle: tr("appintroduction_agilli_tsikl_izleme_06d779", "Ağıllı tsikl izləmə"), description: tr("appintroduction_menstruasiya_tsiklinizi_ovulyasiyani_ve__5d8ab1", 'Menstruasiya tsiklinizi, ovulyasiyanı və bərəkətli günlərinizi dəqiq izləyin.'), icon_name: 'Calendar', gradient: 'from-purple-500 to-violet-600', bg_decor: 'bg-purple-100 dark:bg-purple-900/20' },
+  { id: '3', title: tr("appintroduction_hamilelik_yolculugu_21d366", 'Hamiləlik Yolçuluğu'), subtitle: tr("appintroduction_hefte_hefte_beledci_01e461", "Həftə-həftə bələdçi"), description: tr("appintroduction_korpenizin_boyumesini_izleyin_heftelik_m_b5524b", 'Körpənizin böyüməsini izləyin, həftəlik məsləhətlər alın və doğuma hazırlaşın.'), icon_name: 'Baby', gradient: 'from-blue-500 to-cyan-600', bg_decor: 'bg-blue-100 dark:bg-blue-900/20' },
+  { id: '4', title: 'Anacan.AI', subtitle: tr("appintroduction_24_7_sexsi_meslehetci_c1e4a0", "24/7 şəxsi məsləhətçi"), description: tr("appintroduction_suallarinizi_sorusun_saglamliq_haqqinda__b0b456", 'Suallarınızı soruşun, sağlamlıq haqqında məlumat alın.'), icon_name: 'MessageCircle', gradient: 'from-emerald-500 to-teal-600', bg_decor: 'bg-emerald-100 dark:bg-emerald-900/20' },
+  { id: '5', title: tr("appintroduction_cemiyyet_2dc44d", 'Cəmiyyət'), subtitle: tr("appintroduction_tek_deyilsiniz_17196d", "Tək deyilsiniz"), description: tr("appintroduction_diger_analarla_elaqe_qurun_tecrubelerini_9c1f5a", 'Digər analarla əlaqə qurun, təcrübələrinizi paylaşın və dəstək alın.'), icon_name: 'Users', gradient: 'from-orange-500 to-amber-600', bg_decor: 'bg-orange-100 dark:bg-orange-900/20' },
 ];
 
 const AppIntroduction = ({ onComplete }: AppIntroductionProps) => {
@@ -169,7 +169,7 @@ const AppIntroduction = ({ onComplete }: AppIntroductionProps) => {
             className={`flex-1 h-14 rounded-2xl bg-gradient-to-r ${slide.gradient} text-white font-semibold text-base shadow-lg hover:shadow-xl transition-shadow border-0`}
           >
             {currentSlide === slides.length - 1 ? (
-              <>Başla <Sparkles className="w-5 h-5 ml-2" /></>
+              <>{tr("appintroduction_basla_4820bc", "Başla")}<Sparkles className="w-5 h-5 ml-2" /></>
             ) : (
               <>Davam et <ChevronRight className="w-5 h-5 ml-2" /></>
             )}

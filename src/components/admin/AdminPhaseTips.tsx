@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Edit, Trash2, Save, X, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -74,8 +75,8 @@ const AdminPhaseTips = () => {
   const handleSave = () => {
     if (!formData.title.trim() || !formData.content.trim()) {
       toast({
-        title: 'Xəta',
-        description: 'Başlıq və məzmun tələb olunur',
+        title: tr("adminphasetips_xeta_3cdbb6", "Xəta"),
+        description: tr("adminphasetips_basliq_ve_mezmun_teleb_olunur_02f6f5", "Başlıq və məzmun tələb olunur"),
         variant: 'destructive'
       });
       return;
@@ -83,10 +84,10 @@ const AdminPhaseTips = () => {
 
     if (editingTip) {
       updateTip({ id: editingTip.id, ...formData });
-      toast({ title: 'Məsləhət yeniləndi!' });
+      toast({ title: tr("adminphasetips_meslehet_yenilendi_a9d1bd", "Məsləhət yeniləndi!") });
     } else {
       createTip(formData);
-      toast({ title: 'Yeni məsləhət yaradıldı!' });
+      toast({ title: tr("adminphasetips_yeni_meslehet_yaradildi_282e6d", "Yeni məsləhət yaradıldı!") });
     }
 
     setShowEditor(false);
@@ -96,7 +97,7 @@ const AdminPhaseTips = () => {
   const handleDelete = (id: string) => {
     if (confirm('Bu məsləhəti silmək istədiyinizə əminsiniz?')) {
       deleteTip(id);
-      toast({ title: 'Məsləhət silindi' });
+      toast({ title: tr("adminphasetips_meslehet_silindi_0a5099", "Məsləhət silindi") });
     }
   };
 
@@ -119,8 +120,8 @@ const AdminPhaseTips = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Faza Məsləhətləri</h1>
-          <p className="text-muted-foreground">Menstruasiya fazalarına uyğun məsləhətləri idarə edin</p>
+          <h1 className="text-2xl font-bold text-foreground">{tr("adminphasetips_faza_meslehetleri_8df8d3", "Faza Məsləhətləri")}</h1>
+          <p className="text-muted-foreground">{tr("adminphasetips_menstruasiya_fazalarina_uygun_meslehetle_26de89", "Menstruasiya fazalarına uyğun məsləhətləri idarə edin")}</p>
         </div>
         <Button onClick={handleCreate} className="bg-primary">
           <Plus className="w-4 h-4 mr-2" />
@@ -156,7 +157,7 @@ const AdminPhaseTips = () => {
         <Input
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Məsləhət axtar..."
+          placeholder={tr("adminphasetips_meslehet_axtar_52d3a3", "Məsləhət axtar...")}
           className="pl-10"
         />
       </div>
@@ -210,7 +211,7 @@ const AdminPhaseTips = () => {
       {filteredTips.length === 0 && (
         <div className="text-center py-12">
           <div className="text-5xl mb-4">{PHASE_INFO[activePhase].emoji}</div>
-          <p className="text-muted-foreground">Bu faza üçün məsləhət yoxdur</p>
+          <p className="text-muted-foreground">{tr("adminphasetips_bu_faza_ucun_meslehet_yoxdur_c20833", "Bu faza üçün məsləhət yoxdur")}</p>
           <Button onClick={handleCreate} variant="outline" className="mt-4">
             <Plus className="w-4 h-4 mr-2" />
             İlk məsləhəti əlavə et
@@ -299,7 +300,7 @@ const AdminPhaseTips = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Sıra</label>
+                    <label className="text-sm font-medium mb-2 block">{tr("adminphasetips_sira_421c5f", "Sıra")}</label>
                     <Input
                       type="number"
                       value={formData.sort_order}
@@ -311,7 +312,7 @@ const AdminPhaseTips = () => {
 
                 {/* Title EN */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Başlıq (EN)</label>
+                  <label className="text-sm font-medium mb-2 block">{tr("adminphasetips_basliq_en_4ac905", "Başlıq (EN)")}</label>
                   <Input
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -321,17 +322,17 @@ const AdminPhaseTips = () => {
 
                 {/* Title AZ */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Başlıq (AZ) *</label>
+                  <label className="text-sm font-medium mb-2 block">{tr("adminphasetips_basliq_az_2bba90", "Başlıq (AZ) *")}</label>
                   <Input
                     value={formData.title_az}
                     onChange={(e) => setFormData({ ...formData, title_az: e.target.value })}
-                    placeholder="Azərbaycan dilində başlıq"
+                    placeholder={tr("adminphasetips_azerbaycan_dilinde_basliq_a39299", "Azərbaycan dilində başlıq")}
                   />
                 </div>
 
                 {/* Content EN */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Məzmun (EN)</label>
+                  <label className="text-sm font-medium mb-2 block">{tr("adminphasetips_mezmun_en_7541aa", "Məzmun (EN)")}</label>
                   <Textarea
                     value={formData.content}
                     onChange={(e) => setFormData({ ...formData, content: e.target.value })}
@@ -342,11 +343,11 @@ const AdminPhaseTips = () => {
 
                 {/* Content AZ */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Məzmun (AZ) *</label>
+                  <label className="text-sm font-medium mb-2 block">{tr("adminphasetips_mezmun_az_c325f6", "Məzmun (AZ) *")}</label>
                   <Textarea
                     value={formData.content_az}
                     onChange={(e) => setFormData({ ...formData, content_az: e.target.value })}
-                    placeholder="Azərbaycan dilində məzmun"
+                    placeholder={tr("adminphasetips_azerbaycan_dilinde_mezmun_bd2290", "Azərbaycan dilində məzmun")}
                     rows={3}
                   />
                 </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { 
   Heart, Lightbulb, MessageSquare, Plus, Pencil, Trash2, Search,
@@ -114,18 +115,18 @@ const AdminFlowContent = () => {
           .eq('key', key);
       }
       queryClient.invalidateQueries({ queryKey: ['flow-upcoming-labels'] });
-      toast({ title: 'Başlıqlar saxlanıldı ✅' });
+      toast({ title: tr("adminflowcontent_basliqlar_saxlanildi_a9004c", "Başlıqlar saxlanıldı ✅") });
     } catch {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("adminflowcontent_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
     setLabelsLoading(false);
   };
 
   const tabs = [
     { id: 'symptoms', label: 'Simptomlar', icon: Heart, count: symptomsQuery.data?.length || 0 },
-    { id: 'tips', label: 'Faza Tövsiyələri', icon: Lightbulb, count: tipsQuery.data?.length || 0 },
-    { id: 'insights', label: 'Məsləhətlər', icon: MessageSquare, count: insightsQuery.data?.length || 0 },
-    { id: 'labels', label: 'Başlıqlar', icon: Tag, count: 3 },
+    { id: 'tips', label: tr("adminflowcontent_faza_tovsiyeleri_5a303a", "Faza Tövsiyələri"), icon: Lightbulb, count: tipsQuery.data?.length || 0 },
+    { id: 'insights', label: tr("adminflowcontent_meslehetler_fafd97", "Məsləhətlər"), icon: MessageSquare, count: insightsQuery.data?.length || 0 },
+    { id: 'labels', label: tr("adminflowcontent_basliqlar_b19a1f", "Başlıqlar"), icon: Tag, count: 3 },
   ];
 
   const getCurrentData = () => {
@@ -178,7 +179,7 @@ const AdminFlowContent = () => {
       queryClient.invalidateQueries({ queryKey: ['flow-symptoms'] });
       queryClient.invalidateQueries({ queryKey: ['flow-phase-tips'] });
       queryClient.invalidateQueries({ queryKey: ['flow-insights'] });
-      toast({ title: 'Əlavə edildi' });
+      toast({ title: tr("adminflowcontent_elave_edildi_b7d7e4", "Əlavə edildi") });
       setShowModal(false);
     },
   });
@@ -193,7 +194,7 @@ const AdminFlowContent = () => {
       queryClient.invalidateQueries({ queryKey: ['flow-symptoms'] });
       queryClient.invalidateQueries({ queryKey: ['flow-phase-tips'] });
       queryClient.invalidateQueries({ queryKey: ['flow-insights'] });
-      toast({ title: 'Yeniləndi' });
+      toast({ title: tr("adminflowcontent_yenilendi_d10a01", "Yeniləndi") });
       setShowModal(false);
     },
   });
@@ -295,27 +296,27 @@ const AdminFlowContent = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-foreground mb-1 block">🩸 Period başlığı</label>
+              <label className="text-sm font-medium text-foreground mb-1 block">{tr("adminflowcontent_period_basligi_6a6736", "🩸 Period başlığı")}</label>
               <Input
                 value={flowLabels.flow_label_next_period}
                 onChange={(e) => setFlowLabels({ ...flowLabels, flow_label_next_period: e.target.value })}
-                placeholder="Növbəti Period"
+                placeholder={tr("adminflowcontent_novbeti_period_b29c4a", "Növbəti Period")}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground mb-1 block">💕 Reproduktiv dövr başlığı</label>
+              <label className="text-sm font-medium text-foreground mb-1 block">{tr("adminflowcontent_reproduktiv_dovr_basligi_836250", "💕 Reproduktiv dövr başlığı")}</label>
               <Input
                 value={flowLabels.flow_label_fertile_window}
                 onChange={(e) => setFlowLabels({ ...flowLabels, flow_label_fertile_window: e.target.value })}
-                placeholder="Reproduktiv Dövr"
+                placeholder={tr("adminflowcontent_reproduktiv_dovr_80642c", "Reproduktiv Dövr")}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground mb-1 block">✨ Ovulyasiya başlığı</label>
+              <label className="text-sm font-medium text-foreground mb-1 block">{tr("adminflowcontent_ovulyasiya_basligi_0264bd", "✨ Ovulyasiya başlığı")}</label>
               <Input
                 value={flowLabels.flow_label_ovulation_day}
                 onChange={(e) => setFlowLabels({ ...flowLabels, flow_label_ovulation_day: e.target.value })}
-                placeholder="Ovulyasiya Günü"
+                placeholder={tr("adminflowcontent_ovulyasiya_gunu_811e84", "Ovulyasiya Günü")}
               />
             </div>
             <Button onClick={saveLabels} disabled={labelsLoading} className="gap-2">
@@ -429,7 +430,7 @@ const AdminFlowContent = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Rəng</label>
+                  <label className="text-sm font-medium">{tr("adminflowcontent_reng_8c6bc5", "Rəng")}</label>
                   <Input
                     type="color"
                     value={formData.color || '#F97316'}
@@ -469,7 +470,7 @@ const AdminFlowContent = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Başlıq (EN)</label>
+                  <label className="text-sm font-medium">{tr("adminflowcontent_basliq_en_4ac905", "Başlıq (EN)")}</label>
                   <Input
                     value={formData.title || ''}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -477,15 +478,15 @@ const AdminFlowContent = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Başlıq (AZ)</label>
+                  <label className="text-sm font-medium">{tr("adminflowcontent_basliq_az_3e294a", "Başlıq (AZ)")}</label>
                   <Input
                     value={formData.title_az || ''}
                     onChange={(e) => setFormData({ ...formData, title_az: e.target.value })}
-                    placeholder="Azərbaycan dilində başlıq"
+                    placeholder={tr("adminflowcontent_azerbaycan_dilinde_basliq_a39299", "Azərbaycan dilində başlıq")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Məzmun (EN)</label>
+                  <label className="text-sm font-medium">{tr("adminflowcontent_mezmun_en_7541aa", "Məzmun (EN)")}</label>
                   <Textarea
                     value={formData.content || ''}
                     onChange={(e) => setFormData({ ...formData, content: e.target.value })}
@@ -493,7 +494,7 @@ const AdminFlowContent = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Məzmun (AZ)</label>
+                  <label className="text-sm font-medium">{tr("adminflowcontent_mezmun_az_d18d5f", "Məzmun (AZ)")}</label>
                   <Textarea
                     value={formData.content_az || ''}
                     onChange={(e) => setFormData({ ...formData, content_az: e.target.value })}
@@ -516,7 +517,7 @@ const AdminFlowContent = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">Hamısı</SelectItem>
+                        <SelectItem value="all">{tr("adminflowcontent_hamisi_c73c4d", "Hamısı")}</SelectItem>
                         {PHASES.map((phase) => (
                           <SelectItem key={phase.id} value={phase.id}>
                             {phase.emoji} {phase.label}
@@ -534,21 +535,21 @@ const AdminFlowContent = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Başlıq (EN)</label>
+                  <label className="text-sm font-medium">{tr("adminflowcontent_basliq_en_4ac905", "Başlıq (EN)")}</label>
                   <Input
                     value={formData.title || ''}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Başlıq (AZ)</label>
+                  <label className="text-sm font-medium">{tr("adminflowcontent_basliq_az_3e294a", "Başlıq (AZ)")}</label>
                   <Input
                     value={formData.title_az || ''}
                     onChange={(e) => setFormData({ ...formData, title_az: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Məzmun (EN)</label>
+                  <label className="text-sm font-medium">{tr("adminflowcontent_mezmun_en_7541aa", "Məzmun (EN)")}</label>
                   <Textarea
                     value={formData.content || ''}
                     onChange={(e) => setFormData({ ...formData, content: e.target.value })}
@@ -556,7 +557,7 @@ const AdminFlowContent = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Məzmun (AZ)</label>
+                  <label className="text-sm font-medium">{tr("adminflowcontent_mezmun_az_d18d5f", "Məzmun (AZ)")}</label>
                   <Textarea
                     value={formData.content_az || ''}
                     onChange={(e) => setFormData({ ...formData, content_az: e.target.value })}
@@ -568,7 +569,7 @@ const AdminFlowContent = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Sıra</label>
+                <label className="text-sm font-medium">{tr("adminflowcontent_sira_421c5f", "Sıra")}</label>
                 <Input
                   type="number"
                   value={formData.sort_order || 0}

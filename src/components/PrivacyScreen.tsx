@@ -134,8 +134,8 @@ const PrivacyScreen = ({ onBack }: PrivacyScreenProps) => {
             <ArrowLeft className="w-5 h-5 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">Gizlilik & Təhlükəsizlik</h1>
-            <p className="text-white/80 text-sm">Məlumatlarınızı idarə edin</p>
+            <h1 className="text-xl font-bold text-white">{tr("privacyscreen_gizlilik_tehlukesizlik_67bec6", "Gizlilik & Təhlükəsizlik")}</h1>
+            <p className="text-white/80 text-sm">{tr("privacyscreen_melumatlarinizi_idare_edin_efbcdb", "Məlumatlarınızı idarə edin")}</p>
           </div>
         </div>
       </div>
@@ -198,8 +198,8 @@ const PrivacyScreen = ({ onBack }: PrivacyScreenProps) => {
                 <Download className="w-5 h-5 text-emerald-600" />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-medium text-foreground">Məlumatları Yüklə</p>
-                <p className="text-xs text-muted-foreground">Bütün məlumatlarınızı JSON formatında yükləyin</p>
+                <p className="font-medium text-foreground">{tr("privacyscreen_melumatlari_yukle_5cee89", "Məlumatları Yüklə")}</p>
+                <p className="text-xs text-muted-foreground">{tr("privacyscreen_butun_melumatlarinizi_json_formatinda_yu_0c02e5", "Bütün məlumatlarınızı JSON formatında yükləyin")}</p>
               </div>
             </motion.button>
 
@@ -212,8 +212,8 @@ const PrivacyScreen = ({ onBack }: PrivacyScreenProps) => {
                 <Trash2 className="w-5 h-5 text-destructive" />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-medium text-destructive">Hesabı Sil</p>
-                <p className="text-xs text-muted-foreground">Bütün məlumatlarınızı birdəfəlik silin</p>
+                <p className="font-medium text-destructive">{tr("privacyscreen_hesabi_sil_6abf24", "Hesabı Sil")}</p>
+                <p className="text-xs text-muted-foreground">{tr("privacyscreen_butun_melumatlarinizi_birdefelik_silin_41a068", "Bütün məlumatlarınızı birdəfəlik silin")}</p>
               </div>
             </motion.button>
           </div>
@@ -228,7 +228,7 @@ const PrivacyScreen = ({ onBack }: PrivacyScreenProps) => {
         >
           <p className="text-sm text-muted-foreground text-center">
             Gizlilik siyasətimiz və istifadə şərtlərimiz haqqında ətraflı məlumat üçün{' '}
-            <a href="#" className="text-primary font-medium">buraya klikləyin</a>.
+            <a href="#" className="text-primary font-medium">{tr("privacyscreen_buraya_klikleyin_c20d44", "buraya klikləyin")}</a>.
           </p>
         </motion.div>
       </div>
@@ -244,10 +244,10 @@ const PrivacyScreen = ({ onBack }: PrivacyScreenProps) => {
             <DialogDescription className="text-left">
               Bu əməliyyat geri qaytarıla bilməz. Bütün məlumatlarınız, o cümlədən:
               <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>Profil məlumatları</li>
-                <li>Gündəlik qeydlər</li>
-                <li>Görüşlər</li>
-                <li>Bildirişlər</li>
+                <li>{tr("privacyscreen_profil_melumatlari_82c76c", "Profil məlumatları")}</li>
+                <li>{tr("privacyscreen_gundelik_qeydler_285ea0", "Gündəlik qeydlər")}</li>
+                <li>{tr("privacyscreen_gorusler_a729f1", "Görüşlər")}</li>
+                <li>{tr("privacyscreen_bildirisler_54eb88", "Bildirişlər")}</li>
               </ul>
               birdəfəlik silinəcək.
             </DialogDescription>

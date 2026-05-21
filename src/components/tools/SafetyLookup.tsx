@@ -30,7 +30,7 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
   const queryClient = useQueryClient();
 
   const categories = useMemo(() => {
-    const allOption = { id: 'all', name: 'Hamısı', emoji: '✨' };
+    const allOption = { id: 'all', name: tr("safetylookup_hamisi_c73c4d", "Hamısı"), emoji: '✨' };
     const mapped = dbCategories
       .filter(cat => cat.category_id !== 'all' && cat.name.toLowerCase() !== 'hamısı')
       .map(cat => ({ id: cat.category_id, name: cat.name_az || cat.name, emoji: cat.emoji || '📦' }));
@@ -98,7 +98,7 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-8 h-8 text-primary animate-spin" />
-          <p className="text-sm text-muted-foreground">Yüklənir...</p>
+          <p className="text-sm text-muted-foreground">{tr("safetylookup_yuklenir_5557de", "Yüklənir...")}</p>
         </div>
       </div>
     );
@@ -114,7 +114,7 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
               <ArrowLeft className="w-4 h-4 text-foreground" />
             </button>
             <div className="flex-1 min-w-0">
-              <h1 className="text-base font-bold text-foreground truncate">Təhlükəsizlik Sorğusu</h1>
+              <h1 className="text-base font-bold text-foreground truncate">{tr("safetylookup_tehlukesizlik_sorgusu_bd80c3", "Təhlükəsizlik Sorğusu")}</h1>
             </div>
           </div>
           {/* Search */}
@@ -196,7 +196,7 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
         {filteredItems.length === 0 && searchQuery.trim().length >= 2 && (
           <div className="flex flex-col items-center py-10">
             <Search className="w-8 h-8 text-muted-foreground mb-3" />
-            <p className="text-sm font-semibold text-foreground mb-1">Bazada tapılmadı</p>
+            <p className="text-sm font-semibold text-foreground mb-1">{tr("safetylookup_bazada_tapilmadi_1e2889", "Bazada tapılmadı")}</p>
             <p className="text-xs text-muted-foreground mb-4 text-center">"{searchQuery}" — AI ilə axtarış edin</p>
             <button
               onClick={handleAISearch}
@@ -212,7 +212,7 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
         {filteredItems.length === 0 && searchQuery.trim().length < 2 && (
           <div className="flex flex-col items-center py-10">
             <Shield className="w-8 h-8 text-muted-foreground mb-2" />
-            <p className="text-sm text-muted-foreground">Axtarış etməyə başlayın</p>
+            <p className="text-sm text-muted-foreground">{tr("safetylookup_axtaris_etmeye_baslayin_5447ec", "Axtarış etməyə başlayın")}</p>
           </div>
         )}
       </div>

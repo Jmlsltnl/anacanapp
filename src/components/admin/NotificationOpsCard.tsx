@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { tr } from '@/lib/tr';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -68,7 +69,7 @@ const EXPECTED_BAKU_HOURS: Record<string, number[]> = {
 
 function validateSchedule(job: CronJob): { ok: boolean; message: string } {
   const expected = EXPECTED_BAKU_HOURS[job.jobname];
-  if (!expected) return { ok: true, message: 'tələb tanımlanmayıb' };
+  if (!expected) return { ok: true, message: tr("notificationopscard_teleb_tanimlanmayib_e57484", "tələb tanımlanmayıb") };
   const { baku, allHours } = cronUtcHoursToBaku(job.schedule);
   if (allHours) return { ok: false, message: `gözlənilən: ${expected.join(',')} — alındı: ${baku}` };
   const actual = baku.split(',').map((s) => Number(s));
@@ -127,7 +128,7 @@ const NotificationOpsCard = () => {
         <div className="flex items-center gap-2">
           <ServerCog className="h-5 w-5 text-primary" />
           <div>
-            <h3 className="font-semibold">Bildiriş əməliyyatları</h3>
+            <h3 className="font-semibold">{tr("notificationopscard_bildiris_emeliyyatlari_b18578", "Bildiriş əməliyyatları")}</h3>
             <p className="text-xs text-muted-foreground">
               Cron statusu, vaxt zonası uyğunluğu, günlük hesabat və test push düymələri.
             </p>
@@ -163,14 +164,14 @@ const NotificationOpsCard = () => {
 
           {/* Cron jobs */}
           <div>
-            <div className="text-sm font-semibold mb-2">Cron işləri & vaxt zonası</div>
+            <div className="text-sm font-semibold mb-2">{tr("notificationopscard_cron_isleri_vaxt_zonasi_ce0ec5", "Cron işləri & vaxt zonası")}</div>
             <div className="overflow-x-auto rounded border bg-background">
               <table className="w-full text-xs">
                 <thead className="bg-muted/40">
                   <tr>
                     <th className="text-left p-2">Ad</th>
                     <th className="text-left p-2">Schedule (UTC)</th>
-                    <th className="text-left p-2">Baku saatları</th>
+                    <th className="text-left p-2">{tr("notificationopscard_baku_saatlari_de5041", "Baku saatları")}</th>
                     <th className="text-left p-2">Validation</th>
                     <th className="text-left p-2">Son icra</th>
                   </tr>
@@ -183,7 +184,7 @@ const NotificationOpsCard = () => {
                       <tr key={j.jobid} className="border-t">
                         <td className="p-2 font-medium">
                           {j.jobname}{' '}
-                          {!j.active && <Badge variant="outline" className="ml-1">söndürülüb</Badge>}
+                          {!j.active && <Badge variant="outline" className="ml-1">{tr("notificationopscard_sondurulub_0ea98c", "söndürülüb")}</Badge>}
                         </td>
                         <td className="p-2 font-mono">{j.schedule}</td>
                         <td className="p-2 font-mono">{baku.baku}</td>
@@ -210,14 +211,14 @@ const NotificationOpsCard = () => {
                               <Badge variant="outline">{j.last_run.return_message}</Badge>
                             </span>
                           ) : (
-                            <span className="text-muted-foreground">heç vaxt</span>
+                            <span className="text-muted-foreground">{tr("notificationopscard_hec_vaxt_1c2a46", "heç vaxt")}</span>
                           )}
                         </td>
                       </tr>
                     );
                   })}
                   {data.cron_jobs.length === 0 && (
-                    <tr><td colSpan={5} className="p-3 text-center text-muted-foreground">Cron işi tapılmadı</td></tr>
+                    <tr><td colSpan={5} className="p-3 text-center text-muted-foreground">{tr("notificationopscard_cron_isi_tapilmadi_7af00b", "Cron işi tapılmadı")}</td></tr>
                   )}
                 </tbody>
               </table>
@@ -226,19 +227,19 @@ const NotificationOpsCard = () => {
 
           {/* Today runs */}
           <div>
-            <div className="text-sm font-semibold mb-2">Bu gün cron icraları (Baku)</div>
+            <div className="text-sm font-semibold mb-2">{tr("notificationopscard_bu_gun_cron_icralari_baku_e3b082", "Bu gün cron icraları (Baku)")}</div>
             <div className="overflow-x-auto rounded border bg-background">
               <table className="w-full text-xs">
                 <thead className="bg-muted/40">
                   <tr>
                     <th className="text-left p-2">Funksiya</th>
-                    <th className="text-right p-2">İcralar</th>
-                    <th className="text-right p-2">Uğurlu</th>
-                    <th className="text-right p-2">Xəta</th>
-                    <th className="text-right p-2">Göndərilən</th>
-                    <th className="text-right p-2">Uğursuz</th>
-                    <th className="text-right p-2">Keçilən</th>
-                    <th className="text-left p-2">Son bitmə</th>
+                    <th className="text-right p-2">{tr("notificationopscard_icralar_5cb87f", "İcralar")}</th>
+                    <th className="text-right p-2">{tr("notificationopscard_ugurlu_7fe64c", "Uğurlu")}</th>
+                    <th className="text-right p-2">{tr("notificationopscard_xeta_3cdbb6", "Xəta")}</th>
+                    <th className="text-right p-2">{tr("notificationopscard_gonderilen_686392", "Göndərilən")}</th>
+                    <th className="text-right p-2">{tr("notificationopscard_ugursuz_541932", "Uğursuz")}</th>
+                    <th className="text-right p-2">{tr("notificationopscard_kecilen_271294", "Keçilən")}</th>
+                    <th className="text-left p-2">{tr("notificationopscard_son_bitme_8a369d", "Son bitmə")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -255,7 +256,7 @@ const NotificationOpsCard = () => {
                     </tr>
                   ))}
                   {data.today_runs.length === 0 && (
-                    <tr><td colSpan={8} className="p-3 text-center text-muted-foreground">Bu gün cron icrası yoxdur</td></tr>
+                    <tr><td colSpan={8} className="p-3 text-center text-muted-foreground">{tr("notificationopscard_bu_gun_cron_icrasi_yoxdur_f33b6f", "Bu gün cron icrası yoxdur")}</td></tr>
                   )}
                 </tbody>
               </table>
@@ -264,14 +265,14 @@ const NotificationOpsCard = () => {
 
           {/* Today sends */}
           <div>
-            <div className="text-sm font-semibold mb-2">Bu gün göndərmə hesabatı (tip × status × səbəb)</div>
+            <div className="text-sm font-semibold mb-2">{tr("notificationopscard_bu_gun_gonderme_hesabati_tip_status_sebe_158578", "Bu gün göndərmə hesabatı (tip × status × səbəb)")}</div>
             <div className="overflow-x-auto rounded border bg-background max-h-80 overflow-y-auto">
               <table className="w-full text-xs">
                 <thead className="bg-muted/40 sticky top-0">
                   <tr>
                     <th className="text-left p-2">Tip</th>
                     <th className="text-left p-2">Status</th>
-                    <th className="text-left p-2">Səbəb</th>
+                    <th className="text-left p-2">{tr("notificationopscard_sebeb_7b51f1", "Səbəb")}</th>
                     <th className="text-right p-2">Say</th>
                   </tr>
                 </thead>
@@ -289,7 +290,7 @@ const NotificationOpsCard = () => {
                     </tr>
                   ))}
                   {data.today_sends.length === 0 && (
-                    <tr><td colSpan={4} className="p-3 text-center text-muted-foreground">Bu gün göndərmə qeydi yoxdur</td></tr>
+                    <tr><td colSpan={4} className="p-3 text-center text-muted-foreground">{tr("notificationopscard_bu_gun_gonderme_qeydi_yoxdur_653c4a", "Bu gün göndərmə qeydi yoxdur")}</td></tr>
                   )}
                 </tbody>
               </table>

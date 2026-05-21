@@ -224,8 +224,8 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                   <Sparkles className="h-10 w-10" />
                 </motion.div>
                 <div>
-                  <h2 className="text-2xl font-bold mb-1">Yeni Nağıl Yarat</h2>
-                  <p className="text-sm text-white/90">Uşağınızın adı ilə sehrli bir hekayə</p>
+                  <h2 className="text-2xl font-bold mb-1">{tr("fairytalegenerator_yeni_nagil_yarat_081219", "Yeni Nağıl Yarat")}</h2>
+                  <p className="text-sm text-white/90">{tr("fairytalegenerator_usaginizin_adi_ile_sehrli_bir_hekaye_7896ac", "Uşağınızın adı ilə sehrli bir hekayə")}</p>
                 </div>
               </div>
             </div>
@@ -237,7 +237,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
           <div className="grid grid-cols-3 gap-3 mb-6">
             <Card className="text-center p-3">
               <p className="text-2xl font-bold text-primary">{tales.length}</p>
-              <p className="text-xs text-muted-foreground">Nağıl</p>
+              <p className="text-xs text-muted-foreground">{tr("fairytalegenerator_nagil_1f5665", "Nağıl")}</p>
             </Card>
             <Card className="text-center p-3">
               <p className="text-2xl font-bold text-red-500">{favoriteTales.length}</p>
@@ -266,7 +266,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
             {isLoading ? (
               <div className="text-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary mb-2" />
-                <p className="text-muted-foreground">Nağıllar yüklənir...</p>
+                <p className="text-muted-foreground">{tr("fairytalegenerator_nagillar_yuklenir_44f0f1", "Nağıllar yüklənir...")}</p>
               </div>
             ) : tales.length === 0 ? (
               <motion.div 
@@ -275,8 +275,8 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 className="text-center py-12"
               >
                 <div className="text-6xl mb-4">📚</div>
-                <h3 className="font-semibold mb-2">Hələ nağıl yoxdur</h3>
-                <p className="text-muted-foreground text-sm mb-4">İlk sehrli nağılınızı yaradın!</p>
+                <h3 className="font-semibold mb-2">{tr("fairytalegenerator_hele_nagil_yoxdur_f0166c", "Hələ nağıl yoxdur")}</h3>
+                <p className="text-muted-foreground text-sm mb-4">{tr("fairytalegenerator_ilk_sehrli_nagilinizi_yaradin_efa8d2", "İlk sehrli nağılınızı yaradın!")}</p>
                 <Button onClick={() => setShowCreate(true)} className="bg-gradient-to-r from-indigo-500 to-purple-500">
                   <Sparkles className="h-4 w-4 mr-2" />
                   Nağıl Yarat
@@ -336,8 +336,8 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
             {favoriteTales.length === 0 ? (
               <div className="text-center py-12">
                 <Heart className="h-12 w-12 mx-auto mb-2 text-muted-foreground/50" />
-                <p className="text-muted-foreground">Sevimli nağıl yoxdur</p>
-                <p className="text-xs text-muted-foreground mt-1">Nağılları oxuyarkən ❤️ vurun</p>
+                <p className="text-muted-foreground">{tr("fairytalegenerator_sevimli_nagil_yoxdur_756411", "Sevimli nağıl yoxdur")}</p>
+                <p className="text-xs text-muted-foreground mt-1">{tr("fairytalegenerator_nagillari_oxuyarken_vurun_2acb44", "Nağılları oxuyarkən ❤️ vurun")}</p>
               </div>
             ) : (
               favoriteTales.map(tale => (
@@ -410,8 +410,8 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
               className="space-y-4"
             >
               <div>
-                <Label className="text-base font-semibold">Uşağın adı</Label>
-                <p className="text-xs text-muted-foreground mb-2">İstəyə bağlı - nağılda istifadə olunacaq</p>
+                <Label className="text-base font-semibold">{tr("fairytalegenerator_usagin_adi_80632b", "Uşağın adı")}</Label>
+                <p className="text-xs text-muted-foreground mb-2">{tr("fairytalegenerator_isteye_bagli_nagilda_istifade_olunacaq_2d77bd", "İstəyə bağlı - nağılda istifadə olunacaq")}</p>
                 <Input
                   value={directChildName}
                   onChange={(e) => setDirectChildName(e.target.value)}
@@ -420,8 +420,8 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
               </div>
 
               <div>
-                <Label className="text-base font-semibold">Nağıl təsviri *</Label>
-                <p className="text-xs text-muted-foreground mb-2">Nağılın necə olmasını istədiyinizi yazın</p>
+                <Label className="text-base font-semibold">{tr("fairytalegenerator_nagil_tesviri_4aad0a", "Nağıl təsviri *")}</Label>
+                <p className="text-xs text-muted-foreground mb-2">{tr("fairytalegenerator_nagilin_nece_olmasini_istediyinizi_yazin_1a89d4", "Nağılın necə olmasını istədiyinizi yazın")}</p>
                 <Textarea
                   value={customPrompt}
                   onChange={(e) => setCustomPrompt(e.target.value)}
@@ -454,7 +454,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                   </div>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Yaş</Label>
+                  <Label className="text-sm font-medium">{tr("fairytalegenerator_yas_95595b", "Yaş")}</Label>
                   <div className="grid grid-cols-2 gap-1 mt-1">
                     {AGE_RANGES.map(age => (
                       <button
@@ -509,8 +509,8 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 className="space-y-4"
               >
                 <div>
-                  <Label className="text-base font-semibold">Uşağın adı *</Label>
-                  <p className="text-xs text-muted-foreground mb-2">Nağılda əsas qəhrəman kimi olacaq</p>
+                  <Label className="text-base font-semibold">{tr("fairytalegenerator_usagin_adi_163b8d", "Uşağın adı *")}</Label>
+                  <p className="text-xs text-muted-foreground mb-2">{tr("fairytalegenerator_nagilda_esas_qehreman_kimi_olacaq_25a4c8", "Nağılda əsas qəhrəman kimi olacaq")}</p>
                   <Input
                     value={formData.child_name}
                     onChange={(e) => setFormData({ ...formData, child_name: e.target.value })}
@@ -525,7 +525,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                   <Label className="text-base font-semibold flex items-center gap-2">
                     <Baby className="h-4 w-4" /> Yaş qrupu
                   </Label>
-                  <p className="text-xs text-muted-foreground mb-2">Nağılın çətinlik səviyyəsi</p>
+                  <p className="text-xs text-muted-foreground mb-2">{tr("fairytalegenerator_nagilin_cetinlik_seviyyesi_49f08d", "Nağılın çətinlik səviyyəsi")}</p>
                   <div className="grid grid-cols-4 gap-2">
                     {AGE_RANGES.map(age => (
                       <button
@@ -585,8 +585,8 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 className="space-y-4"
               >
                 <div>
-                  <Label className="text-base font-semibold">Nağılın mövzusu *</Label>
-                  <p className="text-xs text-muted-foreground mb-3">Hansı dünyada macəra olsun?</p>
+                  <Label className="text-base font-semibold">{tr("fairytalegenerator_nagilin_movzusu_f10323", "Nağılın mövzusu *")}</Label>
+                  <p className="text-xs text-muted-foreground mb-3">{tr("fairytalegenerator_hansi_dunyada_macera_olsun_e7e752", "Hansı dünyada macəra olsun?")}</p>
                   <div className="grid grid-cols-3 gap-3">
                     {themes.map(theme => (
                       <motion.button
@@ -610,8 +610,8 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
 
                 {/* Story Style */}
                 <div>
-                  <Label className="text-base font-semibold">Nağılın üslubu</Label>
-                  <p className="text-xs text-muted-foreground mb-2">Hansı tərzdə yazılsın?</p>
+                  <Label className="text-base font-semibold">{tr("fairytalegenerator_nagilin_uslubu_9f0076", "Nağılın üslubu")}</Label>
+                  <p className="text-xs text-muted-foreground mb-2">{tr("fairytalegenerator_hansi_terzde_yazilsin_43fa45", "Hansı tərzdə yazılsın?")}</p>
                   <div className="flex flex-wrap gap-2">
                     {STORY_STYLES.map(style => (
                       <button
@@ -649,8 +649,8 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 className="space-y-4"
               >
                 <div>
-                  <Label className="text-base font-semibold">Köməkçi qəhrəman</Label>
-                  <p className="text-xs text-muted-foreground mb-2">İstəyə bağlı - uşağın dostu</p>
+                  <Label className="text-base font-semibold">{tr("fairytalegenerator_komekci_qehreman_077b6f", "Köməkçi qəhrəman")}</Label>
+                  <p className="text-xs text-muted-foreground mb-2">{tr("fairytalegenerator_isteye_bagli_usagin_dostu_f51381", "İstəyə bağlı - uşağın dostu")}</p>
                   <div className="flex flex-wrap gap-2 mb-2">
                     {HERO_SUGGESTIONS.map(hero => (
                       <button
@@ -691,8 +691,8 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 className="space-y-4"
               >
                 <div>
-                  <Label className="text-base font-semibold">Tərbiyəvi mesaj</Label>
-                  <p className="text-xs text-muted-foreground mb-2">Nağılın sonunda hansı dərs olsun?</p>
+                  <Label className="text-base font-semibold">{tr("fairytalegenerator_terbiyevi_mesaj_6bdeb6", "Tərbiyəvi mesaj")}</Label>
+                  <p className="text-xs text-muted-foreground mb-2">{tr("fairytalegenerator_nagilin_sonunda_hansi_ders_olsun_4d833e", "Nağılın sonunda hansı dərs olsun?")}</p>
                   <div className="grid grid-cols-2 gap-2">
                     {MORAL_LESSONS.map(lesson => (
                       <button
@@ -728,18 +728,18 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 className="space-y-4"
               >
                 <div className="bg-muted/50 rounded-xl p-4 space-y-2">
-                  <h3 className="font-semibold text-sm mb-3">📋 Nağıl xülasəsi</h3>
+                  <h3 className="font-semibold text-sm mb-3">{tr("fairytalegenerator_nagil_xulasesi_07d402", "📋 Nağıl xülasəsi")}</h3>
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div>
-                      <span className="text-muted-foreground">Uşaq:</span>
+                      <span className="text-muted-foreground">{tr("fairytalegenerator_usaq_b70dbc", "Uşaq:")}</span>
                       <p className="font-medium">{formData.child_name}</p>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Yaş:</span>
+                      <span className="text-muted-foreground">{tr("fairytalegenerator_yas_8ef26c", "Yaş:")}</span>
                       <p className="font-medium">{AGE_RANGES.find(a => a.value === formData.age_range)?.label}</p>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Mövzu:</span>
+                      <span className="text-muted-foreground">{tr("fairytalegenerator_movzu_5a3526", "Mövzu:")}</span>
                       <p className="font-medium">{themes.find(t => t.name === formData.theme)?.name_az || formData.theme}</p>
                     </div>
                     <div>
@@ -748,7 +748,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     </div>
                     {formData.hero && (
                       <div>
-                        <span className="text-muted-foreground">Qəhrəman:</span>
+                        <span className="text-muted-foreground">{tr("fairytalegenerator_qehreman_aea468", "Qəhrəman:")}</span>
                         <p className="font-medium">{formData.hero}</p>
                       </div>
                     )}
@@ -760,7 +760,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     )}
                     {formData.story_style && (
                       <div>
-                        <span className="text-muted-foreground">Üslub:</span>
+                        <span className="text-muted-foreground">{tr("fairytalegenerator_uslub_b96040", "Üslub:")}</span>
                         <p className="font-medium">{STORY_STYLES.find(s => s.value === formData.story_style)?.label}</p>
                       </div>
                     )}

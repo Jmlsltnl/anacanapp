@@ -305,7 +305,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 <AlertTriangle className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-amber-800 dark:text-amber-200">Sizinlə danışaq?</h3>
+                <h3 className="font-bold text-amber-800 dark:text-amber-200">{tr("mentalhealthtracker_sizinle_danisaq_a4ad3a", "Sizinlə danışaq?")}</h3>
                 <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
                   Qısa sorğu ilə vəziyyəti qiymətləndirək?
                 </p>
@@ -448,8 +448,8 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center mb-3 shadow-lg">
               <Wind className="w-6 h-6 text-white" />
             </div>
-            <h3 className="font-bold text-foreground">Nəfəs Məşqi</h3>
-            <p className="text-xs text-muted-foreground mt-1">Rahatlama və stress azaltma</p>
+            <h3 className="font-bold text-foreground">{tr("mentalhealthtracker_nefes_mesqi_8d98bb", "Nəfəs Məşqi")}</h3>
+            <p className="text-xs text-muted-foreground mt-1">{tr("mentalhealthtracker_rahatlama_ve_stress_azaltma_1a97bc", "Rahatlama və stress azaltma")}</p>
           </motion.button>
 
           {/* EPDS Assessment */}
@@ -464,7 +464,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
               <Brain className="w-6 h-6 text-white" />
             </div>
             <h3 className="font-bold text-foreground">EPDS Testi</h3>
-            <p className="text-xs text-muted-foreground mt-1">Depressiya riski qiymətləndirmə</p>
+            <p className="text-xs text-muted-foreground mt-1">{tr("mentalhealthtracker_depressiya_riski_qiymetlendirme_2729fe", "Depressiya riski qiymətləndirmə")}</p>
           </motion.button>
         </div>
 
@@ -550,7 +550,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <h3 className="font-bold text-foreground mb-3">Dəstək Resursları</h3>
+            <h3 className="font-bold text-foreground mb-3">{tr("mentalhealthtracker_destek_resurslari_345241", "Dəstək Resursları")}</h3>
             <div className="space-y-2">
               {otherResources.map(resource => (
                 <div key={resource.id} className="bg-card rounded-2xl p-4 shadow-sm border border-border/50">
@@ -759,7 +759,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
           {showResult && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-center">Nəticəniz</DialogTitle>
+                <DialogTitle className="text-center">{tr("mentalhealthtracker_neticeniz_d14591", "Nəticəniz")}</DialogTitle>
               </DialogHeader>
               <div className="space-y-6 text-center">
                 <motion.div 

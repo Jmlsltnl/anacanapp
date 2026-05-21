@@ -142,7 +142,7 @@ const AuthScreen = () => {
       if (!ownerIsPremium) {
         toast({
           title: 'Partnyor modu Premium-dur',
-          description: 'Bu kodun sahibi Premium abunəliyə malik olmalıdır. Həyat yoldaşınızdan Premium aktivləşdirməsini xahiş edin.',
+          description: tr("authscreen_bu_kodun_sahibi_premium_abuneliye_malik__de7345", "Bu kodun sahibi Premium abunəliyə malik olmalıdır. Həyat yoldaşınızdan Premium aktivləşdirməsini xahiş edin."),
           variant: 'destructive',
         });
         setIsLoading(false);
@@ -154,7 +154,7 @@ const AuthScreen = () => {
       const { error: registerError } = await signUp(email, password, partnerName.trim());
       if (registerError) {
         toast({
-          title: 'Qeydiyyat alınmadı',
+          title: tr("authscreen_qeydiyyat_alinmadi_982f04", "Qeydiyyat alınmadı"),
           description: getSignupErrorMessage(registerError),
           variant: 'destructive',
         });
@@ -316,7 +316,7 @@ const AuthScreen = () => {
         const { error } = await signUp(email, password, finalName.trim());
         if (error) {
           toast({
-            title: 'Qeydiyyat alınmadı',
+            title: tr("authscreen_qeydiyyat_alinmadi_982f04", "Qeydiyyat alınmadı"),
             description: getSignupErrorMessage(error),
             variant: 'destructive',
           });
@@ -443,8 +443,8 @@ const AuthScreen = () => {
             >
               <Users className="w-10 h-10 text-white" />
             </motion.div>
-            <h1 className="text-3xl font-black text-white tracking-tight">Partnyor Bölməsi</h1>
-            <p className="text-white/80 mt-2 font-medium text-center">Xanımınızla birlikdə bu səyahətə qoşulun</p>
+            <h1 className="text-3xl font-black text-white tracking-tight">{tr("authscreen_partnyor_bolmesi_ed393a", "Partnyor Bölməsi")}</h1>
+            <p className="text-white/80 mt-2 font-medium text-center">{tr("authscreen_xaniminizla_birlikde_bu_seyahete_qosulun_fa14d9", "Xanımınızla birlikdə bu səyahətə qoşulun")}</p>
           </motion.div>
         </div>
 
@@ -599,8 +599,8 @@ const AuthScreen = () => {
               transition={{ delay: 0.6 }}
             >
               Davam etməklə{' '}
-              <button className="text-blue-500 font-medium">Şərtlər</button> və{' '}
-              <button className="text-blue-500 font-medium">Gizlilik Siyasəti</button> ilə razılaşırsınız
+              <button className="text-blue-500 font-medium">{tr("authscreen_sertler_d86d4e", "Şərtlər")}</button> və{' '}
+              <button className="text-blue-500 font-medium">{tr("authscreen_gizlilik_siyaseti_dc3f28", "Gizlilik Siyasəti")}</button> ilə razılaşırsınız
             </motion.p>
           </div>
         </ScrollArea>
@@ -665,7 +665,7 @@ const AuthScreen = () => {
             )}
           </motion.div>
           <h1 className="text-4xl font-black text-white tracking-tight">Anacan</h1>
-          <p className="text-white/80 mt-2 font-medium">Bədəninlə harmoniyada ol</p>
+          <p className="text-white/80 mt-2 font-medium">{tr("authscreen_bedeninle_harmoniyada_ol_ac87bc", "Bədəninlə harmoniyada ol")}</p>
         </motion.div>
       </div>
 
@@ -721,7 +721,7 @@ const AuthScreen = () => {
                       <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                         <Lock className="w-8 h-8 text-primary" />
                       </div>
-                      <h2 className="text-xl font-bold text-foreground">Şifrəni Bərpa Et</h2>
+                      <h2 className="text-xl font-bold text-foreground">{tr("authscreen_sifreni_berpa_et_1d1ae1", "Şifrəni Bərpa Et")}</h2>
                       <p className="text-sm text-muted-foreground mt-1">
                         E-mail ünvanınıza bərpa linki göndəriləcək
                       </p>
@@ -838,7 +838,7 @@ const AuthScreen = () => {
             >
               <div className="flex items-center gap-4 mb-5">
                 <div className="flex-1 h-px bg-border" />
-                <span className="text-sm text-muted-foreground font-medium">və ya</span>
+                <span className="text-sm text-muted-foreground font-medium">{tr("authscreen_ve_ya_c50561", "və ya")}</span>
                 <div className="flex-1 h-px bg-border" />
               </div>
 
@@ -892,8 +892,8 @@ const AuthScreen = () => {
                     <Users className="w-5 h-5 text-white" />
                   </div>
                   <div className="text-left">
-                    <p className="font-bold text-foreground">Partnyor Bölməsi</p>
-                    <p className="text-xs text-muted-foreground">Xanımınızla bağlanmaq üçün</p>
+                    <p className="font-bold text-foreground">{tr("authscreen_partnyor_bolmesi_ed393a", "Partnyor Bölməsi")}</p>
+                    <p className="text-xs text-muted-foreground">{tr("authscreen_xaniminizla_baglanmaq_ucun_d7b234", "Xanımınızla bağlanmaq üçün")}</p>
                   </div>
                 </div>
                 <ArrowRight className="w-5 h-5 text-blue-500 group-hover:translate-x-1 transition-transform" />
@@ -909,8 +909,8 @@ const AuthScreen = () => {
             transition={{ delay: 0.6 }}
           >
             Davam etməklə{' '}
-            <button className="text-primary font-medium">Şərtlər</button> və{' '}
-            <button className="text-primary font-medium">Gizlilik Siyasəti</button> ilə razılaşırsınız
+            <button className="text-primary font-medium">{tr("authscreen_sertler_d86d4e", "Şərtlər")}</button> və{' '}
+            <button className="text-primary font-medium">{tr("authscreen_gizlilik_siyaseti_dc3f28", "Gizlilik Siyasəti")}</button> ilə razılaşırsınız
           </motion.p>
         </div>
       </ScrollArea>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { motion } from 'framer-motion';
@@ -185,8 +186,8 @@ const AdminHealthcareReviews = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Həkim/Klinika Rəyləri</h1>
-          <p className="text-muted-foreground">İstifadəçi rəylərini idarə edin</p>
+          <h1 className="text-2xl font-bold text-foreground">{tr("adminhealthcarereviews_hekim_klinika_reyleri_95060e", "Həkim/Klinika Rəyləri")}</h1>
+          <p className="text-muted-foreground">{tr("adminhealthcarereviews_istifadeci_reylerini_idare_edin_a41371", "İstifadəçi rəylərini idarə edin")}</p>
         </div>
         <Badge variant="secondary" className="text-lg px-4 py-2">
           {reviews.length} rəy
@@ -198,7 +199,7 @@ const AdminHealthcareReviews = () => {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Axtar (həkim, istifadəçi, rəy)..."
+            placeholder={tr("adminhealthcarereviews_axtar_hekim_istifadeci_rey_7de668", "Axtar (həkim, istifadəçi, rəy)...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -210,7 +211,7 @@ const AdminHealthcareReviews = () => {
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Hamısı</SelectItem>
+            <SelectItem value="all">{tr("adminhealthcarereviews_hamisi_c73c4d", "Hamısı")}</SelectItem>
             <SelectItem value="active">Aktiv</SelectItem>
             <SelectItem value="hidden">Gizli</SelectItem>
           </SelectContent>
@@ -236,7 +237,7 @@ const AdminHealthcareReviews = () => {
       ) : filteredReviews.length === 0 ? (
         <div className="text-center py-12 bg-card rounded-xl border border-border">
           <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-          <p className="text-muted-foreground">Heç bir rəy tapılmadı</p>
+          <p className="text-muted-foreground">{tr("adminhealthcarereviews_hec_bir_rey_tapilmadi_ac307a", "Heç bir rəy tapılmadı")}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -351,7 +352,7 @@ const AdminHealthcareReviews = () => {
       <Dialog open={!!editingReview} onOpenChange={() => setEditingReview(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Rəyi Redaktə Et</DialogTitle>
+            <DialogTitle>{tr("adminhealthcarereviews_reyi_redakte_et_6a10e1", "Rəyi Redaktə Et")}</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
@@ -377,12 +378,12 @@ const AdminHealthcareReviews = () => {
             </div>
 
             <div>
-              <p className="text-sm text-muted-foreground mb-2">Rəy mətni</p>
+              <p className="text-sm text-muted-foreground mb-2">{tr("adminhealthcarereviews_rey_metni_c32510", "Rəy mətni")}</p>
               <textarea
                 value={editComment}
                 onChange={(e) => setEditComment(e.target.value)}
                 className="w-full p-3 rounded-xl bg-muted border-0 text-sm resize-none h-32 outline-none focus:ring-2 focus:ring-primary/20"
-                placeholder="Rəy mətni..."
+                placeholder={tr("adminhealthcarereviews_rey_metni_45a205", "Rəy mətni...")}
               />
             </div>
           </div>

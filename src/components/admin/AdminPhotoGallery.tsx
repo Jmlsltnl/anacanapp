@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Image as ImageIcon, User, Calendar, Palette, Eye, Loader2, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -106,7 +107,7 @@ const AdminPhotoGallery = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ImageIcon className="w-5 h-5 text-primary" />
-          <h3 className="text-lg font-semibold">Generasiya Edilmiş Fotolar</h3>
+          <h3 className="text-lg font-semibold">{tr("adminphotogallery_generasiya_edilmis_fotolar_b3507c", "Generasiya Edilmiş Fotolar")}</h3>
           <span className="text-sm text-muted-foreground">({total} foto)</span>
         </div>
         <Button variant="ghost" size="sm" onClick={fetchPhotos} disabled={loading}>
@@ -182,7 +183,7 @@ const AdminPhotoGallery = () => {
           >
             <div className="p-4 border-b border-border flex items-center justify-between">
               <div>
-                <h3 className="font-bold text-foreground">Foto Detalları</h3>
+                <h3 className="font-bold text-foreground">{tr("adminphotogallery_foto_detallari_8572ca", "Foto Detalları")}</h3>
                 <p className="text-xs text-muted-foreground">
                   {format(new Date(selectedPhoto.created_at), 'dd MMMM yyyy, HH:mm', { locale: az })}
                 </p>
@@ -193,7 +194,7 @@ const AdminPhotoGallery = () => {
             <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Generated Photo */}
               <div>
-                <p className="text-xs font-medium text-muted-foreground mb-2">🎨 Generasiya edilmiş</p>
+                <p className="text-xs font-medium text-muted-foreground mb-2">{tr("adminphotogallery_generasiya_edilmis_0f69a6", "🎨 Generasiya edilmiş")}</p>
                 <img
                   src={getPublicUrl(selectedPhoto.storage_path) || ''}
                   alt="Generated"
@@ -203,7 +204,7 @@ const AdminPhotoGallery = () => {
 
               {/* Original Photo */}
               <div>
-                <p className="text-xs font-medium text-muted-foreground mb-2">📷 Orijinal şəkil</p>
+                <p className="text-xs font-medium text-muted-foreground mb-2">{tr("adminphotogallery_orijinal_sekil_72dccb", "📷 Orijinal şəkil")}</p>
                 {selectedPhoto.source_image_path ? (
                   <img
                     src={getPublicUrl(selectedPhoto.source_image_path) || ''}
@@ -212,7 +213,7 @@ const AdminPhotoGallery = () => {
                   />
                 ) : (
                   <div className="aspect-square rounded-xl border border-dashed border-border flex items-center justify-center bg-muted/30">
-                    <p className="text-xs text-muted-foreground">Orijinal saxlanmayıb</p>
+                    <p className="text-xs text-muted-foreground">{tr("adminphotogallery_orijinal_saxlanmayib_0f1805", "Orijinal saxlanmayıb")}</p>
                   </div>
                 )}
               </div>
@@ -222,7 +223,7 @@ const AdminPhotoGallery = () => {
             <div className="p-4 border-t border-border space-y-3">
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <span className="text-muted-foreground">İstifadəçi:</span>
+                  <span className="text-muted-foreground">{tr("adminphotogallery_istifadeci_4eaf5a", "İstifadəçi:")}</span>
                   <p className="font-medium">{selectedPhoto.userName}</p>
                   <p className="text-xs text-muted-foreground">{selectedPhoto.userEmail}</p>
                 </div>
@@ -234,7 +235,7 @@ const AdminPhotoGallery = () => {
 
               {selectedPhoto.customization && Object.keys(selectedPhoto.customization).length > 0 && (
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground mb-1">Seçilmiş parametrlər:</p>
+                  <p className="text-xs font-medium text-muted-foreground mb-1">{tr("adminphotogallery_secilmis_parametrler_0f1e7a", "Seçilmiş parametrlər:")}</p>
                   <div className="flex flex-wrap gap-1">
                     {Object.entries(selectedPhoto.customization).map(([key, val]) => (
                       <span key={key} className="text-xs bg-muted px-2 py-1 rounded-full">

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { MapPin, Trash2, Check, AlertTriangle, Star, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -129,7 +130,7 @@ const AdminPlaces = () => {
           <MapPin className="w-5 h-5 text-blue-500" />
           Ana Dostu Məkanlar
         </h2>
-        <p className="text-sm text-muted-foreground">Məkanlar və rəylərin idarə edilməsi</p>
+        <p className="text-sm text-muted-foreground">{tr("adminplaces_mekanlar_ve_reylerin_idare_edilmesi_738512", "Məkanlar və rəylərin idarə edilməsi")}</p>
       </div>
 
       <Tabs defaultValue="places">
@@ -157,9 +158,9 @@ const AdminPlaces = () => {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4">
             {[
-              { label: 'Cəmi', count: places.length, f: 'all' as const, color: '' },
-              { label: 'Gözləyən', count: pendingPlaces, f: 'pending' as const, color: 'text-orange-500' },
-              { label: 'Təsdiqlənmiş', count: places.filter(p => p.is_verified).length, f: 'approved' as const, color: 'text-green-500' },
+              { label: tr("adminplaces_cemi_84214a", "Cəmi"), count: places.length, f: 'all' as const, color: '' },
+              { label: tr("adminplaces_gozleyen_5cab14", "Gözləyən"), count: pendingPlaces, f: 'pending' as const, color: 'text-orange-500' },
+              { label: tr("adminplaces_tesdiqlenmis_cf7b5f", "Təsdiqlənmiş"), count: places.filter(p => p.is_verified).length, f: 'approved' as const, color: 'text-green-500' },
             ].map(s => (
               <Card key={s.f} className="cursor-pointer" onClick={() => setFilter(s.f)}>
                 <CardContent className="p-4">
@@ -171,9 +172,9 @@ const AdminPlaces = () => {
           </div>
 
           {isLoading ? (
-            <div className="text-center py-8">Yüklənir...</div>
+            <div className="text-center py-8">{tr("adminplaces_yuklenir_5557de", "Yüklənir...")}</div>
           ) : places.length === 0 ? (
-            <Card><CardContent className="p-8 text-center text-muted-foreground">Bu filtrdə heç bir məkan yoxdur</CardContent></Card>
+            <Card><CardContent className="p-8 text-center text-muted-foreground">{tr("adminplaces_bu_filtrde_hec_bir_mekan_yoxdur_5e134d", "Bu filtrdə heç bir məkan yoxdur")}</CardContent></Card>
           ) : (
             <div className="space-y-3">
               {places.map((place, index) => (
@@ -189,7 +190,7 @@ const AdminPlaces = () => {
                             <div className="flex items-center gap-2 flex-wrap">
                               <h3 className="font-bold">{place.name}</h3>
                               {place.is_verified ? (
-                                <Badge className="bg-green-500">Təsdiqlənmiş</Badge>
+                                <Badge className="bg-green-500">{tr("adminplaces_tesdiqlenmis_cf7b5f", "Təsdiqlənmiş")}</Badge>
                               ) : (
                                 <Badge variant="outline" className="text-orange-500 border-orange-500">
                                   <AlertTriangle className="w-3 h-3 mr-1" />Gözləyir
@@ -198,11 +199,11 @@ const AdminPlaces = () => {
                             </div>
                             <p className="text-sm text-muted-foreground truncate">{place.address}</p>
                             <div className="flex flex-wrap gap-1 mt-2">
-                              {place.has_breastfeeding_room && <Badge variant="secondary" className="text-xs">🤱 Əmizdirmə</Badge>}
-                              {place.has_changing_table && <Badge variant="secondary" className="text-xs">👶 Dəyişdirmə</Badge>}
+                              {place.has_breastfeeding_room && <Badge variant="secondary" className="text-xs">{tr("adminplaces_emizdirme_f8d12a", "🤱 Əmizdirmə")}</Badge>}
+                              {place.has_changing_table && <Badge variant="secondary" className="text-xs">{tr("adminplaces_deyisdirme_2a0b7d", "👶 Dəyişdirmə")}</Badge>}
                               {place.has_stroller_access && <Badge variant="secondary" className="text-xs">🚼 Araba</Badge>}
-                              {place.has_kids_menu && <Badge variant="secondary" className="text-xs">🍽️ Uşaq menyusu</Badge>}
-                              {place.has_play_area && <Badge variant="secondary" className="text-xs">🎮 Oyun sahəsi</Badge>}
+                              {place.has_kids_menu && <Badge variant="secondary" className="text-xs">{tr("adminplaces_usaq_menyusu_fa5c7a", "🍽️ Uşaq menyusu")}</Badge>}
+                              {place.has_play_area && <Badge variant="secondary" className="text-xs">{tr("adminplaces_oyun_sahesi_6ce71d", "🎮 Oyun sahəsi")}</Badge>}
                             </div>
                             {place.avg_rating > 0 && (
                               <div className="flex items-center gap-1 mt-2">
@@ -238,21 +239,21 @@ const AdminPlaces = () => {
             <Card>
               <CardContent className="p-4">
                 <div className="text-2xl font-bold text-orange-500">{pendingReviews}</div>
-                <p className="text-sm text-muted-foreground">Gözləyən rəy</p>
+                <p className="text-sm text-muted-foreground">{tr("adminplaces_gozleyen_rey_c37f08", "Gözləyən rəy")}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
                 <div className="text-2xl font-bold text-green-500">{reviews.filter((r: any) => r.is_verified).length}</div>
-                <p className="text-sm text-muted-foreground">Təsdiqlənmiş rəy</p>
+                <p className="text-sm text-muted-foreground">{tr("adminplaces_tesdiqlenmis_rey_bfd7c5", "Təsdiqlənmiş rəy")}</p>
               </CardContent>
             </Card>
           </div>
 
           {reviewsLoading ? (
-            <div className="text-center py-8">Yüklənir...</div>
+            <div className="text-center py-8">{tr("adminplaces_yuklenir_5557de", "Yüklənir...")}</div>
           ) : reviews.length === 0 ? (
-            <Card><CardContent className="p-8 text-center text-muted-foreground">Hələ rəy yoxdur</CardContent></Card>
+            <Card><CardContent className="p-8 text-center text-muted-foreground">{tr("adminplaces_hele_rey_yoxdur_1f617a", "Hələ rəy yoxdur")}</CardContent></Card>
           ) : (
             <div className="space-y-3">
               {reviews.map((review: any, index: number) => (
@@ -264,7 +265,7 @@ const AdminPlaces = () => {
                           <div className="flex items-center gap-2 flex-wrap mb-1">
                             <h3 className="font-bold text-sm">{review.mom_friendly_places?.name_az || review.mom_friendly_places?.name || 'Naməlum məkan'}</h3>
                             {review.is_verified ? (
-                              <Badge className="bg-green-500 text-xs">Təsdiqlənmiş</Badge>
+                              <Badge className="bg-green-500 text-xs">{tr("adminplaces_tesdiqlenmis_cf7b5f", "Təsdiqlənmiş")}</Badge>
                             ) : (
                               <Badge variant="outline" className="text-orange-500 border-orange-500 text-xs">
                                 <AlertTriangle className="w-3 h-3 mr-1" />Gözləyir
@@ -301,7 +302,7 @@ const AdminPlaces = () => {
 
       <AdminUsageStats 
         eventNames={['place_viewed']}
-        title="📍 Məkan İstifadə Statistikası"
+        title={tr("adminplaces_mekan_istifade_statistikasi_f80b0c", "📍 Məkan İstifadə Statistikası")}
         showEventData
         showUsers
       />

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { MessageSquare, Heart, Search, Filter } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -72,7 +73,7 @@ const AdminMessages = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Mesajlar</h1>
-          <p className="text-muted-foreground">Partner mesajlaşmalarını izləyin</p>
+          <p className="text-muted-foreground">{tr("adminmessages_partner_mesajlasmalarini_izleyin_ac2a01", "Partner mesajlaşmalarını izləyin")}</p>
         </div>
       </div>
 
@@ -85,7 +86,7 @@ const AdminMessages = () => {
             </div>
             <div>
               <p className="text-2xl font-bold">{stats.total}</p>
-              <p className="text-xs text-muted-foreground">Ümumi</p>
+              <p className="text-xs text-muted-foreground">{tr("adminmessages_umumi_1b5521", "Ümumi")}</p>
             </div>
           </div>
         </Card>
@@ -107,7 +108,7 @@ const AdminMessages = () => {
             </div>
             <div>
               <p className="text-2xl font-bold">{stats.text}</p>
-              <p className="text-xs text-muted-foreground">Mətn</p>
+              <p className="text-xs text-muted-foreground">{tr("adminmessages_metn_6e9f0f", "Mətn")}</p>
             </div>
           </div>
         </Card>
@@ -118,7 +119,7 @@ const AdminMessages = () => {
             </div>
             <div>
               <p className="text-2xl font-bold">{stats.unread}</p>
-              <p className="text-xs text-muted-foreground">Oxunmamış</p>
+              <p className="text-xs text-muted-foreground">{tr("adminmessages_oxunmamis_08b615", "Oxunmamış")}</p>
             </div>
           </div>
         </Card>

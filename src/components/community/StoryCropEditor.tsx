@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { tr } from '@/lib/tr';
 import Cropper, { Area, Point } from 'react-easy-crop';
 import { motion } from 'framer-motion';
 import { X, Check, ZoomIn, ZoomOut, RotateCw } from 'lucide-react';
@@ -85,7 +86,7 @@ const StoryCropEditor = ({ imageUrl, onConfirm, onCancel }: StoryCropEditorProps
         >
           <X className="w-5 h-5 text-white" />
         </button>
-        <h3 className="text-white font-semibold text-base">Şəkli nizamla</h3>
+        <h3 className="text-white font-semibold text-base">{tr("storycropeditor_sekli_nizamla_aee92d", "Şəkli nizamla")}</h3>
         <button
           onClick={handleConfirm}
           disabled={saving}

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { 
   Package, Search, Eye, Truck, CheckCircle, XCircle, 
@@ -15,12 +16,12 @@ import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ComponentType<any> }> = {
-  pending: { label: 'Gözləyir', color: 'bg-yellow-100 text-yellow-800', icon: Clock },
-  confirmed: { label: 'Təsdiqləndi', color: 'bg-blue-100 text-blue-800', icon: CheckCircle },
-  processing: { label: 'Hazırlanır', color: 'bg-purple-100 text-purple-800', icon: Package },
-  shipped: { label: 'Göndərildi', color: 'bg-cyan-100 text-cyan-800', icon: Truck },
-  delivered: { label: 'Çatdırıldı', color: 'bg-green-100 text-green-800', icon: CheckCircle },
-  cancelled: { label: 'Ləğv edildi', color: 'bg-red-100 text-red-800', icon: XCircle },
+  pending: { label: tr("adminorders_gozleyir_9ac18a", "Gözləyir"), color: 'bg-yellow-100 text-yellow-800', icon: Clock },
+  confirmed: { label: tr("adminorders_tesdiqlendi_0c46e4", "Təsdiqləndi"), color: 'bg-blue-100 text-blue-800', icon: CheckCircle },
+  processing: { label: tr("adminorders_hazirlanir_c15a4b", "Hazırlanır"), color: 'bg-purple-100 text-purple-800', icon: Package },
+  shipped: { label: tr("adminorders_gonderildi_6cf847", "Göndərildi"), color: 'bg-cyan-100 text-cyan-800', icon: Truck },
+  delivered: { label: tr("adminorders_catdirildi_324039", "Çatdırıldı"), color: 'bg-green-100 text-green-800', icon: CheckCircle },
+  cancelled: { label: tr("adminorders_legv_edildi_bfa98b", "Ləğv edildi"), color: 'bg-red-100 text-red-800', icon: XCircle },
 };
 
 const AdminOrders = () => {
@@ -73,7 +74,7 @@ const AdminOrders = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Package className="w-6 h-6 text-primary" />
-          <h1 className="text-2xl font-bold">Sifarişlər</h1>
+          <h1 className="text-2xl font-bold">{tr("adminorders_sifarisler_660280", "Sifarişlər")}</h1>
         </div>
       </div>
 
@@ -82,31 +83,31 @@ const AdminOrders = () => {
         <Card>
           <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold">{stats.total}</p>
-            <p className="text-sm text-muted-foreground">Ümumi</p>
+            <p className="text-sm text-muted-foreground">{tr("adminorders_umumi_1b5521", "Ümumi")}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
-            <p className="text-sm text-muted-foreground">Gözləyir</p>
+            <p className="text-sm text-muted-foreground">{tr("adminorders_gozleyir_9ac18a", "Gözləyir")}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold text-blue-600">{stats.processing}</p>
-            <p className="text-sm text-muted-foreground">Hazırlanır</p>
+            <p className="text-sm text-muted-foreground">{tr("adminorders_hazirlanir_c15a4b", "Hazırlanır")}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold text-green-600">{stats.completed}</p>
-            <p className="text-sm text-muted-foreground">Çatdırıldı</p>
+            <p className="text-sm text-muted-foreground">{tr("adminorders_catdirildi_324039", "Çatdırıldı")}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold text-primary">{stats.revenue.toFixed(2)} ₼</p>
-            <p className="text-sm text-muted-foreground">Gəlir</p>
+            <p className="text-sm text-muted-foreground">{tr("adminorders_gelir_92208b", "Gəlir")}</p>
           </CardContent>
         </Card>
       </div>
@@ -118,7 +119,7 @@ const AdminOrders = () => {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Sifariş nömrəsi, ad və ya telefon..."
+            placeholder={tr("adminorders_sifaris_nomresi_ad_ve_ya_telefon_24cdf0", "Sifariş nömrəsi, ad və ya telefon...")}
             className="pl-10"
           />
         </div>
@@ -127,7 +128,7 @@ const AdminOrders = () => {
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Hamısı</SelectItem>
+            <SelectItem value="all">{tr("adminorders_hamisi_c73c4d", "Hamısı")}</SelectItem>
             {Object.entries(STATUS_CONFIG).map(([key, { label }]) => (
               <SelectItem key={key} value={key}>{label}</SelectItem>
             ))}
@@ -140,7 +141,7 @@ const AdminOrders = () => {
         {filteredOrders.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
             <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p>Sifariş tapılmadı</p>
+            <p>{tr("adminorders_sifaris_tapilmadi_08e5bf", "Sifariş tapılmadı")}</p>
           </div>
         ) : (
           filteredOrders.map((order) => {
@@ -224,7 +225,7 @@ const AdminOrders = () => {
                     {/* Order Items */}
                     {order.items && order.items.length > 0 && (
                       <div>
-                        <h4 className="font-semibold text-sm mb-2">Məhsullar</h4>
+                        <h4 className="font-semibold text-sm mb-2">{tr("adminorders_mehsullar_24a4ce", "Məhsullar")}</h4>
                         <div className="space-y-2">
                           {order.items.map((item) => (
                             <div key={item.id} className="flex items-center justify-between bg-muted/30 rounded-lg p-2">
@@ -241,7 +242,7 @@ const AdminOrders = () => {
                     {/* Notes */}
                     {order.notes && (
                       <div className="bg-yellow-50 dark:bg-yellow-950/30 rounded-lg p-3">
-                        <h4 className="font-semibold text-sm mb-1">Qeydlər</h4>
+                        <h4 className="font-semibold text-sm mb-1">{tr("adminorders_qeydler_a7a98b", "Qeydlər")}</h4>
                         <p className="text-sm text-muted-foreground">{order.notes}</p>
                       </div>
                     )}

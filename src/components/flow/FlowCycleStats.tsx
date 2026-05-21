@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { Calendar, TrendingUp, Clock, Activity, BarChart3 } from 'lucide-react';
 import { format, parseISO, differenceInDays } from 'date-fns';
 import { az } from 'date-fns/locale';
@@ -42,7 +43,7 @@ const FlowCycleStats = () => {
             <span className="text-xs text-muted-foreground">Orta Tsikl</span>
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.averageCycleLength}</p>
-          <p className="text-xs text-muted-foreground">gün</p>
+          <p className="text-xs text-muted-foreground">{tr("flowcyclestats_gun_54e78d", "gün")}</p>
         </div>
 
         <div className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 rounded-xl p-3">
@@ -51,7 +52,7 @@ const FlowCycleStats = () => {
             <span className="text-xs text-muted-foreground">Orta Period</span>
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.averagePeriodLength}</p>
-          <p className="text-xs text-muted-foreground">gün</p>
+          <p className="text-xs text-muted-foreground">{tr("flowcyclestats_gun_54e78d", "gün")}</p>
         </div>
 
         <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-3">
@@ -62,7 +63,7 @@ const FlowCycleStats = () => {
           <p className="text-xl font-bold text-foreground">
             {stats.shortestCycle}-{stats.longestCycle}
           </p>
-          <p className="text-xs text-muted-foreground">gün</p>
+          <p className="text-xs text-muted-foreground">{tr("flowcyclestats_gun_54e78d", "gün")}</p>
         </div>
 
         <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-3">
@@ -71,14 +72,14 @@ const FlowCycleStats = () => {
             <span className="text-xs text-muted-foreground">Variasiya</span>
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.cycleVariation}</p>
-          <p className="text-xs text-muted-foreground">gün fərq</p>
+          <p className="text-xs text-muted-foreground">{tr("flowcyclestats_gun_ferq_d595f3", "gün fərq")}</p>
         </div>
       </div>
 
       {/* Recent Cycles */}
       {cycles.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-foreground mb-3">Son Tsikllər</h4>
+          <h4 className="text-sm font-medium text-foreground mb-3">{tr("flowcyclestats_son_tsikller_7e7eb6", "Son Tsikllər")}</h4>
           <div className="space-y-2">
             {cycles.slice(0, 3).map((cycle, index) => (
               <div

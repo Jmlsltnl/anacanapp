@@ -178,7 +178,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
             <ArrowLeft className="w-5 h-5 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">Təqvim</h1>
+            <h1 className="text-xl font-bold text-white">{tr("calendarscreen_teqvim_584bdd", "Təqvim")}</h1>
             {lifeStage === 'flow' && currentCycleDay && (
               <p className="text-white/80 text-sm">
                 Tsikl günü: {currentCycleDay} / {cycleLength}
@@ -202,17 +202,17 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
             <div className="bg-white/15 rounded-xl p-2.5 text-center">
               <Droplets className="w-4 h-4 text-white mx-auto mb-1" />
               <p className="text-white text-sm font-bold">{periodLength}</p>
-              <p className="text-white/70 text-[10px]">gün period</p>
+              <p className="text-white/70 text-[10px]">{tr("calendarscreen_gun_period_957849", "gün period")}</p>
             </div>
             <div className="bg-white/15 rounded-xl p-2.5 text-center">
               <CalendarIcon className="w-4 h-4 text-white mx-auto mb-1" />
               <p className="text-white text-sm font-bold">{cycleLength}</p>
-              <p className="text-white/70 text-[10px]">gün tsikl</p>
+              <p className="text-white/70 text-[10px]">{tr("calendarscreen_gun_tsikl_bb0ab6", "gün tsikl")}</p>
             </div>
             <div className="bg-white/15 rounded-xl p-2.5 text-center">
               <Sparkles className="w-4 h-4 text-white mx-auto mb-1" />
               <p className="text-white text-sm font-bold">{cycleLength - 14}</p>
-              <p className="text-white/70 text-[10px]">ovulyasiya günü</p>
+              <p className="text-white/70 text-[10px]">{tr("calendarscreen_ovulyasiya_gunu_e20a0b", "ovulyasiya günü")}</p>
             </div>
           </div>
         )}
@@ -311,7 +311,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
         >
-          <h3 className="font-bold mb-3 text-sm">İşarələr</h3>
+          <h3 className="font-bold mb-3 text-sm">{tr("calendarscreen_isareler_c13095", "İşarələr")}</h3>
           <div className="grid grid-cols-2 gap-2">
             <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-2">
               <div className="w-3 h-3 rounded-full bg-rose-500" />
@@ -319,7 +319,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
             </div>
             <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-2">
               <div className="w-3 h-3 rounded-full bg-emerald-500" />
-              <span className="text-xs text-muted-foreground">Fertil günlər</span>
+              <span className="text-xs text-muted-foreground">{tr("calendarscreen_fertil_gunler_65de2c", "Fertil günlər")}</span>
             </div>
             <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-2">
               <div className="w-3 h-3 rounded-full bg-amber-500" />
@@ -389,7 +389,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
               ) : (
                 <div className="text-center py-6">
                   <CalendarIcon className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">Bu gün üçün hadisə yoxdur</p>
+                  <p className="text-sm text-muted-foreground">{tr("calendarscreen_bu_gun_ucun_hadise_yoxdur_a394c8", "Bu gün üçün hadisə yoxdur")}</p>
                 </div>
               )}
             </motion.div>
@@ -435,7 +435,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
               </p>
               
               <div className="mb-4">
-                <label className="text-sm font-medium text-foreground mb-2 block">Başlıq</label>
+                <label className="text-sm font-medium text-foreground mb-2 block">{tr("calendarscreen_basliq_e1f6c5", "Başlıq")}</label>
                 <Input
                   placeholder={tr("calendarscreen_hekim_muayinesi_78c373", "Həkim müayinəsi")}
                   value={newEventTitle}
@@ -445,7 +445,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
               </div>
 
               <div className="mb-6">
-                <label className="text-sm font-medium text-foreground mb-2 block">Növ</label>
+                <label className="text-sm font-medium text-foreground mb-2 block">{tr("calendarscreen_nov_98ad7c", "Növ")}</label>
                 <div className="flex gap-2">
                   {[
                     { id: 'appointment', label: 'Randevu', icon: '📅' },

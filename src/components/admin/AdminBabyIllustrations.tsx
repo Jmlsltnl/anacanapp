@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Baby, Upload, Trash2, Save, Plus, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -65,10 +66,10 @@ const AdminBabyIllustrations = () => {
 
       setFormData(prev => ({ ...prev, image_url: publicUrl }));
       
-      toast({ title: 'Şəkil yükləndi!' });
+      toast({ title: tr("adminbabyillustrations_sekil_yuklendi_0c2f85", "Şəkil yükləndi!") });
     } catch (error) {
       console.error('Upload error:', error);
-      toast({ title: 'Yükləmə xətası', variant: 'destructive' });
+      toast({ title: tr("adminbabyillustrations_yukleme_xetasi_eebca5", "Yükləmə xətası"), variant: 'destructive' });
     } finally {
       setUploading(false);
     }
@@ -76,7 +77,7 @@ const AdminBabyIllustrations = () => {
 
   const handleSave = async () => {
     if (!selectedMonth || !formData.image_url) {
-      toast({ title: 'Şəkil tələb olunur', variant: 'destructive' });
+      toast({ title: tr("adminbabyillustrations_sekil_teleb_olunur_7f45a4", "Şəkil tələb olunur"), variant: 'destructive' });
       return;
     }
 
@@ -88,11 +89,11 @@ const AdminBabyIllustrations = () => {
         description_az: formData.description_az || null
       });
 
-      toast({ title: 'Yadda saxlanıldı!' });
+      toast({ title: tr("adminbabyillustrations_yadda_saxlanildi_4472d8", "Yadda saxlanıldı!") });
       setDialogOpen(false);
       resetForm();
     } catch (error) {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("adminbabyillustrations_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   };
 
@@ -103,7 +104,7 @@ const AdminBabyIllustrations = () => {
       await deleteMutation.mutateAsync(id);
       toast({ title: 'Silindi!' });
     } catch (error) {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("adminbabyillustrations_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   };
 
@@ -151,13 +152,13 @@ const AdminBabyIllustrations = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-primary">{illustrations.length}</div>
-            <p className="text-sm text-muted-foreground">Yüklənmiş şəkil</p>
+            <p className="text-sm text-muted-foreground">{tr("adminbabyillustrations_yuklenmis_sekil_641af4", "Yüklənmiş şəkil")}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-amber-500">{36 - illustrations.length}</div>
-            <p className="text-sm text-muted-foreground">Boş ay</p>
+            <p className="text-sm text-muted-foreground">{tr("adminbabyillustrations_bos_ay_66cb4e", "Boş ay")}</p>
           </CardContent>
         </Card>
         <Card>
@@ -253,7 +254,7 @@ const AdminBabyIllustrations = () => {
             {/* Form Fields */}
             <div className="space-y-3">
               <div>
-                <label className="text-sm font-medium text-foreground">Başlıq (AZ)</label>
+                <label className="text-sm font-medium text-foreground">{tr("adminbabyillustrations_basliq_az_3e294a", "Başlıq (AZ)")}</label>
                 <Input
                   value={formData.title_az}
                   onChange={(e) => setFormData(prev => ({ ...prev, title_az: e.target.value }))}
@@ -261,11 +262,11 @@ const AdminBabyIllustrations = () => {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground">Açıqlama (AZ)</label>
+                <label className="text-sm font-medium text-foreground">{tr("adminbabyillustrations_aciqlama_az_86f364", "Açıqlama (AZ)")}</label>
                 <Textarea
                   value={formData.description_az}
                   onChange={(e) => setFormData(prev => ({ ...prev, description_az: e.target.value }))}
-                  placeholder="Bu yaşda körpənin xüsusiyyətləri..."
+                  placeholder={tr("adminbabyillustrations_bu_yasda_korpenin_xususiyyetleri_d15028", "Bu yaşda körpənin xüsusiyyətləri...")}
                   rows={3}
                 />
               </div>

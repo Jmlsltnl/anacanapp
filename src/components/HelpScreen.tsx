@@ -174,7 +174,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                   <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
                     <span className="text-[10px]">👩‍⚕️</span>
                   </div>
-                  <span className="text-[10px] font-medium text-primary">Dəstək</span>
+                  <span className="text-[10px] font-medium text-primary">{tr("helpscreen_destek_73b142", "Dəstək")}</span>
                 </div>
                 <p className="text-sm text-foreground">{selectedTicket.admin_response}</p>
                 {selectedTicket.responded_at && (
@@ -204,7 +204,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                       <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
                         <span className="text-[10px]">👩‍⚕️</span>
                       </div>
-                      <span className="text-[10px] font-medium text-primary">Dəstək</span>
+                      <span className="text-[10px] font-medium text-primary">{tr("helpscreen_destek_73b142", "Dəstək")}</span>
                     </div>
                   )}
                   <p className={`text-sm ${reply.is_admin ? 'text-foreground' : ''}`}>{reply.message}</p>
@@ -276,8 +276,8 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
             <ArrowLeft className="w-5 h-5 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">Yardım Mərkəzi</h1>
-            <p className="text-white/80 text-sm">Suallarınıza cavab tapın</p>
+            <h1 className="text-xl font-bold text-white">{tr("helpscreen_yardim_merkezi_0987ed", "Yardım Mərkəzi")}</h1>
+            <p className="text-white/80 text-sm">{tr("helpscreen_suallariniza_cavab_tapin_764218", "Suallarınıza cavab tapın")}</p>
           </div>
         </div>
       </div>
@@ -353,7 +353,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
               className="space-y-4"
             >
               <div className="bg-card rounded-2xl p-4 shadow-card border border-border/50">
-                <h3 className="font-bold text-foreground mb-4">Bizimlə Əlaqə</h3>
+                <h3 className="font-bold text-foreground mb-4">{tr("helpscreen_bizimle_elaqe_ebc559", "Bizimlə Əlaqə")}</h3>
                 
                 <motion.a
                   href="mailto:info@anacan.az"
@@ -364,7 +364,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                     <Mail className="w-6 h-6 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold text-foreground">E-poçt</p>
+                    <p className="font-semibold text-foreground">{tr("helpscreen_e_poct_f5c193", "E-poçt")}</p>
                     <p className="text-sm text-primary">info@anacan.az</p>
                   </div>
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
@@ -387,7 +387,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
               </div>
 
               <div className="bg-card rounded-2xl p-4 shadow-card border border-border/50">
-                <h3 className="font-bold text-foreground mb-2">İş saatları</h3>
+                <h3 className="font-bold text-foreground mb-2">{tr("helpscreen_is_saatlari_cfa6fe", "İş saatları")}</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   Bazar ertəsi - Cümə: 09:00 - 18:00
                 </p>
@@ -426,7 +426,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                   className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-bold text-foreground">Yeni Müraciət</h3>
+                    <h3 className="font-bold text-foreground">{tr("helpscreen_yeni_muraciet_f62908", "Yeni Müraciət")}</h3>
                     <button 
                       onClick={() => setShowNewTicket(false)}
                       className="text-sm text-muted-foreground"
@@ -456,7 +456,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                     </div>
 
                     <div>
-                      <label className="text-sm text-muted-foreground mb-1 block">Mövzu</label>
+                      <label className="text-sm text-muted-foreground mb-1 block">{tr("helpscreen_movzu_5ac952", "Mövzu")}</label>
                       <Input
                         value={newTicket.subject}
                         onChange={(e) => setNewTicket({...newTicket, subject: e.target.value})}
@@ -494,7 +494,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
 
               {/* Existing Tickets */}
               <div className="bg-card rounded-2xl p-4 shadow-card border border-border/50">
-                <h3 className="font-bold text-foreground mb-3">Müraciətləriniz</h3>
+                <h3 className="font-bold text-foreground mb-3">{tr("helpscreen_muracietleriniz_45af5e", "Müraciətləriniz")}</h3>
                 
                 {loading ? (
                   <div className="flex justify-center py-8">
@@ -503,7 +503,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                 ) : tickets.length === 0 ? (
                   <div className="text-center py-8">
                     <div className="text-4xl mb-2">📩</div>
-                    <p className="text-muted-foreground">Hələ müraciət yoxdur</p>
+                    <p className="text-muted-foreground">{tr("helpscreen_hele_muraciet_yoxdur_6f37de", "Hələ müraciət yoxdur")}</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -542,7 +542,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
         {/* App Version */}
         <div className="text-center pt-4">
           <p className="text-xs text-muted-foreground">Anacan v1.0.0</p>
-          <p className="text-xs text-muted-foreground mt-1">© 2025 Anacan. Bütün hüquqlar qorunur.</p>
+          <p className="text-xs text-muted-foreground mt-1">{tr("helpscreen_2025_anacan_butun_huquqlar_qorunur_c35c11", "© 2025 Anacan. Bütün hüquqlar qorunur.")}</p>
         </div>
       </div>
     </div>

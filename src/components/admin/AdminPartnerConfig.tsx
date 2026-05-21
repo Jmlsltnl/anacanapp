@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -90,7 +91,7 @@ const AdminPartnerConfig = () => {
           <Trophy className="w-6 h-6 text-indigo-500" />
           Partner Konfiqurasiyası
         </h2>
-        <p className="text-muted-foreground">Nailiyyətlər, menyu və sürpriz kateqoriyaları</p>
+        <p className="text-muted-foreground">{tr("adminpartnerconfig_nailiyyetler_menyu_ve_surpriz_kateqoriya_5df8e3", "Nailiyyətlər, menyu və sürpriz kateqoriyaları")}</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); setIsAdding(false); setEditingId(null); }}>
@@ -146,7 +147,7 @@ const AdminPartnerConfig = () => {
                             checked={item.is_active}
                             onCheckedChange={() => saveMutation.mutate({ table: 'partner_achievements', data: { id: item.id, is_active: !item.is_active } })}
                           />
-                          <Button variant="ghost" size="sm" onClick={() => setEditingId(item.id)}>Redaktə</Button>
+                          <Button variant="ghost" size="sm" onClick={() => setEditingId(item.id)}>{tr("adminpartnerconfig_redakte_d53ba7", "Redaktə")}</Button>
                           <Button variant="ghost" size="sm" className="text-destructive" onClick={() => deleteMutation.mutate({ table: 'partner_achievements', id: item.id })}>
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -204,7 +205,7 @@ const AdminPartnerConfig = () => {
                             checked={item.is_active}
                             onCheckedChange={() => saveMutation.mutate({ table: 'partner_menu_items', data: { id: item.id, is_active: !item.is_active } })}
                           />
-                          <Button variant="ghost" size="sm" onClick={() => setEditingId(item.id)}>Redaktə</Button>
+                          <Button variant="ghost" size="sm" onClick={() => setEditingId(item.id)}>{tr("adminpartnerconfig_redakte_d53ba7", "Redaktə")}</Button>
                           <Button variant="ghost" size="sm" className="text-destructive" onClick={() => deleteMutation.mutate({ table: 'partner_menu_items', id: item.id })}>
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -262,7 +263,7 @@ const AdminPartnerConfig = () => {
                             checked={item.is_active}
                             onCheckedChange={() => saveMutation.mutate({ table: 'surprise_categories', data: { id: item.id, is_active: !item.is_active } })}
                           />
-                          <Button variant="ghost" size="sm" onClick={() => setEditingId(item.id)}>Redaktə</Button>
+                          <Button variant="ghost" size="sm" onClick={() => setEditingId(item.id)}>{tr("adminpartnerconfig_redakte_d53ba7", "Redaktə")}</Button>
                           <Button variant="ghost" size="sm" className="text-destructive" onClick={() => deleteMutation.mutate({ table: 'surprise_categories', id: item.id })}>
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -305,7 +306,7 @@ const AchievementForm = ({ item, onSave, onCancel, isLoading }: any) => {
       </div>
       <div className="flex gap-2">
         <Button onClick={() => onSave(form)} disabled={isLoading}><Save className="w-4 h-4 mr-2" /> Yadda saxla</Button>
-        <Button variant="outline" onClick={onCancel}><X className="w-4 h-4 mr-2" /> Ləğv et</Button>
+        <Button variant="outline" onClick={onCancel}><X className="w-4 h-4 mr-2" />{tr("adminpartnerconfig_legv_et_b5e49c", "Ləğv et")}</Button>
       </div>
     </div>
   );
@@ -334,7 +335,7 @@ const MenuItemForm = ({ item, onSave, onCancel, isLoading }: any) => {
       </div>
       <div className="flex gap-2">
         <Button onClick={() => onSave(form)} disabled={isLoading}><Save className="w-4 h-4 mr-2" /> Yadda saxla</Button>
-        <Button variant="outline" onClick={onCancel}><X className="w-4 h-4 mr-2" /> Ləğv et</Button>
+        <Button variant="outline" onClick={onCancel}><X className="w-4 h-4 mr-2" />{tr("adminpartnerconfig_legv_et_b5e49c", "Ləğv et")}</Button>
       </div>
     </div>
   );
@@ -363,7 +364,7 @@ const SurpriseCategoryForm = ({ item, onSave, onCancel, isLoading }: any) => {
       </div>
       <div className="flex gap-2">
         <Button onClick={() => onSave(form)} disabled={isLoading}><Save className="w-4 h-4 mr-2" /> Yadda saxla</Button>
-        <Button variant="outline" onClick={onCancel}><X className="w-4 h-4 mr-2" /> Ləğv et</Button>
+        <Button variant="outline" onClick={onCancel}><X className="w-4 h-4 mr-2" />{tr("adminpartnerconfig_legv_et_b5e49c", "Ləğv et")}</Button>
       </div>
     </div>
   );

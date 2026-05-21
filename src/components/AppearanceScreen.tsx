@@ -65,8 +65,8 @@ const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
             <ArrowLeft className="w-5 h-5 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">Görünüş</h1>
-            <p className="text-white/80 text-sm">Tema və rəng seçimləri</p>
+            <h1 className="text-xl font-bold text-white">{tr("appearancescreen_gorunus_165fe3", "Görünüş")}</h1>
+            <p className="text-white/80 text-sm">{tr("appearancescreen_tema_ve_reng_secimleri_f46e36", "Tema və rəng seçimləri")}</p>
           </div>
         </div>
       </div>
@@ -131,7 +131,7 @@ const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
         >
-          <h3 className="font-bold text-foreground mb-4">Cari Görünüş</h3>
+          <h3 className="font-bold text-foreground mb-4">{tr("appearancescreen_cari_gorunus_aeba05", "Cari Görünüş")}</h3>
           
           <div className="space-y-3">
             {/* Color samples */}
@@ -154,8 +154,8 @@ const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
                   <Sun className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">Nümunə kart</p>
-                  <p className="text-xs text-muted-foreground">Bu cari temanızın görünüşüdür</p>
+                  <p className="font-medium text-foreground">{tr("appearancescreen_numune_kart_1dac7f", "Nümunə kart")}</p>
+                  <p className="text-xs text-muted-foreground">{tr("appearancescreen_bu_cari_temanizin_gorunusudur_2e30a3", "Bu cari temanızın görünüşüdür")}</p>
                 </div>
               </div>
             </div>

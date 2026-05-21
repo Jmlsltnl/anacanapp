@@ -131,7 +131,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
             <Baby className="w-4 h-4 text-amber-600 dark:text-amber-400" />
           </div>
           <div className="text-left">
-            <p className="text-xs font-semibold text-foreground">Qidalanma xülasəsi</p>
+            <p className="text-xs font-semibold text-foreground">{tr("feedinghistorypanel_qidalanma_xulasesi_836869", "Qidalanma xülasəsi")}</p>
             <p className="text-[10px] text-muted-foreground">{buildSummaryText()}</p>
           </div>
         </div>
@@ -139,7 +139,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
           {hasAnyFeedings && (
             <div className="text-right mr-2">
               <p className="text-xs font-bold text-amber-600 dark:text-amber-400">{totalFeedings} dəfə</p>
-              <p className="text-[10px] text-muted-foreground">bu gün</p>
+              <p className="text-[10px] text-muted-foreground">{tr("feedinghistorypanel_bu_gun_7d7f30", "bu gün")}</p>
             </div>
           )}
           {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
@@ -162,7 +162,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                     <div className="bg-pink-100/50 dark:bg-pink-500/15 rounded-xl p-2.5 text-center border border-pink-100 dark:border-pink-500/20">
                       <div className="flex items-center justify-center gap-1 mb-1">
                         <ArrowLeft className="w-3 h-3 text-pink-500 dark:text-pink-400" />
-                        <span className="text-xs font-semibold text-foreground">Sol sinə</span>
+                        <span className="text-xs font-semibold text-foreground">{tr("feedinghistorypanel_sol_sine_64d1ac", "Sol sinə")}</span>
                       </div>
                       <p className="text-sm font-bold text-pink-600 dark:text-pink-400">{formatDuration(todayBreakdown.leftTotalSeconds)}</p>
                       <p className="text-[10px] text-muted-foreground">{todayBreakdown.leftCount} dəfə</p>
@@ -171,7 +171,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                   {todayBreakdown.rightCount > 0 && (
                     <div className="bg-blue-100/50 dark:bg-blue-500/15 rounded-xl p-2.5 text-center border border-blue-100 dark:border-blue-500/20">
                       <div className="flex items-center justify-center gap-1 mb-1">
-                        <span className="text-xs font-semibold text-foreground">Sağ sinə</span>
+                        <span className="text-xs font-semibold text-foreground">{tr("feedinghistorypanel_sag_sine_074475", "Sağ sinə")}</span>
                         <ArrowRight className="w-3 h-3 text-blue-500 dark:text-blue-400" />
                       </div>
                       <p className="text-sm font-bold text-blue-600 dark:text-blue-400">{formatDuration(todayBreakdown.rightTotalSeconds)}</p>
@@ -182,20 +182,20 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                     <div className="bg-purple-100/50 dark:bg-purple-500/15 rounded-xl p-2.5 text-center border border-purple-100 dark:border-purple-500/20">
                       <div className="flex items-center justify-center gap-1 mb-1">
                         <span className="text-lg">🍼</span>
-                        <span className="text-xs font-semibold text-foreground">Süni qida</span>
+                        <span className="text-xs font-semibold text-foreground">{tr("feedinghistorypanel_suni_qida_fdf267", "Süni qida")}</span>
                       </div>
                       <p className="text-sm font-bold text-purple-600 dark:text-purple-400">{todayBreakdown.formulaCount} dəfə</p>
-                      <p className="text-[10px] text-muted-foreground">bu gün</p>
+                      <p className="text-[10px] text-muted-foreground">{tr("feedinghistorypanel_bu_gun_7d7f30", "bu gün")}</p>
                     </div>
                   )}
                   {todayBreakdown.solidCount > 0 && (
                     <div className="bg-orange-100/50 dark:bg-orange-500/15 rounded-xl p-2.5 text-center border border-orange-100 dark:border-orange-500/20">
                       <div className="flex items-center justify-center gap-1 mb-1">
                         <span className="text-lg">🥣</span>
-                        <span className="text-xs font-semibold text-foreground">Əlavə qida</span>
+                        <span className="text-xs font-semibold text-foreground">{tr("feedinghistorypanel_elave_qida_ac1beb", "Əlavə qida")}</span>
                       </div>
                       <p className="text-sm font-bold text-orange-600 dark:text-orange-400">{todayBreakdown.solidCount} dəfə</p>
-                      <p className="text-[10px] text-muted-foreground">bu gün</p>
+                      <p className="text-[10px] text-muted-foreground">{tr("feedinghistorypanel_bu_gun_7d7f30", "bu gün")}</p>
                     </div>
                   )}
                 </div>
@@ -218,7 +218,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                           {/* Delete confirmation */}
                           {deletingId === item.id ? (
                             <div className="flex items-center justify-between bg-destructive/10 rounded-lg px-2.5 py-2 border border-destructive/20">
-                              <span className="text-xs text-destructive font-medium">Silmək istəyirsiniz?</span>
+                              <span className="text-xs text-destructive font-medium">{tr("feedinghistorypanel_silmek_isteyirsiniz_77af6b", "Silmək istəyirsiniz?")}</span>
                               <div className="flex gap-1.5">
                                 <button onClick={() => handleDelete(item.id)} className="p-1.5 rounded-full bg-destructive/20 text-destructive">
                                   <Check className="w-3 h-3" />

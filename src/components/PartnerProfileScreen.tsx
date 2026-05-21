@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { 
   User, Settings, Bell, Shield, HelpCircle, LogOut, 
@@ -162,12 +163,12 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
         <div className="bg-gradient-to-br from-violet-400 to-purple-600 rounded-2xl p-4 text-white">
           <Target className="w-6 h-6 mb-2" />
           <p className="text-3xl font-black">{stats.completedMissions}</p>
-          <p className="text-xs text-white/80">Tapşırıq</p>
+          <p className="text-xs text-white/80">{tr("partnerprofilescreen_tapsiriq_d827b6", "Tapşırıq")}</p>
         </div>
         <div className="bg-gradient-to-br from-pink-400 to-rose-500 rounded-2xl p-4 text-white">
           <Gift className="w-6 h-6 mb-2" />
           <p className="text-3xl font-black">{completedSurprises.length}</p>
-          <p className="text-xs text-white/80">Sürpriz</p>
+          <p className="text-xs text-white/80">{tr("partnerprofilescreen_surpriz_67b2b2", "Sürpriz")}</p>
         </div>
         <div className="bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl p-4 text-white">
           <MessageCircle className="w-6 h-6 mb-2" />
@@ -186,12 +187,12 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
         >
           <div className="flex items-center gap-2 mb-4">
             <BarChart3 className="w-5 h-5 text-partner" />
-            <h3 className="font-bold text-foreground">Sürpriz Statistikası</h3>
+            <h3 className="font-bold text-foreground">{tr("partnerprofilescreen_surpriz_statistikasi_5eee15", "Sürpriz Statistikası")}</h3>
           </div>
 
           {/* Monthly Points Chart */}
           <div className="mb-5">
-            <p className="text-sm text-muted-foreground mb-3">Aylıq Xal Qrafiki</p>
+            <p className="text-sm text-muted-foreground mb-3">{tr("partnerprofilescreen_ayliq_xal_qrafiki_dca77f", "Aylıq Xal Qrafiki")}</p>
             <div className="flex items-end justify-between gap-2 h-24">
               {monthlyChartData.map((data, index) => (
                 <div key={data.month} className="flex-1 flex flex-col items-center gap-1">
@@ -210,7 +211,7 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
 
           {/* Category Breakdown */}
           <div>
-            <p className="text-sm text-muted-foreground mb-3">Sürpriz Növləri</p>
+            <p className="text-sm text-muted-foreground mb-3">{tr("partnerprofilescreen_surpriz_novleri_592120", "Sürpriz Növləri")}</p>
             <div className="grid grid-cols-2 gap-2">
               {Object.entries(categoryStats).map(([category, count]) => {
                 const catInfo = getCategoryLabel(category);
@@ -244,7 +245,7 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
                 <TrendingUp className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-xs text-amber-700 dark:text-amber-400">Ən çox edilən</p>
+                <p className="text-xs text-amber-700 dark:text-amber-400">{tr("partnerprofilescreen_en_cox_edilen_f000e8", "Ən çox edilən")}</p>
                 <p className="font-bold text-amber-800 dark:text-amber-300">
                   {getCategoryLabel(topCategory.category).emoji} {getCategoryLabel(topCategory.category).label} ({topCategory.count} dəfə)
                 </p>
@@ -290,7 +291,7 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
         transition={{ delay: 0.25 }}
       >
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-foreground">Nailiyyətlər</h3>
+          <h3 className="text-lg font-bold text-foreground">{tr("partnerprofilescreen_nailiyyetler_92db73", "Nailiyyətlər")}</h3>
           <button 
             onClick={() => onNavigate?.('achievements')}
             className="text-primary text-sm font-semibold flex items-center gap-1"

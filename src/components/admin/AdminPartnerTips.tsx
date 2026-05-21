@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Heart, Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,9 +14,9 @@ import { useAdminPartnerTips, PartnerDailyTip } from '@/hooks/useAdminPartnerTip
 import UnsavedChangesDialog from './UnsavedChangesDialog';
 
 const lifeStages = [
-  { id: 'flow', label: 'Dövr İzləmə', emoji: '🌸' },
-  { id: 'bump', label: 'Hamiləlik', emoji: '🤰' },
-  { id: 'mommy', label: 'Analıq', emoji: '👶' },
+  { id: 'flow', label: tr("adminpartnertips_dovr_izleme_9d1cf4", "Dövr İzləmə"), emoji: '🌸' },
+  { id: 'bump', label: tr("adminpartnertips_hamilelik_e86feb", "Hamiləlik"), emoji: '🤰' },
+  { id: 'mommy', label: tr("adminpartnertips_analiq_9e762d", "Analıq"), emoji: '👶' },
 ];
 
 const AdminPartnerTips = () => {
@@ -89,8 +90,8 @@ const AdminPartnerTips = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Partnyor Məsləhətləri</h1>
-          <p className="text-muted-foreground">Gündəlik partnyor tövsiyələrini idarə edin</p>
+          <h1 className="text-2xl font-bold text-foreground">{tr("adminpartnertips_partnyor_meslehetleri_ba2d1c", "Partnyor Məsləhətləri")}</h1>
+          <p className="text-muted-foreground">{tr("adminpartnertips_gundelik_partnyor_tovsiyelerini_idare_ed_17ab10", "Gündəlik partnyor tövsiyələrini idarə edin")}</p>
         </div>
         <Button onClick={openCreateModal} className="gap-2">
           <Plus className="w-4 h-4" />
@@ -107,7 +108,7 @@ const AdminPartnerTips = () => {
             </div>
             <div>
               <p className="text-2xl font-bold">{tips.length}</p>
-              <p className="text-xs text-muted-foreground">Ümumi</p>
+              <p className="text-xs text-muted-foreground">{tr("adminpartnertips_umumi_1b5521", "Ümumi")}</p>
             </div>
           </div>
         </Card>
@@ -131,7 +132,7 @@ const AdminPartnerTips = () => {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Məsləhət axtar..."
+            placeholder={tr("adminpartnertips_meslehet_axtar_52d3a3", "Məsləhət axtar...")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10"
@@ -146,9 +147,9 @@ const AdminPartnerTips = () => {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">Yüklənir...</div>
+            <div className="text-center py-8 text-muted-foreground">{tr("adminpartnertips_yuklenir_5557de", "Yüklənir...")}</div>
           ) : filteredTips.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">Məsləhət tapılmadı</div>
+            <div className="text-center py-8 text-muted-foreground">{tr("adminpartnertips_meslehet_tapilmadi_614f5a", "Məsləhət tapılmadı")}</div>
           ) : (
             <div className="space-y-3">
               {filteredTips.map((tip, index) => (
@@ -204,12 +205,12 @@ const AdminPartnerTips = () => {
           </DialogHeader>
           <div className="space-y-4">
             <Input
-              placeholder="Mətn (EN)"
+              placeholder={tr("adminpartnertips_metn_en_58edcd", "Mətn (EN)")}
               value={formData.tip_text || ''}
               onChange={(e) => setFormData({ ...formData, tip_text: e.target.value })}
             />
             <Textarea
-              placeholder="Mətn (AZ)"
+              placeholder={tr("adminpartnertips_metn_az_0aaa4b", "Mətn (AZ)")}
               value={formData.tip_text_az || ''}
               onChange={(e) => setFormData({ ...formData, tip_text_az: e.target.value })}
             />
@@ -238,13 +239,13 @@ const AdminPartnerTips = () => {
             <div className="grid grid-cols-2 gap-3">
               <Input
                 type="number"
-                placeholder="Həftə (boş qala bilər)"
+                placeholder={tr("adminpartnertips_hefte_bos_qala_biler_28b6d3", "Həftə (boş qala bilər)")}
                 value={formData.week_number || ''}
                 onChange={(e) => setFormData({ ...formData, week_number: e.target.value ? parseInt(e.target.value) : null })}
               />
               <Input
                 type="number"
-                placeholder="Sıra"
+                placeholder={tr("adminpartnertips_sira_421c5f", "Sıra")}
                 value={formData.sort_order || 0}
                 onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) })}
               />

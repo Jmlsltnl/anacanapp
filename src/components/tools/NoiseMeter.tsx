@@ -200,8 +200,8 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold">Səs-Küy Ölçər</h1>
-            <p className="text-xs text-muted-foreground">Körpə yuxusu üçün ideal mühit</p>
+            <h1 className="text-lg font-bold">{tr("noisemeter_ses_kuy_olcer_68f0b6", "Səs-Küy Ölçər")}</h1>
+            <p className="text-xs text-muted-foreground">{tr("noisemeter_korpe_yuxusu_ucun_ideal_muhit_4a6c06", "Körpə yuxusu üçün ideal mühit")}</p>
           </div>
         </div>
       </div>
@@ -307,7 +307,7 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="w-6 h-6 text-orange-500 shrink-0" />
                   <div className="flex-1">
-                    <h3 className="font-semibold text-orange-600">Səs səviyyəsi yüksəkdir</h3>
+                    <h3 className="font-semibold text-orange-600">{tr("noisemeter_ses_seviyyesi_yuksekdir_f91956", "Səs səviyyəsi yüksəkdir")}</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       Bu səviyyə dərin yuxu üçün çox yüksəkdir. Ağ səs açım?
                     </p>
@@ -346,27 +346,27 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
               <div className="flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full bg-green-500" />
                 <span className="text-sm flex-1">0-40 dB</span>
-                <span className="text-xs text-muted-foreground">Mükəmməl</span>
+                <span className="text-xs text-muted-foreground">{tr("noisemeter_mukemmel_ae2244", "Mükəmməl")}</span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full bg-emerald-500" />
                 <span className="text-sm flex-1">40-50 dB</span>
-                <span className="text-xs text-muted-foreground">Yaxşı</span>
+                <span className="text-xs text-muted-foreground">{tr("noisemeter_yaxsi_9d8595", "Yaxşı")}</span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full bg-yellow-500" />
                 <span className="text-sm flex-1">50-60 dB</span>
-                <span className="text-xs text-muted-foreground">Qəbulolunandır</span>
+                <span className="text-xs text-muted-foreground">{tr("noisemeter_qebulolunandir_0cab62", "Qəbulolunandır")}</span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full bg-orange-500" />
                 <span className="text-sm flex-1">60-70 dB</span>
-                <span className="text-xs text-muted-foreground">Yüksək</span>
+                <span className="text-xs text-muted-foreground">{tr("noisemeter_yuksek_492584", "Yüksək")}</span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full bg-red-500" />
                 <span className="text-sm flex-1">70+ dB</span>
-                <span className="text-xs text-muted-foreground">Çox yüksək</span>
+                <span className="text-xs text-muted-foreground">{tr("noisemeter_cox_yuksek_c4d475", "Çox yüksək")}</span>
               </div>
             </div>
           </CardContent>

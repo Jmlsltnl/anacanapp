@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { ArrowLeft, MessageCircle, Loader2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -58,8 +59,8 @@ const ConversationListScreen = ({ onBack, onOpenChat, partnerId }: ConversationL
           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
             <MessageCircle className="w-7 h-7 text-primary" />
           </div>
-          <p className="text-base font-semibold text-foreground mb-1">Hələ mesajınız yoxdur</p>
-          <p className="text-sm text-muted-foreground">İstifadəçi profilindən mesaj göndərə bilərsiniz</p>
+          <p className="text-base font-semibold text-foreground mb-1">{tr("conversationlistscreen_hele_mesajiniz_yoxdur_79d3c7", "Hələ mesajınız yoxdur")}</p>
+          <p className="text-sm text-muted-foreground">{tr("conversationlistscreen_istifadeci_profilinden_mesaj_gondere_bil_777661", "İstifadəçi profilindən mesaj göndərə bilərsiniz")}</p>
         </div>
       ) : (
         <div className="divide-y divide-border/30">
