@@ -1,7 +1,9 @@
 import { Capacitor } from '@capacitor/core';
 
 // ⚡ FEATURE FLAG: Set to true to enable RevenueCat, false for standard IAP
-export const REVENUECAT_ENABLED = true;
+// Disabled to prevent Android native crash when RevenueCat UI / offerings
+// are not fully configured. Custom paywall UI is used instead.
+export const REVENUECAT_ENABLED = false;
 
 // RevenueCat Configuration
 // NOTE: RevenueCat requires PLATFORM-SPECIFIC public API keys (Android & iOS).

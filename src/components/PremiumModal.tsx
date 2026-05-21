@@ -31,24 +31,13 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
 
   const isNative = isNativePlatform();
 
-  // ⚡ All paywalls must come from RevenueCat. On native, immediately present
-  // the RevenueCat native paywall and skip the custom UI entirely.
+  // ⚡ Native paywall (RevenueCat UI) is currently disabled — present custom UI.
+  // Previously this auto-called showPaywall() on native which crashed Android
+  // when RevenueCat offerings/UI plugin were not fully configured.
   useEffect(() => {
     if (!isOpen || !isNative || !isSupported) return;
-    let cancelled = false;
-    (async () => {
-      const purchased = await showPaywall();
-      if (cancelled) return;
-      if (purchased) {
-        toast({
-          title: tr("premiummodal_premium_aktivlesdirildi_eb58f2", 'Premium aktivləşdirildi! 🎉'),
-          description: tr("premiummodal_i_ndi_butun_xususiyyetlerden_istifade_ed_20a814", 'İndi bütün xüsusiyyətlərdən istifadə edə bilərsiniz.'),
-        });
-      }
-      onClose();
-    })();
-    return () => { cancelled = true; };
-  }, [isOpen, isNative, isSupported, showPaywall, onClose, toast]);
+    // No-op: showPaywall is disabled. Custom modal UI handles everything.
+  }, [isOpen, isNative, isSupported]);
 
   useEffect(() => {
     if (isPremium && subscription?.plan_type === 'premium') setSelectedPlan('yearly');
