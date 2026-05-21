@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -52,7 +53,7 @@ export const useAdminRecipesAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-recipes'] });
       queryClient.invalidateQueries({ queryKey: ['recipes'] });
-      toast({ title: 'Resept əlavə edildi' });
+      toast({ title: tr("useadminrecipes_resept_elave_edildi_fe3c1a", "Resept əlavə edildi") });
     },
   });
 
@@ -64,7 +65,7 @@ export const useAdminRecipesAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-recipes'] });
       queryClient.invalidateQueries({ queryKey: ['recipes'] });
-      toast({ title: 'Resept yeniləndi' });
+      toast({ title: tr("useadminrecipes_resept_yenilendi_dd7821", "Resept yeniləndi") });
     },
   });
 

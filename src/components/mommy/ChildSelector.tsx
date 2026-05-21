@@ -99,7 +99,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
     <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Uşaq Əlavə Et</DialogTitle>
+          <DialogTitle>{tr("childselector_usaq_elave_et_d57c06", "Uşaq Əlavə Et")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
@@ -111,7 +111,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
             />
           </div>
           <div>
-            <label className="text-sm font-medium">Doğum tarixi</label>
+            <label className="text-sm font-medium">{tr("childselector_dogum_tarixi_d96907", "Doğum tarixi")}</label>
             <Input
               type="date"
               value={formData.birth_date}
@@ -246,7 +246,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
                     className="flex items-center gap-2 w-full p-3 rounded-xl text-primary hover:bg-primary/10 transition-colors"
                   >
                     <Plus className="w-4 h-4" />
-                    <span className="font-medium text-sm">Yeni uşaq əlavə et</span>
+                    <span className="font-medium text-sm">{tr("childselector_yeni_usaq_elave_et_bb2a07", "Yeni uşaq əlavə et")}</span>
                   </button>
                 </div>
               </motion.div>
@@ -262,7 +262,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
       <Dialog open={!!editingChild} onOpenChange={() => setEditingChild(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Uşaq Redaktə Et</DialogTitle>
+            <DialogTitle>{tr("childselector_usaq_redakte_et_53eb46", "Uşaq Redaktə Et")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -273,7 +273,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Doğum tarixi</label>
+              <label className="text-sm font-medium">{tr("childselector_dogum_tarixi_d96907", "Doğum tarixi")}</label>
               <Input
                 type="date"
                 value={formData.birth_date}

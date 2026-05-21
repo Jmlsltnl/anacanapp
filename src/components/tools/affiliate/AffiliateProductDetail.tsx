@@ -264,7 +264,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
                     )}
                   </>
                 ) : (
-                  <span className="text-base text-muted-foreground">Qiymət üçün mağazaya keçin</span>
+                  <span className="text-base text-muted-foreground">{tr("affiliateproductdetail_qiymet_ucun_magazaya_kecin_8b6888", "Qiymət üçün mağazaya keçin")}</span>
                 )}
               </div>
               
@@ -283,7 +283,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
               >
                 <div className="flex items-center gap-2">
                   <ExternalLink className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium text-primary">Məhsula get</span>
+                  <span className="text-sm font-medium text-primary">{tr("affiliateproductdetail_mehsula_get_eff59e", "Məhsula get")}</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
               </button>
@@ -370,7 +370,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
         {product.specifications && Object.keys(product.specifications).length > 0 && (
           <Card className="border-0 shadow-md">
             <CardContent className="p-4">
-              <h2 className="font-semibold text-sm mb-3">Xüsusiyyətləri</h2>
+              <h2 className="font-semibold text-sm mb-3">{tr("affiliateproductdetail_xususiyyetleri_11ea09", "Xüsusiyyətləri")}</h2>
               <div className="space-y-0">
                 {Object.entries(product.specifications).map(([key, value], idx, arr) => (
                   <div 

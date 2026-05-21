@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
@@ -6,7 +7,7 @@ type NotificationType = 'mood_update' | 'contraction_started' | 'contraction_511
 
 const notificationMessages: Record<NotificationType, { title: string; getBody: (data?: any) => string }> = {
   mood_update: {
-    title: 'Əhval yeniləndi 💭',
+    title: tr("usepartnernotifications_ehval_yenilendi_967cd7", "Əhval yeniləndi 💭"),
     getBody: (data) => {
       const moodEmojis = ['😢', '😔', '😐', '🙂', '😊'];
       const mood = data?.mood;
@@ -14,19 +15,19 @@ const notificationMessages: Record<NotificationType, { title: string; getBody: (
     }
   },
   contraction_started: {
-    title: 'Sancı başladı! ⏱️',
+    title: tr("usepartnernotifications_sanci_basladi_c51f20", "Sancı başladı! ⏱️"),
     getBody: () => 'Partnyorunuz sancı qeyd etdi. Ona dəstək olmaq vaxtıdır!'
   },
   contraction_511: {
-    title: '⚠️ 5-1-1 Qaydası!',
+    title: tr("usepartnernotifications_5_1_1_qaydasi_976061", "⚠️ 5-1-1 Qaydası!"),
     getBody: () => 'Sancılar 5 dəq aralığında və 1 dəq davam edir. Xəstəxanaya getmə vaxtı ola bilər!'
   },
   kick_session: {
-    title: 'Körpə təpik atdı! 👶',
+    title: tr("usepartnernotifications_korpe_tepik_atdi_628b12", "Körpə təpik atdı! 👶"),
     getBody: (data) => `Körpə ${data?.kickCount || 0} dəfə təpik atdı!`
   },
   water_goal: {
-    title: 'Su hədəfinə çatdı! 💧',
+    title: tr("usepartnernotifications_su_hedefine_catdi_55f2fb", "Su hədəfinə çatdı! 💧"),
     getBody: () => 'Partnyorunuz gündəlik su hədəfinə çatdı!'
   }
 };

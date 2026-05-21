@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { Star, Heart, ExternalLink, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -110,7 +111,7 @@ const AffiliateProductCard = ({ product, onSelect, index = 0, variant = 'grid' }
                   )}
                 </div>
               ) : (
-                <span className="text-sm text-muted-foreground">Qiymətə bax →</span>
+                <span className="text-sm text-muted-foreground">{tr("affiliateproductcard_qiymete_bax_f5159c", "Qiymətə bax →")}</span>
               )}
               {priceAge && (
                 <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">

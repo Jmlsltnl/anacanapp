@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
+import { tr } from '@/lib/tr';
 import { Button } from '@/components/ui/button';
 import { Crown, Check, Shield, X, Sparkles, Loader2 } from 'lucide-react';
 import { useInAppPurchase } from '@/hooks/useInAppPurchase';
@@ -33,7 +34,7 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
     (async () => {
       const purchased = await showPaywall();
       if (purchased) {
-        toast({ title: 'Premium aktivləşdi 🎉', description: '3 günlük pulsuz dövrünüz başladı' });
+        toast({ title: tr("paywallstep_premium_aktivlesdi_67ea32", "Premium aktivləşdi 🎉"), description: tr("paywallstep_3_gunluk_pulsuz_dovrunuz_basladi_d84d42", "3 günlük pulsuz dövrünüz başladı") });
         onPurchase(selectedPlan);
       } else {
         onClose();
@@ -74,10 +75,10 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
 
     const ok = selectedPlan === 'yearly' ? await purchaseYearly() : await purchaseMonthly();
     if (ok) {
-      toast({ title: 'Premium aktivləşdi 🎉', description: '3 günlük pulsuz dövrünüz başladı' });
+      toast({ title: tr("paywallstep_premium_aktivlesdi_67ea32", "Premium aktivləşdi 🎉"), description: tr("paywallstep_3_gunluk_pulsuz_dovrunuz_basladi_d84d42", "3 günlük pulsuz dövrünüz başladı") });
       onPurchase(selectedPlan);
     } else if (error) {
-      toast({ title: 'Alış uğursuz', description: error, variant: 'destructive' });
+      toast({ title: tr("paywallstep_alis_ugursuz_ffb098", "Alış uğursuz"), description: error, variant: 'destructive' });
     }
   };
 
@@ -97,20 +98,20 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
             <Crown className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-xl font-bold text-foreground">Anacan Premium</h2>
-          <p className="text-sm text-muted-foreground mt-1">Tam imkanlardan yararlanın</p>
+          <p className="text-sm text-muted-foreground mt-1">{tr("paywallstep_tam_imkanlardan_yararlanin_4b72fb", "Tam imkanlardan yararlanın")}</p>
         </div>
 
         <div className="flex items-center justify-center gap-2 mb-5">
           <div className="flex items-center gap-1.5 px-4 py-2 bg-green-100 dark:bg-green-900/30 rounded-full">
             <Sparkles className="w-4 h-4 text-green-600 dark:text-green-400" />
-            <span className="text-sm font-bold text-green-700 dark:text-green-400">3 GÜN PULSUZ SINAQ</span>
+            <span className="text-sm font-bold text-green-700 dark:text-green-400">{tr("paywallstep_3_gun_pulsuz_sinaq_132a91", "3 GÜN PULSUZ SINAQ")}</span>
           </div>
         </div>
 
         {isLoading && isNativePlatform() ? (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-            <span className="ml-2 text-sm text-muted-foreground">Qiymətlər yüklənir...</span>
+            <span className="ml-2 text-sm text-muted-foreground">{tr("paywallstep_qiymetler_yuklenir_15aa82", "Qiymətlər yüklənir...")}</span>
           </div>
         ) : (
           <div className="space-y-3 mb-5">
@@ -128,7 +129,7 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
               )}
               <div className="flex items-center justify-between">
                 <div className="text-left">
-                  <p className="text-sm font-semibold text-foreground">İllik</p>
+                  <p className="text-sm font-semibold text-foreground">{tr("paywallstep_illik_4a3cef", "İllik")}</p>
                   <p className="text-xs text-muted-foreground">3 gün pulsuz, sonra {yearlyPriceStr}/il</p>
                 </div>
                 <div className="text-right">
@@ -147,7 +148,7 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
             >
               <div className="flex items-center justify-between">
                 <div className="text-left">
-                  <p className="text-sm font-semibold text-foreground">Aylıq</p>
+                  <p className="text-sm font-semibold text-foreground">{tr("paywallstep_ayliq_6f265e", "Aylıq")}</p>
                   <p className="text-xs text-muted-foreground">3 gün pulsuz, sonra {monthlyPriceStr}/ay</p>
                 </div>
                 <div className="text-right">
@@ -178,7 +179,7 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
 
         <div className="flex items-center gap-2 justify-center text-xs text-muted-foreground">
           <Shield className="w-3.5 h-3.5" />
-          <span>İstədiyin an ləğv et · Zəmanətli</span>
+          <span>{tr("paywallstep_istediyin_an_legv_et_zemanetli_c95beb", "İstədiyin an ləğv et · Zəmanətli")}</span>
         </div>
       </div>
 

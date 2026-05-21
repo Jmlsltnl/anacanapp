@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { tr } from '@/lib/tr';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -106,10 +107,10 @@ export const useJoinGroup = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-memberships'] });
       queryClient.invalidateQueries({ queryKey: ['community-groups'] });
-      toast({ title: 'Qrupa qoşuldunuz! 🎉' });
+      toast({ title: tr("usecommunity_qrupa_qosuldunuz_bea9e3", "Qrupa qoşuldunuz! 🎉") });
     },
     onError: () => {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     },
   });
 };
@@ -134,7 +135,7 @@ export const useLeaveGroup = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-memberships'] });
       queryClient.invalidateQueries({ queryKey: ['community-groups'] });
-      toast({ title: 'Qrupdan ayrıldınız' });
+      toast({ title: tr("usecommunity_qrupdan_ayrildiniz_2ad166", "Qrupdan ayrıldınız") });
     },
   });
 };
@@ -188,7 +189,7 @@ export const useGroupPosts = (groupId: string | null) => {
               ? { name: 'Anonim', avatar_url: null, badge_type: null }
               : authorData
                 ? { name: authorData.name || 'İstifadəçi', avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null }
-                : { name: 'İstifadəçi', avatar_url: null, badge_type: null },
+                : { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null },
             is_liked: isLiked,
           };
         })
@@ -223,10 +224,10 @@ export const useCreatePost = () => {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['group-posts', variables.groupId] });
-      toast({ title: 'Paylaşım əlavə edildi! ✨' });
+      toast({ title: tr("usecommunity_paylasim_elave_edildi_379020", "Paylaşım əlavə edildi! ✨") });
     },
     onError: () => {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     },
   });
 };
@@ -250,10 +251,10 @@ export const useEditPost = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['group-posts'] });
-      toast({ title: 'Post redaktə edildi ✏️' });
+      toast({ title: tr("usecommunity_post_redakte_edildi_c4540d", "Post redaktə edildi ✏️") });
     },
     onError: () => {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     },
   });
 };
@@ -280,7 +281,7 @@ export const useDeletePost = () => {
       toast({ title: 'Post silindi 🗑️' });
     },
     onError: () => {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     },
   });
 };
@@ -313,7 +314,7 @@ export const useToggleLike = () => {
             await supabase.functions.invoke('send-push-notification', {
               body: {
                 userId: post.user_id,
-                title: 'Yeni bəyənmə ❤️',
+                title: tr("usecommunity_yeni_beyenme_3fd88a", "Yeni bəyənmə ❤️"),
                 body: `${likerName} paylaşımınızı bəyəndi`,
                 data: { type: 'community_like', postId, groupId },
               },
@@ -364,7 +365,7 @@ export const usePostComments = (postId: string) => {
             ...comment,
             author: authorData
               ? { name: authorData.name || 'İstifadəçi', avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null }
-              : { name: 'İstifadəçi', avatar_url: null, badge_type: null },
+              : { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null },
             is_liked: isLiked,
           };
         })

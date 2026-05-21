@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -149,10 +150,10 @@ export const useSaveProduct = () => {
     onSuccess: (_, productId) => {
       queryClient.invalidateQueries({ queryKey: ['saved-affiliate-products'] });
       queryClient.invalidateQueries({ queryKey: ['is-product-saved', productId] });
-      toast({ title: 'Yadda saxlanıldı', description: 'Məhsul favoritlərə əlavə edildi' });
+      toast({ title: tr("useaffiliateproducts_yadda_saxlanildi_cf4f4a", "Yadda saxlanıldı"), description: tr("useaffiliateproducts_mehsul_favoritlere_elave_edildi_748bcf", "Məhsul favoritlərə əlavə edildi") });
     },
     onError: () => {
-      toast({ title: 'Xəta', description: 'Məhsul saxlanıla bilmədi', variant: 'destructive' });
+      toast({ title: tr("useaffiliateproducts_xeta_3cdbb6", "Xəta"), description: tr("useaffiliateproducts_mehsul_saxlanila_bilmedi_b71bb7", "Məhsul saxlanıla bilmədi"), variant: 'destructive' });
     },
   });
 };
@@ -177,7 +178,7 @@ export const useUnsaveProduct = () => {
     onSuccess: (_, productId) => {
       queryClient.invalidateQueries({ queryKey: ['saved-affiliate-products'] });
       queryClient.invalidateQueries({ queryKey: ['is-product-saved', productId] });
-      toast({ title: 'Silindi', description: 'Məhsul favoritlərdən silindi' });
+      toast({ title: 'Silindi', description: tr("useaffiliateproducts_mehsul_favoritlerden_silindi_d9717b", "Məhsul favoritlərdən silindi") });
     },
   });
 };

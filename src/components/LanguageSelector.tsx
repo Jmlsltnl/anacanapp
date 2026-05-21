@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { Globe, Check } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { clearTranslationCache, loadTranslations } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 
 const LANGS = [
-  { code: 'az', label: 'Azərbaycan', native: 'Azərbaycan' },
+  { code: 'az', label: tr("languageselector_azerbaycan_733e93", "Azərbaycan"), native: 'Azərbaycan' },
   { code: 'en', label: 'English', native: 'English' },
 ];
 

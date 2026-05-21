@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -15,8 +16,8 @@ export default function ReviewsStep({ reviews, onContinue }: ReviewsStepProps) {
   return (
     <div className="flex flex-col min-h-full px-6 py-8">
       <div className="flex-1">
-        <h2 className="text-xl font-bold text-foreground text-center mb-2">Digər Analar Nə Deyir?</h2>
-        <p className="text-sm text-muted-foreground text-center mb-8">Real istifadəçi rəyləri</p>
+        <h2 className="text-xl font-bold text-foreground text-center mb-2">{tr("reviewsstep_diger_analar_ne_deyir_6be761", "Digər Analar Nə Deyir?")}</h2>
+        <p className="text-sm text-muted-foreground text-center mb-8">{tr("reviewsstep_real_istifadeci_reyleri_c97721", "Real istifadəçi rəyləri")}</p>
 
         <div className="relative">
           <AnimatePresence mode="wait">

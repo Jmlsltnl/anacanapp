@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { tr } from '@/lib/tr';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
@@ -74,7 +75,7 @@ export const useStories = (groupId?: string | null) => {
             ...story,
             author: authorData
               ? { name: authorData.name || 'İstifadəçi', avatar_url: authorData.avatar_url || null }
-              : { name: 'İstifadəçi', avatar_url: null },
+              : { name: tr("usestories_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null },
             is_viewed: isViewed,
           };
         })
@@ -145,10 +146,10 @@ export const useStories = (groupId?: string | null) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stories'] });
-      toast({ title: 'Story paylaşıldı! 📸' });
+      toast({ title: tr("usestories_story_paylasildi_e1288f", "Story paylaşıldı! 📸") });
     },
     onError: () => {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("usestories_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     },
   });
 

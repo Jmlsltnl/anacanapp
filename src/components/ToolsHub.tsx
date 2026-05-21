@@ -486,7 +486,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
             <div className="w-20 h-20 rounded-3xl bg-muted/50 flex items-center justify-center mx-auto mb-4">
               <Search className="w-10 h-10 text-muted-foreground/50" />
             </div>
-            <p className="font-semibold text-foreground mb-1">Alət tapılmadı</p>
+            <p className="font-semibold text-foreground mb-1">{tr("toolshub_alet_tapilmadi_f358cb", "Alət tapılmadı")}</p>
             <p className="text-sm text-muted-foreground">
               {searchQuery ? `"${searchQuery}" ilə uyğun alət yoxdur` : 'Bu kateqoriyada alət yoxdur'}
             </p>

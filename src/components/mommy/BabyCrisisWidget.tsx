@@ -162,7 +162,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                   <Calendar className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm text-foreground">Kriz Təqvimi</h3>
+                  <h3 className="font-bold text-sm text-foreground">{tr("babycrisiswidget_kriz_teqvimi_aa2ea5", "Kriz Təqvimi")}</h3>
                   <p className="text-xs text-muted-foreground">
                     {upcomingCrises.length > 0 
                       ? `Növbəti: ${upcomingCrises[0].week_start}. həftə`
@@ -225,7 +225,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
               <div className="sticky top-0 bg-background/95 backdrop-blur-lg border-b border-border/50 px-4 py-4 z-10">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-xl font-bold text-foreground">Kriz Təqvimi</h2>
+                    <h2 className="text-xl font-bold text-foreground">{tr("babycrisiswidget_kriz_teqvimi_aa2ea5", "Kriz Təqvimi")}</h2>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {babyName} • {babyAgeWeeks}. həftə
                     </p>
@@ -424,7 +424,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                   <div className="bg-primary/5 dark:bg-primary/10 rounded-xl p-4 border border-primary/20">
                     <div className="flex items-center gap-2 mb-3">
                       <Lightbulb className="w-4 h-4 text-primary" />
-                      <h3 className="font-bold text-sm text-primary">Tövsiyələr</h3>
+                      <h3 className="font-bold text-sm text-primary">{tr("babycrisiswidget_tovsiyeler_17a8f7", "Tövsiyələr")}</h3>
                     </div>
                     <div className="space-y-2">
                       {selectedCrisis.tips_az.map((tip, i) => (

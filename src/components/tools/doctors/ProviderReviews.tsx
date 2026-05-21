@@ -167,8 +167,8 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
       ) : reviews.length === 0 ? (
         <div className="text-center py-6">
           <Star className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground">Hələ heç bir rəy yoxdur</p>
-          <p className="text-xs text-muted-foreground/70">İlk rəyi siz yazın!</p>
+          <p className="text-sm text-muted-foreground">{tr("providerreviews_hele_hec_bir_rey_yoxdur_410969", "Hələ heç bir rəy yoxdur")}</p>
+          <p className="text-xs text-muted-foreground/70">{tr("providerreviews_ilk_reyi_siz_yazin_cc6119", "İlk rəyi siz yazın!")}</p>
         </div>
       ) : (
         <div className="space-y-4">

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { Sparkles, Heart, Star } from 'lucide-react';
 import type { MommyHeroProps } from './MommyHeroClassic';
 
@@ -34,7 +35,7 @@ const MommyHeroBento = ({ babyData, exactMonths, remainingDays, babyIllustration
           />
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/40 to-transparent">
-          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/80">Bu gün</p>
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/80">{tr("mommyherobento_bu_gun_786fd4", "Bu gün")}</p>
           <h3 className="text-base font-black text-white drop-shadow truncate">{babyData.name}</h3>
         </div>
       </motion.div>

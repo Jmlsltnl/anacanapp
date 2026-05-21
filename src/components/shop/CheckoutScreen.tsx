@@ -77,7 +77,7 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
           <button onClick={onBack} className="p-2 rounded-full hover:bg-muted">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-bold">Sifarişi Tamamla</h1>
+          <h1 className="text-lg font-bold">{tr("checkoutscreen_sifarisi_tamamla_a8b546", "Sifarişi Tamamla")}</h1>
         </div>
       </div>
 
@@ -125,7 +125,7 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
 
         {/* Order Summary */}
         <div className="bg-card rounded-xl p-4 border border-border space-y-2">
-          <h2 className="font-semibold text-sm">Sifariş Xülasəsi</h2>
+          <h2 className="font-semibold text-sm">{tr("checkoutscreen_sifaris_xulasesi_14a242", "Sifariş Xülasəsi")}</h2>
           {items.map(item => (
             <div key={item.id} className="flex justify-between text-sm">
               <span className="text-muted-foreground">{item.product?.name} x{item.quantity}</span>
@@ -139,7 +139,7 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
             </div>
           )}
           <div className="border-t border-border pt-2 flex justify-between font-bold">
-            <span>Cəmi:</span>
+            <span>{tr("checkoutscreen_cemi_fbbec6", "Cəmi:")}</span>
             <span className="text-primary">{finalPrice.toFixed(2)} ₼</span>
           </div>
         </div>
@@ -149,8 +149,8 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
             <CreditCard className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <p className="font-medium text-sm">Qapıda Ödəniş</p>
-            <p className="text-xs text-muted-foreground">Nağd və ya kartla</p>
+            <p className="font-medium text-sm">{tr("checkoutscreen_qapida_odenis_312926", "Qapıda Ödəniş")}</p>
+            <p className="text-xs text-muted-foreground">{tr("checkoutscreen_nagd_ve_ya_kartla_c4ddd7", "Nağd və ya kartla")}</p>
           </div>
         </div>
       </form>
@@ -158,7 +158,7 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 safe-bottom">
         <Button onClick={handleSubmit} disabled={loading} className="w-full h-12 text-base font-bold">
           {loading ? (
-            <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Gözləyin...</>
+            <><Loader2 className="w-5 h-5 mr-2 animate-spin" />{tr("checkoutscreen_gozleyin_9c465b", "Gözləyin...")}</>
           ) : (
             `Sifariş Ver - ${finalPrice.toFixed(2)} ₼`
           )}

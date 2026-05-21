@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -15,8 +16,8 @@ export default function FeaturesStep({ features, onContinue }: FeaturesStepProps
   return (
     <div className="flex flex-col min-h-full px-6 py-8">
       <div className="flex-1">
-        <h2 className="text-xl font-bold text-foreground text-center mb-2">Xüsusi Funksiyalar</h2>
-        <p className="text-sm text-muted-foreground text-center mb-8">Anacan-ın unikal imkanları</p>
+        <h2 className="text-xl font-bold text-foreground text-center mb-2">{tr("featuresstep_xususi_funksiyalar_674d09", "Xüsusi Funksiyalar")}</h2>
+        <p className="text-sm text-muted-foreground text-center mb-8">{tr("featuresstep_anacan_in_unikal_imkanlari_a6a089", "Anacan-ın unikal imkanları")}</p>
 
         <AnimatePresence mode="wait">
           <motion.div

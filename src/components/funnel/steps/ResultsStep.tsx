@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { Button } from '@/components/ui/button';
 
 interface ResultsStepProps {
@@ -14,8 +15,8 @@ export default function ResultsStep({ lines, onContinue }: ResultsStepProps) {
           <span className="text-3xl">🔍</span>
         </div>
 
-        <h2 className="text-xl font-bold text-foreground text-center mb-2">Fərdi Analiziniz</h2>
-        <p className="text-sm text-muted-foreground text-center mb-8">Cavablarınıza əsasən hazırlandı</p>
+        <h2 className="text-xl font-bold text-foreground text-center mb-2">{tr("resultsstep_ferdi_analiziniz_404155", "Fərdi Analiziniz")}</h2>
+        <p className="text-sm text-muted-foreground text-center mb-8">{tr("resultsstep_cavablariniza_esasen_hazirlandi_43354d", "Cavablarınıza əsasən hazırlandı")}</p>
 
         <div className="space-y-4">
           {lines.map((line, i) => (

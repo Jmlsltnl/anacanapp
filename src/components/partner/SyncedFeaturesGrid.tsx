@@ -40,7 +40,7 @@ const SyncedFeaturesGrid = ({ onNavigate, onTabChange }: SyncedFeaturesGridProps
     {
       id: 'name-voting',
       title: tr("syncedfeaturesgrid_ad_secimi_465d2a", 'Ad Seçimi'),
-      subtitle: 'Swipe ilə seç',
+      subtitle: tr("syncedfeaturesgrid_swipe_ile_sec_77854e", "Swipe ilə seç"),
       icon: Vote,
       gradient: 'from-pink-500 to-rose-600',
       action: () => onNavigate('name-voting'),
@@ -48,7 +48,7 @@ const SyncedFeaturesGrid = ({ onNavigate, onTabChange }: SyncedFeaturesGridProps
     {
       id: 'weekly-stats',
       title: tr("syncedfeaturesgrid_heftelik_statistika_292953", 'Həftəlik Statistika'),
-      subtitle: 'Əhval & aktivlik',
+      subtitle: tr("syncedfeaturesgrid_ehval_aktivlik_a0a105", "Əhval & aktivlik"),
       icon: BarChart3,
       gradient: 'from-cyan-500 to-blue-600',
       action: () => onTabChange('stats'),
@@ -65,7 +65,7 @@ const SyncedFeaturesGrid = ({ onNavigate, onTabChange }: SyncedFeaturesGridProps
     {
       id: 'sos',
       title: tr("syncedfeaturesgrid_sos_xeberdarliq_6bd6d8", 'SOS Xəbərdarlıq'),
-      subtitle: 'Təcili bildiriş',
+      subtitle: tr("syncedfeaturesgrid_tecili_bildiris_5e8451", "Təcili bildiriş"),
       icon: AlertTriangle,
       gradient: 'from-red-500 to-rose-700',
       isEmergency: true,

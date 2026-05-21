@@ -188,16 +188,16 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
         >
           <Heart className="w-14 h-14 text-white fill-white/30" />
         </motion.div>
-        <h1 className="text-2xl font-black mb-2">Hələ bağlanmamısınız</h1>
+        <h1 className="text-2xl font-black mb-2">{tr("partnerdashboard_hele_baglanmamisiniz_bc4f93", "Hələ bağlanmamısınız")}</h1>
         <p className="text-muted-foreground mb-6 max-w-sm">
           Həyat yoldaşınızın Anacan tətbiqindəki partnyor kodunu daxil edib bağlanın — bütün məlumatlar real vaxtda sinxronlaşacaq.
         </p>
         <div className="bg-card rounded-2xl p-6 shadow-lg border border-border/50 max-w-sm">
-          <p className="text-sm font-medium mb-2">📲 Necə bağlanmalı?</p>
+          <p className="text-sm font-medium mb-2">{tr("partnerdashboard_nece_baglanmali_8234cb", "📲 Necə bağlanmalı?")}</p>
           <ol className="text-xs text-muted-foreground text-left space-y-1.5 list-decimal list-inside">
-            <li>Həyat yoldaşınızdan onun profilindəki partnyor kodunu istəyin</li>
-            <li>Profil bölməsinə keçərək kodu daxil edin</li>
-            <li>Bir neçə saniyə içində bağlantı yaranacaq</li>
+            <li>{tr("partnerdashboard_heyat_yoldasinizdan_onun_profilindeki_pa_c8a86f", "Həyat yoldaşınızdan onun profilindəki partnyor kodunu istəyin")}</li>
+            <li>{tr("partnerdashboard_profil_bolmesine_kecerek_kodu_daxil_edin_2d8a3e", "Profil bölməsinə keçərək kodu daxil edin")}</li>
+            <li>{tr("partnerdashboard_bir_nece_saniye_icinde_baglanti_yaranaca_99fbd5", "Bir neçə saniyə içində bağlantı yaranacaq")}</li>
           </ol>
         </div>
       </div>
@@ -266,7 +266,7 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
           {[
             { id: 'home', label: tr("partnerdashboard_esas_6d87f7", 'Əsas'), icon: Home },
             { id: 'stats', label: 'Statistika', icon: BarChart3 },
-            { id: 'notifications', label: 'Bildiriş', icon: Bell },
+            { id: 'notifications', label: tr("partnerdashboard_bildiris_307073", "Bildiriş"), icon: Bell },
             { id: 'surprise', label: tr("partnerdashboard_surpriz_67b2b2", 'Sürpriz'), icon: Gift },
             { id: 'shopping', label: tr("partnerdashboard_siyahi_f04aac", 'Siyahı'), icon: ShoppingCart },
           ].map(tab => {
@@ -319,7 +319,7 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
                     <MessageCircle className="w-7 h-7 text-partner" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-partner text-lg">Yeni mesajınız var!</h3>
+                    <h3 className="font-bold text-partner text-lg">{tr("partnerdashboard_yeni_mesajiniz_var_0ef93a", "Yeni mesajınız var!")}</h3>
                     <p className="text-sm text-muted-foreground">
                       {getUnreadCount()} oxunmamış mesaj
                     </p>
@@ -341,8 +341,8 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
                     <MessageCircle className="w-5 h-5 text-partner" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg">Mesaj göndər</h3>
-                    <p className="text-xs text-muted-foreground">Sevgi sözlərini paylaş</p>
+                    <h3 className="font-bold text-lg">{tr("partnerdashboard_mesaj_gonder_ad33c9", "Mesaj göndər")}</h3>
+                    <p className="text-xs text-muted-foreground">{tr("partnerdashboard_sevgi_sozlerini_paylas_759918", "Sevgi sözlərini paylaş")}</p>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -392,7 +392,7 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
                   <div className="flex items-start gap-3">
                     <span className="text-3xl">{tipEmoji}</span>
                     <div>
-                      <h4 className="font-bold text-amber-800 dark:text-amber-200">Günün Tövsiyəsi</h4>
+                      <h4 className="font-bold text-amber-800 dark:text-amber-200">{tr("partnerdashboard_gunun_tovsiyesi_b3a563", "Günün Tövsiyəsi")}</h4>
                       <p className="text-sm text-amber-700 dark:text-amber-300">{tipText}</p>
                     </div>
                   </div>
@@ -423,8 +423,8 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
                   <ShoppingCart className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="font-bold text-lg">Alış-veriş Siyahısı</h2>
-                  <p className="text-sm text-muted-foreground">Sinxronlaşdırılmış siyahı</p>
+                  <h2 className="font-bold text-lg">{tr("partnerdashboard_alis_veris_siyahisi_a2d4a8", "Alış-veriş Siyahısı")}</h2>
+                  <p className="text-sm text-muted-foreground">{tr("partnerdashboard_sinxronlasdirilmis_siyahi_08835b", "Sinxronlaşdırılmış siyahı")}</p>
                 </div>
               </div>
 
@@ -496,8 +496,8 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
                 {shoppingList.length === 0 && (
                   <div className="text-center py-12">
                     <ShoppingCart className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />
-                    <p className="text-muted-foreground">Siyahı boşdur</p>
-                    <p className="text-sm text-muted-foreground/70">Yuxarıdakı formadan məhsul əlavə edin</p>
+                    <p className="text-muted-foreground">{tr("partnerdashboard_siyahi_bosdur_c420ab", "Siyahı boşdur")}</p>
+                    <p className="text-sm text-muted-foreground/70">{tr("partnerdashboard_yuxaridaki_formadan_mehsul_elave_edin_32989e", "Yuxarıdakı formadan məhsul əlavə edin")}</p>
                   </div>
                 )}
               </div>

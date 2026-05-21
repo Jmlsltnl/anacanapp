@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
@@ -58,7 +59,7 @@ export const useWeightEntries = () => {
       setEntries(prev => [data, ...prev]);
 
       toast({
-        title: 'Çəki yadda saxlandı! ⚖️',
+        title: tr("useweightentries_ceki_yadda_saxlandi_f56b5a", "Çəki yadda saxlandı! ⚖️"),
         description: `${weight} kg`,
       });
 
@@ -66,7 +67,7 @@ export const useWeightEntries = () => {
     } catch (error: any) {
       console.error('Error adding weight entry:', error);
       toast({
-        title: 'Xəta baş verdi',
+        title: tr("useweightentries_xeta_bas_verdi_f22fba", "Xəta baş verdi"),
         description: error.message,
         variant: 'destructive',
       });
@@ -106,7 +107,7 @@ export const useWeightEntries = () => {
       if (error) throw error;
 
       toast({
-        title: 'Başlanğıc çəki yadda saxlandı!',
+        title: tr("useweightentries_baslangic_ceki_yadda_saxlandi_e650ab", "Başlanğıc çəki yadda saxlandı!"),
         description: `${weight} kg`,
       });
     } catch (error: any) {
@@ -133,12 +134,12 @@ export const useWeightEntries = () => {
       setEntries(prev => prev.filter(e => e.id !== entryId));
       toast({
         title: 'Silindi',
-        description: 'Çəki qeydi silindi',
+        description: tr("useweightentries_ceki_qeydi_silindi_d9e1c4", "Çəki qeydi silindi"),
       });
     } catch (error: any) {
       console.error('Error deleting weight entry:', error);
       toast({
-        title: 'Xəta baş verdi',
+        title: tr("useweightentries_xeta_bas_verdi_f22fba", "Xəta baş verdi"),
         description: error.message,
         variant: 'destructive',
       });
@@ -158,13 +159,13 @@ export const useWeightEntries = () => {
 
       setEntries([]);
       toast({
-        title: 'Sıfırlandı',
-        description: 'Bütün çəki qeydləri silindi',
+        title: tr("useweightentries_sifirlandi_edc3d3", "Sıfırlandı"),
+        description: tr("useweightentries_butun_ceki_qeydleri_silindi_9918ff", "Bütün çəki qeydləri silindi"),
       });
     } catch (error: any) {
       console.error('Error deleting all weight entries:', error);
       toast({
-        title: 'Xəta baş verdi',
+        title: tr("useweightentries_xeta_bas_verdi_f22fba", "Xəta baş verdi"),
         description: error.message,
         variant: 'destructive',
       });

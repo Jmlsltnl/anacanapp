@@ -233,8 +233,8 @@ const SurpriseTab = () => {
             <Gift className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="font-bold text-lg">Sürpriz Planla</h2>
-            <p className="text-sm text-muted-foreground">Onu xoşbəxt etmək üçün</p>
+            <h2 className="font-bold text-lg">{tr("surprisetab_surpriz_planla_d495ce", "Sürpriz Planla")}</h2>
+            <p className="text-sm text-muted-foreground">{tr("surprisetab_onu_xosbext_etmek_ucun_7ecff1", "Onu xoşbəxt etmək üçün")}</p>
           </div>
         </div>
         
@@ -310,7 +310,7 @@ const SurpriseTab = () => {
                 <History className="w-5 h-5 text-white" />
               </div>
               <div className="text-left">
-                <h3 className="font-semibold text-emerald-800 dark:text-emerald-200">Sürpriz Tarixçəsi</h3>
+                <h3 className="font-semibold text-emerald-800 dark:text-emerald-200">{tr("surprisetab_surpriz_tarixcesi_46a7ab", "Sürpriz Tarixçəsi")}</h3>
                 <p className="text-sm text-emerald-600 dark:text-emerald-400">
                   {completedSurprises.length} sürpriz tamamlanıb
                 </p>
@@ -471,7 +471,7 @@ const SurpriseTab = () => {
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Tarix seç</label>
+                  <label className="text-sm font-medium mb-2 block">{tr("surprisetab_tarix_sec_937037", "Tarix seç")}</label>
                   <input
                     type="date"
                     value={planningDate}
@@ -481,7 +481,7 @@ const SurpriseTab = () => {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Qeyd (istəyə bağlı)</label>
+                  <label className="text-sm font-medium mb-2 block">{tr("surprisetab_qeyd_isteye_bagli_96c689", "Qeyd (istəyə bağlı)")}</label>
                   <textarea
                     value={planningNotes}
                     onChange={(e) => setPlanningNotes(e.target.value)}
@@ -513,7 +513,7 @@ const SurpriseTab = () => {
       >
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="w-5 h-5 text-pink-500" />
-          <h3 className="font-bold text-pink-800 dark:text-pink-200">İpucu</h3>
+          <h3 className="font-bold text-pink-800 dark:text-pink-200">{tr("surprisetab_ipucu_a842e4", "İpucu")}</h3>
         </div>
         <p className="text-sm text-pink-700 dark:text-pink-300">
           Kiçik və sadə jestlər çox vaxt ən yadda qalanlar olur. Gözlənilməz anlarda edilən sürprizlər daha xüsusidir! 💕

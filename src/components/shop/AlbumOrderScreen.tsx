@@ -104,10 +104,10 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200 }} className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
           <Check className="w-10 h-10 text-green-600" />
         </motion.div>
-        <h2 className="text-xl font-bold mb-2">Sifarişiniz qəbul edildi! 🎉</h2>
-        <p className="text-muted-foreground mb-1 text-sm">Sifariş nömrəniz tezliklə göndəriləcək.</p>
-        <p className="text-muted-foreground mb-6 text-xs">Əlaqə saxlanılacaq və qiymət barədə məlumat veriləcək.</p>
-        <Button onClick={onBack} className="rounded-xl px-8">Geri qayıt</Button>
+        <h2 className="text-xl font-bold mb-2">{tr("albumorderscreen_sifarisiniz_qebul_edildi_8a131d", "Sifarişiniz qəbul edildi! 🎉")}</h2>
+        <p className="text-muted-foreground mb-1 text-sm">{tr("albumorderscreen_sifaris_nomreniz_tezlikle_gonderilecek_9398b5", "Sifariş nömrəniz tezliklə göndəriləcək.")}</p>
+        <p className="text-muted-foreground mb-6 text-xs">{tr("albumorderscreen_elaqe_saxlanilacaq_ve_qiymet_barede_melu_0b90e4", "Əlaqə saxlanılacaq və qiymət barədə məlumat veriləcək.")}</p>
+        <Button onClick={onBack} className="rounded-xl px-8">{tr("albumorderscreen_geri_qayit_ff66c2", "Geri qayıt")}</Button>
       </div>
     );
   }
@@ -165,7 +165,7 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
             <Input value={name} onChange={e => setName(e.target.value)} placeholder={tr("albumorderscreen_adinizi_daxil_edin_bd2b57", "Adınızı daxil edin")} className="rounded-xl mt-1 h-11" />
           </div>
           <div>
-            <Label className="text-xs text-muted-foreground">Telefon nömrəsi *</Label>
+            <Label className="text-xs text-muted-foreground">{tr("albumorderscreen_telefon_nomresi_b26dbc", "Telefon nömrəsi *")}</Label>
             <Input value={phone} onChange={e => setPhone(e.target.value)} placeholder="+994 50 123 45 67" className="rounded-xl mt-1 h-11" />
           </div>
         </div>
@@ -177,11 +177,11 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
             Çatdırılma Ünvanı
           </h2>
           <div>
-            <Label className="text-xs text-muted-foreground">Şəhər</Label>
+            <Label className="text-xs text-muted-foreground">{tr("albumorderscreen_seher_5f373c", "Şəhər")}</Label>
             <Input value={city} onChange={e => setCity(e.target.value)} placeholder={tr("albumorderscreen_seher_5f373c", "Şəhər")} className="rounded-xl mt-1 h-11" />
           </div>
           <div>
-            <Label className="text-xs text-muted-foreground">Ünvan (küçə, bina, mənzil) *</Label>
+            <Label className="text-xs text-muted-foreground">{tr("albumorderscreen_unvan_kuce_bina_menzil_9cfd36", "Ünvan (küçə, bina, mənzil) *")}</Label>
             <Textarea value={address} onChange={e => setAddress(e.target.value)} placeholder={tr("albumorderscreen_tam_unvaninizi_yazin_0106c0", "Tam ünvanınızı yazın")} className="rounded-xl mt-1" rows={2} />
           </div>
         </div>
@@ -233,14 +233,14 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
         {/* Proof upload - only for card transfer */}
         {paymentMethod === 'c2c_transfer' && (
           <div className="space-y-2">
-            <Label className="text-xs text-muted-foreground">Ödəniş sübutu (şəkil/PDF)</Label>
+            <Label className="text-xs text-muted-foreground">{tr("albumorderscreen_odenis_subutu_sekil_pdf_4e1fa5", "Ödəniş sübutu (şəkil/PDF)")}</Label>
             <label className="flex items-center gap-3 p-3 rounded-xl border-2 border-dashed border-border/60 cursor-pointer hover:border-primary/40 transition-all bg-card">
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <Upload className="w-4 h-4 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{proofFile ? proofFile.name : 'Fayl seçin'}</p>
-                <p className="text-[10px] text-muted-foreground">JPG, PNG və ya PDF</p>
+                <p className="text-[10px] text-muted-foreground">{tr("albumorderscreen_jpg_png_ve_ya_pdf_db04d6", "JPG, PNG və ya PDF")}</p>
               </div>
               {proofFile && (
                 <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
@@ -274,8 +274,8 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
             <Package className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <p className="font-medium text-sm">Çatdırılma</p>
-            <p className="text-[11px] text-muted-foreground">Bakı daxili pulsuz çatdırılma. Regionlar üçün əlavə haqqı bildiriləcək.</p>
+            <p className="font-medium text-sm">{tr("albumorderscreen_catdirilma_e955cf", "Çatdırılma")}</p>
+            <p className="text-[11px] text-muted-foreground">{tr("albumorderscreen_baki_daxili_pulsuz_catdirilma_regionlar__2851a6", "Bakı daxili pulsuz çatdırılma. Regionlar üçün əlavə haqqı bildiriləcək.")}</p>
           </div>
         </div>
       </div>
@@ -288,7 +288,7 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
           className="w-full h-12 rounded-2xl text-base font-bold"
         >
           {submitting ? (
-            <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Göndərilir...</>
+            <><Loader2 className="w-5 h-5 mr-2 animate-spin" />{tr("albumorderscreen_gonderilir_1d548c", "Göndərilir...")}</>
           ) : (
             'Sifarişi Göndər'
           )}

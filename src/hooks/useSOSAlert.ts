@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { Geolocation } from '@capacitor/geolocation';
@@ -138,7 +139,7 @@ export const useSOSAlert = () => {
         message_type: 'sos_alert',
         content: JSON.stringify({
           type: 'sos_alert',
-          title: '🆘 TƏCİLİ XƏBƏRDARLIQ!',
+          title: tr("usesosalert_tecili_xeberdarliq_5bfb41", "🆘 TƏCİLİ XƏBƏRDARLIQ!"),
           body: message || 'Partnyorunuz təcili kömək istəyir!',
           alertId: data.id,
           latitude: location?.latitude,

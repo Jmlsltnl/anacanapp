@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
@@ -129,7 +130,7 @@ export const useCommunityPushNotifications = () => {
       await supabase.functions.invoke('send-push-notification', {
         body: {
           userId: postAuthorId,
-          title: 'Yeni bəyənmə! ❤️',
+          title: tr("usepushnotifications_yeni_beyenme_b60a41", "Yeni bəyənmə! ❤️"),
           body: `${likerName} paylaşımınızı bəyəndi`,
           data: { type: 'like' },
         },
@@ -150,7 +151,7 @@ export const useCommunityPushNotifications = () => {
       await supabase.functions.invoke('send-push-notification', {
         body: {
           userId: postAuthorId,
-          title: 'Yeni şərh! 💬',
+          title: tr("usepushnotifications_yeni_serh_659e1c", "Yeni şərh! 💬"),
           body: `${commenterName}: ${commentPreview.slice(0, 50)}${commentPreview.length > 50 ? '...' : ''}`,
           data: { type: 'comment' },
         },

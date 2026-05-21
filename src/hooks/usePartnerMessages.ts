@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
@@ -59,12 +60,12 @@ export const usePartnerMessages = () => {
 
       if (messageType === 'love') {
         toast({
-          title: 'Sevgi göndərildi! ❤️',
-          description: 'Partnyorunuz bildiriş alacaq',
+          title: tr("usepartnermessages_sevgi_gonderildi_14b554", "Sevgi göndərildi! ❤️"),
+          description: tr("usepartnermessages_partnyorunuz_bildiris_alacaq_62f7d7", "Partnyorunuz bildiriş alacaq"),
         });
       } else {
         toast({
-          title: 'Mesaj göndərildi! 💬',
+          title: tr("usepartnermessages_mesaj_gonderildi_353ca0", "Mesaj göndərildi! 💬"),
         });
       }
 
@@ -73,7 +74,7 @@ export const usePartnerMessages = () => {
     } catch (error: any) {
       console.error('Error sending partner message:', error);
       toast({
-        title: 'Xəta baş verdi',
+        title: tr("usepartnermessages_xeta_bas_verdi_f22fba", "Xəta baş verdi"),
         description: error.message,
         variant: 'destructive',
       });
@@ -84,8 +85,8 @@ export const usePartnerMessages = () => {
   const sendLoveToPartner = async () => {
     if (!profile?.linked_partner_id) {
       toast({
-        title: 'Partnyor tapılmadı',
-        description: 'Əvvəlcə partnyorla əlaqələnin',
+        title: tr("usepartnermessages_partnyor_tapilmadi_1239a8", "Partnyor tapılmadı"),
+        description: tr("usepartnermessages_evvelce_partnyorla_elaqelenin_2378fa", "Əvvəlcə partnyorla əlaqələnin"),
         variant: 'destructive',
       });
       return null;
@@ -100,7 +101,7 @@ export const usePartnerMessages = () => {
 
     if (!partnerProfile) {
       toast({
-        title: 'Partnyor tapılmadı',
+        title: tr("usepartnermessages_partnyor_tapilmadi_1239a8", "Partnyor tapılmadı"),
         variant: 'destructive',
       });
       return null;
@@ -176,8 +177,8 @@ export const usePartnerMessages = () => {
             switch (newMessage.message_type) {
               case 'love':
                 toast({
-                  title: 'Sevgi aldınız! ❤️',
-                  description: 'Partnyorunuz sizə sevgi göndərdi',
+                  title: tr("usepartnermessages_sevgi_aldiniz_346423", "Sevgi aldınız! ❤️"),
+                  description: tr("usepartnermessages_partnyorunuz_size_sevgi_gonderdi_765fb4", "Partnyorunuz sizə sevgi göndərdi"),
                 });
                 break;
               case 'mood_update':
@@ -194,8 +195,8 @@ export const usePartnerMessages = () => {
                 break;
               case 'contraction_511':
                 toast({
-                  title: '⚠️ 5-1-1 Qaydası!',
-                  description: 'Xəstəxanaya getmə vaxtı ola bilər!',
+                  title: tr("usepartnermessages_5_1_1_qaydasi_976061", "⚠️ 5-1-1 Qaydası!"),
+                  description: tr("usepartnermessages_xestexanaya_getme_vaxti_ola_biler_b244c0", "Xəstəxanaya getmə vaxtı ola bilər!"),
                   // Use destructive variant for urgent notifications
                 });
                 break;
@@ -208,7 +209,7 @@ export const usePartnerMessages = () => {
               case 'water_goal':
                 toast({
                   title: notificationData?.title || 'Su hədəfinə çatdı! 💧',
-                  description: 'Partnyorunuz gündəlik su hədəfinə çatdı!',
+                  description: tr("usepartnermessages_partnyorunuz_gundelik_su_hedefine_catdi_f06510", "Partnyorunuz gündəlik su hədəfinə çatdı!"),
                 });
                 break;
               default:

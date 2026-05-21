@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { localNotifications, isNative } from '@/lib/native';
 import { useAuth } from './useAuth';
@@ -90,7 +91,7 @@ export const useNotificationSettings = () => {
       if (reminderTime > now) {
         reminders.push({
           id: 100 + hour,
-          title: 'Su içmək vaxtı! 💧',
+          title: tr("usenotificationsettings_su_icmek_vaxti_cecdf9", "Su içmək vaxtı! 💧"),
           body: 'Sağlamlığınız və körpəniz üçün su içməyi unutmayın.',
           schedule: { at: reminderTime }
         });
@@ -122,7 +123,7 @@ export const useNotificationSettings = () => {
 
     await localNotifications.schedule([{
       id: 200,
-      title: 'Vitamin vaxtı! 💊',
+      title: tr("usenotificationsettings_vitamin_vaxti_9bfc40", "Vitamin vaxtı! 💊"),
       body: 'Gündəlik prenatal vitaminlərinizi qəbul etməyi unutmayın.',
       schedule: { at: reminderTime }
     }]);
@@ -153,7 +154,7 @@ export const useNotificationSettings = () => {
         if (reminderTime > now) {
           reminders.push({
             id: 300 + i,
-            title: 'Məşq vaxtı! 🧘‍♀️',
+            title: tr("usenotificationsettings_mesq_vaxti_4a1396", "Məşq vaxtı! 🧘‍♀️"),
             body: 'Hamiləlik üçün sağlam məşqlər edərək günə enerji ilə başlayın.',
             schedule: { at: reminderTime }
           });

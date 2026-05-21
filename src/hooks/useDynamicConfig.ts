@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -319,7 +320,7 @@ export const useExercisesAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['exercises-admin'] });
       queryClient.invalidateQueries({ queryKey: ['exercises'] });
-      toast({ title: 'Məşq əlavə edildi' });
+      toast({ title: tr("usedynamicconfig_mesq_elave_edildi_62071a", "Məşq əlavə edildi") });
     },
   });
 
@@ -331,7 +332,7 @@ export const useExercisesAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['exercises-admin'] });
       queryClient.invalidateQueries({ queryKey: ['exercises'] });
-      toast({ title: 'Məşq yeniləndi' });
+      toast({ title: tr("usedynamicconfig_mesq_yenilendi_6db253", "Məşq yeniləndi") });
     },
   });
 
@@ -343,7 +344,7 @@ export const useExercisesAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['exercises-admin'] });
       queryClient.invalidateQueries({ queryKey: ['exercises'] });
-      toast({ title: 'Məşq silindi' });
+      toast({ title: tr("usedynamicconfig_mesq_silindi_5f2cd4", "Məşq silindi") });
     },
   });
 
@@ -374,7 +375,7 @@ export const useWhiteNoiseSoundsAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['white-noise-sounds-admin'] });
       queryClient.invalidateQueries({ queryKey: ['white-noise-sounds'] });
-      toast({ title: 'Səs əlavə edildi' });
+      toast({ title: tr("usedynamicconfig_ses_elave_edildi_be6380", "Səs əlavə edildi") });
     },
   });
 
@@ -386,7 +387,7 @@ export const useWhiteNoiseSoundsAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['white-noise-sounds-admin'] });
       queryClient.invalidateQueries({ queryKey: ['white-noise-sounds'] });
-      toast({ title: 'Səs yeniləndi' });
+      toast({ title: tr("usedynamicconfig_ses_yenilendi_0d354c", "Səs yeniləndi") });
     },
   });
 
@@ -398,7 +399,7 @@ export const useWhiteNoiseSoundsAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['white-noise-sounds-admin'] });
       queryClient.invalidateQueries({ queryKey: ['white-noise-sounds'] });
-      toast({ title: 'Səs silindi' });
+      toast({ title: tr("usedynamicconfig_ses_silindi_f1ba7a", "Səs silindi") });
     },
   });
 
@@ -429,7 +430,7 @@ export const useSurpriseIdeasAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['surprise-ideas-admin'] });
       queryClient.invalidateQueries({ queryKey: ['surprise-ideas'] });
-      toast({ title: 'Sürpriz əlavə edildi' });
+      toast({ title: tr("usedynamicconfig_surpriz_elave_edildi_8f99e6", "Sürpriz əlavə edildi") });
     },
   });
 
@@ -441,7 +442,7 @@ export const useSurpriseIdeasAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['surprise-ideas-admin'] });
       queryClient.invalidateQueries({ queryKey: ['surprise-ideas'] });
-      toast({ title: 'Sürpriz yeniləndi' });
+      toast({ title: tr("usedynamicconfig_surpriz_yenilendi_7fd527", "Sürpriz yeniləndi") });
     },
   });
 
@@ -453,7 +454,7 @@ export const useSurpriseIdeasAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['surprise-ideas-admin'] });
       queryClient.invalidateQueries({ queryKey: ['surprise-ideas'] });
-      toast({ title: 'Sürpriz silindi' });
+      toast({ title: tr("usedynamicconfig_surpriz_silindi_095181", "Sürpriz silindi") });
     },
   });
 
@@ -484,7 +485,7 @@ export const useBabyMilestonesDBAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['baby-milestones-db-admin'] });
       queryClient.invalidateQueries({ queryKey: ['baby-milestones-db'] });
-      toast({ title: 'Mərhələ əlavə edildi' });
+      toast({ title: tr("usedynamicconfig_merhele_elave_edildi_5bc49c", "Mərhələ əlavə edildi") });
     },
   });
 
@@ -496,7 +497,7 @@ export const useBabyMilestonesDBAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['baby-milestones-db-admin'] });
       queryClient.invalidateQueries({ queryKey: ['baby-milestones-db'] });
-      toast({ title: 'Mərhələ yeniləndi' });
+      toast({ title: tr("usedynamicconfig_merhele_yenilendi_18f4f3", "Mərhələ yeniləndi") });
     },
   });
 
@@ -508,7 +509,7 @@ export const useBabyMilestonesDBAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['baby-milestones-db-admin'] });
       queryClient.invalidateQueries({ queryKey: ['baby-milestones-db'] });
-      toast({ title: 'Mərhələ silindi' });
+      toast({ title: tr("usedynamicconfig_merhele_silindi_fb7d94", "Mərhələ silindi") });
     },
   });
 
@@ -539,7 +540,7 @@ export const useSymptomsAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['symptoms-admin'] });
       queryClient.invalidateQueries({ queryKey: ['symptoms'] });
-      toast({ title: 'Simptom əlavə edildi' });
+      toast({ title: tr("usedynamicconfig_simptom_elave_edildi_bd969e", "Simptom əlavə edildi") });
     },
   });
 
@@ -551,7 +552,7 @@ export const useSymptomsAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['symptoms-admin'] });
       queryClient.invalidateQueries({ queryKey: ['symptoms'] });
-      toast({ title: 'Simptom yeniləndi' });
+      toast({ title: tr("usedynamicconfig_simptom_yenilendi_556a95", "Simptom yeniləndi") });
     },
   });
 
@@ -594,7 +595,7 @@ export const useCommonFoodsAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['common-foods-admin'] });
       queryClient.invalidateQueries({ queryKey: ['common-foods'] });
-      toast({ title: 'Qida əlavə edildi' });
+      toast({ title: tr("usedynamicconfig_qida_elave_edildi_3e2d93", "Qida əlavə edildi") });
     },
   });
 
@@ -606,7 +607,7 @@ export const useCommonFoodsAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['common-foods-admin'] });
       queryClient.invalidateQueries({ queryKey: ['common-foods'] });
-      toast({ title: 'Qida yeniləndi' });
+      toast({ title: tr("usedynamicconfig_qida_yenilendi_63fdde", "Qida yeniləndi") });
     },
   });
 
@@ -649,7 +650,7 @@ export const useShopCategoriesAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['shop-categories-admin'] });
       queryClient.invalidateQueries({ queryKey: ['shop-categories'] });
-      toast({ title: 'Kateqoriya əlavə edildi' });
+      toast({ title: tr("usedynamicconfig_kateqoriya_elave_edildi_e28f72", "Kateqoriya əlavə edildi") });
     },
   });
 
@@ -661,7 +662,7 @@ export const useShopCategoriesAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['shop-categories-admin'] });
       queryClient.invalidateQueries({ queryKey: ['shop-categories'] });
-      toast({ title: 'Kateqoriya yeniləndi' });
+      toast({ title: tr("usedynamicconfig_kateqoriya_yenilendi_02b12b", "Kateqoriya yeniləndi") });
     },
   });
 
@@ -705,7 +706,7 @@ export const usePhotoshootThemesAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['photoshoot-themes-admin'] });
       queryClient.invalidateQueries({ queryKey: ['photoshoot-themes'] });
-      toast({ title: 'Mövzu əlavə edildi' });
+      toast({ title: tr("usedynamicconfig_movzu_elave_edildi_a6721f", "Mövzu əlavə edildi") });
     },
   });
 
@@ -717,7 +718,7 @@ export const usePhotoshootThemesAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['photoshoot-themes-admin'] });
       queryClient.invalidateQueries({ queryKey: ['photoshoot-themes'] });
-      toast({ title: 'Mövzu yeniləndi' });
+      toast({ title: tr("usedynamicconfig_movzu_yenilendi_b5e847", "Mövzu yeniləndi") });
     },
   });
 
@@ -729,7 +730,7 @@ export const usePhotoshootThemesAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['photoshoot-themes-admin'] });
       queryClient.invalidateQueries({ queryKey: ['photoshoot-themes'] });
-      toast({ title: 'Mövzu silindi' });
+      toast({ title: tr("usedynamicconfig_movzu_silindi_9e204d", "Mövzu silindi") });
     },
   });
 
@@ -760,7 +761,7 @@ export const useMoodOptionsAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mood-options-admin'] });
       queryClient.invalidateQueries({ queryKey: ['mood-options'] });
-      toast({ title: 'Əhval yeniləndi' });
+      toast({ title: tr("usedynamicconfig_ehval_yenilendi_0675fd", "Əhval yeniləndi") });
     },
   });
 

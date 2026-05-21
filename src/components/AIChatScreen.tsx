@@ -309,7 +309,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       
       setMessages(prev => prev.map(m => 
         m.id === assistantMessageId 
-          ? { ...m, isStreaming: false, content: 'Bağışlayın, texniki xəta baş verdi. Zəhmət olmasa yenidən cəhd edin. 🙏' }
+          ? { ...m, isStreaming: false, content: tr("aichatscreen_bagislayin_texniki_xeta_bas_verdi_zehmet_feb7d7", "Bağışlayın, texniki xəta baş verdi. Zəhmət olmasa yenidən cəhd edin. 🙏") }
           : m
       ));
     } finally {
@@ -374,7 +374,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-[10px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 rounded-full">⚕️ Həkim məsləhəti əvəzi deyil</span>
+          <span className="text-[10px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 rounded-full">{tr("aichatscreen_hekim_mesleheti_evezi_deyil_a1808c", "⚕️ Həkim məsləhəti əvəzi deyil")}</span>
           <Button variant="ghost" size="icon" className="w-8 h-8" onClick={clearChat}>
             <RefreshCw className="w-4 h-4" />
           </Button>
@@ -442,7 +442,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
             transition={{ delay: 0.3 }}
             className="space-y-2 mt-4"
           >
-            <p className="text-xs text-muted-foreground text-center mb-3">Məsləhət üçün sual seçin:</p>
+            <p className="text-xs text-muted-foreground text-center mb-3">{tr("aichatscreen_meslehet_ucun_sual_secin_3c0236", "Məsləhət üçün sual seçin:")}</p>
             {suggestedQuestions.map((question, index) => (
               <motion.button
                 key={index}

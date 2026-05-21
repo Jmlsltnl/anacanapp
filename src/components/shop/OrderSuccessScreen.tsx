@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { CheckCircle, Package, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -51,8 +52,8 @@ const OrderSuccessScreen = ({ onContinue }: OrderSuccessScreenProps) => {
             <Package className="w-6 h-6 text-primary" />
           </div>
           <div className="text-left">
-            <p className="font-medium">Çatdırılma Müddəti</p>
-            <p className="text-sm text-muted-foreground">1-3 iş günü</p>
+            <p className="font-medium">{tr("ordersuccessscreen_catdirilma_muddeti_07869a", "Çatdırılma Müddəti")}</p>
+            <p className="text-sm text-muted-foreground">{tr("ordersuccessscreen_1_3_is_gunu_6b7ab5", "1-3 iş günü")}</p>
           </div>
         </div>
       </motion.div>
