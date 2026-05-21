@@ -215,11 +215,11 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
           >
             <CreditCard className="w-10 h-10 text-primary" />
           </motion.div>
-          <h2 className="text-lg font-bold text-foreground mb-2">Ödəniş emal olunur...</h2>
-          <p className="text-sm text-muted-foreground">Zəhmət olmasa gözləyin</p>
+          <h2 className="text-lg font-bold text-foreground mb-2">{tr("cakeorderform_odenis_emal_olunur_7b4caf", "Ödəniş emal olunur...")}</h2>
+          <p className="text-sm text-muted-foreground">{tr("cakeorderform_zehmet_olmasa_gozleyin_219fe5", "Zəhmət olmasa gözləyin")}</p>
           <div className="flex items-center justify-center gap-1.5 mt-4">
             <Lock className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">Təhlükəsiz ödəniş</span>
+            <span className="text-xs text-muted-foreground">{tr("cakeorderform_tehlukesiz_odenis_4211a5", "Təhlükəsiz ödəniş")}</span>
           </div>
         </motion.div>
       </div>
@@ -251,7 +251,7 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
-          <h1 className="text-xl font-black text-foreground">Sifariş ver</h1>
+          <h1 className="text-xl font-black text-foreground">{tr("cakeorderform_sifaris_ver_f2be54", "Sifariş ver")}</h1>
           <p className="text-sm text-muted-foreground">{items.length} tort, {totalPrice.toFixed(2)}₼</p>
         </div>
       </div>
@@ -278,33 +278,33 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
       {/* Form */}
       <div className="space-y-4">
         <div>
-          <Label className="text-sm font-semibold">Müştəri adı *</Label>
+          <Label className="text-sm font-semibold">{tr("cakeorderform_musteri_adi_e9554d", "Müştəri adı *")}</Label>
           <Input value={formData.customer_name} onChange={e => setFormData({ ...formData, customer_name: e.target.value })} placeholder={tr("cakeorderform_adinizi_daxil_edin_bd2b57", "Adınızı daxil edin")} className="mt-1" />
         </div>
         <div>
-          <Label className="text-sm font-semibold">Uşağın adı</Label>
+          <Label className="text-sm font-semibold">{tr("cakeorderform_usagin_adi_80632b", "Uşağın adı")}</Label>
           <Input value={formData.child_name} onChange={e => setFormData({ ...formData, child_name: e.target.value })} placeholder={tr("cakeorderform_korpenin_adi_8a4e9e", "Körpənin adı")} className="mt-1" />
         </div>
         <div>
-          <Label className="text-sm font-semibold">Əlaqə nömrəsi *</Label>
+          <Label className="text-sm font-semibold">{tr("cakeorderform_elaqe_nomresi_feb8b9", "Əlaqə nömrəsi *")}</Label>
           <Input value={formData.contact_phone} onChange={e => setFormData({ ...formData, contact_phone: e.target.value })} placeholder="+994 XX XXX XX XX" className="mt-1" />
         </div>
         <div>
-          <Label className="text-sm font-semibold">Çatdırılma tarixi</Label>
+          <Label className="text-sm font-semibold">{tr("cakeorderform_catdirilma_tarixi_716cbd", "Çatdırılma tarixi")}</Label>
           <Input type="date" value={formData.delivery_date} onChange={e => setFormData({ ...formData, delivery_date: e.target.value })} className="mt-1" />
         </div>
         <div>
-          <Label className="text-sm font-semibold">Çatdırılma ünvanı</Label>
+          <Label className="text-sm font-semibold">{tr("cakeorderform_catdirilma_unvani_5cec99", "Çatdırılma ünvanı")}</Label>
           <Input value={formData.delivery_address} onChange={e => setFormData({ ...formData, delivery_address: e.target.value })} placeholder={tr("cakeorderform_unvani_daxil_edin_b8da41", "Ünvanı daxil edin")} className="mt-1" />
         </div>
         <div>
-          <Label className="text-sm font-semibold">Əlavə qeydlər</Label>
+          <Label className="text-sm font-semibold">{tr("cakeorderform_elave_qeydler_c98a42", "Əlavə qeydlər")}</Label>
           <textarea value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} placeholder={tr("cakeorderform_xususi_istekler_allergiya_ve_s_49d429", "Xüsusi istəklər, allergiya və s.")} className="mt-1 w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm" />
         </div>
 
         {/* Payment Method */}
         <div className="space-y-3">
-          <Label className="text-sm font-semibold">Ödəniş üsulu</Label>
+          <Label className="text-sm font-semibold">{tr("cakeorderform_odenis_usulu_b9d87a", "Ödəniş üsulu")}</Label>
           <div className={`grid gap-3 ${activeMethods.length === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
             {activeMethods.map(method => {
               const { title, sub } = getMethodLabel(method);
@@ -341,10 +341,10 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
               <div className="bg-card rounded-2xl p-4 border border-border/50 space-y-3">
                 <div className="flex items-center gap-2 mb-1">
                   <Lock className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">Təhlükəsiz ödəniş</span>
+                  <span className="text-xs text-muted-foreground">{tr("cakeorderform_tehlukesiz_odenis_4211a5", "Təhlükəsiz ödəniş")}</span>
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Kart nömrəsi</Label>
+                  <Label className="text-xs text-muted-foreground">{tr("cakeorderform_kart_nomresi_ace5c5", "Kart nömrəsi")}</Label>
                   <Input
                     value={cardData.number}
                     onChange={e => setCardData({ ...cardData, number: formatCardNumber(e.target.value) })}
@@ -355,7 +355,7 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-xs text-muted-foreground">Son istifadə</Label>
+                    <Label className="text-xs text-muted-foreground">{tr("cakeorderform_son_istifade_9d3239", "Son istifadə")}</Label>
                     <Input
                       value={cardData.expiry}
                       onChange={e => setCardData({ ...cardData, expiry: formatExpiry(e.target.value) })}
@@ -403,10 +403,10 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
               <div className="bg-card rounded-2xl p-4 border border-border/50 space-y-4">
                 {/* Transfer info */}
                 <div className="bg-primary/5 rounded-xl p-3 space-y-2">
-                  <h4 className="font-bold text-sm text-primary">💳 Köçürmə məlumatları</h4>
+                  <h4 className="font-bold text-sm text-primary">{tr("cakeorderform_kocurme_melumatlari_1800d6", "💳 Köçürmə məlumatları")}</h4>
                   {c2cConfig.card_number && (
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-muted-foreground">Kart nömrəsi:</span>
+                      <span className="text-xs text-muted-foreground">{tr("cakeorderform_kart_nomresi_3a8392", "Kart nömrəsi:")}</span>
                       <span className="font-mono font-bold text-sm">{c2cConfig.card_number}</span>
                     </div>
                   )}
@@ -423,7 +423,7 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
                     </div>
                   )}
                   <div className="flex justify-between items-center border-t border-primary/10 pt-2">
-                    <span className="text-xs text-muted-foreground">Məbləğ:</span>
+                    <span className="text-xs text-muted-foreground">{tr("cakeorderform_mebleg_f038e4", "Məbləğ:")}</span>
                     <span className="font-black text-primary">{totalPrice.toFixed(2)} ₼</span>
                   </div>
                   {c2cConfig.instructions && (
@@ -433,8 +433,8 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
 
                 {/* Upload proof */}
                 <div>
-                  <Label className="text-sm font-semibold">Köçürmə təsdiqi yükləyin *</Label>
-                  <p className="text-[10px] text-muted-foreground mb-2">Köçürmənin screenshotunu və ya PDF-ini yükləyin</p>
+                  <Label className="text-sm font-semibold">{tr("cakeorderform_kocurme_tesdiqi_yukleyin_3bd84d", "Köçürmə təsdiqi yükləyin *")}</Label>
+                  <p className="text-[10px] text-muted-foreground mb-2">{tr("cakeorderform_kocurmenin_screenshotunu_ve_ya_pdf_ini_y_ff7238", "Köçürmənin screenshotunu və ya PDF-ini yükləyin")}</p>
                   
                   {proofUrl ? (
                     <div className="flex items-center gap-3 bg-green-50 dark:bg-green-950/30 rounded-xl p-3 border border-green-200 dark:border-green-800">
@@ -452,7 +452,7 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
                       ) : (
                         <>
                           <Upload className="w-6 h-6 text-muted-foreground mb-1" />
-                          <span className="text-xs text-muted-foreground">Şəkil və ya PDF</span>
+                          <span className="text-xs text-muted-foreground">{tr("cakeorderform_sekil_ve_ya_pdf_b7f3aa", "Şəkil və ya PDF")}</span>
                         </>
                       )}
                     </label>
@@ -466,7 +466,7 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
         {/* Total & Submit */}
         <div className="bg-card rounded-2xl p-4 border border-border/50">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-muted-foreground">Cəmi:</span>
+            <span className="text-sm text-muted-foreground">{tr("cakeorderform_cemi_fbbec6", "Cəmi:")}</span>
             <span className="text-xl font-black text-primary">{totalPrice.toFixed(2)}₼</span>
           </div>
           <Button className="w-full h-14 text-base font-bold rounded-2xl" onClick={handleSubmit} disabled={submitting}>

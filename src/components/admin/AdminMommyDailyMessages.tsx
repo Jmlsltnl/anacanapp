@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { tr } from '@/lib/tr';
 import { useMommyDailyMessagesAdmin, MommyDailyMessage } from '@/hooks/useMommyDailyMessages';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -112,14 +113,14 @@ const AdminMommyDailyMessages = () => {
     link.click();
   };
 
-  if (isLoading) return <div className="p-4 text-center text-muted-foreground">Yüklənir...</div>;
+  if (isLoading) return <div className="p-4 text-center text-muted-foreground">{tr("adminmommydailymessages_yuklenir_5557de", "Yüklənir...")}</div>;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <Heart className="w-5 h-5 text-rose-500" />
-          <h3 className="font-bold text-lg">Anaya Mesaj (1-1460 gün)</h3>
+          <h3 className="font-bold text-lg">{tr("adminmommydailymessages_anaya_mesaj_1_1460_gun_b6c7d8", "Anaya Mesaj (1-1460 gün)")}</h3>
           <span className="text-xs bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 px-2 py-0.5 rounded-full font-medium">
             {data.length} mesaj
           </span>
@@ -128,7 +129,7 @@ const AdminMommyDailyMessages = () => {
           <div className="relative">
             <Search className="w-4 h-4 absolute left-2.5 top-2.5 text-muted-foreground" />
             <Input
-              placeholder="Gün axtar..."
+              placeholder={tr("adminmommydailymessages_gun_axtar_4c2871", "Gün axtar...")}
               value={searchDay}
               onChange={e => setSearchDay(e.target.value)}
               className="pl-8 w-32 h-9"
@@ -179,7 +180,7 @@ const AdminMommyDailyMessages = () => {
                       value={formData.day_number ?? item.day_number}
                       onChange={e => setFormData(p => ({ ...p, day_number: parseInt(e.target.value) }))}
                       className="w-24 h-9"
-                      placeholder="Gün"
+                      placeholder={tr("adminmommydailymessages_gun_18b2f4", "Gün")}
                     />
                     <div className="flex items-center gap-1">
                       <Switch
@@ -229,7 +230,7 @@ const AdminMommyDailyMessages = () => {
         {filteredData.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
             <Heart className="w-8 h-8 mx-auto mb-2 opacity-30" />
-            <p>Heç bir mesaj tapılmadı</p>
+            <p>{tr("adminmommydailymessages_hec_bir_mesaj_tapilmadi_12db36", "Heç bir mesaj tapılmadı")}</p>
           </div>
         )}
       </div>

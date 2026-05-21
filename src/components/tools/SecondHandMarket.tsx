@@ -461,7 +461,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 flex items-center justify-center">
                 <Package className="w-8 h-8 text-emerald-500" />
               </div>
-              <h3 className="font-bold text-foreground mb-1">Hələ elan yoxdur</h3>
+              <h3 className="font-bold text-foreground mb-1">{tr("secondhandmarket_hele_elan_yoxdur_89fb8c", "Hələ elan yoxdur")}</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 İlk elanı siz yerləşdirin!
               </p>
@@ -570,7 +570,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
           <div className="space-y-4 mt-4">
             {/* Image Upload */}
             <div>
-              <label className="text-sm font-medium mb-2 block">Şəkillər (maks. 5)</label>
+              <label className="text-sm font-medium mb-2 block">{tr("secondhandmarket_sekiller_maks_5_4281f8", "Şəkillər (maks. 5)")}</label>
               <div className="grid grid-cols-5 gap-2">
                 {uploadedImages.map((img, index) => (
                   <div key={index} className="aspect-square relative rounded-xl overflow-hidden group">
@@ -597,7 +597,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                     ) : (
                       <>
                         <ImagePlus className="w-5 h-5 text-muted-foreground" />
-                        <span className="text-[10px] text-muted-foreground">Əlavə et</span>
+                        <span className="text-[10px] text-muted-foreground">{tr("secondhandmarket_elave_et_6e1b9b", "Əlavə et")}</span>
                       </>
                     )}
                   </motion.button>
@@ -614,7 +614,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Başlıq *</label>
+              <label className="text-sm font-medium mb-1.5 block">{tr("secondhandmarket_basliq_3dfed8", "Başlıq *")}</label>
               <Input
                 placeholder={tr("secondhandmarket_meselen_0_3_ay_oglan_geyimleri_55b327", "Məsələn: 0-3 ay oğlan geyimləri")}
                 value={formData.title}
@@ -624,7 +624,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Təsvir</label>
+              <label className="text-sm font-medium mb-1.5 block">{tr("secondhandmarket_tesvir_f85651", "Təsvir")}</label>
               <Textarea
                 placeholder={tr("secondhandmarket_esya_haqqinda_melumat_9e2aa1", "Əşya haqqında məlumat...")}
                 value={formData.description}
@@ -656,7 +656,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-2 block">Vəziyyət</label>
+              <label className="text-sm font-medium mb-2 block">{tr("secondhandmarket_veziyyet_f0e993", "Vəziyyət")}</label>
               <div className="flex flex-wrap gap-2">
                 {conditions.map(cond => (
                   <motion.button
@@ -678,7 +678,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-2 block">Yaş aralığı</label>
+              <label className="text-sm font-medium mb-2 block">{tr("secondhandmarket_yas_araligi_2e277e", "Yaş aralığı")}</label>
               <div className="flex flex-wrap gap-2">
                 {ageRanges.map(age => (
                   <motion.button
@@ -699,7 +699,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-2 block">Qiymət</label>
+              <label className="text-sm font-medium mb-2 block">{tr("secondhandmarket_qiymet_54c4f3", "Qiymət")}</label>
               <div className="flex gap-2 mb-2">
                 <Button
                   type="button"
@@ -733,7 +733,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Şəhər</label>
+              <label className="text-sm font-medium mb-1.5 block">{tr("secondhandmarket_seher_5f373c", "Şəhər")}</label>
               <Input
                 placeholder={tr("secondhandmarket_meselen_baki_425cda", "Məsələn: Bakı")}
                 value={formData.location_city}
@@ -821,7 +821,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 <Card className={`${selectedListing.is_free ? 'bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-emerald-200 dark:border-emerald-900/30' : 'bg-muted/50'}`}>
                   <CardContent className="p-4 flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Qiymət</p>
+                      <p className="text-sm text-muted-foreground">{tr("secondhandmarket_qiymet_54c4f3", "Qiymət")}</p>
                       <p className={`text-2xl font-black ${selectedListing.is_free ? 'text-emerald-600' : 'text-foreground'}`}>
                         {selectedListing.is_free ? 'Pulsuz' : `${selectedListing.price} ₼`}
                       </p>
@@ -834,7 +834,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 
                 {selectedListing.description && (
                   <div>
-                    <h4 className="font-bold mb-2">Təsvir</h4>
+                    <h4 className="font-bold mb-2">{tr("secondhandmarket_tesvir_f85651", "Təsvir")}</h4>
                     <p className="text-muted-foreground">{selectedListing.description}</p>
                   </div>
                 )}
@@ -906,8 +906,8 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 {contactMessages.length === 0 ? (
                   <div className="text-center py-6">
                     <MessageCircle className="w-10 h-10 mx-auto text-muted-foreground/30 mb-2" />
-                    <p className="text-sm text-muted-foreground">Hələ mesaj yoxdur</p>
-                    <p className="text-xs text-muted-foreground">Satıcıya mesaj göndərin</p>
+                    <p className="text-sm text-muted-foreground">{tr("secondhandmarket_hele_mesaj_yoxdur_cf0b5e", "Hələ mesaj yoxdur")}</p>
+                    <p className="text-xs text-muted-foreground">{tr("secondhandmarket_saticiya_mesaj_gonderin_ad78e2", "Satıcıya mesaj göndərin")}</p>
                   </div>
                 ) : (
                   contactMessages.map(msg => (

@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { tr } from '@/lib/tr';
 import { useBabyDailyInfoAdmin, BabyDailyInfo } from '@/hooks/useBabyDailyInfo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,7 +24,7 @@ const AdminBabyDailyInfo = () => {
   const handleCreate = () => {
     const nextDay = data.length > 0 ? Math.max(...data.map(d => d.day_number)) + 1 : 1;
     createInfo.mutate(
-      { day_number: nextDay, info: 'Yeni gün məlumatı' },
+      { day_number: nextDay, info: tr("adminbabydailyinfo_yeni_gun_melumati_29b028", "Yeni gün məlumatı") },
       {
         onSuccess: () => toast.success('Əlavə edildi'),
         onError: (e: any) => toast.error(e.message || 'Xəta'),
@@ -135,7 +136,7 @@ const AdminBabyDailyInfo = () => {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  if (isLoading) return <div className="p-6 text-center text-muted-foreground">Yüklənir...</div>;
+  if (isLoading) return <div className="p-6 text-center text-muted-foreground">{tr("adminbabydailyinfo_yuklenir_5557de", "Yüklənir...")}</div>;
 
   return (
     <div className="space-y-4">
@@ -176,7 +177,7 @@ const AdminBabyDailyInfo = () => {
         <div className="flex items-center gap-1">
           <Search className="w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Gün axtar..."
+            placeholder={tr("adminbabydailyinfo_gun_axtar_4c2871", "Gün axtar...")}
             value={searchDay}
             onChange={(e) => setSearchDay(e.target.value)}
             className="w-32 h-8 text-sm"
@@ -192,7 +193,7 @@ const AdminBabyDailyInfo = () => {
               {editingId === item.id ? (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <label className="text-xs font-medium w-12">Gün:</label>
+                    <label className="text-xs font-medium w-12">{tr("adminbabydailyinfo_gun_93a83c", "Gün:")}</label>
                     <Input
                       type="number"
                       min={1}

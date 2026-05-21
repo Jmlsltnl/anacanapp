@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Plus, Trash2, Edit2, Tag, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,9 +11,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 const ORDER_TYPES = [
-  { key: 'shop', label: 'Mağaza' },
+  { key: 'shop', label: tr("admincoupons_magaza_defaa2", "Mağaza") },
   { key: 'cake', label: 'Tortlar' },
-  { key: 'album', label: 'Albom Sifarişi' },
+  { key: 'album', label: tr("admincoupons_albom_sifarisi_c85887", "Albom Sifarişi") },
 ];
 
 interface CouponForm {
@@ -87,7 +88,7 @@ const AdminCoupons = () => {
       setEditing(null);
       setForm(emptyForm);
     },
-    onError: (err: any) => toast({ title: 'Xəta', description: err.message, variant: 'destructive' }),
+    onError: (err: any) => toast({ title: tr("admincoupons_xeta_3cdbb6", "Xəta"), description: err.message, variant: 'destructive' }),
   });
 
   const deleteMutation = useMutation({
@@ -130,8 +131,8 @@ const AdminCoupons = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Kupon Kodları</h2>
-          <p className="text-muted-foreground text-sm">Endirim kuponlarını idarə edin</p>
+          <h2 className="text-2xl font-bold">{tr("admincoupons_kupon_kodlari_c425a7", "Kupon Kodları")}</h2>
+          <p className="text-muted-foreground text-sm">{tr("admincoupons_endirim_kuponlarini_idare_edin_e8910a", "Endirim kuponlarını idarə edin")}</p>
         </div>
         <Button onClick={() => { setForm(emptyForm); setEditing(null); setShowForm(true); }} className="gap-2">
           <Plus className="w-4 h-4" /> Yeni Kupon
@@ -153,25 +154,25 @@ const AdminCoupons = () => {
               <Input value={form.code} onChange={e => setForm(p => ({ ...p, code: e.target.value.toUpperCase() }))} placeholder="ANACAN20" className="mt-1" />
             </div>
             <div>
-              <Label className="text-xs">Təsvir</Label>
+              <Label className="text-xs">{tr("admincoupons_tesvir_f85651", "Təsvir")}</Label>
               <Input value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="20% endirim" className="mt-1" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <Label className="text-xs">Endirim növü</Label>
+              <Label className="text-xs">{tr("admincoupons_endirim_novu_f920da", "Endirim növü")}</Label>
               <select
                 value={form.discount_type}
                 onChange={e => setForm(p => ({ ...p, discount_type: e.target.value as any }))}
                 className="w-full mt-1 h-10 rounded-md border border-input bg-background px-3 text-sm"
               >
                 <option value="percentage">Faiz (%)</option>
-                <option value="fixed">Sabit məbləğ (₼)</option>
+                <option value="fixed">{tr("admincoupons_sabit_mebleg_7529ee", "Sabit məbləğ (₼)")}</option>
               </select>
             </div>
             <div>
-              <Label className="text-xs">Endirim dəyəri *</Label>
+              <Label className="text-xs">{tr("admincoupons_endirim_deyeri_09b16e", "Endirim dəyəri *")}</Label>
               <Input
                 type="number"
                 value={form.discount_value}
@@ -180,7 +181,7 @@ const AdminCoupons = () => {
               />
             </div>
             <div>
-              <Label className="text-xs">Min. sifariş məbləği (₼)</Label>
+              <Label className="text-xs">{tr("admincoupons_min_sifaris_meblegi_8d624c", "Min. sifariş məbləği (₼)")}</Label>
               <Input
                 type="number"
                 value={form.min_order_amount}
@@ -192,7 +193,7 @@ const AdminCoupons = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <Label className="text-xs">Maks. istifadə sayı (boş = limitsiz)</Label>
+              <Label className="text-xs">{tr("admincoupons_maks_istifade_sayi_bos_limitsiz_b97fbe", "Maks. istifadə sayı (boş = limitsiz)")}</Label>
               <Input
                 type="number"
                 value={form.max_uses ?? ''}
@@ -202,7 +203,7 @@ const AdminCoupons = () => {
               />
             </div>
             <div>
-              <Label className="text-xs">Bitmə tarixi (boş = limitsiz)</Label>
+              <Label className="text-xs">{tr("admincoupons_bitme_tarixi_bos_limitsiz_a2f8c4", "Bitmə tarixi (boş = limitsiz)")}</Label>
               <Input
                 type="date"
                 value={form.expires_at}
@@ -214,7 +215,7 @@ const AdminCoupons = () => {
 
           {/* Applicable to */}
           <div>
-            <Label className="text-xs mb-2 block">Tətbiq olunacaq sahələr</Label>
+            <Label className="text-xs mb-2 block">{tr("admincoupons_tetbiq_olunacaq_saheler_0c18fd", "Tətbiq olunacaq sahələr")}</Label>
             <div className="flex flex-wrap gap-2">
               {ORDER_TYPES.map(t => (
                 <button
@@ -243,7 +244,7 @@ const AdminCoupons = () => {
               {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
               {editing ? 'Yenilə' : 'Yarat'}
             </Button>
-            <Button variant="outline" onClick={() => { setShowForm(false); setEditing(null); }}>Ləğv et</Button>
+            <Button variant="outline" onClick={() => { setShowForm(false); setEditing(null); }}>{tr("admincoupons_legv_et_b5e49c", "Ləğv et")}</Button>
           </div>
         </motion.div>
       )}
@@ -254,7 +255,7 @@ const AdminCoupons = () => {
       ) : coupons.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
           <Tag className="w-10 h-10 mx-auto mb-2 opacity-30" />
-          <p>Hələ kupon yoxdur</p>
+          <p>{tr("admincoupons_hele_kupon_yoxdur_e859a2", "Hələ kupon yoxdur")}</p>
         </div>
       ) : (
         <div className="space-y-2">

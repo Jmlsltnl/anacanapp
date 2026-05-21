@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { ShieldAlert, Plus, Edit, Trash2, ChevronDown, ChevronUp, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -97,10 +98,10 @@ const AdminFirstAid = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-first-aid-scenarios'] });
       setEditingScenario(null);
       setNewScenario(false);
-      toast({ title: 'Ssenari yadda saxlanıldı' });
+      toast({ title: tr("adminfirstaid_ssenari_yadda_saxlanildi_404cee", "Ssenari yadda saxlanıldı") });
     },
     onError: () => {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("adminfirstaid_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     },
   });
 
@@ -164,7 +165,7 @@ const AdminFirstAid = () => {
 
       {/* Scenarios List */}
       {isLoading ? (
-        <div className="text-center py-8">Yüklənir...</div>
+        <div className="text-center py-8">{tr("adminfirstaid_yuklenir_5557de", "Yüklənir...")}</div>
       ) : (
         <div className="space-y-3">
           {scenarios.map((scenario, index) => (
@@ -270,7 +271,7 @@ const ScenarioForm = ({ scenario, onSave, onCancel, isLoading }: ScenarioFormPro
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium">Başlıq (EN)</label>
+          <label className="text-sm font-medium">{tr("adminfirstaid_basliq_en_4ac905", "Başlıq (EN)")}</label>
           <Input 
             value={form.title} 
             onChange={(e) => setForm({ ...form, title: e.target.value })}
@@ -278,25 +279,25 @@ const ScenarioForm = ({ scenario, onSave, onCancel, isLoading }: ScenarioFormPro
           />
         </div>
         <div>
-          <label className="text-sm font-medium">Başlıq (AZ)</label>
+          <label className="text-sm font-medium">{tr("adminfirstaid_basliq_az_3e294a", "Başlıq (AZ)")}</label>
           <Input 
             value={form.title_az} 
             onChange={(e) => setForm({ ...form, title_az: e.target.value })}
-            placeholder="Boğulma"
+            placeholder={tr("adminfirstaid_bogulma_cad7f4", "Boğulma")}
           />
         </div>
       </div>
       
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium">Təsvir (EN)</label>
+          <label className="text-sm font-medium">{tr("adminfirstaid_tesvir_en_c64521", "Təsvir (EN)")}</label>
           <Textarea 
             value={form.description} 
             onChange={(e) => setForm({ ...form, description: e.target.value })}
           />
         </div>
         <div>
-          <label className="text-sm font-medium">Təsvir (AZ)</label>
+          <label className="text-sm font-medium">{tr("adminfirstaid_tesvir_az_2c237a", "Təsvir (AZ)")}</label>
           <Textarea 
             value={form.description_az} 
             onChange={(e) => setForm({ ...form, description_az: e.target.value })}
@@ -306,28 +307,28 @@ const ScenarioForm = ({ scenario, onSave, onCancel, isLoading }: ScenarioFormPro
       
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <label className="text-sm font-medium">İkon (Emoji)</label>
+          <label className="text-sm font-medium">{tr("adminfirstaid_ikon_emoji_cf6dc8", "İkon (Emoji)")}</label>
           <Input 
             value={form.icon} 
             onChange={(e) => setForm({ ...form, icon: e.target.value })}
           />
         </div>
         <div>
-          <label className="text-sm font-medium">Təcililik Səviyyəsi</label>
+          <label className="text-sm font-medium">{tr("adminfirstaid_tecililik_seviyyesi_9b19ab", "Təcililik Səviyyəsi")}</label>
           <Select value={form.emergency_level} onValueChange={(v) => setForm({ ...form, emergency_level: v })}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="critical">Kritik</SelectItem>
-              <SelectItem value="high">Yüksək</SelectItem>
+              <SelectItem value="high">{tr("adminfirstaid_yuksek_492584", "Yüksək")}</SelectItem>
               <SelectItem value="medium">Orta</SelectItem>
-              <SelectItem value="low">Aşağı</SelectItem>
+              <SelectItem value="low">{tr("adminfirstaid_asagi_1c27f1", "Aşağı")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div>
-          <label className="text-sm font-medium">Sıra</label>
+          <label className="text-sm font-medium">{tr("adminfirstaid_sira_421c5f", "Sıra")}</label>
           <Input 
             type="number"
             value={form.sort_order} 

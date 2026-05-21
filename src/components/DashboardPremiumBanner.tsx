@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Crown, Sparkles, Check, ChevronRight, Shield, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,14 +12,14 @@ interface DashboardPremiumBannerProps {
 }
 
 const BENEFITS = [
-  { icon: '🤖', text: 'AI Bələdçi' },
-  { icon: '🎵', text: 'Yuxu Səsləri' },
+  { icon: '🤖', text: tr("dashboardpremiumbanner_ai_beledci_8bfb55", "AI Bələdçi") },
+  { icon: '🎵', text: tr("dashboardpremiumbanner_yuxu_sesleri_4b518b", "Yuxu Səsləri") },
   { icon: '📸', text: 'AI Fotosessiya' },
-  { icon: '📊', text: 'Həftəlik Hesabat' },
-  { icon: '💊', text: 'Vitamin İzləyici' },
-  { icon: '🍽️', text: 'Qidalanma Planı' },
-  { icon: '📖', text: 'Nağıl Generatoru' },
-  { icon: '🚫', text: 'Reklamsız Təcrübə' },
+  { icon: '📊', text: tr("dashboardpremiumbanner_heftelik_hesabat_283d76", "Həftəlik Hesabat") },
+  { icon: '💊', text: tr("dashboardpremiumbanner_vitamin_izleyici_31ce7c", "Vitamin İzləyici") },
+  { icon: '🍽️', text: tr("dashboardpremiumbanner_qidalanma_plani_a3dde8", "Qidalanma Planı") },
+  { icon: '📖', text: tr("dashboardpremiumbanner_nagil_generatoru_a86172", "Nağıl Generatoru") },
+  { icon: '🚫', text: tr("dashboardpremiumbanner_reklamsiz_tecrube_07620a", "Reklamsız Təcrübə") },
 ];
 
 const MONTHLY_PRICE = 5.99;
@@ -68,14 +69,14 @@ export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremi
               <Crown className="w-5 h-5 text-white" />
               <span className="text-lg font-bold text-white">Anacan Premium</span>
             </div>
-            <p className="text-xs text-white/80">Tam imkanlar · Limitsiz giriş</p>
+            <p className="text-xs text-white/80">{tr("dashboardpremiumbanner_tam_imkanlar_limitsiz_giris_25c339", "Tam imkanlar · Limitsiz giriş")}</p>
           </div>
         </div>
 
         {/* Free trial highlight */}
         <div className="flex justify-center -mt-3 relative z-10">
           <div className="px-5 py-1.5 bg-white dark:bg-card rounded-full shadow-lg border border-border/50">
-            <span className="text-xs font-bold text-foreground">🎁 İlk 3 gün tamamilə ödənişsiz</span>
+            <span className="text-xs font-bold text-foreground">{tr("dashboardpremiumbanner_ilk_3_gun_tamamile_odenissiz_0a15ef", "🎁 İlk 3 gün tamamilə ödənişsiz")}</span>
           </div>
         </div>
 
@@ -112,7 +113,7 @@ export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremi
                   {SAVINGS_PCT}% QƏNAƏT
                 </span>
               )}
-              <p className="text-xs font-semibold text-foreground">İllik</p>
+              <p className="text-xs font-semibold text-foreground">{tr("dashboardpremiumbanner_illik_4a3cef", "İllik")}</p>
               <p className="text-sm font-bold text-foreground">${YEARLY_MONTHLY}<span className="text-[10px] text-muted-foreground font-normal">/ay</span></p>
               <p className="text-[10px] text-muted-foreground">${YEARLY_PRICE}/il</p>
             </button>
@@ -124,7 +125,7 @@ export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremi
                   : 'border-border bg-card'
               }`}
             >
-              <p className="text-xs font-semibold text-foreground">Aylıq</p>
+              <p className="text-xs font-semibold text-foreground">{tr("dashboardpremiumbanner_ayliq_6f265e", "Aylıq")}</p>
               <p className="text-sm font-bold text-foreground">${MONTHLY_PRICE}<span className="text-[10px] text-muted-foreground font-normal">/ay</span></p>
               <p className="text-[10px] text-muted-foreground">&nbsp;</p>
             </button>
@@ -152,7 +153,7 @@ export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremi
             {[1,2,3,4,5].map(i => (
               <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
             ))}
-            <span className="text-[10px] text-muted-foreground ml-1">1,000+ qadın tərəfindən seçildi</span>
+            <span className="text-[10px] text-muted-foreground ml-1">{tr("dashboardpremiumbanner_1_000_qadin_terefinden_secildi_40fdd7", "1,000+ qadın tərəfindən seçildi")}</span>
           </div>
         </div>
       </div>

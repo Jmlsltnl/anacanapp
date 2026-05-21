@@ -159,7 +159,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
           Geri
         </button>
         <div className="text-center py-12">
-          <p className="text-muted-foreground">İstifadəçi tapılmadı</p>
+          <p className="text-muted-foreground">{tr("userprofilescreen_istifadeci_tapilmadi_4e2156", "İstifadəçi tapılmadı")}</p>
         </div>
       </div>
     );
@@ -237,7 +237,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
           </div>
           <div className="text-center p-3 bg-muted/50 rounded-xl">
             <p className="text-2xl font-bold text-foreground">{stats.likesCount}</p>
-            <p className="text-xs text-muted-foreground">Bəyənmə</p>
+            <p className="text-xs text-muted-foreground">{tr("userprofilescreen_beyenme_488df4", "Bəyənmə")}</p>
         </div>
 
         {/* Message Button */}
@@ -271,7 +271,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
           {posts.length === 0 ? (
             <div className="text-center py-12">
               <Grid3X3 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Hələ post yoxdur</p>
+              <p className="text-muted-foreground">{tr("userprofilescreen_hele_post_yoxdur_a26a62", "Hələ post yoxdur")}</p>
             </div>
           ) : (
             posts.map(post => (
@@ -284,7 +284,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
           {stories.length === 0 ? (
             <div className="text-center py-12">
               <Film className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Hələ story yoxdur</p>
+              <p className="text-muted-foreground">{tr("userprofilescreen_hele_story_yoxdur_d7ad34", "Hələ story yoxdur")}</p>
             </div>
           ) : (
             <div className="grid grid-cols-3 gap-2">

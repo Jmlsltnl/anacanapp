@@ -179,7 +179,7 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
 
         {/* Quantity */}
         <div className="bg-card rounded-2xl p-4 border border-border/50">
-          <Label className="text-sm font-semibold mb-3 block">Say seçin</Label>
+          <Label className="text-sm font-semibold mb-3 block">{tr("cakedetailscreen_say_secin_431dab", "Say seçin")}</Label>
           <div className="flex items-center gap-4">
             <button
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -203,7 +203,7 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
         {/* Custom Fields */}
         {showCustomFields && (
           <div className="bg-card rounded-2xl p-4 border border-border/50 space-y-3">
-            <Label className="text-sm font-semibold">✨ Fərdiləşdirmə</Label>
+            <Label className="text-sm font-semibold">{tr("cakedetailscreen_ferdilesdirme_cc39bc", "✨ Fərdiləşdirmə")}</Label>
             {fieldLabels.map((label) => (
               <div key={label}>
                 <Label className="text-xs text-muted-foreground">{label}</Label>

@@ -124,8 +124,8 @@ const PartnerPrivacyScreen = ({ onBack }: PartnerPrivacyScreenProps) => {
             <ArrowLeft className="w-5 h-5 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">Gizlilik & Təhlükəsizlik</h1>
-            <p className="text-white/80 text-sm">Partner məlumatlarınızı idarə edin</p>
+            <h1 className="text-xl font-bold text-white">{tr("partnerprivacyscreen_gizlilik_tehlukesizlik_67bec6", "Gizlilik & Təhlükəsizlik")}</h1>
+            <p className="text-white/80 text-sm">{tr("partnerprivacyscreen_partner_melumatlarinizi_idare_edin_7c5e99", "Partner məlumatlarınızı idarə edin")}</p>
           </div>
         </div>
       </div>
@@ -188,8 +188,8 @@ const PartnerPrivacyScreen = ({ onBack }: PartnerPrivacyScreenProps) => {
                 <Download className="w-5 h-5 text-emerald-600" />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-medium text-foreground">Məlumatları Yüklə</p>
-                <p className="text-xs text-muted-foreground">Bütün məlumatlarınızı JSON formatında yükləyin</p>
+                <p className="font-medium text-foreground">{tr("partnerprivacyscreen_melumatlari_yukle_5cee89", "Məlumatları Yüklə")}</p>
+                <p className="text-xs text-muted-foreground">{tr("partnerprivacyscreen_butun_melumatlarinizi_json_formatinda_yu_0c02e5", "Bütün məlumatlarınızı JSON formatında yükləyin")}</p>
               </div>
             </motion.button>
 
@@ -202,8 +202,8 @@ const PartnerPrivacyScreen = ({ onBack }: PartnerPrivacyScreenProps) => {
                 <Trash2 className="w-5 h-5 text-destructive" />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-medium text-destructive">Hesabı Sil</p>
-                <p className="text-xs text-muted-foreground">Bütün məlumatlarınızı birdəfəlik silin</p>
+                <p className="font-medium text-destructive">{tr("partnerprivacyscreen_hesabi_sil_6abf24", "Hesabı Sil")}</p>
+                <p className="text-xs text-muted-foreground">{tr("partnerprivacyscreen_butun_melumatlarinizi_birdefelik_silin_41a068", "Bütün məlumatlarınızı birdəfəlik silin")}</p>
               </div>
             </motion.button>
           </div>
@@ -218,7 +218,7 @@ const PartnerPrivacyScreen = ({ onBack }: PartnerPrivacyScreenProps) => {
         >
           <p className="text-sm text-muted-foreground text-center">
             Gizlilik siyasətimiz və istifadə şərtlərimiz haqqında ətraflı məlumat üçün{' '}
-            <a href="#" className="text-partner font-medium">buraya klikləyin</a>.
+            <a href="#" className="text-partner font-medium">{tr("partnerprivacyscreen_buraya_klikleyin_c20d44", "buraya klikləyin")}</a>.
           </p>
         </motion.div>
       </div>
@@ -234,10 +234,10 @@ const PartnerPrivacyScreen = ({ onBack }: PartnerPrivacyScreenProps) => {
             <DialogDescription className="text-left">
               Bu əməliyyat geri qaytarıla bilməz. Bütün məlumatlarınız, o cümlədən:
               <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>Profil məlumatları</li>
+                <li>{tr("partnerprivacyscreen_profil_melumatlari_82c76c", "Profil məlumatları")}</li>
                 <li>Mesajlar</li>
-                <li>Tapşırıqlar</li>
-                <li>Bildirişlər</li>
+                <li>{tr("partnerprivacyscreen_tapsiriqlar_f5dbad", "Tapşırıqlar")}</li>
+                <li>{tr("partnerprivacyscreen_bildirisler_54eb88", "Bildirişlər")}</li>
               </ul>
               birdəfəlik silinəcək.
             </DialogDescription>

@@ -62,8 +62,8 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 text-center">
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200 }} className="text-8xl mb-6">🎂</motion.div>
-        <h2 className="text-2xl font-black text-foreground mb-2">Sifarişiniz qəbul edildi!</h2>
-        <p className="text-muted-foreground mb-8">Tezliklə sizinlə əlaqə saxlanılacaq</p>
+        <h2 className="text-2xl font-black text-foreground mb-2">{tr("cakesscreen_sifarisiniz_qebul_edildi_ae5b9e", "Sifarişiniz qəbul edildi!")}</h2>
+        <p className="text-muted-foreground mb-8">{tr("cakesscreen_tezlikle_sizinle_elaqe_saxlanilacaq_806311", "Tezliklə sizinlə əlaqə saxlanılacaq")}</p>
         <button 
           onClick={() => { setShowOrderSuccess(false); setShowCheckout(false); setSelectedCake(null); }}
           className="px-8 py-3 rounded-2xl bg-primary text-primary-foreground font-bold"
@@ -120,7 +120,7 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
           )}
           <div>
             <h1 className="text-2xl font-black text-foreground">Tortlar 🎂</h1>
-            <p className="text-muted-foreground text-sm mt-0.5">Aylıq & Milestone tortları</p>
+            <p className="text-muted-foreground text-sm mt-0.5">{tr("cakesscreen_ayliq_milestone_tortlari_81907e", "Aylıq & Milestone tortları")}</p>
           </div>
         </div>
         <button onClick={() => setShowCart(true)} className="relative w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -164,9 +164,9 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
       <motion.div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-pink-500 to-rose-500 p-4 mb-5 shadow-lg" initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2 }}>
         <div className="absolute -right-4 -bottom-4 text-7xl opacity-20">🎂</div>
         <div className="relative z-10">
-          <span className="inline-block px-3 py-1 bg-white/20 rounded-full text-white text-[10px] font-bold mb-1.5">Xüsusi Tortlar</span>
-          <h3 className="text-white font-black text-lg mb-0.5">Körpənizin xüsusi günü üçün!</h3>
-          <p className="text-white/80 text-xs">Hər ay və milestone üçün unikal dizaynlar</p>
+          <span className="inline-block px-3 py-1 bg-white/20 rounded-full text-white text-[10px] font-bold mb-1.5">{tr("cakesscreen_xususi_tortlar_ba1400", "Xüsusi Tortlar")}</span>
+          <h3 className="text-white font-black text-lg mb-0.5">{tr("cakesscreen_korpenizin_xususi_gunu_ucun_c2d99a", "Körpənizin xüsusi günü üçün!")}</h3>
+          <p className="text-white/80 text-xs">{tr("cakesscreen_her_ay_ve_milestone_ucun_unikal_dizaynla_39bdf9", "Hər ay və milestone üçün unikal dizaynlar")}</p>
         </div>
       </motion.div>
 
@@ -214,7 +214,7 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
       {filteredCakes.length === 0 && (
         <motion.div className="text-center py-12" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <div className="text-6xl mb-4">🎂</div>
-          <p className="text-muted-foreground">Bu kateqoriyada tort tapılmadı</p>
+          <p className="text-muted-foreground">{tr("cakesscreen_bu_kateqoriyada_tort_tapilmadi_330a9b", "Bu kateqoriyada tort tapılmadı")}</p>
         </motion.div>
       )}
 

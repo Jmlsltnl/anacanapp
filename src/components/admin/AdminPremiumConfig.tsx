@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Plus, Edit2, Trash2, Crown, Save, X, Check, Minus, Search, Users, Settings2, Shield, Loader2, ChevronDown, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -39,22 +40,22 @@ const FreeLimitsTab = () => {
   }, [JSON.stringify(currentLimits)]);
 
   const limitFields = [
-    { key: 'white_noise_seconds_per_day', label: 'Ağ Səs (saniyə/gün)', icon: '🎵', suffix: 'saniyə', divider: 60, displaySuffix: 'dəqiqə' },
-    { key: 'baby_photoshoot_count', label: 'Körpə Fotosessiya (ümumi)', icon: '📸', suffix: 'foto' },
-    { key: 'fairy_tale_count_per_day', label: 'Nağıl Generatoru (gün/limit)', icon: '📖', suffix: 'nağıl' },
-    { key: 'ai_chat_count_per_day', label: 'AI Çat Mesajları (gün/limit)', icon: '🤖', suffix: 'mesaj' },
-    { key: 'cry_translator_count_per_day', label: 'Ağlama analizi (gün/limit)', icon: '👶', suffix: 'analiz' },
-    { key: 'poop_scanner_count_per_day', label: 'Nəcis Skaneri (gün/limit)', icon: '💩', suffix: 'skan' },
-    { key: 'horoscope_count_per_day', label: 'Ulduz Falı (gün/limit)', icon: '⭐', suffix: 'sorğu' },
+    { key: 'white_noise_seconds_per_day', label: tr("adminpremiumconfig_ag_ses_saniye_gun_712254", "Ağ Səs (saniyə/gün)"), icon: '🎵', suffix: 'saniyə', divider: 60, displaySuffix: 'dəqiqə' },
+    { key: 'baby_photoshoot_count', label: tr("adminpremiumconfig_korpe_fotosessiya_umumi_c50d97", "Körpə Fotosessiya (ümumi)"), icon: '📸', suffix: 'foto' },
+    { key: 'fairy_tale_count_per_day', label: tr("adminpremiumconfig_nagil_generatoru_gun_limit_29493d", "Nağıl Generatoru (gün/limit)"), icon: '📖', suffix: 'nağıl' },
+    { key: 'ai_chat_count_per_day', label: tr("adminpremiumconfig_ai_cat_mesajlari_gun_limit_28be66", "AI Çat Mesajları (gün/limit)"), icon: '🤖', suffix: 'mesaj' },
+    { key: 'cry_translator_count_per_day', label: tr("adminpremiumconfig_aglama_analizi_gun_limit_5b5f48", "Ağlama analizi (gün/limit)"), icon: '👶', suffix: 'analiz' },
+    { key: 'poop_scanner_count_per_day', label: tr("adminpremiumconfig_necis_skaneri_gun_limit_9b3a23", "Nəcis Skaneri (gün/limit)"), icon: '💩', suffix: 'skan' },
+    { key: 'horoscope_count_per_day', label: tr("adminpremiumconfig_ulduz_fali_gun_limit_5c95cd", "Ulduz Falı (gün/limit)"), icon: '⭐', suffix: 'sorğu' },
   ];
 
   const handleSave = async () => {
     try {
       await updateSetting.mutateAsync({ key: 'free_limits', value: limits });
-      toast({ title: 'Limitlər yeniləndi ✓' });
+      toast({ title: tr("adminpremiumconfig_limitler_yenilendi_9766c3", "Limitlər yeniləndi ✓") });
       setHasChanges(false);
     } catch {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("adminpremiumconfig_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   };
 
@@ -176,7 +177,7 @@ const UserSubscriptionsTab = () => {
       setUsers(results);
     } catch (error) {
       console.error('Search error:', error);
-      toast({ title: 'Axtarış xətası', variant: 'destructive' });
+      toast({ title: tr("adminpremiumconfig_axtaris_xetasi_cd56b0", "Axtarış xətası"), variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -223,12 +224,12 @@ const UserSubscriptionsTab = () => {
         .update({ is_premium: isPrem || editForm.is_premium })
         .eq('user_id', editingUser.user_id);
 
-      toast({ title: 'İstifadəçi yeniləndi ✓' });
+      toast({ title: tr("adminpremiumconfig_istifadeci_yenilendi_3ecf1e", "İstifadəçi yeniləndi ✓") });
       setShowEditModal(false);
       searchUsers(); // Refresh
     } catch (error) {
       console.error('Save error:', error);
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("adminpremiumconfig_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   };
 
@@ -247,7 +248,7 @@ const UserSubscriptionsTab = () => {
       toast({ title: newPremium ? 'Premium verildi ✓' : 'Premium ləğv edildi' });
       searchUsers();
     } catch {
-      toast({ title: 'Xəta', variant: 'destructive' });
+      toast({ title: tr("adminpremiumconfig_xeta_3cdbb6", "Xəta"), variant: 'destructive' });
     }
   };
 
@@ -270,7 +271,7 @@ const UserSubscriptionsTab = () => {
 
       <div className="flex gap-2">
         <Input
-          placeholder="Ad və ya email ilə axtar..."
+          placeholder={tr("adminpremiumconfig_ad_ve_ya_email_ile_axtar_335c5a", "Ad və ya email ilə axtar...")}
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && searchUsers()}
@@ -310,14 +311,14 @@ const UserSubscriptionsTab = () => {
           ))}
         </div>
       ) : searchQuery && !loading ? (
-        <p className="text-center text-muted-foreground py-8">İstifadəçi tapılmadı</p>
+        <p className="text-center text-muted-foreground py-8">{tr("adminpremiumconfig_istifadeci_tapilmadi_4e2156", "İstifadəçi tapılmadı")}</p>
       ) : null}
 
       {/* Edit User Modal */}
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Abunəliyi Redaktə Et</DialogTitle>
+            <DialogTitle>{tr("adminpremiumconfig_abuneliyi_redakte_et_2b6c42", "Abunəliyi Redaktə Et")}</DialogTitle>
           </DialogHeader>
           {editingUser && (
             <div className="space-y-4">
@@ -348,14 +349,14 @@ const UserSubscriptionsTab = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="active">Aktiv</SelectItem>
-                    <SelectItem value="cancelled">Ləğv edilib</SelectItem>
-                    <SelectItem value="expired">Müddəti bitib</SelectItem>
+                    <SelectItem value="cancelled">{tr("adminpremiumconfig_legv_edilib_24db12", "Ləğv edilib")}</SelectItem>
+                    <SelectItem value="expired">{tr("adminpremiumconfig_muddeti_bitib_68fc0e", "Müddəti bitib")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="flex items-center justify-between">
-                <Label>Premium bayrağı (profil)</Label>
+                <Label>{tr("adminpremiumconfig_premium_bayragi_profil_5e7b36", "Premium bayrağı (profil)")}</Label>
                 <Switch
                   checked={editForm.is_premium}
                   onCheckedChange={v => setEditForm({ ...editForm, is_premium: v })}
@@ -450,15 +451,15 @@ const AdminPremiumConfig = () => {
   };
 
   const handleSaveFeature = async () => {
-    if (!featureForm.title.trim()) { toast({ title: 'Başlıq daxil edin', variant: 'destructive' }); return; }
+    if (!featureForm.title.trim()) { toast({ title: tr("adminpremiumconfig_basliq_daxil_edin_edf2fd", "Başlıq daxil edin"), variant: 'destructive' }); return; }
     const result = editingFeature ? await updateFeature(editingFeature.id, featureForm) : await createFeature(featureForm);
-    if (result.error) { toast({ title: 'Xəta baş verdi', variant: 'destructive' }); } else { toast({ title: editingFeature ? 'Yeniləndi' : 'Əlavə edildi' }); closeFeatureModal(); }
+    if (result.error) { toast({ title: tr("adminpremiumconfig_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' }); } else { toast({ title: editingFeature ? 'Yeniləndi' : 'Əlavə edildi' }); closeFeatureModal(); }
   };
 
   const handleDeleteFeature = async (id: string) => {
     if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
     const result = await deleteFeature(id);
-    if (result.error) { toast({ title: 'Xəta', variant: 'destructive' }); } else { toast({ title: 'Silindi' }); }
+    if (result.error) { toast({ title: tr("adminpremiumconfig_xeta_3cdbb6", "Xəta"), variant: 'destructive' }); } else { toast({ title: 'Silindi' }); }
   };
 
   const handlePlanModalClose = () => {
@@ -477,10 +478,10 @@ const AdminPremiumConfig = () => {
   const handleSavePlan = async () => {
     if (!editingPlan) return;
     const result = await updatePlan(editingPlan.id, planForm);
-    if (result.error) { toast({ title: 'Xəta', variant: 'destructive' }); } else { toast({ title: 'Yeniləndi' }); closePlanModal(); }
+    if (result.error) { toast({ title: tr("adminpremiumconfig_xeta_3cdbb6", "Xəta"), variant: 'destructive' }); } else { toast({ title: tr("adminpremiumconfig_yenilendi_d10a01", "Yeniləndi") }); closePlanModal(); }
   };
 
-  if (loading) return <div className="p-6 text-center">Yüklənir...</div>;
+  if (loading) return <div className="p-6 text-center">{tr("adminpremiumconfig_yuklenir_5557de", "Yüklənir...")}</div>;
 
   return (
     <div className="space-y-6">
@@ -489,19 +490,19 @@ const AdminPremiumConfig = () => {
           <Crown className="w-6 h-6 text-amber-500" />
           Premium İdarəetmə
         </h2>
-        <p className="text-muted-foreground">Planlar, limitlər, funksiyalar və istifadəçi abunəlikləri</p>
+        <p className="text-muted-foreground">{tr("adminpremiumconfig_planlar_limitler_funksiyalar_ve_istifade_1a4ca9", "Planlar, limitlər, funksiyalar və istifadəçi abunəlikləri")}</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="overflow-x-auto -mx-2 px-2">
           <TabsList className="inline-flex w-auto min-w-full">
             <TabsTrigger value="designer" className="text-xs px-3">Paywall</TabsTrigger>
-            <TabsTrigger value="billing" className="text-xs px-3">Abunəlik</TabsTrigger>
+            <TabsTrigger value="billing" className="text-xs px-3">{tr("adminpremiumconfig_abunelik_ce9af7", "Abunəlik")}</TabsTrigger>
             <TabsTrigger value="features" className="text-xs px-3">Funksiyalar</TabsTrigger>
             <TabsTrigger value="plans" className="text-xs px-3">Planlar</TabsTrigger>
-            <TabsTrigger value="limits" className="text-xs px-3">Limitlər</TabsTrigger>
-            <TabsTrigger value="users" className="text-xs px-3">İstifadəçilər</TabsTrigger>
-            <TabsTrigger value="preview" className="text-xs px-3">Önizləmə</TabsTrigger>
+            <TabsTrigger value="limits" className="text-xs px-3">{tr("adminpremiumconfig_limitler_caa8fa", "Limitlər")}</TabsTrigger>
+            <TabsTrigger value="users" className="text-xs px-3">{tr("adminpremiumconfig_istifadeciler_1dd7b9", "İstifadəçilər")}</TabsTrigger>
+            <TabsTrigger value="preview" className="text-xs px-3">{tr("adminpremiumconfig_onizleme_1f8cc7", "Önizləmə")}</TabsTrigger>
           </TabsList>
         </div>
 
@@ -582,7 +583,7 @@ const AdminPremiumConfig = () => {
         {/* Preview Tab */}
         <TabsContent value="preview" className="space-y-4">
           <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl p-6">
-            <h3 className="text-xl font-bold text-center mb-6">Premium Planlar Önizləmə</h3>
+            <h3 className="text-xl font-bold text-center mb-6">{tr("adminpremiumconfig_premium_planlar_onizleme_b0c9a8", "Premium Planlar Önizləmə")}</h3>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -619,16 +620,16 @@ const AdminPremiumConfig = () => {
           <div className="space-y-4">
             <div className="grid grid-cols-4 gap-2">
               <div>
-                <Label>İkon</Label>
+                <Label>{tr("adminpremiumconfig_ikon_6e73fc", "İkon")}</Label>
                 <Input value={featureForm.icon} onChange={e => setFeatureForm({ ...featureForm, icon: e.target.value })} className="text-center text-xl" />
               </div>
               <div className="col-span-3">
-                <Label>Başlıq (EN)</Label>
+                <Label>{tr("adminpremiumconfig_basliq_en_4ac905", "Başlıq (EN)")}</Label>
                 <Input value={featureForm.title} onChange={e => setFeatureForm({ ...featureForm, title: e.target.value })} />
               </div>
             </div>
-            <div><Label>Başlıq (AZ)</Label><Input value={featureForm.title_az} onChange={e => setFeatureForm({ ...featureForm, title_az: e.target.value })} /></div>
-            <div><Label>Açıqlama (AZ)</Label><Textarea value={featureForm.description_az} onChange={e => setFeatureForm({ ...featureForm, description_az: e.target.value })} rows={2} /></div>
+            <div><Label>{tr("adminpremiumconfig_basliq_az_3e294a", "Başlıq (AZ)")}</Label><Input value={featureForm.title_az} onChange={e => setFeatureForm({ ...featureForm, title_az: e.target.value })} /></div>
+            <div><Label>{tr("adminpremiumconfig_aciqlama_az_86f364", "Açıqlama (AZ)")}</Label><Textarea value={featureForm.description_az} onChange={e => setFeatureForm({ ...featureForm, description_az: e.target.value })} rows={2} /></div>
             <div className="space-y-3 pt-2">
               <Label>Planlara daxildir:</Label>
               <div className="flex items-center justify-between"><span>Free</span><Switch checked={featureForm.is_included_free} onCheckedChange={v => setFeatureForm({ ...featureForm, is_included_free: v })} /></div>
@@ -637,7 +638,7 @@ const AdminPremiumConfig = () => {
             </div>
             <div className="flex items-center justify-between pt-2"><Label>Aktiv</Label><Switch checked={featureForm.is_active} onCheckedChange={v => setFeatureForm({ ...featureForm, is_active: v })} /></div>
             <div className="flex gap-2 pt-4">
-              <Button variant="outline" className="flex-1" onClick={handleFeatureModalClose}><X className="w-4 h-4 mr-2" />Ləğv et</Button>
+              <Button variant="outline" className="flex-1" onClick={handleFeatureModalClose}><X className="w-4 h-4 mr-2" />{tr("adminpremiumconfig_legv_et_b5e49c", "Ləğv et")}</Button>
               <Button className="flex-1" onClick={handleSaveFeature}><Save className="w-4 h-4 mr-2" />Saxla</Button>
             </div>
           </div>
@@ -647,19 +648,19 @@ const AdminPremiumConfig = () => {
       {/* Plan Modal */}
       <Dialog open={showPlanModal} onOpenChange={handlePlanModalClose}>
         <DialogContent className="max-w-md">
-          <DialogHeader><DialogTitle>Planı Redaktə Et</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{tr("adminpremiumconfig_plani_redakte_et_caa626", "Planı Redaktə Et")}</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <div><Label>Ad (AZ)</Label><Input value={planForm.name_az} onChange={e => setPlanForm({ ...planForm, name_az: e.target.value })} /></div>
             <div className="grid grid-cols-2 gap-4">
-              <div><Label>Aylıq Qiymət</Label><Input type="number" step="0.01" value={planForm.price_monthly} onChange={e => setPlanForm({ ...planForm, price_monthly: parseFloat(e.target.value) || 0 })} /></div>
-              <div><Label>İllik Qiymət</Label><Input type="number" step="0.01" value={planForm.price_yearly} onChange={e => setPlanForm({ ...planForm, price_yearly: parseFloat(e.target.value) || 0 })} /></div>
+              <div><Label>{tr("adminpremiumconfig_ayliq_qiymet_8bb31c", "Aylıq Qiymət")}</Label><Input type="number" step="0.01" value={planForm.price_monthly} onChange={e => setPlanForm({ ...planForm, price_monthly: parseFloat(e.target.value) || 0 })} /></div>
+              <div><Label>{tr("adminpremiumconfig_illik_qiymet_56917a", "İllik Qiymət")}</Label><Input type="number" step="0.01" value={planForm.price_yearly} onChange={e => setPlanForm({ ...planForm, price_yearly: parseFloat(e.target.value) || 0 })} /></div>
             </div>
             <div><Label>Valyuta</Label><Input value={planForm.currency} onChange={e => setPlanForm({ ...planForm, currency: e.target.value })} /></div>
-            <div><Label>Badge Mətni (AZ)</Label><Input value={planForm.badge_text_az} onChange={e => setPlanForm({ ...planForm, badge_text_az: e.target.value })} placeholder="Məs: Ən sərfəli" /></div>
+            <div><Label>{tr("adminpremiumconfig_badge_metni_az_e09581", "Badge Mətni (AZ)")}</Label><Input value={planForm.badge_text_az} onChange={e => setPlanForm({ ...planForm, badge_text_az: e.target.value })} placeholder={tr("adminpremiumconfig_mes_en_serfeli_ce533c", "Məs: Ən sərfəli")} /></div>
             <div className="flex items-center justify-between"><Label>Populyar</Label><Switch checked={planForm.is_popular} onCheckedChange={v => setPlanForm({ ...planForm, is_popular: v })} /></div>
             <div className="flex items-center justify-between"><Label>Aktiv</Label><Switch checked={planForm.is_active} onCheckedChange={v => setPlanForm({ ...planForm, is_active: v })} /></div>
             <div className="flex gap-2 pt-4">
-              <Button variant="outline" className="flex-1" onClick={handlePlanModalClose}><X className="w-4 h-4 mr-2" />Ləğv et</Button>
+              <Button variant="outline" className="flex-1" onClick={handlePlanModalClose}><X className="w-4 h-4 mr-2" />{tr("adminpremiumconfig_legv_et_b5e49c", "Ləğv et")}</Button>
               <Button className="flex-1" onClick={handleSavePlan}><Save className="w-4 h-4 mr-2" />Saxla</Button>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { CreditCard, Save, RefreshCw, Eye, EyeOff, Settings2, List, RotateCcw, CheckCircle, XCircle, Clock, AlertTriangle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -12,12 +13,12 @@ import { useToast } from '@/hooks/use-toast';
 import { useAllPaymentTransactions } from '@/hooks/useEpointPayment';
 
 const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
-  pending: { label: 'Gözləyir', color: 'bg-yellow-500/10 text-yellow-600', icon: Clock },
+  pending: { label: tr("adminepoint_gozleyir_9ac18a", "Gözləyir"), color: 'bg-yellow-500/10 text-yellow-600', icon: Clock },
   processing: { label: 'Emal olunur', color: 'bg-blue-500/10 text-blue-600', icon: RefreshCw },
-  success: { label: 'Uğurlu', color: 'bg-green-500/10 text-green-600', icon: CheckCircle },
-  failed: { label: 'Uğursuz', color: 'bg-red-500/10 text-red-600', icon: XCircle },
-  returned: { label: 'Geri qaytarılıb', color: 'bg-orange-500/10 text-orange-600', icon: RotateCcw },
-  error: { label: 'Xəta', color: 'bg-red-500/10 text-red-600', icon: AlertTriangle },
+  success: { label: tr("adminepoint_ugurlu_7fe64c", "Uğurlu"), color: 'bg-green-500/10 text-green-600', icon: CheckCircle },
+  failed: { label: tr("adminepoint_ugursuz_541932", "Uğursuz"), color: 'bg-red-500/10 text-red-600', icon: XCircle },
+  returned: { label: tr("adminepoint_geri_qaytarilib_d80beb", "Geri qaytarılıb"), color: 'bg-orange-500/10 text-orange-600', icon: RotateCcw },
+  error: { label: tr("adminepoint_xeta_3cdbb6", "Xəta"), color: 'bg-red-500/10 text-red-600', icon: AlertTriangle },
 };
 
 const orderTypeLabels: Record<string, string> = {
@@ -90,9 +91,9 @@ const AdminEpoint = () => {
         }
       }
 
-      toast({ title: 'Uğurlu', description: 'Epoint tənzimləmələri yadda saxlanıldı' });
+      toast({ title: tr("adminepoint_ugurlu_7fe64c", "Uğurlu"), description: tr("adminepoint_epoint_tenzimlemeleri_yadda_saxlanildi_63ea10", "Epoint tənzimləmələri yadda saxlanıldı") });
     } catch (error) {
-      toast({ title: 'Xəta', description: 'Tənzimləmələr saxlanıla bilmədi', variant: 'destructive' });
+      toast({ title: tr("adminepoint_xeta_3cdbb6", "Xəta"), description: tr("adminepoint_tenzimlemeler_saxlanila_bilmedi_85e734", "Tənzimləmələr saxlanıla bilmədi"), variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -108,8 +109,8 @@ const AdminEpoint = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Epoint Ödəniş Sistemi</h1>
-          <p className="text-muted-foreground">Kartla ödəniş konfiqurasiyası və əməliyyatlar</p>
+          <h1 className="text-2xl font-bold text-foreground">{tr("adminepoint_epoint_odenis_sistemi_d87137", "Epoint Ödəniş Sistemi")}</h1>
+          <p className="text-muted-foreground">{tr("adminepoint_kartla_odenis_konfiqurasiyasi_ve_emeliyy_aaf22f", "Kartla ödəniş konfiqurasiyası və əməliyyatlar")}</p>
         </div>
       </div>
 
@@ -143,8 +144,8 @@ const AdminEpoint = () => {
                   <CreditCard className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">Epoint API Açarları</h3>
-                  <p className="text-sm text-muted-foreground">Epoint.az dashboard-dan əldə edilən açarlar</p>
+                  <h3 className="font-semibold text-foreground">{tr("adminepoint_epoint_api_acarlari_3a89d6", "Epoint API Açarları")}</h3>
+                  <p className="text-sm text-muted-foreground">{tr("adminepoint_epoint_az_dashboard_dan_elde_edilen_acar_9ab01a", "Epoint.az dashboard-dan əldə edilən açarlar")}</p>
                 </div>
               </div>
 
@@ -161,7 +162,7 @@ const AdminEpoint = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="live">🟢 Canlı (Production)</SelectItem>
+                        <SelectItem value="live">{tr("adminepoint_canli_production_1d0736", "🟢 Canlı (Production)")}</SelectItem>
                         <SelectItem value="test">🟡 Test (Sandbox)</SelectItem>
                       </SelectContent>
                     </Select>
@@ -175,7 +176,7 @@ const AdminEpoint = () => {
                     <Input
                       value={publicKey}
                       onChange={(e) => setPublicKey(e.target.value)}
-                      placeholder="Məsələn: i000000001"
+                      placeholder={tr("adminepoint_meselen_i000000001_56e9a2", "Məsələn: i000000001")}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
                       Epoint dashboard-da "Tacir identifikatoru" olaraq göstərilir
@@ -189,7 +190,7 @@ const AdminEpoint = () => {
                         type={showPrivateKey ? 'text' : 'password'}
                         value={privateKey}
                         onChange={(e) => setPrivateKey(e.target.value)}
-                        placeholder="API giriş açarı"
+                        placeholder={tr("adminepoint_api_giris_acari_34edbe", "API giriş açarı")}
                         className="pr-10"
                       />
                       <Button
@@ -222,7 +223,7 @@ const AdminEpoint = () => {
                 <div className="p-2 rounded-lg bg-blue-500/10">
                   <AlertTriangle className="w-5 h-5 text-blue-500" />
                 </div>
-                <h3 className="font-semibold text-foreground">Epoint Dashboard-da Qeyd Edilməli URL-lər</h3>
+                <h3 className="font-semibold text-foreground">{tr("adminepoint_epoint_dashboard_da_qeyd_edilmeli_url_le_7d11e1", "Epoint Dashboard-da Qeyd Edilməli URL-lər")}</h3>
               </div>
 
               <div className="space-y-3 text-sm">
@@ -257,15 +258,15 @@ const AdminEpoint = () => {
           <div className="grid grid-cols-3 gap-4">
             <Card className="p-4 text-center">
               <p className="text-2xl font-bold text-green-600">{totalAmount.toFixed(2)} ₼</p>
-              <p className="text-xs text-muted-foreground">Ümumi gəlir</p>
+              <p className="text-xs text-muted-foreground">{tr("adminepoint_umumi_gelir_175bcb", "Ümumi gəlir")}</p>
             </Card>
             <Card className="p-4 text-center">
               <p className="text-2xl font-bold text-green-600">{successCount}</p>
-              <p className="text-xs text-muted-foreground">Uğurlu</p>
+              <p className="text-xs text-muted-foreground">{tr("adminepoint_ugurlu_7fe64c", "Uğurlu")}</p>
             </Card>
             <Card className="p-4 text-center">
               <p className="text-2xl font-bold text-red-600">{failedCount}</p>
-              <p className="text-xs text-muted-foreground">Uğursuz</p>
+              <p className="text-xs text-muted-foreground">{tr("adminepoint_ugursuz_541932", "Uğursuz")}</p>
             </Card>
           </div>
 
@@ -276,9 +277,9 @@ const AdminEpoint = () => {
                 <thead>
                   <tr className="border-b border-border bg-muted/50">
                     <th className="text-left p-3 font-medium text-muted-foreground">Tarix</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Sifariş ID</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Növ</th>
-                    <th className="text-right p-3 font-medium text-muted-foreground">Məbləğ</th>
+                    <th className="text-left p-3 font-medium text-muted-foreground">{tr("adminepoint_sifaris_id_f7533c", "Sifariş ID")}</th>
+                    <th className="text-left p-3 font-medium text-muted-foreground">{tr("adminepoint_nov_98ad7c", "Növ")}</th>
+                    <th className="text-right p-3 font-medium text-muted-foreground">{tr("adminepoint_mebleg_479276", "Məbləğ")}</th>
                     <th className="text-left p-3 font-medium text-muted-foreground">Status</th>
                     <th className="text-left p-3 font-medium text-muted-foreground">Kart</th>
                   </tr>

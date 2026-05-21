@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -113,7 +114,7 @@ const AdminPlacesConfig = () => {
           <MapPin className="w-6 h-6 text-pink-500" />
           Ana Dostu Məkanlar Konfiqurasiyası
         </h2>
-        <p className="text-muted-foreground">Kateqoriyalar və imkanları idarə edin</p>
+        <p className="text-muted-foreground">{tr("adminplacesconfig_kateqoriyalar_ve_imkanlari_idare_edin_3b381c", "Kateqoriyalar və imkanları idarə edin")}</p>
       </div>
 
       <Tabs defaultValue="categories">

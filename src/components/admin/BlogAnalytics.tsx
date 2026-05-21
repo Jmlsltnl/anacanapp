@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { 
   TrendingUp, Eye, Heart, MessageCircle, Bookmark,
@@ -76,28 +77,28 @@ const BlogAnalytics = ({ posts }: BlogAnalyticsProps) => {
 
   const statCards = [
     { 
-      label: 'Ümumi Baxış', 
+      label: tr("bloganalytics_umumi_baxis_f27f07", "Ümumi Baxış"), 
       value: analytics.totalViews.toLocaleString(), 
       icon: Eye, 
       color: 'text-blue-500',
       bg: 'bg-blue-500/10'
     },
     { 
-      label: 'Bəyənmələr', 
+      label: tr("bloganalytics_beyenmeler_7c86a6", "Bəyənmələr"), 
       value: analytics.totalLikes.toLocaleString(), 
       icon: Heart, 
       color: 'text-rose-500',
       bg: 'bg-rose-500/10'
     },
     { 
-      label: 'Şərhlər', 
+      label: tr("bloganalytics_serhler_30d5d9", "Şərhlər"), 
       value: analytics.totalComments.toLocaleString(), 
       icon: MessageCircle, 
       color: 'text-emerald-500',
       bg: 'bg-emerald-500/10'
     },
     { 
-      label: 'Saxlanılanlar', 
+      label: tr("bloganalytics_saxlanilanlar_8882c1", "Saxlanılanlar"), 
       value: analytics.totalSaves.toLocaleString(), 
       icon: Bookmark, 
       color: 'text-amber-500',
@@ -135,7 +136,7 @@ const BlogAnalytics = ({ posts }: BlogAnalyticsProps) => {
       >
         <div className="flex items-center gap-2 mb-4">
           <TrendingUp className="w-5 h-5 text-primary" />
-          <h3 className="font-bold text-foreground">Həftəlik Trend</h3>
+          <h3 className="font-bold text-foreground">{tr("bloganalytics_heftelik_trend_e734f8", "Həftəlik Trend")}</h3>
           <span className="text-xs text-muted-foreground ml-auto">
             Bu həftə: {analytics.weeklyViews} baxış
           </span>
@@ -185,7 +186,7 @@ const BlogAnalytics = ({ posts }: BlogAnalyticsProps) => {
         >
           <div className="flex items-center gap-2 mb-4">
             <Award className="w-5 h-5 text-amber-500" />
-            <h3 className="font-bold text-foreground">Ən Çox Oxunanlar</h3>
+            <h3 className="font-bold text-foreground">{tr("bloganalytics_en_cox_oxunanlar_d68b0f", "Ən Çox Oxunanlar")}</h3>
           </div>
           
           <div className="space-y-3">
@@ -212,7 +213,7 @@ const BlogAnalytics = ({ posts }: BlogAnalyticsProps) => {
             ))}
             
             {analytics.topViewed.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-4">Hələ məqalə yoxdur</p>
+              <p className="text-sm text-muted-foreground text-center py-4">{tr("bloganalytics_hele_meqale_yoxdur_b92aa5", "Hələ məqalə yoxdur")}</p>
             )}
           </div>
         </motion.div>
@@ -226,7 +227,7 @@ const BlogAnalytics = ({ posts }: BlogAnalyticsProps) => {
         >
           <div className="flex items-center gap-2 mb-4">
             <BarChart3 className="w-5 h-5 text-primary" />
-            <h3 className="font-bold text-foreground">Kateqoriya Paylanması</h3>
+            <h3 className="font-bold text-foreground">{tr("bloganalytics_kateqoriya_paylanmasi_6a4800", "Kateqoriya Paylanması")}</h3>
           </div>
           
           <div className="h-40">
@@ -270,13 +271,13 @@ const BlogAnalytics = ({ posts }: BlogAnalyticsProps) => {
       >
         <div className="flex items-center gap-2 mb-4">
           <Calendar className="w-5 h-5 text-primary" />
-          <h3 className="font-bold text-foreground">Nəşr Statistikası</h3>
+          <h3 className="font-bold text-foreground">{tr("bloganalytics_nesr_statistikasi_8d2fed", "Nəşr Statistikası")}</h3>
         </div>
         
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-emerald-500/10 rounded-xl p-4 text-center">
             <p className="text-3xl font-bold text-emerald-600">{analytics.publishedCount}</p>
-            <p className="text-sm text-emerald-600">Dərc edilib</p>
+            <p className="text-sm text-emerald-600">{tr("bloganalytics_derc_edilib_88064f", "Dərc edilib")}</p>
           </div>
           <div className="bg-amber-500/10 rounded-xl p-4 text-center">
             <p className="text-3xl font-bold text-amber-600">{analytics.draftCount}</p>

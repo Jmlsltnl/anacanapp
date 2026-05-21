@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Plus, Search, Edit, Trash2, ChefHat, Lightbulb, Shield, Baby, Briefcase, Apple, X, Upload, Image, FileUp, FileDown } from 'lucide-react';
 import { exportToCSV } from '@/utils/csvExport';
@@ -54,7 +55,7 @@ const AdminContentManager = () => {
   const contentConfig = {
     recipes: {
       table: 'admin_recipes',
-      title: 'Reseptlər',
+      title: tr("admincontentmanager_reseptler_98ed2c", "Reseptlər"),
       icon: ChefHat,
       fields: ['title', 'description', 'category', 'prep_time', 'cook_time', 'servings', 'ingredients', 'instructions', 'image_url', 'is_active'],
       categories: ['pregnancy', 'breastfeeding', 'baby_food', 'healthy'],
@@ -62,7 +63,7 @@ const AdminContentManager = () => {
     },
     tips: {
       table: 'weekly_tips',
-      title: 'Həftəlik Tövsiyələr',
+      title: tr("admincontentmanager_heftelik_tovsiyeler_8dcd89", "Həftəlik Tövsiyələr"),
       icon: Lightbulb,
       fields: ['week_number', 'life_stage', 'title', 'content', 'is_active'],
       categories: ['pregnancy', 'postpartum', 'baby'],
@@ -70,7 +71,7 @@ const AdminContentManager = () => {
     },
     safety: {
       table: 'safety_items',
-      title: 'Təhlükəsizlik',
+      title: tr("admincontentmanager_tehlukesizlik_8bc156", "Təhlükəsizlik"),
       icon: Shield,
       fields: ['name', 'name_az', 'category', 'safety_level', 'description', 'description_az', 'is_active'],
       categories: ['food', 'drink', 'activity', 'beauty', 'medicine'],
@@ -78,7 +79,7 @@ const AdminContentManager = () => {
     },
     names: {
       table: 'baby_names_db',
-      title: 'Körpə Adları',
+      title: tr("admincontentmanager_korpe_adlari_357880", "Körpə Adları"),
       icon: Baby,
       fields: ['name', 'gender', 'origin', 'meaning', 'meaning_az', 'popularity', 'is_active'],
       categories: ['boy', 'girl', 'unisex'],
@@ -86,7 +87,7 @@ const AdminContentManager = () => {
     },
     hospital: {
       table: 'hospital_bag_templates',
-      title: 'Xəstəxana Çantası',
+      title: tr("admincontentmanager_xestexana_cantasi_045078", "Xəstəxana Çantası"),
       icon: Briefcase,
       fields: ['item_name', 'item_name_az', 'category', 'priority', 'notes', 'is_essential', 'sort_order', 'is_active'],
       categories: ['mom', 'baby', 'documents'],
@@ -94,7 +95,7 @@ const AdminContentManager = () => {
     },
     nutrition: {
       table: 'nutrition_tips',
-      title: 'Qidalanma Tövsiyələri',
+      title: tr("admincontentmanager_qidalanma_tovsiyeleri_f04bf1", "Qidalanma Tövsiyələri"),
       icon: Apple,
       fields: ['title', 'content', 'category', 'trimester', 'calories', 'is_active'],
       categories: ['pregnancy', 'breastfeeding', 'baby'],
@@ -122,9 +123,9 @@ const AdminContentManager = () => {
         .getPublicUrl(filePath);
 
       setFormData({ ...formData, image_url: urlData.publicUrl });
-      toast({ title: 'Şəkil yükləndi!' });
+      toast({ title: tr("admincontentmanager_sekil_yuklendi_0c2f85", "Şəkil yükləndi!") });
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("admincontentmanager_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } finally {
       setUploadingImage(false);
     }
@@ -140,7 +141,7 @@ const AdminContentManager = () => {
       .order('created_at', { ascending: false });
 
     if (error) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("admincontentmanager_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } else {
       setItems((data as unknown as ContentItem[]) || []);
     }
@@ -182,7 +183,7 @@ const AdminContentManager = () => {
       const lines = text.split('\n').filter(line => line.trim());
       
       if (lines.length < 2) {
-        toast({ title: 'Xəta', description: 'CSV faylı boşdur', variant: 'destructive' });
+        toast({ title: tr("admincontentmanager_xeta_3cdbb6", "Xəta"), description: tr("admincontentmanager_csv_fayli_bosdur_0a908c", "CSV faylı boşdur"), variant: 'destructive' });
         return;
       }
 
@@ -234,7 +235,7 @@ const AdminContentManager = () => {
       }
 
       if (parsedData.length === 0) {
-        toast({ title: 'Xəta', description: 'Heç bir ad tapılmadı', variant: 'destructive' });
+        toast({ title: tr("admincontentmanager_xeta_3cdbb6", "Xəta"), description: tr("admincontentmanager_hec_bir_ad_tapilmadi_980945", "Heç bir ad tapılmadı"), variant: 'destructive' });
         return;
       }
 
@@ -268,7 +269,7 @@ const AdminContentManager = () => {
 
       if (newNames.length === 0) {
         toast({
-          title: 'Məlumat',
+          title: tr("admincontentmanager_melumat_a1209f", "Məlumat"),
           description: `Bütün ${namesImportData.length} ad artıq mövcuddur`,
         });
         setShowNamesImport(false);
@@ -283,7 +284,7 @@ const AdminContentManager = () => {
       if (error) throw error;
 
       toast({ 
-        title: 'Uğurlu!', 
+        title: tr("admincontentmanager_ugurlu_5c0191", "Uğurlu!"), 
         description: `${newNames.length} yeni ad əlavə edildi${duplicateCount > 0 ? `, ${duplicateCount} təkrar ad keçildi` : ''}` 
       });
       setShowNamesImport(false);
@@ -291,7 +292,7 @@ const AdminContentManager = () => {
       fetchItems();
     } catch (error: any) {
       toast({ 
-        title: 'Xəta', 
+        title: tr("admincontentmanager_xeta_3cdbb6", "Xəta"), 
         description: error.message, 
         variant: 'destructive' 
       });
@@ -311,7 +312,7 @@ const AdminContentManager = () => {
       const lines = text.split('\n').filter(line => line.trim());
       
       if (lines.length < 2) {
-        toast({ title: 'Xəta', description: 'CSV faylı boşdur', variant: 'destructive' });
+        toast({ title: tr("admincontentmanager_xeta_3cdbb6", "Xəta"), description: tr("admincontentmanager_csv_fayli_bosdur_0a908c", "CSV faylı boşdur"), variant: 'destructive' });
         return;
       }
 
@@ -361,7 +362,7 @@ const AdminContentManager = () => {
       }
 
       if (parsedData.length === 0) {
-        toast({ title: 'Xəta', description: 'Heç bir resept tapılmadı', variant: 'destructive' });
+        toast({ title: tr("admincontentmanager_xeta_3cdbb6", "Xəta"), description: tr("admincontentmanager_hec_bir_resept_tapilmadi_f2f561", "Heç bir resept tapılmadı"), variant: 'destructive' });
         return;
       }
 
@@ -385,7 +386,7 @@ const AdminContentManager = () => {
       if (error) throw error;
 
       toast({ 
-        title: 'Uğurlu!', 
+        title: tr("admincontentmanager_ugurlu_5c0191", "Uğurlu!"), 
         description: `${recipesImportData.length} resept əlavə edildi` 
       });
       setShowRecipesImport(false);
@@ -393,7 +394,7 @@ const AdminContentManager = () => {
       fetchItems();
     } catch (error: any) {
       toast({ 
-        title: 'Xəta', 
+        title: tr("admincontentmanager_xeta_3cdbb6", "Xəta"), 
         description: error.message, 
         variant: 'destructive' 
       });
@@ -439,14 +440,14 @@ const AdminContentManager = () => {
           .eq('id', editingItem.id);
         
         if (error) throw error;
-        toast({ title: 'Uğurlu', description: 'Məlumat yeniləndi' });
+        toast({ title: tr("admincontentmanager_ugurlu_7fe64c", "Uğurlu"), description: tr("admincontentmanager_melumat_yenilendi_39c064", "Məlumat yeniləndi") });
       } else {
         const { error } = await supabase
           .from(config.table as any)
           .insert(formData);
         
         if (error) throw error;
-        toast({ title: 'Uğurlu', description: 'Yeni məlumat əlavə edildi' });
+        toast({ title: tr("admincontentmanager_ugurlu_7fe64c", "Uğurlu"), description: tr("admincontentmanager_yeni_melumat_elave_edildi_0714a8", "Yeni məlumat əlavə edildi") });
       }
       
       setShowModal(false);
@@ -454,7 +455,7 @@ const AdminContentManager = () => {
       setFormData({});
       fetchItems();
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("admincontentmanager_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     }
   };
 
@@ -469,9 +470,9 @@ const AdminContentManager = () => {
       .eq('id', id);
 
     if (error) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("admincontentmanager_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: 'Uğurlu', description: 'Məlumat silindi' });
+      toast({ title: tr("admincontentmanager_ugurlu_7fe64c", "Uğurlu"), description: tr("admincontentmanager_melumat_silindi_3b4db0", "Məlumat silindi") });
       fetchItems();
     }
   };
@@ -568,7 +569,7 @@ const AdminContentManager = () => {
                 ) : (
                   <div className="flex flex-col items-center gap-2">
                     <Upload className="w-6 h-6" />
-                    <span className="text-sm">Şəkil yüklə</span>
+                    <span className="text-sm">{tr("admincontentmanager_sekil_yukle_0577d2", "Şəkil yüklə")}</span>
                   </div>
                 )}
               </Button>
@@ -600,12 +601,12 @@ const AdminContentManager = () => {
         return (
           <Select value={String(formData[field] || 2)} onValueChange={(v) => setFormData({ ...formData, [field]: parseInt(v) })}>
             <SelectTrigger>
-              <SelectValue placeholder="Prioritet seçin" />
+              <SelectValue placeholder={tr("admincontentmanager_prioritet_secin_8e4410", "Prioritet seçin")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1">Yüksək</SelectItem>
+              <SelectItem value="1">{tr("admincontentmanager_yuksek_492584", "Yüksək")}</SelectItem>
               <SelectItem value="2">Orta</SelectItem>
-              <SelectItem value="3">Aşağı</SelectItem>
+              <SelectItem value="3">{tr("admincontentmanager_asagi_1c27f1", "Aşağı")}</SelectItem>
             </SelectContent>
           </Select>
         );
@@ -614,7 +615,7 @@ const AdminContentManager = () => {
           <Textarea 
             value={formData[field] || ''} 
             onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
-            placeholder="Qısa açıqlama və ya məlumat"
+            placeholder={tr("admincontentmanager_qisa_aciqlama_ve_ya_melumat_d5937b", "Qısa açıqlama və ya məlumat")}
             rows={2}
           />
         );
@@ -688,12 +689,12 @@ const AdminContentManager = () => {
 
   const getFieldLabel = (field: string) => {
     const labels: Record<string, string> = {
-      title: 'Başlıq',
+      title: tr("admincontentmanager_basliq_e1f6c5", "Başlıq"),
       name: 'Ad',
       name_az: 'Ad (AZ)',
-      description: 'Təsvir',
+      description: tr("admincontentmanager_tesvir_f85651", "Təsvir"),
       description_az: 'Təsvir (AZ)',
-      content: 'Məzmun',
+      content: tr("admincontentmanager_mezmun_f1d51d", "Məzmun"),
       category: 'Kateqoriya',
       life_stage: 'Həyat Mərhələsi',
       week_number: 'Həftə Nömrəsi',
@@ -727,7 +728,7 @@ const AdminContentManager = () => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Icon className="w-6 h-6 text-primary" />
-          <h1 className="text-2xl font-bold">Kontent İdarəetməsi</h1>
+          <h1 className="text-2xl font-bold">{tr("admincontentmanager_kontent_idareetmesi_ecbe99", "Kontent İdarəetməsi")}</h1>
         </div>
         <div className="flex gap-2">
           {activeTab === 'recipes' && (
@@ -779,10 +780,10 @@ const AdminContentManager = () => {
                     [
                       { key: 'name', header: 'Ad' },
                       { key: 'gender', header: 'Cins' },
-                      { key: 'origin', header: 'Mənşə' },
-                      { key: 'meaning', header: 'Məna' },
-                      { key: 'meaning_az', header: 'Məna (AZ)' },
-                      { key: 'popularity', header: 'Populyarlıq' },
+                      { key: 'origin', header: tr("admincontentmanager_mense_4c0d88", "Mənşə") },
+                      { key: 'meaning', header: tr("admincontentmanager_mena_c57b0f", "Məna") },
+                      { key: 'meaning_az', header: tr("admincontentmanager_mena_az_389323", "Məna (AZ)") },
+                      { key: 'popularity', header: tr("admincontentmanager_populyarliq_1501b1", "Populyarlıq") },
                       { key: 'is_active', header: 'Aktiv' },
                     ],
                     'baby_names_export.csv'
@@ -807,15 +808,15 @@ const AdminContentManager = () => {
         <TabsList className="grid grid-cols-6 w-full mb-6">
           <TabsTrigger value="recipes" className="flex items-center gap-1">
             <ChefHat className="w-4 h-4" />
-            <span className="hidden md:inline">Reseptlər</span>
+            <span className="hidden md:inline">{tr("admincontentmanager_reseptler_98ed2c", "Reseptlər")}</span>
           </TabsTrigger>
           <TabsTrigger value="tips" className="flex items-center gap-1">
             <Lightbulb className="w-4 h-4" />
-            <span className="hidden md:inline">Tövsiyələr</span>
+            <span className="hidden md:inline">{tr("admincontentmanager_tovsiyeler_17a8f7", "Tövsiyələr")}</span>
           </TabsTrigger>
           <TabsTrigger value="safety" className="flex items-center gap-1">
             <Shield className="w-4 h-4" />
-            <span className="hidden md:inline">Təhlükəsizlik</span>
+            <span className="hidden md:inline">{tr("admincontentmanager_tehlukesizlik_8bc156", "Təhlükəsizlik")}</span>
           </TabsTrigger>
           <TabsTrigger value="names" className="flex items-center gap-1">
             <Baby className="w-4 h-4" />
@@ -823,7 +824,7 @@ const AdminContentManager = () => {
           </TabsTrigger>
           <TabsTrigger value="hospital" className="flex items-center gap-1">
             <Briefcase className="w-4 h-4" />
-            <span className="hidden md:inline">Çanta</span>
+            <span className="hidden md:inline">{tr("admincontentmanager_canta_95fd63", "Çanta")}</span>
           </TabsTrigger>
           <TabsTrigger value="nutrition" className="flex items-center gap-1">
             <Apple className="w-4 h-4" />
@@ -852,7 +853,7 @@ const AdminContentManager = () => {
             {filteredItems.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
                 <Icon className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>Heç bir məlumat tapılmadı</p>
+                <p>{tr("admincontentmanager_hec_bir_melumat_tapilmadi_54c062", "Heç bir məlumat tapılmadı")}</p>
               </div>
             ) : (
               filteredItems.map((item) => (

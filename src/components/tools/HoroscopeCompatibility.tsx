@@ -83,11 +83,11 @@ const ELEMENT_NAMES: Record<string, string> = {
 
 const LOADING_STEPS = [
   { icon: Star, text: 'Ulduzlar oxunur...', color: 'text-yellow-500' },
-  { icon: Moon, text: 'Ay fazası hesablanır...', color: 'text-blue-400' },
-  { icon: Sun, text: 'Günəş mövqeyi təyin edilir...', color: 'text-orange-500' },
-  { icon: Compass, text: 'Yüksələn bürc axtarılır...', color: 'text-purple-500' },
-  { icon: Heart, text: 'Uyğunluq analiz edilir...', color: 'text-pink-500' },
-  { icon: Sparkles, text: 'Kosmik tövsiyələr hazırlanır...', color: 'text-cyan-400' },
+  { icon: Moon, text: tr("horoscopecompatibility_ay_fazasi_hesablanir_63cb3c", "Ay fazası hesablanır..."), color: 'text-blue-400' },
+  { icon: Sun, text: tr("horoscopecompatibility_gunes_movqeyi_teyin_edilir_bfba89", "Günəş mövqeyi təyin edilir..."), color: 'text-orange-500' },
+  { icon: Compass, text: tr("horoscopecompatibility_yukselen_burc_axtarilir_f2408d", "Yüksələn bürc axtarılır..."), color: 'text-purple-500' },
+  { icon: Heart, text: tr("horoscopecompatibility_uygunluq_analiz_edilir_bca7bd", "Uyğunluq analiz edilir..."), color: 'text-pink-500' },
+  { icon: Sparkles, text: tr("horoscopecompatibility_kosmik_tovsiyeler_hazirlanir_25cfbf", "Kosmik tövsiyələr hazırlanır..."), color: 'text-cyan-400' },
 ];
 
 const TIME_OPTIONS = Array.from({ length: 24 }, (_, h) => 
@@ -247,7 +247,7 @@ Anacan tətbiqi ilə yaradılıb 💜`;
             className="space-y-4"
           >
             <PersonInput
-              label="Ananın Doğum Məlumatları"
+              label={tr("horoscopecompatibility_ananin_dogum_melumatlari_61548b", "Ananın Doğum Məlumatları")}
               emoji="👩"
               data={momData}
               setData={setMomData}
@@ -266,7 +266,7 @@ Anacan tətbiqi ilə yaradılıb 💜`;
             className="space-y-4"
           >
             <PersonInput
-              label="Atanın Doğum Məlumatları"
+              label={tr("horoscopecompatibility_atanin_dogum_melumatlari_fef9a1", "Atanın Doğum Məlumatları")}
               emoji="👨"
               data={dadData}
               setData={setDadData}
@@ -287,7 +287,7 @@ Anacan tətbiqi ilə yaradılıb 💜`;
             <div className="flex items-center justify-between p-4 rounded-2xl bg-muted/50 border">
               <div className="flex items-center gap-3">
                 <span className="text-2xl">🤰</span>
-                <span className="font-medium">Körpə hələ doğulmayıb</span>
+                <span className="font-medium">{tr("horoscopecompatibility_korpe_hele_dogulmayib_b729e6", "Körpə hələ doğulmayıb")}</span>
               </div>
               <Switch checked={isBabyExpected} onCheckedChange={setIsBabyExpected} />
             </div>
@@ -309,7 +309,7 @@ Anacan tətbiqi ilə yaradılıb 💜`;
               </div>
             ) : (
               <PersonInput
-                label="Körpənin Doğum Məlumatları"
+                label={tr("horoscopecompatibility_korpenin_dogum_melumatlari_4ef9a4", "Körpənin Doğum Məlumatları")}
                 emoji="👶"
                 data={babyData}
                 setData={setBabyData}
@@ -473,7 +473,7 @@ Anacan tətbiqi ilə yaradılıb 💜`;
               <Card className="bg-gradient-to-br from-pink-500/10 to-rose-500/10">
                 <CardContent className="p-3 text-center">
                   <Palette className="h-6 w-6 mx-auto text-pink-500 mb-2" />
-                  <p className="text-xs text-muted-foreground mb-1">Uğurlu rənglər</p>
+                  <p className="text-xs text-muted-foreground mb-1">{tr("horoscopecompatibility_ugurlu_rengler_e52ad0", "Uğurlu rənglər")}</p>
                   <p className="text-xs font-semibold">{analysisResult.analysis.luckyColors.join(', ')}</p>
                 </CardContent>
               </Card>
@@ -482,7 +482,7 @@ Anacan tətbiqi ilə yaradılıb 💜`;
               <Card className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10">
                 <CardContent className="p-3 text-center">
                   <CalendarIcon className="h-6 w-6 mx-auto text-blue-500 mb-2" />
-                  <p className="text-xs text-muted-foreground mb-1">Uğurlu günlər</p>
+                  <p className="text-xs text-muted-foreground mb-1">{tr("horoscopecompatibility_ugurlu_gunler_6caab8", "Uğurlu günlər")}</p>
                   <p className="text-xs font-semibold">{analysisResult.analysis.luckyDays.join(', ')}</p>
                 </CardContent>
               </Card>
@@ -491,7 +491,7 @@ Anacan tətbiqi ilə yaradılıb 💜`;
               <Card className="bg-gradient-to-br from-green-500/10 to-emerald-500/10">
                 <CardContent className="p-3 text-center">
                   <Hash className="h-6 w-6 mx-auto text-green-500 mb-2" />
-                  <p className="text-xs text-muted-foreground mb-1">Xoşbəxt rəqəmlər</p>
+                  <p className="text-xs text-muted-foreground mb-1">{tr("horoscopecompatibility_xosbext_reqemler_4d0da9", "Xoşbəxt rəqəmlər")}</p>
                   <p className="text-xs font-semibold">{analysisResult.analysis.luckyNumbers.join(', ')}</p>
                 </CardContent>
               </Card>
@@ -759,7 +759,7 @@ const PersonInput = ({
           {label}
         </Label>
         {isOptional && (
-          <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">İxtiyari</span>
+          <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">{tr("horoscopecompatibility_ixtiyari_4d9763", "İxtiyari")}</span>
         )}
       </div>
 
@@ -785,7 +785,7 @@ const PersonInput = ({
             Doğum saatı
           </Label>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Bilirəm</span>
+            <span className="text-xs text-muted-foreground">{tr("horoscopecompatibility_bilirem_fa9716", "Bilirəm")}</span>
             <Switch
               checked={data.hasBirthTime}
               onCheckedChange={(checked) => setData({ ...data, hasBirthTime: checked, birthTime: checked ? '12:00' : '' })}
@@ -846,7 +846,7 @@ const PersonInput = ({
           </div>
           {data.hasBirthTime && (
             <div className="text-right">
-              <p className="text-xs text-muted-foreground">Yüksələn</p>
+              <p className="text-xs text-muted-foreground">{tr("horoscopecompatibility_yukselen_b35c71", "Yüksələn")}</p>
               <p className="text-xs font-medium text-purple-500">Hesablanacaq ↗</p>
             </div>
           )}
@@ -874,7 +874,7 @@ const BirthChartCard = ({ chart, label, emoji }: { chart: ChartData; label: stri
         <Sun className="h-4 w-4 mx-auto text-yellow-500 mb-1" />
         <span className="text-2xl block">{chart.sun.symbol}</span>
         <p className="text-xs font-medium mt-1">{chart.sun.signAz}</p>
-        <p className="text-[10px] text-muted-foreground">Günəş</p>
+        <p className="text-[10px] text-muted-foreground">{tr("horoscopecompatibility_gunes_b7b2ab", "Günəş")}</p>
       </div>
 
       <div className="text-center p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30">
@@ -902,7 +902,7 @@ const BirthChartCard = ({ chart, label, emoji }: { chart: ChartData; label: stri
             <p className="text-xs text-muted-foreground mt-1">Bilinmir</p>
           </>
         )}
-        <p className="text-[10px] text-muted-foreground">Yüksələn</p>
+        <p className="text-[10px] text-muted-foreground">{tr("horoscopecompatibility_yukselen_b35c71", "Yüksələn")}</p>
       </div>
     </div>
   </div>

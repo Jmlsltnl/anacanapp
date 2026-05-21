@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Loader2, Eye, Package, Check, X as XIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,17 +9,17 @@ import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const ORDER_STATUSES = [
-  { value: 'pending', label: 'Gözləyir', color: 'bg-yellow-100 text-yellow-700' },
-  { value: 'confirmed', label: 'Təsdiqləndi', color: 'bg-blue-100 text-blue-700' },
-  { value: 'preparing', label: 'Hazırlanır', color: 'bg-purple-100 text-purple-700' },
-  { value: 'delivered', label: 'Çatdırıldı', color: 'bg-emerald-100 text-emerald-700' },
-  { value: 'cancelled', label: 'Ləğv', color: 'bg-red-100 text-red-700' },
+  { value: 'pending', label: tr("adminalbumorders_gozleyir_9ac18a", "Gözləyir"), color: 'bg-yellow-100 text-yellow-700' },
+  { value: 'confirmed', label: tr("adminalbumorders_tesdiqlendi_0c46e4", "Təsdiqləndi"), color: 'bg-blue-100 text-blue-700' },
+  { value: 'preparing', label: tr("adminalbumorders_hazirlanir_c15a4b", "Hazırlanır"), color: 'bg-purple-100 text-purple-700' },
+  { value: 'delivered', label: tr("adminalbumorders_catdirildi_324039", "Çatdırıldı"), color: 'bg-emerald-100 text-emerald-700' },
+  { value: 'cancelled', label: tr("adminalbumorders_legv_f7100a", "Ləğv"), color: 'bg-red-100 text-red-700' },
 ];
 
 const PAYMENT_STATUSES = [
-  { value: 'pending', label: 'Gözləyir', color: 'bg-yellow-100 text-yellow-700' },
-  { value: 'paid', label: 'Ödənilib', color: 'bg-green-100 text-green-700' },
-  { value: 'failed', label: 'Uğursuz', color: 'bg-red-100 text-red-700' },
+  { value: 'pending', label: tr("adminalbumorders_gozleyir_9ac18a", "Gözləyir"), color: 'bg-yellow-100 text-yellow-700' },
+  { value: 'paid', label: tr("adminalbumorders_odenilib_4f2298", "Ödənilib"), color: 'bg-green-100 text-green-700' },
+  { value: 'failed', label: tr("adminalbumorders_ugursuz_541932", "Uğursuz"), color: 'bg-red-100 text-red-700' },
 ];
 
 const AdminAlbumOrders = () => {
@@ -48,7 +49,7 @@ const AdminAlbumOrders = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-album-orders'] });
-      toast({ title: 'Status yeniləndi' });
+      toast({ title: tr("adminalbumorders_status_yenilendi_890662", "Status yeniləndi") });
     },
   });
 
@@ -66,7 +67,7 @@ const AdminAlbumOrders = () => {
       </div>
 
       {orders.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">Hələ sifariş yoxdur</div>
+        <div className="text-center py-12 text-muted-foreground">{tr("adminalbumorders_hele_sifaris_yoxdur_b283b8", "Hələ sifariş yoxdur")}</div>
       ) : (
         <div className="space-y-3">
           {orders.map((order: any) => {

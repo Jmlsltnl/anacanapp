@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Plus, Edit2, Trash2, ShoppingCart, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,27 +14,27 @@ import { useAdminDefaultShoppingItems, DefaultShoppingItem } from '@/hooks/useDe
 import UnsavedChangesDialog from './UnsavedChangesDialog';
 
 const categories = [
-  { value: 'baby_care', label: 'Körpə Baxımı' },
+  { value: 'baby_care', label: tr("admindefaultshoppingitems_korpe_baximi_1ba070", "Körpə Baxımı") },
   { value: 'feeding', label: 'Qidalanma' },
   { value: 'clothing', label: 'Geyim' },
   { value: 'bedding', label: 'Yataq' },
-  { value: 'health', label: 'Sağlamlıq' },
-  { value: 'safety', label: 'Təhlükəsizlik' },
-  { value: 'transport', label: 'Nəqliyyat' },
-  { value: 'general', label: 'Ümumi' },
+  { value: 'health', label: tr("admindefaultshoppingitems_saglamliq_09460a", "Sağlamlıq") },
+  { value: 'safety', label: tr("admindefaultshoppingitems_tehlukesizlik_8bc156", "Təhlükəsizlik") },
+  { value: 'transport', label: tr("admindefaultshoppingitems_neqliyyat_a179ff", "Nəqliyyat") },
+  { value: 'general', label: tr("admindefaultshoppingitems_umumi_1b5521", "Ümumi") },
 ];
 
 const lifeStages = [
-  { value: 'all', label: 'Hamısı' },
-  { value: 'bump', label: 'Hamilə' },
-  { value: 'mommy', label: 'Ana (Körpə)' },
+  { value: 'all', label: tr("admindefaultshoppingitems_hamisi_c73c4d", "Hamısı") },
+  { value: 'bump', label: tr("admindefaultshoppingitems_hamile_0080af", "Hamilə") },
+  { value: 'mommy', label: tr("admindefaultshoppingitems_ana_korpe_d5b4be", "Ana (Körpə)") },
   { value: 'flow', label: 'Menstruasiya' },
 ];
 
 const priorities = [
-  { value: 'high', label: 'Yüksək', color: 'bg-red-500' },
+  { value: 'high', label: tr("admindefaultshoppingitems_yuksek_492584", "Yüksək"), color: 'bg-red-500' },
   { value: 'medium', label: 'Orta', color: 'bg-yellow-500' },
-  { value: 'low', label: 'Aşağı', color: 'bg-green-500' },
+  { value: 'low', label: tr("admindefaultshoppingitems_asagi_1c27f1", "Aşağı"), color: 'bg-green-500' },
 ];
 
 const AdminDefaultShoppingItems = () => {
@@ -127,7 +128,7 @@ const AdminDefaultShoppingItems = () => {
     }
 
     if (result.error) {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("admindefaultshoppingitems_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     } else {
       toast({ title: editingItem ? 'Yeniləndi' : 'Əlavə edildi' });
       closeModal();
@@ -139,14 +140,14 @@ const AdminDefaultShoppingItems = () => {
     
     const result = await deleteItem(id);
     if (result.error) {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("admindefaultshoppingitems_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     } else {
       toast({ title: 'Silindi' });
     }
   };
 
   if (loading) {
-    return <div className="p-6 text-center">Yüklənir...</div>;
+    return <div className="p-6 text-center">{tr("admindefaultshoppingitems_yuklenir_5557de", "Yüklənir...")}</div>;
   }
 
   return (
@@ -233,7 +234,7 @@ const AdminDefaultShoppingItems = () => {
               <Input
                 value={formData.name_az}
                 onChange={(e) => setFormData({ ...formData, name_az: e.target.value })}
-                placeholder="Körpə bezləri"
+                placeholder={tr("admindefaultshoppingitems_korpe_bezleri_0bc848", "Körpə bezləri")}
               />
             </div>
 
@@ -274,7 +275,7 @@ const AdminDefaultShoppingItems = () => {
             </div>
 
             <div>
-              <Label>Həyat Mərhələsi</Label>
+              <Label>{tr("admindefaultshoppingitems_heyat_merhelesi_c3ab6b", "Həyat Mərhələsi")}</Label>
               <Select
                 value={formData.life_stage}
                 onValueChange={(v) => setFormData({ ...formData, life_stage: v })}
@@ -291,7 +292,7 @@ const AdminDefaultShoppingItems = () => {
             </div>
 
             <div>
-              <Label>Sıra</Label>
+              <Label>{tr("admindefaultshoppingitems_sira_421c5f", "Sıra")}</Label>
               <Input
                 type="number"
                 value={formData.sort_order}

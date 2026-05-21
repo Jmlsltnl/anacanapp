@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Upload, Image, Smartphone, RefreshCw, X, Check } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -35,14 +36,14 @@ const AdminBranding = () => {
       await updateBranding.mutateAsync({ key, image_url: publicUrl });
 
       toast({
-        title: 'Uğurlu!',
-        description: 'Şəkil yükləndi',
+        title: tr("adminbranding_ugurlu_5c0191", "Uğurlu!"),
+        description: tr("adminbranding_sekil_yuklendi_474bd5", "Şəkil yükləndi"),
       });
     } catch (error) {
       console.error('Upload error:', error);
       toast({
-        title: 'Xəta',
-        description: 'Şəkil yüklənə bilmədi',
+        title: tr("adminbranding_xeta_3cdbb6", "Xəta"),
+        description: tr("adminbranding_sekil_yuklene_bilmedi_3c275f", "Şəkil yüklənə bilmədi"),
         variant: 'destructive',
       });
     } finally {
@@ -58,14 +59,14 @@ const AdminBranding = () => {
     {
       key: 'splash_screen',
       title: 'Splash Screen',
-      description: 'Tətbiq açılarkən görünən şəkil (1024x1024 tövsiyə olunur)',
+      description: tr("adminbranding_tetbiq_acilarken_gorunen_sekil_1024x1024_4826d0", "Tətbiq açılarkən görünən şəkil (1024x1024 tövsiyə olunur)"),
       icon: Smartphone,
       color: 'from-blue-500 to-cyan-500',
     },
     {
       key: 'login_logo',
       title: 'Login Logo',
-      description: 'Giriş ekranındakı logo (512x512 tövsiyə olunur)',
+      description: tr("adminbranding_giris_ekranindaki_logo_512x512_tovsiye_o_97c3da", "Giriş ekranındakı logo (512x512 tövsiyə olunur)"),
       icon: Image,
       color: 'from-purple-500 to-pink-500',
     },
@@ -83,7 +84,7 @@ const AdminBranding = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Branding</h1>
-        <p className="text-muted-foreground">Tətbiq şəkillərini idarə edin</p>
+        <p className="text-muted-foreground">{tr("adminbranding_tetbiq_sekillerini_idare_edin_a6dccb", "Tətbiq şəkillərini idarə edin")}</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">

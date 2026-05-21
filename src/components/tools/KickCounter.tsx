@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, forwardRef } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Play, Pause, RotateCcw, Footprints } from 'lucide-react';
 import { useKickSessions } from '@/hooks/useKickSessions';
@@ -88,8 +89,8 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
             <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-base font-bold text-white">Təpik Sayğacı</h1>
-            <p className="text-white/80 text-[10px]">Körpə hərəkətlərini izləyin</p>
+            <h1 className="text-base font-bold text-white">{tr("kickcounter_tepik_saygaci_85e455", "Təpik Sayğacı")}</h1>
+            <p className="text-white/80 text-[10px]">{tr("kickcounter_korpe_hereketlerini_izleyin_f7fa7c", "Körpə hərəkətlərini izləyin")}</p>
           </div>
         </div>
       </div>
@@ -103,7 +104,7 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
         >
           {/* Timer */}
           <div className="text-center mb-4">
-            <p className="text-muted-foreground text-xs font-medium mb-0.5">Keçən vaxt</p>
+            <p className="text-muted-foreground text-xs font-medium mb-0.5">{tr("kickcounter_kecen_vaxt_0258bf", "Keçən vaxt")}</p>
             <p className="text-3xl font-black text-foreground font-mono">{formatTime(time)}</p>
           </div>
 
@@ -173,7 +174,7 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
           transition={{ delay: 0.1 }}
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="font-bold text-foreground">Bugünkü ümumi</span>
+            <span className="font-bold text-foreground">{tr("kickcounter_bugunku_umumi_bc878f", "Bugünkü ümumi")}</span>
             <span className="text-primary font-bold">{todayStats.totalKicks}/10 təpik</span>
           </div>
           <div className="h-3 bg-muted dark:bg-muted/50 rounded-full overflow-hidden">

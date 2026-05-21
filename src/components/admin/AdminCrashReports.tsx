@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -100,7 +101,7 @@ const AdminCrashReports = () => {
       </div>
 
       {loading ? (
-        <p className="text-muted-foreground">Yüklənir...</p>
+        <p className="text-muted-foreground">{tr("admincrashreports_yuklenir_5557de", "Yüklənir...")}</p>
       ) : reports.length === 0 ? (
         <Card><CardContent className="py-8 text-center text-muted-foreground">Crash report yoxdur 🎉</CardContent></Card>
       ) : (

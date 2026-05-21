@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { 
   MessageSquare, Clock, CheckCircle, AlertCircle, 
@@ -118,9 +119,9 @@ const AdminSupport = () => {
         await updateStatus(selectedTicket.id, 'in_progress');
         setSelectedTicket({ ...selectedTicket, status: 'in_progress' });
       }
-      toast({ title: 'Cavab göndərildi!' });
+      toast({ title: tr("adminsupport_cavab_gonderildi_4746f8", "Cavab göndərildi!") });
     } else {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("adminsupport_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   };
 
@@ -128,14 +129,14 @@ const AdminSupport = () => {
     if (!selectedTicket) return;
     await updateStatus(selectedTicket.id, 'closed');
     setSelectedTicket({ ...selectedTicket, status: 'closed' });
-    toast({ title: 'Müraciət bağlandı' });
+    toast({ title: tr("adminsupport_muraciet_baglandi_878702", "Müraciət bağlandı") });
   };
 
   const handleResolveTicket = async () => {
     if (!selectedTicket) return;
     await updateStatus(selectedTicket.id, 'resolved');
     setSelectedTicket({ ...selectedTicket, status: 'resolved' });
-    toast({ title: 'Müraciət həll edildi' });
+    toast({ title: tr("adminsupport_muraciet_hell_edildi_367c6a", "Müraciət həll edildi") });
   };
 
   const stats = {
@@ -195,10 +196,10 @@ const AdminSupport = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="open">Açıq</SelectItem>
-                <SelectItem value="in_progress">İşlənir</SelectItem>
-                <SelectItem value="resolved">Həll edildi</SelectItem>
-                <SelectItem value="closed">Bağlı</SelectItem>
+                <SelectItem value="open">{tr("adminsupport_aciq_306cc4", "Açıq")}</SelectItem>
+                <SelectItem value="in_progress">{tr("adminsupport_islenir_65a15d", "İşlənir")}</SelectItem>
+                <SelectItem value="resolved">{tr("adminsupport_hell_edildi_beceb9", "Həll edildi")}</SelectItem>
+                <SelectItem value="closed">{tr("adminsupport_bagli_713069", "Bağlı")}</SelectItem>
               </SelectContent>
             </Select>
             <Select 
@@ -212,10 +213,10 @@ const AdminSupport = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="low">Aşağı</SelectItem>
+                <SelectItem value="low">{tr("adminsupport_asagi_1c27f1", "Aşağı")}</SelectItem>
                 <SelectItem value="normal">Normal</SelectItem>
-                <SelectItem value="high">Yüksək</SelectItem>
-                <SelectItem value="urgent">Təcili</SelectItem>
+                <SelectItem value="high">{tr("adminsupport_yuksek_492584", "Yüksək")}</SelectItem>
+                <SelectItem value="urgent">{tr("adminsupport_tecili_ab784b", "Təcili")}</SelectItem>
               </SelectContent>
             </Select>
             {selectedTicket.status !== 'closed' && (
@@ -307,7 +308,7 @@ const AdminSupport = () => {
               <Textarea
                 value={replyMessage}
                 onChange={(e) => setReplyMessage(e.target.value)}
-                placeholder="Cavabınızı yazın..."
+                placeholder={tr("adminsupport_cavabinizi_yazin_2cda33", "Cavabınızı yazın...")}
                 rows={1}
                 className="flex-1 min-h-[44px] max-h-[120px] resize-none"
                 onKeyDown={(e) => {
@@ -348,19 +349,19 @@ const AdminSupport = () => {
       <div className="grid grid-cols-4 gap-4">
         <div className="bg-card rounded-xl p-4 border border-border/50">
           <div className="text-2xl font-bold text-foreground">{stats.total}</div>
-          <div className="text-sm text-muted-foreground">Ümumi</div>
+          <div className="text-sm text-muted-foreground">{tr("adminsupport_umumi_1b5521", "Ümumi")}</div>
         </div>
         <div className="bg-amber-500/10 rounded-xl p-4 border border-amber-500/20">
           <div className="text-2xl font-bold text-amber-600">{stats.open}</div>
-          <div className="text-sm text-amber-600/80">Açıq</div>
+          <div className="text-sm text-amber-600/80">{tr("adminsupport_aciq_306cc4", "Açıq")}</div>
         </div>
         <div className="bg-blue-500/10 rounded-xl p-4 border border-blue-500/20">
           <div className="text-2xl font-bold text-blue-600">{stats.inProgress}</div>
-          <div className="text-sm text-blue-600/80">İşlənir</div>
+          <div className="text-sm text-blue-600/80">{tr("adminsupport_islenir_65a15d", "İşlənir")}</div>
         </div>
         <div className="bg-green-500/10 rounded-xl p-4 border border-green-500/20">
           <div className="text-2xl font-bold text-green-600">{stats.resolved}</div>
-          <div className="text-sm text-green-600/80">Həll edildi</div>
+          <div className="text-sm text-green-600/80">{tr("adminsupport_hell_edildi_beceb9", "Həll edildi")}</div>
         </div>
       </div>
 
@@ -394,7 +395,7 @@ const AdminSupport = () => {
       {filteredTickets.length === 0 ? (
         <div className="text-center py-12 bg-card rounded-xl border border-border/50">
           <div className="text-5xl mb-4">📩</div>
-          <p className="text-muted-foreground">Müraciət tapılmadı</p>
+          <p className="text-muted-foreground">{tr("adminsupport_muraciet_tapilmadi_b93f2d", "Müraciət tapılmadı")}</p>
         </div>
       ) : (
         <div className="space-y-3">

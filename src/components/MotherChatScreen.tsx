@@ -323,7 +323,7 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
             >
               <Smile className="w-10 h-10 text-muted-foreground" />
             </motion.div>
-            <p className="text-muted-foreground">Hələ mesaj yoxdur</p>
+            <p className="text-muted-foreground">{tr("motherchatscreen_hele_mesaj_yoxdur_cf0b5e", "Hələ mesaj yoxdur")}</p>
             <p className="text-sm text-muted-foreground mt-1">
               İlk mesajı siz göndərin!
             </p>

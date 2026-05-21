@@ -145,14 +145,14 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-fuchsia-600/70 dark:text-fuchsia-400/70 text-xs font-medium">Ortalama əhval</p>
+              <p className="text-fuchsia-600/70 dark:text-fuchsia-400/70 text-xs font-medium">{tr("mooddiary_ortalama_ehval_72856f", "Ortalama əhval")}</p>
               <div className="flex items-center gap-3 mt-1">
                 <span className="text-4xl">{logs[0]?.mood ? moodEmojis.find(m => m.value === logs[0].mood)?.emoji : '😊'}</span>
                 <span className="text-3xl font-black text-fuchsia-600 dark:text-fuchsia-400">{averageMood}</span>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-fuchsia-600/70 dark:text-fuchsia-400/70 text-xs font-medium">Bu həftə</p>
+              <p className="text-fuchsia-600/70 dark:text-fuchsia-400/70 text-xs font-medium">{tr("mooddiary_bu_hefte_a5f60b", "Bu həftə")}</p>
               <p className="text-2xl font-black text-fuchsia-600 dark:text-fuchsia-400">{logs.length} qeyd</p>
             </div>
           </div>
@@ -198,7 +198,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
             >
               {/* Mood Selection */}
               <div className="bg-card rounded-3xl p-6 shadow-card border border-border/50">
-                <h2 className="font-bold text-lg mb-4 text-center">Bu gün özünüzü necə hiss edirsiniz?</h2>
+                <h2 className="font-bold text-lg mb-4 text-center">{tr("mooddiary_bu_gun_ozunuzu_nece_hiss_edirsiniz_b2d818", "Bu gün özünüzü necə hiss edirsiniz?")}</h2>
                 <div className="flex justify-between">
                   {moodEmojis.map((mood, index) => (
                     <motion.button
@@ -253,7 +253,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
 
               {/* Notes */}
               <div className="bg-card rounded-3xl p-6 shadow-card border border-border/50">
-                <h2 className="font-bold text-lg mb-4">Qeydlər</h2>
+                <h2 className="font-bold text-lg mb-4">{tr("mooddiary_qeydler_a7a98b", "Qeydlər")}</h2>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
@@ -282,9 +282,9 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               exit={{ opacity: 0, x: 20 }}
               className="space-y-4"
             >
-              <h2 className="font-bold text-lg">Son qeydlər</h2>
+              <h2 className="font-bold text-lg">{tr("mooddiary_son_qeydler_181e41", "Son qeydlər")}</h2>
                 {logs.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">Hələ qeyd yoxdur</p>
+                <p className="text-center text-muted-foreground py-8">{tr("mooddiary_hele_qeyd_yoxdur_a3d826", "Hələ qeyd yoxdur")}</p>
               ) : (
                 logs.slice(0, 10).map((entry, index) => (
                   <motion.div
@@ -351,14 +351,14 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
                 </p>
                 <div className="bg-fuchsia-100 dark:bg-fuchsia-900/30 rounded-2xl p-4 border border-fuchsia-200 dark:border-fuchsia-800/50">
                   <p className="text-fuchsia-800 dark:text-fuchsia-200 text-sm">
-                    💡 <strong>Məsləhət:</strong> Yorğunluq hiss etdiyiniz günlərdə istirahət etməyi unutmayın. Hamiləlik zamanı bədəninizin ehtiyaclarına qulaq asmaq vacibdir.
+                    💡 <strong>{tr("mooddiary_meslehet_6a93f2", "Məsləhət:")}</strong> Yorğunluq hiss etdiyiniz günlərdə istirahət etməyi unutmayın. Hamiləlik zamanı bədəninizin ehtiyaclarına qulaq asmaq vacibdir.
                   </p>
                 </div>
               </div>
 
               {/* Weekly Mood Chart */}
               <div className="bg-card rounded-3xl p-6 shadow-card border border-border/50">
-                <h3 className="font-bold mb-4 text-foreground">Həftəlik əhval trendi</h3>
+                <h3 className="font-bold mb-4 text-foreground">{tr("mooddiary_heftelik_ehval_trendi_5796d9", "Həftəlik əhval trendi")}</h3>
                 <div className="flex items-end justify-between h-32 px-2">
                   {['B.e.', 'Ç.a.', 'Ç.', 'C.a.', 'C.', 'Ş.', 'B.'].map((day, i) => {
                     const dayLog = logs.find(l => new Date(l.log_date).getDay() === (i + 1) % 7);

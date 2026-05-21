@@ -171,8 +171,8 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                 <Baby className="w-7 h-7" />
               </div>
               <div>
-                <h2 className="text-xl font-bold">Təbrik edirik! 🎉</h2>
-                <p className="text-white/80 text-sm">Körpəniz haqqında məlumat verin</p>
+                <h2 className="text-xl font-bold">{tr("birthonboardingmodal_tebrik_edirik_4dc427", "Təbrik edirik! 🎉")}</h2>
+                <p className="text-white/80 text-sm">{tr("birthonboardingmodal_korpeniz_haqqinda_melumat_verin_7560c6", "Körpəniz haqqında məlumat verin")}</p>
               </div>
             </div>
             
@@ -205,8 +205,8 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                     <div className="w-16 h-16 rounded-full bg-pink-100 dark:bg-pink-950/50 flex items-center justify-center mx-auto mb-3">
                       <Calendar className="w-8 h-8 text-pink-500" />
                     </div>
-                    <h3 className="text-lg font-bold text-foreground">Doğum tarixi</h3>
-                    <p className="text-sm text-muted-foreground">Körpəniz nə vaxt doğuldu?</p>
+                    <h3 className="text-lg font-bold text-foreground">{tr("birthonboardingmodal_dogum_tarixi_d96907", "Doğum tarixi")}</h3>
+                    <p className="text-sm text-muted-foreground">{tr("birthonboardingmodal_korpeniz_ne_vaxt_doguldu_165d80", "Körpəniz nə vaxt doğuldu?")}</p>
                   </div>
                   
                   <Popover>
@@ -249,8 +249,8 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                     <div className="w-16 h-16 rounded-full bg-pink-100 dark:bg-pink-950/50 flex items-center justify-center mx-auto mb-3">
                       <Heart className="w-8 h-8 text-pink-500" />
                     </div>
-                    <h3 className="text-lg font-bold text-foreground">Körpənin adı</h3>
-                    <p className="text-sm text-muted-foreground">Balaca möcüzənizin adı nədir?</p>
+                    <h3 className="text-lg font-bold text-foreground">{tr("birthonboardingmodal_korpenin_adi_8a4e9e", "Körpənin adı")}</h3>
+                    <p className="text-sm text-muted-foreground">{tr("birthonboardingmodal_balaca_mocuzenizin_adi_nedir_d5c071", "Balaca möcüzənizin adı nədir?")}</p>
                   </div>
                   
                   <Input
@@ -298,8 +298,8 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                     <div className="w-16 h-16 rounded-full bg-pink-100 dark:bg-pink-950/50 flex items-center justify-center mx-auto mb-3">
                       <Stethoscope className="w-8 h-8 text-pink-500" />
                     </div>
-                    <h3 className="text-lg font-bold text-foreground">Doğum tipi</h3>
-                    <p className="text-sm text-muted-foreground">Doğum necə baş tutdu?</p>
+                    <h3 className="text-lg font-bold text-foreground">{tr("birthonboardingmodal_dogum_tipi_c2efb4", "Doğum tipi")}</h3>
+                    <p className="text-sm text-muted-foreground">{tr("birthonboardingmodal_dogum_nece_bas_tutdu_f27265", "Doğum necə baş tutdu?")}</p>
                   </div>
                   
                   <div className="space-y-2">
@@ -341,13 +341,13 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                     <div className="w-16 h-16 rounded-full bg-pink-100 dark:bg-pink-950/50 flex items-center justify-center mx-auto mb-3">
                       <Sparkles className="w-8 h-8 text-pink-500" />
                     </div>
-                    <h3 className="text-lg font-bold text-foreground">Doğum ölçüləri</h3>
-                    <p className="text-sm text-muted-foreground">İstəyə bağlı - sonra da əlavə edə bilərsiniz</p>
+                    <h3 className="text-lg font-bold text-foreground">{tr("birthonboardingmodal_dogum_olculeri_674a98", "Doğum ölçüləri")}</h3>
+                    <p className="text-sm text-muted-foreground">{tr("birthonboardingmodal_isteye_bagli_sonra_da_elave_ede_bilersin_ade2f0", "İstəyə bağlı - sonra da əlavə edə bilərsiniz")}</p>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <Label className="text-xs text-muted-foreground mb-1 block">Çəki (kq)</Label>
+                      <Label className="text-xs text-muted-foreground mb-1 block">{tr("birthonboardingmodal_ceki_kq_2f7555", "Çəki (kq)")}</Label>
                       <div className="relative">
                         <Scale className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input

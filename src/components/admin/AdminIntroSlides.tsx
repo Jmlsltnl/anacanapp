@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -28,14 +29,14 @@ const ICON_OPTIONS = [
 ];
 
 const GRADIENT_OPTIONS = [
-  { label: 'Çəhrayı', value: 'from-pink-500 to-rose-600' },
-  { label: 'Bənövşəyi', value: 'from-purple-500 to-violet-600' },
+  { label: tr("adminintroslides_cehrayi_cf1224", "Çəhrayı"), value: 'from-pink-500 to-rose-600' },
+  { label: tr("adminintroslides_benovseyi_047412", "Bənövşəyi"), value: 'from-purple-500 to-violet-600' },
   { label: 'Mavi', value: 'from-blue-500 to-cyan-600' },
-  { label: 'Yaşıl', value: 'from-emerald-500 to-teal-600' },
-  { label: 'Narıncı', value: 'from-orange-500 to-amber-600' },
-  { label: 'Qırmızı', value: 'from-red-500 to-rose-600' },
-  { label: 'İndiqo', value: 'from-indigo-500 to-blue-600' },
-  { label: 'Sarı', value: 'from-yellow-500 to-orange-600' },
+  { label: tr("adminintroslides_yasil_b257f4", "Yaşıl"), value: 'from-emerald-500 to-teal-600' },
+  { label: tr("adminintroslides_narinci_5160ef", "Narıncı"), value: 'from-orange-500 to-amber-600' },
+  { label: tr("adminintroslides_qirmizi_ea111d", "Qırmızı"), value: 'from-red-500 to-rose-600' },
+  { label: tr("adminintroslides_indiqo_412c66", "İndiqo"), value: 'from-indigo-500 to-blue-600' },
+  { label: tr("adminintroslides_sari_30ba0d", "Sarı"), value: 'from-yellow-500 to-orange-600' },
 ];
 
 const emptySlide: Partial<IntroSlide> = {
@@ -123,21 +124,21 @@ const AdminIntroSlides = () => {
 
   const handleSave = () => {
     if (!form.title) {
-      toast({ title: 'Başlıq tələb olunur', variant: 'destructive' });
+      toast({ title: tr("adminintroslides_basliq_teleb_olunur_097c6f", "Başlıq tələb olunur"), variant: 'destructive' });
       return;
     }
     const { id, created_at, updated_at, ...rest } = form as any;
     saveMutation.mutate(rest);
   };
 
-  if (isLoading) return <div className="p-6 text-center text-muted-foreground">Yüklənir...</div>;
+  if (isLoading) return <div className="p-6 text-center text-muted-foreground">{tr("adminintroslides_yuklenir_5557de", "Yüklənir...")}</div>;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Qarşılama Ekranları</h2>
-          <p className="text-muted-foreground text-sm">İlk dəfə daxil olan istifadəçilərə göstərilən tanıtım slaydları</p>
+          <h2 className="text-2xl font-bold">{tr("adminintroslides_qarsilama_ekranlari_8e6c64", "Qarşılama Ekranları")}</h2>
+          <p className="text-muted-foreground text-sm">{tr("adminintroslides_ilk_defe_daxil_olan_istifadecilere_goste_efac7e", "İlk dəfə daxil olan istifadəçilərə göstərilən tanıtım slaydları")}</p>
         </div>
         {!creating && (
           <Button onClick={() => { setCreating(true); setForm({ ...emptySlide, sort_order: slides.length + 1 }); }}>
@@ -154,21 +155,21 @@ const AdminIntroSlides = () => {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium">Başlıq *</label>
+                <label className="text-sm font-medium">{tr("adminintroslides_basliq_3dfed8", "Başlıq *")}</label>
                 <Input value={form.title || ''} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} />
               </div>
               <div>
-                <label className="text-sm font-medium">Alt başlıq</label>
+                <label className="text-sm font-medium">{tr("adminintroslides_alt_basliq_209363", "Alt başlıq")}</label>
                 <Input value={form.subtitle || ''} onChange={e => setForm(p => ({ ...p, subtitle: e.target.value }))} />
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium">Təsvir</label>
+              <label className="text-sm font-medium">{tr("adminintroslides_tesvir_f85651", "Təsvir")}</label>
               <Textarea value={form.description || ''} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={3} />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="text-sm font-medium">İkon</label>
+                <label className="text-sm font-medium">{tr("adminintroslides_ikon_6e73fc", "İkon")}</label>
                 <select
                   className="w-full border rounded-md p-2 bg-background"
                   value={form.icon_name || 'Heart'}
@@ -192,7 +193,7 @@ const AdminIntroSlides = () => {
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium">Sıra</label>
+                <label className="text-sm font-medium">{tr("adminintroslides_sira_421c5f", "Sıra")}</label>
                 <Input type="number" value={form.sort_order || 0} onChange={e => setForm(p => ({ ...p, sort_order: parseInt(e.target.value) || 0 }))} />
               </div>
             </div>
@@ -250,7 +251,7 @@ const AdminIntroSlides = () => {
           </Card>
         ))}
         {slides.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">Heç bir slayd yoxdur</div>
+          <div className="text-center py-12 text-muted-foreground">{tr("adminintroslides_hec_bir_slayd_yoxdur_5f7dc7", "Heç bir slayd yoxdur")}</div>
         )}
       </div>
     </div>

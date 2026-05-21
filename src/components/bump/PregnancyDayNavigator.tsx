@@ -107,7 +107,7 @@ const PregnancyDayNavigator = ({
             className="flex items-center gap-1 mt-1"
           >
             <Crown className="w-3 h-3 text-primary" />
-            <span className="text-[10px] text-primary font-medium">Premium ilə daha çox</span>
+            <span className="text-[10px] text-primary font-medium">{tr("pregnancydaynavigator_premium_ile_daha_cox_2aae14", "Premium ilə daha çox")}</span>
           </motion.div>
         )}
       </div>

@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { HelpCircle, Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,11 +15,11 @@ import { useAdminFAQ, FAQ } from '@/hooks/useAdminFAQ';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
 
 const categories = [
-  { id: 'general', label: 'Ümumi' },
+  { id: 'general', label: tr("adminfaq_umumi_1b5521", "Ümumi") },
   { id: 'account', label: 'Hesab' },
-  { id: 'subscription', label: 'Abunəlik' },
-  { id: 'pregnancy', label: 'Hamiləlik' },
-  { id: 'baby', label: 'Körpə' },
+  { id: 'subscription', label: tr("adminfaq_abunelik_ce9af7", "Abunəlik") },
+  { id: 'pregnancy', label: tr("adminfaq_hamilelik_e86feb", "Hamiləlik") },
+  { id: 'baby', label: tr("adminfaq_korpe_fa2b51", "Körpə") },
   { id: 'partner', label: 'Partnyor' },
 ];
 
@@ -93,8 +94,8 @@ const AdminFAQ = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Tez-Tez Verilən Suallar</h1>
-          <p className="text-muted-foreground">FAQ bölməsini idarə edin</p>
+          <h1 className="text-2xl font-bold text-foreground">{tr("adminfaq_tez_tez_verilen_suallar_af4220", "Tez-Tez Verilən Suallar")}</h1>
+          <p className="text-muted-foreground">{tr("adminfaq_faq_bolmesini_idare_edin_02e814", "FAQ bölməsini idarə edin")}</p>
         </div>
         <Button onClick={openCreateModal} className="gap-2">
           <Plus className="w-4 h-4" />
@@ -111,7 +112,7 @@ const AdminFAQ = () => {
             </div>
             <div>
               <p className="text-2xl font-bold">{faqs.length}</p>
-              <p className="text-xs text-muted-foreground">Ümumi</p>
+              <p className="text-xs text-muted-foreground">{tr("adminfaq_umumi_1b5521", "Ümumi")}</p>
             </div>
           </div>
         </Card>
@@ -170,9 +171,9 @@ const AdminFAQ = () => {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">Yüklənir...</div>
+            <div className="text-center py-8 text-muted-foreground">{tr("adminfaq_yuklenir_5557de", "Yüklənir...")}</div>
           ) : filteredFaqs.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">Sual tapılmadı</div>
+            <div className="text-center py-8 text-muted-foreground">{tr("adminfaq_sual_tapilmadi_ba44fc", "Sual tapılmadı")}</div>
           ) : (
             <div className="space-y-3">
               {filteredFaqs.map((faq, index) => (
@@ -262,7 +263,7 @@ const AdminFAQ = () => {
                 </Select>
                 <Input
                   type="number"
-                  placeholder="Sıra"
+                  placeholder={tr("adminfaq_sira_421c5f", "Sıra")}
                   value={formData.sort_order || 0}
                   onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) })}
                 />

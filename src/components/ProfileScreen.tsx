@@ -141,9 +141,9 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   const getStageInfo = () => {
     switch (lifeStage) {
       case 'flow': return { name: 'Menstruasiya', emoji: '🌸', color: 'flow' };
-      case 'bump': return { name: 'Hamiləlik', emoji: '🤰', color: 'bump' };
-      case 'mommy': return { name: 'Analıq', emoji: '👶', color: 'mommy' };
-      default: return { name: 'Seçilməyib', emoji: '✨', color: 'primary' };
+      case 'bump': return { name: tr("profilescreen_hamilelik_e86feb", "Hamiləlik"), emoji: '🤰', color: 'bump' };
+      case 'mommy': return { name: tr("profilescreen_analiq_9e762d", "Analıq"), emoji: '👶', color: 'mommy' };
+      default: return { name: tr("profilescreen_secilmeyib_11e27e", "Seçilməyib"), emoji: '✨', color: 'primary' };
     }
   };
 
@@ -244,7 +244,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
             </div>
             <div className="flex-1">
               <h3 className="font-bold text-foreground">Anacan Premium ✨</h3>
-              <p className="text-sm text-muted-foreground">Premium abunəliyiniz aktivdir</p>
+              <p className="text-sm text-muted-foreground">{tr("profilescreen_premium_abuneliyiniz_aktivdir_9f6e62", "Premium abunəliyiniz aktivdir")}</p>
             </div>
             <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </div>
@@ -265,7 +265,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
             </div>
             <div className="flex-1">
               <h3 className="font-bold text-foreground">Anacan Premium</h3>
-              <p className="text-sm text-muted-foreground">Bütün xüsusiyyətləri açın</p>
+              <p className="text-sm text-muted-foreground">{tr("profilescreen_butun_xususiyyetleri_acin_a7583b", "Bütün xüsusiyyətləri açın")}</p>
             </div>
             <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </div>
@@ -342,7 +342,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
             whileTap={{ scale: 0.98 }}
           >
             <Info className="w-5 h-5 text-partner" />
-            <span className="flex-1 text-left text-sm font-medium text-foreground">Partnyor nələr görə və edə bilər?</span>
+            <span className="flex-1 text-left text-sm font-medium text-foreground">{tr("profilescreen_partnyor_neler_gore_ve_ede_biler_3fa7fa", "Partnyor nələr görə və edə bilər?")}</span>
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </motion.button>
         </motion.div>
@@ -367,7 +367,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
             >
               {/* Header */}
               <div className="sticky top-0 bg-card p-4 border-b border-border flex items-center justify-between">
-                <h2 className="text-lg font-bold text-foreground">Partnyor Rejimi Haqqında</h2>
+                <h2 className="text-lg font-bold text-foreground">{tr("profilescreen_partnyor_rejimi_haqqinda_7eeca8", "Partnyor Rejimi Haqqında")}</h2>
                 <motion.button
                   onClick={() => setShowPartnerInfo(false)}
                   className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"
@@ -395,10 +395,10 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
                   </h3>
                   <div className="space-y-2">
                     {[
-                      { icon: Baby, text: 'Körpənin həftəlik inkişafı və ölçüləri' },
-                      { icon: TrendingUp, text: 'Sizin gündəlik əhvalınız və simptomlarınız' },
-                      { icon: Calendar, text: 'Həkim görüşləri və vacib tarixlər' },
-                      { icon: Heart, text: 'Təpik sayğacı və büzüşmə izləyicisi məlumatları' },
+                      { icon: Baby, text: tr("profilescreen_korpenin_heftelik_inkisafi_ve_olculeri_0474b5", "Körpənin həftəlik inkişafı və ölçüləri") },
+                      { icon: TrendingUp, text: tr("profilescreen_sizin_gundelik_ehvaliniz_ve_simptomlarin_8fde56", "Sizin gündəlik əhvalınız və simptomlarınız") },
+                      { icon: Calendar, text: tr("profilescreen_hekim_gorusleri_ve_vacib_tarixler_a345c4", "Həkim görüşləri və vacib tarixlər") },
+                      { icon: Heart, text: tr("profilescreen_tepik_saygaci_ve_buzusme_izleyicisi_melu_7f7ba1", "Təpik sayğacı və büzüşmə izləyicisi məlumatları") },
                     ].map((item, i) => (
                       <div key={i} className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
                         <item.icon className="w-5 h-5 text-primary" />
@@ -415,10 +415,10 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
                   </h3>
                   <div className="space-y-2">
                     {[
-                      { icon: MessageCircle, text: 'Sizə sevgi mesajları və dəstək göndərə bilər' },
-                      { icon: ShoppingCart, text: 'Ortaq alış-veriş siyahısına əlavə edə bilər' },
-                      { icon: Gift, text: 'Sürprizlər planlaşdırıb xallar toplaya bilər' },
-                      { icon: TrendingUp, text: 'Missiyaları yerinə yetirib səviyyə qazana bilər' },
+                      { icon: MessageCircle, text: tr("profilescreen_size_sevgi_mesajlari_ve_destek_gondere_b_7c91fb", "Sizə sevgi mesajları və dəstək göndərə bilər") },
+                      { icon: ShoppingCart, text: tr("profilescreen_ortaq_alis_veris_siyahisina_elave_ede_bi_8dd341", "Ortaq alış-veriş siyahısına əlavə edə bilər") },
+                      { icon: Gift, text: tr("profilescreen_surprizler_planlasdirib_xallar_toplaya_b_9fe114", "Sürprizlər planlaşdırıb xallar toplaya bilər") },
+                      { icon: TrendingUp, text: tr("profilescreen_missiyalari_yerine_yetirib_seviyye_qazan_719718", "Missiyaları yerinə yetirib səviyyə qazana bilər") },
                     ].map((item, i) => (
                       <div key={i} className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
                         <item.icon className="w-5 h-5 text-partner" />
@@ -454,7 +454,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
                 <Users className="w-4 h-4 text-pink-600" />
               </div>
               <div>
-                <h3 className="font-bold text-foreground text-sm">Uşaqlarım</h3>
+                <h3 className="font-bold text-foreground text-sm">{tr("profilescreen_usaqlarim_d988f7", "Uşaqlarım")}</h3>
                 <p className="text-[10px] text-muted-foreground">
                   {children.length === 0 ? 'Uşaq əlavə et' : `${children.length} uşaq`}
                 </p>
@@ -509,7 +509,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
               className="w-full p-4 rounded-xl border-2 border-dashed border-muted-foreground/30 flex flex-col items-center gap-2 text-muted-foreground hover:border-pink-400 hover:text-pink-500 transition-colors"
             >
               <Baby className="w-8 h-8" />
-              <span className="text-sm font-medium">İlk uşağı əlavə et</span>
+              <span className="text-sm font-medium">{tr("profilescreen_ilk_usagi_elave_et_251a77", "İlk uşağı əlavə et")}</span>
             </button>
           )}
         </motion.div>
@@ -536,7 +536,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Doğum tarixi</label>
+              <label className="text-sm font-medium">{tr("profilescreen_dogum_tarixi_d96907", "Doğum tarixi")}</label>
               <Input
                 type="date"
                 value={childForm.birth_date}
@@ -649,7 +649,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
         transition={{ delay: 0.55 }}
       >
         <div className="px-3 pt-3 pb-1">
-          <h2 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Hüquqi</h2>
+          <h2 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{tr("profilescreen_huquqi_ceb5d3", "Hüquqi")}</h2>
         </div>
         {[
           { id: 'legal/privacy_policy', icon: FileText, label: tr("profilescreen_gizlilik_siyaseti_dc3f28", 'Gizlilik Siyasəti') },

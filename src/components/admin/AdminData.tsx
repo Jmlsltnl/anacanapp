@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Database, Calendar, Baby, Heart, Download, Trash2, RefreshCw } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -94,7 +95,7 @@ const AdminData = () => {
       if (error) throw error;
 
       toast({
-        title: 'Uğurlu',
+        title: tr("admindata_ugurlu_7fe64c", "Uğurlu"),
         description: 'Köhnə məlumatlar silindi'
       });
 
@@ -103,8 +104,8 @@ const AdminData = () => {
     } catch (error) {
       console.error('Error clearing data:', error);
       toast({
-        title: 'Xəta',
-        description: 'Məlumatlar silinə bilmədi',
+        title: tr("admindata_xeta_3cdbb6", "Xəta"),
+        description: tr("admindata_melumatlar_siline_bilmedi_12aa6d", "Məlumatlar silinə bilmədi"),
         variant: 'destructive'
       });
     }
@@ -112,14 +113,14 @@ const AdminData = () => {
 
   const dataCards = [
     { 
-      label: 'Günlük Qeydlər', 
+      label: tr("admindata_gunluk_qeydler_c69448", "Günlük Qeydlər"), 
       value: stats.dailyLogs, 
       icon: Calendar, 
       color: 'bg-blue-500',
       table: 'daily_logs'
     },
     { 
-      label: 'Körpə Qeydləri', 
+      label: tr("admindata_korpe_qeydleri_53482e", "Körpə Qeydləri"), 
       value: stats.babyLogs, 
       icon: Baby, 
       color: 'bg-pink-500',
@@ -133,7 +134,7 @@ const AdminData = () => {
       table: 'partner_messages'
     },
     { 
-      label: 'Alış-veriş', 
+      label: tr("admindata_alis_veris_5f0748", "Alış-veriş"), 
       value: stats.shoppingItems, 
       icon: Database, 
       color: 'bg-green-500',
@@ -160,8 +161,8 @@ const AdminData = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Məlumatlar</h1>
-          <p className="text-muted-foreground">İstifadəçi məlumatlarını idarə edin</p>
+          <h1 className="text-2xl font-bold text-foreground">{tr("admindata_melumatlar_29e562", "Məlumatlar")}</h1>
+          <p className="text-muted-foreground">{tr("admindata_istifadeci_melumatlarini_idare_edin_20ce0a", "İstifadəçi məlumatlarını idarə edin")}</p>
         </div>
         <Button variant="outline" onClick={() => { fetchStats(); fetchTableData(); }} className="gap-2">
           <RefreshCw className="w-4 h-4" />
@@ -209,10 +210,10 @@ const AdminData = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="daily_logs">Günlük Qeydlər</SelectItem>
-                <SelectItem value="baby_logs">Körpə Qeydləri</SelectItem>
+                <SelectItem value="daily_logs">{tr("admindata_gunluk_qeydler_c69448", "Günlük Qeydlər")}</SelectItem>
+                <SelectItem value="baby_logs">{tr("admindata_korpe_qeydleri_53482e", "Körpə Qeydləri")}</SelectItem>
                 <SelectItem value="partner_messages">Mesajlar</SelectItem>
-                <SelectItem value="shopping_items">Alış-veriş</SelectItem>
+                <SelectItem value="shopping_items">{tr("admindata_alis_veris_5f0748", "Alış-veriş")}</SelectItem>
               </SelectContent>
             </Select>
             <Badge variant="secondary">

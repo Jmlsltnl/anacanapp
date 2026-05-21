@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { 
   Users, Plus, Search, Edit2, Trash2, Save, X, 
@@ -31,11 +32,11 @@ interface AdminGroup {
 }
 
 const GROUP_TYPES = [
-  { value: 'birth_month', label: 'Doğum ayı' },
+  { value: 'birth_month', label: tr("admincommunity_dogum_ayi_47ddbd", "Doğum ayı") },
   { value: 'gender', label: 'Cins' },
-  { value: 'multiples', label: 'Əkizlər' },
-  { value: 'pregnancy_month', label: 'Hamiləlik ayı' },
-  { value: 'general', label: 'Ümumi' },
+  { value: 'multiples', label: tr("admincommunity_ekizler_14f521", "Əkizlər") },
+  { value: 'pregnancy_month', label: tr("admincommunity_hamilelik_ayi_f43286", "Hamiləlik ayı") },
+  { value: 'general', label: tr("admincommunity_umumi_1b5521", "Ümumi") },
 ];
 
 const AdminCommunity = () => {
@@ -87,9 +88,9 @@ const AdminCommunity = () => {
           .update({ value: headerTexts[stage] })
           .eq('key', `community_header_${stage}`);
       }
-      toast({ title: 'Başlıq mətnləri yeniləndi ✓' });
+      toast({ title: tr("admincommunity_basliq_metnleri_yenilendi_e71981", "Başlıq mətnləri yeniləndi ✓") });
     } catch {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("admincommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     } finally {
       setHeaderSaving(false);
     }
@@ -121,7 +122,7 @@ const AdminCommunity = () => {
       setGroups((data as AdminGroup[]) || []);
     } catch (error) {
       console.error('Error fetching groups:', error);
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("admincommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -157,7 +158,7 @@ const AdminCommunity = () => {
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
-      toast({ title: 'Qrup adı tələb olunur', variant: 'destructive' });
+      toast({ title: tr("admincommunity_qrup_adi_teleb_olunur_adfa43", "Qrup adı tələb olunur"), variant: 'destructive' });
       return;
     }
 
@@ -180,7 +181,7 @@ const AdminCommunity = () => {
           .eq('id', editingGroup.id);
 
         if (error) throw error;
-        toast({ title: 'Qrup yeniləndi ✅' });
+        toast({ title: tr("admincommunity_qrup_yenilendi_d0267d", "Qrup yeniləndi ✅") });
       } else {
         // Create
         const { error } = await supabase
@@ -196,14 +197,14 @@ const AdminCommunity = () => {
           });
 
         if (error) throw error;
-        toast({ title: 'Qrup yaradıldı ✅' });
+        toast({ title: tr("admincommunity_qrup_yaradildi_071e0d", "Qrup yaradıldı ✅") });
       }
 
       setIsModalOpen(false);
       fetchGroups();
     } catch (error) {
       console.error('Error saving group:', error);
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("admincommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -223,7 +224,7 @@ const AdminCommunity = () => {
       fetchGroups();
     } catch (error) {
       console.error('Error deleting group:', error);
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("admincommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   };
 
@@ -257,12 +258,12 @@ const AdminCommunity = () => {
     <div className="space-y-6">
       {/* Community Header Texts per Life Stage */}
       <Card className="p-4">
-        <h3 className="font-bold text-foreground mb-3">📝 Cəmiyyət Başlıq Mətnləri (Fazalara görə)</h3>
+        <h3 className="font-bold text-foreground mb-3">{tr("admincommunity_cemiyyet_basliq_metnleri_fazalara_gore_aa4c16", "📝 Cəmiyyət Başlıq Mətnləri (Fazalara görə)")}</h3>
         <div className="space-y-3">
           {[
-            { key: 'flow' as const, label: '🩸 Menstruasiya', placeholder: 'Digər qadınlar ilə əlaqədə olun' },
-            { key: 'bump' as const, label: '🤰 Hamiləlik', placeholder: 'Digər hamilə analar ilə əlaqədə olun' },
-            { key: 'mommy' as const, label: '👩‍👧 Analıq', placeholder: 'Digər analar ilə əlaqədə olun' },
+            { key: 'flow' as const, label: '🩸 Menstruasiya', placeholder: tr("admincommunity_diger_qadinlar_ile_elaqede_olun_c330c7", "Digər qadınlar ilə əlaqədə olun") },
+            { key: 'bump' as const, label: tr("admincommunity_hamilelik_c61caf", "🤰 Hamiləlik"), placeholder: tr("admincommunity_diger_hamile_analar_ile_elaqede_olun_1ad833", "Digər hamilə analar ilə əlaqədə olun") },
+            { key: 'mommy' as const, label: tr("admincommunity_analiq_e28953", "👩‍👧 Analıq"), placeholder: tr("admincommunity_diger_analar_ile_elaqede_olun_4830a3", "Digər analar ilə əlaqədə olun") },
           ].map((stage) => (
             <div key={stage.key} className="flex items-center gap-3">
               <span className="text-sm font-medium w-32 flex-shrink-0">{stage.label}</span>
@@ -283,8 +284,8 @@ const AdminCommunity = () => {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Cəmiyyət Qrupları</h1>
-          <p className="text-muted-foreground">Community qruplarını idarə edin</p>
+          <h1 className="text-2xl font-bold text-foreground">{tr("admincommunity_cemiyyet_qruplari_cbaa40", "Cəmiyyət Qrupları")}</h1>
+          <p className="text-muted-foreground">{tr("admincommunity_community_qruplarini_idare_edin_1a966b", "Community qruplarını idarə edin")}</p>
         </div>
         <Button onClick={openCreateModal} className="gap-2">
           <Plus className="w-4 h-4" />
@@ -310,7 +311,7 @@ const AdminCommunity = () => {
               <SelectValue placeholder="Tip filteri" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Hamısı</SelectItem>
+              <SelectItem value="all">{tr("admincommunity_hamisi_c73c4d", "Hamısı")}</SelectItem>
               {GROUP_TYPES.map(type => (
                 <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
               ))}
@@ -322,7 +323,7 @@ const AdminCommunity = () => {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="p-4">
-          <p className="text-sm text-muted-foreground">Ümumi qruplar</p>
+          <p className="text-sm text-muted-foreground">{tr("admincommunity_umumi_qruplar_38d8db", "Ümumi qruplar")}</p>
           <p className="text-2xl font-bold">{groups.length}</p>
         </Card>
         <Card className="p-4">
@@ -332,13 +333,13 @@ const AdminCommunity = () => {
           </p>
         </Card>
         <Card className="p-4">
-          <p className="text-sm text-muted-foreground">Avtomatik qoşulma</p>
+          <p className="text-sm text-muted-foreground">{tr("admincommunity_avtomatik_qosulma_1af00d", "Avtomatik qoşulma")}</p>
           <p className="text-2xl font-bold text-primary">
             {groups.filter(g => g.is_auto_join).length}
           </p>
         </Card>
         <Card className="p-4">
-          <p className="text-sm text-muted-foreground">Ümumi üzv</p>
+          <p className="text-sm text-muted-foreground">{tr("admincommunity_umumi_uzv_ed3652", "Ümumi üzv")}</p>
           <p className="text-2xl font-bold text-violet-500">
             {groups.reduce((sum, g) => sum + (g.member_count || 0), 0)}
           </p>
@@ -443,21 +444,21 @@ const AdminCommunity = () => {
                 />
               </div>
               <div className="flex-1">
-                <label className="text-sm font-medium mb-2 block">Qrup adı</label>
+                <label className="text-sm font-medium mb-2 block">{tr("admincommunity_qrup_adi_3ca22e", "Qrup adı")}</label>
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Qrup adını daxil edin"
+                  placeholder={tr("admincommunity_qrup_adini_daxil_edin_a15074", "Qrup adını daxil edin")}
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-2 block">Açıqlama</label>
+              <label className="text-sm font-medium mb-2 block">{tr("admincommunity_aciqlama_c33d69", "Açıqlama")}</label>
               <Textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Qrup haqqında qısa məlumat"
+                placeholder={tr("admincommunity_qrup_haqqinda_qisa_melumat_ef7e85", "Qrup haqqında qısa məlumat")}
                 rows={3}
               />
             </div>
@@ -482,7 +483,7 @@ const AdminCommunity = () => {
             <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
               <div>
                 <p className="font-medium">Aktiv</p>
-                <p className="text-sm text-muted-foreground">Qrup istifadəçilərə görünsün</p>
+                <p className="text-sm text-muted-foreground">{tr("admincommunity_qrup_istifadecilere_gorunsun_c16afa", "Qrup istifadəçilərə görünsün")}</p>
               </div>
               <Switch
                 checked={formData.is_active}
@@ -492,8 +493,8 @@ const AdminCommunity = () => {
 
             <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
               <div>
-                <p className="font-medium">Avtomatik qoşulma</p>
-                <p className="text-sm text-muted-foreground">İstifadəçilər avtomatik qoşulsun</p>
+                <p className="font-medium">{tr("admincommunity_avtomatik_qosulma_1af00d", "Avtomatik qoşulma")}</p>
+                <p className="text-sm text-muted-foreground">{tr("admincommunity_istifadeciler_avtomatik_qosulsun_dda827", "İstifadəçilər avtomatik qoşulsun")}</p>
               </div>
               <Switch
                 checked={formData.is_auto_join}
@@ -521,7 +522,7 @@ const AdminCommunity = () => {
 
       <AdminUsageStats 
         eventNames={['community_post_created', 'community_post_liked']}
-        title="👥 İcma İstifadə Statistikası"
+        title={tr("admincommunity_icma_istifade_statistikasi_90d30c", "👥 İcma İstifadə Statistikası")}
         showEventData
         showUsers
       />

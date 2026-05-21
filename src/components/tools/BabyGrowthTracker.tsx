@@ -279,7 +279,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
             <p className="text-2xl font-black text-amber-600 dark:text-amber-400">
               {latestEntry?.head_cm ? `${latestEntry.head_cm}` : '—'}
             </p>
-            <p className="text-xs text-amber-600/70 dark:text-amber-400/70 font-medium">baş sm</p>
+            <p className="text-xs text-amber-600/70 dark:text-amber-400/70 font-medium">{tr("babygrowthtracker_bas_sm_1367d0", "baş sm")}</p>
           </motion.div>
         </div>
 
@@ -294,7 +294,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-400 to-pink-600 flex items-center justify-center">
                 <LineChart className="w-4 h-4 text-white" />
               </div>
-              <h2 className="font-bold text-foreground">Ölçü Tarixçəsi</h2>
+              <h2 className="font-bold text-foreground">{tr("babygrowthtracker_olcu_tarixcesi_249279", "Ölçü Tarixçəsi")}</h2>
             </div>
             <span className="text-xs text-muted-foreground">{entries.length} qeyd</span>
           </div>
@@ -314,7 +314,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-rose-100 to-pink-100 dark:from-rose-900/30 dark:to-pink-900/30 flex items-center justify-center">
                   <Scale className="w-8 h-8 text-rose-500" />
                 </div>
-                <h3 className="font-bold text-foreground mb-1">Hələ ölçü yoxdur</h3>
+                <h3 className="font-bold text-foreground mb-1">{tr("babygrowthtracker_hele_olcu_yoxdur_7f7813", "Hələ ölçü yoxdur")}</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   Körpənizin çəki və boyunu izləmək üçün ilk ölçünü əlavə edin
                 </p>
@@ -471,7 +471,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Qeyd (istəyə bağlı)</label>
+              <label className="text-sm font-medium mb-1.5 block">{tr("babygrowthtracker_qeyd_isteye_bagli_96c689", "Qeyd (istəyə bağlı)")}</label>
               <Input
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}

@@ -224,8 +224,8 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
                   <Sparkles className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-foreground">Premium-a yüksəldin!</h3>
-                  <p className="text-[10px] text-muted-foreground">Sınırsız imkanlar əldə edin</p>
+                  <h3 className="text-sm font-bold text-foreground">{tr("billingscreen_premium_a_yukseldin_d29d79", "Premium-a yüksəldin!")}</h3>
+                  <p className="text-[10px] text-muted-foreground">{tr("billingscreen_sinirsiz_imkanlar_elde_edin_8ffea5", "Sınırsız imkanlar əldə edin")}</p>
                 </div>
               </div>
 
@@ -277,10 +277,10 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
               </h3>
               <div className="space-y-2">
                 {[
-                  { text: 'Gündəlik limitli AI çat', included: true },
-                  { text: 'Əsas izləmə alətləri', included: true },
-                  { text: 'Topluluk girişi', included: true },
-                  { text: 'Reklam ilə istifadə', included: true },
+                  { text: tr("billingscreen_gundelik_limitli_ai_cat_cde61e", "Gündəlik limitli AI çat"), included: true },
+                  { text: tr("billingscreen_esas_izleme_aletleri_d7a341", "Əsas izləmə alətləri"), included: true },
+                  { text: tr("billingscreen_topluluk_girisi_4f806d", "Topluluk girişi"), included: true },
+                  { text: tr("billingscreen_reklam_ile_istifade_6445ef", "Reklam ilə istifadə"), included: true },
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-2 text-xs">
                     <CheckCircle className="w-3.5 h-3.5 text-muted-foreground" />
@@ -303,8 +303,8 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
                 <Star className="w-5 h-5 text-amber-500" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-bold text-foreground">Planları müqayisə edin</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Premium ilə nələr əldə edəcəyinizi görün</p>
+                <p className="text-sm font-bold text-foreground">{tr("billingscreen_planlari_muqayise_edin_13fb70", "Planları müqayisə edin")}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{tr("billingscreen_premium_ile_neler_elde_edeceyinizi_gorun_5b1bd7", "Premium ilə nələr əldə edəcəyinizi görün")}</p>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </motion.button>
@@ -453,7 +453,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
                       </div>
                       <div className="text-right shrink-0 ml-2">
                         {p.type === 'next' ? (
-                          <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold">Planlı</span>
+                          <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold">{tr("billingscreen_planli_74dfd2", "Planlı")}</span>
                         ) : (
                           <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">{config.paid_label}</span>
                         )}

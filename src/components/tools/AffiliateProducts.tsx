@@ -86,12 +86,12 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
             <Button variant="ghost" size="icon" onClick={onBack} className="relative z-30">
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h1 className="text-lg font-bold">Tövsiyyə olunan məhsullar</h1>
+            <h1 className="text-lg font-bold">{tr("affiliateproducts_tovsiyye_olunan_mehsullar_db580f", "Tövsiyyə olunan məhsullar")}</h1>
           </div>
         </div>
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
           <Package className="w-16 h-16 text-muted-foreground mb-4" />
-          <p className="text-lg font-medium mb-2">Tezliklə</p>
+          <p className="text-lg font-medium mb-2">{tr("affiliateproducts_tezlikle_125239", "Tezliklə")}</p>
           <p className="text-sm text-muted-foreground text-center">
             Sizin üçün seçilmiş məhsullar tezliklə burada olacaq
           </p>
@@ -110,8 +110,8 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div>
-              <h1 className="text-lg font-bold">Tövsiyyə olunan məhsullar</h1>
-              <p className="text-xs text-muted-foreground">Sizin üçün seçdiklərimiz</p>
+              <h1 className="text-lg font-bold">{tr("affiliateproducts_tovsiyye_olunan_mehsullar_db580f", "Tövsiyyə olunan məhsullar")}</h1>
+              <p className="text-xs text-muted-foreground">{tr("affiliateproducts_sizin_ucun_secdiklerimiz_e5dde6", "Sizin üçün seçdiklərimiz")}</p>
             </div>
           </div>
           <Button 
@@ -205,7 +205,7 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
         ) : filteredProducts.length === 0 ? (
           <div className="text-center py-12">
             <ShoppingBag className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground">Heç bir məhsul tapılmadı</p>
+            <p className="text-muted-foreground">{tr("affiliateproducts_hec_bir_mehsul_tapilmadi_7ded0c", "Heç bir məhsul tapılmadı")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3">

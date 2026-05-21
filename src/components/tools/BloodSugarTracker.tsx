@@ -165,8 +165,8 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div>
-              <h1 className="text-lg font-bold">Qan Şəkəri</h1>
-              <p className="text-xs text-muted-foreground">Səviyyəni izləyin</p>
+              <h1 className="text-lg font-bold">{tr("bloodsugartracker_qan_sekeri_b9a2cc", "Qan Şəkəri")}</h1>
+              <p className="text-xs text-muted-foreground">{tr("bloodsugartracker_seviyyeni_izleyin_1b70d5", "Səviyyəni izləyin")}</p>
             </div>
           </div>
           <Button 
@@ -189,7 +189,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
         >
           <div className="flex items-center gap-2 mb-2">
             <Droplet className="w-5 h-5 text-red-500" />
-            <span className="text-xs text-muted-foreground">Bu gün orta</span>
+            <span className="text-xs text-muted-foreground">{tr("bloodsugartracker_bu_gun_orta_96f2fa", "Bu gün orta")}</span>
           </div>
           <p className="text-2xl font-bold">
             {avgToday ? `${avgToday}` : '—'}
@@ -210,7 +210,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
         >
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="w-5 h-5 text-primary" />
-            <span className="text-xs text-muted-foreground">Həftəlik orta</span>
+            <span className="text-xs text-muted-foreground">{tr("bloodsugartracker_heftelik_orta_f3a738", "Həftəlik orta")}</span>
           </div>
           <p className="text-2xl font-bold">
             {avgWeek ? `${avgWeek}` : '—'}
@@ -228,9 +228,9 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
           <div className="flex items-start gap-2">
             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <div className="text-xs text-amber-800 dark:text-amber-200">
-              <p className="font-medium mb-1">Hamiləlik zamanı normal səviyyələr:</p>
-              <p>• Aclıq: 70-95 mg/dL</p>
-              <p>• Yeməkdən 2 saat sonra: &lt;140 mg/dL</p>
+              <p className="font-medium mb-1">{tr("bloodsugartracker_hamilelik_zamani_normal_seviyyeler_458722", "Hamiləlik zamanı normal səviyyələr:")}</p>
+              <p>{tr("bloodsugartracker_acliq_70_95_mg_dl_d4ac37", "• Aclıq: 70-95 mg/dL")}</p>
+              <p>{tr("bloodsugartracker_yemekden_2_saat_sonra_lt_140_mg_dl_8efae2", "• Yeməkdən 2 saat sonra: &lt;140 mg/dL")}</p>
             </div>
           </div>
         </div>
@@ -238,7 +238,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
 
       {/* Logs List */}
       <div className="px-4">
-        <h2 className="font-semibold text-sm mb-3">Son ölçmələr</h2>
+        <h2 className="font-semibold text-sm mb-3">{tr("bloodsugartracker_son_olcmeler_b024cf", "Son ölçmələr")}</h2>
         
         {isLoading ? (
           <div className="space-y-3">
@@ -252,8 +252,8 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
         ) : logs.length === 0 ? (
           <div className="text-center py-12">
             <Droplet className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground text-sm">Hələ heç bir qeyd yoxdur</p>
-            <p className="text-muted-foreground text-xs mt-1">İlk ölçmənizi əlavə edin</p>
+            <p className="text-muted-foreground text-sm">{tr("bloodsugartracker_hele_hec_bir_qeyd_yoxdur_463107", "Hələ heç bir qeyd yoxdur")}</p>
+            <p className="text-muted-foreground text-xs mt-1">{tr("bloodsugartracker_ilk_olcmenizi_elave_edin_c94d74", "İlk ölçmənizi əlavə edin")}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -332,7 +332,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 24px)' }}
           >
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-lg">Yeni ölçmə</h2>
+              <h2 className="font-bold text-lg">{tr("bloodsugartracker_yeni_olcme_cc2042", "Yeni ölçmə")}</h2>
               <Button variant="ghost" size="icon" onClick={() => setShowAddModal(false)}>
                 <X className="w-5 h-5" />
               </Button>
@@ -340,7 +340,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
 
             {/* Reading Value */}
             <div className="mb-4">
-              <label className="text-sm font-medium mb-2 block">Qan şəkəri səviyyəsi (mg/dL)</label>
+              <label className="text-sm font-medium mb-2 block">{tr("bloodsugartracker_qan_sekeri_seviyyesi_mg_dl_cb75a9", "Qan şəkəri səviyyəsi (mg/dL)")}</label>
               <input
                 type="number"
                 inputMode="decimal"
@@ -360,7 +360,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
 
             {/* Reading Type */}
             <div className="mb-4">
-              <label className="text-sm font-medium mb-2 block">Ölçmə növü</label>
+              <label className="text-sm font-medium mb-2 block">{tr("bloodsugartracker_olcme_novu_0d8219", "Ölçmə növü")}</label>
               <div className="grid grid-cols-2 gap-2">
                 {readingTypes.map(type => (
                   <button
@@ -382,7 +382,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
             {/* Meal Context (optional) */}
             {(selectedType === 'before_meal' || selectedType === 'after_meal') && (
               <div className="mb-4">
-                <label className="text-sm font-medium mb-2 block">Yemək</label>
+                <label className="text-sm font-medium mb-2 block">{tr("bloodsugartracker_yemek_b1fd56", "Yemək")}</label>
                 <div className="grid grid-cols-4 gap-2">
                   {mealContexts.map(meal => (
                     <button
@@ -404,7 +404,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
 
             {/* Notes */}
             <div className="mb-6">
-              <label className="text-sm font-medium mb-2 block">Qeyd (istəyə bağlı)</label>
+              <label className="text-sm font-medium mb-2 block">{tr("bloodsugartracker_qeyd_isteye_bagli_96c689", "Qeyd (istəyə bağlı)")}</label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}

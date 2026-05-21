@@ -150,7 +150,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
             <Heart className="w-5 h-5 text-white" />
           </div>
           <div className="text-left">
-            <h3 className="font-bold text-foreground">Gündəlik Qeyd</h3>
+            <h3 className="font-bold text-foreground">{tr("flowdailylogger_gundelik_qeyd_32e154", "Gündəlik Qeyd")}</h3>
             <p className="text-xs text-muted-foreground">
               {format(date, 'd MMMM, EEEE', { locale: az })}
             </p>
@@ -178,7 +178,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
             <div className="p-4 space-y-6">
               {/* Mood */}
               <div>
-                <label className="text-sm font-medium text-foreground mb-3 block">Əhval</label>
+                <label className="text-sm font-medium text-foreground mb-3 block">{tr("flowdailylogger_ehval_0457f9", "Əhval")}</label>
                 <div className="flex gap-2 justify-between">
                   {MOOD_OPTIONS.map(option => (
                     <button
@@ -199,7 +199,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
 
               {/* Energy */}
               <div>
-                <label className="text-sm font-medium text-foreground mb-3 block">Enerji Səviyyəsi</label>
+                <label className="text-sm font-medium text-foreground mb-3 block">{tr("flowdailylogger_enerji_seviyyesi_961691", "Enerji Səviyyəsi")}</label>
                 <div className="flex gap-2 justify-between">
                   {ENERGY_OPTIONS.map(option => {
                     const Icon = option.icon;
@@ -259,8 +259,8 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
                   className="w-full"
                 />
                 <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                  <span>Ağrı yoxdur</span>
-                  <span>Çox ağrılı</span>
+                  <span>{tr("flowdailylogger_agri_yoxdur_25522a", "Ağrı yoxdur")}</span>
+                  <span>{tr("flowdailylogger_cox_agrili_ee7bd3", "Çox ağrılı")}</span>
                 </div>
               </div>
 
@@ -305,7 +305,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">Yuxu Keyfiyyəti</label>
+                  <label className="text-sm font-medium text-foreground mb-2 block">{tr("flowdailylogger_yuxu_keyfiyyeti_0bb5f7", "Yuxu Keyfiyyəti")}</label>
                   <div className="flex gap-1">
                     {SLEEP_QUALITY.map(option => (
                       <button
@@ -350,7 +350,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
 
               {/* Notes */}
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">Qeydlər</label>
+                <label className="text-sm font-medium text-foreground mb-2 block">{tr("flowdailylogger_qeydler_a7a98b", "Qeydlər")}</label>
                 <Textarea
                   value={formData.notes ?? ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value || null }))}

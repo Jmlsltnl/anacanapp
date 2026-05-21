@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { 
   Camera, Plus, Trash2, Edit2, Save, X, 
@@ -105,9 +106,9 @@ const AdminPhotoshoot = () => {
       setEditingItem(null);
       setIsAdding(false);
       setNewItem({});
-      toast({ title: 'Uğurla yadda saxlanıldı!' });
+      toast({ title: tr("adminphotoshoot_ugurla_yadda_saxlanildi_4a21f2", "Uğurla yadda saxlanıldı!") });
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminphotoshoot_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -146,9 +147,9 @@ const AdminPhotoshoot = () => {
       setEditingItem(null);
       setIsAdding(false);
       setNewItem({});
-      toast({ title: 'Uğurla yadda saxlanıldı!' });
+      toast({ title: tr("adminphotoshoot_ugurla_yadda_saxlanildi_4a21f2", "Uğurla yadda saxlanıldı!") });
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminphotoshoot_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -185,9 +186,9 @@ const AdminPhotoshoot = () => {
       setEditingItem(null);
       setIsAdding(false);
       setNewItem({});
-      toast({ title: 'Uğurla yadda saxlanıldı!' });
+      toast({ title: tr("adminphotoshoot_ugurla_yadda_saxlanildi_4a21f2", "Uğurla yadda saxlanıldı!") });
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminphotoshoot_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -224,9 +225,9 @@ const AdminPhotoshoot = () => {
       setEditingItem(null);
       setIsAdding(false);
       setNewItem({});
-      toast({ title: 'Uğurla yadda saxlanıldı!' });
+      toast({ title: tr("adminphotoshoot_ugurla_yadda_saxlanildi_4a21f2", "Uğurla yadda saxlanıldı!") });
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminphotoshoot_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -263,9 +264,9 @@ const AdminPhotoshoot = () => {
       setEditingItem(null);
       setIsAdding(false);
       setNewItem({});
-      toast({ title: 'Uğurla yadda saxlanıldı!' });
+      toast({ title: tr("adminphotoshoot_ugurla_yadda_saxlanildi_4a21f2", "Uğurla yadda saxlanıldı!") });
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminphotoshoot_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -304,9 +305,9 @@ const AdminPhotoshoot = () => {
       setEditingItem(null);
       setIsAdding(false);
       setNewItem({});
-      toast({ title: 'Uğurla yadda saxlanıldı!' });
+      toast({ title: tr("adminphotoshoot_ugurla_yadda_saxlanildi_4a21f2", "Uğurla yadda saxlanıldı!") });
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminphotoshoot_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -323,9 +324,9 @@ const AdminPhotoshoot = () => {
       
       if (error) throw error;
       refreshData();
-      toast({ title: 'Uğurla silindi!' });
+      toast({ title: tr("adminphotoshoot_ugurla_silindi_430290", "Uğurla silindi!") });
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminphotoshoot_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     }
   };
 
@@ -340,7 +341,7 @@ const AdminPhotoshoot = () => {
       refreshData();
       toast({ title: currentStatus ? 'Deaktiv edildi' : 'Aktiv edildi' });
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminphotoshoot_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     }
   };
 
@@ -365,7 +366,7 @@ const AdminPhotoshoot = () => {
           <CardContent className="p-3 text-center">
             <Sparkles className="w-5 h-5 mx-auto text-violet-500 mb-1" />
             <p className="text-xl font-bold">{imageStyles.length}</p>
-            <p className="text-xs text-muted-foreground">Şəkil Növü</p>
+            <p className="text-xs text-muted-foreground">{tr("adminphotoshoot_sekil_novu_c47221", "Şəkil Növü")}</p>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-pink-500/10 to-rose-500/10 border-pink-200">
@@ -386,21 +387,21 @@ const AdminPhotoshoot = () => {
           <CardContent className="p-3 text-center">
             <Eye className="w-5 h-5 mx-auto text-blue-500 mb-1" />
             <p className="text-xl font-bold">{eyeColors.length}</p>
-            <p className="text-xs text-muted-foreground">Göz Rəngi</p>
+            <p className="text-xs text-muted-foreground">{tr("adminphotoshoot_goz_rengi_8fe8d7", "Göz Rəngi")}</p>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-200">
           <CardContent className="p-3 text-center">
             <Palette className="w-5 h-5 mx-auto text-amber-500 mb-1" />
             <p className="text-xl font-bold">{hairColors.length}</p>
-            <p className="text-xs text-muted-foreground">Saç Rəngi</p>
+            <p className="text-xs text-muted-foreground">{tr("adminphotoshoot_sac_rengi_68dd12", "Saç Rəngi")}</p>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-200">
           <CardContent className="p-3 text-center">
             <Scissors className="w-5 h-5 mx-auto text-green-500 mb-1" />
             <p className="text-xl font-bold">{hairStyles.length}</p>
-            <p className="text-xs text-muted-foreground">Saç Forması</p>
+            <p className="text-xs text-muted-foreground">{tr("adminphotoshoot_sac_formasi_5d3388", "Saç Forması")}</p>
           </CardContent>
         </Card>
       </div>
@@ -455,18 +456,18 @@ const AdminPhotoshoot = () => {
                     onChange={(e) => setNewItem({ ...newItem, emoji: e.target.value })}
                   />
                   <Input
-                    placeholder="İngilis adı"
+                    placeholder={tr("adminphotoshoot_ingilis_adi_0325b8", "İngilis adı")}
                     value={newItem.style_name || ''}
                     onChange={(e) => setNewItem({ ...newItem, style_name: e.target.value })}
                   />
                   <Input
-                    placeholder="Azərbaycan adı"
+                    placeholder={tr("adminphotoshoot_azerbaycan_adi_439c58", "Azərbaycan adı")}
                     value={newItem.style_name_az || ''}
                     onChange={(e) => setNewItem({ ...newItem, style_name_az: e.target.value })}
                   />
                 </div>
                 <Textarea
-                  placeholder="Prompt Modifier (AI stil üçün)"
+                  placeholder={tr("adminphotoshoot_prompt_modifier_ai_stil_ucun_d0558d", "Prompt Modifier (AI stil üçün)")}
                   value={newItem.prompt_modifier || ''}
                   onChange={(e) => setNewItem({ ...newItem, prompt_modifier: e.target.value })}
                   rows={3}
@@ -554,17 +555,17 @@ const AdminPhotoshoot = () => {
                     onChange={(e) => setNewItem({ ...newItem, theme_emoji: e.target.value })}
                   />
                   <Input
-                    placeholder="İngilis adı"
+                    placeholder={tr("adminphotoshoot_ingilis_adi_0325b8", "İngilis adı")}
                     value={newItem.theme_name || ''}
                     onChange={(e) => setNewItem({ ...newItem, theme_name: e.target.value })}
                   />
                   <Input
-                    placeholder="Azərbaycan adı"
+                    placeholder={tr("adminphotoshoot_azerbaycan_adi_439c58", "Azərbaycan adı")}
                     value={newItem.theme_name_az || ''}
                     onChange={(e) => setNewItem({ ...newItem, theme_name_az: e.target.value })}
                   />
                   <Input
-                    placeholder="Kateqoriya (İngilis)"
+                    placeholder={tr("adminphotoshoot_kateqoriya_ingilis_a39e44", "Kateqoriya (İngilis)")}
                     value={newItem.category_name || ''}
                     onChange={(e) => setNewItem({ ...newItem, category_name: e.target.value })}
                   />
@@ -575,7 +576,7 @@ const AdminPhotoshoot = () => {
                   />
                 </div>
                 <Textarea
-                  placeholder="Prompt Template (AI üçün)"
+                  placeholder={tr("adminphotoshoot_prompt_template_ai_ucun_39b0ad", "Prompt Template (AI üçün)")}
                   value={newItem.prompt_template || ''}
                   onChange={(e) => setNewItem({ ...newItem, prompt_template: e.target.value })}
                   rows={3}
@@ -585,12 +586,12 @@ const AdminPhotoshoot = () => {
                   onValueChange={(v) => setNewItem({ ...newItem, gender: v })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Cinsiyyət" />
+                    <SelectValue placeholder={tr("adminphotoshoot_cinsiyyet_1526fb", "Cinsiyyət")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="unisex">Hamı üçün</SelectItem>
-                    <SelectItem value="boy">Oğlan</SelectItem>
-                    <SelectItem value="girl">Qız</SelectItem>
+                    <SelectItem value="unisex">{tr("adminphotoshoot_hami_ucun_97455b", "Hamı üçün")}</SelectItem>
+                    <SelectItem value="boy">{tr("adminphotoshoot_oglan_e9715e", "Oğlan")}</SelectItem>
+                    <SelectItem value="girl">{tr("adminphotoshoot_qiz_79bf6b", "Qız")}</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="flex gap-2">
@@ -671,12 +672,12 @@ const AdminPhotoshoot = () => {
                     onChange={(e) => setNewItem({ ...newItem, emoji: e.target.value })}
                   />
                   <Input
-                    placeholder="İngilis adı"
+                    placeholder={tr("adminphotoshoot_ingilis_adi_0325b8", "İngilis adı")}
                     value={newItem.outfit_name || ''}
                     onChange={(e) => setNewItem({ ...newItem, outfit_name: e.target.value })}
                   />
                   <Input
-                    placeholder="Azərbaycan adı"
+                    placeholder={tr("adminphotoshoot_azerbaycan_adi_439c58", "Azərbaycan adı")}
                     value={newItem.outfit_name_az || ''}
                     onChange={(e) => setNewItem({ ...newItem, outfit_name_az: e.target.value })}
                   />
@@ -686,12 +687,12 @@ const AdminPhotoshoot = () => {
                   onValueChange={(v) => setNewItem({ ...newItem, gender: v })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Cinsiyyət" />
+                    <SelectValue placeholder={tr("adminphotoshoot_cinsiyyet_1526fb", "Cinsiyyət")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Hamı üçün</SelectItem>
-                    <SelectItem value="boy">Oğlan</SelectItem>
-                    <SelectItem value="girl">Qız</SelectItem>
+                    <SelectItem value="all">{tr("adminphotoshoot_hami_ucun_97455b", "Hamı üçün")}</SelectItem>
+                    <SelectItem value="boy">{tr("adminphotoshoot_oglan_e9715e", "Oğlan")}</SelectItem>
+                    <SelectItem value="girl">{tr("adminphotoshoot_qiz_79bf6b", "Qız")}</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="flex gap-2">
@@ -772,12 +773,12 @@ const AdminPhotoshoot = () => {
                     onChange={(e) => setNewItem({ ...newItem, hex_value: e.target.value })}
                   />
                   <Input
-                    placeholder="İngilis adı"
+                    placeholder={tr("adminphotoshoot_ingilis_adi_0325b8", "İngilis adı")}
                     value={newItem.color_name || ''}
                     onChange={(e) => setNewItem({ ...newItem, color_name: e.target.value })}
                   />
                   <Input
-                    placeholder="Azərbaycan adı"
+                    placeholder={tr("adminphotoshoot_azerbaycan_adi_439c58", "Azərbaycan adı")}
                     value={newItem.color_name_az || ''}
                     onChange={(e) => setNewItem({ ...newItem, color_name_az: e.target.value })}
                   />
@@ -858,12 +859,12 @@ const AdminPhotoshoot = () => {
                     onChange={(e) => setNewItem({ ...newItem, hex_value: e.target.value })}
                   />
                   <Input
-                    placeholder="İngilis adı"
+                    placeholder={tr("adminphotoshoot_ingilis_adi_0325b8", "İngilis adı")}
                     value={newItem.color_name || ''}
                     onChange={(e) => setNewItem({ ...newItem, color_name: e.target.value })}
                   />
                   <Input
-                    placeholder="Azərbaycan adı"
+                    placeholder={tr("adminphotoshoot_azerbaycan_adi_439c58", "Azərbaycan adı")}
                     value={newItem.color_name_az || ''}
                     onChange={(e) => setNewItem({ ...newItem, color_name_az: e.target.value })}
                   />
@@ -944,12 +945,12 @@ const AdminPhotoshoot = () => {
                     onChange={(e) => setNewItem({ ...newItem, emoji: e.target.value })}
                   />
                   <Input
-                    placeholder="İngilis adı"
+                    placeholder={tr("adminphotoshoot_ingilis_adi_0325b8", "İngilis adı")}
                     value={newItem.style_name || ''}
                     onChange={(e) => setNewItem({ ...newItem, style_name: e.target.value })}
                   />
                   <Input
-                    placeholder="Azərbaycan adı"
+                    placeholder={tr("adminphotoshoot_azerbaycan_adi_439c58", "Azərbaycan adı")}
                     value={newItem.style_name_az || ''}
                     onChange={(e) => setNewItem({ ...newItem, style_name_az: e.target.value })}
                   />
@@ -1012,7 +1013,7 @@ const AdminPhotoshoot = () => {
 
       <AdminUsageStats 
         eventNames={['baby_photo_generated', 'tool_opened']}
-        title="📸 Foto Generator İstifadə Statistikası"
+        title={tr("adminphotoshoot_foto_generator_istifade_statistikasi_a9e4ef", "📸 Foto Generator İstifadə Statistikası")}
         showEventData
         showUsers
       />

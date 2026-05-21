@@ -1,4 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
+import { tr } from '@/lib/tr';
 import { reportComponentCrash } from '@/lib/crashReporter';
 
 interface Props {
@@ -31,7 +32,7 @@ class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) return this.props.fallback;
       return (
         <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-background text-foreground">
-          <p className="text-lg font-semibold mb-2">Xəta baş verdi</p>
+          <p className="text-lg font-semibold mb-2">{tr("errorboundary_xeta_bas_verdi_f22fba", "Xəta baş verdi")}</p>
           <p className="text-sm text-muted-foreground text-center mb-4">
             {this.state.error?.message || 'Naməlum xəta'}
           </p>

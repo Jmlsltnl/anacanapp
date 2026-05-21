@@ -124,7 +124,7 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
             <Moon className="w-4 h-4 text-violet-600 dark:text-violet-400" />
           </div>
           <div className="text-left">
-            <p className="text-xs font-semibold text-foreground">Yuxu xülasəsi</p>
+            <p className="text-xs font-semibold text-foreground">{tr("sleephistorypanel_yuxu_xulasesi_b2dc87", "Yuxu xülasəsi")}</p>
             <p className="text-[10px] text-muted-foreground">
               {todaySleepStats.count > 0
                 ? `🌙 ${todaySleepStats.count} dəfə · ${formatDuration(todaySleepStats.totalMinutes)}`
@@ -138,7 +138,7 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
               <p className="text-xs font-bold text-violet-600 dark:text-violet-400">
                 {formatDuration(todaySleepStats.totalMinutes)}
               </p>
-              <p className="text-[10px] text-muted-foreground">bu gün</p>
+              <p className="text-[10px] text-muted-foreground">{tr("sleephistorypanel_bu_gun_7d7f30", "bu gün")}</p>
             </div>
           )}
           {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
@@ -175,7 +175,7 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
                           <div key={log.id} className="relative">
                             {deletingId === log.id ? (
                               <div className="flex items-center justify-between bg-destructive/10 rounded-lg px-2.5 py-2 border border-destructive/20">
-                                <span className="text-xs text-destructive font-medium">Silmək istəyirsiniz?</span>
+                                <span className="text-xs text-destructive font-medium">{tr("sleephistorypanel_silmek_isteyirsiniz_77af6b", "Silmək istəyirsiniz?")}</span>
                                 <div className="flex gap-1.5">
                                   <button onClick={() => handleDelete(log.id)} className="p-1.5 rounded-full bg-destructive/20 text-destructive">
                                     <Check className="w-3 h-3" />

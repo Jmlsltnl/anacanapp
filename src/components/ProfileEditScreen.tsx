@@ -240,7 +240,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
           >
             <ArrowLeft className="w-5 h-5" />
           </motion.button>
-          <h1 className="text-lg font-bold text-foreground flex-1">Profili Redaktə Et</h1>
+          <h1 className="text-lg font-bold text-foreground flex-1">{tr("profileeditscreen_profili_redakte_et_b5368c", "Profili Redaktə Et")}</h1>
           <Button onClick={handleSave} disabled={loading} className="gradient-primary">
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
             Saxla
@@ -281,7 +281,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
               className="hidden"
             />
           </div>
-          <p className="text-sm text-muted-foreground mt-2">Profil şəklini dəyiş</p>
+          <p className="text-sm text-muted-foreground mt-2">{tr("profileeditscreen_profil_seklini_deyis_7dbfc6", "Profil şəklini dəyiş")}</p>
         </div>
 
         {/* Basic Info */}
@@ -324,7 +324,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
           </h3>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">Mərhələ</label>
+            <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_merhele_0e09aa", "Mərhələ")}</label>
             <Select
               value={formData.life_stage}
               onValueChange={handleLifeStageChange}
@@ -333,8 +333,8 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="flow">🌸 Menstruasiya izləyicisi</SelectItem>
-                <SelectItem value="bump">🤰 Hamiləyəm</SelectItem>
+                <SelectItem value="flow">{tr("profileeditscreen_menstruasiya_izleyicisi_b0d2dd", "🌸 Menstruasiya izləyicisi")}</SelectItem>
+                <SelectItem value="bump">{tr("profileeditscreen_hamileyem_01937d", "🤰 Hamiləyəm")}</SelectItem>
                 <SelectItem value="mommy">👶 Anayam</SelectItem>
               </SelectContent>
             </Select>
@@ -345,7 +345,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
             <>
               {/* Date Input Mode Toggle */}
               <div className="space-y-3">
-                <label className="text-sm font-medium text-muted-foreground">Tarix növünü seçin</label>
+                <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_tarix_novunu_secin_ad6b20", "Tarix növünü seçin")}</label>
                 <ToggleGroup 
                   type="single" 
                   value={dateInputMode} 
@@ -364,7 +364,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                     className="flex items-center gap-2 h-auto py-3 px-4 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-xl border"
                   >
                     <Baby className="w-4 h-4" />
-                    <span className="text-sm">Doğuş tarixi</span>
+                    <span className="text-sm">{tr("profileeditscreen_dogus_tarixi_e2caea", "Doğuş tarixi")}</span>
                   </ToggleGroupItem>
                 </ToggleGroup>
               </div>
@@ -372,7 +372,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
               {/* Date Input based on mode */}
               {dateInputMode === 'lmp' ? (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Son menstruasiyanın ilk günü</label>
+                  <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_son_menstruasiyanin_ilk_gunu_c79f76", "Son menstruasiyanın ilk günü")}</label>
                   <Input
                     type="date"
                     value={formData.last_period_date}
@@ -381,7 +381,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Təxmini doğuş tarixi</label>
+                  <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_texmini_dogus_tarixi_a8b543", "Təxmini doğuş tarixi")}</label>
                   <Input
                     type="date"
                     value={formData.due_date}
@@ -399,7 +399,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                 >
                   <div className="flex items-center gap-2 text-primary">
                     <Sparkles className="w-4 h-4" />
-                    <span className="text-sm font-medium">Hesablanmış məlumatlar</span>
+                    <span className="text-sm font-medium">{tr("profileeditscreen_hesablanmis_melumatlar_b5a420", "Hesablanmış məlumatlar")}</span>
                   </div>
                   
                   {calculatedDates.calculatedDueDate && (
@@ -423,7 +423,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
               )}
               
               <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">Körpənin adı (istəyə bağlı)</label>
+                <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_korpenin_adi_isteye_bagli_4e76c8", "Körpənin adı (istəyə bağlı)")}</label>
                 <Input
                   value={formData.baby_name}
                   onChange={(e) => setFormData(prev => ({ ...prev, baby_name: e.target.value }))}
@@ -445,7 +445,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">Dövrün uzunluğu (gün)</label>
+                <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_dovrun_uzunlugu_gun_4d99da", "Dövrün uzunluğu (gün)")}</label>
                 <Input
                   type="number"
                   value={formData.cycle_length}
@@ -461,7 +461,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
           {formData.life_stage === 'mommy' && (
             <>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">Körpənin adı</label>
+                <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_korpenin_adi_8a4e9e", "Körpənin adı")}</label>
                 <Input
                   value={formData.baby_name}
                   onChange={(e) => setFormData(prev => ({ ...prev, baby_name: e.target.value }))}
@@ -469,7 +469,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">Doğuş tarixi</label>
+                <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_dogus_tarixi_e2caea", "Doğuş tarixi")}</label>
                 <Input
                   type="date"
                   value={formData.baby_birth_date}
@@ -486,8 +486,8 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                     <SelectValue placeholder={tr("profileeditscreen_secin_5c0c8d", "Seçin")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="boy">👦 Oğlan</SelectItem>
-                    <SelectItem value="girl">👧 Qız</SelectItem>
+                    <SelectItem value="boy">{tr("profileeditscreen_oglan_c41cd8", "👦 Oğlan")}</SelectItem>
+                    <SelectItem value="girl">{tr("profileeditscreen_qiz_cc9008", "👧 Qız")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { useAllQuickActions, useQuickActionsMutations, QuickAction } from '@/hooks/useQuickActions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -61,7 +62,7 @@ const AdminQuickActions = () => {
     setFormData(action);
   };
 
-  if (isLoading) return <div className="p-4">Yüklənir...</div>;
+  if (isLoading) return <div className="p-4">{tr("adminquickactions_yuklenir_5557de", "Yüklənir...")}</div>;
 
   // Group by life_stage and age_group
   const grouped = actions.reduce((acc, action) => {
@@ -74,7 +75,7 @@ const AdminQuickActions = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Sürətli Keçidlər</h2>
+        <h2 className="text-2xl font-bold">{tr("adminquickactions_suretli_kecidler_cee44e", "Sürətli Keçidlər")}</h2>
         <Button onClick={handleCreate} size="sm">
           <Plus className="w-4 h-4 mr-2" />
           Yeni
@@ -109,7 +110,7 @@ const AdminQuickActions = () => {
                     <Input
                       value={formData.label_az ?? action.label_az ?? ''}
                       onChange={(e) => setFormData({ ...formData, label_az: e.target.value })}
-                      placeholder="Azərbaycanca"
+                      placeholder={tr("adminquickactions_azerbaycanca_bdc8df", "Azərbaycanca")}
                       className="flex-1"
                     />
                     <Input

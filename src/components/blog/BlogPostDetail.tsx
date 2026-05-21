@@ -377,7 +377,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           </div>
           <div>
             <p className="font-bold text-foreground">{post.author_name}</p>
-            <p className="text-sm text-muted-foreground">Məqalə müəllifi</p>
+            <p className="text-sm text-muted-foreground">{tr("blogpostdetail_meqale_muellifi_1bf996", "Məqalə müəllifi")}</p>
           </div>
         </motion.div>
 
@@ -426,8 +426,8 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
               <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-violet-100 to-purple-100 dark:from-violet-900/30 dark:to-purple-900/30 flex items-center justify-center">
                 <MessageCircle className="w-7 h-7 text-violet-500" />
               </div>
-              <p className="font-semibold text-foreground">Hələ şərh yoxdur</p>
-              <p className="text-sm text-muted-foreground">İlk şərhi siz yazın!</p>
+              <p className="font-semibold text-foreground">{tr("blogpostdetail_hele_serh_yoxdur_1dfc90", "Hələ şərh yoxdur")}</p>
+              <p className="text-sm text-muted-foreground">{tr("blogpostdetail_ilk_serhi_siz_yazin_00a364", "İlk şərhi siz yazın!")}</p>
             </div>
           ) : (
             <div className="space-y-4">

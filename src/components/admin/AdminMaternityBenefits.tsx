@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Plus, Edit2, Trash2, Calculator, Save, X, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -96,22 +97,22 @@ const AdminMaternityBenefits = () => {
     if (!editingConfig) return;
     const value = parseFloat(configValue);
     if (isNaN(value)) {
-      toast({ title: 'Düzgün rəqəm daxil edin', variant: 'destructive' });
+      toast({ title: tr("adminmaternitybenefits_duzgun_reqem_daxil_edin_b92de2", "Düzgün rəqəm daxil edin"), variant: 'destructive' });
       return;
     }
     
     const result = await updateConfigValue(editingConfig.id, value);
     if (result.error) {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("adminmaternitybenefits_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     } else {
-      toast({ title: 'Yeniləndi' });
+      toast({ title: tr("adminmaternitybenefits_yenilendi_d10a01", "Yeniləndi") });
       setEditingConfig(null);
     }
   };
 
   const handleSaveGuide = async () => {
     if (!guideForm.title.trim() || !guideForm.content.trim()) {
-      toast({ title: 'Başlıq və məzmun daxil edin', variant: 'destructive' });
+      toast({ title: tr("adminmaternitybenefits_basliq_ve_mezmun_daxil_edin_d2ab00", "Başlıq və məzmun daxil edin"), variant: 'destructive' });
       return;
     }
 
@@ -123,7 +124,7 @@ const AdminMaternityBenefits = () => {
     }
 
     if (result.error) {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("adminmaternitybenefits_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     } else {
       toast({ title: editingGuide ? 'Yeniləndi' : 'Əlavə edildi' });
       closeGuideModal();
@@ -134,14 +135,14 @@ const AdminMaternityBenefits = () => {
     if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
     const result = await deleteGuideline(id);
     if (result.error) {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("adminmaternitybenefits_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     } else {
       toast({ title: 'Silindi' });
     }
   };
 
   if (loading) {
-    return <div className="p-6 text-center">Yüklənir...</div>;
+    return <div className="p-6 text-center">{tr("adminmaternitybenefits_yuklenir_5557de", "Yüklənir...")}</div>;
   }
 
   return (
@@ -159,7 +160,7 @@ const AdminMaternityBenefits = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="config">Konfiqurasiya</TabsTrigger>
-          <TabsTrigger value="guidelines">Bələdçilər</TabsTrigger>
+          <TabsTrigger value="guidelines">{tr("adminmaternitybenefits_beledciler_38051c", "Bələdçilər")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="config" className="space-y-4">
@@ -269,7 +270,7 @@ const AdminMaternityBenefits = () => {
           <div className="space-y-4">
             <div className="grid grid-cols-4 gap-2">
               <div>
-                <Label>İkon</Label>
+                <Label>{tr("adminmaternitybenefits_ikon_6e73fc", "İkon")}</Label>
                 <Input
                   value={guideForm.icon}
                   onChange={(e) => setGuideForm({ ...guideForm, icon: e.target.value })}
@@ -277,7 +278,7 @@ const AdminMaternityBenefits = () => {
                 />
               </div>
               <div className="col-span-3">
-                <Label>Başlıq (EN)</Label>
+                <Label>{tr("adminmaternitybenefits_basliq_en_4ac905", "Başlıq (EN)")}</Label>
                 <Input
                   value={guideForm.title}
                   onChange={(e) => setGuideForm({ ...guideForm, title: e.target.value })}
@@ -286,7 +287,7 @@ const AdminMaternityBenefits = () => {
             </div>
 
             <div>
-              <Label>Başlıq (AZ)</Label>
+              <Label>{tr("adminmaternitybenefits_basliq_az_3e294a", "Başlıq (AZ)")}</Label>
               <Input
                 value={guideForm.title_az}
                 onChange={(e) => setGuideForm({ ...guideForm, title_az: e.target.value })}
@@ -294,7 +295,7 @@ const AdminMaternityBenefits = () => {
             </div>
 
             <div>
-              <Label>Məzmun (EN)</Label>
+              <Label>{tr("adminmaternitybenefits_mezmun_en_7541aa", "Məzmun (EN)")}</Label>
               <Textarea
                 value={guideForm.content}
                 onChange={(e) => setGuideForm({ ...guideForm, content: e.target.value })}
@@ -303,7 +304,7 @@ const AdminMaternityBenefits = () => {
             </div>
 
             <div>
-              <Label>Məzmun (AZ) - Markdown dəstəklənir</Label>
+              <Label>{tr("adminmaternitybenefits_mezmun_az_markdown_desteklenir_769038", "Məzmun (AZ) - Markdown dəstəklənir")}</Label>
               <Textarea
                 value={guideForm.content_az}
                 onChange={(e) => setGuideForm({ ...guideForm, content_az: e.target.value })}
@@ -320,7 +321,7 @@ const AdminMaternityBenefits = () => {
                 />
               </div>
               <div>
-                <Label>Sıra</Label>
+                <Label>{tr("adminmaternitybenefits_sira_421c5f", "Sıra")}</Label>
                 <Input
                   type="number"
                   value={guideForm.sort_order}

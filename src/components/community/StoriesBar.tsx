@@ -176,7 +176,7 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
               </div>
               <div className="p-5 pt-3">
                 <div className="flex items-center justify-between mb-5">
-                  <h3 className="text-[16px] font-black text-foreground">Story Əlavə Et</h3>
+                  <h3 className="text-[16px] font-black text-foreground">{tr("storiesbar_story_elave_et_21f0b9", "Story Əlavə Et")}</h3>
                   <button onClick={() => setShowCreateModal(false)} className="w-8 h-8 rounded-full bg-muted/40 flex items-center justify-center">
                     <X className="w-4 h-4 text-muted-foreground/60" />
                   </button>
@@ -213,7 +213,7 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
         <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center">
           <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="bg-card rounded-2xl p-6 flex flex-col items-center gap-3 shadow-xl">
             <div className="w-10 h-10 border-[2.5px] border-primary/25 border-t-primary rounded-full animate-spin" />
-            <p className="font-bold text-[12px] text-foreground">Story yüklənir...</p>
+            <p className="font-bold text-[12px] text-foreground">{tr("storiesbar_story_yuklenir_a92632", "Story yüklənir...")}</p>
           </motion.div>
         </div>
       )}

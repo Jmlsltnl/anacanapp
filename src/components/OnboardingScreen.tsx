@@ -542,7 +542,7 @@ const OnboardingScreen = () => {
                         </motion.button>
                         <div className="flex-1 h-14 rounded-2xl bg-muted/50 flex items-center justify-center">
                           <span className="text-2xl font-bold text-foreground">{cycleLength}</span>
-                          <span className="text-muted-foreground ml-2">gün</span>
+                          <span className="text-muted-foreground ml-2">{tr("onboardingscreen_gun_54e78d", "gün")}</span>
                         </div>
                         <motion.button
                           type="button"
@@ -574,7 +574,7 @@ const OnboardingScreen = () => {
                         </motion.button>
                         <div className="flex-1 h-14 rounded-2xl bg-muted/50 flex items-center justify-center">
                           <span className="text-2xl font-bold text-foreground">{periodLength}</span>
-                          <span className="text-muted-foreground ml-2">gün</span>
+                          <span className="text-muted-foreground ml-2">{tr("onboardingscreen_gun_54e78d", "gün")}</span>
                         </div>
                         <motion.button
                           type="button"

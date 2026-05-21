@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { tr } from '@/lib/tr';
 import { DEEPLINK_ROUTES, generateDeeplink, DeeplinkRoute } from '@/lib/deeplink';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -214,7 +215,7 @@ const AdminDeeplinks = () => {
       {Object.keys(filteredCategories).length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
           <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
-          <p>Nəticə tapılmadı</p>
+          <p>{tr("admindeeplinks_netice_tapilmadi_4b1b52", "Nəticə tapılmadı")}</p>
         </div>
       )}
     </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,8 +28,8 @@ const AdminMentalHealth = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Mental Sağlamlıq İdarəetməsi</h2>
-        <p className="text-muted-foreground">EPDS sualları, əhval, nəfəs məşqləri, səs hədləri və dəstək resursları</p>
+        <h2 className="text-2xl font-bold">{tr("adminmentalhealth_mental_saglamliq_idareetmesi_1b85ab", "Mental Sağlamlıq İdarəetməsi")}</h2>
+        <p className="text-muted-foreground">{tr("adminmentalhealth_epds_suallari_ehval_nefes_mesqleri_ses_h_577a68", "EPDS sualları, əhval, nəfəs məşqləri, səs hədləri və dəstək resursları")}</p>
       </div>
 
       <Tabs defaultValue="epds" className="space-y-4">
@@ -106,7 +107,7 @@ const EPDSTab = () => {
               <TableHead>№</TableHead>
               <TableHead>Sual (AZ)</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="w-[100px]">Əməliyyatlar</TableHead>
+              <TableHead className="w-[100px]">{tr("adminmentalhealth_emeliyyatlar_54d70c", "Əməliyyatlar")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -157,7 +158,7 @@ const EPDSForm = ({ item, onSave }: { item: EPDSQuestion | null; onSave: (data: 
           <Input type="number" value={formData.question_number} onChange={e => setFormData({...formData, question_number: parseInt(e.target.value)})} />
         </div>
         <div>
-          <Label>Sıra</Label>
+          <Label>{tr("adminmentalhealth_sira_421c5f", "Sıra")}</Label>
           <Input type="number" value={formData.sort_order} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value)})} />
         </div>
       </div>
@@ -171,7 +172,7 @@ const EPDSForm = ({ item, onSave }: { item: EPDSQuestion | null; onSave: (data: 
       </div>
       <div className="flex items-center gap-4">
         <Switch checked={formData.is_reverse_scored} onCheckedChange={v => setFormData({...formData, is_reverse_scored: v})} />
-        <Label>Tərsinə hesablanır</Label>
+        <Label>{tr("adminmentalhealth_tersine_hesablanir_dfe11e", "Tərsinə hesablanır")}</Label>
         <Switch checked={formData.is_active} onCheckedChange={v => setFormData({...formData, is_active: v})} />
         <Label>Aktiv</Label>
       </div>
@@ -252,7 +253,7 @@ const MoodForm = ({ item, onSave }: { item: MoodLevel | null; onSave: (data: Par
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label>Dəyər (1-5)</Label>
+          <Label>{tr("adminmentalhealth_deyer_1_5_24b5f4", "Dəyər (1-5)")}</Label>
           <Input type="number" min={1} max={5} value={formData.mood_value} onChange={e => setFormData({...formData, mood_value: parseInt(e.target.value)})} />
         </div>
         <div>
@@ -271,7 +272,7 @@ const MoodForm = ({ item, onSave }: { item: MoodLevel | null; onSave: (data: Par
         </div>
       </div>
       <div>
-        <Label>Rəng</Label>
+        <Label>{tr("adminmentalhealth_reng_8c6bc5", "Rəng")}</Label>
         <Input type="color" value={formData.color} onChange={e => setFormData({...formData, color: e.target.value})} />
       </div>
       <Button onClick={() => onSave(formData)} className="w-full">Yadda saxla</Button>
@@ -318,11 +319,11 @@ const BreathingTab = () => {
           <TableHeader>
             <TableRow>
               <TableHead>Ad</TableHead>
-              <TableHead>Nəfəs al</TableHead>
+              <TableHead>{tr("adminmentalhealth_nefes_al_50ff18", "Nəfəs al")}</TableHead>
               <TableHead>Saxla</TableHead>
-              <TableHead>Nəfəs ver</TableHead>
-              <TableHead>Dövrlər</TableHead>
-              <TableHead>Əməliyyatlar</TableHead>
+              <TableHead>{tr("adminmentalhealth_nefes_ver_6ccae7", "Nəfəs ver")}</TableHead>
+              <TableHead>{tr("adminmentalhealth_dovrler_24f55e", "Dövrlər")}</TableHead>
+              <TableHead>{tr("adminmentalhealth_emeliyyatlar_54d70c", "Əməliyyatlar")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -383,7 +384,7 @@ const BreathingForm = ({ item, onSave }: { item: BreathingExercise | null; onSav
       </div>
       <div className="grid grid-cols-4 gap-2">
         <div>
-          <Label>Nəfəs al (s)</Label>
+          <Label>{tr("adminmentalhealth_nefes_al_s_197780", "Nəfəs al (s)")}</Label>
           <Input type="number" value={formData.inhale_seconds} onChange={e => setFormData({...formData, inhale_seconds: parseInt(e.target.value)})} />
         </div>
         <div>
@@ -391,16 +392,16 @@ const BreathingForm = ({ item, onSave }: { item: BreathingExercise | null; onSav
           <Input type="number" value={formData.hold_seconds} onChange={e => setFormData({...formData, hold_seconds: parseInt(e.target.value)})} />
         </div>
         <div>
-          <Label>Nəfəs ver (s)</Label>
+          <Label>{tr("adminmentalhealth_nefes_ver_s_119735", "Nəfəs ver (s)")}</Label>
           <Input type="number" value={formData.exhale_seconds} onChange={e => setFormData({...formData, exhale_seconds: parseInt(e.target.value)})} />
         </div>
         <div>
-          <Label>Dövr</Label>
+          <Label>{tr("adminmentalhealth_dovr_ce797b", "Dövr")}</Label>
           <Input type="number" value={formData.total_cycles} onChange={e => setFormData({...formData, total_cycles: parseInt(e.target.value)})} />
         </div>
       </div>
       <div>
-        <Label>Təsvir (AZ)</Label>
+        <Label>{tr("adminmentalhealth_tesvir_az_2c237a", "Təsvir (AZ)")}</Label>
         <Textarea value={formData.description_az} onChange={e => setFormData({...formData, description_az: e.target.value})} />
       </div>
       <Button onClick={() => onSave(formData)} className="w-full">Yadda saxla</Button>
@@ -446,11 +447,11 @@ const NoiseTab = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Açar</TableHead>
-              <TableHead>Aralıq (dB)</TableHead>
+              <TableHead>{tr("adminmentalhealth_acar_644193", "Açar")}</TableHead>
+              <TableHead>{tr("adminmentalhealth_araliq_db_a88377", "Aralıq (dB)")}</TableHead>
               <TableHead>Etiket</TableHead>
               <TableHead>Emoji</TableHead>
-              <TableHead>Əməliyyatlar</TableHead>
+              <TableHead>{tr("adminmentalhealth_emeliyyatlar_54d70c", "Əməliyyatlar")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -496,7 +497,7 @@ const NoiseForm = ({ item, onSave }: { item: NoiseThreshold | null; onSave: (dat
   return (
     <div className="space-y-4">
       <div>
-        <Label>Açar (məs: silent, quiet)</Label>
+        <Label>{tr("adminmentalhealth_acar_mes_silent_quiet_9eed69", "Açar (məs: silent, quiet)")}</Label>
         <Input value={formData.threshold_key} onChange={e => setFormData({...formData, threshold_key: e.target.value})} />
       </div>
       <div className="grid grid-cols-2 gap-4">
@@ -521,7 +522,7 @@ const NoiseForm = ({ item, onSave }: { item: NoiseThreshold | null; onSave: (dat
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label>Rəng</Label>
+          <Label>{tr("adminmentalhealth_reng_8c6bc5", "Rəng")}</Label>
           <Input type="color" value={formData.color || '#22c55e'} onChange={e => setFormData({...formData, color: e.target.value})} />
         </div>
         <div>
@@ -530,7 +531,7 @@ const NoiseForm = ({ item, onSave }: { item: NoiseThreshold | null; onSave: (dat
         </div>
       </div>
       <div>
-        <Label>Təsvir (AZ)</Label>
+        <Label>{tr("adminmentalhealth_tesvir_az_2c237a", "Təsvir (AZ)")}</Label>
         <Textarea value={formData.description_az} onChange={e => setFormData({...formData, description_az: e.target.value})} />
       </div>
       <Button onClick={() => onSave(formData)} className="w-full">Yadda saxla</Button>
@@ -593,7 +594,7 @@ const ResourcesTab = () => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-lg">Təcili Yardım & Dəstək Resursları</CardTitle>
+        <CardTitle className="text-lg">{tr("adminmentalhealth_tecili_yardim_destek_resurslari_1ed147", "Təcili Yardım & Dəstək Resursları")}</CardTitle>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button size="sm" onClick={() => { setEditItem(null); setFormData({ name: '', name_az: '', description: '', description_az: '', resource_type: 'hotline', phone: '', website: '', address: '', address_az: '', is_emergency: false, is_active: true, sort_order: 0 }); }}>
@@ -610,25 +611,25 @@ const ResourcesTab = () => {
                 <div><Label>Ad (AZ)</Label><Input value={formData.name_az} onChange={e => setFormData({...formData, name_az: e.target.value})} /></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div><Label>Təsvir (EN)</Label><Textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} /></div>
-                <div><Label>Təsvir (AZ)</Label><Textarea value={formData.description_az} onChange={e => setFormData({...formData, description_az: e.target.value})} /></div>
+                <div><Label>{tr("adminmentalhealth_tesvir_en_c64521", "Təsvir (EN)")}</Label><Textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} /></div>
+                <div><Label>{tr("adminmentalhealth_tesvir_az_2c237a", "Təsvir (AZ)")}</Label><Textarea value={formData.description_az} onChange={e => setFormData({...formData, description_az: e.target.value})} /></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Telefon</Label><Input value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} /></div>
                 <div><Label>Sayt</Label><Input value={formData.website} onChange={e => setFormData({...formData, website: e.target.value})} /></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div><Label>Ünvan (EN)</Label><Input value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} /></div>
-                <div><Label>Ünvan (AZ)</Label><Input value={formData.address_az} onChange={e => setFormData({...formData, address_az: e.target.value})} /></div>
+                <div><Label>{tr("adminmentalhealth_unvan_en_18f4d9", "Ünvan (EN)")}</Label><Input value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} /></div>
+                <div><Label>{tr("adminmentalhealth_unvan_az_9434ac", "Ünvan (AZ)")}</Label><Input value={formData.address_az} onChange={e => setFormData({...formData, address_az: e.target.value})} /></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Tip</Label><Input value={formData.resource_type} onChange={e => setFormData({...formData, resource_type: e.target.value})} placeholder="hotline, clinic, support" /></div>
-                <div><Label>Sıra</Label><Input type="number" value={formData.sort_order} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value) || 0})} /></div>
+                <div><Label>{tr("adminmentalhealth_sira_421c5f", "Sıra")}</Label><Input type="number" value={formData.sort_order} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value) || 0})} /></div>
               </div>
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
                   <Switch checked={formData.is_emergency} onCheckedChange={v => setFormData({...formData, is_emergency: v})} />
-                  <Label>Təcili</Label>
+                  <Label>{tr("adminmentalhealth_tecili_ab784b", "Təcili")}</Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <Switch checked={formData.is_active} onCheckedChange={v => setFormData({...formData, is_active: v})} />
@@ -647,9 +648,9 @@ const ResourcesTab = () => {
               <TableHead>Ad (AZ)</TableHead>
               <TableHead>Telefon</TableHead>
               <TableHead>Tip</TableHead>
-              <TableHead>Təcili</TableHead>
+              <TableHead>{tr("adminmentalhealth_tecili_ab784b", "Təcili")}</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Əməliyyat</TableHead>
+              <TableHead>{tr("adminmentalhealth_emeliyyat_580469", "Əməliyyat")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -658,7 +659,7 @@ const ResourcesTab = () => {
                 <TableCell className="font-medium">{r.name_az}</TableCell>
                 <TableCell>{r.phone || '—'}</TableCell>
                 <TableCell><Badge variant="outline">{r.resource_type}</Badge></TableCell>
-                <TableCell>{r.is_emergency ? <Badge className="bg-red-500">Təcili</Badge> : '—'}</TableCell>
+                <TableCell>{r.is_emergency ? <Badge className="bg-red-500">{tr("adminmentalhealth_tecili_ab784b", "Təcili")}</Badge> : '—'}</TableCell>
                 <TableCell>{r.is_active ? <Badge className="bg-green-500">Aktiv</Badge> : <Badge variant="secondary">Deaktiv</Badge>}</TableCell>
                 <TableCell>
                   <div className="flex gap-1">

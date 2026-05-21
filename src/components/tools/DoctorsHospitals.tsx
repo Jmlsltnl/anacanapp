@@ -220,7 +220,7 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
         ) : filteredProviders.length === 0 ? (
           <div className="text-center py-12">
             <Building2 className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground">Heç bir nəticə tapılmadı</p>
+            <p className="text-muted-foreground">{tr("doctorshospitals_hec_bir_netice_tapilmadi_5745d9", "Heç bir nəticə tapılmadı")}</p>
           </div>
         ) : (
           filteredProviders.map((provider, index) => (
@@ -415,7 +415,7 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
 
         {/* Contact Info */}
         <div className="bg-card rounded-2xl p-4 border border-border/50 mb-4 space-y-3">
-          <h2 className="font-semibold text-sm">Əlaqə məlumatları</h2>
+          <h2 className="font-semibold text-sm">{tr("doctorshospitals_elaqe_melumatlari_ddd442", "Əlaqə məlumatları")}</h2>
           
           {provider.address_az && (
             <div className="flex items-start gap-3">
@@ -423,7 +423,7 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
                 <MapPin className="w-4 h-4 text-primary" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Ünvan</p>
+                <p className="text-xs text-muted-foreground">{tr("doctorshospitals_unvan_b8651a", "Ünvan")}</p>
                 <p className="text-sm">{provider.address_az}, {provider.city}</p>
               </div>
             </div>
@@ -447,7 +447,7 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
                 <Mail className="w-4 h-4 text-blue-600" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">E-poçt</p>
+                <p className="text-xs text-muted-foreground">{tr("doctorshospitals_e_poct_f5c193", "E-poçt")}</p>
                 <p className="text-sm text-primary">{provider.email}</p>
               </div>
             </a>
@@ -471,7 +471,7 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
           <div className="bg-card rounded-2xl p-4 border border-border/50 mb-4">
             <div className="flex items-center gap-2 mb-3">
               <Clock className="w-4 h-4 text-primary" />
-              <h2 className="font-semibold text-sm">İş saatları</h2>
+              <h2 className="font-semibold text-sm">{tr("doctorshospitals_is_saatlari_cfa6fe", "İş saatları")}</h2>
             </div>
             <div className="space-y-2">
               {Object.entries(provider.working_hours as Record<string, string>).map(([day, hours]) => (
@@ -489,7 +489,7 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
           <div className="bg-card rounded-2xl p-4 border border-border/50 mb-4">
             <div className="flex items-center gap-2 mb-3">
               <DollarSign className="w-4 h-4 text-primary" />
-              <h2 className="font-semibold text-sm">Xidmətlər və qiymətlər</h2>
+              <h2 className="font-semibold text-sm">{tr("doctorshospitals_xidmetler_ve_qiymetler_8e63a7", "Xidmətlər və qiymətlər")}</h2>
             </div>
             <div className="space-y-2">
               {(provider.services as Service[]).map((service, index) => (

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { tr } from '@/lib/tr';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 type SourceKey = 'pregnancy_day_notifications' | 'mommy_day_notifications' | 'flow_reminders';
 
 const SOURCES: { key: SourceKey; label: string; timeCol: string; labelCol: string }[] = [
-  { key: 'pregnancy_day_notifications', label: 'Hamiləlik (bump)', timeCol: 'send_time', labelCol: 'title' },
+  { key: 'pregnancy_day_notifications', label: tr("bulktimemanager_hamilelik_bump_b450c6", "Hamiləlik (bump)"), timeCol: 'send_time', labelCol: 'title' },
   { key: 'mommy_day_notifications', label: 'Ana (mommy)', timeCol: 'send_time', labelCol: 'title' },
   { key: 'flow_reminders', label: 'Tsikl (flow)', timeCol: 'send_time', labelCol: 'title' },
 ];
@@ -131,7 +132,7 @@ const BulkTimeManager = () => {
         <div className="flex items-center gap-2 mb-3">
           <Clock className="h-5 w-5 text-primary" />
           <div>
-            <h3 className="font-semibold">Toplu saat dəyişdirici</h3>
+            <h3 className="font-semibold">{tr("bulktimemanager_toplu_saat_deyisdirici_9723b3", "Toplu saat dəyişdirici")}</h3>
             <p className="text-xs text-muted-foreground">
               Mənbə seçin → mövcud saata görə filterləyin → yeni saatı təyin edib seçilənləri toplu yeniləyin.
             </p>
@@ -140,7 +141,7 @@ const BulkTimeManager = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           <div>
-            <Label className="text-xs">Mənbə</Label>
+            <Label className="text-xs">{tr("bulktimemanager_menbe_76eac8", "Mənbə")}</Label>
             <Select value={source} onValueChange={(v) => setSource(v as SourceKey)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -152,7 +153,7 @@ const BulkTimeManager = () => {
           </div>
 
           <div>
-            <Label className="text-xs flex items-center gap-1"><Filter className="h-3 w-3" /> Mövcud saat filteri</Label>
+            <Label className="text-xs flex items-center gap-1"><Filter className="h-3 w-3" />{tr("bulktimemanager_movcud_saat_filteri_ea28d2", "Mövcud saat filteri")}</Label>
             <Select value={timeFilter} onValueChange={setTimeFilter}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -200,8 +201,8 @@ const BulkTimeManager = () => {
                   <Checkbox checked={allSelected} onCheckedChange={toggleAll} />
                 </th>
                 <th className="p-2 text-left">Saat</th>
-                {source !== 'flow_reminders' && <th className="p-2 text-left">Gün</th>}
-                <th className="p-2 text-left">Başlıq</th>
+                {source !== 'flow_reminders' && <th className="p-2 text-left">{tr("bulktimemanager_gun_18b2f4", "Gün")}</th>}
+                <th className="p-2 text-left">{tr("bulktimemanager_basliq_e1f6c5", "Başlıq")}</th>
                 <th className="p-2 text-left">ID</th>
               </tr>
             </thead>
@@ -218,7 +219,7 @@ const BulkTimeManager = () => {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">Sətir yoxdur</td></tr>
+                <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">{tr("bulktimemanager_setir_yoxdur_08da0f", "Sətir yoxdur")}</td></tr>
               )}
             </tbody>
           </table>

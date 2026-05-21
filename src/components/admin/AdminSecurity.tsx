@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Shield, Users, Key, AlertTriangle, CheckCircle, UserPlus } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -85,7 +86,7 @@ const AdminSecurity = () => {
       if (error) throw error;
 
       toast({
-        title: 'Uğurlu',
+        title: tr("adminsecurity_ugurlu_7fe64c", "Uğurlu"),
         description: 'İstifadəçi rolu yeniləndi'
       });
 
@@ -93,8 +94,8 @@ const AdminSecurity = () => {
     } catch (error) {
       console.error('Error updating role:', error);
       toast({
-        title: 'Xəta',
-        description: 'Rol yenilənə bilmədi',
+        title: tr("adminsecurity_xeta_3cdbb6", "Xəta"),
+        description: tr("adminsecurity_rol_yenilene_bilmedi_176789", "Rol yenilənə bilmədi"),
         variant: 'destructive'
       });
     }
@@ -117,7 +118,7 @@ const AdminSecurity = () => {
         if (error) throw error;
 
         toast({
-          title: 'Uğurlu',
+          title: tr("adminsecurity_ugurlu_7fe64c", "Uğurlu"),
           description: 'İstifadəçiyə rol təyin edildi'
         });
       }
@@ -127,8 +128,8 @@ const AdminSecurity = () => {
     } catch (error) {
       console.error('Error adding role:', error);
       toast({
-        title: 'Xəta',
-        description: 'Rol təyin edilə bilmədi',
+        title: tr("adminsecurity_xeta_3cdbb6", "Xəta"),
+        description: tr("adminsecurity_rol_teyin_edile_bilmedi_8ddf00", "Rol təyin edilə bilmədi"),
         variant: 'destructive'
       });
     }
@@ -164,8 +165,8 @@ const AdminSecurity = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Təhlükəsizlik</h1>
-          <p className="text-muted-foreground">İstifadəçi rollarını və icazələrini idarə edin</p>
+          <h1 className="text-2xl font-bold text-foreground">{tr("adminsecurity_tehlukesizlik_8bc156", "Təhlükəsizlik")}</h1>
+          <p className="text-muted-foreground">{tr("adminsecurity_istifadeci_rollarini_ve_icazelerini_idar_244eb9", "İstifadəçi rollarını və icazələrini idarə edin")}</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
@@ -176,14 +177,14 @@ const AdminSecurity = () => {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>İstifadəçiyə Rol Təyin Et</DialogTitle>
+              <DialogTitle>{tr("adminsecurity_istifadeciye_rol_teyin_et_41c4f9", "İstifadəçiyə Rol Təyin Et")}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 mt-4">
               <div>
-                <label className="text-sm font-medium mb-2 block">İstifadəçi</label>
+                <label className="text-sm font-medium mb-2 block">{tr("adminsecurity_istifadeci_b6bdd6", "İstifadəçi")}</label>
                 <Select value={selectedUserId} onValueChange={setSelectedUserId}>
                   <SelectTrigger>
-                    <SelectValue placeholder="İstifadəçi seçin" />
+                    <SelectValue placeholder={tr("adminsecurity_istifadeci_secin_3e7045", "İstifadəçi seçin")} />
                   </SelectTrigger>
                   <SelectContent>
                     {profiles.map((profile) => (
@@ -201,7 +202,7 @@ const AdminSecurity = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="user">İstifadəçi</SelectItem>
+                    <SelectItem value="user">{tr("adminsecurity_istifadeci_b6bdd6", "İstifadəçi")}</SelectItem>
                     <SelectItem value="moderator">Moderator</SelectItem>
                     <SelectItem value="admin">Admin</SelectItem>
                   </SelectContent>
@@ -246,7 +247,7 @@ const AdminSecurity = () => {
             </div>
             <div>
               <p className="text-2xl font-bold">{stats.users}</p>
-              <p className="text-sm text-muted-foreground">İstifadəçi</p>
+              <p className="text-sm text-muted-foreground">{tr("adminsecurity_istifadeci_b6bdd6", "İstifadəçi")}</p>
             </div>
           </div>
         </Card>
@@ -272,7 +273,7 @@ const AdminSecurity = () => {
             <Badge className="bg-green-500/10 text-green-500">Aktiv</Badge>
           </div>
           <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-            <span>Email Təsdiqi</span>
+            <span>{tr("adminsecurity_email_tesdiqi_2cd6ac", "Email Təsdiqi")}</span>
             <Badge className="bg-green-500/10 text-green-500">Aktiv</Badge>
           </div>
         </div>
@@ -281,15 +282,15 @@ const AdminSecurity = () => {
       {/* Roles Table */}
       <Card className="overflow-hidden">
         <div className="p-4 border-b border-border">
-          <h3 className="font-semibold">İstifadəçi Rolları</h3>
+          <h3 className="font-semibold">{tr("adminsecurity_istifadeci_rollari_4f840d", "İstifadəçi Rolları")}</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-muted/50">
               <tr>
-                <th className="text-left p-4 font-medium text-muted-foreground">İstifadəçi</th>
+                <th className="text-left p-4 font-medium text-muted-foreground">{tr("adminsecurity_istifadeci_b6bdd6", "İstifadəçi")}</th>
                 <th className="text-left p-4 font-medium text-muted-foreground">Rol</th>
-                <th className="text-right p-4 font-medium text-muted-foreground">Əməliyyat</th>
+                <th className="text-right p-4 font-medium text-muted-foreground">{tr("adminsecurity_emeliyyat_580469", "Əməliyyat")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -343,7 +344,7 @@ const AdminSecurity = () => {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="user">İstifadəçi</SelectItem>
+                            <SelectItem value="user">{tr("adminsecurity_istifadeci_b6bdd6", "İstifadəçi")}</SelectItem>
                             <SelectItem value="moderator">Moderator</SelectItem>
                             <SelectItem value="admin">Admin</SelectItem>
                           </SelectContent>

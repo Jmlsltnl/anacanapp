@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Package, Settings, BarChart3, Shield, 
@@ -36,97 +37,97 @@ interface MenuGroup {
 const menuGroups: MenuGroup[] = [
   {
     id: 'main',
-    label: 'Əsas Panel & Analitika',
+    label: tr("adminlayout_esas_panel_analitika_f94ea3", "Əsas Panel & Analitika"),
     emoji: '📊',
     icon: LayoutDashboard,
     items: [
       { id: 'dashboard', label: 'Dashboard', icon: Home },
       { id: 'analytics', label: 'Analitika', icon: BarChart3 },
-      { id: 'quick-actions', label: 'Sürətli Keçidlər', icon: Zap },
+      { id: 'quick-actions', label: tr("adminlayout_suretli_kecidler_cee44e", "Sürətli Keçidlər"), icon: Zap },
     ],
   },
   {
     id: 'users',
-    label: 'İstifadəçilər & İcma',
+    label: tr("adminlayout_istifadeciler_icma_0167fc", "İstifadəçilər & İcma"),
     emoji: '👥',
     icon: Users,
     items: [
-      { id: 'users', label: 'İstifadəçilər', icon: Users },
-      { id: 'community', label: 'Cəmiyyət', icon: MessageSquare },
+      { id: 'users', label: tr("adminlayout_istifadeciler_1dd7b9", "İstifadəçilər"), icon: Users },
+      { id: 'community', label: tr("adminlayout_cemiyyet_2dc44d", "Cəmiyyət"), icon: MessageSquare },
       { id: 'moderation', label: 'Moderasiya', icon: AlertTriangle },
-      { id: 'support', label: 'Dəstək Müraciətləri', icon: MessageSquare },
+      { id: 'support', label: tr("adminlayout_destek_muracietleri_f2b929", "Dəstək Müraciətləri"), icon: MessageSquare },
       { id: 'messages', label: 'Mesajlar', icon: Key },
       { id: 'mommy-daily-messages', label: 'Anaya Mesaj', icon: Heart },
     ],
   },
   {
     id: 'content',
-    label: 'Məzmun İdarəetməsi',
+    label: tr("adminlayout_mezmun_idareetmesi_4493d0", "Məzmun İdarəetməsi"),
     emoji: '📝',
     icon: FileText,
     items: [
       { id: 'blog', label: 'Bloq', icon: FileText },
-      { id: 'dynamic-content', label: 'Dinamik Məzmun', icon: Layers },
-      { id: 'content', label: 'Digər Kontent', icon: FileText },
-      { id: 'data', label: 'Məlumatlar', icon: Database },
+      { id: 'dynamic-content', label: tr("adminlayout_dinamik_mezmun_bec232", "Dinamik Məzmun"), icon: Layers },
+      { id: 'content', label: tr("adminlayout_diger_kontent_425557", "Digər Kontent"), icon: FileText },
+      { id: 'data', label: tr("adminlayout_melumatlar_29e562", "Məlumatlar"), icon: Database },
       { id: 'faq', label: 'FAQ', icon: HelpCircle },
-      { id: 'pregnancy', label: 'Hamiləlik Kontenti', icon: Baby },
-      { id: 'flow-content', label: 'Menstruasiya Məzmunu', icon: Baby },
-      { id: 'partner-tips', label: 'Partnyor Məsləhətləri', icon: Heart },
-      { id: 'mental-health', label: 'Mental Sağlamlıq', icon: Brain },
-      { id: 'first-aid', label: 'İlk Yardım (SOS)', icon: ShieldAlert },
-      { id: 'recipes', label: 'Reseptlər', icon: UtensilsCrossed },
+      { id: 'pregnancy', label: tr("adminlayout_hamilelik_kontenti_9bc47b", "Hamiləlik Kontenti"), icon: Baby },
+      { id: 'flow-content', label: tr("adminlayout_menstruasiya_mezmunu_bf5904", "Menstruasiya Məzmunu"), icon: Baby },
+      { id: 'partner-tips', label: tr("adminlayout_partnyor_meslehetleri_ba2d1c", "Partnyor Məsləhətləri"), icon: Heart },
+      { id: 'mental-health', label: tr("adminlayout_mental_saglamliq_68e65e", "Mental Sağlamlıq"), icon: Brain },
+      { id: 'first-aid', label: tr("adminlayout_ilk_yardim_sos_28f569", "İlk Yardım (SOS)"), icon: ShieldAlert },
+      { id: 'recipes', label: tr("adminlayout_reseptler_98ed2c", "Reseptlər"), icon: UtensilsCrossed },
     ],
   },
   {
     id: 'tools',
-    label: 'Modullar & Alətlər',
+    label: tr("adminlayout_modullar_aletler_fa6a62", "Modullar & Alətlər"),
     emoji: '🛠',
     icon: Wrench,
     items: [
-      { id: 'tools-config', label: 'Alət Konfiqurasiyaları', icon: Settings },
-      { id: 'tools', label: 'Alətlər Sıralaması', icon: Wrench },
-      { id: 'development-tips', label: 'İnkişaf Tövsiyələri', icon: Lightbulb },
-      { id: 'baby-growth', label: 'İnkişaf izləyicisi', icon: Scale },
-      { id: 'teething', label: 'Diş Çıxarma', icon: Sparkles },
-      { id: 'crisis-calendar', label: 'Kriz Təqvimi', icon: Calendar },
-      { id: 'baby-daily-info', label: 'Günlük Məlumatlar (Ana)', icon: Calendar },
-      { id: 'phase-tips', label: 'Faza Məsləhətləri', icon: Lightbulb },
-      { id: 'trimester-tips', label: 'Trimester Tövsiyələri', icon: Baby },
-      { id: 'vitamins', label: 'Vitaminlər', icon: Pill },
+      { id: 'tools-config', label: tr("adminlayout_alet_konfiqurasiyalari_942d10", "Alət Konfiqurasiyaları"), icon: Settings },
+      { id: 'tools', label: tr("adminlayout_aletler_siralamasi_56ef13", "Alətlər Sıralaması"), icon: Wrench },
+      { id: 'development-tips', label: tr("adminlayout_inkisaf_tovsiyeleri_9f473e", "İnkişaf Tövsiyələri"), icon: Lightbulb },
+      { id: 'baby-growth', label: tr("adminlayout_inkisaf_izleyicisi_71039e", "İnkişaf izləyicisi"), icon: Scale },
+      { id: 'teething', label: tr("adminlayout_dis_cixarma_ca53f7", "Diş Çıxarma"), icon: Sparkles },
+      { id: 'crisis-calendar', label: tr("adminlayout_kriz_teqvimi_aa2ea5", "Kriz Təqvimi"), icon: Calendar },
+      { id: 'baby-daily-info', label: tr("adminlayout_gunluk_melumatlar_ana_5c9b86", "Günlük Məlumatlar (Ana)"), icon: Calendar },
+      { id: 'phase-tips', label: tr("adminlayout_faza_meslehetleri_8df8d3", "Faza Məsləhətləri"), icon: Lightbulb },
+      { id: 'trimester-tips', label: tr("adminlayout_trimester_tovsiyeleri_bf9d05", "Trimester Tövsiyələri"), icon: Baby },
+      { id: 'vitamins', label: tr("adminlayout_vitaminler_e49129", "Vitaminlər"), icon: Pill },
       { id: 'maternity', label: 'Dekret Kalkulyatoru', icon: Calculator },
-      { id: 'default-shopping', label: 'Default Alışveriş Siyahısı', icon: ShoppingCart },
-      { id: 'fairy-tales', label: 'Sehrli Nağılçı', icon: BookHeart },
+      { id: 'default-shopping', label: tr("adminlayout_default_alisveris_siyahisi_cafdaf", "Default Alışveriş Siyahısı"), icon: ShoppingCart },
+      { id: 'fairy-tales', label: tr("adminlayout_sehrli_nagilci_25f8c2", "Sehrli Nağılçı"), icon: BookHeart },
     ],
   },
   {
     id: 'commerce',
-    label: 'Satış & E-Ticarət',
+    label: tr("adminlayout_satis_e_ticaret_4b5898", "Satış & E-Ticarət"),
     emoji: '💰',
     icon: DollarSign,
     items: [
-      { id: 'subscriptions', label: 'Abunəliklər', icon: Crown },
-      { id: 'orders', label: 'Sifarişlər', icon: ShoppingCart },
-      { id: 'epoint', label: 'Epoint Ödəniş', icon: CreditCard },
-      { id: 'products', label: 'Məhsullar', icon: Package },
-      { id: 'affiliate', label: 'Affiliate Məhsullar', icon: ShoppingBag },
-      { id: 'marketplace', label: 'İkinci Əl Bazarı', icon: Store },
-      { id: 'play-activities', label: 'Ağıllı Oyun Qutusu', icon: Gamepad2 },
-      { id: 'album-orders', label: 'Albom Sifarişləri', icon: Package },
+      { id: 'subscriptions', label: tr("adminlayout_abunelikler_467656", "Abunəliklər"), icon: Crown },
+      { id: 'orders', label: tr("adminlayout_sifarisler_660280", "Sifarişlər"), icon: ShoppingCart },
+      { id: 'epoint', label: tr("adminlayout_epoint_odenis_a468aa", "Epoint Ödəniş"), icon: CreditCard },
+      { id: 'products', label: tr("adminlayout_mehsullar_24a4ce", "Məhsullar"), icon: Package },
+      { id: 'affiliate', label: tr("adminlayout_affiliate_mehsullar_249cb5", "Affiliate Məhsullar"), icon: ShoppingBag },
+      { id: 'marketplace', label: tr("adminlayout_ikinci_el_bazari_ad9f9f", "İkinci Əl Bazarı"), icon: Store },
+      { id: 'play-activities', label: tr("adminlayout_agilli_oyun_qutusu_db6ef9", "Ağıllı Oyun Qutusu"), icon: Gamepad2 },
+      { id: 'album-orders', label: tr("adminlayout_albom_sifarisleri_dc9604", "Albom Sifarişləri"), icon: Package },
       { id: 'cakes', label: 'Tortlar', icon: Package },
       { id: 'photoshoot', label: 'Fotosessiya', icon: Camera },
-      { id: 'coupons', label: 'Kupon Kodları', icon: Tag },
+      { id: 'coupons', label: tr("adminlayout_kupon_kodlari_c425a7", "Kupon Kodları"), icon: Tag },
     ],
   },
   {
     id: 'places',
-    label: 'Məkanlar & Partnyorlar',
+    label: tr("adminlayout_mekanlar_partnyorlar_50e0e6", "Məkanlar & Partnyorlar"),
     emoji: '📍',
     icon: MapPinned,
     items: [
-      { id: 'places', label: 'Ana Dostu Məkanlar', icon: MapPin },
-      { id: 'places-config', label: 'Məkan Konfiqurasiya', icon: MapPin },
-      { id: 'healthcare-reviews', label: 'Həkim/Klinika Rəyləri', icon: Stethoscope },
+      { id: 'places', label: tr("adminlayout_ana_dostu_mekanlar_4153ec", "Ana Dostu Məkanlar"), icon: MapPin },
+      { id: 'places-config', label: tr("adminlayout_mekan_konfiqurasiya_d63ae1", "Məkan Konfiqurasiya"), icon: MapPin },
+      { id: 'healthcare-reviews', label: tr("adminlayout_hekim_klinika_reyleri_95060e", "Həkim/Klinika Rəyləri"), icon: Stethoscope },
       { id: 'partner-config', label: 'Partner Konfiqurasiya', icon: Heart },
     ],
   },
@@ -136,13 +137,13 @@ const menuGroups: MenuGroup[] = [
     emoji: '🎨',
     icon: Palette,
     items: [
-      { id: 'premium-config', label: 'Premium Səhifə Dizayneri', icon: Crown },
-      { id: 'intro-slides', label: 'Qarşılama Ekranları', icon: Sparkles },
-      { id: 'onboarding', label: 'Qeydiyyat Mərhələləri', icon: Sparkles },
-      { id: 'banners', label: 'Bannerlər', icon: Megaphone },
+      { id: 'premium-config', label: tr("adminlayout_premium_sehife_dizayneri_5f070e", "Premium Səhifə Dizayneri"), icon: Crown },
+      { id: 'intro-slides', label: tr("adminlayout_qarsilama_ekranlari_8e6c64", "Qarşılama Ekranları"), icon: Sparkles },
+      { id: 'onboarding', label: tr("adminlayout_qeydiyyat_merheleleri_5979e2", "Qeydiyyat Mərhələləri"), icon: Sparkles },
+      { id: 'banners', label: tr("adminlayout_bannerler_efc415", "Bannerlər"), icon: Megaphone },
       { id: 'branding', label: 'Branding', icon: Image },
-      { id: 'baby-illustrations', label: 'Körpə İllustrasiyaları', icon: Baby },
-      { id: 'fruit-images', label: 'Körpə Ölçüsü Şəkilləri', icon: Baby },
+      { id: 'baby-illustrations', label: tr("adminlayout_korpe_illustrasiyalari_1abfaa", "Körpə İllustrasiyaları"), icon: Baby },
+      { id: 'fruit-images', label: tr("adminlayout_korpe_olcusu_sekilleri_103ec8", "Körpə Ölçüsü Şəkilləri"), icon: Baby },
     ],
   },
   {
@@ -151,22 +152,22 @@ const menuGroups: MenuGroup[] = [
     emoji: '🌐',
     icon: Globe,
     items: [
-      { id: 'languages', label: 'Dillər', icon: Globe },
-      { id: 'translations', label: 'Tərcümələr', icon: BookOpen },
+      { id: 'languages', label: tr("adminlayout_diller_58a514", "Dillər"), icon: Globe },
+      { id: 'translations', label: tr("adminlayout_tercumeler_f31ad6", "Tərcümələr"), icon: BookOpen },
     ],
   },
   {
     id: 'system',
-    label: 'Sistem Tənzimləmələri',
+    label: tr("adminlayout_sistem_tenzimlemeleri_f2da40", "Sistem Tənzimləmələri"),
     emoji: '⚙️',
     icon: Cog,
     items: [
-      { id: 'settings', label: 'Tənzimləmələr', icon: Settings },
-      { id: 'security', label: 'Təhlükəsizlik', icon: Shield },
-      { id: 'legal', label: 'Hüquqi Sənədlər', icon: Scale },
-      { id: 'push-notifications', label: 'Push Bildirişləri', icon: Send },
+      { id: 'settings', label: tr("adminlayout_tenzimlemeler_085659", "Tənzimləmələr"), icon: Settings },
+      { id: 'security', label: tr("adminlayout_tehlukesizlik_8bc156", "Təhlükəsizlik"), icon: Shield },
+      { id: 'legal', label: tr("adminlayout_huquqi_senedler_ca8c60", "Hüquqi Sənədlər"), icon: Scale },
+      { id: 'push-notifications', label: tr("adminlayout_push_bildirisleri_c44832", "Push Bildirişləri"), icon: Send },
       { id: 'force-update', label: 'Force Update', icon: Shield },
-      { id: 'deeplinks', label: 'Deeplinklər', icon: Globe },
+      { id: 'deeplinks', label: tr("adminlayout_deeplinkler_7ecb47", "Deeplinklər"), icon: Globe },
       { id: 'crash-reports', label: 'Crash Reports', icon: AlertTriangle },
     ],
   },
@@ -414,7 +415,7 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
               className={cn("flex-1 h-7 text-xs", !sidebarOpen && "px-2")}
             >
               <Home className="w-3.5 h-3.5" />
-              {sidebarOpen && <span className="ml-1.5">Tətbiqə qayıt</span>}
+              {sidebarOpen && <span className="ml-1.5">{tr("adminlayout_tetbiqe_qayit_a4ef23", "Tətbiqə qayıt")}</span>}
             </Button>
           </div>
           
@@ -428,7 +429,7 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
             )}
           >
             <LogOut className="w-3.5 h-3.5" />
-            {sidebarOpen && <span className="ml-1.5">Çıxış</span>}
+            {sidebarOpen && <span className="ml-1.5">{tr("adminlayout_cixis_c2de5c", "Çıxış")}</span>}
           </Button>
         </div>
       </motion.aside>

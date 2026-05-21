@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, forwardRef } from 'react';
+import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Play, Square, Timer, AlertCircle, Trash2 } from 'lucide-react';
 import { useContractions } from '@/hooks/useContractions';
@@ -80,8 +81,8 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
             <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-base font-bold text-white">Sancı Ölçən</h1>
-            <p className="text-white/80 text-[10px]">5-1-1 qaydası ilə izləyin</p>
+            <h1 className="text-base font-bold text-white">{tr("contractiontimer_sanci_olcen_67d681", "Sancı Ölçən")}</h1>
+            <p className="text-white/80 text-[10px]">{tr("contractiontimer_5_1_1_qaydasi_ile_izleyin_31947d", "5-1-1 qaydası ilə izləyin")}</p>
           </div>
           {contractions.length > 0 && (
             <motion.button
@@ -110,8 +111,8 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
                 <AlertCircle className="w-4 h-4 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-red-700 dark:text-red-400 text-xs">Xəstəxanaya getmə vaxtı!</h3>
-                <p className="text-[10px] text-red-600 dark:text-red-300">5-1-1 qaydası: Sancılar 5 dəqiqədən bir, 1 dəqiqə davam edir</p>
+                <h3 className="font-bold text-red-700 dark:text-red-400 text-xs">{tr("contractiontimer_xestexanaya_getme_vaxti_780dba", "Xəstəxanaya getmə vaxtı!")}</h3>
+                <p className="text-[10px] text-red-600 dark:text-red-300">{tr("contractiontimer_5_1_1_qaydasi_sancilar_5_deqiqeden_bir_1_c1c5ce", "5-1-1 qaydası: Sancılar 5 dəqiqədən bir, 1 dəqiqə davam edir")}</p>
               </div>
             </motion.div>
           )}
@@ -171,9 +172,9 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.1 }}
           >
-            <p className="text-xs text-muted-foreground mb-0.5">Ort. Müddət</p>
+            <p className="text-xs text-muted-foreground mb-0.5">{tr("contractiontimer_ort_muddet_b77c4e", "Ort. Müddət")}</p>
             <p className="text-xl font-black text-foreground">{formatTime(stats.avgDuration)}</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Hədəf: ~1 dəq</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">{tr("contractiontimer_hedef_1_deq_6ce02e", "Hədəf: ~1 dəq")}</p>
           </motion.div>
 
           <motion.div
@@ -182,9 +183,9 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <p className="text-xs text-muted-foreground mb-0.5">Ort. Aralıq</p>
+            <p className="text-xs text-muted-foreground mb-0.5">{tr("contractiontimer_ort_araliq_711af3", "Ort. Aralıq")}</p>
             <p className="text-xl font-black text-foreground">{formatTime(stats.avgInterval)}</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Hədəf: ~5 dəq</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">{tr("contractiontimer_hedef_5_deq_b2dc81", "Hədəf: ~5 dəq")}</p>
           </motion.div>
         </div>
 
@@ -200,7 +201,7 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
             5-1-1 Qaydası
           </h3>
           <p className="text-xs text-muted-foreground">
-            Sancılar <strong className="text-foreground">5 dəqiqə</strong> aralığında, <strong className="text-foreground">1 dəqiqə</strong> davam edərsə və bu <strong className="text-foreground">1 saat</strong> boyunca davam edərsə, xəstəxanaya getmə vaxtıdır.
+            Sancılar <strong className="text-foreground">{tr("contractiontimer_5_deqiqe_ad05bb", "5 dəqiqə")}</strong>{tr("contractiontimer_araliginda_24710a", "aralığında,")}<strong className="text-foreground">{tr("contractiontimer_1_deqiqe_a187ac", "1 dəqiqə")}</strong>{tr("contractiontimer_davam_ederse_ve_bu_7029f5", "davam edərsə və bu")}<strong className="text-foreground">1 saat</strong> boyunca davam edərsə, xəstəxanaya getmə vaxtıdır.
           </p>
         </motion.div>
 
@@ -232,7 +233,7 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
                     {contraction.interval_seconds && (
                       <div className="text-right">
                         <p className="text-xs font-bold text-muted-foreground">{formatTime(contraction.interval_seconds)}</p>
-                        <p className="text-[10px] text-muted-foreground">aralıq</p>
+                        <p className="text-[10px] text-muted-foreground">{tr("contractiontimer_araliq_05bea1", "aralıq")}</p>
                       </div>
                     )}
                   </div>
