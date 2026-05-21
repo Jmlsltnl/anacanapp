@@ -1,4 +1,5 @@
 // Anacan Type Definitions
+import { tr } from '@/lib/tr';
 
 export type LifeStage = 'flow' | 'bump' | 'mommy' | 'partner';
 
