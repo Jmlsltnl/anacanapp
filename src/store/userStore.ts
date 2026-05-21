@@ -97,6 +97,8 @@ export const useUserStore = create<UserState>()(
       babyCount: 1,
       multiplesType: null,
       language: 'az',
+      i18nVersion: 0,
+      bumpI18n: () => set((s) => ({ i18nVersion: s.i18nVersion + 1 })),
       partnerWomanData: null,
 
       setAuth: (isAuth, userId, email, name) => {
