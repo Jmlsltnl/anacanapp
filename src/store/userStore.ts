@@ -28,6 +28,8 @@ interface UserState {
   babyCount: number;
   multiplesType: 'single' | 'twins' | 'triplets' | 'quadruplets' | null;
   language: string;
+  i18nVersion: number;
+  bumpI18n: () => void;
   
   // Partner's woman data (for partner mode)
   partnerWomanData: {
