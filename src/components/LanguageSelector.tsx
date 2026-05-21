@@ -39,6 +39,15 @@ export default function LanguageSelector() {
     clearTranslationCache();
     if (code !== 'az') await loadTranslations(code);
     setLanguage(code);
+    // Persist to user_preferences so server-side (cron, edge fns) honors the choice
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase
+          .from('user_preferences')
+          .upsert({ user_id: user.id, language: code }, { onConflict: 'user_id' });
+      }
+    } catch (e) { console.warn('lang persist failed', e); }
     setSwitching(false);
     setOpen(false);
     // Force re-render of the app
