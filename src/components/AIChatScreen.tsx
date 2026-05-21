@@ -186,6 +186,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
           pregnancyWeek: pregnancyData?.currentWeek,
           isPartner: false,
           stream: true,
+          language: useUserStore.getState().language || 'az',
           userProfile: {
             name: userProfile.name,
             dueDate: userProfile.due_date,
