@@ -15,11 +15,19 @@ import PaymentSuccess from "./components/payment/PaymentSuccess";
 import PaymentError from "./components/payment/PaymentError";
 import RevenueCatDebug from "./pages/RevenueCatDebug";
 import { initRevenueCat } from "@/lib/revenuecat";
+import { loadTranslations } from "@/lib/i18n";
+import { useUserStore } from "@/store/userStore";
 
 const queryClient = new QueryClient();
 
 // Initialize RevenueCat on app startup
 initRevenueCat().catch(console.error);
+
+// Preload translations for current language (after Zustand rehydrate)
+setTimeout(() => {
+  const lang = useUserStore.getState().language;
+  if (lang && lang !== 'az') loadTranslations(lang).catch(console.error);
+}, 0);
 
 const App = () => (
   <ErrorBoundary>

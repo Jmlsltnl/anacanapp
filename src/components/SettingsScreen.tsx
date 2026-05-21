@@ -26,6 +26,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import LanguageSelector from '@/components/LanguageSelector';
 
 interface SettingsScreenProps {
   onBack: () => void;
@@ -383,9 +384,9 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
           <div className="px-4 pt-4 pb-2">
             <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Görünüş</h2>
           </div>
-          <SettingRow icon={Globe} label="Dil" description="Azərbaycan dili" onClick={() => toast.info('Tezliklə digər dillər əlavə olunacaq')}>
-            <ChevronRight className="w-5 h-5 text-muted-foreground" />
-          </SettingRow>
+          <div className="px-3 pb-3">
+            <LanguageSelector />
+          </div>
         </div>
 
         {/* Privacy & Data */}
