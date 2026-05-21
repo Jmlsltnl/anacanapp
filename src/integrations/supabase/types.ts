@@ -683,6 +683,7 @@ export type Database = {
           day_number: number
           id: string
           info: string
+          info_en: string | null
           is_active: boolean
           updated_at: string
         }
@@ -691,6 +692,7 @@ export type Database = {
           day_number: number
           id?: string
           info: string
+          info_en?: string | null
           is_active?: boolean
           updated_at?: string
         }
@@ -699,6 +701,7 @@ export type Database = {
           day_number?: number
           id?: string
           info?: string
+          info_en?: string | null
           is_active?: boolean
           updated_at?: string
         }
@@ -3003,9 +3006,11 @@ export type Database = {
           id: string
           is_enabled: boolean | null
           message: string | null
+          message_en: string | null
           reminder_type: string
           time_of_day: string | null
           title: string | null
+          title_en: string | null
           updated_at: string
           user_id: string
         }
@@ -3015,9 +3020,11 @@ export type Database = {
           id?: string
           is_enabled?: boolean | null
           message?: string | null
+          message_en?: string | null
           reminder_type: string
           time_of_day?: string | null
           title?: string | null
+          title_en?: string | null
           updated_at?: string
           user_id: string
         }
@@ -3027,9 +3034,11 @@ export type Database = {
           id?: string
           is_enabled?: boolean | null
           message?: string | null
+          message_en?: string | null
           reminder_type?: string
           time_of_day?: string | null
           title?: string | null
+          title_en?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -4089,6 +4098,7 @@ export type Database = {
           id: string
           is_active: boolean
           message: string
+          message_en: string | null
           updated_at: string
         }
         Insert: {
@@ -4097,6 +4107,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           message: string
+          message_en?: string | null
           updated_at?: string
         }
         Update: {
@@ -4105,6 +4116,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           message?: string
+          message_en?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -5902,7 +5914,9 @@ export type Database = {
       pregnancy_daily_content: {
         Row: {
           baby_development: string | null
+          baby_development_en: string | null
           baby_message: string | null
+          baby_message_en: string | null
           baby_size_cm: number | null
           baby_size_fruit: string | null
           baby_weight_gram: number | null
@@ -5914,14 +5928,18 @@ export type Database = {
           doctor_visit_tip: string | null
           emotional_tip: string | null
           exercise_tip: string | null
+          exercise_tip_en: string | null
           foods_to_avoid: string[] | null
           id: string
           image_url: string | null
           is_active: boolean | null
           mother_symptoms: string[] | null
           mother_tips: string | null
+          mother_tips_en: string | null
           mother_warnings: string | null
+          mother_warnings_en: string | null
           nutrition_tip: string | null
+          nutrition_tip_en: string | null
           partner_tip: string | null
           pregnancy_day: number | null
           recommended_exercises: string[] | null
@@ -5933,7 +5951,9 @@ export type Database = {
         }
         Insert: {
           baby_development?: string | null
+          baby_development_en?: string | null
           baby_message?: string | null
+          baby_message_en?: string | null
           baby_size_cm?: number | null
           baby_size_fruit?: string | null
           baby_weight_gram?: number | null
@@ -5945,14 +5965,18 @@ export type Database = {
           doctor_visit_tip?: string | null
           emotional_tip?: string | null
           exercise_tip?: string | null
+          exercise_tip_en?: string | null
           foods_to_avoid?: string[] | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
           mother_symptoms?: string[] | null
           mother_tips?: string | null
+          mother_tips_en?: string | null
           mother_warnings?: string | null
+          mother_warnings_en?: string | null
           nutrition_tip?: string | null
+          nutrition_tip_en?: string | null
           partner_tip?: string | null
           pregnancy_day?: number | null
           recommended_exercises?: string[] | null
@@ -5964,7 +5988,9 @@ export type Database = {
         }
         Update: {
           baby_development?: string | null
+          baby_development_en?: string | null
           baby_message?: string | null
+          baby_message_en?: string | null
           baby_size_cm?: number | null
           baby_size_fruit?: string | null
           baby_weight_gram?: number | null
@@ -5976,14 +6002,18 @@ export type Database = {
           doctor_visit_tip?: string | null
           emotional_tip?: string | null
           exercise_tip?: string | null
+          exercise_tip_en?: string | null
           foods_to_avoid?: string[] | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
           mother_symptoms?: string[] | null
           mother_tips?: string | null
+          mother_tips_en?: string | null
           mother_warnings?: string | null
+          mother_warnings_en?: string | null
           nutrition_tip?: string | null
+          nutrition_tip_en?: string | null
           partner_tip?: string | null
           pregnancy_day?: number | null
           recommended_exercises?: string[] | null
@@ -7690,6 +7720,7 @@ export type Database = {
           exercise_days: number[] | null
           exercise_reminder: boolean | null
           id: string
+          language: string
           last_push_sent_at: string | null
           last_white_noise_sound: string | null
           notifications_enabled: boolean | null
@@ -7718,6 +7749,7 @@ export type Database = {
           exercise_days?: number[] | null
           exercise_reminder?: boolean | null
           id?: string
+          language?: string
           last_push_sent_at?: string | null
           last_white_noise_sound?: string | null
           notifications_enabled?: boolean | null
@@ -7746,6 +7778,7 @@ export type Database = {
           exercise_days?: number[] | null
           exercise_reminder?: boolean | null
           id?: string
+          language?: string
           last_push_sent_at?: string | null
           last_white_noise_sound?: string | null
           notifications_enabled?: boolean | null
