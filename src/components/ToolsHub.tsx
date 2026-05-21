@@ -141,19 +141,30 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   };
 
   // Build tools from DB configs
+  const language = useUserStore(state => state.language);
+  const isEn = language === 'en';
   const tools: Tool[] = useMemo(() => {
     if (toolConfigs.length === 0) {
       return [];
     }
     
     return toolConfigs.map(config => {
-      const name = hasPartner && config.requires_partner && config.partner_name_az
+      const azName = hasPartner && config.requires_partner && config.partner_name_az
         ? config.partner_name_az
         : (config as any).display_name_az || config.name_az || config.name;
-      
-      const description = hasPartner && config.requires_partner && config.partner_description_az
+      const enName = hasPartner && config.requires_partner && (config as any).partner_name
+        ? (config as any).partner_name
+        : (config as any).display_name || config.name;
+      const name = isEn ? (enName || azName) : azName;
+
+      const azDescription = hasPartner && config.requires_partner && config.partner_description_az
         ? config.partner_description_az
         : config.description_az || config.description || '';
+      const enDescription = hasPartner && config.requires_partner && (config as any).partner_description
+        ? (config as any).partner_description
+        : config.description || '';
+      const description = isEn ? (enDescription || azDescription) : azDescription;
+
       
       return {
         id: config.tool_id,
