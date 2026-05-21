@@ -257,6 +257,7 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
     purchaseLifetime,
     restorePurchases: handleRestore,
     showPaywall,
+    showPaywallSafe,
     showCustomerCenter,
     refreshEntitlements,
   };
