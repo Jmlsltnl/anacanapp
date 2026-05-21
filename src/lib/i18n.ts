@@ -1,6 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
 import enStatic from '@/locales/en.json';
-import { useUserStore } from '@/store/userStore';
 
 // In-memory translation cache: { [lang]: { [key]: value } }
 const translationCache: Record<string, Record<string, string>> = {};
@@ -40,8 +39,6 @@ export async function loadTranslations(lang: string): Promise<void> {
       }
       translationCache[lang] = { ...(translationCache[lang] || {}), ...overlay };
       dbLoadedFor = lang;
-      // Trigger re-render of subscribed components
-      try { useUserStore.getState().bumpI18n?.(); } catch {}
     } catch (err) {
       console.error('Translation load error:', err);
     } finally {
