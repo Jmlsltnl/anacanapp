@@ -1,35 +1,29 @@
 import { supabase } from '@/integrations/supabase/client';
+import enStatic from '@/locales/en.json';
+import { useUserStore } from '@/store/userStore';
 
 // In-memory translation cache: { [lang]: { [key]: value } }
 const translationCache: Record<string, Record<string, string>> = {};
-let cacheLoadedFor: string | null = null;
-let cachePromise: Promise<void> | null = null;
+
+// Synchronously seed the EN cache from the bundled JSON so tr() returns English
+// on the very first render after a reload — no waiting on the network.
+translationCache['en'] = { ...(enStatic as Record<string, string>) };
+
+let dbLoadedFor: string | null = null;
+let dbPromise: Promise<void> | null = null;
 
 /**
- * Load all translations for a given language into cache.
- * Skips loading for 'az' since Azerbaijani is hardcoded as fallback.
- * For 'en', loads a bundled JSON immediately (instant), then overlays DB values if any.
+ * Overlay translations from the DB for a given language.
+ * EN already has the static bundle preloaded; this just adds admin overrides.
  */
 export async function loadTranslations(lang: string): Promise<void> {
   if (lang === 'az') return;
-  if (cacheLoadedFor === lang) return;
-  if (cachePromise) return cachePromise;
+  if (dbLoadedFor === lang) return;
+  if (dbPromise) return dbPromise;
 
-  cachePromise = (async () => {
+  dbPromise = (async () => {
     try {
-      const allTranslations: Record<string, string> = {};
-
-      // 1) Static bundled fallback (currently only EN ships with the app)
-      if (lang === 'en') {
-        try {
-          const staticEn = (await import('@/locales/en.json')).default as Record<string, string>;
-          Object.assign(allTranslations, staticEn);
-        } catch (e) {
-          console.warn('Static EN bundle not found', e);
-        }
-      }
-
-      // 2) Overlay with DB translations (admin can override individual keys)
+      const overlay: Record<string, string> = {};
       let from = 0;
       const batchSize = 1000;
       let hasMore = true;
@@ -40,21 +34,22 @@ export async function loadTranslations(lang: string): Promise<void> {
           .eq('lang', lang)
           .range(from, from + batchSize - 1);
         if (error) { console.error('Failed to load translations:', error); break; }
-        if (data) data.forEach(row => { allTranslations[row.key] = row.value; });
+        if (data) data.forEach(row => { overlay[row.key] = row.value; });
         hasMore = (data?.length ?? 0) === batchSize;
         from += batchSize;
       }
-
-      translationCache[lang] = allTranslations;
-      cacheLoadedFor = lang;
+      translationCache[lang] = { ...(translationCache[lang] || {}), ...overlay };
+      dbLoadedFor = lang;
+      // Trigger re-render of subscribed components
+      try { useUserStore.getState().bumpI18n?.(); } catch {}
     } catch (err) {
       console.error('Translation load error:', err);
     } finally {
-      cachePromise = null;
+      dbPromise = null;
     }
   })();
 
-  return cachePromise;
+  return dbPromise;
 }
 
 export function getCachedTranslation(key: string, lang: string): string | undefined {
@@ -63,6 +58,8 @@ export function getCachedTranslation(key: string, lang: string): string | undefi
 
 export function clearTranslationCache(): void {
   Object.keys(translationCache).forEach(k => delete translationCache[k]);
-  cacheLoadedFor = null;
-  cachePromise = null;
+  // Re-seed EN bundle (it's always available)
+  translationCache['en'] = { ...(enStatic as Record<string, string>) };
+  dbLoadedFor = null;
+  dbPromise = null;
 }
