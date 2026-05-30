@@ -62,6 +62,11 @@ function toMinutes(value: string): number {
   return hour * 60 + minute;
 }
 
+function normalizeSourceTypeForDedup(value: string | null | undefined): string | null {
+  if (!value) return null;
+  return value.startsWith('scheduled:') ? 'scheduled' : value;
+}
+
 // Each slot maps 1:1 to a cron run. Content times are matched EXACTLY (no ±30min spillover)
 // so that e.g. 15:00 content does not get sent on the 15:30 run.
 const DAILY_RUN_SLOTS: DailyRunSlot[] = [
@@ -167,7 +172,11 @@ Deno.serve(async (req) => {
 
      // Get active scheduled notifications
     const { data: scheduledNotifications } = await supabase
-      .from('scheduled_notifications').select('*').eq('is_active', true).order('priority', { ascending: true });
+      .from('scheduled_notifications')
+      .select('*')
+      .eq('is_active', true)
+      .order('priority', { ascending: true })
+      .order('created_at', { ascending: true });
 
     // Get day-based notifications and normalize send_time in code so both 09:00 and 09:30 style values work.
     const { data: pregnancyNotifications } = await supabase
@@ -243,8 +252,9 @@ Deno.serve(async (req) => {
     const alreadySent = new Set<string>();
     if (!body.skipDedup) {
       todaySentLogs?.forEach((log: any) => {
-        if (log.source_type && log.source_notification_id) {
-          alreadySent.add(`${log.user_id}:${log.source_type}:${log.source_notification_id}`);
+        const sourceType = normalizeSourceTypeForDedup(log.source_type);
+        if (sourceType && log.source_notification_id) {
+          alreadySent.add(`${log.user_id}:${sourceType}:${log.source_notification_id}`);
         }
       });
     }
@@ -338,8 +348,14 @@ Deno.serve(async (req) => {
           return false;
         });
         const slotIndex = activeSendTime ? Math.max(DAILY_RUN_SLOTS.findIndex((slot) => slot.runAt === activeSendTime), 0) : 0;
-        const match = matches.length ? matches[slotIndex % matches.length] : null;
-        const scheduledSourceType = activeSendTime ? `scheduled:${activeSendTime}` : 'scheduled';
+        const scheduledSourceType = 'scheduled';
+        const rotatedMatches = matches.length
+          ? matches.map((_, index) => matches[(slotIndex + index) % matches.length])
+          : [];
+        const match = rotatedMatches.find((candidate) => {
+          const dedupKey = `${user.user_id}:${scheduledSourceType}:${candidate.id}`;
+          return !alreadySent.has(dedupKey);
+        }) ?? null;
         if (match) {
           const dedupKey = `${user.user_id}:${scheduledSourceType}:${match.id}`;
           if (!alreadySent.has(dedupKey)) {
@@ -360,6 +376,7 @@ Deno.serve(async (req) => {
             sentCount++;
             delivered = true;
             results.push({ userId: user.user_id, success: true, type: notif.type, day: notif.day });
+            alreadySent.add(`${user.user_id}:${normalizeSourceTypeForDedup(notif.sourceType ?? notif.type)}:${notif.id}`);
             await supabase.from('notification_send_log').insert({
               user_id: user.user_id,
               notification_id: notif.type === 'scheduled' ? notif.id : null,
