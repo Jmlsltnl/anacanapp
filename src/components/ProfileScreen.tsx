@@ -96,6 +96,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
 
   const menuItems = [
     { id: 'billing', icon: CreditCard, label: tr("profilescreen_abuneliyim_f6c8ed", 'Abunəliyim') },
+    { id: 'partners', icon: Sparkles, label: 'Partnyor Endirimləri', badge: 'Yeni' },
     { id: 'notifications', icon: Bell, label: tr("profilescreen_bildirisler_54eb88", 'Bildirişlər'), badge: unreadCount > 0 ? String(unreadCount) : undefined },
     { id: 'appearance', icon: Palette, label: tr("profilescreen_gorunus_165fe3", 'Görünüş') },
     { id: 'calendar', icon: Calendar, label: tr("profilescreen_teqvim_ayarlari_012790", 'Təqvim Ayarları') },
