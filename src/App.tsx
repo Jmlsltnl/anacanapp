@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound";
 import PaymentSuccess from "./components/payment/PaymentSuccess";
 import PaymentError from "./components/payment/PaymentError";
 import RevenueCatDebug from "./pages/RevenueCatDebug";
+import PartnerVerifyPage from "./pages/PartnerVerifyPage";
 import { initRevenueCat } from "@/lib/revenuecat";
 import { loadTranslations } from "@/lib/i18n";
 import { useUserStore } from "@/store/userStore";
@@ -45,6 +46,7 @@ const App = () => (
                 <Route path="/payment/success" element={<PaymentSuccess />} />
                 <Route path="/payment/error" element={<PaymentError />} />
                 <Route path="/debug/revenuecat" element={<RevenueCatDebug />} />
+                <Route path="/p/v/:token" element={<PartnerVerifyPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
