@@ -62,6 +62,11 @@ function toMinutes(value: string): number {
   return hour * 60 + minute;
 }
 
+function normalizeSourceTypeForDedup(value: string | null | undefined): string | null {
+  if (!value) return null;
+  return value.startsWith('scheduled:') ? 'scheduled' : value;
+}
+
 // Each slot maps 1:1 to a cron run. Content times are matched EXACTLY (no ±30min spillover)
 // so that e.g. 15:00 content does not get sent on the 15:30 run.
 const DAILY_RUN_SLOTS: DailyRunSlot[] = [
@@ -247,8 +252,9 @@ Deno.serve(async (req) => {
     const alreadySent = new Set<string>();
     if (!body.skipDedup) {
       todaySentLogs?.forEach((log: any) => {
-        if (log.source_type && log.source_notification_id) {
-          alreadySent.add(`${log.user_id}:${log.source_type}:${log.source_notification_id}`);
+        const sourceType = normalizeSourceTypeForDedup(log.source_type);
+        if (sourceType && log.source_notification_id) {
+          alreadySent.add(`${log.user_id}:${sourceType}:${log.source_notification_id}`);
         }
       });
     }
@@ -370,7 +376,7 @@ Deno.serve(async (req) => {
             sentCount++;
             delivered = true;
             results.push({ userId: user.user_id, success: true, type: notif.type, day: notif.day });
-            alreadySent.add(`${user.user_id}:${notif.sourceType ?? notif.type}:${notif.id}`);
+            alreadySent.add(`${user.user_id}:${normalizeSourceTypeForDedup(notif.sourceType ?? notif.type)}:${notif.id}`);
             await supabase.from('notification_send_log').insert({
               user_id: user.user_id,
               notification_id: notif.type === 'scheduled' ? notif.id : null,
