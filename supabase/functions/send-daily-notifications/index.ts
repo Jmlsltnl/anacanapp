@@ -167,7 +167,11 @@ Deno.serve(async (req) => {
 
      // Get active scheduled notifications
     const { data: scheduledNotifications } = await supabase
-      .from('scheduled_notifications').select('*').eq('is_active', true).order('priority', { ascending: true });
+      .from('scheduled_notifications')
+      .select('*')
+      .eq('is_active', true)
+      .order('priority', { ascending: true })
+      .order('created_at', { ascending: true });
 
     // Get day-based notifications and normalize send_time in code so both 09:00 and 09:30 style values work.
     const { data: pregnancyNotifications } = await supabase
@@ -338,8 +342,14 @@ Deno.serve(async (req) => {
           return false;
         });
         const slotIndex = activeSendTime ? Math.max(DAILY_RUN_SLOTS.findIndex((slot) => slot.runAt === activeSendTime), 0) : 0;
-        const match = matches.length ? matches[slotIndex % matches.length] : null;
-        const scheduledSourceType = activeSendTime ? `scheduled:${activeSendTime}` : 'scheduled';
+        const scheduledSourceType = 'scheduled';
+        const rotatedMatches = matches.length
+          ? matches.map((_, index) => matches[(slotIndex + index) % matches.length])
+          : [];
+        const match = rotatedMatches.find((candidate) => {
+          const dedupKey = `${user.user_id}:${scheduledSourceType}:${candidate.id}`;
+          return !alreadySent.has(dedupKey);
+        }) ?? null;
         if (match) {
           const dedupKey = `${user.user_id}:${scheduledSourceType}:${match.id}`;
           if (!alreadySent.has(dedupKey)) {
@@ -360,6 +370,7 @@ Deno.serve(async (req) => {
             sentCount++;
             delivered = true;
             results.push({ userId: user.user_id, success: true, type: notif.type, day: notif.day });
+            alreadySent.add(`${user.user_id}:${notif.sourceType ?? notif.type}:${notif.id}`);
             await supabase.from('notification_send_log').insert({
               user_id: user.user_id,
               notification_id: notif.type === 'scheduled' ? notif.id : null,
