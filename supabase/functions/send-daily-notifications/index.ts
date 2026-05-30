@@ -179,11 +179,37 @@ Deno.serve(async (req) => {
       .order('created_at', { ascending: true });
 
     // Get day-based notifications and normalize send_time in code so both 09:00 and 09:30 style values work.
-    const { data: pregnancyNotifications } = await supabase
-      .from('pregnancy_day_notifications').select('*').eq('is_active', true);
+    // IMPORTANT: Supabase default limit is 1000 rows. mommy_day_notifications has 4380+ rows,
+    // so we MUST paginate to load ALL of them — otherwise day-specific notifs disappear.
+    async function fetchAllRows<T>(tableName: string): Promise<T[]> {
+      const pageSize = 1000;
+      const all: T[] = [];
+      let from = 0;
+      // Loop until we get a short page
+      // Safety cap: 50 pages = 50,000 rows
+      for (let i = 0; i < 50; i++) {
+        const { data, error } = await supabase
+          .from(tableName)
+          .select('*')
+          .eq('is_active', true)
+          .range(from, from + pageSize - 1);
+        if (error) {
+          console.error(`[send-daily-notifications] fetchAllRows(${tableName}) error:`, error.message);
+          break;
+        }
+        if (!data || data.length === 0) break;
+        all.push(...(data as T[]));
+        if (data.length < pageSize) break;
+        from += pageSize;
+      }
+      return all;
+    }
+
+    const pregnancyNotifications = await fetchAllRows<DayNotification>('pregnancy_day_notifications');
+    console.log(`[send-daily-notifications] Loaded ${pregnancyNotifications.length} pregnancy_day rows`);
 
     const pregnancyNotifsByDay = new Map<number, DayNotification[]>();
-    pregnancyNotifications?.forEach((n: DayNotification) => {
+    pregnancyNotifications.forEach((n: DayNotification) => {
       const normalizedTime = normalizeTimeLabel(n.send_time);
       if (activeContentTimes && (!normalizedTime || !activeContentTimes.has(normalizedTime))) return;
       const existing = pregnancyNotifsByDay.get(n.day_number) || [];
@@ -191,17 +217,18 @@ Deno.serve(async (req) => {
       pregnancyNotifsByDay.set(n.day_number, existing);
     });
 
-    const { data: mommyNotifications } = await supabase
-      .from('mommy_day_notifications').select('*').eq('is_active', true);
+    const mommyNotifications = await fetchAllRows<DayNotification>('mommy_day_notifications');
+    console.log(`[send-daily-notifications] Loaded ${mommyNotifications.length} mommy_day rows`);
 
     const mommyNotifsByDay = new Map<number, DayNotification[]>();
-    mommyNotifications?.forEach((n: DayNotification) => {
+    mommyNotifications.forEach((n: DayNotification) => {
       const normalizedTime = normalizeTimeLabel(n.send_time);
       if (activeContentTimes && (!normalizedTime || !activeContentTimes.has(normalizedTime))) return;
       const existing = mommyNotifsByDay.get(n.day_number) || [];
       existing.push(n);
       mommyNotifsByDay.set(n.day_number, existing);
     });
+
 
     // Get users — optionally filter by single userId for debugging
     let profilesQuery = supabase
