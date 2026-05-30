@@ -129,6 +129,8 @@ const menuGroups: MenuGroup[] = [
       { id: 'places-config', label: tr("adminlayout_mekan_konfiqurasiya_d63ae1", "Məkan Konfiqurasiya"), icon: MapPin },
       { id: 'healthcare-reviews', label: tr("adminlayout_hekim_klinika_reyleri_95060e", "Həkim/Klinika Rəyləri"), icon: Stethoscope },
       { id: 'partner-config', label: 'Partner Konfiqurasiya', icon: Heart },
+      { id: 'partner-venues', label: 'Partnyor Məkanları (Endirim)', icon: Sparkles },
+      { id: 'partner-redemptions', label: 'Endirim Hesabatı', icon: Sparkles },
     ],
   },
   {
