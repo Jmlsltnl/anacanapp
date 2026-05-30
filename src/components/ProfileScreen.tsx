@@ -5,7 +5,7 @@ import {
   ChevronRight, Crown, Copy, Share2,
   Heart, Calendar, Palette, ShieldCheck, Edit, CreditCard, Info, ArrowLeft, X,
   MessageCircle, Baby, ShoppingCart, TrendingUp, Gift, Plus, Trash2, Users,
-  FileText, Scale, AlertCircle, RotateCcw, Database
+  FileText, Scale, AlertCircle, RotateCcw, Database, Sparkles
 } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
