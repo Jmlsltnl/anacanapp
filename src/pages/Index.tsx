@@ -48,6 +48,7 @@ const NameVotingScreen = lazy(() => import('@/components/partner/NameVotingScree
 const PartnerHospitalBagScreen = lazy(() => import('@/components/partner/PartnerHospitalBagScreen'));
 const DailySummaryScreen = lazy(() => import('@/components/partner/DailySummaryScreen'));
 const SOSAlertReceiverModule = lazy(() => import('@/components/partner/SOSButton').then(m => ({ default: m.SOSAlertReceiver })));
+const PartnersScreen = lazy(() => import('@/components/partners/PartnersScreen'));
 
 const suspenseFallback = (
   <div className="min-h-screen flex items-center justify-center bg-background">
@@ -476,6 +477,7 @@ const Index = () => {
   if (activeScreen === 'name-voting' && role === 'partner') return <Suspense fallback={suspenseFallback}><NameVotingScreen onBack={() => setActiveScreen(null)} /></Suspense>;
   if (activeScreen === 'partner-hospital-bag' && role === 'partner') return <Suspense fallback={suspenseFallback}><PartnerHospitalBagScreen onBack={() => setActiveScreen(null)} /></Suspense>;
   if (activeScreen === 'daily-summary' && role === 'partner') return <Suspense fallback={suspenseFallback}><DailySummaryScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'partners') return <Suspense fallback={suspenseFallback}><PartnersScreen onBack={() => setActiveScreen(null)} /></Suspense>;
 
   // Messages screen (unified: partner + community DMs)
   if (showMotherChat) {
