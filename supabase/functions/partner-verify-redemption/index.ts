@@ -92,7 +92,6 @@ Deno.serve(async (req) => {
 
     return jsonResponse({
         status: 'verified',
-        status: 'verified',
         venue_name: venue.name,
         venue_logo_url: venue.logo_url,
         discount_label: venue.discount_label,
