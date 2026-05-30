@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { tr } from '@/lib/tr';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { UtensilsCrossed, Plus, Pencil, Trash2, Search, Clock, Users, FileUp, Download, Upload, X, Image as ImageIcon, Settings2, FileDown } from 'lucide-react';
@@ -127,13 +128,13 @@ const AdminRecipes = () => {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      toast({ title: 'Xəta', description: 'Yalnız şəkil faylları yüklənə bilər', variant: 'destructive' });
+      toast({ title: tr("adminrecipes_xeta_3cdbb6", "Xəta"), description: tr("adminrecipes_yalniz_sekil_fayllari_yuklene_biler_f67b23", "Yalnız şəkil faylları yüklənə bilər"), variant: 'destructive' });
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast({ title: 'Xəta', description: 'Şəkil 5MB-dan böyük ola bilməz', variant: 'destructive' });
+      toast({ title: tr("adminrecipes_xeta_3cdbb6", "Xəta"), description: tr("adminrecipes_sekil_5mb_dan_boyuk_ola_bilmez_3e4e99", "Şəkil 5MB-dan böyük ola bilməz"), variant: 'destructive' });
       return;
     }
 
@@ -154,9 +155,9 @@ const AdminRecipes = () => {
         .getPublicUrl(filePath);
 
       setFormData({ ...formData, image_url: publicUrl });
-      toast({ title: 'Şəkil yükləndi' });
+      toast({ title: tr("adminrecipes_sekil_yuklendi_474bd5", "Şəkil yükləndi") });
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminrecipes_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } finally {
       setUploadingImage(false);
       if (imageInputRef.current) {
@@ -240,7 +241,7 @@ const AdminRecipes = () => {
       const lines = splitCSVIntoRows(text);
       
       if (lines.length < 2) {
-        toast({ title: 'Xəta', description: 'CSV faylı boşdur', variant: 'destructive' });
+        toast({ title: tr("adminrecipes_xeta_3cdbb6", "Xəta"), description: tr("adminrecipes_csv_fayli_bosdur_0a908c", "CSV faylı boşdur"), variant: 'destructive' });
         return;
       }
 
@@ -290,7 +291,7 @@ const AdminRecipes = () => {
       }
 
       if (parsedData.length === 0) {
-        toast({ title: 'Xəta', description: 'Heç bir resept tapılmadı', variant: 'destructive' });
+        toast({ title: tr("adminrecipes_xeta_3cdbb6", "Xəta"), description: tr("adminrecipes_hec_bir_resept_tapilmadi_f2f561", "Heç bir resept tapılmadı"), variant: 'destructive' });
         return;
       }
 
@@ -315,7 +316,7 @@ const AdminRecipes = () => {
       if (error) throw error;
 
       toast({ 
-        title: 'Uğurlu!', 
+        title: tr("adminrecipes_ugurlu_5c0191", "Uğurlu!"), 
         description: `${importData.length} resept əlavə edildi` 
       });
       setShowImportModal(false);
@@ -323,7 +324,7 @@ const AdminRecipes = () => {
       refetch();
     } catch (error: any) {
       toast({ 
-        title: 'Xəta', 
+        title: tr("adminrecipes_xeta_3cdbb6", "Xəta"), 
         description: error.message, 
         variant: 'destructive' 
       });
@@ -356,14 +357,14 @@ const AdminRecipes = () => {
       setShowCatModal(false);
       toast({ title: editingCat ? 'Kateqoriya yeniləndi' : 'Kateqoriya əlavə edildi' });
     } catch (e: any) {
-      toast({ title: 'Xəta', description: e.message, variant: 'destructive' });
+      toast({ title: tr("adminrecipes_xeta_3cdbb6", "Xəta"), description: e.message, variant: 'destructive' });
     }
   };
 
   const deleteCat = async (id: string) => {
     if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
     const { error } = await supabase.from('recipe_categories').delete().eq('id', id);
-    if (error) { toast({ title: 'Xəta', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast({ title: tr("adminrecipes_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' }); return; }
     queryClient.invalidateQueries({ queryKey: ['recipe-categories-admin'] });
     queryClient.invalidateQueries({ queryKey: ['recipe-categories'] });
     toast({ title: 'Kateqoriya silindi' });
@@ -389,8 +390,8 @@ const AdminRecipes = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Reseptlər</h1>
-          <p className="text-muted-foreground">Hamiləlik və analıq reseptlərini idarə edin</p>
+          <h1 className="text-2xl font-bold text-foreground">{tr("adminrecipes_reseptler_98ed2c", "Reseptlər")}</h1>
+          <p className="text-muted-foreground">{tr("adminrecipes_hamilelik_ve_analiq_reseptlerini_idare_e_ff4d53", "Hamiləlik və analıq reseptlərini idarə edin")}</p>
         </div>
         <div className="flex gap-2">
           <input
@@ -415,16 +416,16 @@ const AdminRecipes = () => {
               exportToCSV(
                 recipes,
                 [
-                  { key: 'title', header: 'Başlıq' },
-                  { key: 'description', header: 'Təsvir' },
+                  { key: 'title', header: tr("adminrecipes_basliq_e1f6c5", "Başlıq") },
+                  { key: 'description', header: tr("adminrecipes_tesvir_f85651", "Təsvir") },
                   { key: 'category', header: 'Kateqoriya' },
-                  { key: 'prep_time', header: 'Hazırlıq (dəq)' },
-                  { key: 'cook_time', header: 'Bişirmə (dəq)' },
+                  { key: 'prep_time', header: tr("adminrecipes_hazirliq_deq_0e31cf", "Hazırlıq (dəq)") },
+                  { key: 'cook_time', header: tr("adminrecipes_bisirme_deq_88f48d", "Bişirmə (dəq)") },
                   { key: 'servings', header: 'Porsiya' },
                   { key: 'calories', header: 'Kalori' },
-                  { key: 'ingredients', header: 'İnqredientlər' },
-                  { key: 'instructions', header: 'Hazırlanma' },
-                  { key: 'image_url', header: 'Şəkil URL' },
+                  { key: 'ingredients', header: tr("adminrecipes_inqredientler_ac7a19", "İnqredientlər") },
+                  { key: 'instructions', header: tr("adminrecipes_hazirlanma_13bf8d", "Hazırlanma") },
+                  { key: 'image_url', header: tr("adminrecipes_sekil_url_d302df", "Şəkil URL") },
                   { key: 'is_active', header: 'Aktiv' },
                 ],
                 'recipes_export.csv'
@@ -452,7 +453,7 @@ const AdminRecipes = () => {
             </div>
             <div>
               <p className="text-2xl font-bold">{recipes.length}</p>
-              <p className="text-xs text-muted-foreground">Ümumi</p>
+              <p className="text-xs text-muted-foreground">{tr("adminrecipes_umumi_1b5521", "Ümumi")}</p>
             </div>
           </div>
         </Card>
@@ -522,11 +523,11 @@ const AdminRecipes = () => {
             </div>
             <div>
               <Label>Ad</Label>
-              <Input value={catForm.name} onChange={e => setCatForm({ ...catForm, name: e.target.value })} placeholder="Səhər yeməyi" />
+              <Input value={catForm.name} onChange={e => setCatForm({ ...catForm, name: e.target.value })} placeholder={tr("adminrecipes_seher_yemeyi_b82929", "Səhər yeməyi")} />
             </div>
             <div>
               <Label>Ad (AZ)</Label>
-              <Input value={catForm.name_az} onChange={e => setCatForm({ ...catForm, name_az: e.target.value })} placeholder="Səhər yeməyi" />
+              <Input value={catForm.name_az} onChange={e => setCatForm({ ...catForm, name_az: e.target.value })} placeholder={tr("adminrecipes_seher_yemeyi_b82929", "Səhər yeməyi")} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -534,7 +535,7 @@ const AdminRecipes = () => {
                 <Input value={catForm.emoji} onChange={e => setCatForm({ ...catForm, emoji: e.target.value })} placeholder="🍳" />
               </div>
               <div>
-                <Label>Sıra</Label>
+                <Label>{tr("adminrecipes_sira_421c5f", "Sıra")}</Label>
                 <Input type="number" value={catForm.sort_order} onChange={e => setCatForm({ ...catForm, sort_order: parseInt(e.target.value) || 0 })} />
               </div>
             </div>
@@ -544,7 +545,7 @@ const AdminRecipes = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCatModal(false)}>Ləğv et</Button>
+            <Button variant="outline" onClick={() => setShowCatModal(false)}>{tr("adminrecipes_legv_et_b5e49c", "Ləğv et")}</Button>
             <Button onClick={saveCat}>Yadda saxla</Button>
           </DialogFooter>
         </DialogContent>
@@ -570,9 +571,9 @@ const AdminRecipes = () => {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">Yüklənir...</div>
+            <div className="text-center py-8 text-muted-foreground">{tr("adminrecipes_yuklenir_5557de", "Yüklənir...")}</div>
           ) : filteredRecipes.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">Resept tapılmadı</div>
+            <div className="text-center py-8 text-muted-foreground">{tr("adminrecipes_resept_tapilmadi_dde89b", "Resept tapılmadı")}</div>
           ) : (
             <div className="space-y-3">
               {filteredRecipes.map((recipe, index) => (
@@ -647,12 +648,12 @@ const AdminRecipes = () => {
           <ScrollArea className="max-h-[60vh] pr-4">
             <div className="space-y-4">
               <Input
-                placeholder="Başlıq"
+                placeholder={tr("adminrecipes_basliq_e1f6c5", "Başlıq")}
                 value={formData.title || ''}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               />
               <Textarea
-                placeholder="Təsvir"
+                placeholder={tr("adminrecipes_tesvir_f85651", "Təsvir")}
                 value={formData.description || ''}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               />
@@ -672,7 +673,7 @@ const AdminRecipes = () => {
                 </SelectContent>
               </Select>
               <div className="space-y-2">
-                <Label>Alt kateqoriya etiketləri</Label>
+                <Label>{tr("adminrecipes_alt_kateqoriya_etiketleri_5a3e12", "Alt kateqoriya etiketləri")}</Label>
                 <div className="flex flex-wrap gap-2">
                   {recipeTags.map(tag => {
                     const selected = (formData.tags || []).includes(tag.tag_id);
@@ -704,13 +705,13 @@ const AdminRecipes = () => {
               <div className="grid grid-cols-4 gap-3">
                 <Input
                   type="number"
-                  placeholder="Hazırlıq (dəq)"
+                  placeholder={tr("adminrecipes_hazirliq_deq_0e31cf", "Hazırlıq (dəq)")}
                   value={formData.prep_time || ''}
                   onChange={(e) => setFormData({ ...formData, prep_time: parseInt(e.target.value) })}
                 />
                 <Input
                   type="number"
-                  placeholder="Bişirmə (dəq)"
+                  placeholder={tr("adminrecipes_bisirme_deq_88f48d", "Bişirmə (dəq)")}
                   value={formData.cook_time || ''}
                   onChange={(e) => setFormData({ ...formData, cook_time: parseInt(e.target.value) })}
                 />
@@ -728,7 +729,7 @@ const AdminRecipes = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Resept şəkli</Label>
+                <Label>{tr("adminrecipes_resept_sekli_881c26", "Resept şəkli")}</Label>
                 <input
                   type="file"
                   ref={imageInputRef}
@@ -741,7 +742,7 @@ const AdminRecipes = () => {
                   <div className="relative">
                     <img 
                       src={formData.image_url} 
-                      alt="Resept şəkli" 
+                      alt={tr("adminrecipes_resept_sekli_881c26", "Resept şəkli")} 
                       className="w-full h-48 object-cover rounded-lg border"
                     />
                     <Button
@@ -762,12 +763,12 @@ const AdminRecipes = () => {
                     {uploadingImage ? (
                       <div className="flex flex-col items-center gap-2">
                         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                        <span className="text-sm text-muted-foreground">Yüklənir...</span>
+                        <span className="text-sm text-muted-foreground">{tr("adminrecipes_yuklenir_5557de", "Yüklənir...")}</span>
                       </div>
                     ) : (
                       <>
                         <ImageIcon className="w-10 h-10 text-muted-foreground mb-2" />
-                        <span className="text-sm text-muted-foreground">Şəkil yükləmək üçün klikləyin</span>
+                        <span className="text-sm text-muted-foreground">{tr("adminrecipes_sekil_yuklemek_ucun_klikleyin_91a262", "Şəkil yükləmək üçün klikləyin")}</span>
                         <span className="text-xs text-muted-foreground mt-1">PNG, JPG, WEBP (max 5MB)</span>
                       </>
                     )}
@@ -775,13 +776,13 @@ const AdminRecipes = () => {
                 )}
               </div>
               <Textarea
-                placeholder="İnqrediyentlər (hər sətirdə bir)"
+                placeholder={tr("adminrecipes_inqrediyentler_her_setirde_bir_f98891", "İnqrediyentlər (hər sətirdə bir)")}
                 value={(formData.ingredients || []).join('\n')}
                 onChange={(e) => setFormData({ ...formData, ingredients: e.target.value.split('\n').filter(Boolean) })}
                 rows={5}
               />
               <Textarea
-                placeholder="Təlimatlar (hər sətirdə bir addım)"
+                placeholder={tr("adminrecipes_telimatlar_her_setirde_bir_addim_0c6e13", "Təlimatlar (hər sətirdə bir addım)")}
                 value={(formData.instructions || []).join('\n')}
                 onChange={(e) => setFormData({ ...formData, instructions: e.target.value.split('\n').filter(Boolean) })}
                 rows={5}
@@ -862,7 +863,7 @@ const AdminRecipes = () => {
 
       <AdminUsageStats 
         eventNames={['recipe_viewed']}
-        title="🍳 Resept İstifadə Statistikası"
+        title={tr("adminrecipes_resept_istifade_statistikasi_d6132d", "🍳 Resept İstifadə Statistikası")}
         showEventData
         showUsers
       />

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { Pill, AlertCircle, Leaf, Info } from 'lucide-react';
 import { useVitamins, Vitamin } from '@/hooks/useVitamins';
 import { useUserStore } from '@/store/userStore';
@@ -74,7 +75,7 @@ const VitaminsTab = ({ className }: VitaminsTabProps) => {
       {/* Benefits */}
       {vitamin.benefits && vitamin.benefits.length > 0 && (
         <div className="mt-2 pt-2 border-t border-border/50">
-          <p className="text-[10px] text-muted-foreground mb-1 font-medium">Faydaları:</p>
+          <p className="text-[10px] text-muted-foreground mb-1 font-medium">{tr("vitaminstab_faydalari_8b3d9f", "Faydaları:")}</p>
           <div className="flex flex-wrap gap-1">
             {vitamin.benefits.slice(0, 3).map((benefit, i) => (
               <span 
@@ -126,7 +127,7 @@ const VitaminsTab = ({ className }: VitaminsTabProps) => {
         <div>
           <div className="flex items-center gap-2 mb-2">
             <AlertCircle className="w-4 h-4 text-primary" />
-            <h2 className="font-bold text-sm text-foreground">Vacib Vitaminlər</h2>
+            <h2 className="font-bold text-sm text-foreground">{tr("vitaminstab_vacib_vitaminler_167026", "Vacib Vitaminlər")}</h2>
           </div>
           <div className="space-y-2">
             {essentialVitamins.map((vitamin, index) => (
@@ -141,7 +142,7 @@ const VitaminsTab = ({ className }: VitaminsTabProps) => {
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Pill className="w-4 h-4 text-muted-foreground" />
-            <h2 className="font-bold text-sm text-foreground">Tövsiyə Olunan</h2>
+            <h2 className="font-bold text-sm text-foreground">{tr("vitaminstab_tovsiye_olunan_f7f407", "Tövsiyə Olunan")}</h2>
           </div>
           <div className="space-y-2">
             {recommendedVitamins.map((vitamin, index) => (
@@ -154,7 +155,7 @@ const VitaminsTab = ({ className }: VitaminsTabProps) => {
       {vitamins.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
           <Pill className="w-12 h-12 mx-auto mb-3 opacity-50" />
-          <p className="text-sm">Bu mərhələ üçün vitamin məlumatı yoxdur</p>
+          <p className="text-sm">{tr("vitaminstab_bu_merhele_ucun_vitamin_melumati_yoxdur_d17150", "Bu mərhələ üçün vitamin məlumatı yoxdur")}</p>
         </div>
       )}
 

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { tr } from '@/lib/tr';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -208,7 +209,7 @@ const AdminTranslations = () => {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2">
           <BookOpen className="w-6 h-6 text-primary" />
-          <h2 className="text-2xl font-bold">Tərcümələr</h2>
+          <h2 className="text-2xl font-bold">{tr("admintranslations_tercumeler_f31ad6", "Tərcümələr")}</h2>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => setShowAddKey(!showAddKey)}>
@@ -219,7 +220,7 @@ const AdminTranslations = () => {
           </Button>
           <label>
             <Button variant="outline" size="sm" asChild>
-              <span><Upload className="w-4 h-4 mr-1" /> CSV İdxal</span>
+              <span><Upload className="w-4 h-4 mr-1" />{tr("admintranslations_csv_idxal_f88021", "CSV İdxal")}</span>
             </Button>
             <input type="file" accept=".csv" className="hidden" onChange={handleImport} />
           </label>
@@ -249,7 +250,7 @@ const AdminTranslations = () => {
           <Select value={selectedNamespace} onValueChange={setSelectedNamespace}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Hamısı</SelectItem>
+              <SelectItem value="all">{tr("admintranslations_hamisi_c73c4d", "Hamısı")}</SelectItem>
               {NAMESPACES.map(ns => (
                 <SelectItem key={ns} value={ns}>{ns}</SelectItem>
               ))}
@@ -261,8 +262,8 @@ const AdminTranslations = () => {
           <Select value={filterMode} onValueChange={(v) => setFilterMode(v as typeof filterMode)}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Hamısı</SelectItem>
-              <SelectItem value="empty">Boş</SelectItem>
+              <SelectItem value="all">{tr("admintranslations_hamisi_c73c4d", "Hamısı")}</SelectItem>
+              <SelectItem value="empty">{tr("admintranslations_bos_485510", "Boş")}</SelectItem>
               <SelectItem value="filled">Dolu</SelectItem>
             </SelectContent>
           </Select>
@@ -271,7 +272,7 @@ const AdminTranslations = () => {
           <Label>Axtar</Label>
           <div className="relative">
             <Search className="absolute left-2 top-2.5 w-4 h-4 text-muted-foreground" />
-            <Input className="pl-8" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Açar və ya dəyər axtar..." />
+            <Input className="pl-8" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder={tr("admintranslations_acar_ve_ya_deyer_axtar_7422e0", "Açar və ya dəyər axtar...")} />
           </div>
         </div>
       </div>
@@ -290,7 +291,7 @@ const AdminTranslations = () => {
           <CardContent className="pt-4 space-y-3">
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <Label>Açar</Label>
+                <Label>{tr("admintranslations_acar_644193", "Açar")}</Label>
                 <Input value={newKey.key} onChange={e => setNewKey(p => ({ ...p, key: e.target.value }))} placeholder="nav.home" />
               </div>
               <div>
@@ -303,8 +304,8 @@ const AdminTranslations = () => {
                 </Select>
               </div>
               <div>
-                <Label>AZ Dəyəri (referans)</Label>
-                <Input value={newKey.defaultValue} onChange={e => setNewKey(p => ({ ...p, defaultValue: e.target.value }))} placeholder="Əsas" />
+                <Label>{tr("admintranslations_az_deyeri_referans_814983", "AZ Dəyəri (referans)")}</Label>
+                <Input value={newKey.defaultValue} onChange={e => setNewKey(p => ({ ...p, defaultValue: e.target.value }))} placeholder={tr("admintranslations_esas_6d87f7", "Əsas")} />
               </div>
             </div>
             <Button onClick={() => addTranslationKey.mutate()} disabled={!newKey.key} size="sm">
@@ -316,9 +317,9 @@ const AdminTranslations = () => {
 
       {/* Translation List */}
       {isLoading ? (
-        <div className="text-center py-8 text-muted-foreground">Yüklənir...</div>
+        <div className="text-center py-8 text-muted-foreground">{tr("admintranslations_yuklenir_5557de", "Yüklənir...")}</div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">Tərcümə tapılmadı</div>
+        <div className="text-center py-8 text-muted-foreground">{tr("admintranslations_tercume_tapilmadi_6b4f34", "Tərcümə tapılmadı")}</div>
       ) : (
         <div className="space-y-2">
           {filtered.map(t => (
@@ -332,7 +333,7 @@ const AdminTranslations = () => {
                   className="text-sm min-h-[36px] resize-none"
                   value={editedValues[t.id] !== undefined ? editedValues[t.id] : t.value}
                   onChange={e => setEditedValues(prev => ({ ...prev, [t.id]: e.target.value }))}
-                  placeholder="Tərcüməni daxil edin..."
+                  placeholder={tr("admintranslations_tercumeni_daxil_edin_3e150c", "Tərcüməni daxil edin...")}
                   rows={1}
                 />
               </div>

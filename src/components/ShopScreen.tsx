@@ -72,7 +72,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
   const categories = useMemo(() => {
     if (dbCategories.length > 0) {
       return [
-        { id: 'all', name: 'Hamısı', emoji: '✨' },
+        { id: 'all', name: tr("shopscreen_hamisi_c73c4d", "Hamısı"), emoji: '✨' },
         ...dbCategories.map(cat => ({
           id: cat.category_key,
           name: cat.name_az || cat.name,
@@ -82,7 +82,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
     }
     const uniqueCategories = [...new Set(dbProducts.map(p => p.category))];
     return [
-      { id: 'all', name: 'Hamısı', emoji: '✨' },
+      { id: 'all', name: tr("shopscreen_hamisi_c73c4d", "Hamısı"), emoji: '✨' },
       ...uniqueCategories.map(cat => ({
         id: cat,
         name: cat.charAt(0).toUpperCase() + cat.slice(1),
@@ -127,12 +127,12 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
         <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-3">
           <Lock className="w-8 h-8 text-muted-foreground" />
         </div>
-        <h2 className="text-lg font-bold mb-1">Mağaza Hazırlanır</h2>
+        <h2 className="text-lg font-bold mb-1">{tr("shopscreen_magaza_hazirlanir_5c87ce", "Mağaza Hazırlanır")}</h2>
         <p className="text-muted-foreground text-sm max-w-xs">
           Mağaza bölməsi tezliklə aktiv olacaq.
         </p>
         {onBack && (
-          <button onClick={onBack} className="mt-4 text-primary font-medium text-sm">Geri qayıt</button>
+          <button onClick={onBack} className="mt-4 text-primary font-medium text-sm">{tr("shopscreen_geri_qayit_ff66c2", "Geri qayıt")}</button>
         )}
       </div>
     );
@@ -235,8 +235,8 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
             </button>
           )}
           <div>
-            <h1 className="text-lg font-black text-foreground">Mağaza</h1>
-            <p className="text-muted-foreground text-xs">Ana və körpə üçün</p>
+            <h1 className="text-lg font-black text-foreground">{tr("shopscreen_magaza_defaa2", "Mağaza")}</h1>
+            <p className="text-muted-foreground text-xs">{tr("shopscreen_ana_ve_korpe_ucun_8dd4f2", "Ana və körpə üçün")}</p>
           </div>
         </div>
         <motion.button 
@@ -290,7 +290,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
           <span className="inline-block px-2 py-0.5 bg-white/20 rounded-full text-white text-[10px] font-bold mb-1">
             Xüsusi Təklif
           </span>
-          <h3 className="text-white font-bold text-sm mb-0.5">İlk sifarişə 20% endirim!</h3>
+          <h3 className="text-white font-bold text-sm mb-0.5">{tr("shopscreen_ilk_sifarise_20_endirim_444b7e", "İlk sifarişə 20% endirim!")}</h3>
           <p className="text-white/80 text-xs">ANACAN20 kodunu daxil edin</p>
         </div>
       </div>
@@ -348,7 +348,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
       {filteredProducts.length === 0 && (
         <div className="text-center py-8">
           <div className="text-4xl mb-2">🛒</div>
-          <p className="text-muted-foreground text-sm">Heç bir məhsul tapılmadı</p>
+          <p className="text-muted-foreground text-sm">{tr("shopscreen_hec_bir_mehsul_tapilmadi_7ded0c", "Heç bir məhsul tapılmadı")}</p>
         </div>
       )}
 

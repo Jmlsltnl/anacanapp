@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Plus, Edit2, Trash2, Cake as CakeIcon, Loader2, Upload, X, Eye, EyeOff, Settings, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,30 +14,30 @@ import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const MILESTONE_OPTIONS = [
-  { value: 'first_tooth', label: 'İlk Diş' },
-  { value: 'first_step', label: 'İlk Addım' },
-  { value: 'first_word', label: 'İlk Söz' },
-  { value: 'first_birthday', label: '1 Yaş' },
-  { value: 'first_food', label: 'İlk Yemək' },
-  { value: 'crawling', label: 'Sürünmə' },
+  { value: 'first_tooth', label: tr("admincakes_ilk_dis_03153e", "İlk Diş") },
+  { value: 'first_step', label: tr("admincakes_ilk_addim_e1c5b9", "İlk Addım") },
+  { value: 'first_word', label: tr("admincakes_ilk_soz_2ce62a", "İlk Söz") },
+  { value: 'first_birthday', label: tr("admincakes_1_yas_fee411", "1 Yaş") },
+  { value: 'first_food', label: tr("admincakes_ilk_yemek_92d22e", "İlk Yemək") },
+  { value: 'crawling', label: tr("admincakes_surunme_5dccab", "Sürünmə") },
   { value: 'sitting', label: 'Oturma' },
-  { value: 'standing', label: 'Ayağa Durma' },
-  { value: 'custom', label: 'Xüsusi' },
+  { value: 'standing', label: tr("admincakes_ayaga_durma_1d8061", "Ayağa Durma") },
+  { value: 'custom', label: tr("admincakes_xususi_1055b8", "Xüsusi") },
 ];
 
 const ORDER_STATUSES = [
-  { value: 'pending', label: 'Gözləyir', color: 'bg-yellow-100 text-yellow-700' },
-  { value: 'confirmed', label: 'Təsdiqləndi', color: 'bg-blue-100 text-blue-700' },
-  { value: 'preparing', label: 'Hazırlanır', color: 'bg-purple-100 text-purple-700' },
-  { value: 'ready', label: 'Hazırdır', color: 'bg-green-100 text-green-700' },
-  { value: 'delivered', label: 'Çatdırıldı', color: 'bg-emerald-100 text-emerald-700' },
-  { value: 'cancelled', label: 'Ləğv edildi', color: 'bg-red-100 text-red-700' },
+  { value: 'pending', label: tr("admincakes_gozleyir_9ac18a", "Gözləyir"), color: 'bg-yellow-100 text-yellow-700' },
+  { value: 'confirmed', label: tr("admincakes_tesdiqlendi_0c46e4", "Təsdiqləndi"), color: 'bg-blue-100 text-blue-700' },
+  { value: 'preparing', label: tr("admincakes_hazirlanir_c15a4b", "Hazırlanır"), color: 'bg-purple-100 text-purple-700' },
+  { value: 'ready', label: tr("admincakes_hazirdir_acac14", "Hazırdır"), color: 'bg-green-100 text-green-700' },
+  { value: 'delivered', label: tr("admincakes_catdirildi_324039", "Çatdırıldı"), color: 'bg-emerald-100 text-emerald-700' },
+  { value: 'cancelled', label: tr("admincakes_legv_edildi_bfa98b", "Ləğv edildi"), color: 'bg-red-100 text-red-700' },
 ];
 
 const PAYMENT_STATUSES = [
-  { value: 'pending', label: 'Gözləyir', color: 'bg-yellow-100 text-yellow-700' },
-  { value: 'paid', label: 'Ödənilib', color: 'bg-green-100 text-green-700' },
-  { value: 'failed', label: 'Uğursuz', color: 'bg-red-100 text-red-700' },
+  { value: 'pending', label: tr("admincakes_gozleyir_9ac18a", "Gözləyir"), color: 'bg-yellow-100 text-yellow-700' },
+  { value: 'paid', label: tr("admincakes_odenilib_4f2298", "Ödənilib"), color: 'bg-green-100 text-green-700' },
+  { value: 'failed', label: tr("admincakes_ugursuz_541932", "Uğursuz"), color: 'bg-red-100 text-red-700' },
 ];
 
 const AdminCakes = () => {
@@ -101,13 +102,13 @@ const AdminCakes = () => {
   const uploadImage = async (file: File): Promise<string | null> => {
     if (!file.type.startsWith('image/')) return null;
     if (file.size > 5 * 1024 * 1024) {
-      toast({ title: 'Fayl çox böyükdür', description: 'Max 5MB', variant: 'destructive' });
+      toast({ title: tr("admincakes_fayl_cox_boyukdur_f5cf61", "Fayl çox böyükdür"), description: 'Max 5MB', variant: 'destructive' });
       return null;
     }
     const fileName = `cake-${Date.now()}-${Math.random().toString(36).slice(2, 6)}.${file.name.split('.').pop()}`;
     const { error } = await supabase.storage.from('assets').upload(`cakes/${fileName}`, file);
     if (error) {
-      toast({ title: 'Yükləmə xətası', variant: 'destructive' });
+      toast({ title: tr("admincakes_yukleme_xetasi_eebca5", "Yükləmə xətası"), variant: 'destructive' });
       return null;
     }
     const { data: { publicUrl } } = supabase.storage.from('assets').getPublicUrl(`cakes/${fileName}`);
@@ -138,7 +139,7 @@ const AdminCakes = () => {
 
   const handleSave = async () => {
     if (!formData.name.trim() || !formData.price) {
-      toast({ title: 'Xəta', description: 'Ad və qiymət tələb olunur', variant: 'destructive' });
+      toast({ title: tr("admincakes_xeta_3cdbb6", "Xəta"), description: tr("admincakes_ad_ve_qiymet_teleb_olunur_9e671a", "Ad və qiymət tələb olunur"), variant: 'destructive' });
       return;
     }
 
@@ -171,7 +172,7 @@ const AdminCakes = () => {
       toast({ title: editingCake ? 'Tort yeniləndi' : 'Tort əlavə edildi' });
       resetForm();
     } else {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("admincakes_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   };
 
@@ -183,7 +184,7 @@ const AdminCakes = () => {
 
   const handleStatusChange = async (orderId: string, status: string) => {
     await updateOrderStatus(orderId, status);
-    toast({ title: 'Status yeniləndi' });
+    toast({ title: tr("admincakes_status_yenilendi_890662", "Status yeniləndi") });
   };
 
   const handlePaymentStatusChange = async (orderId: string, paymentStatus: string) => {
@@ -193,10 +194,10 @@ const AdminCakes = () => {
         .update({ payment_status: paymentStatus } as any)
         .eq('id', orderId);
       if (error) throw error;
-      toast({ title: 'Ödəniş statusu yeniləndi' });
+      toast({ title: tr("admincakes_odenis_statusu_yenilendi_9fad6d", "Ödəniş statusu yeniləndi") });
     } catch (error) {
       console.error('Error updating payment status:', error);
-      toast({ title: 'Xəta', variant: 'destructive' });
+      toast({ title: tr("admincakes_xeta_3cdbb6", "Xəta"), variant: 'destructive' });
     }
   };
 
@@ -211,7 +212,7 @@ const AdminCakes = () => {
     if (!editingConfig) return;
     const success = await updateMethod(editingConfig.id, { config: editingConfig.config } as any);
     if (success) {
-      toast({ title: 'Konfiqurasiya yadda saxlanıldı' });
+      toast({ title: tr("admincakes_konfiqurasiya_yadda_saxlanildi_919f9e", "Konfiqurasiya yadda saxlanıldı") });
       setEditingConfig(null);
     }
   };
@@ -223,7 +224,7 @@ const AdminCakes = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-foreground">🎂 Tortlar</h2>
-          <p className="text-muted-foreground text-sm">Aylıq və Milestone tortlarını idarə edin</p>
+          <p className="text-muted-foreground text-sm">{tr("admincakes_ayliq_ve_milestone_tortlarini_idare_edin_10f658", "Aylıq və Milestone tortlarını idarə edin")}</p>
         </div>
         <div className="flex gap-2 flex-wrap">
           <Button
@@ -270,7 +271,7 @@ const AdminCakes = () => {
                   <Input value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
                 </div>
                 <div>
-                  <Label>Qiymət (₼) *</Label>
+                  <Label>{tr("admincakes_qiymet_b6ab33", "Qiymət (₼) *")}</Label>
                   <Input type="number" step="0.01" value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} />
                 </div>
                 <div>
@@ -280,7 +281,7 @@ const AdminCakes = () => {
                     onChange={e => setFormData({ ...formData, category: e.target.value as any })}
                     className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
                   >
-                    <option value="month">Aylıq Tort</option>
+                    <option value="month">{tr("admincakes_ayliq_tort_db55bc", "Aylıq Tort")}</option>
                     <option value="milestone">Milestone Tort</option>
                   </select>
                 </div>
@@ -301,7 +302,7 @@ const AdminCakes = () => {
                 {formData.category === 'milestone' && (
                   <>
                     <div>
-                      <Label>Milestone növü</Label>
+                      <Label>{tr("admincakes_milestone_novu_096351", "Milestone növü")}</Label>
                       <select
                         value={formData.milestone_type}
                         onChange={e => {
@@ -314,7 +315,7 @@ const AdminCakes = () => {
                         }}
                         className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
                       >
-                        <option value="">Seçin</option>
+                        <option value="">{tr("admincakes_secin_5c0c8d", "Seçin")}</option>
                         {MILESTONE_OPTIONS.map(o => (
                           <option key={o.value} value={o.value}>{o.label}</option>
                         ))}
@@ -327,13 +328,13 @@ const AdminCakes = () => {
                   </>
                 )}
                 <div>
-                  <Label>Sıralama</Label>
+                  <Label>{tr("admincakes_siralama_9e1268", "Sıralama")}</Label>
                   <Input type="number" value={formData.sort_order} onChange={e => setFormData({ ...formData, sort_order: e.target.value })} />
                 </div>
               </div>
 
               <div>
-                <Label>Açıqlama</Label>
+                <Label>{tr("admincakes_aciqlama_c33d69", "Açıqlama")}</Label>
                 <textarea
                   value={formData.description}
                   onChange={e => setFormData({ ...formData, description: e.target.value })}
@@ -343,7 +344,7 @@ const AdminCakes = () => {
 
               {/* Main Image Upload */}
               <div>
-                <Label>Əsas şəkil</Label>
+                <Label>{tr("admincakes_esas_sekil_829387", "Əsas şəkil")}</Label>
                 {formData.image_url ? (
                   <div className="relative inline-block mt-2">
                     <img src={formData.image_url} alt="preview" className="w-32 h-32 object-cover rounded-xl" />
@@ -361,7 +362,7 @@ const AdminCakes = () => {
 
               {/* Additional Images */}
               <div>
-                <Label>Əlavə şəkillər</Label>
+                <Label>{tr("admincakes_elave_sekiller_693a5b", "Əlavə şəkillər")}</Label>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {formData.images.map((img, i) => (
                     <div key={i} className="relative">
@@ -385,24 +386,24 @@ const AdminCakes = () => {
 
               <div className="flex items-center gap-2">
                 <input type="checkbox" checked={formData.has_custom_fields} onChange={e => setFormData({ ...formData, has_custom_fields: e.target.checked })} />
-                <Label>Fərdi sahələr (Custom Fields)</Label>
+                <Label>{tr("admincakes_ferdi_saheler_custom_fields_5c08c9", "Fərdi sahələr (Custom Fields)")}</Label>
               </div>
 
               {formData.has_custom_fields && (
                 <div>
-                  <Label>Sahə adları (vergüllə ayırın)</Label>
+                  <Label>{tr("admincakes_sahe_adlari_vergulle_ayirin_d72a0e", "Sahə adları (vergüllə ayırın)")}</Label>
                   <Input 
                     value={formData.custom_field_labels} 
                     onChange={e => setFormData({ ...formData, custom_field_labels: e.target.value })} 
-                    placeholder="Məs: Uşaq adı, Təbrik mətni, Rəng seçimi"
+                    placeholder={tr("admincakes_mes_usaq_adi_tebrik_metni_reng_secimi_c15451", "Məs: Uşaq adı, Təbrik mətni, Rəng seçimi")}
                   />
-                  <p className="text-[10px] text-muted-foreground mt-1">Müştəri bu sahələri sifariş zamanı dolduracaq</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">{tr("admincakes_musteri_bu_saheleri_sifaris_zamani_doldu_f0107d", "Müştəri bu sahələri sifariş zamanı dolduracaq")}</p>
                 </div>
               )}
 
               <div className="flex gap-2">
                 <Button onClick={handleSave}>Yadda saxla</Button>
-                <Button variant="outline" onClick={resetForm}>Ləğv et</Button>
+                <Button variant="outline" onClick={resetForm}>{tr("admincakes_legv_et_b5e49c", "Ləğv et")}</Button>
               </div>
             </motion.div>
           )}
@@ -446,7 +447,7 @@ const AdminCakes = () => {
               </motion.div>
             ))}
             {cakes.length === 0 && (
-              <p className="text-center text-muted-foreground py-8">Hələ tort əlavə edilməyib</p>
+              <p className="text-center text-muted-foreground py-8">{tr("admincakes_hele_tort_elave_edilmeyib_fe2ab6", "Hələ tort əlavə edilməyib")}</p>
             )}
           </div>
         </>
@@ -470,11 +471,11 @@ const AdminCakes = () => {
                   </div>
                   <span className="text-sm font-bold text-primary">{order.total_price}₼</span>
                 </div>
-                {order.child_name && <p className="text-xs"><strong>Uşaq:</strong> {order.child_name}</p>}
-                {order.custom_text && <p className="text-xs"><strong>Mətn:</strong> {order.custom_text}</p>}
+                {order.child_name && <p className="text-xs"><strong>{tr("admincakes_usaq_b70dbc", "Uşaq:")}</strong> {order.child_name}</p>}
+                {order.custom_text && <p className="text-xs"><strong>{tr("admincakes_metn_efe3db", "Mətn:")}</strong> {order.custom_text}</p>}
                 {order.contact_phone && <p className="text-xs"><strong>Telefon:</strong> {order.contact_phone}</p>}
-                {order.delivery_date && <p className="text-xs"><strong>Çatdırılma:</strong> {order.delivery_date}</p>}
-                {order.delivery_address && <p className="text-xs"><strong>Ünvan:</strong> {order.delivery_address}</p>}
+                {order.delivery_date && <p className="text-xs"><strong>{tr("admincakes_catdirilma_fe6804", "Çatdırılma:")}</strong> {order.delivery_date}</p>}
+                {order.delivery_address && <p className="text-xs"><strong>{tr("admincakes_unvan_23accf", "Ünvan:")}</strong> {order.delivery_address}</p>}
                 {order.notes && <p className="text-xs"><strong>Qeyd:</strong> {order.notes}</p>}
 
                 {/* Payment Info */}
@@ -540,7 +541,7 @@ const AdminCakes = () => {
             );
           })}
           {orders.length === 0 && (
-            <p className="text-center text-muted-foreground py-8">Hələ sifariş yoxdur</p>
+            <p className="text-center text-muted-foreground py-8">{tr("admincakes_hele_sifaris_yoxdur_b283b8", "Hələ sifariş yoxdur")}</p>
           )}
         </div>
       )}
@@ -548,7 +549,7 @@ const AdminCakes = () => {
       {/* Payment Methods Tab */}
       {activeTab === 'payments' && (
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">Tort sifarişləri üçün mövcud ödəniş üsullarını aktiv/deaktiv edin</p>
+          <p className="text-sm text-muted-foreground">{tr("admincakes_tort_sifarisleri_ucun_movcud_odenis_usul_72681e", "Tort sifarişləri üçün mövcud ödəniş üsullarını aktiv/deaktiv edin")}</p>
           
           {pmLoading ? (
             <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
@@ -588,13 +589,13 @@ const AdminCakes = () => {
       <Dialog open={!!proofViewUrl} onOpenChange={() => setProofViewUrl(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Ödəniş Təsdiqi</DialogTitle>
+            <DialogTitle>{tr("admincakes_odenis_tesdiqi_241387", "Ödəniş Təsdiqi")}</DialogTitle>
           </DialogHeader>
           {proofViewUrl && (
             proofViewUrl.endsWith('.pdf') ? (
               <iframe src={proofViewUrl} className="w-full h-[500px] rounded-lg" />
             ) : (
-              <img src={proofViewUrl} alt="Ödəniş təsdiqi" className="w-full rounded-lg" />
+              <img src={proofViewUrl} alt={tr("admincakes_odenis_tesdiqi_5feb93", "Ödəniş təsdiqi")} className="w-full rounded-lg" />
             )
           )}
         </DialogContent>
@@ -609,7 +610,7 @@ const AdminCakes = () => {
           {editingConfig && (
             <div className="space-y-4">
               <div>
-                <Label>Kart nömrəsi</Label>
+                <Label>{tr("admincakes_kart_nomresi_ace5c5", "Kart nömrəsi")}</Label>
                 <Input
                   value={editingConfig.config.card_number || ''}
                   onChange={e => setEditingConfig({ ...editingConfig, config: { ...editingConfig.config, card_number: e.target.value } })}
@@ -625,19 +626,19 @@ const AdminCakes = () => {
                 />
               </div>
               <div>
-                <Label>Bank adı</Label>
+                <Label>{tr("admincakes_bank_adi_5dc2f7", "Bank adı")}</Label>
                 <Input
                   value={editingConfig.config.bank_name || ''}
                   onChange={e => setEditingConfig({ ...editingConfig, config: { ...editingConfig.config, bank_name: e.target.value } })}
-                  placeholder="Məs: Kapital Bank"
+                  placeholder={tr("admincakes_mes_kapital_bank_57ef78", "Məs: Kapital Bank")}
                 />
               </div>
               <div>
-                <Label>Əlavə təlimat</Label>
+                <Label>{tr("admincakes_elave_telimat_60b61b", "Əlavə təlimat")}</Label>
                 <textarea
                   value={editingConfig.config.instructions || ''}
                   onChange={e => setEditingConfig({ ...editingConfig, config: { ...editingConfig.config, instructions: e.target.value } })}
-                  placeholder="Köçürmə zamanı qeyd hissəsində sifariş nömrənizi yazın"
+                  placeholder={tr("admincakes_kocurme_zamani_qeyd_hissesinde_sifaris_n_e15a2a", "Köçürmə zamanı qeyd hissəsində sifariş nömrənizi yazın")}
                   className="w-full min-h-[60px] rounded-md border border-input bg-background px-3 py-2 text-sm"
                 />
               </div>

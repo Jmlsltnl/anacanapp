@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { 
   BarChart3, TrendingUp, Users, Crown, MousePointerClick, 
@@ -45,7 +46,7 @@ interface PremiumFunnel {
 const CATEGORY_LABELS: Record<string, string> = {
   tools: 'Alətlər',
   health: 'Sağlamlıq',
-  content: 'Məzmun',
+  content: tr("adminanalytics_mezmun_f1d51d", "Məzmun"),
   ai: 'AI',
   premium: 'Premium',
   auth: 'Giriş/Qeydiyyat',
@@ -273,10 +274,10 @@ const AdminAnalytics = () => {
   }, [events]);
 
   const statCards = [
-    { label: 'Cəmi Hadisə', value: overviewStats.totalEvents, icon: Activity, color: 'bg-blue-500' },
-    { label: 'Unikal İstifadəçi', value: overviewStats.uniqueUsers, icon: Users, color: 'bg-emerald-500' },
-    { label: 'Alət İstifadəsi', value: overviewStats.toolEvents, icon: MousePointerClick, color: 'bg-purple-500' },
-    { label: 'Premium Keçid', value: overviewStats.premiumConversions, icon: Crown, color: 'bg-amber-500' },
+    { label: tr("adminanalytics_cemi_hadise_a138e5", "Cəmi Hadisə"), value: overviewStats.totalEvents, icon: Activity, color: 'bg-blue-500' },
+    { label: tr("adminanalytics_unikal_istifadeci_7c7eec", "Unikal İstifadəçi"), value: overviewStats.uniqueUsers, icon: Users, color: 'bg-emerald-500' },
+    { label: tr("adminanalytics_alet_istifadesi_b15cf9", "Alət İstifadəsi"), value: overviewStats.toolEvents, icon: MousePointerClick, color: 'bg-purple-500' },
+    { label: tr("adminanalytics_premium_kecid_62b1e5", "Premium Keçid"), value: overviewStats.premiumConversions, icon: Crown, color: 'bg-amber-500' },
   ];
 
   return (
@@ -285,7 +286,7 @@ const AdminAnalytics = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">📊 Analitika</h1>
-          <p className="text-muted-foreground">İstifadəçi davranışı və alət istifadəsi</p>
+          <p className="text-muted-foreground">{tr("adminanalytics_istifadeci_davranisi_ve_alet_istifadesi_879ed3", "İstifadəçi davranışı və alət istifadəsi")}</p>
         </div>
         <div className="flex items-center gap-3">
           <Select value={dateRange} onValueChange={setDateRange}>
@@ -294,10 +295,10 @@ const AdminAnalytics = () => {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1">Bu gün</SelectItem>
-              <SelectItem value="7">Son 7 gün</SelectItem>
-              <SelectItem value="30">Son 30 gün</SelectItem>
-              <SelectItem value="90">Son 90 gün</SelectItem>
+              <SelectItem value="1">{tr("adminanalytics_bu_gun_786fd4", "Bu gün")}</SelectItem>
+              <SelectItem value="7">{tr("adminanalytics_son_7_gun_d6fc2a", "Son 7 gün")}</SelectItem>
+              <SelectItem value="30">{tr("adminanalytics_son_30_gun_89778f", "Son 30 gün")}</SelectItem>
+              <SelectItem value="90">{tr("adminanalytics_son_90_gun_68d604", "Son 90 gün")}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
@@ -306,7 +307,7 @@ const AdminAnalytics = () => {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Hamısı</SelectItem>
+              <SelectItem value="all">{tr("adminanalytics_hamisi_c73c4d", "Hamısı")}</SelectItem>
               {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
                 <SelectItem key={key} value={key}>{label}</SelectItem>
               ))}
@@ -342,17 +343,17 @@ const AdminAnalytics = () => {
 
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="overview">Ümumi Baxış</TabsTrigger>
-          <TabsTrigger value="tools">Alət İstifadəsi</TabsTrigger>
+          <TabsTrigger value="overview">{tr("adminanalytics_umumi_baxis_f27f07", "Ümumi Baxış")}</TabsTrigger>
+          <TabsTrigger value="tools">{tr("adminanalytics_alet_istifadesi_b15cf9", "Alət İstifadəsi")}</TabsTrigger>
           <TabsTrigger value="premium">Premium Analiz</TabsTrigger>
-          <TabsTrigger value="users">İstifadəçi Segmentləri</TabsTrigger>
+          <TabsTrigger value="users">{tr("adminanalytics_istifadeci_segmentleri_f5dd13", "İstifadəçi Segmentləri")}</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
           {/* Daily Trend */}
           <Card className="p-5">
-            <h3 className="text-lg font-semibold mb-4">Gündəlik Trend</h3>
+            <h3 className="text-lg font-semibold mb-4">{tr("adminanalytics_gundelik_trend_589103", "Gündəlik Trend")}</h3>
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={dailyTrend}>
@@ -380,7 +381,7 @@ const AdminAnalytics = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Top Events */}
             <Card className="p-5">
-              <h3 className="text-lg font-semibold mb-4">Ən Çox Baş Verən Hadisələr</h3>
+              <h3 className="text-lg font-semibold mb-4">{tr("adminanalytics_en_cox_bas_veren_hadiseler_787f85", "Ən Çox Baş Verən Hadisələr")}</h3>
               <div className="space-y-2 max-h-80 overflow-y-auto">
                 {topEvents.map((ev, i) => (
                   <div key={ev.event_name} className="flex items-center justify-between p-2.5 rounded-lg bg-muted/50">
@@ -395,14 +396,14 @@ const AdminAnalytics = () => {
                   </div>
                 ))}
                 {topEvents.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">Hələ məlumat yoxdur</p>
+                  <p className="text-center text-muted-foreground py-8">{tr("adminanalytics_hele_melumat_yoxdur_91fda8", "Hələ məlumat yoxdur")}</p>
                 )}
               </div>
             </Card>
 
             {/* Category Pie */}
             <Card className="p-5">
-              <h3 className="text-lg font-semibold mb-4">Kateqoriya Paylanması</h3>
+              <h3 className="text-lg font-semibold mb-4">{tr("adminanalytics_kateqoriya_paylanmasi_6a4800", "Kateqoriya Paylanması")}</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -430,7 +431,7 @@ const AdminAnalytics = () => {
         {/* Tools Tab */}
         <TabsContent value="tools" className="space-y-6">
           <Card className="p-5">
-            <h3 className="text-lg font-semibold mb-4">Alət İstifadə Statistikası</h3>
+            <h3 className="text-lg font-semibold mb-4">{tr("adminanalytics_alet_istifade_statistikasi_24bdb0", "Alət İstifadə Statistikası")}</h3>
             {toolUsage.length > 0 ? (
               <>
                 <div className="h-80">
@@ -455,11 +456,11 @@ const AdminAnalytics = () => {
                       <div className="flex items-center gap-6">
                         <div className="text-right">
                           <p className="text-sm font-bold">{tool.count}</p>
-                          <p className="text-xs text-muted-foreground">istifadə</p>
+                          <p className="text-xs text-muted-foreground">{tr("adminanalytics_istifade_ddadc5", "istifadə")}</p>
                         </div>
                         <div className="text-right">
                           <p className="text-sm font-bold">{tool.unique_users}</p>
-                          <p className="text-xs text-muted-foreground">istifadəçi</p>
+                          <p className="text-xs text-muted-foreground">{tr("adminanalytics_istifadeci_84a198", "istifadəçi")}</p>
                         </div>
                       </div>
                     </div>
@@ -467,7 +468,7 @@ const AdminAnalytics = () => {
                 </div>
               </>
             ) : (
-              <p className="text-center text-muted-foreground py-12">Alət istifadə məlumatı hələ yoxdur</p>
+              <p className="text-center text-muted-foreground py-12">{tr("adminanalytics_alet_istifade_melumati_hele_yoxdur_338696", "Alət istifadə məlumatı hələ yoxdur")}</p>
             )}
           </Card>
         </TabsContent>
@@ -478,7 +479,7 @@ const AdminAnalytics = () => {
             <Card className="p-5 text-center">
               <Eye className="w-8 h-8 mx-auto text-blue-500 mb-2" />
               <p className="text-2xl font-bold">{premiumFunnel.paywall_shown}</p>
-              <p className="text-sm text-muted-foreground">Paywall Göstərildi</p>
+              <p className="text-sm text-muted-foreground">{tr("adminanalytics_paywall_gosterildi_359f44", "Paywall Göstərildi")}</p>
             </Card>
             <Card className="p-5 text-center">
               <MousePointerClick className="w-8 h-8 mx-auto text-purple-500 mb-2" />
@@ -493,7 +494,7 @@ const AdminAnalytics = () => {
             <Card className="p-5 text-center">
               <Crown className="w-8 h-8 mx-auto text-amber-500 mb-2" />
               <p className="text-2xl font-bold">{premiumFunnel.subscribed}</p>
-              <p className="text-sm text-muted-foreground">Abunə Oldu</p>
+              <p className="text-sm text-muted-foreground">{tr("adminanalytics_abune_oldu_65a281", "Abunə Oldu")}</p>
               {premiumFunnel.paywall_clicked > 0 && (
                 <p className="text-xs text-emerald-500 mt-1">
                   {((premiumFunnel.subscribed / premiumFunnel.paywall_clicked) * 100).toFixed(1)}% tamamlandı
@@ -504,7 +505,7 @@ const AdminAnalytics = () => {
 
           {/* Premium events by source */}
           <Card className="p-5">
-            <h3 className="text-lg font-semibold mb-4">Paywall Mənbələri</h3>
+            <h3 className="text-lg font-semibold mb-4">{tr("adminanalytics_paywall_menbeleri_6b7bac", "Paywall Mənbələri")}</h3>
             <div className="space-y-2">
               {(() => {
                 const sources = new Map<string, number>();
@@ -524,7 +525,7 @@ const AdminAnalytics = () => {
                   ));
               })()}
               {events.filter(e => e.event_name === 'premium_paywall_shown').length === 0 && (
-                <p className="text-center text-muted-foreground py-8">Hələ paywall məlumatı yoxdur</p>
+                <p className="text-center text-muted-foreground py-8">{tr("adminanalytics_hele_paywall_melumati_yoxdur_5c3dd4", "Hələ paywall məlumatı yoxdur")}</p>
               )}
             </div>
           </Card>
@@ -535,7 +536,7 @@ const AdminAnalytics = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Life Stage */}
             <Card className="p-5">
-              <h3 className="text-lg font-semibold mb-4">Həyat Mərhələsinə Görə Aktivlik</h3>
+              <h3 className="text-lg font-semibold mb-4">{tr("adminanalytics_heyat_merhelesine_gore_aktivlik_fb5a3f", "Həyat Mərhələsinə Görə Aktivlik")}</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -560,7 +561,7 @@ const AdminAnalytics = () => {
 
             {/* Platform */}
             <Card className="p-5">
-              <h3 className="text-lg font-semibold mb-4">Platforma Paylanması</h3>
+              <h3 className="text-lg font-semibold mb-4">{tr("adminanalytics_platforma_paylanmasi_bae2ed", "Platforma Paylanması")}</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -586,13 +587,13 @@ const AdminAnalytics = () => {
 
           {/* Premium vs Free activity */}
           <Card className="p-5">
-            <h3 className="text-lg font-semibold mb-4">Premium vs Pulsuz İstifadəçi Aktivliyi</h3>
+            <h3 className="text-lg font-semibold mb-4">{tr("adminanalytics_premium_vs_pulsuz_istifadeci_aktivliyi_90623a", "Premium vs Pulsuz İstifadəçi Aktivliyi")}</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center p-4 rounded-lg bg-muted/50">
                 <p className="text-3xl font-bold text-foreground">
                   {events.filter(e => !e.is_premium).length}
                 </p>
-                <p className="text-sm text-muted-foreground mt-1">Pulsuz İstifadəçi Hadisələri</p>
+                <p className="text-sm text-muted-foreground mt-1">{tr("adminanalytics_pulsuz_istifadeci_hadiseleri_1d304c", "Pulsuz İstifadəçi Hadisələri")}</p>
                 <p className="text-xs text-muted-foreground">
                   {new Set(events.filter(e => !e.is_premium).map(e => e.user_id)).size} unikal istifadəçi
                 </p>
@@ -601,7 +602,7 @@ const AdminAnalytics = () => {
                 <p className="text-3xl font-bold text-amber-500">
                   {events.filter(e => e.is_premium).length}
                 </p>
-                <p className="text-sm text-muted-foreground mt-1">Premium İstifadəçi Hadisələri</p>
+                <p className="text-sm text-muted-foreground mt-1">{tr("adminanalytics_premium_istifadeci_hadiseleri_df62ce", "Premium İstifadəçi Hadisələri")}</p>
                 <p className="text-xs text-muted-foreground">
                   {new Set(events.filter(e => e.is_premium).map(e => e.user_id)).size} unikal istifadəçi
                 </p>

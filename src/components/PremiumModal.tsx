@@ -26,20 +26,25 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const {
     packages, isLoading, isPurchasing, error, isSupported,
-    purchaseMonthly, purchaseYearly, restorePurchases, showPaywall,
+    purchaseMonthly, purchaseYearly, restorePurchases, showPaywallSafe,
   } = useInAppPurchase();
 
   const isNative = isNativePlatform();
 
-  // ⚡ All paywalls must come from RevenueCat. On native, immediately present
-  // the RevenueCat native paywall and skip the custom UI entirely.
+  // On native, try presenting the RevenueCat paywall. If RC UI plugin is
+  // missing or no paywall is configured, gracefully fall back to the custom
+  // modal UI (no crash).
   useEffect(() => {
     if (!isOpen || !isNative || !isSupported) return;
     let cancelled = false;
     (async () => {
-      const purchased = await showPaywall();
+      const result = await showPaywallSafe();
       if (cancelled) return;
-      if (purchased) {
+      if (!result.available) {
+        // Native paywall unavailable — keep showing the custom modal.
+        return;
+      }
+      if (result.didPurchase) {
         toast({
           title: tr("premiummodal_premium_aktivlesdirildi_eb58f2", 'Premium aktivləşdirildi! 🎉'),
           description: tr("premiummodal_i_ndi_butun_xususiyyetlerden_istifade_ed_20a814", 'İndi bütün xüsusiyyətlərdən istifadə edə bilərsiniz.'),
@@ -48,7 +53,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
       onClose();
     })();
     return () => { cancelled = true; };
-  }, [isOpen, isNative, isSupported, showPaywall, onClose, toast]);
+  }, [isOpen, isNative, isSupported, showPaywallSafe, onClose, toast]);
 
   useEffect(() => {
     if (isPremium && subscription?.plan_type === 'premium') setSelectedPlan('yearly');

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { Calendar, Baby, Droplets, Heart, Bell, Activity, Flower2, Moon, Sparkles } from 'lucide-react';
 import type { CyclePhaseInfo } from '@/lib/cycle-utils';
 
@@ -137,7 +138,7 @@ const PartnerHeroCard = ({
       {/* BUMP stats */}
       {lifeStage === 'bump' && currentWeek > 0 && (
         <div className="grid grid-cols-3 gap-3 mt-5">
-          <StatTile icon={Calendar} value={daysUntilDue} label="Gün qaldı" delay={0.1} />
+          <StatTile icon={Calendar} value={daysUntilDue} label={tr("partnerherocard_gun_qaldi_309c87", "Gün qaldı")} delay={0.1} />
           <StatTile emoji={weekData?.emoji || '👶'} label={weekData?.fruit || 'Körpə'} delay={0.15} />
           <StatTile icon={Droplets} value={waterIntake} label="ml su" delay={0.2} />
         </div>
@@ -151,7 +152,7 @@ const PartnerHeroCard = ({
             label={babyName || 'Körpə'}
             delay={0.1}
           />
-          <StatTile icon={Baby} value={babyMonths} label="aylıq" delay={0.15} />
+          <StatTile icon={Baby} value={babyMonths} label={tr("partnerherocard_ayliq_0c8da3", "aylıq")} delay={0.15} />
           <StatTile icon={Droplets} value={waterIntake} label="ml su" delay={0.2} />
         </div>
       )}
@@ -164,7 +165,7 @@ const PartnerHeroCard = ({
             label={PHASE_LABEL[cyclePhase.phase].label}
             delay={0.1}
           />
-          <StatTile icon={Moon} value={daysUntilNextPeriod || 0} label="gün qaldı" delay={0.15} />
+          <StatTile icon={Moon} value={daysUntilNextPeriod || 0} label={tr("partnerherocard_gun_qaldi_993281", "gün qaldı")} delay={0.15} />
           <StatTile
             icon={cyclePhase.isFertileDay ? Sparkles : Flower2}
             value={cyclePhase.dayInCycle}

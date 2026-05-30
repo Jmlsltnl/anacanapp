@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { FileText, Save, Plus, Eye, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -91,8 +92,8 @@ const AdminLegal = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Hüquqi Sənədlər</h2>
-          <p className="text-muted-foreground">Şərtlər, Məxfilik, GDPR və digər sənədləri idarə edin</p>
+          <h2 className="text-2xl font-bold">{tr("adminlegal_huquqi_senedler_ca8c60", "Hüquqi Sənədlər")}</h2>
+          <p className="text-muted-foreground">{tr("adminlegal_sertler_mexfilik_gdpr_ve_diger_senedleri_4d1d93", "Şərtlər, Məxfilik, GDPR və digər sənədləri idarə edin")}</p>
         </div>
         <Button onClick={handleCreate}>
           <Plus className="h-4 w-4 mr-2" />
@@ -153,15 +154,15 @@ const AdminLegal = () => {
           
           <Tabs defaultValue="content" className="flex-1">
             <TabsList className="w-full">
-              <TabsTrigger value="content" className="flex-1">Məzmun</TabsTrigger>
-              <TabsTrigger value="settings" className="flex-1">Parametrlər</TabsTrigger>
+              <TabsTrigger value="content" className="flex-1">{tr("adminlegal_mezmun_f1d51d", "Məzmun")}</TabsTrigger>
+              <TabsTrigger value="settings" className="flex-1">{tr("adminlegal_parametrler_5d664b", "Parametrlər")}</TabsTrigger>
             </TabsList>
 
             <ScrollArea className="h-[60vh] mt-4">
               <TabsContent value="content" className="space-y-4 px-1">
                 {isCreating && (
                   <div className="space-y-2">
-                    <Label>Sənəd Növü (ingiliscə)</Label>
+                    <Label>{tr("adminlegal_sened_novu_ingilisce_925de7", "Sənəd Növü (ingiliscə)")}</Label>
                     <Input
                       value={editForm.document_type || ''}
                       onChange={(e) => setEditForm({ ...editForm, document_type: e.target.value })}
@@ -172,14 +173,14 @@ const AdminLegal = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Başlıq (EN)</Label>
+                    <Label>{tr("adminlegal_basliq_en_4ac905", "Başlıq (EN)")}</Label>
                     <Input
                       value={editForm.title || ''}
                       onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Başlıq (AZ)</Label>
+                    <Label>{tr("adminlegal_basliq_az_3e294a", "Başlıq (AZ)")}</Label>
                     <Input
                       value={editForm.title_az || ''}
                       onChange={(e) => setEditForm({ ...editForm, title_az: e.target.value })}
@@ -188,16 +189,16 @@ const AdminLegal = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Məzmun (AZ)</Label>
+                  <Label>{tr("adminlegal_mezmun_az_d18d5f", "Məzmun (AZ)")}</Label>
                   <RichTextEditor
                     content={editForm.content_az || ''}
                     onChange={(html) => setEditForm({ ...editForm, content_az: html })}
-                    placeholder="Hüquqi sənədin məzmunu..."
+                    placeholder={tr("adminlegal_huquqi_senedin_mezmunu_0db749", "Hüquqi sənədin məzmunu...")}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Məzmun (EN)</Label>
+                  <Label>{tr("adminlegal_mezmun_en_7541aa", "Məzmun (EN)")}</Label>
                   <RichTextEditor
                     content={editForm.content || ''}
                     onChange={(html) => setEditForm({ ...editForm, content: html })}
@@ -219,7 +220,7 @@ const AdminLegal = () => {
                 <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
                   <div>
                     <Label>Aktiv</Label>
-                    <p className="text-sm text-muted-foreground">Sənədi istifadəçilərə göstər</p>
+                    <p className="text-sm text-muted-foreground">{tr("adminlegal_senedi_istifadecilere_goster_7e821b", "Sənədi istifadəçilərə göstər")}</p>
                   </div>
                   <Switch
                     checked={editForm.is_active ?? true}

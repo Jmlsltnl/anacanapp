@@ -449,7 +449,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     const { nativeShare } = await import('@/lib/native');
     await nativeShare({
       title: tr("babyphotoshoot_korpe_fotosessiyasi_546576", 'Körpə Fotosessiyası'),
-      text: 'Anacan tətbiqində yaradılmış körpə fotosu',
+      text: tr("babyphotoshoot_anacan_tetbiqinde_yaradilmis_korpe_fotos_d73b4f", "Anacan tətbiqində yaradılmış körpə fotosu"),
       url: url,
     });
   };
@@ -497,8 +497,8 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                   <Upload className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                  <h2 className="font-semibold text-sm text-foreground">Körpənin Şəklini Yükləyin</h2>
-                  <p className="text-[10px] text-muted-foreground">Üzü aydın görünən foto seçin</p>
+                  <h2 className="font-semibold text-sm text-foreground">{tr("babyphotoshoot_korpenin_seklini_yukleyin_b1c595", "Körpənin Şəklini Yükləyin")}</h2>
+                  <p className="text-[10px] text-muted-foreground">{tr("babyphotoshoot_uzu_aydin_gorunen_foto_secin_9b42f9", "Üzü aydın görünən foto seçin")}</p>
                 </div>
               </div>
 
@@ -514,7 +514,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                 <div className="relative">
                   <img
                     src={sourceImagePreview}
-                    alt="Yüklənmiş şəkil"
+                    alt={tr("babyphotoshoot_yuklenmis_sekil_641af4", "Yüklənmiş şəkil")}
                     className="w-full h-44 object-cover rounded-2xl"
                   />
                   <motion.button
@@ -535,7 +535,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                       <Camera className="w-6 h-6 text-primary" />
                   </div>
                   <div className="text-center">
-                    <p className="font-bold text-foreground">Şəkil seçin</p>
+                    <p className="font-bold text-foreground">{tr("babyphotoshoot_sekil_secin_e3e1f3", "Şəkil seçin")}</p>
                     <p className="text-sm text-muted-foreground mt-1">Maksimum 5MB</p>
                   </div>
                 </motion.button>
@@ -544,11 +544,11 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
             {/* Gender Selection */}
             <div className="bg-card rounded-2xl p-4 shadow-elevated">
-              <h2 className="font-semibold text-sm text-foreground mb-3">Cinsiyyət Seçin</h2>
+              <h2 className="font-semibold text-sm text-foreground mb-3">{tr("babyphotoshoot_cinsiyyet_secin_186992", "Cinsiyyət Seçin")}</h2>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { id: 'boy', name: 'Oğlan', emoji: '👦', color: 'from-blue-400 to-blue-600' },
-                  { id: 'girl', name: 'Qız', emoji: '👧', color: 'from-pink-400 to-rose-500' },
+                  { id: 'boy', name: tr("babyphotoshoot_oglan_e9715e", "Oğlan"), emoji: '👦', color: 'from-blue-400 to-blue-600' },
+                  { id: 'girl', name: tr("babyphotoshoot_qiz_79bf6b", "Qız"), emoji: '👧', color: 'from-pink-400 to-rose-500' },
                 ].map((option) => (
                   <motion.button
                     key={option.id}
@@ -599,8 +599,8 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                   <Sparkles className="w-4 h-4 text-purple-500" />
                 </div>
                 <div>
-                  <h2 className="font-semibold text-sm text-foreground">Şəkil Növü</h2>
-                  <p className="text-[10px] text-muted-foreground">Foto stilini seçin</p>
+                  <h2 className="font-semibold text-sm text-foreground">{tr("babyphotoshoot_sekil_novu_c47221", "Şəkil Növü")}</h2>
+                  <p className="text-[10px] text-muted-foreground">{tr("babyphotoshoot_foto_stilini_secin_e2d6a1", "Foto stilini seçin")}</p>
                 </div>
               </div>
               <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
@@ -676,7 +676,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             <div className="bg-card rounded-3xl p-4 shadow-elevated">
               <div className="flex items-center gap-2 mb-3">
                 <Eye className="w-5 h-5 text-blue-500" />
-                <h2 className="font-bold text-foreground text-sm">Göz Rəngi</h2>
+                <h2 className="font-bold text-foreground text-sm">{tr("babyphotoshoot_goz_rengi_8fe8d7", "Göz Rəngi")}</h2>
               </div>
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {eyeColorOptions.map((option) => (
@@ -701,7 +701,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             <div className="bg-card rounded-3xl p-4 shadow-elevated">
               <div className="flex items-center gap-2 mb-3">
                 <Palette className="w-5 h-5 text-amber-500" />
-                <h2 className="font-bold text-foreground text-sm">Saç Rəngi</h2>
+                <h2 className="font-bold text-foreground text-sm">{tr("babyphotoshoot_sac_rengi_68dd12", "Saç Rəngi")}</h2>
               </div>
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {hairColorOptions.map((option) => (
@@ -726,7 +726,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             <div className="bg-card rounded-3xl p-4 shadow-elevated">
               <div className="flex items-center gap-2 mb-3">
                 <Scissors className="w-5 h-5 text-purple-500" />
-                <h2 className="font-bold text-foreground text-sm">Saç Forması</h2>
+                <h2 className="font-bold text-foreground text-sm">{tr("babyphotoshoot_sac_formasi_5d3388", "Saç Forması")}</h2>
               </div>
               <div className="flex gap-1.5 overflow-x-auto pb-1">
                 {hairStyleOptions.map((option) => (
@@ -810,7 +810,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
           <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
             <Camera className="w-7 h-7 text-primary" />
           </div>
-          <h3 className="font-bold text-foreground mb-1 text-sm">Hələ foto yoxdur</h3>
+          <h3 className="font-bold text-foreground mb-1 text-sm">{tr("babyphotoshoot_hele_foto_yoxdur_3ce618", "Hələ foto yoxdur")}</h3>
           <p className="text-muted-foreground text-xs">
             Şəkil yükləyin və foto yaradın!
           </p>
@@ -857,8 +857,8 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold text-white">Körpə Fotosessiyası</h1>
-            <p className="text-white/70 text-xs">AI ilə sehrli fotolar</p>
+            <h1 className="text-lg font-bold text-white">{tr("babyphotoshoot_korpe_fotosessiyasi_546576", "Körpə Fotosessiyası")}</h1>
+            <p className="text-white/70 text-xs">{tr("babyphotoshoot_ai_ile_sehrli_fotolar_0fce8f", "AI ilə sehrli fotolar")}</p>
           </div>
           {isPremium && (
             <div className="bg-amber-400 text-amber-900 px-2.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1">
@@ -935,12 +935,12 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
               {isGenerating ? (
                 <div className="flex items-center gap-2">
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Yaradılır...</span>
+                  <span>{tr("babyphotoshoot_yaradilir_9bb5ed", "Yaradılır...")}</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5" />
-                  <span>Şəkil Yarat</span>
+                  <span>{tr("babyphotoshoot_sekil_yarat_6d7c0c", "Şəkil Yarat")}</span>
                 </div>
               )}
             </Button>

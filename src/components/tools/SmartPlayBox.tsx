@@ -264,7 +264,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
               <div className="bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-500 text-white p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <Trophy className="h-5 w-5" />
-                  <span className="font-semibold">Bugünkü Tövsiyə</span>
+                  <span className="font-semibold">{tr("smartplaybox_bugunku_tovsiye_ec6c3a", "Bugünkü Tövsiyə")}</span>
                 </div>
                 <div className="flex items-start gap-4">
                   <motion.div 
@@ -302,7 +302,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
 
                 {todaysActivity.required_items?.length > 0 && (
                   <div className="mb-4">
-                    <p className="text-xs text-muted-foreground mb-2">Lazım olan əşyalar:</p>
+                    <p className="text-xs text-muted-foreground mb-2">{tr("smartplaybox_lazim_olan_esyalar_b33d1b", "Lazım olan əşyalar:")}</p>
                     <div className="flex flex-wrap gap-2">
                       {todaysActivity.required_items.map(item => {
                         const invItem = inventoryItems.find(i => 
@@ -342,7 +342,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
         {/* Skills Overview */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Bacarıq Sahələri</CardTitle>
+            <CardTitle className="text-base">{tr("smartplaybox_bacariq_saheleri_d5133c", "Bacarıq Sahələri")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-5 gap-2">
@@ -372,14 +372,14 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
           {isLoading ? (
             <div className="text-center py-12">
               <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary mb-2" />
-              <p className="text-muted-foreground">Oyunlar yüklənir...</p>
+              <p className="text-muted-foreground">{tr("smartplaybox_oyunlar_yuklenir_d1edd2", "Oyunlar yüklənir...")}</p>
             </div>
           ) : filteredActivities.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <Baby className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>Bu yaşa uyğun oyun tapılmadı</p>
+              <p>{tr("smartplaybox_bu_yasa_uygun_oyun_tapilmadi_72e443", "Bu yaşa uyğun oyun tapılmadı")}</p>
               {!profile?.baby_birth_date && (
-                <p className="text-sm mt-2">Profildə körpənin doğum tarixini əlavə edin</p>
+                <p className="text-sm mt-2">{tr("smartplaybox_profilde_korpenin_dogum_tarixini_elave_e_696d85", "Profildə körpənin doğum tarixini əlavə edin")}</p>
               )}
             </div>
           ) : (
@@ -474,7 +474,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                 {/* Required items */}
                 {selectedActivity.required_items?.length > 0 && (
                   <div>
-                    <h4 className="font-semibold mb-2">📦 Lazım olan əşyalar</h4>
+                    <h4 className="font-semibold mb-2">{tr("smartplaybox_lazim_olan_esyalar_8e1429", "📦 Lazım olan əşyalar")}</h4>
                     <div className="flex flex-wrap gap-2">
                       {selectedActivity.required_items.map(item => {
                         const invItem = inventoryItems.find(i => 
@@ -502,7 +502,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                 {/* Instructions */}
                 {selectedActivity.instructions_az && (
                   <div>
-                    <h4 className="font-semibold mb-2">📝 Necə oynamalı</h4>
+                    <h4 className="font-semibold mb-2">{tr("smartplaybox_nece_oynamali_6cadac", "📝 Necə oynamalı")}</h4>
                     <div className="bg-muted rounded-lg p-4">
                       <p className="text-sm whitespace-pre-line leading-relaxed">
                         {selectedActivity.instructions_az}
@@ -528,10 +528,10 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
       <Dialog open={showComplete} onOpenChange={setShowComplete}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-center">🎉 Əla!</DialogTitle>
+            <DialogTitle className="text-center">{tr("smartplaybox_ela_548a34", "🎉 Əla!")}</DialogTitle>
           </DialogHeader>
           <div className="text-center space-y-4">
-            <p className="text-muted-foreground">Oyun necə keçdi?</p>
+            <p className="text-muted-foreground">{tr("smartplaybox_oyun_nece_kecdi_c5f5f4", "Oyun necə keçdi?")}</p>
             <div className="flex justify-center gap-2">
               {[1, 2, 3, 4, 5].map(star => (
                 <motion.button

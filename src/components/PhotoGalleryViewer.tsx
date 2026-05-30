@@ -127,7 +127,7 @@ const PhotoGalleryViewer = ({
 
     const shared = await nativeShare({
       title: tr("photogalleryviewer_korpe_fotosu_770c1a", 'Körpə Fotosu'),
-      text: 'Anacan ilə yaradılmış körpə fotosu',
+      text: tr("photogalleryviewer_anacan_ile_yaradilmis_korpe_fotosu_cfa1e7", "Anacan ilə yaradılmış körpə fotosu"),
       url: currentPhoto.url,
     });
 
@@ -337,7 +337,7 @@ const PhotoGalleryViewer = ({
         <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
           <AlertDialogContent className="rounded-3xl max-w-sm mx-4">
             <AlertDialogHeader>
-              <AlertDialogTitle>Şəkli silmək istəyirsiniz?</AlertDialogTitle>
+              <AlertDialogTitle>{tr("photogalleryviewer_sekli_silmek_isteyirsiniz_87c14d", "Şəkli silmək istəyirsiniz?")}</AlertDialogTitle>
               <AlertDialogDescription>
                 Bu əməliyyat geri alına bilməz. Şəkil həmişəlik silinəcək.
               </AlertDialogDescription>

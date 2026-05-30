@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { 
   Plus, Search, Edit2, Trash2, Download, Upload, 
@@ -115,14 +116,14 @@ const AdminPregnancyContent = () => {
     try {
       if (editingItem) {
         await updateContent.mutateAsync({ id: editingItem.id, ...formData });
-        toast({ title: 'Uğurla yeniləndi!' });
+        toast({ title: tr("adminpregnancycontent_ugurla_yenilendi_e58679", "Uğurla yeniləndi!") });
       } else {
         await createContent.mutateAsync(formData);
-        toast({ title: 'Uğurla əlavə edildi!' });
+        toast({ title: tr("adminpregnancycontent_ugurla_elave_edildi_9fc0c7", "Uğurla əlavə edildi!") });
       }
       setModalOpen(false);
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminpregnancycontent_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     }
   };
 
@@ -132,7 +133,7 @@ const AdminPregnancyContent = () => {
       await deleteContent.mutateAsync(id);
       toast({ title: 'Silindi!' });
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminpregnancycontent_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     }
   };
 
@@ -143,7 +144,7 @@ const AdminPregnancyContent = () => {
       setSelectedItems([]);
       toast({ title: `${selectedItems.length} məlumat silindi!` });
     } catch (error: any) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminpregnancycontent_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     }
   };
 
@@ -330,7 +331,7 @@ const AdminPregnancyContent = () => {
       setImportProgress(100);
 
       toast({
-        title: 'İmport tamamlandı!',
+        title: tr("adminpregnancycontent_import_tamamlandi_e48258", "İmport tamamlandı!"),
         description: `${results.success} uğurlu, ${results.failed} uğursuz${results.errors?.length ? ` - İlk xəta: ${results.errors[0]}` : ''}`,
       });
 
@@ -339,7 +340,7 @@ const AdminPregnancyContent = () => {
       }
     } catch (error: any) {
       console.error('Import error:', error);
-      toast({ title: 'İmport xətası', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminpregnancycontent_import_xetasi_a3a4fb", "İmport xətası"), description: error.message, variant: 'destructive' });
     } finally {
       setImporting(false);
       setImportModalOpen(false);
@@ -483,8 +484,8 @@ const AdminPregnancyContent = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Hamiləlik Kontenti</h1>
-          <p className="text-muted-foreground">Həftəlik/gündəlik kontent idarəsi</p>
+          <h1 className="text-2xl font-bold text-foreground">{tr("adminpregnancycontent_hamilelik_kontenti_9bc47b", "Hamiləlik Kontenti")}</h1>
+          <p className="text-muted-foreground">{tr("adminpregnancycontent_heftelik_gundelik_kontent_idaresi_833350", "Həftəlik/gündəlik kontent idarəsi")}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={downloadExcel}>
@@ -505,9 +506,9 @@ const AdminPregnancyContent = () => {
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4">
         {[
-          { icon: Baby, label: 'Ümumi həftə', value: content.length, color: 'bg-pink-100 text-pink-600' },
+          { icon: Baby, label: tr("adminpregnancycontent_umumi_hefte_4e6a97", "Ümumi həftə"), value: content.length, color: 'bg-pink-100 text-pink-600' },
           { icon: Apple, label: 'Qidalanma', value: content.filter(c => c.nutrition_tip).length, color: 'bg-green-100 text-green-600' },
-          { icon: Heart, label: 'Körpə mesajı', value: content.filter(c => c.baby_message).length, color: 'bg-red-100 text-red-600' },
+          { icon: Heart, label: tr("adminpregnancycontent_korpe_mesaji_d119e3", "Körpə mesajı"), value: content.filter(c => c.baby_message).length, color: 'bg-red-100 text-red-600' },
           { icon: Check, label: 'Aktiv', value: content.filter(c => c.is_active).length, color: 'bg-blue-100 text-blue-600' },
         ].map((stat, i) => (
           <motion.div
@@ -531,7 +532,7 @@ const AdminPregnancyContent = () => {
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Həftə, meyvə, inkişaf axtar..."
+            placeholder={tr("adminpregnancycontent_hefte_meyve_inkisaf_axtar_5b38a8", "Həftə, meyvə, inkişaf axtar...")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10"
@@ -558,15 +559,15 @@ const AdminPregnancyContent = () => {
                     onCheckedChange={handleSelectAll}
                   />
                 </TableHead>
-                <TableHead className="w-16">Gün</TableHead>
-                <TableHead className="w-16">Həftə</TableHead>
-                <TableHead>Meyvə</TableHead>
-                <TableHead>Ölçü</TableHead>
-                <TableHead className="max-w-[180px]">Körpə mesajı</TableHead>
-                <TableHead className="max-w-[180px]">Bədən dəyişikliyi</TableHead>
-                <TableHead className="max-w-[150px]">Günün tövsiyəsi</TableHead>
+                <TableHead className="w-16">{tr("adminpregnancycontent_gun_18b2f4", "Gün")}</TableHead>
+                <TableHead className="w-16">{tr("adminpregnancycontent_hefte_3aa886", "Həftə")}</TableHead>
+                <TableHead>{tr("adminpregnancycontent_meyve_50ca17", "Meyvə")}</TableHead>
+                <TableHead>{tr("adminpregnancycontent_olcu_735972", "Ölçü")}</TableHead>
+                <TableHead className="max-w-[180px]">{tr("adminpregnancycontent_korpe_mesaji_d119e3", "Körpə mesajı")}</TableHead>
+                <TableHead className="max-w-[180px]">{tr("adminpregnancycontent_beden_deyisikliyi_1dd37f", "Bədən dəyişikliyi")}</TableHead>
+                <TableHead className="max-w-[150px]">{tr("adminpregnancycontent_gunun_tovsiyesi_f10d9b", "Günün tövsiyəsi")}</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-24">Əməliyyat</TableHead>
+                <TableHead className="w-24">{tr("adminpregnancycontent_emeliyyat_580469", "Əməliyyat")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -624,7 +625,7 @@ const AdminPregnancyContent = () => {
               </h4>
               <div className="grid grid-cols-5 gap-3">
                 <div>
-                  <Label>Gün (1-280)</Label>
+                  <Label>{tr("adminpregnancycontent_gun_1_280_8e5b4a", "Gün (1-280)")}</Label>
                   <Input
                     type="number"
                     min={1}
@@ -642,7 +643,7 @@ const AdminPregnancyContent = () => {
                   />
                 </div>
                 <div>
-                  <Label>Həftə</Label>
+                  <Label>{tr("adminpregnancycontent_hefte_3aa886", "Həftə")}</Label>
                   <Input
                     type="number"
                     min={1}
@@ -652,7 +653,7 @@ const AdminPregnancyContent = () => {
                   />
                 </div>
                 <div>
-                  <Label>Meyvə ölçüsü</Label>
+                  <Label>{tr("adminpregnancycontent_meyve_olcusu_f8676b", "Meyvə ölçüsü")}</Label>
                   <Input
                     value={formData.baby_size_fruit || ''}
                     onChange={(e) => setFormData({ ...formData, baby_size_fruit: e.target.value })}
@@ -660,7 +661,7 @@ const AdminPregnancyContent = () => {
                   />
                 </div>
                 <div>
-                  <Label>Ölçü (sm)</Label>
+                  <Label>{tr("adminpregnancycontent_olcu_sm_ae8d14", "Ölçü (sm)")}</Label>
                   <Input
                     type="number"
                     step="0.1"
@@ -669,7 +670,7 @@ const AdminPregnancyContent = () => {
                   />
                 </div>
                 <div>
-                  <Label>Çəki (qram)</Label>
+                  <Label>{tr("adminpregnancycontent_ceki_qram_1bd180", "Çəki (qram)")}</Label>
                   <Input
                     type="number"
                     step="0.1"
@@ -682,7 +683,7 @@ const AdminPregnancyContent = () => {
 
             {/* Baby Message */}
             <div className="space-y-2">
-              <Label>Körpədən mesaj 💬</Label>
+              <Label>{tr("adminpregnancycontent_korpeden_mesaj_67f29c", "Körpədən mesaj 💬")}</Label>
               <Textarea
                 value={formData.baby_message || ''}
                 onChange={(e) => setFormData({ ...formData, baby_message: e.target.value })}
@@ -693,33 +694,33 @@ const AdminPregnancyContent = () => {
 
             {/* Baby Development */}
             <div className="space-y-2">
-              <Label>Körpə inkişafı 👶</Label>
+              <Label>{tr("adminpregnancycontent_korpe_inkisafi_e7dc67", "Körpə inkişafı 👶")}</Label>
               <Textarea
                 value={formData.baby_development || ''}
                 onChange={(e) => setFormData({ ...formData, baby_development: e.target.value })}
-                placeholder="Ürək döyüntüsü başlayır..."
+                placeholder={tr("adminpregnancycontent_urek_doyuntusu_baslayir_12ea3b", "Ürək döyüntüsü başlayır...")}
                 rows={3}
               />
             </div>
 
             {/* Body Changes */}
             <div className="space-y-2">
-              <Label>Bədəninizdə nələr baş verir 🤰</Label>
+              <Label>{tr("adminpregnancycontent_bedeninizde_neler_bas_verir_f84fdb", "Bədəninizdə nələr baş verir 🤰")}</Label>
               <Textarea
                 value={formData.body_changes || ''}
                 onChange={(e) => setFormData({ ...formData, body_changes: e.target.value })}
-                placeholder="Ürəkbulanma başlaya bilər..."
+                placeholder={tr("adminpregnancycontent_urekbulanma_baslaya_biler_81e163", "Ürəkbulanma başlaya bilər...")}
                 rows={3}
               />
             </div>
 
             {/* Daily Tip */}
             <div className="space-y-2">
-              <Label>Günün Məsləhəti 💡</Label>
+              <Label>{tr("adminpregnancycontent_gunun_mesleheti_abd084", "Günün Məsləhəti 💡")}</Label>
               <Textarea
                 value={formData.daily_tip || ''}
                 onChange={(e) => setFormData({ ...formData, daily_tip: e.target.value })}
-                placeholder="Folik turşusu qəbul edin..."
+                placeholder={tr("adminpregnancycontent_folik_tursusu_qebul_edin_81c86b", "Folik turşusu qəbul edin...")}
                 rows={3}
               />
             </div>
@@ -731,19 +732,19 @@ const AdminPregnancyContent = () => {
               </h4>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label>Simptomlar (hər sətirdə bir)</Label>
+                  <Label>{tr("adminpregnancycontent_simptomlar_her_setirde_bir_5396e7", "Simptomlar (hər sətirdə bir)")}</Label>
                   <Textarea
                     value={(formData.mother_symptoms || []).join('\n')}
                     onChange={(e) => setFormData({ 
                       ...formData, 
                       mother_symptoms: e.target.value.split('\n').filter(s => s.trim()) 
                     })}
-                    placeholder="Ürəkbulanma&#10;Yorğunluq"
+                    placeholder={tr("adminpregnancycontent_urekbulanma_10_yorgunluq_eeb0bf", "Ürəkbulanma&#10;Yorğunluq")}
                     rows={3}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Ana üçün tövsiyə</Label>
+                  <Label>{tr("adminpregnancycontent_ana_ucun_tovsiye_d33fd6", "Ana üçün tövsiyə")}</Label>
                   <Textarea
                     value={formData.mother_tips || ''}
                     onChange={(e) => setFormData({ ...formData, mother_tips: e.target.value })}
@@ -760,7 +761,7 @@ const AdminPregnancyContent = () => {
               </h4>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label>Qidalanma tövsiyəsi</Label>
+                  <Label>{tr("adminpregnancycontent_qidalanma_tovsiyesi_cddcc0", "Qidalanma tövsiyəsi")}</Label>
                   <Textarea
                     value={formData.nutrition_tip || ''}
                     onChange={(e) => setFormData({ ...formData, nutrition_tip: e.target.value })}
@@ -768,7 +769,7 @@ const AdminPregnancyContent = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Tövsiyə edilən qidalar (hər sətirdə bir)</Label>
+                  <Label>{tr("adminpregnancycontent_tovsiye_edilen_qidalar_her_setirde_bir_55972b", "Tövsiyə edilən qidalar (hər sətirdə bir)")}</Label>
                   <Textarea
                     value={(formData.recommended_foods || []).join('\n')}
                     onChange={(e) => setFormData({ 
@@ -783,7 +784,7 @@ const AdminPregnancyContent = () => {
 
             {/* Emotional & Partner */}
             <div className="space-y-2">
-              <Label>Emosional tövsiyə</Label>
+              <Label>{tr("adminpregnancycontent_emosional_tovsiye_2c36f9", "Emosional tövsiyə")}</Label>
               <Textarea
                 value={formData.emotional_tip || ''}
                 onChange={(e) => setFormData({ ...formData, emotional_tip: e.target.value })}
@@ -791,7 +792,7 @@ const AdminPregnancyContent = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label>Partner üçün tövsiyə</Label>
+              <Label>{tr("adminpregnancycontent_partner_ucun_tovsiye_3fdfae", "Partner üçün tövsiyə")}</Label>
               <Textarea
                 value={formData.partner_tip || ''}
                 onChange={(e) => setFormData({ ...formData, partner_tip: e.target.value })}
@@ -810,7 +811,7 @@ const AdminPregnancyContent = () => {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setModalOpen(false)}>Ləğv et</Button>
+            <Button variant="outline" onClick={() => setModalOpen(false)}>{tr("adminpregnancycontent_legv_et_b5e49c", "Ləğv et")}</Button>
             <Button onClick={handleSave}>
               {editingItem ? 'Yenilə' : 'Əlavə et'}
             </Button>
@@ -822,14 +823,14 @@ const AdminPregnancyContent = () => {
       <Dialog open={importModalOpen} onOpenChange={setImportModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Excel/CSV İmport</DialogTitle>
+            <DialogTitle>{tr("adminpregnancycontent_excel_csv_import_f512ca", "Excel/CSV İmport")}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="p-4 bg-muted rounded-lg">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                 <AlertCircle className="w-4 h-4" />
-                <span>CSV və ya JSON formatında fayl yükləyin</span>
+                <span>{tr("adminpregnancycontent_csv_ve_ya_json_formatinda_fayl_yukleyin_25e1aa", "CSV və ya JSON formatında fayl yükləyin")}</span>
               </div>
               <Button variant="outline" size="sm" onClick={downloadTemplate}>
                 <FileSpreadsheet className="w-4 h-4 mr-2" />

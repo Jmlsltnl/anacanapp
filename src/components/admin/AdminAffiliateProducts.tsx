@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { tr } from '@/lib/tr';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -156,10 +157,10 @@ const AdminAffiliateProducts = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-affiliate-products'] });
       resetForm();
-      toast({ title: 'Yadda saxlanıldı' });
+      toast({ title: tr("adminaffiliateproducts_yadda_saxlanildi_cf4f4a", "Yadda saxlanıldı") });
     },
     onError: (err) => {
-      toast({ title: 'Xəta', description: String(err), variant: 'destructive' });
+      toast({ title: tr("adminaffiliateproducts_xeta_3cdbb6", "Xəta"), description: String(err), variant: 'destructive' });
     },
   });
 
@@ -241,7 +242,7 @@ const AdminAffiliateProducts = () => {
     },
     onError: (err) => {
       setImporting(false);
-      toast({ title: 'İmport xətası', description: String(err), variant: 'destructive' });
+      toast({ title: tr("adminaffiliateproducts_import_xetasi_a3a4fb", "İmport xətası"), description: String(err), variant: 'destructive' });
     },
   });
 
@@ -257,7 +258,7 @@ const AdminAffiliateProducts = () => {
       
       if (products.length === 0) {
         setImporting(false);
-        toast({ title: 'CSV boşdur və ya formatı səhvdir', variant: 'destructive' });
+        toast({ title: tr("adminaffiliateproducts_csv_bosdur_ve_ya_formati_sehvdir_ece4c1", "CSV boşdur və ya formatı səhvdir"), variant: 'destructive' });
         return;
       }
       
@@ -337,12 +338,12 @@ const AdminAffiliateProducts = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold">Affiliate Məhsulları</h2>
-          <p className="text-sm text-muted-foreground">Tövsiyyə olunan məhsulları tam idarə edin</p>
+          <h2 className="text-xl font-bold">{tr("adminaffiliateproducts_affiliate_mehsullari_8282c4", "Affiliate Məhsulları")}</h2>
+          <p className="text-sm text-muted-foreground">{tr("adminaffiliateproducts_tovsiyye_olunan_mehsullari_tam_idare_edi_5f71b5", "Tövsiyyə olunan məhsulları tam idarə edin")}</p>
         </div>
         <div className="flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2">
-            <span className="text-sm">Bölmə aktiv:</span>
+            <span className="text-sm">{tr("adminaffiliateproducts_bolme_aktiv_4321ea", "Bölmə aktiv:")}</span>
             <Switch 
               checked={sectionEnabled}
               onCheckedChange={(checked) => updateSetting.mutate({ key: 'affiliate_section_enabled', value: checked })}
@@ -414,10 +415,10 @@ const AdminAffiliateProducts = () => {
           
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="basic">Əsas</TabsTrigger>
+              <TabsTrigger value="basic">{tr("adminaffiliateproducts_esas_6d87f7", "Əsas")}</TabsTrigger>
               <TabsTrigger value="media">Media</TabsTrigger>
               <TabsTrigger value="details">Detallar</TabsTrigger>
-              <TabsTrigger value="reviews">Rəylər</TabsTrigger>
+              <TabsTrigger value="reviews">{tr("adminaffiliateproducts_reyler_032ec8", "Rəylər")}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="basic" className="space-y-4 mt-4">
@@ -430,23 +431,23 @@ const AdminAffiliateProducts = () => {
                   <option value="trendyol">Trendyol</option>
                   <option value="amazon">Amazon</option>
                   <option value="aliexpress">AliExpress</option>
-                  <option value="other">Digər</option>
+                  <option value="other">{tr("adminaffiliateproducts_diger_293b3a", "Digər")}</option>
                 </select>
                 
                 <select value={formData.category} onChange={(e) => setFormData(p => ({ ...p, category: e.target.value }))} className="h-10 rounded-md border bg-background px-3">
-                  <option value="baby_gear">Körpə əşyaları</option>
-                  <option value="maternity">Hamiləlik geyimləri</option>
-                  <option value="health">Sağlamlıq</option>
+                  <option value="baby_gear">{tr("adminaffiliateproducts_korpe_esyalari_6e92e1", "Körpə əşyaları")}</option>
+                  <option value="maternity">{tr("adminaffiliateproducts_hamilelik_geyimleri_fb1c46", "Hamiləlik geyimləri")}</option>
+                  <option value="health">{tr("adminaffiliateproducts_saglamliq_09460a", "Sağlamlıq")}</option>
                   <option value="nutrition">Qidalanma</option>
-                  <option value="skincare">Dəri qulluğu</option>
-                  <option value="general">Ümumi</option>
+                  <option value="skincare">{tr("adminaffiliateproducts_deri_qullugu_6c59a3", "Dəri qulluğu")}</option>
+                  <option value="general">{tr("adminaffiliateproducts_umumi_1b5521", "Ümumi")}</option>
                 </select>
 
-                <Input placeholder="Mağaza adı" value={formData.store_name} onChange={(e) => setFormData(p => ({ ...p, store_name: e.target.value }))} />
-                <Input placeholder="Mağaza logo URL" value={formData.store_logo_url} onChange={(e) => setFormData(p => ({ ...p, store_logo_url: e.target.value }))} />
+                <Input placeholder={tr("adminaffiliateproducts_magaza_adi_d4e01e", "Mağaza adı")} value={formData.store_name} onChange={(e) => setFormData(p => ({ ...p, store_name: e.target.value }))} />
+                <Input placeholder={tr("adminaffiliateproducts_magaza_logo_url_8308d4", "Mağaza logo URL")} value={formData.store_logo_url} onChange={(e) => setFormData(p => ({ ...p, store_logo_url: e.target.value }))} />
                 
-                <Input type="number" placeholder="Qiymət" value={formData.price} onChange={(e) => setFormData(p => ({ ...p, price: e.target.value }))} />
-                <Input type="number" placeholder="Köhnə qiymət (endirim)" value={formData.original_price} onChange={(e) => setFormData(p => ({ ...p, original_price: e.target.value }))} />
+                <Input type="number" placeholder={tr("adminaffiliateproducts_qiymet_54c4f3", "Qiymət")} value={formData.price} onChange={(e) => setFormData(p => ({ ...p, price: e.target.value }))} />
+                <Input type="number" placeholder={tr("adminaffiliateproducts_kohne_qiymet_endirim_7e46fd", "Köhnə qiymət (endirim)")} value={formData.original_price} onChange={(e) => setFormData(p => ({ ...p, original_price: e.target.value }))} />
                 
                 <select value={formData.currency} onChange={(e) => setFormData(p => ({ ...p, currency: e.target.value }))} className="h-10 rounded-md border bg-background px-3">
                   <option value="AZN">AZN</option>
@@ -470,17 +471,17 @@ const AdminAffiliateProducts = () => {
                 </div>
               </div>
               
-              <Textarea placeholder="Təsvir (AZ)" value={formData.description_az} onChange={(e) => setFormData(p => ({ ...p, description_az: e.target.value }))} rows={3} />
+              <Textarea placeholder={tr("adminaffiliateproducts_tesvir_az_2c237a", "Təsvir (AZ)")} value={formData.description_az} onChange={(e) => setFormData(p => ({ ...p, description_az: e.target.value }))} rows={3} />
             </TabsContent>
 
             <TabsContent value="media" className="space-y-4 mt-4">
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Əsas şəkil URL</label>
+                  <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_esas_sekil_url_3fdd67", "Əsas şəkil URL")}</label>
                   <Input placeholder="https://..." value={formData.image_url} onChange={(e) => setFormData(p => ({ ...p, image_url: e.target.value }))} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Əlavə şəkillər (hər sətirdə bir URL)</label>
+                  <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_elave_sekiller_her_setirde_bir_url_d60242", "Əlavə şəkillər (hər sətirdə bir URL)")}</label>
                   <Textarea placeholder="https://image1.jpg&#10;https://image2.jpg" value={formData.images} onChange={(e) => setFormData(p => ({ ...p, images: e.target.value }))} rows={4} />
                 </div>
                 <div>
@@ -493,20 +494,20 @@ const AdminAffiliateProducts = () => {
             <TabsContent value="details" className="space-y-4 mt-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Üstünlükləri (hər sətirdə bir)</label>
-                  <Textarea placeholder="Keyfiyyətli material&#10;Uzunömürlü" value={formData.pros} onChange={(e) => setFormData(p => ({ ...p, pros: e.target.value }))} rows={4} />
+                  <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_ustunlukleri_her_setirde_bir_54cbce", "Üstünlükləri (hər sətirdə bir)")}</label>
+                  <Textarea placeholder={tr("adminaffiliateproducts_keyfiyyetli_material_10_uzunomurlu_215f76", "Keyfiyyətli material&#10;Uzunömürlü")} value={formData.pros} onChange={(e) => setFormData(p => ({ ...p, pros: e.target.value }))} rows={4} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Çatışmazlıqları (hər sətirdə bir)</label>
-                  <Textarea placeholder="Bahalıdır&#10;Çatdırılma uzun çəkir" value={formData.cons} onChange={(e) => setFormData(p => ({ ...p, cons: e.target.value }))} rows={4} />
+                  <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_catismazliqlari_her_setirde_bir_1f2f46", "Çatışmazlıqları (hər sətirdə bir)")}</label>
+                  <Textarea placeholder={tr("adminaffiliateproducts_bahalidir_10_catdirilma_uzun_cekir_66741d", "Bahalıdır&#10;Çatdırılma uzun çəkir")} value={formData.cons} onChange={(e) => setFormData(p => ({ ...p, cons: e.target.value }))} rows={4} />
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Teqlər (vergüllə ayırın)</label>
-                <Input placeholder="hamiləlik, körpə, yeni" value={formData.tags} onChange={(e) => setFormData(p => ({ ...p, tags: e.target.value }))} />
+                <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_teqler_vergulle_ayirin_cbcd30", "Teqlər (vergüllə ayırın)")}</label>
+                <Input placeholder={tr("adminaffiliateproducts_hamilelik_korpe_yeni_edb521", "hamiləlik, körpə, yeni")} value={formData.tags} onChange={(e) => setFormData(p => ({ ...p, tags: e.target.value }))} />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Xüsusiyyətlər (JSON və ya key:value)</label>
+                <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_xususiyyetler_json_ve_ya_key_value_f5355a", "Xüsusiyyətlər (JSON və ya key:value)")}</label>
                 <Textarea placeholder='{"Çəki": "500g", "Rəng": "Ağ"}' value={formData.specifications} onChange={(e) => setFormData(p => ({ ...p, specifications: e.target.value }))} rows={4} />
               </div>
             </TabsContent>
@@ -514,9 +515,9 @@ const AdminAffiliateProducts = () => {
             <TabsContent value="reviews" className="space-y-4 mt-4">
               <div className="grid grid-cols-2 gap-4">
                 <Input type="number" placeholder="Reytinq (0-5)" value={formData.rating} onChange={(e) => setFormData(p => ({ ...p, rating: e.target.value }))} step="0.1" max="5" min="0" />
-                <Input type="number" placeholder="Rəy sayı" value={formData.review_count} onChange={(e) => setFormData(p => ({ ...p, review_count: e.target.value }))} />
+                <Input type="number" placeholder={tr("adminaffiliateproducts_rey_sayi_8a7896", "Rəy sayı")} value={formData.review_count} onChange={(e) => setFormData(p => ({ ...p, review_count: e.target.value }))} />
               </div>
-              <Textarea placeholder="Rəy xülasəsi (AZ)" value={formData.review_summary_az} onChange={(e) => setFormData(p => ({ ...p, review_summary_az: e.target.value }))} rows={3} />
+              <Textarea placeholder={tr("adminaffiliateproducts_rey_xulasesi_az_3a0257", "Rəy xülasəsi (AZ)")} value={formData.review_summary_az} onChange={(e) => setFormData(p => ({ ...p, review_summary_az: e.target.value }))} rows={3} />
             </TabsContent>
           </Tabs>
           
@@ -544,11 +545,11 @@ const AdminAffiliateProducts = () => {
 
       <div className="space-y-2">
         {isLoading ? (
-          <p className="text-muted-foreground">Yüklənir...</p>
+          <p className="text-muted-foreground">{tr("adminaffiliateproducts_yuklenir_5557de", "Yüklənir...")}</p>
         ) : products.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
             <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>Hələ heç bir məhsul yoxdur</p>
+            <p>{tr("adminaffiliateproducts_hele_hec_bir_mehsul_yoxdur_1c6e41", "Hələ heç bir məhsul yoxdur")}</p>
           </div>
         ) : (
           products.map((product: any) => (

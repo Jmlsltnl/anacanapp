@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { Baby, Moon, Clock, TrendingUp, Droplets, Activity } from 'lucide-react';
 import { useBabyLogs } from '@/hooks/useBabyLogs';
 import { useChildren } from '@/hooks/useChildren';
@@ -78,7 +79,7 @@ const QuickStatsWidget = () => {
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-cyan-600 flex items-center justify-center">
             <Activity className="w-4 h-4 text-white" />
           </div>
-          <h3 className="font-bold text-sm text-foreground">Həftəlik Baxış</h3>
+          <h3 className="font-bold text-sm text-foreground">{tr("quickstatswidget_heftelik_baxis_625baf", "Həftəlik Baxış")}</h3>
         </div>
       </div>
       

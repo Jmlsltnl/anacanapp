@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
@@ -123,7 +124,7 @@ export const useAppointments = () => {
       }
 
       toast({
-        title: 'Randevu əlavə edildi! 📅',
+        title: tr("useappointments_randevu_elave_edildi_dc2666", "Randevu əlavə edildi! 📅"),
         description: appointment.title,
       });
 
@@ -132,7 +133,7 @@ export const useAppointments = () => {
     } catch (error: any) {
       console.error('Error adding appointment:', error);
       toast({
-        title: 'Xəta baş verdi',
+        title: tr("useappointments_xeta_bas_verdi_f22fba", "Xəta baş verdi"),
         description: error.message,
         variant: 'destructive',
       });

@@ -46,7 +46,7 @@ const stageMessages: Record<AnalysisStage, string> = {
   complete: 'Analiz tamamlandı',
   no_cry: 'Ağlama aşkarlanmadı',
   false_positive: 'Saxta səs aşkarlandı',
-  error: 'Xəta baş verdi',
+  error: tr("crytranslator_xeta_bas_verdi_f22fba", "Xəta baş verdi"),
 };
 
 const CryTranslator = ({ onBack }: CryTranslatorProps) => {
@@ -321,8 +321,8 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold">Ağlama analizi edək</h1>
-            <p className="text-xs text-muted-foreground">AI ilə körpə ağlamasını analiz edin</p>
+            <h1 className="text-lg font-bold">{tr("crytranslator_aglama_analizi_edek_ebce29", "Ağlama analizi edək")}</h1>
+            <p className="text-xs text-muted-foreground">{tr("crytranslator_ai_ile_korpe_aglamasini_analiz_edin_e2e23c", "AI ilə körpə ağlamasını analiz edin")}</p>
           </div>
           <Button variant="ghost" size="icon" onClick={() => setShowHistory(!showHistory)} className="relative z-30">
             <History className="w-5 h-5" />
@@ -425,7 +425,7 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
                       🔇
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold">Ağlama aşkarlanmadı</h3>
+                      <h3 className="text-xl font-bold">{tr("crytranslator_aglama_askarlanmadi_15a23e", "Ağlama aşkarlanmadı")}</h3>
                       <p className="text-sm text-muted-foreground mt-1">
                         Ortamda körpə ağlaması eşidilmədi
                       </p>
@@ -469,7 +469,7 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
                       📺
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold">Saxta səs aşkarlandı</h3>
+                      <h3 className="text-xl font-bold">{tr("crytranslator_saxta_ses_askarlandi_d6f6bf", "Saxta səs aşkarlandı")}</h3>
                       <p className="text-sm text-muted-foreground mt-1">
                         Bu səs həqiqi körpə ağlaması deyil
                       </p>

@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { X, Minus, Plus, Trash2, ShoppingCart, Send, Cake as CakeIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCakeCart } from '@/hooks/useCakeCart';
@@ -46,7 +47,7 @@ const CakeCartDrawer = ({ open, onClose, onCheckout }: CakeCartDrawerProps) => {
               {items.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="text-5xl mb-3">🛒</div>
-                  <p className="text-muted-foreground">Səbət boşdur</p>
+                  <p className="text-muted-foreground">{tr("cakecartdrawer_sebet_bosdur_ff5b34", "Səbət boşdur")}</p>
                 </div>
               ) : (
                 items.map((item, index) => (
@@ -99,7 +100,7 @@ const CakeCartDrawer = ({ open, onClose, onCheckout }: CakeCartDrawerProps) => {
             {items.length > 0 && (
               <div className="p-4 border-t border-border/50 space-y-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 88px)' }}>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground font-medium">Cəmi:</span>
+                  <span className="text-muted-foreground font-medium">{tr("cakecartdrawer_cemi_fbbec6", "Cəmi:")}</span>
                   <span className="text-xl font-black text-primary">{totalPrice.toFixed(2)}₼</span>
                 </div>
                 <Button className="w-full h-14 text-base font-bold rounded-2xl" onClick={onCheckout}>

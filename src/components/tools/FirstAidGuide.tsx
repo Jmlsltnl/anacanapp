@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, AlertTriangle, ChevronRight, ChevronLeft, Phone, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -117,7 +118,7 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                 </div>
                 <div className="flex-1">
                   <p className="text-lg font-black text-white">103</p>
-                  <p className="text-xs text-white/80">Təcili Tibbi Yardım</p>
+                  <p className="text-xs text-white/80">{tr("firstaidguide_tecili_tibbi_yardim_b28b39", "Təcili Tibbi Yardım")}</p>
                 </div>
                 <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center animate-pulse">
                   <ChevronRight className="w-4 h-4 text-white" />

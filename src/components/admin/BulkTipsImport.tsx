@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Upload, FileText, Check, AlertCircle, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -67,7 +68,7 @@ const BulkTipsImport = ({ isOpen, onClose, onSuccess }: BulkTipsImportProps) => 
 
   const handleImport = async () => {
     if (!jsonInput.trim()) {
-      toast({ title: 'Xəta', description: 'JSON məlumatı daxil edin', variant: 'destructive' });
+      toast({ title: tr("bulktipsimport_xeta_3cdbb6", "Xəta"), description: tr("bulktipsimport_json_melumati_daxil_edin_419a3c", "JSON məlumatı daxil edin"), variant: 'destructive' });
       return;
     }
 
@@ -78,7 +79,7 @@ const BulkTipsImport = ({ isOpen, onClose, onSuccess }: BulkTipsImportProps) => 
         throw new Error('JSON array olmalıdır');
       }
     } catch (error) {
-      toast({ title: 'Xəta', description: 'Yanlış JSON formatı', variant: 'destructive' });
+      toast({ title: tr("bulktipsimport_xeta_3cdbb6", "Xəta"), description: tr("bulktipsimport_yanlis_json_formati_a42037", "Yanlış JSON formatı"), variant: 'destructive' });
       return;
     }
 
@@ -141,7 +142,7 @@ const BulkTipsImport = ({ isOpen, onClose, onSuccess }: BulkTipsImportProps) => 
     setImporting(false);
     
     toast({
-      title: 'İmport tamamlandı',
+      title: tr("bulktipsimport_import_tamamlandi_c650ca", "İmport tamamlandı"),
       description: `${successCount} uğurlu, ${failedCount} uğursuz`,
     });
 
@@ -163,15 +164,15 @@ const BulkTipsImport = ({ isOpen, onClose, onSuccess }: BulkTipsImportProps) => 
         <div className="space-y-4 mt-4">
           {/* Life Stage Selection */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Həyat Mərhələsi</label>
+            <label className="text-sm font-medium">{tr("bulktipsimport_heyat_merhelesi_c3ab6b", "Həyat Mərhələsi")}</label>
             <Select value={lifeStage} onValueChange={setLifeStage}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="bump">Hamiləlik (bump)</SelectItem>
+                <SelectItem value="bump">{tr("bulktipsimport_hamilelik_bump_b450c6", "Hamiləlik (bump)")}</SelectItem>
                 <SelectItem value="flow">Menstruasiya (flow)</SelectItem>
-                <SelectItem value="mommy">Analıq (mommy)</SelectItem>
+                <SelectItem value="mommy">{tr("bulktipsimport_analiq_mommy_3e684f", "Analıq (mommy)")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -183,12 +184,12 @@ const BulkTipsImport = ({ isOpen, onClose, onSuccess }: BulkTipsImportProps) => 
             whileTap={{ scale: 0.98 }}
           >
             <Download className="w-5 h-5" />
-            <span className="font-medium">1-40 həftə üçün şablon yüklə</span>
+            <span className="font-medium">{tr("bulktipsimport_1_40_hefte_ucun_sablon_yukle_94a1f6", "1-40 həftə üçün şablon yüklə")}</span>
           </motion.button>
 
           {/* JSON Input */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">JSON Məlumatı</label>
+            <label className="text-sm font-medium">{tr("bulktipsimport_json_melumati_69cf29", "JSON Məlumatı")}</label>
             <Textarea
               value={jsonInput}
               onChange={(e) => setJsonInput(e.target.value)}

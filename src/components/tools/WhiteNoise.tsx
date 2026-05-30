@@ -23,7 +23,7 @@ interface Sound {
 // Noise type metadata
 const noiseTypes = [
   { 
-    id: 'white', label: tr("whitenoise_beyaz_kuy_3acf2d", 'Bəyaz Küy'), subtitle: 'Sakitləşdirici',
+    id: 'white', label: tr("whitenoise_beyaz_kuy_3acf2d", 'Bəyaz Küy'), subtitle: tr("whitenoise_sakitlesdirici_d99d9d", "Sakitləşdirici"),
     description: tr("whitenoise_ana_betnindeki_sese_benzer_monoton_fon_8d1144", 'Ana bətnindəki səsə bənzər monoton fon'), emoji: '⚪',
     gradient: 'from-slate-100 to-gray-200 dark:from-slate-800 dark:to-gray-900',
     borderColor: 'border-slate-300 dark:border-slate-700',
@@ -31,7 +31,7 @@ const noiseTypes = [
     badgeColor: 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300',
   },
   { 
-    id: 'pink', label: tr("whitenoise_cehrayi_kuy_68573d", 'Çəhrayı Küy'), subtitle: 'Təbiət effekti',
+    id: 'pink', label: tr("whitenoise_cehrayi_kuy_68573d", 'Çəhrayı Küy'), subtitle: tr("whitenoise_tebiet_effekti_45e038", "Təbiət effekti"),
     description: tr("whitenoise_yungul_yagis_ve_yarpaq_xisiltisi_kimi_d5aea8", 'Yüngül yağış və yarpaq xışıltısı kimi'), emoji: '🌸',
     gradient: 'from-pink-50 to-rose-100 dark:from-pink-900/30 dark:to-rose-900/20',
     borderColor: 'border-pink-300 dark:border-pink-800',
@@ -39,7 +39,7 @@ const noiseTypes = [
     badgeColor: 'bg-pink-200 dark:bg-pink-800 text-pink-700 dark:text-pink-300',
   },
   { 
-    id: 'brown', label: tr("whitenoise_qehveyi_kuy_f8e3c6", 'Qəhvəyi Küy'), subtitle: 'Dərin yuxu',
+    id: 'brown', label: tr("whitenoise_qehveyi_kuy_f8e3c6", 'Qəhvəyi Küy'), subtitle: tr("whitenoise_derin_yuxu_b4d583", "Dərin yuxu"),
     description: tr("whitenoise_derin_ve_boguq_sesler_selale_goy_gurultu_47382e", 'Dərin və boğuq səslər — şəlalə, göy gurultusu'), emoji: '🟤',
     gradient: 'from-amber-50 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/20',
     borderColor: 'border-amber-300 dark:border-amber-800',
@@ -258,8 +258,8 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </motion.button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold text-foreground">Yuxu Səsləri</h1>
-            <p className="text-xs text-muted-foreground">Küy rəngləri ilə dərin yuxu</p>
+            <h1 className="text-lg font-bold text-foreground">{tr("whitenoise_yuxu_sesleri_4b518b", "Yuxu Səsləri")}</h1>
+            <p className="text-xs text-muted-foreground">{tr("whitenoise_kuy_rengleri_ile_derin_yuxu_c4a0f7", "Küy rəngləri ilə dərin yuxu")}</p>
           </div>
           {isPremium && (
             <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-lg">
@@ -391,8 +391,8 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
               <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-3">
                 <Music2 className="w-8 h-8 text-muted-foreground" />
               </div>
-              <h3 className="font-bold text-foreground mb-1">Hansı səs körpənizə daha xoş gəlir?</h3>
-              <p className="text-sm text-muted-foreground">Aşağıdakı küy növlərindən birini seçərək başlayın</p>
+              <h3 className="font-bold text-foreground mb-1">{tr("whitenoise_hansi_ses_korpenize_daha_xos_gelir_488ff5", "Hansı səs körpənizə daha xoş gəlir?")}</h3>
+              <p className="text-sm text-muted-foreground">{tr("whitenoise_asagidaki_kuy_novlerinden_birini_secerek_ece91d", "Aşağıdakı küy növlərindən birini seçərək başlayın")}</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -406,7 +406,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
         >
           <div className="flex items-center gap-2 mb-3">
             <Volume2 className="w-4 h-4 text-primary" />
-            <span className="text-sm font-semibold text-foreground">Səs səviyyəsi</span>
+            <span className="text-sm font-semibold text-foreground">{tr("whitenoise_ses_seviyyesi_7296d5", "Səs səviyyəsi")}</span>
             <span className="ml-auto text-sm font-bold text-primary">{isMuted ? 0 : volume}%</span>
           </div>
           <div className="relative">

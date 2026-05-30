@@ -57,7 +57,7 @@ const SendDailySummaryWidget: React.FC = () => {
           <FileText className="w-6 h-6 text-white" />
         </div>
         <div className="flex-1">
-          <h3 className="font-bold text-foreground">Gündəlik Xülasə</h3>
+          <h3 className="font-bold text-foreground">{tr("senddailysummarywidget_gundelik_xulase_3d07a5", "Gündəlik Xülasə")}</h3>
           <p className="text-xs text-muted-foreground">
             {alreadySent 
               ? 'Bugünkü xülasə göndərildi ✓' 

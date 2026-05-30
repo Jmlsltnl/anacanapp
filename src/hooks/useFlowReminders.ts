@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -18,14 +19,14 @@ export interface FlowReminder {
 }
 
 export const REMINDER_TYPE_INFO: Record<ReminderType, { label: string; labelAz: string; emoji: string; description: string }> = {
-  period_start: { label: 'Period Start', labelAz: 'Period Başlanğıcı', emoji: '🔴', description: 'Period başlamadan əvvəl xəbərdar ol' },
-  period_end: { label: 'Period End', labelAz: 'Period Sonu', emoji: '✅', description: 'Period bitəndə xəbərdar ol' },
-  ovulation: { label: 'Ovulation', labelAz: 'Ovulyasiya', emoji: '🌸', description: 'Ovulyasiya günündən əvvəl xəbərdar ol' },
-  fertile_start: { label: 'Fertile Window Start', labelAz: 'Məhsuldar Günlər', emoji: '💕', description: 'Məhsuldar günlər başlayanda xəbərdar ol' },
-  fertile_end: { label: 'Fertile Window End', labelAz: 'Məhsuldar Günlər Sonu', emoji: '📅', description: 'Məhsuldar günlər bitəndə xəbərdar ol' },
-  pms: { label: 'PMS', labelAz: 'PMS Dövrü', emoji: '⚡', description: 'PMS dövrü başlayanda xəbərdar ol' },
-  pill: { label: 'Pill Reminder', labelAz: 'Həb Xatırlatması', emoji: '💊', description: 'Gündəlik həb xatırlatması' },
-  custom: { label: 'Custom', labelAz: 'Xüsusi', emoji: '🔔', description: 'Xüsusi xatırlatma' },
+  period_start: { label: 'Period Start', labelAz: 'Period Başlanğıcı', emoji: '🔴', description: tr("useflowreminders_period_baslamadan_evvel_xeberdar_ol_b8867d", "Period başlamadan əvvəl xəbərdar ol") },
+  period_end: { label: 'Period End', labelAz: 'Period Sonu', emoji: '✅', description: tr("useflowreminders_period_bitende_xeberdar_ol_2d8f7f", "Period bitəndə xəbərdar ol") },
+  ovulation: { label: 'Ovulation', labelAz: 'Ovulyasiya', emoji: '🌸', description: tr("useflowreminders_ovulyasiya_gununden_evvel_xeberdar_ol_0c1c95", "Ovulyasiya günündən əvvəl xəbərdar ol") },
+  fertile_start: { label: 'Fertile Window Start', labelAz: 'Məhsuldar Günlər', emoji: '💕', description: tr("useflowreminders_mehsuldar_gunler_baslayanda_xeberdar_ol_a14656", "Məhsuldar günlər başlayanda xəbərdar ol") },
+  fertile_end: { label: 'Fertile Window End', labelAz: 'Məhsuldar Günlər Sonu', emoji: '📅', description: tr("useflowreminders_mehsuldar_gunler_bitende_xeberdar_ol_1356c7", "Məhsuldar günlər bitəndə xəbərdar ol") },
+  pms: { label: 'PMS', labelAz: 'PMS Dövrü', emoji: '⚡', description: tr("useflowreminders_pms_dovru_baslayanda_xeberdar_ol_d31932", "PMS dövrü başlayanda xəbərdar ol") },
+  pill: { label: 'Pill Reminder', labelAz: 'Həb Xatırlatması', emoji: '💊', description: tr("useflowreminders_gundelik_heb_xatirlatmasi_149aba", "Gündəlik həb xatırlatması") },
+  custom: { label: 'Custom', labelAz: 'Xüsusi', emoji: '🔔', description: tr("useflowreminders_xususi_xatirlatma_dd5178", "Xüsusi xatırlatma") },
 };
 
 export const useFlowReminders = () => {
@@ -133,8 +134,8 @@ export const useInitializeFlowReminders = () => {
           days_before: 2,
           time_of_day: '09:00',
           is_enabled: true,
-          title: 'Period yaxınlaşır',
-          message: 'Perioda 2 gün qaldı, hazır ol!',
+          title: tr("useflowreminders_period_yaxinlasir_06bbcf", "Period yaxınlaşır"),
+          message: tr("useflowreminders_perioda_2_gun_qaldi_hazir_ol_0c170f", "Perioda 2 gün qaldı, hazır ol!"),
         },
         {
           user_id: user.id,
@@ -142,8 +143,8 @@ export const useInitializeFlowReminders = () => {
           days_before: 1,
           time_of_day: '09:00',
           is_enabled: true,
-          title: 'Ovulyasiya günü',
-          message: 'Sabah ovulyasiya günüdür!',
+          title: tr("useflowreminders_ovulyasiya_gunu_751dc6", "Ovulyasiya günü"),
+          message: tr("useflowreminders_sabah_ovulyasiya_gunudur_c8c5d7", "Sabah ovulyasiya günüdür!"),
         },
         {
           user_id: user.id,
@@ -151,8 +152,8 @@ export const useInitializeFlowReminders = () => {
           days_before: 1,
           time_of_day: '09:00',
           is_enabled: true,
-          title: 'Məhsuldar günlər',
-          message: 'Sabahdan məhsuldar günlər başlayır!',
+          title: tr("useflowreminders_mehsuldar_gunler_b8c031", "Məhsuldar günlər"),
+          message: tr("useflowreminders_sabahdan_mehsuldar_gunler_baslayir_fba6cc", "Sabahdan məhsuldar günlər başlayır!"),
         },
       ];
 

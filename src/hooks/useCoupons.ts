@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
@@ -43,7 +44,7 @@ export const useCouponValidator = (orderType: string = 'shop') => {
         .single();
 
       if (error || !data) {
-        toast({ title: 'Kupon tapılmadı', description: 'Bu kupon kodu mövcud deyil', variant: 'destructive' });
+        toast({ title: tr("usecoupons_kupon_tapilmadi_e41e4e", "Kupon tapılmadı"), description: tr("usecoupons_bu_kupon_kodu_movcud_deyil_6b3eb9", "Bu kupon kodu mövcud deyil"), variant: 'destructive' });
         return null;
       }
 
@@ -51,19 +52,19 @@ export const useCouponValidator = (orderType: string = 'shop') => {
 
       // Check applicable_to
       if (!coupon.applicable_to.includes(orderType)) {
-        toast({ title: 'Kupon keçərsizdir', description: 'Bu kupon bu növ sifariş üçün keçərli deyil', variant: 'destructive' });
+        toast({ title: tr("usecoupons_kupon_kecersizdir_42186d", "Kupon keçərsizdir"), description: tr("usecoupons_bu_kupon_bu_nov_sifaris_ucun_kecerli_dey_17536c", "Bu kupon bu növ sifariş üçün keçərli deyil"), variant: 'destructive' });
         return null;
       }
 
       // Check expiry
       if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
-        toast({ title: 'Kupon müddəti bitib', variant: 'destructive' });
+        toast({ title: tr("usecoupons_kupon_muddeti_bitib_242f3f", "Kupon müddəti bitib"), variant: 'destructive' });
         return null;
       }
 
       // Check start date
       if (new Date(coupon.starts_at) > new Date()) {
-        toast({ title: 'Kupon hələ aktiv deyil', variant: 'destructive' });
+        toast({ title: tr("usecoupons_kupon_hele_aktiv_deyil_1247d5", "Kupon hələ aktiv deyil"), variant: 'destructive' });
         return null;
       }
 
@@ -75,7 +76,7 @@ export const useCouponValidator = (orderType: string = 'shop') => {
 
       // Check min order amount
       if (coupon.min_order_amount && orderTotal < coupon.min_order_amount) {
-        toast({ title: 'Minimum məbləğ', description: `Bu kupon minimum ${coupon.min_order_amount}₼ sifariş üçün keçərlidir`, variant: 'destructive' });
+        toast({ title: tr("usecoupons_minimum_mebleg_435135", "Minimum məbləğ"), description: `Bu kupon minimum ${coupon.min_order_amount}₼ sifariş üçün keçərlidir`, variant: 'destructive' });
         return null;
       }
 
@@ -87,7 +88,7 @@ export const useCouponValidator = (orderType: string = 'shop') => {
         .eq('user_id', user.id);
 
       if (usage && (usage as any[]).length > 0) {
-        toast({ title: 'Artıq istifadə edilib', description: 'Bu kuponu artıq istifadə etmisiniz', variant: 'destructive' });
+        toast({ title: tr("usecoupons_artiq_istifade_edilib_709c3e", "Artıq istifadə edilib"), description: tr("usecoupons_bu_kuponu_artiq_istifade_etmisiniz_a8e01e", "Bu kuponu artıq istifadə etmisiniz"), variant: 'destructive' });
         return null;
       }
 
@@ -103,10 +104,10 @@ export const useCouponValidator = (orderType: string = 'shop') => {
 
       const applied: AppliedCoupon = { coupon, discountAmount };
       setAppliedCoupon(applied);
-      toast({ title: 'Kupon tətbiq edildi! ✅', description: `${discountAmount.toFixed(2)}₼ endirim` });
+      toast({ title: tr("usecoupons_kupon_tetbiq_edildi_e2143c", "Kupon tətbiq edildi! ✅"), description: `${discountAmount.toFixed(2)}₼ endirim` });
       return applied;
     } catch (err) {
-      toast({ title: 'Xəta', description: 'Kupon yoxlanarkən xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("usecoupons_xeta_3cdbb6", "Xəta"), description: tr("usecoupons_kupon_yoxlanarken_xeta_bas_verdi_9f76a4", "Kupon yoxlanarkən xəta baş verdi"), variant: 'destructive' });
       return null;
     } finally {
       setValidating(false);

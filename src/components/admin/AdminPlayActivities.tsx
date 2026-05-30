@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Gamepad2, Plus, Edit, Trash2, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -60,10 +61,10 @@ const AdminPlayActivities = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-play-activities'] });
       setEditingId(null);
       setNewActivity(false);
-      toast({ title: 'Aktivlik yadda saxlanıldı' });
+      toast({ title: tr("adminplayactivities_aktivlik_yadda_saxlanildi_6e3342", "Aktivlik yadda saxlanıldı") });
     },
     onError: () => {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("adminplayactivities_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     },
   });
 
@@ -119,7 +120,7 @@ const AdminPlayActivities = () => {
             <SelectValue placeholder="Kateqoriya" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Hamısı</SelectItem>
+            <SelectItem value="all">{tr("adminplayactivities_hamisi_c73c4d", "Hamısı")}</SelectItem>
             {skillCategories.map(cat => (
               <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
             ))}
@@ -146,7 +147,7 @@ const AdminPlayActivities = () => {
 
       {/* Activities List */}
       {isLoading ? (
-        <div className="text-center py-8">Yüklənir...</div>
+        <div className="text-center py-8">{tr("adminplayactivities_yuklenir_5557de", "Yüklənir...")}</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredActivities.map((activity, index) => (
@@ -275,14 +276,14 @@ const ActivityForm = ({ activity, onSave, onCancel, isLoading }: ActivityFormPro
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium">Başlıq (EN)</label>
+          <label className="text-sm font-medium">{tr("adminplayactivities_basliq_en_4ac905", "Başlıq (EN)")}</label>
           <Input 
             value={form.title} 
             onChange={(e) => setForm({ ...form, title: e.target.value })}
           />
         </div>
         <div>
-          <label className="text-sm font-medium">Başlıq (AZ)</label>
+          <label className="text-sm font-medium">{tr("adminplayactivities_basliq_az_3e294a", "Başlıq (AZ)")}</label>
           <Input 
             value={form.title_az} 
             onChange={(e) => setForm({ ...form, title_az: e.target.value })}
@@ -292,14 +293,14 @@ const ActivityForm = ({ activity, onSave, onCancel, isLoading }: ActivityFormPro
       
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium">Təsvir (EN)</label>
+          <label className="text-sm font-medium">{tr("adminplayactivities_tesvir_en_c64521", "Təsvir (EN)")}</label>
           <Textarea 
             value={form.description} 
             onChange={(e) => setForm({ ...form, description: e.target.value })}
           />
         </div>
         <div>
-          <label className="text-sm font-medium">Təsvir (AZ)</label>
+          <label className="text-sm font-medium">{tr("adminplayactivities_tesvir_az_2c237a", "Təsvir (AZ)")}</label>
           <Textarea 
             value={form.description_az} 
             onChange={(e) => setForm({ ...form, description_az: e.target.value })}
@@ -309,7 +310,7 @@ const ActivityForm = ({ activity, onSave, onCancel, isLoading }: ActivityFormPro
       
       <div className="grid grid-cols-4 gap-4">
         <div>
-          <label className="text-sm font-medium">Min Yaş (gün)</label>
+          <label className="text-sm font-medium">{tr("adminplayactivities_min_yas_gun_3267aa", "Min Yaş (gün)")}</label>
           <Input 
             type="number"
             value={form.min_age_days} 
@@ -317,7 +318,7 @@ const ActivityForm = ({ activity, onSave, onCancel, isLoading }: ActivityFormPro
           />
         </div>
         <div>
-          <label className="text-sm font-medium">Max Yaş (gün)</label>
+          <label className="text-sm font-medium">{tr("adminplayactivities_max_yas_gun_370335", "Max Yaş (gün)")}</label>
           <Input 
             type="number"
             value={form.max_age_days} 
@@ -325,7 +326,7 @@ const ActivityForm = ({ activity, onSave, onCancel, isLoading }: ActivityFormPro
           />
         </div>
         <div>
-          <label className="text-sm font-medium">Müddət (dəq)</label>
+          <label className="text-sm font-medium">{tr("adminplayactivities_muddet_deq_cbf031", "Müddət (dəq)")}</label>
           <Input 
             type="number"
             value={form.duration_minutes} 
@@ -333,7 +334,7 @@ const ActivityForm = ({ activity, onSave, onCancel, isLoading }: ActivityFormPro
           />
         </div>
         <div>
-          <label className="text-sm font-medium">Çətinlik</label>
+          <label className="text-sm font-medium">{tr("adminplayactivities_cetinlik_19294d", "Çətinlik")}</label>
           <Select value={form.difficulty_level} onValueChange={(v) => setForm({ ...form, difficulty_level: v })}>
             <SelectTrigger>
               <SelectValue />
@@ -341,14 +342,14 @@ const ActivityForm = ({ activity, onSave, onCancel, isLoading }: ActivityFormPro
             <SelectContent>
               <SelectItem value="easy">Asan</SelectItem>
               <SelectItem value="medium">Orta</SelectItem>
-              <SelectItem value="hard">Çətin</SelectItem>
+              <SelectItem value="hard">{tr("adminplayactivities_cetin_4bf032", "Çətin")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
       
       <div>
-        <label className="text-sm font-medium">Bacarıq Etiketləri (vergüllə ayırın)</label>
+        <label className="text-sm font-medium">{tr("adminplayactivities_bacariq_etiketleri_vergulle_ayirin_468018", "Bacarıq Etiketləri (vergüllə ayırın)")}</label>
         <Input 
           value={form.skill_tags} 
           onChange={(e) => setForm({ ...form, skill_tags: e.target.value })}
@@ -357,11 +358,11 @@ const ActivityForm = ({ activity, onSave, onCancel, isLoading }: ActivityFormPro
       </div>
       
       <div>
-        <label className="text-sm font-medium">Tələb Olunan Əşyalar (hər sətirdə bir)</label>
+        <label className="text-sm font-medium">{tr("adminplayactivities_teleb_olunan_esyalar_her_setirde_bir_0998f2", "Tələb Olunan Əşyalar (hər sətirdə bir)")}</label>
         <Textarea 
           value={form.required_items} 
           onChange={(e) => setForm({ ...form, required_items: e.target.value })}
-          placeholder="Güzgü&#10;Yastıq&#10;Top"
+          placeholder={tr("adminplayactivities_guzgu_10_yastiq_10_top_65b3ec", "Güzgü&#10;Yastıq&#10;Top")}
           rows={4}
         />
       </div>

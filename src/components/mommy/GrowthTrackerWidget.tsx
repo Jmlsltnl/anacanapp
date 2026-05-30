@@ -150,7 +150,7 @@ const GrowthTrackerWidget = () => {
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-400 to-pink-600 flex items-center justify-center">
             <Scale className="w-4 h-4 text-white" />
           </div>
-          <h3 className="font-bold text-sm text-foreground">İnkişaf izləyicisi</h3>
+          <h3 className="font-bold text-sm text-foreground">{tr("growthtrackerwidget_inkisaf_izleyicisi_71039e", "İnkişaf izləyicisi")}</h3>
         </div>
         <motion.button
           onClick={() => setShowInput(!showInput)}
@@ -166,7 +166,7 @@ const GrowthTrackerWidget = () => {
         <div className="bg-rose-50 dark:bg-rose-500/15 rounded-xl p-3">
           <div className="flex items-center gap-1.5 mb-1">
             <Scale className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400" />
-            <span className="text-[10px] text-rose-600/70 dark:text-rose-400/70">Çəki</span>
+            <span className="text-[10px] text-rose-600/70 dark:text-rose-400/70">{tr("growthtrackerwidget_ceki_b10cc4", "Çəki")}</span>
           </div>
           <p className="text-lg font-black text-rose-700 dark:text-rose-300">
             {latestEntry?.weight_kg ? `${latestEntry.weight_kg} kq` : '—'}
@@ -203,7 +203,7 @@ const GrowthTrackerWidget = () => {
           <div className="bg-amber-50 dark:bg-amber-500/15 rounded-xl p-3">
             <div className="flex items-center gap-1.5 mb-1">
               <CircleDot className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
-              <span className="text-[10px] text-amber-600/70 dark:text-amber-400/70">Baş</span>
+              <span className="text-[10px] text-amber-600/70 dark:text-amber-400/70">{tr("growthtrackerwidget_bas_3cb8b6", "Baş")}</span>
             </div>
             <p className="text-lg font-black text-amber-700 dark:text-amber-300">
               {latestEntry?.head_cm ? `${latestEntry.head_cm} sm` : '—'}
@@ -231,7 +231,7 @@ const GrowthTrackerWidget = () => {
           >
             <div className={`grid ${showHeadCircumference ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}>
               <div>
-                <label className="text-[10px] text-muted-foreground mb-1 block">Çəki (kq)</label>
+                <label className="text-[10px] text-muted-foreground mb-1 block">{tr("growthtrackerwidget_ceki_kq_2f7555", "Çəki (kq)")}</label>
                 <input
                   type="number"
                   step="0.1"
@@ -254,7 +254,7 @@ const GrowthTrackerWidget = () => {
               </div>
               {showHeadCircumference && (
                 <div>
-                  <label className="text-[10px] text-muted-foreground mb-1 block">Baş (sm)</label>
+                  <label className="text-[10px] text-muted-foreground mb-1 block">{tr("growthtrackerwidget_bas_sm_927b99", "Baş (sm)")}</label>
                   <input
                     type="number"
                     step="0.5"

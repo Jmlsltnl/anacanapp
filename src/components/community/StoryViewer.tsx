@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { tr } from '@/lib/tr';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { X, Pause, Play, Trash2, Eye, Users, ChevronUp } from 'lucide-react';
 import { Story, UserStoryGroup } from '@/hooks/useStories';
@@ -327,7 +328,7 @@ const StoryViewer = ({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setIsPaused(false)}>Ləğv et</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setIsPaused(false)}>{tr("storyviewer_legv_et_b5e49c", "Ləğv et")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-red-500 hover:bg-red-600">
               Sil
             </AlertDialogAction>
@@ -365,7 +366,7 @@ const StoryViewer = ({
                     <Eye className="w-4 h-4 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-base text-foreground">Baxışlar</h3>
+                    <h3 className="font-bold text-base text-foreground">{tr("storyviewer_baxislar_e938f5", "Baxışlar")}</h3>
                     <p className="text-xs text-muted-foreground">{currentStory.view_count} nəfər</p>
                   </div>
                 </div>
@@ -386,7 +387,7 @@ const StoryViewer = ({
                 ) : viewers.length === 0 ? (
                   <div className="text-center py-12">
                     <Eye className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-                    <p className="text-sm text-muted-foreground">Hələ heç kim baxmayıb</p>
+                    <p className="text-sm text-muted-foreground">{tr("storyviewer_hele_hec_kim_baxmayib_30427f", "Hələ heç kim baxmayıb")}</p>
                   </div>
                 ) : (
                   <div className="px-5 py-2">

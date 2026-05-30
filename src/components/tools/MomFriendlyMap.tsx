@@ -171,8 +171,8 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold">Ana Dostu Məkanlar</h1>
-            <p className="text-xs text-muted-foreground">Körpənizlə rahat yerlər</p>
+            <h1 className="text-lg font-bold">{tr("momfriendlymap_ana_dostu_mekanlar_4153ec", "Ana Dostu Məkanlar")}</h1>
+            <p className="text-xs text-muted-foreground">{tr("momfriendlymap_korpenizle_rahat_yerler_4e48e6", "Körpənizlə rahat yerlər")}</p>
           </div>
           <Button
             variant={showFilters || selectedAmenities.length > 0 ? "default" : "ghost"}
@@ -310,7 +310,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-rose-100 dark:bg-rose-900/20 flex items-center justify-center">
                 <MapPin className="w-8 h-8 text-rose-500" />
               </div>
-              <h3 className="font-bold text-foreground mb-1">Məkan tapılmadı</h3>
+              <h3 className="font-bold text-foreground mb-1">{tr("momfriendlymap_mekan_tapilmadi_ffea6b", "Məkan tapılmadı")}</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Bu filtrlərə uyğun məkan yoxdur
               </p>
@@ -407,7 +407,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <div>
-              <Label className="text-sm font-medium">Məkan adı *</Label>
+              <Label className="text-sm font-medium">{tr("momfriendlymap_mekan_adi_ec57ac", "Məkan adı *")}</Label>
               <Input
                 value={newPlace.name}
                 onChange={(e) => setNewPlace({ ...newPlace, name: e.target.value, name_az: e.target.value })}
@@ -416,7 +416,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
               />
             </div>
             <div>
-              <Label className="text-sm font-medium">Ünvan</Label>
+              <Label className="text-sm font-medium">{tr("momfriendlymap_unvan_b8651a", "Ünvan")}</Label>
               <Input
                 value={newPlace.address_az || ''}
                 onChange={(e) => setNewPlace({ ...newPlace, address_az: e.target.value })}
@@ -446,7 +446,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
               </Select>
             </div>
             <div>
-              <Label className="text-sm font-medium mb-3 block">İmkanlar</Label>
+              <Label className="text-sm font-medium mb-3 block">{tr("momfriendlymap_imkanlar_60eb86", "İmkanlar")}</Label>
               <div className="grid grid-cols-1 gap-2">
                 {AMENITIES.map(amenity => (
                   <div 
@@ -541,7 +541,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                     ))}
                   </div>
                   {getPlaceAmenities(selectedPlace).length === 0 && (
-                    <p className="text-sm text-muted-foreground text-center py-4">İmkan göstərilməyib</p>
+                    <p className="text-sm text-muted-foreground text-center py-4">{tr("momfriendlymap_imkan_gosterilmeyib_1f22f8", "İmkan göstərilməyib")}</p>
                   )}
                 </div>
 
@@ -577,7 +577,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                     <Card className="mb-3 border-rose-200 dark:border-rose-900/30">
                       <CardContent className="p-4 space-y-3">
                         <div>
-                          <p className="text-sm font-medium mb-2">Qiymətləndirmə</p>
+                          <p className="text-sm font-medium mb-2">{tr("momfriendlymap_qiymetlendirme_1fde6b", "Qiymətləndirmə")}</p>
                           <div className="flex gap-1">
                             {[1, 2, 3, 4, 5].map(star => (
                               <button
@@ -591,7 +591,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                           </div>
                         </div>
                         <div>
-                          <p className="text-sm font-medium mb-2">Şərh (istəyə bağlı)</p>
+                          <p className="text-sm font-medium mb-2">{tr("momfriendlymap_serh_isteye_bagli_0acfd0", "Şərh (istəyə bağlı)")}</p>
                           <Textarea
                             value={reviewComment}
                             onChange={(e) => setReviewComment(e.target.value)}
@@ -623,7 +623,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
 
                   {/* Reviews List */}
                   {placeReviews.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-4">Hələ rəy yoxdur. İlk rəyi siz yazın!</p>
+                    <p className="text-sm text-muted-foreground text-center py-4">{tr("momfriendlymap_hele_rey_yoxdur_ilk_reyi_siz_yazin_156bd8", "Hələ rəy yoxdur. İlk rəyi siz yazın!")}</p>
                   ) : (
                     <div className="space-y-2">
                       {placeReviews.map(review => (

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Baby, Droplets, Smile, Zap, Bell } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -155,7 +156,7 @@ const LiveActivityCard = () => {
             </motion.span>
             <div>
               <p className="text-white font-bold text-sm">{latestEvent.message}</p>
-              <p className="text-white/70 text-xs">İndicə</p>
+              <p className="text-white/70 text-xs">{tr("liveactivitycard_indice_3c9745", "İndicə")}</p>
             </div>
             <motion.div
               animate={{ rotate: [0, 15, -15, 0] }}
@@ -178,7 +179,7 @@ const LiveActivityCard = () => {
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-partner to-violet-600 flex items-center justify-center">
               <Zap className="w-4 h-4 text-white" />
             </div>
-            <h3 className="font-bold">Canlı Aktivlik</h3>
+            <h3 className="font-bold">{tr("liveactivitycard_canli_aktivlik_5e44b6", "Canlı Aktivlik")}</h3>
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse ml-auto" />
           </div>
 

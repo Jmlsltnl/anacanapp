@@ -1,79 +1,139 @@
-# Anacan – Yeni dəyişikliklər planı
 
-Bu planda 6 ayrı dəyişiklik var. Hamısı bir-birindən asılı olmayan kiçik təkmilləşdirmələrdir.
+# Partnyor Endirim Sistemi — Plan
 
----
-
-## 1) Anacan.AI tonu və scroll problemi
-
-**Problem 1 — Ton:** AI bəzən "Ay [ad]", "əziz ana", "rəfiqənizəm" kimi qeyri-formal müraciətlər istifadə edir. Daha peşəkar olmalıdır.
-
-**Problem 2 — Scroll:** Yeni mesaj yazılanda ekran "ən başa" sıçrayır. Səbəb: `AIChatScreen.tsx`-da `motion.div` üçün `transition={{ delay: index * 0.05 }}` hər mesaj üçün təxir verir, və yeni mesaj əlavə olunanda bütün mesajlar yenidən aşağıdan-yuxarı animasiya ilə render olunur — bu vizual "yuxarıya qaçma" hissi yaradır.
-
-**Düzəliş:**
-- `supabase/functions/dr-anacan-chat/prompts.ts` — system prompt-da "Ay", "əziz ana", "canım", "rəfiqə" kimi söz/müraciətləri qadağan et; "siz" formasında, peşəkar tonda cavab vermək tələbi əlavə et.
-- `src/components/AIChatScreen.tsx`:
-  - Welcome mesajlarından "əziz ana", "sağlamlıq rəfiqənizəm", "AI rəfiqənizəm" sözlərini çıxart, neytral peşəkar formaya gətir.
-  - `motion.div`-dən `transition={{ delay: index * 0.05 }}` çıxar — sadəcə qısa fade-in qalsın.
-  - Eyni dəyişikliyi `PartnerAIChatScreen.tsx`-də də et.
+## Məqsəd
+Anacan tətbiqində premium istifadəçilərə spa, idman zalı, pilates və s. partnyor məkanlarda özəl endirim. İstifadəçi tətbiqdə QR yaradır → məkan kamerada oxuyur → `partner.anacan.az/verify/...` açılır → təsdiq + PIN ilə redemption qeyd olunur.
 
 ---
 
-## 2) Bütün alətləri Premium et
+## 1) Verilənlər bazası (yeni cədvəllər)
 
-**Problem:** Hazırda yalnız bəzi alətlər premiumdur. Sizin istəyiniz: **Alətlər bölməsindəki bütün alətlər premium** olsun, premium olmayanlar istifadə edə bilməsinlər və hər yerdə (ana ekran, dashboard widget, daxili giriş nöqtələri) premium nişanı görünsün.
+### `partner_venues` (əsas məkan kataloqu)
+- `id`, `name`, `slug`, `category` (spa / gym / pilates / beauty / other)
+- `description`, `logo_url`, `cover_url`, `gallery_urls[]`
+- `address`, `city`, `district`, `latitude`, `longitude`, `phone`, `website`, `instagram`
+- `working_hours` (jsonb)
+- `discount_label` (məs. "20% endirim"), `discount_value`, `discount_terms`
+- `redemption_cooldown_hours` (məkana özəl, məs. 24 / 168 / 720)
+- `redemption_lifetime_limit` (nullable — ümumi limit, məs. 1)
+- `qr_ttl_seconds` (default 300 — 5 dəq)
+- `pin_hash` (partnyorun "Təsdiqlə" düyməsi üçün PIN — bcrypt)
+- `is_active`, `is_featured`, `sort_order`, `created_at`, `updated_at`
 
-**Düzəliş:**
-- `tool_configs` cədvəlində bütün alətləri tək migrasiya ilə `is_premium = true` et.
-- `useDynamicTools` hook-u onsuz da `is_premium` oxuyur; `ToolsScreen` və alət kartları üçün premium kilid göstərir — kodda əlavə dəyişiklik tələb olunmur, sadəcə DB yenilənməsi.
-- Əgər hansısa alət `useDynamicTools`-dan kənar (sabit/hardcoded) açılırsa, onu da `usePremiumGate` (və ya mövcud `useSubscription`) yoxlaması ilə qoru.
+### `partner_redemptions` (hər QR / istifadə)
+- `id`, `venue_id`, `user_id`
+- `token` (random, unique, indexed) — QR-da gedir
+- `status`: `pending` | `verified` | `expired` | `cancelled`
+- `created_at`, `expires_at`, `verified_at`, `verified_ip`
+- `client_meta` (jsonb — UA və s.)
 
----
+### `partner_venue_categories` (admin idarə edə bilsin)
+- `id`, `key`, `label_az`, `icon`, `sort_order`, `is_active`
 
-## 3) Partnyor profili onboarding görməməlidir
-
-**Problem:** `life_stage = 'partner'` olan istifadəçi standart bump/mommy/flow onboarding-lərini görür.
-
-**Düzəliş:**
-- `OnboardingScreen` (və ya əsas onboarding router) içində `lifeStage === 'partner'` olduqda **hər hansı onboarding addımı göstərmədən** birbaşa partnyor ana ekranına yönləndir.
-- Partnyor üçün ayrı tip onboarding əgər varsa, onu da skip et — partnyor heç bir onboarding görməməlidir.
-
----
-
-## 4) Cəmiyyət iconu üzərində oxunmamış post sayı (qırmızı badge)
-
-**Problem:** Yeni cəmiyyət postları gəldikdə bottom-nav-dakı "Cəmiyyət" iconunda heç bir göstərici yoxdur.
-
-**Düzəliş:**
-- Yeni hook: `useUnreadCommunityPosts` — istifadəçinin son `community_posts.last_seen_at` (yeni `user_preferences` sütunu) tarixindən sonra yaradılmış postların sayını qaytarır.
-- Migrasiya: `user_preferences` cədvəlinə `community_last_seen_at timestamptz` sütunu əlavə et.
-- `BottomNav.tsx`-da Cəmiyyət iconunun üst sağında qırmızı yuvarlaq badge (sayla) göstər; say > 99 olarsa "99+".
-- İstifadəçi Cəmiyyət ekranını açanda `community_last_seen_at` indi vaxtına yenilənir → say sıfırlanır.
+**RLS xülasəsi:**
+- `partner_venues`: SELECT — authenticated (yalnız `is_active=true`); admin tam idarə.
+- `partner_redemptions`: user yalnız öz `user_id`-sini görür/yaradır; admin hamısı; verify edge function service-role ilə update edir.
+- GRANT-lar bütün cədvəllər üçün təlimata uyğun əlavə olunur.
 
 ---
 
-## 5) Cəmiyyətdə "Qruplar" tab-ını müvəqqəti gizlət
+## 2) Edge funksiyalar
 
-**Düzəliş:**
-- `CommunityScreen.tsx`-da Qruplar tab/section-ını gizlət (silmə, sadəcə şərt ilə render etmə — `const SHOW_GROUPS = false;` flag).
-- Default açılış tab-ı "Feed" olsun.
-- `GroupsList`, `GroupFeed` faylları silinmir — gələcəkdə flag ilə açıla bilər.
+### `partner-create-redemption` (POST, JWT validation)
+- Input: `venue_id`
+- Yoxlayır: istifadəçi **premium**, məkan aktiv, cooldown və lifetime limit keçilməyib.
+- Yeni `partner_redemptions` sətri yaradır (`pending`, `expires_at = now + qr_ttl_seconds`).
+- Cavab: `token`, `verify_url = https://app.anacan.az/p/v/<token>`, `expires_at`.
+
+### `partner-verify-redemption` (POST, public)
+- Input: `token`, `pin`
+- Tokeni tapır, expired/already verified yoxlayır, PIN-i məkanın `pin_hash`-i ilə müqayisə edir.
+- Uğurla: status=`verified`, `verified_at=now`, IP qeyd.
+- Cavab: user adı (mask), premium status, endirim mətni, məkan adı.
+
+### `partner-redemption-status` (GET, public)
+- `token` üçün cari status — portal səhifəsi polling-siz ilkin yükləmə üçün.
+
+Bütün funksiyalar `verify_jwt = false` (PIN flow public), `partner-create-redemption` istisna — orda JWT manual yoxlanılır.
 
 ---
 
-## 6) Dashboard – "İnkişaf mərhələləri" və "Bugünkü Xülasə" widget yerlərini dəyişmək
+## 3) İstifadəçi (mobil) tərəfi
 
-**Problem:** Hazırda `Dashboard.tsx`-da əvvəlcə "İnkişaf mərhələləri" (sətr ~1634), sonra "Today's Summary" (sətr ~1718) gəlir. Sizin istəyiniz: yerlər dəyişdirilsin — əvvəlcə Xülasə, sonra İnkişaf mərhələləri.
+**Yeni route:** `/partnyorlar` (tab "Kəşf et" və ya `tools` menyusunda).
 
-**Düzəliş:**
-- `Dashboard.tsx`-da iki bloku yerini dəyişdir (Today's Summary blokunu Milestones-dən yuxarı çək).
+Komponentlər:
+- `PartnersScreen.tsx` — kateqoriya filterləri, axtarış, məkan kart grid.
+- `PartnerVenueDetailScreen.tsx` — şəkillər, ünvan, xəritə linki, "Endirimi al" düyməsi.
+- `RedemptionQRSheet.tsx` — Bottom sheet: böyük QR (qrcode.react), geri sayım taymeri, expire-də "Yenilə" düyməsi.
+- Premium deyil → mövcud `PaywallSheet`-ə yönləndirilir.
+- Hook: `usePartnerVenues`, `useCreateRedemption`.
 
 ---
 
-## Texniki qeydlər
+## 4) Partnyor veb-portalı (`/p/v/:token`)
 
-- Migrasiyalar (DB):
-  1. `UPDATE tool_configs SET is_premium = true;`
-  2. `ALTER TABLE user_preferences ADD COLUMN community_last_seen_at timestamptz;`
-- Edge function `dr-anacan-chat` avtomatik yenidən deploy olunur.
-- Yoxlama: APK/preview-də (a) AI welcome mesajı, (b) yeni mesaj scroll davranışı, (c) alətlərin kilidli görünüşü, (d) Cəmiyyət badge-i, (e) Dashboard widget sırası.
+Yeni route — login tələb etmir, amma PIN tələb edir.
+
+- `PartnerVerifyPage.tsx`:
+  1. Tokenin statusunu çəkir.
+  2. Əgər `pending` və müddəti bitməyib → məkan logosu + "PIN daxil edin" + "Təsdiqlə" düyməsi.
+  3. PIN düz → tam ekran yaşıl: ✓ "Təsdiqləndi — Premium İstifadəçi — 20% endirim" + istifadəçi adı (mask: "Aysel M.") və saat.
+  4. Səhv/expired → qırmızı ekran ilə səbəb.
+- Mobile-first, böyük tipoqrafiya (kassir oxusun).
+- Route `App.tsx`-də public marshrut kimi qeyd olunur.
+
+---
+
+## 5) Admin paneli
+
+Yeni 2 tab `AdminPanel.tsx`-ə əlavə olunur:
+
+### `AdminPartnerVenues.tsx`
+- CRUD: ad, kateqoriya, ünvan, koordinatlar, şəkillər (storage upload), endirim mətni/dəyəri, terms, cooldown saatları, lifetime limit, QR TTL, PIN (yeniləmə zamanı bcrypt hash).
+- Toggle: aktiv / featured.
+- Excel/CSV ixrac yoxdur (gələcəkdə).
+
+### `AdminPartnerRedemptions.tsx`
+- Filter: məkan, status, tarix aralığı.
+- Cədvəl: tarix, məkan, istifadəçi (ad+email), status, IP.
+- KPI kartları: bu gün/həftə/ay verified sayı, məkan üzrə top-5.
+
+### `AdminPartnerCategories.tsx` (kiçik — kateqoriya idarəsi)
+
+`AdminPanel.tsx`-ə üç yeni `case` (partner-venues / partner-redemptions / partner-categories) və sidebar girişləri.
+
+---
+
+## 6) Premium gating & analitika
+- `usePremium` hook ilə "Endirimi al" düyməsi qıfıllı göstərilir.
+- `analytics.track('partner_redeem_initiated', { venue_id })` və `partner_redeem_verified` (verify edge funksiyada DB-də qeyd ki, frontend bilməsə də sayılsın).
+
+---
+
+## 7) Texniki detallar (geliştirici üçün)
+
+- QR token: `crypto.randomUUID().replace(/-/g,'')` + `random_bytes(8)` → 40 simvol; cədvəldə unique index.
+- PIN hash: `bcrypt` (deno-da `https://deno.land/x/bcrypt`).
+- Cooldown yoxlaması: `SELECT max(verified_at) FROM partner_redemptions WHERE user_id=? AND venue_id=? AND status='verified'` → indi - max < cooldown_hours.
+- Lifetime limit: count(verified) >= limit → 429 cavab.
+- `partner.anacan.az` ayrı subdomen yox — `app.anacan.az/p/v/:token` kifayətdir (sizin `public/.well-known` artıq mövcuddur). İstənilsə gələcəkdə subdomain yönləndirməsi əlavə olunar.
+- Yeni `mem://features/partner-venues-discount` memorisi əlavə olunacaq (premium-only, cooldown məkana özəl, hibrid PIN+QR).
+
+---
+
+## 8) İş bölgüsü (faza-faza)
+
+1. **Migration**: 3 cədvəl + RLS + GRANT + 1 helper funksiya (`can_redeem(venue, user)`).
+2. **Edge functions**: 3 funksiya (create / verify / status).
+3. **User UI**: route + 3 komponent + 2 hook.
+4. **Verify portal**: 1 public səhifə.
+5. **Admin**: 3 yeni admin ekran + sidebar entry-ləri.
+6. **Analytics + memory + sənədləşmə**.
+
+---
+
+## Açıq sual (təsdiqlədikdən sonra qərar verə bilərik, plan üçün blocker deyil)
+- Hələ partnyor məkanları siyahısı yoxdursa, ilk admin dəstəyi üçün bir test məkanı seed edək?
+- PIN unutqanlığı üçün admin paneldən "PIN sıfırla" düyməsi (yenidən qoymaq) kifayətdir, ayrı email lazım deyil — razıyıq?
+

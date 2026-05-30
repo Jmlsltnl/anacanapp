@@ -180,7 +180,7 @@ const NotificationsTab = () => {
       className="space-y-4"
     >
       <div className="flex items-center justify-between">
-        <h2 className="font-bold text-lg">Bildiriş Tarixçəsi</h2>
+        <h2 className="font-bold text-lg">{tr("notificationstab_bildiris_tarixcesi_36bb6a", "Bildiriş Tarixçəsi")}</h2>
         <span className="text-sm text-muted-foreground">
           {filteredMessages.length} bildiriş
         </span>
@@ -232,7 +232,7 @@ const NotificationsTab = () => {
           >
             {/* Type Filters */}
             <div>
-              <p className="text-xs text-muted-foreground mb-2">Bildiriş tipi</p>
+              <p className="text-xs text-muted-foreground mb-2">{tr("notificationstab_bildiris_tipi_9b6b8e", "Bildiriş tipi")}</p>
               <div className="flex flex-wrap gap-2">
                 {filters.map(filter => {
                   const Icon = filter.icon;

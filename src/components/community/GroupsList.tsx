@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { Users, ChevronRight, UserPlus, UserMinus, Check } from 'lucide-react';
 import { CommunityGroup, useJoinGroup, useLeaveGroup } from '@/hooks/useCommunity';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -133,7 +134,7 @@ const GroupsList = ({ groups, memberGroupIds, onSelectGroup, searchQuery, isLoad
           <div className="w-16 h-16 rounded-full bg-muted/15 flex items-center justify-center mx-auto mb-3">
             <Users className="w-7 h-7 text-muted-foreground/20" />
           </div>
-          <p className="text-muted-foreground/35 text-[13px] font-bold">Qrup tapılmadı</p>
+          <p className="text-muted-foreground/35 text-[13px] font-bold">{tr("groupslist_qrup_tapilmadi_78fc7d", "Qrup tapılmadı")}</p>
         </div>
       )}
     </div>

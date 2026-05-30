@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Plus, Search, Edit, Trash2, Package, MoreVertical } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -98,14 +99,14 @@ const AdminProducts = () => {
           .eq('id', editingProduct.id);
 
         if (error) throw error;
-        toast({ title: 'Uğurlu', description: 'Məhsul yeniləndi' });
+        toast({ title: tr("adminproducts_ugurlu_7fe64c", "Uğurlu"), description: tr("adminproducts_mehsul_yenilendi_294d27", "Məhsul yeniləndi") });
       } else {
         const { error } = await supabase
           .from('products')
           .insert([formData]);
 
         if (error) throw error;
-        toast({ title: 'Uğurlu', description: 'Məhsul əlavə edildi' });
+        toast({ title: tr("adminproducts_ugurlu_7fe64c", "Uğurlu"), description: tr("adminproducts_mehsul_elave_edildi_f09ac4", "Məhsul əlavə edildi") });
       }
 
       fetchProducts();
@@ -114,8 +115,8 @@ const AdminProducts = () => {
     } catch (error) {
       console.error('Error saving product:', error);
       toast({
-        title: 'Xəta',
-        description: 'Məhsul yadda saxlanıla bilmədi',
+        title: tr("adminproducts_xeta_3cdbb6", "Xəta"),
+        description: tr("adminproducts_mehsul_yadda_saxlanila_bilmedi_3ea27d", "Məhsul yadda saxlanıla bilmədi"),
         variant: 'destructive'
       });
     }
@@ -129,13 +130,13 @@ const AdminProducts = () => {
         .eq('id', id);
 
       if (error) throw error;
-      toast({ title: 'Uğurlu', description: 'Məhsul silindi' });
+      toast({ title: tr("adminproducts_ugurlu_7fe64c", "Uğurlu"), description: tr("adminproducts_mehsul_silindi_e284ab", "Məhsul silindi") });
       fetchProducts();
     } catch (error) {
       console.error('Error deleting product:', error);
       toast({
-        title: 'Xəta',
-        description: 'Məhsul silinə bilmədi',
+        title: tr("adminproducts_xeta_3cdbb6", "Xəta"),
+        description: tr("adminproducts_mehsul_siline_bilmedi_84d362", "Məhsul silinə bilmədi"),
         variant: 'destructive'
       });
     }
@@ -177,8 +178,8 @@ const AdminProducts = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Məhsullar</h1>
-          <p className="text-muted-foreground">Mağaza məhsullarını idarə edin</p>
+          <h1 className="text-2xl font-bold text-foreground">{tr("adminproducts_mehsullar_24a4ce", "Məhsullar")}</h1>
+          <p className="text-muted-foreground">{tr("adminproducts_magaza_mehsullarini_idare_edin_d82f10", "Mağaza məhsullarını idarə edin")}</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={(open) => {
           setDialogOpen(open);
@@ -202,20 +203,20 @@ const AdminProducts = () => {
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Məhsul adı"
+                  placeholder={tr("adminproducts_mehsul_adi_0495ad", "Məhsul adı")}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Təsvir</label>
+                <label className="text-sm font-medium">{tr("adminproducts_tesvir_f85651", "Təsvir")}</label>
                 <Textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Məhsul təsviri"
+                  placeholder={tr("adminproducts_mehsul_tesviri_4d8420", "Məhsul təsviri")}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium">Qiymət (₼)</label>
+                  <label className="text-sm font-medium">{tr("adminproducts_qiymet_ef61c0", "Qiymət (₼)")}</label>
                   <Input
                     type="number"
                     value={formData.price}
@@ -238,7 +239,7 @@ const AdminProducts = () => {
                   onValueChange={(value) => setFormData({ ...formData, category: value })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Kateqoriya seçin" />
+                    <SelectValue placeholder={tr("adminproducts_kateqoriya_secin_706eed", "Kateqoriya seçin")} />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((cat) => (
@@ -248,7 +249,7 @@ const AdminProducts = () => {
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-medium">Şəkil URL</label>
+                <label className="text-sm font-medium">{tr("adminproducts_sekil_url_d302df", "Şəkil URL")}</label>
                 <Input
                   value={formData.image_url}
                   onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
@@ -275,7 +276,7 @@ const AdminProducts = () => {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Məhsul axtar..."
+            placeholder={tr("adminproducts_mehsul_axtar_580a05", "Məhsul axtar...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -296,7 +297,7 @@ const AdminProducts = () => {
         ) : filteredProducts.length === 0 ? (
           <Card className="col-span-full p-8 text-center">
             <Package className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground">Məhsul tapılmadı</p>
+            <p className="text-muted-foreground">{tr("adminproducts_mehsul_tapilmadi_ff5957", "Məhsul tapılmadı")}</p>
           </Card>
         ) : (
           filteredProducts.map((product, index) => (

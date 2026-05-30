@@ -80,7 +80,7 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
               <ArrowLeft className="w-4 h-4 text-foreground" />
             </motion.button>
             <div className="flex-1">
-              <h1 className="text-[18px] font-black text-foreground">Bildirişlər</h1>
+              <h1 className="text-[18px] font-black text-foreground">{tr("notificationsscreen_bildirisler_54eb88", "Bildirişlər")}</h1>
               {unreadCount > 0 && <p className="text-[10px] text-muted-foreground/50 font-medium">{unreadCount} oxunmamış</p>}
             </div>
             {unreadCount > 0 && (
@@ -115,8 +115,8 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
             <div className="w-16 h-16 rounded-full bg-muted/15 flex items-center justify-center mx-auto mb-3">
               <Bell className="w-7 h-7 text-muted-foreground/20" />
             </div>
-            <p className="text-[13px] font-bold text-muted-foreground/35">Bildiriş yoxdur</p>
-            <p className="text-[11px] text-muted-foreground/25 mt-1">Yeni bildirişlər burada görünəcək</p>
+            <p className="text-[13px] font-bold text-muted-foreground/35">{tr("notificationsscreen_bildiris_yoxdur_6ccf4d", "Bildiriş yoxdur")}</p>
+            <p className="text-[11px] text-muted-foreground/25 mt-1">{tr("notificationsscreen_yeni_bildirisler_burada_gorunecek_a0484a", "Yeni bildirişlər burada görünəcək")}</p>
           </motion.div>
         ) : (
           <div className="space-y-2">
@@ -147,7 +147,7 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
                       </div>
                       <p className="text-[11px] text-muted-foreground/60 mt-0.5 leading-relaxed line-clamp-2">{notification.message}</p>
                       {isCommunity && (
-                        <p className="text-[9px] text-primary/50 font-bold mt-1.5">Görmək üçün toxun →</p>
+                        <p className="text-[9px] text-primary/50 font-bold mt-1.5">{tr("notificationsscreen_gormek_ucun_toxun_04883f", "Görmək üçün toxun →")}</p>
                       )}
                     </div>
                   </div>

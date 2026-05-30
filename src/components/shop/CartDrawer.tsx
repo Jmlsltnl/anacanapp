@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { X, Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/useOrders';
@@ -37,7 +38,7 @@ const CartDrawer = ({ isOpen, onClose, onCheckout }: CartDrawerProps) => {
         className="fixed right-0 top-0 h-full w-full max-w-md bg-background z-50 shadow-xl flex flex-col"
       >
         <div className="flex items-center justify-between p-4 border-b border-border">
-          <h2 className="text-lg font-bold">Səbət</h2>
+          <h2 className="text-lg font-bold">{tr("cartdrawer_sebet_9a08cf", "Səbət")}</h2>
           <button onClick={onClose} className="p-2 rounded-full hover:bg-muted">
             <X className="w-5 h-5" />
           </button>
@@ -51,8 +52,8 @@ const CartDrawer = ({ isOpen, onClose, onCheckout }: CartDrawerProps) => {
           ) : items.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <ShoppingBag className="w-12 h-12 mb-3 opacity-30" />
-              <p className="text-base font-medium">Səbət boşdur</p>
-              <p className="text-sm">Məhsulları səbətə əlavə edin</p>
+              <p className="text-base font-medium">{tr("cartdrawer_sebet_bosdur_ff5b34", "Səbət boşdur")}</p>
+              <p className="text-sm">{tr("cartdrawer_mehsullari_sebete_elave_edin_639c4a", "Məhsulları səbətə əlavə edin")}</p>
             </div>
           ) : (
             items.map((item) => (
@@ -115,7 +116,7 @@ const CartDrawer = ({ isOpen, onClose, onCheckout }: CartDrawerProps) => {
 
             <div className="space-y-1">
               <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">Ara cəm:</span>
+                <span className="text-muted-foreground">{tr("cartdrawer_ara_cem_dc0699", "Ara cəm:")}</span>
                 <span>{totalPrice.toFixed(2)} ₼</span>
               </div>
               {appliedCoupon && (
@@ -125,7 +126,7 @@ const CartDrawer = ({ isOpen, onClose, onCheckout }: CartDrawerProps) => {
                 </div>
               )}
               <div className="flex justify-between items-center pt-1 border-t border-border">
-                <span className="font-semibold">Cəmi:</span>
+                <span className="font-semibold">{tr("cartdrawer_cemi_fbbec6", "Cəmi:")}</span>
                 <span className="text-xl font-bold text-primary">{finalPrice.toFixed(2)} ₼</span>
               </div>
             </div>

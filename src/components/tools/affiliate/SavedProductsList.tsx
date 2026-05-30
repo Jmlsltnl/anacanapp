@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { Heart, ArrowLeft, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSavedProducts, AffiliateProduct } from '@/hooks/useAffiliateProducts';
@@ -22,7 +23,7 @@ const SavedProductsList = ({ onSelectProduct, onBack }: SavedProductsListProps) 
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-lg font-bold">Saxlanılmış məhsullar</h1>
+            <h1 className="text-lg font-bold">{tr("savedproductslist_saxlanilmis_mehsullar_28bd17", "Saxlanılmış məhsullar")}</h1>
             <p className="text-xs text-muted-foreground">{savedProducts.length} məhsul</p>
           </div>
         </div>
@@ -50,7 +51,7 @@ const SavedProductsList = ({ onSelectProduct, onBack }: SavedProductsListProps) 
             <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
               <Heart className="w-10 h-10 text-muted-foreground" />
             </div>
-            <h2 className="text-lg font-semibold mb-2">Hələ heç nə saxlanmayıb</h2>
+            <h2 className="text-lg font-semibold mb-2">{tr("savedproductslist_hele_hec_ne_saxlanmayib_70769c", "Hələ heç nə saxlanmayıb")}</h2>
             <p className="text-sm text-muted-foreground max-w-xs mx-auto">
               Bəyəndiyiniz məhsulları ❤️ ilə saxlayın, sonra buradan asanlıqla tapın
             </p>

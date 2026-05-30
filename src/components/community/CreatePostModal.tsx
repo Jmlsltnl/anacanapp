@@ -193,7 +193,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
 
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-3">
-              <h3 className="text-[17px] font-black text-foreground">Yeni Paylaşım</h3>
+              <h3 className="text-[17px] font-black text-foreground">{tr("createpostmodal_yeni_paylasim_4f5b15", "Yeni Paylaşım")}</h3>
               <button onClick={handleClose} className="w-8 h-8 rounded-full bg-muted/40 flex items-center justify-center">
                 <X className="w-4 h-4 text-muted-foreground/60" />
               </button>
@@ -206,7 +206,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
                   <SelectValue placeholder={tr("createpostmodal_qrup_secin_8e26b9", "Qrup seçin")} />
                 </SelectTrigger>
                 <SelectContent className="bg-popover border-border z-[100] rounded-xl">
-                  <SelectItem value="public">🌍 Ümumi</SelectItem>
+                  <SelectItem value="public">{tr("createpostmodal_umumi_794727", "🌍 Ümumi")}</SelectItem>
                   {groups.map((group) => (
                     <SelectItem key={group.id} value={group.id}>{group.icon_emoji || '👥'} {group.name}</SelectItem>
                   ))}
@@ -292,7 +292,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
 
               {/* Media Actions */}
               <div className="flex items-center gap-2.5 py-2">
-                <span className="text-[11px] text-muted-foreground/40 font-medium">Əlavə et:</span>
+                <span className="text-[11px] text-muted-foreground/40 font-medium">{tr("createpostmodal_elave_et_81035a", "Əlavə et:")}</span>
                 <button onClick={() => imageInputRef.current?.click()} disabled={mediaFiles.length >= 4 || isUploading}
                   className="w-9 h-9 rounded-full bg-primary/6 flex items-center justify-center disabled:opacity-40 transition-colors active:bg-primary/12">
                   <Image className="w-4 h-4 text-primary/60" />
@@ -316,8 +316,8 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
                   <EyeOff className="w-4 h-4" />
                 </div>
                 <div className="flex-1 text-left">
-                  <p className={`text-[12px] font-bold ${isAnonymous ? 'text-primary' : 'text-foreground'}`}>Anonim paylaş</p>
-                  <p className="text-[10px] text-muted-foreground/40">Adınız gizlədilir</p>
+                  <p className={`text-[12px] font-bold ${isAnonymous ? 'text-primary' : 'text-foreground'}`}>{tr("createpostmodal_anonim_paylas_6074c9", "Anonim paylaş")}</p>
+                  <p className="text-[10px] text-muted-foreground/40">{tr("createpostmodal_adiniz_gizledilir_fb1df0", "Adınız gizlədilir")}</p>
                 </div>
                 <div className={`w-10 h-6 rounded-full transition-colors ${isAnonymous ? 'bg-primary' : 'bg-border/50'}`}>
                   <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform mt-0.5 ${isAnonymous ? 'ml-[18px]' : 'ml-0.5'}`} />
@@ -331,9 +331,9 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
                 className="w-full h-11 rounded-full gradient-primary font-bold text-[13px] shadow-lg shadow-primary/20"
               >
                 {isUploading || createPost.isPending ? (
-                  <div className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /><span>Yüklənir...</span></div>
+                  <div className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /><span>{tr("createpostmodal_yuklenir_5557de", "Yüklənir...")}</span></div>
                 ) : (
-                  <><Send className="w-4 h-4 mr-2" />Paylaş</>
+                  <><Send className="w-4 h-4 mr-2" />{tr("createpostmodal_paylas_b4be3b", "Paylaş")}</>
                 )}
               </Button>
             </div>

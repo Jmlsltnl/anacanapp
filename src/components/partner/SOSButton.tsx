@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   AlertTriangle, 
@@ -163,8 +164,8 @@ const SOSButton: React.FC<SOSButtonProps> = ({ variant = 'full' }) => {
               >
                 <Check className="w-10 h-10" />
               </motion.div>
-              <h2 className="text-2xl font-bold mb-2">SOS Göndərildi!</h2>
-              <p className="text-white/80">Partnyorunuz xəbərdar edildi</p>
+              <h2 className="text-2xl font-bold mb-2">{tr("sosbutton_sos_gonderildi_fa1202", "SOS Göndərildi!")}</h2>
+              <p className="text-white/80">{tr("sosbutton_partnyorunuz_xeberdar_edildi_4497d5", "Partnyorunuz xəbərdar edildi")}</p>
             </div>
           </motion.div>
         )}
@@ -219,7 +220,7 @@ export const SOSAlertReceiver: React.FC = () => {
             <AlertTriangle className="w-12 h-12" />
           </motion.div>
 
-          <h1 className="text-3xl font-bold mb-2">TƏCİLİ XƏBƏRDARLIQ!</h1>
+          <h1 className="text-3xl font-bold mb-2">{tr("sosbutton_tecili_xeberdarliq_0bc7b9", "TƏCİLİ XƏBƏRDARLIQ!")}</h1>
           <p className="text-white/80 text-center mb-6">
             {pendingAlert.message || 'Partnyorunuz təcili kömək istəyir!'}
           </p>

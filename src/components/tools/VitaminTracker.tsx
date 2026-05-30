@@ -12,9 +12,9 @@ interface VitaminTrackerProps {
 }
 
 const VITAMIN_PRESETS = [
-  { name: 'Folat (Fol turşusu)', emoji: '🟢' },
+  { name: tr("vitamintracker_folat_fol_tursusu_941d76", "Folat (Fol turşusu)"), emoji: '🟢' },
   { name: 'D vitamini', emoji: '☀️' },
-  { name: 'Dəmir', emoji: '🔴' },
+  { name: tr("vitamintracker_demir_30bf6c", "Dəmir"), emoji: '🔴' },
   { name: 'Kalsium', emoji: '🦴' },
   { name: 'Omega-3', emoji: '🐟' },
   { name: 'B12 vitamini', emoji: '💜' },
@@ -109,7 +109,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
           <button onClick={onBack} className="w-10 h-10 rounded-full bg-muted/60 flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
-          <h1 className="text-lg font-bold text-foreground">Vitamin İzləyicisi</h1>
+          <h1 className="text-lg font-bold text-foreground">{tr("vitamintracker_vitamin_izleyicisi_049643", "Vitamin İzləyicisi")}</h1>
           <button onClick={() => setShowAddModal(true)} className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
             <Plus className="w-5 h-5 text-primary" />
           </button>
@@ -125,7 +125,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
         >
           <div className="flex items-center justify-between mb-3">
             <div>
-              <p className="text-white/70 text-sm">Bugünkü qəbul</p>
+              <p className="text-white/70 text-sm">{tr("vitamintracker_bugunku_qebul_ae152d", "Bugünkü qəbul")}</p>
               <p className="text-3xl font-bold">{takenCount}/{totalCount}</p>
             </div>
             <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
@@ -141,7 +141,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
             />
           </div>
           {totalCount > 0 && takenCount === totalCount && (
-            <p className="text-sm text-white/80 mt-2 font-medium">🎉 Bütün vitaminlər qəbul edildi!</p>
+            <p className="text-sm text-white/80 mt-2 font-medium">{tr("vitamintracker_butun_vitaminler_qebul_edildi_87d9d1", "🎉 Bütün vitaminlər qəbul edildi!")}</p>
           )}
         </motion.div>
 
@@ -161,8 +161,8 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
             <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <Pill className="w-10 h-10 text-primary/50" />
             </div>
-            <p className="font-semibold text-foreground mb-1">Vitamin əlavə edin</p>
-            <p className="text-sm text-muted-foreground mb-4">Gündəlik vitamin qəbulunuzu izləyin</p>
+            <p className="font-semibold text-foreground mb-1">{tr("vitamintracker_vitamin_elave_edin_3a46b1", "Vitamin əlavə edin")}</p>
+            <p className="text-sm text-muted-foreground mb-4">{tr("vitamintracker_gundelik_vitamin_qebulunuzu_izleyin_f8d5c5", "Gündəlik vitamin qəbulunuzu izləyin")}</p>
             <button
               onClick={() => setShowAddModal(true)}
               className="px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold"
@@ -259,7 +259,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             >
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-foreground">Vitamin Əlavə Et</h2>
+                <h2 className="text-lg font-bold text-foreground">{tr("vitamintracker_vitamin_elave_et_ba4a9c", "Vitamin Əlavə Et")}</h2>
                 <button onClick={() => setShowAddModal(false)} className="w-8 h-8 rounded-full bg-muted/60 flex items-center justify-center">
                   <X className="w-4 h-4" />
                 </button>
@@ -271,7 +271,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
                   onClick={() => setShowPresets(!showPresets)}
                   className="flex items-center gap-2 text-sm font-medium text-primary mb-2"
                 >
-                  <span>Hazır vitaminlər</span>
+                  <span>{tr("vitamintracker_hazir_vitaminler_73ff90", "Hazır vitaminlər")}</span>
                   <ChevronDown className={`w-4 h-4 transition-transform ${showPresets ? 'rotate-180' : ''}`} />
                 </button>
                 <AnimatePresence>
@@ -303,7 +303,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
 
               {/* Name */}
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Vitamin adı</label>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">{tr("vitamintracker_vitamin_adi_15e0a6", "Vitamin adı")}</label>
                 <div className="flex gap-2">
                   <button
                     onClick={() => {
@@ -326,7 +326,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
 
               {/* Time */}
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Qəbul saatı</label>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">{tr("vitamintracker_qebul_saati_b569b1", "Qəbul saatı")}</label>
                 <input
                   type="time"
                   value={newVitamin.time}
@@ -337,7 +337,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
 
               {/* Days */}
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-2 block">Qəbul günləri</label>
+                <label className="text-xs font-medium text-muted-foreground mb-2 block">{tr("vitamintracker_qebul_gunleri_5262ae", "Qəbul günləri")}</label>
                 <div className="flex gap-1.5">
                   {DAY_LABELS.map((label, idx) => (
                     <button
@@ -359,7 +359,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
               <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
                 <div className="flex items-center gap-2">
                   <Bell className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium text-foreground">Xatırlatma bildirişi</span>
+                  <span className="text-sm font-medium text-foreground">{tr("vitamintracker_xatirlatma_bildirisi_8da2b8", "Xatırlatma bildirişi")}</span>
                 </div>
                 <button
                   onClick={() => setNewVitamin(prev => ({ ...prev, notification: !prev.notification }))}

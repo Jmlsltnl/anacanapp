@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Heart, Search, Sparkles, Users } from 'lucide-react';
 import { useFavoriteNames } from '@/hooks/useFavoriteNames';
@@ -128,8 +129,8 @@ const NameVotingScreen: React.FC<NameVotingScreenProps> = ({ onBack }) => {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div className="flex-1">
-              <h1 className="text-lg font-bold">Ad Seçimi</h1>
-              <p className="text-[11px] text-muted-foreground">Hər ikiniz bəyəndikdə match olur</p>
+              <h1 className="text-lg font-bold">{tr("namevotingscreen_ad_secimi_465d2a", "Ad Seçimi")}</h1>
+              <p className="text-[11px] text-muted-foreground">{tr("namevotingscreen_her_ikiniz_beyendikde_match_olur_28c3f5", "Hər ikiniz bəyəndikdə match olur")}</p>
             </div>
             {matches.length > 0 && (
               <Badge className="bg-pink-500 text-white">
@@ -143,7 +144,7 @@ const NameVotingScreen: React.FC<NameVotingScreenProps> = ({ onBack }) => {
 
       <Tabs defaultValue="browse" className="w-full">
         <TabsList className="grid grid-cols-3 mx-4 mt-3 max-w-[calc(100%-2rem)]">
-          <TabsTrigger value="browse">Adları Bəyən</TabsTrigger>
+          <TabsTrigger value="browse">{tr("namevotingscreen_adlari_beyen_67dae3", "Adları Bəyən")}</TabsTrigger>
           <TabsTrigger value="mine">Sevimlilərim ({favorites.length})</TabsTrigger>
           <TabsTrigger value="matches">
             Match
@@ -162,7 +163,7 @@ const NameVotingScreen: React.FC<NameVotingScreenProps> = ({ onBack }) => {
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Ad və ya məna axtarın..."
+              placeholder={tr("namevotingscreen_ad_ve_ya_mena_axtarin_30a88e", "Ad və ya məna axtarın...")}
               className="w-full h-10 pl-10 pr-4 rounded-xl bg-muted/50 text-sm outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
@@ -184,7 +185,7 @@ const NameVotingScreen: React.FC<NameVotingScreenProps> = ({ onBack }) => {
               <NameRow key={n.name} n={n} />
             ))}
             {filtered.length === 0 && (
-              <div className="text-center py-12 text-sm text-muted-foreground">Ad tapılmadı</div>
+              <div className="text-center py-12 text-sm text-muted-foreground">{tr("namevotingscreen_ad_tapilmadi_cf4c7a", "Ad tapılmadı")}</div>
             )}
           </div>
         </TabsContent>
@@ -193,7 +194,7 @@ const NameVotingScreen: React.FC<NameVotingScreenProps> = ({ onBack }) => {
           {favorites.length === 0 ? (
             <div className="flex flex-col items-center py-16 text-center">
               <Heart className="w-12 h-12 text-muted-foreground/30 mb-3" />
-              <p className="text-sm text-muted-foreground">Hələ ad seçməmisiniz</p>
+              <p className="text-sm text-muted-foreground">{tr("namevotingscreen_hele_ad_secmemisiniz_7c1388", "Hələ ad seçməmisiniz")}</p>
             </div>
           ) : (
             favorites.map(f => <NameRow key={f.name} n={f} />)
@@ -204,7 +205,7 @@ const NameVotingScreen: React.FC<NameVotingScreenProps> = ({ onBack }) => {
           {matches.length === 0 ? (
             <div className="flex flex-col items-center py-16 text-center">
               <Users className="w-12 h-12 text-muted-foreground/30 mb-3" />
-              <p className="text-sm font-medium">Hələ match yoxdur</p>
+              <p className="text-sm font-medium">{tr("namevotingscreen_hele_match_yoxdur_ad5fb8", "Hələ match yoxdur")}</p>
               <p className="text-xs text-muted-foreground mt-1 max-w-xs">
                 Hər ikiniz eyni adı bəyəndikdə burada görünəcək
               </p>

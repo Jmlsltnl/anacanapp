@@ -23,10 +23,10 @@ interface NutritionProps {
 
 // Fallback meal types
 const fallbackMealTypes = [
-  { meal_id: 'breakfast', name: 'Səhər yeməyi', name_az: 'Səhər yeməyi', emoji: '🍳', time_range: '07:00 - 09:00' },
+  { meal_id: 'breakfast', name: tr("nutrition_seher_yemeyi_b82929", "Səhər yeməyi"), name_az: 'Səhər yeməyi', emoji: '🍳', time_range: '07:00 - 09:00' },
   { meal_id: 'lunch', name: 'Nahar', name_az: 'Nahar', emoji: '🍲', time_range: '12:00 - 14:00' },
-  { meal_id: 'dinner', name: 'Şam yeməyi', name_az: 'Şam yeməyi', emoji: '🍽️', time_range: '18:00 - 20:00' },
-  { meal_id: 'snack', name: 'Qəlyanaltı', name_az: 'Qəlyanaltı', emoji: '🍎', time_range: 'İstənilən vaxt' },
+  { meal_id: 'dinner', name: tr("nutrition_sam_yemeyi_6002e9", "Şam yeməyi"), name_az: 'Şam yeməyi', emoji: '🍽️', time_range: '18:00 - 20:00' },
+  { meal_id: 'snack', name: tr("nutrition_qelyanalti_42fb71", "Qəlyanaltı"), name_az: 'Qəlyanaltı', emoji: '🍎', time_range: 'İstənilən vaxt' },
 ];
 
 // Fallback targets
@@ -39,9 +39,9 @@ const fallbackTargets = {
 // Common foods will be fetched from DB, fallback for loading
 const fallbackFoods = [
   { name: 'Yumurta', calories: 78, emoji: '🥚' },
-  { name: 'Çörək (1 dilim)', calories: 80, emoji: '🍞' },
+  { name: tr("nutrition_corek_1_dilim_6ad54a", "Çörək (1 dilim)"), calories: 80, emoji: '🍞' },
   { name: 'Pendir', calories: 113, emoji: '🧀' },
-  { name: 'Süd (1 stəkan)', calories: 150, emoji: '🥛' },
+  { name: tr("nutrition_sud_1_stekan_45357d", "Süd (1 stəkan)"), calories: 150, emoji: '🥛' },
 ];
 
 // Icon mapping for meal types
@@ -196,7 +196,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
           <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20">
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-white/70 text-xs">Bu yemək</p>
+                <p className="text-white/70 text-xs">{tr("nutrition_bu_yemek_be47dc", "Bu yemək")}</p>
                 <p className="text-xl font-black text-white">{mealCalories} kal</p>
               </div>
               <div className="text-white/70 text-xs">
@@ -210,7 +210,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
           {/* Added foods */}
           {mealLogs.length > 0 && (
             <div className="bg-card rounded-xl p-3 shadow-card border border-border/50">
-              <h3 className="font-semibold mb-2 text-sm">Əlavə edilən qidalar</h3>
+              <h3 className="font-semibold mb-2 text-sm">{tr("nutrition_elave_edilen_qidalar_c604e8", "Əlavə edilən qidalar")}</h3>
               <div className="space-y-1.5">
                 {mealLogs.map((log) => (
                   <motion.div
@@ -238,7 +238,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
 
           {/* Quick add foods */}
           <div className="bg-card rounded-xl p-3 shadow-card border border-border/50">
-            <h3 className="font-semibold mb-2 text-sm">Tez əlavə et</h3>
+            <h3 className="font-semibold mb-2 text-sm">{tr("nutrition_tez_elave_et_5c2127", "Tez əlavə et")}</h3>
             <div className="grid grid-cols-4 gap-1.5">
               {commonFoods.map((food, index) => (
                 <motion.button
@@ -265,7 +265,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
             whileTap={{ scale: 0.98 }}
           >
             <Plus className="w-4 h-4" />
-            <span className="font-medium">Xüsusi qida əlavə et</span>
+            <span className="font-medium">{tr("nutrition_xususi_qida_elave_et_2a3838", "Xüsusi qida əlavə et")}</span>
           </motion.button>
         </div>
 
@@ -288,7 +288,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                 onClick={e => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-base font-bold">Xüsusi qida əlavə et</h2>
+                  <h2 className="text-base font-bold">{tr("nutrition_xususi_qida_elave_et_2a3838", "Xüsusi qida əlavə et")}</h2>
                   <button onClick={() => setShowAddModal(false)}>
                     <X className="w-5 h-5" />
                   </button>
@@ -296,7 +296,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
 
                 <div className="space-y-3">
                   <div>
-                    <label className="text-xs text-muted-foreground mb-1 block">Qida adı</label>
+                    <label className="text-xs text-muted-foreground mb-1 block">{tr("nutrition_qida_adi_d6a129", "Qida adı")}</label>
                     <Input
                       value={customFood.name}
                       onChange={e => setCustomFood({ ...customFood, name: e.target.value })}
@@ -360,7 +360,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
         <div className="bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl p-4 text-white">
           <div className="flex justify-between items-center mb-3">
             <div>
-              <p className="text-white/70 text-xs font-medium">Bugünkü kalori</p>
+              <p className="text-white/70 text-xs font-medium">{tr("nutrition_bugunku_kalori_33554f", "Bugünkü kalori")}</p>
               <p className="text-2xl font-bold">
                 {todayCalories} <span className="text-sm font-normal">/ {targets.calories}</span>
               </p>
@@ -414,7 +414,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
               exit={{ opacity: 0, x: 20 }}
               className="space-y-2"
             >
-              <h2 className="font-bold text-sm">Bugünkü yeməklər</h2>
+              <h2 className="font-bold text-sm">{tr("nutrition_bugunku_yemekler_25c273", "Bugünkü yeməklər")}</h2>
               {mealTypes.map((meal, index) => {
                 const mealLogs = getMealsByType(meal.id);
                 const mealCalories = stats.mealCalories[meal.id as keyof typeof stats.mealCalories] || 0;
@@ -465,7 +465,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
             >
               <div className="flex items-center gap-2 mb-1">
                 <Star className="w-4 h-4 text-amber-500" />
-                <h2 className="font-bold text-sm">Tövsiyə olunan qidalar</h2>
+                <h2 className="font-bold text-sm">{tr("nutrition_tovsiye_olunan_qidalar_5d52f5", "Tövsiyə olunan qidalar")}</h2>
               </div>
               <p className="text-xs text-muted-foreground mb-2">
                 {lifeStage === 'bump' ? 'Hamiləlik dövründə faydalı qidalar' :
@@ -476,7 +476,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
               {nutritionTips.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-4xl mb-3">🥗</div>
-                  <p className="text-muted-foreground text-sm">Tövsiyə tapılmadı</p>
+                  <p className="text-muted-foreground text-sm">{tr("nutrition_tovsiye_tapilmadi_facebb", "Tövsiyə tapılmadı")}</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-2">
@@ -525,7 +525,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                 <h2 className="text-3xl font-black text-foreground mb-1">
                   {waterGlasses} / {targets.water}
                 </h2>
-                <p className="text-muted-foreground text-sm mb-4">stəkan su içdiniz</p>
+                <p className="text-muted-foreground text-sm mb-4">{tr("nutrition_stekan_su_icdiniz_a26973", "stəkan su içdiniz")}</p>
                 
                 <div className="flex flex-wrap justify-center gap-1.5 mb-4">
                   {Array.from({ length: targets.water }).map((_, i) => (
@@ -557,7 +557,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
               </div>
 
               <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
-                <h3 className="font-bold text-blue-800 dark:text-blue-300 mb-1 text-sm">💡 Məsləhət</h3>
+                <h3 className="font-bold text-blue-800 dark:text-blue-300 mb-1 text-sm">{tr("nutrition_meslehet_f594cf", "💡 Məsləhət")}</h3>
                 <p className="text-xs text-blue-700 dark:text-blue-400">
                   {lifeStage === 'bump' 
                     ? 'Hamiləlik zamanı gündə ən azı 10 stəkan su içmək tövsiyə olunur. Yetərli su içmək körpənin inkişafına kömək edir.'

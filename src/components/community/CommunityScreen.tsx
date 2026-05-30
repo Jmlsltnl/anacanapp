@@ -107,7 +107,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
               </motion.button>
             )}
             <div className="flex-1">
-              <h1 className="text-[22px] font-black text-foreground tracking-tight leading-none">Cəmiyyət</h1>
+              <h1 className="text-[22px] font-black text-foreground tracking-tight leading-none">{tr("communityscreen_cemiyyet_2dc44d", "Cəmiyyət")}</h1>
               <p className="text-[11px] text-muted-foreground/50 mt-1 font-medium">{headerText}</p>
             </div>
             <motion.button
@@ -165,7 +165,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/15 to-accent/10 flex items-center justify-center flex-shrink-0">
             <Pen className="w-4 h-4 text-primary" />
           </div>
-          <span className="text-[14px] text-muted-foreground/40 font-medium">Nə düşünürsünüz?</span>
+          <span className="text-[14px] text-muted-foreground/40 font-medium">{tr("communityscreen_ne_dusunursunuz_0378b3", "Nə düşünürsünüz?")}</span>
         </motion.button>
       </div>
 
@@ -183,7 +183,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
         transition={{ type: 'spring', stiffness: 400, damping: 20 }}
       >
         <Pen className="w-4 h-4 text-primary-foreground" strokeWidth={2.5} />
-        <span className="text-[12px] font-bold text-primary-foreground">Paylaş</span>
+        <span className="text-[12px] font-bold text-primary-foreground">{tr("communityscreen_paylas_b4be3b", "Paylaş")}</span>
       </motion.button>
     </div>
   );

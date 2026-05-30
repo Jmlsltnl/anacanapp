@@ -1,4 +1,5 @@
 // Anacan Type Definitions
+import { tr } from '@/lib/tr';
 
 export type LifeStage = 'flow' | 'bump' | 'mommy' | 'partner';
 
@@ -91,24 +92,24 @@ export interface Tool {
 }
 
 export const SYMPTOMS = [
-  { id: 'headache', label: 'Baş ağrısı', icon: '🤕' },
-  { id: 'cramps', label: 'Sancı', icon: '😣' },
-  { id: 'bloating', label: 'Şişkinlik', icon: '🫄' },
-  { id: 'fatigue', label: 'Yorğunluq', icon: '😴' },
-  { id: 'mood_swings', label: 'Əhval dəyişikliyi', icon: '🎭' },
-  { id: 'nausea', label: 'Ürək bulanması', icon: '🤢' },
-  { id: 'back_pain', label: 'Bel ağrısı', icon: '🔙' },
-  { id: 'breast_tenderness', label: 'Döş həssaslığı', icon: '💗' },
-  { id: 'acne', label: 'Sızanaq', icon: '😖' },
-  { id: 'cravings', label: 'İştah', icon: '🍫' },
+  { id: 'headache', label: tr("anacan_bas_agrisi_ff6f4c", "Baş ağrısı"), icon: '🤕' },
+  { id: 'cramps', label: tr("anacan_sanci_350c2d", "Sancı"), icon: '😣' },
+  { id: 'bloating', label: tr("anacan_siskinlik_7c7923", "Şişkinlik"), icon: '🫄' },
+  { id: 'fatigue', label: tr("anacan_yorgunluq_c68d62", "Yorğunluq"), icon: '😴' },
+  { id: 'mood_swings', label: tr("anacan_ehval_deyisikliyi_9fa36f", "Əhval dəyişikliyi"), icon: '🎭' },
+  { id: 'nausea', label: tr("anacan_urek_bulanmasi_e8f29d", "Ürək bulanması"), icon: '🤢' },
+  { id: 'back_pain', label: tr("anacan_bel_agrisi_9e824e", "Bel ağrısı"), icon: '🔙' },
+  { id: 'breast_tenderness', label: tr("anacan_dos_hessasligi_326b6d", "Döş həssaslığı"), icon: '💗' },
+  { id: 'acne', label: tr("anacan_sizanaq_0b0664", "Sızanaq"), icon: '😖' },
+  { id: 'cravings', label: tr("anacan_istah_54578a", "İştah"), icon: '🍫' },
 ];
 
 export const MOODS = [
-  { value: 1, label: 'Çox pis', emoji: '😢' },
+  { value: 1, label: tr("anacan_cox_pis_e041c5", "Çox pis"), emoji: '😢' },
   { value: 2, label: 'Pis', emoji: '😔' },
   { value: 3, label: 'Normal', emoji: '😐' },
-  { value: 4, label: 'Yaxşı', emoji: '😊' },
-  { value: 5, label: 'Əla', emoji: '🥰' },
+  { value: 4, label: tr("anacan_yaxsi_9d8595", "Yaxşı"), emoji: '😊' },
+  { value: 5, label: tr("anacan_ela_720a0e", "Əla"), emoji: '🥰' },
 ];
 
 export const FRUIT_SIZES: Record<number, { fruit: string; emoji: string; lengthCm: number; weightG: number }> = {

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { useAllDevelopmentTips, useDevelopmentTipsMutations, DevelopmentTip } from '@/hooks/useDevelopmentTips';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,9 +11,9 @@ import { Plus, Trash2, Save, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 const AGE_GROUPS = [
-  { value: 'newborn', label: 'Yenidoğan (0-3 ay)' },
-  { value: 'infant', label: 'Körpə (3-6 ay)' },
-  { value: 'older', label: 'Böyük (6+ ay)' },
+  { value: 'newborn', label: tr("admindevelopmenttips_yenidogan_0_3_ay_267ade", "Yenidoğan (0-3 ay)") },
+  { value: 'infant', label: tr("admindevelopmenttips_korpe_3_6_ay_a4695a", "Körpə (3-6 ay)") },
+  { value: 'older', label: tr("admindevelopmenttips_boyuk_6_ay_5bd3b1", "Böyük (6+ ay)") },
 ];
 
 const EMOJIS = ['👁️', '🎵', '🤲', '🧸', '📖', '🎶', '🥣', '🚶', '🗣️', '💪', '🌟', '❤️'];
@@ -69,7 +70,7 @@ const AdminDevelopmentTips = () => {
     setFormData({});
   };
 
-  if (isLoading) return <div className="p-4">Yüklənir...</div>;
+  if (isLoading) return <div className="p-4">{tr("admindevelopmenttips_yuklenir_5557de", "Yüklənir...")}</div>;
 
   // Group by age_group
   const grouped = tips.reduce((acc, tip) => {
@@ -81,7 +82,7 @@ const AdminDevelopmentTips = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">İnkişaf Tövsiyələri</h2>
+        <h2 className="text-2xl font-bold">{tr("admindevelopmenttips_inkisaf_tovsiyeleri_9f473e", "İnkişaf Tövsiyələri")}</h2>
         <Button onClick={handleCreate} size="sm">
           <Plus className="w-4 h-4 mr-2" />
           Yeni
@@ -115,7 +116,7 @@ const AdminDevelopmentTips = () => {
                       <Input
                         value={formData.title_az ?? tip.title_az ?? ''}
                         onChange={(e) => setFormData({ ...formData, title_az: e.target.value })}
-                        placeholder="Başlıq (AZ)"
+                        placeholder={tr("admindevelopmenttips_basliq_az_3e294a", "Başlıq (AZ)")}
                         className="flex-1"
                       />
                       <Select
@@ -135,7 +136,7 @@ const AdminDevelopmentTips = () => {
                     <Textarea
                       value={formData.content_az ?? tip.content_az ?? ''}
                       onChange={(e) => setFormData({ ...formData, content_az: e.target.value })}
-                      placeholder="Mətn (AZ)"
+                      placeholder={tr("admindevelopmenttips_metn_az_0aaa4b", "Mətn (AZ)")}
                       rows={2}
                     />
                     <div className="flex gap-2">
@@ -144,7 +145,7 @@ const AdminDevelopmentTips = () => {
                         value={formData.sort_order ?? tip.sort_order}
                         onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) })}
                         className="w-20"
-                        placeholder="Sıra"
+                        placeholder={tr("admindevelopmenttips_sira_421c5f", "Sıra")}
                       />
                       <Button size="sm" onClick={() => handleUpdate(tip.id)}>
                         <Save className="w-4 h-4 mr-1" />

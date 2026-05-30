@@ -166,14 +166,14 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
           <motion.button onClick={onBack} className="w-9 h-9 rounded-full bg-muted/40 flex items-center justify-center" whileTap={{ scale: 0.9 }}>
             <ArrowLeft className="w-4 h-4 text-foreground" />
           </motion.button>
-          <h1 className="text-[15px] font-black text-foreground">Yeni Paylaşım</h1>
+          <h1 className="text-[15px] font-black text-foreground">{tr("createpostscreen_yeni_paylasim_4f5b15", "Yeni Paylaşım")}</h1>
           <Button
             onClick={handleSubmit}
             disabled={!canSubmit}
             size="sm"
             className="h-8 px-4 rounded-full gradient-primary text-[12px] font-bold shadow-sm shadow-primary/20 disabled:opacity-40"
           >
-            {isUploading || createPost.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <><Send className="w-3.5 h-3.5 mr-1" />Paylaş</>}
+            {isUploading || createPost.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <><Send className="w-3.5 h-3.5 mr-1" />{tr("createpostscreen_paylas_b4be3b", "Paylaş")}</>}
           </Button>
         </div>
       </div>
@@ -186,7 +186,7 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
             <SelectValue placeholder={tr("createpostscreen_qrup_secin_8e26b9", "Qrup seçin")} />
           </SelectTrigger>
           <SelectContent className="bg-popover border-border z-[100] rounded-xl">
-            <SelectItem value="public">🌍 Ümumi</SelectItem>
+            <SelectItem value="public">{tr("createpostscreen_umumi_794727", "🌍 Ümumi")}</SelectItem>
             {groups.map((group) => (
               <SelectItem key={group.id} value={group.id}>{group.icon_emoji || '👥'} {group.name}</SelectItem>
             ))}
@@ -273,7 +273,7 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
 
         {/* Media Actions */}
         <div className="flex items-center gap-3">
-          <span className="text-[11px] text-muted-foreground/40 font-medium">Əlavə et:</span>
+          <span className="text-[11px] text-muted-foreground/40 font-medium">{tr("createpostscreen_elave_et_81035a", "Əlavə et:")}</span>
           <button onClick={() => imageInputRef.current?.click()} disabled={mediaFiles.length >= 4 || isUploading}
             className="w-10 h-10 rounded-full bg-primary/6 flex items-center justify-center disabled:opacity-40 transition-colors active:bg-primary/12">
             <Image className="w-4.5 h-4.5 text-primary/60" />
@@ -297,8 +297,8 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
             <EyeOff className="w-4 h-4" />
           </div>
           <div className="flex-1 text-left">
-            <p className={`text-[12px] font-bold ${isAnonymous ? 'text-primary' : 'text-foreground'}`}>Anonim paylaş</p>
-            <p className="text-[10px] text-muted-foreground/40">Adınız və şəkliniz gizlədilir</p>
+            <p className={`text-[12px] font-bold ${isAnonymous ? 'text-primary' : 'text-foreground'}`}>{tr("createpostscreen_anonim_paylas_6074c9", "Anonim paylaş")}</p>
+            <p className="text-[10px] text-muted-foreground/40">{tr("createpostscreen_adiniz_ve_sekliniz_gizledilir_6fc767", "Adınız və şəkliniz gizlədilir")}</p>
           </div>
           <div className={`w-10 h-6 rounded-full transition-colors ${isAnonymous ? 'bg-primary' : 'bg-border/50'}`}>
             <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform mt-0.5 ${isAnonymous ? 'ml-[18px]' : 'ml-0.5'}`} />

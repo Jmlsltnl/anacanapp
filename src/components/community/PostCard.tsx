@@ -218,7 +218,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
           <div className="px-4 pb-3 space-y-2">
             <Textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} className="min-h-[70px] rounded-xl resize-none text-[13px] bg-muted/10 border-border/15" autoFocus />
             <div className="flex gap-1.5 justify-end">
-              <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="rounded-lg text-[11px] h-7 px-3">Ləğv et</Button>
+              <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="rounded-lg text-[11px] h-7 px-3">{tr("postcard_legv_et_b5e49c", "Ləğv et")}</Button>
               <Button size="sm" onClick={handleEditPost} disabled={!editContent.trim() || editPost.isPending} className="gradient-primary rounded-lg text-[11px] h-7 px-4">
                 {editPost.isPending ? '...' : 'Saxla'}
               </Button>
@@ -305,7 +305,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
                     <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
                   </div>
                 ) : topLevelComments.length === 0 ? (
-                  <p className="text-center py-5 text-[11px] text-muted-foreground/30 font-medium">Hələ şərh yoxdur 💭</p>
+                  <p className="text-center py-5 text-[11px] text-muted-foreground/30 font-medium">{tr("postcard_hele_serh_yoxdur_89ce09", "Hələ şərh yoxdur 💭")}</p>
                 ) : (
                   <div className="space-y-2">
                     {topLevelComments.map((comment) => (
@@ -323,13 +323,13 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
       <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
         <DialogContent className="sm:max-w-md max-w-[90vw] rounded-2xl">
           <DialogHeader>
-            <DialogTitle className="text-sm">Postu Şikayət Et</DialogTitle>
-            <DialogDescription className="text-xs">Bu postun niyə uyğunsuz olduğunu bildirin</DialogDescription>
+            <DialogTitle className="text-sm">{tr("postcard_postu_sikayet_et_fd45d9", "Postu Şikayət Et")}</DialogTitle>
+            <DialogDescription className="text-xs">{tr("postcard_bu_postun_niye_uygunsuz_oldugunu_bildiri_b86b7c", "Bu postun niyə uyğunsuz olduğunu bildirin")}</DialogDescription>
           </DialogHeader>
           <Textarea value={reportReason} onChange={(e) => setReportReason(e.target.value)} placeholder={tr("postcard_sikayet_sebebi_a49b6b", "Şikayət səbəbi...")} className="rounded-xl text-sm" />
           <div className="flex gap-2 justify-end">
-            <Button variant="outline" onClick={() => setShowReportDialog(false)} className="rounded-lg text-xs h-8">Ləğv et</Button>
-            <Button onClick={handleReportPost} className="gradient-primary rounded-lg text-xs h-8">Göndər</Button>
+            <Button variant="outline" onClick={() => setShowReportDialog(false)} className="rounded-lg text-xs h-8">{tr("postcard_legv_et_b5e49c", "Ləğv et")}</Button>
+            <Button onClick={handleReportPost} className="gradient-primary rounded-lg text-xs h-8">{tr("postcard_gonder_3f11bd", "Göndər")}</Button>
           </div>
         </DialogContent>
       </Dialog>

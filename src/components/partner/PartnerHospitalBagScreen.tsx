@@ -98,7 +98,7 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
             <button onClick={onBack} className="p-2 -ml-2 rounded-full hover:bg-muted">
               <ArrowLeft className="w-6 h-6" />
             </button>
-            <h1 className="text-lg font-bold">Xəstəxana Çantası</h1>
+            <h1 className="text-lg font-bold">{tr("partnerhospitalbagscreen_xestexana_cantasi_045078", "Xəstəxana Çantası")}</h1>
             <div className="w-10" />
           </div>
         </div>
@@ -124,7 +124,7 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
           <button onClick={onBack} className="p-2 -ml-2 rounded-full hover:bg-muted">
             <ArrowLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-lg font-bold">Xəstəxana Çantası</h1>
+          <h1 className="text-lg font-bold">{tr("partnerhospitalbagscreen_xestexana_cantasi_045078", "Xəstəxana Çantası")}</h1>
           <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
             <DialogTrigger asChild>
               <Button size="icon" variant="ghost">
@@ -133,7 +133,7 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Əşya əlavə et</DialogTitle>
+                <DialogTitle>{tr("partnerhospitalbagscreen_esya_elave_et_79e28e", "Əşya əlavə et")}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 pt-4">
                 <Input
@@ -149,9 +149,9 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="mom">Ana üçün</SelectItem>
-                    <SelectItem value="baby">Körpə üçün</SelectItem>
-                    <SelectItem value="documents">Sənədlər</SelectItem>
+                    <SelectItem value="mom">{tr("partnerhospitalbagscreen_ana_ucun_8f885e", "Ana üçün")}</SelectItem>
+                    <SelectItem value="baby">{tr("partnerhospitalbagscreen_korpe_ucun_27c058", "Körpə üçün")}</SelectItem>
+                    <SelectItem value="documents">{tr("partnerhospitalbagscreen_senedler_d60b5e", "Sənədlər")}</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button 
@@ -172,7 +172,7 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
       <div className="p-4">
         <div className="bg-card rounded-2xl p-4 border border-border">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium">Hazırlıq</span>
+            <span className="text-sm font-medium">{tr("partnerhospitalbagscreen_hazirliq_23905c", "Hazırlıq")}</span>
             <span className="text-sm text-muted-foreground">
               {checkedCount} / {totalCount}
             </span>
@@ -193,11 +193,11 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
           </TabsTrigger>
           <TabsTrigger value="baby" className="flex items-center gap-1">
             <Baby className="w-4 h-4" />
-            <span className="hidden sm:inline">Körpə</span>
+            <span className="hidden sm:inline">{tr("partnerhospitalbagscreen_korpe_fa2b51", "Körpə")}</span>
           </TabsTrigger>
           <TabsTrigger value="documents" className="flex items-center gap-1">
             <FileText className="w-4 h-4" />
-            <span className="hidden sm:inline">Sənəd</span>
+            <span className="hidden sm:inline">{tr("partnerhospitalbagscreen_sened_424b86", "Sənəd")}</span>
           </TabsTrigger>
         </TabsList>
 

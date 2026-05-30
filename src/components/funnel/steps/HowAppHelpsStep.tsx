@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { Button } from '@/components/ui/button';
 import { Crown } from 'lucide-react';
 import type { SymptomMapping } from '../funnelData';
@@ -12,8 +13,8 @@ export default function HowAppHelpsStep({ mappings, onContinue }: HowAppHelpsSte
   return (
     <div className="flex flex-col min-h-full px-6 py-8">
       <div className="flex-1">
-        <h2 className="text-xl font-bold text-foreground text-center mb-2">Anacan Necə Kömək Edir?</h2>
-        <p className="text-sm text-muted-foreground text-center mb-6">Hər problemə fərdi həll</p>
+        <h2 className="text-xl font-bold text-foreground text-center mb-2">{tr("howapphelpsstep_anacan_nece_komek_edir_a6ab1a", "Anacan Necə Kömək Edir?")}</h2>
+        <p className="text-sm text-muted-foreground text-center mb-6">{tr("howapphelpsstep_her_probleme_ferdi_hell_97e2f5", "Hər problemə fərdi həll")}</p>
 
         <div className="space-y-3">
           {mappings.map((m, i) => (

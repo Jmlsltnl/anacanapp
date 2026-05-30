@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,8 +23,8 @@ interface ForceUpdateConfig {
 const defaultConfig: ForceUpdateConfig = {
   enabled: false,
   min_version: '1.0.0',
-  title: 'Yeniləmə tələb olunur',
-  message: 'Tətbiqin yeni versiyası mövcuddur. Davam etmək üçün tətbiqi yeniləyin.',
+  title: tr("adminforceupdate_yenileme_teleb_olunur_45d7d7", "Yeniləmə tələb olunur"),
+  message: tr("adminforceupdate_tetbiqin_yeni_versiyasi_movcuddur_davam__d3be89", "Tətbiqin yeni versiyası mövcuddur. Davam etmək üçün tətbiqi yeniləyin."),
   android_url: 'https://play.google.com/store/apps/details?id=com.atlasoon.anacan',
   ios_url: 'https://apps.apple.com/app/anacan/id6745406124',
 };
@@ -62,7 +63,7 @@ const AdminForceUpdate = () => {
 
   const update = (patch: Partial<ForceUpdateConfig>) => setForm({ ...current, ...patch });
 
-  if (isLoading) return <div className="p-4 text-muted-foreground">Yüklənir...</div>;
+  if (isLoading) return <div className="p-4 text-muted-foreground">{tr("adminforceupdate_yuklenir_5557de", "Yüklənir...")}</div>;
 
   return (
     <div className="space-y-6">
@@ -99,7 +100,7 @@ const AdminForceUpdate = () => {
           </div>
 
           <div className="space-y-2">
-            <Label>Başlıq</Label>
+            <Label>{tr("adminforceupdate_basliq_e1f6c5", "Başlıq")}</Label>
             <Input
               value={current.title}
               onChange={(e) => update({ title: e.target.value })}

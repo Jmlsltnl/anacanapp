@@ -66,7 +66,7 @@ const PartnerQuickStats = () => {
         </motion.div>
         
         <div className="flex-1">
-          <p className="text-white/70 text-xs font-medium">Partner Səviyyəsi</p>
+          <p className="text-white/70 text-xs font-medium">{tr("partnerquickstats_partner_seviyyesi_9a38f6", "Partner Səviyyəsi")}</p>
           <h3 className="text-white text-2xl font-black">Səviyyə {stats.level}</h3>
         </div>
         

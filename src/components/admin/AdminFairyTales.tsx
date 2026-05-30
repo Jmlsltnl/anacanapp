@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { BookHeart, Plus, Edit, Trash2, Save, X, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -77,10 +78,10 @@ const AdminFairyTales = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-fairy-tale-themes'] });
       setEditingTheme(null);
       setNewTheme(false);
-      toast({ title: 'Tema yadda saxlanıldı' });
+      toast({ title: tr("adminfairytales_tema_yadda_saxlanildi_b505df", "Tema yadda saxlanıldı") });
     },
     onError: () => {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("adminfairytales_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     },
   });
 
@@ -127,7 +128,7 @@ const AdminFairyTales = () => {
         <Card>
           <CardContent className="p-4">
             <div className="text-2xl font-bold text-indigo-500">{talesStats?.totalTales || 0}</div>
-            <p className="text-sm text-muted-foreground">Yaradılmış Nağıllar</p>
+            <p className="text-sm text-muted-foreground">{tr("adminfairytales_yaradilmis_nagillar_80b7b7", "Yaradılmış Nağıllar")}</p>
           </CardContent>
         </Card>
         <Card>
@@ -156,7 +157,7 @@ const AdminFairyTales = () => {
 
       {/* Themes List */}
       {isLoading ? (
-        <div className="text-center py-8">Yüklənir...</div>
+        <div className="text-center py-8">{tr("adminfairytales_yuklenir_5557de", "Yüklənir...")}</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {themes.map((theme, index) => (
@@ -220,7 +221,7 @@ const AdminFairyTales = () => {
 
       <AdminUsageStats 
         eventNames={['fairy_tale_generated']}
-        title="📖 Nağıl Generatoru İstifadə Statistikası"
+        title={tr("adminfairytales_nagil_generatoru_istifade_statistikasi_b567b1", "📖 Nağıl Generatoru İstifadə Statistikası")}
         showEventData
         showUsers
       />
@@ -263,21 +264,21 @@ const ThemeForm = ({ theme, onSave, onCancel, isLoading }: ThemeFormProps) => {
           <Input 
             value={form.name_az} 
             onChange={(e) => setForm({ ...form, name_az: e.target.value })}
-            placeholder="Meşə Macərası"
+            placeholder={tr("adminfairytales_mese_macerasi_6112a8", "Meşə Macərası")}
           />
         </div>
       </div>
       
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium">Təsvir (EN)</label>
+          <label className="text-sm font-medium">{tr("adminfairytales_tesvir_en_c64521", "Təsvir (EN)")}</label>
           <Textarea 
             value={form.description} 
             onChange={(e) => setForm({ ...form, description: e.target.value })}
           />
         </div>
         <div>
-          <label className="text-sm font-medium">Təsvir (AZ)</label>
+          <label className="text-sm font-medium">{tr("adminfairytales_tesvir_az_2c237a", "Təsvir (AZ)")}</label>
           <Textarea 
             value={form.description_az} 
             onChange={(e) => setForm({ ...form, description_az: e.target.value })}
@@ -294,7 +295,7 @@ const ThemeForm = ({ theme, onSave, onCancel, isLoading }: ThemeFormProps) => {
           />
         </div>
         <div>
-          <label className="text-sm font-medium">Sıra</label>
+          <label className="text-sm font-medium">{tr("adminfairytales_sira_421c5f", "Sıra")}</label>
           <Input 
             type="number"
             value={form.sort_order} 

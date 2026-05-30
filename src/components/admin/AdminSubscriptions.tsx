@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Search, Crown, User, Calendar, MoreHorizontal, Check, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -52,7 +53,7 @@ const AdminSubscriptions = () => {
       .order('created_at', { ascending: false });
 
     if (error) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminsubscriptions_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } else {
       setUsers(data || []);
     }
@@ -92,9 +93,9 @@ const AdminSubscriptions = () => {
       .eq('id', selectedUser.id);
 
     if (error) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminsubscriptions_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: 'Uğurlu', description: `${selectedUser.name} üçün Premium aktivləşdirildi` });
+      toast({ title: tr("adminsubscriptions_ugurlu_7fe64c", "Uğurlu"), description: `${selectedUser.name} üçün Premium aktivləşdirildi` });
       setShowModal(false);
       setSelectedUser(null);
       fetchUsers();
@@ -114,9 +115,9 @@ const AdminSubscriptions = () => {
       .eq('id', user.id);
 
     if (error) {
-      toast({ title: 'Xəta', description: error.message, variant: 'destructive' });
+      toast({ title: tr("adminsubscriptions_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: 'Uğurlu', description: `${user.name} üçün Premium ləğv edildi` });
+      toast({ title: tr("adminsubscriptions_ugurlu_7fe64c", "Uğurlu"), description: `${user.name} üçün Premium ləğv edildi` });
       fetchUsers();
     }
   };
@@ -139,7 +140,7 @@ const AdminSubscriptions = () => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Crown className="w-6 h-6 text-amber-500" />
-          <h1 className="text-2xl font-bold">Abunəlik İdarəetməsi</h1>
+          <h1 className="text-2xl font-bold">{tr("adminsubscriptions_abunelik_idareetmesi_3d3c6c", "Abunəlik İdarəetməsi")}</h1>
         </div>
       </div>
 
@@ -151,7 +152,7 @@ const AdminSubscriptions = () => {
               <User className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Ümumi</p>
+              <p className="text-sm text-muted-foreground">{tr("adminsubscriptions_umumi_1b5521", "Ümumi")}</p>
               <p className="text-2xl font-bold">{users.length}</p>
             </div>
           </div>
@@ -187,7 +188,7 @@ const AdminSubscriptions = () => {
           <Input 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="İstifadəçi axtar..."
+            placeholder={tr("adminsubscriptions_istifadeci_axtar_4c82f8", "İstifadəçi axtar...")}
             className="pl-10"
           />
         </div>
@@ -271,7 +272,7 @@ const AdminSubscriptions = () => {
       <Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Premium Aktivləşdir</DialogTitle>
+            <DialogTitle>{tr("adminsubscriptions_premium_aktivlesdir_b95d85", "Premium Aktivləşdir")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <p className="text-muted-foreground">
@@ -284,8 +285,8 @@ const AdminSubscriptions = () => {
               <SelectContent>
                 <SelectItem value="1_month">1 Ay</SelectItem>
                 <SelectItem value="3_months">3 Ay</SelectItem>
-                <SelectItem value="1_year">1 İl</SelectItem>
-                <SelectItem value="lifetime">Ömürlük</SelectItem>
+                <SelectItem value="1_year">{tr("adminsubscriptions_1_il_edbac9", "1 İl")}</SelectItem>
+                <SelectItem value="lifetime">{tr("adminsubscriptions_omurluk_988e77", "Ömürlük")}</SelectItem>
               </SelectContent>
             </Select>
             <div className="flex gap-3">
@@ -303,7 +304,7 @@ const AdminSubscriptions = () => {
 
       <AdminUsageStats 
         eventNames={['premium_subscribed', 'premium_cancelled', 'premium_paywall_shown', 'premium_paywall_clicked']}
-        title="👑 Premium Statistikası"
+        title={tr("adminsubscriptions_premium_statistikasi_059afd", "👑 Premium Statistikası")}
         showEventData
         showUsers
       />

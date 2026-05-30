@@ -105,7 +105,7 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center animate-pulse">
             <BookOpen className="w-8 h-8 text-white" />
           </div>
-          <p className="text-muted-foreground">Məqalələr yüklənir...</p>
+          <p className="text-muted-foreground">{tr("blogscreen_meqaleler_yuklenir_3f3d01", "Məqalələr yüklənir...")}</p>
         </div>
       </div>
     );
@@ -238,7 +238,7 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
                 <Star className="w-4 h-4 text-white" />
               </div>
-              <h2 className="font-bold text-foreground">Önə Çıxan</h2>
+              <h2 className="font-bold text-foreground">{tr("blogscreen_one_cixan_648e68", "Önə Çıxan")}</h2>
               <TrendingUp className="w-4 h-4 text-amber-500" />
             </div>
             

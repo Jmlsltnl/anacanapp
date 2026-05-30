@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { Button } from '@/components/ui/button';
 
 interface CustomPlanStepProps {
@@ -14,7 +15,7 @@ export default function CustomPlanStep({ userName, milestones, onContinue }: Cus
         <h2 className="text-xl font-bold text-foreground text-center mb-1">
           {userName}, sizin üçün hazırladığımız plan
         </h2>
-        <p className="text-sm text-muted-foreground text-center mb-10">Fərdi yol xəritəniz</p>
+        <p className="text-sm text-muted-foreground text-center mb-10">{tr("customplanstep_ferdi_yol_xeriteniz_bb96ed", "Fərdi yol xəritəniz")}</p>
 
         {/* Visual roadmap */}
         <div className="relative pl-8">
@@ -47,7 +48,7 @@ export default function CustomPlanStep({ userName, milestones, onContinue }: Cus
         {/* Progress visualization */}
         <div className="mt-8 bg-card rounded-2xl border border-border p-4">
           <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-            <span>İndi 😟</span>
+            <span>{tr("customplanstep_indi_a5d6f3", "İndi 😟")}</span>
             <span>3 ay sonra 😌</span>
           </div>
           <div className="h-3 bg-muted rounded-full overflow-hidden">

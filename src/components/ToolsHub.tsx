@@ -141,19 +141,30 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   };
 
   // Build tools from DB configs
+  const language = useUserStore(state => state.language);
+  const isEn = language === 'en';
   const tools: Tool[] = useMemo(() => {
     if (toolConfigs.length === 0) {
       return [];
     }
     
     return toolConfigs.map(config => {
-      const name = hasPartner && config.requires_partner && config.partner_name_az
+      const azName = hasPartner && config.requires_partner && config.partner_name_az
         ? config.partner_name_az
         : (config as any).display_name_az || config.name_az || config.name;
-      
-      const description = hasPartner && config.requires_partner && config.partner_description_az
+      const enName = hasPartner && config.requires_partner && (config as any).partner_name
+        ? (config as any).partner_name
+        : (config as any).display_name || config.name;
+      const name = isEn ? (enName || azName) : azName;
+
+      const azDescription = hasPartner && config.requires_partner && config.partner_description_az
         ? config.partner_description_az
         : config.description_az || config.description || '';
+      const enDescription = hasPartner && config.requires_partner && (config as any).partner_description
+        ? (config as any).partner_description
+        : config.description || '';
+      const description = isEn ? (enDescription || azDescription) : azDescription;
+
       
       return {
         id: config.tool_id,
@@ -170,7 +181,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         isLocked: getLockedStatus(config),
       };
     });
-  }, [toolConfigs, hasPartner, lifeStage]);
+  }, [toolConfigs, hasPartner, lifeStage, isEn]);
 
   // Set initial tool from props on mount
   useEffect(() => {
@@ -362,7 +373,9 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
           
           return heroTools.map((hero, idx) => {
             const HeroIcon = iconMap[hero.icon] || Wrench;
-            const displayName = hero.display_name_az || hero.name_az || hero.name;
+            const displayName = isEn
+              ? ((hero as any).display_name || hero.name)
+              : (hero.display_name_az || hero.name_az || hero.name);
             
             return (
               <motion.button
@@ -394,7 +407,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
                       )}
                     </div>
                     <h3 className="text-white font-bold text-base">{displayName}</h3>
-                    <p className="text-white/70 text-xs">{hero.hero_subtitle || hero.description_az || ''}</p>
+                    <p className="text-white/70 text-xs">{hero.hero_subtitle || (isEn ? (hero.description || hero.description_az) : hero.description_az) || ''}</p>
                   </div>
                   <ChevronRight className="w-6 h-6 text-white/60" />
                 </div>
@@ -473,7 +486,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
             <div className="w-20 h-20 rounded-3xl bg-muted/50 flex items-center justify-center mx-auto mb-4">
               <Search className="w-10 h-10 text-muted-foreground/50" />
             </div>
-            <p className="font-semibold text-foreground mb-1">Alət tapılmadı</p>
+            <p className="font-semibold text-foreground mb-1">{tr("toolshub_alet_tapilmadi_f358cb", "Alət tapılmadı")}</p>
             <p className="text-sm text-muted-foreground">
               {searchQuery ? `"${searchQuery}" ilə uyğun alət yoxdur` : 'Bu kateqoriyada alət yoxdur'}
             </p>

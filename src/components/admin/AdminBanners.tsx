@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { useAllBanners, useCreateBanner, useUpdateBanner, useDeleteBanner, Banner, BannerPlacement, BannerType, LinkType } from '@/hooks/useBanners';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,25 +14,25 @@ import { toast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2, Image, Layout, Eye, EyeOff, ExternalLink, MousePointer, BarChart3 } from 'lucide-react';
 
 const PLACEMENTS: { value: BannerPlacement; label: string }[] = [
-  { value: 'home_top', label: 'Ana Səhifə - Üst' },
-  { value: 'home_middle', label: 'Ana Səhifə - Orta' },
-  { value: 'home_bottom', label: 'Ana Səhifə - Alt' },
-  { value: 'tools_top', label: 'Alətlər - Üst' },
-  { value: 'tools_bottom', label: 'Alətlər - Alt' },
-  { value: 'profile_top', label: 'Profil - Üst' },
-  { value: 'community_top', label: 'Cəmiyyət - Üst' },
-  { value: 'ai_chat_top', label: 'AI Chat - Üst' }
+  { value: 'home_top', label: tr("adminbanners_ana_sehife_ust_67d37b", "Ana Səhifə - Üst") },
+  { value: 'home_middle', label: tr("adminbanners_ana_sehife_orta_806a99", "Ana Səhifə - Orta") },
+  { value: 'home_bottom', label: tr("adminbanners_ana_sehife_alt_91e4ed", "Ana Səhifə - Alt") },
+  { value: 'tools_top', label: tr("adminbanners_aletler_ust_a0e524", "Alətlər - Üst") },
+  { value: 'tools_bottom', label: tr("adminbanners_aletler_alt_74224f", "Alətlər - Alt") },
+  { value: 'profile_top', label: tr("adminbanners_profil_ust_a0a39d", "Profil - Üst") },
+  { value: 'community_top', label: tr("adminbanners_cemiyyet_ust_c6809f", "Cəmiyyət - Üst") },
+  { value: 'ai_chat_top', label: tr("adminbanners_ai_chat_ust_72c347", "AI Chat - Üst") }
 ];
 
 const BANNER_TYPES: { value: BannerType; label: string }[] = [
   { value: 'native', label: 'Native (Dizayn)' },
-  { value: 'image', label: 'Şəkil' }
+  { value: 'image', label: tr("adminbanners_sekil_43e2e3", "Şəkil") }
 ];
 
 const LINK_TYPES: { value: LinkType; label: string }[] = [
   { value: 'external', label: 'Xarici Link' },
-  { value: 'internal', label: 'Daxili Səhifə' },
-  { value: 'tool', label: 'Alət Açılışı' }
+  { value: 'internal', label: tr("adminbanners_daxili_sehife_763453", "Daxili Səhifə") },
+  { value: 'tool', label: tr("adminbanners_alet_acilisi_c88075", "Alət Açılışı") }
 ];
 
 const DEFAULT_COLORS = [
@@ -100,22 +101,22 @@ const AdminBanners = () => {
 
   const handleSave = async () => {
     if (!formData.title) {
-      toast({ title: 'Başlıq tələb olunur', variant: 'destructive' });
+      toast({ title: tr("adminbanners_basliq_teleb_olunur_097c6f", "Başlıq tələb olunur"), variant: 'destructive' });
       return;
     }
 
     try {
       if (editingBanner) {
         await updateBanner.mutateAsync({ id: editingBanner.id, ...formData });
-        toast({ title: 'Banner yeniləndi' });
+        toast({ title: tr("adminbanners_banner_yenilendi_6d2ad8", "Banner yeniləndi") });
       } else {
         await createBanner.mutateAsync(formData);
-        toast({ title: 'Banner yaradıldı' });
+        toast({ title: tr("adminbanners_banner_yaradildi_8ba9bd", "Banner yaradıldı") });
       }
       setIsDialogOpen(false);
       resetForm();
     } catch (error) {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("adminbanners_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   };
 
@@ -126,7 +127,7 @@ const AdminBanners = () => {
       await deleteBanner.mutateAsync(id);
       toast({ title: 'Banner silindi' });
     } catch (error) {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("adminbanners_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   };
 
@@ -135,7 +136,7 @@ const AdminBanners = () => {
       await updateBanner.mutateAsync({ id: banner.id, is_active: !banner.is_active });
       toast({ title: banner.is_active ? 'Banner deaktiv edildi' : 'Banner aktiv edildi' });
     } catch (error) {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("adminbanners_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   };
 
@@ -148,15 +149,15 @@ const AdminBanners = () => {
   };
 
   if (isLoading) {
-    return <div className="p-4 text-center">Yüklənir...</div>;
+    return <div className="p-4 text-center">{tr("adminbanners_yuklenir_5557de", "Yüklənir...")}</div>;
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Banner İdarəsi</h2>
-          <p className="text-muted-foreground">Tətbiqdəki bannerləri idarə edin</p>
+          <h2 className="text-2xl font-bold">{tr("adminbanners_banner_idaresi_bc3a16", "Banner İdarəsi")}</h2>
+          <p className="text-muted-foreground">{tr("adminbanners_tetbiqdeki_bannerleri_idare_edin_a0927c", "Tətbiqdəki bannerləri idarə edin")}</p>
         </div>
         <Button onClick={() => handleOpenDialog()}>
           <Plus className="w-4 h-4 mr-2" />
@@ -172,7 +173,7 @@ const AdminBanners = () => {
               <Layout className="w-5 h-5 text-primary" />
               <div>
                 <p className="text-2xl font-bold">{banners?.length || 0}</p>
-                <p className="text-xs text-muted-foreground">Ümumi Banner</p>
+                <p className="text-xs text-muted-foreground">{tr("adminbanners_umumi_banner_4d2adc", "Ümumi Banner")}</p>
               </div>
             </div>
           </CardContent>
@@ -194,7 +195,7 @@ const AdminBanners = () => {
               <MousePointer className="w-5 h-5 text-blue-500" />
               <div>
                 <p className="text-2xl font-bold">{banners?.reduce((sum, b) => sum + (b.click_count || 0), 0) || 0}</p>
-                <p className="text-xs text-muted-foreground">Ümumi Klik</p>
+                <p className="text-xs text-muted-foreground">{tr("adminbanners_umumi_klik_504648", "Ümumi Klik")}</p>
               </div>
             </div>
           </CardContent>
@@ -205,7 +206,7 @@ const AdminBanners = () => {
               <BarChart3 className="w-5 h-5 text-purple-500" />
               <div>
                 <p className="text-2xl font-bold">{PLACEMENTS.length}</p>
-                <p className="text-xs text-muted-foreground">Yerləşdirmə</p>
+                <p className="text-xs text-muted-foreground">{tr("adminbanners_yerlesdirme_6c3e92", "Yerləşdirmə")}</p>
               </div>
             </div>
           </CardContent>
@@ -215,7 +216,7 @@ const AdminBanners = () => {
       {/* Tabs by placement */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="flex-wrap h-auto gap-1">
-          <TabsTrigger value="all">Hamısı</TabsTrigger>
+          <TabsTrigger value="all">{tr("adminbanners_hamisi_c73c4d", "Hamısı")}</TabsTrigger>
           {PLACEMENTS.map(p => (
             <TabsTrigger key={p.value} value={p.value} className="text-xs">
               {p.label}
@@ -311,7 +312,7 @@ const AdminBanners = () => {
             {/* Basic Info */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Başlıq (EN)</Label>
+                <Label>{tr("adminbanners_basliq_en_4ac905", "Başlıq (EN)")}</Label>
                 <Input 
                   value={formData.title || ''} 
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -319,18 +320,18 @@ const AdminBanners = () => {
                 />
               </div>
               <div>
-                <Label>Başlıq (AZ)</Label>
+                <Label>{tr("adminbanners_basliq_az_3e294a", "Başlıq (AZ)")}</Label>
                 <Input 
                   value={formData.title_az || ''} 
                   onChange={(e) => setFormData({ ...formData, title_az: e.target.value })}
-                  placeholder="Banner Başlığı"
+                  placeholder={tr("adminbanners_banner_basligi_0722c5", "Banner Başlığı")}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Təsvir (EN)</Label>
+                <Label>{tr("adminbanners_tesvir_en_c64521", "Təsvir (EN)")}</Label>
                 <Textarea 
                   value={formData.description || ''} 
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -339,11 +340,11 @@ const AdminBanners = () => {
                 />
               </div>
               <div>
-                <Label>Təsvir (AZ)</Label>
+                <Label>{tr("adminbanners_tesvir_az_2c237a", "Təsvir (AZ)")}</Label>
                 <Textarea 
                   value={formData.description_az || ''} 
                   onChange={(e) => setFormData({ ...formData, description_az: e.target.value })}
-                  placeholder="Təsvir"
+                  placeholder={tr("adminbanners_tesvir_f85651", "Təsvir")}
                   rows={2}
                 />
               </div>
@@ -368,7 +369,7 @@ const AdminBanners = () => {
                 </Select>
               </div>
               <div>
-                <Label>Yerləşdirmə</Label>
+                <Label>{tr("adminbanners_yerlesdirme_6c3e92", "Yerləşdirmə")}</Label>
                 <Select 
                   value={formData.placement} 
                   onValueChange={(v) => setFormData({ ...formData, placement: v as BannerPlacement })}
@@ -389,7 +390,7 @@ const AdminBanners = () => {
             {formData.banner_type === 'native' && (
               <div className="space-y-3">
                 <div>
-                  <Label>Arxa Fon Rəngi</Label>
+                  <Label>{tr("adminbanners_arxa_fon_rengi_c914c9", "Arxa Fon Rəngi")}</Label>
                   <div className="flex items-center gap-2 mt-1">
                     <Input 
                       type="color"
@@ -410,7 +411,7 @@ const AdminBanners = () => {
                   </div>
                 </div>
                 <div>
-                  <Label>Mətn Rəngi</Label>
+                  <Label>{tr("adminbanners_metn_rengi_b3857e", "Mətn Rəngi")}</Label>
                   <div className="flex items-center gap-2 mt-1">
                     <Input 
                       type="color"
@@ -430,7 +431,7 @@ const AdminBanners = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Düymə Mətni (EN)</Label>
+                    <Label>{tr("adminbanners_duyme_metni_en_f2f4bd", "Düymə Mətni (EN)")}</Label>
                     <Input 
                       value={formData.button_text || ''} 
                       onChange={(e) => setFormData({ ...formData, button_text: e.target.value })}
@@ -438,11 +439,11 @@ const AdminBanners = () => {
                     />
                   </div>
                   <div>
-                    <Label>Düymə Mətni (AZ)</Label>
+                    <Label>{tr("adminbanners_duyme_metni_az_75db00", "Düymə Mətni (AZ)")}</Label>
                     <Input 
                       value={formData.button_text_az || ''} 
                       onChange={(e) => setFormData({ ...formData, button_text_az: e.target.value })}
-                      placeholder="Daha Çox"
+                      placeholder={tr("adminbanners_daha_cox_7d8a93", "Daha Çox")}
                     />
                   </div>
                 </div>
@@ -452,7 +453,7 @@ const AdminBanners = () => {
             {/* Image Banner */}
             {formData.banner_type === 'image' && (
               <div>
-                <Label>Şəkil URL</Label>
+                <Label>{tr("adminbanners_sekil_url_d302df", "Şəkil URL")}</Label>
                 <Input 
                   value={formData.image_url || ''} 
                   onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
@@ -496,7 +497,7 @@ const AdminBanners = () => {
             {/* Settings */}
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <Label>Sıra</Label>
+                <Label>{tr("adminbanners_sira_421c5f", "Sıra")}</Label>
                 <Input 
                   type="number"
                   value={formData.sort_order || 0} 
@@ -522,7 +523,7 @@ const AdminBanners = () => {
             {/* Preview */}
             {formData.banner_type === 'native' && (
               <div>
-                <Label>Önizləmə</Label>
+                <Label>{tr("adminbanners_onizleme_1f8cc7", "Önizləmə")}</Label>
                 <div 
                   className="mt-2 rounded-2xl p-4 flex items-center gap-4"
                   style={{ 
@@ -544,7 +545,7 @@ const AdminBanners = () => {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Ləğv et</Button>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{tr("adminbanners_legv_et_b5e49c", "Ləğv et")}</Button>
             <Button onClick={handleSave} disabled={createBanner.isPending || updateBanner.isPending}>
               {editingBanner ? 'Yenilə' : 'Yarat'}
             </Button>

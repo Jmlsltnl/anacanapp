@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { tr } from '@/lib/tr';
 import { Activity, Users, TrendingUp, Clock, RefreshCw, Eye } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -158,10 +159,10 @@ const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = 
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1">Bu gün</SelectItem>
-              <SelectItem value="7">7 gün</SelectItem>
-              <SelectItem value="30">30 gün</SelectItem>
-              <SelectItem value="90">90 gün</SelectItem>
+              <SelectItem value="1">{tr("adminusagestats_bu_gun_786fd4", "Bu gün")}</SelectItem>
+              <SelectItem value="7">{tr("adminusagestats_7_gun_5782ea", "7 gün")}</SelectItem>
+              <SelectItem value="30">{tr("adminusagestats_30_gun_767ad9", "30 gün")}</SelectItem>
+              <SelectItem value="90">{tr("adminusagestats_90_gun_632564", "90 gün")}</SelectItem>
             </SelectContent>
           </Select>
           <Button variant="ghost" size="sm" onClick={handleRefresh} disabled={refreshing}>
@@ -175,17 +176,17 @@ const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = 
         <div className="bg-muted/50 rounded-lg p-3 text-center">
           <Eye className="w-4 h-4 mx-auto mb-1 text-muted-foreground" />
           <p className="text-2xl font-bold">{loading ? '...' : totalCount}</p>
-          <p className="text-xs text-muted-foreground">Cəmi istifadə</p>
+          <p className="text-xs text-muted-foreground">{tr("adminusagestats_cemi_istifade_31f4fc", "Cəmi istifadə")}</p>
         </div>
         <div className="bg-muted/50 rounded-lg p-3 text-center">
           <Users className="w-4 h-4 mx-auto mb-1 text-muted-foreground" />
           <p className="text-2xl font-bold">{loading ? '...' : uniqueUsers}</p>
-          <p className="text-xs text-muted-foreground">Unikal istifadəçi</p>
+          <p className="text-xs text-muted-foreground">{tr("adminusagestats_unikal_istifadeci_c5640a", "Unikal istifadəçi")}</p>
         </div>
         <div className="bg-muted/50 rounded-lg p-3 text-center">
           <TrendingUp className="w-4 h-4 mx-auto mb-1 text-muted-foreground" />
           <p className="text-2xl font-bold">{loading ? '...' : premiumUsers}</p>
-          <p className="text-xs text-muted-foreground">Premium istifadəçi</p>
+          <p className="text-xs text-muted-foreground">{tr("adminusagestats_premium_istifadeci_125a87", "Premium istifadəçi")}</p>
         </div>
       </div>
 
@@ -207,7 +208,7 @@ const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = 
       {/* Event Data Breakdown */}
       {showEventData && eventDataBreakdown.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium mb-2">Detallı Paylanma</h4>
+          <h4 className="text-sm font-medium mb-2">{tr("adminusagestats_detalli_paylanma_f316d8", "Detallı Paylanma")}</h4>
           <div className="space-y-1 max-h-48 overflow-y-auto">
             {eventDataBreakdown.map((item, i) => (
               <div key={i} className="flex items-center justify-between py-1.5 px-2 rounded bg-muted/30 text-sm">
@@ -222,15 +223,15 @@ const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = 
       {/* User Table */}
       {showUsers && users.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium mb-2">Ən aktiv istifadəçilər</h4>
+          <h4 className="text-sm font-medium mb-2">{tr("adminusagestats_en_aktiv_istifadeciler_a5e570", "Ən aktiv istifadəçilər")}</h4>
           <div className="rounded-md border max-h-64 overflow-y-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-xs">İstifadəçi</TableHead>
+                  <TableHead className="text-xs">{tr("adminusagestats_istifadeci_b6bdd6", "İstifadəçi")}</TableHead>
                   <TableHead className="text-xs">Email</TableHead>
                   <TableHead className="text-xs text-center">Premium</TableHead>
-                  <TableHead className="text-xs text-right">Sayı</TableHead>
+                  <TableHead className="text-xs text-right">{tr("adminusagestats_sayi_deaa4b", "Sayı")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -251,7 +252,7 @@ const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = 
       )}
 
       {!loading && events.length === 0 && (
-        <p className="text-center text-sm text-muted-foreground py-4">Bu müddətdə istifadə məlumatı yoxdur</p>
+        <p className="text-center text-sm text-muted-foreground py-4">{tr("adminusagestats_bu_muddetde_istifade_melumati_yoxdur_d9a35a", "Bu müddətdə istifadə məlumatı yoxdur")}</p>
       )}
     </Card>
   );

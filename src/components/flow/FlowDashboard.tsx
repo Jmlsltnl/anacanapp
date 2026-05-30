@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Calendar as CalendarIcon, Droplets, Heart, Moon, Sparkles, 
@@ -265,14 +266,14 @@ const FlowDashboard = () => {
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-white/70 text-sm font-medium mb-1">Hal-hazırda</p>
+              <p className="text-white/70 text-sm font-medium mb-1">{tr("flowdashboard_hal_hazirda_b78349", "Hal-hazırda")}</p>
               <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                 <span className="text-3xl">{PHASE_INFO[currentPhase].emoji}</span>
                 {PHASE_INFO[currentPhase].labelAz}
               </h2>
             </div>
             <div className="text-right">
-              <p className="text-white/70 text-xs">Tsikl günü</p>
+              <p className="text-white/70 text-xs">{tr("flowdashboard_tsikl_gunu_b9e250", "Tsikl günü")}</p>
               <p className="text-4xl font-bold text-white">{currentDay}</p>
             </div>
           </div>
@@ -292,17 +293,17 @@ const FlowDashboard = () => {
             <div className="bg-white/15 rounded-xl p-3 text-center">
               <Droplets className="w-5 h-5 text-white mx-auto mb-1" />
               <p className="text-white text-lg font-bold">{daysUntilPeriod > 0 ? daysUntilPeriod : 0}</p>
-              <p className="text-white/70 text-[10px]">gün qaldı</p>
+              <p className="text-white/70 text-[10px]">{tr("flowdashboard_gun_qaldi_993281", "gün qaldı")}</p>
             </div>
             <div className="bg-white/15 rounded-xl p-3 text-center">
               <CalendarIcon className="w-5 h-5 text-white mx-auto mb-1" />
               <p className="text-white text-lg font-bold">{cycleLength}</p>
-              <p className="text-white/70 text-[10px]">gün tsikl</p>
+              <p className="text-white/70 text-[10px]">{tr("flowdashboard_gun_tsikl_bb0ab6", "gün tsikl")}</p>
             </div>
             <div className="bg-white/15 rounded-xl p-3 text-center">
               <Heart className="w-5 h-5 text-white mx-auto mb-1" />
               <p className="text-white text-lg font-bold">{periodLength}</p>
-              <p className="text-white/70 text-[10px]">gün period</p>
+              <p className="text-white/70 text-[10px]">{tr("flowdashboard_gun_period_957849", "gün period")}</p>
             </div>
           </div>
 
@@ -425,7 +426,7 @@ const FlowDashboard = () => {
 
             {filteredTips.length === 0 && (
               <div className="text-center py-8">
-                <p className="text-muted-foreground text-sm">Bu kateqoriyada məsləhət yoxdur</p>
+                <p className="text-muted-foreground text-sm">{tr("flowdashboard_bu_kateqoriyada_meslehet_yoxdur_2e13ec", "Bu kateqoriyada məsləhət yoxdur")}</p>
               </div>
             )}
           </div>
@@ -534,7 +535,7 @@ const FlowDashboard = () => {
           <p className="font-bold text-foreground text-lg">
             {currentPhase === 'follicular' || currentPhase === 'ovulation' ? 'Yüksək' : 'Normal'}
           </p>
-          <p className="text-xs text-muted-foreground">Enerji Səviyyəsi</p>
+          <p className="text-xs text-muted-foreground">{tr("flowdashboard_enerji_seviyyesi_961691", "Enerji Səviyyəsi")}</p>
         </div>
 
         <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-2xl p-4 border border-blue-100 dark:border-blue-800/30">
@@ -542,7 +543,7 @@ const FlowDashboard = () => {
           <p className="font-bold text-foreground text-lg">
             {currentPhase === 'luteal' ? '8-9 saat' : '7-8 saat'}
           </p>
-          <p className="text-xs text-muted-foreground">Tövsiyə Edilən Yuxu</p>
+          <p className="text-xs text-muted-foreground">{tr("flowdashboard_tovsiye_edilen_yuxu_e219dd", "Tövsiyə Edilən Yuxu")}</p>
         </div>
 
         <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-4 border border-green-100 dark:border-green-800/30">
@@ -558,7 +559,7 @@ const FlowDashboard = () => {
           <p className="font-bold text-foreground text-lg">
             {currentPhase === 'menstrual' ? 'Yüngül' : currentPhase === 'ovulation' ? 'İntensiv' : 'Orta'}
           </p>
-          <p className="text-xs text-muted-foreground">Məşq İntensivliyi</p>
+          <p className="text-xs text-muted-foreground">{tr("flowdashboard_mesq_intensivliyi_f59d1b", "Məşq İntensivliyi")}</p>
         </div>
       </motion.div>
 
@@ -569,7 +570,7 @@ const FlowDashboard = () => {
       }}>
         <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
-            <AlertDialogTitle>🩸 Period başlanğıcı</AlertDialogTitle>
+            <AlertDialogTitle>{tr("flowdashboard_period_baslangici_c90515", "🩸 Period başlanğıcı")}</AlertDialogTitle>
             <AlertDialogDescription>
               Periodunuzun başladığı tarixi seçin:
             </AlertDialogDescription>
@@ -588,7 +589,7 @@ const FlowDashboard = () => {
             Seçilən tarix: <strong>{format(periodStartDate, 'd MMMM yyyy', { locale: az })}</strong>
           </p>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={markingPeriod}>Ləğv et</AlertDialogCancel>
+            <AlertDialogCancel disabled={markingPeriod}>{tr("flowdashboard_legv_et_b5e49c", "Ləğv et")}</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleMarkPeriodStarted}
               disabled={markingPeriod}
@@ -607,7 +608,7 @@ const FlowDashboard = () => {
       }}>
         <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
-            <AlertDialogTitle>✅ Period bitişi</AlertDialogTitle>
+            <AlertDialogTitle>{tr("flowdashboard_period_bitisi_d0fdcc", "✅ Period bitişi")}</AlertDialogTitle>
             <AlertDialogDescription>
               Periodunuzun bitdiyi tarixi seçin:
             </AlertDialogDescription>
@@ -629,7 +630,7 @@ const FlowDashboard = () => {
             )}
           </p>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={markingPeriod}>Ləğv et</AlertDialogCancel>
+            <AlertDialogCancel disabled={markingPeriod}>{tr("flowdashboard_legv_et_b5e49c", "Ləğv et")}</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleMarkPeriodEnded}
               disabled={markingPeriod}

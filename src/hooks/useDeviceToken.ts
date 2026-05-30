@@ -26,7 +26,10 @@ export const useDeviceToken = () => {
         tokenSuffix: '...' + deviceToken.slice(-12),
       });
 
-      // 1) Safe upsert on (user_id, token) — never destroys an existing live token.
+      // 1) Upsert on `token` (unique). If this physical device was previously bound
+      //    to a different profile on the same device (multi-account testing),
+      //    ownership transfers to the currently logged-in user — preventing
+      //    the same push from arriving multiple times to one device.
       const { error: upsertError } = await supabase
         .from('device_tokens')
         .upsert(
@@ -37,7 +40,7 @@ export const useDeviceToken = () => {
             device_name: deviceName,
             updated_at: new Date().toISOString(),
           },
-          { onConflict: 'user_id,token' }
+          { onConflict: 'token' }
         );
 
       if (upsertError) {
@@ -45,8 +48,7 @@ export const useDeviceToken = () => {
         return false;
       }
 
-      // 2) Only AFTER success, clean up any STALE tokens for this user on this platform
-      //    (different token strings — not the one we just saved).
+      // 2) Clean up stale tokens for this user on this platform (different token strings).
       const { error: cleanupError } = await supabase
         .from('device_tokens')
         .delete()
@@ -55,7 +57,6 @@ export const useDeviceToken = () => {
         .neq('token', deviceToken);
 
       if (cleanupError) {
-        // Non-fatal — the new token is already saved.
         console.warn('[DeviceToken] Stale-token cleanup warning:', cleanupError);
       }
 

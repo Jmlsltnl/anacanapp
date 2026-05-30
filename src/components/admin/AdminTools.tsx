@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { 
   Wrench, Search, Save, RefreshCw, ChevronDown, ChevronUp, 
@@ -309,12 +310,12 @@ const AdminTools = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-tool-configs'] });
       queryClient.invalidateQueries({ queryKey: ['tool-configs'] });
       setHasChanges(false);
-      toast({ title: 'Yadda saxlanıldı', description: 'Alət ayarları yeniləndi' });
+      toast({ title: tr("admintools_yadda_saxlanildi_cf4f4a", "Yadda saxlanıldı"), description: tr("admintools_alet_ayarlari_yenilendi_044855", "Alət ayarları yeniləndi") });
     },
     onError: (error) => {
       toast({ 
-        title: 'Xəta', 
-        description: 'Dəyişikliklər saxlanıla bilmədi', 
+        title: tr("admintools_xeta_3cdbb6", "Xəta"), 
+        description: tr("admintools_deyisiklikler_saxlanila_bilmedi_ecf8b6", "Dəyişikliklər saxlanıla bilmədi"), 
         variant: 'destructive' 
       });
       console.error('Save error:', error);
@@ -365,7 +366,7 @@ const AdminTools = () => {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
-          placeholder="Alət axtar..."
+          placeholder={tr("admintools_alet_axtar_1f976c", "Alət axtar...")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="pl-9"
@@ -395,7 +396,7 @@ const AdminTools = () => {
               </CardHeader>
               <CardContent>
                 {isLoading ? (
-                  <div className="text-center py-8 text-muted-foreground">Yüklənir...</div>
+                  <div className="text-center py-8 text-muted-foreground">{tr("admintools_yuklenir_5557de", "Yüklənir...")}</div>
                 ) : categoryTools.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     Bu kateqoriyada alət yoxdur
@@ -494,7 +495,7 @@ const AdminTools = () => {
                                 setLocalTools(newTools);
                                 setHasChanges(true);
                               }}
-                              title="Sürətli giriş"
+                              title={tr("admintools_suretli_giris_bcd978", "Sürətli giriş")}
                             >
                               <Zap className="w-3.5 h-3.5" />
                             </Button>
@@ -578,27 +579,27 @@ const AdminTools = () => {
       <div className="flex flex-wrap gap-4 text-xs text-muted-foreground bg-muted/30 p-3 rounded-lg">
         <div className="flex items-center gap-2">
           <Eye className="w-4 h-4" />
-          <span>Aktiv - alət bütün phase-lərdə görünə bilər</span>
+          <span>{tr("admintools_aktiv_alet_butun_phase_lerde_gorune_bile_ffe606", "Aktiv - alət bütün phase-lərdə görünə bilər")}</span>
         </div>
         <div className="flex items-center gap-2">
           <Lock className="w-4 h-4 text-destructive" />
-          <span>Kilidli - alət premium tələb edir</span>
+          <span>{tr("admintools_kilidli_alet_premium_teleb_edir_9bfa45", "Kilidli - alət premium tələb edir")}</span>
         </div>
         <div className="flex items-center gap-2">
           <Crown className="w-4 h-4 text-amber-500" />
-          <span>Premium - limit və ya premium-only</span>
+          <span>{tr("admintools_premium_limit_ve_ya_premium_only_2ed4c5", "Premium - limit və ya premium-only")}</span>
         </div>
         <div className="flex items-center gap-2">
           <Edit2 className="w-4 h-4" />
-          <span>Redaktə - ad və açıqlamanı dəyişin</span>
+          <span>{tr("admintools_redakte_ad_ve_aciqlamani_deyisin_e632f7", "Redaktə - ad və açıqlamanı dəyişin")}</span>
         </div>
         <div className="flex items-center gap-2">
           <Star className="w-4 h-4 text-violet-500" />
-          <span>Hero - böyük banner kimi göstər</span>
+          <span>{tr("admintools_hero_boyuk_banner_kimi_goster_6a6f9f", "Hero - böyük banner kimi göstər")}</span>
         </div>
         <div className="flex items-center gap-2">
           <Zap className="w-4 h-4 text-blue-500" />
-          <span>QA - sürətli giriş sırasında göstər</span>
+          <span>{tr("admintools_qa_suretli_giris_sirasinda_goster_38995c", "QA - sürətli giriş sırasında göstər")}</span>
         </div>
       </div>
 
@@ -606,7 +607,7 @@ const AdminTools = () => {
       <Dialog open={!!editingTool} onOpenChange={() => setEditingTool(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Aləti Redaktə Et</DialogTitle>
+            <DialogTitle>{tr("admintools_aleti_redakte_et_c9886f", "Aləti Redaktə Et")}</DialogTitle>
           </DialogHeader>
           {editingTool && (
             <EditToolForm
@@ -622,7 +623,7 @@ const AdminTools = () => {
       <Dialog open={!!premiumModal} onOpenChange={() => setPremiumModal(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Premium Ayarları</DialogTitle>
+            <DialogTitle>{tr("admintools_premium_ayarlari_19bdd3", "Premium Ayarları")}</DialogTitle>
           </DialogHeader>
           {premiumModal && (
             <PremiumSettingsForm
@@ -636,7 +637,7 @@ const AdminTools = () => {
 
       <AdminUsageStats 
         eventNames={['tool_opened', 'tool_used']}
-        title="🔧 Alət İstifadə Statistikası"
+        title={tr("admintools_alet_istifade_statistikasi_78b2a7", "🔧 Alət İstifadə Statistikası")}
         showEventData
         showUsers
       />
@@ -676,33 +677,33 @@ const EditToolForm = ({
 
   const gradientPresets = [
     { label: 'Primary', value: 'from-primary to-primary/80' },
-    { label: 'Yaşıl', value: 'from-emerald-500 to-teal-600' },
+    { label: tr("admintools_yasil_b257f4", "Yaşıl"), value: 'from-emerald-500 to-teal-600' },
     { label: 'Mavi', value: 'from-blue-500 to-indigo-600' },
-    { label: 'Bənövşəyi', value: 'from-purple-500 to-violet-600' },
-    { label: 'Çəhrayı', value: 'from-pink-500 to-rose-600' },
-    { label: 'Narıncı', value: 'from-orange-500 to-amber-600' },
-    { label: 'Qırmızı', value: 'from-red-500 to-rose-600' },
+    { label: tr("admintools_benovseyi_047412", "Bənövşəyi"), value: 'from-purple-500 to-violet-600' },
+    { label: tr("admintools_cehrayi_cf1224", "Çəhrayı"), value: 'from-pink-500 to-rose-600' },
+    { label: tr("admintools_narinci_5160ef", "Narıncı"), value: 'from-orange-500 to-amber-600' },
+    { label: tr("admintools_qirmizi_ea111d", "Qırmızı"), value: 'from-red-500 to-rose-600' },
     { label: 'Teal', value: 'from-teal-500 to-cyan-600' },
-    { label: 'Göy-yaşıl', value: 'from-cyan-500 to-blue-600' },
+    { label: tr("admintools_goy_yasil_20e443", "Göy-yaşıl"), value: 'from-cyan-500 to-blue-600' },
   ];
 
   return (
     <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
       {/* Basic Info */}
       <div>
-        <Label>Görünən Ad (AZ)</Label>
+        <Label>{tr("admintools_gorunen_ad_az_991e41", "Görünən Ad (AZ)")}</Label>
         <Input
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
-          placeholder="Alət adı"
+          placeholder={tr("admintools_alet_adi_e90435", "Alət adı")}
         />
       </div>
       <div>
-        <Label>Açıqlama (AZ)</Label>
+        <Label>{tr("admintools_aciqlama_az_86f364", "Açıqlama (AZ)")}</Label>
         <Textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Alət haqqında qısa açıqlama"
+          placeholder={tr("admintools_alet_haqqinda_qisa_aciqlama_dfbbda", "Alət haqqında qısa açıqlama")}
           rows={2}
         />
       </div>
@@ -715,7 +716,7 @@ const EditToolForm = ({
           </p>
           
           <div>
-            <Label className="text-xs">Hero Sırası</Label>
+            <Label className="text-xs">{tr("admintools_hero_sirasi_eef2b1", "Hero Sırası")}</Label>
             <Input
               type="number"
               min={0}
@@ -726,11 +727,11 @@ const EditToolForm = ({
           </div>
 
           <div>
-            <Label className="text-xs">Hero Alt Yazı</Label>
+            <Label className="text-xs">{tr("admintools_hero_alt_yazi_26258f", "Hero Alt Yazı")}</Label>
             <Input
               value={heroSubtitle}
               onChange={(e) => setHeroSubtitle(e.target.value)}
-              placeholder="Banner alt yazısı"
+              placeholder={tr("admintools_banner_alt_yazisi_58550f", "Banner alt yazısı")}
               className="h-8"
             />
           </div>
@@ -740,13 +741,13 @@ const EditToolForm = ({
             <Input
               value={heroBadge}
               onChange={(e) => setHeroBadge(e.target.value)}
-              placeholder="Məs: YENİ, ✨ Populyar"
+              placeholder={tr("admintools_mes_yeni_populyar_3cb8a9", "Məs: YENİ, ✨ Populyar")}
               className="h-8"
             />
           </div>
 
           <div>
-            <Label className="text-xs">Gradient Rəngi</Label>
+            <Label className="text-xs">{tr("admintools_gradient_rengi_b5a4b4", "Gradient Rəngi")}</Label>
             <Select value={heroGradient} onValueChange={setHeroGradient}>
               <SelectTrigger className="h-8">
                 <SelectValue />
@@ -775,7 +776,7 @@ const EditToolForm = ({
           </p>
           
           <div>
-            <Label className="text-xs">Sürətli Giriş Sırası</Label>
+            <Label className="text-xs">{tr("admintools_suretli_giris_sirasi_5e7ffc", "Sürətli Giriş Sırası")}</Label>
             <Input
               type="number"
               min={0}
@@ -786,7 +787,7 @@ const EditToolForm = ({
           </div>
 
           <div>
-            <Label className="text-xs">Gradient Rəngi</Label>
+            <Label className="text-xs">{tr("admintools_gradient_rengi_b5a4b4", "Gradient Rəngi")}</Label>
             <Select value={quickAccessGradient} onValueChange={setQuickAccessGradient}>
               <SelectTrigger className="h-8">
                 <SelectValue />
@@ -838,7 +839,7 @@ const PremiumSettingsForm = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <Label>Premium Alət</Label>
+        <Label>{tr("admintools_premium_alet_9456e3", "Premium Alət")}</Label>
         <Switch
           checked={isPremium}
           onCheckedChange={setIsPremium}
@@ -848,16 +849,16 @@ const PremiumSettingsForm = ({
       {isPremium && (
         <>
           <div>
-            <Label>Premium Növü</Label>
+            <Label>{tr("admintools_premium_novu_d85e42", "Premium Növü")}</Label>
             <Select value={premiumType} onValueChange={setPremiumType}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">Seçin...</SelectItem>
-                <SelectItem value="limited_total">İlk X istifadə pulsuz</SelectItem>
-                <SelectItem value="limited_monthly">Aylıq X istifadə pulsuz</SelectItem>
-                <SelectItem value="premium_only">Yalnız Premium istifadəçilər</SelectItem>
+                <SelectItem value="none">{tr("admintools_secin_4f7bd7", "Seçin...")}</SelectItem>
+                <SelectItem value="limited_total">{tr("admintools_ilk_x_istifade_pulsuz_a870aa", "İlk X istifadə pulsuz")}</SelectItem>
+                <SelectItem value="limited_monthly">{tr("admintools_ayliq_x_istifade_pulsuz_7a3cf0", "Aylıq X istifadə pulsuz")}</SelectItem>
+                <SelectItem value="premium_only">{tr("admintools_yalniz_premium_istifadeciler_d5a0aa", "Yalnız Premium istifadəçilər")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -874,7 +875,7 @@ const PremiumSettingsForm = ({
                 min={0}
                 value={premiumLimit}
                 onChange={(e) => setPremiumLimit(parseInt(e.target.value) || 0)}
-                placeholder="Məs: 3"
+                placeholder={tr("admintools_mes_3_399873", "Məs: 3")}
               />
               <p className="text-xs text-muted-foreground mt-1">
                 {premiumType === 'limited_total' 

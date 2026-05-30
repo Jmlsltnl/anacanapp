@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
@@ -62,7 +63,7 @@ export const useKickSessions = () => {
       if (error) throw error;
 
       toast({
-        title: 'Sessiya yadda saxlandı! 👶',
+        title: tr("usekicksessions_sessiya_yadda_saxlandi_241831", "Sessiya yadda saxlandı! 👶"),
         description: `${kickCount} təpik, ${Math.floor(durationSeconds / 60)} dəqiqə`,
       });
 
@@ -81,7 +82,7 @@ export const useKickSessions = () => {
     } catch (error: any) {
       console.error('Error adding kick session:', error);
       toast({
-        title: 'Xəta baş verdi',
+        title: tr("usekicksessions_xeta_bas_verdi_f22fba", "Xəta baş verdi"),
         description: error.message,
         variant: 'destructive',
       });

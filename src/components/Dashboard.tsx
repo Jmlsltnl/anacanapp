@@ -404,9 +404,9 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           {/* Progress Bar */}
           <div className="w-full mt-3 space-y-1">
             <div className="flex justify-between text-[10px] text-muted-foreground">
-              <span>Başlanğıc</span>
+              <span>{tr("dashboard_baslangic_e9d2d5", "Başlanğıc")}</span>
               <span className={`${trimesterColors.text} font-semibold`}>{Math.round(progressPercent)}%</span>
-              <span>Doğuş</span>
+              <span>{tr("dashboard_dogus_6b7bfd", "Doğuş")}</span>
             </div>
             <div className={`h-2 ${trimesterColors.accent} rounded-full overflow-hidden`}>
               <motion.div 
@@ -464,7 +464,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
         >
           <Calendar className={`w-4 h-4 ${trimesterColors.icon} mx-auto mb-0.5`} />
           <p className="text-lg font-black text-foreground">{daysLeft}</p>
-          <p className="text-[9px] text-muted-foreground">gün qaldı</p>
+          <p className="text-[9px] text-muted-foreground">{tr("dashboard_gun_qaldi_993281", "gün qaldı")}</p>
         </motion.div>
 
         {/* Only show kick counter after week 16 */}
@@ -479,7 +479,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           >
             <Footprints className={`w-4 h-4 ${trimesterColors.icon} mx-auto mb-0.5`} />
             <p className="text-lg font-black text-foreground">{kickCount}</p>
-            <p className="text-[9px] text-muted-foreground">təpik</p>
+            <p className="text-[9px] text-muted-foreground">{tr("dashboard_tepik_6483fe", "təpik")}</p>
           </motion.button>
         )}
 
@@ -491,7 +491,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
         >
           <Scale className={`w-4 h-4 ${trimesterColors.icon} mx-auto mb-0.5`} />
           <p className="text-lg font-black text-foreground">+{weightGain}</p>
-          <p className="text-[9px] text-muted-foreground">kq çəki</p>
+          <p className="text-[9px] text-muted-foreground">{tr("dashboard_kq_ceki_b42b8d", "kq çəki")}</p>
         </motion.div>
       </div>
 
@@ -502,7 +502,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.25 }}
       >
-        <h3 className="text-sm font-bold text-foreground mb-2">Körpənin inkişafı</h3>
+        <h3 className="text-sm font-bold text-foreground mb-2">{tr("dashboard_korpenin_inkisafi_269d83", "Körpənin inkişafı")}</h3>
         <div className="flex justify-around">
           {[
             { icon: '👀', label: tr("dashboard_goz_fbc05e", 'Göz'), active: weeklyDevelopment.eyes },
@@ -548,7 +548,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                   <span className="text-sm">👶</span>
                 </div>
                 <div>
-                <p className="text-xs text-primary font-bold uppercase tracking-wider">Körpədən Mesaj</p>
+                <p className="text-xs text-primary font-bold uppercase tracking-wider">{tr("dashboard_korpeden_mesaj_89353a", "Körpədən Mesaj")}</p>
                   <p className="text-[10px] text-muted-foreground">Gün {pregnancyDay} / 280</p>
                 </div>
               </div>
@@ -571,7 +571,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                 <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
                   <span className="text-sm">🤰</span>
                 </div>
-                <p className="text-xs text-primary font-bold uppercase tracking-wider">Bədəndəki Dəyişikliklər</p>
+                <p className="text-xs text-primary font-bold uppercase tracking-wider">{tr("dashboard_bedendeki_deyisiklikler_7a5c81", "Bədəndəki Dəyişikliklər")}</p>
               </div>
               <p className="text-sm text-foreground/90 leading-relaxed">
                 {dayContent.body_changes}
@@ -592,7 +592,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                 <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
                   <span className="text-sm">🌱</span>
                 </div>
-                <p className="text-xs text-primary font-bold uppercase tracking-wider">Körpənin İnkişafı</p>
+                <p className="text-xs text-primary font-bold uppercase tracking-wider">{tr("dashboard_korpenin_inkisafi_485a30", "Körpənin İnkişafı")}</p>
               </div>
               <p className="text-sm text-foreground/90 leading-relaxed">
                 {dayContent.baby_development}
@@ -613,7 +613,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                 <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
                   <span className="text-sm">💡</span>
                 </div>
-                <p className="text-xs text-primary font-bold uppercase tracking-wider">Günün Tövsiyəsi</p>
+                <p className="text-xs text-primary font-bold uppercase tracking-wider">{tr("dashboard_gunun_tovsiyesi_b3a563", "Günün Tövsiyəsi")}</p>
               </div>
               <p className="text-sm text-foreground/90 leading-relaxed">
                 {dayContent.daily_tip}
@@ -667,7 +667,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
         />
         <QuickActionButton 
           icon={Activity} 
-          label="Məşq" 
+          label={tr("dashboard_mesq_046a80", "Məşq")} 
           color="bg-primary/10 dark:bg-primary/20 text-primary" 
           onClick={() => {
             if (onNavigateToTool) onNavigateToTool('exercises');
@@ -675,7 +675,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
         />
         <QuickActionButton 
           icon={Heart} 
-          label="Əhval" 
+          label={tr("dashboard_ehval_0457f9", "Əhval")} 
           color="bg-primary/10 dark:bg-primary/20 text-primary" 
           value={currentMood ? getMoodEmoji(currentMood) : undefined}
           onClick={() => {
@@ -703,8 +703,8 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
               <PartyPopper className="w-6 h-6" />
             </div>
             <div className="text-left">
-              <p className="font-bold text-lg">Doğum etdim! 🎉</p>
-              <p className="text-white/80 text-sm">Analıq səyahətinizə başlayın</p>
+              <p className="font-bold text-lg">{tr("dashboard_dogum_etdim_e3eca9", "Doğum etdim! 🎉")}</p>
+              <p className="text-white/80 text-sm">{tr("dashboard_analiq_seyahetinize_baslayin_b03582", "Analıq səyahətinizə başlayın")}</p>
             </div>
             <ChevronRight className="w-6 h-6 ml-auto" />
           </div>
@@ -863,7 +863,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   if (!babyData) {
     return (
       <div className="flex items-center justify-center p-8 min-h-[200px]">
-        <p className="text-muted-foreground text-sm animate-pulse">Yüklənir...</p>
+        <p className="text-muted-foreground text-sm animate-pulse">{tr("dashboard_yuklenir_5557de", "Yüklənir...")}</p>
       </div>
     );
   }
@@ -1174,7 +1174,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
               <span className="text-2xl">🎂</span>
             </div>
             <div className="flex-1">
-              <h3 className="font-bold text-sm text-foreground">Xüsusi Tortlar</h3>
+              <h3 className="font-bold text-sm text-foreground">{tr("dashboard_xususi_tortlar_ba1400", "Xüsusi Tortlar")}</h3>
               <p className="text-[11px] text-muted-foreground mt-0.5">
                 {babyData.ageInMonths > 0 ? `${babyData.ageInMonths + 1}-ci aylıq tortunu sifariş ver!` : 'Körpəniz üçün milestone tortları'}
               </p>
@@ -1197,7 +1197,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
               <Moon className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="font-bold text-sm text-foreground">Yuxu İzləmə</h3>
+              <h3 className="font-bold text-sm text-foreground">{tr("dashboard_yuxu_izleme_adaa4f", "Yuxu İzləmə")}</h3>
               <p className="text-xs text-muted-foreground">Bu gün: {(() => { const m = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60); const h = Math.floor(m / 60); const rm = m % 60; if (h === 0 && rm === 0) return '0 dəq'; if (h === 0) return `${rm} dəq`; if (rm === 0) return `${h} saat`; return `${h}s ${rm}d`; })()}</p>
             </div>
           </div>
@@ -1246,7 +1246,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
               <Baby className="w-5 h-5 text-white" />
             </div>
             <div className="text-left">
-              <h3 className="font-bold text-sm text-foreground">Qidalanmaya nəzarət</h3>
+              <h3 className="font-bold text-sm text-foreground">{tr("dashboard_qidalanmaya_nezaret_1b60b4", "Qidalanmaya nəzarət")}</h3>
               <p className="text-xs text-muted-foreground">Bu gün: {todayStats.feedingCount} dəfə</p>
             </div>
           </button>
@@ -1306,7 +1306,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 whileTap={{ scale: 0.95 }}
               >
                 <span className="text-xl">🍼</span>
-                <span className="text-xs font-medium text-blue-700">Süd Əvəzedicisi</span>
+                <span className="text-xs font-medium text-blue-700">{tr("dashboard_sud_evezedicisi_4ba2dd", "Süd Əvəzedicisi")}</span>
               </motion.button>
               <motion.button
                 onClick={() => setShowSolidFoodInput(true)}
@@ -1314,7 +1314,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 whileTap={{ scale: 0.95 }}
               >
                 <span className="text-xl">🥣</span>
-                <span className="text-xs font-medium text-orange-700">Əlavə Qida</span>
+                <span className="text-xs font-medium text-orange-700">{tr("dashboard_elave_qida_676032", "Əlavə Qida")}</span>
               </motion.button>
             </motion.div>
           )}
@@ -1331,7 +1331,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             >
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-lg">🍼</span>
-                <span className="text-sm font-semibold text-blue-700">Neçə ml?</span>
+                <span className="text-sm font-semibold text-blue-700">{tr("dashboard_nece_ml_c9f7a6", "Neçə ml?")}</span>
               </div>
               <div className="flex flex-wrap gap-1.5 mb-2">
                 {formulaMLPresets.map(ml => (
@@ -1385,7 +1385,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             >
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-lg">🥣</span>
-                <span className="text-sm font-semibold text-orange-700"><span className="text-sm font-semibold text-orange-700">Əlavə Qida</span></span>
+                <span className="text-sm font-semibold text-orange-700"><span className="text-sm font-semibold text-orange-700">{tr("dashboard_elave_qida_676032", "Əlavə Qida")}</span></span>
               </div>
               <div className="flex gap-2">
                 <input
@@ -1453,7 +1453,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
               <Clock className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="font-bold text-sm text-foreground">Bez Dəyişmə</h3>
+              <h3 className="font-bold text-sm text-foreground">{tr("dashboard_bez_deyisme_ba242a", "Bez Dəyişmə")}</h3>
               <p className="text-xs text-muted-foreground">Bu gün: {todayStats.diaperCount} dəfə</p>
             </div>
           </div>
@@ -1523,7 +1523,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         transition={{ delay: 0.3 }}
       >
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-base font-bold text-foreground">Bugünkü xülasə</h3>
+          <h3 className="text-base font-bold text-foreground">{tr("dashboard_bugunku_xulase_e1e1b3", "Bugünkü xülasə")}</h3>
           <button
             onClick={() => refetch()}
             className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
@@ -1543,7 +1543,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                   <Moon className="w-4 h-4 text-violet-600 dark:text-violet-400" />
                 </div>
                 <div className="text-left">
-                  <p className="text-xs font-semibold text-foreground">Yuxu xülasəsi</p>
+                  <p className="text-xs font-semibold text-foreground">{tr("dashboard_yuxu_xulasesi_b2dc87", "Yuxu xülasəsi")}</p>
                   <p className="text-[10px] text-muted-foreground">
                     {todayStats.sleepLogs?.length || 0} yuxu qeydə alınıb
                   </p>
@@ -1562,7 +1562,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                       return `${h} saat ${m} dəq`;
                     })()}
                   </p>
-                  <p className="text-[10px] text-muted-foreground">bu gün</p>
+                  <p className="text-[10px] text-muted-foreground">{tr("dashboard_bu_gun_7d7f30", "bu gün")}</p>
                 </div>
                 {sleepExpanded ? (
                   <ChevronUp className="w-4 h-4 text-muted-foreground" />
@@ -1609,7 +1609,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                         );
                       })
                     ) : (
-                      <p className="text-[11px] text-muted-foreground text-center py-2">Bu gün yuxu qeydə alınmayıb</p>
+                      <p className="text-[11px] text-muted-foreground text-center py-2">{tr("dashboard_bu_gun_yuxu_qeyde_alinmayib_8a3535", "Bu gün yuxu qeydə alınmayıb")}</p>
                     )}
                   </div>
                 </motion.div>
@@ -1624,7 +1624,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           <div className="flex items-center justify-between p-2.5 bg-emerald-50 dark:bg-emerald-500/15 rounded-xl border border-emerald-100 dark:border-emerald-500/20">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span className="text-xs font-medium text-foreground">Bez dəyişmə</span>
+              <span className="text-xs font-medium text-foreground">{tr("dashboard_bez_deyisme_647cbc", "Bez dəyişmə")}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-[10px] text-muted-foreground">
@@ -1646,7 +1646,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         transition={{ delay: 0.25 }}
       >
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-base font-bold text-foreground">İnkişaf mərhələləri</h3>
+          <h3 className="text-base font-bold text-foreground">{tr("dashboard_inkisaf_merheleleri_d6d887", "İnkişaf mərhələləri")}</h3>
           <div className="flex items-center gap-2">
             <span className="text-xs text-primary font-bold">
               {allMilestones.filter(m => m.achieved).length}/{allMilestones.length}

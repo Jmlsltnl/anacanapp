@@ -1,6 +1,11 @@
 import { Capacitor } from '@capacitor/core';
 
-// ⚡ FEATURE FLAG: Set to true to enable RevenueCat, false for standard IAP
+// ⚡ FEATURE FLAG: RevenueCat enabled for full IAP + Paywall support.
+// REQUIREMENTS for Android:
+//   1. After pulling this code, run: npm install && npx cap sync android
+//   2. Configure a Paywall in RevenueCat Dashboard → Paywalls (otherwise
+//      presentPaywall() silently no-ops and the JS custom UI is used).
+//   3. Ensure offerings & products are set in RevenueCat Dashboard.
 export const REVENUECAT_ENABLED = true;
 
 // RevenueCat Configuration
@@ -192,21 +197,34 @@ export async function restorePurchases(): Promise<{
 }
 
 /**
- * Present RevenueCat native paywall
+ * Present RevenueCat native paywall.
+ * Returns { didPurchase: false, available: false } when the RevenueCat UI
+ * plugin or a configured paywall is not available — caller should fall back
+ * to the custom in-app modal UI.
  */
 export async function presentPaywall(): Promise<{
   didPurchase: boolean;
+  available: boolean;
 }> {
-  if (!REVENUECAT_ENABLED || !isNativePlatform()) return { didPurchase: false };
+  if (!REVENUECAT_ENABLED || !isNativePlatform()) {
+    return { didPurchase: false, available: false };
+  }
 
   try {
-    const { RevenueCatUI } = await import('@revenuecat/purchases-capacitor-ui');
-    const { PAYWALL_RESULT } = await import('@revenuecat/purchases-capacitor-ui');
+    const mod = await import('@revenuecat/purchases-capacitor-ui').catch(() => null);
+    if (!mod || !mod.RevenueCatUI) {
+      console.warn('[RevenueCat] UI plugin not available — falling back to custom paywall');
+      return { didPurchase: false, available: false };
+    }
+    const { RevenueCatUI, PAYWALL_RESULT } = mod;
     const result = await RevenueCatUI.presentPaywall();
-    return { didPurchase: result?.result === PAYWALL_RESULT.PURCHASED || result?.result === PAYWALL_RESULT.RESTORED };
+    const didPurchase =
+      result?.result === PAYWALL_RESULT.PURCHASED ||
+      result?.result === PAYWALL_RESULT.RESTORED;
+    return { didPurchase, available: true };
   } catch (err) {
-    console.error('RevenueCat paywall error:', err);
-    return { didPurchase: false };
+    console.error('[RevenueCat] paywall error — falling back to custom UI:', err);
+    return { didPurchase: false, available: false };
   }
 }
 

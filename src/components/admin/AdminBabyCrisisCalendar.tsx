@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { 
   Calendar, Plus, Trash2, Save, Edit2, AlertTriangle, 
@@ -148,14 +149,14 @@ const AdminBabyCrisisCalendar = () => {
     try {
       if (editingId) {
         await updateMutation.mutateAsync({ id: editingId, ...payload });
-        toast({ title: 'Kriz dövrü yeniləndi!' });
+        toast({ title: tr("adminbabycrisiscalendar_kriz_dovru_yenilendi_3afe9c", "Kriz dövrü yeniləndi!") });
       } else {
         await createMutation.mutateAsync(payload as any);
-        toast({ title: 'Kriz dövrü yaradıldı!' });
+        toast({ title: tr("adminbabycrisiscalendar_kriz_dovru_yaradildi_377ff6", "Kriz dövrü yaradıldı!") });
       }
       setDialogOpen(false);
     } catch (error) {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("adminbabycrisiscalendar_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   };
 
@@ -166,7 +167,7 @@ const AdminBabyCrisisCalendar = () => {
       await deleteMutation.mutateAsync(id);
       toast({ title: 'Silindi!' });
     } catch (error) {
-      toast({ title: 'Xəta baş verdi', variant: 'destructive' });
+      toast({ title: tr("adminbabycrisiscalendar_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   };
 
@@ -202,7 +203,7 @@ const AdminBabyCrisisCalendar = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-primary">{crisisPeriods.length}</div>
-            <p className="text-sm text-muted-foreground">Ümumi kriz dövrü</p>
+            <p className="text-sm text-muted-foreground">{tr("adminbabycrisiscalendar_umumi_kriz_dovru_ca0915", "Ümumi kriz dövrü")}</p>
           </CardContent>
         </Card>
         <Card>
@@ -210,7 +211,7 @@ const AdminBabyCrisisCalendar = () => {
             <div className="text-2xl font-bold text-green-500">
               {crisisPeriods.filter(p => p.severity === 'mild').length}
             </div>
-            <p className="text-sm text-muted-foreground">Yüngül</p>
+            <p className="text-sm text-muted-foreground">{tr("adminbabycrisiscalendar_yungul_2a8010", "Yüngül")}</p>
           </CardContent>
         </Card>
         <Card>
@@ -226,7 +227,7 @@ const AdminBabyCrisisCalendar = () => {
             <div className="text-2xl font-bold text-red-500">
               {crisisPeriods.filter(p => p.severity === 'intense').length}
             </div>
-            <p className="text-sm text-muted-foreground">Şiddətli</p>
+            <p className="text-sm text-muted-foreground">{tr("adminbabycrisiscalendar_siddetli_2dc9e7", "Şiddətli")}</p>
           </CardContent>
         </Card>
       </div>
@@ -329,7 +330,7 @@ const AdminBabyCrisisCalendar = () => {
                   </div>
                   {(period.description_az || period.description) && (
                     <div className="md:col-span-2">
-                      <h4 className="font-semibold text-sm text-foreground mb-2">Açıqlama</h4>
+                      <h4 className="font-semibold text-sm text-foreground mb-2">{tr("adminbabycrisiscalendar_aciqlama_c33d69", "Açıqlama")}</h4>
                       <p className="text-sm text-muted-foreground">
                         {period.description_az || period.description}
                       </p>
@@ -356,7 +357,7 @@ const AdminBabyCrisisCalendar = () => {
             {/* Basic Info */}
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="text-sm font-medium">Başlanğıc həftə</label>
+                <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_baslangic_hefte_24d6e7", "Başlanğıc həftə")}</label>
                 <Input
                   type="number"
                   min={1}
@@ -366,7 +367,7 @@ const AdminBabyCrisisCalendar = () => {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Bitiş həftəsi</label>
+                <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_bitis_heftesi_8cb7ed", "Bitiş həftəsi")}</label>
                 <Input
                   type="number"
                   min={1}
@@ -390,7 +391,7 @@ const AdminBabyCrisisCalendar = () => {
             {/* Title */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-sm font-medium">Başlıq (EN)</label>
+                <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_basliq_en_4ac905", "Başlıq (EN)")}</label>
                 <Input
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
@@ -398,11 +399,11 @@ const AdminBabyCrisisCalendar = () => {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Başlıq (AZ)</label>
+                <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_basliq_az_3e294a", "Başlıq (AZ)")}</label>
                 <Input
                   value={formData.title_az}
                   onChange={(e) => setFormData(prev => ({ ...prev, title_az: e.target.value }))}
-                  placeholder="...Dünyası"
+                  placeholder={tr("adminbabycrisiscalendar_dunyasi_77862f", "...Dünyası")}
                 />
               </div>
             </div>
@@ -410,7 +411,7 @@ const AdminBabyCrisisCalendar = () => {
             {/* Description */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-sm font-medium">Açıqlama (EN)</label>
+                <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_aciqlama_en_6fb6db", "Açıqlama (EN)")}</label>
                 <Textarea
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
@@ -418,7 +419,7 @@ const AdminBabyCrisisCalendar = () => {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Açıqlama (AZ)</label>
+                <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_aciqlama_az_86f364", "Açıqlama (AZ)")}</label>
                 <Textarea
                   value={formData.description_az}
                   onChange={(e) => setFormData(prev => ({ ...prev, description_az: e.target.value }))}
@@ -430,7 +431,7 @@ const AdminBabyCrisisCalendar = () => {
             {/* Symptoms */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-sm font-medium">Simptomlar (EN) - hər sətirdə bir</label>
+                <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_simptomlar_en_her_setirde_bir_b0a595", "Simptomlar (EN) - hər sətirdə bir")}</label>
                 <Textarea
                   value={formData.symptoms}
                   onChange={(e) => setFormData(prev => ({ ...prev, symptoms: e.target.value }))}
@@ -443,7 +444,7 @@ const AdminBabyCrisisCalendar = () => {
                 <Textarea
                   value={formData.symptoms_az}
                   onChange={(e) => setFormData(prev => ({ ...prev, symptoms_az: e.target.value }))}
-                  placeholder="Daha çox ağlama&#10;Yuxu problemləri"
+                  placeholder={tr("adminbabycrisiscalendar_daha_cox_aglama_10_yuxu_problemleri_c4317e", "Daha çox ağlama&#10;Yuxu problemləri")}
                   rows={3}
                 />
               </div>
@@ -452,7 +453,7 @@ const AdminBabyCrisisCalendar = () => {
             {/* Tips */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-sm font-medium">Tövsiyələr (EN)</label>
+                <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_tovsiyeler_en_28e0bf", "Tövsiyələr (EN)")}</label>
                 <Textarea
                   value={formData.tips}
                   onChange={(e) => setFormData(prev => ({ ...prev, tips: e.target.value }))}
@@ -461,11 +462,11 @@ const AdminBabyCrisisCalendar = () => {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Tövsiyələr (AZ)</label>
+                <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_tovsiyeler_az_12e64c", "Tövsiyələr (AZ)")}</label>
                 <Textarea
                   value={formData.tips_az}
                   onChange={(e) => setFormData(prev => ({ ...prev, tips_az: e.target.value }))}
-                  placeholder="Əlavə qucaqlaşma&#10;Səbir"
+                  placeholder={tr("adminbabycrisiscalendar_elave_qucaqlasma_10_sebir_8f500e", "Əlavə qucaqlaşma&#10;Səbir")}
                   rows={3}
                 />
               </div>
@@ -474,7 +475,7 @@ const AdminBabyCrisisCalendar = () => {
             {/* Settings */}
             <div className="grid grid-cols-4 gap-3">
               <div>
-                <label className="text-sm font-medium">Müddət (gün)</label>
+                <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_muddet_gun_f19d66", "Müddət (gün)")}</label>
                 <Input
                   type="number"
                   value={formData.duration_days}
@@ -482,7 +483,7 @@ const AdminBabyCrisisCalendar = () => {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Şiddət</label>
+                <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_siddet_afc814", "Şiddət")}</label>
                 <Select
                   value={formData.severity}
                   onValueChange={(v) => setFormData(prev => ({ ...prev, severity: v }))}
@@ -491,9 +492,9 @@ const AdminBabyCrisisCalendar = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="mild">Yüngül</SelectItem>
+                    <SelectItem value="mild">{tr("adminbabycrisiscalendar_yungul_2a8010", "Yüngül")}</SelectItem>
                     <SelectItem value="medium">Orta</SelectItem>
-                    <SelectItem value="intense">Şiddətli</SelectItem>
+                    <SelectItem value="intense">{tr("adminbabycrisiscalendar_siddetli_2dc9e7", "Şiddətli")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -506,7 +507,7 @@ const AdminBabyCrisisCalendar = () => {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Rəng</label>
+                <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_reng_8c6bc5", "Rəng")}</label>
                 <Input
                   type="color"
                   value={formData.color}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -205,7 +206,7 @@ const AdminTeething = () => {
   };
 
   if (loading) {
-    return <div className="p-8 text-center">Yüklənir...</div>;
+    return <div className="p-8 text-center">{tr("adminteething_yuklenir_5557de", "Yüklənir...")}</div>;
   }
 
   return (
@@ -216,7 +217,7 @@ const AdminTeething = () => {
             <Sparkles className="w-6 h-6 text-pink-500" />
             Diş Çıxarma İdarəetməsi
           </h2>
-          <p className="text-muted-foreground">Körpə dişləri, qulluq məsləhətləri və simptomları idarə edin</p>
+          <p className="text-muted-foreground">{tr("adminteething_korpe_disleri_qulluq_meslehetleri_ve_sim_bedaf6", "Körpə dişləri, qulluq məsləhətləri və simptomları idarə edin")}</p>
         </div>
         <Button onClick={handleCreate}>
           <Plus className="w-4 h-4 mr-2" />
@@ -247,12 +248,12 @@ const AdminTeething = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Diş</TableHead>
-                    <TableHead>Mövqe</TableHead>
-                    <TableHead>Növ</TableHead>
-                    <TableHead>Çıxma Yaşı</TableHead>
+                    <TableHead>{tr("adminteething_dis_683988", "Diş")}</TableHead>
+                    <TableHead>{tr("adminteething_movqe_509838", "Mövqe")}</TableHead>
+                    <TableHead>{tr("adminteething_nov_98ad7c", "Növ")}</TableHead>
+                    <TableHead>{tr("adminteething_cixma_yasi_941826", "Çıxma Yaşı")}</TableHead>
                     <TableHead>Aktiv</TableHead>
-                    <TableHead>Əməliyyatlar</TableHead>
+                    <TableHead>{tr("adminteething_emeliyyatlar_54d70c", "Əməliyyatlar")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -307,10 +308,10 @@ const AdminTeething = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Məsləhət</TableHead>
+                    <TableHead>{tr("adminteething_meslehet_9a0892", "Məsləhət")}</TableHead>
                     <TableHead>Kateqoriya</TableHead>
                     <TableHead>Aktiv</TableHead>
-                    <TableHead>Əməliyyatlar</TableHead>
+                    <TableHead>{tr("adminteething_emeliyyatlar_54d70c", "Əməliyyatlar")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -362,9 +363,9 @@ const AdminTeething = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Simptom</TableHead>
-                    <TableHead>Şiddət</TableHead>
+                    <TableHead>{tr("adminteething_siddet_afc814", "Şiddət")}</TableHead>
                     <TableHead>Aktiv</TableHead>
-                    <TableHead>Əməliyyatlar</TableHead>
+                    <TableHead>{tr("adminteething_emeliyyatlar_54d70c", "Əməliyyatlar")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -445,7 +446,7 @@ const AdminTeething = () => {
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium">Sıra</label>
+                      <label className="text-sm font-medium">{tr("adminteething_sira_421c5f", "Sıra")}</label>
                       <Input
                         type="number"
                         value={editingItem.sort_order || 0}
@@ -469,34 +470,34 @@ const AdminTeething = () => {
                   </div>
                   <div className="grid grid-cols-3 gap-4">
                     <div>
-                      <label className="text-sm font-medium">Mövqe</label>
+                      <label className="text-sm font-medium">{tr("adminteething_movqe_509838", "Mövqe")}</label>
                       <Select value={editingItem.position} onValueChange={(v) => updateEditingItem('position', v)}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="upper">Yuxarı</SelectItem>
-                          <SelectItem value="lower">Aşağı</SelectItem>
+                          <SelectItem value="upper">{tr("adminteething_yuxari_565e22", "Yuxarı")}</SelectItem>
+                          <SelectItem value="lower">{tr("adminteething_asagi_1c27f1", "Aşağı")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
-                      <label className="text-sm font-medium">Tərəf</label>
+                      <label className="text-sm font-medium">{tr("adminteething_teref_f60bc0", "Tərəf")}</label>
                       <Select value={editingItem.side} onValueChange={(v) => updateEditingItem('side', v)}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="left">Sol</SelectItem>
-                          <SelectItem value="right">Sağ</SelectItem>
-                          <SelectItem value="center">Mərkəz</SelectItem>
+                          <SelectItem value="right">{tr("adminteething_sag_edbe12", "Sağ")}</SelectItem>
+                          <SelectItem value="center">{tr("adminteething_merkez_fa0929", "Mərkəz")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
-                      <label className="text-sm font-medium">Növ</label>
+                      <label className="text-sm font-medium">{tr("adminteething_nov_98ad7c", "Növ")}</label>
                       <Select value={editingItem.tooth_type} onValueChange={(v) => updateEditingItem('tooth_type', v)}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="incisor">Kəsici</SelectItem>
-                          <SelectItem value="canine">Köpək</SelectItem>
-                          <SelectItem value="molar">Azı</SelectItem>
+                          <SelectItem value="incisor">{tr("adminteething_kesici_569ec2", "Kəsici")}</SelectItem>
+                          <SelectItem value="canine">{tr("adminteething_kopek_b079b8", "Köpək")}</SelectItem>
+                          <SelectItem value="molar">{tr("adminteething_azi_462627", "Azı")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -537,31 +538,31 @@ const AdminTeething = () => {
                       <Select value={editingItem.category} onValueChange={(v) => updateEditingItem('category', v)}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="before">Əvvəl</SelectItem>
-                          <SelectItem value="during">Zamanı</SelectItem>
+                          <SelectItem value="before">{tr("adminteething_evvel_b41251", "Əvvəl")}</SelectItem>
+                          <SelectItem value="during">{tr("adminteething_zamani_de9ddc", "Zamanı")}</SelectItem>
                           <SelectItem value="after">Sonra</SelectItem>
-                          <SelectItem value="pain_relief">Ağrı Kəsici</SelectItem>
-                          <SelectItem value="general">Ümumi</SelectItem>
+                          <SelectItem value="pain_relief">{tr("adminteething_agri_kesici_9c92cd", "Ağrı Kəsici")}</SelectItem>
+                          <SelectItem value="general">{tr("adminteething_umumi_1b5521", "Ümumi")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Başlıq (EN)</label>
+                    <label className="text-sm font-medium">{tr("adminteething_basliq_en_4ac905", "Başlıq (EN)")}</label>
                     <Input
                       value={editingItem.title || ''}
                       onChange={(e) => updateEditingItem('title', e.target.value)}
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Başlıq (AZ)</label>
+                    <label className="text-sm font-medium">{tr("adminteething_basliq_az_3e294a", "Başlıq (AZ)")}</label>
                     <Input
                       value={editingItem.title_az || ''}
                       onChange={(e) => updateEditingItem('title_az', e.target.value)}
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Məzmun (EN)</label>
+                    <label className="text-sm font-medium">{tr("adminteething_mezmun_en_7541aa", "Məzmun (EN)")}</label>
                     <Textarea
                       value={editingItem.content || ''}
                       onChange={(e) => updateEditingItem('content', e.target.value)}
@@ -569,7 +570,7 @@ const AdminTeething = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Məzmun (AZ)</label>
+                    <label className="text-sm font-medium">{tr("adminteething_mezmun_az_d18d5f", "Məzmun (AZ)")}</label>
                     <Textarea
                       value={editingItem.content_az || ''}
                       onChange={(e) => updateEditingItem('content_az', e.target.value)}
@@ -590,11 +591,11 @@ const AdminTeething = () => {
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium">Şiddət</label>
+                      <label className="text-sm font-medium">{tr("adminteething_siddet_afc814", "Şiddət")}</label>
                       <Select value={editingItem.severity} onValueChange={(v) => updateEditingItem('severity', v)}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="mild">Yüngül</SelectItem>
+                          <SelectItem value="mild">{tr("adminteething_yungul_2a8010", "Yüngül")}</SelectItem>
                           <SelectItem value="moderate">Orta</SelectItem>
                           <SelectItem value="severe">Ciddi</SelectItem>
                         </SelectContent>
@@ -616,7 +617,7 @@ const AdminTeething = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Açıqlama (EN)</label>
+                    <label className="text-sm font-medium">{tr("adminteething_aciqlama_en_6fb6db", "Açıqlama (EN)")}</label>
                     <Textarea
                       value={editingItem.description || ''}
                       onChange={(e) => updateEditingItem('description', e.target.value)}
@@ -624,7 +625,7 @@ const AdminTeething = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Açıqlama (AZ)</label>
+                    <label className="text-sm font-medium">{tr("adminteething_aciqlama_az_86f364", "Açıqlama (AZ)")}</label>
                     <Textarea
                       value={editingItem.description_az || ''}
                       onChange={(e) => updateEditingItem('description_az', e.target.value)}

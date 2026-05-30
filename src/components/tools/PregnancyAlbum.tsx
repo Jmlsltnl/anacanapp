@@ -254,8 +254,8 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold">Hamiləlik Albomu</h1>
-            <p className="text-xs text-muted-foreground">Hər ay xatirə</p>
+            <h1 className="text-lg font-bold">{tr("pregnancyalbum_hamilelik_albomu_6f1559", "Hamiləlik Albomu")}</h1>
+            <p className="text-xs text-muted-foreground">{tr("pregnancyalbum_her_ay_xatire_c5bdee", "Hər ay xatirə")}</p>
           </div>
           <Button size="sm" variant="outline" className="rounded-xl gap-1.5" onClick={() => setShowOrder(true)}>
             <ShoppingBag className="w-4 h-4" />
@@ -273,7 +273,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-muted-foreground">Hal-hazırda</p>
+              <p className="text-xs text-muted-foreground">{tr("pregnancyalbum_hal_hazirda_b78349", "Hal-hazırda")}</p>
               <p className="text-xl font-bold">{currentMonth}-ci ay</p>
               <p className="text-xs text-muted-foreground">{currentWeek}. həftə</p>
             </div>
@@ -294,7 +294,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
 
       {/* Album Grid */}
       <div className="px-4">
-        <h2 className="font-semibold text-sm mb-3">Xatirələriniz</h2>
+        <h2 className="font-semibold text-sm mb-3">{tr("pregnancyalbum_xatireleriniz_3e880f", "Xatirələriniz")}</h2>
         
         <div className="grid grid-cols-3 gap-2">
           {monthLabels.map((month, index) => {
@@ -347,7 +347,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                     {isCurrent ? (
                       <>
                         <ImagePlus className="w-5 h-5 text-primary mb-1" />
-                        <span className="text-[10px] text-primary font-medium">Əlavə et</span>
+                        <span className="text-[10px] text-primary font-medium">{tr("pregnancyalbum_elave_et_6e1b9b", "Əlavə et")}</span>
                       </>
                     ) : isPast ? (
                       <>
@@ -381,7 +381,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
               <Heart className="w-5 h-5 text-pink-500" />
             </div>
             <div>
-              <h3 className="font-semibold text-sm mb-1">Məsləhət</h3>
+              <h3 className="font-semibold text-sm mb-1">{tr("pregnancyalbum_meslehet_9a0892", "Məsləhət")}</h3>
               <p className="text-xs text-muted-foreground">
                 Hər ay eyni bucaqdan və eyni paltarla şəkil çəkmək daha gözəl albom yaradır. 
                 Beləcə hamiləlik boyunca dəyişiklikləri açıq şəkildə görə bilərsiniz.
@@ -449,7 +449,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                   onClick={() => handleReplace(showActionSheet)}
                 >
                   <RefreshCw className="w-5 h-5 text-blue-500" />
-                  <span className="text-xs font-medium">Dəyişdir</span>
+                  <span className="text-xs font-medium">{tr("pregnancyalbum_deyisdir_aca175", "Dəyişdir")}</span>
                 </Button>
                 
                 <Button
@@ -565,7 +565,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                   ) : (
                     <>
                       <Edit className="w-4 h-4" />
-                      <span className="text-sm">Başlıq əlavə et</span>
+                      <span className="text-sm">{tr("pregnancyalbum_basliq_elave_et_ac912f", "Başlıq əlavə et")}</span>
                     </>
                   )}
                 </button>
@@ -580,7 +580,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
           <div className="bg-card rounded-2xl p-6 text-center">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-            <p className="font-medium">Şəkil yüklənir...</p>
+            <p className="font-medium">{tr("pregnancyalbum_sekil_yuklenir_babf92", "Şəkil yüklənir...")}</p>
           </div>
         </div>
       )}

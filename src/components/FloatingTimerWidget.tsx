@@ -114,7 +114,7 @@ const FloatingTimerWidget = () => {
                     <p className="text-[11px] font-semibold text-foreground truncate leading-tight">
                       {whiteNoise.soundName || 'Küy Səsi'}
                     </p>
-                    <p className="text-[10px] text-muted-foreground">Oynayır</p>
+                    <p className="text-[10px] text-muted-foreground">{tr("floatingtimerwidget_oynayir_2c8aa6", "Oynayır")}</p>
                   </div>
                   <motion.button
                     onClick={() => whiteNoise.toggleMute()}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Users, Package, TrendingUp, Activity, ArrowUp, ArrowDown, UserPlus, Crown, CreditCard } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -177,8 +178,8 @@ const AdminDashboard = () => {
 
       setLifeStageStats([
         { name: 'Flow (Menstruasiya)', value: stageCounts.flow || 15, color: '#ec4899' },
-        { name: 'Bump (Hamiləlik)', value: stageCounts.bump || 45, color: '#f28155' },
-        { name: 'Mommy (Analıq)', value: stageCounts.mommy || 30, color: '#8b5cf6' },
+        { name: tr("admindashboard_bump_hamilelik_f698da", "Bump (Hamiləlik)"), value: stageCounts.bump || 45, color: '#f28155' },
+        { name: tr("admindashboard_mommy_analiq_bd48e3", "Mommy (Analıq)"), value: stageCounts.mommy || 30, color: '#8b5cf6' },
         { name: 'Partner', value: stageCounts.partner || 10, color: '#3b82f6' }
       ]);
     } catch (error) {
@@ -188,7 +189,7 @@ const AdminDashboard = () => {
 
   const statCards = [
     { 
-      label: 'Ümumi İstifadəçilər', 
+      label: tr("admindashboard_umumi_istifadeciler_b02095", "Ümumi İstifadəçilər"), 
       value: stats.totalUsers, 
       icon: Users, 
       color: 'bg-blue-500',
@@ -196,7 +197,7 @@ const AdminDashboard = () => {
       trendUp: stats.newUsersThisWeek > 0
     },
     { 
-      label: 'Premium İstifadəçilər', 
+      label: tr("admindashboard_premium_istifadeciler_ca786c", "Premium İstifadəçilər"), 
       value: stats.premiumUsers, 
       icon: Crown, 
       color: 'bg-amber-500',
@@ -204,7 +205,7 @@ const AdminDashboard = () => {
       trendUp: true
     },
     { 
-      label: 'Bu gün aktiv', 
+      label: tr("admindashboard_bu_gun_aktiv_a7f74d", "Bu gün aktiv"), 
       value: stats.activeToday, 
       icon: Activity, 
       color: 'bg-emerald-500',
@@ -212,7 +213,7 @@ const AdminDashboard = () => {
       trendUp: stats.activeToday > 0
     },
     { 
-      label: 'Bu həftə yeni', 
+      label: tr("admindashboard_bu_hefte_yeni_fec0a5", "Bu həftə yeni"), 
       value: stats.newUsersThisWeek, 
       icon: UserPlus, 
       color: 'bg-purple-500',
@@ -225,7 +226,7 @@ const AdminDashboard = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground">Anacan admin panelinə xoş gəldiniz</p>
+        <p className="text-muted-foreground">{tr("admindashboard_anacan_admin_paneline_xos_geldiniz_adf61c", "Anacan admin panelinə xoş gəldiniz")}</p>
       </div>
 
       {/* Stats Grid */}
@@ -247,7 +248,7 @@ const AdminDashboard = () => {
                   <div className={`flex items-center gap-1 mt-2 text-sm ${stat.trendUp ? 'text-green-500' : 'text-red-500'}`}>
                     {stat.trendUp ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
                     <span>{stat.trend}</span>
-                    <span className="text-muted-foreground">keçən həftəyə nisbətən</span>
+                    <span className="text-muted-foreground">{tr("admindashboard_kecen_hefteye_nisbeten_f4b79f", "keçən həftəyə nisbətən")}</span>
                   </div>
                 </div>
                 <div className={`p-3 rounded-xl ${stat.color}`}>
@@ -263,7 +264,7 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* User Activity Chart */}
         <Card className="p-5">
-          <h3 className="text-lg font-semibold mb-4">Həftəlik Aktivlik</h3>
+          <h3 className="text-lg font-semibold mb-4">{tr("admindashboard_heftelik_aktivlik_6fb4d2", "Həftəlik Aktivlik")}</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={dailyStats}>
@@ -317,7 +318,7 @@ const AdminDashboard = () => {
 
         {/* Life Stage Distribution */}
         <Card className="p-5">
-          <h3 className="text-lg font-semibold mb-4">Həyat Mərhələsi Paylanması</h3>
+          <h3 className="text-lg font-semibold mb-4">{tr("admindashboard_heyat_merhelesi_paylanmasi_9e1b38", "Həyat Mərhələsi Paylanması")}</h3>
           <div className="h-64 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -357,7 +358,7 @@ const AdminDashboard = () => {
 
       {/* Daily Logs Chart */}
       <Card className="p-5">
-        <h3 className="text-lg font-semibold mb-4">Günlük Qeydlər Trendi</h3>
+        <h3 className="text-lg font-semibold mb-4">{tr("admindashboard_gunluk_qeydler_trendi_323286", "Günlük Qeydlər Trendi")}</h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={dailyStats}>
@@ -426,7 +427,7 @@ const AdminDashboard = () => {
             ) : (
               <div className="text-center py-8 text-muted-foreground">
                 <Users className="w-10 h-10 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">Hələ qeydiyyat yoxdur</p>
+                <p className="text-sm">{tr("admindashboard_hele_qeydiyyat_yoxdur_f9d74f", "Hələ qeydiyyat yoxdur")}</p>
               </div>
             )}
           </div>
@@ -457,12 +458,12 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <AdminUsageStats 
           eventNames={['ai_chat_started', 'ai_chat_message']}
-          title="🤖 Anacan AI İstifadəsi"
+          title={tr("admindashboard_anacan_ai_istifadesi_e7b42c", "🤖 Anacan AI İstifadəsi")}
           showUsers
         />
         <AdminUsageStats 
           eventNames={['baby_photo_generated', 'cry_analyzed', 'poop_analyzed', 'fairy_tale_generated']}
-          title="⚡ AI Alətləri İstifadəsi"
+          title={tr("admindashboard_ai_aletleri_istifadesi_ff700b", "⚡ AI Alətləri İstifadəsi")}
           showEventData
           showUsers
         />

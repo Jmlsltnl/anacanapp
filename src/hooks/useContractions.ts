@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
@@ -65,7 +66,7 @@ export const useContractions = () => {
     } catch (error: any) {
       console.error('Error adding contraction:', error);
       toast({
-        title: 'Xəta baş verdi',
+        title: tr("usecontractions_xeta_bas_verdi_f22fba", "Xəta baş verdi"),
         description: error.message,
         variant: 'destructive',
       });
@@ -111,8 +112,8 @@ export const useContractions = () => {
 
       setContractions([]);
       toast({
-        title: 'Sancılar silindi',
-        description: 'Bütün qeydlər silindi.',
+        title: tr("usecontractions_sancilar_silindi_535de3", "Sancılar silindi"),
+        description: tr("usecontractions_butun_qeydler_silindi_1f1172", "Bütün qeydlər silindi."),
       });
     } catch (error: any) {
       console.error('Error clearing contractions:', error);

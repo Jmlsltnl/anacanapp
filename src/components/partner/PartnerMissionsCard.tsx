@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { Target, CheckCircle, Star, Zap, Timer } from 'lucide-react';
 import { usePartnerMissions } from '@/hooks/usePartnerMissions';
 import { useToast } from '@/hooks/use-toast';
@@ -61,7 +62,7 @@ const PartnerMissionsCard = ({ showAll = false }: PartnerMissionsCardProps) => {
             <Target className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="font-bold">Gündəlik Tapşırıqlar</h3>
+            <h3 className="font-bold">{tr("partnermissionscard_gundelik_tapsiriqlar_f54fc3", "Gündəlik Tapşırıqlar")}</h3>
             <p className="text-xs text-muted-foreground">{completedCount}/{missions.length} tamamlandı</p>
           </div>
         </div>

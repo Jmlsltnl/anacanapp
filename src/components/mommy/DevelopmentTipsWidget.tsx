@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lightbulb, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useDevelopmentTips } from '@/hooks/useDevelopmentTips';
@@ -57,7 +58,7 @@ const DevelopmentTipsWidget = () => {
         animate={{ y: 0, opacity: 1 }}
       >
         <div className="text-center py-4">
-          <p className="text-sm text-muted-foreground">Bu yaş qrupu üçün tövsiyə yoxdur</p>
+          <p className="text-sm text-muted-foreground">{tr("developmenttipswidget_bu_yas_qrupu_ucun_tovsiye_yoxdur_3e49db", "Bu yaş qrupu üçün tövsiyə yoxdur")}</p>
         </div>
       </motion.div>
     );
@@ -79,7 +80,7 @@ const DevelopmentTipsWidget = () => {
             <Lightbulb className="w-4 h-4 text-teal-600 dark:text-teal-400" />
           </div>
           <div>
-            <h3 className="font-bold text-sm text-foreground">İnkişaf Tövsiyələri</h3>
+            <h3 className="font-bold text-sm text-foreground">{tr("developmenttipswidget_inkisaf_tovsiyeleri_9f473e", "İnkişaf Tövsiyələri")}</h3>
             <span className="text-[10px] text-teal-600 dark:text-teal-400 font-medium">{getAgeLabel()}</span>
           </div>
         </div>

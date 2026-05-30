@@ -109,12 +109,12 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
               {isShared ? (
                 <>
                   <Users className="w-3 h-3" />
-                  <span>Partnyor ilə ortaq</span>
+                  <span>{tr("shoppinglist_partnyor_ile_ortaq_bbdb50", "Partnyor ilə ortaq")}</span>
                 </>
               ) : (
                 <>
                   <User className="w-3 h-3" />
-                  <span>Şəxsi siyahı</span>
+                  <span>{tr("shoppinglist_sexsi_siyahi_93858e", "Şəxsi siyahı")}</span>
                 </>
               )}
             </div>
@@ -130,11 +130,11 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
         <div className="flex gap-2 mb-2">
           <div className="flex-1 bg-card rounded-xl p-2.5 border border-border/50 flex items-center gap-2">
             <div className="text-xl font-black text-primary">{uncheckedCount}</div>
-            <div className="text-xs text-muted-foreground">alınacaq</div>
+            <div className="text-xs text-muted-foreground">{tr("shoppinglist_alinacaq_c49c64", "alınacaq")}</div>
           </div>
           <div className="flex-1 bg-card rounded-xl p-2.5 border border-border/50 flex items-center gap-2">
             <div className="text-xl font-black text-green-600">{checkedCount}</div>
-            <div className="text-xs text-muted-foreground">alındı</div>
+            <div className="text-xs text-muted-foreground">{tr("shoppinglist_alindi_63cabc", "alındı")}</div>
           </div>
         </div>
 
@@ -263,7 +263,7 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
           {uncheckedItems.length === 0 && (
             <div className="text-center py-6">
               <div className="text-3xl mb-1">🛒</div>
-              <p className="text-sm text-muted-foreground">Siyahı boşdur</p>
+              <p className="text-sm text-muted-foreground">{tr("shoppinglist_siyahi_bosdur_c420ab", "Siyahı boşdur")}</p>
             </div>
           )}
         </div>
@@ -320,7 +320,7 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
           <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-foreground">Ortaq siyahı</p>
+              <p className="text-sm font-medium text-foreground">{tr("shoppinglist_ortaq_siyahi_e10fff", "Ortaq siyahı")}</p>
               <p className="text-xs text-muted-foreground">
                 Bu siyahıya əlavə etdiyiniz məhsullar partnyorunuz tərəfindən də görünür və real vaxtda sinxronlaşır.
               </p>

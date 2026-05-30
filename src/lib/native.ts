@@ -1,4 +1,5 @@
 import { Capacitor } from '@capacitor/core';
+import { tr } from '@/lib/tr';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { StatusBar, Style } from '@capacitor/status-bar';
@@ -207,7 +208,7 @@ export const localNotifications = {
       if (reminderTime > now) {
         reminders.push({
           id: 100 + hour,
-          title: 'Su içmək vaxtı! 💧',
+          title: tr("native_su_icmek_vaxti_cecdf9", "Su içmək vaxtı! 💧"),
           body: 'Sağlamlığınız üçün su içməyi unutmayın.',
           schedule: { at: reminderTime }
         });
@@ -223,7 +224,7 @@ export const localNotifications = {
   schedulePillReminder: async (time: Date) => {
     await localNotifications.schedule([{
       id: 200,
-      title: 'Vitamin vaxtı! 💊',
+      title: tr("native_vitamin_vaxti_9bfc40", "Vitamin vaxtı! 💊"),
       body: 'Gündəlik vitaminlərinizi qəbul etməyi unutmayın.',
       schedule: { at: time }
     }]);
@@ -368,7 +369,7 @@ export const saveImageToGallery = async (imageUrl: string, fileName?: string): P
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({
             files: [file],
-            title: 'Şəkli yadda saxla',
+            title: tr("native_sekli_yadda_saxla_dfbccd", "Şəkli yadda saxla"),
           });
           console.log('iOS: Share sheet opened successfully');
         } else {

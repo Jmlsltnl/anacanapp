@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { Sparkles, ChevronRight, Check, Clock } from 'lucide-react';
 import { useTeething } from '@/hooks/useTeething';
 import { useChildren } from '@/hooks/useChildren';
@@ -45,13 +46,13 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
   
   // Get next expected teeth
   const getNextTeethInfo = (months: number): { name: string; timeframe: string } | null => {
-    if (months < 6) return { name: 'Alt mərkəzi kəsicilər', timeframe: '6-10 ay' };
-    if (months < 8) return { name: 'Yuxarı mərkəzi kəsicilər', timeframe: '8-12 ay' };
-    if (months < 10) return { name: 'Yan kəsicilər', timeframe: '9-16 ay' };
-    if (months < 14) return { name: 'Birinci azı dişlər', timeframe: '13-19 ay' };
-    if (months < 18) return { name: 'Köpək dişləri', timeframe: '16-23 ay' };
-    if (months < 24) return { name: 'İkinci azı dişlər', timeframe: '23-33 ay' };
-    if (emergedCount < 20) return { name: 'Son süd dişləri', timeframe: 'Tezliklə' };
+    if (months < 6) return { name: tr("teethingwidget_alt_merkezi_kesiciler_63d8b0", "Alt mərkəzi kəsicilər"), timeframe: '6-10 ay' };
+    if (months < 8) return { name: tr("teethingwidget_yuxari_merkezi_kesiciler_456b8c", "Yuxarı mərkəzi kəsicilər"), timeframe: '8-12 ay' };
+    if (months < 10) return { name: tr("teethingwidget_yan_kesiciler_c75ada", "Yan kəsicilər"), timeframe: '9-16 ay' };
+    if (months < 14) return { name: tr("teethingwidget_birinci_azi_disler_eccbbc", "Birinci azı dişlər"), timeframe: '13-19 ay' };
+    if (months < 18) return { name: tr("teethingwidget_kopek_disleri_a86ac1", "Köpək dişləri"), timeframe: '16-23 ay' };
+    if (months < 24) return { name: tr("teethingwidget_ikinci_azi_disler_861654", "İkinci azı dişlər"), timeframe: '23-33 ay' };
+    if (emergedCount < 20) return { name: tr("teethingwidget_son_sud_disleri_c43b8c", "Son süd dişləri"), timeframe: 'Tezliklə' };
     return null;
   };
 
@@ -82,7 +83,7 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-sm">Diş Çıxarma</h3>
+                <h3 className="font-semibold text-sm">{tr("teethingwidget_dis_cixarma_ca53f7", "Diş Çıxarma")}</h3>
                 <p className="text-xs text-muted-foreground">
                   {selectedChild.name} • {childAge.displayText}
                 </p>
@@ -94,7 +95,7 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
           {/* Progress */}
           <div className="mb-3">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs text-muted-foreground">Çıxan dişlər</span>
+              <span className="text-xs text-muted-foreground">{tr("teethingwidget_cixan_disler_a9eadd", "Çıxan dişlər")}</span>
               <span className="text-sm font-bold text-pink-600 dark:text-pink-400">{emergedCount} / {totalTeeth}</span>
             </div>
             <Progress value={progress} className="h-2 bg-pink-100 dark:bg-pink-900/30" />
@@ -120,7 +121,7 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
               <div className="flex-1 rounded-xl p-2.5 bg-muted/50">
                 <div className="flex items-center gap-1 mb-0.5">
                   <Clock className="w-3 h-3 text-muted-foreground" />
-                  <p className="text-[10px] text-muted-foreground">Növbəti:</p>
+                  <p className="text-[10px] text-muted-foreground">{tr("teethingwidget_novbeti_0fff9a", "Növbəti:")}</p>
                 </div>
                 <p className="text-xs font-medium line-clamp-1">{nextTeeth.name}</p>
                 <p className="text-[10px] text-muted-foreground">{nextTeeth.timeframe}</p>

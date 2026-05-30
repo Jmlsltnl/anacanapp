@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { 
   Dumbbell, Volume2, Camera, Gift, Baby, Heart, Smile, 
@@ -48,13 +49,13 @@ const AdminDynamicContent = () => {
   const moods = useMoodOptionsAdmin();
 
   const tabs = [
-    { id: 'exercises', label: 'Məşqlər', icon: Dumbbell, count: exercises.data?.length || 0 },
-    { id: 'sounds', label: 'Səslər', icon: Volume2, count: sounds.data?.length || 0 },
-    { id: 'themes', label: 'Foto Mövzuları', icon: Camera, count: themes.data?.length || 0 },
-    { id: 'surprises', label: 'Sürprizlər', icon: Gift, count: surprises.data?.length || 0 },
-    { id: 'milestones', label: 'Mərhələlər', icon: Baby, count: milestones.data?.length || 0 },
+    { id: 'exercises', label: tr("admindynamiccontent_mesqler_603be9", "Məşqlər"), icon: Dumbbell, count: exercises.data?.length || 0 },
+    { id: 'sounds', label: tr("admindynamiccontent_sesler_e66894", "Səslər"), icon: Volume2, count: sounds.data?.length || 0 },
+    { id: 'themes', label: tr("admindynamiccontent_foto_movzulari_b28412", "Foto Mövzuları"), icon: Camera, count: themes.data?.length || 0 },
+    { id: 'surprises', label: tr("admindynamiccontent_surprizler_422463", "Sürprizlər"), icon: Gift, count: surprises.data?.length || 0 },
+    { id: 'milestones', label: tr("admindynamiccontent_merheleler_5eb66e", "Mərhələlər"), icon: Baby, count: milestones.data?.length || 0 },
     { id: 'symptoms', label: 'Simptomlar', icon: Heart, count: symptoms.data?.length || 0 },
-    { id: 'moods', label: 'Əhvallar', icon: Smile, count: moods.data?.length || 0 },
+    { id: 'moods', label: tr("admindynamiccontent_ehvallar_7eced7", "Əhvallar"), icon: Smile, count: moods.data?.length || 0 },
     { id: 'foods', label: 'Qidalar', icon: UtensilsCrossed, count: foods.data?.length || 0 },
     { id: 'categories', label: 'Kateqoriyalar', icon: ShoppingBag, count: categories.data?.length || 0 },
   ];
@@ -165,23 +166,23 @@ const AdminDynamicContent = () => {
               <Input placeholder="Ad (AZ)" value={formData.name_az || ''} onChange={e => setFormData({...formData, name_az: e.target.value})} />
             </div>
             <div className="grid grid-cols-3 gap-3">
-              <Input type="number" placeholder="Dəqiqə" value={formData.duration_minutes || ''} onChange={e => setFormData({...formData, duration_minutes: parseInt(e.target.value)})} />
+              <Input type="number" placeholder={tr("admindynamiccontent_deqiqe_582f34", "Dəqiqə")} value={formData.duration_minutes || ''} onChange={e => setFormData({...formData, duration_minutes: parseInt(e.target.value)})} />
               <Input type="number" placeholder="Kalori" value={formData.calories || ''} onChange={e => setFormData({...formData, calories: parseInt(e.target.value)})} />
               <Select value={formData.level || 'easy'} onValueChange={v => setFormData({...formData, level: v})}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="easy">Asan</SelectItem>
                   <SelectItem value="medium">Orta</SelectItem>
-                  <SelectItem value="hard">Çətin</SelectItem>
+                  <SelectItem value="hard">{tr("admindynamiccontent_cetin_4bf032", "Çətin")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <Input placeholder="İkon (emoji)" value={formData.icon || ''} onChange={e => setFormData({...formData, icon: e.target.value})} />
-              <Input type="number" placeholder="Sıra" value={formData.sort_order || 0} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value)})} />
+              <Input placeholder={tr("admindynamiccontent_ikon_emoji_39cbd9", "İkon (emoji)")} value={formData.icon || ''} onChange={e => setFormData({...formData, icon: e.target.value})} />
+              <Input type="number" placeholder={tr("admindynamiccontent_sira_421c5f", "Sıra")} value={formData.sort_order || 0} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value)})} />
             </div>
-            <Textarea placeholder="Təsvir" value={formData.description || ''} onChange={e => setFormData({...formData, description: e.target.value})} />
-            <Textarea placeholder="Addımlar (hər sətirdə bir addım)" value={(formData.steps || []).join('\n')} onChange={e => setFormData({...formData, steps: e.target.value.split('\n').filter(Boolean)})} />
+            <Textarea placeholder={tr("admindynamiccontent_tesvir_f85651", "Təsvir")} value={formData.description || ''} onChange={e => setFormData({...formData, description: e.target.value})} />
+            <Textarea placeholder={tr("admindynamiccontent_addimlar_her_setirde_bir_addim_a2d6ed", "Addımlar (hər sətirdə bir addım)")} value={(formData.steps || []).join('\n')} onChange={e => setFormData({...formData, steps: e.target.value.split('\n').filter(Boolean)})} />
             <div className="flex items-center gap-2">
               <Switch checked={formData.is_active} onCheckedChange={v => setFormData({...formData, is_active: v})} />
               <span className="text-sm">Aktiv</span>
@@ -199,22 +200,22 @@ const AdminDynamicContent = () => {
             <div className="grid grid-cols-3 gap-3">
               <Input placeholder="Emoji" value={formData.emoji || ''} onChange={e => setFormData({...formData, emoji: e.target.value})} />
               <Select value={formData.noise_type || 'white'} onValueChange={v => setFormData({...formData, noise_type: v})}>
-                <SelectTrigger><SelectValue placeholder="Küy növü" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={tr("admindynamiccontent_kuy_novu_59bd2a", "Küy növü")} /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="white">⚪ Bəyaz Küy</SelectItem>
-                  <SelectItem value="pink">🌸 Çəhrayı Küy</SelectItem>
-                  <SelectItem value="brown">🟤 Qəhvəyi Küy</SelectItem>
+                  <SelectItem value="white">{tr("admindynamiccontent_beyaz_kuy_88a496", "⚪ Bəyaz Küy")}</SelectItem>
+                  <SelectItem value="pink">{tr("admindynamiccontent_cehrayi_kuy_c34852", "🌸 Çəhrayı Küy")}</SelectItem>
+                  <SelectItem value="brown">{tr("admindynamiccontent_qehveyi_kuy_b199b4", "🟤 Qəhvəyi Küy")}</SelectItem>
                 </SelectContent>
               </Select>
               <Input placeholder="Gradient" value={formData.color_gradient || ''} onChange={e => setFormData({...formData, color_gradient: e.target.value})} />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <Input placeholder="Təsvir (AZ)" value={formData.description_az || ''} onChange={e => setFormData({...formData, description_az: e.target.value})} />
-              <Input placeholder="Təsvir (EN)" value={formData.description || ''} onChange={e => setFormData({...formData, description: e.target.value})} />
+              <Input placeholder={tr("admindynamiccontent_tesvir_az_2c237a", "Təsvir (AZ)")} value={formData.description_az || ''} onChange={e => setFormData({...formData, description_az: e.target.value})} />
+              <Input placeholder={tr("admindynamiccontent_tesvir_en_c64521", "Təsvir (EN)")} value={formData.description || ''} onChange={e => setFormData({...formData, description: e.target.value})} />
             </div>
             <Input placeholder="Audio URL" value={formData.audio_url || ''} onChange={e => setFormData({...formData, audio_url: e.target.value})} />
             <div className="grid grid-cols-2 gap-3">
-              <Input type="number" placeholder="Sıra" value={formData.sort_order || 0} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value)})} />
+              <Input type="number" placeholder={tr("admindynamiccontent_sira_421c5f", "Sıra")} value={formData.sort_order || 0} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value)})} />
               <div className="flex items-center gap-2">
                 <Switch checked={formData.is_active} onCheckedChange={v => setFormData({...formData, is_active: v})} />
                 <span className="text-sm">Aktiv</span>
@@ -226,11 +227,11 @@ const AdminDynamicContent = () => {
       case 'surprises':
         return (
           <>
-            <Input placeholder="Başlıq" value={formData.title || ''} onChange={e => setFormData({...formData, title: e.target.value})} />
-            <Textarea placeholder="Təsvir" value={formData.description || ''} onChange={e => setFormData({...formData, description: e.target.value})} />
+            <Input placeholder={tr("admindynamiccontent_basliq_e1f6c5", "Başlıq")} value={formData.title || ''} onChange={e => setFormData({...formData, title: e.target.value})} />
+            <Textarea placeholder={tr("admindynamiccontent_tesvir_f85651", "Təsvir")} value={formData.description || ''} onChange={e => setFormData({...formData, description: e.target.value})} />
             <div className="grid grid-cols-3 gap-3">
               <Input placeholder="Emoji" value={formData.emoji || ''} onChange={e => setFormData({...formData, emoji: e.target.value})} />
-              <Input placeholder="İkon" value={formData.icon || ''} onChange={e => setFormData({...formData, icon: e.target.value})} />
+              <Input placeholder={tr("admindynamiccontent_ikon_6e73fc", "İkon")} value={formData.icon || ''} onChange={e => setFormData({...formData, icon: e.target.value})} />
               <Input type="number" placeholder="Xal" value={formData.points || 10} onChange={e => setFormData({...formData, points: parseInt(e.target.value)})} />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -238,9 +239,9 @@ const AdminDynamicContent = () => {
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="romantic">Romantik</SelectItem>
-                  <SelectItem value="care">Qayğı</SelectItem>
-                  <SelectItem value="adventure">Macəra</SelectItem>
-                  <SelectItem value="gift">Hədiyyə</SelectItem>
+                  <SelectItem value="care">{tr("admindynamiccontent_qaygi_868e7d", "Qayğı")}</SelectItem>
+                  <SelectItem value="adventure">{tr("admindynamiccontent_macera_bc3bdc", "Macəra")}</SelectItem>
+                  <SelectItem value="gift">{tr("admindynamiccontent_hediyye_8578f3", "Hədiyyə")}</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={formData.difficulty || 'easy'} onValueChange={v => setFormData({...formData, difficulty: v})}>
@@ -248,7 +249,7 @@ const AdminDynamicContent = () => {
                 <SelectContent>
                   <SelectItem value="easy">Asan</SelectItem>
                   <SelectItem value="medium">Orta</SelectItem>
-                  <SelectItem value="hard">Çətin</SelectItem>
+                  <SelectItem value="hard">{tr("admindynamiccontent_cetin_4bf032", "Çətin")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -263,19 +264,19 @@ const AdminDynamicContent = () => {
         return (
           <>
             <div className="grid grid-cols-2 gap-3">
-              <Input placeholder="Açar (e.g. first_smile)" value={formData.milestone_key || ''} onChange={e => setFormData({...formData, milestone_key: e.target.value})} />
-              <Input type="number" placeholder="Həftə" value={formData.week_number || 1} onChange={e => setFormData({...formData, week_number: parseInt(e.target.value)})} />
+              <Input placeholder={tr("admindynamiccontent_acar_e_g_first_smile_b34cee", "Açar (e.g. first_smile)")} value={formData.milestone_key || ''} onChange={e => setFormData({...formData, milestone_key: e.target.value})} />
+              <Input type="number" placeholder={tr("admindynamiccontent_hefte_3aa886", "Həftə")} value={formData.week_number || 1} onChange={e => setFormData({...formData, week_number: parseInt(e.target.value)})} />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <Input placeholder="Başlıq (EN)" value={formData.label || ''} onChange={e => setFormData({...formData, label: e.target.value})} />
-              <Input placeholder="Başlıq (AZ)" value={formData.label_az || ''} onChange={e => setFormData({...formData, label_az: e.target.value})} />
+              <Input placeholder={tr("admindynamiccontent_basliq_en_4ac905", "Başlıq (EN)")} value={formData.label || ''} onChange={e => setFormData({...formData, label: e.target.value})} />
+              <Input placeholder={tr("admindynamiccontent_basliq_az_3e294a", "Başlıq (AZ)")} value={formData.label_az || ''} onChange={e => setFormData({...formData, label_az: e.target.value})} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Input placeholder="Emoji" value={formData.emoji || ''} onChange={e => setFormData({...formData, emoji: e.target.value})} />
-              <Input type="number" placeholder="Sıra" value={formData.sort_order || 0} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value)})} />
+              <Input type="number" placeholder={tr("admindynamiccontent_sira_421c5f", "Sıra")} value={formData.sort_order || 0} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value)})} />
             </div>
-            <Textarea placeholder="Təsvir (EN)" value={formData.description || ''} onChange={e => setFormData({...formData, description: e.target.value})} />
-            <Textarea placeholder="Təsvir (AZ)" value={formData.description_az || ''} onChange={e => setFormData({...formData, description_az: e.target.value})} />
+            <Textarea placeholder={tr("admindynamiccontent_tesvir_en_c64521", "Təsvir (EN)")} value={formData.description || ''} onChange={e => setFormData({...formData, description: e.target.value})} />
+            <Textarea placeholder={tr("admindynamiccontent_tesvir_az_2c237a", "Təsvir (AZ)")} value={formData.description_az || ''} onChange={e => setFormData({...formData, description_az: e.target.value})} />
             <div className="flex items-center gap-2">
               <Switch checked={formData.is_active} onCheckedChange={v => setFormData({...formData, is_active: v})} />
               <span className="text-sm">Aktiv</span>
@@ -287,14 +288,14 @@ const AdminDynamicContent = () => {
         return (
           <>
             <div className="grid grid-cols-2 gap-3">
-              <Input placeholder="Açar (e.g. headache)" value={formData.symptom_key || ''} onChange={e => setFormData({...formData, symptom_key: e.target.value})} />
-              <Input placeholder="İkon (emoji)" value={formData.icon || ''} onChange={e => setFormData({...formData, icon: e.target.value})} />
+              <Input placeholder={tr("admindynamiccontent_acar_e_g_headache_92c8bb", "Açar (e.g. headache)")} value={formData.symptom_key || ''} onChange={e => setFormData({...formData, symptom_key: e.target.value})} />
+              <Input placeholder={tr("admindynamiccontent_ikon_emoji_39cbd9", "İkon (emoji)")} value={formData.icon || ''} onChange={e => setFormData({...formData, icon: e.target.value})} />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <Input placeholder="Başlıq (EN)" value={formData.label || ''} onChange={e => setFormData({...formData, label: e.target.value})} />
-              <Input placeholder="Başlıq (AZ)" value={formData.label_az || ''} onChange={e => setFormData({...formData, label_az: e.target.value})} />
+              <Input placeholder={tr("admindynamiccontent_basliq_en_4ac905", "Başlıq (EN)")} value={formData.label || ''} onChange={e => setFormData({...formData, label: e.target.value})} />
+              <Input placeholder={tr("admindynamiccontent_basliq_az_3e294a", "Başlıq (AZ)")} value={formData.label_az || ''} onChange={e => setFormData({...formData, label_az: e.target.value})} />
             </div>
-            <Input type="number" placeholder="Sıra" value={formData.sort_order || 0} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value)})} />
+            <Input type="number" placeholder={tr("admindynamiccontent_sira_421c5f", "Sıra")} value={formData.sort_order || 0} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value)})} />
             <div className="flex items-center gap-2">
               <Switch checked={formData.is_active} onCheckedChange={v => setFormData({...formData, is_active: v})} />
               <span className="text-sm">Aktiv</span>
@@ -315,13 +316,13 @@ const AdminDynamicContent = () => {
               <Input placeholder="Kateqoriya" value={formData.category || ''} onChange={e => setFormData({...formData, category: e.target.value})} />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Yemək növləri</label>
+              <label className="text-sm font-medium">{tr("admindynamiccontent_yemek_novleri_906750", "Yemək növləri")}</label>
               <div className="flex flex-wrap gap-3">
                 {[
-                  { id: 'breakfast', label: '🍳 Səhər yeməyi' },
+                  { id: 'breakfast', label: tr("admindynamiccontent_seher_yemeyi_390d79", "🍳 Səhər yeməyi") },
                   { id: 'lunch', label: '🍲 Nahar' },
-                  { id: 'dinner', label: '🍽️ Şam yeməyi' },
-                  { id: 'snack', label: '🍎 Qəlyanaltı' },
+                  { id: 'dinner', label: tr("admindynamiccontent_sam_yemeyi_34d8bf", "🍽️ Şam yeməyi") },
+                  { id: 'snack', label: tr("admindynamiccontent_qelyanalti_9ceae9", "🍎 Qəlyanaltı") },
                 ].map(mt => {
                   const selected = (formData.meal_types || []).includes(mt.id);
                   return (
@@ -346,9 +347,9 @@ const AdminDynamicContent = () => {
                   );
                 })}
               </div>
-              <p className="text-xs text-muted-foreground">Heç biri seçilməsə bütün yemək növlərində göstəriləcək</p>
+              <p className="text-xs text-muted-foreground">{tr("admindynamiccontent_hec_biri_secilmese_butun_yemek_novlerind_3d16a4", "Heç biri seçilməsə bütün yemək növlərində göstəriləcək")}</p>
             </div>
-            <Input type="number" placeholder="Sıra" value={formData.sort_order || 0} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value)})} />
+            <Input type="number" placeholder={tr("admindynamiccontent_sira_421c5f", "Sıra")} value={formData.sort_order || 0} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value)})} />
             <div className="flex items-center gap-2">
               <Switch checked={formData.is_active} onCheckedChange={v => setFormData({...formData, is_active: v})} />
               <span className="text-sm">Aktiv</span>
@@ -359,14 +360,14 @@ const AdminDynamicContent = () => {
       case 'categories':
         return (
           <>
-            <Input placeholder="Açar (e.g. vitamins)" value={formData.category_key || ''} onChange={e => setFormData({...formData, category_key: e.target.value})} />
+            <Input placeholder={tr("admindynamiccontent_acar_e_g_vitamins_9b17ec", "Açar (e.g. vitamins)")} value={formData.category_key || ''} onChange={e => setFormData({...formData, category_key: e.target.value})} />
             <div className="grid grid-cols-2 gap-3">
               <Input placeholder="Ad (EN)" value={formData.name || ''} onChange={e => setFormData({...formData, name: e.target.value})} />
               <Input placeholder="Ad (AZ)" value={formData.name_az || ''} onChange={e => setFormData({...formData, name_az: e.target.value})} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Input placeholder="Emoji" value={formData.emoji || ''} onChange={e => setFormData({...formData, emoji: e.target.value})} />
-              <Input type="number" placeholder="Sıra" value={formData.sort_order || 0} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value)})} />
+              <Input type="number" placeholder={tr("admindynamiccontent_sira_421c5f", "Sıra")} value={formData.sort_order || 0} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value)})} />
             </div>
             <div className="flex items-center gap-2">
               <Switch checked={formData.is_active} onCheckedChange={v => setFormData({...formData, is_active: v})} />
@@ -392,10 +393,10 @@ const AdminDynamicContent = () => {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Input placeholder="Emoji" value={formData.emoji || ''} onChange={e => setFormData({...formData, emoji: e.target.value})} />
-              <Input type="number" placeholder="Sıra" value={formData.sort_order || 0} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value)})} />
+              <Input type="number" placeholder={tr("admindynamiccontent_sira_421c5f", "Sıra")} value={formData.sort_order || 0} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value)})} />
             </div>
-            <Input placeholder="Önizləmə URL" value={formData.preview_url || ''} onChange={e => setFormData({...formData, preview_url: e.target.value})} />
-            <Textarea placeholder="Prompt mətni" value={formData.prompt_text || ''} onChange={e => setFormData({...formData, prompt_text: e.target.value})} />
+            <Input placeholder={tr("admindynamiccontent_onizleme_url_ad0267", "Önizləmə URL")} value={formData.preview_url || ''} onChange={e => setFormData({...formData, preview_url: e.target.value})} />
+            <Textarea placeholder={tr("admindynamiccontent_prompt_metni_e761e0", "Prompt mətni")} value={formData.prompt_text || ''} onChange={e => setFormData({...formData, prompt_text: e.target.value})} />
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Switch checked={formData.is_premium} onCheckedChange={v => setFormData({...formData, is_premium: v})} />
@@ -413,14 +414,14 @@ const AdminDynamicContent = () => {
         return (
           <>
             <div className="grid grid-cols-2 gap-3">
-              <Input type="number" placeholder="Dəyər (1-5)" value={formData.value || 3} onChange={e => setFormData({...formData, value: parseInt(e.target.value)})} disabled={!!editingItem} />
+              <Input type="number" placeholder={tr("admindynamiccontent_deyer_1_5_24b5f4", "Dəyər (1-5)")} value={formData.value || 3} onChange={e => setFormData({...formData, value: parseInt(e.target.value)})} disabled={!!editingItem} />
               <Input placeholder="Emoji" value={formData.emoji || ''} onChange={e => setFormData({...formData, emoji: e.target.value})} />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <Input placeholder="Başlıq (EN)" value={formData.label || ''} onChange={e => setFormData({...formData, label: e.target.value})} />
-              <Input placeholder="Başlıq (AZ)" value={formData.label_az || ''} onChange={e => setFormData({...formData, label_az: e.target.value})} />
+              <Input placeholder={tr("admindynamiccontent_basliq_en_4ac905", "Başlıq (EN)")} value={formData.label || ''} onChange={e => setFormData({...formData, label: e.target.value})} />
+              <Input placeholder={tr("admindynamiccontent_basliq_az_3e294a", "Başlıq (AZ)")} value={formData.label_az || ''} onChange={e => setFormData({...formData, label_az: e.target.value})} />
             </div>
-            <Input placeholder="Rəng sinifi (e.g. bg-red-100 border-red-300)" value={formData.color_class || ''} onChange={e => setFormData({...formData, color_class: e.target.value})} />
+            <Input placeholder={tr("admindynamiccontent_reng_sinifi_e_g_bg_red_100_border_red_30_9f81d4", "Rəng sinifi (e.g. bg-red-100 border-red-300)")} value={formData.color_class || ''} onChange={e => setFormData({...formData, color_class: e.target.value})} />
             <div className="flex items-center gap-2">
               <Switch checked={formData.is_active} onCheckedChange={v => setFormData({...formData, is_active: v})} />
               <span className="text-sm">Aktiv</span>
@@ -503,8 +504,8 @@ const AdminDynamicContent = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-foreground">Dinamik Məzmun</h2>
-          <p className="text-muted-foreground text-xs sm:text-sm">Tətbiqdəki bütün konfiqurasiya edilə bilən məlumatları idarə edin</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground">{tr("admindynamiccontent_dinamik_mezmun_bec232", "Dinamik Məzmun")}</h2>
+          <p className="text-muted-foreground text-xs sm:text-sm">{tr("admindynamiccontent_tetbiqdeki_butun_konfiqurasiya_edile_bil_b47cab", "Tətbiqdəki bütün konfiqurasiya edilə bilən məlumatları idarə edin")}</p>
         </div>
         {activeTab !== 'moods' && (
           <Button onClick={openCreateModal} className="gap-2 w-full sm:w-auto">
@@ -566,7 +567,7 @@ const AdminDynamicContent = () => {
             {renderFormFields()}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowModal(false)}>Ləğv et</Button>
+            <Button variant="outline" onClick={() => setShowModal(false)}>{tr("admindynamiccontent_legv_et_b5e49c", "Ləğv et")}</Button>
             <Button onClick={handleSave}>Saxla</Button>
           </DialogFooter>
         </DialogContent>

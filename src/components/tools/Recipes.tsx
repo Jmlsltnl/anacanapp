@@ -1,4 +1,5 @@
 import { useState, useMemo, forwardRef } from 'react';
+import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, Search, ChefHat, Clock, Heart, 
@@ -39,7 +40,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
   
   // Get recipe categories from DB or use fallback - filter out any existing "all"
   const recipeCategories = useMemo(() => {
-    const base = [{ id: 'all', name: 'Hamısı', emoji: '🍽️' }];
+    const base = [{ id: 'all', name: tr("recipes_hamisi_c73c4d", "Hamısı"), emoji: '🍽️' }];
     if (dbRecipeCategories.length > 0) {
       const filtered = dbRecipeCategories
         .filter(c => c.category_id !== 'all' && c.name.toLowerCase() !== 'hamısı')
@@ -326,7 +327,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
                 <ChefHat className="w-5 h-5" />
                 Reseptlər
               </h1>
-              <p className="text-white/80 text-sm">Sağlam və ləzzətli yeməklər</p>
+              <p className="text-white/80 text-sm">{tr("recipes_saglam_ve_lezzetli_yemekler_ad49b7", "Sağlam və ləzzətli yeməklər")}</p>
             </div>
             {isPremium && (
               <div className="bg-gradient-to-r from-amber-300 to-amber-400 text-amber-900 px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg">
@@ -347,8 +348,8 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
                 <Crown className="w-6 h-6 text-amber-900" />
               </div>
               <div className="flex-1">
-                <p className="text-white font-bold">Daha çox resept?</p>
-                <p className="text-white/70 text-sm">Hər kateqoriyadan 3 resept pulsuzdur. Hamısını görmək üçün Premium-a keçin</p>
+                <p className="text-white font-bold">{tr("recipes_daha_cox_resept_975410", "Daha çox resept?")}</p>
+                <p className="text-white/70 text-sm">{tr("recipes_her_kateqoriyadan_3_resept_pulsuzdur_ham_42a43d", "Hər kateqoriyadan 3 resept pulsuzdur. Hamısını görmək üçün Premium-a keçin")}</p>
               </div>
               <Sparkles className="w-5 h-5 text-amber-300 animate-pulse" />
             </motion.div>
@@ -422,8 +423,8 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
               <div className="w-20 h-20 mx-auto mb-4 rounded-3xl bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/20 flex items-center justify-center">
                 <UtensilsCrossed className="w-10 h-10 text-amber-500" />
               </div>
-              <p className="text-muted-foreground font-medium">Resept tapılmadı</p>
-              <p className="text-sm text-muted-foreground/70 mt-1">Başqa kateqoriya yoxlayın</p>
+              <p className="text-muted-foreground font-medium">{tr("recipes_resept_tapilmadi_dde89b", "Resept tapılmadı")}</p>
+              <p className="text-sm text-muted-foreground/70 mt-1">{tr("recipes_basqa_kateqoriya_yoxlayin_31917a", "Başqa kateqoriya yoxlayın")}</p>
             </motion.div>
           ) : (
             <div className="grid grid-cols-2 gap-3">

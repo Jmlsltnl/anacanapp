@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -55,7 +56,7 @@ export const useAdminFAQ = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['faqs-admin'] });
       queryClient.invalidateQueries({ queryKey: ['faqs'] });
-      toast({ title: 'Sual əlavə edildi' });
+      toast({ title: tr("useadminfaq_sual_elave_edildi_2d000b", "Sual əlavə edildi") });
     },
   });
 
@@ -67,7 +68,7 @@ export const useAdminFAQ = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['faqs-admin'] });
       queryClient.invalidateQueries({ queryKey: ['faqs'] });
-      toast({ title: 'Sual yeniləndi' });
+      toast({ title: tr("useadminfaq_sual_yenilendi_786899", "Sual yeniləndi") });
     },
   });
 
