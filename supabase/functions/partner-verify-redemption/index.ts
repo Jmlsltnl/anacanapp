@@ -7,6 +7,13 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
 };
 
+function jsonResponse(payload: Record<string, unknown>, status = 200) {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
+
 function maskName(name?: string | null): string {
   if (!name) return 'İstifadəçi';
   const parts = name.trim().split(/\s+/);
@@ -26,9 +33,7 @@ Deno.serve(async (req) => {
     const token = typeof body?.token === 'string' ? body.token.trim() : '';
     const pin = typeof body?.pin === 'string' ? body.pin.trim() : '';
 
-    if (!token || !pin) {
-      return new Response(JSON.stringify({ error: 'missing_params' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
+    if (!token || !pin) return jsonResponse({ status: 'error', error: 'missing_params' });
 
     const { data: red } = await admin
       .from('partner_redemptions')
@@ -36,17 +41,15 @@ Deno.serve(async (req) => {
       .eq('token', token)
       .maybeSingle();
 
-    if (!red) {
-      return new Response(JSON.stringify({ error: 'invalid_token' }), { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
+    if (!red) return jsonResponse({ status: 'error', error: 'invalid_token' });
 
     if (red.status === 'verified') {
-      return new Response(JSON.stringify({ error: 'already_verified', verified_at: red.verified_at }), { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      return jsonResponse({ status: 'error', error: 'already_verified', verified_at: red.verified_at });
     }
 
     if (new Date(red.expires_at) < new Date()) {
       await admin.from('partner_redemptions').update({ status: 'expired' }).eq('id', red.id).eq('status', 'pending');
-      return new Response(JSON.stringify({ error: 'expired' }), { status: 410, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      return jsonResponse({ status: 'error', error: 'expired' });
     }
 
     const { data: venue } = await admin
@@ -55,17 +58,15 @@ Deno.serve(async (req) => {
       .eq('id', red.venue_id)
       .maybeSingle();
 
-    if (!venue) {
-      return new Response(JSON.stringify({ error: 'venue_missing' }), { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
+    if (!venue) return jsonResponse({ status: 'error', error: 'venue_missing' });
 
     if (!venue.pin_hash) {
-      return new Response(JSON.stringify({ error: 'pin_not_configured' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      return jsonResponse({ status: 'error', error: 'pin_not_configured' });
     }
 
     const okPin = await bcrypt.compare(pin, venue.pin_hash);
     if (!okPin) {
-      return new Response(JSON.stringify({ error: 'invalid_pin' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      return jsonResponse({ status: 'error', error: 'invalid_pin' });
     }
 
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || req.headers.get('cf-connecting-ip') || null;
@@ -80,7 +81,7 @@ Deno.serve(async (req) => {
       .eq('status', 'pending');
 
     if (updErr) {
-      return new Response(JSON.stringify({ error: 'update_failed', details: updErr.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      return jsonResponse({ error: 'update_failed', details: updErr.message }, 500);
     }
 
     const { data: profile } = await admin
@@ -89,8 +90,8 @@ Deno.serve(async (req) => {
       .eq('user_id', red.user_id)
       .maybeSingle();
 
-    return new Response(
-      JSON.stringify({
+    return jsonResponse({
+        status: 'verified',
         status: 'verified',
         venue_name: venue.name,
         venue_logo_url: venue.logo_url,
@@ -98,10 +99,9 @@ Deno.serve(async (req) => {
         user_name: maskName(profile?.name),
         is_premium: !!profile?.is_premium,
         verified_at: updatedRows?.[0]?.verified_at ?? verifiedAt,
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+      });
   } catch (e) {
-    return new Response(JSON.stringify({ error: 'internal', details: String(e) }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    console.error('partner-verify-redemption failed', e);
+    return jsonResponse({ error: 'internal', details: String(e) }, 500);
   }
 });
