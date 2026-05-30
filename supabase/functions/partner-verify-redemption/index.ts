@@ -1,5 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.45.0';
-import * as bcrypt from 'https://deno.land/x/bcrypt@v0.4.1/mod.ts';
+import bcrypt from 'npm:bcryptjs';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -23,8 +23,8 @@ Deno.serve(async (req) => {
     const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     const body = await req.json().catch(() => ({}));
-    const token = body?.token as string;
-    const pin = body?.pin as string;
+    const token = typeof body?.token === 'string' ? body.token.trim() : '';
+    const pin = typeof body?.pin === 'string' ? body.pin.trim() : '';
 
     if (!token || !pin) {
       return new Response(JSON.stringify({ error: 'missing_params' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -59,6 +59,10 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'venue_missing' }), { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
+    if (!venue.pin_hash) {
+      return new Response(JSON.stringify({ error: 'pin_not_configured' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
     const okPin = await bcrypt.compare(pin, venue.pin_hash);
     if (!okPin) {
       return new Response(JSON.stringify({ error: 'invalid_pin' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -66,9 +70,12 @@ Deno.serve(async (req) => {
 
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || req.headers.get('cf-connecting-ip') || null;
 
-    const { error: updErr } = await admin
+    const verifiedAt = new Date().toISOString();
+
+    const { data: updatedRows, error: updErr } = await admin
       .from('partner_redemptions')
-      .update({ status: 'verified', verified_at: new Date().toISOString(), verified_ip: ip })
+      .update({ status: 'verified', verified_at: verifiedAt, verified_ip: ip })
+      .select('verified_at')
       .eq('id', red.id)
       .eq('status', 'pending');
 
@@ -90,7 +97,7 @@ Deno.serve(async (req) => {
         discount_label: venue.discount_label,
         user_name: maskName(profile?.name),
         is_premium: !!profile?.is_premium,
-        verified_at: new Date().toISOString(),
+        verified_at: updatedRows?.[0]?.verified_at ?? verifiedAt,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

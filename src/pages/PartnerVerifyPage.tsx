@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { CheckCircle2, XCircle, Loader2, Sparkles, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { FunctionsHttpError } from '@supabase/supabase-js';
 
 interface StatusData {
   status: string;
@@ -50,12 +51,23 @@ export default function PartnerVerifyPage() {
       if ((data as any)?.error) throw new Error((data as any).error);
       setVerified(data as StatusData);
     } catch (e: any) {
-      const msg = e?.message || 'Xəta';
+      let msg = e?.message || 'Xəta';
+
+      if (e instanceof FunctionsHttpError) {
+        try {
+          const errorBody = await e.context.json();
+          msg = errorBody?.error || errorBody?.details || msg;
+        } catch {
+          msg = e.message || msg;
+        }
+      }
+
       const map: Record<string, string> = {
         invalid_pin: 'PIN səhvdir',
         invalid_token: 'QR yanlışdır',
         expired: 'QR-ın müddəti bitib',
         already_verified: 'Bu QR artıq istifadə olunub',
+        pin_not_configured: 'Məkan üçün PIN hələ qurulmayıb',
       };
       setError(map[msg] || msg);
     } finally {
