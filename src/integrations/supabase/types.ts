@@ -4935,6 +4935,60 @@ export type Database = {
         }
         Relationships: []
       }
+      partner_redemptions: {
+        Row: {
+          client_meta: Json | null
+          created_at: string
+          expires_at: string
+          id: string
+          status: string
+          token: string
+          user_id: string
+          venue_id: string
+          verified_at: string | null
+          verified_ip: string | null
+        }
+        Insert: {
+          client_meta?: Json | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          status?: string
+          token: string
+          user_id: string
+          venue_id: string
+          verified_at?: string | null
+          verified_ip?: string | null
+        }
+        Update: {
+          client_meta?: Json | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          status?: string
+          token?: string
+          user_id?: string
+          venue_id?: string
+          verified_at?: string | null
+          verified_ip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_redemptions_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "partner_venues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_redemptions_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "partner_venues_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partner_surprises: {
         Row: {
           completed_date: string | null
@@ -4982,6 +5036,143 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      partner_venue_categories: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          is_active: boolean
+          key: string
+          label_az: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          key: string
+          label_az: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          key?: string
+          label_az?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      partner_venues: {
+        Row: {
+          address: string | null
+          category_key: string
+          city: string | null
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          discount_label: string
+          discount_terms: string | null
+          discount_value: number | null
+          district: string | null
+          gallery_urls: string[] | null
+          id: string
+          instagram: string | null
+          is_active: boolean
+          is_featured: boolean
+          latitude: number | null
+          logo_url: string | null
+          longitude: number | null
+          name: string
+          phone: string | null
+          pin_hash: string
+          qr_ttl_seconds: number
+          redemption_cooldown_hours: number
+          redemption_lifetime_limit: number | null
+          slug: string | null
+          sort_order: number
+          updated_at: string
+          website: string | null
+          working_hours: Json | null
+        }
+        Insert: {
+          address?: string | null
+          category_key: string
+          city?: string | null
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          discount_label: string
+          discount_terms?: string | null
+          discount_value?: number | null
+          district?: string | null
+          gallery_urls?: string[] | null
+          id?: string
+          instagram?: string | null
+          is_active?: boolean
+          is_featured?: boolean
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          name: string
+          phone?: string | null
+          pin_hash: string
+          qr_ttl_seconds?: number
+          redemption_cooldown_hours?: number
+          redemption_lifetime_limit?: number | null
+          slug?: string | null
+          sort_order?: number
+          updated_at?: string
+          website?: string | null
+          working_hours?: Json | null
+        }
+        Update: {
+          address?: string | null
+          category_key?: string
+          city?: string | null
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          discount_label?: string
+          discount_terms?: string | null
+          discount_value?: number | null
+          district?: string | null
+          gallery_urls?: string[] | null
+          id?: string
+          instagram?: string | null
+          is_active?: boolean
+          is_featured?: boolean
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          name?: string
+          phone?: string | null
+          pin_hash?: string
+          qr_ttl_seconds?: number
+          redemption_cooldown_hours?: number
+          redemption_lifetime_limit?: number | null
+          slug?: string | null
+          sort_order?: number
+          updated_at?: string
+          website?: string | null
+          working_hours?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_venues_category_key_fkey"
+            columns: ["category_key"]
+            isOneToOne: false
+            referencedRelation: "partner_venue_categories"
+            referencedColumns: ["key"]
+          },
+        ]
       }
       payment_methods: {
         Row: {
@@ -8271,9 +8462,113 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      partner_venues_public: {
+        Row: {
+          address: string | null
+          category_key: string | null
+          city: string | null
+          cover_url: string | null
+          created_at: string | null
+          description: string | null
+          discount_label: string | null
+          discount_terms: string | null
+          discount_value: number | null
+          district: string | null
+          gallery_urls: string[] | null
+          id: string | null
+          instagram: string | null
+          is_active: boolean | null
+          is_featured: boolean | null
+          latitude: number | null
+          logo_url: string | null
+          longitude: number | null
+          name: string | null
+          phone: string | null
+          qr_ttl_seconds: number | null
+          redemption_cooldown_hours: number | null
+          redemption_lifetime_limit: number | null
+          slug: string | null
+          sort_order: number | null
+          updated_at: string | null
+          website: string | null
+          working_hours: Json | null
+        }
+        Insert: {
+          address?: string | null
+          category_key?: string | null
+          city?: string | null
+          cover_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          discount_label?: string | null
+          discount_terms?: string | null
+          discount_value?: number | null
+          district?: string | null
+          gallery_urls?: string[] | null
+          id?: string | null
+          instagram?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          name?: string | null
+          phone?: string | null
+          qr_ttl_seconds?: number | null
+          redemption_cooldown_hours?: number | null
+          redemption_lifetime_limit?: number | null
+          slug?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+          website?: string | null
+          working_hours?: Json | null
+        }
+        Update: {
+          address?: string | null
+          category_key?: string | null
+          city?: string | null
+          cover_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          discount_label?: string | null
+          discount_terms?: string | null
+          discount_value?: number | null
+          district?: string | null
+          gallery_urls?: string[] | null
+          id?: string | null
+          instagram?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          name?: string | null
+          phone?: string | null
+          qr_ttl_seconds?: number | null
+          redemption_cooldown_hours?: number | null
+          redemption_lifetime_limit?: number | null
+          slug?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+          website?: string | null
+          working_hours?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_venues_category_key_fkey"
+            columns: ["category_key"]
+            isOneToOne: false
+            referencedRelation: "partner_venue_categories"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
     }
     Functions: {
+      can_redeem_partner_venue: {
+        Args: { _user_id: string; _venue_id: string }
+        Returns: Json
+      }
       find_partner_by_code: {
         Args: { p_partner_code: string }
         Returns: {

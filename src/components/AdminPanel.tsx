@@ -64,6 +64,8 @@ import AdminLanguages from './admin/AdminLanguages';
 import AdminTranslations from './admin/AdminTranslations';
 import AdminDeeplinks from './admin/AdminDeeplinks';
 import AdminCrashReports from './admin/AdminCrashReports';
+import AdminPartnerVenues from './admin/AdminPartnerVenues';
+import AdminPartnerRedemptions from './admin/AdminPartnerRedemptions';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -204,6 +206,10 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminDeeplinks />;
       case 'crash-reports':
         return <AdminCrashReports />;
+      case 'partner-venues':
+        return <AdminPartnerVenues />;
+      case 'partner-redemptions':
+        return <AdminPartnerRedemptions />;
       default:
         return <AdminDashboard />;
     }

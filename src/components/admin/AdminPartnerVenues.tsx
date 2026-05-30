@@ -1,0 +1,182 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import bcrypt from 'bcryptjs';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Plus, Edit, Trash2, Sparkles, Eye, EyeOff } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+
+interface Venue {
+  id?: string;
+  name: string;
+  category_key: string;
+  description?: string | null;
+  logo_url?: string | null;
+  cover_url?: string | null;
+  address?: string | null;
+  city?: string | null;
+  phone?: string | null;
+  website?: string | null;
+  instagram?: string | null;
+  discount_label: string;
+  discount_value?: number | null;
+  discount_terms?: string | null;
+  redemption_cooldown_hours: number;
+  redemption_lifetime_limit?: number | null;
+  qr_ttl_seconds: number;
+  pin_hash?: string;
+  is_active: boolean;
+  is_featured: boolean;
+  sort_order: number;
+}
+
+const emptyVenue = (): Venue => ({
+  name: '', category_key: 'spa', discount_label: '20% endirim',
+  redemption_cooldown_hours: 24, qr_ttl_seconds: 300,
+  is_active: true, is_featured: false, sort_order: 0,
+});
+
+export default function AdminPartnerVenues() {
+  const [venues, setVenues] = useState<Venue[]>([]);
+  const [categories, setCategories] = useState<{ key: string; label_az: string }[]>([]);
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Venue | null>(null);
+  const [pin, setPin] = useState('');
+  const [showPin, setShowPin] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  const load = async () => {
+    const [{ data: v }, { data: c }] = await Promise.all([
+      supabase.from('partner_venues').select('*').order('sort_order'),
+      supabase.from('partner_venue_categories').select('key, label_az').order('sort_order'),
+    ]);
+    setVenues((v as any) || []);
+    setCategories((c as any) || []);
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const openNew = () => { setEditing(emptyVenue()); setPin(''); setOpen(true); };
+  const openEdit = (v: Venue) => { setEditing({ ...v }); setPin(''); setOpen(true); };
+
+  const save = async () => {
+    if (!editing) return;
+    if (!editing.name || !editing.discount_label) {
+      toast({ title: 'Ad və endirim mətni vacibdir', variant: 'destructive' }); return;
+    }
+    if (!editing.id && !pin) {
+      toast({ title: 'Yeni məkan üçün PIN qoyun', variant: 'destructive' }); return;
+    }
+    setLoading(true);
+    try {
+      const payload: any = { ...editing };
+      delete payload.id;
+      if (pin) payload.pin_hash = await bcrypt.hash(pin, 10);
+      else delete payload.pin_hash;
+
+      if (editing.id) {
+        const { error } = await supabase.from('partner_venues').update(payload).eq('id', editing.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('partner_venues').insert(payload);
+        if (error) throw error;
+      }
+      toast({ title: 'Yadda saxlandı' });
+      setOpen(false);
+      await load();
+    } catch (e: any) {
+      toast({ title: 'Xəta', description: e.message, variant: 'destructive' });
+    } finally { setLoading(false); }
+  };
+
+  const del = async (v: Venue) => {
+    if (!confirm(`"${v.name}" silinsin?`)) return;
+    const { error } = await supabase.from('partner_venues').delete().eq('id', v.id!);
+    if (error) { toast({ title: 'Xəta', description: error.message, variant: 'destructive' }); return; }
+    toast({ title: 'Silindi' });
+    await load();
+  };
+
+  return (
+    <div className="p-4 space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2"><Sparkles className="w-5 h-5 text-primary" /> Partnyor Məkanları</h1>
+          <p className="text-sm text-muted-foreground">Premium istifadəçilərə endirim verən məkanlar</p>
+        </div>
+        <Button onClick={openNew}><Plus className="w-4 h-4 mr-1" /> Yeni məkan</Button>
+      </div>
+
+      <div className="grid gap-3">
+        {venues.map((v) => (
+          <Card key={v.id} className="p-3 flex items-center gap-3">
+            {v.logo_url ? <img src={v.logo_url} className="w-12 h-12 rounded-xl object-cover" /> : <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center"><Sparkles className="w-5 h-5 text-muted-foreground" /></div>}
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold">{v.name}</h3>
+                {v.is_featured && <span className="text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full">★</span>}
+                {!v.is_active && <span className="text-[10px] bg-destructive/20 text-destructive px-1.5 py-0.5 rounded-full">Deaktiv</span>}
+              </div>
+              <p className="text-xs text-muted-foreground">{v.category_key} • {v.discount_label} • cooldown {v.redemption_cooldown_hours}h • TTL {v.qr_ttl_seconds}s</p>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => openEdit(v)}><Edit className="w-4 h-4" /></Button>
+            <Button variant="ghost" size="icon" onClick={() => del(v)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+          </Card>
+        ))}
+        {venues.length === 0 && <p className="text-center text-sm text-muted-foreground py-12">Hələ partnyor məkanı yoxdur.</p>}
+      </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>{editing?.id ? 'Məkanı redaktə et' : 'Yeni partnyor məkanı'}</DialogTitle></DialogHeader>
+          {editing && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <Input placeholder="Ad" value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} />
+                <select className="h-10 border border-input rounded-md px-3 bg-background" value={editing.category_key} onChange={(e) => setEditing({ ...editing, category_key: e.target.value })}>
+                  {categories.map(c => <option key={c.key} value={c.key}>{c.label_az}</option>)}
+                </select>
+              </div>
+              <textarea placeholder="Təsvir" className="w-full min-h-[80px] border border-input rounded-md p-2 bg-background text-sm" value={editing.description || ''} onChange={(e) => setEditing({ ...editing, description: e.target.value })} />
+              <div className="grid grid-cols-2 gap-3">
+                <Input placeholder="Logo URL" value={editing.logo_url || ''} onChange={(e) => setEditing({ ...editing, logo_url: e.target.value })} />
+                <Input placeholder="Cover URL" value={editing.cover_url || ''} onChange={(e) => setEditing({ ...editing, cover_url: e.target.value })} />
+                <Input placeholder="Ünvan" value={editing.address || ''} onChange={(e) => setEditing({ ...editing, address: e.target.value })} />
+                <Input placeholder="Şəhər" value={editing.city || ''} onChange={(e) => setEditing({ ...editing, city: e.target.value })} />
+                <Input placeholder="Telefon" value={editing.phone || ''} onChange={(e) => setEditing({ ...editing, phone: e.target.value })} />
+                <Input placeholder="Veb sayt" value={editing.website || ''} onChange={(e) => setEditing({ ...editing, website: e.target.value })} />
+                <Input placeholder="Instagram (@user)" value={editing.instagram || ''} onChange={(e) => setEditing({ ...editing, instagram: e.target.value })} />
+              </div>
+              <div className="border-t pt-3">
+                <h4 className="text-sm font-bold mb-2">Endirim qaydaları</h4>
+                <Input placeholder="Endirim mətni (məs: 20% endirim)" value={editing.discount_label} onChange={(e) => setEditing({ ...editing, discount_label: e.target.value })} />
+                <textarea placeholder="Şərtlər (istisnalar, vaxt limiti)" className="w-full mt-2 min-h-[60px] border border-input rounded-md p-2 bg-background text-sm" value={editing.discount_terms || ''} onChange={(e) => setEditing({ ...editing, discount_terms: e.target.value })} />
+                <div className="grid grid-cols-3 gap-2 mt-2">
+                  <label className="text-xs">Cooldown (saat)<Input type="number" value={editing.redemption_cooldown_hours} onChange={(e) => setEditing({ ...editing, redemption_cooldown_hours: parseInt(e.target.value) || 0 })} /></label>
+                  <label className="text-xs">Ümumi limit (boş = limitsiz)<Input type="number" value={editing.redemption_lifetime_limit ?? ''} onChange={(e) => setEditing({ ...editing, redemption_lifetime_limit: e.target.value ? parseInt(e.target.value) : null })} /></label>
+                  <label className="text-xs">QR TTL (san)<Input type="number" value={editing.qr_ttl_seconds} onChange={(e) => setEditing({ ...editing, qr_ttl_seconds: parseInt(e.target.value) || 60 })} /></label>
+                </div>
+              </div>
+              <div className="border-t pt-3">
+                <h4 className="text-sm font-bold mb-2">Məkan PIN kodu {editing.id && '(boş buraxın → dəyişməz)'}</h4>
+                <div className="relative">
+                  <Input type={showPin ? 'text' : 'password'} placeholder={editing.id ? 'Yeni PIN (boş = saxlanılır)' : 'PIN qoy'} value={pin} onChange={(e) => setPin(e.target.value)} />
+                  <button type="button" className="absolute right-2 top-2" onClick={() => setShowPin(!showPin)}>{showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
+                </div>
+              </div>
+              <div className="flex gap-4 items-center">
+                <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={editing.is_active} onChange={(e) => setEditing({ ...editing, is_active: e.target.checked })} /> Aktiv</label>
+                <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={editing.is_featured} onChange={(e) => setEditing({ ...editing, is_featured: e.target.checked })} /> Önə çıxar</label>
+                <label className="text-sm flex items-center gap-2">Sıra: <Input className="w-20" type="number" value={editing.sort_order} onChange={(e) => setEditing({ ...editing, sort_order: parseInt(e.target.value) || 0 })} /></label>
+              </div>
+              <Button onClick={save} disabled={loading} className="w-full">{loading ? 'Saxlanılır...' : 'Yadda saxla'}</Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
