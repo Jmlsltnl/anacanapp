@@ -128,7 +128,7 @@
 		<true/>
 	</dict>
 
-	<!-- ===== URL Schemes (Deeplink) ===== -->
+	<!-- ===== URL Schemes (Deeplink + Facebook) ===== -->
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -142,7 +142,25 @@
 				<string>com.atlasoon.anacan</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb927014948766655</string>
+			</array>
+		</dict>
 	</array>
+
+	<!-- ===== Facebook / Meta SDK ===== -->
+	<key>FacebookAppID</key>
+	<string>927014948766655</string>
+	<key>FacebookClientToken</key>
+	<string>67f7fdf1147431285d5ff230fa259f3a</string>
+	<key>FacebookDisplayName</key>
+	<string>Anacan</string>
+	<key>FacebookAutoLogAppEventsEnabled</key>
+	<true/>
+	<key>FacebookAdvertiserIDCollectionEnabled</key>
+	<true/>
 
 	<!-- ===== Universal Links üçün açılan tətbiqlər ===== -->
 	<key>LSApplicationQueriesSchemes</key>
@@ -152,6 +170,10 @@
 		<string>tel</string>
 		<string>https</string>
 		<string>http</string>
+		<string>fbapi</string>
+		<string>fb-messenger-share-api</string>
+		<string>fbauth2</string>
+		<string>fbshareextension</string>
 	</array>
 
 	<!-- ===== Encryption (App Store yükləməni sürətləndirir) ===== -->

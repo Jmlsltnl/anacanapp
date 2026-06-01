@@ -167,6 +167,11 @@ export const logEvent = async (eventName: AnalyticsEvent, params?: AnalyticsPara
       trackMixpanelEvent(eventName, params as Record<string, any>);
     }).catch(() => {});
 
+    // Facebook / Meta App Events tracking (non-blocking, native-only)
+    import('@/lib/facebook-events').then(({ logFacebookEvent }) => {
+      logFacebookEvent(eventName, params as Record<string, any>);
+    }).catch(() => {});
+
     // Internal DB tracking (non-blocking)
     trackInternal(eventName, params);
     
