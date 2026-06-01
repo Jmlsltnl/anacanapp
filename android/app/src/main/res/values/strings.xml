@@ -4,4 +4,9 @@
     <string name="title_activity_main">Anacan</string>
     <string name="package_name">com.atlasoon.anacan</string>
     <string name="custom_url_scheme">com.atlasoon.anacan</string>
+
+    <!-- Facebook / Meta SDK -->
+    <string name="facebook_app_id">927014948766655</string>
+    <string name="facebook_client_token">67f7fdf1147431285d5ff230fa259f3a</string>
+    <string name="fb_login_protocol_scheme">fb927014948766655</string>
 </resources>
