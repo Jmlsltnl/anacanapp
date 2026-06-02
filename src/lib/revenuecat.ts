@@ -41,6 +41,12 @@ export const RC_PRODUCTS = {
 
 export const isNativePlatform = (): boolean => Capacitor.isNativePlatform();
 
+export const hasRevenueCatPlugin = (): boolean =>
+  isNativePlatform() && Capacitor.isPluginAvailable('Purchases');
+
+export const hasRevenueCatUIPlugin = (): boolean =>
+  isNativePlatform() && Capacitor.isPluginAvailable('RevenueCatUI');
+
 export const getPlatform = (): 'ios' | 'android' | 'web' => {
   const p = Capacitor.getPlatform();
   if (p === 'ios') return 'ios';
@@ -52,7 +58,7 @@ export const getPlatform = (): 'ios' | 'android' | 'web' => {
  * Initialize RevenueCat SDK. Call once at app startup on native platforms.
  */
 export async function initRevenueCat(appUserID?: string): Promise<void> {
-  if (!REVENUECAT_ENABLED || !isNativePlatform()) return;
+  if (!REVENUECAT_ENABLED || !hasRevenueCatPlugin()) return;
 
   try {
     const { Purchases, LOG_LEVEL } = await import('@revenuecat/purchases-capacitor');
@@ -73,7 +79,7 @@ export async function initRevenueCat(appUserID?: string): Promise<void> {
  * Identify user in RevenueCat (call after login)
  */
 export async function identifyUser(appUserID: string): Promise<void> {
-  if (!REVENUECAT_ENABLED || !isNativePlatform()) return;
+  if (!REVENUECAT_ENABLED || !hasRevenueCatPlugin()) return;
   try {
     const { Purchases } = await import('@revenuecat/purchases-capacitor');
     await Purchases.logIn({ appUserID });
@@ -86,7 +92,7 @@ export async function identifyUser(appUserID: string): Promise<void> {
  * Log out user from RevenueCat (call after logout)
  */
 export async function logOutRevenueCat(): Promise<void> {
-  if (!REVENUECAT_ENABLED || !isNativePlatform()) return;
+  if (!REVENUECAT_ENABLED || !hasRevenueCatPlugin()) return;
   try {
     const { Purchases } = await import('@revenuecat/purchases-capacitor');
     await Purchases.logOut();
@@ -104,7 +110,7 @@ export async function checkEntitlement(): Promise<{
   productId: string | null;
   willRenew: boolean;
 }> {
-  if (!REVENUECAT_ENABLED || !isNativePlatform()) {
+  if (!REVENUECAT_ENABLED || !hasRevenueCatPlugin()) {
     return { isPro: false, expiresAt: null, productId: null, willRenew: false };
   }
 
@@ -133,7 +139,7 @@ export async function checkEntitlement(): Promise<{
  * Get available offerings/packages
  */
 export async function getOfferings() {
-  if (!REVENUECAT_ENABLED || !isNativePlatform()) return null;
+  if (!REVENUECAT_ENABLED || !hasRevenueCatPlugin()) return null;
 
   try {
     const { Purchases } = await import('@revenuecat/purchases-capacitor');
@@ -155,7 +161,7 @@ export async function purchasePackage(packageToPurchase: any): Promise<{
   customerInfo?: any;
   error?: string;
 }> {
-  if (!REVENUECAT_ENABLED || !isNativePlatform()) {
+  if (!REVENUECAT_ENABLED || !hasRevenueCatPlugin()) {
     return { success: false, error: 'RevenueCat is disabled or not on native platform' };
   }
 
@@ -183,7 +189,7 @@ export async function restorePurchases(): Promise<{
   success: boolean;
   customerInfo?: any;
 }> {
-  if (!REVENUECAT_ENABLED || !isNativePlatform()) return { success: false };
+  if (!REVENUECAT_ENABLED || !hasRevenueCatPlugin()) return { success: false };
 
   try {
     const { Purchases } = await import('@revenuecat/purchases-capacitor');
@@ -206,7 +212,7 @@ export async function presentPaywall(): Promise<{
   didPurchase: boolean;
   available: boolean;
 }> {
-  if (!REVENUECAT_ENABLED || !isNativePlatform()) {
+  if (!REVENUECAT_ENABLED || !hasRevenueCatUIPlugin()) {
     return { didPurchase: false, available: false };
   }
 
@@ -232,7 +238,7 @@ export async function presentPaywall(): Promise<{
  * Present RevenueCat Customer Center
  */
 export async function presentCustomerCenter(): Promise<void> {
-  if (!REVENUECAT_ENABLED || !isNativePlatform()) return;
+  if (!REVENUECAT_ENABLED || !hasRevenueCatUIPlugin()) return;
 
   try {
     const { RevenueCatUI } = await import('@revenuecat/purchases-capacitor-ui');
