@@ -90,7 +90,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
         </div>
       </div>
 
-      <div className="px-4 -mt-3 relative z-30">
+      <div className="px-4 pt-3 relative z-30">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="w-full grid grid-cols-2 bg-card/95 backdrop-blur-sm shadow-lg rounded-xl p-1">
             <TabsTrigger value="calculator" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
