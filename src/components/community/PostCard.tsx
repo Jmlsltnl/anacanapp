@@ -265,11 +265,11 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
               <motion.div animate={post.is_liked ? { scale: [1, 1.3, 1] } : {}} transition={{ duration: 0.3 }}>
                 <Heart className={`w-[22px] h-[22px] transition-colors ${post.is_liked ? 'fill-rose-500 text-rose-500' : 'text-foreground/60'}`} />
               </motion.div>
-              {post.likes_count > 0 && <span className={`text-[13px] font-bold ${post.is_liked ? 'text-rose-500' : 'text-foreground/50'}`}>{post.likes_count}</span>}
+              {post.likes_count > 0 && <span className={`text-[14px] font-bold ${post.is_liked ? 'text-rose-500' : 'text-foreground/70'}`}>{post.likes_count}</span>}
             </motion.button>
             <motion.button onClick={() => setShowComments(!showComments)} className="flex items-center gap-1.5" whileTap={{ scale: 0.8 }}>
               <MessageCircle className={`w-[21px] h-[21px] transition-colors ${showComments ? 'text-primary' : 'text-foreground/60'}`} />
-              {post.comments_count > 0 && <span className="text-[13px] font-bold text-foreground/50">{post.comments_count}</span>}
+              {post.comments_count > 0 && <span className="text-[14px] font-bold text-foreground/70">{post.comments_count}</span>}
             </motion.button>
             <motion.button onClick={handleShare} whileTap={{ scale: 0.8 }}>
               <Share2 className="w-[20px] h-[20px] text-foreground/60" />
