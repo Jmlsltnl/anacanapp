@@ -1625,7 +1625,10 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             <FeedingHistoryPanel />
           </div>
           <div className="bg-primary/5 rounded-2xl overflow-hidden border border-primary/20">
-            <div className="w-full p-3 flex items-center justify-between">
+            <button
+              onClick={() => setShowDiaperModal(true)}
+              className="w-full p-3 flex items-center justify-between hover:bg-primary/10 transition-colors"
+            >
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Clock className="w-4 h-4 text-primary" />
@@ -1641,7 +1644,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 <p className="text-xs font-bold text-primary">{todayStats.diaperCount} dəfə</p>
                 <p className="text-[10px] text-muted-foreground">{tr("dashboard_bu_gun_7d7f30", "bu gün")}</p>
               </div>
-            </div>
+            </button>
           </div>
         </div>
       </motion.div>
