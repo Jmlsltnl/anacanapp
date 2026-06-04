@@ -1536,14 +1536,14 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         </div>
         <div className="space-y-1.5">
           {/* Sleep Summary - Expandable */}
-          <div className="bg-violet-50/50 dark:bg-violet-500/10 rounded-2xl overflow-hidden border border-violet-100 dark:border-violet-500/20">
+          <div className="bg-primary/5 rounded-2xl overflow-hidden border border-primary/20">
             <button
               onClick={() => setSleepExpanded(!sleepExpanded)}
-              className="w-full p-3 flex items-center justify-between hover:bg-violet-100/30 dark:hover:bg-violet-500/15 transition-colors"
+              className="w-full p-3 flex items-center justify-between hover:bg-primary/10 transition-colors"
             >
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-violet-100 dark:bg-violet-500/20 flex items-center justify-center">
-                  <Moon className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+                <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Moon className="w-4 h-4 text-primary" />
                 </div>
                 <div className="text-left">
                   <p className="text-xs font-semibold text-foreground">{tr("dashboard_yuxu_xulasesi_b2dc87", "Yuxu xülasəsi")}</p>
@@ -1554,7 +1554,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
               </div>
               <div className="flex items-center gap-2">
                 <div className="text-right mr-2">
-                  <p className="text-xs font-bold text-violet-600 dark:text-violet-400">
+                  <p className="text-xs font-bold text-primary">
                     {(() => {
                       const totalMin = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60);
                       const h = Math.floor(totalMin / 60);
@@ -1595,7 +1595,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                         const durText = dH > 0 ? `${dH}s ${dM}d` : dM > 0 ? `${dM} dəq ${dS} san` : `${dS} san`;
 
                         return (
-                          <div key={log.id} className="flex items-center justify-between p-2 bg-violet-100/50 dark:bg-violet-500/10 rounded-xl">
+                          <div key={log.id} className="flex items-center justify-between p-2 bg-primary/10 rounded-xl">
                             <div className="flex items-center gap-2">
                               <span className="text-sm">😴</span>
                               <div>
@@ -1605,7 +1605,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                                 </p>
                               </div>
                             </div>
-                            <span className="text-[11px] font-semibold text-violet-600 dark:text-violet-400">
+                            <span className="text-[11px] font-semibold text-primary">
                               {end ? durText : 'Davam edir...'}
                             </span>
                           </div>
@@ -1624,9 +1624,9 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           <div ref={feedingSummaryRef}>
             <FeedingHistoryPanel />
           </div>
-          <div className="flex items-center justify-between p-2.5 bg-emerald-50 dark:bg-emerald-500/15 rounded-xl border border-emerald-100 dark:border-emerald-500/20">
+          <div className="flex items-center justify-between p-2.5 bg-primary/5 rounded-xl border border-primary/20">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <Clock className="w-4 h-4 text-primary" />
               <span className="text-xs font-medium text-foreground">{tr("dashboard_bez_deyisme_647cbc", "Bez dəyişmə")}</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -1635,7 +1635,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 💩{todayStats.dirtyCount}
                 💧💩{todayStats.bothCount}
               </span>
-              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{todayStats.diaperCount} dəfə</span>
+              <span className="text-xs font-bold text-primary">{todayStats.diaperCount} dəfə</span>
             </div>
           </div>
         </div>
