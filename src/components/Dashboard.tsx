@@ -1783,7 +1783,7 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
   const hasPartner = !!profile?.linked_partner_id;
 
   return (
-    <div className="pb-28 pt-2 px-3">
+    <div className="pb-20 pt-2 px-3">
       {/* Header */}
       <motion.div 
         className="flex items-center justify-between mb-2"
@@ -1833,7 +1833,7 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
       <DashboardPremiumBanner />
 
       {/* Bottom Banner Slot */}
-      <BannerSlot placement="home_bottom" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mt-4" />
+      <BannerSlot placement="home_bottom" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mt-2" />
     </div>
   );
 };
