@@ -3,6 +3,7 @@ import Capacitor
 import FirebaseCore
 import FirebaseMessaging
 import UserNotifications
+import FBSDKCoreKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
@@ -12,7 +13,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Initialize Firebase before anything else
         FirebaseApp.configure()
-        
+
+        // Initialize Facebook / Meta SDK (reads FacebookAppID & FacebookClientToken from Info.plist)
+        ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
+        Settings.shared.isAutoLogAppEventsEnabled = true
+        Settings.shared.isAdvertiserIDCollectionEnabled = true
+
         // Set up push notification delegates
         UNUserNotificationCenter.current().delegate = self
         Messaging.messaging().delegate = self
@@ -89,7 +95,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func applicationWillResignActive(_ application: UIApplication) {}
     func applicationDidEnterBackground(_ application: UIApplication) {}
     func applicationWillEnterForeground(_ application: UIApplication) {}
-    func applicationDidBecomeActive(_ application: UIApplication) {}
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        // Facebook: standart "Activate App" event-i göndərir (Meta Test Events panelində görünür)
+        AppEvents.shared.activateApp()
+    }
     func applicationWillTerminate(_ application: UIApplication) {}
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {

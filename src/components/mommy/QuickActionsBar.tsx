@@ -87,7 +87,7 @@ const QuickActionsBar = ({ onNavigateToTool }: QuickActionsBarProps) => {
               <motion.button
                 key={action.id}
                 onClick={() => handleAction(action.tool_key)}
-                className={`relative bg-gradient-to-br from-${action.color_from} to-${action.color_to} rounded-xl p-3 flex flex-col items-center gap-1.5 text-white shadow-sm`}
+                className="relative bg-gradient-to-br from-primary to-primary/80 rounded-xl p-3 flex flex-col items-center gap-1.5 text-primary-foreground shadow-sm"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.1 + idx * 0.05 }}

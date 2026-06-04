@@ -98,21 +98,21 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   return (
     <div ref={ref} className="min-h-screen pb-24 bg-background">
       {/* Header */}
-      <div className="bg-background/70 backdrop-blur-3xl">
-        <div className="px-5 pt-4 pb-1">
-          <div className="flex items-center gap-3 mb-4">
+      <div className="bg-card border-b border-border/60 shadow-sm">
+        <div className="px-5 pt-4 pb-2">
+          <div className="flex items-center gap-3 mb-3">
             {onBack && (
-              <motion.button onClick={onBack} className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center active:bg-muted/70 transition-colors" whileTap={{ scale: 0.9 }}>
+              <motion.button onClick={onBack} className="w-9 h-9 rounded-full bg-muted flex items-center justify-center active:bg-muted/80 transition-colors" whileTap={{ scale: 0.9 }}>
                 <ArrowLeft className="w-4 h-4 text-foreground" />
               </motion.button>
             )}
             <div className="flex-1">
-              <h1 className="text-[22px] font-black text-foreground tracking-tight leading-none">{tr("communityscreen_cemiyyet_2dc44d", "Cəmiyyət")}</h1>
-              <p className="text-[11px] text-muted-foreground/50 mt-1 font-medium">{headerText}</p>
+              <h1 className="text-[26px] font-black text-foreground tracking-tight leading-none">{tr("communityscreen_cemiyyet_2dc44d", "Cəmiyyət")}</h1>
+              <p className="text-[13px] text-muted-foreground mt-1 font-medium">{headerText}</p>
             </div>
             <motion.button
               onClick={() => setShowConversations(true)}
-              className="relative w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center"
+              className="relative w-9 h-9 rounded-full bg-muted flex items-center justify-center"
               whileTap={{ scale: 0.9 }}
             >
               <MessageCircle className="w-4 h-4 text-foreground" />
@@ -124,8 +124,8 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
             </motion.button>
           </div>
 
-          <motion.div className="relative mb-4" animate={{ scale: searchFocused ? 1.01 : 1 }} transition={{ duration: 0.2 }}>
-            <Search className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-300 ${searchFocused ? 'text-primary' : 'text-muted-foreground/30'}`} />
+          <motion.div className="relative" animate={{ scale: searchFocused ? 1.01 : 1 }} transition={{ duration: 0.2 }}>
+            <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-300 ${searchFocused ? 'text-primary' : 'text-muted-foreground/70'}`} />
             <input
               type="text"
               placeholder="Axtar..."
@@ -133,15 +133,15 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
-              className={`w-full h-10 pl-10 pr-9 rounded-2xl text-[13px] font-medium outline-none transition-all duration-300 placeholder:text-muted-foreground/30 ${
-                searchFocused ? 'bg-card border border-primary/25 shadow-[0_0_0_4px_hsl(var(--primary)/0.06)]' : 'bg-muted/20 border border-transparent'
+              className={`w-full h-9 pl-9 pr-8 rounded-xl text-[14px] font-medium outline-none transition-all duration-300 placeholder:text-muted-foreground/60 ${
+                searchFocused ? 'bg-background border border-primary/30 shadow-[0_0_0_3px_hsl(var(--primary)/0.08)]' : 'bg-muted/60 border border-border/40'
               }`}
             />
             <AnimatePresence>
               {searchQuery && (
                 <motion.button initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-muted/60 flex items-center justify-center">
-                  <X className="w-2.5 h-2.5 text-muted-foreground/70" />
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-muted flex items-center justify-center">
+                  <X className="w-2.5 h-2.5 text-muted-foreground" />
                 </motion.button>
               )}
             </AnimatePresence>
@@ -151,25 +151,25 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
         </div>
       </div>
 
-      <div className="px-5 pt-3 pb-2">
+      <div className="px-5 pt-2 pb-1">
         <StoriesBar groupId={null} />
       </div>
 
-      {/* Facebook-style post input */}
-      <div className="px-4 pt-1 pb-2">
+      {/* Facebook-style post input - compact */}
+      <div className="bg-card border-b border-border/30 px-4 py-2.5">
         <motion.button
           onClick={() => setShowCreatePost(true)}
-          className="w-full flex items-center gap-3 bg-card rounded-2xl border border-border/10 p-3 active:bg-muted/30 transition-colors"
+          className="w-full flex items-center gap-2.5 active:bg-muted/30 transition-colors rounded-lg"
           whileTap={{ scale: 0.98 }}
         >
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/15 to-accent/10 flex items-center justify-center flex-shrink-0">
-            <Pen className="w-4 h-4 text-primary" />
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/15 to-accent/10 flex items-center justify-center flex-shrink-0">
+            <Pen className="w-3.5 h-3.5 text-primary" />
           </div>
-          <span className="text-[14px] text-muted-foreground/40 font-medium">{tr("communityscreen_ne_dusunursunuz_0378b3", "Nə düşünürsünüz?")}</span>
+          <span className="text-[14px] text-muted-foreground/70 font-medium">{tr("communityscreen_ne_dusunursunuz_0378b3", "Nə düşünürsünüz?")}</span>
         </motion.button>
       </div>
 
-      <div className="px-4 pt-1">
+      <div className="pt-0">
         <GroupFeed group={null} onBack={() => {}} onCreatePost={() => setShowCreatePost(true)} isEmbedded onUserClick={handleUserClick} externalSearchQuery={searchQuery} />
       </div>
 

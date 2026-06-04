@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Home, Compass, MessageCircle, User, Users, Cake } from 'lucide-react';
+import { Home, Compass, MessageCircle, User, Users } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useUnreadCommunityPosts } from '@/hooks/useUnreadCommunityPosts';
@@ -14,7 +14,7 @@ interface BottomNavProps {
 const womanTabs = [
   { id: 'home', label: tr("bottomnav_esas_6d87f7", 'Əsas'), icon: Home },
   { id: 'tools', label: tr("bottomnav_aletler_4778b4", 'Alətlər'), icon: Compass },
-  { id: 'cakes', label: 'Tortlar', icon: Cake },
+  
   { id: 'community', label: tr("bottomnav_cemiyyet_2dc44d", 'Cəmiyyət'), icon: Users },
   { id: 'ai', label: 'Anacan.AI', icon: MessageCircle },
   { id: 'profile', label: 'Profil', icon: User },
@@ -52,10 +52,7 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
     }
   };
 
-  // Hide cakes tab in flow mode
-  const visibleWomanTabs = lifeStage === 'flow' 
-    ? womanTabs.filter(t => t.id !== 'cakes') 
-    : womanTabs;
+  const visibleWomanTabs = womanTabs;
 
   return (
     <nav 

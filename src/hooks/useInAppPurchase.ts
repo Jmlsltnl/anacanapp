@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import {
   isNativePlatform,
+  hasRevenueCatPlugin,
   initRevenueCat,
   identifyUser,
   checkEntitlement,
@@ -60,6 +61,13 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
   useEffect(() => {
     const init = async () => {
       if (!isNativePlatform()) {
+        setIsSupported(false);
+        setIsLoading(false);
+        return;
+      }
+
+      if (!hasRevenueCatPlugin()) {
+        setIsSupported(false);
         setIsLoading(false);
         return;
       }

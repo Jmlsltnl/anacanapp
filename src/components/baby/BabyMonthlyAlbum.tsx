@@ -1,10 +1,11 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Camera, X, Loader2, ShoppingBag, Trash2, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Camera, X, Loader2, ShoppingBag, Trash2, RefreshCw, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useChildren } from '@/hooks/useChildren';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 import AlbumOrderScreen from '@/components/shop/AlbumOrderScreen';
@@ -29,6 +30,7 @@ const monthLabels = Array.from({ length: 12 }, (_, i) => ({
 const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
   useScrollToTop();
   const { user } = useAuth();
+  const { selectedChild, getChildAge } = useChildren();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -38,6 +40,9 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
   const [replacingPhoto, setReplacingPhoto] = useState<AlbumPhoto | null>(null);
   const [viewingPhoto, setViewingPhoto] = useState<AlbumPhoto | null>(null);
   const [showActionSheet, setShowActionSheet] = useState<AlbumPhoto | null>(null);
+
+  const babyMonths = selectedChild ? getChildAge(selectedChild).months : 0;
+  const canOrderPhysical = babyMonths >= 12;
 
   const { data: photos = [], isLoading } = useQuery({
     queryKey: ['baby-album-photos', user?.id],
@@ -117,10 +122,6 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
               <h1 className="text-lg font-bold">{tr("babymonthlyalbum_korpe_albomu_42d4c6", "Körpə Albomu")}</h1>
               <p className="text-xs text-muted-foreground">{tr("babymonthlyalbum_her_ay_bir_xatire_4ca0e9", "Hər ay bir xatirə")}</p>
             </div>
-            <Button size="sm" variant="outline" className="rounded-xl gap-1.5" onClick={() => setShowOrder(true)}>
-              <ShoppingBag className="w-4 h-4" />
-              <span className="text-xs">Fiziki Albom</span>
-            </Button>
           </div>
         </div>
       </div>
@@ -160,6 +161,76 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
           );
         })}
       </div>
+
+      {canOrderPhysical ? (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mx-4 mt-6 mb-4 rounded-2xl bg-gradient-to-br from-primary/15 via-primary/10 to-amber-400/15 border border-primary/30 p-4 shadow-sm"
+        >
+          <div className="flex items-start gap-3">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-amber-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+              <Sparkles className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-bold text-foreground mb-0.5">
+                {selectedChild?.name || 'Körpəniz'} artıq 1 yaşındadır! 🎉
+              </h3>
+              <p className="text-[12px] text-muted-foreground leading-snug mb-3">
+                İlk ilin xatirələrini fiziki albom kimi əlinizdə tutun. Hər ay üçün ayrıca səhifə, premium kağız, ömürlük xatirə.
+              </p>
+              <div className="grid grid-cols-3 gap-2 mb-3">
+                <div className="rounded-xl bg-background/60 border border-border/40 p-2 text-center">
+                  <p className="text-[10px] text-muted-foreground">Səhifə</p>
+                  <p className="text-[13px] font-bold text-foreground">12+</p>
+                </div>
+                <div className="rounded-xl bg-background/60 border border-border/40 p-2 text-center">
+                  <p className="text-[10px] text-muted-foreground">Format</p>
+                  <p className="text-[13px] font-bold text-foreground">A4</p>
+                </div>
+                <div className="rounded-xl bg-background/60 border border-border/40 p-2 text-center">
+                  <p className="text-[10px] text-muted-foreground">Çatdırılma</p>
+                  <p className="text-[13px] font-bold text-foreground">3-5 gün</p>
+                </div>
+              </div>
+              <Button
+                onClick={() => setShowOrder(true)}
+                className="w-full h-10 rounded-xl gradient-primary text-primary-foreground text-[13px] font-bold gap-1.5"
+              >
+                <ShoppingBag className="w-4 h-4" />
+                Fiziki Albom Sifariş Et
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mx-4 mt-6 mb-4 rounded-2xl bg-card border border-border/50 p-4"
+        >
+          <div className="flex items-start gap-3">
+            <div className="w-11 h-11 rounded-2xl bg-muted flex items-center justify-center flex-shrink-0">
+              <ShoppingBag className="w-5 h-5 text-muted-foreground" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-bold text-foreground mb-0.5">Fiziki Albom</h3>
+              <p className="text-[12px] text-muted-foreground leading-snug mb-2">
+                {selectedChild?.name || 'Körpəniz'} 1 yaşına çatdıqda ilk ilin bütün xatirələrini fiziki albom kimi sifariş edə bilərsiniz.
+              </p>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary/60 rounded-full"
+                    style={{ width: `${Math.min(100, (babyMonths / 12) * 100)}%` }}
+                  />
+                </div>
+                <span className="text-[11px] font-semibold text-muted-foreground">{babyMonths}/12 ay</span>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
 

@@ -1024,56 +1024,70 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
 
   return (
     <div className="space-y-3">
-      {/* Premium Baby Hero Card — variant chosen via app_settings.mommy_hero_variant */}
-      <MommyHero
-        babyData={{
-          name: babyData.name,
-          ageInMonths: babyData.ageInMonths,
-          ageInDays: babyData.ageInDays,
-        }}
-        exactMonths={exactMonths}
-        remainingDays={remainingDays}
-        babyIllustration={babyIllustration}
-      />
-
-      {/* Bu günün məlumatları */}
-      {dailyInfo && (
+      {/* Child Selector - for multiple children (top of page) */}
+      {hasChildren && (
         <motion.div 
-          className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800 shadow-lg"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          className="flex items-center justify-between"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
         >
-          <div className="flex items-center gap-3 mb-4 pb-3 border-b border-amber-200 dark:border-amber-800">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-800/50 flex items-center justify-center shadow-sm">
-              <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-            </div>
-            <div className="flex-1">
-              <p className="text-[10px] font-semibold text-amber-500 dark:text-amber-400 uppercase tracking-widest mb-0.5">
-                {babyData.ageInDays}. Gün
-              </p>
-              <p className="text-sm font-bold text-amber-900 dark:text-amber-100">
-                Bu günün məlumatları
-              </p>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            {dailyInfo.info
-              .split('\n')
-              .filter(line => line.trim().length > 0)
-              .map((line, index) => (
-                <div key={index} className="flex items-start gap-2.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
-                  <p className="text-[13px] text-amber-800 dark:text-white leading-relaxed font-medium">
-                    {line.trim()}
-                  </p>
-                </div>
-              ))
-            }
-          </div>
+          <ChildSelector />
         </motion.div>
       )}
+
+      {/* Hero + Daily Info — seamless orange→yellow gradient continuity */}
+      <div className="space-y-0">
+        {/* Premium Baby Hero Card — variant chosen via app_settings.mommy_hero_variant */}
+        <MommyHero
+          babyData={{
+            name: babyData.name,
+            ageInMonths: babyData.ageInMonths,
+            ageInDays: babyData.ageInDays,
+          }}
+          exactMonths={exactMonths}
+          remainingDays={remainingDays}
+          babyIllustration={babyIllustration}
+        />
+
+        {/* Bu günün məlumatları */}
+        {dailyInfo && (
+          <motion.div 
+            className="bg-gradient-to-b from-amber-50/80 to-amber-100/30 dark:from-amber-900/15 dark:to-amber-900/5 rounded-2xl p-4 border border-amber-100/40 dark:border-amber-800/30 shadow-sm"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-amber-200/40 dark:border-amber-800/40">
+              <div className="w-10 h-10 rounded-xl bg-amber-100/60 dark:bg-amber-800/40 flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] font-semibold text-amber-500 dark:text-amber-400 uppercase tracking-widest mb-0.5">
+                  {babyData.ageInDays}. Gün
+                </p>
+                <p className="text-sm font-bold text-amber-900 dark:text-amber-100">
+                  Bu günün məlumatları
+                </p>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              {dailyInfo.info
+                .split('\n')
+                .filter(line => line.trim().length > 0)
+                .map((line, index) => (
+                  <div key={index} className="flex items-start gap-2.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
+                    <p className="text-[13px] text-amber-800 dark:text-white leading-relaxed font-medium">
+                      {line.trim()}
+                    </p>
+                  </div>
+                ))
+              }
+            </div>
+          </motion.div>
+        )}
+      </div>
 
       {/* Anaya Mesaj */}
       {mommyMessage && (
@@ -1141,18 +1155,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         </motion.div>
       )}
 
-      {/* Child Selector - for multiple children */}
-      {hasChildren && (
-        <motion.div 
-          className="flex items-center justify-between"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          <ChildSelector />
-        </motion.div>
-      )}
-
       {/* Teething Widget */}
+
       <TeethingWidget onOpen={() => onNavigateToTool?.('teething')} />
 
       {/* Quick Actions Bar */}
@@ -1161,7 +1165,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
       {/* Cakes Widget - navigate to cakes tab, hide after 12 months */}
       {babyData.ageInMonths < 12 && (
         <motion.div
-          className="bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-500/10 dark:to-rose-500/10 rounded-2xl p-4 border border-pink-200/50 dark:border-pink-500/20 shadow-card cursor-pointer"
+          className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl p-4 border border-primary/20 shadow-card cursor-pointer"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.12 }}
@@ -1170,7 +1174,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           onClick={() => onNavigateToTool?.('cakes')}
         >
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg">
               <span className="text-2xl">🎂</span>
             </div>
             <div className="flex-1">
@@ -1179,7 +1183,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 {babyData.ageInMonths > 0 ? `${babyData.ageInMonths + 1}-ci aylıq tortunu sifariş ver!` : 'Körpəniz üçün milestone tortları'}
               </p>
             </div>
-            <ChevronRight className="w-5 h-5 text-pink-400" />
+            <ChevronRight className="w-5 h-5 text-primary" />
           </div>
         </motion.div>
       )}
@@ -1193,8 +1197,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
       >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center">
-              <Moon className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+              <Moon className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
               <h3 className="font-bold text-sm text-foreground">{tr("dashboard_yuxu_izleme_adaa4f", "Yuxu İzləmə")}</h3>
@@ -1205,8 +1209,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             onClick={toggleSleep}
             className={`px-4 py-2.5 rounded-xl font-bold text-xs ${
               sleepTimer 
-                ? 'bg-amber-500 text-white' 
-                : 'bg-violet-100 text-violet-700'
+                ? 'bg-primary text-primary-foreground' 
+                : 'bg-primary/10 text-primary'
             }`}
             whileTap={{ scale: 0.95 }}
             animate={sleepTimer ? { scale: [1, 1.05, 1] } : {}}
@@ -1218,12 +1222,12 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         
         {sleepTimer && (
           <motion.div 
-            className="bg-violet-50 rounded-xl p-3 flex items-center gap-3"
+            className="bg-primary/10 rounded-xl p-3 flex items-center gap-3"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
           >
-            <div className="w-3 h-3 rounded-full bg-violet-500 animate-pulse" />
-            <span className="text-sm text-violet-700 font-medium">
+            <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
+            <span className="text-sm text-primary font-medium">
               Yuxu davam edir: {formatDuration(getElapsedSeconds(sleepTimer.id))}
             </span>
           </motion.div>
@@ -1242,8 +1246,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => feedingSummaryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center">
-              <Baby className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+              <Baby className="w-5 h-5 text-primary-foreground" />
             </div>
             <div className="text-left">
               <h3 className="font-bold text-sm text-foreground">{tr("dashboard_qidalanmaya_nezaret_1b60b4", "Qidalanmaya nəzarət")}</h3>
@@ -1252,7 +1256,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           </button>
           <motion.button
             onClick={() => setShowFeedingModal(true)}
-            className="px-4 py-2.5 rounded-xl bg-amber-100 text-amber-700 font-bold text-xs"
+            className="px-4 py-2.5 rounded-xl bg-primary/10 text-primary font-bold text-xs"
             whileTap={{ scale: 0.95 }}
           >
             + Əlavə et
@@ -1449,8 +1453,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
       >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center">
-              <Clock className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+              <Clock className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
               <h3 className="font-bold text-sm text-foreground">{tr("dashboard_bez_deyisme_ba242a", "Bez Dəyişmə")}</h3>
@@ -1459,7 +1463,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           </div>
           <motion.button
             onClick={() => setShowDiaperModal(true)}
-            className="px-4 py-2.5 rounded-xl bg-emerald-100 text-emerald-700 font-bold text-xs"
+            className="px-4 py-2.5 rounded-xl bg-primary/10 text-primary font-bold text-xs"
             whileTap={{ scale: 0.95 }}
           >
             + Əlavə et
@@ -1533,14 +1537,14 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         </div>
         <div className="space-y-1.5">
           {/* Sleep Summary - Expandable */}
-          <div className="bg-violet-50/50 dark:bg-violet-500/10 rounded-2xl overflow-hidden border border-violet-100 dark:border-violet-500/20">
+          <div className="bg-primary/5 rounded-2xl overflow-hidden border border-primary/20">
             <button
               onClick={() => setSleepExpanded(!sleepExpanded)}
-              className="w-full p-3 flex items-center justify-between hover:bg-violet-100/30 dark:hover:bg-violet-500/15 transition-colors"
+              className="w-full p-3 flex items-center justify-between hover:bg-primary/10 transition-colors"
             >
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-violet-100 dark:bg-violet-500/20 flex items-center justify-center">
-                  <Moon className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+                <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Moon className="w-4 h-4 text-primary" />
                 </div>
                 <div className="text-left">
                   <p className="text-xs font-semibold text-foreground">{tr("dashboard_yuxu_xulasesi_b2dc87", "Yuxu xülasəsi")}</p>
@@ -1551,7 +1555,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
               </div>
               <div className="flex items-center gap-2">
                 <div className="text-right mr-2">
-                  <p className="text-xs font-bold text-violet-600 dark:text-violet-400">
+                  <p className="text-xs font-bold text-primary">
                     {(() => {
                       const totalMin = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60);
                       const h = Math.floor(totalMin / 60);
@@ -1592,7 +1596,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                         const durText = dH > 0 ? `${dH}s ${dM}d` : dM > 0 ? `${dM} dəq ${dS} san` : `${dS} san`;
 
                         return (
-                          <div key={log.id} className="flex items-center justify-between p-2 bg-violet-100/50 dark:bg-violet-500/10 rounded-xl">
+                          <div key={log.id} className="flex items-center justify-between p-2 bg-primary/10 rounded-xl">
                             <div className="flex items-center gap-2">
                               <span className="text-sm">😴</span>
                               <div>
@@ -1602,7 +1606,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                                 </p>
                               </div>
                             </div>
-                            <span className="text-[11px] font-semibold text-violet-600 dark:text-violet-400">
+                            <span className="text-[11px] font-semibold text-primary">
                               {end ? durText : 'Davam edir...'}
                             </span>
                           </div>
@@ -1621,22 +1625,36 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           <div ref={feedingSummaryRef}>
             <FeedingHistoryPanel />
           </div>
-          <div className="flex items-center justify-between p-2.5 bg-emerald-50 dark:bg-emerald-500/15 rounded-xl border border-emerald-100 dark:border-emerald-500/20">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span className="text-xs font-medium text-foreground">{tr("dashboard_bez_deyisme_647cbc", "Bez dəyişmə")}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-muted-foreground">
-                💧{todayStats.wetCount}
-                💩{todayStats.dirtyCount}
-                💧💩{todayStats.bothCount}
-              </span>
-              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{todayStats.diaperCount} dəfə</span>
-            </div>
+          <div className="bg-primary/5 rounded-2xl overflow-hidden border border-primary/20">
+            <button
+              onClick={() => setShowDiaperModal(true)}
+              className="w-full p-3 flex items-center justify-between hover:bg-primary/10 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-primary" />
+                </div>
+                <div className="text-left">
+                  <p className="text-xs font-semibold text-foreground">{tr("dashboard_bez_deyisme_647cbc", "Bez dəyişmə")}</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    💧{todayStats.wetCount} 💩{todayStats.dirtyCount} 💧💩{todayStats.bothCount}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right mr-2">
+                <p className="text-xs font-bold text-primary">{todayStats.diaperCount} dəfə</p>
+                <p className="text-[10px] text-muted-foreground">{tr("dashboard_bu_gun_7d7f30", "bu gün")}</p>
+              </div>
+            </button>
           </div>
         </div>
       </motion.div>
+
+      {/* Weekly Stats Overview */}
+      <QuickStatsWidget />
+
+      {/* Growth Tracker */}
+      <GrowthTrackerWidget />
 
       {/* Milestones with Carousel */}
       <motion.div 
@@ -1730,11 +1748,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         />
       )}
 
-      {/* Weekly Stats Overview */}
-      <QuickStatsWidget />
 
-      {/* Growth Tracker */}
-      <GrowthTrackerWidget />
+
 
       {/* Development Tips - Dynamic based on age */}
       <DevelopmentTipsWidget />

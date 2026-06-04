@@ -46,6 +46,7 @@ export interface PostComment {
   content: string;
   likes_count: number;
   created_at: string;
+  is_anonymous?: boolean;
   author?: {
     name: string;
     avatar_url: string | null;
@@ -361,11 +362,14 @@ export const usePostComments = (postId: string) => {
             isLiked = !!likeData;
           }
 
+          const isAnon = comment.is_anonymous === true;
           return {
             ...comment,
-            author: authorData
-              ? { name: authorData.name || 'İstifadəçi', avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null }
-              : { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null },
+            author: isAnon
+              ? { name: 'Anonim', avatar_url: null, badge_type: null }
+              : authorData
+                ? { name: authorData.name || 'İstifadəçi', avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null }
+                : { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null },
             is_liked: isLiked,
           };
         })
@@ -387,12 +391,14 @@ export const useCreateComment = () => {
       parentCommentId,
       postAuthorId,
       commenterName,
+      isAnonymous,
     }: {
       postId: string;
       content: string;
       parentCommentId?: string | null;
       postAuthorId?: string;
       commenterName?: string;
+      isAnonymous?: boolean;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
@@ -404,13 +410,14 @@ export const useCreateComment = () => {
           user_id: user.id,
           parent_comment_id: parentCommentId ?? null,
           content,
+          is_anonymous: isAnonymous || false,
         });
 
       if (error) throw error;
 
       if (postAuthorId && postAuthorId !== user.id) {
         const preview = content.length > 50 ? `${content.slice(0, 50)}...` : content;
-        const senderName = commenterName?.trim() || 'İstifadəçi';
+        const senderName = isAnonymous ? 'Anonim' : (commenterName?.trim() || 'İstifadəçi');
 
         // Push notification (also stores in-app notification via edge function)
         try {

@@ -104,15 +104,22 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl border-b border-border/50">
-        <div className="flex items-center justify-between px-4 py-3" style={{ paddingTop: 'calc(env(safe-area-inset-top, 12px) + 12px)' }}>
-          <button onClick={onBack} className="w-10 h-10 rounded-full bg-muted/60 flex items-center justify-center">
-            <ArrowLeft className="w-5 h-5 text-foreground" />
-          </button>
-          <h1 className="text-lg font-bold text-foreground">{tr("vitamintracker_vitamin_izleyicisi_049643", "Vitamin İzləyicisi")}</h1>
-          <button onClick={() => setShowAddModal(true)} className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-            <Plus className="w-5 h-5 text-primary" />
-          </button>
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
+        <div className="px-4 pb-2 safe-area-top">
+          <div className="flex items-center gap-3">
+            <button onClick={onBack} className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+              <ArrowLeft className="w-5 h-5 text-foreground" />
+            </button>
+            <div className="flex-1">
+              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Pill className="w-5 h-5 text-primary" />
+                {tr("vitamintracker_vitamin_izleyicisi_049643", "Vitamin İzləyicisi")}
+              </h1>
+            </div>
+            <button onClick={() => setShowAddModal(true)} className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Plus className="w-5 h-5 text-primary" />
+            </button>
+          </div>
         </div>
       </div>
 
