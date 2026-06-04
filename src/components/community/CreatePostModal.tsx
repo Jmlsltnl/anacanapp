@@ -194,15 +194,15 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-3">
               <h3 className="text-[17px] font-black text-foreground">{tr("createpostmodal_yeni_paylasim_4f5b15", "Yeni Paylaşım")}</h3>
-              <button onClick={handleClose} className="w-8 h-8 rounded-full bg-muted/40 flex items-center justify-center">
-                <X className="w-4 h-4 text-muted-foreground/60" />
+              <button onClick={handleClose} className="w-8 h-8 rounded-full bg-muted/60 flex items-center justify-center">
+                <X className="w-4 h-4 text-muted-foreground/80" />
               </button>
             </div>
 
             <div className="px-5 space-y-4">
               {/* Group Selector */}
               <Select value={selectedGroupId || 'public'} onValueChange={(value) => setSelectedGroupId(value === 'public' ? null : value)}>
-                <SelectTrigger className="w-full h-10 rounded-2xl bg-muted/20 border-border/10 text-[12px] font-medium">
+                <SelectTrigger className="w-full h-10 rounded-2xl bg-muted/40 border-border/30 text-[12px] font-medium">
                   <SelectValue placeholder={tr("createpostmodal_qrup_secin_8e26b9", "Qrup seçin")} />
                 </SelectTrigger>
                 <SelectContent className="bg-popover border-border z-[100] rounded-xl">
@@ -220,12 +220,12 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
                   value={content}
                   onChange={handleContentChange}
                   placeholder={tr("createpostmodal_ne_dusunursunuz_474859", "Nə düşünürsünüz? ✨")}
-                  className="min-h-[130px] rounded-2xl resize-none text-[14px] bg-muted/10 border-border/10 focus:border-primary/20 pr-12 leading-relaxed"
+                  className="min-h-[130px] rounded-2xl resize-none text-[14px] bg-muted/25 border-border/25 focus:border-primary/30 pr-12 leading-relaxed"
                 />
                 <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
                   <PopoverTrigger asChild>
-                    <button type="button" className="absolute right-3 top-3 w-8 h-8 rounded-full bg-muted/30 hover:bg-muted/50 flex items-center justify-center transition-colors">
-                      <Smile className="w-4 h-4 text-muted-foreground/50" />
+                    <button type="button" className="absolute right-3 top-3 w-8 h-8 rounded-full bg-muted/50 hover:bg-muted/70 flex items-center justify-center transition-colors">
+                      <Smile className="w-4 h-4 text-muted-foreground/80" />
                     </button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0 border-0" align="end" side="top">
