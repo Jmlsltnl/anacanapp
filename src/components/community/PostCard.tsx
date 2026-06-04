@@ -163,7 +163,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
             <div className="flex items-center gap-1.5 flex-wrap">
               <motion.button
                 onClick={handleAvatarClick}
-                className={`font-bold text-[14px] leading-tight ${isAnonymous && !isAdmin ? 'text-muted-foreground italic' : 'text-foreground hover:text-primary'} transition-colors`}
+                className={`font-bold text-[16px] leading-tight ${isAnonymous && !isAdmin ? 'text-muted-foreground italic' : 'text-foreground hover:text-primary'} transition-colors`}
                 whileTap={{ scale: 0.98 }}
                 disabled={isAnonymous && !isAdmin}
               >
