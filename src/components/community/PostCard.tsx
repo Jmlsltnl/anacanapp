@@ -178,7 +178,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
               </motion.button>
               {!isAnonymous && <UserBadge type={authorBadge} />}
               {isAnonymous && isAdmin && <UserBadge type={authorBadge} />}
-              <span className="text-[11px] text-muted-foreground/35 font-medium">· {timeAgo}</span>
+              <span className="text-[13px] text-muted-foreground font-medium">· {timeAgo}</span>
             </div>
             {isAnonymous && (
               <span className="inline-flex items-center gap-[2px] px-1 py-[1px] rounded text-[7px] font-semibold bg-muted/30 text-muted-foreground/40 mt-0.5">
