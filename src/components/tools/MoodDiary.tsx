@@ -230,21 +230,21 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               </div>
 
               {/* Symptoms */}
-              <div className="bg-card rounded-3xl p-6 shadow-card border border-border/50">
-                <h2 className="font-bold text-lg mb-4">Simptomlar</h2>
-                <div className="flex flex-wrap gap-2">
+              <div className="bg-card rounded-2xl p-4 shadow-card border border-border/50">
+                <h2 className="font-bold text-sm mb-2.5">Simptomlar</h2>
+                <div className="flex flex-wrap gap-1.5">
                   {symptomOptions.map(symptom => (
                     <motion.button
                       key={symptom.id}
                       onClick={() => toggleSymptom(symptom.id)}
-                      className={`px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-all ${
+                      className={`px-2.5 py-1 rounded-full flex items-center gap-1 text-[11px] font-medium transition-all ${
                         selectedSymptoms.includes(symptom.id)
                           ? 'bg-primary text-white'
                           : 'bg-muted/50 text-muted-foreground'
                       }`}
                       whileTap={{ scale: 0.95 }}
                     >
-                      <span>{symptom.emoji}</span>
+                      <span className="text-xs">{symptom.emoji}</span>
                       {symptom.label}
                     </motion.button>
                   ))}
