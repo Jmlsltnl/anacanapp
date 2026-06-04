@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 
 export interface MommyHeroProps {
   babyData: {
@@ -12,122 +13,114 @@ export interface MommyHeroProps {
 }
 
 /**
- * CLASSIC variant — the original glassmorphism hero card.
- * Extracted verbatim from Dashboard.tsx so the existing look stays available.
+ * MommyHeroClassic — redesigned to match the Pregnancy Hero layout.
+ * Same structural pattern: gradient card → centered image → main text → badge chips → progress bar.
  */
 const MommyHeroClassic = ({ babyData, exactMonths, remainingDays, babyIllustration }: MommyHeroProps) => {
+  // Mommy stage colors (coral/salmon family to match existing brand)
+  const colors = {
+    bg: 'from-rose-400/10 via-orange-300/5 to-rose-400/10 dark:from-rose-500/20 dark:via-orange-400/10 dark:to-rose-500/20',
+    border: 'border-rose-400/20 dark:border-rose-500/30',
+    accent: 'bg-rose-400/10 dark:bg-rose-500/20',
+    text: 'text-rose-600 dark:text-rose-400',
+    badge: 'bg-rose-400/10 text-rose-600 dark:text-rose-400',
+    progress: 'bg-rose-500',
+  };
+
+  const totalFirstYearDays = 365;
+  const progressPercent = Math.min((babyData.ageInDays / totalFirstYearDays) * 100, 100);
+
+  // Days until next month milestone
+  const daysUntilNextMonth = remainingDays > 0 ? remainingDays : 0;
+
   return (
     <motion.div
-      className="relative overflow-hidden rounded-[2rem]"
-      initial={{ scale: 0.95, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.5 }}
+      className={`relative overflow-hidden bg-gradient-to-br ${colors.bg} rounded-2xl p-4 shadow-card ${colors.border}`}
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ delay: 0.1 }}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-[hsl(12,80%,48%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/15 via-transparent to-transparent" />
+      {/* Background blur orbs — same style as pregnancy hero */}
+      <div className={`absolute -top-12 -right-12 w-36 h-36 rounded-full ${colors.accent} blur-2xl`} />
+      <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full ${colors.accent} blur-xl opacity-50`} />
 
-      <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-white/10 blur-3xl" />
-      <div className="absolute -bottom-20 -left-20 w-48 h-48 rounded-full bg-black/5 blur-2xl" />
-
-      <div className="relative z-10 p-4 pt-5">
+      <div className="relative z-10 flex flex-col items-center">
+        {/* Baby Image — centered with subtle float, matching pregnancy fetus image style */}
         <motion.div
-          className="flex items-center justify-between mb-4"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+          className="w-[178px] h-[178px] mb-3 relative"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{
+            scale: 1,
+            opacity: 1,
+            y: [0, -4, 0],
+          }}
+          transition={{
+            scale: { delay: 0.2, type: 'spring' },
+            opacity: { delay: 0.2 },
+            y: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
+          }}
         >
-          <div>
-            <h2 className="text-2xl font-black text-white tracking-tight">{babyData.name}</h2>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-white/70 text-sm">
-                {exactMonths > 0 ? (
-                  <span className="font-medium">
-                    <span className="text-white font-bold">{exactMonths}</span> ay{' '}
-                    {remainingDays > 0 && (
-                      <>
-                        <span className="text-white font-bold">{remainingDays}</span> gün
-                      </>
-                    )}
-                  </span>
-                ) : (
-                  <span className="font-medium">
-                    <span className="text-white font-bold">{babyData.ageInDays}</span> günlük
-                  </span>
-                )}
+          <img
+            src={babyIllustration}
+            alt={`${babyData.name} — ${babyData.ageInMonths} aylıq`}
+            className="w-full h-full object-contain drop-shadow-lg"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/placeholder.svg';
+            }}
+          />
+        </motion.div>
+
+        {/* Main Text — matching "Anacan, hazırda ... boydayam" structure */}
+        <div className="text-center">
+          <p className="text-lg font-bold text-foreground mb-1">
+            {tr("dashboard_anacan_hazirda_ayliq_4f2a8c", "Anacan, hazırda")}{' '}
+            <span className={colors.text}>
+              {exactMonths > 0 ? `${exactMonths} aylıq` : `${babyData.ageInDays} günlük`}
+            </span>
+          </p>
+          <p className="text-xs text-muted-foreground font-medium">
+            {babyData.name} • {babyData.ageInDays}. gün
+          </p>
+
+          {/* Badge chips — same style as pregnancy badges */}
+          <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
+            {exactMonths > 0 && (
+              <span className={`text-xs font-semibold ${colors.badge} px-2 py-0.5 rounded-full`}>
+                {exactMonths} ay
               </span>
-            </div>
+            )}
+            {remainingDays > 0 && (
+              <span className={`text-xs font-semibold ${colors.badge} px-2 py-0.5 rounded-full`}>
+                {remainingDays} gün
+              </span>
+            )}
+            <span className={`text-xs font-semibold ${colors.badge} px-2 py-0.5 rounded-full`}>
+              {babyData.ageInDays} gün
+            </span>
+            {daysUntilNextMonth > 0 && exactMonths < 12 && (
+              <span className={`text-xs font-semibold ${colors.badge} px-2 py-0.5 rounded-full`}>
+                {daysUntilNextMonth} gün qaldı
+              </span>
+            )}
           </div>
+        </div>
 
-          <motion.div
-            className="bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-2 shadow-lg"
-            initial={{ scale: 0, rotate: -10 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
-          >
-            <div className="text-center">
-              <span className="text-2xl font-black text-primary">{exactMonths || babyData.ageInDays}</span>
-              <span className="text-xs font-bold text-primary/70 ml-0.5">{exactMonths > 0 ? 'ay' : 'gün'}</span>
-            </div>
-          </motion.div>
-        </motion.div>
-
-        <motion.div
-          className="flex justify-center mb-5"
-          animate={{ y: [0, -6, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <div className="relative">
-            <div className="absolute -inset-4 bg-white/20 rounded-full blur-3xl" />
-            <div className="absolute -inset-2 bg-white/15 rounded-full blur-xl animate-pulse-soft" />
-
-            <div className="relative p-1 rounded-[2rem] bg-gradient-to-br from-white/80 via-white/50 to-white/30 shadow-2xl">
-              <div className="relative w-44 h-44 rounded-[1.75rem] bg-white/30 backdrop-blur-md p-1 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent rounded-[1.75rem]" />
-
-                <div className="relative w-full h-full rounded-[1.5rem] bg-gradient-to-br from-white/60 via-white/40 to-white/20 overflow-hidden flex items-center justify-center shadow-inner">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_white_0%,_transparent_70%)] opacity-50" />
-
-                  <img
-                    src={babyIllustration}
-                    alt={`${babyData.ageInMonths} aylıq körpə`}
-                    className="relative z-10 w-full h-full object-contain p-2 drop-shadow-2xl scale-105"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/placeholder.svg';
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-
+        {/* Progress Bar — progress through first year, matching pregnancy style */}
+        <div className="w-full mt-3 space-y-1">
+          <div className="flex justify-between text-[10px] text-muted-foreground">
+            <span>{tr("dashboard_dogus_6b7bfd", "Doğuş")}</span>
+            <span className={`${colors.text} font-semibold`}>{Math.round(progressPercent)}%</span>
+            <span>{tr("dashboard_1_yas_a1b2c3", "1 yaş")}</span>
+          </div>
+          <div className={`h-2 ${colors.accent} rounded-full overflow-hidden`}>
             <motion.div
-              className="absolute -inset-3 rounded-full border-2 border-dashed border-white/30"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+              className={`h-full ${colors.progress} rounded-full`}
+              initial={{ width: 0 }}
+              animate={{ width: `${progressPercent}%` }}
+              transition={{ duration: 1, delay: 0.3 }}
             />
-
-            <motion.div
-              className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow-lg text-lg"
-              animate={{ rotate: [0, 15, 0], scale: [1, 1.15, 1] }}
-              transition={{ duration: 3, repeat: Infinity }}
-            >
-              ✨
-            </motion.div>
-            <motion.div
-              className="absolute -bottom-2 -left-2 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center shadow-lg text-sm"
-              animate={{ rotate: [0, -15, 0], scale: [1, 1.2, 1] }}
-              transition={{ duration: 2.5, repeat: Infinity, delay: 0.5 }}
-            >
-              💫
-            </motion.div>
-            <motion.div
-              className="absolute top-1/2 -right-4 w-6 h-6 rounded-full bg-white/80 flex items-center justify-center shadow-md text-xs"
-              animate={{ x: [0, 3, 0], opacity: [0.8, 1, 0.8] }}
-              transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-            >
-              🌟
-            </motion.div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </motion.div>
   );
