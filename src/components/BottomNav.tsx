@@ -52,10 +52,7 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
     }
   };
 
-  // Hide cakes tab in flow mode
-  const visibleWomanTabs = lifeStage === 'flow' 
-    ? womanTabs.filter(t => t.id !== 'cakes') 
-    : womanTabs;
+  const visibleWomanTabs = womanTabs;
 
   return (
     <nav 
