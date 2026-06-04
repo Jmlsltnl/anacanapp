@@ -69,31 +69,33 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className={`${stats.is511 ? 'bg-gradient-to-r from-red-500 to-rose-600' : 'gradient-primary'} px-3 pt-2 pb-3 safe-top transition-colors relative z-20`}>
-        <div className="flex items-center gap-2 relative z-20">
-          <motion.button
-            onClick={onBack}
-            className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <ArrowLeft className="w-4 h-4 text-white" />
-          </motion.button>
-          <div className="flex-1">
-            <h1 className="text-base font-bold text-white">{tr("contractiontimer_sanci_olcen_67d681", "Sancı Ölçən")}</h1>
-            <p className="text-white/80 text-[10px]">{tr("contractiontimer_5_1_1_qaydasi_ile_izleyin_31947d", "5-1-1 qaydası ilə izləyin")}</p>
-          </div>
-          {contractions.length > 0 && (
+      {/* Minimalist Header */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
+        <div className="px-4 pb-2 safe-area-top">
+          <div className="flex items-center gap-3">
             <motion.button
-              onClick={clearAll}
-              className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center"
-              whileHover={{ scale: 1.05 }}
+              onClick={onBack}
+              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
               whileTap={{ scale: 0.95 }}
             >
-              <Trash2 className="w-4 h-4 text-white" />
+              <ArrowLeft className="w-5 h-5 text-foreground" />
             </motion.button>
-          )}
+            <div className="flex-1">
+              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Timer className="w-5 h-5 text-primary" />
+                {tr("contractiontimer_sanci_olcen_67d681", "Sancı Ölçən")}
+              </h1>
+            </div>
+            {contractions.length > 0 && (
+              <motion.button
+                onClick={clearAll}
+                className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
+                whileTap={{ scale: 0.95 }}
+              >
+                <Trash2 className="w-5 h-5 text-foreground" />
+              </motion.button>
+            )}
+          </div>
         </div>
       </div>
 
