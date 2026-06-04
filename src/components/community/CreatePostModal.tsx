@@ -258,7 +258,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
               <div className="flex flex-wrap gap-1.5">
                 {POPULAR_HASHTAGS.slice(0, 5).map(tag => (
                   <button key={tag} onClick={() => setContent(prev => prev + (prev ? ' ' : '') + `#${tag}`)}
-                    className="px-2.5 py-1 rounded-full bg-muted/20 text-[10px] font-bold text-muted-foreground/50 hover:bg-primary/8 hover:text-primary transition-colors">
+                    className="px-2.5 py-1 rounded-full bg-muted/35 text-[10px] font-bold text-muted-foreground/75 hover:bg-primary/15 hover:text-primary transition-colors">
                     #{tag}
                   </button>
                 ))}
