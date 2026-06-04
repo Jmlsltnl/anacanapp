@@ -30,8 +30,6 @@ const MommyHeroClassic = ({ babyData, exactMonths, remainingDays, babyIllustrati
   const totalFirstYearDays = 365;
   const progressPercent = Math.min((babyData.ageInDays / totalFirstYearDays) * 100, 100);
 
-  // Days until next month milestone
-  const daysUntilNextMonth = remainingDays > 0 ? remainingDays : 0;
 
   return (
     <motion.div
