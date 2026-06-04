@@ -266,7 +266,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                                   <p className="text-xs font-medium text-foreground">
                                     {item.feedType === 'solid' && item.notes ? item.notes : getFeedTypeLabel(item.feedType)}
                                     {item.feedType === 'formula' && item.notes && item.notes.includes('ml') && (
-                                      <span className="ml-1 text-blue-600 dark:text-blue-400 font-bold">({item.notes})</span>
+                                      <span className="ml-1 text-primary font-bold">({item.notes})</span>
                                     )}
                                   </p>
                                   <p className="text-[10px] text-muted-foreground">
