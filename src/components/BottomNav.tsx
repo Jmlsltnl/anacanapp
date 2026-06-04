@@ -14,7 +14,7 @@ interface BottomNavProps {
 const womanTabs = [
   { id: 'home', label: tr("bottomnav_esas_6d87f7", 'Əsas'), icon: Home },
   { id: 'tools', label: tr("bottomnav_aletler_4778b4", 'Alətlər'), icon: Compass },
-  { id: 'cakes', label: 'Tortlar', icon: Cake },
+  
   { id: 'community', label: tr("bottomnav_cemiyyet_2dc44d", 'Cəmiyyət'), icon: Users },
   { id: 'ai', label: 'Anacan.AI', icon: MessageCircle },
   { id: 'profile', label: 'Profil', icon: User },
