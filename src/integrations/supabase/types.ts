@@ -5948,6 +5948,7 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean | null
+          is_anonymous: boolean
           likes_count: number | null
           parent_comment_id: string | null
           post_id: string
@@ -5959,6 +5960,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean | null
+          is_anonymous?: boolean
           likes_count?: number | null
           parent_comment_id?: string | null
           post_id: string
@@ -5970,6 +5972,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean | null
+          is_anonymous?: boolean
           likes_count?: number | null
           parent_comment_id?: string | null
           post_id?: string
