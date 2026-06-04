@@ -96,6 +96,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
     createComment.mutate({
       postId: post.id, content, postAuthorId: post.user_id,
       commenterName: profile?.name || user?.user_metadata?.name || 'İstifadəçi',
+      isAnonymous: commentAnonymous,
     });
     setCommentText('');
   };
