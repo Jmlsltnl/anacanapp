@@ -1554,7 +1554,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
               </div>
               <div className="flex items-center gap-2">
                 <div className="text-right mr-2">
-                  <p className="text-xs font-bold text-violet-600 dark:text-violet-400">
+                  <p className="text-xs font-bold text-primary">
                     {(() => {
                       const totalMin = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60);
                       const h = Math.floor(totalMin / 60);
