@@ -70,16 +70,15 @@ const MommyHeroClassic = ({ babyData, exactMonths, remainingDays, babyIllustrati
           />
         </motion.div>
 
-        {/* Main Text — matching "Anacan, hazırda ... boydayam" structure */}
+        {/* Main Text — baby name + day info */}
         <div className="text-center">
           <p className="text-lg font-bold text-foreground mb-1">
-            {tr("dashboard_anacan_hazirda_ayliq_4f2a8c", "Anacan, hazırda")}{' '}
-            <span className={colors.text}>
-              {exactMonths > 0 ? `${exactMonths} aylıq` : `${babyData.ageInDays} günlük`}
-            </span>
+            {babyData.name} • {babyData.ageInDays}. gün
           </p>
           <p className="text-xs text-muted-foreground font-medium">
-            {babyData.name} • {babyData.ageInDays}. gün
+            {exactMonths > 0
+              ? `${exactMonths} ay ${remainingDays > 0 ? remainingDays + ' gün' : ''}`
+              : `${babyData.ageInDays} günlük`}
           </p>
 
           {/* Badge chips — same style as pregnancy badges */}
