@@ -1595,7 +1595,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                         const durText = dH > 0 ? `${dH}s ${dM}d` : dM > 0 ? `${dM} dəq ${dS} san` : `${dS} san`;
 
                         return (
-                          <div key={log.id} className="flex items-center justify-between p-2 bg-violet-100/50 dark:bg-violet-500/10 rounded-xl">
+                          <div key={log.id} className="flex items-center justify-between p-2 bg-primary/10 rounded-xl">
                             <div className="flex items-center gap-2">
                               <span className="text-sm">😴</span>
                               <div>
@@ -1605,7 +1605,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                                 </p>
                               </div>
                             </div>
-                            <span className="text-[11px] font-semibold text-violet-600 dark:text-violet-400">
+                            <span className="text-[11px] font-semibold text-primary">
                               {end ? durText : 'Davam edir...'}
                             </span>
                           </div>
