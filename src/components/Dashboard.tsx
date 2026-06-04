@@ -1243,7 +1243,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             onClick={() => feedingSummaryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
           >
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-              <Baby className="w-5 h-5 text-white" />
+              <Baby className="w-5 h-5 text-primary-foreground" />
             </div>
             <div className="text-left">
               <h3 className="font-bold text-sm text-foreground">{tr("dashboard_qidalanmaya_nezaret_1b60b4", "Qidalanmaya nəzarət")}</h3>
