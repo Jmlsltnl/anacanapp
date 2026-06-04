@@ -259,6 +259,21 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     return matchesSearch;
   });
 
+  // Inject virtual Cakes tool (moved here from bottom nav)
+  const cakesVirtual: Tool = {
+    id: 'cakes',
+    name: 'Tortlar',
+    description: 'Xüsusi günlər üçün tortlar',
+    icon: iconMap['ChefHat'] || Wrench,
+    color: 'pink',
+    bgColor: 'pink',
+    stages: ['bump', 'mommy'],
+  };
+  const showCakes = (lifeStage === 'bump' || lifeStage === 'mommy' || isAdmin) &&
+    (cakesVirtual.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      cakesVirtual.description.toLowerCase().includes(searchQuery.toLowerCase()));
+  const displayedTools: Tool[] = showCakes ? [cakesVirtual, ...filteredTools] : filteredTools;
+
   const handleBack = () => {
     if (activeTool) {
       // If opened from Dashboard (onBack exists and we have initialTool), go back to Dashboard
