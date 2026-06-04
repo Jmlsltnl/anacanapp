@@ -292,16 +292,16 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
 
               {/* Media Actions */}
               <div className="flex items-center gap-2.5 py-2">
-                <span className="text-[11px] text-muted-foreground/40 font-medium">{tr("createpostmodal_elave_et_81035a", "Əlavə et:")}</span>
+                <span className="text-[11px] text-muted-foreground/65 font-medium">{tr("createpostmodal_elave_et_81035a", "Əlavə et:")}</span>
                 <button onClick={() => imageInputRef.current?.click()} disabled={mediaFiles.length >= 4 || isUploading}
-                  className="w-9 h-9 rounded-full bg-primary/6 flex items-center justify-center disabled:opacity-40 transition-colors active:bg-primary/12">
-                  <Image className="w-4 h-4 text-primary/60" />
+                  className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center disabled:opacity-40 transition-colors active:bg-primary/25">
+                  <Image className="w-4 h-4 text-primary" />
                 </button>
                 <button onClick={() => videoInputRef.current?.click()} disabled={mediaFiles.length >= 4 || isUploading}
-                  className="w-9 h-9 rounded-full bg-blue-500/6 flex items-center justify-center disabled:opacity-40 transition-colors active:bg-blue-500/12">
-                  <Video className="w-4 h-4 text-blue-500/60" />
+                  className="w-9 h-9 rounded-full bg-blue-500/15 flex items-center justify-center disabled:opacity-40 transition-colors active:bg-blue-500/25">
+                  <Video className="w-4 h-4 text-blue-500" />
                 </button>
-                {mediaFiles.length > 0 && <span className="text-[10px] text-muted-foreground/35 font-medium ml-auto">{mediaFiles.length}/4</span>}
+                {mediaFiles.length > 0 && <span className="text-[10px] text-muted-foreground/60 font-medium ml-auto">{mediaFiles.length}/4</span>}
               </div>
 
               {/* Anonymous Toggle */}
