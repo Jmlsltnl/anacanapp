@@ -187,7 +187,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
             <div className="flex-1">
               <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <Wand2 className="h-5 w-5 text-purple-500" />
-                Sehrli Nağılçı
+                Ağıllı Nağıllar
               </h1>
             </div>
           </div>

@@ -349,7 +349,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                 <Utensils className="w-5 h-5 text-primary" />
                 Qidalanma
               </h1>
-              <p className="text-xs text-muted-foreground">{targets.description}</p>
+              
             </div>
           </div>
         </div>

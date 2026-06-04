@@ -133,17 +133,6 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
         </button>
       </motion.div>
 
-      {/* Search */}
-      <motion.div className="relative mb-5" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-        <input
-          type="text"
-          placeholder={tr("cakesscreen_tort_axtarin_f26a97", "Tort axtarın...")}
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          className="w-full h-12 pl-12 pr-4 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-sm transition-all outline-none"
-        />
-      </motion.div>
 
       {/* Filters */}
       <motion.div className="flex gap-2 mb-5 overflow-x-auto hide-scrollbar pb-2" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }}>
