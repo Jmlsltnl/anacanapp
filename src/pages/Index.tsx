@@ -185,11 +185,6 @@ const Index = () => {
 
   // Handle tool navigation from Dashboard
   const handleNavigateToTool = (tool: string) => {
-    // Cakes has its own tab, navigate directly
-    if (tool === 'cakes') {
-      setActiveTab('cakes');
-      return;
-    }
     setActiveTool(tool);
     setToolOpenedFromDashboard(true);
     setActiveTab('tools');
