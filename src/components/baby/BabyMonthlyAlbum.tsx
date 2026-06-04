@@ -1,10 +1,11 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Camera, X, Loader2, ShoppingBag, Trash2, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Camera, X, Loader2, ShoppingBag, Trash2, RefreshCw, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useChildren } from '@/hooks/useChildren';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 import AlbumOrderScreen from '@/components/shop/AlbumOrderScreen';
@@ -29,6 +30,7 @@ const monthLabels = Array.from({ length: 12 }, (_, i) => ({
 const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
   useScrollToTop();
   const { user } = useAuth();
+  const { selectedChild, getChildAge } = useChildren();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -38,6 +40,9 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
   const [replacingPhoto, setReplacingPhoto] = useState<AlbumPhoto | null>(null);
   const [viewingPhoto, setViewingPhoto] = useState<AlbumPhoto | null>(null);
   const [showActionSheet, setShowActionSheet] = useState<AlbumPhoto | null>(null);
+
+  const babyMonths = selectedChild ? getChildAge(selectedChild).months : 0;
+  const canOrderPhysical = babyMonths >= 12;
 
   const { data: photos = [], isLoading } = useQuery({
     queryKey: ['baby-album-photos', user?.id],
@@ -117,10 +122,12 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
               <h1 className="text-lg font-bold">{tr("babymonthlyalbum_korpe_albomu_42d4c6", "Körpə Albomu")}</h1>
               <p className="text-xs text-muted-foreground">{tr("babymonthlyalbum_her_ay_bir_xatire_4ca0e9", "Hər ay bir xatirə")}</p>
             </div>
-            <Button size="sm" variant="outline" className="rounded-xl gap-1.5" onClick={() => setShowOrder(true)}>
-              <ShoppingBag className="w-4 h-4" />
-              <span className="text-xs">Fiziki Albom</span>
-            </Button>
+            {canOrderPhysical && (
+              <Button size="sm" variant="outline" className="rounded-xl gap-1.5" onClick={() => setShowOrder(true)}>
+                <ShoppingBag className="w-4 h-4" />
+                <span className="text-xs">Fiziki Albom</span>
+              </Button>
+            )}
           </div>
         </div>
       </div>
