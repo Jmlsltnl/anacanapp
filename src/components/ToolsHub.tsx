@@ -264,7 +264,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     id: 'cakes',
     name: 'Tortlar',
     description: 'Xüsusi günlər üçün tortlar',
-    icon: iconMap['ChefHat'] || Wrench,
+    icon: Cake,
     color: 'pink',
     bgColor: 'pink',
     stages: ['bump', 'mommy'],
