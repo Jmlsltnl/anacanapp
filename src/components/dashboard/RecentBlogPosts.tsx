@@ -90,7 +90,7 @@ const RecentBlogPosts = ({ onNavigate, lifeStage }: RecentBlogPostsProps) => {
           <div className="h-4 w-20 bg-muted rounded-lg animate-pulse" />
         </div>
         <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
+          {[1, 2, 3, 4].map((i) => (
             <div key={i} className="flex gap-3 p-3 bg-card rounded-2xl border border-border/50">
               <div className="w-20 h-20 rounded-xl bg-muted animate-pulse" />
               <div className="flex-1 space-y-2">
