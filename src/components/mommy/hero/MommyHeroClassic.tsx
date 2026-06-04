@@ -17,14 +17,14 @@ export interface MommyHeroProps {
  * Same structural pattern: gradient card → centered image → main text → badge chips → progress bar.
  */
 const MommyHeroClassic = ({ babyData, exactMonths, remainingDays, babyIllustration }: MommyHeroProps) => {
-  // Mommy stage colors (coral/salmon family to match existing brand)
+  // Mommy stage colors — Coral Orange (#F28155) brand palette
   const colors = {
-    bg: 'from-rose-400/10 via-orange-300/5 to-rose-400/10 dark:from-rose-500/20 dark:via-orange-400/10 dark:to-rose-500/20',
-    border: 'border-rose-400/20 dark:border-rose-500/30',
-    accent: 'bg-rose-400/10 dark:bg-rose-500/20',
-    text: 'text-rose-600 dark:text-rose-400',
-    badge: 'bg-rose-400/10 text-rose-600 dark:text-rose-400',
-    progress: 'bg-rose-500',
+    bg: 'from-primary/10 via-primary/5 to-primary/10 dark:from-primary/20 dark:via-primary/10 dark:to-primary/20',
+    border: 'border-primary/20 dark:border-primary/30',
+    accent: 'bg-primary/10 dark:bg-primary/20',
+    text: 'text-primary',
+    badge: 'bg-primary/10 text-primary',
+    progress: 'bg-primary',
   };
 
   const totalFirstYearDays = 365;
