@@ -76,7 +76,7 @@ const RecentBlogPosts = ({ onNavigate, lifeStage }: RecentBlogPostsProps) => {
     : posts;
   
   // Get only the 3 most recent filtered posts
-  const recentPosts = filteredByStage.slice(0, 3);
+  const recentPosts = filteredByStage.slice(0, 4);
 
   if (loading) {
     return (
