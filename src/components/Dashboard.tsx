@@ -1624,9 +1624,9 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           <div ref={feedingSummaryRef}>
             <FeedingHistoryPanel />
           </div>
-          <div className="flex items-center justify-between p-2.5 bg-emerald-50 dark:bg-emerald-500/15 rounded-xl border border-emerald-100 dark:border-emerald-500/20">
+          <div className="flex items-center justify-between p-2.5 bg-primary/5 rounded-xl border border-primary/20">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <Clock className="w-4 h-4 text-primary" />
               <span className="text-xs font-medium text-foreground">{tr("dashboard_bez_deyisme_647cbc", "Bez dəyişmə")}</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -1635,7 +1635,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 💩{todayStats.dirtyCount}
                 💧💩{todayStats.bothCount}
               </span>
-              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{todayStats.diaperCount} dəfə</span>
+              <span className="text-xs font-bold text-primary">{todayStats.diaperCount} dəfə</span>
             </div>
           </div>
         </div>
