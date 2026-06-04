@@ -227,7 +227,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
         ) : (
           <div onClick={handleDoubleTap} className="relative">
             <div className="px-4 pb-2.5">
-              <p className="text-foreground/90 whitespace-pre-wrap text-[14px] leading-[1.7]">
+              <p className="text-foreground whitespace-pre-wrap text-[16px] leading-[1.6]">
                 {post.content.split(/(\s+)/).map((word, index) => {
                   if (word.startsWith('#')) return <span key={index} className="text-primary font-semibold">{word}</span>;
                   if (word.startsWith('@')) return <span key={index} className="text-blue-500 font-semibold">{word}</span>;
