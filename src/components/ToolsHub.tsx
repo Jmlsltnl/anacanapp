@@ -6,7 +6,7 @@ import {
   Utensils, Activity, ArrowLeft, Camera, Lock, ShoppingCart, LucideIcon, Wrench, BookOpen, ChefHat,
   Stethoscope, Droplet, ImagePlus, Package, Mic, Scan, CloudSun, Gauge, Store,
   MapPin, Gamepad2, ShieldAlert, BookHeart, Stars, Crown, Ruler, Sparkles, TrendingUp, Zap,
-  Pill
+  Pill, Cake
 } from 'lucide-react';
 import BlogScreen from '@/components/BlogScreen';
 import { useUserStore } from '@/store/userStore';
@@ -45,6 +45,7 @@ const MaternityCalculator = lazy(() => import('./tools/MaternityCalculator'));
 const TeethingTracker = lazy(() => import('./tools/TeethingTracker'));
 const VitaminTracker = lazy(() => import('./tools/VitaminTracker'));
 const BabyMonthlyAlbum = lazy(() => import('./baby/BabyMonthlyAlbum'));
+const CakesScreen = lazy(() => import('./CakesScreen'));
 import { PremiumModal } from './PremiumModal';
 
 import { useToast } from '@/hooks/use-toast';
@@ -258,6 +259,21 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     return matchesSearch;
   });
 
+  // Inject virtual Cakes tool (moved here from bottom nav)
+  const cakesVirtual: Tool = {
+    id: 'cakes',
+    name: 'Tortlar',
+    description: 'Xüsusi günlər üçün tortlar',
+    icon: Cake,
+    color: 'pink',
+    bgColor: 'pink',
+    stages: ['bump', 'mommy'],
+  };
+  const showCakes = (lifeStage === 'bump' || lifeStage === 'mommy' || isAdmin) &&
+    (cakesVirtual.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      cakesVirtual.description.toLowerCase().includes(searchQuery.toLowerCase()));
+  const displayedTools: Tool[] = showCakes ? [cakesVirtual, ...filteredTools] : filteredTools;
+
   const handleBack = () => {
     if (activeTool) {
       // If opened from Dashboard (onBack exists and we have initialTool), go back to Dashboard
@@ -318,6 +334,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
       case 'maternity-calculator': case 'maternity': return <MaternityCalculator onBack={handleBack} />;
       case 'teething': case 'teething-tracker': return <TeethingTracker onBack={handleBack} />;
       case 'vitamin-tracker': case 'vitamins': return <VitaminTracker onBack={handleBack} />;
+      case 'cakes': return <CakesScreen onBack={handleBack} />;
       default: return null;
     }
   })();
@@ -419,19 +436,19 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         {/* Quick Access Row removed - only hero banners shown */}
 
         {/* Tools Count Header */}
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-2.5">
           <h2 className="text-sm font-semibold text-foreground">
             Bütün Alətlər
           </h2>
-          <span className="text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full font-medium">
-            {filteredTools.length} alət
+          <span className="text-[11px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full font-medium">
+            {displayedTools.length} alət
           </span>
         </div>
 
-        {/* Tools Grid - 2 Columns with Description */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* Tools Grid - 3 Columns, Compact */}
+        <div className="grid grid-cols-3 gap-2">
           <AnimatePresence mode="popLayout">
-            {filteredTools.map((tool, index) => {
+            {displayedTools.map((tool, index) => {
               const Icon = tool.icon;
               const available = isToolAvailable(tool);
               const needsPremium = (tool.isLocked || tool.isPremium) && !isPremium;
@@ -443,33 +460,33 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ delay: Math.min(index * 0.02, 0.2) }}
-                  onClick={() => handleToolClick(tool)}
-                  className={`bg-card rounded-2xl p-3.5 text-left border border-border/40 relative overflow-hidden transition-all active:scale-95 ${!available ? 'opacity-40' : 'hover:shadow-lg hover:border-primary/20'}`}
+                  transition={{ delay: Math.min(index * 0.015, 0.18) }}
+                  onClick={() => tool.id === 'cakes' ? openTool('cakes') : handleToolClick(tool)}
+                  className={`bg-card rounded-xl p-2.5 text-left border border-border/40 relative overflow-hidden transition-all active:scale-95 ${!available ? 'opacity-40' : 'hover:shadow-md hover:border-primary/20'}`}
                 >
                   {/* Premium/Lock indicator */}
                   {needsPremium && (
-                    <div className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-amber-500/15 flex items-center justify-center">
-                      <Lock className="w-3 h-3 text-amber-500" />
+                    <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-amber-500/15 flex items-center justify-center">
+                      <Lock className="w-2.5 h-2.5 text-amber-500" />
                     </div>
                   )}
                   {!needsPremium && tool.isPremium && (
-                    <div className="absolute top-2.5 right-2.5">
-                      <Crown className="w-4 h-4 text-amber-400" />
+                    <div className="absolute top-1.5 right-1.5">
+                      <Crown className="w-3 h-3 text-amber-400" />
                     </div>
                   )}
                   
                   {/* Icon */}
-                  <div className={`w-12 h-12 rounded-xl mb-2.5 flex items-center justify-center ${
+                  <div className={`w-9 h-9 rounded-lg mb-1.5 flex items-center justify-center ${
                     needsPremium 
                       ? 'bg-gradient-to-br from-amber-500/15 to-orange-500/15' 
                       : 'bg-gradient-to-br from-primary/10 to-primary/20'
                   }`}>
-                    <Icon className={`w-6 h-6 ${needsPremium ? 'text-amber-500' : 'text-primary'}`} />
+                    <Icon className={`w-[18px] h-[18px] ${needsPremium ? 'text-amber-500' : 'text-primary'}`} />
                   </div>
                   
-                  <h3 className="font-semibold text-foreground text-sm mb-1 pr-6">{tool.name}</h3>
-                  <p className="text-xs text-muted-foreground leading-snug line-clamp-2">{tool.description}</p>
+                  <h3 className="font-semibold text-foreground text-[12px] leading-tight mb-0.5 pr-4 line-clamp-2">{tool.name}</h3>
+                  <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">{tool.description}</p>
                 </motion.button>
               );
             })}
@@ -477,7 +494,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         </div>
 
         {/* Empty State */}
-        {filteredTools.length === 0 && (
+        {displayedTools.length === 0 && (
           <motion.div 
             className="text-center py-16"
             initial={{ opacity: 0 }}
