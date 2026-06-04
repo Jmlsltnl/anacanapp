@@ -46,6 +46,7 @@ export interface PostComment {
   content: string;
   likes_count: number;
   created_at: string;
+  is_anonymous?: boolean;
   author?: {
     name: string;
     avatar_url: string | null;
