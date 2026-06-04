@@ -168,6 +168,35 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
         })}
       </div>
 
+      {canOrderPhysical && (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mx-4 mt-5 rounded-2xl bg-gradient-to-br from-primary/15 via-primary/10 to-amber-400/15 border border-primary/30 p-4 shadow-sm"
+        >
+          <div className="flex items-start gap-3">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-amber-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+              <Sparkles className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-bold text-foreground mb-0.5">
+                {selectedChild?.name || 'Körpəniz'} artıq 1 yaşındadır! 🎉
+              </h3>
+              <p className="text-[12px] text-muted-foreground leading-snug mb-3">
+                İlk ilin xatirələrini fiziki albom kimi əlinizdə tutun. Hər ay üçün bir səhifə, ömürlük xatirə.
+              </p>
+              <Button
+                onClick={() => setShowOrder(true)}
+                className="w-full h-10 rounded-xl gradient-primary text-primary-foreground text-[13px] font-bold gap-1.5"
+              >
+                <ShoppingBag className="w-4 h-4" />
+                Fiziki Albom Sifariş Et
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
 
       {/* Photo Viewer Modal */}
