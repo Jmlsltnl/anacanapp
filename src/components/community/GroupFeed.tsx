@@ -120,20 +120,20 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
         )}
       </div>
 
-      <div className="px-4 pt-3">
+      <div className="px-4 pt-3 pb-1">
         <PostSearchFilter searchQuery={searchQuery} onSearchChange={setSearchQuery} sortBy={sortBy} onSortChange={setSortBy} />
       </div>
 
-      <div className="px-4 pt-1 space-y-3">
+      <div className="pt-1">
         {isLoading ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}
+          <div className="space-y-2 px-4">
+            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-36" />)}
           </div>
         ) : filteredPosts.length === 0 ? (
           <EmptyState emoji="🌟" text={searchQuery ? 'Nəticə tapılmadı' : 'Hələ paylaşım yoxdur'} subtext={searchQuery ? 'Başqa axtarış sözləri sınayın' : 'Bu qrupda ilk paylaşımı siz edin!'} />
         ) : (
           filteredPosts.map((post, index) => (
-            <motion.div key={post.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }}>
+            <motion.div key={post.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}>
               <PostSeenObserver postId={post.id} createdAt={post.created_at} postUserId={post.user_id}>
                 <PostCard post={post} groupId={group?.id || null} onUserClick={onUserClick} />
               </PostSeenObserver>

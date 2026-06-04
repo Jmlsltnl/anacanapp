@@ -156,20 +156,20 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
       </div>
 
       {/* Facebook-style post input - compact */}
-      <div className="px-4 pt-1 pb-1.5">
+      <div className="bg-card border-b border-border/30 px-4 py-2.5">
         <motion.button
           onClick={() => setShowCreatePost(true)}
-          className="w-full flex items-center gap-2.5 bg-card rounded-xl border border-border/40 px-3 py-2 active:bg-muted/30 transition-colors"
+          className="w-full flex items-center gap-2.5 active:bg-muted/30 transition-colors rounded-lg"
           whileTap={{ scale: 0.98 }}
         >
-          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary/15 to-accent/10 flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/15 to-accent/10 flex items-center justify-center flex-shrink-0">
             <Pen className="w-3.5 h-3.5 text-primary" />
           </div>
           <span className="text-[14px] text-muted-foreground/70 font-medium">{tr("communityscreen_ne_dusunursunuz_0378b3", "Nə düşünürsünüz?")}</span>
         </motion.button>
       </div>
 
-      <div className="px-4 pt-1">
+      <div className="pt-0">
         <GroupFeed group={null} onBack={() => {}} onCreatePost={() => setShowCreatePost(true)} isEmbedded onUserClick={handleUserClick} externalSearchQuery={searchQuery} />
       </div>
 
