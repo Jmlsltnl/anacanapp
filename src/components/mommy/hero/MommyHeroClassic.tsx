@@ -30,8 +30,6 @@ const MommyHeroClassic = ({ babyData, exactMonths, remainingDays, babyIllustrati
   const totalFirstYearDays = 365;
   const progressPercent = Math.min((babyData.ageInDays / totalFirstYearDays) * 100, 100);
 
-  // Days until next month milestone
-  const daysUntilNextMonth = remainingDays > 0 ? remainingDays : 0;
 
   return (
     <motion.div
@@ -75,11 +73,6 @@ const MommyHeroClassic = ({ babyData, exactMonths, remainingDays, babyIllustrati
           <p className="text-lg font-bold text-foreground mb-1">
             {babyData.name} • {babyData.ageInDays}. gün
           </p>
-          <p className="text-xs text-muted-foreground font-medium">
-            {exactMonths > 0
-              ? `${exactMonths} ay ${remainingDays > 0 ? remainingDays + ' gün' : ''}`
-              : `${babyData.ageInDays} günlük`}
-          </p>
 
           {/* Badge chips — same style as pregnancy badges */}
           <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
@@ -96,11 +89,6 @@ const MommyHeroClassic = ({ babyData, exactMonths, remainingDays, babyIllustrati
             <span className={`text-xs font-semibold ${colors.badge} px-2 py-0.5 rounded-full`}>
               {babyData.ageInDays} gün
             </span>
-            {daysUntilNextMonth > 0 && exactMonths < 12 && (
-              <span className={`text-xs font-semibold ${colors.badge} px-2 py-0.5 rounded-full`}>
-                {daysUntilNextMonth} gün qaldı
-              </span>
-            )}
           </div>
         </div>
 
