@@ -362,11 +362,14 @@ export const usePostComments = (postId: string) => {
             isLiked = !!likeData;
           }
 
+          const isAnon = comment.is_anonymous === true;
           return {
             ...comment,
-            author: authorData
-              ? { name: authorData.name || 'İstifadəçi', avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null }
-              : { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null },
+            author: isAnon
+              ? { name: 'Anonim', avatar_url: null, badge_type: null }
+              : authorData
+                ? { name: authorData.name || 'İstifadəçi', avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null }
+                : { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null },
             is_liked: isLiked,
           };
         })
