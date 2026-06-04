@@ -387,6 +387,76 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
         </div>
       </div>
 
+      {/* Fiziki Albom CTA */}
+      {currentMonth >= 6 ? (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mx-4 mt-4 mb-4 rounded-2xl bg-gradient-to-br from-primary/15 via-primary/10 to-amber-400/15 border border-primary/30 p-4 shadow-sm"
+        >
+          <div className="flex items-start gap-3">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-amber-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+              <Heart className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-bold text-foreground mb-0.5">Hamiləlik xatirələrini əlinizdə tutun</h3>
+              <p className="text-[12px] text-muted-foreground leading-snug mb-3">
+                9 ayın hər anını fiziki albom kimi sifariş edin. Premium kağız, hər ay üçün ayrıca səhifə, ömürlük xatirə.
+              </p>
+              <div className="grid grid-cols-3 gap-2 mb-3">
+                <div className="rounded-xl bg-background/60 border border-border/40 p-2 text-center">
+                  <p className="text-[10px] text-muted-foreground">Səhifə</p>
+                  <p className="text-[13px] font-bold text-foreground">9+</p>
+                </div>
+                <div className="rounded-xl bg-background/60 border border-border/40 p-2 text-center">
+                  <p className="text-[10px] text-muted-foreground">Format</p>
+                  <p className="text-[13px] font-bold text-foreground">A4</p>
+                </div>
+                <div className="rounded-xl bg-background/60 border border-border/40 p-2 text-center">
+                  <p className="text-[10px] text-muted-foreground">Çatdırılma</p>
+                  <p className="text-[13px] font-bold text-foreground">3-5 gün</p>
+                </div>
+              </div>
+              <Button
+                onClick={() => setShowOrder(true)}
+                className="w-full h-10 rounded-xl gradient-primary text-primary-foreground text-[13px] font-bold gap-1.5"
+              >
+                <ShoppingBag className="w-4 h-4" />
+                Fiziki Albom Sifariş Et
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mx-4 mt-4 mb-4 rounded-2xl bg-card border border-border/50 p-4"
+        >
+          <div className="flex items-start gap-3">
+            <div className="w-11 h-11 rounded-2xl bg-muted flex items-center justify-center flex-shrink-0">
+              <ShoppingBag className="w-5 h-5 text-muted-foreground" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-bold text-foreground mb-0.5">Fiziki Albom</h3>
+              <p className="text-[12px] text-muted-foreground leading-snug mb-2">
+                6-cı ayı tamamladıqdan sonra hamiləlik albomunuzu fiziki kitab kimi sifariş edə bilərsiniz.
+              </p>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary/60 rounded-full"
+                    style={{ width: `${Math.min(100, (currentMonth / 6) * 100)}%` }}
+                  />
+                </div>
+                <span className="text-[11px] font-semibold text-muted-foreground">{currentMonth}/6 ay</span>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+
       {/* Action Sheet - appears when tapping a photo */}
       <AnimatePresence>
         {showActionSheet && (
