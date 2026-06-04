@@ -45,6 +45,7 @@ const MaternityCalculator = lazy(() => import('./tools/MaternityCalculator'));
 const TeethingTracker = lazy(() => import('./tools/TeethingTracker'));
 const VitaminTracker = lazy(() => import('./tools/VitaminTracker'));
 const BabyMonthlyAlbum = lazy(() => import('./baby/BabyMonthlyAlbum'));
+const CakesScreen = lazy(() => import('./CakesScreen'));
 import { PremiumModal } from './PremiumModal';
 
 import { useToast } from '@/hooks/use-toast';
