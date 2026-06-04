@@ -347,7 +347,10 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         <div className="relative">
           {toolComponent}
           {showPremiumBadge && (
-            <div className="pointer-events-none fixed top-3 right-3 z-[60] safe-area-top">
+            <div
+              className="pointer-events-none fixed left-1/2 -translate-x-1/2 z-[60]"
+              style={{ top: 'calc(env(safe-area-inset-top, 0px) + 6px)' }}
+            >
               <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 shadow-lg shadow-amber-500/30">
                 <span className="text-[9px] font-extrabold uppercase tracking-wider text-white">Premium</span>
               </div>
