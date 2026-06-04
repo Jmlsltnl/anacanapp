@@ -122,12 +122,6 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
               <h1 className="text-lg font-bold">{tr("babymonthlyalbum_korpe_albomu_42d4c6", "Körpə Albomu")}</h1>
               <p className="text-xs text-muted-foreground">{tr("babymonthlyalbum_her_ay_bir_xatire_4ca0e9", "Hər ay bir xatirə")}</p>
             </div>
-            {canOrderPhysical && (
-              <Button size="sm" variant="outline" className="rounded-xl gap-1.5" onClick={() => setShowOrder(true)}>
-                <ShoppingBag className="w-4 h-4" />
-                <span className="text-xs">Fiziki Albom</span>
-              </Button>
-            )}
           </div>
         </div>
       </div>
