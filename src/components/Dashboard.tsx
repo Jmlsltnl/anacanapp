@@ -1624,18 +1624,23 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           <div ref={feedingSummaryRef}>
             <FeedingHistoryPanel />
           </div>
-          <div className="flex items-center justify-between p-2.5 bg-primary/5 rounded-xl border border-primary/20">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-primary" />
-              <span className="text-xs font-medium text-foreground">{tr("dashboard_bez_deyisme_647cbc", "Bez dəyişmə")}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-muted-foreground">
-                💧{todayStats.wetCount}
-                💩{todayStats.dirtyCount}
-                💧💩{todayStats.bothCount}
-              </span>
-              <span className="text-xs font-bold text-primary">{todayStats.diaperCount} dəfə</span>
+          <div className="bg-primary/5 rounded-2xl overflow-hidden border border-primary/20">
+            <div className="w-full p-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-primary" />
+                </div>
+                <div className="text-left">
+                  <p className="text-xs font-semibold text-foreground">{tr("dashboard_bez_deyisme_647cbc", "Bez dəyişmə")}</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    💧{todayStats.wetCount} 💩{todayStats.dirtyCount} 💧💩{todayStats.bothCount}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right mr-2">
+                <p className="text-xs font-bold text-primary">{todayStats.diaperCount} dəfə</p>
+                <p className="text-[10px] text-muted-foreground">{tr("dashboard_bu_gun_7d7f30", "bu gün")}</p>
+              </div>
             </div>
           </div>
         </div>
