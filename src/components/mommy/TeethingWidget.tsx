@@ -71,16 +71,16 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <div className="bg-gradient-to-br from-pink-50 via-rose-50 to-fuchsia-50 dark:from-pink-950/30 dark:via-rose-950/30 dark:to-fuchsia-950/30 rounded-2xl p-4 border border-pink-100/50 dark:border-pink-900/30 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-primary/10 dark:from-primary/15 dark:via-primary/10 dark:to-primary/15 rounded-2xl p-4 border border-primary/20 relative overflow-hidden">
         {/* Background decoration */}
-        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-pink-200/30 to-transparent rounded-full blur-2xl" />
+        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-2xl" />
         
         <div className="relative">
           {/* Header */}
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center shadow-lg shadow-pink-500/20">
-                <Sparkles className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
+                <Sparkles className="w-5 h-5 text-primary-foreground" />
               </div>
               <div>
                 <h3 className="font-semibold text-sm">{tr("teethingwidget_dis_cixarma_ca53f7", "Diş Çıxarma")}</h3>
@@ -96,9 +96,9 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
           <div className="mb-3">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-xs text-muted-foreground">{tr("teethingwidget_cixan_disler_a9eadd", "Çıxan dişlər")}</span>
-              <span className="text-sm font-bold text-pink-600 dark:text-pink-400">{emergedCount} / {totalTeeth}</span>
+              <span className="text-sm font-bold text-primary">{emergedCount} / {totalTeeth}</span>
             </div>
-            <Progress value={progress} className="h-2 bg-pink-100 dark:bg-pink-900/30" />
+            <Progress value={progress} className="h-2 bg-primary/10" />
           </div>
 
           {/* Stats Row */}

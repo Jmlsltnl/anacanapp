@@ -1161,7 +1161,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
       {/* Cakes Widget - navigate to cakes tab, hide after 12 months */}
       {babyData.ageInMonths < 12 && (
         <motion.div
-          className="bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-500/10 dark:to-rose-500/10 rounded-2xl p-4 border border-pink-200/50 dark:border-pink-500/20 shadow-card cursor-pointer"
+          className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl p-4 border border-primary/20 shadow-card cursor-pointer"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.12 }}
@@ -1170,7 +1170,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           onClick={() => onNavigateToTool?.('cakes')}
         >
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg">
               <span className="text-2xl">🎂</span>
             </div>
             <div className="flex-1">
@@ -1179,7 +1179,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 {babyData.ageInMonths > 0 ? `${babyData.ageInMonths + 1}-ci aylıq tortunu sifariş ver!` : 'Körpəniz üçün milestone tortları'}
               </p>
             </div>
-            <ChevronRight className="w-5 h-5 text-pink-400" />
+            <ChevronRight className="w-5 h-5 text-primary" />
           </div>
         </motion.div>
       )}
@@ -1193,8 +1193,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
       >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center">
-              <Moon className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+              <Moon className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
               <h3 className="font-bold text-sm text-foreground">{tr("dashboard_yuxu_izleme_adaa4f", "Yuxu İzləmə")}</h3>
@@ -1205,8 +1205,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             onClick={toggleSleep}
             className={`px-4 py-2.5 rounded-xl font-bold text-xs ${
               sleepTimer 
-                ? 'bg-amber-500 text-white' 
-                : 'bg-violet-100 text-violet-700'
+                ? 'bg-primary text-primary-foreground' 
+                : 'bg-primary/10 text-primary'
             }`}
             whileTap={{ scale: 0.95 }}
             animate={sleepTimer ? { scale: [1, 1.05, 1] } : {}}
@@ -1218,12 +1218,12 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         
         {sleepTimer && (
           <motion.div 
-            className="bg-violet-50 rounded-xl p-3 flex items-center gap-3"
+            className="bg-primary/10 rounded-xl p-3 flex items-center gap-3"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
           >
-            <div className="w-3 h-3 rounded-full bg-violet-500 animate-pulse" />
-            <span className="text-sm text-violet-700 font-medium">
+            <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
+            <span className="text-sm text-primary font-medium">
               Yuxu davam edir: {formatDuration(getElapsedSeconds(sleepTimer.id))}
             </span>
           </motion.div>
@@ -1242,8 +1242,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => feedingSummaryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center">
-              <Baby className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+              <Baby className="w-5 h-5 text-primary-foreground" />
             </div>
             <div className="text-left">
               <h3 className="font-bold text-sm text-foreground">{tr("dashboard_qidalanmaya_nezaret_1b60b4", "Qidalanmaya nəzarət")}</h3>
@@ -1252,7 +1252,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           </button>
           <motion.button
             onClick={() => setShowFeedingModal(true)}
-            className="px-4 py-2.5 rounded-xl bg-amber-100 text-amber-700 font-bold text-xs"
+            className="px-4 py-2.5 rounded-xl bg-primary/10 text-primary font-bold text-xs"
             whileTap={{ scale: 0.95 }}
           >
             + Əlavə et
@@ -1449,8 +1449,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
       >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center">
-              <Clock className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+              <Clock className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
               <h3 className="font-bold text-sm text-foreground">{tr("dashboard_bez_deyisme_ba242a", "Bez Dəyişmə")}</h3>
@@ -1459,7 +1459,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           </div>
           <motion.button
             onClick={() => setShowDiaperModal(true)}
-            className="px-4 py-2.5 rounded-xl bg-emerald-100 text-emerald-700 font-bold text-xs"
+            className="px-4 py-2.5 rounded-xl bg-primary/10 text-primary font-bold text-xs"
             whileTap={{ scale: 0.95 }}
           >
             + Əlavə et
