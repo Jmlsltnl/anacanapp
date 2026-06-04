@@ -391,12 +391,14 @@ export const useCreateComment = () => {
       parentCommentId,
       postAuthorId,
       commenterName,
+      isAnonymous,
     }: {
       postId: string;
       content: string;
       parentCommentId?: string | null;
       postAuthorId?: string;
       commenterName?: string;
+      isAnonymous?: boolean;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
@@ -408,13 +410,14 @@ export const useCreateComment = () => {
           user_id: user.id,
           parent_comment_id: parentCommentId ?? null,
           content,
+          is_anonymous: isAnonymous || false,
         });
 
       if (error) throw error;
 
       if (postAuthorId && postAuthorId !== user.id) {
         const preview = content.length > 50 ? `${content.slice(0, 50)}...` : content;
-        const senderName = commenterName?.trim() || 'İstifadəçi';
+        const senderName = isAnonymous ? 'Anonim' : (commenterName?.trim() || 'İstifadəçi');
 
         // Push notification (also stores in-app notification via edge function)
         try {
