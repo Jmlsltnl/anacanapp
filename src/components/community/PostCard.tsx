@@ -54,6 +54,7 @@ const UserBadge = ({ type }: { type: 'admin' | 'premium' | 'moderator' | null })
 const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
+  const [commentAnonymous, setCommentAnonymous] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [isEditing, setIsEditing] = useState(false);
