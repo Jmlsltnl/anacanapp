@@ -1024,6 +1024,17 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
 
   return (
     <div className="space-y-3">
+      {/* Child Selector - for multiple children (top of page) */}
+      {hasChildren && (
+        <motion.div 
+          className="flex items-center justify-between"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <ChildSelector />
+        </motion.div>
+      )}
+
       {/* Hero + Daily Info — seamless orange→yellow gradient continuity */}
       <div className="space-y-0">
         {/* Premium Baby Hero Card — variant chosen via app_settings.mommy_hero_variant */}
@@ -1144,18 +1155,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         </motion.div>
       )}
 
-      {/* Child Selector - for multiple children */}
-      {hasChildren && (
-        <motion.div 
-          className="flex items-center justify-between"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          <ChildSelector />
-        </motion.div>
-      )}
-
       {/* Teething Widget */}
+
       <TeethingWidget onOpen={() => onNavigateToTool?.('teething')} />
 
       {/* Quick Actions Bar */}
@@ -1649,6 +1650,12 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         </div>
       </motion.div>
 
+      {/* Weekly Stats Overview */}
+      <QuickStatsWidget />
+
+      {/* Growth Tracker */}
+      <GrowthTrackerWidget />
+
       {/* Milestones with Carousel */}
       <motion.div 
         className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
@@ -1741,11 +1748,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         />
       )}
 
-      {/* Weekly Stats Overview */}
-      <QuickStatsWidget />
 
-      {/* Growth Tracker */}
-      <GrowthTrackerWidget />
+
 
       {/* Development Tips - Dynamic based on age */}
       <DevelopmentTipsWidget />

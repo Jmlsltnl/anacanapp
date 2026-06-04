@@ -202,90 +202,90 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
         </div>
       </div>
 
-      <div className="p-4 space-y-6">
+      <div className="p-3 space-y-3">
         {/* Child Info Banner */}
         {selectedChild && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20"
+            className="flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20"
           >
-            <span className="text-2xl">{selectedChild.avatar_emoji}</span>
+            <span className="text-lg">{selectedChild.avatar_emoji}</span>
             <div>
-              <p className="font-medium text-sm">{selectedChild.name}</p>
-              <p className="text-xs text-muted-foreground">{childAge?.displayText}</p>
+              <p className="font-medium text-xs">{selectedChild.name}</p>
+              <p className="text-[10px] text-muted-foreground">{childAge?.displayText}</p>
             </div>
           </motion.div>
         )}
         {/* Progress Card */}
         <Card className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-950/20 dark:to-rose-950/20 border-pink-200/50">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-3">
+          <CardContent className="p-3">
+            <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-pink-500" />
+                <div className="w-8 h-8 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-pink-500" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium">{tr("teethingtracker_cixan_disler_ab71e7", "Çıxan Dişlər")}</p>
-                  <p className="text-2xl font-bold text-pink-600">{emergedCount} / {totalTeeth}</p>
+                  <p className="text-xs font-medium">{tr("teethingtracker_cixan_disler_ab71e7", "Çıxan Dişlər")}</p>
+                  <p className="text-lg font-bold text-pink-600">{emergedCount} / {totalTeeth}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold text-pink-600">{Math.round(progress)}%</p>
-                <p className="text-xs text-muted-foreground">{tr("teethingtracker_tamamlandi_d6728f", "tamamlandı")}</p>
+                <p className="text-xl font-bold text-pink-600">{Math.round(progress)}%</p>
+                <p className="text-[10px] text-muted-foreground">{tr("teethingtracker_tamamlandi_d6728f", "tamamlandı")}</p>
               </div>
             </div>
-            <Progress value={progress} className="h-2" />
+            <Progress value={progress} className="h-1.5" />
           </CardContent>
         </Card>
 
         {/* Teeth Diagram */}
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Heart className="w-4 h-4 text-rose-500" />
+          <CardHeader className="pb-1 pt-3">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Heart className="w-3.5 h-3.5 text-rose-500" />
               Diş Diaqramı
             </CardTitle>
-            <p className="text-xs text-muted-foreground">{tr("teethingtracker_dise_toxunaraq_qeyd_edin_65aadb", "Dişə toxunaraq qeyd edin")}</p>
+            <p className="text-[11px] text-muted-foreground">{tr("teethingtracker_dise_toxunaraq_qeyd_edin_65aadb", "Dişə toxunaraq qeyd edin")}</p>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-2 pb-3">
             {/* Upper Jaw */}
-            <div className="space-y-2">
-              <p className="text-xs text-center text-muted-foreground font-medium">{tr("teethingtracker_yuxari_cene_589483", "Yuxarı Çənə")}</p>
-              <div className="bg-gradient-to-b from-rose-100/80 via-rose-50/50 to-transparent dark:from-rose-900/30 dark:via-rose-950/20 rounded-t-[80px] p-5 pt-8 border-x-2 border-t-2 border-rose-200/50 dark:border-rose-800/30">
+            <div className="space-y-1">
+              <p className="text-[10px] text-center text-muted-foreground font-medium">{tr("teethingtracker_yuxari_cene_589483", "Yuxarı Çənə")}</p>
+              <div className="bg-gradient-to-b from-rose-100/80 via-rose-50/50 to-transparent dark:from-rose-900/30 dark:via-rose-950/20 rounded-t-[80px] p-3 pt-5 border-x-2 border-t-2 border-rose-200/50 dark:border-rose-800/30">
                 {renderToothDiagram(upperTeeth, 'upper')}
               </div>
             </div>
 
             {/* Divider - Gum Line */}
-            <div className="relative py-2">
+            <div className="relative py-1">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-1 bg-gradient-to-r from-transparent via-rose-300 to-transparent dark:via-rose-600 rounded-full" />
+                <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-rose-300 to-transparent dark:via-rose-600 rounded-full" />
               </div>
               <div className="relative flex justify-center">
-                <span className="bg-background px-4 py-1 text-xs font-medium text-rose-500 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-full">
+                <span className="bg-background px-2.5 py-0.5 text-[10px] font-medium text-rose-500 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-full">
                   Diş əti xətti
                 </span>
               </div>
             </div>
 
             {/* Lower Jaw */}
-            <div className="space-y-2">
-              <div className="bg-gradient-to-t from-rose-100/80 via-rose-50/50 to-transparent dark:from-rose-900/30 dark:via-rose-950/20 rounded-b-[80px] p-5 pb-8 border-x-2 border-b-2 border-rose-200/50 dark:border-rose-800/30">
+            <div className="space-y-1">
+              <div className="bg-gradient-to-t from-rose-100/80 via-rose-50/50 to-transparent dark:from-rose-900/30 dark:via-rose-950/20 rounded-b-[80px] p-3 pb-5 border-x-2 border-b-2 border-rose-200/50 dark:border-rose-800/30">
                 {renderToothDiagram(lowerTeeth, 'lower')}
               </div>
-              <p className="text-xs text-center text-muted-foreground font-medium">{tr("teethingtracker_asagi_cene_78719d", "Aşağı Çənə")}</p>
+              <p className="text-[10px] text-center text-muted-foreground font-medium">{tr("teethingtracker_asagi_cene_78719d", "Aşağı Çənə")}</p>
             </div>
 
             {/* Legend */}
-            <div className="flex justify-center gap-8 pt-4 border-t border-border/50">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-6 rounded-t-md rounded-b-[30%] bg-gradient-to-b from-pink-300 to-pink-400 border-2 border-pink-200 shadow-sm" />
-                <span className="text-xs font-medium">{tr("teethingtracker_cixib_f2099b", "Çıxıb")}</span>
+            <div className="flex justify-center gap-6 pt-2 border-t border-border/50">
+              <div className="flex items-center gap-1.5">
+                <div className="w-4 h-5 rounded-t-md rounded-b-[30%] bg-gradient-to-b from-pink-300 to-pink-400 border-2 border-pink-200 shadow-sm" />
+                <span className="text-[11px] font-medium">{tr("teethingtracker_cixib_f2099b", "Çıxıb")}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-6 rounded-t-md rounded-b-[30%] bg-gradient-to-b from-gray-200 to-gray-300 border-2 border-gray-300" />
-                <span className="text-xs font-medium">{tr("teethingtracker_cixmayib_d90dc0", "Çıxmayıb")}</span>
+              <div className="flex items-center gap-1.5">
+                <div className="w-4 h-5 rounded-t-md rounded-b-[30%] bg-gradient-to-b from-gray-200 to-gray-300 border-2 border-gray-300" />
+                <span className="text-[11px] font-medium">{tr("teethingtracker_cixmayib_d90dc0", "Çıxmayıb")}</span>
               </div>
             </div>
           </CardContent>

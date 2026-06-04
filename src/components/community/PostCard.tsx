@@ -136,8 +136,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   return (
     <>
       <motion.div 
-        className="bg-card rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] border border-border/8 overflow-hidden"
-        whileTap={{ scale: 0.995 }}
+        className="bg-card border-b border-border/30 overflow-hidden"
         transition={{ duration: 0.1 }}
       >
         {/* Author row */}

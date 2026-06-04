@@ -69,27 +69,28 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
 
   return (
     <div className="min-h-screen bg-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
-      {/* Header */}
-      <div className="bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 px-4 pb-4 safe-top relative z-20">
-        <div className="flex items-center gap-3 mb-3">
-          <motion.button
-            onClick={onBack}
-            className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}
-          >
-            <ArrowLeft className="w-5 h-5 text-white" />
-          </motion.button>
-          <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">Dekret Kalkulyatoru</h1>
-            <p className="text-white/80 text-sm">{tr("maternitycalculator_muavinet_hesablama_ebc288", "Müavinət hesablama")}</p>
-          </div>
-          <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-            <Calculator className="w-6 h-6 text-white" />
+      {/* Minimalist Header */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
+        <div className="px-4 pb-2 safe-area-top">
+          <div className="flex items-center gap-3">
+            <motion.button
+              onClick={onBack}
+              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
+              whileTap={{ scale: 0.95 }}
+            >
+              <ArrowLeft className="w-5 h-5 text-foreground" />
+            </motion.button>
+            <div className="flex-1">
+              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Calculator className="w-5 h-5 text-primary" />
+                Dekret Kalkulyatoru
+              </h1>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="px-4 -mt-3 relative z-30">
+      <div className="px-4 pt-3 relative z-30">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="w-full grid grid-cols-2 bg-card/95 backdrop-blur-sm shadow-lg rounded-xl p-1">
             <TabsTrigger value="calculator" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
