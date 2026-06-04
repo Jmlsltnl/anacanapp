@@ -294,7 +294,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
                   <Input
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
-                    placeholder={tr("postcard_serh_yaz_54a89a", "Şərh yaz...")}
+                    placeholder={commentAnonymous ? 'Anonim şərh yaz...' : tr("postcard_serh_yaz_54a89a", "Şərh yaz...")}
                     className="flex-1 h-9 rounded-full text-[12px] bg-muted/15 border-border/10 px-4"
                     onKeyPress={(e) => e.key === 'Enter' && handleComment()}
                   />
@@ -302,6 +302,16 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
                     <Send className="w-3.5 h-3.5 text-primary-foreground" />
                   </Button>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setCommentAnonymous(v => !v)}
+                  className={`flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full transition-colors ${
+                    commentAnonymous ? 'bg-primary/10 text-primary' : 'bg-muted/40 text-muted-foreground'
+                  }`}
+                >
+                  <span className={`w-3 h-3 rounded-full border ${commentAnonymous ? 'border-primary bg-primary' : 'border-muted-foreground/40'}`} />
+                  Anonim olaraq yaz
+                </button>
                 {commentsLoading ? (
                   <div className="text-center py-4">
                     <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
