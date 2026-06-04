@@ -1650,6 +1650,12 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         </div>
       </motion.div>
 
+      {/* Weekly Stats Overview */}
+      <QuickStatsWidget />
+
+      {/* Growth Tracker */}
+      <GrowthTrackerWidget />
+
       {/* Milestones with Carousel */}
       <motion.div 
         className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
@@ -1742,11 +1748,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         />
       )}
 
-      {/* Weekly Stats Overview */}
-      <QuickStatsWidget />
 
-      {/* Growth Tracker */}
-      <GrowthTrackerWidget />
+
 
       {/* Development Tips - Dynamic based on age */}
       <DevelopmentTipsWidget />
