@@ -1536,14 +1536,14 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         </div>
         <div className="space-y-1.5">
           {/* Sleep Summary - Expandable */}
-          <div className="bg-violet-50/50 dark:bg-violet-500/10 rounded-2xl overflow-hidden border border-violet-100 dark:border-violet-500/20">
+          <div className="bg-primary/5 rounded-2xl overflow-hidden border border-primary/20">
             <button
               onClick={() => setSleepExpanded(!sleepExpanded)}
-              className="w-full p-3 flex items-center justify-between hover:bg-violet-100/30 dark:hover:bg-violet-500/15 transition-colors"
+              className="w-full p-3 flex items-center justify-between hover:bg-primary/10 transition-colors"
             >
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-violet-100 dark:bg-violet-500/20 flex items-center justify-center">
-                  <Moon className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+                <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Moon className="w-4 h-4 text-primary" />
                 </div>
                 <div className="text-left">
                   <p className="text-xs font-semibold text-foreground">{tr("dashboard_yuxu_xulasesi_b2dc87", "Yuxu xülasəsi")}</p>
