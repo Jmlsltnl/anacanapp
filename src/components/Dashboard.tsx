@@ -1449,8 +1449,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
       >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center">
-              <Clock className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+              <Clock className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
               <h3 className="font-bold text-sm text-foreground">{tr("dashboard_bez_deyisme_ba242a", "Bez Dəyişmə")}</h3>
@@ -1459,7 +1459,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           </div>
           <motion.button
             onClick={() => setShowDiaperModal(true)}
-            className="px-4 py-2.5 rounded-xl bg-emerald-100 text-emerald-700 font-bold text-xs"
+            className="px-4 py-2.5 rounded-xl bg-primary/10 text-primary font-bold text-xs"
             whileTap={{ scale: 0.95 }}
           >
             + Əlavə et
