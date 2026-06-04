@@ -91,11 +91,6 @@ const MommyHeroClassic = ({ babyData, exactMonths, remainingDays, babyIllustrati
             <span className={`text-xs font-semibold ${colors.badge} px-2 py-0.5 rounded-full`}>
               {babyData.ageInDays} gün
             </span>
-            {daysUntilNextMonth > 0 && exactMonths < 12 && (
-              <span className={`text-xs font-semibold ${colors.badge} px-2 py-0.5 rounded-full`}>
-                {daysUntilNextMonth} gün qaldı
-              </span>
-            )}
           </div>
         </div>
 
