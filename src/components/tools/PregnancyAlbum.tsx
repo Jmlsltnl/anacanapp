@@ -257,10 +257,6 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
             <h1 className="text-lg font-bold">{tr("pregnancyalbum_hamilelik_albomu_6f1559", "Hamiləlik Albomu")}</h1>
             <p className="text-xs text-muted-foreground">{tr("pregnancyalbum_her_ay_xatire_c5bdee", "Hər ay xatirə")}</p>
           </div>
-          <Button size="sm" variant="outline" className="rounded-xl gap-1.5" onClick={() => setShowOrder(true)}>
-            <ShoppingBag className="w-4 h-4" />
-            <span className="text-xs">Fiziki Albom</span>
-          </Button>
         </div>
       </div>
 
