@@ -1252,7 +1252,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           </button>
           <motion.button
             onClick={() => setShowFeedingModal(true)}
-            className="px-4 py-2.5 rounded-xl bg-amber-100 text-amber-700 font-bold text-xs"
+            className="px-4 py-2.5 rounded-xl bg-primary/10 text-primary font-bold text-xs"
             whileTap={{ scale: 0.95 }}
           >
             + Əlavə et
