@@ -309,17 +309,17 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
                 type="button"
                 onClick={() => setIsAnonymous(!isAnonymous)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${
-                  isAnonymous ? 'bg-primary/8 border border-primary/20' : 'bg-muted/15 border border-border/10'
+                  isAnonymous ? 'bg-primary/15 border border-primary/30' : 'bg-muted/25 border border-border/25'
                 }`}
               >
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isAnonymous ? 'bg-primary text-primary-foreground' : 'bg-muted/50 text-muted-foreground/50'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isAnonymous ? 'bg-primary text-primary-foreground' : 'bg-muted/70 text-muted-foreground/75'}`}>
                   <EyeOff className="w-4 h-4" />
                 </div>
                 <div className="flex-1 text-left">
                   <p className={`text-[12px] font-bold ${isAnonymous ? 'text-primary' : 'text-foreground'}`}>{tr("createpostmodal_anonim_paylas_6074c9", "Anonim paylaş")}</p>
-                  <p className="text-[10px] text-muted-foreground/40">{tr("createpostmodal_adiniz_gizledilir_fb1df0", "Adınız gizlədilir")}</p>
+                  <p className="text-[10px] text-muted-foreground/65">{tr("createpostmodal_adiniz_gizledilir_fb1df0", "Adınız gizlədilir")}</p>
                 </div>
-                <div className={`w-10 h-6 rounded-full transition-colors ${isAnonymous ? 'bg-primary' : 'bg-border/50'}`}>
+                <div className={`w-10 h-6 rounded-full transition-colors ${isAnonymous ? 'bg-primary' : 'bg-muted-foreground/40'}`}>
                   <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform mt-0.5 ${isAnonymous ? 'ml-[18px]' : 'ml-0.5'}`} />
                 </div>
               </button>
