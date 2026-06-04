@@ -17,9 +17,9 @@ export interface MommyHeroProps {
  * Same structural pattern: gradient card → centered image → main text → badge chips → progress bar.
  */
 const MommyHeroClassic = ({ babyData, exactMonths, remainingDays, babyIllustration }: MommyHeroProps) => {
-  // Mommy stage colors — Coral Orange (#F28155) brand palette
+  // Mommy stage colors — Orange to Yellow gradient for visual continuity
   const colors = {
-    bg: 'from-primary/10 via-primary/5 to-primary/10 dark:from-primary/20 dark:via-primary/10 dark:to-primary/20',
+    bg: 'from-primary/20 via-primary/5 to-amber-100/60 dark:from-primary/20 dark:via-primary/10 dark:to-amber-900/20',
     border: 'border-primary/20 dark:border-primary/30',
     accent: 'bg-primary/10 dark:bg-primary/20',
     text: 'text-primary',
@@ -39,8 +39,8 @@ const MommyHeroClassic = ({ babyData, exactMonths, remainingDays, babyIllustrati
       transition={{ delay: 0.1 }}
     >
       {/* Background blur orbs — same style as pregnancy hero */}
-      <div className={`absolute -top-12 -right-12 w-36 h-36 rounded-full ${colors.accent} blur-2xl`} />
-      <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full ${colors.accent} blur-xl opacity-50`} />
+      <div className="absolute -top-12 -right-12 w-36 h-36 rounded-full bg-primary/10 blur-2xl" />
+      <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-amber-200/40 blur-xl opacity-60" />
 
       <div className="relative z-10 flex flex-col items-center">
         {/* Baby Image — centered with subtle float, matching pregnancy fetus image style */}

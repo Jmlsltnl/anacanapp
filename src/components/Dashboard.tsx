@@ -1024,56 +1024,59 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
 
   return (
     <div className="space-y-3">
-      {/* Premium Baby Hero Card — variant chosen via app_settings.mommy_hero_variant */}
-      <MommyHero
-        babyData={{
-          name: babyData.name,
-          ageInMonths: babyData.ageInMonths,
-          ageInDays: babyData.ageInDays,
-        }}
-        exactMonths={exactMonths}
-        remainingDays={remainingDays}
-        babyIllustration={babyIllustration}
-      />
+      {/* Hero + Daily Info — seamless orange→yellow gradient continuity */}
+      <div className="space-y-0">
+        {/* Premium Baby Hero Card — variant chosen via app_settings.mommy_hero_variant */}
+        <MommyHero
+          babyData={{
+            name: babyData.name,
+            ageInMonths: babyData.ageInMonths,
+            ageInDays: babyData.ageInDays,
+          }}
+          exactMonths={exactMonths}
+          remainingDays={remainingDays}
+          babyIllustration={babyIllustration}
+        />
 
-      {/* Bu günün məlumatları */}
-      {dailyInfo && (
-        <motion.div 
-          className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800 shadow-lg"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <div className="flex items-center gap-3 mb-4 pb-3 border-b border-amber-200 dark:border-amber-800">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-800/50 flex items-center justify-center shadow-sm">
-              <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+        {/* Bu günün məlumatları */}
+        {dailyInfo && (
+          <motion.div 
+            className="bg-gradient-to-b from-amber-50/80 to-amber-100/30 dark:from-amber-900/15 dark:to-amber-900/5 rounded-2xl p-4 border border-amber-100/40 dark:border-amber-800/30 shadow-sm"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-amber-200/40 dark:border-amber-800/40">
+              <div className="w-10 h-10 rounded-xl bg-amber-100/60 dark:bg-amber-800/40 flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] font-semibold text-amber-500 dark:text-amber-400 uppercase tracking-widest mb-0.5">
+                  {babyData.ageInDays}. Gün
+                </p>
+                <p className="text-sm font-bold text-amber-900 dark:text-amber-100">
+                  Bu günün məlumatları
+                </p>
+              </div>
             </div>
-            <div className="flex-1">
-              <p className="text-[10px] font-semibold text-amber-500 dark:text-amber-400 uppercase tracking-widest mb-0.5">
-                {babyData.ageInDays}. Gün
-              </p>
-              <p className="text-sm font-bold text-amber-900 dark:text-amber-100">
-                Bu günün məlumatları
-              </p>
+            
+            <div className="space-y-2">
+              {dailyInfo.info
+                .split('\n')
+                .filter(line => line.trim().length > 0)
+                .map((line, index) => (
+                  <div key={index} className="flex items-start gap-2.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
+                    <p className="text-[13px] text-amber-800 dark:text-white leading-relaxed font-medium">
+                      {line.trim()}
+                    </p>
+                  </div>
+                ))
+              }
             </div>
-          </div>
-          
-          <div className="space-y-2">
-            {dailyInfo.info
-              .split('\n')
-              .filter(line => line.trim().length > 0)
-              .map((line, index) => (
-                <div key={index} className="flex items-start gap-2.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
-                  <p className="text-[13px] text-amber-800 dark:text-white leading-relaxed font-medium">
-                    {line.trim()}
-                  </p>
-                </div>
-              ))
-            }
-          </div>
-        </motion.div>
-      )}
+          </motion.div>
+        )}
+      </div>
 
       {/* Anaya Mesaj */}
       {mommyMessage && (
