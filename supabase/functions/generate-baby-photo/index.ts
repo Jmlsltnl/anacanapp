@@ -332,17 +332,15 @@ Deno.serve(async (req) => {
       });
     }
 
-    // NOTE: gemini-3.x-*-image-preview models are NOT available on Vertex AI.
-    // Force Gemini API for image generation regardless of Vertex configuration.
+    const useVertex = isVertexConfigured();
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    const useVertex = false;
-    if (!GEMINI_API_KEY) {
-      return new Response(JSON.stringify({ error: "AI service not configured (GEMINI_API_KEY required for image generation)" }), {
+    if (!useVertex && !GEMINI_API_KEY) {
+      return new Response(JSON.stringify({ error: "AI service not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    console.log("Image gen backend: Gemini API (Vertex AI not supported for preview image models)");
+    console.log(`Image gen backend: ${useVertex ? "Vertex AI" : "Gemini API"}`);
 
     // Build the master prompt
     const masterPrompt = await buildMasterPrompt(backgroundTheme, customization, supabase);
@@ -362,9 +360,10 @@ Deno.serve(async (req) => {
 
     // Try models in order: Gemini 3.1 Flash Image (primary), Gemini 3 Pro Image (fallback)
     const models = [
-      "gemini-3.1-flash-image-preview",
-      "gemini-3-pro-image-preview",
+      "gemini-3.1-flash-image",
+      "gemini-3-pro-image",
     ];
+
 
     const requestBody = {
       contents: [
