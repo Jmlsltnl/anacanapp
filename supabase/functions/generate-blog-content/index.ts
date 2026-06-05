@@ -25,10 +25,7 @@ serve(async (req) => {
       );
     }
 
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) {
-      throw new Error("GEMINI_API_KEY is not configured");
-    }
+    // AI handled by callGeminiSmart (Vertex AI if configured, else Gemini API)
 
     const systemPrompt = `Sən Azərbaycan dilində hamiləlik və ana-uşaq mövzularında məqalə yazan peşəkar yazarsan.
 
@@ -64,26 +61,17 @@ JSON formatında cavab ver:
 }`;
 
     // Use direct Gemini API
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.7,
-          },
-        }),
-      }
-    );
+    const response = await callGeminiSmart("gemini-2.5-flash", {
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }]
+        }
+      ],
+      generationConfig: {
+        temperature: 0.7,
+      },
+    });
 
     if (!response.ok) {
       if (response.status === 429) {
