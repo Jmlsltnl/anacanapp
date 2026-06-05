@@ -1,9 +1,11 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { callVertex, isVertexConfigured } from "../_shared/vertex-ai.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
 
 interface CustomizationOptions {
   gender: "boy" | "girl" | "keep";
@@ -330,14 +332,15 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check API key
+    const useVertex = isVertexConfigured();
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) {
+    if (!useVertex && !GEMINI_API_KEY) {
       return new Response(JSON.stringify({ error: "AI service not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    console.log(`Image gen backend: ${useVertex ? "Vertex AI" : "Gemini API"}`);
 
     // Build the master prompt
     const masterPrompt = await buildMasterPrompt(backgroundTheme, customization, supabase);
@@ -361,36 +364,49 @@ Deno.serve(async (req) => {
       "gemini-3-pro-image-preview",
     ];
 
+    const requestBody = {
+      contents: [
+        {
+          parts: [
+            { text: masterPrompt },
+            {
+              inline_data: {
+                mime_type: mimeType,
+                data: imageBase64,
+              },
+            },
+          ],
+        },
+      ],
+      generationConfig: {
+        responseModalities: ["TEXT", "IMAGE"],
+      },
+    };
+
     let geminiResponse: Response | null = null;
     let lastError = "";
 
     for (const model of models) {
-      console.log(`Trying model: ${model}...`);
-      const resp = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  { text: masterPrompt },
-                  {
-                    inline_data: {
-                      mime_type: mimeType,
-                      data: imageBase64,
-                    },
-                  },
-                ],
-              },
-            ],
-            generationConfig: {
-              responseModalities: ["TEXT", "IMAGE"],
-            },
-          }),
+      console.log(`Trying model: ${model} (${useVertex ? "Vertex" : "Gemini API"})...`);
+      let resp: Response;
+      try {
+        if (useVertex) {
+          resp = await callVertex({ model, body: requestBody });
+        } else {
+          resp = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(requestBody),
+            }
+          );
         }
-      );
+      } catch (err) {
+        lastError = err instanceof Error ? err.message : String(err);
+        console.error(`Model ${model} request threw:`, lastError);
+        continue;
+      }
 
       if (resp.ok) {
         geminiResponse = resp;
@@ -401,14 +417,15 @@ Deno.serve(async (req) => {
       lastError = await resp.text();
       console.error(`Model ${model} failed (${resp.status}):`, lastError);
       
-      // Only retry on 503 (unavailable), fail fast on other errors
-      if (resp.status !== 503) {
+      // Retry on 503 (unavailable) or 404 (model not in this backend); fail fast on other errors
+      if (resp.status !== 503 && resp.status !== 404) {
         return new Response(JSON.stringify({ error: "Image generation failed", details: lastError }), {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
     }
+
 
     if (!geminiResponse) {
       return new Response(JSON.stringify({ error: "All AI models are currently unavailable. Please try again later.", details: lastError }), {
