@@ -27,7 +27,7 @@ interface ImageValidation {
 
 // Stage 1: Validate if image contains a diaper/poop
 async function validateImage(imageBase64: string, _apiKey?: string): Promise<ImageValidation> {
-  const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
+  const models = ['gemini-2.5-flash-lite', 'gemini-2.5-flash'];
   
   for (const model of models) {
     try {
