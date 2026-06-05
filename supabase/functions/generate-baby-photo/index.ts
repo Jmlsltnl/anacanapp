@@ -368,6 +368,7 @@ Deno.serve(async (req) => {
     const requestBody = {
       contents: [
         {
+          role: "user",
           parts: [
             { text: masterPrompt },
             {
