@@ -194,7 +194,7 @@ CAVAB FORMATI (STRICT JSON):
   "alertLevel": "safe|caution|warning|danger"
 }`;
 
-    const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
+    const models = ['gemini-2.5-flash-lite', 'gemini-2.5-flash'];
     let geminiResponse: Response | null = null;
     for (const model of models) {
       geminiResponse = await callGeminiSmart(model, {
