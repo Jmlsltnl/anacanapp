@@ -503,9 +503,20 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { data: { publicUrl } } = supabase.storage
-      .from("baby-photos")
-      .getPublicUrl(fileName);
+    // Create a signed URL (bucket is private) — needed for reloads
+    let signedUrl: string | null = null;
+    try {
+      const { data: signed } = await supabase.storage
+        .from("baby-photos")
+        .createSignedUrl(fileName, 60 * 60 * 24);
+      signedUrl = signed?.signedUrl ?? null;
+    } catch (e) {
+      console.warn("Failed to create signed URL:", e);
+    }
+
+    // Inline data URL for INSTANT first display (no extra network round-trip)
+    const dataUrl = `data:${outputMimeType};base64,${generatedImageBase64}`;
+    const displayUrl = dataUrl;
 
     // Save to database with source image path and customization
     const { data: photoRecord, error: dbError } = await supabase.from("baby_photos").insert({
@@ -526,11 +537,13 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        imageUrl: publicUrl,
+        imageUrl: displayUrl,
+        signedUrl,
         storagePath: fileName,
         photo: photoRecord ? {
           id: photoRecord.id,
-          url: publicUrl,
+          url: displayUrl,
+          signedUrl,
           theme: backgroundTheme,
           createdAt: photoRecord.created_at,
         } : null,
