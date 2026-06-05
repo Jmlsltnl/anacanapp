@@ -1,6 +1,7 @@
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { callGeminiSmart } from "../_shared/vertex-ai.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -25,27 +26,23 @@ interface ImageValidation {
 }
 
 // Stage 1: Validate if image contains a diaper/poop
-async function validateImage(imageBase64: string, apiKey: string): Promise<ImageValidation> {
-  const models = ['gemini-2.0-flash', 'gemini-2.5-flash'];
+async function validateImage(imageBase64: string, _apiKey?: string): Promise<ImageValidation> {
+  const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
   
   for (const model of models) {
     try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [
-                {
-                  inlineData: {
-                    mimeType: 'image/jpeg',
-                    data: imageBase64
-                  }
-                },
-                {
-                  text: `Bu şəklin NƏ OLDUĞUNU müəyyən et. YALNIZ aşağıdakı kateqoriyalardan birini seç:
+      const response = await callGeminiSmart(model, {
+        contents: [{
+          role: 'user',
+          parts: [
+            {
+              inlineData: {
+                mimeType: 'image/jpeg',
+                data: imageBase64
+              }
+            },
+            {
+              text: `Bu şəklin NƏ OLDUĞUNU müəyyən et. YALNIZ aşağıdakı kateqoriyalardan birini seç:
 
 ŞƏKİL TİPLƏRİ:
 1. "diaper_with_poop" - Körpə bezi İÇİNDƏ nəcis görünür
@@ -69,18 +66,16 @@ CAVAB FORMATI (STRICT JSON, heç bir əlavə mətn yoxdur):
   "confidence": 0-100,
   "description": "Şəkildə nə görünür (1 cümlə)"
 }`
-                }
-              ]
-            }],
-            generationConfig: {
-              temperature: 0.1,
-              topK: 5,
-              topP: 0.8,
-              maxOutputTokens: 256,
             }
-          })
+          ]
+        }],
+        generationConfig: {
+          temperature: 0.1,
+          topK: 5,
+          topP: 0.8,
+          maxOutputTokens: 256,
         }
-      );
+      });
 
       if (response.status === 429) {
         console.log(`Rate limit on ${model} for validation, trying next...`);
@@ -140,8 +135,8 @@ CAVAB FORMATI (STRICT JSON, heç bir əlavə mətn yoxdur):
 }
 
 // Stage 2: Analyze the poop
-async function analyzePoop(imageBase64: string, apiKey: string, userContext?: PoopAnalysisRequest['userContext']): Promise<Response | null> {
-  const models = ['gemini-2.0-flash', 'gemini-2.5-pro', 'gemini-2.5-flash'];
+async function analyzePoop(imageBase64: string, _apiKey?: string, userContext?: PoopAnalysisRequest['userContext']): Promise<Response | null> {
+  const models = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.5-flash-lite'];
   
   // Build age context for prompt
   let ageContext = '';
@@ -163,22 +158,18 @@ async function analyzePoop(imageBase64: string, apiKey: string, userContext?: Po
   
   for (const model of models) {
     console.log(`Trying analysis with model: ${model}`);
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              {
-                inlineData: {
-                  mimeType: 'image/jpeg',
-                  data: imageBase64
-                }
-              },
-              {
-                text: `Sən pediatrik sağlamlıq mütəxəssisisən. Bu körpə bezindəki NƏCİSİ DİQQƏTLƏ analiz et.
+    const response = await callGeminiSmart(model, {
+      contents: [{
+        role: 'user',
+        parts: [
+          {
+            inlineData: {
+              mimeType: 'image/jpeg',
+              data: imageBase64
+            }
+          },
+          {
+            text: `Sən pediatrik sağlamlıq mütəxəssisisən. Bu körpə bezindəki NƏCİSİ DİQQƏTLƏ analiz et.
 
 ${ageContext ? `KÖRPƏ KONTEKST: ${ageContext}` : ''}
 
@@ -218,18 +209,16 @@ CAVAB FORMATI (STRICT JSON):
 }
 
 XƏBƏRDARLIQ: Ağ, qara və ya qırmızı rəng gördükdə "urgent" səviyyəsi VER!`
-              }
-            ]
-          }],
-          generationConfig: {
-            temperature: 0.1,
-            topK: 10,
-            topP: 0.7,
-            maxOutputTokens: 1024,
           }
-        })
+        ]
+      }],
+      generationConfig: {
+        temperature: 0.1,
+        topK: 10,
+        topP: 0.7,
+        maxOutputTokens: 1024,
       }
-    );
+    });
 
     if (response.ok) {
       console.log(`Analysis success with model: ${model}`);
@@ -254,10 +243,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
-    if (!GEMINI_API_KEY) {
-      throw new Error('GEMINI_API_KEY not configured');
-    }
+    // AI handled by callGeminiSmart
 
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -289,7 +275,7 @@ Deno.serve(async (req) => {
 
     // Stage 1: Validate image
     console.log('Stage 1: Validating image...');
-    const validation = await validateImage(imageBase64, GEMINI_API_KEY);
+    const validation = await validateImage(imageBase64);
     console.log('Validation result:', validation);
 
     if (!validation.isValidDiaperImage) {
@@ -310,7 +296,7 @@ Deno.serve(async (req) => {
 
     // Stage 2: Analyze poop
     console.log('Stage 2: Analyzing poop...');
-    const response = await analyzePoop(imageBase64, GEMINI_API_KEY, userContext);
+    const response = await analyzePoop(imageBase64, undefined, userContext);
 
     if (!response) {
       throw new Error('AI analysis failed - all models exhausted');

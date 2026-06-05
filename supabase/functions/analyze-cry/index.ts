@@ -1,6 +1,7 @@
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { callGeminiSmart } from "../_shared/vertex-ai.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,16 +23,12 @@ interface CryAnalysisRequest {
 // NOTE: This is intentionally conservative to minimize false positives.
 async function detectIfCrying(
   audioBase64: string,
-  apiKey: string
+  _apiKey?: string
 ): Promise<{ isCrying: boolean; confidence: number; soundType: string }> {
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [
+  const response = await callGeminiSmart("gemini-2.5-flash", {
+    contents: [{
+      role: 'user',
+      parts: [
             {
               inlineData: {
                 mimeType: 'audio/webm',
@@ -91,9 +88,7 @@ Return ONLY this JSON (no markdown, no extra keys):
           topP: 0.1,
           maxOutputTokens: 512,
         }
-      })
-    }
-  );
+      });
 
   if (!response.ok) {
     console.error('Detection API error:', response.status);
@@ -142,7 +137,7 @@ Return ONLY this JSON (no markdown, no extra keys):
 }
 
 // Classify cry type only if crying is confirmed
-async function classifyCryType(audioBase64: string, apiKey: string, userContext?: CryAnalysisRequest['userContext']): Promise<any> {
+async function classifyCryType(audioBase64: string, _apiKey?: string, userContext?: CryAnalysisRequest['userContext']): Promise<any> {
   // Build age context for prompt
   let ageContext = '';
   if (userContext?.babyAgeMonths !== undefined) {
@@ -163,22 +158,18 @@ async function classifyCryType(audioBase64: string, apiKey: string, userContext?
     }
   }
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [
-            {
-              inlineData: {
-                mimeType: 'audio/webm',
-                data: audioBase64
-              }
-            },
-            {
-              text: `Bu səsdə TƏSDIQ OLUNMUŞ körpə ağlaması var. İndi ağlamanın SƏBƏBİNİ müəyyən et.
+  const response = await callGeminiSmart("gemini-2.5-flash", {
+    contents: [{
+      role: 'user',
+      parts: [
+        {
+          inlineData: {
+            mimeType: 'audio/webm',
+            data: audioBase64
+          }
+        },
+        {
+          text: `Bu səsdə TƏSDIQ OLUNMUŞ körpə ağlaması var. İndi ağlamanın SƏBƏBİNİ müəyyən et.
 
 ${ageContext ? `KÖRPƏ KONTEKST: ${ageContext}` : ''}
 
@@ -208,18 +199,16 @@ JSON CAVAB:
   "recommendations": ["tövsiyə 1", "tövsiyə 2", "tövsiyə 3"],
   "urgency": "low|medium|high"
 }`
-            }
-          ]
-        }],
-        generationConfig: {
-          temperature: 0.2,
-          topK: 10,
-          topP: 0.5,
-          maxOutputTokens: 1024,
         }
-      })
+      ]
+    }],
+    generationConfig: {
+      temperature: 0.2,
+      topK: 10,
+      topP: 0.5,
+      maxOutputTokens: 1024,
     }
-  );
+  });
 
   if (!response.ok) {
     throw new Error('Classification failed');
@@ -242,10 +231,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
-    if (!GEMINI_API_KEY) {
-      throw new Error('GEMINI_API_KEY not configured');
-    }
+    // AI handled by callGeminiSmart
 
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -295,7 +281,7 @@ Deno.serve(async (req) => {
     console.log('Stage 1: Detecting if audio contains baby crying...');
     
     // STAGE 1: First detect if there's actually crying
-    const detection = await detectIfCrying(audioBase64, GEMINI_API_KEY);
+    const detection = await detectIfCrying(audioBase64);
     
     console.log('Detection result:', JSON.stringify(detection));
 
@@ -342,7 +328,7 @@ Deno.serve(async (req) => {
     // STAGE 2: Crying confirmed, now classify the type
     let analysisResult;
     try {
-      analysisResult = await classifyCryType(audioBase64, GEMINI_API_KEY, userContext);
+      analysisResult = await classifyCryType(audioBase64, undefined, userContext);
       analysisResult.isCryDetected = true;
     } catch (classifyError) {
       console.error('Classification error:', classifyError);

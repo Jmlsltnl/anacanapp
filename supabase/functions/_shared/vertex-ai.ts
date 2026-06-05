@@ -110,3 +110,33 @@ export async function callVertex(opts: VertexCallOptions): Promise<Response> {
     body: JSON.stringify(opts.body),
   });
 }
+
+/**
+ * Smart helper: uses Vertex AI if configured, otherwise falls back to Gemini API (generativelanguage).
+ * Normalizes request body so it works on both backends (adds role: "user" to contents entries
+ * that are missing it — required by Vertex).
+ */
+export async function callGeminiSmart(model: string, body: any): Promise<Response> {
+  // Normalize: Vertex requires `role` on each content entry. Gemini API accepts it too.
+  const normalized = { ...body };
+  if (Array.isArray(normalized.contents)) {
+    normalized.contents = normalized.contents.map((c: any) =>
+      c && typeof c === "object" && !c.role ? { role: "user", ...c } : c
+    );
+  }
+
+  if (isVertexConfigured()) {
+    return await callVertex({ model, body: normalized });
+  }
+
+  const apiKey = Deno.env.get("GEMINI_API_KEY");
+  if (!apiKey) throw new Error("Neither Vertex AI nor GEMINI_API_KEY is configured");
+  return await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(normalized),
+    },
+  );
+}

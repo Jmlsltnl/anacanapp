@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireUser } from "../_shared/auth.ts";
+import { callGeminiSmart } from "../_shared/vertex-ai.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -226,10 +227,7 @@ serve(async (req) => {
       baby_due_date 
     } = await req.json() as HoroscopeRequest;
 
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) {
-      throw new Error("GEMINI_API_KEY is not configured");
-    }
+    // AI handled by callGeminiSmart
 
     // Calculate all astrological data for mom
     const momSun = getZodiacSign(mom_birth_date);
@@ -345,22 +343,15 @@ ${dadSun ? `[Ana (${momSun.signAz}) və ata (${dadSun.signAz}) arasındakı kosm
 
     console.log("Calling Gemini API for horoscope analysis with accurate calculations...");
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.8,
-            maxOutputTokens: 4000,
-            topP: 0.9,
-            topK: 40,
-          },
-        }),
-      }
-    );
+    const response = await callGeminiSmart("gemini-2.5-flash", {
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: {
+        temperature: 0.8,
+        maxOutputTokens: 4000,
+        topP: 0.9,
+        topK: 40,
+      },
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
