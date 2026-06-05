@@ -158,22 +158,18 @@ async function classifyCryType(audioBase64: string, apiKey: string, userContext?
     }
   }
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [
-            {
-              inlineData: {
-                mimeType: 'audio/webm',
-                data: audioBase64
-              }
-            },
-            {
-              text: `Bu səsdə TƏSDIQ OLUNMUŞ körpə ağlaması var. İndi ağlamanın SƏBƏBİNİ müəyyən et.
+  const response = await callGeminiSmart("gemini-2.5-flash", {
+    contents: [{
+      role: 'user',
+      parts: [
+        {
+          inlineData: {
+            mimeType: 'audio/webm',
+            data: audioBase64
+          }
+        },
+        {
+          text: `Bu səsdə TƏSDIQ OLUNMUŞ körpə ağlaması var. İndi ağlamanın SƏBƏBİNİ müəyyən et.
 
 ${ageContext ? `KÖRPƏ KONTEKST: ${ageContext}` : ''}
 
@@ -203,18 +199,16 @@ JSON CAVAB:
   "recommendations": ["tövsiyə 1", "tövsiyə 2", "tövsiyə 3"],
   "urgency": "low|medium|high"
 }`
-            }
-          ]
-        }],
-        generationConfig: {
-          temperature: 0.2,
-          topK: 10,
-          topP: 0.5,
-          maxOutputTokens: 1024,
         }
-      })
+      ]
+    }],
+    generationConfig: {
+      temperature: 0.2,
+      topK: 10,
+      topP: 0.5,
+      maxOutputTokens: 1024,
     }
-  );
+  });
 
   if (!response.ok) {
     throw new Error('Classification failed');
