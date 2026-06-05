@@ -173,18 +173,6 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
         <GroupFeed group={null} onBack={() => {}} onCreatePost={() => setShowCreatePost(true)} isEmbedded onUserClick={handleUserClick} externalSearchQuery={searchQuery} />
       </div>
 
-      <motion.button
-        onClick={() => setShowCreatePost(true)}
-        className="fixed bottom-24 right-5 flex items-center gap-2 px-5 py-3 rounded-full gradient-primary shadow-[0_8px_32px_-4px_hsl(var(--primary)/0.5)] z-40"
-        whileTap={{ scale: 0.9 }}
-        whileHover={{ scale: 1.03 }}
-        initial={{ scale: 0, y: 20 }}
-        animate={{ scale: 1, y: 0 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-      >
-        <Pen className="w-4 h-4 text-primary-foreground" strokeWidth={2.5} />
-        <span className="text-[12px] font-bold text-primary-foreground">{tr("communityscreen_paylas_b4be3b", "Paylaş")}</span>
-      </motion.button>
     </div>
   );
 });
