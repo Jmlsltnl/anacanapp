@@ -15,18 +15,20 @@ import { Capacitor } from '@capacitor/core';
 // thenable, call `plugin.then(...)` through the Proxy, and on Android the native
 // bridge throws `"FacebookEvents.then()" is not implemented on android`, which
 // surfaces as an unhandled rejection and crashes flows like the premium modal.
-let fbWrapper: { plugin: any } | null = null;
+type FacebookPluginWrapper = { plugin: any };
+
+let fbWrapper: FacebookPluginWrapper | null = null;
 let initialized = false;
 
-const getPlugin = async (): Promise<any> => {
+const getPlugin = async (): Promise<FacebookPluginWrapper | null> => {
   if (!Capacitor.isNativePlatform()) return null;
-  if (fbWrapper) return fbWrapper.plugin;
+  if (fbWrapper) return fbWrapper;
   try {
     const mod = await import('capacitor-facebook-events');
     const plugin = (mod as any).FacebookEvents ?? (mod as any).default ?? null;
     if (!plugin) return null;
     fbWrapper = { plugin };
-    return plugin;
+    return fbWrapper;
   } catch (e) {
     console.warn('[fb-events] plugin not available:', e);
     return null;
@@ -38,7 +40,8 @@ const getPlugin = async (): Promise<any> => {
  * Bu olmadan Meta reklam atribusiyası limit olur.
  */
 export const setFacebookAdvertiserTracking = async (enabled: boolean) => {
-  const p = await getPlugin();
+  const wrapper = await getPlugin();
+  const p = wrapper?.plugin;
   if (!p) return;
   try {
     await p.setAdvertiserTrackingEnabled({ enabled });
@@ -94,7 +97,8 @@ const cleanParams = (params?: Record<string, any>) => {
  * Səssiz fail — analytics heç vaxt app-ı sındırmamalıdır.
  */
 export const logFacebookEvent = async (eventName: string, params?: Record<string, any>) => {
-  const p = await getPlugin();
+  const wrapper = await getPlugin();
+  const p = wrapper?.plugin;
   if (!p) return;
   try {
     const fbEvent = EVENT_MAP[eventName] || eventName;
