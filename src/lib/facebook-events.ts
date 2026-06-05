@@ -8,16 +8,25 @@
 
 import { Capacitor } from '@capacitor/core';
 
-let fbPlugin: any = null;
+// IMPORTANT: We wrap the Capacitor plugin in a plain object before returning it
+// from an async function. Capacitor plugin objects are JS Proxies that intercept
+// EVERY property access — including `.then`. If we returned the raw plugin from
+// an `async` function, `await getPlugin()` would re-check if the value is a
+// thenable, call `plugin.then(...)` through the Proxy, and on Android the native
+// bridge throws `"FacebookEvents.then()" is not implemented on android`, which
+// surfaces as an unhandled rejection and crashes flows like the premium modal.
+let fbWrapper: { plugin: any } | null = null;
 let initialized = false;
 
-const getPlugin = async () => {
+const getPlugin = async (): Promise<any> => {
   if (!Capacitor.isNativePlatform()) return null;
-  if (fbPlugin) return fbPlugin;
+  if (fbWrapper) return fbWrapper.plugin;
   try {
     const mod = await import('capacitor-facebook-events');
-    fbPlugin = (mod as any).FacebookEvents;
-    return fbPlugin;
+    const plugin = (mod as any).FacebookEvents ?? (mod as any).default ?? null;
+    if (!plugin) return null;
+    fbWrapper = { plugin };
+    return plugin;
   } catch (e) {
     console.warn('[fb-events] plugin not available:', e);
     return null;
