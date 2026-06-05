@@ -33,22 +33,27 @@ interface ChatRequest {
 
 import { getSystemPrompt } from "./prompts.ts";
 import { requireUser } from "../_shared/auth.ts";
+import { callVertex, isVertexConfigured } from "../_shared/vertex-ai.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
+
   try {
-    // Require authenticated caller — prevents abuse of Gemini quota.
+    // Require authenticated caller — prevents abuse of quota.
     const auth = await requireUser(req);
     if (auth.error) return auth.error;
 
+    const useVertex = isVertexConfigured();
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) {
-      console.error("GEMINI_API_KEY not configured");
+    if (!useVertex && !GEMINI_API_KEY) {
+      console.error("Neither Vertex AI nor GEMINI_API_KEY configured");
       throw new Error("AI service not configured");
     }
+    console.log(`AI backend: ${useVertex ? "Vertex AI" : "Gemini API"}`);
+
 
     const {
       messages,
@@ -107,15 +112,25 @@ Deno.serve(async (req) => {
     let lastError = "";
     
     for (const model of models) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:${endpoint}?${stream ? "alt=sse&" : ""}key=${GEMINI_API_KEY}`;
-      response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(geminiBody),
-      });
+      try {
+        if (useVertex) {
+          response = await callVertex({ model, body: geminiBody, stream });
+        } else {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:${endpoint}?${stream ? "alt=sse&" : ""}key=${GEMINI_API_KEY}`;
+          response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(geminiBody),
+          });
+        }
+      } catch (err) {
+        console.error(`Model ${model} request failed:`, err);
+        lastError = err instanceof Error ? err.message : String(err);
+        continue;
+      }
       
       if (response.ok) {
-        console.log(`Using model: ${model}`);
+        console.log(`Using model: ${model} (${useVertex ? "Vertex" : "Gemini API"})`);
         break;
       }
       
@@ -136,6 +151,7 @@ Deno.serve(async (req) => {
       // For other errors (4xx except 404), don't retry
       break;
     }
+
 
     if (!response || !response.ok) {
       return new Response(
