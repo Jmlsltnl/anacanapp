@@ -233,33 +233,45 @@ async function buildMasterPrompt(
     customizations.push(`Give the baby ${hairColor} ${hairStyle}`.trim());
   }
   
-  // Outfit
-  if (customization.outfit !== "keep" && outfitDescriptions[customization.outfit]) {
-    customizations.push(`Dress the baby ${outfitDescriptions[customization.outfit]}`);
+  // Outfit — make replacement explicit
+  const outfitChangeRequested = customization.outfit !== "keep" && outfitDescriptions[customization.outfit];
+  if (outfitChangeRequested) {
+    customizations.push(
+      `REPLACE the baby's current clothing entirely with a new outfit: ${outfitDescriptions[customization.outfit]}. The new outfit must fit naturally on the baby's body, with realistic fabric, folds, and lighting that matches the scene. Do NOT keep any part of the original clothing visible.`
+    );
+  } else {
+    customizations.push("Keep the baby's original clothing from the source photo unchanged.");
   }
 
-  const customizationText = customizations.length > 0 
+  const customizationText = customizations.length > 0
     ? `\n\n**CUSTOMIZATION REQUESTS:**\n${customizations.map((c, i) => `${i + 1}. ${c}`).join("\n")}`
     : "";
 
   return `You are an award-winning professional baby portrait photographer and digital artist. Create a BREATHTAKING masterpiece portrait.
 
 **═══════════════════════════════════════════════════════════════════════════**
-**ABSOLUTE PRIORITY #1: FACIAL IDENTITY PRESERVATION**
+**ABSOLUTE PRIORITY #1: FACIAL IDENTITY PRESERVATION (NON-NEGOTIABLE)**
 **═══════════════════════════════════════════════════════════════════════════**
 
 ${styleConfig.faceNote}
 
-This is NON-NEGOTIABLE. The parents must instantly recognize their baby in the generated image.
+The parents must instantly recognize THIS specific baby. Never invent a new face, never blend with another baby, never "improve" the face. If there is ANY conflict between facial preservation and any other instruction (style, customization, background), facial preservation WINS.
+
+Forbidden face changes: altering eye color/shape/spacing, changing nose shape, changing mouth/lips, slimming or fattening cheeks, reshaping chin/jaw, smoothing skin texture, removing birthmarks/freckles, changing skin tone, changing expression.
 
 **═══════════════════════════════════════════════════════════════════════════**
-**SCENE CREATION**
+**SCENE & BACKGROUND**
 **═══════════════════════════════════════════════════════════════════════════**
 
-Create this beautiful environment around the baby:
+Build this environment AROUND the baby (the baby stays as photographed; only the surroundings change):
 ${background}
 
-The scene should feel immersive, magical, and perfectly composed with the baby as the clear focal point.
+Background rules:
+• Clean, tidy, well-composed — no visual clutter, no random floating objects, no duplicated elements, no text or watermarks.
+• Cohesive color palette that complements the baby without overpowering them.
+• Soft, natural depth-of-field blur on the background so the baby remains the clear focal point.
+• Lighting on the baby must match the scene's light direction, color temperature, and intensity for a believable composite.
+• No extra people, no extra babies, no extra hands or limbs anywhere in the frame.
 
 **═══════════════════════════════════════════════════════════════════════════**
 **ARTISTIC STYLE**
@@ -277,16 +289,16 @@ ${customizationText}
 • Lighting: Professional, flattering, matching the scene mood
 • Focus: Sharp on baby's face, soft artistic blur on background
 • Colors: Rich, vibrant, harmonious palette
-• Expression: Capture the baby's natural charm and personality
+• Anatomy: Correct number of fingers/toes, natural proportions, no deformities
 
 **═══════════════════════════════════════════════════════════════════════════**
 **OUTPUT**
 **═══════════════════════════════════════════════════════════════════════════**
 
 Generate ONE stunning, professional-quality baby portrait that:
-✓ Preserves the baby's exact facial identity
-✓ Places them beautifully in the described scene
-✓ Applies any requested customizations naturally
+✓ Keeps the baby's exact face from the source photo (untouched)
+✓ Places them beautifully in the described clean, cohesive scene
+✓ Applies the requested outfit/customization changes naturally
 ✓ Creates a cherished keepsake-worthy image`;
 }
 
