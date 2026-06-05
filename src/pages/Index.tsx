@@ -418,10 +418,10 @@ const Index = () => {
   }
 
   // Reverse Trial Funnel disabled for all users (production + dev).
-  const isPremiumProfile = profile?.is_premium === true;
   if (!hasCompletedFunnel) {
     setFunnelCompleted(true);
   }
+
 
 
   // Admin Panel
