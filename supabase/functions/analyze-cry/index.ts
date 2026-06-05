@@ -88,9 +88,7 @@ Return ONLY this JSON (no markdown, no extra keys):
           topP: 0.1,
           maxOutputTokens: 512,
         }
-      })
-    }
-  );
+      });
 
   if (!response.ok) {
     console.error('Detection API error:', response.status);
