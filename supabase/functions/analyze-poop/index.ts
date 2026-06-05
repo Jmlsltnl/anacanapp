@@ -243,10 +243,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
-    if (!GEMINI_API_KEY) {
-      throw new Error('GEMINI_API_KEY not configured');
-    }
+    // AI handled by callGeminiSmart
 
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -278,7 +275,7 @@ Deno.serve(async (req) => {
 
     // Stage 1: Validate image
     console.log('Stage 1: Validating image...');
-    const validation = await validateImage(imageBase64, GEMINI_API_KEY);
+    const validation = await validateImage(imageBase64);
     console.log('Validation result:', validation);
 
     if (!validation.isValidDiaperImage) {
@@ -299,7 +296,7 @@ Deno.serve(async (req) => {
 
     // Stage 2: Analyze poop
     console.log('Stage 2: Analyzing poop...');
-    const response = await analyzePoop(imageBase64, GEMINI_API_KEY, userContext);
+    const response = await analyzePoop(imageBase64, undefined, userContext);
 
     if (!response) {
       throw new Error('AI analysis failed - all models exhausted');
