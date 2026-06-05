@@ -118,7 +118,7 @@ NÜMUNƏLƏR:
 - Kofe: warning - gündə 200mg-dən az kofein təhlükəsizdir, çox içmək riskli ola bilər
 - Epilyasiya: warning - mumla epilyasiya təhlükəsizdir, lazer tövsiyə olunmur`;
 
-    const response = await callGeminiSmart("gemini-2.5-flash", {
+    const response = await callGeminiSmart("gemini-2.5-flash-lite", {
       contents: [{
         role: 'user',
         parts: [{ text: query }]
