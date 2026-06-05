@@ -17,6 +17,7 @@ let initialized = false;
 
 const getPlugin = (): any | null => {
   if (!Capacitor.isNativePlatform()) return null;
+  if (Capacitor.getPlatform() === 'android') return null;
   if (fbPlugin) return fbPlugin;
   try {
     fbPlugin = FacebookEvents ?? null;
@@ -109,7 +110,7 @@ export const logFacebookEvent = async (eventName: string, params?: Record<string
 /**
  * App start zamanı çağırılır — pluginin yüklənməsini "isti" tutur.
  */
-export const initFacebookEvents = async () => {
+export const initFacebookEvents = () => {
   if (initialized) return;
   initialized = true;
   if (!Capacitor.isNativePlatform()) return;

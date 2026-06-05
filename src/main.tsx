@@ -13,7 +13,7 @@ initCrashReporter();
 initMixpanel();
 
 // Initialize Facebook / Meta App Events (native-only, no-op on web)
-initFacebookEvents().catch(console.error);
+initFacebookEvents();
 
 // Initialize native features when app starts
 initializeNativeFeatures().catch(console.error);
