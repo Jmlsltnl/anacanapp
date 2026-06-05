@@ -1,6 +1,7 @@
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { callGeminiSmart } from "../_shared/vertex-ai.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -25,27 +26,23 @@ interface ImageValidation {
 }
 
 // Stage 1: Validate if image contains a diaper/poop
-async function validateImage(imageBase64: string, apiKey: string): Promise<ImageValidation> {
-  const models = ['gemini-2.0-flash', 'gemini-2.5-flash'];
+async function validateImage(imageBase64: string, _apiKey?: string): Promise<ImageValidation> {
+  const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
   
   for (const model of models) {
     try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [
-                {
-                  inlineData: {
-                    mimeType: 'image/jpeg',
-                    data: imageBase64
-                  }
-                },
-                {
-                  text: `Bu şəklin NƏ OLDUĞUNU müəyyən et. YALNIZ aşağıdakı kateqoriyalardan birini seç:
+      const response = await callGeminiSmart(model, {
+        contents: [{
+          role: 'user',
+          parts: [
+            {
+              inlineData: {
+                mimeType: 'image/jpeg',
+                data: imageBase64
+              }
+            },
+            {
+              text: `Bu şəklin NƏ OLDUĞUNU müəyyən et. YALNIZ aşağıdakı kateqoriyalardan birini seç:
 
 ŞƏKİL TİPLƏRİ:
 1. "diaper_with_poop" - Körpə bezi İÇİNDƏ nəcis görünür
@@ -69,18 +66,16 @@ CAVAB FORMATI (STRICT JSON, heç bir əlavə mətn yoxdur):
   "confidence": 0-100,
   "description": "Şəkildə nə görünür (1 cümlə)"
 }`
-                }
-              ]
-            }],
-            generationConfig: {
-              temperature: 0.1,
-              topK: 5,
-              topP: 0.8,
-              maxOutputTokens: 256,
             }
-          })
+          ]
+        }],
+        generationConfig: {
+          temperature: 0.1,
+          topK: 5,
+          topP: 0.8,
+          maxOutputTokens: 256,
         }
-      );
+      });
 
       if (response.status === 429) {
         console.log(`Rate limit on ${model} for validation, trying next...`);
