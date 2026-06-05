@@ -36,6 +36,26 @@ function getSignupErrorMessage(error: any): string {
   return error?.message || 'Qeydiyyat zamanı xəta baş verdi. Yenidən cəhd edin.';
 }
 
+function getLoginErrorMessage(error: any): string {
+  const code = error?.code || '';
+  const msg = (error?.message || '').toLowerCase();
+
+  if (msg.includes('fetch') || msg.includes('network request failed') || msg.includes('networkerror')) {
+    return 'Serverə bağlantı alınmadı. Android build-də son native dəyişikliklər hələ sync olunmayıbsa, tətbiqi yenidən build edib sync edin və sonra yenidən cəhd edin.';
+  }
+  if (code === 'invalid_credentials' || msg.includes('invalid login credentials')) {
+    return 'E-mail və ya şifrə yanlışdır.';
+  }
+  if (msg.includes('email not confirmed') || msg.includes('not confirmed')) {
+    return 'E-mail təsdiqlənməyib.';
+  }
+  if (msg.includes('rate limit') || code === 'over_request_rate_limit') {
+    return 'Çox sayda cəhd edildi. Bir az sonra yenidən yoxlayın.';
+  }
+
+  return error?.message || 'Giriş zamanı xəta baş verdi. Yenidən cəhd edin.';
+}
+
 const AuthScreen = () => {
   const [mainView, setMainView] = useState<MainView>('main');
   const [mode, setMode] = useState<AuthMode>('login');
@@ -291,7 +311,7 @@ const AuthScreen = () => {
         if (error) {
           toast({
             title: tr("authscreen_giris_alinmadi_e321fa", 'Giriş alınmadı'),
-            description: tr("authscreen_e_mail_ve_ya_sifre_yanlisdir_1ef792", 'E-mail və ya şifrə yanlışdır.'),
+            description: getLoginErrorMessage(error),
             variant: 'destructive',
           });
         } else {
