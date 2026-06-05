@@ -131,51 +131,51 @@ const outfitDescriptions: Record<string, string> = {
 const imageStyleConfig: Record<string, { style: string; faceNote: string }> = {
   realistic: {
     style: "ultra-realistic professional photography, magazine-quality, natural skin texture, studio-grade lighting, 1K resolution",
-    faceNote: "CRITICAL: Preserve 100% of the baby's original facial features - exact eye shape, nose structure, lip curves, cheek contours, chin shape. The face must be IDENTICAL and instantly recognizable.",
+    faceNote: "ABSOLUTE RULE: The baby's face from the source photo MUST be transferred 1:1, pixel-faithful. Do NOT modify, retouch, smooth, beautify, age, or stylize the face in any way. Keep the EXACT same eye shape and spacing, eyebrow shape, nose shape and nostrils, mouth shape and lip thickness, chin, jawline, cheek fat, ears, skin tone, skin texture, birthmarks, freckles, and natural expression. Treat the source face as a locked reference — only the body, clothing, hair styling (if requested), and surrounding scene may change.",
   },
   "3d_render": {
     style: "high-quality 3D render with smooth textures, professional studio lighting, subtle stylization",
-    faceNote: "Preserve the baby's key facial proportions and features while applying gentle 3D stylization. The baby must remain recognizable.",
+    faceNote: "Keep the baby's face as close to the source photo as possible — same eye shape, nose, mouth, face shape, skin tone and expression. Apply only minimal 3D shading; do NOT redesign the face.",
   },
   "3d_disney": {
     style: "3D Disney Pixar animation style, adorable big expressive eyes, soft rounded features, magical warm lighting, heartwarming atmosphere",
-    faceNote: "Adapt the baby's features to Disney Pixar style while maintaining their essential identity markers - their unique expressions and recognizable traits.",
+    faceNote: "Stylize toward Pixar/Disney while keeping the baby instantly recognizable — preserve source eye shape, nose, mouth, face proportions, skin tone and hair. Do NOT replace with a generic Pixar baby.",
   },
   "3d_pixar": {
     style: "Pixar movie quality 3D animation, endearing character design, vibrant rich colors, cinematic lighting, emotional depth",
-    faceNote: "Transform into Pixar style while preserving the baby's distinctive facial characteristics and expressions.",
+    faceNote: "Stylize toward Pixar while keeping the baby instantly recognizable — preserve source eye shape, nose, mouth, face proportions, skin tone and hair. Do NOT replace with a generic Pixar baby.",
   },
   anime: {
     style: "beautiful Japanese anime illustration style, large sparkling expressive eyes, soft delicate features, warm color palette",
-    faceNote: "Render in anime style while keeping the baby's unique identifying features recognizable in stylized form.",
+    faceNote: "Render anime style while keeping the baby's unique features clearly recognizable — same face shape, nose, mouth, hair, skin tone.",
   },
   illustration: {
     style: "elegant digital illustration, hand-painted storybook quality, soft watercolor-like colors, artistic brushwork",
-    faceNote: "Create artistic illustration while maintaining the baby's essential facial features and expressions.",
+    faceNote: "Illustrate while preserving the baby's exact facial features, proportions and expression.",
   },
   "2d_simpsons": {
     style: "The Simpsons cartoon style, 2D animation, characteristic yellow skin, simple bold features",
-    faceNote: "Adapt to Simpsons style while keeping key recognizable traits from the original photo.",
+    faceNote: "Adapt to Simpsons style while keeping recognizable features (hair, eye placement, mouth shape) from the source.",
   },
   "3d_simpsons": {
     style: "3D rendered Simpsons style, yellow skin tone, cartoon proportions, smooth 3D surfaces",
-    faceNote: "Transform to 3D Simpsons aesthetic while maintaining recognizable character traits.",
+    faceNote: "Transform to 3D Simpsons aesthetic while keeping recognizable features from the source.",
   },
   watercolor: {
     style: "delicate watercolor painting, soft color washes, artistic brushstrokes, dreamy ethereal quality",
-    faceNote: "Create watercolor portrait while preserving the baby's distinct features in artistic form.",
+    faceNote: "Paint in watercolor while preserving the baby's exact facial features and expression.",
   },
   oil_painting: {
     style: "classical oil painting portrait style, rich textured brushwork, Renaissance-inspired lighting, museum quality",
-    faceNote: "Paint in classical style while maintaining the baby's likeness and character.",
+    faceNote: "Paint in classical style while preserving the baby's exact facial features and expression.",
   },
   clay_art: {
     style: "adorable claymation stop-motion style, handcrafted clay figure aesthetic, warm tactile textures",
-    faceNote: "Create clay figure style while keeping baby's recognizable features in sculpted form.",
+    faceNote: "Sculpt clay figure while keeping baby's recognizable features (face shape, eyes, nose, mouth) from the source.",
   },
   pop_art: {
     style: "vibrant pop art style, bold primary colors, comic book halftone dots, Andy Warhol inspired",
-    faceNote: "Transform to pop art while maintaining baby's facial structure in stylized form.",
+    faceNote: "Transform to pop art while maintaining baby's facial structure and recognizable features from the source.",
   },
 };
 
@@ -233,33 +233,45 @@ async function buildMasterPrompt(
     customizations.push(`Give the baby ${hairColor} ${hairStyle}`.trim());
   }
   
-  // Outfit
-  if (customization.outfit !== "keep" && outfitDescriptions[customization.outfit]) {
-    customizations.push(`Dress the baby ${outfitDescriptions[customization.outfit]}`);
+  // Outfit — make replacement explicit
+  const outfitChangeRequested = customization.outfit !== "keep" && outfitDescriptions[customization.outfit];
+  if (outfitChangeRequested) {
+    customizations.push(
+      `REPLACE the baby's current clothing entirely with a new outfit: ${outfitDescriptions[customization.outfit]}. The new outfit must fit naturally on the baby's body, with realistic fabric, folds, and lighting that matches the scene. Do NOT keep any part of the original clothing visible.`
+    );
+  } else {
+    customizations.push("Keep the baby's original clothing from the source photo unchanged.");
   }
 
-  const customizationText = customizations.length > 0 
+  const customizationText = customizations.length > 0
     ? `\n\n**CUSTOMIZATION REQUESTS:**\n${customizations.map((c, i) => `${i + 1}. ${c}`).join("\n")}`
     : "";
 
   return `You are an award-winning professional baby portrait photographer and digital artist. Create a BREATHTAKING masterpiece portrait.
 
 **═══════════════════════════════════════════════════════════════════════════**
-**ABSOLUTE PRIORITY #1: FACIAL IDENTITY PRESERVATION**
+**ABSOLUTE PRIORITY #1: FACIAL IDENTITY PRESERVATION (NON-NEGOTIABLE)**
 **═══════════════════════════════════════════════════════════════════════════**
 
 ${styleConfig.faceNote}
 
-This is NON-NEGOTIABLE. The parents must instantly recognize their baby in the generated image.
+The parents must instantly recognize THIS specific baby. Never invent a new face, never blend with another baby, never "improve" the face. If there is ANY conflict between facial preservation and any other instruction (style, customization, background), facial preservation WINS.
+
+Forbidden face changes: altering eye color/shape/spacing, changing nose shape, changing mouth/lips, slimming or fattening cheeks, reshaping chin/jaw, smoothing skin texture, removing birthmarks/freckles, changing skin tone, changing expression.
 
 **═══════════════════════════════════════════════════════════════════════════**
-**SCENE CREATION**
+**SCENE & BACKGROUND**
 **═══════════════════════════════════════════════════════════════════════════**
 
-Create this beautiful environment around the baby:
+Build this environment AROUND the baby (the baby stays as photographed; only the surroundings change):
 ${background}
 
-The scene should feel immersive, magical, and perfectly composed with the baby as the clear focal point.
+Background rules:
+• Clean, tidy, well-composed — no visual clutter, no random floating objects, no duplicated elements, no text or watermarks.
+• Cohesive color palette that complements the baby without overpowering them.
+• Soft, natural depth-of-field blur on the background so the baby remains the clear focal point.
+• Lighting on the baby must match the scene's light direction, color temperature, and intensity for a believable composite.
+• No extra people, no extra babies, no extra hands or limbs anywhere in the frame.
 
 **═══════════════════════════════════════════════════════════════════════════**
 **ARTISTIC STYLE**
@@ -277,16 +289,16 @@ ${customizationText}
 • Lighting: Professional, flattering, matching the scene mood
 • Focus: Sharp on baby's face, soft artistic blur on background
 • Colors: Rich, vibrant, harmonious palette
-• Expression: Capture the baby's natural charm and personality
+• Anatomy: Correct number of fingers/toes, natural proportions, no deformities
 
 **═══════════════════════════════════════════════════════════════════════════**
 **OUTPUT**
 **═══════════════════════════════════════════════════════════════════════════**
 
 Generate ONE stunning, professional-quality baby portrait that:
-✓ Preserves the baby's exact facial identity
-✓ Places them beautifully in the described scene
-✓ Applies any requested customizations naturally
+✓ Keeps the baby's exact face from the source photo (untouched)
+✓ Places them beautifully in the described clean, cohesive scene
+✓ Applies the requested outfit/customization changes naturally
 ✓ Creates a cherished keepsake-worthy image`;
 }
 
