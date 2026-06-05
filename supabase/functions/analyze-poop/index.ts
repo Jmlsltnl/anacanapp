@@ -135,8 +135,8 @@ CAVAB FORMATI (STRICT JSON, heç bir əlavə mətn yoxdur):
 }
 
 // Stage 2: Analyze the poop
-async function analyzePoop(imageBase64: string, apiKey: string, userContext?: PoopAnalysisRequest['userContext']): Promise<Response | null> {
-  const models = ['gemini-2.0-flash', 'gemini-2.5-pro', 'gemini-2.5-flash'];
+async function analyzePoop(imageBase64: string, _apiKey?: string, userContext?: PoopAnalysisRequest['userContext']): Promise<Response | null> {
+  const models = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.5-flash-lite'];
   
   // Build age context for prompt
   let ageContext = '';
@@ -158,22 +158,18 @@ async function analyzePoop(imageBase64: string, apiKey: string, userContext?: Po
   
   for (const model of models) {
     console.log(`Trying analysis with model: ${model}`);
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              {
-                inlineData: {
-                  mimeType: 'image/jpeg',
-                  data: imageBase64
-                }
-              },
-              {
-                text: `Sən pediatrik sağlamlıq mütəxəssisisən. Bu körpə bezindəki NƏCİSİ DİQQƏTLƏ analiz et.
+    const response = await callGeminiSmart(model, {
+      contents: [{
+        role: 'user',
+        parts: [
+          {
+            inlineData: {
+              mimeType: 'image/jpeg',
+              data: imageBase64
+            }
+          },
+          {
+            text: `Sən pediatrik sağlamlıq mütəxəssisisən. Bu körpə bezindəki NƏCİSİ DİQQƏTLƏ analiz et.
 
 ${ageContext ? `KÖRPƏ KONTEKST: ${ageContext}` : ''}
 
@@ -213,18 +209,16 @@ CAVAB FORMATI (STRICT JSON):
 }
 
 XƏBƏRDARLIQ: Ağ, qara və ya qırmızı rəng gördükdə "urgent" səviyyəsi VER!`
-              }
-            ]
-          }],
-          generationConfig: {
-            temperature: 0.1,
-            topK: 10,
-            topP: 0.7,
-            maxOutputTokens: 1024,
           }
-        })
+        ]
+      }],
+      generationConfig: {
+        temperature: 0.1,
+        topK: 10,
+        topP: 0.7,
+        maxOutputTokens: 1024,
       }
-    );
+    });
 
     if (response.ok) {
       console.log(`Analysis success with model: ${model}`);
