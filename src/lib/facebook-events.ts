@@ -7,28 +7,20 @@
  */
 
 import { Capacitor } from '@capacitor/core';
+import { FacebookEvents } from 'capacitor-facebook-events';
 
-// IMPORTANT: We wrap the Capacitor plugin in a plain object before returning it
-// from an async function. Capacitor plugin objects are JS Proxies that intercept
-// EVERY property access — including `.then`. If we returned the raw plugin from
-// an `async` function, `await getPlugin()` would re-check if the value is a
-// thenable, call `plugin.then(...)` through the Proxy, and on Android the native
-// bridge throws `"FacebookEvents.then()" is not implemented on android`, which
-// surfaces as an unhandled rejection and crashes flows like the premium modal.
-type FacebookPluginWrapper = { plugin: any };
-
-let fbWrapper: FacebookPluginWrapper | null = null;
+// IMPORTANT: Capacitor plugin proxies can be treated as thenables if they cross
+// async/promise boundaries. Keep plugin lookup synchronous and only await real
+// native method calls like `logEvent()` or `setAdvertiserTrackingEnabled()`.
+let fbPlugin: any | null = null;
 let initialized = false;
 
-const getPlugin = async (): Promise<FacebookPluginWrapper | null> => {
+const getPlugin = (): any | null => {
   if (!Capacitor.isNativePlatform()) return null;
-  if (fbWrapper) return fbWrapper;
+  if (fbPlugin) return fbPlugin;
   try {
-    const mod = await import('capacitor-facebook-events');
-    const plugin = (mod as any).FacebookEvents ?? (mod as any).default ?? null;
-    if (!plugin) return null;
-    fbWrapper = { plugin };
-    return fbWrapper;
+    fbPlugin = FacebookEvents ?? null;
+    return fbPlugin;
   } catch (e) {
     console.warn('[fb-events] plugin not available:', e);
     return null;
@@ -40,8 +32,7 @@ const getPlugin = async (): Promise<FacebookPluginWrapper | null> => {
  * Bu olmadan Meta reklam atribusiyası limit olur.
  */
 export const setFacebookAdvertiserTracking = async (enabled: boolean) => {
-  const wrapper = await getPlugin();
-  const p = wrapper?.plugin;
+  const p = getPlugin();
   if (!p) return;
   try {
     await p.setAdvertiserTrackingEnabled({ enabled });
@@ -97,8 +88,7 @@ const cleanParams = (params?: Record<string, any>) => {
  * Səssiz fail — analytics heç vaxt app-ı sındırmamalıdır.
  */
 export const logFacebookEvent = async (eventName: string, params?: Record<string, any>) => {
-  const wrapper = await getPlugin();
-  const p = wrapper?.plugin;
+  const p = getPlugin();
   if (!p) return;
   try {
     const fbEvent = EVENT_MAP[eventName] || eventName;
@@ -123,5 +113,5 @@ export const initFacebookEvents = async () => {
   if (initialized) return;
   initialized = true;
   if (!Capacitor.isNativePlatform()) return;
-  await getPlugin();
+  getPlugin();
 };
