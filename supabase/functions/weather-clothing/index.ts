@@ -199,7 +199,7 @@ CAVAB FORMATI (STRICT JSON):
     for (const model of models) {
       geminiResponse = await callGeminiSmart(model, {
         contents: [{ role: 'user', parts: [{ text: promptText }] }],
-        generationConfig: { temperature: 0.3, maxOutputTokens: 1500 },
+        generationConfig: { temperature: 0.3, maxOutputTokens: 4096 },
       });
       if (geminiResponse.ok) {
         console.log(`weather-clothing using model: ${model}`);

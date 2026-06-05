@@ -347,7 +347,7 @@ ${dadSun ? `[Ana (${momSun.signAz}) və ata (${dadSun.signAz}) arasındakı kosm
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: 0.8,
-        maxOutputTokens: 4000,
+        maxOutputTokens: 8192,
         topP: 0.9,
         topK: 40,
       },
