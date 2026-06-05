@@ -1,6 +1,7 @@
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { callGeminiSmart } from "../_shared/vertex-ai.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -26,10 +27,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
-    if (!GEMINI_API_KEY) {
-      throw new Error('GEMINI_API_KEY not configured');
-    }
+    // AI handled by callGeminiSmart
 
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -199,17 +197,10 @@ CAVAB FORMATI (STRICT JSON):
     const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
     let geminiResponse: Response | null = null;
     for (const model of models) {
-      geminiResponse = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: promptText }] }],
-            generationConfig: { temperature: 0.3, maxOutputTokens: 1500 },
-          }),
-        }
-      );
+      geminiResponse = await callGeminiSmart(model, {
+        contents: [{ role: 'user', parts: [{ text: promptText }] }],
+        generationConfig: { temperature: 0.3, maxOutputTokens: 1500 },
+      });
       if (geminiResponse.ok) {
         console.log(`weather-clothing using model: ${model}`);
         break;
