@@ -136,7 +136,7 @@ CAVAB FORMATI (STRICT JSON, heç bir əlavə mətn yoxdur):
 
 // Stage 2: Analyze the poop
 async function analyzePoop(imageBase64: string, _apiKey?: string, userContext?: PoopAnalysisRequest['userContext']): Promise<Response | null> {
-  const models = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.5-flash-lite'];
+  const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
   
   // Build age context for prompt
   let ageContext = '';
