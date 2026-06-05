@@ -71,6 +71,7 @@ JSON formatında cavab ver:
       ],
       generationConfig: {
         temperature: 0.7,
+        maxOutputTokens: 8192,
       },
     });
 

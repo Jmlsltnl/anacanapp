@@ -128,7 +128,7 @@ NÜMUNƏLƏR:
       },
       generationConfig: {
         temperature: 0.3,
-        maxOutputTokens: 1024,
+        maxOutputTokens: 2048,
       },
     });
 
