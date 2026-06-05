@@ -269,7 +269,7 @@ serve(async (req) => {
           temperature: 0.7,
           topK: 30,
           topP: 0.9,
-          maxOutputTokens: 8192,
+          maxOutputTokens: 3072,
         },
         safetySettings: [
           { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
@@ -280,8 +280,8 @@ serve(async (req) => {
       });
     };
 
-    // Try models in order with fallback on rate limit (429) or unavailable (503)
-    const models = ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.0-flash'];
+    // Flash-first for speed; fall back to lite then pro on overload
+    const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.5-pro'];
     let response: Response | null = null;
     
     for (const model of models) {
