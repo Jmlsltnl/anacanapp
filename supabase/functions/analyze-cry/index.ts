@@ -25,7 +25,7 @@ async function detectIfCrying(
   audioBase64: string,
   _apiKey?: string
 ): Promise<{ isCrying: boolean; confidence: number; soundType: string }> {
-  const response = await callGeminiSmart("gemini-2.5-flash", {
+  const response = await callGeminiSmart("gemini-2.5-flash-lite", {
     contents: [{
       role: 'user',
       parts: [
