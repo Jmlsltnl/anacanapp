@@ -3,7 +3,7 @@ import { tr } from '@/lib/tr';
 import { Button } from '@/components/ui/button';
 import { Crown, Check, Shield, X, Sparkles, Loader2 } from 'lucide-react';
 import { useInAppPurchase } from '@/hooks/useInAppPurchase';
-import { isNativePlatform } from '@/lib/revenuecat';
+import { canUseNativePaywallUI, isNativePlatform } from '@/lib/revenuecat';
 import { useToast } from '@/hooks/use-toast';
 
 interface PaywallStepProps {
@@ -29,7 +29,7 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
   const presentedRef = useRef(false);
   useEffect(() => {
     if (presentedRef.current) return;
-    if (!isNativePlatform() || !isSupported) return;
+    if (!isNativePlatform() || !isSupported || !canUseNativePaywallUI()) return;
     presentedRef.current = true;
     (async () => {
       const purchased = await showPaywall();

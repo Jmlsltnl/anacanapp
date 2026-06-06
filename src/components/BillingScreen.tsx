@@ -15,7 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { PremiumModal } from '@/components/PremiumModal';
 import { useBillingConfig } from '@/hooks/usePaywallConfig';
 import { usePremiumConfig } from '@/hooks/usePremiumConfig';
-import { isNativePlatform } from '@/lib/revenuecat';
+import { getPlatform, isNativePlatform } from '@/lib/revenuecat';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { tr } from "@/lib/tr";
@@ -45,6 +45,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
   const [isRestoring, setIsRestoring] = useState(false);
   const [payments, setPayments] = useState<PaymentEntry[]>([]);
   const [loadingPayments, setLoadingPayments] = useState(false);
+  const isAndroidNative = isNativePlatform() && getPlatform() === 'android';
 
   // Fetch real purchase history from RevenueCat
   const fetchPaymentHistory = async () => {
@@ -105,7 +106,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
 
   const handleCancelSubscription = async () => {
     // On native platforms, redirect to App Store / Play Store subscription management
-    if (isIAPSupported) {
+    if (isIAPSupported && !isAndroidNative) {
       if (!confirm('Abunəliyi ləğv etmək üçün App Store / Google Play abunəlik idarəetmə səhifəsinə yönləndiriləcəksiniz.')) return;
       setIsCanceling(true);
       await showCustomerCenter();
@@ -464,7 +465,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
               )}
             </div>
 
-            {isIAPSupported && (
+            {isIAPSupported && !isAndroidNative && (
               <button
                 onClick={async () => { await showCustomerCenter(); fetchPaymentHistory(); }}
                 className="w-full mt-3 text-[11px] text-primary font-semibold hover:underline"
