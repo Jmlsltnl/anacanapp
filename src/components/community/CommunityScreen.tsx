@@ -98,7 +98,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   }
 
   return (
-    <div ref={ref} className="min-h-screen pb-24 bg-background">
+    <div ref={ref} className={`min-h-screen pb-24 bg-background ${Capacitor.isNativePlatform() ? 'community-native-text' : ''}`}>
       {/* Header */}
       <div className="bg-card border-b border-border/60 shadow-sm">
         <div className="px-5 pt-4 pb-2">
