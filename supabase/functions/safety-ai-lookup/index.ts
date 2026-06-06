@@ -2,6 +2,7 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { requireUser } from "../_shared/auth.ts";
+import { callGeminiSmart } from "../_shared/vertex-ai.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -39,13 +40,8 @@ Deno.serve(async (req) => {
     const auth = await requireUser(req);
     if (auth.error) return auth.error;
 
-    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-
-    if (!GEMINI_API_KEY) {
-      throw new Error('GEMINI_API_KEY not configured');
-    }
 
     if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
       throw new Error('Supabase credentials not configured');
@@ -122,26 +118,19 @@ NÜMUNƏLƏR:
 - Kofe: warning - gündə 200mg-dən az kofein təhlükəsizdir, çox içmək riskli ola bilər
 - Epilyasiya: warning - mumla epilyasiya təhlükəsizdir, lazer tövsiyə olunmur`;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{
-            role: 'user',
-            parts: [{ text: query }]
-          }],
-          systemInstruction: {
-            parts: [{ text: systemPrompt }]
-          },
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 1024,
-          },
-        }),
-      }
-    );
+    const response = await callGeminiSmart("gemini-2.5-flash-lite", {
+      contents: [{
+        role: 'user',
+        parts: [{ text: query }]
+      }],
+      systemInstruction: {
+        parts: [{ text: systemPrompt }]
+      },
+      generationConfig: {
+        temperature: 0.3,
+        maxOutputTokens: 2048,
+      },
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
