@@ -1,6 +1,13 @@
 package com.atlasoon.anacan;
 
+import android.os.Build;
 import android.util.Log;
+import android.view.View;
+import android.webkit.WebView;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import com.getcapacitor.BridgeActivity;
 import com.getcapacitor.Plugin;
 import java.lang.reflect.Field;
@@ -15,6 +22,33 @@ public class MainActivity extends BridgeActivity {
     protected void load() {
         disableProblematicAndroidPlugins();
         super.load();
+        applySystemBarInsetsToWebView();
+    }
+
+    /**
+     * Android 15 (targetSDK 35+) forces edge-to-edge, so the system navigation /
+     * gesture bar overlaps the WebView. Pad the WebView by the bottom system
+     * inset so our bottom nav is never covered. Also expose top inset as a
+     * CSS variable so status-bar safe areas work.
+     */
+    private void applySystemBarInsetsToWebView() {
+        try {
+            WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+            final WebView webView = this.bridge.getWebView();
+            if (webView == null) return;
+
+            ViewCompat.setOnApplyWindowInsetsListener(webView, (v, windowInsets) -> {
+                Insets bars = windowInsets.getInsets(
+                    WindowInsetsCompat.Type.systemBars()
+                    | WindowInsetsCompat.Type.displayCutout()
+                );
+                v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+                return WindowInsetsCompat.CONSUMED;
+            });
+            webView.requestApplyInsets();
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to apply window insets to WebView", e);
+        }
     }
 
     @SuppressWarnings("unchecked")
