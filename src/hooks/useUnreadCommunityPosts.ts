@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 type SeenPostMap = Record<string, boolean>;
 
@@ -39,6 +40,11 @@ const writeSeenPostIds = (userId: string, seenPostIds: SeenPostMap) => {
   } catch {
   }
 };
+
+let activeUnreadChannel: RealtimeChannel | null = null;
+let activeUnreadChannelUserId: string | null = null;
+let activeHydrationUserId: string | null = null;
+let activeHydrationPromise: Promise<void> | null = null;
 
 const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
   unreadCount: 0,
@@ -104,14 +110,9 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
     if (state.seenPostIds[postId]) return;
 
     const nextSeenPostIds = { ...state.seenPostIds, [postId]: true } satisfies SeenPostMap;
-    const nextLastSeenAt = !state.lastSeenAt || new Date(createdAt) > new Date(state.lastSeenAt)
-      ? createdAt
-      : state.lastSeenAt;
-
     set({
       seenPostIds: nextSeenPostIds,
       unreadCount: Math.max(0, state.unreadCount - 1),
-      lastSeenAt: nextLastSeenAt,
       syncing: true,
     });
 
@@ -122,9 +123,8 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
       .upsert({ user_id: userId, post_id: postId, seen_at: new Date().toISOString() } as any, { onConflict: 'user_id,post_id' });
 
     if (!error) {
-      await supabase
-      .from('user_preferences')
-      .upsert({ user_id: userId, community_last_seen_at: nextLastSeenAt } as any, { onConflict: 'user_id' });
+      set({ syncing: false });
+      return;
     }
 
     set({ syncing: false });
@@ -208,24 +208,37 @@ export const useUnreadCommunityPosts = () => {
 
   useEffect(() => {
     if (!user?.id) {
+      if (activeUnreadChannel) {
+        supabase.removeChannel(activeUnreadChannel);
+        activeUnreadChannel = null;
+      }
+      activeUnreadChannelUserId = null;
+      activeHydrationUserId = null;
+      activeHydrationPromise = null;
       reset();
       return;
     }
 
-    void hydrateForUser(user.id);
+    if (initializedUserId !== user.id && activeHydrationUserId !== user.id) {
+      activeHydrationUserId = user.id;
+      activeHydrationPromise = hydrateForUser(user.id).finally(() => {
+        activeHydrationUserId = null;
+        activeHydrationPromise = null;
+      });
+    }
 
-    const channel = supabase
-      .channel(`community-unread-${user.id}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_posts' }, (payload) => {
-        const newRow: any = payload.new;
-        registerNewPost({ userId: user.id, postId: newRow.id, createdAt: newRow.created_at, postUserId: newRow.user_id });
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user?.id, hydrateForUser, registerNewPost, reset]);
+    if (activeUnreadChannelUserId !== user.id) {
+      if (activeUnreadChannel) supabase.removeChannel(activeUnreadChannel);
+      activeUnreadChannel = supabase
+        .channel(`community-unread-${user.id}`)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_posts' }, (payload) => {
+          const newRow: any = payload.new;
+          registerNewPost({ userId: user.id, postId: newRow.id, createdAt: newRow.created_at, postUserId: newRow.user_id });
+        })
+        .subscribe();
+      activeUnreadChannelUserId = user.id;
+    }
+  }, [user?.id, hydrateForUser, initializedUserId, registerNewPost, reset]);
 
   const refresh = useCallback(async () => {
     if (!user?.id) return;
