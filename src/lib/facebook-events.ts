@@ -121,5 +121,9 @@ export const initFacebookEvents = () => {
   if (initialized) return;
   initialized = true;
   if (!Capacitor.isNativePlatform()) return;
-  getPlugin();
+  // Defer plugin lookup so it doesn't block app boot or race the native bridge.
+  // Any throw here is swallowed by getPlugin's try/catch — cannot crash the app.
+  setTimeout(() => {
+    try { getPlugin(); } catch { /* silent */ }
+  }, 1500);
 };
