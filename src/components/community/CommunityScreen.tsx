@@ -1,5 +1,5 @@
 import { useState, forwardRef } from 'react';
-import { Capacitor } from '@capacitor/core';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Users, Plus, Search, TrendingUp, Compass, Sparkles, X, Pen, MessageCircle } from 'lucide-react';
 import { useCommunityGroups, useUserMemberships } from '@/hooks/useCommunity';
@@ -98,7 +98,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   }
 
   return (
-    <div ref={ref} className={`min-h-screen pb-24 bg-background ${Capacitor.isNativePlatform() ? 'community-native-text' : ''}`}>
+    <div ref={ref} className="min-h-screen pb-24 bg-background community-native-text">
       {/* Header */}
       <div className="bg-card border-b border-border/60 shadow-sm">
         <div className="px-5 pt-4 pb-2">

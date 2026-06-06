@@ -131,5 +131,5 @@ export const useUnreadCommunityPosts = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  return { unreadCount, markCommunitySeen, markPostSeen, refresh };
+  return { unreadCount, markCommunitySeen, markPostSeen, refresh, lastSeenAt };
 };
