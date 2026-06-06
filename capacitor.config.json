@@ -34,6 +34,21 @@
     "backgroundColor": "#FAF7F4"
   },
   "android": {
+    "includePlugins": [
+      "@capacitor-firebase/analytics",
+      "@capacitor-firebase/messaging",
+      "@capacitor/app",
+      "@capacitor/camera",
+      "@capacitor/filesystem",
+      "@capacitor/geolocation",
+      "@capacitor/haptics",
+      "@capacitor/local-notifications",
+      "@capacitor/push-notifications",
+      "@capacitor/splash-screen",
+      "@capacitor/status-bar",
+      "@revenuecat/purchases-capacitor",
+      "@revenuecat/purchases-capacitor-ui"
+    ],
     "allowMixedContent": true,
     "captureInput": true,
     "webContentsDebuggingEnabled": false,

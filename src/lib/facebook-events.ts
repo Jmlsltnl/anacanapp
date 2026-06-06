@@ -16,9 +16,11 @@ import { Capacitor } from '@capacitor/core';
 let fbPlugin: any | null = null;
 let pluginLookupAttempted = false;
 let initialized = false;
+const isAndroid = Capacitor.getPlatform() === 'android';
 
 const getPlugin = (): any | null => {
   if (!Capacitor.isNativePlatform()) return null;
+  if (isAndroid) return null;
   if (fbPlugin) return fbPlugin;
   if (pluginLookupAttempted) return null;
   pluginLookupAttempted = true;
@@ -121,6 +123,7 @@ export const initFacebookEvents = () => {
   if (initialized) return;
   initialized = true;
   if (!Capacitor.isNativePlatform()) return;
+  if (isAndroid) return;
   // Defer plugin lookup so it doesn't block app boot or race the native bridge.
   // Any throw here is swallowed by getPlugin's try/catch — cannot crash the app.
   setTimeout(() => {
