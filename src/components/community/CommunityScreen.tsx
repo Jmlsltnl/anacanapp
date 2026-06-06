@@ -1,4 +1,5 @@
 import { useState, forwardRef } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Users, Plus, Search, TrendingUp, Compass, Sparkles, X, Pen, MessageCircle } from 'lucide-react';
 import { useCommunityGroups, useUserMemberships } from '@/hooks/useCommunity';
@@ -7,6 +8,7 @@ import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useUserStore } from '@/store/userStore';
 import { useAppSetting } from '@/hooks/useAppSettings';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
+
 
 import GroupsList from './GroupsList';
 import GroupFeed from './GroupFeed';
