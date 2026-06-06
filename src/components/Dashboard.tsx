@@ -1024,16 +1024,9 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
 
   return (
     <div className="space-y-3">
-      {/* Child Selector - for multiple children (top of page) */}
-      {hasChildren && (
-        <motion.div 
-          className="flex items-center justify-between"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          <ChildSelector />
-        </motion.div>
-      )}
+      {/* Child Selector moved to dashboard header for compactness */}
+
+
 
       {/* Hero + Daily Info — seamless orange→yellow gradient continuity */}
       <div className="space-y-0">
