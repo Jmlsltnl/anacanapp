@@ -480,3 +480,12 @@
     opacity: 0;
   }
 }
+
+/* Community native compact text - applied only on Android/iOS native builds */
+.community-native-text p,
+.community-native-text .post-body,
+.community-native-text textarea,
+.community-native-text input[type="text"] {
+  font-size: 11pt !important;
+  line-height: 1.45 !important;
+}
