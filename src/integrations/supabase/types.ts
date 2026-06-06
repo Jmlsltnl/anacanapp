@@ -1812,6 +1812,35 @@ export type Database = {
         }
         Relationships: []
       }
+      community_post_reads: {
+        Row: {
+          id: string
+          post_id: string
+          seen_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          post_id: string
+          seen_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          post_id?: string
+          seen_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_post_reads_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_posts: {
         Row: {
           comments_count: number | null
