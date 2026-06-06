@@ -1,5 +1,5 @@
 import { useState, forwardRef } from 'react';
-import { Capacitor } from '@capacitor/core';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Users, Plus, Search, TrendingUp, Compass, Sparkles, X, Pen, MessageCircle } from 'lucide-react';
 import { useCommunityGroups, useUserMemberships } from '@/hooks/useCommunity';
