@@ -3,6 +3,7 @@ import { X, Crown, Sparkles, Loader2, RefreshCw, Lock, Check, Zap, Shield, Star,
 import { Button } from '@/components/ui/button';
 import { useInAppPurchase } from '@/hooks/useInAppPurchase';
 import { isNativePlatform } from '@/lib/iap';
+import { getPlatform } from '@/lib/revenuecat';
 import { useToast } from '@/hooks/use-toast';
 import { usePremiumConfig } from '@/hooks/usePremiumConfig';
 import { usePaywallConfig } from '@/hooks/usePaywallConfig';
@@ -30,12 +31,13 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   } = useInAppPurchase();
 
   const isNative = isNativePlatform();
+  const isAndroid = isNative && getPlatform() === 'android';
 
   // On native, try presenting the RevenueCat paywall. If RC UI plugin is
   // missing or no paywall is configured, gracefully fall back to the custom
   // modal UI (no crash).
   useEffect(() => {
-    if (!isOpen || !isNative || !isSupported) return;
+    if (!isOpen || !isNative || !isSupported || isAndroid) return;
     let cancelled = false;
     (async () => {
       const result = await showPaywallSafe();
@@ -53,7 +55,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
       onClose();
     })();
     return () => { cancelled = true; };
-  }, [isOpen, isNative, isSupported, showPaywallSafe, onClose, toast]);
+  }, [isOpen, isNative, isSupported, isAndroid, showPaywallSafe, onClose, toast]);
 
   useEffect(() => {
     if (isPremium && subscription?.plan_type === 'premium') setSelectedPlan('yearly');
