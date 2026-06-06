@@ -17,15 +17,21 @@ interface PostSeenObserverProps {
  */
 const PostSeenObserver = ({ postId, createdAt, postUserId, children }: PostSeenObserverProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const { markPostSeen, lastSeenAt } = useUnreadCommunityPosts();
+  const { markPostSeen, isUnreadPost, seenPostIds } = useUnreadCommunityPosts();
   const { user } = useAuth();
   const [marked, setMarked] = useState(false);
 
   const isOwnPost = !!postUserId && postUserId === user?.id;
-  const isUnread =
-    !isOwnPost &&
-    !marked &&
-    (!lastSeenAt || new Date(createdAt) > new Date(lastSeenAt));
+
+  useEffect(() => {
+    if (seenPostIds[postId]) {
+      setMarked(true);
+      return;
+    }
+    setMarked(false);
+  }, [postId, seenPostIds]);
+
+  const isUnread = !isOwnPost && !marked && isUnreadPost(postId, createdAt, postUserId);
 
   useEffect(() => {
     if (!ref.current || marked) return;

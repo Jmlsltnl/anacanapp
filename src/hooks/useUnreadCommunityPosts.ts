@@ -1,135 +1,264 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
+import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
-/**
- * Tracks how many community posts have been created since the user
- * last opened the Community tab. Stored on user_preferences.community_last_seen_at.
- *
- * Behavior:
- *  - On mount, fetch lastSeenAt and count of new posts after it.
- *  - Realtime: increment count when a new post arrives from another user.
- *  - markPostSeen(postId, createdAt): decrement count for a previously-unseen post
- *    and bump server-side lastSeenAt to the latest seen post timestamp (debounced).
- *  - markCommunitySeen(): mark everything as read (used for "mark all" actions).
- */
-export const useUnreadCommunityPosts = () => {
-  const { user } = useAuth();
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [lastSeenAt, setLastSeenAt] = useState<string | null>(null);
+type SeenPostMap = Record<string, boolean>;
 
-  // Track which posts have already been marked seen this session
-  const seenIdsRef = useRef<Set<string>>(new Set());
-  // Track the latest (max) created_at among posts we have marked seen
-  const latestSeenTsRef = useRef<string | null>(null);
-  // Debounce timer for syncing lastSeenAt to the server
-  const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+type UnreadCommunityState = {
+  unreadCount: number;
+  lastSeenAt: string | null;
+  seenPostIds: SeenPostMap;
+  initializedUserId: string | null;
+  syncing: boolean;
+  realtimeReadyForUserId: string | null;
+  hydrateForUser: (userId: string) => Promise<void>;
+  markPostSeen: (params: { userId: string; postId: string; createdAt: string; postUserId?: string }) => Promise<void>;
+  markCommunitySeen: (userId: string) => Promise<void>;
+  registerNewPost: (params: { userId: string; postId: string; createdAt: string; postUserId?: string }) => void;
+  isPostUnread: (params: { userId: string; postId: string; createdAt: string; postUserId?: string }) => boolean;
+  reset: () => void;
+};
 
-  const fetchLastSeen = useCallback(async () => {
-    if (!user?.id) return null;
-    const { data } = await supabase
+const readSeenPostIds = (userId: string) => {
+  if (typeof window === 'undefined') return {} as SeenPostMap;
+  try {
+    const raw = window.localStorage.getItem(`community_seen_posts:${userId}`);
+    if (!raw) return {} as SeenPostMap;
+    const parsed = JSON.parse(raw) as string[];
+    return Object.fromEntries(parsed.map((id) => [id, true])) as SeenPostMap;
+  } catch {
+    return {} as SeenPostMap;
+  }
+};
+
+const writeSeenPostIds = (userId: string, seenPostIds: SeenPostMap) => {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(`community_seen_posts:${userId}`, JSON.stringify(Object.keys(seenPostIds)));
+  } catch {
+  }
+};
+
+let activeUnreadChannel: RealtimeChannel | null = null;
+let activeUnreadChannelUserId: string | null = null;
+let activeHydrationUserId: string | null = null;
+let activeHydrationPromise: Promise<void> | null = null;
+
+const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
+  unreadCount: 0,
+  lastSeenAt: null,
+  seenPostIds: {},
+  initializedUserId: null,
+  syncing: false,
+  realtimeReadyForUserId: null,
+
+  hydrateForUser: async (userId: string) => {
+    const localSeenPostIds = readSeenPostIds(userId);
+
+    const { data: prefData } = await supabase
       .from('user_preferences')
       .select('community_last_seen_at')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .maybeSingle();
-    const ts = (data as any)?.community_last_seen_at ?? null;
-    setLastSeenAt(ts);
-    return ts as string | null;
-  }, [user?.id]);
 
-  const fetchCount = useCallback(async (since: string | null) => {
-    if (!user?.id) return;
-    let query = supabase
+    const lastSeenAt = (prefData as any)?.community_last_seen_at ?? null;
+
+    const { data: readRows, error: readsError } = await supabase
+      .from('community_post_reads')
+      .select('post_id')
+      .eq('user_id', userId);
+
+    if (readsError) throw readsError;
+
+    const serverSeenPostIds = Object.fromEntries(
+      ((readRows || []) as Array<{ post_id: string }>).map((row) => [row.post_id, true])
+    ) as SeenPostMap;
+    const seenPostIds = { ...localSeenPostIds, ...serverSeenPostIds } satisfies SeenPostMap;
+    writeSeenPostIds(userId, seenPostIds);
+
+    const { data: posts, error } = await supabase
       .from('community_posts')
-      .select('id', { count: 'exact', head: true })
-      .neq('user_id', user.id);
-    if (since) query = query.gt('created_at', since);
-    const { count, error } = await query;
-    if (!error) setUnreadCount(count ?? 0);
-  }, [user?.id]);
+      .select('id, created_at, user_id')
+      .eq('is_active', true)
+      .is('group_id', null)
+      .neq('user_id', userId)
+      .order('created_at', { ascending: false });
 
-  const refresh = useCallback(async () => {
-    const ts = await fetchLastSeen();
-    await fetchCount(ts);
-    // Reset session seen tracking when we refresh from server
-    seenIdsRef.current = new Set();
-    latestSeenTsRef.current = null;
-  }, [fetchLastSeen, fetchCount]);
+    if (error) throw error;
 
-  // Persist current latest-seen-ts to server (debounced)
-  const scheduleSync = useCallback(() => {
-    if (!user?.id) return;
-    if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
-    syncTimerRef.current = setTimeout(async () => {
-      const ts = latestSeenTsRef.current;
-      if (!ts) return;
-      // Only push forward, never backward
-      if (lastSeenAt && new Date(ts) <= new Date(lastSeenAt)) return;
-      await supabase
-        .from('user_preferences')
-        .upsert({ user_id: user.id, community_last_seen_at: ts } as any, { onConflict: 'user_id' });
-      setLastSeenAt(ts);
-    }, 1500);
-  }, [user?.id, lastSeenAt]);
+    const unreadCount = (posts || []).filter((post: any) => {
+      if (seenPostIds[post.id]) return false;
+      if (!lastSeenAt) return true;
+      return new Date(post.created_at) > new Date(lastSeenAt);
+    }).length;
 
-  // Mark a single post as seen (decrement badge + push lastSeenAt forward)
-  const markPostSeen = useCallback((postId: string, createdAt: string, postUserId?: string) => {
-    if (!user?.id) return;
-    if (postUserId && postUserId === user.id) return; // own posts don't count
-    if (seenIdsRef.current.has(postId)) return;
-    // Only decrement if this post is actually "new" relative to lastSeenAt
-    if (lastSeenAt && new Date(createdAt) <= new Date(lastSeenAt)) {
-      seenIdsRef.current.add(postId);
+    set({
+      unreadCount,
+      lastSeenAt,
+      seenPostIds,
+      initializedUserId: userId,
+    });
+  },
+
+  markPostSeen: async ({ userId, postId, createdAt, postUserId }) => {
+    if (postUserId && postUserId === userId) return;
+
+    const state = get();
+    if (state.initializedUserId !== userId) return;
+    if (state.seenPostIds[postId]) return;
+
+    const nextSeenPostIds = { ...state.seenPostIds, [postId]: true } satisfies SeenPostMap;
+    set({
+      seenPostIds: nextSeenPostIds,
+      unreadCount: Math.max(0, state.unreadCount - 1),
+      syncing: true,
+    });
+
+    writeSeenPostIds(userId, nextSeenPostIds);
+
+    const { error } = await supabase
+      .from('community_post_reads')
+      .upsert({ user_id: userId, post_id: postId, seen_at: new Date().toISOString() } as any, { onConflict: 'user_id,post_id' });
+
+    if (!error) {
+      set({ syncing: false });
       return;
     }
-    seenIdsRef.current.add(postId);
-    setUnreadCount((c) => Math.max(0, c - 1));
-    // Track latest seen timestamp
-    if (!latestSeenTsRef.current || new Date(createdAt) > new Date(latestSeenTsRef.current)) {
-      latestSeenTsRef.current = createdAt;
-    }
-    scheduleSync();
-  }, [user?.id, lastSeenAt, scheduleSync]);
 
-  // Mark community as fully seen (used as a "mark all read" fallback)
-  const markCommunitySeen = useCallback(async () => {
-    if (!user?.id) return;
-    const now = new Date().toISOString();
+    set({ syncing: false });
+    if (error) await get().hydrateForUser(userId);
+  },
+
+  markCommunitySeen: async (userId: string) => {
+    const { data: posts } = await supabase
+      .from('community_posts')
+      .select('id, created_at, user_id')
+      .eq('is_active', true)
+      .is('group_id', null)
+      .neq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    const seenPostIds = {
+      ...get().seenPostIds,
+      ...Object.fromEntries(((posts || []) as any[]).map((post) => [post.id, true])),
+    } satisfies SeenPostMap;
+    const latestPostAt = (posts || [])[0]?.created_at ?? new Date().toISOString();
+
+    set({ unreadCount: 0, seenPostIds, lastSeenAt: latestPostAt });
+    writeSeenPostIds(userId, seenPostIds);
+
+    if ((posts || []).length > 0) {
+      await supabase.from('community_post_reads').upsert(
+        ((posts || []) as any[]).map((post) => ({ user_id: userId, post_id: post.id, seen_at: new Date().toISOString() })) as any,
+        { onConflict: 'user_id,post_id' }
+      );
+    }
+
     await supabase
       .from('user_preferences')
-      .upsert({ user_id: user.id, community_last_seen_at: now } as any, { onConflict: 'user_id' });
-    setLastSeenAt(now);
-    setUnreadCount(0);
-    seenIdsRef.current = new Set();
-    latestSeenTsRef.current = null;
-  }, [user?.id]);
+      .upsert({ user_id: userId, community_last_seen_at: latestPostAt } as any, { onConflict: 'user_id' });
+  },
+
+  registerNewPost: ({ userId, postId, createdAt, postUserId }) => {
+    if (postUserId && postUserId === userId) return;
+
+    const state = get();
+    if (state.initializedUserId !== userId) return;
+    if (state.seenPostIds[postId]) return;
+    if (state.lastSeenAt && new Date(createdAt) <= new Date(state.lastSeenAt)) return;
+
+    set({ unreadCount: state.unreadCount + 1 });
+  },
+
+  isPostUnread: ({ userId, postId, createdAt, postUserId }) => {
+    const state = get();
+    if (postUserId && postUserId === userId) return false;
+    if (state.initializedUserId !== userId) return false;
+    if (state.seenPostIds[postId]) return false;
+    if (!state.lastSeenAt) return true;
+    return new Date(createdAt) > new Date(state.lastSeenAt);
+  },
+
+  reset: () => set({
+    unreadCount: 0,
+    lastSeenAt: null,
+    seenPostIds: {},
+    initializedUserId: null,
+    syncing: false,
+    realtimeReadyForUserId: null,
+  }),
+}));
+
+export const useUnreadCommunityPosts = () => {
+  const { user } = useAuth();
+  const {
+    unreadCount,
+    lastSeenAt,
+    seenPostIds,
+    initializedUserId,
+    hydrateForUser,
+    markPostSeen: markPostSeenInStore,
+    markCommunitySeen: markCommunitySeenInStore,
+    registerNewPost,
+    isPostUnread,
+    reset,
+  } = useUnreadCommunityStore();
 
   useEffect(() => {
+    if (!user?.id) {
+      if (activeUnreadChannel) {
+        supabase.removeChannel(activeUnreadChannel);
+        activeUnreadChannel = null;
+      }
+      activeUnreadChannelUserId = null;
+      activeHydrationUserId = null;
+      activeHydrationPromise = null;
+      reset();
+      return;
+    }
+
+    if (initializedUserId !== user.id && activeHydrationUserId !== user.id) {
+      activeHydrationUserId = user.id;
+      activeHydrationPromise = hydrateForUser(user.id).finally(() => {
+        activeHydrationUserId = null;
+        activeHydrationPromise = null;
+      });
+    }
+
+    if (activeUnreadChannelUserId !== user.id) {
+      if (activeUnreadChannel) supabase.removeChannel(activeUnreadChannel);
+      activeUnreadChannel = supabase
+        .channel(`community-unread-${user.id}`)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_posts' }, (payload) => {
+          const newRow: any = payload.new;
+          registerNewPost({ userId: user.id, postId: newRow.id, createdAt: newRow.created_at, postUserId: newRow.user_id });
+        })
+        .subscribe();
+      activeUnreadChannelUserId = user.id;
+    }
+  }, [user?.id, hydrateForUser, initializedUserId, registerNewPost, reset]);
+
+  const refresh = useCallback(async () => {
     if (!user?.id) return;
-    refresh();
+    await hydrateForUser(user.id);
+  }, [user?.id, hydrateForUser]);
 
-    // Realtime: listen for new posts
-    const channel = supabase
-      .channel('community-unread-' + user.id)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_posts' }, (payload) => {
-        const newRow: any = payload.new;
-        if (newRow?.user_id === user.id) return;
-        if (!lastSeenAt || new Date(newRow.created_at) > new Date(lastSeenAt)) {
-          setUnreadCount((c) => c + 1);
-        }
-      })
-      .subscribe();
+  const markPostSeen = useCallback(async (postId: string, createdAt: string, postUserId?: string) => {
+    if (!user?.id) return;
+    await markPostSeenInStore({ userId: user.id, postId, createdAt, postUserId });
+  }, [user?.id, markPostSeenInStore]);
 
-    // Refresh periodically
-    const interval = setInterval(refresh, 60_000);
+  const markCommunitySeen = useCallback(async () => {
+    if (!user?.id) return;
+    await markCommunitySeenInStore(user.id);
+  }, [user?.id, markCommunitySeenInStore]);
 
-    return () => {
-      supabase.removeChannel(channel);
-      clearInterval(interval);
-      if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  const isUnreadPost = useCallback((postId: string, createdAt: string, postUserId?: string) => {
+    if (!user?.id) return false;
+    return isPostUnread({ userId: user.id, postId, createdAt, postUserId });
+  }, [user?.id, isPostUnread, seenPostIds, lastSeenAt, initializedUserId]);
 
-  return { unreadCount, markCommunitySeen, markPostSeen, refresh, lastSeenAt };
+  return { unreadCount, markCommunitySeen, markPostSeen, refresh, lastSeenAt, isUnreadPost, seenPostIds };
 };
