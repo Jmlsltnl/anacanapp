@@ -3,10 +3,12 @@ import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
+type SeenPostMap = Record<string, boolean>;
+
 type UnreadCommunityState = {
   unreadCount: number;
   lastSeenAt: string | null;
-  seenPostIds: Record<string, true>;
+  seenPostIds: SeenPostMap;
   initializedUserId: string | null;
   syncing: boolean;
   realtimeReadyForUserId: string | null;
@@ -19,18 +21,18 @@ type UnreadCommunityState = {
 };
 
 const readSeenPostIds = (userId: string) => {
-  if (typeof window === 'undefined') return {} as Record<string, true>;
+  if (typeof window === 'undefined') return {} as SeenPostMap;
   try {
     const raw = window.localStorage.getItem(`community_seen_posts:${userId}`);
-    if (!raw) return {} as Record<string, true>;
+    if (!raw) return {} as SeenPostMap;
     const parsed = JSON.parse(raw) as string[];
-    return Object.fromEntries(parsed.map((id) => [id, true]));
+    return Object.fromEntries(parsed.map((id) => [id, true])) as SeenPostMap;
   } catch {
-    return {} as Record<string, true>;
+    return {} as SeenPostMap;
   }
 };
 
-const writeSeenPostIds = (userId: string, seenPostIds: Record<string, true>) => {
+const writeSeenPostIds = (userId: string, seenPostIds: SeenPostMap) => {
   if (typeof window === 'undefined') return;
   try {
     window.localStorage.setItem(`community_seen_posts:${userId}`, JSON.stringify(Object.keys(seenPostIds)));
@@ -47,7 +49,7 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
   realtimeReadyForUserId: null,
 
   hydrateForUser: async (userId: string) => {
-    const seenPostIds = readSeenPostIds(userId);
+    const localSeenPostIds = readSeenPostIds(userId);
 
     const { data: prefData } = await supabase
       .from('user_preferences')
@@ -56,6 +58,19 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
       .maybeSingle();
 
     const lastSeenAt = (prefData as any)?.community_last_seen_at ?? null;
+
+    const { data: readRows, error: readsError } = await supabase
+      .from('community_post_reads')
+      .select('post_id')
+      .eq('user_id', userId);
+
+    if (readsError) throw readsError;
+
+    const serverSeenPostIds = Object.fromEntries(
+      ((readRows || []) as Array<{ post_id: string }>).map((row) => [row.post_id, true])
+    ) as SeenPostMap;
+    const seenPostIds = { ...localSeenPostIds, ...serverSeenPostIds } satisfies SeenPostMap;
+    writeSeenPostIds(userId, seenPostIds);
 
     const { data: posts, error } = await supabase
       .from('community_posts')
@@ -88,7 +103,7 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
     if (state.initializedUserId !== userId) return;
     if (state.seenPostIds[postId]) return;
 
-    const nextSeenPostIds = { ...state.seenPostIds, [postId]: true };
+    const nextSeenPostIds = { ...state.seenPostIds, [postId]: true } satisfies SeenPostMap;
     const nextLastSeenAt = !state.lastSeenAt || new Date(createdAt) > new Date(state.lastSeenAt)
       ? createdAt
       : state.lastSeenAt;
@@ -103,17 +118,17 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
     writeSeenPostIds(userId, nextSeenPostIds);
 
     const { error } = await supabase
+      .from('community_post_reads')
+      .upsert({ user_id: userId, post_id: postId, seen_at: new Date().toISOString() } as any, { onConflict: 'user_id,post_id' });
+
+    if (!error) {
+      await supabase
       .from('user_preferences')
       .upsert({ user_id: userId, community_last_seen_at: nextLastSeenAt } as any, { onConflict: 'user_id' });
+    }
 
     set({ syncing: false });
-    if (error) {
-      set((current) => ({
-        seenPostIds: current.seenPostIds,
-        unreadCount: current.unreadCount,
-        lastSeenAt: current.lastSeenAt,
-      }));
-    }
+    if (error) await get().hydrateForUser(userId);
   },
 
   markCommunitySeen: async (userId: string) => {
@@ -128,11 +143,18 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
     const seenPostIds = {
       ...get().seenPostIds,
       ...Object.fromEntries(((posts || []) as any[]).map((post) => [post.id, true])),
-    } as Record<string, true>;
+    } satisfies SeenPostMap;
     const latestPostAt = (posts || [])[0]?.created_at ?? new Date().toISOString();
 
     set({ unreadCount: 0, seenPostIds, lastSeenAt: latestPostAt });
     writeSeenPostIds(userId, seenPostIds);
+
+    if ((posts || []).length > 0) {
+      await supabase.from('community_post_reads').upsert(
+        ((posts || []) as any[]).map((post) => ({ user_id: userId, post_id: post.id, seen_at: new Date().toISOString() })) as any,
+        { onConflict: 'user_id,post_id' }
+      );
+    }
 
     await supabase
       .from('user_preferences')
