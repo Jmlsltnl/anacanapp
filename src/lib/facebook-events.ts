@@ -7,20 +7,27 @@
  */
 
 import { Capacitor } from '@capacitor/core';
-import { FacebookEvents } from 'capacitor-facebook-events';
 
 // IMPORTANT: Capacitor plugin proxies can be treated as thenables if they cross
 // async/promise boundaries. Keep plugin lookup synchronous and only await real
 // native method calls like `logEvent()` or `setAdvertiserTrackingEnabled()`.
+// NOTE: We lazy-require the plugin so that any module-load error on Android
+// (missing native class, SDK init issue) cannot crash the JS bundle.
 let fbPlugin: any | null = null;
+let pluginLookupAttempted = false;
 let initialized = false;
 
 const getPlugin = (): any | null => {
   if (!Capacitor.isNativePlatform()) return null;
-  if (Capacitor.getPlatform() === 'android') return null;
   if (fbPlugin) return fbPlugin;
+  if (pluginLookupAttempted) return null;
+  pluginLookupAttempted = true;
   try {
-    fbPlugin = FacebookEvents ?? null;
+    // Dynamic require avoids top-level import crashes on platforms where the
+    // native bridge isn't ready yet.
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const mod = require('capacitor-facebook-events');
+    fbPlugin = mod?.FacebookEvents ?? null;
     return fbPlugin;
   } catch (e) {
     console.warn('[fb-events] plugin not available:', e);
@@ -114,5 +121,9 @@ export const initFacebookEvents = () => {
   if (initialized) return;
   initialized = true;
   if (!Capacitor.isNativePlatform()) return;
-  getPlugin();
+  // Defer plugin lookup so it doesn't block app boot or race the native bridge.
+  // Any throw here is swallowed by getPlugin's try/catch — cannot crash the app.
+  setTimeout(() => {
+    try { getPlugin(); } catch { /* silent */ }
+  }, 1500);
 };
