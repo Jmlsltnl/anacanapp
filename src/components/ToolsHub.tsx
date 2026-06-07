@@ -6,7 +6,7 @@ import {
   Utensils, Activity, ArrowLeft, Camera, Lock, ShoppingCart, LucideIcon, Wrench, BookOpen, ChefHat,
   Stethoscope, Droplet, ImagePlus, Package, Mic, Scan, CloudSun, Gauge, Store,
   MapPin, Gamepad2, ShieldAlert, BookHeart, Stars, Crown, Ruler, Sparkles, TrendingUp, Zap,
-  Pill, Cake
+  Pill, Cake, Syringe
 } from 'lucide-react';
 import BlogScreen from '@/components/BlogScreen';
 import { useUserStore } from '@/store/userStore';
@@ -44,6 +44,7 @@ const BabyGrowthTracker = lazy(() => import('./tools/BabyGrowthTracker'));
 const MaternityCalculator = lazy(() => import('./tools/MaternityCalculator'));
 const TeethingTracker = lazy(() => import('./tools/TeethingTracker'));
 const VitaminTracker = lazy(() => import('./tools/VitaminTracker'));
+const VaccineCalendar = lazy(() => import('./tools/VaccineCalendar'));
 const BabyMonthlyAlbum = lazy(() => import('./baby/BabyMonthlyAlbum'));
 const CakesScreen = lazy(() => import('./CakesScreen'));
 import { PremiumModal } from './PremiumModal';
@@ -101,6 +102,7 @@ const iconMap: Record<string, LucideIcon> = {
   'Stars': Stars,
   'Calculator': Calculator,
   'Pill': Pill,
+  'Syringe': Syringe,
 };
 
 // Import Calculator icon
@@ -333,6 +335,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
       case 'affiliate': case 'affiliate-products': return <AffiliateProducts onBack={handleBack} />;
       case 'maternity-calculator': case 'maternity': return <MaternityCalculator onBack={handleBack} />;
       case 'teething': case 'teething-tracker': return <TeethingTracker onBack={handleBack} />;
+      case 'vaccine-calendar': case 'vaccines-calendar': return <VaccineCalendar onBack={handleBack} />;
       case 'vitamin-tracker': case 'vitamins': return <VitaminTracker onBack={handleBack} />;
       case 'cakes': return <CakesScreen onBack={handleBack} />;
       default: return null;
@@ -376,7 +379,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     <div className="min-h-screen bg-gradient-to-b from-muted/30 to-background pb-24">
       {/* Minimal Header */}
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl">
-        <div className="px-4 pt-2 pb-2 safe-area-top">
+        <div className="px-4 pt-2 pb-2">
           {/* Search Bar with integrated title */}
           <div className="flex items-center gap-3">
             <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${stageInfo.color} flex items-center justify-center shadow-md flex-shrink-0`}>

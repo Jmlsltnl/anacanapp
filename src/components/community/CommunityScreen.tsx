@@ -1,4 +1,5 @@
 import { useState, forwardRef } from 'react';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Users, Plus, Search, TrendingUp, Compass, Sparkles, X, Pen, MessageCircle } from 'lucide-react';
 import { useCommunityGroups, useUserMemberships } from '@/hooks/useCommunity';
@@ -7,6 +8,7 @@ import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useUserStore } from '@/store/userStore';
 import { useAppSetting } from '@/hooks/useAppSettings';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
+
 
 import GroupsList from './GroupsList';
 import GroupFeed from './GroupFeed';
@@ -96,7 +98,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   }
 
   return (
-    <div ref={ref} className="min-h-screen pb-24 bg-background">
+    <div ref={ref} className="min-h-screen pb-24 bg-background community-native-text">
       {/* Header */}
       <div className="bg-card border-b border-border/60 shadow-sm">
         <div className="px-5 pt-4 pb-2">

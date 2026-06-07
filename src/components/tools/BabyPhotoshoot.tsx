@@ -847,7 +847,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="gradient-primary px-3 pt-2 pb-4 rounded-b-[1.5rem] flex-shrink-0 safe-top">
+      <div className="gradient-primary px-3 pt-2 pb-4 rounded-b-[1.5rem] flex-shrink-0">
         <div className="flex items-center gap-3 mb-3">
           <motion.button
             onClick={onBack}

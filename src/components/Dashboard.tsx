@@ -48,7 +48,7 @@ import ChildSelector from '@/components/mommy/ChildSelector';
 import TeethingWidget from '@/components/mommy/TeethingWidget';
 import MommyHero from '@/components/mommy/hero/MommyHero';
 import BannerSlot from '@/components/banners/BannerSlot';
-import SendDailySummaryWidget from '@/components/partner/SendDailySummaryWidget';
+import DailySummaryAutoSync from '@/components/partner/DailySummaryAutoSync';
 import RecentBlogPosts from '@/components/dashboard/RecentBlogPosts';
 import FlowDashboard from '@/components/flow/FlowDashboard';
 import BirthOnboardingModal from '@/components/BirthOnboardingModal';
@@ -658,11 +658,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           label="Vitamin" 
           color="bg-primary/10 dark:bg-primary/20 text-primary" 
           onClick={() => {
-            toast({
-              title: tr("dashboard_vitamin_xatirlatmasi_b8a490", "Vitamin Xatırlatması 💊"),
-              description: tr("dashboard_prenatal_vitamininizi_gunluk_qebul_etmey_c8cba3", "Prenatal vitamininizi günlük qəbul etməyi unutmayın. Folat, D vitamini və dəmir vacibdir!"),
-            });
-            if (onNavigateToTool) onNavigateToTool('nutrition');
+            if (onNavigateToTool) onNavigateToTool('vitaminTracker');
           }}
         />
         <QuickActionButton 
@@ -670,7 +666,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           label={tr("dashboard_mesq_046a80", "Məşq")} 
           color="bg-primary/10 dark:bg-primary/20 text-primary" 
           onClick={() => {
-            if (onNavigateToTool) onNavigateToTool('exercises');
+            if (onNavigateToTool) onNavigateToTool('safetyLookup');
           }}
         />
         <QuickActionButton 
@@ -1024,16 +1020,9 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
 
   return (
     <div className="space-y-3">
-      {/* Child Selector - for multiple children (top of page) */}
-      {hasChildren && (
-        <motion.div 
-          className="flex items-center justify-between"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          <ChildSelector />
-        </motion.div>
-      )}
+      {/* Child Selector moved to dashboard header for compactness */}
+
+
 
       {/* Hero + Daily Info — seamless orange→yellow gradient continuity */}
       <div className="space-y-0">
@@ -1076,12 +1065,9 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 .split('\n')
                 .filter(line => line.trim().length > 0)
                 .map((line, index) => (
-                  <div key={index} className="flex items-start gap-2.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
-                    <p className="text-[13px] text-amber-800 dark:text-white leading-relaxed font-medium">
-                      {line.trim()}
-                    </p>
-                  </div>
+                  <p key={index} className="text-[13px] text-amber-800 dark:text-white leading-relaxed font-medium">
+                    {line.trim()}
+                  </p>
                 ))
               }
             </div>
@@ -1795,25 +1781,30 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
           <h1 className="text-lg font-black text-foreground">{name || 'Xanım'} 👋</h1>
         </div>
         <div className="flex items-center gap-2">
-          <motion.button 
-            onClick={onOpenChat}
-            className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center relative"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <MessageCircle className="w-4 h-4 text-primary" />
-            {totalUnread > 0 && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[9px] font-bold text-white flex items-center justify-center"
-              >
-                {totalUnread > 9 ? '9+' : totalUnread}
-              </motion.span>
-            )}
-          </motion.button>
+          {lifeStage === 'mommy' ? (
+            <ChildSelector compact />
+          ) : (
+            <motion.button 
+              onClick={onOpenChat}
+              className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center relative"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <MessageCircle className="w-4 h-4 text-primary" />
+              {totalUnread > 0 && (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[9px] font-bold text-white flex items-center justify-center"
+                >
+                  {totalUnread > 9 ? '9+' : totalUnread}
+                </motion.span>
+              )}
+            </motion.button>
+          )}
           {/* Notification bell temporarily disabled */}
         </div>
+
       </motion.div>
 
       {/* Top Banner Slot */}
@@ -1823,8 +1814,8 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
       {lifeStage === 'bump' && <BumpDashboard onNavigateToTool={onNavigateToTool} />}
       {lifeStage === 'mommy' && <MommyDashboard onNavigateToTool={onNavigateToTool} />}
 
-      {/* Send Daily Summary to Partner Widget - only for bump stage with linked partner */}
-      {lifeStage === 'bump' && <SendDailySummaryWidget />}
+      {/* Daily summary auto-syncs to partner in background — manual widget removed */}
+      {lifeStage === 'bump' && profile?.linked_partner_id && <DailySummaryAutoSync />}
 
       {/* Recent Blog Posts - filtered by life stage (partner uses bump stage content) */}
       {onNavigate && <RecentBlogPosts onNavigate={onNavigate} lifeStage={lifeStage === 'partner' ? 'bump' : lifeStage} />}

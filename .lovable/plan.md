@@ -1,139 +1,105 @@
+## Peyvənd Təqvimi — Plan
 
-# Partnyor Endirim Sistemi — Plan
-
-## Məqsəd
-Anacan tətbiqində premium istifadəçilərə spa, idman zalı, pilates və s. partnyor məkanlarda özəl endirim. İstifadəçi tətbiqdə QR yaradır → məkan kamerada oxuyur → `partner.anacan.az/verify/...` açılır → təsdiq + PIN ilə redemption qeyd olunur.
-
----
-
-## 1) Verilənlər bazası (yeni cədvəllər)
-
-### `partner_venues` (əsas məkan kataloqu)
-- `id`, `name`, `slug`, `category` (spa / gym / pilates / beauty / other)
-- `description`, `logo_url`, `cover_url`, `gallery_urls[]`
-- `address`, `city`, `district`, `latitude`, `longitude`, `phone`, `website`, `instagram`
-- `working_hours` (jsonb)
-- `discount_label` (məs. "20% endirim"), `discount_value`, `discount_terms`
-- `redemption_cooldown_hours` (məkana özəl, məs. 24 / 168 / 720)
-- `redemption_lifetime_limit` (nullable — ümumi limit, məs. 1)
-- `qr_ttl_seconds` (default 300 — 5 dəq)
-- `pin_hash` (partnyorun "Təsdiqlə" düyməsi üçün PIN — bcrypt)
-- `is_active`, `is_featured`, `sort_order`, `created_at`, `updated_at`
-
-### `partner_redemptions` (hər QR / istifadə)
-- `id`, `venue_id`, `user_id`
-- `token` (random, unique, indexed) — QR-da gedir
-- `status`: `pending` | `verified` | `expired` | `cancelled`
-- `created_at`, `expires_at`, `verified_at`, `verified_ip`
-- `client_meta` (jsonb — UA və s.)
-
-### `partner_venue_categories` (admin idarə edə bilsin)
-- `id`, `key`, `label_az`, `icon`, `sort_order`, `is_active`
-
-**RLS xülasəsi:**
-- `partner_venues`: SELECT — authenticated (yalnız `is_active=true`); admin tam idarə.
-- `partner_redemptions`: user yalnız öz `user_id`-sini görür/yaradır; admin hamısı; verify edge function service-role ilə update edir.
-- GRANT-lar bütün cədvəllər üçün təlimata uyğun əlavə olunur.
+### Məqsəd
+Ana (mommy) modulunda hər uşaq üçün rəsmi, peşəkar Peyvənd təqvimi. Azərbaycan SN-nin Milli İmmunizasiya Qrafiki əsasında doldurulur. Ölkə dəyişəndə həmin ölkənin qrafiki avtomatik istifadə olunur. Admin panel hər ölkə üçün peyvəndləri tam redaktə edə bilir.
 
 ---
 
-## 2) Edge funksiyalar
+### 1. Verilənlər bazası (3 yeni cədvəl)
 
-### `partner-create-redemption` (POST, JWT validation)
-- Input: `venue_id`
-- Yoxlayır: istifadəçi **premium**, məkan aktiv, cooldown və lifetime limit keçilməyib.
-- Yeni `partner_redemptions` sətri yaradır (`pending`, `expires_at = now + qr_ttl_seconds`).
-- Cavab: `token`, `verify_url = https://app.anacan.az/p/v/<token>`, `expires_at`.
+**`vaccine_countries`** — dəstəklənən ölkələr
+- `code` (text, unik — məs. `AZ`, `TR`, `RU`, `US`)
+- `name_az`, `name_en`, `flag_emoji`
+- `is_active`, `is_default` (yalnız 1 default — AZ)
+- `source_url` (rəsmi qaynaq linki), `source_label`
 
-### `partner-verify-redemption` (POST, public)
-- Input: `token`, `pin`
-- Tokeni tapır, expired/already verified yoxlayır, PIN-i məkanın `pin_hash`-i ilə müqayisə edir.
-- Uğurla: status=`verified`, `verified_at=now`, IP qeyd.
-- Cavab: user adı (mask), premium status, endirim mətni, məkan adı.
+**`vaccines`** — ölkə üzrə peyvənd kataloqu (admin redaktə edir)
+- `country_code` (FK → vaccine_countries.code)
+- `code` (məs. `BCG`, `HEPB`, `DTP`, `MMR`, `IPV`, `OPV`, `HIB`, `PCV`, `ROTA`, `VARICELLA`, `HEPA`, `HPV`)
+- `name_az`, `name_en`, `short_description_az`, `full_description_az` (uzun mətn — nə üçün, nə qoruyur)
+- `disease_az` (qarşısını aldığı xəstəlik), `route_az` (əzələdaxili / oral / dərialtı)
+- `side_effects_az` (mümkün yan təsirlər), `contraindications_az` (əks-göstərişlər)
+- `is_mandatory` (məcburi / könüllü), `is_active`
+- `sort_order`, `color_hex` (UI üçün)
 
-### `partner-redemption-status` (GET, public)
-- `token` üçün cari status — portal səhifəsi polling-siz ilkin yükləmə üçün.
+**`vaccine_schedules`** — qrafikdəki hər doza (admin redaktə edir)
+- `vaccine_id` (FK → vaccines.id)
+- `country_code` (denormalize — sürətli sorğu üçün)
+- `dose_number` (1, 2, 3...), `dose_label_az` (məs. "1-ci doza", "Bustər")
+- `recommended_age_days` (yaş — günlə, məs. 0 = doğulanda, 60 = 2 ay, 1825 = 5 yaş)
+- `age_label_az` (UI üçün — "Doğulanda", "2 aylıq", "12 aylıq", "6 yaş")
+- `min_age_days`, `max_age_days` (pəncərə)
+- `notes_az` (xüsusi qeydlər)
 
-Bütün funksiyalar `verify_jwt = false` (PIN flow public), `partner-create-redemption` istisna — orda JWT manual yoxlanılır.
+**`child_vaccinations`** — istifadəçinin uşağı üçün status izləyici
+- `child_id` (FK), `user_id` (FK)
+- `vaccine_schedule_id` (FK), `country_code`
+- `administered_at` (date | null), `is_skipped` (bool), `skip_reason`
+- `location_az` (harada vurulub), `batch_number`, `notes`
+- `reminder_sent_at`
 
----
+**RLS**: `vaccine_countries`, `vaccines`, `vaccine_schedules` — hamı (authenticated) oxuya bilər, yalnız admin yaza bilər. `child_vaccinations` — istifadəçi yalnız öz uşaqları üçün CRUD.
 
-## 3) İstifadəçi (mobil) tərəfi
-
-**Yeni route:** `/partnyorlar` (tab "Kəşf et" və ya `tools` menyusunda).
-
-Komponentlər:
-- `PartnersScreen.tsx` — kateqoriya filterləri, axtarış, məkan kart grid.
-- `PartnerVenueDetailScreen.tsx` — şəkillər, ünvan, xəritə linki, "Endirimi al" düyməsi.
-- `RedemptionQRSheet.tsx` — Bottom sheet: böyük QR (qrcode.react), geri sayım taymeri, expire-də "Yenilə" düyməsi.
-- Premium deyil → mövcud `PaywallSheet`-ə yönləndirilir.
-- Hook: `usePartnerVenues`, `useCreateRedemption`.
-
----
-
-## 4) Partnyor veb-portalı (`/p/v/:token`)
-
-Yeni route — login tələb etmir, amma PIN tələb edir.
-
-- `PartnerVerifyPage.tsx`:
-  1. Tokenin statusunu çəkir.
-  2. Əgər `pending` və müddəti bitməyib → məkan logosu + "PIN daxil edin" + "Təsdiqlə" düyməsi.
-  3. PIN düz → tam ekran yaşıl: ✓ "Təsdiqləndi — Premium İstifadəçi — 20% endirim" + istifadəçi adı (mask: "Aysel M.") və saat.
-  4. Səhv/expired → qırmızı ekran ilə səbəb.
-- Mobile-first, böyük tipoqrafiya (kassir oxusun).
-- Route `App.tsx`-də public marshrut kimi qeyd olunur.
+**Seed**: Azərbaycan Səhiyyə Nazirliyinin Milli İmmunizasiya Qrafiki tam doldurulur (BCG, Hep B, DTP/HiB/Polio, Rotavirus, PCV, MMR, Hep A, Varicella, HPV — 0 gün - 16 yaş diapazonu).
 
 ---
 
-## 5) Admin paneli
+### 2. Frontend — `VaccineCalendar.tsx` aləti (mommy)
 
-Yeni 2 tab `AdminPanel.tsx`-ə əlavə olunur:
+`src/components/tools/VaccineCalendar.tsx`:
+- Header: uşaq adı + yaşı + ölkə bayrağı (ChildSelector mövcuddur)
+- **Ölkə seçici** dropdown — istifadəçi öz ölkəsini dəyişə bilər (default `AZ`); seçim `children.country_code` sütununda saxlanır
+- **Üç tab**:
+  - **Yaxınlaşan** — növbəti 3 doza (yaşa görə)
+  - **Tam qrafik** — yaşa görə qruplanmış timeline (Doğulanda → 16 yaş), hər doza üçün: ad, yaş etiketi, status badge (✅ Vuruldu / ⏰ Gözləmədə / ⚠️ Gecikdi / ⊘ Buraxılıb)
+  - **Tamamlanmış** — vurulmuş peyvəndlər
+- Hər kartda klik → **detallı sheet**: tam təsvir, qarşısı alınan xəstəlik, yan təsirlər, əks-göstərişlər, rəsmi qaynaq linki
+- Status əməliyyatları: "Vuruldu" (tarix + qeyd), "Buraxıldı" (səbəb), "Bərpa et"
+- Tərəqqi göstəricisi: ümumi `{n}/{total}` + faiz dairəsi
+- Print/PDF export (sadə browser print)
+- `useChildren` ilə inteqrasiya; uşaqda `country_code` yoxdursa default `AZ`
 
-### `AdminPartnerVenues.tsx`
-- CRUD: ad, kateqoriya, ünvan, koordinatlar, şəkillər (storage upload), endirim mətni/dəyəri, terms, cooldown saatları, lifetime limit, QR TTL, PIN (yeniləmə zamanı bcrypt hash).
-- Toggle: aktiv / featured.
-- Excel/CSV ixrac yoxdur (gələcəkdə).
+`src/hooks/useVaccines.ts` — `useQuery` ilə ölkə-spesifik qrafik + `child_vaccinations` join.
 
-### `AdminPartnerRedemptions.tsx`
-- Filter: məkan, status, tarix aralığı.
-- Cədvəl: tarix, məkan, istifadəçi (ad+email), status, IP.
-- KPI kartları: bu gün/həftə/ay verified sayı, məkan üzrə top-5.
+### 3. Mommy modulu inteqrasiyası
+- `ToolsHub.tsx`-də lazy import + `case 'vaccine-calendar':` route
+- `tool_configs`-da yeni entry: `tool_key='vaccine-calendar'`, stage=mommy, icon=`Syringe`
+- Dashboard mommy bölümündə kiçik widget: "Növbəti peyvənd: 2 aylıq — DTP/HiB/Polio — 12 gün sonra"
+- Push reminder — `send-daily-notifications` cron-a vaccine yoxlaması əlavə (3 gün, 1 gün qabaq)
 
-### `AdminPartnerCategories.tsx` (kiçik — kateqoriya idarəsi)
+### 4. Admin panel — `AdminVaccines.tsx`
+`src/components/admin/AdminVaccines.tsx` + `AdminLayout`-da menyu:
+- **Ölkələr tab**: list + add/edit/delete + active/default toggle
+- **Peyvəndlər tab**: ölkə seçiciyə görə filter, peyvənd CRUD (bütün AZ/EN sahələr, mətn redaktoru ilə uzun təsvir)
+- **Qrafik tab**: ölkə + peyvənd seçiciyə görə dozalar — yaş, etiket, pəncərə, qeyd
+- **Köçürmə**: "Bu ölkəni başqa ölkəyə kopyala" düyməsi — bir ölkə üçün hazır qrafiki yeni ölkəyə şablon kimi köçürür, sonra redaktə olunur
+- Bütün sahələr inline-edit; sıralama drag-and-drop və ya sort_order input
 
-`AdminPanel.tsx`-ə üç yeni `case` (partner-venues / partner-redemptions / partner-categories) və sidebar girişləri.
-
----
-
-## 6) Premium gating & analitika
-- `usePremium` hook ilə "Endirimi al" düyməsi qıfıllı göstərilir.
-- `analytics.track('partner_redeem_initiated', { venue_id })` və `partner_redeem_verified` (verify edge funksiyada DB-də qeyd ki, frontend bilməsə də sayılsın).
-
----
-
-## 7) Texniki detallar (geliştirici üçün)
-
-- QR token: `crypto.randomUUID().replace(/-/g,'')` + `random_bytes(8)` → 40 simvol; cədvəldə unique index.
-- PIN hash: `bcrypt` (deno-da `https://deno.land/x/bcrypt`).
-- Cooldown yoxlaması: `SELECT max(verified_at) FROM partner_redemptions WHERE user_id=? AND venue_id=? AND status='verified'` → indi - max < cooldown_hours.
-- Lifetime limit: count(verified) >= limit → 429 cavab.
-- `partner.anacan.az` ayrı subdomen yox — `app.anacan.az/p/v/:token` kifayətdir (sizin `public/.well-known` artıq mövcuddur). İstənilsə gələcəkdə subdomain yönləndirməsi əlavə olunar.
-- Yeni `mem://features/partner-venues-discount` memorisi əlavə olunacaq (premium-only, cooldown məkana özəl, hibrid PIN+QR).
-
----
-
-## 8) İş bölgüsü (faza-faza)
-
-1. **Migration**: 3 cədvəl + RLS + GRANT + 1 helper funksiya (`can_redeem(venue, user)`).
-2. **Edge functions**: 3 funksiya (create / verify / status).
-3. **User UI**: route + 3 komponent + 2 hook.
-4. **Verify portal**: 1 public səhifə.
-5. **Admin**: 3 yeni admin ekran + sidebar entry-ləri.
-6. **Analytics + memory + sənədləşmə**.
+### 5. Çoxdilli & ölkə dəyişikliyi
+- `children` cədvəlinə `country_code text default 'AZ'` əlavə (migration)
+- İstifadəçi UI-da ölkəni dəyişdikdə → `children.country_code` yenilənir → bütün sorğular həmin ölkə üçün yenidən fetch olunur
+- `child_vaccinations` köhnə ölkə üçün saxlanılır (silinmir) — istifadəçi geri dönsə tarixçə qalır
+- AZ üçün default qrafik onsuz da seed olunur; digər ölkələr admin tərəfindən doldurulduqca aktivləşir; admin doldurmayıbsa istifadəçiyə "Bu ölkə üçün qrafik hələ hazırlanmayıb" mesajı
 
 ---
 
-## Açıq sual (təsdiqlədikdən sonra qərar verə bilərik, plan üçün blocker deyil)
-- Hələ partnyor məkanları siyahısı yoxdursa, ilk admin dəstəyi üçün bir test məkanı seed edək?
-- PIN unutqanlığı üçün admin paneldən "PIN sıfırla" düyməsi (yenidən qoymaq) kifayətdir, ayrı email lazım deyil — razıyıq?
+### Texniki detallar
 
+```text
+ölkə (UI) ──► children.country_code ──► useVaccines(country_code)
+                                              │
+                                              ├─► vaccine_schedules (qrafik şablonu)
+                                              └─► child_vaccinations (status, child_id-yə bağlı)
+```
+
+- Yaş hesablanması: `getRealCalendarAge(child.birth_date)` ilə günə çevrilir, sonra `recommended_age_days` ilə müqayisə (Baku UTC+4 qaydası)
+- Realtime: lazım deyil — `invalidateQueries` ilə kifayət
+
+### Çatdırılma sırası
+1. Migration (4 cədvəl + GRANT + RLS) + AZ seed
+2. `useVaccines` hook + `VaccineCalendar.tsx` (3 tab + detal sheet)
+3. ToolsHub + tool_configs qeydiyyat
+4. AdminVaccines panel
+5. Mommy dashboard widget + push reminder (cron-a kiçik əlavə)
+
+Təsdiq edin, başlayım.
