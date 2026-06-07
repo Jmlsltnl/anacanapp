@@ -1819,6 +1819,7 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
       {lifeStage === 'mommy' && <MommyDashboard onNavigateToTool={onNavigateToTool} />}
 
       {/* Daily summary auto-syncs to partner in background — manual widget removed */}
+      {lifeStage === 'bump' && profile?.linked_partner_id && <DailySummaryAutoSync />}
 
       {/* Recent Blog Posts - filtered by life stage (partner uses bump stage content) */}
       {onNavigate && <RecentBlogPosts onNavigate={onNavigate} lifeStage={lifeStage === 'partner' ? 'bump' : lifeStage} />}
