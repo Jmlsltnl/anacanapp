@@ -33,7 +33,7 @@ const STATUS = {
   done: { label: 'Vuruldu', icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50', ring: 'ring-emerald-200' },
   pending: { label: 'Gözləmədə', icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50', ring: 'ring-amber-200' },
   overdue: { label: 'Gecikdi', icon: AlertTriangle, color: 'text-red-600', bg: 'bg-red-50', ring: 'ring-red-200' },
-  skipped: { label: 'Buraxıldı', icon: Ban, color: 'text-gray-500', bg: 'bg-gray-100', ring: 'ring-gray-200' },
+  skipped: { label: 'Buraxıldı', icon: Ban, color: 'text-muted-foreground', bg: 'bg-muted', ring: 'ring-gray-200' },
   future:  { label: 'Növbədə', icon: Clock, color: 'text-blue-600', bg: 'bg-blue-50', ring: 'ring-blue-200' },
 } as const;
 
@@ -148,7 +148,7 @@ export default function VaccineCalendar({ onBack }: Props) {
         layout
         whileTap={{ scale: 0.98 }}
         onClick={() => setDetailRow(row)}
-        className={`w-full text-left bg-white rounded-2xl border border-gray-100 p-3 shadow-sm active:shadow-none transition-all`}
+        className={`w-full text-left bg-card rounded-2xl border border-border p-3 shadow-sm active:shadow-none transition-all`}
       >
         <div className="flex items-start gap-3">
           <div
@@ -159,18 +159,18 @@ export default function VaccineCalendar({ onBack }: Props) {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <h4 className="text-[13px] font-bold text-gray-900 truncate">{row.vaccine.name_az}</h4>
+              <h4 className="text-[13px] font-bold text-foreground truncate">{row.vaccine.name_az}</h4>
               {!row.vaccine.is_mandatory && (
-                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 font-medium">könüllü</span>
+                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">könüllü</span>
               )}
             </div>
-            <p className="text-[11px] text-gray-500 mt-0.5">
+            <p className="text-[11px] text-muted-foreground mt-0.5">
               {row.age_label_az} • {row.dose_label_az}
             </p>
             <div className="flex items-center justify-between mt-1.5">
               {renderStatusBadge(status)}
               {log?.administered_at && (
-                <span className="text-[10px] text-gray-400">{formatDateAz(log.administered_at)}</span>
+                <span className="text-[10px] text-muted-foreground">{formatDateAz(log.administered_at)}</span>
               )}
             </div>
           </div>
@@ -181,33 +181,33 @@ export default function VaccineCalendar({ onBack }: Props) {
 
   if (!selectedChild) {
     return (
-      <div className="min-h-screen bg-[#FAF7F4] flex flex-col">
+      <div className="min-h-screen bg-background flex flex-col">
         <Header onBack={onBack} />
         <div className="flex-1 flex flex-col items-center justify-center text-center px-6">
-          <Syringe className="w-12 h-12 text-gray-300 mb-3" />
-          <h3 className="text-base font-bold text-gray-900">Uşaq seçilməyib</h3>
-          <p className="text-xs text-gray-500 mt-1">Peyvənd təqvimini görmək üçün əvvəlcə uşaq profili yaradın.</p>
+          <Syringe className="w-12 h-12 text-muted-foreground mb-3" />
+          <h3 className="text-base font-bold text-foreground">Uşaq seçilməyib</h3>
+          <p className="text-xs text-muted-foreground mt-1">Peyvənd təqvimini görmək üçün əvvəlcə uşaq profili yaradın.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF7F4] pb-24">
+    <div className="min-h-screen bg-background pb-24">
       <Header onBack={onBack} />
 
       {/* Child + Country selector */}
       <div className="px-3 pt-2">
-        <div className="bg-white rounded-2xl border border-gray-100 p-3 shadow-sm">
+        <div className="bg-card rounded-2xl border border-border p-3 shadow-sm">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 min-w-0">
-              <div className="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center text-lg shrink-0">
+              <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-lg shrink-0">
                 {selectedChild.avatar_emoji}
               </div>
               <div className="min-w-0">
                 {children.length > 1 ? (
                   <DropdownMenu>
-                    <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-bold text-gray-900">
+                    <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-bold text-foreground">
                       {selectedChild.name} <ChevronDown className="w-3 h-3" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
@@ -219,9 +219,9 @@ export default function VaccineCalendar({ onBack }: Props) {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
-                  <h2 className="text-sm font-bold text-gray-900 truncate">{selectedChild.name}</h2>
+                  <h2 className="text-sm font-bold text-foreground truncate">{selectedChild.name}</h2>
                 )}
-                <p className="text-[11px] text-gray-500">{getChildAge(selectedChild).displayText}</p>
+                <p className="text-[11px] text-muted-foreground">{getChildAge(selectedChild).displayText}</p>
               </div>
             </div>
 
@@ -252,10 +252,10 @@ export default function VaccineCalendar({ onBack }: Props) {
           </div>
           <div className="mt-2.5">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] text-gray-500 font-medium">Tərəqqi</span>
-              <span className="text-[10px] font-bold text-gray-900">{stats.pct}%</span>
+              <span className="text-[10px] text-muted-foreground font-medium">Tərəqqi</span>
+              <span className="text-[10px] font-bold text-foreground">{stats.pct}%</span>
             </div>
-            <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+            <div className="h-1.5 rounded-full bg-muted overflow-hidden">
               <motion.div
                 className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500"
                 animate={{ width: `${stats.pct}%` }}
@@ -268,7 +268,7 @@ export default function VaccineCalendar({ onBack }: Props) {
 
       {/* Tabs */}
       <div className="px-3 mt-3 sticky top-0 z-10">
-        <div className="flex bg-white rounded-full border border-gray-100 p-0.5 shadow-sm">
+        <div className="flex bg-card rounded-full border border-border p-0.5 shadow-sm">
           {([
             { k: 'upcoming', l: 'Yaxınlaşan' },
             { k: 'all', l: 'Tam qrafik' },
@@ -278,7 +278,7 @@ export default function VaccineCalendar({ onBack }: Props) {
               key={t.k}
               onClick={() => setTab(t.k)}
               className={`flex-1 py-1.5 text-[11px] font-semibold rounded-full transition-all ${
-                tab === t.k ? 'bg-[#F28155] text-white shadow' : 'text-gray-500'
+                tab === t.k ? 'bg-primary text-primary-foreground shadow' : 'text-muted-foreground'
               }`}
             >
               {t.l}
@@ -288,20 +288,20 @@ export default function VaccineCalendar({ onBack }: Props) {
       </div>
 
       <div className="px-3 mt-3 space-y-2">
-        {schedLoading && <p className="text-center text-xs text-gray-400 py-6">Yüklənir...</p>}
+        {schedLoading && <p className="text-center text-xs text-muted-foreground py-6">Yüklənir...</p>}
 
         {!schedLoading && schedule.length === 0 && (
-          <div className="bg-white rounded-2xl p-6 text-center border border-gray-100">
-            <Globe className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-            <p className="text-sm font-semibold text-gray-700">Bu ölkə üçün qrafik hələ hazırlanmayıb</p>
-            <p className="text-xs text-gray-500 mt-1">Tezliklə əlavə olunacaq.</p>
+          <div className="bg-card rounded-2xl p-6 text-center border border-border">
+            <Globe className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
+            <p className="text-sm font-semibold text-foreground">Bu ölkə üçün qrafik hələ hazırlanmayıb</p>
+            <p className="text-xs text-muted-foreground mt-1">Tezliklə əlavə olunacaq.</p>
           </div>
         )}
 
         {tab === 'upcoming' && upcomingRows.map(renderCard)}
         {tab === 'done' && (
           doneRows.length === 0 ? (
-            <p className="text-center text-xs text-gray-400 py-6">Hələ tamamlanmış peyvənd yoxdur.</p>
+            <p className="text-center text-xs text-muted-foreground py-6">Hələ tamamlanmış peyvənd yoxdur.</p>
           ) : doneRows.map(renderCard)
         )}
         {tab === 'all' && groupedAll.map(g => {
@@ -309,9 +309,9 @@ export default function VaccineCalendar({ onBack }: Props) {
           return (
             <div key={g.label} className="mt-3 first:mt-0">
               <div className="flex items-center gap-2 mb-1.5 px-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#F28155]" />
-                <h3 className="text-[11px] font-bold text-gray-700 uppercase tracking-wide">{g.label}</h3>
-                <div className="flex-1 h-px bg-gray-200" />
+                <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                <h3 className="text-[11px] font-bold text-foreground uppercase tracking-wide">{g.label}</h3>
+                <div className="flex-1 h-px bg-muted" />
               </div>
               <div className="space-y-2">{groupRows.map(renderCard)}</div>
             </div>
@@ -326,7 +326,7 @@ export default function VaccineCalendar({ onBack }: Props) {
             href={country.source_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 justify-center text-[10px] text-gray-400 hover:text-gray-600"
+            className="flex items-center gap-1.5 justify-center text-[10px] text-muted-foreground hover:text-foreground"
           >
             <Info className="w-3 h-3" />
             <span>Mənbə: {country.source_label || country.source_url}</span>
@@ -350,18 +350,18 @@ export default function VaccineCalendar({ onBack }: Props) {
                   </div>
                   <div className="flex-1 text-left">
                     <SheetTitle className="text-base">{detailRow.vaccine.name_az}</SheetTitle>
-                    <p className="text-[11px] text-gray-500">{detailRow.age_label_az} • {detailRow.dose_label_az}</p>
+                    <p className="text-[11px] text-muted-foreground">{detailRow.age_label_az} • {detailRow.dose_label_az}</p>
                   </div>
                 </div>
               </SheetHeader>
 
               <div className="mt-4 space-y-3 text-sm">
                 {detailRow.vaccine.short_description_az && (
-                  <p className="text-[13px] text-gray-700 leading-relaxed">{detailRow.vaccine.short_description_az}</p>
+                  <p className="text-[13px] text-foreground leading-relaxed">{detailRow.vaccine.short_description_az}</p>
                 )}
                 {detailRow.vaccine.full_description_az && (
-                  <div className="bg-orange-50/50 rounded-xl p-3">
-                    <p className="text-[12px] text-gray-700 leading-relaxed whitespace-pre-line">
+                  <div className="bg-primary/5 rounded-xl p-3">
+                    <p className="text-[12px] text-foreground leading-relaxed whitespace-pre-line">
                       {detailRow.vaccine.full_description_az}
                     </p>
                   </div>
@@ -446,35 +446,35 @@ export default function VaccineCalendar({ onBack }: Props) {
 
 function Header({ onBack }: { onBack: () => void }) {
   return (
-    <header className="bg-white border-b border-gray-100 sticky top-0 z-20">
+    <header className="bg-card border-b border-border sticky top-0 z-20">
       <div className="px-3 h-12 flex items-center gap-2">
-        <button onClick={onBack} className="w-8 h-8 -ml-1 flex items-center justify-center rounded-full active:bg-gray-100">
-          <ArrowLeft className="w-5 h-5 text-gray-700" />
+        <button onClick={onBack} className="w-8 h-8 -ml-1 flex items-center justify-center rounded-full active:bg-muted">
+          <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <div className="flex-1">
-          <h1 className="text-sm font-bold text-gray-900 leading-tight">Peyvənd Təqvimi</h1>
-          <p className="text-[10px] text-gray-500 leading-tight">Milli İmmunizasiya Qrafiki</p>
+          <h1 className="text-sm font-bold text-foreground leading-tight">Peyvənd Təqvimi</h1>
+          <p className="text-[10px] text-muted-foreground leading-tight">Milli İmmunizasiya Qrafiki</p>
         </div>
-        <Sparkles className="w-4 h-4 text-[#F28155]" />
+        <Sparkles className="w-4 h-4 text-primary" />
       </div>
     </header>
   );
 }
 
-function Stat({ label, value, color = 'text-gray-900' }: { label: string; value: number; color?: string }) {
+function Stat({ label, value, color = 'text-foreground' }: { label: string; value: number; color?: string }) {
   return (
     <div className="text-center">
       <div className={`text-base font-extrabold leading-none ${color}`}>{value}</div>
-      <div className="text-[9px] text-gray-500 mt-0.5">{label}</div>
+      <div className="text-[9px] text-muted-foreground mt-0.5">{label}</div>
     </div>
   );
 }
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border-l-2 border-orange-200 pl-3">
-      <p className="text-[10px] uppercase font-semibold text-gray-500 tracking-wide">{label}</p>
-      <p className="text-[13px] text-gray-800 leading-relaxed mt-0.5 whitespace-pre-line">{value}</p>
+    <div className="border-l-2 border-primary/30 pl-3">
+      <p className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wide">{label}</p>
+      <p className="text-[13px] text-foreground leading-relaxed mt-0.5 whitespace-pre-line">{value}</p>
     </div>
   );
 }
@@ -503,7 +503,7 @@ function ActionDialog({
             {mode === 'done' ? 'Peyvənd vuruldu' : 'Peyvəndi buraxıldı kimi qeyd et'}
           </DialogTitle>
         </DialogHeader>
-        {row && <p className="text-xs text-gray-500 -mt-2">{row.vaccine.name_az} • {row.dose_label_az}</p>}
+        {row && <p className="text-xs text-muted-foreground -mt-2">{row.vaccine.name_az} • {row.dose_label_az}</p>}
         {mode === 'done' ? (
           <div className="space-y-3 mt-2">
             <div>
