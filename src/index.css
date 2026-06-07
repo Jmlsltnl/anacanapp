@@ -486,6 +486,6 @@
 .community-native-text .post-body,
 .community-native-text textarea,
 .community-native-text input[type="text"] {
-  font-size: 11pt !important;
+  font-size: 10pt !important;
   line-height: 1.45 !important;
 }

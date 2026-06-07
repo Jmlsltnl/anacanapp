@@ -47,7 +47,7 @@ export default function PartnersScreen({ onBack }: Props) {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="flex items-center gap-3 p-3">
           <button onClick={onBack} className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
             <ArrowLeft className="w-4 h-4" />
