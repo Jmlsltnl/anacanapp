@@ -50,7 +50,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
     <div ref={ref} className="min-h-screen bg-background">
       {/* Compact Sticky Header */}
       <div className="sticky top-0 z-20 bg-card border-b border-border/50">
-        <div className="px-4 pb-2 safe-area-top">
+        <div className="px-4 pb-2">
           {/* Top Row - Back, Title, Random */}
           <div className="flex items-center gap-3 mb-3">
             <motion.button

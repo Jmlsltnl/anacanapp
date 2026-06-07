@@ -79,7 +79,7 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
     <div className="min-h-screen bg-background">
       {/* Minimalist Header */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 pb-2 safe-area-top">
+        <div className="px-4 pb-2">
           <div className="flex items-center gap-3">
             <motion.button
               onClick={onBack}

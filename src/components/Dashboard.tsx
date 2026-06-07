@@ -48,7 +48,7 @@ import ChildSelector from '@/components/mommy/ChildSelector';
 import TeethingWidget from '@/components/mommy/TeethingWidget';
 import MommyHero from '@/components/mommy/hero/MommyHero';
 import BannerSlot from '@/components/banners/BannerSlot';
-import SendDailySummaryWidget from '@/components/partner/SendDailySummaryWidget';
+import DailySummaryAutoSync from '@/components/partner/DailySummaryAutoSync';
 import RecentBlogPosts from '@/components/dashboard/RecentBlogPosts';
 import FlowDashboard from '@/components/flow/FlowDashboard';
 import BirthOnboardingModal from '@/components/BirthOnboardingModal';
@@ -1818,8 +1818,8 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
       {lifeStage === 'bump' && <BumpDashboard onNavigateToTool={onNavigateToTool} />}
       {lifeStage === 'mommy' && <MommyDashboard onNavigateToTool={onNavigateToTool} />}
 
-      {/* Send Daily Summary to Partner Widget - only for bump stage with linked partner */}
-      {lifeStage === 'bump' && <SendDailySummaryWidget />}
+      {/* Daily summary auto-syncs to partner in background — manual widget removed */}
+      {lifeStage === 'bump' && profile?.linked_partner_id && <DailySummaryAutoSync />}
 
       {/* Recent Blog Posts - filtered by life stage (partner uses bump stage content) */}
       {onNavigate && <RecentBlogPosts onNavigate={onNavigate} lifeStage={lifeStage === 'partner' ? 'bump' : lifeStage} />}

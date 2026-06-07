@@ -329,7 +329,7 @@ Anacan tətbiqi ilə yaradılıb 💜`;
     return (
       <div className="min-h-screen bg-background pb-24">
         {/* Result Header */}
-        <div className={`bg-gradient-to-br ${getScoreGradient(analysisResult.analysis.overallScore)} text-white px-6 pb-4 safe-area-top`}>
+        <div className={`bg-gradient-to-br ${getScoreGradient(analysisResult.analysis.overallScore)} text-white px-6 pb-4`}>
           <button onClick={() => setAnalysisResult(null)} className="p-2 hover:bg-white/20 rounded-full mb-4">
             <ArrowLeft className="h-5 w-5" />
           </button>
@@ -512,7 +512,7 @@ Anacan tətbiqi ilə yaradılıb 💜`;
     <div className="min-h-screen bg-background pb-24">
       {/* Compact Header */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 pb-2 safe-area-top">
+        <div className="px-4 pb-2">
           <div className="flex items-center gap-3 mb-3">
             <motion.button 
               onClick={onBack} 
