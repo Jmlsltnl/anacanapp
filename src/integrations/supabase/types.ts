@@ -1696,6 +1696,72 @@ export type Database = {
         }
         Relationships: []
       }
+      child_vaccinations: {
+        Row: {
+          administered_at: string | null
+          batch_number: string | null
+          child_id: string
+          country_code: string
+          created_at: string
+          id: string
+          is_skipped: boolean
+          location_az: string | null
+          notes: string | null
+          reminder_sent_at: string | null
+          skip_reason: string | null
+          updated_at: string
+          user_id: string
+          vaccine_schedule_id: string
+        }
+        Insert: {
+          administered_at?: string | null
+          batch_number?: string | null
+          child_id: string
+          country_code: string
+          created_at?: string
+          id?: string
+          is_skipped?: boolean
+          location_az?: string | null
+          notes?: string | null
+          reminder_sent_at?: string | null
+          skip_reason?: string | null
+          updated_at?: string
+          user_id: string
+          vaccine_schedule_id: string
+        }
+        Update: {
+          administered_at?: string | null
+          batch_number?: string | null
+          child_id?: string
+          country_code?: string
+          created_at?: string
+          id?: string
+          is_skipped?: boolean
+          location_az?: string | null
+          notes?: string | null
+          reminder_sent_at?: string | null
+          skip_reason?: string | null
+          updated_at?: string
+          user_id?: string
+          vaccine_schedule_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "child_vaccinations_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "user_children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "child_vaccinations_vaccine_schedule_id_fkey"
+            columns: ["vaccine_schedule_id"]
+            isOneToOne: false
+            referencedRelation: "vaccine_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comment_likes: {
         Row: {
           comment_id: string
@@ -7873,6 +7939,7 @@ export type Database = {
         Row: {
           avatar_emoji: string | null
           birth_date: string
+          country_code: string
           created_at: string | null
           gender: string | null
           id: string
@@ -7886,6 +7953,7 @@ export type Database = {
         Insert: {
           avatar_emoji?: string | null
           birth_date: string
+          country_code?: string
           created_at?: string | null
           gender?: string | null
           id?: string
@@ -7899,6 +7967,7 @@ export type Database = {
         Update: {
           avatar_emoji?: string | null
           birth_date?: string
+          country_code?: string
           created_at?: string | null
           gender?: string | null
           id?: string
@@ -8129,6 +8198,178 @@ export type Database = {
           vitamin_name?: string
         }
         Relationships: []
+      }
+      vaccine_countries: {
+        Row: {
+          code: string
+          created_at: string
+          flag_emoji: string | null
+          id: string
+          is_active: boolean
+          is_default: boolean
+          name_az: string
+          name_en: string
+          sort_order: number
+          source_label: string | null
+          source_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          flag_emoji?: string | null
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name_az: string
+          name_en: string
+          sort_order?: number
+          source_label?: string | null
+          source_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          flag_emoji?: string | null
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name_az?: string
+          name_en?: string
+          sort_order?: number
+          source_label?: string | null
+          source_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      vaccine_schedules: {
+        Row: {
+          age_label_az: string
+          country_code: string
+          created_at: string
+          dose_label_az: string
+          dose_number: number
+          id: string
+          max_age_days: number | null
+          min_age_days: number | null
+          notes_az: string | null
+          recommended_age_days: number
+          sort_order: number
+          updated_at: string
+          vaccine_id: string
+        }
+        Insert: {
+          age_label_az: string
+          country_code: string
+          created_at?: string
+          dose_label_az: string
+          dose_number?: number
+          id?: string
+          max_age_days?: number | null
+          min_age_days?: number | null
+          notes_az?: string | null
+          recommended_age_days: number
+          sort_order?: number
+          updated_at?: string
+          vaccine_id: string
+        }
+        Update: {
+          age_label_az?: string
+          country_code?: string
+          created_at?: string
+          dose_label_az?: string
+          dose_number?: number
+          id?: string
+          max_age_days?: number | null
+          min_age_days?: number | null
+          notes_az?: string | null
+          recommended_age_days?: number
+          sort_order?: number
+          updated_at?: string
+          vaccine_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vaccine_schedules_vaccine_id_fkey"
+            columns: ["vaccine_id"]
+            isOneToOne: false
+            referencedRelation: "vaccines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vaccines: {
+        Row: {
+          code: string
+          color_hex: string | null
+          contraindications_az: string | null
+          country_code: string
+          created_at: string
+          disease_az: string | null
+          full_description_az: string | null
+          id: string
+          is_active: boolean
+          is_mandatory: boolean
+          name_az: string
+          name_en: string | null
+          route_az: string | null
+          short_description_az: string | null
+          side_effects_az: string | null
+          sort_order: number
+          source_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          color_hex?: string | null
+          contraindications_az?: string | null
+          country_code: string
+          created_at?: string
+          disease_az?: string | null
+          full_description_az?: string | null
+          id?: string
+          is_active?: boolean
+          is_mandatory?: boolean
+          name_az: string
+          name_en?: string | null
+          route_az?: string | null
+          short_description_az?: string | null
+          side_effects_az?: string | null
+          sort_order?: number
+          source_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          color_hex?: string | null
+          contraindications_az?: string | null
+          country_code?: string
+          created_at?: string
+          disease_az?: string | null
+          full_description_az?: string | null
+          id?: string
+          is_active?: boolean
+          is_mandatory?: boolean
+          name_az?: string
+          name_en?: string | null
+          route_az?: string | null
+          short_description_az?: string | null
+          side_effects_az?: string | null
+          sort_order?: number
+          source_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vaccines_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "vaccine_countries"
+            referencedColumns: ["code"]
+          },
+        ]
       }
       vitamin_intake_logs: {
         Row: {

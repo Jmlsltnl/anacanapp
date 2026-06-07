@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Package, Settings, BarChart3, Shield, 
   ChevronLeft, Menu, LogOut, Bell, Search,
-  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store, ShieldAlert, BookHeart, MapPin, Gamepad2, Zap, Lightbulb, Megaphone, UtensilsCrossed, Heart, HelpCircle, Sparkles, ShoppingCart, Brain, Calculator, Calendar, Stethoscope, Tag, CreditCard, ChevronDown, LayoutDashboard, PenTool, Cog, MapPinned, DollarSign, Palette, Globe, BookOpen
+  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store, ShieldAlert, BookHeart, MapPin, Gamepad2, Zap, Lightbulb, Megaphone, UtensilsCrossed, Heart, HelpCircle, Sparkles, ShoppingCart, Brain, Calculator, Calendar, Stethoscope, Tag, CreditCard, ChevronDown, LayoutDashboard, PenTool, Cog, MapPinned, DollarSign, Palette, Globe, BookOpen, Syringe
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -95,6 +95,7 @@ const menuGroups: MenuGroup[] = [
       { id: 'phase-tips', label: tr("adminlayout_faza_meslehetleri_8df8d3", "Faza Məsləhətləri"), icon: Lightbulb },
       { id: 'trimester-tips', label: tr("adminlayout_trimester_tovsiyeleri_bf9d05", "Trimester Tövsiyələri"), icon: Baby },
       { id: 'vitamins', label: tr("adminlayout_vitaminler_e49129", "Vitaminlər"), icon: Pill },
+      { id: 'vaccines', label: 'Peyvənd Təqvimi', icon: Syringe },
       { id: 'maternity', label: 'Dekret Kalkulyatoru', icon: Calculator },
       { id: 'default-shopping', label: tr("adminlayout_default_alisveris_siyahisi_cafdaf", "Default Alışveriş Siyahısı"), icon: ShoppingCart },
       { id: 'fairy-tales', label: tr("adminlayout_sehrli_nagilci_25f8c2", "Sehrli Nağılçı"), icon: BookHeart },

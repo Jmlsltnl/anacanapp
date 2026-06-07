@@ -66,6 +66,7 @@ import AdminDeeplinks from './admin/AdminDeeplinks';
 import AdminCrashReports from './admin/AdminCrashReports';
 import AdminPartnerVenues from './admin/AdminPartnerVenues';
 import AdminPartnerRedemptions from './admin/AdminPartnerRedemptions';
+import AdminVaccines from './admin/AdminVaccines';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -210,6 +211,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminPartnerVenues />;
       case 'partner-redemptions':
         return <AdminPartnerRedemptions />;
+      case 'vaccines':
+        return <AdminVaccines />;
       default:
         return <AdminDashboard />;
     }
