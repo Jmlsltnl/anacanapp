@@ -658,11 +658,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           label="Vitamin" 
           color="bg-primary/10 dark:bg-primary/20 text-primary" 
           onClick={() => {
-            toast({
-              title: tr("dashboard_vitamin_xatirlatmasi_b8a490", "Vitamin Xatırlatması 💊"),
-              description: tr("dashboard_prenatal_vitamininizi_gunluk_qebul_etmey_c8cba3", "Prenatal vitamininizi günlük qəbul etməyi unutmayın. Folat, D vitamini və dəmir vacibdir!"),
-            });
-            if (onNavigateToTool) onNavigateToTool('nutrition');
+            if (onNavigateToTool) onNavigateToTool('vitaminTracker');
           }}
         />
         <QuickActionButton 
@@ -670,7 +666,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           label={tr("dashboard_mesq_046a80", "Məşq")} 
           color="bg-primary/10 dark:bg-primary/20 text-primary" 
           onClick={() => {
-            if (onNavigateToTool) onNavigateToTool('exercises');
+            if (onNavigateToTool) onNavigateToTool('safetyLookup');
           }}
         />
         <QuickActionButton 
