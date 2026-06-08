@@ -33,8 +33,7 @@ let package = Package(
             dependencies: [
                 .product(name: "Capacitor", package: "capacitor-swift-pm"),
                 .product(name: "Cordova", package: "capacitor-swift-pm"),
-                .product(name: "FBSDKCoreKit", package: "facebook-ios-sdk"),
-                .product(name: "FBAEMKit", package: "facebook-ios-sdk"),
+                .product(name: "FacebookCore", package: "facebook-ios-sdk"),
                 .product(name: "CapacitorFirebaseAnalytics", package: "CapacitorFirebaseAnalytics"),
                 .product(name: "CapacitorFirebaseMessaging", package: "CapacitorFirebaseMessaging"),
                 .product(name: "CapacitorApp", package: "CapacitorApp"),
