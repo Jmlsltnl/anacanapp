@@ -344,11 +344,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    // For image generation we prefer the public Gemini API (Nano Banana 2)
-    // because the image-gen models are only available in Vertex's `global`
-    // region with a `-preview` suffix, and our GCP_LOCATION may be regional.
+    const useVertex = isVertexConfigured();
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    const useVertex = !GEMINI_API_KEY && isVertexConfigured();
     if (!useVertex && !GEMINI_API_KEY) {
       return new Response(JSON.stringify({ error: "AI service not configured" }), {
         status: 500,
@@ -373,18 +370,16 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Nano Banana 2 (primary) → Nano Banana Pro (fallback) → Nano Banana 1 (last resort).
-    // Vertex needs the `-preview` suffix; Gemini API uses the stable IDs.
+    // Nano Banana 2 (primary) → Nano Banana Pro (fallback).
+    // Vertex needs `-preview` suffix and `global` region; Gemini API uses stable IDs.
     const models = useVertex
       ? [
           "gemini-3.1-flash-image-preview",
           "gemini-3-pro-image-preview",
-          "gemini-2.5-flash-image-preview",
         ]
       : [
           "gemini-3.1-flash-image",
           "gemini-3-pro-image",
-          "gemini-2.5-flash-image",
         ];
 
 
