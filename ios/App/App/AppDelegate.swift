@@ -3,7 +3,9 @@ import Capacitor
 import FirebaseCore
 import FirebaseMessaging
 import UserNotifications
+#if canImport(FBSDKCoreKit)
 import FBSDKCoreKit
+#endif
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
@@ -15,9 +17,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         FirebaseApp.configure()
 
         // Initialize Facebook / Meta SDK (reads FacebookAppID & FacebookClientToken from Info.plist)
+#if canImport(FBSDKCoreKit)
         ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         Settings.shared.isAutoLogAppEventsEnabled = true
         Settings.shared.isAdvertiserIDCollectionEnabled = true
+#endif
 
         // Set up push notification delegates
         UNUserNotificationCenter.current().delegate = self
@@ -97,15 +101,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func applicationWillEnterForeground(_ application: UIApplication) {}
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Facebook: standart "Activate App" event-i göndərir (Meta Test Events panelində görünür)
+#if canImport(FBSDKCoreKit)
         AppEvents.shared.activateApp()
+#endif
     }
     func applicationWillTerminate(_ application: UIApplication) {}
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+#if canImport(FBSDKCoreKit)
         return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
+#else
+        return false
+#endif
     }
 
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+#if canImport(FBSDKCoreKit)
         return ApplicationDelegateProxy.shared.application(application, continue: userActivity, restorationHandler: restorationHandler)
+#else
+        return false
+#endif
     }
 }
