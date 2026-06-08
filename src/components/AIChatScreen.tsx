@@ -381,8 +381,17 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
         </div>
       </div>
 
+      {/* Persistent medical disclaimer banner */}
+      <div className="px-3 py-2 bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-900/50 flex items-start gap-2">
+        <span className="text-base leading-none mt-0.5">⚕️</span>
+        <p className="text-[11px] leading-snug text-amber-900 dark:text-amber-200">
+          {tr("aichatscreen_medical_disclaimer_banner", "Anacan.AI tibbi məsləhət, diaqnoz və ya müalicə əvəzi DEYİL. Verilən məlumatlar yalnız informasiya xarakterli olub yalnız təhsil məqsədi daşıyır. Hər hansı tibbi qərar verməzdən əvvəl mütləq həkiminizə və ya ixtisaslı tibb işçisinə müraciət edin. Təcili hallarda 103-ə zəng edin.")}
+        </p>
+      </div>
+
       {/* Messages */}
       <ScrollArea className="flex-1 px-4 py-4" ref={scrollRef}>
+
         <div className="space-y-4 pb-4">
           <AnimatePresence>
             {messages.map((message) => (
@@ -484,7 +493,12 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
             )}
           </Button>
         </div>
+        <p className="text-[9px] text-center text-muted-foreground mt-1 px-2 leading-tight">
+          {tr("aichatscreen_input_disclaimer", "Anacan.AI səhv edə bilər. Tibbi qərarlar üçün həkiminizə müraciət edin.")}
+        </p>
       </div>
+
+
     </div>
   );
 });
