@@ -492,8 +492,11 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
               <Send className="w-4 h-4" />
             )}
           </Button>
-        </div>
+        <p className="text-[9px] text-center text-muted-foreground mt-1 px-2 leading-tight">
+          {tr("aichatscreen_input_disclaimer", "Anacan.AI səhv edə bilər. Tibbi qərarlar üçün həkiminizə müraciət edin.")}
+        </p>
       </div>
+
     </div>
   );
 });
