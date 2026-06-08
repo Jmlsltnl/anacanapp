@@ -370,11 +370,17 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Try models in order: Gemini 3.1 Flash Image (primary), Gemini 3 Pro Image (fallback)
-    const models = [
-      "gemini-3.1-flash-image",
-      "gemini-3-pro-image",
-    ];
+    // Try models in order. On Vertex AI use the preview model IDs;
+    // on the public Gemini API use the stable model names.
+    const models = useVertex
+      ? [
+          "gemini-2.5-flash-image-preview",
+          "gemini-2.5-flash-image",
+        ]
+      : [
+          "gemini-2.5-flash-image",
+          "gemini-2.5-flash-image-preview",
+        ];
 
 
     const requestBody = {
