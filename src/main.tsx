@@ -1,3 +1,6 @@
+// MUST be the very first import — polyfills for Android 11 WebView (Chrome 90)
+// and old iOS Safari. Without this Object.hasOwn etc. crash the app at startup.
+import "./lib/polyfills";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
