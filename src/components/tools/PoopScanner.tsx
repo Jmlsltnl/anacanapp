@@ -10,6 +10,7 @@ import { takePhoto, pickFromGallery, requestCameraPermission } from '@/lib/permi
 import { Capacitor } from '@capacitor/core';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
+import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface PoopScannerProps {
   onBack: () => void;
@@ -251,6 +252,7 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
       </div>
 
       <div className="p-4 space-y-4">
+        <MedicalDisclaimer variant="compact" />
         {/* Info Card */}
         <Card className="border-primary/20 bg-primary/5">
           <CardContent className="p-3">

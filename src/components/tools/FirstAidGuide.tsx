@@ -8,6 +8,7 @@ import { useFirstAidScenarios, useFirstAidSteps, FirstAidScenario } from '@/hook
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { toast } from 'sonner';
+import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface FirstAidGuideProps {
   onBack: () => void;
@@ -125,6 +126,9 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                 </div>
               </div>
             </motion.a>
+
+            <MedicalDisclaimer variant="compact" className="mb-3" />
+
 
             {/* Scenario Selection */}
             <h2 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2">
