@@ -1,0 +1,73 @@
+import { motion } from 'framer-motion';
+import { AlertTriangle, Info } from 'lucide-react';
+import { useCycleStats, useCycleHistory } from '@/hooks/useCycleHistory';
+
+const CycleAnomalyBanner = () => {
+  const stats = useCycleStats();
+  const { data: cycles = [] } = useCycleHistory();
+
+  if (cycles.length < 3) return null;
+
+  const anomalies: { severity: 'warn' | 'info'; title: string; message: string }[] = [];
+
+  if (stats.shortestCycle > 0 && stats.shortestCycle < 21) {
+    anomalies.push({
+      severity: 'warn',
+      title: 'Qısa tsikl aşkar edildi',
+      message: `Ən qısa tsikliniz ${stats.shortestCycle} gündür. 21 gündən az tsikllər həkim müraciəti tələb edə bilər.`,
+    });
+  }
+
+  if (stats.longestCycle > 35) {
+    anomalies.push({
+      severity: 'warn',
+      title: 'Uzun tsikl aşkar edildi',
+      message: `Ən uzun tsikliniz ${stats.longestCycle} gündür. 35 gündən uzun tsikllər PCOS və ya hormonal disbalans əlaməti ola bilər.`,
+    });
+  }
+
+  if (stats.cycleVariation > 7) {
+    anomalies.push({
+      severity: 'info',
+      title: 'Düzənsiz tsikl',
+      message: `Tsikllər arasında ${stats.cycleVariation} gün fərq var. Bu stress, çəki dəyişikliyi və ya tireoid problemlərlə bağlı ola bilər.`,
+    });
+  }
+
+  if (anomalies.length === 0) return null;
+
+  return (
+    <div className="space-y-2">
+      {anomalies.map((a, i) => {
+        const isWarn = a.severity === 'warn';
+        const Icon = isWarn ? AlertTriangle : Info;
+        return (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`rounded-2xl p-3 border ${
+              isWarn
+                ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'
+                : 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+            }`}
+          >
+            <div className="flex items-start gap-2">
+              <Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${isWarn ? 'text-amber-600' : 'text-blue-600'}`} />
+              <div className="flex-1">
+                <p className={`text-sm font-semibold ${isWarn ? 'text-amber-900 dark:text-amber-200' : 'text-blue-900 dark:text-blue-200'}`}>
+                  {a.title}
+                </p>
+                <p className={`text-xs mt-0.5 ${isWarn ? 'text-amber-800 dark:text-amber-300' : 'text-blue-800 dark:text-blue-300'}`}>
+                  {a.message}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default CycleAnomalyBanner;

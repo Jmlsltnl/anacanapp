@@ -8013,6 +8013,7 @@ export type Database = {
           exercise_reminder: boolean | null
           id: string
           language: string
+          last_delay_notification_at: string | null
           last_push_sent_at: string | null
           last_white_noise_sound: string | null
           notifications_enabled: boolean | null
@@ -8042,6 +8043,7 @@ export type Database = {
           exercise_reminder?: boolean | null
           id?: string
           language?: string
+          last_delay_notification_at?: string | null
           last_push_sent_at?: string | null
           last_white_noise_sound?: string | null
           notifications_enabled?: boolean | null
@@ -8071,6 +8073,7 @@ export type Database = {
           exercise_reminder?: boolean | null
           id?: string
           language?: string
+          last_delay_notification_at?: string | null
           last_push_sent_at?: string | null
           last_white_noise_sound?: string | null
           notifications_enabled?: boolean | null

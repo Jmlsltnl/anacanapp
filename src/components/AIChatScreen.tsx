@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAISuggestedQuestions } from '@/hooks/useDynamicTools';
 import { getPregnancyDay } from '@/lib/pregnancy-utils';
+import { getPhaseInfoForDate } from '@/lib/cycle-utils';
 import MarkdownContent from './MarkdownContent';
 import { tr } from "@/lib/tr";
 
@@ -36,7 +37,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { lifeStage, getPregnancyData, name, dueDate, babyName, babyBirthDate, lastPeriodDate, cycleLength } = useUserStore();
+  const { lifeStage, getPregnancyData, name, dueDate, babyName, babyBirthDate, lastPeriodDate, cycleLength, periodLength } = useUserStore();
   const { user } = useAuth();
   const { messages: savedMessages, addMessage, clearHistory, loading: historyLoading } = useAIChatHistory('woman');
   const { toast } = useToast();
@@ -202,6 +203,12 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
           isPartner: false,
           stream: true,
           language: useUserStore.getState().language || 'az',
+          ...(lifeStage === 'flow' && lastPeriodDate ? (() => {
+            try {
+              const info = getPhaseInfoForDate(new Date(), new Date(lastPeriodDate), cycleLength || 28, periodLength || 5);
+              return { cyclePhase: info.phase, cycleDay: info.dayInCycle };
+            } catch { return {}; }
+          })() : {}),
           userProfile: {
             name: userProfile.name,
             dueDate: userProfile.due_date,
