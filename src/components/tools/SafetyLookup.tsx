@@ -309,6 +309,12 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
                     </ul>
                   </div>
 
+                  <div className="mb-3">
+                    <MedicalDisclaimer variant="compact" />
+                  </div>
+
+
+
                   <button
                     onClick={() => setSelectedItem(null)}
                     className="w-full h-10 rounded-xl bg-primary text-primary-foreground text-sm font-semibold"
