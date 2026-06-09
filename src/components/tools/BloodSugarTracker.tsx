@@ -17,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import { format, isToday, isYesterday, subDays, startOfDay } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { tr } from "@/lib/tr";
+import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface BloodSugarTrackerProps {
   onBack: () => void;
