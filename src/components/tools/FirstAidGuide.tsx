@@ -127,6 +127,9 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
               </div>
             </motion.a>
 
+            <MedicalDisclaimer variant="compact" className="mb-3" />
+
+
             {/* Scenario Selection */}
             <h2 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-red-500" />
