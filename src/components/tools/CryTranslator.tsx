@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { requestMicrophonePermission } from '@/lib/permissions';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
+import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface CryTranslatorProps {
   onBack: () => void;
