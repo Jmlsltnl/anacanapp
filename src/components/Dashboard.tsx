@@ -6,6 +6,7 @@ import {
   ThermometerSun, Pill, Baby, Footprints, Scale, Clock, Star, Award,
   MessageCircle, Check, Lightbulb, BookOpen, PartyPopper, RefreshCw, ChevronUp, ChevronDown
 } from 'lucide-react';
+import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 import { useUserStore } from '@/store/userStore';
 import { useTimerStore } from '@/store/timerStore';
 import { FRUIT_SIZES } from '@/types/anacan';
