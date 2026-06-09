@@ -36,7 +36,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { lifeStage, getPregnancyData, name, dueDate, babyName, babyBirthDate, lastPeriodDate, cycleLength } = useUserStore();
+  const { lifeStage, getPregnancyData, name, dueDate, babyName, babyBirthDate, lastPeriodDate, cycleLength, periodLength } = useUserStore();
   const { user } = useAuth();
   const { messages: savedMessages, addMessage, clearHistory, loading: historyLoading } = useAIChatHistory('woman');
   const { toast } = useToast();
