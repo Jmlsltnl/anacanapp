@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { hapticFeedback } from '@/lib/native';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
+import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface VitaminTrackerProps {
   onBack?: () => void;
