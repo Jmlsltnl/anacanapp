@@ -32,6 +32,7 @@ import { format, subDays } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { tr } from "@/lib/tr";
+import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface MentalHealthTrackerProps {
   onBack: () => void;
