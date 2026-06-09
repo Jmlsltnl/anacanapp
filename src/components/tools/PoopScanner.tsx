@@ -10,6 +10,7 @@ import { takePhoto, pickFromGallery, requestCameraPermission } from '@/lib/permi
 import { Capacitor } from '@capacitor/core';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
+import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface PoopScannerProps {
   onBack: () => void;
