@@ -260,6 +260,15 @@ const FlowDashboard = () => {
 
   return (
     <div className="space-y-5">
+      {/* Partner's flow status (only renders if user is partner viewing flow woman) */}
+      <PartnerFlowStatusCard />
+
+      {/* Period delay banner (auto-shows if late) */}
+      <PeriodDelayBanner />
+
+      {/* Daily Story Cards — phase-personalized */}
+      <DailyStoryCards />
+
       {/* Current Phase Hero Card */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
