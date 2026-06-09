@@ -41,8 +41,8 @@ const PeriodDelayBanner = () => {
       await supabase.from('notifications').insert({
         user_id: user.id,
         title: 'Period gecikir',
-        body: `Periodunuz təxmini tarixdən ${delayDays} gün gecikir. Hamiləlik testi etməyi və ya Dr. Anacan-dan soruşmağı düşünün.`,
-        type: 'flow_delay',
+        message: `Periodunuz təxmini tarixdən ${delayDays} gün gecikir. Hamiləlik testi etməyi və ya Dr. Anacan-dan soruşmağı düşünün.`,
+        notification_type: 'flow_delay',
         is_read: false,
       });
       await supabase
