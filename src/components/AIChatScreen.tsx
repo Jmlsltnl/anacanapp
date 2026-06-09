@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAISuggestedQuestions } from '@/hooks/useDynamicTools';
 import { getPregnancyDay } from '@/lib/pregnancy-utils';
+import { getPhaseInfoForDate } from '@/lib/cycle-utils';
 import MarkdownContent from './MarkdownContent';
 import { tr } from "@/lib/tr";
 
