@@ -332,6 +332,7 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
       </div>
 
       <div className="p-4 space-y-4">
+        <MedicalDisclaimer variant="compact" />
         {/* Info Card */}
         <Card className="border-primary/20 bg-primary/5">
           <CardContent className="p-3">
