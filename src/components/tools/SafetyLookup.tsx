@@ -131,6 +131,11 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
         </div>
       </div>
 
+      {/* Medical disclaimer */}
+      <div className="px-4 pt-2.5">
+        <MedicalDisclaimer variant="compact" />
+      </div>
+
       {/* Stats inline */}
       <div className="px-4 pt-2.5 pb-1">
         <div className="flex gap-1.5">
