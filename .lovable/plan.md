@@ -1,105 +1,202 @@
-## Peyvənd Təqvimi — Plan
+# Flow Modulu Genişləndirmə Planı
 
-### Məqsəd
-Ana (mommy) modulunda hər uşaq üçün rəsmi, peşəkar Peyvənd təqvimi. Azərbaycan SN-nin Milli İmmunizasiya Qrafiki əsasında doldurulur. Ölkə dəyişəndə həmin ölkənin qrafiki avtomatik istifadə olunur. Admin panel hər ölkə üçün peyvəndləri tam redaktə edə bilir.
-
----
-
-### 1. Verilənlər bazası (3 yeni cədvəl)
-
-**`vaccine_countries`** — dəstəklənən ölkələr
-- `code` (text, unik — məs. `AZ`, `TR`, `RU`, `US`)
-- `name_az`, `name_en`, `flag_emoji`
-- `is_active`, `is_default` (yalnız 1 default — AZ)
-- `source_url` (rəsmi qaynaq linki), `source_label`
-
-**`vaccines`** — ölkə üzrə peyvənd kataloqu (admin redaktə edir)
-- `country_code` (FK → vaccine_countries.code)
-- `code` (məs. `BCG`, `HEPB`, `DTP`, `MMR`, `IPV`, `OPV`, `HIB`, `PCV`, `ROTA`, `VARICELLA`, `HEPA`, `HPV`)
-- `name_az`, `name_en`, `short_description_az`, `full_description_az` (uzun mətn — nə üçün, nə qoruyur)
-- `disease_az` (qarşısını aldığı xəstəlik), `route_az` (əzələdaxili / oral / dərialtı)
-- `side_effects_az` (mümkün yan təsirlər), `contraindications_az` (əks-göstərişlər)
-- `is_mandatory` (məcburi / könüllü), `is_active`
-- `sort_order`, `color_hex` (UI üçün)
-
-**`vaccine_schedules`** — qrafikdəki hər doza (admin redaktə edir)
-- `vaccine_id` (FK → vaccines.id)
-- `country_code` (denormalize — sürətli sorğu üçün)
-- `dose_number` (1, 2, 3...), `dose_label_az` (məs. "1-ci doza", "Bustər")
-- `recommended_age_days` (yaş — günlə, məs. 0 = doğulanda, 60 = 2 ay, 1825 = 5 yaş)
-- `age_label_az` (UI üçün — "Doğulanda", "2 aylıq", "12 aylıq", "6 yaş")
-- `min_age_days`, `max_age_days` (pəncərə)
-- `notes_az` (xüsusi qeydlər)
-
-**`child_vaccinations`** — istifadəçinin uşağı üçün status izləyici
-- `child_id` (FK), `user_id` (FK)
-- `vaccine_schedule_id` (FK), `country_code`
-- `administered_at` (date | null), `is_skipped` (bool), `skip_reason`
-- `location_az` (harada vurulub), `batch_number`, `notes`
-- `reminder_sent_at`
-
-**RLS**: `vaccine_countries`, `vaccines`, `vaccine_schedules` — hamı (authenticated) oxuya bilər, yalnız admin yaza bilər. `child_vaccinations` — istifadəçi yalnız öz uşaqları üçün CRUD.
-
-**Seed**: Azərbaycan Səhiyyə Nazirliyinin Milli İmmunizasiya Qrafiki tam doldurulur (BCG, Hep B, DTP/HiB/Polio, Rotavirus, PCV, MMR, Hep A, Varicella, HPV — 0 gün - 16 yaş diapazonu).
+Aşağıdakı 7 funksiyanı qurub Anacan-ın menstruasiya modulunu Flo səviyyəsinə yaxınlaşdıracağıq. Sonda 9 və 10-cu bəndlər üçün izahat var (kod yazılmayacaq).
 
 ---
 
-### 2. Frontend — `VaccineCalendar.tsx` aləti (mommy)
+## 1. Dr. Anacan AI — Cycle Phase Context
 
-`src/components/tools/VaccineCalendar.tsx`:
-- Header: uşaq adı + yaşı + ölkə bayrağı (ChildSelector mövcuddur)
-- **Ölkə seçici** dropdown — istifadəçi öz ölkəsini dəyişə bilər (default `AZ`); seçim `children.country_code` sütununda saxlanır
-- **Üç tab**:
-  - **Yaxınlaşan** — növbəti 3 doza (yaşa görə)
-  - **Tam qrafik** — yaşa görə qruplanmış timeline (Doğulanda → 16 yaş), hər doza üçün: ad, yaş etiketi, status badge (✅ Vuruldu / ⏰ Gözləmədə / ⚠️ Gecikdi / ⊘ Buraxılıb)
-  - **Tamamlanmış** — vurulmuş peyvəndlər
-- Hər kartda klik → **detallı sheet**: tam təsvir, qarşısı alınan xəstəlik, yan təsirlər, əks-göstərişlər, rəsmi qaynaq linki
-- Status əməliyyatları: "Vuruldu" (tarix + qeyd), "Buraxıldı" (səbəb), "Bərpa et"
-- Tərəqqi göstəricisi: ümumi `{n}/{total}` + faiz dairəsi
-- Print/PDF export (sadə browser print)
-- `useChildren` ilə inteqrasiya; uşaqda `country_code` yoxdursa default `AZ`
+**Problem:** `dr-anacan-chat` edge function `cyclePhase` və `cycleDay` parametrlərini qəbul edir, amma frontend göndərmir. AI menstruasiya mərhələsini bilmir.
 
-`src/hooks/useVaccines.ts` — `useQuery` ilə ölkə-spesifik qrafik + `child_vaccinations` join.
-
-### 3. Mommy modulu inteqrasiyası
-- `ToolsHub.tsx`-də lazy import + `case 'vaccine-calendar':` route
-- `tool_configs`-da yeni entry: `tool_key='vaccine-calendar'`, stage=mommy, icon=`Syringe`
-- Dashboard mommy bölümündə kiçik widget: "Növbəti peyvənd: 2 aylıq — DTP/HiB/Polio — 12 gün sonra"
-- Push reminder — `send-daily-notifications` cron-a vaccine yoxlaması əlavə (3 gün, 1 gün qabaq)
-
-### 4. Admin panel — `AdminVaccines.tsx`
-`src/components/admin/AdminVaccines.tsx` + `AdminLayout`-da menyu:
-- **Ölkələr tab**: list + add/edit/delete + active/default toggle
-- **Peyvəndlər tab**: ölkə seçiciyə görə filter, peyvənd CRUD (bütün AZ/EN sahələr, mətn redaktoru ilə uzun təsvir)
-- **Qrafik tab**: ölkə + peyvənd seçiciyə görə dozalar — yaş, etiket, pəncərə, qeyd
-- **Köçürmə**: "Bu ölkəni başqa ölkəyə kopyala" düyməsi — bir ölkə üçün hazır qrafiki yeni ölkəyə şablon kimi köçürür, sonra redaktə olunur
-- Bütün sahələr inline-edit; sıralama drag-and-drop və ya sort_order input
-
-### 5. Çoxdilli & ölkə dəyişikliyi
-- `children` cədvəlinə `country_code text default 'AZ'` əlavə (migration)
-- İstifadəçi UI-da ölkəni dəyişdikdə → `children.country_code` yenilənir → bütün sorğular həmin ölkə üçün yenidən fetch olunur
-- `child_vaccinations` köhnə ölkə üçün saxlanılır (silinmir) — istifadəçi geri dönsə tarixçə qalır
-- AZ üçün default qrafik onsuz da seed olunur; digər ölkələr admin tərəfindən doldurulduqca aktivləşir; admin doldurmayıbsa istifadəçiyə "Bu ölkə üçün qrafik hələ hazırlanmayıb" mesajı
+**Həll:**
+- `src/components/AIChatScreen.tsx` (və ya Dr.Anacan chat komponenti) içində `useUserStore`-dan `lastPeriodDate`, `cycleLength` götürüb `getCyclePhase()` (yeni `src/lib/cycle-utils.ts` helper-i) ilə cari fazanı hesabla: `menstruation | follicular | ovulation | luteal`.
+- Edge function-a göndərilən payload-a `cyclePhase`, `cycleDay`, `daysUntilNextPeriod` əlavə et.
+- Flow modulunda istifadəçi olduqda sistem promptu artıq fazaya uyğun cavab verəcək.
 
 ---
 
-### Texniki detallar
+## 2. Cycle Length Trend Graph + Anomaliya Aşkarlama
+
+**Yer:** `src/components/tools/MenstrualCalendar.tsx` (və ya Flow ana ekranı) — yeni "İnsightlər" tab/section.
+
+**Komponentlər:**
+- `src/components/flow/CycleTrendChart.tsx` — Recharts LineChart, son 6-12 dövr `cycle_history`-dən, X: dövr №, Y: gün uzunluğu, ortalama xətti ilə.
+- `src/components/flow/CycleAnomalyBanner.tsx` — ACOG normalarına görə (21-35 gün norma):
+  - <21 gün: "Qısa dövr — həkimə müraciət tövsiyə"
+  - >35 gün: "Gecikmiş dövr — pregnancy test və ya həkim"
+  - Variation >7 gün: "Düzənsiz dövr"
+- Mövcud `useCycleStats()` hook-undan istifadə.
+
+---
+
+## 3. Həb/Kontrasepsiya Xatırlatma UI
+
+**Status:** `flow_reminders` cədvəlində `pill` tipi artıq var, edge function `send-flow-reminders` də işləyir. Yalnız UI yoxdur.
+
+**Yer:** `src/components/flow/FlowRemindersSettings.tsx` (yeni və ya mövcud reminder səhifəsinə əlavə).
+
+**Funksionallıq:**
+- "Həb Xatırlatması" tab/card
+- Gündəlik vaxt seçici (`time_of_day`)
+- Açıq/bağlı toggle
+- Başlıq və mesajı redaktə (default: "Həbinizi qəbul edin 💊")
+- LocalNotifications ilə cihazda təkrarlanan bildiriş qur (Capacitor)
+- `useSaveFlowReminder({ reminder_type: 'pill' })` çağırışı
+
+---
+
+## 4. Period Gecikmə Aşkarlama + AI Auto-Mesaj
+
+**Məntiq:** `Dashboard.tsx` flow modulunda hər yükləmədə:
+- `daysSinceLastPeriod = today - lastPeriodDate`
+- Əgər `daysSinceLastPeriod > avgCycleLength + 3` → "Period gecikir" banner
+- Banner-də: "Hamiləlik testi etməyi düşün" + "Dr. Anacan-dan soruş" CTA
+- AI-ya context-li link (`?prompt=period_delay&days=X`)
+- Notification Center-ə avto-mesaj əlavə et (24 saatda 1 dəfə, throttled — `useUserPreferences`-də `last_delay_notification_at` flag)
+
+**Yer:**
+- `src/components/flow/PeriodDelayBanner.tsx` (yeni)
+- `src/components/Dashboard.tsx` — flow stage condition altında render
+
+---
+
+## 5. Simptom Pattern Analysis (Premium)
+
+**Yer:** `src/components/flow/SymptomPatternReport.tsx` (yeni premium tool).
+
+**Logic:**
+- `flow_daily_logs`-dan son 3 dövrlük data oxu
+- Hər simptom üçün hesabla: hansı cycle day-də ən tez-tez baş verir
+- Heat-map və ya bar chart: "Baş ağrısı adətən 14-16-cı gündə (ovulyasiya)"
+- Top 5 pattern göstər
+- Premium gating: `useSubscription` → `is_premium` yoxla, deyilsə Paywall
+
+**Tool config:** `tool_configs`-də yeni entry `symptom_pattern_report`, `requires_premium: true`.
+
+---
+
+## 6. Gündəlik Story Cards
+
+**Konsept:** Flo-nun "Today" tab-ı kimi — hər gün üçün faza-spesifik 3-5 card (təhsil, məsləhət, simptom proqnozu).
+
+**Cədvəl:** `flow_insights` artıq var (`phase`, `title_az`, `content_az`, `emoji`).
+
+**Komponent:** `src/components/flow/DailyStoryCards.tsx`
+- Horizontal scroll snap carousel (Instagram story tərzi mini kartlar — story DEYIL, kart)
+- Hər kart: emoji + başlıq + 2 sətr preview
+- Tap → full-screen modal `StoryDetailSheet`
+- Daily deterministic seed (date + user_id) ilə eyni gün eyni kartlar
+- Faza filtri: cari `cyclePhase`-ə uyğun + ümumi (phase=null) qarışıq
+
+**Yer:** Dashboard flow stage-də ən üstə.
+
+---
+
+## 8. Flow üçün Partner Mode
+
+**Mövcud:** Partner mode hazırda yalnız bump/mommy üçündür (memory: partner-mode-scope).
+
+**Genişləndirmə:**
+- `partner_config`-də yeni flag `flow_enabled: boolean`
+- `usePartnerData` hook-una flow məlumatı əlavə:
+  - Cari faza
+  - Növbəti period proqnozu
+  - PMS xəbərdarlığı (3 gün əvvəl)
+  - "Trying to conceive" rejimi (fertile window)
+- Partner ekranında yeni card: `PartnerFlowStatusCard.tsx`
+- Partner push: PMS başlayanda "Partneriniz PMS dövründədir, dəstək göstərin 💕"
+- Premium gating saxlanılır
+
+**Memory update:** partner-mode-scope memo-su flow stage-i daxil edəcək şəkildə yenilənəcək.
+
+---
+
+## Texniki Detallar (qısaca)
 
 ```text
-ölkə (UI) ──► children.country_code ──► useVaccines(country_code)
-                                              │
-                                              ├─► vaccine_schedules (qrafik şablonu)
-                                              └─► child_vaccinations (status, child_id-yə bağlı)
+Yeni fayllar:
+- src/lib/cycle-utils.ts → getCyclePhase(lpd, cycleLen, today)
+- src/components/flow/CycleTrendChart.tsx
+- src/components/flow/CycleAnomalyBanner.tsx
+- src/components/flow/PeriodDelayBanner.tsx
+- src/components/flow/SymptomPatternReport.tsx
+- src/components/flow/DailyStoryCards.tsx
+- src/components/flow/PartnerFlowStatusCard.tsx
+- src/components/flow/PillReminderCard.tsx
+
+Dəyişdiriləcək:
+- src/components/AIChatScreen.tsx (cyclePhase göndər)
+- src/components/Dashboard.tsx (flow widget-lərini əlavə)
+- src/hooks/usePartnerData.ts (flow datası)
+- supabase/functions/dr-anacan-chat/prompts.ts (faza promptları zənginləşdir)
+
+Migration:
+- partner_config.flow_enabled (boolean, default false)
+- tool_configs entry: symptom_pattern_report
+- user_preferences.last_delay_notification_at (timestamptz)
 ```
 
-- Yaş hesablanması: `getRealCalendarAge(child.birth_date)` ilə günə çevrilir, sonra `recommended_age_days` ilə müqayisə (Baku UTC+4 qaydası)
-- Realtime: lazım deyil — `invalidateQueries` ilə kifayət
+---
 
-### Çatdırılma sırası
-1. Migration (4 cədvəl + GRANT + RLS) + AZ seed
-2. `useVaccines` hook + `VaccineCalendar.tsx` (3 tab + detal sheet)
-3. ToolsHub + tool_configs qeydiyyat
-4. AdminVaccines panel
-5. Mommy dashboard widget + push reminder (cron-a kiçik əlavə)
+# 9 və 10: Necə Edəcəyimizin İzahı (qurulmayacaq)
 
-Təsdiq edin, başlayım.
+## 9. Apple Health / Health Connect Sync
+
+**Texnoloji yanaşma:**
+- **iOS:** `@capacitor-community/health` plugin (HealthKit wrapper). Native side-da `NSHealthShareUsageDescription` və `NSHealthUpdateUsageDescription` `Info.plist`-ə.
+- **Android:** Health Connect SDK — `androidx.health.connect:connect-client`. Manifest-ə `android.permission.health.READ_MENSTRUATION` və `WRITE_MENSTRUATION`.
+- Capacitor plugin: ya mövcud `capacitor-health-connect`, ya da custom bridge yaz.
+
+**Sync axını:**
+1. Settings → "Sağlamlıq tətbiqi ilə sinxronlaşdır" toggle
+2. İlk açılış: permission dialogu (oxu/yaz menstruation, ovulation, basal body temperature)
+3. **Pull (oxu):** Health-dən son 6 ay menstruation cycle datasını çək → `period_day_logs` və `cycle_history`-yə upsert (deduplication tarix əsasında)
+4. **Push (yaz):** İstifadəçi Anacan-da period log etdikdə → Health-ə `MenstrualFlowSample` yaz
+5. Background sync: `@capacitor/background-runner` ilə gündə 1 dəfə
+
+**Çətinliklər:**
+- iOS App Review: HealthKit istifadəsi üçün ayrıca justification lazım, screencast tələb olunur
+- Android: Health Connect yalnız Android 14+ native, köhnə versiyalarda Play Store-dan ayrı APK
+- Web fallback yox — yalnız native build-də işləyəcək (`Capacitor.isNativePlatform()` guard)
+
+**Təxmini iş həcmi:** 2-3 gün (plugin inteqrasiyası + sync logic + permission UI + App Store/Play Store sənədləri).
+
+---
+
+## 10. PMDD/PCOS/Endometriosis Təhsil Moduları
+
+**Yanaşma:** Mövcud blog/learn infrastrukturundan istifadə + spesifik symptom-based pathways.
+
+**Komponentlər:**
+1. **Yeni cədvəl:** `health_conditions` (key, name_az, description_az, symptoms[], risk_factors[], when_to_see_doctor, screening_questions jsonb)
+2. **Screening Quiz:** Hər kondisiya üçün 8-10 sual (məs. PMDD üçün DRSP scale qısa versiyası). Cavablara görə risk skoru.
+3. **Educational Content:** Blog tipli uzun məqalələr (markdown), `blog_posts` cədvəlində `category: health_condition` ilə.
+4. **Smart Detection:** `flow_daily_logs`-dakı simptomları analiz et:
+   - PCOS: düzənsiz dövrlər (>35 gün, variation >9), acne, hair issues simptomları
+   - Endometriosis: pain_level >7 mütəmadi, painful periods
+   - PMDD: lutein fazada mood <3 ardıcıl 3 dövr
+5. **Trigger:** Pattern aşkar olunanda banner: "Simptomlarınız [X]-ə uyğun ola bilər. Screening edək?"
+6. **CTA:** Quiz → nəticə → təhsil materialı → "Həkimə müraciət üçün hazırlıq" PDF/checklist
+
+**UI:**
+- `src/pages/HealthConditions.tsx` — ana hub
+- `src/components/health/ConditionQuiz.tsx` — generic quiz engine
+- `src/components/health/ConditionDetectionBanner.tsx` — flow dashboard-da
+
+**Məzmun istehsalı:**
+- Admin panel-də `health_conditions` CRUD
+- İlkin seed: PMDD, PCOS, Endometriosis (AZ dilində, həkim review tələb olunur)
+- Hər birinə 3-5 məqalə (səbəblər, simptomlar, müalicə variantları, life with…)
+
+**Hüquqi:**
+- Hər səhifədə güclü medical disclaimer (artıq mövcud `MedicalDisclaimer` komponenti)
+- "Bu diaqnoz deyil, screening-dir" mesajı vurğulanmalı
+- Google Play Health Content policy üçün məcburi
+
+**Təxmini iş həcmi:** 3-4 gün (məzmun olmadan), məzmunla 1-2 həftə (həkim review daxil).
+
+---
+
+## Sual
+
+1-6 və 8-i sırayla qurmağa başlayım? Yoxsa hansısa prioritet dəyişiklik var?
