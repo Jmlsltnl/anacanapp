@@ -205,7 +205,6 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
           language: useUserStore.getState().language || 'az',
           ...(lifeStage === 'flow' && lastPeriodDate ? (() => {
             try {
-              const { getPhaseInfoForDate } = require('@/lib/cycle-utils');
               const info = getPhaseInfoForDate(new Date(), new Date(lastPeriodDate), cycleLength || 28, periodLength || 5);
               return { cyclePhase: info.phase, cycleDay: info.dayInCycle };
             } catch { return {}; }
