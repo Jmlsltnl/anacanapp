@@ -8,6 +8,7 @@ import { useFirstAidScenarios, useFirstAidSteps, FirstAidScenario } from '@/hook
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { toast } from 'sonner';
+import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface FirstAidGuideProps {
   onBack: () => void;
