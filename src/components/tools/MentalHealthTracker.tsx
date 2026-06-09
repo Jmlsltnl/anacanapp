@@ -258,6 +258,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
       </div>
 
       <div className="px-4 pt-4">
+        <MedicalDisclaimer variant="compact" className="mb-4" />
         {/* Stats Cards */}
         <div className="grid grid-cols-3 gap-3 mb-4">
           <motion.div
