@@ -181,6 +181,10 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
         </div>
       </div>
 
+      <div className="px-4 pt-3">
+        <MedicalDisclaimer variant="compact" />
+      </div>
+
       {/* Stats Cards */}
       <div className="px-4 py-4 grid grid-cols-2 gap-3">
         <motion.div 
