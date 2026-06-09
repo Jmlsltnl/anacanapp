@@ -530,11 +530,27 @@ const FlowDashboard = () => {
         <FlowCycleStats />
       </motion.div>
 
+      {/* Cycle Trend Chart + Anomaly Detection */}
+      <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.65 }}>
+        <CycleTrendChart />
+      </motion.div>
+      <CycleAnomalyBanner />
+
+      {/* Symptom Pattern Analysis (Premium) */}
+      <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.68 }}>
+        <SymptomPatternReport />
+      </motion.div>
+
+      {/* Pill / Contraception Reminder */}
+      <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.7 }}>
+        <PillReminderCard />
+      </motion.div>
+
       {/* Reminders */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.7 }}
+        transition={{ delay: 0.72 }}
       >
         <FlowRemindersCard />
       </motion.div>
