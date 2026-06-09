@@ -1826,6 +1826,9 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
 
       {/* Bottom Banner Slot */}
       <BannerSlot placement="home_bottom" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mt-2" />
+
+      {/* Small medical disclaimer for all modules — Google Play Health Content policy */}
+      <MedicalDisclaimer variant="inline" className="mt-3 px-1" />
     </div>
   );
 };
