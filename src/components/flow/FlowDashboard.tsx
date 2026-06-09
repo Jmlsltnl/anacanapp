@@ -31,6 +31,13 @@ import FlowMoodChart from './FlowMoodChart';
 import FlowCycleStats from './FlowCycleStats';
 import FlowRemindersCard from './FlowRemindersCard';
 import FlowPeriodCalendar from './FlowPeriodCalendar';
+import CycleTrendChart from './CycleTrendChart';
+import CycleAnomalyBanner from './CycleAnomalyBanner';
+import PeriodDelayBanner from './PeriodDelayBanner';
+import PillReminderCard from './PillReminderCard';
+import SymptomPatternReport from './SymptomPatternReport';
+import DailyStoryCards from './DailyStoryCards';
+import PartnerFlowStatusCard from './PartnerFlowStatusCard';
 import { getPhaseInfoForDate, getNextPeriodDate, getFertileWindow } from '@/lib/cycle-utils';
 const FlowDashboard = () => {
   const { getCycleData, cycleLength, periodLength, setLastPeriodDate } = useUserStore();
