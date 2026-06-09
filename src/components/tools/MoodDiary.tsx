@@ -11,6 +11,7 @@ import { useUserStore } from '@/store/userStore';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
+import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface MoodDiaryProps {
   onBack: () => void;
