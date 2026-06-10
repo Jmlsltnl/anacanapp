@@ -26,6 +26,18 @@ export interface RCPackage {
     priceString: string;
     price: number;
     currencyCode: string;
+    defaultOptionId?: string | null;
+    defaultOptionHasFreeTrial?: boolean;
+    defaultOptionTrialPeriod?: string | null;
+    defaultOptionTags?: string[];
+    subscriptionOptions?: Array<{
+      id: string;
+      isBasePlan: boolean;
+      tags: string[];
+      hasFreeTrial: boolean;
+      trialPeriod: string | null;
+      fullPricePeriod: string | null;
+    }>;
   };
   _raw: any; // full package object for purchasePackage
 }
@@ -86,6 +98,19 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
         const offerings = await getOfferings();
         if (offerings?.current?.availablePackages) {
           const pkgs: RCPackage[] = offerings.current.availablePackages.map((pkg: any) => ({
+            const defaultOption = pkg.product?.defaultOption;
+            const subscriptionOptions = Array.isArray(pkg.product?.subscriptionOptions)
+              ? pkg.product.subscriptionOptions.map((option: any) => ({
+                  id: option?.id || '',
+                  isBasePlan: !!option?.isBasePlan,
+                  tags: Array.isArray(option?.tags) ? option.tags : [],
+                  hasFreeTrial: !!option?.freePhase,
+                  trialPeriod: option?.freePhase?.billingPeriod || null,
+                  fullPricePeriod: option?.fullPricePhase?.billingPeriod || null,
+                }))
+              : [];
+
+            return {
             identifier: pkg.identifier,
             packageType: pkg.packageType,
             product: {
@@ -95,9 +120,14 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
               priceString: pkg.product?.priceString || '',
               price: pkg.product?.price || 0,
               currencyCode: pkg.product?.currencyCode || '',
+              defaultOptionId: defaultOption?.id || null,
+              defaultOptionHasFreeTrial: !!defaultOption?.freePhase,
+              defaultOptionTrialPeriod: defaultOption?.freePhase?.billingPeriod || null,
+              defaultOptionTags: Array.isArray(defaultOption?.tags) ? defaultOption.tags : [],
+              subscriptionOptions,
             },
             _raw: pkg,
-          }));
+          }});
           setPackages(pkgs);
         }
       } catch (err) {
