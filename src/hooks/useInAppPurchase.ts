@@ -26,6 +26,18 @@ export interface RCPackage {
     priceString: string;
     price: number;
     currencyCode: string;
+    defaultOptionId?: string | null;
+    defaultOptionHasFreeTrial?: boolean;
+    defaultOptionTrialPeriod?: string | null;
+    defaultOptionTags?: string[];
+    subscriptionOptions?: Array<{
+      id: string;
+      isBasePlan: boolean;
+      tags: string[];
+      hasFreeTrial: boolean;
+      trialPeriod: string | null;
+      fullPricePeriod: string | null;
+    }>;
   };
   _raw: any; // full package object for purchasePackage
 }
@@ -85,19 +97,38 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
         // Load offerings
         const offerings = await getOfferings();
         if (offerings?.current?.availablePackages) {
-          const pkgs: RCPackage[] = offerings.current.availablePackages.map((pkg: any) => ({
-            identifier: pkg.identifier,
-            packageType: pkg.packageType,
-            product: {
-              identifier: pkg.product?.identifier || '',
-              title: pkg.product?.title || '',
-              description: pkg.product?.description || '',
-              priceString: pkg.product?.priceString || '',
-              price: pkg.product?.price || 0,
-              currencyCode: pkg.product?.currencyCode || '',
-            },
-            _raw: pkg,
-          }));
+          const pkgs: RCPackage[] = offerings.current.availablePackages.map((pkg: any) => {
+            const defaultOption = pkg.product?.defaultOption;
+            const subscriptionOptions = Array.isArray(pkg.product?.subscriptionOptions)
+              ? pkg.product.subscriptionOptions.map((option: any) => ({
+                  id: option?.id || '',
+                  isBasePlan: !!option?.isBasePlan,
+                  tags: Array.isArray(option?.tags) ? option.tags : [],
+                  hasFreeTrial: !!option?.freePhase,
+                  trialPeriod: option?.freePhase?.billingPeriod || null,
+                  fullPricePeriod: option?.fullPricePhase?.billingPeriod || null,
+                }))
+              : [];
+
+            return {
+              identifier: pkg.identifier,
+              packageType: pkg.packageType,
+              product: {
+                identifier: pkg.product?.identifier || '',
+                title: pkg.product?.title || '',
+                description: pkg.product?.description || '',
+                priceString: pkg.product?.priceString || '',
+                price: pkg.product?.price || 0,
+                currencyCode: pkg.product?.currencyCode || '',
+                defaultOptionId: defaultOption?.id || null,
+                defaultOptionHasFreeTrial: !!defaultOption?.freePhase,
+                defaultOptionTrialPeriod: defaultOption?.freePhase?.billingPeriod || null,
+                defaultOptionTags: Array.isArray(defaultOption?.tags) ? defaultOption.tags : [],
+                subscriptionOptions,
+              },
+              _raw: pkg,
+            };
+          });
           setPackages(pkgs);
         }
       } catch (err) {
@@ -111,20 +142,25 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
     init();
   }, [user?.id]);
 
-  const syncWithDatabase = useCallback(async (isPro: boolean, productId?: string) => {
+  const syncWithDatabase = useCallback(async (isPro: boolean, productId?: string, expiresAtOverride?: string | null) => {
     if (!user) return;
     try {
       const planType = productId?.includes('yearly') || productId?.includes('lifetime')
         ? 'premium_plus' : 'premium';
 
-      const expiresAt = new Date();
-      if (productId?.includes('lifetime')) {
-        expiresAt.setFullYear(expiresAt.getFullYear() + 100);
-      } else if (productId?.includes('yearly')) {
-        expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-      } else {
-        expiresAt.setMonth(expiresAt.getMonth() + 1);
-      }
+      const expiresAt = expiresAtOverride
+        ? new Date(expiresAtOverride)
+        : (() => {
+            const fallback = new Date();
+            if (productId?.includes('lifetime')) {
+              fallback.setFullYear(fallback.getFullYear() + 100);
+            } else if (productId?.includes('yearly')) {
+              fallback.setFullYear(fallback.getFullYear() + 1);
+            } else {
+              fallback.setMonth(fallback.getMonth() + 1);
+            }
+            return fallback;
+          })();
 
       await supabase
         .from('subscriptions')
@@ -162,7 +198,8 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
 
       if (result.success) {
         setIsPro(true);
-        await syncWithDatabase(true, pkg.product.identifier);
+        const entitlement = result.customerInfo?.entitlements?.active?.[REVENUECAT_CONFIG.ENTITLEMENT_ID];
+        await syncWithDatabase(true, pkg.product.identifier, entitlement?.expirationDate || null);
         import('@/lib/analytics').then(m => m.analytics.logPremiumSubscribed(pkg.identifier)).catch(() => {});
         return true;
       }
