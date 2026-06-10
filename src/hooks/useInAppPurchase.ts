@@ -97,7 +97,7 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
         // Load offerings
         const offerings = await getOfferings();
         if (offerings?.current?.availablePackages) {
-          const pkgs: RCPackage[] = offerings.current.availablePackages.map((pkg: any) => ({
+          const pkgs: RCPackage[] = offerings.current.availablePackages.map((pkg: any) => {
             const defaultOption = pkg.product?.defaultOption;
             const subscriptionOptions = Array.isArray(pkg.product?.subscriptionOptions)
               ? pkg.product.subscriptionOptions.map((option: any) => ({
@@ -111,23 +111,24 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
               : [];
 
             return {
-            identifier: pkg.identifier,
-            packageType: pkg.packageType,
-            product: {
-              identifier: pkg.product?.identifier || '',
-              title: pkg.product?.title || '',
-              description: pkg.product?.description || '',
-              priceString: pkg.product?.priceString || '',
-              price: pkg.product?.price || 0,
-              currencyCode: pkg.product?.currencyCode || '',
-              defaultOptionId: defaultOption?.id || null,
-              defaultOptionHasFreeTrial: !!defaultOption?.freePhase,
-              defaultOptionTrialPeriod: defaultOption?.freePhase?.billingPeriod || null,
-              defaultOptionTags: Array.isArray(defaultOption?.tags) ? defaultOption.tags : [],
-              subscriptionOptions,
-            },
-            _raw: pkg,
-          }});
+              identifier: pkg.identifier,
+              packageType: pkg.packageType,
+              product: {
+                identifier: pkg.product?.identifier || '',
+                title: pkg.product?.title || '',
+                description: pkg.product?.description || '',
+                priceString: pkg.product?.priceString || '',
+                price: pkg.product?.price || 0,
+                currencyCode: pkg.product?.currencyCode || '',
+                defaultOptionId: defaultOption?.id || null,
+                defaultOptionHasFreeTrial: !!defaultOption?.freePhase,
+                defaultOptionTrialPeriod: defaultOption?.freePhase?.billingPeriod || null,
+                defaultOptionTags: Array.isArray(defaultOption?.tags) ? defaultOption.tags : [],
+                subscriptionOptions,
+              },
+              _raw: pkg,
+            };
+          });
           setPackages(pkgs);
         }
       } catch (err) {
