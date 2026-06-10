@@ -142,20 +142,25 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
     init();
   }, [user?.id]);
 
-  const syncWithDatabase = useCallback(async (isPro: boolean, productId?: string) => {
+  const syncWithDatabase = useCallback(async (isPro: boolean, productId?: string, expiresAtOverride?: string | null) => {
     if (!user) return;
     try {
       const planType = productId?.includes('yearly') || productId?.includes('lifetime')
         ? 'premium_plus' : 'premium';
 
-      const expiresAt = new Date();
-      if (productId?.includes('lifetime')) {
-        expiresAt.setFullYear(expiresAt.getFullYear() + 100);
-      } else if (productId?.includes('yearly')) {
-        expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-      } else {
-        expiresAt.setMonth(expiresAt.getMonth() + 1);
-      }
+      const expiresAt = expiresAtOverride
+        ? new Date(expiresAtOverride)
+        : (() => {
+            const fallback = new Date();
+            if (productId?.includes('lifetime')) {
+              fallback.setFullYear(fallback.getFullYear() + 100);
+            } else if (productId?.includes('yearly')) {
+              fallback.setFullYear(fallback.getFullYear() + 1);
+            } else {
+              fallback.setMonth(fallback.getMonth() + 1);
+            }
+            return fallback;
+          })();
 
       await supabase
         .from('subscriptions')
@@ -193,7 +198,8 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
 
       if (result.success) {
         setIsPro(true);
-        await syncWithDatabase(true, pkg.product.identifier);
+        const entitlement = result.customerInfo?.entitlements?.active?.[REVENUECAT_CONFIG.ENTITLEMENT_ID];
+        await syncWithDatabase(true, pkg.product.identifier, entitlement?.expirationDate || null);
         import('@/lib/analytics').then(m => m.analytics.logPremiumSubscribed(pkg.identifier)).catch(() => {});
         return true;
       }
