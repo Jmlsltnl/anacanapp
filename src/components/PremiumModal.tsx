@@ -86,6 +86,21 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
 
   const monthlyProduct = packages.find(p => p?.product?.identifier?.includes('monthly'));
   const yearlyProduct = packages.find(p => p?.product?.identifier?.includes('yearly'));
+  const selectedProduct = selectedPlan === 'yearly' ? yearlyProduct : monthlyProduct;
+  const selectedTrialPeriod = selectedProduct?.product?.defaultOptionTrialPeriod;
+  const selectedHasStoreTrial = !!selectedProduct?.product?.defaultOptionHasFreeTrial;
+  const hasAnyStoreTrial = packages.some((pkg) => pkg.product.defaultOptionHasFreeTrial);
+  const parseIsoTrialDays = (period?: string | null) => {
+    if (!period) return null;
+    const match = /^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)W)?(?:(\d+)D)?$/i.exec(period);
+    if (!match) return null;
+    const years = Number(match[1] || 0);
+    const months = Number(match[2] || 0);
+    const weeks = Number(match[3] || 0);
+    const days = Number(match[4] || 0);
+    return years * 365 + months * 30 + weeks * 7 + days;
+  };
+  const storeTrialDays = parseIsoTrialDays(selectedTrialPeriod) ?? parseIsoTrialDays(monthlyProduct?.product?.defaultOptionTrialPeriod) ?? parseIsoTrialDays(yearlyProduct?.product?.defaultOptionTrialPeriod);
 
   const currencySymbol = dbCurrency === 'AZN' ? '₼' : dbCurrency;
   const monthlyPrice = monthlyProduct?.product?.priceString || (dbMonthlyPrice ? `${dbMonthlyPrice}` : '9.99');
@@ -103,8 +118,10 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const allFeatures = [...premiumOnlyFeatures, ...limitedFreeFeatures];
 
   const isCurrentlyMonthly = isPremium && subscription?.plan_type === 'premium';
-  const showFreeTrial = paywallConfig.free_trial_enabled && !isPremium;
-  const freeTrialNote = paywallConfig.free_trial_note.replace('{days}', String(paywallConfig.free_trial_days));
+  const fallbackTrialEnabled = paywallConfig.free_trial_enabled && !isPremium;
+  const showFreeTrial = !isPremium && (isNative ? hasAnyStoreTrial : fallbackTrialEnabled);
+  const effectiveTrialDays = storeTrialDays ?? paywallConfig.free_trial_days;
+  const freeTrialNote = paywallConfig.free_trial_note.replace('{days}', String(effectiveTrialDays));
   const ctaText = showFreeTrial
     ? paywallConfig.free_trial_cta
     : isCurrentlyMonthly && selectedPlan === 'yearly'
