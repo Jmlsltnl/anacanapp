@@ -321,7 +321,11 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                     )}
                   </div>
                   <p className="text-lg font-black">{currencySymbol}{yearlyMonthly}<span className="text-[10px] font-normal opacity-60">{paywallConfig.yearly_suffix}</span></p>
-                  <p className={`text-[10px] mt-0.5 ${selectedPlan === 'yearly' ? 'text-muted-foreground' : 'text-white/50'}`}>{currencySymbol}{yearlyPrice}{paywallConfig.yearly_total_suffix}</p>
+                  <p className={`text-[10px] mt-0.5 ${selectedPlan === 'yearly' ? 'text-muted-foreground' : 'text-white/50'}`}>
+                    {yearlyProduct?.product?.defaultOptionHasFreeTrial
+                      ? `${parseIsoTrialDays(yearlyProduct.product.defaultOptionTrialPeriod) ?? paywallConfig.free_trial_days} gün pulsuz, sonra ${currencySymbol}${yearlyPrice}${paywallConfig.yearly_total_suffix}`
+                      : `${currencySymbol}${yearlyPrice}${paywallConfig.yearly_total_suffix}`}
+                  </p>
                 </motion.button>
 
                 {/* Monthly */}
@@ -344,7 +348,11 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                     )}
                   </div>
                   <p className="text-lg font-black">{currencySymbol}{monthlyPrice}<span className="text-[10px] font-normal opacity-60">{paywallConfig.monthly_suffix}</span></p>
-                  <p className={`text-[10px] mt-0.5 ${selectedPlan === 'monthly' ? 'text-muted-foreground' : 'text-white/50'}`}>&nbsp;</p>
+                  <p className={`text-[10px] mt-0.5 ${selectedPlan === 'monthly' ? 'text-muted-foreground' : 'text-white/50'}`}>
+                    {monthlyProduct?.product?.defaultOptionHasFreeTrial
+                      ? `${parseIsoTrialDays(monthlyProduct.product.defaultOptionTrialPeriod) ?? paywallConfig.free_trial_days} gün pulsuz, sonra ${currencySymbol}${monthlyPrice}${paywallConfig.monthly_suffix}`
+                      : '\u00A0'}
+                  </p>
                 </motion.button>
               </div>
             </div>
@@ -353,7 +361,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
             <div className="shrink-0 px-5 pt-2" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}>
               {showFreeTrial && (
                 <p className="text-center text-[11px] text-white/80 mb-2 font-medium">
-                  {freeTrialNote}
+                  {selectedHasStoreTrial || !isNative ? freeTrialNote : 'Bu plan üçün pulsuz sınaq yoxdur'}
                 </p>
               )}
               <Button
