@@ -65,6 +65,15 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
   const yearlyMonthly = +(yearlyPriceNum / 12).toFixed(2);
   const yearlyMonthlyStr = `${symbol}${yearlyMonthly.toFixed(2)}`;
   const savingsPercent = monthlyPriceNum > 0 ? Math.round((1 - yearlyMonthly / monthlyPriceNum) * 100) : 0;
+  const parseIsoTrialDays = (period?: string | null) => {
+    if (!period) return null;
+    const match = /^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)W)?(?:(\d+)D)?$/i.exec(period);
+    if (!match) return null;
+    return Number(match[1] || 0) * 365 + Number(match[2] || 0) * 30 + Number(match[3] || 0) * 7 + Number(match[4] || 0);
+  };
+  const monthlyTrialDays = parseIsoTrialDays(monthlyPkg?.product?.defaultOptionTrialPeriod);
+  const yearlyTrialDays = parseIsoTrialDays(yearlyPkg?.product?.defaultOptionTrialPeriod);
+  const anyTrialDays = yearlyTrialDays ?? monthlyTrialDays;
 
   const handlePurchase = async () => {
     // Web / non-native fallback — just continue
@@ -101,12 +110,14 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
           <p className="text-sm text-muted-foreground mt-1">{tr("paywallstep_tam_imkanlardan_yararlanin_4b72fb", "Tam imkanlardan yararlanın")}</p>
         </div>
 
-        <div className="flex items-center justify-center gap-2 mb-5">
-          <div className="flex items-center gap-1.5 px-4 py-2 bg-green-100 dark:bg-green-900/30 rounded-full">
-            <Sparkles className="w-4 h-4 text-green-600 dark:text-green-400" />
-            <span className="text-sm font-bold text-green-700 dark:text-green-400">{tr("paywallstep_3_gun_pulsuz_sinaq_132a91", "3 GÜN PULSUZ SINAQ")}</span>
-          </div>
-        </div>
+          {anyTrialDays && (
+            <div className="flex items-center justify-center gap-2 mb-5">
+              <div className="flex items-center gap-1.5 px-4 py-2 bg-green-100 dark:bg-green-900/30 rounded-full">
+                <Sparkles className="w-4 h-4 text-green-600 dark:text-green-400" />
+                <span className="text-sm font-bold text-green-700 dark:text-green-400">{anyTrialDays} GÜN PULSUZ SINAQ</span>
+              </div>
+            </div>
+          )}
 
         {isLoading && isNativePlatform() ? (
           <div className="flex items-center justify-center py-8">
@@ -130,7 +141,7 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
               <div className="flex items-center justify-between">
                 <div className="text-left">
                   <p className="text-sm font-semibold text-foreground">{tr("paywallstep_illik_4a3cef", "İllik")}</p>
-                  <p className="text-xs text-muted-foreground">3 gün pulsuz, sonra {yearlyPriceStr}/il</p>
+                  <p className="text-xs text-muted-foreground">{yearlyTrialDays ? `${yearlyTrialDays} gün pulsuz, sonra ${yearlyPriceStr}/il` : `${yearlyPriceStr}/il`}</p>
                 </div>
                 <div className="text-right">
                   <span className="text-lg font-bold text-foreground">{yearlyMonthlyStr}</span>
@@ -149,7 +160,7 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
               <div className="flex items-center justify-between">
                 <div className="text-left">
                   <p className="text-sm font-semibold text-foreground">{tr("paywallstep_ayliq_6f265e", "Aylıq")}</p>
-                  <p className="text-xs text-muted-foreground">3 gün pulsuz, sonra {monthlyPriceStr}/ay</p>
+                  <p className="text-xs text-muted-foreground">{monthlyTrialDays ? `${monthlyTrialDays} gün pulsuz, sonra ${monthlyPriceStr}/ay` : `${monthlyPriceStr}/ay`}</p>
                 </div>
                 <div className="text-right">
                   <span className="text-lg font-bold text-foreground">{monthlyPriceStr}</span>
@@ -192,11 +203,13 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
           {isPurchasing ? (
             <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Emal edilir...</>
           ) : (
-            '3 Gün Pulsuz Başla'
+              anyTrialDays ? `${anyTrialDays} Gün Pulsuz Başla` : 'Premium-a Keç'
           )}
         </Button>
         <p className="text-[11px] text-center text-muted-foreground">
-          3 gün pulsuz sınayın · Sonra {selectedPlan === 'yearly' ? `${yearlyPriceStr}/il` : `${monthlyPriceStr}/ay`} · İstənilən vaxt ləğv edin
+            {selectedPlan === 'yearly'
+              ? (yearlyTrialDays ? `${yearlyTrialDays} gün pulsuz sınayın · Sonra ${yearlyPriceStr}/il · İstənilən vaxt ləğv edin` : `${yearlyPriceStr}/il · İstənilən vaxt ləğv edin`)
+              : (monthlyTrialDays ? `${monthlyTrialDays} gün pulsuz sınayın · Sonra ${monthlyPriceStr}/ay · İstənilən vaxt ləğv edin` : `${monthlyPriceStr}/ay · İstənilən vaxt ləğv edin`)}
         </p>
       </div>
     </div>
