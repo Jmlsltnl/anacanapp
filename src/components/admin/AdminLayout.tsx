@@ -172,6 +172,7 @@ const menuGroups: MenuGroup[] = [
       { id: 'force-update', label: 'Force Update', icon: Shield },
       { id: 'deeplinks', label: tr("adminlayout_deeplinkler_7ecb47", "Deeplinklər"), icon: Globe },
       { id: 'crash-reports', label: 'Crash Reports', icon: AlertTriangle },
+      { id: 'revenuecat-debug', label: 'RevenueCat Debug', icon: Cog },
     ],
   },
 ];
