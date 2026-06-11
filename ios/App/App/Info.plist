@@ -104,11 +104,6 @@
 	<key>NSMotionUsageDescription</key>
 	<string>Gündəlik aktivlik və addım sayını izləmək üçün hərəkət sensoru istifadə olunur.</string>
 
-	<key>NSHealthShareUsageDescription</key>
-	<string>Hamiləlik və ana sağlamlığı məlumatlarınızı oxumaq üçün Sağlamlıq tətbiqinə daxil olur.</string>
-
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>Çəki, simptom və aktivlik məlumatlarını Sağlamlıq tətbiqinə yazmaq üçün icazə lazımdır.</string>
 
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Anacan ağıllı cihazlarla (məs. körpə monitoru) əlaqə üçün Bluetooth istifadə edə bilər.</string>
