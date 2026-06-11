@@ -11,6 +11,7 @@ import { useUserStore } from '@/store/userStore';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
+import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface MoodDiaryProps {
   onBack: () => void;
@@ -137,6 +138,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
       </div>
 
       <div className="px-4 pt-4">
+        <MedicalDisclaimer variant="compact" className="mb-4" />
         {/* Mood Summary */}
         <motion.div 
           className="bg-fuchsia-50 dark:bg-fuchsia-500/10 rounded-2xl p-4 border border-fuchsia-100 dark:border-fuchsia-500/20 mb-4"

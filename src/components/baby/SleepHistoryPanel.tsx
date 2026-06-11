@@ -100,8 +100,11 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
     const updates: any = { start_time: newStart.toISOString() };
     if (editEndTime) {
       const [eh, em] = editEndTime.split(':').map(Number);
-      const newEnd = new Date(log.start_time);
+      const newEnd = new Date(newStart);
       newEnd.setHours(eh, em, 0, 0);
+      if (newEnd.getTime() <= newStart.getTime()) {
+        newEnd.setDate(newEnd.getDate() + 1);
+      }
       updates.end_time = newEnd.toISOString();
     }
     const result = await updateLog(log.id, updates);
@@ -232,7 +235,7 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
                                     <Clock className="w-3 h-3" />
                                     <span className="text-xs font-bold">{formatDuration(durationMin)}</span>
                                   </div>
-                                  <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <div className="flex gap-0.5">
                                     <button onClick={() => handleEdit(log)} className="p-1 rounded text-muted-foreground hover:text-primary">
                                       <Pencil className="w-3 h-3" />
                                     </button>

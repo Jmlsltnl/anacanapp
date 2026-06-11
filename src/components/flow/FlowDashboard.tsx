@@ -31,6 +31,13 @@ import FlowMoodChart from './FlowMoodChart';
 import FlowCycleStats from './FlowCycleStats';
 import FlowRemindersCard from './FlowRemindersCard';
 import FlowPeriodCalendar from './FlowPeriodCalendar';
+import CycleTrendChart from './CycleTrendChart';
+import CycleAnomalyBanner from './CycleAnomalyBanner';
+import PeriodDelayBanner from './PeriodDelayBanner';
+import PillReminderCard from './PillReminderCard';
+import SymptomPatternReport from './SymptomPatternReport';
+import DailyStoryCards from './DailyStoryCards';
+import PartnerFlowStatusCard from './PartnerFlowStatusCard';
 import { getPhaseInfoForDate, getNextPeriodDate, getFertileWindow } from '@/lib/cycle-utils';
 const FlowDashboard = () => {
   const { getCycleData, cycleLength, periodLength, setLastPeriodDate } = useUserStore();
@@ -253,6 +260,15 @@ const FlowDashboard = () => {
 
   return (
     <div className="space-y-5">
+      {/* Partner's flow status (only renders if user is partner viewing flow woman) */}
+      <PartnerFlowStatusCard />
+
+      {/* Period delay banner (auto-shows if late) */}
+      <PeriodDelayBanner />
+
+      {/* Daily Story Cards — phase-personalized */}
+      <DailyStoryCards />
+
       {/* Current Phase Hero Card */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
@@ -514,11 +530,27 @@ const FlowDashboard = () => {
         <FlowCycleStats />
       </motion.div>
 
+      {/* Cycle Trend Chart + Anomaly Detection */}
+      <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.65 }}>
+        <CycleTrendChart />
+      </motion.div>
+      <CycleAnomalyBanner />
+
+      {/* Symptom Pattern Analysis (Premium) */}
+      <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.68 }}>
+        <SymptomPatternReport />
+      </motion.div>
+
+      {/* Pill / Contraception Reminder */}
+      <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.7 }}>
+        <PillReminderCard />
+      </motion.div>
+
       {/* Reminders */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.7 }}
+        transition={{ delay: 0.72 }}
       >
         <FlowRemindersCard />
       </motion.div>

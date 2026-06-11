@@ -6,6 +6,7 @@ import {
   ThermometerSun, Pill, Baby, Footprints, Scale, Clock, Star, Award,
   MessageCircle, Check, Lightbulb, BookOpen, PartyPopper, RefreshCw, ChevronUp, ChevronDown
 } from 'lucide-react';
+import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 import { useUserStore } from '@/store/userStore';
 import { useTimerStore } from '@/store/timerStore';
 import { FRUIT_SIZES } from '@/types/anacan';
@@ -1825,6 +1826,9 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
 
       {/* Bottom Banner Slot */}
       <BannerSlot placement="home_bottom" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mt-2" />
+
+      {/* Small medical disclaimer for all modules — Google Play Health Content policy */}
+      <MedicalDisclaimer variant="inline" className="mt-3 px-1" />
     </div>
   );
 };

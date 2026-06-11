@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { hapticFeedback } from '@/lib/native';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
+import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface VitaminTrackerProps {
   onBack?: () => void;
@@ -124,6 +125,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
       </div>
 
       <div className="px-4 py-4 space-y-4 pb-32">
+        <MedicalDisclaimer variant="compact" />
         {/* Progress Card */}
         <motion.div
           className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white shadow-lg"

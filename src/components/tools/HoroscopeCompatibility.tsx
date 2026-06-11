@@ -17,6 +17,7 @@ import { az } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
+import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface HoroscopeCompatibilityProps {
   onBack: () => void;
@@ -362,7 +363,13 @@ Anacan tətbiqi ilə yaradılıb 💜`;
         </div>
 
         <div className="p-4 space-y-4">
+          <div className="rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900/40 px-3 py-2">
+            <p className="text-[11px] text-purple-800 dark:text-purple-200 leading-relaxed">
+              ✨ {tr('horoscope_entertainment_disclaimer', 'Ulduz falı yalnız əyləncə məqsədi daşıyır. Tibbi, psixoloji və ya valideynlik qərarları üçün ixtisaslı mütəxəssisə (həkim/psixoloq) müraciət edin.')}
+            </p>
+          </div>
           {/* Birth Charts */}
+
           <Card>
             <CardContent className="p-4 space-y-4">
               <h3 className="font-semibold text-lg flex items-center gap-2">
@@ -558,6 +565,12 @@ Anacan tətbiqi ilə yaradılıb 💜`;
       </div>
 
       <div className="p-4 space-y-4">
+        <div className="rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900/40 px-3 py-2">
+          <p className="text-[11px] text-purple-800 dark:text-purple-200 leading-relaxed">
+            ✨ {tr('horoscope_entertainment_disclaimer', 'Ulduz falı yalnız əyləncə məqsədi daşıyır. Tibbi, psixoloji və ya valideynlik qərarları üçün ixtisaslı mütəxəssisə (həkim/psixoloq) müraciət edin.')}
+          </p>
+        </div>
+
         {/* Step Content */}
         <AnimatePresence mode="wait">
           {renderStepContent()}

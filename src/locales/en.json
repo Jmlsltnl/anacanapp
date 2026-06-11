@@ -3174,5 +3174,10 @@
  "whitenoise_ses_seviyyesi_7296d5": "Volume level",
  "whitenoise_tebiet_effekti_45e038": "Nature sounds",
  "whitenoise_yungul_yagis_ve_yarpaq_xisiltisi_kimi_d5aea8": "Like light rain and leaves rustling",
- "whitenoise_yuxu_sesleri_4b518b": "Sleep Sounds"
+ "whitenoise_yuxu_sesleri_4b518b": "Sleep Sounds",
+ "medical_disclaimer_full": "This information is for educational purposes only and is NOT a substitute for medical advice, diagnosis, or treatment. Always consult your doctor or a qualified healthcare professional before making any medical decisions. In an emergency, call 103.",
+ "horoscope_entertainment_disclaimer": "Horoscope readings are for entertainment purposes only. For medical, psychological, or parenting decisions, please consult a qualified professional (doctor/psychologist).",
+ "aichatscreen_medical_disclaimer_banner": "Anacan.AI is NOT a substitute for medical advice, diagnosis, or treatment. The information provided is for educational purposes only. Always consult your doctor or a qualified healthcare professional before making any medical decisions. In an emergency, call 103.",
+ "aichatscreen_input_disclaimer": "Anacan.AI can make mistakes. Consult your doctor for medical decisions.",
+ "aichatscreen_hekim_mesleheti_evezi_deyil_a1808c": "⚕️ Not a substitute for medical advice"
 }

@@ -7,6 +7,7 @@ import {
   initRevenueCat,
   getOfferings,
   checkEntitlement,
+  findFreeTrialOption,
 } from '@/lib/revenuecat';
 
 export default function RevenueCatDebug() {
@@ -51,9 +52,29 @@ export default function RevenueCatDebug() {
         const pkgs = off?.current?.availablePackages || [];
         append(`Current packages count: ${pkgs.length}`);
         pkgs.forEach((p: any, i: number) => {
+          const defaultOption = p.product?.defaultOption;
           append(
             `  [${i}] id="${p.identifier}" type="${p.packageType}" → product="${p.product?.identifier}" ${p.product?.priceString} (${p.product?.currencyCode})`
           );
+          append(
+            `      defaultOption="${defaultOption?.id || '(none)'}" trial=${defaultOption?.freePhase ? 'YES' : 'NO'} trialPeriod=${defaultOption?.freePhase?.billingPeriod || '(none)'} tags=${(defaultOption?.tags || []).join(',') || '(none)'}`
+          );
+          const options = p.product?.subscriptionOptions || [];
+          options.forEach((option: any, optionIndex: number) => {
+            append(
+              `      option[${optionIndex}] id="${option?.id}" basePlan=${!!option?.isBasePlan} trial=${option?.freePhase ? 'YES' : 'NO'} trialPeriod=${option?.freePhase?.billingPeriod || '(none)'} fullPeriod=${option?.fullPricePhase?.billingPeriod || '(none)'} tags=${(option?.tags || []).join(',') || '(none)'}`
+            );
+          });
+          const trialOption = findFreeTrialOption(p);
+          if (Capacitor.getPlatform() === 'android') {
+            if (trialOption && !defaultOption?.freePhase) {
+              append(`      ▶️ PURCHASE PLAN: trial option "${trialOption?.id}" (free trial FORCED via purchaseSubscriptionOption)`);
+            } else if (defaultOption?.freePhase) {
+              append(`      ▶️ PURCHASE PLAN: defaultOption (already includes trial)`);
+            } else {
+              append(`      ⚠️ PURCHASE PLAN: base plan — NO free trial offer found in Play Console!`);
+            }
+          }
         });
       }
 

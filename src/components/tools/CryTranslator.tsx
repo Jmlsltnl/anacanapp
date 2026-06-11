@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { requestMicrophonePermission } from '@/lib/permissions';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
+import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface CryTranslatorProps {
   onBack: () => void;
@@ -331,6 +332,7 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
       </div>
 
       <div className="p-4 space-y-4">
+        <MedicalDisclaimer variant="compact" />
         {/* Info Card */}
         <Card className="border-primary/20 bg-primary/5">
           <CardContent className="p-3">

@@ -15,6 +15,31 @@ interface CrashReport {
 let lastReport = { message: '', time: 0 };
 const DEDUPE_MS = 30_000;
 
+// Ignore noisy / non-actionable errors that don't represent real crashes.
+// These are browser/network/storage transient conditions that pollute reports.
+const IGNORED_PATTERNS: RegExp[] = [
+  /signal is aborted/i,
+  /the operation was aborted/i,
+  /aborterror/i,
+  /the user aborted a request/i,
+  /load failed/i,                      // iOS Safari fetch cancellation
+  /networkerror when attempting to fetch/i,
+  /failed to fetch/i,                  // transient network
+  /internal error was encountered in the indexed database/i,
+  /write permission denied/i,          // Safari/WebView private mode storage
+  /quotaexceedederror/i,
+  /resizeobserver loop/i,
+  /script error\.?$/i,                 // cross-origin opaque errors
+  /non-error promise rejection captured/i,
+  /cannot read properties of null \(reading 'useeffect'\)/i, // extension/HMR noise
+  /cannot read properties of null \(reading 'getsnapshot'\)/i,
+];
+
+const shouldIgnore = (message: string): boolean => {
+  if (!message) return true;
+  return IGNORED_PATTERNS.some((re) => re.test(message));
+};
+
 const detectPlatform = (): string => {
   const ua = navigator.userAgent || '';
   if (/android/i.test(ua)) return 'android';
@@ -23,6 +48,7 @@ const detectPlatform = (): string => {
 };
 
 async function sendCrashReport(report: CrashReport) {
+  if (shouldIgnore(report.error_message)) return;
   const now = Date.now();
   if (report.error_message === lastReport.message && now - lastReport.time < DEDUPE_MS) return;
   lastReport = { message: report.error_message, time: now };

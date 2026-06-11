@@ -86,6 +86,21 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
 
   const monthlyProduct = packages.find(p => p?.product?.identifier?.includes('monthly'));
   const yearlyProduct = packages.find(p => p?.product?.identifier?.includes('yearly'));
+  const selectedProduct = selectedPlan === 'yearly' ? yearlyProduct : monthlyProduct;
+  const selectedTrialPeriod = selectedProduct?.product?.defaultOptionTrialPeriod;
+  const selectedHasStoreTrial = !!selectedProduct?.product?.defaultOptionHasFreeTrial;
+  const hasAnyStoreTrial = packages.some((pkg) => pkg.product.defaultOptionHasFreeTrial);
+  const parseIsoTrialDays = (period?: string | null) => {
+    if (!period) return null;
+    const match = /^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)W)?(?:(\d+)D)?$/i.exec(period);
+    if (!match) return null;
+    const years = Number(match[1] || 0);
+    const months = Number(match[2] || 0);
+    const weeks = Number(match[3] || 0);
+    const days = Number(match[4] || 0);
+    return years * 365 + months * 30 + weeks * 7 + days;
+  };
+  const storeTrialDays = parseIsoTrialDays(selectedTrialPeriod) ?? parseIsoTrialDays(monthlyProduct?.product?.defaultOptionTrialPeriod) ?? parseIsoTrialDays(yearlyProduct?.product?.defaultOptionTrialPeriod);
 
   const currencySymbol = dbCurrency === 'AZN' ? '₼' : dbCurrency;
   const monthlyPrice = monthlyProduct?.product?.priceString || (dbMonthlyPrice ? `${dbMonthlyPrice}` : '9.99');
@@ -103,8 +118,10 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const allFeatures = [...premiumOnlyFeatures, ...limitedFreeFeatures];
 
   const isCurrentlyMonthly = isPremium && subscription?.plan_type === 'premium';
-  const showFreeTrial = paywallConfig.free_trial_enabled && !isPremium;
-  const freeTrialNote = paywallConfig.free_trial_note.replace('{days}', String(paywallConfig.free_trial_days));
+  const fallbackTrialEnabled = paywallConfig.free_trial_enabled && !isPremium;
+  const showFreeTrial = !isPremium && (isNative ? hasAnyStoreTrial : fallbackTrialEnabled);
+  const effectiveTrialDays = storeTrialDays ?? paywallConfig.free_trial_days;
+  const freeTrialNote = paywallConfig.free_trial_note.replace('{days}', String(effectiveTrialDays));
   const ctaText = showFreeTrial
     ? paywallConfig.free_trial_cta
     : isCurrentlyMonthly && selectedPlan === 'yearly'
@@ -304,7 +321,11 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                     )}
                   </div>
                   <p className="text-lg font-black">{currencySymbol}{yearlyMonthly}<span className="text-[10px] font-normal opacity-60">{paywallConfig.yearly_suffix}</span></p>
-                  <p className={`text-[10px] mt-0.5 ${selectedPlan === 'yearly' ? 'text-muted-foreground' : 'text-white/50'}`}>{currencySymbol}{yearlyPrice}{paywallConfig.yearly_total_suffix}</p>
+                  <p className={`text-[10px] mt-0.5 ${selectedPlan === 'yearly' ? 'text-muted-foreground' : 'text-white/50'}`}>
+                    {yearlyProduct?.product?.defaultOptionHasFreeTrial
+                      ? `${parseIsoTrialDays(yearlyProduct.product.defaultOptionTrialPeriod) ?? paywallConfig.free_trial_days} gün pulsuz, sonra ${currencySymbol}${yearlyPrice}${paywallConfig.yearly_total_suffix}`
+                      : `${currencySymbol}${yearlyPrice}${paywallConfig.yearly_total_suffix}`}
+                  </p>
                 </motion.button>
 
                 {/* Monthly */}
@@ -327,7 +348,11 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                     )}
                   </div>
                   <p className="text-lg font-black">{currencySymbol}{monthlyPrice}<span className="text-[10px] font-normal opacity-60">{paywallConfig.monthly_suffix}</span></p>
-                  <p className={`text-[10px] mt-0.5 ${selectedPlan === 'monthly' ? 'text-muted-foreground' : 'text-white/50'}`}>&nbsp;</p>
+                  <p className={`text-[10px] mt-0.5 ${selectedPlan === 'monthly' ? 'text-muted-foreground' : 'text-white/50'}`}>
+                    {monthlyProduct?.product?.defaultOptionHasFreeTrial
+                      ? `${parseIsoTrialDays(monthlyProduct.product.defaultOptionTrialPeriod) ?? paywallConfig.free_trial_days} gün pulsuz, sonra ${currencySymbol}${monthlyPrice}${paywallConfig.monthly_suffix}`
+                      : '\u00A0'}
+                  </p>
                 </motion.button>
               </div>
             </div>
@@ -336,7 +361,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
             <div className="shrink-0 px-5 pt-2" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}>
               {showFreeTrial && (
                 <p className="text-center text-[11px] text-white/80 mb-2 font-medium">
-                  {freeTrialNote}
+                  {selectedHasStoreTrial || !isNative ? freeTrialNote : 'Bu plan üçün pulsuz sınaq yoxdur'}
                 </p>
               )}
               <Button

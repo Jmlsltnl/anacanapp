@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { tr } from "@/lib/tr";
+import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface SafetyLookupProps {
   onBack: () => void;
@@ -129,6 +130,11 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
             />
           </div>
         </div>
+      </div>
+
+      {/* Medical disclaimer */}
+      <div className="px-4 pt-2.5">
+        <MedicalDisclaimer variant="compact" />
       </div>
 
       {/* Stats inline */}
@@ -302,6 +308,12 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
                       )}
                     </ul>
                   </div>
+
+                  <div className="mb-3">
+                    <MedicalDisclaimer variant="compact" />
+                  </div>
+
+
 
                   <button
                     onClick={() => setSelectedItem(null)}

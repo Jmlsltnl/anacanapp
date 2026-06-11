@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import {
@@ -26,6 +26,18 @@ export interface RCPackage {
     priceString: string;
     price: number;
     currencyCode: string;
+    defaultOptionId?: string | null;
+    defaultOptionHasFreeTrial?: boolean;
+    defaultOptionTrialPeriod?: string | null;
+    defaultOptionTags?: string[];
+    subscriptionOptions?: Array<{
+      id: string;
+      isBasePlan: boolean;
+      tags: string[];
+      hasFreeTrial: boolean;
+      trialPeriod: string | null;
+      fullPricePeriod: string | null;
+    }>;
   };
   _raw: any; // full package object for purchasePackage
 }
@@ -49,13 +61,17 @@ interface UseInAppPurchaseReturn {
 }
 
 export function useInAppPurchase(): UseInAppPurchaseReturn {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const [packages, setPackages] = useState<RCPackage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSupported, setIsSupported] = useState(false);
   const [isPro, setIsPro] = useState(false);
+  const syncWithDatabaseRef = useRef<
+    ((isPro: boolean, productId?: string, expiresAtOverride?: string | null) => Promise<void>) | null
+  >(null);
+
 
   // Initialize RevenueCat
   useEffect(() => {
@@ -82,22 +98,46 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
         const ent = await checkEntitlement();
         setIsPro(ent.isPro);
 
+        // Self-heal: if store says Pro but DB/profile is out of sync, re-sync now
+        if (ent.isPro && user?.id) {
+          syncWithDatabaseRef.current?.(true, ent.productId || undefined, ent.expiresAt || null);
+        }
+
         // Load offerings
         const offerings = await getOfferings();
         if (offerings?.current?.availablePackages) {
-          const pkgs: RCPackage[] = offerings.current.availablePackages.map((pkg: any) => ({
-            identifier: pkg.identifier,
-            packageType: pkg.packageType,
-            product: {
-              identifier: pkg.product?.identifier || '',
-              title: pkg.product?.title || '',
-              description: pkg.product?.description || '',
-              priceString: pkg.product?.priceString || '',
-              price: pkg.product?.price || 0,
-              currencyCode: pkg.product?.currencyCode || '',
-            },
-            _raw: pkg,
-          }));
+          const pkgs: RCPackage[] = offerings.current.availablePackages.map((pkg: any) => {
+            const defaultOption = pkg.product?.defaultOption;
+            const subscriptionOptions = Array.isArray(pkg.product?.subscriptionOptions)
+              ? pkg.product.subscriptionOptions.map((option: any) => ({
+                  id: option?.id || '',
+                  isBasePlan: !!option?.isBasePlan,
+                  tags: Array.isArray(option?.tags) ? option.tags : [],
+                  hasFreeTrial: !!option?.freePhase,
+                  trialPeriod: option?.freePhase?.billingPeriod || null,
+                  fullPricePeriod: option?.fullPricePhase?.billingPeriod || null,
+                }))
+              : [];
+
+            return {
+              identifier: pkg.identifier,
+              packageType: pkg.packageType,
+              product: {
+                identifier: pkg.product?.identifier || '',
+                title: pkg.product?.title || '',
+                description: pkg.product?.description || '',
+                priceString: pkg.product?.priceString || '',
+                price: pkg.product?.price || 0,
+                currencyCode: pkg.product?.currencyCode || '',
+                defaultOptionId: defaultOption?.id || null,
+                defaultOptionHasFreeTrial: !!defaultOption?.freePhase,
+                defaultOptionTrialPeriod: defaultOption?.freePhase?.billingPeriod || null,
+                defaultOptionTags: Array.isArray(defaultOption?.tags) ? defaultOption.tags : [],
+                subscriptionOptions,
+              },
+              _raw: pkg,
+            };
+          });
           setPackages(pkgs);
         }
       } catch (err) {
@@ -111,22 +151,27 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
     init();
   }, [user?.id]);
 
-  const syncWithDatabase = useCallback(async (isPro: boolean, productId?: string) => {
+  const syncWithDatabase = useCallback(async (isPro: boolean, productId?: string, expiresAtOverride?: string | null) => {
     if (!user) return;
     try {
       const planType = productId?.includes('yearly') || productId?.includes('lifetime')
         ? 'premium_plus' : 'premium';
 
-      const expiresAt = new Date();
-      if (productId?.includes('lifetime')) {
-        expiresAt.setFullYear(expiresAt.getFullYear() + 100);
-      } else if (productId?.includes('yearly')) {
-        expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-      } else {
-        expiresAt.setMonth(expiresAt.getMonth() + 1);
-      }
+      const expiresAt = expiresAtOverride
+        ? new Date(expiresAtOverride)
+        : (() => {
+            const fallback = new Date();
+            if (productId?.includes('lifetime')) {
+              fallback.setFullYear(fallback.getFullYear() + 100);
+            } else if (productId?.includes('yearly')) {
+              fallback.setFullYear(fallback.getFullYear() + 1);
+            } else {
+              fallback.setMonth(fallback.getMonth() + 1);
+            }
+            return fallback;
+          })();
 
-      await supabase
+      const { error: subError } = await supabase
         .from('subscriptions')
         .upsert({
           user_id: user.id,
@@ -135,18 +180,27 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
           started_at: new Date().toISOString(),
           expires_at: expiresAt.toISOString(),
         }, { onConflict: 'user_id' });
+      if (subError) console.error('Subscription sync error:', subError);
 
-      await supabase
+      const { error: profileError } = await supabase
         .from('profiles')
         .update({
           is_premium: isPro,
           premium_until: isPro ? expiresAt.toISOString() : null,
         })
         .eq('user_id', user.id);
+      if (profileError) console.error('Profile sync error:', profileError);
+
+      // Refresh in-memory profile so the UI unlocks premium immediately
+      await refreshProfile();
     } catch (err) {
       console.error('DB sync error:', err);
     }
-  }, [user]);
+  }, [user, refreshProfile]);
+
+  useEffect(() => {
+    syncWithDatabaseRef.current = syncWithDatabase;
+  }, [syncWithDatabase]);
 
   const executePurchase = useCallback(async (pkg: RCPackage): Promise<boolean> => {
     setIsPurchasing(true);
@@ -162,7 +216,8 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
 
       if (result.success) {
         setIsPro(true);
-        await syncWithDatabase(true, pkg.product.identifier);
+        const entitlement = result.customerInfo?.entitlements?.active?.[REVENUECAT_CONFIG.ENTITLEMENT_ID];
+        await syncWithDatabase(true, pkg.product.identifier, entitlement?.expirationDate || null);
         import('@/lib/analytics').then(m => m.analytics.logPremiumSubscribed(pkg.identifier)).catch(() => {});
         return true;
       }
