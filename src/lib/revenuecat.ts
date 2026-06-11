@@ -163,7 +163,30 @@ export async function getOfferings() {
 }
 
 /**
- * Purchase a package
+ * Find the best subscription option for purchase on Android (Google Play).
+ * Google Play free trials live on OFFERS, not on the base plan. To guarantee
+ * the trial is applied we must explicitly purchase the SubscriptionOption that
+ * contains a freePhase, instead of relying on defaultOption.
+ */
+export function findFreeTrialOption(pkg: any): any | null {
+  const options = pkg?.product?.subscriptionOptions;
+  if (!Array.isArray(options) || options.length === 0) return null;
+
+  // 1) Prefer an offer (non base-plan) with a free trial phase
+  const trialOffer = options.find((o: any) => o?.freePhase && !o?.isBasePlan);
+  if (trialOffer) return trialOffer;
+
+  // 2) Any option with a free phase
+  const anyTrial = options.find((o: any) => o?.freePhase);
+  if (anyTrial) return anyTrial;
+
+  return null;
+}
+
+/**
+ * Purchase a package.
+ * On Android, explicitly purchases the free-trial SubscriptionOption when one
+ * exists and the defaultOption doesn't already include it (eligibility-safe).
  */
 export async function purchasePackage(packageToPurchase: any): Promise<{
   success: boolean;
@@ -176,9 +199,42 @@ export async function purchasePackage(packageToPurchase: any): Promise<{
 
   try {
     const { Purchases } = await import('@revenuecat/purchases-capacitor');
-    const { customerInfo } = await Purchases.purchasePackage({
-      aPackage: packageToPurchase,
-    });
+    let customerInfo: any;
+
+    if (Capacitor.getPlatform() === 'android') {
+      const trialOption = findFreeTrialOption(packageToPurchase);
+      const defaultHasTrial = !!packageToPurchase?.product?.defaultOption?.freePhase;
+
+      if (trialOption && !defaultHasTrial) {
+        // Default option would skip the trial — force the trial offer.
+        console.log('[RevenueCat] Purchasing free-trial subscription option:', trialOption?.id);
+        try {
+          const result = await Purchases.purchaseSubscriptionOption({
+            subscriptionOption: trialOption,
+          });
+          customerInfo = result.customerInfo;
+        } catch (optionErr: any) {
+          if (optionErr?.code === 1 || optionErr?.message?.includes('cancel') || optionErr?.userCancelled) {
+            return { success: false, error: 'USER_CANCELLED' };
+          }
+          // Fall back to standard package purchase (e.g. user not trial-eligible)
+          console.warn('[RevenueCat] Trial option purchase failed, falling back to package purchase:', optionErr?.message);
+          const fallback = await Purchases.purchasePackage({ aPackage: packageToPurchase });
+          customerInfo = fallback.customerInfo;
+        }
+      } else {
+        if (trialOption) {
+          console.log('[RevenueCat] defaultOption already includes free trial — purchasing package');
+        } else {
+          console.log('[RevenueCat] No free-trial option found on product — purchasing base plan');
+        }
+        const result = await Purchases.purchasePackage({ aPackage: packageToPurchase });
+        customerInfo = result.customerInfo;
+      }
+    } else {
+      const result = await Purchases.purchasePackage({ aPackage: packageToPurchase });
+      customerInfo = result.customerInfo;
+    }
 
     const isPro = !!customerInfo.entitlements.active[REVENUECAT_CONFIG.ENTITLEMENT_ID];
     return { success: isPro, customerInfo };
