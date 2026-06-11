@@ -46,6 +46,7 @@ const App = () => (
                 <Route path="/payment/success" element={<PaymentSuccess />} />
                 <Route path="/payment/error" element={<PaymentError />} />
                 <Route path="/debug/revenuecat" element={<RevenueCatDebug />} />
+                <Route path="/revenuecat-debug" element={<RevenueCatDebug />} />
                 <Route path="/p/v/:token" element={<PartnerVerifyPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
