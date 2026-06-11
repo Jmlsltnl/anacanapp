@@ -10,7 +10,7 @@ export const REVENUECAT_ENABLED = true;
 
 // Bundle marker — cihazda hansı web bundle-ın işlədiyini yoxlamaq üçün.
 // RevenueCat Debug səhifəsində görünür. Hər kritik fix-də artırılır.
-export const RC_BUILD_MARKER = '2026-06-11-android-paywall-fix';
+export const RC_BUILD_MARKER = '2026-06-11-android-paywall-enabled';
 
 // RevenueCat Configuration
 // NOTE: RevenueCat requires PLATFORM-SPECIFIC public API keys (Android & iOS).
@@ -48,14 +48,11 @@ export const isNativePlatform = (): boolean => Capacitor.isNativePlatform();
 export const hasRevenueCatPlugin = (): boolean =>
   isNativePlatform() && Capacitor.isPluginAvailable('Purchases');
 
-// RevenueCat native paywall UI — yalnız iOS-da aktiv.
-// Android-də RevenueCatUI plagini Jetpack Compose / AndroidX uyumsuzluqlarına
-// görə modal açılan kimi crash verə bilir. Android üçün custom in-app paywall
-// modalını istifadə edirik (IAP funksionallığı `Purchases` plagini ilə işləyir).
+// RevenueCat native paywall UI — həm iOS, həm Android-də aktiv.
+// Dashboard paywall dizaynında mənfi padding olmamalıdır, yoxsa Android crash verir.
 export const canUseNativePaywallUI = (): boolean =>
   REVENUECAT_ENABLED &&
   isNativePlatform() &&
-  Capacitor.getPlatform() === 'ios' &&
   Capacitor.isPluginAvailable('RevenueCatUI');
 
 export const hasRevenueCatUIPlugin = (): boolean =>
@@ -282,13 +279,6 @@ export async function presentPaywall(): Promise<{
   didPurchase: boolean;
   available: boolean;
 }> {
-  // ⛔ HARD GUARD: Android-də native RevenueCat paywall QƏTI açılmamalıdır.
-  // (Dashboard paywall dizaynında mənfi "top padding" dəyəri var →
-  //  java.lang.IllegalArgumentException: Top padding must be non-negative)
-  if (Capacitor.getPlatform() === 'android') {
-    console.log('[RevenueCat] Android: native paywall blocked, using custom modal. Build:', RC_BUILD_MARKER);
-    return { didPurchase: false, available: false };
-  }
   if (!canUseNativePaywallUI()) {
     return { didPurchase: false, available: false };
   }
