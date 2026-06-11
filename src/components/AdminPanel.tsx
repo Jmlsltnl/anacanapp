@@ -67,6 +67,7 @@ import AdminCrashReports from './admin/AdminCrashReports';
 import AdminPartnerVenues from './admin/AdminPartnerVenues';
 import AdminPartnerRedemptions from './admin/AdminPartnerRedemptions';
 import AdminVaccines from './admin/AdminVaccines';
+import RevenueCatDebug from '@/pages/RevenueCatDebug';
 
 interface AdminPanelProps {
   onExit: () => void;
