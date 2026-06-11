@@ -690,13 +690,23 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
         })}
       </motion.div>
 
-      {/* Version */}
-      <p
-        className="text-center text-xs text-muted-foreground mt-3 select-none"
-        onClick={handleVersionTap}
-      >
-        Anacan v1.0.0 • Azərbaycan 🇦🇿
-      </p>
+      {/* Version + Debug */}
+      <div className="flex flex-col items-center gap-2 mt-3">
+        <button
+          type="button"
+          onClick={handleVersionTap}
+          className="text-center text-xs text-muted-foreground select-none px-6 py-2 active:opacity-60"
+        >
+          Anacan v1.0.0 • Azərbaycan 🇦🇿 {versionTaps > 0 && versionTaps < 5 ? `(${versionTaps}/5)` : ''}
+        </button>
+        <button
+          type="button"
+          onClick={() => { window.location.href = '/debug/revenuecat'; }}
+          className="text-[10px] text-muted-foreground/60 underline px-4 py-1 active:opacity-60"
+        >
+          🛠 RevenueCat Debug
+        </button>
+      </div>
 
       {/* Premium Modal */}
       <PremiumModal 
