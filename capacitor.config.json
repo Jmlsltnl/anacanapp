@@ -47,7 +47,8 @@
       "@capacitor/push-notifications",
       "@capacitor/splash-screen",
       "@capacitor/status-bar",
-      "@revenuecat/purchases-capacitor"
+      "@revenuecat/purchases-capacitor",
+      "@revenuecat/purchases-capacitor-ui"
     ],
     "allowMixedContent": true,
     "captureInput": true,
