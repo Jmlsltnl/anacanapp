@@ -280,7 +280,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                                   <Clock className="w-3 h-3" />
                                   <span className="text-xs font-bold">{formatDuration(item.durationSeconds)}</span>
                                 </div>
-                                <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="flex gap-0.5">
                                   <button onClick={() => handleEdit(item)} className="p-1 rounded text-muted-foreground hover:text-primary">
                                     <Pencil className="w-3 h-3" />
                                   </button>
