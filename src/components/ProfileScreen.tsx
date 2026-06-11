@@ -43,16 +43,6 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   const [showChildModal, setShowChildModal] = useState(false);
   const [editingChild, setEditingChild] = useState<Child | null>(null);
   const [childForm, setChildForm] = useState<{ name: string; birth_date: string; gender: 'boy' | 'girl' }>({ name: '', birth_date: '', gender: 'boy' });
-  const [versionTaps, setVersionTaps] = useState(0);
-
-  const handleVersionTap = () => {
-    const next = versionTaps + 1;
-    setVersionTaps(next);
-    if (next >= 5) {
-      setVersionTaps(0);
-      window.location.href = '/debug/revenuecat';
-    }
-  };
 
   const genderOptions = [
     { value: 'boy', label: tr("profilescreen_oglan_e9715e", 'Oğlan'), emoji: '👦' },
@@ -690,22 +680,11 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
         })}
       </motion.div>
 
-      {/* Version + Debug */}
+      {/* Version */}
       <div className="flex flex-col items-center gap-2 mt-3">
-        <button
-          type="button"
-          onClick={handleVersionTap}
-          className="text-center text-xs text-muted-foreground select-none px-6 py-2 active:opacity-60"
-        >
-          Anacan v1.0.0 • Azərbaycan 🇦🇿 {versionTaps > 0 && versionTaps < 5 ? `(${versionTaps}/5)` : ''}
-        </button>
-        <button
-          type="button"
-          onClick={() => { window.location.href = '/debug/revenuecat'; }}
-          className="text-[10px] text-muted-foreground/60 underline px-4 py-1 active:opacity-60"
-        >
-          🛠 RevenueCat Debug
-        </button>
+        <div className="text-center text-xs text-muted-foreground select-none px-6 py-2">
+          Anacan v1.0.0 • Azərbaycan 🇦🇿
+        </div>
       </div>
 
       {/* Premium Modal */}
