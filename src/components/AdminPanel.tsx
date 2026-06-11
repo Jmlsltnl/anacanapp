@@ -67,6 +67,7 @@ import AdminCrashReports from './admin/AdminCrashReports';
 import AdminPartnerVenues from './admin/AdminPartnerVenues';
 import AdminPartnerRedemptions from './admin/AdminPartnerRedemptions';
 import AdminVaccines from './admin/AdminVaccines';
+import RevenueCatDebug from '@/pages/RevenueCatDebug';
 
 interface AdminPanelProps {
   onExit: () => void;
@@ -213,6 +214,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminPartnerRedemptions />;
       case 'vaccines':
         return <AdminVaccines />;
+      case 'revenuecat-debug':
+        return <RevenueCatDebug />;
       default:
         return <AdminDashboard />;
     }
