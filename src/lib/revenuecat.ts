@@ -44,13 +44,11 @@ export const isNativePlatform = (): boolean => Capacitor.isNativePlatform();
 export const hasRevenueCatPlugin = (): boolean =>
   isNativePlatform() && Capacitor.isPluginAvailable('Purchases');
 
-// Android-də native RevenueCat UI (paywall/customer center) crash path verdiyi
-// üçün yalnız iOS-da aktiv saxlayırıq. Android custom paywall + direct purchase
-// flow istifadə edir.
+// RevenueCat native paywall UI — həm iOS, həm Android-də aktiv.
+// (Əvvəl Android-də deaktiv edilmişdi; istifadəçi tərəfindən tələb olundu.)
 export const canUseNativePaywallUI = (): boolean =>
   REVENUECAT_ENABLED &&
   isNativePlatform() &&
-  Capacitor.getPlatform() === 'ios' &&
   Capacitor.isPluginAvailable('RevenueCatUI');
 
 export const hasRevenueCatUIPlugin = (): boolean =>
