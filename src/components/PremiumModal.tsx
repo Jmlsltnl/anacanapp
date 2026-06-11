@@ -37,7 +37,8 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   // missing or no paywall is configured, gracefully fall back to the custom
   // modal UI (no crash).
   useEffect(() => {
-    if (!isOpen || !isNative || !isSupported || isAndroid) return;
+    // Native RC paywall — həm iOS, həm Android-də cəhd edirik.
+    if (!isOpen || !isNative || !isSupported) return;
     let cancelled = false;
     (async () => {
       const result = await showPaywallSafe();
@@ -55,7 +56,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
       onClose();
     })();
     return () => { cancelled = true; };
-  }, [isOpen, isNative, isSupported, isAndroid, showPaywallSafe, onClose, toast]);
+  }, [isOpen, isNative, isSupported, showPaywallSafe, onClose, toast]);
 
   useEffect(() => {
     if (isPremium && subscription?.plan_type === 'premium') setSelectedPlan('yearly');
