@@ -279,13 +279,6 @@ export async function presentPaywall(): Promise<{
   didPurchase: boolean;
   available: boolean;
 }> {
-  // ⛔ HARD GUARD: Android-də native RevenueCat paywall QƏTI açılmamalıdır.
-  // (Dashboard paywall dizaynında mənfi "top padding" dəyəri var →
-  //  java.lang.IllegalArgumentException: Top padding must be non-negative)
-  if (Capacitor.getPlatform() === 'android') {
-    console.log('[RevenueCat] Android: native paywall blocked, using custom modal. Build:', RC_BUILD_MARKER);
-    return { didPurchase: false, available: false };
-  }
   if (!canUseNativePaywallUI()) {
     return { didPurchase: false, available: false };
   }
