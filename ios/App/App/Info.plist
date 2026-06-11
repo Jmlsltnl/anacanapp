@@ -95,9 +95,6 @@
 	<key>NSFaceIDUsageDescription</key>
 	<string>Tətbiqə təhlükəsiz daxil olmaq üçün Face ID istifadə olunur.</string>
 
-	<key>NSUserTrackingUsageDescription</key>
-	<string>Sizə daha uyğun məzmun və təcrübə təqdim etmək üçün analitika məlumatları toplanılır.</string>
-
 	<key>NSContactsUsageDescription</key>
 	<string>Partnyorunuzu dəvət etmək üçün kontaktlara daxil olur.</string>
 
@@ -107,11 +104,6 @@
 	<key>NSMotionUsageDescription</key>
 	<string>Gündəlik aktivlik və addım sayını izləmək üçün hərəkət sensoru istifadə olunur.</string>
 
-	<key>NSHealthShareUsageDescription</key>
-	<string>Hamiləlik və ana sağlamlığı məlumatlarınızı oxumaq üçün Sağlamlıq tətbiqinə daxil olur.</string>
-
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>Çəki, simptom və aktivlik məlumatlarını Sağlamlıq tətbiqinə yazmaq üçün icazə lazımdır.</string>
 
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Anacan ağıllı cihazlarla (məs. körpə monitoru) əlaqə üçün Bluetooth istifadə edə bilər.</string>
