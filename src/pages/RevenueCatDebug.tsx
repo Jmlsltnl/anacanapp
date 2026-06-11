@@ -7,6 +7,7 @@ import {
   initRevenueCat,
   getOfferings,
   checkEntitlement,
+  findFreeTrialOption,
 } from '@/lib/revenuecat';
 
 export default function RevenueCatDebug() {
