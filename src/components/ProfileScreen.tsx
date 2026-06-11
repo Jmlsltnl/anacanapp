@@ -43,6 +43,16 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   const [showChildModal, setShowChildModal] = useState(false);
   const [editingChild, setEditingChild] = useState<Child | null>(null);
   const [childForm, setChildForm] = useState<{ name: string; birth_date: string; gender: 'boy' | 'girl' }>({ name: '', birth_date: '', gender: 'boy' });
+  const [versionTaps, setVersionTaps] = useState(0);
+
+  const handleVersionTap = () => {
+    const next = versionTaps + 1;
+    setVersionTaps(next);
+    if (next >= 5) {
+      setVersionTaps(0);
+      window.location.href = '/debug/revenuecat';
+    }
+  };
 
   const genderOptions = [
     { value: 'boy', label: tr("profilescreen_oglan_e9715e", 'Oğlan'), emoji: '👦' },
@@ -681,7 +691,10 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
       </motion.div>
 
       {/* Version */}
-      <p className="text-center text-xs text-muted-foreground mt-3">
+      <p
+        className="text-center text-xs text-muted-foreground mt-3 select-none"
+        onClick={handleVersionTap}
+      >
         Anacan v1.0.0 • Azərbaycan 🇦🇿
       </p>
 
