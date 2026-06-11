@@ -95,9 +95,6 @@
 	<key>NSFaceIDUsageDescription</key>
 	<string>Tətbiqə təhlükəsiz daxil olmaq üçün Face ID istifadə olunur.</string>
 
-	<key>NSUserTrackingUsageDescription</key>
-	<string>Sizə daha uyğun məzmun və təcrübə təqdim etmək üçün analitika məlumatları toplanılır.</string>
-
 	<key>NSContactsUsageDescription</key>
 	<string>Partnyorunuzu dəvət etmək üçün kontaktlara daxil olur.</string>
 
