@@ -68,6 +68,10 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
   const [error, setError] = useState<string | null>(null);
   const [isSupported, setIsSupported] = useState(false);
   const [isPro, setIsPro] = useState(false);
+  const syncWithDatabaseRef = useRef<
+    ((isPro: boolean, productId?: string, expiresAtOverride?: string | null) => Promise<void>) | null
+  >(null);
+
 
   // Initialize RevenueCat
   useEffect(() => {
@@ -193,6 +197,10 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
       console.error('DB sync error:', err);
     }
   }, [user, refreshProfile]);
+
+  useEffect(() => {
+    syncWithDatabaseRef.current = syncWithDatabase;
+  }, [syncWithDatabase]);
 
   const executePurchase = useCallback(async (pkg: RCPackage): Promise<boolean> => {
     setIsPurchasing(true);
