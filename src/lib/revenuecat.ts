@@ -10,7 +10,7 @@ export const REVENUECAT_ENABLED = true;
 
 // Bundle marker — cihazda hansı web bundle-ın işlədiyini yoxlamaq üçün.
 // RevenueCat Debug səhifəsində görünür. Hər kritik fix-də artırılır.
-export const RC_BUILD_MARKER = '2026-06-11-android-paywall-fix';
+export const RC_BUILD_MARKER = '2026-06-11-android-paywall-enabled';
 
 // RevenueCat Configuration
 // NOTE: RevenueCat requires PLATFORM-SPECIFIC public API keys (Android & iOS).
