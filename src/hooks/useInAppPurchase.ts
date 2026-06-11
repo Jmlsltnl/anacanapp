@@ -94,6 +94,11 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
         const ent = await checkEntitlement();
         setIsPro(ent.isPro);
 
+        // Self-heal: if store says Pro but DB/profile is out of sync, re-sync now
+        if (ent.isPro && user?.id) {
+          syncWithDatabaseRef.current?.(true, ent.productId || undefined, ent.expiresAt || null);
+        }
+
         // Load offerings
         const offerings = await getOfferings();
         if (offerings?.current?.availablePackages) {
