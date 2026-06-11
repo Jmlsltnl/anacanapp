@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import {
@@ -61,13 +61,17 @@ interface UseInAppPurchaseReturn {
 }
 
 export function useInAppPurchase(): UseInAppPurchaseReturn {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const [packages, setPackages] = useState<RCPackage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSupported, setIsSupported] = useState(false);
   const [isPro, setIsPro] = useState(false);
+  const syncWithDatabaseRef = useRef<
+    ((isPro: boolean, productId?: string, expiresAtOverride?: string | null) => Promise<void>) | null
+  >(null);
+
 
   // Initialize RevenueCat
   useEffect(() => {
@@ -93,6 +97,11 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
         // Check entitlements
         const ent = await checkEntitlement();
         setIsPro(ent.isPro);
+
+        // Self-heal: if store says Pro but DB/profile is out of sync, re-sync now
+        if (ent.isPro && user?.id) {
+          syncWithDatabaseRef.current?.(true, ent.productId || undefined, ent.expiresAt || null);
+        }
 
         // Load offerings
         const offerings = await getOfferings();
@@ -162,7 +171,7 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
             return fallback;
           })();
 
-      await supabase
+      const { error: subError } = await supabase
         .from('subscriptions')
         .upsert({
           user_id: user.id,
@@ -171,18 +180,27 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
           started_at: new Date().toISOString(),
           expires_at: expiresAt.toISOString(),
         }, { onConflict: 'user_id' });
+      if (subError) console.error('Subscription sync error:', subError);
 
-      await supabase
+      const { error: profileError } = await supabase
         .from('profiles')
         .update({
           is_premium: isPro,
           premium_until: isPro ? expiresAt.toISOString() : null,
         })
         .eq('user_id', user.id);
+      if (profileError) console.error('Profile sync error:', profileError);
+
+      // Refresh in-memory profile so the UI unlocks premium immediately
+      await refreshProfile();
     } catch (err) {
       console.error('DB sync error:', err);
     }
-  }, [user]);
+  }, [user, refreshProfile]);
+
+  useEffect(() => {
+    syncWithDatabaseRef.current = syncWithDatabase;
+  }, [syncWithDatabase]);
 
   const executePurchase = useCallback(async (pkg: RCPackage): Promise<boolean> => {
     setIsPurchasing(true);
