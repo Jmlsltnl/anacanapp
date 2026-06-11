@@ -286,7 +286,12 @@ export async function presentPaywall(): Promise<{
       return { didPurchase: false, available: false };
     }
     const { RevenueCatUI, PAYWALL_RESULT } = mod;
-    const result = await RevenueCatUI.presentPaywall();
+    const result = await RevenueCatUI.presentPaywall({ displayCloseButton: true });
+    console.log('[RevenueCat] presentPaywall result:', JSON.stringify(result));
+    if (result?.result === PAYWALL_RESULT.NOT_PRESENTED) {
+      // No paywall configured for the current offering — fall back to custom UI.
+      return { didPurchase: false, available: false };
+    }
     const didPurchase =
       result?.result === PAYWALL_RESULT.PURCHASED ||
       result?.result === PAYWALL_RESULT.RESTORED;

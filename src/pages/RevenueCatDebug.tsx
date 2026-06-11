@@ -30,6 +30,8 @@ export default function RevenueCatDebug() {
       append(`Entitlement ID: ${REVENUECAT_CONFIG.ENTITLEMENT_ID}`);
       append(`Android key set: ${REVENUECAT_CONFIG.ANDROID_API_KEY.startsWith('goog_')}`);
       append(`iOS key set: ${REVENUECAT_CONFIG.IOS_API_KEY.startsWith('appl_')}`);
+      append(`Purchases plugin: ${Capacitor.isPluginAvailable('Purchases')}`);
+      append(`RevenueCatUI plugin: ${Capacitor.isPluginAvailable('RevenueCatUI')} ${Capacitor.isPluginAvailable('RevenueCatUI') ? '✅' : '❌ (npx cap sync lazımdır)'}`);
 
       if (!isNativePlatform()) {
         append('⚠️ Web preview: RevenueCat yalnız native cihazda işləyir. APK/IPA quraşdırın.');
