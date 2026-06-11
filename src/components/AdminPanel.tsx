@@ -214,6 +214,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminPartnerRedemptions />;
       case 'vaccines':
         return <AdminVaccines />;
+      case 'revenuecat-debug':
+        return <RevenueCatDebug />;
       default:
         return <AdminDashboard />;
     }
