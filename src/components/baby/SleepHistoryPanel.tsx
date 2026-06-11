@@ -232,7 +232,7 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
                                     <Clock className="w-3 h-3" />
                                     <span className="text-xs font-bold">{formatDuration(durationMin)}</span>
                                   </div>
-                                  <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <div className="flex gap-0.5">
                                     <button onClick={() => handleEdit(log)} className="p-1 rounded text-muted-foreground hover:text-primary">
                                       <Pencil className="w-3 h-3" />
                                     </button>
