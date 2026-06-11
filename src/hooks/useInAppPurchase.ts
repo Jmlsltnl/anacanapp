@@ -61,7 +61,7 @@ interface UseInAppPurchaseReturn {
 }
 
 export function useInAppPurchase(): UseInAppPurchaseReturn {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const [packages, setPackages] = useState<RCPackage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isPurchasing, setIsPurchasing] = useState(false);
@@ -162,7 +162,7 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
             return fallback;
           })();
 
-      await supabase
+      const { error: subError } = await supabase
         .from('subscriptions')
         .upsert({
           user_id: user.id,
@@ -171,18 +171,23 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
           started_at: new Date().toISOString(),
           expires_at: expiresAt.toISOString(),
         }, { onConflict: 'user_id' });
+      if (subError) console.error('Subscription sync error:', subError);
 
-      await supabase
+      const { error: profileError } = await supabase
         .from('profiles')
         .update({
           is_premium: isPro,
           premium_until: isPro ? expiresAt.toISOString() : null,
         })
         .eq('user_id', user.id);
+      if (profileError) console.error('Profile sync error:', profileError);
+
+      // Refresh in-memory profile so the UI unlocks premium immediately
+      await refreshProfile();
     } catch (err) {
       console.error('DB sync error:', err);
     }
-  }, [user]);
+  }, [user, refreshProfile]);
 
   const executePurchase = useCallback(async (pkg: RCPackage): Promise<boolean> => {
     setIsPurchasing(true);
