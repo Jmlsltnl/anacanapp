@@ -48,14 +48,11 @@ export const isNativePlatform = (): boolean => Capacitor.isNativePlatform();
 export const hasRevenueCatPlugin = (): boolean =>
   isNativePlatform() && Capacitor.isPluginAvailable('Purchases');
 
-// RevenueCat native paywall UI — yalnız iOS-da aktiv.
-// Android-də RevenueCatUI plagini Jetpack Compose / AndroidX uyumsuzluqlarına
-// görə modal açılan kimi crash verə bilir. Android üçün custom in-app paywall
-// modalını istifadə edirik (IAP funksionallığı `Purchases` plagini ilə işləyir).
+// RevenueCat native paywall UI — həm iOS, həm Android-də aktiv.
+// Dashboard paywall dizaynında mənfi padding olmamalıdır, yoxsa Android crash verir.
 export const canUseNativePaywallUI = (): boolean =>
   REVENUECAT_ENABLED &&
   isNativePlatform() &&
-  Capacitor.getPlatform() === 'ios' &&
   Capacitor.isPluginAvailable('RevenueCatUI');
 
 export const hasRevenueCatUIPlugin = (): boolean =>
