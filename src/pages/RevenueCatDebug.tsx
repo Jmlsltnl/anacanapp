@@ -8,6 +8,8 @@ import {
   getOfferings,
   checkEntitlement,
   findFreeTrialOption,
+  canUseNativePaywallUI,
+  RC_BUILD_MARKER,
 } from '@/lib/revenuecat';
 
 export default function RevenueCatDebug() {
@@ -24,8 +26,10 @@ export default function RevenueCatDebug() {
     setError(null);
     setLog([]);
     try {
+      append(`Bundle versiyası: ${RC_BUILD_MARKER}`);
       append(`Platform: ${Capacitor.getPlatform()}`);
       append(`isNativePlatform: ${isNativePlatform()}`);
+      append(`Native paywall UI aktiv: ${canUseNativePaywallUI()} ${Capacitor.getPlatform() === 'android' ? '(Android-də həmişə FALSE olmalıdır)' : ''}`);
       append(`REVENUECAT_ENABLED: ${REVENUECAT_ENABLED}`);
       append(`Entitlement ID: ${REVENUECAT_CONFIG.ENTITLEMENT_ID}`);
       append(`Android key set: ${REVENUECAT_CONFIG.ANDROID_API_KEY.startsWith('goog_')}`);
