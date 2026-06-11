@@ -98,7 +98,13 @@ export default function RevenueCatDebug() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-4 pb-32">
+    <div className="min-h-screen bg-background text-foreground p-4 pb-32" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1rem)' }}>
+      <button
+        onClick={() => { window.location.href = '/'; }}
+        className="mb-3 px-3 py-1.5 rounded bg-muted text-foreground text-sm"
+      >
+        ← Geri
+      </button>
       <h1 className="text-xl font-bold mb-2">RevenueCat Debug</h1>
       <button
         onClick={run}
