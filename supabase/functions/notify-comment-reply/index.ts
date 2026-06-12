@@ -62,6 +62,23 @@ Deno.serve(async (req) => {
     const title = `${authorName} rəyinizə cavab yazdı`;
     const body = (reply.content || '').slice(0, 120);
 
+    // Idempotency: avoid duplicate notifications for the same reply
+    const { data: existing } = await supabase
+      .from('notifications')
+      .select('id')
+      .eq('user_id', parent.user_id)
+      .eq('notification_type', 'community_reply')
+      .eq('message', body)
+      .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+      .limit(1)
+      .maybeSingle();
+
+    if (existing) {
+      return new Response(JSON.stringify({ skipped: true, reason: 'duplicate' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Store in-app notification
     await supabase.from('notifications').insert({
       user_id: parent.user_id,
