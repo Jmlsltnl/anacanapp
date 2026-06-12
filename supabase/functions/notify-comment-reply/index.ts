@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
       .eq('user_id', parent.user_id)
       .eq('notification_type', 'community_reply')
       .eq('message', body)
-      .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+      .gte('created_at', new Date(Date.now() - 60 * 1000).toISOString())
       .limit(1)
       .maybeSingle();
 
@@ -116,16 +116,20 @@ Deno.serve(async (req) => {
     };
 
     let success = 0, failed = 0;
+    const errors: string[] = [];
+    console.log(`[notify-comment-reply] Sending to ${tokens.length} tokens for user ${parent.user_id}`);
     for (const { token } of tokens) {
       const r = await sendFCMv1(accessToken, projectId, token, title, body, fcmData);
       if (r.success) success++;
       else {
         failed++;
+        errors.push(`${r.errorCode}:${r.httpStatus}`);
         if (r.unregistered) await supabase.from('device_tokens').delete().eq('token', token);
       }
     }
+    console.log(`[notify-comment-reply] sent=${success} failed=${failed} errors=${errors.join(',')}`);
 
-    return new Response(JSON.stringify({ sent: success, failed }), {
+    return new Response(JSON.stringify({ sent: success, failed, errors }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (err) {
