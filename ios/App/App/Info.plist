@@ -150,9 +150,11 @@
 	<key>FacebookDisplayName</key>
 	<string>Anacan</string>
 	<key>FacebookAutoLogAppEventsEnabled</key>
-	<false/>
+	<true/>
 	<key>FacebookAdvertiserIDCollectionEnabled</key>
-	<false/>
+	<true/>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>İcazəniz reklamlarımızın effektivliyini ölçməyə və sizə daha uyğun məzmun göstərməyə kömək edir. Şəxsi məlumatlarınız üçüncü tərəflərlə paylaşılmır.</string>
 
 	<!-- ===== Universal Links üçün açılan tətbiqlər ===== -->
 	<key>LSApplicationQueriesSchemes</key>
