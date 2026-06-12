@@ -124,9 +124,23 @@ export const initFacebookEvents = () => {
   initialized = true;
   if (!Capacitor.isNativePlatform()) return;
   if (isAndroid) return;
-  // Defer plugin lookup so it doesn't block app boot or race the native bridge.
-  // Any throw here is swallowed by getPlugin's try/catch — cannot crash the app.
-  setTimeout(() => {
+  // Defer plugin lookup + ATT prompt so it doesn't block app boot or race the
+  // native bridge. Apple recommends asking AFTER the app is visible.
+  setTimeout(async () => {
     try { getPlugin(); } catch { /* silent */ }
-  }, 1500);
+    try {
+      const { AppTrackingTransparency } = await import('capacitor-plugin-app-tracking-transparency');
+      const status = await AppTrackingTransparency.getStatus();
+      let finalStatus = status.status;
+      if (finalStatus === 'notDetermined') {
+        const res = await AppTrackingTransparency.requestPermission();
+        finalStatus = res.status;
+      }
+      const granted = finalStatus === 'authorized';
+      await setFacebookAdvertiserTracking(granted);
+      console.log('[ATT] status =', finalStatus, 'fb tracking =', granted);
+    } catch (e) {
+      console.warn('[ATT] request failed', e);
+    }
+  }, 2000);
 };
