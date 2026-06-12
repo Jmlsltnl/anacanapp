@@ -19,8 +19,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Initialize Facebook / Meta SDK (reads FacebookAppID & FacebookClientToken from Info.plist)
 #if canImport(FBSDKCoreKit)
         ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
-        Settings.shared.isAutoLogAppEventsEnabled = true
-        Settings.shared.isAdvertiserIDCollectionEnabled = true
+        Settings.shared.isAutoLogAppEventsEnabled = false
+        Settings.shared.isAdvertiserIDCollectionEnabled = false
 #endif
 
         // Set up push notification delegates
