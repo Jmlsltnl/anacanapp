@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
       .eq('user_id', parent.user_id)
       .eq('notification_type', 'community_reply')
       .eq('message', body)
-      .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+      .gte('created_at', new Date(Date.now() - 60 * 1000).toISOString())
       .limit(1)
       .maybeSingle();
 
