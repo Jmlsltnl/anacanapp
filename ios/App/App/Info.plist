@@ -150,9 +150,9 @@
 	<key>FacebookDisplayName</key>
 	<string>Anacan</string>
 	<key>FacebookAutoLogAppEventsEnabled</key>
-	<true/>
+	<false/>
 	<key>FacebookAdvertiserIDCollectionEnabled</key>
-	<true/>
+	<false/>
 
 	<!-- ===== Universal Links üçün açılan tətbiqlər ===== -->
 	<key>LSApplicationQueriesSchemes</key>
