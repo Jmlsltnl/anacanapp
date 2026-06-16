@@ -708,7 +708,12 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
         </motion.button>
       }
 
-al(false);
+      {/* Birth Onboarding Modal */}
+      <BirthOnboardingModal
+        isOpen={showBirthModal}
+        onClose={() => setShowBirthModal(false)}
+        onComplete={() => {
+          setShowBirthModal(false);
           window.location.reload();
         }} />
       
