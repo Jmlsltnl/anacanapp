@@ -46,13 +46,13 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
   
   // Get next expected teeth
   const getNextTeethInfo = (months: number): { name: string; timeframe: string } | null => {
-    if (months < 6) return { name: tr("teethingwidget_alt_merkezi_kesiciler_63d8b0", "Alt mərkəzi kəsicilər"), timeframe: '6-10 ay' };
-    if (months < 8) return { name: tr("teethingwidget_yuxari_merkezi_kesiciler_456b8c", "Yuxarı mərkəzi kəsicilər"), timeframe: '8-12 ay' };
-    if (months < 10) return { name: tr("teethingwidget_yan_kesiciler_c75ada", "Yan kəsicilər"), timeframe: '9-16 ay' };
-    if (months < 14) return { name: tr("teethingwidget_birinci_azi_disler_eccbbc", "Birinci azı dişlər"), timeframe: '13-19 ay' };
-    if (months < 18) return { name: tr("teethingwidget_kopek_disleri_a86ac1", "Köpək dişləri"), timeframe: '16-23 ay' };
-    if (months < 24) return { name: tr("teethingwidget_ikinci_azi_disler_861654", "İkinci azı dişlər"), timeframe: '23-33 ay' };
-    if (emergedCount < 20) return { name: tr("teethingwidget_son_sud_disleri_c43b8c", "Son süd dişləri"), timeframe: 'Tezliklə' };
+    if (months < 6) return { name: tr("teethingwidget_alt_merkezi_kesiciler_63d8b0", "Alt mərkəzi kəsicilər"), timeframe: tr('teethingwidget_timeframe_6_10', '6-10 ay') };
+    if (months < 8) return { name: tr("teethingwidget_yuxari_merkezi_kesiciler_456b8c", "Yuxarı mərkəzi kəsicilər"), timeframe: tr('teethingwidget_timeframe_8_12', '8-12 ay') };
+    if (months < 10) return { name: tr("teethingwidget_yan_kesiciler_c75ada", "Yan kəsicilər"), timeframe: tr('teethingwidget_timeframe_9_16', '9-16 ay') };
+    if (months < 14) return { name: tr("teethingwidget_birinci_azi_disler_eccbbc", "Birinci azı dişlər"), timeframe: tr('teethingwidget_timeframe_13_19', '13-19 ay') };
+    if (months < 18) return { name: tr("teethingwidget_kopek_disleri_a86ac1", "Köpək dişləri"), timeframe: tr('teethingwidget_timeframe_16_23', '16-23 ay') };
+    if (months < 24) return { name: tr("teethingwidget_ikinci_azi_disler_861654", "İkinci azı dişlər"), timeframe: tr('teethingwidget_timeframe_23_33', '23-33 ay') };
+    if (emergedCount < 20) return { name: tr("teethingwidget_son_sud_disleri_c43b8c", "Son süd dişləri"), timeframe: tr('teethingwidget_timeframe_soon', 'Tezliklə') };
     return null;
   };
 
@@ -108,11 +108,11 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
               <div className="flex items-center gap-1.5 mb-0.5">
                 <Check className={`w-3.5 h-3.5 ${statusColor}`} />
                 <span className={`text-xs font-medium ${statusColor}`}>
-                  {isOnTrack ? 'Normal inkişaf' : 'Diqqət'}
+                  {isOnTrack ? tr('teethingwidget_normal_development', 'Normal inkişaf') : 'Diqqət'}
                 </span>
               </div>
               <p className="text-[10px] text-muted-foreground">
-                {ageMonths} aylıq üçün ~{expectedTeeth} diş gözlənilir
+                {tr('teethingwidget_expected_teeth', '{n} aylıq üçün ~{t} diş gözlənilir').replace('{n}', String(ageMonths)).replace('{t}', String(expectedTeeth))}
               </p>
             </div>
 

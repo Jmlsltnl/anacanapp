@@ -127,7 +127,7 @@ const RecentBlogPosts = ({ onNavigate, lifeStage }: RecentBlogPostsProps) => {
           className="flex items-center gap-1 text-primary text-sm font-semibold hover:gap-2 transition-all"
           whileTap={{ scale: 0.95 }}
         >
-          Hamısı
+          {tr('blogscreen_all_filter', 'Hamısı')}
           <ChevronRight className="w-4 h-4" />
         </motion.button>
       </div>
