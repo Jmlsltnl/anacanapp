@@ -480,7 +480,7 @@ const AuthScreen = () => {
               {/* Partner Mode Tabs */}
               <div className="flex gap-2 mb-7 p-1.5 bg-muted rounded-2xl">
                 {[
-                { id: 'register', label: 'Qeydiyyat' },
+                { id: 'register', label: tr("authscreen_qeydiyyat", 'Qeydiyyat') },
                 { id: 'login', label: tr("authscreen_giris_1ffbd7", 'Giriş') }].
                 map((tab) =>
                 <button
@@ -601,7 +601,7 @@ const AuthScreen = () => {
 
 
                       <span className="flex items-center gap-2">
-                          {partnerMode === 'register' ? tr("authscreen_qeydiyyatdan_kec_433379", "Qeydiyyatdan ke\xE7") : 'Daxil ol'}
+                          {partnerMode === 'register' ? tr("authscreen_qeydiyyatdan_kec_433379", "Qeydiyyatdan keç") : tr("authscreen_daxil_ol", 'Daxil ol')}
                           <ArrowRight className="w-5 h-5" />
                         </span>
                       }
@@ -617,10 +617,10 @@ const AuthScreen = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}>
-              {tr("authscreen_davam_etmekle_7dba26", "Davam etm\u0259kl\u0259")}
+              {tr("authscreen_davam_etmekle_7dba26", "Davam etməklə")}
               {' '}
-              <button className="text-blue-500 font-medium">{tr("authscreen_sertler_d86d4e", "Şərtlər")}</button> {tr("authscreen_ve_4e4a26", "v\u0259")}{' '}
-              <button className="text-blue-500 font-medium">{tr("authscreen_gizlilik_siyaseti_dc3f28", "Gizlilik Siyasəti")}</button> {tr("authscreen_ile_razilasirsiniz_547dd9", "il\u0259 raz\u0131la\u015F\u0131rs\u0131n\u0131z")}
+              <button className="text-blue-500 font-medium">{tr("authscreen_sertler_d86d4e", "Şərtlər")}</button> {tr("authscreen_ve_4e4a26", "və")}{' '}
+              <button className="text-blue-500 font-medium">{tr("authscreen_gizlilik_siyaseti_dc3f28", "Gizlilik Siyasəti")}</button> {tr("authscreen_ile_razilasirsiniz_547dd9", "ilə razılaşırsınız")}
             </motion.p>
           </div>
         </ScrollArea>
@@ -702,7 +702,7 @@ const AuthScreen = () => {
             <div className="flex gap-2 mb-7 p-1.5 bg-muted rounded-2xl">
               {[
               { id: 'login', label: tr("authscreen_giris_1ffbd7", 'Giriş') },
-              { id: 'register', label: 'Qeydiyyat' }].
+              { id: 'register', label: tr("authscreen_qeydiyyat", 'Qeydiyyat') }].
               map((tab) =>
               <button
                 key={tab.id}
@@ -743,7 +743,7 @@ const AuthScreen = () => {
                       </div>
                       <h2 className="text-xl font-bold text-foreground">{tr("authscreen_sifreni_berpa_et_1d1ae1", "Şifrəni Bərpa Et")}</h2>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {tr("authscreen_e_mail_unvaniniza_berpa_linki__20b085", "E-mail \xFCnvan\u0131n\u0131za b\u0259rpa linki g\xF6nd\u0259ril\u0259c\u0259k")}
+                        {tr("authscreen_e_mail_unvaniniza_berpa_linki__20b085", "E-mail ünvanınıza bərpa linki göndəriləcək")}
                       </p>
                     </motion.div>
 
@@ -817,7 +817,7 @@ const AuthScreen = () => {
                       type="button"
                       onClick={() => setMode('forgot-password')}
                       className="text-sm text-primary font-medium hover:underline">
-                          {tr("authscreen_sifreni_unutdunuz_f70bc9", "\u015Eifr\u0259ni unutdunuz?")}
+                          {tr("authscreen_sifreni_unutdunuz_f70bc9", "Şifrəni unutdunuz?")}
                         
                     </button>
                       </motion.div>
@@ -839,13 +839,9 @@ const AuthScreen = () => {
 
 
                     <span className="flex items-center gap-2">
-                        {mode === 'login' ? 'Daxil ol' : mode === 'register' ? tr("authscreen_qeydiyyatdan_kec_433379", "Qeydiyyatdan ke\xE7") : tr("authscreen_link_gonder_d6b028", "Link g\xF6nd\u0259r")}
+                        {mode === 'login' ? tr("authscreen_daxil_ol", 'Daxil ol') : mode === 'register' ? tr("authscreen_qeydiyyatdan_kec_433379", "Qeydiyyatdan keç") : tr("authscreen_link_gonder_d6b028", "Link göndər")}
                         <ArrowRight className="w-5 h-5" />
                       </span>
-                    }
-                  </Button>
-                </motion.div>
-              </motion.form>
             </AnimatePresence>
 
             {/* Social Login - only shown when enabled in app_settings */}

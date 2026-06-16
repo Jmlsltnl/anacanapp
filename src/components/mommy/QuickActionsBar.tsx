@@ -100,7 +100,7 @@ const QuickActionsBar = ({ onNavigateToTool }: QuickActionsBarProps) => {
                   </div>
                 )}
                 <IconComponent className="w-5 h-5" />
-                <span className="text-[10px] font-bold">{action.label_az || action.label}</span>
+                <span className="text-[10px] font-bold">{tr(`quick_action_${action.tool_key}`, action.label_az || action.label)}</span>
               </motion.button>
             );
           })}

@@ -90,21 +90,21 @@ const QuickStatsWidget = () => {
           <p className="text-lg font-black text-amber-700 dark:text-amber-300">
             {avgFeeding.toFixed(1)}
           </p>
-          <p className="text-[9px] text-amber-600/70 dark:text-amber-400/70">Ort. qidalanma</p>
+          <p className="text-[9px] text-amber-600/70 dark:text-amber-400/70">{tr("quickstatswidget_ort_qidalanma", "Ort. qidalanma")}</p>
         </div>
         <div className="bg-violet-50 dark:bg-violet-500/15 rounded-xl p-2.5 text-center">
           <Moon className="w-4 h-4 mx-auto mb-1 text-violet-600 dark:text-violet-400" />
           <p className="text-lg font-black text-violet-700 dark:text-violet-300">
             {avgSleep.toFixed(1)}
           </p>
-          <p className="text-[9px] text-violet-600/70 dark:text-violet-400/70">Ort. yuxu (s)</p>
+          <p className="text-[9px] text-violet-600/70 dark:text-violet-400/70">{tr("quickstatswidget_ort_yuxu_s", "Ort. yuxu (s)")}</p>
         </div>
         <div className="bg-emerald-50 dark:bg-emerald-500/15 rounded-xl p-2.5 text-center">
           <Clock className="w-4 h-4 mx-auto mb-1 text-emerald-600 dark:text-emerald-400" />
           <p className="text-lg font-black text-emerald-700 dark:text-emerald-300">
             {avgDiaper.toFixed(1)}
           </p>
-          <p className="text-[9px] text-emerald-600/70 dark:text-emerald-400/70">Ort. bez</p>
+          <p className="text-[9px] text-emerald-600/70 dark:text-emerald-400/70">{tr("quickstatswidget_ort_bez", "Ort. bez")}</p>
         </div>
       </div>
       
