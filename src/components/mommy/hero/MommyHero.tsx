@@ -1,4 +1,5 @@
 import { useAppSetting } from '@/hooks/useAppSettings';
+import { tr } from '@/lib/tr';
 import MommyHeroClassic, { MommyHeroProps } from './MommyHeroClassic';
 import MommyHeroAurora from './MommyHeroAurora';
 import MommyHeroStorybook from './MommyHeroStorybook';

@@ -5966,5 +5966,10 @@
   "quick_action_fairy_tale": "Smart Fairy Tales",
   "quick_action_white_noise": "White Noise",
   "quick_action_milestones": "Milestones",
-  "quick_action_vaccine_calendar": "Vaccine Calendar"
+  "quick_action_vaccine_calendar": "Vaccine Calendar",
+  "time_month": "month",
+  "time_day": "day",
+  "time_days_old": "days old",
+  "time_months_old": "months old",
+  "time_years_old": "years old"
 }

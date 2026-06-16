@@ -1,4 +1,5 @@
 import { tr } from "@/lib/tr";import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { Heart } from 'lucide-react';
 import type { MommyHeroProps } from './MommyHeroClassic';
 
@@ -64,8 +65,8 @@ const MommyHeroStorybook = ({ babyData, exactMonths, remainingDays, babyIllustra
             <Heart className="w-3 h-3 text-[hsl(340,80%,55%)] fill-current" />
             <span className="text-[11px] font-bold text-[hsl(15,60%,30%)]">
               {exactMonths > 0 ?
-              `${exactMonths} ay${remainingDays > 0 ? ` ${remainingDays} gün` : ''}` :
-              `${babyData.ageInDays} günlük`}
+              `${exactMonths} ${tr('time_month', 'ay')}${remainingDays > 0 ? ` ${remainingDays} ${tr('time_day', 'gün')}` : ''}` :
+              `${babyData.ageInDays} ${tr('time_days_old', 'günlük')}`}
             </span>
           </div>
 

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import type { MommyHeroProps } from './MommyHeroClassic';
 
 /**
@@ -8,8 +9,8 @@ import type { MommyHeroProps } from './MommyHeroClassic';
 const MommyHeroStory = ({ babyData, exactMonths, remainingDays, babyIllustration }: MommyHeroProps) => {
   const ageLabel =
     exactMonths > 0
-      ? `${exactMonths} ay${remainingDays > 0 ? ` ${remainingDays} gün` : ''}`
-      : `${babyData.ageInDays} günlük`;
+      ? `${exactMonths} ${tr('time_month', 'ay')}${remainingDays > 0 ? ` ${remainingDays} ${tr('time_day', 'gün')}` : ''}`
+      : `${babyData.ageInDays} ${tr('time_days_old', 'günlük')}`;
 
   // Story progress: position in current month
   const progress = exactMonths > 0 ? Math.min(100, (remainingDays / 30) * 100) : Math.min(100, (babyData.ageInDays / 30) * 100);

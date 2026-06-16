@@ -65,13 +65,13 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
 
     let label = '';
     if (months < 1) {
-      label = `${days} günlük`;
+      label = `${days} ${tr('time_days_old', 'günlük')}`;
     } else if (months < 12) {
-      label = `${months} aylıq`;
+      label = `${months} ${tr('time_months_old', 'aylıq')}`;
     } else {
       const years = Math.floor(months / 12);
       const remainingMonths = months % 12;
-      label = `${years} yaş${remainingMonths > 0 ? ` ${remainingMonths} ay` : ''}`;
+      label = `${years} ${tr('time_years_old', 'yaş')}${remainingMonths > 0 ? ` ${remainingMonths} ${tr('time_month', 'ay')}` : ''}`;
     }
 
     return { days, months, label };

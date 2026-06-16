@@ -1,4 +1,5 @@
 import { tr } from "@/lib/tr";import { motion } from 'framer-motion';
+import { tr } from '@/lib/tr';
 import { TrendingUp } from 'lucide-react';
 import type { MommyHeroProps } from './MommyHeroClassic';
 
