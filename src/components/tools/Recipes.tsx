@@ -329,12 +329,6 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
               </h1>
               <p className="text-white/80 text-sm">{tr("recipes_saglam_ve_lezzetli_yemekler_ad49b7", "Sağlam və ləzzətli yeməklər")}</p>
             </div>
-            {isPremium && (
-              <div className="bg-gradient-to-r from-amber-300 to-amber-400 text-amber-900 px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg">
-                <Crown className="w-3.5 h-3.5" />
-                Premium
-              </div>
-            )}
           </div>
 
           {/* Premium banner for non-premium users */}
