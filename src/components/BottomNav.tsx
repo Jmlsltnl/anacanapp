@@ -11,26 +11,26 @@ interface BottomNavProps {
   isPartner?: boolean;
 }
 
-const womanTabs = [
-  { id: 'home', label: tr("bottomnav_esas_6d87f7", 'Əsas'), icon: Home },
-  { id: 'tools', label: tr("bottomnav_aletler_4778b4", 'Alətlər'), icon: Compass },
-  
-  { id: 'community', label: tr("bottomnav_cemiyyet_2dc44d", 'Cəmiyyət'), icon: Users },
-  { id: 'ai', label: 'Anacan.AI', icon: MessageCircle },
-  { id: 'profile', label: 'Profil', icon: User },
-];
-
-const partnerTabs = [
-  { id: 'home', label: tr("bottomnav_esas_6d87f7", 'Əsas'), icon: Home },
-  { id: 'chat', label: 'Mesajlar', icon: MessageCircle },
-  { id: 'ai', label: tr("bottomnav_meslehet_9a0892", 'Məsləhət'), icon: Compass },
-  { id: 'profile', label: 'Profil', icon: User },
-];
-
 const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps) => {
   const { lifeStage } = useUserStore();
   const { unreadCount } = useUnreadMessages();
   const { unreadCount: communityUnread } = useUnreadCommunityPosts();
+
+  const womanTabs = [
+    { id: 'home', label: tr("bottomnav_esas_6d87f7", 'Əsas'), icon: Home },
+    { id: 'tools', label: tr("bottomnav_aletler_4778b4", 'Alətlər'), icon: Compass },
+    
+    { id: 'community', label: tr("bottomnav_cemiyyet_2dc44d", 'Cəmiyyət'), icon: Users },
+    { id: 'ai', label: 'Anacan.AI', icon: MessageCircle },
+    { id: 'profile', label: tr("bottomnav_profil", 'Profil'), icon: User },
+  ];
+
+  const partnerTabs = [
+    { id: 'home', label: tr("bottomnav_esas_6d87f7", 'Əsas'), icon: Home },
+    { id: 'chat', label: tr("bottomnav_mesajlar", 'Mesajlar'), icon: MessageCircle },
+    { id: 'ai', label: tr("bottomnav_meslehet_9a0892", 'Məsləhət'), icon: Compass },
+    { id: 'profile', label: tr("bottomnav_profil", 'Profil'), icon: User },
+  ];
   
   const getActiveColor = () => {
     switch (lifeStage) {
