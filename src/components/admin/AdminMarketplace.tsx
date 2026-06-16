@@ -36,7 +36,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 
 interface Listing {
   id: string;
@@ -556,7 +556,7 @@ const AdminMarketplace = () => {
                         </TableCell>
                         <TableCell>
                           <span className="text-sm text-muted-foreground">
-                            {format(new Date(listing.created_at), 'dd MMM yyyy', { locale: az })}
+                            {format(new Date(listing.created_at), 'dd MMM yyyy', { locale: getCurrentDateLocale() })}
                           </span>
                         </TableCell>
                         <TableCell className="text-right">
@@ -685,9 +685,9 @@ const AdminMarketplace = () => {
             }
               
               <div className="text-sm text-muted-foreground">
-                <p>{tr("adminmarketplace_yaradilma_44cfee", "Yarad\u0131lma:")} {format(new Date(selectedListing.created_at), 'dd MMMM yyyy, HH:mm', { locale: az })}</p>
+                <p>{tr("adminmarketplace_yaradilma_44cfee", "Yarad\u0131lma:")} {format(new Date(selectedListing.created_at), 'dd MMMM yyyy, HH:mm', { locale: getCurrentDateLocale() })}</p>
                 {selectedListing.reviewed_at &&
-              <p>{tr("adminmarketplace_baxis_1e7f87", "Bax\u0131\u015F:")} {format(new Date(selectedListing.reviewed_at), 'dd MMMM yyyy, HH:mm', { locale: az })}</p>
+              <p>{tr("adminmarketplace_baxis_1e7f87", "Bax\u0131\u015F:")} {format(new Date(selectedListing.reviewed_at), 'dd MMMM yyyy, HH:mm', { locale: getCurrentDateLocale() })}</p>
               }
               </div>
             </div>

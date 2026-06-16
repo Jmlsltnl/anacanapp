@@ -12,7 +12,7 @@ import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { Input } from '@/components/ui/input';
 import { getPhaseInfoForDate, getCycleDayForDate } from '@/lib/cycle-utils';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { tr } from "@/lib/tr";
 
 interface CalendarScreenProps {
@@ -235,7 +235,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
               <ChevronLeft className="w-5 h-5" />
             </motion.button>
             <h2 className="text-lg font-bold capitalize">
-              {format(currentMonth, 'MMMM yyyy', { locale: az })}
+              {format(currentMonth, 'MMMM yyyy', { locale: getCurrentDateLocale() })}
             </h2>
             <motion.button
               onClick={() => navigateMonth('next')}
@@ -344,7 +344,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <h3 className="font-bold">
-                    {format(selectedDate, 'd MMMM, EEEE', { locale: az })}
+                    {format(selectedDate, 'd MMMM, EEEE', { locale: getCurrentDateLocale() })}
                   </h3>
                   {lifeStage === 'flow' && cycleData &&
                 <p className="text-xs text-muted-foreground">
@@ -431,7 +431,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
               </div>
 
               <p className="text-sm text-muted-foreground mb-4">
-                {format(selectedDate, 'd MMMM yyyy', { locale: az })}
+                {format(selectedDate, 'd MMMM yyyy', { locale: getCurrentDateLocale() })}
               </p>
               
               <div className="mb-4">

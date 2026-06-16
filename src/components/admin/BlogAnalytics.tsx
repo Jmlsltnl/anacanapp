@@ -7,7 +7,7 @@ import {
 'lucide-react';
 import { BlogPost } from '@/hooks/useBlog';
 import { format, subDays, isAfter } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, BarChart, Bar } from
@@ -40,7 +40,7 @@ const BlogAnalytics = ({ posts }: BlogAnalyticsProps) => {
       });
 
       weeklyData.push({
-        day: format(date, 'EEE', { locale: az }),
+        day: format(date, 'EEE', { locale: getCurrentDateLocale() }),
         posts: dayPosts.length,
         views: dayPosts.reduce((sum, p) => sum + (p.view_count || 0), 0)
       });

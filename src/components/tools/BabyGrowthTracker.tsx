@@ -14,7 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useChildren } from '@/hooks/useChildren';
 import { format } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
 
@@ -346,7 +346,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
                           </div>
                           <div>
                             <p className="font-bold text-foreground">
-                              {format(new Date(entry.entry_date), 'd MMMM yyyy', { locale: az })}
+                              {format(new Date(entry.entry_date), 'd MMMM yyyy', { locale: getCurrentDateLocale() })}
                             </p>
                             <div className="flex items-center gap-3 mt-1 text-sm">
                               {entry.weight_kg &&

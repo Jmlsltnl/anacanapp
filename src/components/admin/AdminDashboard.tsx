@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { formatDistanceToNow, subDays, format } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import AdminUsageStats from './AdminUsageStats';
 
 interface Stats {
@@ -141,7 +141,7 @@ const AdminDashboard = () => {
         lte('created_at', endOfDay.toISOString());
 
         days.push({
-          date: format(date, 'EEE', { locale: az }),
+          date: format(date, 'EEE', { locale: getCurrentDateLocale() }),
           users: usersCount || 0,
           logs: logsCount || 0,
           premium: premiumCount || 0
@@ -419,7 +419,7 @@ const AdminDashboard = () => {
                   }
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {formatDistanceToNow(new Date(user.created_at), { addSuffix: true, locale: az })}
+                      {formatDistanceToNow(new Date(user.created_at), { addSuffix: true, locale: getCurrentDateLocale() })}
                     </p>
                   </div>
                 </div>

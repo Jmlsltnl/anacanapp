@@ -838,10 +838,14 @@ const AuthScreen = () => {
                       transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }} /> :
 
 
-                    <span className="flex items-center gap-2">
+                      <span className="flex items-center gap-2">
                         {mode === 'login' ? tr("authscreen_daxil_ol", 'Daxil ol') : mode === 'register' ? tr("authscreen_qeydiyyatdan_kec_433379", "Qeydiyyatdan keç") : tr("authscreen_link_gonder_d6b028", "Link göndər")}
                         <ArrowRight className="w-5 h-5" />
                       </span>
+                    }
+                  </Button>
+                </motion.div>
+              </motion.form>
             </AnimatePresence>
 
             {/* Social Login - only shown when enabled in app_settings */}

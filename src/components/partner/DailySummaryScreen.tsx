@@ -14,7 +14,7 @@ import {
 'lucide-react';
 import { useDailySummary, DailySummary } from '@/hooks/useDailySummary';
 import { format, isToday, isYesterday } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { Badge } from '@/components/ui/badge';
 import { SYMPTOMS } from '@/types/anacan';
 
@@ -41,7 +41,7 @@ const DailySummaryScreen: React.FC<DailySummaryScreenProps> = ({ onBack }) => {
     const date = new Date(dateStr);
     if (isToday(date)) return tr("dailysummaryscreen_bu_gun_786fd4", "Bu g\xFCn");
     if (isYesterday(date)) return tr("dailysummaryscreen_dunen_52b701", "D\xFCn\u0259n");
-    return format(date, 'd MMMM', { locale: az });
+    return format(date, 'd MMMM', { locale: getCurrentDateLocale() });
   };
 
   const getSymptomLabel = (symptomId: string) => {

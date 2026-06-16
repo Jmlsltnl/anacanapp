@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { tr } from '@/lib/tr';
 import { Calendar, TrendingUp, Clock, Activity, BarChart3 } from 'lucide-react';
 import { format, parseISO, differenceInDays } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { useCycleHistory, useCycleStats, CycleHistory } from '@/hooks/useCycleHistory';
 
 const FlowCycleStats = () => {
@@ -92,11 +92,11 @@ const FlowCycleStats = () => {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-foreground">
-                      {format(parseISO(cycle.start_date), 'd MMM', { locale: az })}
+                      {format(parseISO(cycle.start_date), 'd MMM', { locale: getCurrentDateLocale() })}
                       {cycle.end_date &&
                   <span className="text-muted-foreground">
                           {' - '}
-                          {format(parseISO(cycle.end_date), 'd MMM', { locale: az })}
+                          {format(parseISO(cycle.end_date), 'd MMM', { locale: getCurrentDateLocale() })}
                         </span>
                   }
                     </p>

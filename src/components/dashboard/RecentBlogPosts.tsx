@@ -3,7 +3,7 @@ import { tr } from '@/lib/tr';
 import { ChevronRight, Clock, Eye, BookOpen } from 'lucide-react';
 import { useBlog, BlogPost, BlogLifeStage } from '@/hooks/useBlog';
 import { formatDistanceToNow } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 
 interface RecentBlogPostsProps {
   onNavigate: (screen: string) => void;
@@ -13,7 +13,7 @@ interface RecentBlogPostsProps {
 const BlogPostCard = ({ post, index, onClick }: {post: BlogPost;index: number;onClick: () => void;}) => {
   const timeAgo = formatDistanceToNow(new Date(post.created_at), {
     addSuffix: true,
-    locale: az
+    locale: getCurrentDateLocale()
   });
 
   return (

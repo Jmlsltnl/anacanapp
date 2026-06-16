@@ -15,7 +15,7 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { tr } from "@/lib/tr";
 
 interface PregnancyAlbumProps {
@@ -487,7 +487,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                     {monthLabels[showActionSheet.month_number - 1]?.label}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {format(new Date(showActionSheet.photo_date), 'd MMMM yyyy', { locale: az })}
+                    {format(new Date(showActionSheet.photo_date), 'd MMMM yyyy', { locale: getCurrentDateLocale() })}
                   </p>
                   {showActionSheet.caption &&
                 <p className="text-xs text-muted-foreground mt-0.5">{showActionSheet.caption}</p>
@@ -569,7 +569,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
               <div className="text-center text-white">
                 <p className="font-semibold">{monthLabels[viewingPhoto.month_number - 1]?.label}</p>
                 <p className="text-xs opacity-70">
-                  {format(new Date(viewingPhoto.photo_date), 'd MMMM yyyy', { locale: az })}
+                  {format(new Date(viewingPhoto.photo_date), 'd MMMM yyyy', { locale: getCurrentDateLocale() })}
                 </p>
               </div>
               <div className="flex gap-2">

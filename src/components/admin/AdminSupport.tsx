@@ -13,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import {
   Select,
   SelectContent,
@@ -247,7 +247,7 @@ const AdminSupport = () => {
               </div>
               <p className="text-sm text-foreground">{selectedTicket.message}</p>
               <p className="text-[10px] text-muted-foreground mt-1">
-                {format(new Date(selectedTicket.created_at), 'd MMM yyyy, HH:mm', { locale: az })}
+                {format(new Date(selectedTicket.created_at), 'd MMM yyyy, HH:mm', { locale: getCurrentDateLocale() })}
               </p>
             </div>
           </div>
@@ -259,7 +259,7 @@ const AdminSupport = () => {
                 <p className="text-sm">{selectedTicket.admin_response}</p>
                 {selectedTicket.responded_at &&
               <p className="text-[10px] opacity-70 mt-1 text-right">
-                    {format(new Date(selectedTicket.responded_at), 'd MMM, HH:mm', { locale: az })}
+                    {format(new Date(selectedTicket.responded_at), 'd MMM, HH:mm', { locale: getCurrentDateLocale() })}
                   </p>
               }
               </div>
@@ -291,7 +291,7 @@ const AdminSupport = () => {
                   <p className={`text-[10px] mt-1 ${
               reply.is_admin ? 'opacity-70 text-right' : 'text-muted-foreground'}`
               }>
-                    {format(new Date(reply.created_at), 'd MMMM, HH:mm', { locale: az })}
+                    {format(new Date(reply.created_at), 'd MMMM, HH:mm', { locale: getCurrentDateLocale() })}
                   </p>
                 </div>
               </div>
@@ -433,7 +433,7 @@ const AdminSupport = () => {
 
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>{getCategoryLabel(ticket.category)}</span>
-                <span>{format(new Date(ticket.created_at), 'd MMM yyyy, HH:mm', { locale: az })}</span>
+                <span>{format(new Date(ticket.created_at), 'd MMM yyyy, HH:mm', { locale: getCurrentDateLocale() })}</span>
               </div>
             </motion.div>
         )}

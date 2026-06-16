@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { AffiliateProduct, useIsProductSaved, useSaveProduct, useUnsaveProduct } from '@/hooks/useAffiliateProducts';
 import { formatDistanceToNow } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { nativeShare } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
@@ -272,7 +272,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
               {product.price_updated_at &&
               <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
                   <Clock className="w-3 h-3" />
-                  {tr("affiliateproductdetail_qiymet_54c4f3", "Qiym\u0259t")} {formatDistanceToNow(new Date(product.price_updated_at), { locale: az, addSuffix: true })} {tr("affiliateproductdetail_yenilenib_d414bf", "yenil\u0259nib")}
+                  {tr("affiliateproductdetail_qiymet_54c4f3", "Qiym\u0259t")} {formatDistanceToNow(new Date(product.price_updated_at), { locale: getCurrentDateLocale(), addSuffix: true })} {tr("affiliateproductdetail_yenilenib_d414bf", "yenil\u0259nib")}
                 </p>
               }
 

@@ -9,7 +9,7 @@ import {
 import { useUserStore } from '@/store/userStore';
 import { usePhaseTips, PHASE_INFO, CATEGORY_INFO, MenstrualPhase, TipCategory } from '@/hooks/usePhaseTips';
 import { format, addDays, differenceInDays } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { Calendar } from '@/components/ui/calendar';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -110,7 +110,7 @@ const FlowDashboard = () => {
       }
 
       toast.success(tr("flowdashboard_period_baslangici_qeyd_edildi_6961a5", "Period ba\u015Flan\u011F\u0131c\u0131 qeyd edildi! \uD83E\uDE78"), {
-        description: format(selectedDay, 'd MMMM yyyy', { locale: az })
+        description: format(selectedDay, 'd MMMM yyyy', { locale: getCurrentDateLocale() })
       });
     } catch (error) {
       console.error('Error marking period:', error);
@@ -470,7 +470,7 @@ const FlowDashboard = () => {
             <div className="flex-1">
               <p className="font-semibold text-foreground text-sm">{labelNextPeriod}</p>
               <p className="text-xs text-muted-foreground">
-                {format(nextPeriodDate, 'd MMMM', { locale: az })} • {daysUntilPeriod > 0 ? `${daysUntilPeriod} gün qaldı` : tr("flowdashboard_bu_gun_786fd4", "Bu g\xFCn")}
+                {format(nextPeriodDate, 'd MMMM', { locale: getCurrentDateLocale() })} • {daysUntilPeriod > 0 ? `${daysUntilPeriod} gün qaldı` : tr("flowdashboard_bu_gun_786fd4", "Bu g\xFCn")}
               </p>
             </div>
           </div>
@@ -483,7 +483,7 @@ const FlowDashboard = () => {
             <div className="flex-1">
               <p className="font-semibold text-foreground text-sm">{labelFertileWindow}</p>
               <p className="text-xs text-muted-foreground">
-                {format(fertileStart, 'd MMMM', { locale: az })} - {format(fertileEnd, 'd MMMM', { locale: az })}
+                {format(fertileStart, 'd MMMM', { locale: getCurrentDateLocale() })} - {format(fertileEnd, 'd MMMM', { locale: getCurrentDateLocale() })}
               </p>
             </div>
           </div>
@@ -496,7 +496,7 @@ const FlowDashboard = () => {
             <div className="flex-1">
               <p className="font-semibold text-foreground text-sm">{labelOvulationDay}</p>
               <p className="text-xs text-muted-foreground">
-                {format(addDays(lastPeriodDate, 14), 'd MMMM', { locale: az })}
+                {format(addDays(lastPeriodDate, 14), 'd MMMM', { locale: getCurrentDateLocale() })}
               </p>
             </div>
           </div>
@@ -618,7 +618,7 @@ const FlowDashboard = () => {
             
           </div>
           <p className="text-sm text-center text-muted-foreground">
-            {tr("flowdashboard_secilen_tarix_104372", "Se\xE7il\u0259n tarix:")} <strong>{format(periodStartDate, 'd MMMM yyyy', { locale: az })}</strong>
+            {tr("flowdashboard_secilen_tarix_104372", "Se\xE7il\u0259n tarix:")} <strong>{format(periodStartDate, 'd MMMM yyyy', { locale: getCurrentDateLocale() })}</strong>
           </p>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={markingPeriod}>{tr("flowdashboard_legv_et_b5e49c", "Ləğv et")}</AlertDialogCancel>
@@ -656,7 +656,7 @@ const FlowDashboard = () => {
             
           </div>
           <p className="text-sm text-center text-muted-foreground">
-            {tr("flowdashboard_secilen_tarix_104372", "Se\xE7il\u0259n tarix:")} <strong>{format(periodEndDate, 'd MMMM yyyy', { locale: az })}</strong>
+            {tr("flowdashboard_secilen_tarix_104372", "Se\xE7il\u0259n tarix:")} <strong>{format(periodEndDate, 'd MMMM yyyy', { locale: getCurrentDateLocale() })}</strong>
             {cycleData?.lastPeriodDate &&
             <> • Period: <strong>{differenceInDays(periodEndDate, new Date(cycleData.lastPeriodDate)) + 1} {tr("flowdashboard_gun_54e78d", "g\xFCn")}</strong></>
             }

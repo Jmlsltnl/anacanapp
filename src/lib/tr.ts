@@ -1,6 +1,6 @@
 import { getCachedTranslation } from './i18n';
 
-function getPersistedLanguage(): string {
+export function getPersistedLanguage(): string {
   if (typeof window === 'undefined') return 'az';
 
   try {

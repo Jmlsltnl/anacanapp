@@ -14,7 +14,7 @@ import { usePartnerData } from '@/hooks/usePartnerData';
 import { useSurprises } from '@/hooks/useSurprises';
 import { useSurpriseIdeas } from '@/hooks/useDynamicConfig';
 import { format } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { tr } from "@/lib/tr";
 
 interface SurpriseIdea {
@@ -164,7 +164,7 @@ const SurpriseTab = () => {
 
       toast({
         title: tr("surprisetab_surpriz_planlandi_0e685c", 'Sürpriz planlandı! 🎉'),
-        description: `${selectedSurprise.title} - ${format(new Date(planningDate), 'd MMMM yyyy', { locale: az })}`
+        description: `${selectedSurprise.title} - ${format(new Date(planningDate), 'd MMMM yyyy', { locale: getCurrentDateLocale() })}`
       });
 
       setSelectedSurprise(null);
@@ -269,7 +269,7 @@ const SurpriseTab = () => {
                   <h4 className="font-semibold">{planned.surprise_title}</h4>
                   <p className="text-sm text-muted-foreground flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
-                    {format(new Date(planned.planned_date), 'd MMMM yyyy', { locale: az })}
+                    {format(new Date(planned.planned_date), 'd MMMM yyyy', { locale: getCurrentDateLocale() })}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -347,7 +347,7 @@ const SurpriseTab = () => {
                       <p className="font-medium text-sm">{surprise.surprise_title}</p>
                       <p className="text-xs text-muted-foreground">
                         {surprise.completed_date ?
-                  format(new Date(surprise.completed_date), 'd MMM yyyy', { locale: az }) : tr("surprisetab_tamamlandi_5e0188", "Tamamland\u0131")
+                  format(new Date(surprise.completed_date), 'd MMM yyyy', { locale: getCurrentDateLocale() }) : tr("surprisetab_tamamlandi_5e0188", "Tamamland\u0131")
 
                   }
                       </p>

@@ -6,7 +6,7 @@ import { Story, UserStoryGroup } from '@/hooks/useStories';
 import { useStoryViewers } from '@/hooks/useStoryViewers';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDistanceToNow } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -252,7 +252,7 @@ const StoryViewer = ({
                   <p className="text-white/50 text-[11px]">
                     {formatDistanceToNow(new Date(currentStory.created_at), {
                       addSuffix: true,
-                      locale: az
+                      locale: getCurrentDateLocale()
                     })}
                   </p>
                 </div>
@@ -416,7 +416,7 @@ const StoryViewer = ({
                           <p className="text-[11px] text-muted-foreground">
                             {formatDistanceToNow(new Date(viewer.viewed_at), {
                         addSuffix: true,
-                        locale: az
+                        locale: getCurrentDateLocale()
                       })}
                           </p>
                         </div>

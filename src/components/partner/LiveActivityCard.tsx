@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePartnerData } from '@/hooks/usePartnerData';
 import { formatDistanceToNow } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 
 interface LiveEvent {
   id: string;
@@ -200,7 +200,7 @@ const LiveActivityCard = () => {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{event.message}</p>
                     <p className="text-xs text-muted-foreground">
-                      {formatDistanceToNow(event.timestamp, { addSuffix: true, locale: az })}
+                      {formatDistanceToNow(event.timestamp, { addSuffix: true, locale: getCurrentDateLocale() })}
                     </p>
                   </div>
                 </motion.div>);

@@ -29,7 +29,7 @@ import {
   FALLBACK_BREATHING_EXERCISES } from
 '@/hooks/useMentalHealthData';
 import { format, subDays } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { toast } from 'sonner';
 import { tr } from "@/lib/tr";
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
@@ -228,7 +228,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
   const last7Days = [...Array(7)].map((_, i) => {
     const date = format(subDays(new Date(), 6 - i), 'yyyy-MM-dd');
     const checkin = moodCheckins.find((c) => c.checked_at === date);
-    return { date, mood: checkin?.mood_level || 0, day: format(subDays(new Date(), 6 - i), 'EEE', { locale: az }) };
+    return { date, mood: checkin?.mood_level || 0, day: format(subDays(new Date(), 6 - i), 'EEE', { locale: getCurrentDateLocale() }) };
   });
 
   const emergencyResources = resources.filter((r) => r.is_emergency);
@@ -497,7 +497,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                     </div>
                     <div className="text-left">
                       <p className="font-medium text-foreground">
-                        {format(new Date(assessment.completed_at), 'd MMMM yyyy', { locale: az })}
+                        {format(new Date(assessment.completed_at), 'd MMMM yyyy', { locale: getCurrentDateLocale() })}
                       </p>
                       <p className="text-xs text-muted-foreground">Bal: {assessment.total_score}/30</p>
                     </div>

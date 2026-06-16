@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, Calendar, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { az } from "date-fns/locale";
+import { getCurrentDateLocale } from '@/lib/date-utils';
 
 interface DatePickerWheelProps {
   value?: Date;
@@ -325,7 +325,7 @@ export function DatePickerWheel({
           <div className="flex flex-col items-start">
             <span className="text-xs text-muted-foreground">{tr("date-picker-wheel_dogum_tarixi_d96907", "Doğum tarixi")}</span>
             <span className={cn("font-medium", value ? "text-foreground" : "text-muted-foreground")}>
-              {value ? format(value, "d MMMM yyyy", { locale: az }) : placeholder}
+              {value ? format(value, "d MMMM yyyy", { locale: getCurrentDateLocale() }) : placeholder}
             </span>
           </div>
         </div>

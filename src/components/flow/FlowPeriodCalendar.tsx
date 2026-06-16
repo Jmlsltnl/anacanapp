@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, ChevronLeft, ChevronRight, Droplets } from 'lucide-react';
 import { format, addDays, subDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isAfter } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { useUserStore } from '@/store/userStore';
 import { usePeriodDayLogs, useTogglePeriodDay } from '@/hooks/usePeriodDayLogs';
 import { getPhaseInfoForDate } from '@/lib/cycle-utils';
@@ -75,7 +75,7 @@ const FlowPeriodCalendar = () => {
       toggleMutation.mutate({ date }, {
         onSuccess: () => {
           toast.success(tr("flowperiodcalendar_period_gunu_silindi_c4a18f", "Period g\xFCn\xFC silindi"), {
-            description: format(date, 'd MMMM', { locale: az })
+            description: format(date, 'd MMMM', { locale: getCurrentDateLocale() })
           });
         }
       });
@@ -91,7 +91,7 @@ const FlowPeriodCalendar = () => {
     toggleMutation.mutate({ date: selectedDate, flowIntensity: intensity }, {
       onSuccess: () => {
         toast.success(tr("flowperiodcalendar_period_gunu_qeyd_edildi_0555f5", "Period g\xFCn\xFC qeyd edildi \uD83E\uDE78"), {
-          description: format(selectedDate, 'd MMMM', { locale: az })
+          description: format(selectedDate, 'd MMMM', { locale: getCurrentDateLocale() })
         });
         setShowFlowPicker(false);
         setSelectedDate(null);
@@ -128,7 +128,7 @@ const FlowPeriodCalendar = () => {
             <ChevronLeft className="w-4 h-4" />
           </button>
           <span className="text-sm font-medium min-w-[110px] text-center">
-            {format(calendarMonth, 'MMMM yyyy', { locale: az })}
+            {format(calendarMonth, 'MMMM yyyy', { locale: getCurrentDateLocale() })}
           </span>
           <button
             onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1))}
@@ -247,7 +247,7 @@ const FlowPeriodCalendar = () => {
             
               <div className="w-10 h-1 rounded-full bg-muted-foreground/30 mx-auto mb-4" />
               <h4 className="font-bold text-foreground text-center mb-1">
-                🩸 {format(selectedDate, 'd MMMM yyyy', { locale: az })}
+                🩸 {format(selectedDate, 'd MMMM yyyy', { locale: getCurrentDateLocale() })}
               </h4>
               <p className="text-sm text-muted-foreground text-center mb-5">
                 {tr("flowperiodcalendar_axinti_intensivliyini_secin_7d78ea", "Ax\u0131nt\u0131 intensivliyini se\xE7in")}

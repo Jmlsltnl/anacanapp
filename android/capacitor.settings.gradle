@@ -26,6 +26,9 @@ project(':capacitor-haptics').projectDir = new File('../node_modules/@capacitor/
 include ':capacitor-local-notifications'
 project(':capacitor-local-notifications').projectDir = new File('../node_modules/@capacitor/local-notifications/android')
 
+include ':capacitor-preferences'
+project(':capacitor-preferences').projectDir = new File('../node_modules/@capacitor/preferences/android')
+
 include ':capacitor-push-notifications'
 project(':capacitor-push-notifications').projectDir = new File('../node_modules/@capacitor/push-notifications/android')
 
@@ -40,6 +43,3 @@ project(':revenuecat-purchases-capacitor').projectDir = new File('../node_module
 
 include ':revenuecat-purchases-capacitor-ui'
 project(':revenuecat-purchases-capacitor-ui').projectDir = new File('../node_modules/@revenuecat/purchases-capacitor-ui/android')
-
-include ':capacitor-facebook-events'
-project(':capacitor-facebook-events').projectDir = new File('../node_modules/capacitor-facebook-events/android')

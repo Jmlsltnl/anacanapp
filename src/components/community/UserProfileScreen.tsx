@@ -9,7 +9,7 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import PostCard from './PostCard';
 import { CommunityPost } from '@/hooks/useCommunity';
 import { formatDistanceToNow } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { tr } from "@/lib/tr";
 
 interface UserProfile {
@@ -220,7 +220,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
             }
 
             <p className="text-xs text-muted-foreground mt-2">
-              {formatDistanceToNow(new Date(profile.created_at), { addSuffix: true, locale: az })} {tr("userprofilescreen_qosuldu_78ba1a", "qo\u015Fuldu")}
+              {formatDistanceToNow(new Date(profile.created_at), { addSuffix: true, locale: getCurrentDateLocale() })} {tr("userprofilescreen_qosuldu_78ba1a", "qo\u015Fuldu")}
             </p>
           </div>
         </div>
@@ -310,7 +310,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
               }
                   <div className="absolute bottom-2 left-2 right-2">
                     <span className="text-xs text-white/80 bg-black/40 px-2 py-0.5 rounded-full">
-                      {formatDistanceToNow(new Date(story.created_at), { addSuffix: false, locale: az })}
+                      {formatDistanceToNow(new Date(story.created_at), { addSuffix: false, locale: getCurrentDateLocale() })}
                     </span>
                   </div>
                 </motion.div>

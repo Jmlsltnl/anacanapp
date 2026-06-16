@@ -15,7 +15,7 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { useToast } from '@/hooks/use-toast';
 import { format, isToday, isYesterday, subDays, startOfDay } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { tr } from "@/lib/tr";
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
@@ -153,7 +153,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
     const date = new Date(dateStr);
     if (isToday(date)) return tr("bloodsugartracker_bu_gun_786fd4", "Bu g\xFCn");
     if (isYesterday(date)) return tr("bloodsugartracker_dunen_52b701", "D\xFCn\u0259n");
-    return format(date, 'd MMM', { locale: az });
+    return format(date, 'd MMM', { locale: getCurrentDateLocale() });
   };
 
   return (

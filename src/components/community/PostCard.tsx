@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, MessageCircle, Share2, MoreHorizontal, Send, Trash2, Crown, Shield, Flag, Pencil, EyeOff } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { CommunityPost, useToggleLike, usePostComments, useCreateComment, useEditPost, useDeletePost } from '@/hooks/useCommunity';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -127,7 +127,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
     await nativeShare({ title: tr("postcard_anacan_paylasim_9618d9", 'Anacan - Paylaşım'), text: post.content.substring(0, 100) + (post.content.length > 100 ? '...' : '') });
   };
 
-  const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: az });
+  const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: getCurrentDateLocale() });
   const mediaItems = (post.media_urls || []).map((url) => ({ url, type: getMediaType(url) }));
   const authorBadge = post.author?.badge_type as 'admin' | 'premium' | 'moderator' | null;
   const handleAvatarClick = () => {if (post.user_id && onUserClick && (!isAnonymous || isAdmin)) onUserClick(post.user_id);};

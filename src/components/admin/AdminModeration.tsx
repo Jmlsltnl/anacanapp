@@ -16,7 +16,7 @@ import {
   DialogTitle } from
 '@/components/ui/dialog';
 import { formatDistanceToNow } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { getPublicProfileCards } from '@/lib/public-profile-cards';
 
 interface Post {
@@ -399,7 +399,7 @@ const AdminModeration = () => {
                           </Badge>
                           <Badge variant="outline">{report.reason}</Badge>
                           <span className="text-xs text-muted-foreground">
-                            {formatDistanceToNow(new Date(report.created_at), { addSuffix: true, locale: az })}
+                            {formatDistanceToNow(new Date(report.created_at), { addSuffix: true, locale: getCurrentDateLocale() })}
                           </span>
                         </div>
 
@@ -524,7 +524,7 @@ const AdminModeration = () => {
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-semibold">{post.author?.name || tr("adminmoderation_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}</span>
                         <span className="text-xs text-muted-foreground">
-                          {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: az })}
+                          {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: getCurrentDateLocale() })}
                         </span>
                       </div>
                       <p className="text-sm text-foreground mb-2 whitespace-pre-wrap">{post.content}</p>
@@ -599,7 +599,7 @@ const AdminModeration = () => {
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-semibold">{comment.author?.name || tr("adminmoderation_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}</span>
                         <span className="text-xs text-muted-foreground">
-                          {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: az })}
+                          {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: getCurrentDateLocale() })}
                         </span>
                       </div>
                       <p className="text-sm text-foreground">{comment.content}</p>

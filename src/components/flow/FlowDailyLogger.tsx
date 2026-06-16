@@ -6,7 +6,7 @@ import {
   Zap, CloudRain, Sun, Sparkles } from
 'lucide-react';
 import { format } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
@@ -152,7 +152,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
           <div className="text-left">
             <h3 className="font-bold text-foreground">{tr("flowdailylogger_gundelik_qeyd_32e154", "Gündəlik Qeyd")}</h3>
             <p className="text-xs text-muted-foreground">
-              {format(date, 'd MMMM, EEEE', { locale: az })}
+              {format(date, 'd MMMM, EEEE', { locale: getCurrentDateLocale() })}
             </p>
           </div>
         </div>

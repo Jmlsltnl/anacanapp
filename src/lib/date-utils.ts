@@ -1,6 +1,11 @@
 import { tr } from "@/lib/tr";import { format } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { az, enUS } from 'date-fns/locale';
+import { getPersistedLanguage } from './tr';
 
+export const getCurrentDateLocale = () => {
+  const lang = getPersistedLanguage();
+  return lang === 'en' ? enUS : az;
+};
 /**
  * Format date to Azerbaijani format: "18 Fevral" or "18 Fevral 2025"
  */
@@ -9,7 +14,7 @@ export const formatDateAz = (date: Date | string, includeYear = false): string =
   if (isNaN(d.getTime())) return '';
 
   const formatStr = includeYear ? 'd MMMM yyyy' : 'd MMMM';
-  return format(d, formatStr, { locale: az });
+  return format(d, formatStr, { locale: getCurrentDateLocale() });
 };
 
 /**
@@ -20,7 +25,7 @@ export const formatDateTimeAz = (date: Date | string, includeYear = false): stri
   if (isNaN(d.getTime())) return '';
 
   const formatStr = includeYear ? 'd MMMM yyyy, HH:mm' : 'd MMMM, HH:mm';
-  return format(d, formatStr, { locale: az });
+  return format(d, formatStr, { locale: getCurrentDateLocale() });
 };
 
 /**
@@ -30,7 +35,7 @@ export const formatTimeAz = (date: Date | string): string => {
   const d = typeof date === 'string' ? new Date(date) : date;
   if (isNaN(d.getTime())) return '';
 
-  return format(d, 'HH:mm', { locale: az });
+  return format(d, 'HH:mm', { locale: getCurrentDateLocale() });
 };
 
 /**

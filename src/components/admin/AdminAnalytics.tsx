@@ -15,7 +15,7 @@ import {
   PieChart, Pie, Cell, LineChart, Line, AreaChart, Area } from
 'recharts';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 
 interface EventStat {
   event_name: string;
@@ -210,7 +210,7 @@ const AdminAnalytics = () => {
       const uniqueUsers = new Set(dayEvents.map((e) => e.user_id)).size;
       trend.push({
         date: dateStr,
-        label: format(date, days <= 7 ? 'EEE' : 'dd MMM', { locale: az }),
+        label: format(date, days <= 7 ? 'EEE' : 'dd MMM', { locale: getCurrentDateLocale() }),
         total: dayEvents.length,
         unique: uniqueUsers
       });

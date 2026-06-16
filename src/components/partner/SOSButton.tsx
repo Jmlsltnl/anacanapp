@@ -14,7 +14,7 @@ import { useSOSAlert } from '@/hooks/useSOSAlert';
 import { Button } from '@/components/ui/button';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { format } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 
 interface SOSButtonProps {
   variant?: 'full' | 'compact';
@@ -227,7 +227,7 @@ export const SOSAlertReceiver: React.FC = () => {
 
           <div className="text-sm text-white/60 mb-8">
             <Clock className="w-4 h-4 inline-block mr-1" />
-            {format(new Date(pendingAlert.created_at), 'HH:mm', { locale: az })}
+            {format(new Date(pendingAlert.created_at), 'HH:mm', { locale: getCurrentDateLocale() })}
           </div>
 
           <div className="w-full max-w-sm space-y-3">

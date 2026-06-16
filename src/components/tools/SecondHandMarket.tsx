@@ -15,7 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
@@ -848,7 +848,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Clock className="w-4 h-4" />
-                  {format(new Date(selectedListing.created_at), 'd MMMM yyyy', { locale: az })}
+                  {format(new Date(selectedListing.created_at), 'd MMMM yyyy', { locale: getCurrentDateLocale() })}
                 </div>
                 
               <Button

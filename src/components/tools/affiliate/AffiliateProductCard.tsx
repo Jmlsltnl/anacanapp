@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AffiliateProduct, useIsProductSaved, useSaveProduct, useUnsaveProduct } from '@/hooks/useAffiliateProducts';
 import { formatDistanceToNow } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 
 interface AffiliateProductCardProps {
   product: AffiliateProduct;
@@ -40,7 +40,7 @@ const AffiliateProductCard = ({ product, onSelect, index = 0, variant = 'grid' }
   null;
 
   const priceAge = product.price_updated_at ?
-  formatDistanceToNow(new Date(product.price_updated_at), { locale: az, addSuffix: true }) :
+  formatDistanceToNow(new Date(product.price_updated_at), { locale: getCurrentDateLocale(), addSuffix: true }) :
   null;
 
   if (variant === 'featured') {

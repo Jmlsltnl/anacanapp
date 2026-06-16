@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, Clock, Moon, Pencil, Trash2, X, Check } from 'lucide-react';
 import { useBabyLogs } from '@/hooks/useBabyLogs';
 import { format, isToday, isYesterday } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { useToast } from '@/hooks/use-toast';
 import { tr } from "@/lib/tr";
 
@@ -19,7 +19,7 @@ const getDateLabel = (dateStr: string): string => {
   const date = new Date(dateStr);
   if (isToday(date)) return tr('sleephistorypanel_today','Bu gün');
   if (isYesterday(date)) return tr('sleephistorypanel_yesterday','Dünən');
-  return format(date, 'd MMMM', { locale: az });
+  return format(date, 'd MMMM', { locale: getCurrentDateLocale() });
 };
 
 interface SleepHistoryPanelProps {

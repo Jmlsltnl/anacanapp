@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { useToast } from '@/hooks/use-toast';
 import RelatedPosts from './RelatedPosts';
 import MarkdownContent from '@/components/MarkdownContent';
@@ -149,7 +149,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           }
 
             <span className="text-xs text-muted-foreground">
-              {format(new Date(comment.created_at), 'd MMM', { locale: az })}
+              {format(new Date(comment.created_at), 'd MMM', { locale: getCurrentDateLocale() })}
             </span>
 
             {user?.id === comment.user_id &&
@@ -296,7 +296,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
               {post.view_count} {tr("blogpostdetail_baxis_d4da3e", "bax\u0131\u015F")}
             </span>
             <span>
-              {format(new Date(post.created_at), 'd MMMM yyyy', { locale: az })}
+              {format(new Date(post.created_at), 'd MMMM yyyy', { locale: getCurrentDateLocale() })}
             </span>
           </div>
 

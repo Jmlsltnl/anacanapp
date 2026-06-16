@@ -3,7 +3,7 @@ import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { TrendingUp, Smile, Zap, Heart } from 'lucide-react';
 import { format, subDays, parseISO } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { useFlowMoodChart } from '@/hooks/useFlowDailyLogs';
 
@@ -20,7 +20,7 @@ const FlowMoodChart = () => {
 
       days.push({
         date: dateStr,
-        dayLabel: format(date, 'd', { locale: az }),
+        dayLabel: format(date, 'd', { locale: getCurrentDateLocale() }),
         mood: dayData?.mood || null,
         energy: dayData?.energy_level || null,
         pain: dayData?.pain_level || null,
@@ -58,7 +58,7 @@ const FlowMoodChart = () => {
       return (
         <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
           <p className="text-sm font-medium text-foreground mb-2">
-            {format(parseISO(data.date), 'd MMMM', { locale: az })}
+            {format(parseISO(data.date), 'd MMMM', { locale: getCurrentDateLocale() })}
           </p>
           {data.mood &&
           <p className="text-xs text-muted-foreground">

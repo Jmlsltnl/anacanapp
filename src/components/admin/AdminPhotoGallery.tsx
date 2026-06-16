@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 
 interface PhotoRecord {
   id: string;
@@ -147,7 +147,7 @@ const AdminPhotoGallery = () => {
                   <div className="p-2">
                     <p className="text-xs text-muted-foreground truncate">{photo.background_theme}</p>
                     <p className="text-[10px] text-muted-foreground">
-                      {format(new Date(photo.created_at), 'dd MMM yyyy HH:mm', { locale: az })}
+                      {format(new Date(photo.created_at), 'dd MMM yyyy HH:mm', { locale: getCurrentDateLocale() })}
                     </p>
                   </div>
                 </div>
@@ -185,7 +185,7 @@ const AdminPhotoGallery = () => {
               <div>
                 <h3 className="font-bold text-foreground">{tr("adminphotogallery_foto_detallari_8572ca", "Foto Detalları")}</h3>
                 <p className="text-xs text-muted-foreground">
-                  {format(new Date(selectedPhoto.created_at), 'dd MMMM yyyy, HH:mm', { locale: az })}
+                  {format(new Date(selectedPhoto.created_at), 'dd MMMM yyyy, HH:mm', { locale: getCurrentDateLocale() })}
                 </p>
               </div>
               <Button variant="ghost" size="sm" onClick={() => setSelectedPhoto(null)}>✕</Button>

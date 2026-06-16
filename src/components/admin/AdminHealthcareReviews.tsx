@@ -26,7 +26,7 @@ import {
 '@/components/ui/select';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 
 interface Review {
   id: string;
@@ -290,7 +290,7 @@ const AdminHealthcareReviews = () => {
                 }
 
                     <p className="text-xs text-muted-foreground mt-2">
-                      {formatDistanceToNow(new Date(review.created_at), { addSuffix: true, locale: az })}
+                      {formatDistanceToNow(new Date(review.created_at), { addSuffix: true, locale: getCurrentDateLocale() })}
                     </p>
                   </div>
                 </div>

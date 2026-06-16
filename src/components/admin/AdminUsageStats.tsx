@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { format, subDays } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface UsageUser {
@@ -124,7 +124,7 @@ const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = 
       const date = subDays(new Date(), i);
       const dateStr = format(date, 'yyyy-MM-dd');
       const dayCount = events.filter((e) => e.created_at?.startsWith(dateStr)).length;
-      trend.push({ date: format(date, 'dd MMM', { locale: az }), count: dayCount });
+      trend.push({ date: format(date, 'dd MMM', { locale: getCurrentDateLocale() }), count: dayCount });
     }
     return trend;
   }, [events, dateRange]);

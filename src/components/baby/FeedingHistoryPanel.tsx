@@ -4,7 +4,7 @@ import { ChevronDown, ChevronUp, Clock, ArrowLeft, ArrowRight, Baby, Pencil, Tra
 import { useBabyLogs, FeedingHistoryItem } from '@/hooks/useBabyLogs';
 
 import { format, isToday, isYesterday } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { useToast } from '@/hooks/use-toast';
 import { tr } from "@/lib/tr";
 
@@ -42,7 +42,7 @@ const getDateLabel = (dateStr: string): string => {
   const date = new Date(dateStr);
   if (isToday(date)) return tr('feedinghistorypanel_today','Bu gün');
   if (isYesterday(date)) return tr('feedinghistorypanel_yesterday','Dünən');
-  return format(date, 'd MMMM', { locale: az });
+  return format(date, 'd MMMM', { locale: getCurrentDateLocale() });
 };
 
 interface FeedingHistoryPanelProps {

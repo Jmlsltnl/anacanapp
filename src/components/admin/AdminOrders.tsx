@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useAllOrders, Order } from '@/hooks/useOrders';
 import { format } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 
 const STATUS_CONFIG: Record<string, {label: string;color: string;icon: React.ComponentType<any>;}> = {
   pending: { label: tr("adminorders_gozleyir_9ac18a", "Gözləyir"), color: 'bg-yellow-100 text-yellow-800', icon: Clock },
@@ -170,7 +170,7 @@ const AdminOrders = () => {
                       <Badge className={statusConfig.color}>{statusConfig.label}</Badge>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>{format(new Date(order.created_at), 'd MMMM, HH:mm', { locale: az })}</span>
+                      <span>{format(new Date(order.created_at), 'd MMMM, HH:mm', { locale: getCurrentDateLocale() })}</span>
                       <span className="font-medium text-foreground">{order.total_amount.toFixed(2)} ₼</span>
                       {order.shipping_address?.name &&
                     <span className="flex items-center gap-1">

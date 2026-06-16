@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Reply, Send, X, Heart, Trash2, ChevronDown, ChevronUp, Crown, Shield } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { PostComment, useCreateComment } from '@/hooks/useCommunity';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -89,7 +89,7 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
   };
 
   const handleAvatarClick = () => {if (comment.user_id && onUserClick) onUserClick(comment.user_id);};
-  const timeAgo = formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: az });
+  const timeAgo = formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: getCurrentDateLocale() });
   const canReply = level < 2;
 
   return (

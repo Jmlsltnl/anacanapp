@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Progress } from '@/components/ui/progress';
 import { useFairyTales, useFairyTaleThemes, useGenerateFairyTale, useToggleFavorite, useDeleteFairyTale, useIncrementPlayCount, FairyTale } from '@/hooks/useFairyTales';
 import { format } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import MarkdownContent from '@/components/MarkdownContent';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -318,7 +318,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                                   <span className="flex items-center gap-1">
                                     <BookOpenCheck className="h-3 w-3" />{tale.play_count || 0}×
                                   </span>
-                                  <span>{format(new Date(tale.created_at), 'd MMM', { locale: az })}</span>
+                                  <span>{format(new Date(tale.created_at), 'd MMM', { locale: getCurrentDateLocale() })}</span>
                                 </div>
                               </div>
                             </div>
@@ -826,7 +826,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                   <Clock className="h-4 w-4" />
                   <span>{getReadingTime(selectedTale.content)} {tr("fairytalegenerator_deqiqelik_oxu_1896a5", "d\u0259qiq\u0259lik oxu")}</span>
                   <span className="mx-2">•</span>
-                  <span>{format(new Date(selectedTale.created_at), 'd MMMM yyyy', { locale: az })}</span>
+                  <span>{format(new Date(selectedTale.created_at), 'd MMMM yyyy', { locale: getCurrentDateLocale() })}</span>
                 </div>
               </div>
 

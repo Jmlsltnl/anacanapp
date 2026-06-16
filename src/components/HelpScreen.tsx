@@ -14,7 +14,7 @@ import { useFaqs, useSupportCategories } from '@/hooks/useDynamicTools';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { tr } from "@/lib/tr";
 
 interface HelpScreenProps {
@@ -161,7 +161,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
             <div className="max-w-[80%] bg-primary text-primary-foreground p-3 rounded-2xl rounded-br-md">
               <p className="text-sm">{selectedTicket.message}</p>
               <p className="text-[10px] opacity-70 mt-1 text-right">
-                {format(new Date(selectedTicket.created_at), 'd MMM, HH:mm', { locale: az })}
+                {format(new Date(selectedTicket.created_at), 'd MMM, HH:mm', { locale: getCurrentDateLocale() })}
               </p>
             </div>
           </div>
@@ -179,7 +179,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                 <p className="text-sm text-foreground">{selectedTicket.admin_response}</p>
                 {selectedTicket.responded_at &&
               <p className="text-[10px] text-muted-foreground mt-1">
-                    {format(new Date(selectedTicket.responded_at), 'd MMM, HH:mm', { locale: az })}
+                    {format(new Date(selectedTicket.responded_at), 'd MMM, HH:mm', { locale: getCurrentDateLocale() })}
                   </p>
               }
               </div>
@@ -211,7 +211,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                   <p className={`text-[10px] mt-1 ${
               reply.is_admin ? 'text-muted-foreground' : 'opacity-70'} ${
               reply.is_admin ? '' : 'text-right'}`}>
-                    {format(new Date(reply.created_at), 'd MMMM, HH:mm', { locale: az })}
+                    {format(new Date(reply.created_at), 'd MMMM, HH:mm', { locale: getCurrentDateLocale() })}
                   </p>
                 </div>
               </div>
@@ -526,7 +526,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                         <p className="text-sm text-muted-foreground line-clamp-1 mb-2">{ticket.message}</p>
                         <div className="flex items-center justify-between">
                           <p className="text-xs text-muted-foreground">
-                            {format(new Date(ticket.created_at), 'd MMM yyyy', { locale: az })}
+                            {format(new Date(ticket.created_at), 'd MMM yyyy', { locale: getCurrentDateLocale() })}
                           </p>
                           <ChevronRight className="w-4 h-4 text-muted-foreground" />
                         </div>

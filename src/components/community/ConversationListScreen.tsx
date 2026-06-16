@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useDirectMessages, Conversation } from '@/hooks/useDirectMessages';
 import { usePartnerConversation } from '@/hooks/usePartnerConversation';
 import { formatDistanceToNow } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 
 interface ConversationListScreenProps {
   onBack: () => void;
@@ -88,7 +88,7 @@ const ConversationListScreen = ({ onBack, onOpenChat, partnerId }: ConversationL
                     {conv.name}
                   </p>
                   <span className="text-[10px] text-muted-foreground flex-shrink-0 ml-2">
-                    {formatDistanceToNow(new Date(conv.last_message_at), { addSuffix: false, locale: az })}
+                    {formatDistanceToNow(new Date(conv.last_message_at), { addSuffix: false, locale: getCurrentDateLocale() })}
                   </span>
                 </div>
                 <p className={`text-[12px] truncate mt-0.5 ${conv.unread_count > 0 ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>

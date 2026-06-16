@@ -4,7 +4,7 @@ import { Star, Send, Trash2, User, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useProviderReviews } from '@/hooks/useProviderReviews';
 import { formatDistanceToNow } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { tr } from "@/lib/tr";
 
 interface ProviderReviewsProps {
@@ -194,7 +194,7 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-medium text-sm">{review.user_name}</span>
                   <span className="text-xs text-muted-foreground">
-                    {formatDistanceToNow(new Date(review.created_at), { addSuffix: true, locale: az })}
+                    {formatDistanceToNow(new Date(review.created_at), { addSuffix: true, locale: getCurrentDateLocale() })}
                   </span>
                 </div>
                 

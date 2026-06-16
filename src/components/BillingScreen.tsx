@@ -17,7 +17,7 @@ import { useBillingConfig } from '@/hooks/usePaywallConfig';
 import { usePremiumConfig } from '@/hooks/usePremiumConfig';
 import { getPlatform, isNativePlatform } from '@/lib/revenuecat';
 import { format } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { tr } from "@/lib/tr";
 
 interface PaymentEntry {
@@ -318,7 +318,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-3.5 bg-amber-50 dark:bg-amber-900/20 rounded-2xl flex items-start gap-2.5 border border-amber-200 dark:border-amber-800">
             <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
             <p className="text-xs text-amber-700 dark:text-amber-300">
-              {config.cancelled_notice.replace('{date}', format(new Date(subscription.expires_at), 'd MMM yyyy', { locale: az }))}
+              {config.cancelled_notice.replace('{date}', format(new Date(subscription.expires_at), 'd MMM yyyy', { locale: getCurrentDateLocale() }))}
             </p>
           </motion.div>
         }
@@ -332,7 +332,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
                   <Calendar className="w-3 h-3 text-muted-foreground" />
                   <p className="text-[10px] text-muted-foreground uppercase font-semibold tracking-wider">{config.start_date_label}</p>
                 </div>
-                <p className="font-bold text-foreground text-sm">{format(new Date(subscription.started_at), 'd MMM yyyy', { locale: az })}</p>
+                <p className="font-bold text-foreground text-sm">{format(new Date(subscription.started_at), 'd MMM yyyy', { locale: getCurrentDateLocale() })}</p>
               </div>
               {subscription.expires_at &&
             <div className="flex-1">
@@ -341,7 +341,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
                     <p className="text-[10px] text-muted-foreground uppercase font-semibold tracking-wider">{isCancelled ? config.expiry_label : config.renewal_label}</p>
                   </div>
                   <p className={`font-bold text-sm ${isCancelled ? 'text-amber-600 dark:text-amber-400' : 'text-foreground'}`}>
-                    {format(new Date(subscription.expires_at), 'd MMM yyyy', { locale: az })}
+                    {format(new Date(subscription.expires_at), 'd MMM yyyy', { locale: getCurrentDateLocale() })}
                   </p>
                 </div>
             }
@@ -427,7 +427,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
                   <div>
                     <p className="font-semibold text-foreground text-sm">{planName}</p>
                     <p className="text-[10px] text-muted-foreground mt-0.5">
-                      {format(new Date(subscription.started_at), 'd MMM yyyy', { locale: az })}
+                      {format(new Date(subscription.started_at), 'd MMM yyyy', { locale: getCurrentDateLocale() })}
                     </p>
                   </div>
                   <div className="text-right">
@@ -449,7 +449,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
                           {isYearly ? 'İllik Premium' : tr("billingscreen_ayliq_premium_45f3bf", "Ayl\u0131q Premium")}
                         </p>
                         <p className="text-[10px] text-muted-foreground mt-0.5">
-                          {format(new Date(p.date), 'd MMM yyyy, HH:mm', { locale: az })} · {itemLabel}
+                          {format(new Date(p.date), 'd MMM yyyy, HH:mm', { locale: getCurrentDateLocale() })} · {itemLabel}
                         </p>
                       </div>
                       <div className="text-right shrink-0 ml-2">

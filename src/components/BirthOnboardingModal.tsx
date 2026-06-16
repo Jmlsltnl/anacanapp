@@ -12,7 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUserStore } from '@/store/userStore';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
@@ -219,7 +219,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                       )}>
                       
                         <Calendar className="mr-3 h-5 w-5 text-pink-500" />
-                        {birthDate ? format(birthDate, "d MMMM yyyy", { locale: az }) : tr("birthonboardingmodal_tarix_secin_3377b4", "Tarix se\xE7in")}
+                        {birthDate ? format(birthDate, "d MMMM yyyy", { locale: getCurrentDateLocale() }) : tr("birthonboardingmodal_tarix_secin_3377b4", "Tarix se\xE7in")}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0 z-[60]" align="center">
@@ -389,7 +389,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <p className="text-muted-foreground">Ad: <span className="text-foreground font-medium">{babyName}</span></p>
                       <p className="text-muted-foreground">Cins: <span className="text-foreground font-medium">{gender === 'boy' ? tr("birthonboardingmodal_oglan_e9715e", "O\u011Flan") : tr("birthonboardingmodal_qiz_79bf6b", "Q\u0131z")}</span></p>
-                      <p className="text-muted-foreground">Tarix: <span className="text-foreground font-medium">{birthDate ? format(birthDate, 'd MMM yyyy', { locale: az }) : '-'}</span></p>
+                      <p className="text-muted-foreground">Tarix: <span className="text-foreground font-medium">{birthDate ? format(birthDate, 'd MMM yyyy', { locale: getCurrentDateLocale() }) : '-'}</span></p>
                       <p className="text-muted-foreground">Tip: <span className="text-foreground font-medium">{deliveryOptions.find((d) => d.value === deliveryType)?.label}</span></p>
                     </div>
                   </div>
