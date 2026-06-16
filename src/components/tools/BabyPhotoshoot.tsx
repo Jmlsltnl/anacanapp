@@ -860,12 +860,6 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             <h1 className="text-lg font-bold text-white">{tr("babyphotoshoot_korpe_fotosessiyasi_546576", "Körpə Fotosessiyası")}</h1>
             <p className="text-white/70 text-xs">{tr("babyphotoshoot_ai_ile_sehrli_fotolar_0fce8f", "AI ilə sehrli fotolar")}</p>
           </div>
-          {isPremium && (
-            <div className="bg-amber-400 text-amber-900 px-2.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1">
-              <Crown className="w-3 h-3" />
-              Premium
-            </div>
-          )}
         </div>
 
         {/* Step Indicator */}
