@@ -71,7 +71,7 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="h-[100dvh] overflow-y-auto bg-background pb-24" data-scroll-container>
       {/* Header */}
       <div className="sticky top-0 z-40 bg-background/70 backdrop-blur-3xl border-b border-border/10">
         <div className="px-4 py-3">

@@ -30,33 +30,46 @@ setTimeout(() => {
   if (lang && lang !== 'az') loadTranslations(lang).catch(console.error);
 }, 0);
 
-const App = () => (
-  <ErrorBoundary>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/legal/:docType" element={<LegalPage />} />
-                <Route path="/payment/success" element={<PaymentSuccess />} />
-                <Route path="/payment/error" element={<PaymentError />} />
-                <Route path="/debug/revenuecat" element={<RevenueCatDebug />} />
-                <Route path="/revenuecat-debug" element={<RevenueCatDebug />} />
-                <Route path="/p/v/:token" element={<PartnerVerifyPage />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
-  </ErrorBoundary>
-);
+const App = () => {
+  // Subscribe to language so the whole tree re-renders when the user switches
+  // language. tr() reads language synchronously from the store, but without a
+  // subscription nothing would re-render and translations would appear "stuck".
+  const language = useUserStore((s) => s.language);
+
+  useEffect(() => {
+    if (language && language !== 'az') {
+      loadTranslations(language).catch(console.error);
+    }
+  }, [language]);
+
+  return (
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <AuthProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter key={language}>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/legal/:docType" element={<LegalPage />} />
+                  <Route path="/payment/success" element={<PaymentSuccess />} />
+                  <Route path="/payment/error" element={<PaymentError />} />
+                  <Route path="/debug/revenuecat" element={<RevenueCatDebug />} />
+                  <Route path="/revenuecat-debug" element={<RevenueCatDebug />} />
+                  <Route path="/p/v/:token" element={<PartnerVerifyPage />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
+  );
+};
 
 export default App;

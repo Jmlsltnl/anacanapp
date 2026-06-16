@@ -66,6 +66,7 @@
         "bcryptjs": "^3.0.3",
         "canvas-confetti": "^1.9.4",
         "capacitor-facebook-events": "^8.0.0",
+        "capacitor-plugin-app-tracking-transparency": "^3.0.0",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cmdk": "^1.1.1",
@@ -880,6 +881,8 @@
     "canvas-confetti": ["canvas-confetti@1.9.4", "", {}, "sha512-yxQbJkAVrFXWNbTUjPqjF7G+g6pDotOUHGbkZq2NELZUMDpiJ85rIEazVb8GTaAptNW2miJAXbs1BtioA251Pw=="],
 
     "capacitor-facebook-events": ["capacitor-facebook-events@8.0.0", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/capacitor-facebook-events/-/capacitor-facebook-events-8.0.0.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-+R2cpPZPdt2Oeio2F5oT8JqFSPygVUrAWkzZluklWv+ylS1RZTb2XXPjuQoLz9KOw5GJ8at7ry5yFbmoFRdhEQ=="],
+
+    "capacitor-plugin-app-tracking-transparency": ["capacitor-plugin-app-tracking-transparency@3.0.0", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/capacitor-plugin-app-tracking-transparency/-/capacitor-plugin-app-tracking-transparency-3.0.0.tgz", { "peerDependencies": { "@capacitor/core": ">=7.0.0" } }, "sha512-paBaxm/7nu83e4U/o2PiM39oI6XKIpUGuG/WuoXyX9olZ6EYFc9YXA4wUvR4fllBDqGqvVYzUrZ7XTSeZxJMVw=="],
 
     "ccount": ["ccount@2.0.1", "", {}, "sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg=="],
 

@@ -343,23 +343,9 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   })();
 
   if (toolComponent) {
-    const activeMeta = tools.find(t => t.id === activeTool);
-    const showPremiumBadge = activeMeta?.isPremium && isPremium;
     return (
       <Suspense fallback={toolFallback}>
-        <div className="relative">
-          {toolComponent}
-          {showPremiumBadge && (
-            <div
-              className="pointer-events-none fixed right-3 z-[60]"
-              style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 76px)' }}
-            >
-              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 shadow-lg shadow-amber-500/30">
-                <span className="text-[9px] font-extrabold uppercase tracking-wider text-white">Premium</span>
-              </div>
-            </div>
-          )}
-        </div>
+        {toolComponent}
       </Suspense>
     );
   }

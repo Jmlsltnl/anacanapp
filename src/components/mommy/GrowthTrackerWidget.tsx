@@ -127,7 +127,7 @@ const GrowthTrackerWidget = () => {
       
       toast({
         title: tr("growthtrackerwidget_olcu_yadda_saxlandi_3c8d60", 'Ölçü yadda saxlandı! 📏'),
-        description: `${!isNaN(weight) ? `${weight} kq` : ''} ${!isNaN(height) ? `${height} sm` : ''}`,
+        description: `${!isNaN(weight) ? `${weight} ${tr('growthtrackerwidget_unit_kg','kq')}` : ''} ${!isNaN(height) ? `${height} ${tr('growthtrackerwidget_unit_cm','sm')}` : ''}`,
       });
     } catch (error) {
       console.error('Error adding growth entry:', error);
@@ -169,7 +169,7 @@ const GrowthTrackerWidget = () => {
             <span className="text-[10px] text-rose-600/70 dark:text-rose-400/70">{tr("growthtrackerwidget_ceki_b10cc4", "Çəki")}</span>
           </div>
           <p className="text-lg font-black text-rose-700 dark:text-rose-300">
-            {latestEntry?.weight_kg ? `${latestEntry.weight_kg} kq` : '—'}
+            {latestEntry?.weight_kg ? `${latestEntry.weight_kg} ${tr('growthtrackerwidget_unit_kg','kq')}` : '—'}
           </p>
           {weightChange && parseFloat(weightChange) !== 0 && (
             <div className="flex items-center gap-1 mt-1">
@@ -184,10 +184,10 @@ const GrowthTrackerWidget = () => {
         <div className="bg-indigo-50 dark:bg-indigo-500/15 rounded-xl p-3">
           <div className="flex items-center gap-1.5 mb-1">
             <Ruler className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
-            <span className="text-[10px] text-indigo-600/70 dark:text-indigo-400/70">Boy</span>
+            <span className="text-[10px] text-indigo-600/70 dark:text-indigo-400/70">{tr('growthtrackerwidget_height','Boy')}</span>
           </div>
           <p className="text-lg font-black text-indigo-700 dark:text-indigo-300">
-            {latestEntry?.height_cm ? `${latestEntry.height_cm} sm` : '—'}
+            {latestEntry?.height_cm ? `${latestEntry.height_cm} ${tr('growthtrackerwidget_unit_cm','sm')}` : '—'}
           </p>
           {heightChange && parseFloat(heightChange) !== 0 && (
             <div className="flex items-center gap-1 mt-1">
@@ -206,7 +206,7 @@ const GrowthTrackerWidget = () => {
               <span className="text-[10px] text-amber-600/70 dark:text-amber-400/70">{tr("growthtrackerwidget_bas_3cb8b6", "Baş")}</span>
             </div>
             <p className="text-lg font-black text-amber-700 dark:text-amber-300">
-              {latestEntry?.head_cm ? `${latestEntry.head_cm} sm` : '—'}
+              {latestEntry?.head_cm ? `${latestEntry.head_cm} ${tr('growthtrackerwidget_unit_cm','sm')}` : '—'}
             </p>
             {headChange && parseFloat(headChange) !== 0 && (
               <div className="flex items-center gap-1 mt-1">
@@ -242,7 +242,7 @@ const GrowthTrackerWidget = () => {
                 />
               </div>
               <div>
-                <label className="text-[10px] text-muted-foreground mb-1 block">Boy (sm)</label>
+                <label className="text-[10px] text-muted-foreground mb-1 block">{tr('growthtrackerwidget_height_cm','Boy (sm)')}</label>
                 <input
                   type="number"
                   step="0.5"
@@ -271,7 +271,7 @@ const GrowthTrackerWidget = () => {
               className="w-full py-2.5 bg-primary text-white rounded-xl font-bold text-sm"
               whileTap={{ scale: 0.98 }}
             >
-              Yadda saxla
+              {tr('growthtrackerwidget_save','Yadda saxla')}
             </motion.button>
           </motion.div>
         )}
@@ -280,7 +280,7 @@ const GrowthTrackerWidget = () => {
       {/* Last updated */}
       {latestEntry && !showInput && (
         <p className="text-[10px] text-muted-foreground text-center">
-          Son ölçü: {new Date(latestEntry.entry_date).toLocaleDateString('az-AZ')}
+          {tr('growthtrackerwidget_last_meas_label','Son ölçü:')} {new Date(latestEntry.entry_date).toLocaleDateString('az-AZ')}
         </p>
       )}
     </motion.div>

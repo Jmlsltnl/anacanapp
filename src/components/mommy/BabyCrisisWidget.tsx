@@ -23,7 +23,7 @@ const severityConfig = {
     bgColor: 'bg-orange-50 dark:bg-orange-500/10',
     borderColor: 'border-orange-200 dark:border-orange-500/30',
     textColor: 'text-orange-700 dark:text-orange-400',
-    label: 'Orta'
+    label: tr('babycrisiswidget_medium','Orta')
   },
   intense: { 
     color: 'from-rose-400 to-red-500', 
@@ -96,7 +96,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                   <div className="flex items-center gap-1.5">
                     <AlertTriangle className={`w-3.5 h-3.5 ${getSeverityConfig(currentCrisis.severity).textColor}`} />
                     <span className={`text-xs font-bold uppercase tracking-wide ${getSeverityConfig(currentCrisis.severity).textColor}`}>
-                      Aktiv Kriz Dövrü
+                      {tr('babycrisiswidget_active_crisis','Aktiv Kriz Dövrü')}
                     </span>
                   </div>
                   <h3 className="font-bold text-foreground mt-0.5">
@@ -111,10 +111,10 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
             <div className="mb-3">
               <div className="flex items-center justify-between text-xs mb-1">
                 <span className="text-muted-foreground">
-                  Həftə {currentCrisis.week_start}-{currentCrisis.week_end}
+                  {tr('babycrisiswidget_weeks_range','Həftə {s}-{e}').replace('{s}',String(currentCrisis.week_start)).replace('{e}',String(currentCrisis.week_end))}
                 </span>
                 <span className={`font-medium ${getSeverityConfig(currentCrisis.severity).textColor}`}>
-                  {Math.round(getProgressInCrisis())}% keçdi
+                  {Math.round(getProgressInCrisis())}{tr('babycrisiswidget_pct_done','% keçdi')}
                 </span>
               </div>
               <div className="h-2 bg-white/50 dark:bg-black/20 rounded-full overflow-hidden">
@@ -165,8 +165,8 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                   <h3 className="font-bold text-sm text-foreground">{tr("babycrisiswidget_kriz_teqvimi_aa2ea5", "Kriz Təqvimi")}</h3>
                   <p className="text-xs text-muted-foreground">
                     {upcomingCrises.length > 0 
-                      ? `Növbəti: ${upcomingCrises[0].week_start}. həftə`
-                      : 'Yaxınlaşan kriz yoxdur'}
+                      ? tr('babycrisiswidget_next_week','Növbəti: {n}. həftə').replace('{n}',String(upcomingCrises[0].week_start))
+                      : tr('babycrisiswidget_no_upcoming','Yaxınlaşan kriz yoxdur')}
                   </p>
                 </div>
               </div>
@@ -187,7 +187,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                         {crisis.title_az || crisis.title}
                       </p>
                       <p className="text-[10px] text-muted-foreground">
-                        Həftə {crisis.week_start}-{crisis.week_end} • {crisis.week_start - babyAgeWeeks} həftə sonra
+                        {tr('babycrisiswidget_weeks_range','Həftə {s}-{e}').replace('{s}',String(crisis.week_start)).replace('{e}',String(crisis.week_end))} • {crisis.week_start - babyAgeWeeks} {tr('babycrisiswidget_week_unit_later','həftə sonra')}
                       </p>
                     </div>
                     <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${getSeverityConfig(crisis.severity).bgColor} ${getSeverityConfig(crisis.severity).textColor}`}>
@@ -227,7 +227,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                   <div>
                     <h2 className="text-xl font-bold text-foreground">{tr("babycrisiswidget_kriz_teqvimi_aa2ea5", "Kriz Təqvimi")}</h2>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {babyName} • {babyAgeWeeks}. həftə
+                      {babyName} • {babyAgeWeeks}. {tr('babycrisiswidget_week_header','həftə')}
                     </p>
                   </div>
                   <motion.button
@@ -302,13 +302,13 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                                   </h3>
                                   {isCurrent && (
                                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/50 dark:bg-black/20 ${getSeverityConfig(crisis.severity).textColor}`}>
-                                      İNDİ
+                                      {tr('babycrisiswidget_indi','İNDİ')}
                                     </span>
                                   )}
                                 </div>
                                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                   <Clock className="w-3 h-3" />
-                                  <span>Həftə {crisis.week_start}-{crisis.week_end}</span>
+                                  <span>{tr('babycrisiswidget_weeks_range','Həftə {s}-{e}').replace('{s}',String(crisis.week_start)).replace('{e}',String(crisis.week_end))}</span>
                                   <span>•</span>
                                   <span className={`font-medium ${getSeverityConfig(crisis.severity).textColor}`}>
                                     {getSeverityConfig(crisis.severity).label}
@@ -380,7 +380,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                     <div className="flex items-center gap-2 mt-1">
                       <Clock className="w-3.5 h-3.5 text-white/80" />
                       <span className="text-sm text-white/90">
-                        Həftə {selectedCrisis.week_start}-{selectedCrisis.week_end}
+                        {tr('babycrisiswidget_weeks_range','Həftə {s}-{e}').replace('{s}',String(selectedCrisis.week_start)).replace('{e}',String(selectedCrisis.week_end))}
                       </span>
                       <span className="px-2 py-0.5 rounded-full bg-white/20 text-xs text-white font-medium">
                         {getSeverityConfig(selectedCrisis.severity).label}
@@ -405,7 +405,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                     <div className="flex items-center gap-2 mb-3">
                       <AlertTriangle className={`w-4 h-4 ${getSeverityConfig(selectedCrisis.severity).textColor}`} />
                       <h3 className={`font-bold text-sm ${getSeverityConfig(selectedCrisis.severity).textColor}`}>
-                        Əlamətlər
+                        {tr('babycrisiswidget_elamtler','Əlamətlər')}
                       </h3>
                     </div>
                     <div className="space-y-2">

@@ -189,7 +189,7 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
             whileTap={{ scale: 0.95 }}
           >
             <Sparkles className="w-4 h-4" />
-            Hamısı
+            {tr('blogscreen_all_filter', 'Hamısı')}
           </motion.button>
 
           {user && (

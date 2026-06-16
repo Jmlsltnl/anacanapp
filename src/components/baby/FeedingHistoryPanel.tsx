@@ -13,17 +13,17 @@ const formatDuration = (seconds: number): string => {
   const hours = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
   const secs = seconds % 60;
-  if (hours > 0) return `${hours} saat ${mins} dəq`;
-  if (mins > 0) return `${mins} dəq ${secs} san`;
-  return `${secs} san`;
+  if (hours > 0) return `${hours} ${tr('unit_hr','saat')} ${mins} ${tr('unit_min','dəq')}`;
+  if (mins > 0) return `${mins} ${tr('unit_min','dəq')} ${secs} ${tr('unit_sec','san')}`;
+  return `${secs} ${tr('unit_sec','san')}`;
 };
 
 const getFeedTypeLabel = (type: string): string => {
   switch (type) {
-    case 'left': return 'Sol sinə';
-    case 'right': return 'Sağ sinə';
-    case 'formula': return 'Süni qida';
-    case 'solid': return 'Bərk qida';
+    case 'left': return tr('feedinghistorypanel_sol_sine_64d1ac','Sol sinə');
+    case 'right': return tr('feedinghistorypanel_sag_sine_074475','Sağ sinə');
+    case 'formula': return tr('feedinghistorypanel_suni_qida_fdf267','Süni qida');
+    case 'solid': return tr('feedinghistorypanel_elave_qida_ac1beb','Bərk qida');
     default: return type;
   }
 };
@@ -40,8 +40,8 @@ const getFeedTypeEmoji = (type: string): string => {
 
 const getDateLabel = (dateStr: string): string => {
   const date = new Date(dateStr);
-  if (isToday(date)) return 'Bu gün';
-  if (isYesterday(date)) return 'Dünən';
+  if (isToday(date)) return tr('feedinghistorypanel_today','Bu gün');
+  if (isYesterday(date)) return tr('feedinghistorypanel_yesterday','Dünən');
   return format(date, 'd MMMM', { locale: az });
 };
 
@@ -78,13 +78,13 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
     }
     if (todayBreakdown.formulaCount > 0) parts.push(`🍼 ${todayBreakdown.formulaCount}`);
     if (todayBreakdown.solidCount > 0) parts.push(`🥣 ${todayBreakdown.solidCount}`);
-    return parts.length > 0 ? parts.join(' · ') : 'Qeyd yoxdur';
+    return parts.length > 0 ? parts.join(' · ') : tr('feedinghistorypanel_no_records','Qeyd yoxdur');
   };
 
   const handleDelete = async (id: string) => {
     const result = await deleteLog(id);
     if (!result.error) {
-      toast({ title: 'Qeyd silindi' });
+      toast({ title: tr('feedinghistorypanel_record_deleted','Qeyd silindi') });
       setDeletingId(null);
     } else {
       toast({ title: tr("feedinghistorypanel_xeta_bas_verdi_f22fba", 'Xəta baş verdi'), variant: 'destructive' });
@@ -138,7 +138,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
         <div className="flex items-center gap-2">
           {hasAnyFeedings && (
             <div className="text-right mr-2">
-              <p className="text-xs font-bold text-primary">{totalFeedings} dəfə</p>
+              <p className="text-xs font-bold text-primary">{totalFeedings} {tr('feedinghistorypanel_times','dəfə')}</p>
               <p className="text-[10px] text-muted-foreground">{tr("feedinghistorypanel_bu_gun_7d7f30", "bu gün")}</p>
             </div>
           )}
@@ -165,7 +165,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                         <span className="text-xs font-semibold text-foreground">{tr("feedinghistorypanel_sol_sine_64d1ac", "Sol sinə")}</span>
                       </div>
                       <p className="text-sm font-bold text-primary">{formatDuration(todayBreakdown.leftTotalSeconds)}</p>
-                      <p className="text-[10px] text-muted-foreground">{todayBreakdown.leftCount} dəfə</p>
+                      <p className="text-[10px] text-muted-foreground">{todayBreakdown.leftCount} {tr('feedinghistorypanel_times','dəfə')}</p>
                     </div>
                   )}
                   {todayBreakdown.rightCount > 0 && (
@@ -175,7 +175,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                         <ArrowRight className="w-3 h-3 text-primary" />
                       </div>
                       <p className="text-sm font-bold text-primary">{formatDuration(todayBreakdown.rightTotalSeconds)}</p>
-                      <p className="text-[10px] text-muted-foreground">{todayBreakdown.rightCount} dəfə</p>
+                      <p className="text-[10px] text-muted-foreground">{todayBreakdown.rightCount} {tr('feedinghistorypanel_times','dəfə')}</p>
                     </div>
                   )}
                   {todayBreakdown.formulaCount > 0 && (
@@ -184,7 +184,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                         <span className="text-lg">🍼</span>
                         <span className="text-xs font-semibold text-foreground">{tr("feedinghistorypanel_suni_qida_fdf267", "Süni qida")}</span>
                       </div>
-                      <p className="text-sm font-bold text-primary">{todayBreakdown.formulaCount} dəfə</p>
+                      <p className="text-sm font-bold text-primary">{todayBreakdown.formulaCount} {tr('feedinghistorypanel_times','dəfə')}</p>
                       <p className="text-[10px] text-muted-foreground">{tr("feedinghistorypanel_bu_gun_7d7f30", "bu gün")}</p>
                     </div>
                   )}
@@ -194,7 +194,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                         <span className="text-lg">🥣</span>
                         <span className="text-xs font-semibold text-foreground">{tr("feedinghistorypanel_elave_qida_ac1beb", "Əlavə qida")}</span>
                       </div>
-                      <p className="text-sm font-bold text-primary">{todayBreakdown.solidCount} dəfə</p>
+                      <p className="text-sm font-bold text-primary">{todayBreakdown.solidCount} {tr('feedinghistorypanel_times','dəfə')}</p>
                       <p className="text-[10px] text-muted-foreground">{tr("feedinghistorypanel_bu_gun_7d7f30", "bu gün")}</p>
                     </div>
                   )}
@@ -206,11 +206,11 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                 <div key={date} className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <p className="text-xs font-semibold text-foreground">{getDateLabel(date)}</p>
-                    <p className="text-[10px] text-muted-foreground">{items.length} qidalanma</p>
+                    <p className="text-[10px] text-muted-foreground">{items.length} {tr('feedinghistorypanel_feedings_count','qidalanma')}</p>
                   </div>
                   
                   {items.length === 0 ? (
-                    <p className="text-xs text-muted-foreground text-center py-2">Qeyd yoxdur</p>
+                    <p className="text-xs text-muted-foreground text-center py-2">{tr('feedinghistorypanel_no_records','Qeyd yoxdur')}</p>
                   ) : (
                     <div className="space-y-1">
                       {items.map((item) => (

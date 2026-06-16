@@ -1056,7 +1056,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                   {babyData.ageInDays}. Gün
                 </p>
                 <p className="text-sm font-bold text-amber-900 dark:text-amber-100">
-                  Bu günün məlumatları
+                  {tr('dashboard_todays_info', 'Bu günün məlumatları')}
                 </p>
               </div>
             </div>
@@ -1097,7 +1097,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 {babyData?.ageInDays}. Gün
               </p>
               <p className="text-sm font-bold text-rose-800 dark:text-rose-100">
-                Anaya Mesaj
+                {tr('dashboard_message_for_mom', 'Anaya Mesaj')}
               </p>
             </div>
           </div>
@@ -1167,7 +1167,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             <div className="flex-1">
               <h3 className="font-bold text-sm text-foreground">{tr("dashboard_xususi_tortlar_ba1400", "Xüsusi Tortlar")}</h3>
               <p className="text-[11px] text-muted-foreground mt-0.5">
-                {babyData.ageInMonths > 0 ? `${babyData.ageInMonths + 1}-ci aylıq tortunu sifariş ver!` : 'Körpəniz üçün milestone tortları'}
+                {babyData.ageInMonths > 0 ? tr('dashboard_order_monthly_cake', '{n}-ci aylıq tortunu sifariş ver!').replace('{n}', String(babyData.ageInMonths + 1)) : 'Körpəniz üçün milestone tortları'}
               </p>
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
@@ -1189,7 +1189,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             </div>
             <div>
               <h3 className="font-bold text-sm text-foreground">{tr("dashboard_yuxu_izleme_adaa4f", "Yuxu İzləmə")}</h3>
-              <p className="text-xs text-muted-foreground">Bu gün: {(() => { const m = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60); const h = Math.floor(m / 60); const rm = m % 60; if (h === 0 && rm === 0) return '0 dəq'; if (h === 0) return `${rm} dəq`; if (rm === 0) return `${h} saat`; return `${h}s ${rm}d`; })()}</p>
+              <p className="text-xs text-muted-foreground">{ tr('dashboard_today_label', 'Bu gün') }: {(() => { const m = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60); const h = Math.floor(m / 60); const rm = m % 60; if (h === 0 && rm === 0) return '0 dəq'; if (h === 0) return `${rm} dəq`; if (rm === 0) return `${h} saat`; return `${h}s ${rm}d`; })()}</p>
             </div>
           </div>
           <motion.button
@@ -1203,7 +1203,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             animate={sleepTimer ? { scale: [1, 1.05, 1] } : {}}
             transition={{ duration: 1, repeat: sleepTimer ? Infinity : 0 }}
           >
-            {sleepTimer ? `☀️ ${formatDuration(getElapsedSeconds(sleepTimer.id))}` : '😴 Yatdı'}
+            {sleepTimer ? `☀️ ${formatDuration(getElapsedSeconds(sleepTimer.id))}` : ('😴 ' + tr('dashboard_slept_btn', 'Yatdı'))}
           </motion.button>
         </div>
         
@@ -1215,7 +1215,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           >
             <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
             <span className="text-sm text-primary font-medium">
-              Yuxu davam edir: {formatDuration(getElapsedSeconds(sleepTimer.id))}
+              {tr('dashboard_sleep_ongoing', 'Yuxu davam edir')}: {formatDuration(getElapsedSeconds(sleepTimer.id))}
             </span>
           </motion.div>
         )}
@@ -1238,7 +1238,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             </div>
             <div className="text-left">
               <h3 className="font-bold text-sm text-foreground">{tr("dashboard_qidalanmaya_nezaret_1b60b4", "Qidalanmaya nəzarət")}</h3>
-              <p className="text-xs text-muted-foreground">Bu gün: {todayStats.feedingCount} dəfə</p>
+              <p className="text-xs text-muted-foreground">{tr('dashboard_today_label', 'Bu gün')}: {todayStats.feedingCount} {tr('dashboard_times_unit', 'dəfə')}</p>
             </div>
           </button>
           <motion.button
@@ -1417,7 +1417,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             <div className="flex items-center gap-3">
               <div className="w-3 h-3 rounded-full bg-pink-500 animate-pulse" />
               <span className="text-sm text-pink-700 font-medium">
-                {leftFeedTimer ? 'Sol sinə' : 'Sağ sinə'}: {formatDuration(getElapsedSeconds((leftFeedTimer || rightFeedTimer)!.id))}
+                {leftFeedTimer ? tr('dashboard_left_breast', 'Sol sinə') : tr('dashboard_right_breast', 'Sağ sinə')}: {formatDuration(getElapsedSeconds((leftFeedTimer || rightFeedTimer)!.id))}
               </span>
             </div>
             <motion.button
@@ -1445,7 +1445,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             </div>
             <div>
               <h3 className="font-bold text-sm text-foreground">{tr("dashboard_bez_deyisme_ba242a", "Bez Dəyişmə")}</h3>
-              <p className="text-xs text-muted-foreground">Bu gün: {todayStats.diaperCount} dəfə</p>
+              <p className="text-xs text-muted-foreground">{tr('dashboard_today_label', 'Bu gün')}: {todayStats.diaperCount} {tr('dashboard_times_unit', 'dəfə')}</p>
             </div>
           </div>
           <motion.button
@@ -1536,7 +1536,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 <div className="text-left">
                   <p className="text-xs font-semibold text-foreground">{tr("dashboard_yuxu_xulasesi_b2dc87", "Yuxu xülasəsi")}</p>
                   <p className="text-[10px] text-muted-foreground">
-                    {todayStats.sleepLogs?.length || 0} yuxu qeydə alınıb
+                    {todayStats.sleepLogs?.length || 0} {tr('dashboard_sleep_recorded', 'yuxu qeydə alınıb')}
                   </p>
                 </div>
               </div>
@@ -1762,9 +1762,9 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Sabahınız xeyir';
-    if (hour < 18) return 'Günortanız xeyir';
-    return 'Axşamınız xeyir';
+    if (hour < 12) return tr('dashboard_good_morning_xeyir', 'Sabahınız xeyir');
+    if (hour < 18) return tr('dashboard_good_afternoon_xeyir', 'Günortanız xeyir');
+    return tr('dashboard_good_evening_xeyir', 'Axşamınız xeyir');
   };
 
   const hasPartner = !!profile?.linked_partner_id;

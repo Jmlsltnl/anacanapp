@@ -261,12 +261,6 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
             <h1 className="text-lg font-bold text-foreground">{tr("whitenoise_yuxu_sesleri_4b518b", "Yuxu Səsləri")}</h1>
             <p className="text-xs text-muted-foreground">{tr("whitenoise_kuy_rengleri_ile_derin_yuxu_c4a0f7", "Küy rəngləri ilə dərin yuxu")}</p>
           </div>
-          {isPremium && (
-            <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-lg">
-              <Crown className="w-3 h-3" />
-              Premium
-            </div>
-          )}
         </div>
       </div>
 

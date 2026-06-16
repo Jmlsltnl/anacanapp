@@ -10,6 +10,7 @@ import { useChildren } from '@/hooks/useChildren';
 import { useToolConfigs } from '@/hooks/useDynamicTools';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useUserStore } from '@/store/userStore';
+import { tr } from '@/lib/tr';
 import { PremiumModal } from '@/components/PremiumModal';
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -77,7 +78,7 @@ const QuickActionsBar = ({ onNavigateToTool }: QuickActionsBarProps) => {
         transition={{ delay: 0.05 }}
       >
         <p className="text-[10px] text-muted-foreground font-medium mb-2 px-1">
-          {ageGroup === 'newborn' ? 'Yenidoğan üçün' : 'Sürətli keçid'}
+          {ageGroup === 'newborn' ? tr('quickactionsbar_for_newborn', 'Yenidoğan üçün') : tr('quickactionsbar_quick_access', 'Sürətli keçid')}
         </p>
         <div className="grid grid-cols-4 gap-2">
           {dbActions.map((action, idx) => {
