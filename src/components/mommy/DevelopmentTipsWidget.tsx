@@ -20,12 +20,12 @@ const DevelopmentTipsWidget = () => {
   const { data: tips = [], isLoading } = useDevelopmentTips(getAgeGroup());
 
   const getAgeLabel = () => {
-    if (ageInMonths < 1) return 'Yenidoğan';
-    if (ageInMonths < 3) return '0-3 ay';
-    if (ageInMonths < 6) return '3-6 ay';
-    if (ageInMonths < 9) return '6-9 ay';
-    if (ageInMonths < 12) return '9-12 ay';
-    return '12+ ay';
+    if (ageInMonths < 1) return tr('developmenttipswidget_newborn','Yenidoğan');
+    if (ageInMonths < 3) return tr('developmenttipswidget_0_3_mo','0-3 ay');
+    if (ageInMonths < 6) return tr('developmenttipswidget_3_6_mo','3-6 ay');
+    if (ageInMonths < 9) return tr('developmenttipswidget_6_9_mo','6-9 ay');
+    if (ageInMonths < 12) return tr('developmenttipswidget_9_12_mo','9-12 ay');
+    return tr('developmenttipswidget_12_plus_mo','12+ ay');
   };
 
   const handleNext = () => {

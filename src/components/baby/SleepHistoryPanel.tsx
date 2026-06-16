@@ -11,14 +11,14 @@ const formatDuration = (minutes: number): string => {
   if (minutes <= 0) return '-';
   const hours = Math.floor(minutes / 60);
   const mins = Math.round(minutes % 60);
-  if (hours > 0) return `${hours} saat ${mins} dəq`;
-  return `${mins} dəq`;
+  if (hours > 0) return `${hours} ${tr('unit_hr','saat')} ${mins} ${tr('unit_min','dəq')}`;
+  return `${mins} ${tr('unit_min','dəq')}`;
 };
 
 const getDateLabel = (dateStr: string): string => {
   const date = new Date(dateStr);
-  if (isToday(date)) return 'Bu gün';
-  if (isYesterday(date)) return 'Dünən';
+  if (isToday(date)) return tr('sleephistorypanel_today','Bu gün');
+  if (isYesterday(date)) return tr('sleephistorypanel_yesterday','Dünən');
   return format(date, 'd MMMM', { locale: az });
 };
 
@@ -80,7 +80,7 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
   const handleDelete = async (id: string) => {
     const result = await deleteLog(id);
     if (!result.error) {
-      toast({ title: 'Yuxu qeydi silindi' });
+      toast({ title: tr('sleephistorypanel_record_deleted','Yuxu qeydi silindi') });
       setDeletingId(null);
     } else {
       toast({ title: tr("sleephistorypanel_xeta_bas_verdi_f22fba", 'Xəta baş verdi'), variant: 'destructive' });
@@ -130,8 +130,8 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
             <p className="text-xs font-semibold text-foreground">{tr("sleephistorypanel_yuxu_xulasesi_b2dc87", "Yuxu xülasəsi")}</p>
             <p className="text-[10px] text-muted-foreground">
               {todaySleepStats.count > 0
-                ? `🌙 ${todaySleepStats.count} dəfə · ${formatDuration(todaySleepStats.totalMinutes)}`
-                : 'Qeyd yoxdur'}
+                ? `🌙 ${todaySleepStats.count} ${tr('sleephistorypanel_times','dəfə')} · ${formatDuration(todaySleepStats.totalMinutes)}`
+                : tr('sleephistorypanel_no_records','Qeyd yoxdur')}
             </p>
           </div>
         </div>
@@ -162,11 +162,11 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
                 <div key={date} className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <p className="text-xs font-semibold text-foreground">{getDateLabel(date)}</p>
-                    <p className="text-[10px] text-muted-foreground">{items.length} yuxu</p>
+                    <p className="text-[10px] text-muted-foreground">{items.length} {tr('sleephistorypanel_sleep_sessions','yuxu')}</p>
                   </div>
 
                   {items.length === 0 ? (
-                    <p className="text-xs text-muted-foreground text-center py-2">Qeyd yoxdur</p>
+                    <p className="text-xs text-muted-foreground text-center py-2">{tr('sleephistorypanel_no_records','Qeyd yoxdur')}</p>
                   ) : (
                     <div className="space-y-1">
                       {items.map((log) => {
@@ -192,7 +192,7 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
                               <div className="bg-primary/5 rounded-lg px-2.5 py-2 border border-primary/20 space-y-2">
                                 <div className="flex items-center gap-2">
                                   <span className="text-sm">🌙</span>
-                                  <span className="text-xs font-medium text-foreground">Yuxu</span>
+                                  <span className="text-xs font-medium text-foreground">{tr('sleephistorypanel_sleep_label','Yuxu')}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <input
@@ -223,7 +223,7 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
                                 <div className="flex items-center gap-2">
                                   <span className="text-sm">🌙</span>
                                   <div>
-                                    <p className="text-xs font-medium text-foreground">Yuxu</p>
+                                    <p className="text-xs font-medium text-foreground">{tr('sleephistorypanel_sleep_label','Yuxu')}</p>
                                     <p className="text-[10px] text-muted-foreground">
                                       {format(startTime, 'HH:mm')}
                                       {endTime && ` - ${format(endTime, 'HH:mm')}`}

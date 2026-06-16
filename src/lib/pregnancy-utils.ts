@@ -1,3 +1,4 @@
+import { tr } from '@/lib/tr';
 /**
  * Centralized pregnancy & baby age calculation utilities
  * All pregnancy-related date calculations should use these functions
@@ -46,11 +47,11 @@ export const getRealCalendarAge = (birthDate: Date | string | null): {
   
   let displayText = '';
   if (years > 0) {
-    displayText = `${years} yaş${remainingMonths > 0 ? ` ${remainingMonths} ay` : ''}`;
+    displayText = `${years} ${tr('pregnancy_utils_year','yaş')}${remainingMonths > 0 ? ` ${remainingMonths} ${tr('pregnancy_utils_month','ay')}` : ''}`;
   } else if (months > 0) {
-    displayText = `${months} ay ${days} gün`;
+    displayText = `${months} ${tr('pregnancy_utils_month','ay')} ${days} ${tr('pregnancy_utils_day','gün')}`;
   } else {
-    displayText = `${totalDays} gün`;
+    displayText = `${totalDays} ${tr('pregnancy_utils_day','gün')}`;
   }
   
   return { months, days, totalDays, years, remainingMonths, displayText };
@@ -213,7 +214,7 @@ export const getWeekDayString = (lastPeriodDate: Date | string | null): string =
   const week = getPregnancyWeek(lastPeriodDate);
   const day = getDayInWeek(lastPeriodDate);
   
-  return `${week} həftə ${day} gün`;
+  return `${week} ${tr('pregnancy_utils_week','həftə')} ${day} ${tr('pregnancy_utils_day','gün')}`;
 };
 
 /**

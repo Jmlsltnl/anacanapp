@@ -3248,4 +3248,19 @@
   "developmenttipswidget_12_plus_mo": "12+ mo",
   "recentblogposts_reading_time_unit": "min",
   "blogscreen_all_filter": "All"
+  ,
+  "pregnancy_utils_year": "yr",
+  "pregnancy_utils_month": "mo",
+  "pregnancy_utils_day": "d",
+  "pregnancy_utils_week": "wk",
+  "growthtrackerwidget_save": "Save",
+  "growthtrackerwidget_last_meas_label": "Last measurement:",
+  "growthtrackerwidget_height_cm": "Height (cm)",
+  "babycrisiswidget_medium": "Medium",
+  "babycrisiswidget_indi": "NOW",
+  "babycrisiswidget_elamtler": "Symptoms",
+  "babycrisiswidget_week_header": "week",
+  "sleephistorypanel_record_deleted": "Sleep record deleted",
+  "sleephistorypanel_sleep_label": "Sleep",
+  "feedinghistorypanel_record_deleted": "Record deleted"
 }
