@@ -18,44 +18,44 @@ const QuickStatsWidget = () => {
   // Calculate last 7 days stats
   const getWeeklyStats = (): DayStats[] => {
     const stats: DayStats[] = [];
-    
+
     for (let i = 6; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split('T')[0];
-      
-      const dayLogs = logs.filter(log => log.start_time.startsWith(dateStr));
-      const feedingLogs = dayLogs.filter(l => l.log_type === 'feeding');
-      const sleepLogs = dayLogs.filter(l => l.log_type === 'sleep');
-      const diaperLogs = dayLogs.filter(l => l.log_type === 'diaper');
-      
+
+      const dayLogs = logs.filter((log) => log.start_time.startsWith(dateStr));
+      const feedingLogs = dayLogs.filter((l) => l.log_type === 'feeding');
+      const sleepLogs = dayLogs.filter((l) => l.log_type === 'sleep');
+      const diaperLogs = dayLogs.filter((l) => l.log_type === 'diaper');
+
       let sleepMinutes = 0;
-      sleepLogs.forEach(log => {
+      sleepLogs.forEach((log) => {
         if (log.end_time) {
           const start = new Date(log.start_time);
           const end = new Date(log.end_time);
           sleepMinutes += (end.getTime() - start.getTime()) / (1000 * 60);
         }
       });
-      
+
       stats.push({
         date: dateStr,
         feedingCount: feedingLogs.length,
         sleepHours: Math.round(sleepMinutes / 60 * 10) / 10,
-        diaperCount: diaperLogs.length,
+        diaperCount: diaperLogs.length
       });
     }
-    
+
     return stats;
   };
 
   const weeklyStats = getWeeklyStats();
-  
+
   // Calculate averages
   const avgFeeding = weeklyStats.reduce((sum, d) => sum + d.feedingCount, 0) / 7;
   const avgSleep = weeklyStats.reduce((sum, d) => sum + d.sleepHours, 0) / 7;
   const avgDiaper = weeklyStats.reduce((sum, d) => sum + d.diaperCount, 0) / 7;
-  
+
   // Get today vs average
   const today = weeklyStats[6];
   const feedingTrend = today.feedingCount >= avgFeeding;
@@ -63,7 +63,7 @@ const QuickStatsWidget = () => {
 
   const getDayLabel = (dateStr: string) => {
     const date = new Date(dateStr);
-    const days = ['B', 'B.e', 'Ç.a', 'Ç', 'C.a', 'C', 'Ş'];
+    const days = ['B', 'B.e', tr("quickstatswidget_c_a_28099e", "\xC7.a"), tr("quickstatswidget_c_b70344", "\xC7"), 'C.a', 'C', tr("quickstatswidget_s_b97106", "\u015E")];
     return days[date.getDay()];
   };
 
@@ -72,8 +72,8 @@ const QuickStatsWidget = () => {
       className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.15 }}
-    >
+      transition={{ delay: 0.15 }}>
+      
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-cyan-600 flex items-center justify-center">
@@ -108,8 +108,8 @@ const QuickStatsWidget = () => {
         </div>
       </div>
       
-    </motion.div>
-  );
+    </motion.div>);
+
 };
 
 export default QuickStatsWidget;

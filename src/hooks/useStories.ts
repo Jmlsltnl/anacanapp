@@ -40,11 +40,11 @@ export const useStories = (groupId?: string | null) => {
   const { data: stories = [], isLoading } = useQuery({
     queryKey: ['stories', groupId],
     queryFn: async () => {
-      let query = supabase
-        .from('community_stories')
-        .select('*')
-        .gt('expires_at', new Date().toISOString())
-        .order('created_at', { ascending: false });
+      let query = supabase.
+      from('community_stories').
+      select('*').
+      gt('expires_at', new Date().toISOString()).
+      order('created_at', { ascending: false });
 
       if (groupId) {
         query = query.eq('group_id', groupId);
@@ -62,33 +62,33 @@ export const useStories = (groupId?: string | null) => {
 
           let isViewed = false;
           if (user) {
-            const { data: viewData } = await supabase
-              .from('story_views')
-              .select('id')
-              .eq('story_id', story.id)
-              .eq('user_id', user.id)
-              .single();
+            const { data: viewData } = await supabase.
+            from('story_views').
+            select('id').
+            eq('story_id', story.id).
+            eq('user_id', user.id).
+            single();
             isViewed = !!viewData;
           }
 
           return {
             ...story,
-            author: authorData
-              ? { name: authorData.name || 'İstifadəçi', avatar_url: authorData.avatar_url || null }
-              : { name: tr("usestories_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null },
-            is_viewed: isViewed,
+            author: authorData ?
+            { name: authorData.name || tr("usestories_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"), avatar_url: authorData.avatar_url || null } :
+            { name: tr("usestories_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null },
+            is_viewed: isViewed
           };
         })
       );
 
       return storiesWithDetails as Story[];
     },
-    staleTime: 30000,
+    staleTime: 30000
   });
 
   // Group stories by user
   const storyGroups: UserStoryGroup[] = stories.reduce((acc: UserStoryGroup[], story) => {
-    const existingGroup = acc.find(g => g.user_id === story.user_id);
+    const existingGroup = acc.find((g) => g.user_id === story.user_id);
     if (existingGroup) {
       existingGroup.stories.push(story);
       if (!story.is_viewed) {
@@ -97,10 +97,10 @@ export const useStories = (groupId?: string | null) => {
     } else {
       acc.push({
         user_id: story.user_id,
-        user_name: story.author?.name || 'İstifadəçi',
+        user_name: story.author?.name || tr("usestories_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
         user_avatar: story.author?.avatar_url || null,
         stories: [story],
-        has_unviewed: !story.is_viewed,
+        has_unviewed: !story.is_viewed
       });
     }
     return acc;
@@ -121,26 +121,26 @@ export const useStories = (groupId?: string | null) => {
       mediaType,
       textOverlay,
       backgroundColor,
-      groupId: storyGroupId,
-    }: {
-      mediaUrl: string;
-      mediaType: 'image' | 'video';
-      textOverlay?: string;
-      backgroundColor?: string;
-      groupId?: string;
-    }) => {
+      groupId: storyGroupId
+
+
+
+
+
+
+    }: {mediaUrl: string;mediaType: 'image' | 'video';textOverlay?: string;backgroundColor?: string;groupId?: string;}) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('community_stories')
-        .insert({
-          user_id: user.id,
-          group_id: storyGroupId || null,
-          media_url: mediaUrl,
-          media_type: mediaType,
-          text_overlay: textOverlay || null,
-          background_color: backgroundColor || null,
-        });
+      const { error } = await supabase.
+      from('community_stories').
+      insert({
+        user_id: user.id,
+        group_id: storyGroupId || null,
+        media_url: mediaUrl,
+        media_type: mediaType,
+        text_overlay: textOverlay || null,
+        background_color: backgroundColor || null
+      });
 
       if (error) throw error;
     },
@@ -150,21 +150,21 @@ export const useStories = (groupId?: string | null) => {
     },
     onError: () => {
       toast({ title: tr("usestories_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
-    },
+    }
   });
 
   const markAsViewed = useCallback(async (storyId: string) => {
     if (!user) return;
 
     try {
-      await supabase
-        .from('story_views')
-        .upsert({
-          story_id: storyId,
-          user_id: user.id,
-        }, {
-          onConflict: 'story_id,user_id'
-        });
+      await supabase.
+      from('story_views').
+      upsert({
+        story_id: storyId,
+        user_id: user.id
+      }, {
+        onConflict: 'story_id,user_id'
+      });
 
       queryClient.invalidateQueries({ queryKey: ['stories'] });
     } catch (error) {
@@ -176,18 +176,18 @@ export const useStories = (groupId?: string | null) => {
     mutationFn: async (storyId: string) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('community_stories')
-        .delete()
-        .eq('id', storyId)
-        .eq('user_id', user.id);
+      const { error } = await supabase.
+      from('community_stories').
+      delete().
+      eq('id', storyId).
+      eq('user_id', user.id);
 
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stories'] });
       toast({ title: 'Story silindi' });
-    },
+    }
   });
 
   return {
@@ -197,6 +197,6 @@ export const useStories = (groupId?: string | null) => {
     createStory: createStoryMutation.mutate,
     isCreating: createStoryMutation.isPending,
     markAsViewed,
-    deleteStory: deleteStory.mutate,
+    deleteStory: deleteStory.mutate
   };
 };

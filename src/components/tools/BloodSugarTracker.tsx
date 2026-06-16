@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  ArrowLeft, Droplet, Plus, TrendingUp, TrendingDown, 
+import {
+  ArrowLeft, Droplet, Plus, TrendingUp, TrendingDown,
   Minus, Calendar, Clock, Trash2, AlertTriangle, CheckCircle,
-  Edit, Save, X
-} from 'lucide-react';
+  Edit, Save, X } from
+'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -35,19 +35,19 @@ interface BloodSugarLog {
 }
 
 const readingTypes = [
-  { id: 'fasting', label: tr("bloodsugartracker_acliq_b6d5ee", 'Aclıq'), emoji: '🌅', description: tr("bloodsugartracker_seher_tezden_yemekden_evvel_3f58e4", 'Səhər tezdən, yeməkdən əvvəl') },
-  { id: 'before_meal', label: tr("bloodsugartracker_yemekden_evvel_167a3d", 'Yeməkdən əvvəl'), emoji: '🍽️', description: tr("bloodsugartracker_yemekden_30_deq_evvel_266704", 'Yeməkdən 30 dəq əvvəl') },
-  { id: 'after_meal', label: tr("bloodsugartracker_yemekden_sonra_56238e", 'Yeməkdən sonra'), emoji: '⏰', description: tr("bloodsugartracker_yemekden_2_saat_sonra_c59165", 'Yeməkdən 2 saat sonra') },
-  { id: 'bedtime', label: tr("bloodsugartracker_yatmazdan_evvel_a457fa", 'Yatmazdan əvvəl'), emoji: '🌙', description: tr("bloodsugartracker_gece_yatmaq_ucun_34ca83", 'Gecə yatmaq üçün') },
-  { id: 'random', label: tr("bloodsugartracker_tesadufi_98c20c", 'Təsadüfi'), emoji: '📊', description: tr("bloodsugartracker_i_stenilen_vaxt_ec15be", 'İstənilən vaxt') },
-];
+{ id: 'fasting', label: tr("bloodsugartracker_acliq_b6d5ee", 'Aclıq'), emoji: '🌅', description: tr("bloodsugartracker_seher_tezden_yemekden_evvel_3f58e4", 'Səhər tezdən, yeməkdən əvvəl') },
+{ id: 'before_meal', label: tr("bloodsugartracker_yemekden_evvel_167a3d", 'Yeməkdən əvvəl'), emoji: '🍽️', description: tr("bloodsugartracker_yemekden_30_deq_evvel_266704", 'Yeməkdən 30 dəq əvvəl') },
+{ id: 'after_meal', label: tr("bloodsugartracker_yemekden_sonra_56238e", 'Yeməkdən sonra'), emoji: '⏰', description: tr("bloodsugartracker_yemekden_2_saat_sonra_c59165", 'Yeməkdən 2 saat sonra') },
+{ id: 'bedtime', label: tr("bloodsugartracker_yatmazdan_evvel_a457fa", 'Yatmazdan əvvəl'), emoji: '🌙', description: tr("bloodsugartracker_gece_yatmaq_ucun_34ca83", 'Gecə yatmaq üçün') },
+{ id: 'random', label: tr("bloodsugartracker_tesadufi_98c20c", 'Təsadüfi'), emoji: '📊', description: tr("bloodsugartracker_i_stenilen_vaxt_ec15be", 'İstənilən vaxt') }];
+
 
 const mealContexts = [
-  { id: 'breakfast', label: tr("bloodsugartracker_seher_yemeyi_b82929", 'Səhər yeməyi'), emoji: '🥞' },
-  { id: 'lunch', label: 'Nahar', emoji: '🍲' },
-  { id: 'dinner', label: tr("bloodsugartracker_sam_yemeyi_6002e9", 'Şam yeməyi'), emoji: '🍛' },
-  { id: 'snack', label: tr("bloodsugartracker_qelyanalti_42fb71", 'Qəlyanaltı'), emoji: '🍎' },
-];
+{ id: 'breakfast', label: tr("bloodsugartracker_seher_yemeyi_b82929", 'Səhər yeməyi'), emoji: '🥞' },
+{ id: 'lunch', label: 'Nahar', emoji: '🍲' },
+{ id: 'dinner', label: tr("bloodsugartracker_sam_yemeyi_6002e9", 'Şam yeməyi'), emoji: '🍛' },
+{ id: 'snack', label: tr("bloodsugartracker_qelyanalti_42fb71", 'Qəlyanaltı'), emoji: '🍎' }];
+
 
 // Blood sugar level thresholds (mg/dL)
 const getReadingStatus = (value: number, type: string) => {
@@ -67,11 +67,11 @@ const getReadingStatus = (value: number, type: string) => {
 const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
   useScrollToTop();
   useScreenAnalytics('BloodSugarTracker', 'Tools');
-  
+
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [newReading, setNewReading] = useState('');
   const [selectedType, setSelectedType] = useState('random');
@@ -82,31 +82,31 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
     queryKey: ['blood-sugar-logs', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
-      const { data, error } = await supabase
-        .from('blood_sugar_logs')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('logged_at', { ascending: false })
-        .limit(100);
+      const { data, error } = await supabase.
+      from('blood_sugar_logs').
+      select('*').
+      eq('user_id', user.id).
+      order('logged_at', { ascending: false }).
+      limit(100);
       if (error) throw error;
       return data as BloodSugarLog[];
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id
   });
 
   const addLogMutation = useMutation({
     mutationFn: async () => {
-      if (!user?.id || !newReading) throw new Error('Məlumat yoxdur');
-      
-      const { error } = await supabase
-        .from('blood_sugar_logs')
-        .insert({
-          user_id: user.id,
-          reading_value: parseFloat(newReading),
-          reading_type: selectedType,
-          meal_context: selectedMeal,
-          notes: notes || null,
-        });
+      if (!user?.id || !newReading) throw new Error(tr("bloodsugartracker_melumat_yoxdur_a3e271", "M\u0259lumat yoxdur"));
+
+      const { error } = await supabase.
+      from('blood_sugar_logs').
+      insert({
+        user_id: user.id,
+        reading_value: parseFloat(newReading),
+        reading_type: selectedType,
+        meal_context: selectedMeal,
+        notes: notes || null
+      });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -120,39 +120,39 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
     },
     onError: () => {
       toast({ title: tr("bloodsugartracker_xeta_3cdbb6", 'Xəta'), description: tr("bloodsugartracker_qeyd_elave_edile_bilmedi_c1e5e5", 'Qeyd əlavə edilə bilmədi'), variant: 'destructive' });
-    },
+    }
   });
 
   const deleteLogMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('blood_sugar_logs')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.
+      from('blood_sugar_logs').
+      delete().
+      eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['blood-sugar-logs'] });
       toast({ title: 'Silindi', description: 'Qeyd silindi' });
-    },
+    }
   });
 
   // Calculate statistics
-  const todayLogs = logs.filter(log => isToday(new Date(log.logged_at)));
-  const weekLogs = logs.filter(log => new Date(log.logged_at) >= subDays(new Date(), 7));
-  
-  const avgToday = todayLogs.length > 0 
-    ? Math.round(todayLogs.reduce((sum, log) => sum + log.reading_value, 0) / todayLogs.length)
-    : null;
-  
-  const avgWeek = weekLogs.length > 0
-    ? Math.round(weekLogs.reduce((sum, log) => sum + log.reading_value, 0) / weekLogs.length)
-    : null;
+  const todayLogs = logs.filter((log) => isToday(new Date(log.logged_at)));
+  const weekLogs = logs.filter((log) => new Date(log.logged_at) >= subDays(new Date(), 7));
+
+  const avgToday = todayLogs.length > 0 ?
+  Math.round(todayLogs.reduce((sum, log) => sum + log.reading_value, 0) / todayLogs.length) :
+  null;
+
+  const avgWeek = weekLogs.length > 0 ?
+  Math.round(weekLogs.reduce((sum, log) => sum + log.reading_value, 0) / weekLogs.length) :
+  null;
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    if (isToday(date)) return 'Bu gün';
-    if (isYesterday(date)) return 'Dünən';
+    if (isToday(date)) return tr("bloodsugartracker_bu_gun_786fd4", "Bu g\xFCn");
+    if (isYesterday(date)) return tr("bloodsugartracker_dunen_52b701", "D\xFCn\u0259n");
     return format(date, 'd MMM', { locale: az });
   };
 
@@ -170,13 +170,13 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
               <p className="text-xs text-muted-foreground">{tr("bloodsugartracker_seviyyeni_izleyin_1b70d5", "Səviyyəni izləyin")}</p>
             </div>
           </div>
-          <Button 
-            size="sm" 
+          <Button
+            size="sm"
             className="rounded-xl relative z-30"
-            onClick={() => setShowAddModal(true)}
-          >
+            onClick={() => setShowAddModal(true)}>
+            
             <Plus className="w-4 h-4 mr-1" />
-            Əlavə et
+            {tr("bloodsugartracker_elave_et_6e1b9b", "\u018Flav\u0259 et")}
           </Button>
         </div>
       </div>
@@ -187,11 +187,11 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
 
       {/* Stats Cards */}
       <div className="px-4 py-4 grid grid-cols-2 gap-3">
-        <motion.div 
+        <motion.div
           className="bg-gradient-to-br from-red-500/20 to-red-500/5 rounded-2xl p-4 border border-red-500/20"
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+          animate={{ opacity: 1, y: 0 }}>
+          
           <div className="flex items-center gap-2 mb-2">
             <Droplet className="w-5 h-5 text-red-500" />
             <span className="text-xs text-muted-foreground">{tr("bloodsugartracker_bu_gun_orta_96f2fa", "Bu gün orta")}</span>
@@ -200,19 +200,19 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
             {avgToday ? `${avgToday}` : '—'}
             {avgToday && <span className="text-sm font-normal text-muted-foreground ml-1">mg/dL</span>}
           </p>
-          {avgToday && (
-            <Badge className={`mt-1 text-[10px] ${getReadingStatus(avgToday, 'random').bg} ${getReadingStatus(avgToday, 'random').color} border-0`}>
+          {avgToday &&
+          <Badge className={`mt-1 text-[10px] ${getReadingStatus(avgToday, 'random').bg} ${getReadingStatus(avgToday, 'random').color} border-0`}>
               {getReadingStatus(avgToday, 'random').label}
             </Badge>
-          )}
+          }
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl p-4 border border-primary/20"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
+          transition={{ delay: 0.1 }}>
+          
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="w-5 h-5 text-primary" />
             <span className="text-xs text-muted-foreground">{tr("bloodsugartracker_heftelik_orta_f3a738", "Həftəlik orta")}</span>
@@ -222,7 +222,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
             {avgWeek && <span className="text-sm font-normal text-muted-foreground ml-1">mg/dL</span>}
           </p>
           <p className="text-[10px] text-muted-foreground mt-1">
-            {weekLogs.length} ölçmə
+            {weekLogs.length} {tr("bloodsugartracker_olcme_6aff0d", "\xF6l\xE7m\u0259")}
           </p>
         </motion.div>
       </div>
@@ -245,36 +245,36 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
       <div className="px-4">
         <h2 className="font-semibold text-sm mb-3">{tr("bloodsugartracker_son_olcmeler_b024cf", "Son ölçmələr")}</h2>
         
-        {isLoading ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="bg-card rounded-xl p-3 border border-border/50 animate-pulse">
+        {isLoading ?
+        <div className="space-y-3">
+            {[1, 2, 3].map((i) =>
+          <div key={i} className="bg-card rounded-xl p-3 border border-border/50 animate-pulse">
                 <div className="h-4 bg-muted rounded w-1/3 mb-2" />
                 <div className="h-6 bg-muted rounded w-1/4" />
               </div>
-            ))}
-          </div>
-        ) : logs.length === 0 ? (
-          <div className="text-center py-12">
+          )}
+          </div> :
+        logs.length === 0 ?
+        <div className="text-center py-12">
             <Droplet className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
             <p className="text-muted-foreground text-sm">{tr("bloodsugartracker_hele_hec_bir_qeyd_yoxdur_463107", "Hələ heç bir qeyd yoxdur")}</p>
             <p className="text-muted-foreground text-xs mt-1">{tr("bloodsugartracker_ilk_olcmenizi_elave_edin_c94d74", "İlk ölçmənizi əlavə edin")}</p>
-          </div>
-        ) : (
-          <div className="space-y-2">
+          </div> :
+
+        <div className="space-y-2">
             {logs.map((log, index) => {
-              const status = getReadingStatus(log.reading_value, log.reading_type);
-              const typeInfo = readingTypes.find(t => t.id === log.reading_type);
-              const mealInfo = mealContexts.find(m => m.id === log.meal_context);
-              
-              return (
-                <motion.div
-                  key={log.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.03 }}
-                  className="bg-card rounded-xl p-3 border border-border/50"
-                >
+            const status = getReadingStatus(log.reading_value, log.reading_type);
+            const typeInfo = readingTypes.find((t) => t.id === log.reading_type);
+            const mealInfo = mealContexts.find((m) => m.id === log.meal_context);
+
+            return (
+              <motion.div
+                key={log.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.03 }}
+                className="bg-card rounded-xl p-3 border border-border/50">
+                
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-xl ${status.bg} flex items-center justify-center`}>
@@ -290,12 +290,12 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
                         </div>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <span>{typeInfo?.label}</span>
-                          {mealInfo && (
-                            <>
+                          {mealInfo &&
+                        <>
                               <span>•</span>
                               <span>{mealInfo.emoji} {mealInfo.label}</span>
                             </>
-                          )}
+                        }
                         </div>
                       </div>
                     </div>
@@ -306,36 +306,36 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
                           {format(new Date(log.logged_at), 'HH:mm')}
                         </p>
                       </div>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                        onClick={() => deleteLogMutation.mutate(log.id)}
-                      >
+                      <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                      onClick={() => deleteLogMutation.mutate(log.id)}>
+                      
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
-                  {log.notes && (
-                    <p className="text-xs text-muted-foreground mt-2 pl-13">{log.notes}</p>
-                  )}
-                </motion.div>
-              );
-            })}
+                  {log.notes &&
+                <p className="text-xs text-muted-foreground mt-2 pl-13">{log.notes}</p>
+                }
+                </motion.div>);
+
+          })}
           </div>
-        )}
+        }
       </div>
 
       {/* Add Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-end">
+      {showAddModal &&
+      <div className="fixed inset-0 z-50 bg-black/50 flex items-end">
           <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            className="w-full bg-card rounded-t-3xl p-5 max-h-[85vh] overflow-y-auto"
-            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 24px)' }}
-          >
+          initial={{ y: '100%' }}
+          animate={{ y: 0 }}
+          exit={{ y: '100%' }}
+          className="w-full bg-card rounded-t-3xl p-5 max-h-[85vh] overflow-y-auto"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 24px)' }}>
+          
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-bold text-lg">{tr("bloodsugartracker_yeni_olcme_cc2042", "Yeni ölçmə")}</h2>
               <Button variant="ghost" size="icon" onClick={() => setShowAddModal(false)}>
@@ -347,89 +347,89 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
             <div className="mb-4">
               <label className="text-sm font-medium mb-2 block">{tr("bloodsugartracker_qan_sekeri_seviyyesi_mg_dl_cb75a9", "Qan şəkəri səviyyəsi (mg/dL)")}</label>
               <input
-                type="number"
-                inputMode="decimal"
-                value={newReading}
-                onChange={(e) => setNewReading(e.target.value)}
-                placeholder={tr("bloodsugartracker_meselen_95_23137b", "Məsələn: 95")}
-                className="w-full h-14 px-4 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-2xl font-bold text-center transition-all outline-none"
-              />
-              {newReading && (
-                <div className="mt-2 text-center">
+              type="number"
+              inputMode="decimal"
+              value={newReading}
+              onChange={(e) => setNewReading(e.target.value)}
+              placeholder={tr("bloodsugartracker_meselen_95_23137b", "Məsələn: 95")}
+              className="w-full h-14 px-4 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-2xl font-bold text-center transition-all outline-none" />
+            
+              {newReading &&
+            <div className="mt-2 text-center">
                   <Badge className={`${getReadingStatus(parseFloat(newReading), selectedType).bg} ${getReadingStatus(parseFloat(newReading), selectedType).color} border-0`}>
                     {getReadingStatus(parseFloat(newReading), selectedType).label}
                   </Badge>
                 </div>
-              )}
+            }
             </div>
 
             {/* Reading Type */}
             <div className="mb-4">
               <label className="text-sm font-medium mb-2 block">{tr("bloodsugartracker_olcme_novu_0d8219", "Ölçmə növü")}</label>
               <div className="grid grid-cols-2 gap-2">
-                {readingTypes.map(type => (
-                  <button
-                    key={type.id}
-                    onClick={() => setSelectedType(type.id)}
-                    className={`p-3 rounded-xl border-2 text-left transition-all ${
-                      selectedType === type.id 
-                        ? 'border-primary bg-primary/5' 
-                        : 'border-border/50 bg-card'
-                    }`}
-                  >
+                {readingTypes.map((type) =>
+              <button
+                key={type.id}
+                onClick={() => setSelectedType(type.id)}
+                className={`p-3 rounded-xl border-2 text-left transition-all ${
+                selectedType === type.id ?
+                'border-primary bg-primary/5' :
+                'border-border/50 bg-card'}`
+                }>
+                
                     <span className="text-lg mr-2">{type.emoji}</span>
                     <span className="text-sm font-medium">{type.label}</span>
                   </button>
-                ))}
+              )}
               </div>
             </div>
 
             {/* Meal Context (optional) */}
-            {(selectedType === 'before_meal' || selectedType === 'after_meal') && (
-              <div className="mb-4">
+            {(selectedType === 'before_meal' || selectedType === 'after_meal') &&
+          <div className="mb-4">
                 <label className="text-sm font-medium mb-2 block">{tr("bloodsugartracker_yemek_b1fd56", "Yemək")}</label>
                 <div className="grid grid-cols-4 gap-2">
-                  {mealContexts.map(meal => (
-                    <button
-                      key={meal.id}
-                      onClick={() => setSelectedMeal(selectedMeal === meal.id ? null : meal.id)}
-                      className={`p-2 rounded-xl border-2 text-center transition-all ${
-                        selectedMeal === meal.id 
-                          ? 'border-primary bg-primary/5' 
-                          : 'border-border/50 bg-card'
-                      }`}
-                    >
+                  {mealContexts.map((meal) =>
+              <button
+                key={meal.id}
+                onClick={() => setSelectedMeal(selectedMeal === meal.id ? null : meal.id)}
+                className={`p-2 rounded-xl border-2 text-center transition-all ${
+                selectedMeal === meal.id ?
+                'border-primary bg-primary/5' :
+                'border-border/50 bg-card'}`
+                }>
+                
                       <span className="text-xl block">{meal.emoji}</span>
                       <span className="text-[10px]">{meal.label}</span>
                     </button>
-                  ))}
+              )}
                 </div>
               </div>
-            )}
+          }
 
             {/* Notes */}
             <div className="mb-6">
               <label className="text-sm font-medium mb-2 block">{tr("bloodsugartracker_qeyd_isteye_bagli_96c689", "Qeyd (istəyə bağlı)")}</label>
               <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder={tr("bloodsugartracker_elave_qeydler_c55f23", "Əlavə qeydlər...")}
-                className="w-full h-20 px-3 py-2 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-sm resize-none transition-all outline-none"
-              />
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder={tr("bloodsugartracker_elave_qeydler_c55f23", "Əlavə qeydlər...")}
+              className="w-full h-20 px-3 py-2 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-sm resize-none transition-all outline-none" />
+            
             </div>
 
-            <Button 
-              className="w-full h-12 rounded-xl font-semibold"
-              disabled={!newReading || addLogMutation.isPending}
-              onClick={() => addLogMutation.mutate()}
-            >
-              {addLogMutation.isPending ? 'Əlavə edilir...' : 'Qeyd et'}
+            <Button
+            className="w-full h-12 rounded-xl font-semibold"
+            disabled={!newReading || addLogMutation.isPending}
+            onClick={() => addLogMutation.mutate()}>
+            
+              {addLogMutation.isPending ? tr("bloodsugartracker_elave_edilir_3c28b4", "\u018Flav\u0259 edilir...") : 'Qeyd et'}
             </Button>
           </motion.div>
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 
 export default BloodSugarTracker;

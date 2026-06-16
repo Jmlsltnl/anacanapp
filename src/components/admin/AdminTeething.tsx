@@ -71,17 +71,17 @@ const AdminTeething = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    
+
     const [teethRes, tipsRes, symptomsRes] = await Promise.all([
-      supabase.from('baby_teeth_db').select('*').order('sort_order'),
-      supabase.from('teething_care_tips').select('*').order('sort_order'),
-      supabase.from('teething_symptoms').select('*').order('sort_order'),
-    ]);
+    supabase.from('baby_teeth_db').select('*').order('sort_order'),
+    supabase.from('teething_care_tips').select('*').order('sort_order'),
+    supabase.from('teething_symptoms').select('*').order('sort_order')]
+    );
 
     if (teethRes.data) setTeeth(teethRes.data);
     if (tipsRes.data) setTips(tipsRes.data);
     if (symptomsRes.data) setSymptoms(symptomsRes.data);
-    
+
     setLoading(false);
   };
 
@@ -103,7 +103,7 @@ const AdminTeething = () => {
         typical_emergence_months_min: 6,
         typical_emergence_months_max: 12,
         sort_order: teeth.length + 1,
-        is_active: true,
+        is_active: true
       });
     } else if (activeTab === 'tips') {
       setEditingItem({
@@ -114,7 +114,7 @@ const AdminTeething = () => {
         category: 'general',
         emoji: '💡',
         sort_order: tips.length + 1,
-        is_active: true,
+        is_active: true
       });
     } else {
       setEditingItem({
@@ -127,7 +127,7 @@ const AdminTeething = () => {
         relief_tips: [],
         relief_tips_az: [],
         sort_order: symptoms.length + 1,
-        is_active: true,
+        is_active: true
       });
     }
     setShowEditModal(true);
@@ -137,25 +137,25 @@ const AdminTeething = () => {
   const handleSave = async () => {
     if (!editingItem) return;
 
-    const tableName = activeTab === 'teeth' ? 'baby_teeth_db' : 
-                      activeTab === 'tips' ? 'teething_care_tips' : 'teething_symptoms';
+    const tableName = activeTab === 'teeth' ? 'baby_teeth_db' :
+    activeTab === 'tips' ? 'teething_care_tips' : 'teething_symptoms';
 
     try {
       if (editingItem.id) {
-        const { error } = await supabase
-          .from(tableName)
-          .update(editingItem)
-          .eq('id', editingItem.id);
+        const { error } = await supabase.
+        from(tableName).
+        update(editingItem).
+        eq('id', editingItem.id);
 
         if (error) throw error;
-        toast.success('Yeniləndi');
+        toast.success(tr("adminteething_yenilendi_d10a01", "Yenil\u0259ndi"));
       } else {
-        const { error } = await supabase
-          .from(tableName)
-          .insert(editingItem);
+        const { error } = await supabase.
+        from(tableName).
+        insert(editingItem);
 
         if (error) throw error;
-        toast.success('Əlavə edildi');
+        toast.success(tr("adminteething_elave_edildi_b7d7e4", "\u018Flav\u0259 edildi"));
       }
 
       setShowEditModal(false);
@@ -163,21 +163,21 @@ const AdminTeething = () => {
       fetchData();
     } catch (error) {
       console.error('Save error:', error);
-      toast.error('Xəta baş verdi');
+      toast.error(tr("adminteething_xeta_bas_verdi_f22fba", "X\u0259ta ba\u015F verdi"));
     }
   };
 
   const handleDelete = async (id: string) => {
-    const tableName = activeTab === 'teeth' ? 'baby_teeth_db' : 
-                      activeTab === 'tips' ? 'teething_care_tips' : 'teething_symptoms';
+    const tableName = activeTab === 'teeth' ? 'baby_teeth_db' :
+    activeTab === 'tips' ? 'teething_care_tips' : 'teething_symptoms';
 
-    const { error } = await supabase
-      .from(tableName)
-      .delete()
-      .eq('id', id);
+    const { error } = await supabase.
+    from(tableName).
+    delete().
+    eq('id', id);
 
     if (error) {
-      toast.error('Silinə bilmədi');
+      toast.error(tr("adminteething_siline_bilmedi_e5f591", "Silin\u0259 bilm\u0259di"));
     } else {
       toast.success('Silindi');
       fetchData();
@@ -185,16 +185,16 @@ const AdminTeething = () => {
   };
 
   const handleToggleActive = async (id: string, isActive: boolean) => {
-    const tableName = activeTab === 'teeth' ? 'baby_teeth_db' : 
-                      activeTab === 'tips' ? 'teething_care_tips' : 'teething_symptoms';
+    const tableName = activeTab === 'teeth' ? 'baby_teeth_db' :
+    activeTab === 'tips' ? 'teething_care_tips' : 'teething_symptoms';
 
-    const { error } = await supabase
-      .from(tableName)
-      .update({ is_active: isActive })
-      .eq('id', id);
+    const { error } = await supabase.
+    from(tableName).
+    update({ is_active: isActive }).
+    eq('id', id);
 
     if (error) {
-      toast.error('Xəta baş verdi');
+      toast.error(tr("adminteething_xeta_bas_verdi_f22fba", "X\u0259ta ba\u015F verdi"));
     } else {
       fetchData();
     }
@@ -215,13 +215,13 @@ const AdminTeething = () => {
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <Sparkles className="w-6 h-6 text-pink-500" />
-            Diş Çıxarma İdarəetməsi
+            {tr("adminteething_dis_cixarma_i_dareetmesi_c46924", "Di\u015F \xC7\u0131xarma \u0130dar\u0259etm\u0259si")}
           </h2>
           <p className="text-muted-foreground">{tr("adminteething_korpe_disleri_qulluq_meslehetleri_ve_sim_bedaf6", "Körpə dişləri, qulluq məsləhətləri və simptomları idarə edin")}</p>
         </div>
         <Button onClick={handleCreate}>
           <Plus className="w-4 h-4 mr-2" />
-          Yeni Əlavə Et
+          {tr("adminteething_yeni_elave_et_fa6b69", "Yeni \u018Flav\u0259 Et")}
         </Button>
       </div>
 
@@ -229,11 +229,11 @@ const AdminTeething = () => {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="teeth" className="flex items-center gap-2">
             <Heart className="w-4 h-4" />
-            Dişlər ({teeth.length})
+            {tr("adminteething_disler_2bd3d1", "Di\u015Fl\u0259r (")}{teeth.length})
           </TabsTrigger>
           <TabsTrigger value="tips" className="flex items-center gap-2">
             <Sparkles className="w-4 h-4" />
-            Məsləhətlər ({tips.length})
+            {tr("adminteething_meslehetler_ac87a6", "M\u0259sl\u0259h\u0259tl\u0259r (")}{tips.length})
           </TabsTrigger>
           <TabsTrigger value="symptoms" className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4" />
@@ -257,8 +257,8 @@ const AdminTeething = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {teeth.map((tooth) => (
-                    <TableRow key={tooth.id}>
+                  {teeth.map((tooth) =>
+                  <TableRow key={tooth.id}>
                       <TableCell>
                         <div>
                           <p className="font-medium">{tooth.name_az || tooth.name}</p>
@@ -267,21 +267,21 @@ const AdminTeething = () => {
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline">
-                          {tooth.position === 'upper' ? 'Yuxarı' : 'Aşağı'} / {tooth.side === 'left' ? 'Sol' : tooth.side === 'right' ? 'Sağ' : 'Mərkəz'}
+                          {tooth.position === 'upper' ? tr("adminteething_yuxari_565e22", "Yuxar\u0131") : tr("adminteething_asagi_1c27f1", "A\u015Fa\u011F\u0131")} / {tooth.side === 'left' ? 'Sol' : tooth.side === 'right' ? tr("adminteething_sag_edbe12", "Sa\u011F") : tr("adminteething_merkez_fa0929", "M\u0259rk\u0259z")}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {tooth.tooth_type === 'incisor' ? 'Kəsici' : 
-                         tooth.tooth_type === 'canine' ? 'Köpək' : 'Azı'}
+                        {tooth.tooth_type === 'incisor' ? tr("adminteething_kesici_569ec2", "K\u0259sici") :
+                      tooth.tooth_type === 'canine' ? tr("adminteething_kopek_b079b8", "K\xF6p\u0259k") : tr("adminteething_azi_462627", "Az\u0131")}
                       </TableCell>
                       <TableCell>
                         {tooth.typical_emergence_months_min}-{tooth.typical_emergence_months_max} ay
                       </TableCell>
                       <TableCell>
                         <Switch
-                          checked={tooth.is_active}
-                          onCheckedChange={(checked) => handleToggleActive(tooth.id, checked)}
-                        />
+                        checked={tooth.is_active}
+                        onCheckedChange={(checked) => handleToggleActive(tooth.id, checked)} />
+                      
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
@@ -294,7 +294,7 @@ const AdminTeething = () => {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -315,8 +315,8 @@ const AdminTeething = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {tips.map((tip) => (
-                    <TableRow key={tip.id}>
+                  {tips.map((tip) =>
+                  <TableRow key={tip.id}>
                       <TableCell>
                         <div className="flex items-start gap-2">
                           <span className="text-xl">{tip.emoji}</span>
@@ -333,9 +333,9 @@ const AdminTeething = () => {
                       </TableCell>
                       <TableCell>
                         <Switch
-                          checked={tip.is_active}
-                          onCheckedChange={(checked) => handleToggleActive(tip.id, checked)}
-                        />
+                        checked={tip.is_active}
+                        onCheckedChange={(checked) => handleToggleActive(tip.id, checked)} />
+                      
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
@@ -348,7 +348,7 @@ const AdminTeething = () => {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -369,8 +369,8 @@ const AdminTeething = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {symptoms.map((symptom) => (
-                    <TableRow key={symptom.id}>
+                  {symptoms.map((symptom) =>
+                  <TableRow key={symptom.id}>
                       <TableCell>
                         <div className="flex items-start gap-2">
                           <span className="text-xl">{symptom.emoji}</span>
@@ -384,19 +384,19 @@ const AdminTeething = () => {
                       </TableCell>
                       <TableCell>
                         <Badge className={
-                          symptom.severity === 'mild' ? 'bg-green-100 text-green-700' :
-                          symptom.severity === 'moderate' ? 'bg-amber-100 text-amber-700' :
-                          'bg-red-100 text-red-700'
-                        }>
-                          {symptom.severity === 'mild' ? 'Yüngül' : 
-                           symptom.severity === 'moderate' ? 'Orta' : 'Ciddi'}
+                      symptom.severity === 'mild' ? 'bg-green-100 text-green-700' :
+                      symptom.severity === 'moderate' ? 'bg-amber-100 text-amber-700' :
+                      'bg-red-100 text-red-700'
+                      }>
+                          {symptom.severity === 'mild' ? tr("adminteething_yungul_2a8010", "Y\xFCng\xFCl") :
+                        symptom.severity === 'moderate' ? 'Orta' : 'Ciddi'}
                         </Badge>
                       </TableCell>
                       <TableCell>
                         <Switch
-                          checked={symptom.is_active}
-                          onCheckedChange={(checked) => handleToggleActive(symptom.id, checked)}
-                        />
+                        checked={symptom.is_active}
+                        onCheckedChange={(checked) => handleToggleActive(symptom.id, checked)} />
+                      
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
@@ -409,7 +409,7 @@ const AdminTeething = () => {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -428,45 +428,45 @@ const AdminTeething = () => {
         <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {editingItem?.id ? 'Redaktə Et' : 'Yeni Əlavə Et'}
+              {editingItem?.id ? tr("adminteething_redakte_et_78eab1", "Redakt\u0259 Et") : tr("adminteething_yeni_elave_et_fa6b69", "Yeni \u018Flav\u0259 Et")}
             </DialogTitle>
           </DialogHeader>
 
-          {editingItem && (
-            <div className="space-y-4">
-              {activeTab === 'teeth' && (
-                <>
+          {editingItem &&
+          <div className="space-y-4">
+              {activeTab === 'teeth' &&
+            <>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium">Kod</label>
                       <Input
-                        value={editingItem.tooth_code || ''}
-                        onChange={(e) => updateEditingItem('tooth_code', e.target.value)}
-                        placeholder="upper_central_incisor_right"
-                      />
+                    value={editingItem.tooth_code || ''}
+                    onChange={(e) => updateEditingItem('tooth_code', e.target.value)}
+                    placeholder="upper_central_incisor_right" />
+                  
                     </div>
                     <div>
                       <label className="text-sm font-medium">{tr("adminteething_sira_421c5f", "Sıra")}</label>
                       <Input
-                        type="number"
-                        value={editingItem.sort_order || 0}
-                        onChange={(e) => updateEditingItem('sort_order', parseInt(e.target.value))}
-                      />
+                    type="number"
+                    value={editingItem.sort_order || 0}
+                    onChange={(e) => updateEditingItem('sort_order', parseInt(e.target.value))} />
+                  
                     </div>
                   </div>
                   <div>
                     <label className="text-sm font-medium">Ad (EN)</label>
                     <Input
-                      value={editingItem.name || ''}
-                      onChange={(e) => updateEditingItem('name', e.target.value)}
-                    />
+                  value={editingItem.name || ''}
+                  onChange={(e) => updateEditingItem('name', e.target.value)} />
+                
                   </div>
                   <div>
                     <label className="text-sm font-medium">Ad (AZ)</label>
                     <Input
-                      value={editingItem.name_az || ''}
-                      onChange={(e) => updateEditingItem('name_az', e.target.value)}
-                    />
+                  value={editingItem.name_az || ''}
+                  onChange={(e) => updateEditingItem('name_az', e.target.value)} />
+                
                   </div>
                   <div className="grid grid-cols-3 gap-4">
                     <div>
@@ -506,32 +506,32 @@ const AdminTeething = () => {
                     <div>
                       <label className="text-sm font-medium">Min Ay</label>
                       <Input
-                        type="number"
-                        value={editingItem.typical_emergence_months_min || ''}
-                        onChange={(e) => updateEditingItem('typical_emergence_months_min', parseInt(e.target.value))}
-                      />
+                    type="number"
+                    value={editingItem.typical_emergence_months_min || ''}
+                    onChange={(e) => updateEditingItem('typical_emergence_months_min', parseInt(e.target.value))} />
+                  
                     </div>
                     <div>
                       <label className="text-sm font-medium">Max Ay</label>
                       <Input
-                        type="number"
-                        value={editingItem.typical_emergence_months_max || ''}
-                        onChange={(e) => updateEditingItem('typical_emergence_months_max', parseInt(e.target.value))}
-                      />
+                    type="number"
+                    value={editingItem.typical_emergence_months_max || ''}
+                    onChange={(e) => updateEditingItem('typical_emergence_months_max', parseInt(e.target.value))} />
+                  
                     </div>
                   </div>
                 </>
-              )}
+            }
 
-              {activeTab === 'tips' && (
-                <>
+              {activeTab === 'tips' &&
+            <>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium">Emoji</label>
                       <Input
-                        value={editingItem.emoji || ''}
-                        onChange={(e) => updateEditingItem('emoji', e.target.value)}
-                      />
+                    value={editingItem.emoji || ''}
+                    onChange={(e) => updateEditingItem('emoji', e.target.value)} />
+                  
                     </div>
                     <div>
                       <label className="text-sm font-medium">Kateqoriya</label>
@@ -550,45 +550,45 @@ const AdminTeething = () => {
                   <div>
                     <label className="text-sm font-medium">{tr("adminteething_basliq_en_4ac905", "Başlıq (EN)")}</label>
                     <Input
-                      value={editingItem.title || ''}
-                      onChange={(e) => updateEditingItem('title', e.target.value)}
-                    />
+                  value={editingItem.title || ''}
+                  onChange={(e) => updateEditingItem('title', e.target.value)} />
+                
                   </div>
                   <div>
                     <label className="text-sm font-medium">{tr("adminteething_basliq_az_3e294a", "Başlıq (AZ)")}</label>
                     <Input
-                      value={editingItem.title_az || ''}
-                      onChange={(e) => updateEditingItem('title_az', e.target.value)}
-                    />
+                  value={editingItem.title_az || ''}
+                  onChange={(e) => updateEditingItem('title_az', e.target.value)} />
+                
                   </div>
                   <div>
                     <label className="text-sm font-medium">{tr("adminteething_mezmun_en_7541aa", "Məzmun (EN)")}</label>
                     <Textarea
-                      value={editingItem.content || ''}
-                      onChange={(e) => updateEditingItem('content', e.target.value)}
-                      rows={3}
-                    />
+                  value={editingItem.content || ''}
+                  onChange={(e) => updateEditingItem('content', e.target.value)}
+                  rows={3} />
+                
                   </div>
                   <div>
                     <label className="text-sm font-medium">{tr("adminteething_mezmun_az_d18d5f", "Məzmun (AZ)")}</label>
                     <Textarea
-                      value={editingItem.content_az || ''}
-                      onChange={(e) => updateEditingItem('content_az', e.target.value)}
-                      rows={3}
-                    />
+                  value={editingItem.content_az || ''}
+                  onChange={(e) => updateEditingItem('content_az', e.target.value)}
+                  rows={3} />
+                
                   </div>
                 </>
-              )}
+            }
 
-              {activeTab === 'symptoms' && (
-                <>
+              {activeTab === 'symptoms' &&
+            <>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium">Emoji</label>
                       <Input
-                        value={editingItem.emoji || ''}
-                        onChange={(e) => updateEditingItem('emoji', e.target.value)}
-                      />
+                    value={editingItem.emoji || ''}
+                    onChange={(e) => updateEditingItem('emoji', e.target.value)} />
+                  
                     </div>
                     <div>
                       <label className="text-sm font-medium">{tr("adminteething_siddet_afc814", "Şiddət")}</label>
@@ -605,42 +605,42 @@ const AdminTeething = () => {
                   <div>
                     <label className="text-sm font-medium">Ad (EN)</label>
                     <Input
-                      value={editingItem.name || ''}
-                      onChange={(e) => updateEditingItem('name', e.target.value)}
-                    />
+                  value={editingItem.name || ''}
+                  onChange={(e) => updateEditingItem('name', e.target.value)} />
+                
                   </div>
                   <div>
                     <label className="text-sm font-medium">Ad (AZ)</label>
                     <Input
-                      value={editingItem.name_az || ''}
-                      onChange={(e) => updateEditingItem('name_az', e.target.value)}
-                    />
+                  value={editingItem.name_az || ''}
+                  onChange={(e) => updateEditingItem('name_az', e.target.value)} />
+                
                   </div>
                   <div>
                     <label className="text-sm font-medium">{tr("adminteething_aciqlama_en_6fb6db", "Açıqlama (EN)")}</label>
                     <Textarea
-                      value={editingItem.description || ''}
-                      onChange={(e) => updateEditingItem('description', e.target.value)}
-                      rows={2}
-                    />
+                  value={editingItem.description || ''}
+                  onChange={(e) => updateEditingItem('description', e.target.value)}
+                  rows={2} />
+                
                   </div>
                   <div>
                     <label className="text-sm font-medium">{tr("adminteething_aciqlama_az_86f364", "Açıqlama (AZ)")}</label>
                     <Textarea
-                      value={editingItem.description_az || ''}
-                      onChange={(e) => updateEditingItem('description_az', e.target.value)}
-                      rows={2}
-                    />
+                  value={editingItem.description_az || ''}
+                  onChange={(e) => updateEditingItem('description_az', e.target.value)}
+                  rows={2} />
+                
                   </div>
                 </>
-              )}
+            }
 
               <Button onClick={handleSave} className="w-full">
                 <Save className="w-4 h-4 mr-2" />
                 Yadda Saxla
               </Button>
             </div>
-          )}
+          }
         </DialogContent>
       </Dialog>
 
@@ -653,10 +653,10 @@ const AdminTeething = () => {
         onDiscard={() => {
           setShowEditModal(false);
           setHasUnsavedChanges(false);
-        }}
-      />
-    </div>
-  );
+        }} />
+      
+    </div>);
+
 };
 
 export default AdminTeething;

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { tr } from "@/lib/tr";import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface EPDSQuestion {
@@ -6,7 +6,7 @@ export interface EPDSQuestion {
   question_number: number;
   question_text: string;
   question_text_az: string | null;
-  options: { value: number; text: string; text_az: string }[];
+  options: {value: number;text: string;text_az: string;}[];
   is_reverse_scored: boolean;
 }
 
@@ -51,19 +51,19 @@ export const useEPDSQuestionsDB = () => {
   return useQuery({
     queryKey: ['epds-questions'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('epds_questions')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order');
-      
+      const { data, error } = await supabase.
+      from('epds_questions').
+      select('*').
+      eq('is_active', true).
+      order('sort_order');
+
       if (error) throw error;
-      return (data || []).map(q => ({
+      return (data || []).map((q) => ({
         ...q,
-        options: (q.options as { value: number; text: string; text_az: string }[]) || [],
+        options: q.options as {value: number;text: string;text_az: string;}[] || []
       })) as EPDSQuestion[];
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5 // 5 minutes
   });
 };
 
@@ -71,16 +71,16 @@ export const useMoodLevelsDB = () => {
   return useQuery({
     queryKey: ['mood-levels'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('mood_levels')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order');
-      
+      const { data, error } = await supabase.
+      from('mood_levels').
+      select('*').
+      eq('is_active', true).
+      order('sort_order');
+
       if (error) throw error;
       return data as MoodLevel[];
     },
-    staleTime: 1000 * 60 * 30,
+    staleTime: 1000 * 60 * 30
   });
 };
 
@@ -88,16 +88,16 @@ export const useBreathingExercisesDB = () => {
   return useQuery({
     queryKey: ['breathing-exercises'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('breathing_exercises')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order');
-      
+      const { data, error } = await supabase.
+      from('breathing_exercises').
+      select('*').
+      eq('is_active', true).
+      order('sort_order');
+
       if (error) throw error;
       return data as BreathingExercise[];
     },
-    staleTime: 1000 * 60 * 30,
+    staleTime: 1000 * 60 * 30
   });
 };
 
@@ -105,57 +105,56 @@ export const useNoiseThresholdsDB = () => {
   return useQuery({
     queryKey: ['noise-thresholds'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('noise_thresholds')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order');
-      
+      const { data, error } = await supabase.
+      from('noise_thresholds').
+      select('*').
+      eq('is_active', true).
+      order('sort_order');
+
       if (error) throw error;
       return data as NoiseThreshold[];
     },
-    staleTime: 1000 * 60 * 30,
+    staleTime: 1000 * 60 * 30
   });
 };
 
 // Fallback data for when DB is empty
 export const FALLBACK_MOOD_LEVELS: MoodLevel[] = [
-  { id: '1', mood_value: 1, label: 'Very Bad', label_az: 'Çox pis', emoji: '😢', color: '#ef4444' },
-  { id: '2', mood_value: 2, label: 'Bad', label_az: 'Pis', emoji: '😔', color: '#f97316' },
-  { id: '3', mood_value: 3, label: 'Okay', label_az: 'Normal', emoji: '😐', color: '#eab308' },
-  { id: '4', mood_value: 4, label: 'Good', label_az: 'Yaxşı', emoji: '😊', color: '#22c55e' },
-  { id: '5', mood_value: 5, label: 'Great', label_az: 'Əla', emoji: '🥰', color: '#10b981' },
-];
+{ id: '1', mood_value: 1, label: 'Very Bad', label_az: tr("usementalhealthdata_cox_pis_e041c5", "\xC7ox pis"), emoji: '😢', color: '#ef4444' },
+{ id: '2', mood_value: 2, label: 'Bad', label_az: 'Pis', emoji: '😔', color: '#f97316' },
+{ id: '3', mood_value: 3, label: 'Okay', label_az: 'Normal', emoji: '😐', color: '#eab308' },
+{ id: '4', mood_value: 4, label: 'Good', label_az: tr("usementalhealthdata_yaxsi_9d8595", "Yax\u015F\u0131"), emoji: '😊', color: '#22c55e' },
+{ id: '5', mood_value: 5, label: 'Great', label_az: tr("usementalhealthdata_ela_720a0e", "\u018Fla"), emoji: '🥰', color: '#10b981' }];
+
 
 export const FALLBACK_BREATHING_EXERCISES: BreathingExercise[] = [
-  { 
-    id: '1', 
-    name: '4-7-8 Breathing', 
-    name_az: '4-7-8 Nəfəs',
-    description: 'A relaxation technique that promotes calm and sleep',
-    description_az: 'Sakitlik və yuxuya kömək edən relaksasiya texnikası',
-    icon: 'Wind',
-    color: '#8b5cf6',
-    inhale_seconds: 4,
-    hold_seconds: 7,
-    exhale_seconds: 8,
-    hold_after_exhale_seconds: 0,
-    total_cycles: 4,
-    benefits_az: ['Stressi azaldır', 'Yuxuya kömək edir']
-  },
-  { 
-    id: '2', 
-    name: 'Box Breathing', 
-    name_az: 'Qutu Nəfəsi',
-    description: 'A technique used by Navy SEALs for stress control',
-    description_az: 'Stress nəzarəti üçün texnika',
-    icon: 'Square',
-    color: '#3b82f6',
-    inhale_seconds: 4,
-    hold_seconds: 4,
-    exhale_seconds: 4,
-    hold_after_exhale_seconds: 4,
-    total_cycles: 4,
-    benefits_az: ['Diqqəti artırır', 'Narahatlığı azaldır']
-  },
-];
+{
+  id: '1',
+  name: '4-7-8 Breathing',
+  name_az: tr("usementalhealthdata_4_7_8_nefes_3ae243", "4-7-8 N\u0259f\u0259s"),
+  description: 'A relaxation technique that promotes calm and sleep',
+  description_az: tr("usementalhealthdata_sakitlik_ve_yuxuya_komek_eden__f1b25c", "Sakitlik v\u0259 yuxuya k\xF6m\u0259k ed\u0259n relaksasiya texnikas\u0131"),
+  icon: 'Wind',
+  color: '#8b5cf6',
+  inhale_seconds: 4,
+  hold_seconds: 7,
+  exhale_seconds: 8,
+  hold_after_exhale_seconds: 0,
+  total_cycles: 4,
+  benefits_az: [tr("usementalhealthdata_stressi_azaldir_80384b", "Stressi azald\u0131r"), tr("usementalhealthdata_yuxuya_komek_edir_bc795a", "Yuxuya k\xF6m\u0259k edir")]
+},
+{
+  id: '2',
+  name: 'Box Breathing',
+  name_az: tr("usementalhealthdata_qutu_nefesi_7667cf", "Qutu N\u0259f\u0259si"),
+  description: 'A technique used by Navy SEALs for stress control',
+  description_az: tr("usementalhealthdata_stress_nezareti_ucun_texnika_83964c", "Stress n\u0259zar\u0259ti \xFC\xE7\xFCn texnika"),
+  icon: 'Square',
+  color: '#3b82f6',
+  inhale_seconds: 4,
+  hold_seconds: 4,
+  exhale_seconds: 4,
+  hold_after_exhale_seconds: 4,
+  total_cycles: 4,
+  benefits_az: [tr("usementalhealthdata_diqqeti_artirir_6ef41b", "Diqq\u0259ti art\u0131r\u0131r"), tr("usementalhealthdata_narahatligi_azaldir_9bb2df", "Narahatl\u0131\u011F\u0131 azald\u0131r")]
+}];

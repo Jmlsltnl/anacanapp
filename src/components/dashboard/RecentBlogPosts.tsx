@@ -10,10 +10,10 @@ interface RecentBlogPostsProps {
   lifeStage?: BlogLifeStage;
 }
 
-const BlogPostCard = ({ post, index, onClick }: { post: BlogPost; index: number; onClick: () => void }) => {
-  const timeAgo = formatDistanceToNow(new Date(post.created_at), { 
-    addSuffix: true, 
-    locale: az 
+const BlogPostCard = ({ post, index, onClick }: {post: BlogPost;index: number;onClick: () => void;}) => {
+  const timeAgo = formatDistanceToNow(new Date(post.created_at), {
+    addSuffix: true,
+    locale: az
   });
 
   return (
@@ -22,21 +22,21 @@ const BlogPostCard = ({ post, index, onClick }: { post: BlogPost; index: number;
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
       onClick={onClick}
-      className="flex gap-3 p-3 bg-card rounded-2xl border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/30 transition-all text-left w-full group"
-    >
+      className="flex gap-3 p-3 bg-card rounded-2xl border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/30 transition-all text-left w-full group">
+      
       {/* Thumbnail */}
       <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-muted">
-        {post.cover_image_url ? (
-          <img 
-            src={post.cover_image_url} 
-            alt={post.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+        {post.cover_image_url ?
+        <img
+          src={post.cover_image_url}
+          alt={post.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" /> :
+
+
+        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
             <BookOpen className="w-6 h-6 text-primary/50" />
           </div>
-        )}
+        }
       </div>
 
       {/* Content */}
@@ -49,7 +49,7 @@ const BlogPostCard = ({ post, index, onClick }: { post: BlogPost; index: number;
         <div className="flex items-center gap-3 mt-1.5">
           <div className="flex items-center gap-1 text-muted-foreground">
             <Clock className="w-3 h-3" />
-            <span className="text-[10px]">{post.reading_time} dəq</span>
+            <span className="text-[10px]">{post.reading_time} {tr("recentblogposts_deq_780a5c", "d\u0259q")}</span>
           </div>
           <div className="flex items-center gap-1 text-muted-foreground">
             <Eye className="w-3 h-3" />
@@ -63,18 +63,18 @@ const BlogPostCard = ({ post, index, onClick }: { post: BlogPost; index: number;
       <div className="flex items-center">
         <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
       </div>
-    </motion.button>
-  );
+    </motion.button>);
+
 };
 
 const RecentBlogPosts = ({ onNavigate, lifeStage }: RecentBlogPostsProps) => {
   const { posts, loading } = useBlog();
-  
+
   // Filter posts strictly by life stage - only show posts for the current stage
-  const filteredByStage = lifeStage 
-    ? posts.filter(p => p.life_stage === lifeStage)
-    : posts;
-  
+  const filteredByStage = lifeStage ?
+  posts.filter((p) => p.life_stage === lifeStage) :
+  posts;
+
   // Get only the 3 most recent filtered posts
   const recentPosts = filteredByStage.slice(0, 4);
 
@@ -83,25 +83,25 @@ const RecentBlogPosts = ({ onNavigate, lifeStage }: RecentBlogPostsProps) => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="mt-5"
-      >
+        className="mt-5">
+        
         <div className="flex items-center justify-between mb-3">
           <div className="h-5 w-24 bg-muted rounded-lg animate-pulse" />
           <div className="h-4 w-20 bg-muted rounded-lg animate-pulse" />
         </div>
         <div className="space-y-3">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="flex gap-3 p-3 bg-card rounded-2xl border border-border/50">
+          {[1, 2, 3, 4].map((i) =>
+          <div key={i} className="flex gap-3 p-3 bg-card rounded-2xl border border-border/50">
               <div className="w-20 h-20 rounded-xl bg-muted animate-pulse" />
               <div className="flex-1 space-y-2">
                 <div className="h-4 w-3/4 bg-muted rounded animate-pulse" />
                 <div className="h-3 w-1/2 bg-muted rounded animate-pulse" />
               </div>
             </div>
-          ))}
+          )}
         </div>
-      </motion.div>
-    );
+      </motion.div>);
+
   }
 
   if (recentPosts.length === 0) {
@@ -112,8 +112,8 @@ const RecentBlogPosts = ({ onNavigate, lifeStage }: RecentBlogPostsProps) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mt-5"
-    >
+      className="mt-5">
+      
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
@@ -125,8 +125,8 @@ const RecentBlogPosts = ({ onNavigate, lifeStage }: RecentBlogPostsProps) => {
         <motion.button
           onClick={() => onNavigate('blog')}
           className="flex items-center gap-1 text-primary text-sm font-semibold hover:gap-2 transition-all"
-          whileTap={{ scale: 0.95 }}
-        >
+          whileTap={{ scale: 0.95 }}>
+          
           {tr('blogscreen_all_filter', 'Hamısı')}
           <ChevronRight className="w-4 h-4" />
         </motion.button>
@@ -134,17 +134,17 @@ const RecentBlogPosts = ({ onNavigate, lifeStage }: RecentBlogPostsProps) => {
 
       {/* Posts List */}
       <div className="space-y-2.5">
-        {recentPosts.map((post, index) => (
-          <BlogPostCard 
-            key={post.id} 
-            post={post} 
-            index={index}
-            onClick={() => onNavigate(`blog/${post.slug}`)}
-          />
-        ))}
+        {recentPosts.map((post, index) =>
+        <BlogPostCard
+          key={post.id}
+          post={post}
+          index={index}
+          onClick={() => onNavigate(`blog/${post.slug}`)} />
+
+        )}
       </div>
-    </motion.div>
-  );
+    </motion.div>);
+
 };
 
 export default RecentBlogPosts;

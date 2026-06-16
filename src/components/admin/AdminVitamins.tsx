@@ -31,7 +31,7 @@ const AdminVitamins = () => {
     importance: 'recommended',
     icon_emoji: '💊',
     is_active: true,
-    sort_order: 0,
+    sort_order: 0
   });
 
   const resetForm = () => {
@@ -49,7 +49,7 @@ const AdminVitamins = () => {
       importance: 'recommended',
       icon_emoji: '💊',
       is_active: true,
-      sort_order: 0,
+      sort_order: 0
     });
     setEditingVitamin(null);
   };
@@ -75,7 +75,7 @@ const AdminVitamins = () => {
       importance: vitamin.importance || 'recommended',
       icon_emoji: vitamin.icon_emoji || '💊',
       is_active: vitamin.is_active,
-      sort_order: vitamin.sort_order || 0,
+      sort_order: vitamin.sort_order || 0
     });
     setIsModalOpen(true);
   };
@@ -87,8 +87,8 @@ const AdminVitamins = () => {
         name_az: formData.name_az || null,
         description: formData.description_az || null,
         description_az: formData.description_az || null,
-        benefits: formData.benefits ? formData.benefits.split('\n').filter(b => b.trim()) : null,
-        food_sources: formData.food_sources ? formData.food_sources.split('\n').filter(f => f.trim()) : null,
+        benefits: formData.benefits ? formData.benefits.split('\n').filter((b) => b.trim()) : null,
+        food_sources: formData.food_sources ? formData.food_sources.split('\n').filter((f) => f.trim()) : null,
         dosage: formData.dosage || null,
         week_start: formData.week_start ? parseInt(formData.week_start) : null,
         week_end: formData.week_end ? parseInt(formData.week_end) : null,
@@ -97,36 +97,36 @@ const AdminVitamins = () => {
         importance: formData.importance,
         icon_emoji: formData.icon_emoji,
         is_active: formData.is_active,
-        sort_order: formData.sort_order,
+        sort_order: formData.sort_order
       };
 
       if (editingVitamin) {
         await updateVitamin.mutateAsync({ id: editingVitamin.id, ...vitaminData });
-        toast.success('Vitamin yeniləndi');
+        toast.success(tr("adminvitamins_vitamin_yenilendi_f137eb", "Vitamin yenil\u0259ndi"));
       } else {
         await createVitamin.mutateAsync(vitaminData);
-        toast.success('Vitamin əlavə edildi');
+        toast.success(tr("adminvitamins_vitamin_elave_edildi_b2e88b", "Vitamin \u0259lav\u0259 edildi"));
       }
       setIsModalOpen(false);
       resetForm();
     } catch (error) {
-      toast.error('Xəta baş verdi');
+      toast.error(tr("adminvitamins_xeta_bas_verdi_f22fba", "X\u0259ta ba\u015F verdi"));
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bu vitamini silmək istədiyinizə əminsiniz?')) return;
+    if (!confirm(tr("adminvitamins_bu_vitamini_silmek_istediyiniz_4bcf37", "Bu vitamini silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
     try {
       await deleteVitamin.mutateAsync(id);
       toast.success('Vitamin silindi');
     } catch (error) {
-      toast.error('Xəta baş verdi');
+      toast.error(tr("adminvitamins_xeta_bas_verdi_f22fba", "X\u0259ta ba\u015F verdi"));
     }
   };
 
-  const filteredVitamins = vitamins.filter(v => {
+  const filteredVitamins = vitamins.filter((v) => {
     const matchesSearch = v.name.toLowerCase().includes(search.toLowerCase()) ||
-      v.name_az?.toLowerCase().includes(search.toLowerCase());
+    v.name_az?.toLowerCase().includes(search.toLowerCase());
     const matchesStage = filterStage === 'all' || v.life_stage === filterStage;
     return matchesSearch && matchesStage;
   });
@@ -135,8 +135,8 @@ const AdminVitamins = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -145,13 +145,13 @@ const AdminVitamins = () => {
         <div>
           <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
             <Pill className="w-5 h-5 text-primary" />
-            Vitaminlər
+            {tr("adminvitamins_vitaminler_e49129", "Vitaminl\u0259r")}
           </h1>
           <p className="text-sm text-muted-foreground">{tr("adminvitamins_heftelik_vitamin_tovsiyelerini_idare_edi_d31541", "Həftəlik vitamin tövsiyələrini idarə edin")}</p>
         </div>
         <Button onClick={openCreateModal} size="sm">
           <Plus className="w-4 h-4 mr-1" />
-          Əlavə et
+          {tr("adminvitamins_elave_et_6e1b9b", "\u018Flav\u0259 et")}
         </Button>
       </div>
 
@@ -162,9 +162,9 @@ const AdminVitamins = () => {
           <Input
             placeholder="Axtar..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="pl-9 h-9"
-          />
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 h-9" />
+          
         </div>
         <Select value={filterStage} onValueChange={setFilterStage}>
           <SelectTrigger className="w-32 h-9">
@@ -181,14 +181,14 @@ const AdminVitamins = () => {
 
       {/* Vitamins List */}
       <div className="grid gap-3">
-        {filteredVitamins.map((vitamin, index) => (
-          <motion.div
-            key={vitamin.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.03 }}
-            className={`bg-card border rounded-xl p-3 ${!vitamin.is_active ? 'opacity-50' : ''}`}
-          >
+        {filteredVitamins.map((vitamin, index) =>
+        <motion.div
+          key={vitamin.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.03 }}
+          className={`bg-card border rounded-xl p-3 ${!vitamin.is_active ? 'opacity-50' : ''}`}>
+          
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-xl">
                 {vitamin.icon_emoji}
@@ -197,11 +197,11 @@ const AdminVitamins = () => {
                 <div className="flex items-center gap-2">
                   <h3 className="font-semibold text-sm">{vitamin.name_az || vitamin.name}</h3>
                   <span className={`text-[10px] px-1.5 py-0.5 rounded ${
-                    vitamin.importance === 'essential' 
-                      ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' 
-                      : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                  }`}>
-                    {vitamin.importance === 'essential' ? 'Vacib' : 'Tövsiyə'}
+                vitamin.importance === 'essential' ?
+                'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'}`
+                }>
+                    {vitamin.importance === 'essential' ? 'Vacib' : tr("adminvitamins_tovsiye_712d0f", "T\xF6vsiy\u0259")}
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
@@ -209,22 +209,22 @@ const AdminVitamins = () => {
                 </p>
                 <div className="flex items-center gap-2 mt-1.5 text-[10px] text-muted-foreground">
                   <span className="px-1.5 py-0.5 bg-muted rounded">
-                    {vitamin.life_stage === 'bump' ? 'Hamiləlik' : vitamin.life_stage === 'mommy' ? 'Anacan' : 'Ümumi'}
+                    {vitamin.life_stage === 'bump' ? tr("adminvitamins_hamilelik_e86feb", "Hamil\u0259lik") : vitamin.life_stage === 'mommy' ? 'Anacan' : tr("adminvitamins_umumi_1b5521", "\xDCmumi")}
                   </span>
-                  {vitamin.trimester && vitamin.trimester.length === 3 && (
-                    <span className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/30 rounded text-purple-700 dark:text-purple-400">{tr("adminvitamins_her_uc_trimester_ceff3a", "Hər üç trimester")}</span>
-                  )}
-                  {vitamin.trimester && vitamin.trimester.length > 0 && vitamin.trimester.length < 3 && (
-                    <span className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/30 rounded text-purple-700 dark:text-purple-400">
+                  {vitamin.trimester && vitamin.trimester.length === 3 &&
+                <span className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/30 rounded text-purple-700 dark:text-purple-400">{tr("adminvitamins_her_uc_trimester_ceff3a", "Hər üç trimester")}</span>
+                }
+                  {vitamin.trimester && vitamin.trimester.length > 0 && vitamin.trimester.length < 3 &&
+                <span className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/30 rounded text-purple-700 dark:text-purple-400">
                       Trimester {vitamin.trimester.join(', ')}
                     </span>
-                  )}
-                  {vitamin.week_start && vitamin.week_end && (
-                    <span>Həftə {vitamin.week_start}-{vitamin.week_end}</span>
-                  )}
-                  {vitamin.dosage && (
-                    <span>• {vitamin.dosage}</span>
-                  )}
+                }
+                  {vitamin.week_start && vitamin.week_end &&
+                <span>{tr("adminvitamins_hefte_3aa886", "H\u0259ft\u0259")} {vitamin.week_start}-{vitamin.week_end}</span>
+                }
+                  {vitamin.dosage &&
+                <span>• {vitamin.dosage}</span>
+                }
                 </div>
               </div>
               <div className="flex items-center gap-1">
@@ -237,21 +237,21 @@ const AdminVitamins = () => {
               </div>
             </div>
           </motion.div>
-        ))}
+        )}
 
-        {filteredVitamins.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
+        {filteredVitamins.length === 0 &&
+        <div className="text-center py-12 text-muted-foreground">
             <Leaf className="w-12 h-12 mx-auto mb-3 opacity-50" />
             <p>{tr("adminvitamins_vitamin_tapilmadi_f35170", "Vitamin tapılmadı")}</p>
           </div>
-        )}
+        }
       </div>
 
       {/* Create/Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingVitamin ? 'Vitamini Redaktə Et' : 'Yeni Vitamin'}</DialogTitle>
+            <DialogTitle>{editingVitamin ? tr("adminvitamins_vitamini_redakte_et_9033aa", "Vitamini Redakt\u0259 Et") : 'Yeni Vitamin'}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-3">
@@ -260,19 +260,19 @@ const AdminVitamins = () => {
                 <label className="text-xs text-muted-foreground mb-1 block">Ad (EN)</label>
                 <Input
                   value={formData.name}
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Vitamin D"
-                  className="h-9"
-                />
+                  className="h-9" />
+                
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Ad (AZ)</label>
                 <Input
                   value={formData.name_az}
-                  onChange={e => setFormData({ ...formData, name_az: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, name_az: e.target.value })}
                   placeholder="D vitamini"
-                  className="h-9"
-                />
+                  className="h-9" />
+                
               </div>
             </div>
 
@@ -280,10 +280,10 @@ const AdminVitamins = () => {
               <label className="text-xs text-muted-foreground mb-1 block">{tr("adminvitamins_tesvir_az_2c237a", "Təsvir (AZ)")}</label>
               <Textarea
                 value={formData.description_az}
-                onChange={e => setFormData({ ...formData, description_az: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, description_az: e.target.value })}
                 placeholder={tr("adminvitamins_vitaminin_faydalari_haqqinda_a3e855", "Vitaminin faydaları haqqında...")}
-                rows={2}
-              />
+                rows={2} />
+              
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -291,19 +291,19 @@ const AdminVitamins = () => {
                 <label className="text-xs text-muted-foreground mb-1 block">{tr("adminvitamins_faydalari_her_setirde_1_872e37", "Faydaları (hər sətirdə 1)")}</label>
                 <Textarea
                   value={formData.benefits}
-                  onChange={e => setFormData({ ...formData, benefits: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, benefits: e.target.value })}
                   placeholder={tr("adminvitamins_sumuk_saglamligi_10_immun_sistem_desteyi_54fc6a", "Sümük sağlamlığı&#10;İmmun sistem dəstəyi")}
-                  rows={3}
-                />
+                  rows={3} />
+                
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">{tr("adminvitamins_qida_menbeleri_her_setirde_1_197057", "Qida mənbələri (hər sətirdə 1)")}</label>
                 <Textarea
                   value={formData.food_sources}
-                  onChange={e => setFormData({ ...formData, food_sources: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, food_sources: e.target.value })}
                   placeholder={tr("adminvitamins_sud_mehsullari_10_baliq_10_yumurta_e6328b", "Süd məhsulları&#10;Balıq&#10;Yumurta")}
-                  rows={3}
-                />
+                  rows={3} />
+                
               </div>
             </div>
 
@@ -312,28 +312,28 @@ const AdminVitamins = () => {
                 <label className="text-xs text-muted-foreground mb-1 block">Dozaj</label>
                 <Input
                   value={formData.dosage}
-                  onChange={e => setFormData({ ...formData, dosage: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, dosage: e.target.value })}
                   placeholder={tr("adminvitamins_400_iu_gun_74a3aa", "400 IU/gün")}
-                  className="h-9"
-                />
+                  className="h-9" />
+                
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Emoji</label>
                 <Input
                   value={formData.icon_emoji}
-                  onChange={e => setFormData({ ...formData, icon_emoji: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, icon_emoji: e.target.value })}
                   placeholder="💊"
-                  className="h-9"
-                />
+                  className="h-9" />
+                
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">{tr("adminvitamins_sira_421c5f", "Sıra")}</label>
                 <Input
                   type="number"
                   value={formData.sort_order}
-                  onChange={e => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
-                  className="h-9"
-                />
+                  onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
+                  className="h-9" />
+                
               </div>
             </div>
 
@@ -343,59 +343,59 @@ const AdminVitamins = () => {
                 <Input
                   type="number"
                   value={formData.week_start}
-                  onChange={e => setFormData({ ...formData, week_start: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, week_start: e.target.value })}
                   placeholder="1"
-                  className="h-9"
-                />
+                  className="h-9" />
+                
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">{tr("adminvitamins_hefte_son_078eb1", "Həftə (son)")}</label>
                 <Input
                   type="number"
                   value={formData.week_end}
-                  onChange={e => setFormData({ ...formData, week_end: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, week_end: e.target.value })}
                   placeholder="40"
-                  className="h-9"
-                />
+                  className="h-9" />
+                
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">{tr("adminvitamins_trimestrler_3800f5", "Trimestrlər")}</label>
                 <div className="flex flex-wrap gap-2">
                   {[
-                    { value: 1, label: '1-ci' },
-                    { value: 2, label: '2-ci' },
-                    { value: 3, label: tr("adminvitamins_3_cu_af0141", "3-cü") },
-                  ].map(t => (
-                    <button
-                      key={t.value}
-                      type="button"
-                      onClick={() => {
-                        const current = formData.trimesters;
-                        const updated = current.includes(t.value)
-                          ? current.filter(v => v !== t.value)
-                          : [...current, t.value].sort();
-                        setFormData({ ...formData, trimesters: updated });
-                      }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                        formData.trimesters.includes(t.value)
-                          ? 'bg-primary text-primary-foreground border-primary'
-                          : 'bg-muted text-muted-foreground border-border hover:bg-muted/80'
-                      }`}
-                    >
+                  { value: 1, label: '1-ci' },
+                  { value: 2, label: '2-ci' },
+                  { value: 3, label: tr("adminvitamins_3_cu_af0141", "3-cü") }].
+                  map((t) =>
+                  <button
+                    key={t.value}
+                    type="button"
+                    onClick={() => {
+                      const current = formData.trimesters;
+                      const updated = current.includes(t.value) ?
+                      current.filter((v) => v !== t.value) :
+                      [...current, t.value].sort();
+                      setFormData({ ...formData, trimesters: updated });
+                    }}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                    formData.trimesters.includes(t.value) ?
+                    'bg-primary text-primary-foreground border-primary' :
+                    'bg-muted text-muted-foreground border-border hover:bg-muted/80'}`
+                    }>
+                    
                       {t.label}
                     </button>
-                  ))}
+                  )}
                 </div>
-                {formData.trimesters.length === 3 && (
-                  <p className="text-[10px] text-primary mt-1">{tr("adminvitamins_her_uc_trimester_secildi_3c6bfa", "✓ Hər üç trimester seçildi")}</p>
-                )}
+                {formData.trimesters.length === 3 &&
+                <p className="text-[10px] text-primary mt-1">{tr("adminvitamins_her_uc_trimester_secildi_3c6bfa", "✓ Hər üç trimester seçildi")}</p>
+                }
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">{tr("adminvitamins_merhele_0e09aa", "Mərhələ")}</label>
-                <Select value={formData.life_stage} onValueChange={v => setFormData({ ...formData, life_stage: v })}>
+                <Select value={formData.life_stage} onValueChange={(v) => setFormData({ ...formData, life_stage: v })}>
                   <SelectTrigger className="h-9">
                     <SelectValue />
                   </SelectTrigger>
@@ -408,7 +408,7 @@ const AdminVitamins = () => {
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">{tr("adminvitamins_ehemiyyet_bfefa3", "Əhəmiyyət")}</label>
-                <Select value={formData.importance} onValueChange={v => setFormData({ ...formData, importance: v })}>
+                <Select value={formData.importance} onValueChange={(v) => setFormData({ ...formData, importance: v })}>
                   <SelectTrigger className="h-9">
                     <SelectValue />
                   </SelectTrigger>
@@ -424,14 +424,14 @@ const AdminVitamins = () => {
               <div className="flex items-center gap-2">
                 <Switch
                   checked={formData.is_active}
-                  onCheckedChange={v => setFormData({ ...formData, is_active: v })}
-                />
+                  onCheckedChange={(v) => setFormData({ ...formData, is_active: v })} />
+                
                 <span className="text-sm">Aktiv</span>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setIsModalOpen(false)}>
                   <X className="w-4 h-4 mr-1" />
-                  Ləğv et
+                  {tr("adminvitamins_legv_et_b5e49c", "L\u0259\u011Fv et")}
                 </Button>
                 <Button onClick={handleSave} disabled={!formData.name}>
                   <Check className="w-4 h-4 mr-1" />
@@ -442,8 +442,8 @@ const AdminVitamins = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AdminVitamins;

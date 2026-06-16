@@ -10,17 +10,17 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { 
-  useAdminOnboardingStages, 
+import {
+  useAdminOnboardingStages,
   useAdminMultiplesOptions,
   OnboardingStage,
-  MultiplesOption 
-} from '@/hooks/useAdminOnboarding';
+  MultiplesOption } from
+'@/hooks/useAdminOnboarding';
 
 const AdminOnboarding = () => {
   const stages = useAdminOnboardingStages();
   const multiples = useAdminMultiplesOptions();
-  
+
   const [activeTab, setActiveTab] = useState('stages');
   const [showStageModal, setShowStageModal] = useState(false);
   const [showMultipleModal, setShowMultipleModal] = useState(false);
@@ -44,7 +44,7 @@ const AdminOnboarding = () => {
       icon_name: 'Baby',
       bg_gradient: 'from-purple-500 to-pink-600',
       sort_order: 0,
-      is_active: true,
+      is_active: true
     });
     setShowStageModal(true);
   };
@@ -65,7 +65,7 @@ const AdminOnboarding = () => {
   };
 
   const handleDeleteStage = async (id: string) => {
-    if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
+    if (!confirm(tr("adminonboarding_silmek_istediyinize_eminsiniz_09658f", "Silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
     await stages.remove.mutateAsync(id);
   };
 
@@ -79,7 +79,7 @@ const AdminOnboarding = () => {
       emoji: '👶',
       baby_count: 1,
       sort_order: 0,
-      is_active: true,
+      is_active: true
     });
     setShowMultipleModal(true);
   };
@@ -100,7 +100,7 @@ const AdminOnboarding = () => {
   };
 
   const handleDeleteMultiple = async (id: string) => {
-    if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
+    if (!confirm(tr("adminonboarding_silmek_istediyinize_eminsiniz_09658f", "Silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
     await multiples.remove.mutateAsync(id);
   };
 
@@ -143,7 +143,7 @@ const AdminOnboarding = () => {
               <Sparkles className="w-5 h-5 text-green-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{stages.data?.filter(s => s.is_active).length || 0}</p>
+              <p className="text-2xl font-bold">{stages.data?.filter((s) => s.is_active).length || 0}</p>
               <p className="text-xs text-muted-foreground">{tr("adminonboarding_aktiv_merhele_f4c424", "Aktiv Mərhələ")}</p>
             </div>
           </div>
@@ -154,7 +154,7 @@ const AdminOnboarding = () => {
               <Baby className="w-5 h-5 text-purple-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{multiples.data?.filter(m => m.is_active).length || 0}</p>
+              <p className="text-2xl font-bold">{multiples.data?.filter((m) => m.is_active).length || 0}</p>
               <p className="text-xs text-muted-foreground">{tr("adminonboarding_aktiv_coxluq_564cca", "Aktiv Çoxluq")}</p>
             </div>
           </div>
@@ -172,29 +172,29 @@ const AdminOnboarding = () => {
           <div className="flex justify-end">
             <Button onClick={openCreateStageModal} className="gap-2">
               <Plus className="w-4 h-4" />
-              Yeni Mərhələ
+              {tr("adminonboarding_yeni_merhele_bd7533", "Yeni M\u0259rh\u0259l\u0259")}
             </Button>
           </div>
 
           <Card>
             <CardHeader>
-              <CardTitle>Həyat Mərhələləri ({stages.data?.length || 0})</CardTitle>
+              <CardTitle>{tr("adminonboarding_heyat_merheleleri_0bdd4c", "H\u0259yat M\u0259rh\u0259l\u0259l\u0259ri (")}{stages.data?.length || 0})</CardTitle>
             </CardHeader>
             <CardContent>
-              {stages.isLoading ? (
-                <div className="text-center py-8 text-muted-foreground">{tr("adminonboarding_yuklenir_5557de", "Yüklənir...")}</div>
-              ) : (stages.data?.length || 0) === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">{tr("adminonboarding_merhele_tapilmadi_32ebcd", "Mərhələ tapılmadı")}</div>
-              ) : (
-                <div className="space-y-3">
-                  {stages.data?.map((stage, index) => (
-                    <motion.div
-                      key={stage.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.03 }}
-                      className="flex items-center justify-between p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
-                    >
+              {stages.isLoading ?
+              <div className="text-center py-8 text-muted-foreground">{tr("adminonboarding_yuklenir_5557de", "Yüklənir...")}</div> :
+              (stages.data?.length || 0) === 0 ?
+              <div className="text-center py-8 text-muted-foreground">{tr("adminonboarding_merhele_tapilmadi_32ebcd", "Mərhələ tapılmadı")}</div> :
+
+              <div className="space-y-3">
+                  {stages.data?.map((stage, index) =>
+                <motion.div
+                  key={stage.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.03 }}
+                  className="flex items-center justify-between p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors">
+                  
                       <div className="flex items-center gap-4">
                         <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stage.bg_gradient} flex items-center justify-center text-2xl text-white`}>
                           {stage.emoji}
@@ -209,7 +209,7 @@ const AdminOnboarding = () => {
                           <p className="text-sm text-muted-foreground">{stage.subtitle_az || stage.subtitle}</p>
                           <div className="flex items-center gap-2 mt-1">
                             <Badge variant="outline">{stage.stage_id}</Badge>
-                            <span className="text-xs text-muted-foreground">Sıra: {stage.sort_order}</span>
+                            <span className="text-xs text-muted-foreground">{tr("adminonboarding_sira_d654d0", "S\u0131ra:")} {stage.sort_order}</span>
                           </div>
                         </div>
                       </div>
@@ -222,9 +222,9 @@ const AdminOnboarding = () => {
                         </Button>
                       </div>
                     </motion.div>
-                  ))}
+                )}
                 </div>
-              )}
+              }
             </CardContent>
           </Card>
         </TabsContent>
@@ -233,29 +233,29 @@ const AdminOnboarding = () => {
           <div className="flex justify-end">
             <Button onClick={openCreateMultipleModal} className="gap-2">
               <Plus className="w-4 h-4" />
-              Yeni Seçim
+              {tr("adminonboarding_yeni_secim_b1b8e4", "Yeni Se\xE7im")}
             </Button>
           </div>
 
           <Card>
             <CardHeader>
-              <CardTitle>Çoxluq Seçimləri ({multiples.data?.length || 0})</CardTitle>
+              <CardTitle>{tr("adminonboarding_coxluq_secimleri_c95869", "\xC7oxluq Se\xE7iml\u0259ri (")}{multiples.data?.length || 0})</CardTitle>
             </CardHeader>
             <CardContent>
-              {multiples.isLoading ? (
-                <div className="text-center py-8 text-muted-foreground">{tr("adminonboarding_yuklenir_5557de", "Yüklənir...")}</div>
-              ) : (multiples.data?.length || 0) === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">{tr("adminonboarding_secim_tapilmadi_f906d4", "Seçim tapılmadı")}</div>
-              ) : (
-                <div className="space-y-3">
-                  {multiples.data?.map((option, index) => (
-                    <motion.div
-                      key={option.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.03 }}
-                      className="flex items-center justify-between p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
-                    >
+              {multiples.isLoading ?
+              <div className="text-center py-8 text-muted-foreground">{tr("adminonboarding_yuklenir_5557de", "Yüklənir...")}</div> :
+              (multiples.data?.length || 0) === 0 ?
+              <div className="text-center py-8 text-muted-foreground">{tr("adminonboarding_secim_tapilmadi_f906d4", "Seçim tapılmadı")}</div> :
+
+              <div className="space-y-3">
+                  {multiples.data?.map((option, index) =>
+                <motion.div
+                  key={option.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.03 }}
+                  className="flex items-center justify-between p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors">
+                  
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-2xl">
                           {option.emoji}
@@ -268,8 +268,8 @@ const AdminOnboarding = () => {
                             </Badge>
                           </div>
                           <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="outline">{option.baby_count} uşaq</Badge>
-                            <span className="text-xs text-muted-foreground">Sıra: {option.sort_order}</span>
+                            <Badge variant="outline">{option.baby_count} {tr("adminonboarding_usaq_36b348", "u\u015Faq")}</Badge>
+                            <span className="text-xs text-muted-foreground">{tr("adminonboarding_sira_d654d0", "S\u0131ra:")} {option.sort_order}</span>
                           </div>
                         </div>
                       </div>
@@ -282,9 +282,9 @@ const AdminOnboarding = () => {
                         </Button>
                       </div>
                     </motion.div>
-                  ))}
+                )}
                 </div>
-              )}
+              }
             </CardContent>
           </Card>
         </TabsContent>
@@ -294,82 +294,82 @@ const AdminOnboarding = () => {
       <Dialog open={showStageModal} onOpenChange={setShowStageModal}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>{editingStage ? 'Mərhələ Redaktə Et' : 'Yeni Mərhələ'}</DialogTitle>
+            <DialogTitle>{editingStage ? tr("adminonboarding_merhele_redakte_et_79bfa4", "M\u0259rh\u0259l\u0259 Redakt\u0259 Et") : tr("adminonboarding_yeni_merhele_bd7533", "Yeni M\u0259rh\u0259l\u0259")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <Input
                 placeholder="Stage ID (flow, bump, mommy)"
                 value={stageFormData.stage_id || ''}
-                onChange={(e) => setStageFormData({ ...stageFormData, stage_id: e.target.value })}
-              />
+                onChange={(e) => setStageFormData({ ...stageFormData, stage_id: e.target.value })} />
+              
               <Input
                 placeholder="Emoji"
                 value={stageFormData.emoji || ''}
-                onChange={(e) => setStageFormData({ ...stageFormData, emoji: e.target.value })}
-              />
+                onChange={(e) => setStageFormData({ ...stageFormData, emoji: e.target.value })} />
+              
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Input
                 placeholder={tr("adminonboarding_basliq_en_4ac905", "Başlıq (EN)")}
                 value={stageFormData.title || ''}
-                onChange={(e) => setStageFormData({ ...stageFormData, title: e.target.value })}
-              />
+                onChange={(e) => setStageFormData({ ...stageFormData, title: e.target.value })} />
+              
               <Input
                 placeholder={tr("adminonboarding_basliq_az_3e294a", "Başlıq (AZ)")}
                 value={stageFormData.title_az || ''}
-                onChange={(e) => setStageFormData({ ...stageFormData, title_az: e.target.value })}
-              />
+                onChange={(e) => setStageFormData({ ...stageFormData, title_az: e.target.value })} />
+              
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Input
                 placeholder={tr("adminonboarding_alt_basliq_en_bb08aa", "Alt başlıq (EN)")}
                 value={stageFormData.subtitle || ''}
-                onChange={(e) => setStageFormData({ ...stageFormData, subtitle: e.target.value })}
-              />
+                onChange={(e) => setStageFormData({ ...stageFormData, subtitle: e.target.value })} />
+              
               <Input
                 placeholder={tr("adminonboarding_alt_basliq_az_fe8faa", "Alt başlıq (AZ)")}
                 value={stageFormData.subtitle_az || ''}
-                onChange={(e) => setStageFormData({ ...stageFormData, subtitle_az: e.target.value })}
-              />
+                onChange={(e) => setStageFormData({ ...stageFormData, subtitle_az: e.target.value })} />
+              
             </div>
             <Textarea
               placeholder={tr("adminonboarding_tesvir_az_2c237a", "Təsvir (AZ)")}
               value={stageFormData.description_az || ''}
-              onChange={(e) => setStageFormData({ ...stageFormData, description_az: e.target.value })}
-            />
+              onChange={(e) => setStageFormData({ ...stageFormData, description_az: e.target.value })} />
+            
             <div className="grid grid-cols-2 gap-3">
               <Input
                 placeholder={tr("adminonboarding_ikon_adi_baby_heart_calendar_e2a7df", "İkon adı (Baby, Heart, Calendar)")}
                 value={stageFormData.icon_name || ''}
-                onChange={(e) => setStageFormData({ ...stageFormData, icon_name: e.target.value })}
-              />
+                onChange={(e) => setStageFormData({ ...stageFormData, icon_name: e.target.value })} />
+              
               <Input
                 placeholder="Gradient (from-purple-500 to-pink-600)"
                 value={stageFormData.bg_gradient || ''}
-                onChange={(e) => setStageFormData({ ...stageFormData, bg_gradient: e.target.value })}
-              />
+                onChange={(e) => setStageFormData({ ...stageFormData, bg_gradient: e.target.value })} />
+              
             </div>
             <Input
               type="number"
               placeholder={tr("adminonboarding_sira_421c5f", "Sıra")}
               value={stageFormData.sort_order || 0}
-              onChange={(e) => setStageFormData({ ...stageFormData, sort_order: parseInt(e.target.value) })}
-            />
+              onChange={(e) => setStageFormData({ ...stageFormData, sort_order: parseInt(e.target.value) })} />
+            
             <div className="flex items-center gap-2">
               <Switch
                 checked={stageFormData.is_active ?? true}
-                onCheckedChange={(v) => setStageFormData({ ...stageFormData, is_active: v })}
-              />
+                onCheckedChange={(v) => setStageFormData({ ...stageFormData, is_active: v })} />
+              
               <span className="text-sm">Aktiv</span>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowStageModal(false)}>
-              Ləğv et
+              {tr("adminonboarding_legv_et_b5e49c", "L\u0259\u011Fv et")}
             </Button>
             <Button onClick={handleSaveStage} disabled={stages.create.isPending || stages.update.isPending}>
-              {editingStage ? 'Yenilə' : 'Əlavə et'}
+              {editingStage ? tr("adminonboarding_yenile_570ce2", "Yenil\u0259") : tr("adminonboarding_elave_et_6e1b9b", "\u018Flav\u0259 et")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -379,67 +379,67 @@ const AdminOnboarding = () => {
       <Dialog open={showMultipleModal} onOpenChange={setShowMultipleModal}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>{editingMultiple ? 'Seçim Redaktə Et' : 'Yeni Seçim'}</DialogTitle>
+            <DialogTitle>{editingMultiple ? tr("adminonboarding_secim_redakte_et_01ab36", "Se\xE7im Redakt\u0259 Et") : tr("adminonboarding_yeni_secim_b1b8e4", "Yeni Se\xE7im")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <Input
                 placeholder="Option ID (single, twins)"
                 value={multipleFormData.option_id || ''}
-                onChange={(e) => setMultipleFormData({ ...multipleFormData, option_id: e.target.value })}
-              />
+                onChange={(e) => setMultipleFormData({ ...multipleFormData, option_id: e.target.value })} />
+              
               <Input
                 placeholder="Emoji"
                 value={multipleFormData.emoji || ''}
-                onChange={(e) => setMultipleFormData({ ...multipleFormData, emoji: e.target.value })}
-              />
+                onChange={(e) => setMultipleFormData({ ...multipleFormData, emoji: e.target.value })} />
+              
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Input
                 placeholder="Label (EN)"
                 value={multipleFormData.label || ''}
-                onChange={(e) => setMultipleFormData({ ...multipleFormData, label: e.target.value })}
-              />
+                onChange={(e) => setMultipleFormData({ ...multipleFormData, label: e.target.value })} />
+              
               <Input
                 placeholder="Label (AZ)"
                 value={multipleFormData.label_az || ''}
-                onChange={(e) => setMultipleFormData({ ...multipleFormData, label_az: e.target.value })}
-              />
+                onChange={(e) => setMultipleFormData({ ...multipleFormData, label_az: e.target.value })} />
+              
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Input
                 type="number"
                 placeholder={tr("adminonboarding_usaq_sayi_04c015", "Uşaq sayı")}
                 value={multipleFormData.baby_count || 1}
-                onChange={(e) => setMultipleFormData({ ...multipleFormData, baby_count: parseInt(e.target.value) })}
-              />
+                onChange={(e) => setMultipleFormData({ ...multipleFormData, baby_count: parseInt(e.target.value) })} />
+              
               <Input
                 type="number"
                 placeholder={tr("adminonboarding_sira_421c5f", "Sıra")}
                 value={multipleFormData.sort_order || 0}
-                onChange={(e) => setMultipleFormData({ ...multipleFormData, sort_order: parseInt(e.target.value) })}
-              />
+                onChange={(e) => setMultipleFormData({ ...multipleFormData, sort_order: parseInt(e.target.value) })} />
+              
             </div>
             <div className="flex items-center gap-2">
               <Switch
                 checked={multipleFormData.is_active ?? true}
-                onCheckedChange={(v) => setMultipleFormData({ ...multipleFormData, is_active: v })}
-              />
+                onCheckedChange={(v) => setMultipleFormData({ ...multipleFormData, is_active: v })} />
+              
               <span className="text-sm">Aktiv</span>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowMultipleModal(false)}>
-              Ləğv et
+              {tr("adminonboarding_legv_et_b5e49c", "L\u0259\u011Fv et")}
             </Button>
             <Button onClick={handleSaveMultiple} disabled={multiples.create.isPending || multiples.update.isPending}>
-              {editingMultiple ? 'Yenilə' : 'Əlavə et'}
+              {editingMultiple ? tr("adminonboarding_yenile_570ce2", "Yenil\u0259") : tr("adminonboarding_elave_et_6e1b9b", "\u018Flav\u0259 et")}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AdminOnboarding;

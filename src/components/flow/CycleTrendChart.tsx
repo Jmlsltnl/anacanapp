@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { tr } from "@/lib/tr";import { motion } from 'framer-motion';
 import { TrendingUp } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from 'recharts';
 import { useCycleHistory, useCycleStats } from '@/hooks/useCycleHistory';
@@ -7,22 +7,22 @@ const CycleTrendChart = () => {
   const { data: cycles = [], isLoading } = useCycleHistory();
   const stats = useCycleStats();
 
-  const chartData = cycles
-    .filter(c => c.cycle_length && c.cycle_length > 0)
-    .slice(0, 12)
-    .reverse()
-    .map(c => ({
-      cycle: `#${c.cycle_number}`,
-      length: c.cycle_length!,
-    }));
+  const chartData = cycles.
+  filter((c) => c.cycle_length && c.cycle_length > 0).
+  slice(0, 12).
+  reverse().
+  map((c) => ({
+    cycle: `#${c.cycle_number}`,
+    length: c.cycle_length!
+  }));
 
   if (isLoading) {
     return (
       <div className="bg-card rounded-2xl p-4 border border-border animate-pulse">
         <div className="h-6 bg-muted rounded w-1/2 mb-4" />
         <div className="h-40 bg-muted rounded" />
-      </div>
-    );
+      </div>);
+
   }
 
   if (chartData.length < 2) {
@@ -33,12 +33,12 @@ const CycleTrendChart = () => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-card rounded-2xl p-4 border border-border"
-    >
+      className="bg-card rounded-2xl p-4 border border-border">
+      
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-bold text-foreground flex items-center gap-2">
           <TrendingUp className="w-5 h-5 text-indigo-500" />
-          Tsikl Uzunluğu Trendi
+          {tr("cycletrendchart_tsikl_uzunlugu_trendi_13a67d", "Tsikl Uzunlu\u011Fu Trendi")}
         </h3>
         <span className="text-xs text-muted-foreground">{chartData.length} tsikl</span>
       </div>
@@ -54,10 +54,10 @@ const CycleTrendChart = () => {
                 backgroundColor: 'hsl(var(--card))',
                 border: '1px solid hsl(var(--border))',
                 borderRadius: 12,
-                fontSize: 12,
+                fontSize: 12
               }}
-              formatter={(v: number) => [`${v} gün`, 'Uzunluq']}
-            />
+              formatter={(v: number) => [`${v} gün`, 'Uzunluq']} />
+            
             <ReferenceLine y={stats.averageCycleLength} stroke="hsl(var(--primary))" strokeDasharray="4 4" label={{ value: `Orta ${stats.averageCycleLength}`, position: 'insideTopRight', fontSize: 10, fill: 'hsl(var(--primary))' }} />
             <ReferenceLine y={21} stroke="hsl(var(--destructive))" strokeOpacity={0.3} strokeDasharray="2 4" />
             <ReferenceLine y={35} stroke="hsl(var(--destructive))" strokeOpacity={0.3} strokeDasharray="2 4" />
@@ -66,10 +66,10 @@ const CycleTrendChart = () => {
         </ResponsiveContainer>
       </div>
       <p className="text-[10px] text-muted-foreground text-center mt-1">
-        Normal diapazon: 21–35 gün (ACOG)
+        {tr("cycletrendchart_normal_diapazon_21_35_gun_acog_48b2bf", "Normal diapazon: 21\u201335 g\xFCn (ACOG)")}
       </p>
-    </motion.div>
-  );
+    </motion.div>);
+
 };
 
 export default CycleTrendChart;

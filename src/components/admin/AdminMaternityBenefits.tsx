@@ -17,17 +17,17 @@ const AdminMaternityBenefits = () => {
   const { configItems, guidelines, loading, updateConfigValue, createGuideline, updateGuideline, deleteGuideline } = useAdminMaternityBenefits();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('config');
-  
+
   // Config editing
   const [editingConfig, setEditingConfig] = useState<MaternityConfigItem | null>(null);
   const [configValue, setConfigValue] = useState('');
-  
+
   // Guideline modal
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [editingGuide, setEditingGuide] = useState<MaternityGuideline | null>(null);
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const initialFormDataRef = useRef<string>('');
-  
+
   const [guideForm, setGuideForm] = useState({
     title: '',
     title_az: '',
@@ -36,7 +36,7 @@ const AdminMaternityBenefits = () => {
     category: 'general',
     icon: '📋',
     sort_order: 0,
-    is_active: true,
+    is_active: true
   });
 
   const hasUnsavedChanges = () => {
@@ -63,7 +63,7 @@ const AdminMaternityBenefits = () => {
       category: 'general',
       icon: '📋',
       sort_order: 0,
-      is_active: true,
+      is_active: true
     });
   };
 
@@ -76,7 +76,7 @@ const AdminMaternityBenefits = () => {
       category: guide.category,
       icon: guide.icon,
       sort_order: guide.sort_order,
-      is_active: guide.is_active,
+      is_active: guide.is_active
     } : {
       title: '',
       title_az: '',
@@ -85,7 +85,7 @@ const AdminMaternityBenefits = () => {
       category: 'general',
       icon: '📋',
       sort_order: guidelines.length,
-      is_active: true,
+      is_active: true
     };
     setGuideForm(data);
     initialFormDataRef.current = JSON.stringify(data);
@@ -100,7 +100,7 @@ const AdminMaternityBenefits = () => {
       toast({ title: tr("adminmaternitybenefits_duzgun_reqem_daxil_edin_b92de2", "Düzgün rəqəm daxil edin"), variant: 'destructive' });
       return;
     }
-    
+
     const result = await updateConfigValue(editingConfig.id, value);
     if (result.error) {
       toast({ title: tr("adminmaternitybenefits_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
@@ -126,13 +126,13 @@ const AdminMaternityBenefits = () => {
     if (result.error) {
       toast({ title: tr("adminmaternitybenefits_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     } else {
-      toast({ title: editingGuide ? 'Yeniləndi' : 'Əlavə edildi' });
+      toast({ title: editingGuide ? tr("adminmaternitybenefits_yenilendi_d10a01", "Yenil\u0259ndi") : tr("adminmaternitybenefits_elave_edildi_b7d7e4", "\u018Flav\u0259 edildi") });
       closeGuideModal();
     }
   };
 
   const handleDeleteGuide = async (id: string) => {
-    if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
+    if (!confirm(tr("adminmaternitybenefits_silmek_istediyinize_eminsiniz_09658f", "Silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
     const result = await deleteGuideline(id);
     if (result.error) {
       toast({ title: tr("adminmaternitybenefits_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
@@ -153,7 +153,7 @@ const AdminMaternityBenefits = () => {
           Dekret Kalkulyatoru
         </h2>
         <p className="text-muted-foreground">
-          Dekret ödənişi konfiqurasiyası və bələdçilər
+          {tr("adminmaternitybenefits_dekret_odenisi_konfiqurasiyasi_b3b5af", "Dekret \xF6d\u0259ni\u015Fi konfiqurasiyas\u0131 v\u0259 b\u0259l\u0259d\xE7il\u0259r")}
         </p>
       </div>
 
@@ -167,55 +167,55 @@ const AdminMaternityBenefits = () => {
           <div className="bg-muted/50 rounded-xl p-4 mb-4">
             <p className="text-sm text-muted-foreground flex items-center gap-2">
               <Settings className="w-4 h-4" />
-              Bu dəyərlər Azərbaycan qanunvericiliyinə əsasən tənzimlənir
+              {tr("adminmaternitybenefits_bu_deyerler_azerbaycan_qanunve_96a197", "Bu d\u0259y\u0259rl\u0259r Az\u0259rbaycan qanunvericiliyin\u0259 \u0259sas\u0259n t\u0259nziml\u0259nir")}
             </p>
           </div>
 
           <div className="grid gap-3">
-            {configItems.map((item) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between p-4 bg-card rounded-xl border"
-              >
+            {configItems.map((item) =>
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-between p-4 bg-card rounded-xl border">
+              
                 <div className="flex-1">
                   <p className="font-medium">{item.label_az || item.label}</p>
                   <p className="text-sm text-muted-foreground">{item.description_az || item.description}</p>
                 </div>
                 
-                {editingConfig?.id === item.id ? (
-                  <div className="flex items-center gap-2">
+                {editingConfig?.id === item.id ?
+              <div className="flex items-center gap-2">
                     <Input
-                      type="number"
-                      value={configValue}
-                      onChange={(e) => setConfigValue(e.target.value)}
-                      className="w-32"
-                    />
+                  type="number"
+                  value={configValue}
+                  onChange={(e) => setConfigValue(e.target.value)}
+                  className="w-32" />
+                
                     <Button size="sm" onClick={handleSaveConfig}>
                       <Save className="w-4 h-4" />
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => setEditingConfig(null)}>
                       <X className="w-4 h-4" />
                     </Button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-3">
+                  </div> :
+
+              <div className="flex items-center gap-3">
                     <span className="text-xl font-bold text-primary">{item.value}</span>
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {
-                        setEditingConfig(item);
-                        setConfigValue(item.value.toString());
-                      }}
-                    >
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    setEditingConfig(item);
+                    setConfigValue(item.value.toString());
+                  }}>
+                  
                       <Edit2 className="w-4 h-4" />
                     </Button>
                   </div>
-                )}
+              }
               </motion.div>
-            ))}
+            )}
           </div>
         </TabsContent>
 
@@ -223,24 +223,24 @@ const AdminMaternityBenefits = () => {
           <div className="flex justify-end">
             <Button onClick={() => openGuideModal()}>
               <Plus className="w-4 h-4 mr-2" />
-              Yeni Bələdçi
+              {tr("adminmaternitybenefits_yeni_beledci_1e4796", "Yeni B\u0259l\u0259d\xE7i")}
             </Button>
           </div>
 
           <div className="grid gap-3">
-            {guidelines.map((guide) => (
-              <motion.div
-                key={guide.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between p-4 bg-card rounded-xl border"
-              >
+            {guidelines.map((guide) =>
+            <motion.div
+              key={guide.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-between p-4 bg-card rounded-xl border">
+              
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{guide.icon}</span>
                   <div>
                     <p className="font-medium">{guide.title_az || guide.title}</p>
                     <p className="text-sm text-muted-foreground">
-                      Kateqoriya: {guide.category} | Sıra: {guide.sort_order}
+                      Kateqoriya: {guide.category} {tr("adminmaternitybenefits_sira_b8830f", "| S\u0131ra:")} {guide.sort_order}
                     </p>
                   </div>
                 </div>
@@ -253,7 +253,7 @@ const AdminMaternityBenefits = () => {
                   </Button>
                 </div>
               </motion.div>
-            ))}
+            )}
           </div>
         </TabsContent>
       </Tabs>
@@ -263,7 +263,7 @@ const AdminMaternityBenefits = () => {
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {editingGuide ? 'Bələdçini Redaktə Et' : 'Yeni Bələdçi'}
+              {editingGuide ? tr("adminmaternitybenefits_beledcini_redakte_et_41582d", "B\u0259l\u0259d\xE7ini Redakt\u0259 Et") : tr("adminmaternitybenefits_yeni_beledci_1e4796", "Yeni B\u0259l\u0259d\xE7i")}
             </DialogTitle>
           </DialogHeader>
           
@@ -274,15 +274,15 @@ const AdminMaternityBenefits = () => {
                 <Input
                   value={guideForm.icon}
                   onChange={(e) => setGuideForm({ ...guideForm, icon: e.target.value })}
-                  className="text-center text-xl"
-                />
+                  className="text-center text-xl" />
+                
               </div>
               <div className="col-span-3">
                 <Label>{tr("adminmaternitybenefits_basliq_en_4ac905", "Başlıq (EN)")}</Label>
                 <Input
                   value={guideForm.title}
-                  onChange={(e) => setGuideForm({ ...guideForm, title: e.target.value })}
-                />
+                  onChange={(e) => setGuideForm({ ...guideForm, title: e.target.value })} />
+                
               </div>
             </div>
 
@@ -290,8 +290,8 @@ const AdminMaternityBenefits = () => {
               <Label>{tr("adminmaternitybenefits_basliq_az_3e294a", "Başlıq (AZ)")}</Label>
               <Input
                 value={guideForm.title_az}
-                onChange={(e) => setGuideForm({ ...guideForm, title_az: e.target.value })}
-              />
+                onChange={(e) => setGuideForm({ ...guideForm, title_az: e.target.value })} />
+              
             </div>
 
             <div>
@@ -299,8 +299,8 @@ const AdminMaternityBenefits = () => {
               <Textarea
                 value={guideForm.content}
                 onChange={(e) => setGuideForm({ ...guideForm, content: e.target.value })}
-                rows={4}
-              />
+                rows={4} />
+              
             </div>
 
             <div>
@@ -308,8 +308,8 @@ const AdminMaternityBenefits = () => {
               <Textarea
                 value={guideForm.content_az}
                 onChange={(e) => setGuideForm({ ...guideForm, content_az: e.target.value })}
-                rows={6}
-              />
+                rows={6} />
+              
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -317,16 +317,16 @@ const AdminMaternityBenefits = () => {
                 <Label>Kateqoriya</Label>
                 <Input
                   value={guideForm.category}
-                  onChange={(e) => setGuideForm({ ...guideForm, category: e.target.value })}
-                />
+                  onChange={(e) => setGuideForm({ ...guideForm, category: e.target.value })} />
+                
               </div>
               <div>
                 <Label>{tr("adminmaternitybenefits_sira_421c5f", "Sıra")}</Label>
                 <Input
                   type="number"
                   value={guideForm.sort_order}
-                  onChange={(e) => setGuideForm({ ...guideForm, sort_order: parseInt(e.target.value) || 0 })}
-                />
+                  onChange={(e) => setGuideForm({ ...guideForm, sort_order: parseInt(e.target.value) || 0 })} />
+                
               </div>
             </div>
 
@@ -334,14 +334,14 @@ const AdminMaternityBenefits = () => {
               <Label>Aktiv</Label>
               <Switch
                 checked={guideForm.is_active}
-                onCheckedChange={(v) => setGuideForm({ ...guideForm, is_active: v })}
-              />
+                onCheckedChange={(v) => setGuideForm({ ...guideForm, is_active: v })} />
+              
             </div>
 
             <div className="flex gap-2 pt-4">
               <Button variant="outline" className="flex-1" onClick={handleGuideModalClose}>
                 <X className="w-4 h-4 mr-2" />
-                Ləğv et
+                {tr("adminmaternitybenefits_legv_et_b5e49c", "L\u0259\u011Fv et")}
               </Button>
               <Button className="flex-1" onClick={handleSaveGuide}>
                 <Save className="w-4 h-4 mr-2" />
@@ -355,10 +355,10 @@ const AdminMaternityBenefits = () => {
       <UnsavedChangesDialog
         open={showUnsavedDialog}
         onOpenChange={setShowUnsavedDialog}
-        onDiscard={closeGuideModal}
-      />
-    </div>
-  );
+        onDiscard={closeGuideModal} />
+      
+    </div>);
+
 };
 
 export default AdminMaternityBenefits;

@@ -25,7 +25,7 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
     name: '',
     phone: '',
     address: '',
-    city: 'Bakı',
+    city: tr("checkoutscreen_baki_998629", "Bak\u0131"),
     notes: ''
   });
 
@@ -70,8 +70,8 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="min-h-screen bg-background"
-    >
+      className="min-h-screen bg-background">
+      
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border px-4 py-3">
         <div className="flex items-center gap-3">
           <button onClick={onBack} className="p-2 rounded-full hover:bg-muted">
@@ -85,27 +85,27 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
         <div className="space-y-3">
           <h2 className="text-base font-semibold flex items-center gap-2">
             <User className="w-4 h-4 text-primary" />
-            Əlaqə Məlumatları
+            {tr("checkoutscreen_elaqe_melumatlari_8a7aae", "\u018Flaq\u0259 M\u0259lumatlar\u0131")}
           </h2>
-          <Input placeholder="Ad Soyad" value={formData.name} onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))} className="h-11" />
-          <Input placeholder="Telefon (+994 XX XXX XX XX)" value={formData.phone} onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))} className="h-11" />
+          <Input placeholder="Ad Soyad" value={formData.name} onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))} className="h-11" />
+          <Input placeholder="Telefon (+994 XX XXX XX XX)" value={formData.phone} onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))} className="h-11" />
         </div>
 
         <div className="space-y-3">
           <h2 className="text-base font-semibold flex items-center gap-2">
             <MapPin className="w-4 h-4 text-primary" />
-            Çatdırılma Ünvanı
+            {tr("checkoutscreen_catdirilma_unvani_10ea11", "\xC7atd\u0131r\u0131lma \xDCnvan\u0131")}
           </h2>
-          <Input placeholder={tr("checkoutscreen_seher_5f373c", "Şəhər")} value={formData.city} onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))} className="h-11" />
-          <Textarea placeholder={tr("checkoutscreen_unvan_kuce_bina_menzil_ad3ef6", "Ünvan (küçə, bina, mənzil)")} value={formData.address} onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))} rows={2} />
+          <Input placeholder={tr("checkoutscreen_seher_5f373c", "Şəhər")} value={formData.city} onChange={(e) => setFormData((prev) => ({ ...prev, city: e.target.value }))} className="h-11" />
+          <Textarea placeholder={tr("checkoutscreen_unvan_kuce_bina_menzil_ad3ef6", "Ünvan (küçə, bina, mənzil)")} value={formData.address} onChange={(e) => setFormData((prev) => ({ ...prev, address: e.target.value }))} rows={2} />
         </div>
 
         <div className="space-y-3">
           <h2 className="text-base font-semibold flex items-center gap-2">
             <Truck className="w-4 h-4 text-primary" />
-            Əlavə Qeydlər
+            {tr("checkoutscreen_elave_qeydler_49e1f1", "\u018Flav\u0259 Qeydl\u0259r")}
           </h2>
-          <Textarea placeholder={tr("checkoutscreen_kuryere_mesaj_isteye_bagli_56df8d", "Kuryerə mesaj (istəyə bağlı)")} value={formData.notes} onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))} rows={2} />
+          <Textarea placeholder={tr("checkoutscreen_kuryere_mesaj_isteye_bagli_56df8d", "Kuryerə mesaj (istəyə bağlı)")} value={formData.notes} onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))} rows={2} />
         </div>
 
         {/* Coupon */}
@@ -119,25 +119,25 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
             onApply={() => validateCoupon(couponCode, totalPrice)}
             onRemove={removeCoupon}
             appliedCoupon={appliedCoupon}
-            validating={validating}
-          />
+            validating={validating} />
+          
         </div>
 
         {/* Order Summary */}
         <div className="bg-card rounded-xl p-4 border border-border space-y-2">
           <h2 className="font-semibold text-sm">{tr("checkoutscreen_sifaris_xulasesi_14a242", "Sifariş Xülasəsi")}</h2>
-          {items.map(item => (
-            <div key={item.id} className="flex justify-between text-sm">
+          {items.map((item) =>
+          <div key={item.id} className="flex justify-between text-sm">
               <span className="text-muted-foreground">{item.product?.name} x{item.quantity}</span>
               <span>{((item.product?.price || 0) * item.quantity).toFixed(2)} ₼</span>
             </div>
-          ))}
-          {discountAmount > 0 && (
-            <div className="flex justify-between text-sm text-green-600">
+          )}
+          {discountAmount > 0 &&
+          <div className="flex justify-between text-sm text-green-600">
               <span>Kupon endirimi</span>
               <span>-{discountAmount.toFixed(2)} ₼</span>
             </div>
-          )}
+          }
           <div className="border-t border-border pt-2 flex justify-between font-bold">
             <span>{tr("checkoutscreen_cemi_fbbec6", "Cəmi:")}</span>
             <span className="text-primary">{finalPrice.toFixed(2)} ₼</span>
@@ -157,15 +157,15 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
 
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 safe-bottom">
         <Button onClick={handleSubmit} disabled={loading} className="w-full h-12 text-base font-bold">
-          {loading ? (
-            <><Loader2 className="w-5 h-5 mr-2 animate-spin" />{tr("checkoutscreen_gozleyin_9c465b", "Gözləyin...")}</>
-          ) : (
-            `Sifariş Ver - ${finalPrice.toFixed(2)} ₼`
-          )}
+          {loading ?
+          <><Loader2 className="w-5 h-5 mr-2 animate-spin" />{tr("checkoutscreen_gozleyin_9c465b", "Gözləyin...")}</> :
+
+          `Sifariş Ver - ${finalPrice.toFixed(2)} ₼`
+          }
         </Button>
       </div>
-    </motion.div>
-  );
+    </motion.div>);
+
 };
 
 export default CheckoutScreen;

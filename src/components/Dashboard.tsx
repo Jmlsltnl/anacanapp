@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Droplets, Moon, Utensils, Activity, Plus, TrendingUp, Heart, Sparkles, 
+import {
+  Droplets, Moon, Utensils, Activity, Plus, TrendingUp, Heart, Sparkles,
   Bell, ChevronRight, Flame, Target, Calendar, Zap, Sun, Cloud, Wind,
   ThermometerSun, Pill, Baby, Footprints, Scale, Clock, Star, Award,
-  MessageCircle, Check, Lightbulb, BookOpen, PartyPopper, RefreshCw, ChevronUp, ChevronDown
-} from 'lucide-react';
+  MessageCircle, Check, Lightbulb, BookOpen, PartyPopper, RefreshCw, ChevronUp, ChevronDown } from
+'lucide-react';
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 import { useUserStore } from '@/store/userStore';
 import { useTimerStore } from '@/store/timerStore';
@@ -68,7 +68,7 @@ import FetusMonth8 from '@/assets/fetus/month-8.svg';
 import FetusMonth9 from '@/assets/fetus/month-9.svg';
 import { tr } from "@/lib/tr";
 
-const FETUS_IMAGES: { [key: number]: string } = {
+const FETUS_IMAGES: {[key: number]: string;} = {
   1: FetusMonth1,
   2: FetusMonth2,
   3: FetusMonth3,
@@ -77,7 +77,7 @@ const FETUS_IMAGES: { [key: number]: string } = {
   6: FetusMonth6,
   7: FetusMonth7,
   8: FetusMonth8,
-  9: FetusMonth9,
+  9: FetusMonth9
 };
 
 interface QuickActionProps {
@@ -88,36 +88,36 @@ interface QuickActionProps {
   onClick?: () => void;
 }
 
-const QuickActionButton = ({ icon: Icon, label, color, value, onClick }: QuickActionProps) => (
-  <motion.button 
-    onClick={async () => {
-      await hapticFeedback.light();
-      onClick?.();
-    }}
-    className={`${color} p-3 rounded-xl flex flex-col items-center gap-1 shadow-card relative overflow-hidden`}
-    whileHover={{ scale: 1.05, y: -2 }}
-    whileTap={{ scale: 0.95 }}
-  >
+const QuickActionButton = ({ icon: Icon, label, color, value, onClick }: QuickActionProps) =>
+<motion.button
+  onClick={async () => {
+    await hapticFeedback.light();
+    onClick?.();
+  }}
+  className={`${color} p-3 rounded-xl flex flex-col items-center gap-1 shadow-card relative overflow-hidden`}
+  whileHover={{ scale: 1.05, y: -2 }}
+  whileTap={{ scale: 0.95 }}>
+  
     <Icon className="w-5 h-5" />
     <span className="text-[10px] font-bold">{label}</span>
-    {value && (
-      <span className="absolute top-1.5 right-1.5 text-[9px] font-bold bg-white/30 px-1 py-0.5 rounded-full">
+    {value &&
+  <span className="absolute top-1.5 right-1.5 text-[9px] font-bold bg-white/30 px-1 py-0.5 rounded-full">
         {value}
       </span>
-    )}
-  </motion.button>
-);
+  }
+  </motion.button>;
+
 
 // Animated Progress Ring
-const ProgressRing = ({ progress, size = 100, strokeWidth = 8, color = "stroke-primary" }: {
-  progress: number;
-  size?: number;
-  strokeWidth?: number;
-  color?: string;
-}) => {
+const ProgressRing = ({ progress, size = 100, strokeWidth = 8, color = "stroke-primary"
+
+
+
+
+}: {progress: number;size?: number;strokeWidth?: number;color?: string;}) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (progress / 100) * circumference;
+  const offset = circumference - progress / 100 * circumference;
 
   return (
     <svg width={size} height={size} className="rotate-[-90deg]">
@@ -127,8 +127,8 @@ const ProgressRing = ({ progress, size = 100, strokeWidth = 8, color = "stroke-p
         r={radius}
         fill="none"
         strokeWidth={strokeWidth}
-        className="stroke-muted"
-      />
+        className="stroke-muted" />
+      
       <motion.circle
         cx={size / 2}
         cy={size / 2}
@@ -140,16 +140,16 @@ const ProgressRing = ({ progress, size = 100, strokeWidth = 8, color = "stroke-p
         initial={{ strokeDashoffset: circumference }}
         animate={{ strokeDashoffset: offset }}
         transition={{ duration: 1, ease: "easeOut" }}
-        style={{ strokeDasharray: circumference }}
-      />
-    </svg>
-  );
+        style={{ strokeDasharray: circumference }} />
+      
+    </svg>);
+
 };
 
 // FlowDashboard is now imported from @/components/flow/FlowDashboard
 
 
-const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string) => void }) => {
+const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) => void;}) => {
   const { getPregnancyData, setLifeStage } = useUserStore();
   const { toast } = useToast();
   const pregData = getPregnancyData();
@@ -158,18 +158,18 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
   const { entries: weightEntries } = useWeightEntries();
   const { data: fruitImages = [] } = useFruitImages();
   const { isPremium } = useSubscription();
-  
+
   // Birth onboarding modal state
   const [showBirthModal, setShowBirthModal] = useState(false);
-  
+
   // Calculate actual current pregnancy day (1-280)
-  const actualPregnancyDay = pregData?.lastPeriodDate 
-    ? getPregnancyDay(pregData.lastPeriodDate)
-    : 1;
-  
+  const actualPregnancyDay = pregData?.lastPeriodDate ?
+  getPregnancyDay(pregData.lastPeriodDate) :
+  1;
+
   // Day navigation hook - allows viewing past/future days
-  const { 
-    selectedDay: pregnancyDay, 
+  const {
+    selectedDay: pregnancyDay,
     selectedWeek,
     selectedDayInWeek,
     selectedTrimester,
@@ -177,31 +177,31 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
     isViewingCurrentDay,
     navigateToDay,
     actualCurrentDay
-  } = usePregnancyDayNavigation({ 
+  } = usePregnancyDayNavigation({
     lastPeriodDate: pregData?.lastPeriodDate || null,
     dueDate: pregData?.dueDate
   });
-  
+
   // Fetch weekly tip from database based on selected week
   const { data: weeklyTips = [] } = useWeeklyTips(selectedWeek, 'bump');
   const currentWeekTip = weeklyTips[0];
-  
+
   // Fetch dynamic pregnancy content by selected day
   const { data: dayContent } = usePregnancyContentByDay(pregnancyDay);
-  
+
   // Fetch dynamic trimester tips from database based on selected trimester
   const { data: dynamicTrimesterTips = [] } = useTrimesterTips(selectedTrimester);
-  
+
   const todayStats = getTodayStats();
   const kickCount = todayStats.totalKicks;
   const waterCount = todayLog?.water_intake || 0;
   const currentMood = todayLog?.mood || 0;
-  
+
   // Calculate weight gain from first entry
   const latestWeight = weightEntries[0]?.weight;
   const firstWeight = weightEntries[weightEntries.length - 1]?.weight;
   const weightGain = latestWeight && firstWeight ? (latestWeight - firstWeight).toFixed(1) : '0';
-  
+
   // Show "I gave birth" button from week 38
   const showBirthButton = pregData?.currentWeek ? pregData.currentWeek >= 38 : false;
 
@@ -218,7 +218,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           text: 'text-green-600 dark:text-green-400',
           badge: 'bg-green-500/10 text-green-600 dark:text-green-400',
           progress: 'bg-green-500',
-          icon: 'text-green-600 dark:text-green-400',
+          icon: 'text-green-600 dark:text-green-400'
         };
       case 2:
         return {
@@ -228,7 +228,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           text: 'text-amber-600 dark:text-amber-400',
           badge: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
           progress: 'bg-amber-500',
-          icon: 'text-amber-600 dark:text-amber-400',
+          icon: 'text-amber-600 dark:text-amber-400'
         };
       case 3:
       default:
@@ -239,14 +239,14 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
           text: 'text-primary',
           badge: 'bg-primary/10 text-primary',
           progress: 'bg-primary',
-          icon: 'text-primary',
+          icon: 'text-primary'
         };
     }
   };
-  
+
   // Use selected trimester for colors (based on navigated day)
   const trimesterColors = getTrimesterColors(selectedTrimester);
-  
+
   // Trimester info for display
   const getTrimesterInfo = (trimester: number) => {
     switch (trimester) {
@@ -259,9 +259,9 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
         return { title: tr("dashboard_3_cu_trimester_tovsiyeleri_93f711", '3-cü Trimester Tövsiyələri'), emoji: '🍼' };
     }
   };
-  
+
   const trimesterInfo = getTrimesterInfo(selectedTrimester);
-  
+
   // Get mood emoji
   const getMoodEmoji = (mood: number) => {
     if (mood >= 4) return '😊';
@@ -280,17 +280,17 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
       dayContent
     );
   };
-  
+
   const weekData = getFruitData();
-  
+
   // For progress bar and development milestones, use actual current day
   const daysLeft = daysUntilDueFromSelected;
   const totalDays = 280;
   const daysElapsed = pregnancyDay;
-  const progressPercent = (pregnancyDay / totalDays) * 100;
+  const progressPercent = pregnancyDay / totalDays * 100;
 
   // Dynamic baby message from database
-  const babyMessage = dayContent?.baby_message || "Salam ana! Bu gün çox böyüdüm. 💕";
+  const babyMessage = dayContent?.baby_message || tr("dashboard_salam_ana_bu_gun_cox_boyudum_4e9d53", "Salam ana! Bu g\xFCn \xE7ox b\xF6y\xFCd\xFCm. \uD83D\uDC95");
 
   // Development milestones based on selected week
   const weeklyDevelopment = {
@@ -298,7 +298,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
     ears: selectedWeek >= 16,
     fingers: selectedWeek >= 10,
     kicks: selectedWeek >= 18,
-    hair: selectedWeek >= 22,
+    hair: selectedWeek >= 22
   };
 
   const addKick = async () => {
@@ -307,7 +307,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
     await addSession(1, 0);
     toast({
       title: tr("dashboard_tepik_qeyd_edildi_284f06", "Təpik qeyd edildi! 👶"),
-      description: `Bu gün ${kickCount + 1} təpik`,
+      description: `Bu gün ${kickCount + 1} təpik`
     });
   };
 
@@ -316,19 +316,19 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
     await updateWaterIntake(1);
     toast({
       title: tr("dashboard_su_elave_edildi_7b894d", "Su əlavə edildi! 💧"),
-      description: `${waterCount + 1}/8 stəkan`,
+      description: `${waterCount + 1}/8 stəkan`
     });
   };
 
   return (
     <div className="space-y-2">
       {/* Baby Development Hero Section - Trimester colored */}
-      <motion.div 
+      <motion.div
         className={`relative overflow-hidden bg-gradient-to-br ${trimesterColors.bg} rounded-2xl p-4 shadow-card ${trimesterColors.border}`}
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1 }}
-      >
+        transition={{ delay: 0.1 }}>
+        
         <div className={`absolute -top-12 -right-12 w-36 h-36 rounded-full ${trimesterColors.accent} blur-2xl`} />
         <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full ${trimesterColors.accent} blur-xl opacity-50`} />
         
@@ -339,56 +339,56 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
               currentActualDay={actualCurrentDay}
               selectedDay={pregnancyDay}
               onDayChange={navigateToDay}
-              isPremium={isPremium}
-            />
+              isPremium={isPremium} />
+            
           </div>
 
           {/* Viewing past/future day indicator */}
-          {!isViewingCurrentDay && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-2 px-3 py-1 rounded-full bg-muted border border-border"
-            >
+          {!isViewingCurrentDay &&
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-2 px-3 py-1 rounded-full bg-muted border border-border">
+            
               <span className="text-xs font-medium text-foreground">
-                {pregnancyDay < actualCurrentDay ? '⏮️ Keçmiş' : '⏭️ Gələcək'} günə baxırsınız
+                {pregnancyDay < actualCurrentDay ? tr("dashboard_kecmis_a3b2bf", "\u23EE\uFE0F Ke\xE7mi\u015F") : tr("dashboard_gelecek_8dc8dc", "\u23ED\uFE0F G\u0259l\u0259c\u0259k")} {tr("dashboard_gune_baxirsiniz_165efc", "g\xFCn\u0259 bax\u0131rs\u0131n\u0131z")}
               </span>
             </motion.div>
-          )}
+          }
 
           {/* Fetus Image with subtle motion */}
-          <motion.div 
+          <motion.div
             className="w-[178px] h-[178px] mb-3 relative"
             initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ 
-              scale: 1, 
+            animate={{
+              scale: 1,
               opacity: 1,
-              y: [0, -4, 0],
+              y: [0, -4, 0]
             }}
-            transition={{ 
+            transition={{
               scale: { delay: 0.2, type: "spring" },
               opacity: { delay: 0.2 },
               y: { duration: 4, repeat: Infinity, ease: "easeInOut" }
-            }}
-          >
-            <img 
-              src={FETUS_IMAGES[Math.min(Math.ceil(selectedWeek / 4.4), 9)] || FETUS_IMAGES[1]} 
+            }}>
+            
+            <img
+              src={FETUS_IMAGES[Math.min(Math.ceil(selectedWeek / 4.4), 9)] || FETUS_IMAGES[1]}
               alt={`${selectedWeek} həftəlik körpə`}
-              className="w-full h-full object-contain drop-shadow-lg"
-            />
+              className="w-full h-full object-contain drop-shadow-lg" />
+            
           </motion.div>
           
           {/* Main Text - "Anacan hazırda meyvə boydayam" */}
           <div className="text-center">
             <p className="text-lg font-bold text-foreground mb-1">
-              Anacan, hazırda <span className={trimesterColors.text}>{weekData.fruit}</span> boydayam
+              {tr("dashboard_anacan_hazirda_cfaa50", "Anacan, haz\u0131rda")} <span className={trimesterColors.text}>{weekData.fruit}</span> boydayam
             </p>
             <p className="text-xs text-muted-foreground font-medium">
-              {selectedWeek}. həftə, {selectedDayInWeek}. gün • <span className={`font-semibold ${trimesterColors.text}`}>{selectedTrimester}-{selectedTrimester === 1 ? 'ci' : selectedTrimester === 2 ? 'ci' : 'cü'} Trimester</span>
+              {selectedWeek}{tr("dashboard_hefte_5af01f", ". h\u0259ft\u0259,")} {selectedDayInWeek}{tr("dashboard_gun_a4ba4e", ". g\xFCn \u2022")} <span className={`font-semibold ${trimesterColors.text}`}>{selectedTrimester}-{selectedTrimester === 1 ? 'ci' : selectedTrimester === 2 ? 'ci' : tr("dashboard_cu_a8237f", "c\xFC")} Trimester</span>
             </p>
             <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
               <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
-                {pregnancyDay}. gün
+                {pregnancyDay}{tr("dashboard_gun_d96b5d", ". g\xFCn")}
               </span>
               <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
                 {weekData.lengthCm} sm
@@ -397,7 +397,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                 {weekData.weightG} qr
               </span>
               <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
-                {daysLeft} gün qaldı
+                {daysLeft} {tr("dashboard_gun_qaldi_993281", "g\xFCn qald\u0131")}
               </span>
             </div>
           </div>
@@ -410,25 +410,25 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
               <span>{tr("dashboard_dogus_6b7bfd", "Doğuş")}</span>
             </div>
             <div className={`h-2 ${trimesterColors.accent} rounded-full overflow-hidden`}>
-              <motion.div 
+              <motion.div
                 className={`h-full ${trimesterColors.progress} rounded-full`}
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercent}%` }}
-                transition={{ duration: 1, delay: 0.3 }}
-              />
+                transition={{ duration: 1, delay: 0.3 }} />
+              
             </div>
           </div>
         </div>
       </motion.div>
 
       {/* Trimester Tips Section */}
-      {dynamicTrimesterTips.length > 0 && (
-        <motion.div 
-          className={`relative overflow-hidden ${trimesterColors.accent} rounded-xl p-3 ${trimesterColors.border}`}
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.15 }}
-        >
+      {dynamicTrimesterTips.length > 0 &&
+      <motion.div
+        className={`relative overflow-hidden ${trimesterColors.accent} rounded-xl p-3 ${trimesterColors.border}`}
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.15 }}>
+        
           <div className="absolute -right-6 -top-6 text-7xl opacity-10">{trimesterInfo.emoji}</div>
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-2">
@@ -438,58 +438,58 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
               <h3 className={`text-sm font-bold ${trimesterColors.text}`}>{trimesterInfo.title}</h3>
             </div>
             <div className="space-y-1.5">
-              {dynamicTrimesterTips.map((tip, index) => (
-                <motion.div 
-                  key={tip.id}
-                  className="flex items-start gap-2 bg-card/50 rounded-lg p-2"
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.2 + index * 0.05 }}
-                >
+              {dynamicTrimesterTips.map((tip, index) =>
+            <motion.div
+              key={tip.id}
+              className="flex items-start gap-2 bg-card/50 rounded-lg p-2"
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.2 + index * 0.05 }}>
+              
                   <span className="text-sm flex-shrink-0">{tip.icon}</span>
                   <p className="text-xs text-foreground/90 leading-relaxed">{tip.tip_text}</p>
                 </motion.div>
-              ))}
+            )}
             </div>
           </div>
         </motion.div>
-      )}
+      }
 
       {/* Stats Grid - Show kick counter only after week 16 */}
       <div className={`grid ${selectedWeek >= 16 ? 'grid-cols-3' : 'grid-cols-2'} gap-1.5`}>
-        <motion.div 
+        <motion.div
           className={`${trimesterColors.accent} rounded-xl p-2.5 shadow-card ${trimesterColors.border} text-center`}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
+          transition={{ delay: 0.2 }}>
+          
           <Calendar className={`w-4 h-4 ${trimesterColors.icon} mx-auto mb-0.5`} />
           <p className="text-lg font-black text-foreground">{daysLeft}</p>
           <p className="text-[9px] text-muted-foreground">{tr("dashboard_gun_qaldi_993281", "gün qaldı")}</p>
         </motion.div>
 
         {/* Only show kick counter after week 16 */}
-        {selectedWeek >= 16 && (
-          <motion.button 
-            onClick={addKick}
-            className={`${trimesterColors.accent} rounded-xl p-2.5 shadow-card ${trimesterColors.border} text-center`}
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.25 }}
-            whileTap={{ scale: 0.95 }}
-          >
+        {selectedWeek >= 16 &&
+        <motion.button
+          onClick={addKick}
+          className={`${trimesterColors.accent} rounded-xl p-2.5 shadow-card ${trimesterColors.border} text-center`}
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.25 }}
+          whileTap={{ scale: 0.95 }}>
+          
             <Footprints className={`w-4 h-4 ${trimesterColors.icon} mx-auto mb-0.5`} />
             <p className="text-lg font-black text-foreground">{kickCount}</p>
             <p className="text-[9px] text-muted-foreground">{tr("dashboard_tepik_6483fe", "təpik")}</p>
           </motion.button>
-        )}
+        }
 
-        <motion.div 
+        <motion.div
           className={`${trimesterColors.accent} rounded-xl p-2.5 shadow-card ${trimesterColors.border} text-center`}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
+          transition={{ delay: 0.3 }}>
+          
           <Scale className={`w-4 h-4 ${trimesterColors.icon} mx-auto mb-0.5`} />
           <p className="text-lg font-black text-foreground">+{weightGain}</p>
           <p className="text-[9px] text-muted-foreground">{tr("dashboard_kq_ceki_b42b8d", "kq çəki")}</p>
@@ -497,52 +497,52 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
       </div>
 
       {/* Baby Development - Static Icons */}
-      <motion.div 
+      <motion.div
         className="bg-primary/5 dark:bg-primary/10 rounded-xl p-3 shadow-card border border-primary/20"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.25 }}
-      >
+        transition={{ delay: 0.25 }}>
+        
         <h3 className="text-sm font-bold text-foreground mb-2">{tr("dashboard_korpenin_inkisafi_269d83", "Körpənin inkişafı")}</h3>
         <div className="flex justify-around">
           {[
-            { icon: '👀', label: tr("dashboard_goz_fbc05e", 'Göz'), active: weeklyDevelopment.eyes },
-            { icon: '👂', label: 'Qulaq', active: weeklyDevelopment.ears },
-            { icon: '✋', label: 'Barmaq', active: weeklyDevelopment.fingers },
-            { icon: '🦶', label: tr("dashboard_tepik_9a873a", 'Təpik'), active: weeklyDevelopment.kicks },
-            { icon: '💇', label: tr("dashboard_sac_a09eaa", 'Saç'), active: weeklyDevelopment.hair },
-          ].map((item, index) => (
-            <motion.div 
-              key={item.label}
-              className="text-center"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.3 + index * 0.1 }}
-            >
+          { icon: '👀', label: tr("dashboard_goz_fbc05e", 'Göz'), active: weeklyDevelopment.eyes },
+          { icon: '👂', label: 'Qulaq', active: weeklyDevelopment.ears },
+          { icon: '✋', label: 'Barmaq', active: weeklyDevelopment.fingers },
+          { icon: '🦶', label: tr("dashboard_tepik_9a873a", 'Təpik'), active: weeklyDevelopment.kicks },
+          { icon: '💇', label: tr("dashboard_sac_a09eaa", 'Saç'), active: weeklyDevelopment.hair }].
+          map((item, index) =>
+          <motion.div
+            key={item.label}
+            className="text-center"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.3 + index * 0.1 }}>
+            
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-lg mb-0.5 ${
-                item.active ? 'bg-primary/20' : 'bg-muted opacity-40'
-              }`}>
+            item.active ? 'bg-primary/20' : 'bg-muted opacity-40'}`
+            }>
                 {item.icon}
               </div>
               <span className={`text-[10px] ${item.active ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
                 {item.label}
               </span>
             </motion.div>
-          ))}
+          )}
         </div>
       </motion.div>
 
       {/* Daily Content Cards - Separated */}
-      {dayContent && (
-        <div className="space-y-1.5">
+      {dayContent &&
+      <div className="space-y-1.5">
           {/* Baby Message Card */}
-          {dayContent.baby_message && (
-            <motion.div 
-              className="relative overflow-hidden bg-primary/5 dark:bg-primary/10 rounded-xl p-3 border border-primary/20"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
+          {dayContent.baby_message &&
+        <motion.div
+          className="relative overflow-hidden bg-primary/5 dark:bg-primary/10 rounded-xl p-3 border border-primary/20"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}>
+          
               <div className="absolute -right-4 -top-4 text-6xl opacity-10">💬</div>
               <div className="flex items-center gap-1.5 mb-1.5">
                 <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
@@ -550,23 +550,23 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                 </div>
                 <div>
                 <p className="text-xs text-primary font-bold uppercase tracking-wider">{tr("dashboard_korpeden_mesaj_89353a", "Körpədən Mesaj")}</p>
-                  <p className="text-[10px] text-muted-foreground">Gün {pregnancyDay} / 280</p>
+                  <p className="text-[10px] text-muted-foreground">{tr("dashboard_gun_18b2f4", "G\xFCn")} {pregnancyDay} / 280</p>
                 </div>
               </div>
               <p className="text-foreground font-medium text-sm leading-relaxed">
                 {dayContent.baby_message}
               </p>
             </motion.div>
-          )}
+        }
 
           {/* Body Changes Card */}
-          {dayContent.body_changes && (
-            <motion.div 
-              className="relative overflow-hidden bg-primary/5 dark:bg-primary/10 rounded-xl p-3 border border-primary/20"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.35 }}
-            >
+          {dayContent.body_changes &&
+        <motion.div
+          className="relative overflow-hidden bg-primary/5 dark:bg-primary/10 rounded-xl p-3 border border-primary/20"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.35 }}>
+          
               <div className="absolute -right-4 -top-4 text-6xl opacity-10">🤰</div>
               <div className="flex items-center gap-1.5 mb-1.5">
                 <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
@@ -578,16 +578,16 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                 {dayContent.body_changes}
               </p>
             </motion.div>
-          )}
+        }
 
           {/* Baby Development Card */}
-          {dayContent.baby_development && (
-            <motion.div 
-              className="relative overflow-hidden bg-primary/5 dark:bg-primary/10 rounded-xl p-3 border border-primary/20"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
+          {dayContent.baby_development &&
+        <motion.div
+          className="relative overflow-hidden bg-primary/5 dark:bg-primary/10 rounded-xl p-3 border border-primary/20"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}>
+          
               <div className="absolute -right-4 -top-4 text-6xl opacity-10">🌱</div>
               <div className="flex items-center gap-1.5 mb-1.5">
                 <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
@@ -599,16 +599,16 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                 {dayContent.baby_development}
               </p>
             </motion.div>
-          )}
+        }
 
           {/* Daily Tip Card */}
-          {dayContent.daily_tip && (
-            <motion.div 
-              className="relative overflow-hidden bg-primary/5 dark:bg-primary/10 rounded-xl p-3 border border-primary/20"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.45 }}
-            >
+          {dayContent.daily_tip &&
+        <motion.div
+          className="relative overflow-hidden bg-primary/5 dark:bg-primary/10 rounded-xl p-3 border border-primary/20"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.45 }}>
+          
               <div className="absolute -right-4 -top-4 text-6xl opacity-10">💡</div>
               <div className="flex items-center gap-1.5 mb-1.5">
                 <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
@@ -620,78 +620,78 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
                 {dayContent.daily_tip}
               </p>
             </motion.div>
-          )}
+        }
         </div>
-      )}
+      }
 
       {/* Weekly Tip from Database */}
-      {currentWeekTip && (
-        <motion.div 
-          className="bg-primary/5 dark:bg-primary/10 rounded-xl p-3 border border-primary/20"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
+      {currentWeekTip &&
+      <motion.div
+        className="bg-primary/5 dark:bg-primary/10 rounded-xl p-3 border border-primary/20"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.5 }}>
+        
           <div className="flex items-center gap-1.5 mb-1.5">
             <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
               <Lightbulb className="w-3 h-3 text-primary" />
             </div>
             <div>
-              <p className="text-[10px] text-primary font-bold uppercase tracking-wider">Həftə {selectedWeek} Tövsiyəsi</p>
+              <p className="text-[10px] text-primary font-bold uppercase tracking-wider">{tr("dashboard_hefte_3aa886", "H\u0259ft\u0259")} {selectedWeek} {tr("dashboard_tovsiyesi_6412b4", "T\xF6vsiy\u0259si")}</p>
               <h4 className="font-bold text-foreground text-sm">{currentWeekTip.title}</h4>
             </div>
           </div>
           <p className="text-xs text-foreground/80 leading-relaxed">{currentWeekTip.content}</p>
         </motion.div>
-      )}
+      }
 
       {/* Quick Actions Grid */}
       <div className="grid grid-cols-4 gap-1.5">
-        <QuickActionButton 
-          icon={Droplets} 
-          label="Su" 
-          color="bg-primary/10 dark:bg-primary/20 text-primary" 
+        <QuickActionButton
+          icon={Droplets}
+          label="Su"
+          color="bg-primary/10 dark:bg-primary/20 text-primary"
           value={`${waterCount}/8`}
-          onClick={addWater}
-        />
-        <QuickActionButton 
-          icon={Pill} 
-          label="Vitamin" 
-          color="bg-primary/10 dark:bg-primary/20 text-primary" 
+          onClick={addWater} />
+        
+        <QuickActionButton
+          icon={Pill}
+          label="Vitamin"
+          color="bg-primary/10 dark:bg-primary/20 text-primary"
           onClick={() => {
             if (onNavigateToTool) onNavigateToTool('vitaminTracker');
-          }}
-        />
-        <QuickActionButton 
-          icon={Activity} 
-          label={tr("dashboard_mesq_046a80", "Məşq")} 
-          color="bg-primary/10 dark:bg-primary/20 text-primary" 
+          }} />
+        
+        <QuickActionButton
+          icon={Activity}
+          label={tr("dashboard_mesq_046a80", "Məşq")}
+          color="bg-primary/10 dark:bg-primary/20 text-primary"
           onClick={() => {
             if (onNavigateToTool) onNavigateToTool('safetyLookup');
-          }}
-        />
-        <QuickActionButton 
-          icon={Heart} 
-          label={tr("dashboard_ehval_0457f9", "Əhval")} 
-          color="bg-primary/10 dark:bg-primary/20 text-primary" 
+          }} />
+        
+        <QuickActionButton
+          icon={Heart}
+          label={tr("dashboard_ehval_0457f9", "Əhval")}
+          color="bg-primary/10 dark:bg-primary/20 text-primary"
           value={currentMood ? getMoodEmoji(currentMood) : undefined}
           onClick={() => {
             if (onNavigateToTool) onNavigateToTool('mood-diary');
-          }}
-        />
+          }} />
+        
       </div>
 
       {/* "I Gave Birth" Button - Shown from week 38 */}
-      {showBirthButton && (
-        <motion.button
-          onClick={() => setShowBirthModal(true)}
-          className="w-full p-4 rounded-2xl bg-gradient-to-r from-pink-500 via-rose-500 to-red-500 text-white shadow-lg relative overflow-hidden"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
+      {showBirthButton &&
+      <motion.button
+        onClick={() => setShowBirthModal(true)}
+        className="w-full p-4 rounded-2xl bg-gradient-to-r from-pink-500 via-rose-500 to-red-500 text-white shadow-lg relative overflow-hidden"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.6 }}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}>
+        
           <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
           <div className="absolute -left-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-xl" />
           
@@ -706,7 +706,7 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
             <ChevronRight className="w-6 h-6 ml-auto" />
           </div>
         </motion.button>
-      )}
+      }
 
       {/* Birth Onboarding Modal */}
       <BirthOnboardingModal
@@ -715,45 +715,45 @@ const BumpDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string)
         onComplete={() => {
           setShowBirthModal(false);
           window.location.reload();
-        }}
-      />
-    </div>
-  );
+        }} />
+      
+    </div>);
+
 };
 
 // Daily fun facts about baby - changes every day
-const BABY_FUN_FACTS = [
-  "Bu gün əlləri ilə əşyaları tutmağı öyrənir! 🤲",
-  "Səsləri tanımaq qabiliyyəti artır 🎵",
-  "Bu gün gülüşləri daha mənalı olacaq 😊",
-  "Rəngləri daha aydın görməyə başlayır 🌈",
-  "Hərəkətləri daha koordinasiyalı olur 🏃",
-  "Bu gün yeni dadlar kəşf edə bilər 🍎",
-  "Emosiyalarını daha yaxşı ifadə edir 💕",
-  "Diqqət müddəti artmağa davam edir 👀",
-  "Yatma qaydaları daha müntəzəm olur 😴",
-  "Ətrafı tanımaq bacarığı inkişaf edir 🌍",
-  "Əlaqə qurma bacarıqları güclənir 🤝",
-  "Körpənin yaddaşı hər gün güclənir 🧠",
-  "Bu gün yeni səslər çıxara bilər 🗣️",
-  "Hərəkət koordinasiyası inkişaf edir ⚡",
-  "Mimikalar daha zəngin olur 😮",
-  "Ətrafdakılara diqqət artır 👁️",
-  "Gülümsəmələri daha tez-tez olur 😍",
-  "Oyun zamanı daha aktiv olur 🎮",
-  "Valideynləri tanıma güclənir 👨‍👩‍👧",
-  "Yeni nailiyyətlərə doğru irəliləyir 🌟",
-  "Bu gün əlləri ağzına apara bilər 🖐️",
-  "Şəkillərə baxmağı xoşlayır 🖼️",
-  "Musiqi dinləməkdən zövq alır 🎶",
-  "Ayaqlarını hərəkət etdirməyi sevir 🦶",
-  "Yuxu zamanı yuxu görə bilər 💭",
-  "Üzlərə baxmağı çox xoşlayır 👶",
-  "Bu gün qıcıqlanmaya reaksiya artır 🤭",
-  "Toxunma hissi daha həssas olur 🤚",
-  "Barmaqlarını kəşf etməyə davam edir ✋",
-  "Ətraf səslərə daha çox reaksiya verir 👂",
-];
+const BABY_FUN_FACTS = [tr("dashboard_bu_gun_elleri_ile_esyalari_tut_5ce101", "Bu g\xFCn \u0259ll\u0259ri il\u0259 \u0259\u015Fyalar\u0131 tutma\u011F\u0131 \xF6yr\u0259nir! \uD83E\uDD32"), tr("dashboard_sesleri_tanimaq_qabiliyyeti_ar_c1f670", "S\u0259sl\u0259ri tan\u0131maq qabiliyy\u0259ti art\u0131r \uD83C\uDFB5"), tr("dashboard_bu_gun_gulusleri_daha_menali_o_0ca2b5", "Bu g\xFCn g\xFCl\xFC\u015Fl\u0259ri daha m\u0259nal\u0131 olacaq \uD83D\uDE0A"), tr("dashboard_rengleri_daha_aydin_gormeye_ba_4ee0b0", "R\u0259ngl\u0259ri daha ayd\u0131n g\xF6rm\u0259y\u0259 ba\u015Flay\u0131r \uD83C\uDF08"), tr("dashboard_hereketleri_daha_koordinasiyal_c4d7d4", "H\u0259r\u0259k\u0259tl\u0259ri daha koordinasiyal\u0131 olur \uD83C\uDFC3"), tr("dashboard_bu_gun_yeni_dadlar_kesf_ede_bi_6a1832", "Bu g\xFCn yeni dadlar k\u0259\u015Ff ed\u0259 bil\u0259r \uD83C\uDF4E"), tr("dashboard_emosiyalarini_daha_yaxsi_ifade_a98a2f", "Emosiyalar\u0131n\u0131 daha yax\u015F\u0131 ifad\u0259 edir \uD83D\uDC95"), tr("dashboard_diqqet_muddeti_artmaga_davam_e_8ef858", "Diqq\u0259t m\xFCdd\u0259ti artma\u011Fa davam edir \uD83D\uDC40"), tr("dashboard_yatma_qaydalari_daha_muntezem__296d25", "Yatma qaydalar\u0131 daha m\xFCnt\u0259z\u0259m olur \uD83D\uDE34"), tr("dashboard_etrafi_tanimaq_bacarigi_inkisa_183398", "\u018Ftraf\u0131 tan\u0131maq bacar\u0131\u011F\u0131 inki\u015Faf edir \uD83C\uDF0D"), tr("dashboard_elaqe_qurma_bacariqlari_guclen_c24991", "\u018Flaq\u0259 qurma bacar\u0131qlar\u0131 g\xFCcl\u0259nir \uD83E\uDD1D"), tr("dashboard_korpenin_yaddasi_her_gun_gucle_3932c3", "K\xF6rp\u0259nin yadda\u015F\u0131 h\u0259r g\xFCn g\xFCcl\u0259nir \uD83E\uDDE0"), tr("dashboard_bu_gun_yeni_sesler_cixara_bile_cf83d8", "Bu g\xFCn yeni s\u0259sl\u0259r \xE7\u0131xara bil\u0259r \uD83D\uDDE3\uFE0F"), tr("dashboard_hereket_koordinasiyasi_inkisaf_56f22b", "H\u0259r\u0259k\u0259t koordinasiyas\u0131 inki\u015Faf edir \u26A1"), tr("dashboard_mimikalar_daha_zengin_olur_71f33d", "Mimikalar daha z\u0259ngin olur \uD83D\uDE2E"), tr("dashboard_etrafdakilara_diqqet_artir_29f3e2", "\u018Ftrafdak\u0131lara diqq\u0259t art\u0131r \uD83D\uDC41\uFE0F"), tr("dashboard_gulumsemeleri_daha_tez_tez_olu_22ffaa", "G\xFCl\xFCms\u0259m\u0259l\u0259ri daha tez-tez olur \uD83D\uDE0D"), tr("dashboard_oyun_zamani_daha_aktiv_olur_b55fb7", "Oyun zaman\u0131 daha aktiv olur \uD83C\uDFAE"), tr("dashboard_valideynleri_tanima_guclenir_0de81e", "Valideynl\u0259ri tan\u0131ma g\xFCcl\u0259nir \uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67"), tr("dashboard_yeni_nailiyyetlere_dogru_ireli_500201", "Yeni nailiyy\u0259tl\u0259r\u0259 do\u011Fru ir\u0259lil\u0259yir \uD83C\uDF1F"), tr("dashboard_bu_gun_elleri_agzina_apara_bil_a3b801", "Bu g\xFCn \u0259ll\u0259ri a\u011Fz\u0131na apara bil\u0259r \uD83D\uDD90\uFE0F"), tr("dashboard_sekillere_baxmagi_xoslayir_824e23", "\u015E\u0259kill\u0259r\u0259 baxma\u011F\u0131 xo\u015Flay\u0131r \uD83D\uDDBC\uFE0F"), tr("dashboard_musiqi_dinlemekden_zovq_alir_bbc189", "Musiqi dinl\u0259m\u0259kd\u0259n z\xF6vq al\u0131r \uD83C\uDFB6"), tr("dashboard_ayaqlarini_hereket_etdirmeyi_s_f3dbce", "Ayaqlar\u0131n\u0131 h\u0259r\u0259k\u0259t etdirm\u0259yi sevir \uD83E\uDDB6"), tr("dashboard_yuxu_zamani_yuxu_gore_biler_4fee2a", "Yuxu zaman\u0131 yuxu g\xF6r\u0259 bil\u0259r \uD83D\uDCAD"), tr("dashboard_uzlere_baxmagi_cox_xoslayir_628158", "\xDCzl\u0259r\u0259 baxma\u011F\u0131 \xE7ox xo\u015Flay\u0131r \uD83D\uDC76"), tr("dashboard_bu_gun_qiciqlanmaya_reaksiya_a_d65dc4", "Bu g\xFCn q\u0131c\u0131qlanmaya reaksiya art\u0131r \uD83E\uDD2D"), tr("dashboard_toxunma_hissi_daha_hessas_olur_cb038e", "Toxunma hissi daha h\u0259ssas olur \uD83E\uDD1A"), tr("dashboard_barmaqlarini_kesf_etmeye_davam_17caad", "Barmaqlar\u0131n\u0131 k\u0259\u015Ff etm\u0259y\u0259 davam edir \u270B"), tr("dashboard_etraf_seslere_daha_cox_reaksiy_c929eb", "\u018Ftraf s\u0259sl\u0259r\u0259 daha \xE7ox reaksiya verir \uD83D\uDC42")];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const getBabyDailyFunFact = (ageInDays: number): string => {
   // Use age + current day to get a rotating fact
@@ -762,15 +762,15 @@ const getBabyDailyFunFact = (ageInDays: number): string => {
   return BABY_FUN_FACTS[factIndex];
 };
 
-const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string) => void }) => {
+const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) => void;}) => {
   const { toast } = useToast();
   const { isMilestoneAchieved, toggleMilestone, getMilestoneDate, MILESTONES } = useBabyMilestones();
   const { unlockAchievement, getTotalPoints } = useAchievements();
   const { activeTimers, startTimer, stopTimer, getElapsedSeconds, getActiveTimer } = useTimerStore();
   const { todayLogs, addLog, getTodayStats, refetch } = useBabyLogs();
-  
+
   const { children, selectedChild, hasChildren, hasMultipleChildren, getChildAge } = useChildren();
-  
+
   // Derive baby data from selectedChild for multi-child support
   const childAge = selectedChild ? getChildAge(selectedChild) : null;
   const babyData = selectedChild && childAge ? {
@@ -779,26 +779,26 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
     birthDate: new Date(selectedChild.birth_date),
     gender: selectedChild.gender as 'boy' | 'girl',
     ageInDays: childAge.days,
-    ageInMonths: childAge.months,
+    ageInMonths: childAge.months
   } : null;
-  
+
   const babyAgeMonths = childAge?.months || 1;
   const { imageUrl: babyIllustration, title: illustrationTitle, description: illustrationDescription } = useBabyIllustrationByMonth(Math.max(1, Math.min(36, babyAgeMonths)));
   const { data: dailyInfo } = useBabyDailyInfoByDay(babyData?.ageInDays && babyData.ageInDays > 0 ? babyData.ageInDays : null);
   const { data: mommyMessage } = useMommyDailyMessageByDay(babyData?.ageInDays && babyData.ageInDays > 0 ? babyData.ageInDays : null);
-  
+
   // Current time for timer display
   const [, setTick] = useState(0);
-  
+
   // Milestone carousel state
   const [milestonePageIndex, setMilestonePageIndex] = useState(0);
-  
+
   // Get today's stats from database
   const todayStats = getTodayStats();
-  
+
   // Sleep tracking
   const sleepTimer = getActiveTimer('sleep');
-  
+
   // Feeding tracking with live timer
   const [showFeedingModal, setShowFeedingModal] = useState(false);
   const [showFormulaMLInput, setShowFormulaMLInput] = useState(false);
@@ -808,7 +808,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   const [solidFoodName, setSolidFoodName] = useState('');
   const leftFeedTimer = getActiveTimer('feeding', 'left');
   const rightFeedTimer = getActiveTimer('feeding', 'right');
-  
+
   // Diaper tracking
   const [showDiaperModal, setShowDiaperModal] = useState(false);
   const feedingSummaryRef = useRef<HTMLDivElement>(null);
@@ -816,25 +816,25 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
 
   // Update timer display every second
   useEffect(() => {
-    const interval = setInterval(() => setTick(t => t + 1), 1000);
+    const interval = setInterval(() => setTick((t) => t + 1), 1000);
     return () => clearInterval(interval);
   }, []);
 
   // Use all dynamic milestones from hook - with carousel if > 5
-  const allMilestones = MILESTONES.map(m => ({
+  const allMilestones = MILESTONES.map((m) => ({
     ...m,
     achieved: isMilestoneAchieved(m.id),
-    achievedDate: getMilestoneDate(m.id),
+    achievedDate: getMilestoneDate(m.id)
   }));
-  
+
   // Paginate milestones (5 per page)
   const milestonesPerPage = 5;
   const totalMilestonePages = Math.ceil(allMilestones.length / milestonesPerPage);
-  
+
   const getInitialMilestonePage = () => {
     for (let page = 0; page < totalMilestonePages; page++) {
       const pageItems = allMilestones.slice(page * milestonesPerPage, (page + 1) * milestonesPerPage);
-      if (pageItems.some(m => !m.achieved)) return page;
+      if (pageItems.some((m) => !m.achieved)) return page;
     }
     return 0;
   };
@@ -845,11 +845,11 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
       milestonePageIndex * milestonesPerPage,
       (milestonePageIndex + 1) * milestonesPerPage
     );
-    const allCompleted = currentPageItems.length > 0 && currentPageItems.every(m => m.achieved);
+    const allCompleted = currentPageItems.length > 0 && currentPageItems.every((m) => m.achieved);
     if (allCompleted && milestonePageIndex < totalMilestonePages - 1) {
       setMilestonePageIndex(milestonePageIndex + 1);
     }
-  }, [allMilestones.map(m => m.achieved).join(',')]);
+  }, [allMilestones.map((m) => m.achieved).join(',')]);
 
   // Set initial page on mount
   useEffect(() => {
@@ -861,12 +861,12 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
     return (
       <div className="flex items-center justify-center p-8 min-h-[200px]">
         <p className="text-muted-foreground text-sm animate-pulse">{tr("dashboard_yuklenir_5557de", "Yüklənir...")}</p>
-      </div>
-    );
+      </div>);
+
   }
-  
+
   const displayMilestones = allMilestones.slice(
-    milestonePageIndex * milestonesPerPage, 
+    milestonePageIndex * milestonesPerPage,
     (milestonePageIndex + 1) * milestonesPerPage
   );
   const hasMoreMilestones = allMilestones.length > milestonesPerPage;
@@ -886,7 +886,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         await addLog({
           log_type: 'sleep',
           start_time: new Date(Date.now() - result.durationSeconds * 1000).toISOString(),
-          end_time: new Date().toISOString(),
+          end_time: new Date().toISOString()
         });
         toast({ title: "Yuxu bitdi! ☀️", description: `${formatDuration(result.durationSeconds)} yatdı` });
       }
@@ -900,7 +900,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
   const toggleFeeding = async (type: 'left' | 'right') => {
     await hapticFeedback.medium();
     const activeTimer = type === 'left' ? leftFeedTimer : rightFeedTimer;
-    
+
     if (activeTimer) {
       // Stop feeding - save to database
       const result = stopTimer(activeTimer.id);
@@ -909,13 +909,13 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           log_type: 'feeding',
           feed_type: type === 'left' ? 'breast_left' : 'breast_right',
           start_time: new Date(Date.now() - result.durationSeconds * 1000).toISOString(),
-          end_time: new Date().toISOString(),
+          end_time: new Date().toISOString()
         });
-        toast({ 
-          title: `${type === 'left' ? 'Sol' : 'Sağ'} sinə bitti!`, 
-          description: `Müddət: ${formatDuration(result.durationSeconds)}` 
+        toast({
+          title: `${type === 'left' ? 'Sol' : tr("dashboard_sag_edbe12", "Sa\u011F")} sinə bitti!`,
+          description: `Müddət: ${formatDuration(result.durationSeconds)}`
         });
-        
+
         // Check for achievement
         if (todayStats.feedingCount >= 9) {
           unlockAchievement('feeding_pro', 'mommy');
@@ -933,21 +933,21 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
     let notes: string | undefined;
     if (type === 'formula' && amountMl) notes = `${amountMl} ml`;
     if (type === 'solid' && foodName) notes = foodName;
-    
+
     await addLog({
       log_type: 'feeding',
       feed_type: type,
-      notes,
+      notes
     });
     setShowFeedingModal(false);
     setShowFormulaMLInput(false);
     setFormulaML('');
     setShowSolidFoodInput(false);
     setSolidFoodName('');
-    
+
     const typeLabels = {
-      formula: amountMl ? `Süd əvəzedicisi ${amountMl} ml 🍼` : 'Süd əvəzedicisi 🍼',
-      solid: foodName ? `${foodName} 🥣` : 'Əlavə qida 🥣'
+      formula: amountMl ? `Süd əvəzedicisi ${amountMl} ml 🍼` : tr("dashboard_sud_evezedicisi_057b37", "S\xFCd \u0259v\u0259zedicisi \uD83C\uDF7C"),
+      solid: foodName ? `${foodName} 🥣` : tr("dashboard_elave_qida_0e11a2", "\u018Flav\u0259 qida \uD83E\uDD63")
     };
     toast({ title: `${typeLabels[type]} qeyd edildi!` });
   };
@@ -965,17 +965,17 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
     await hapticFeedback.medium();
     await addLog({
       log_type: 'diaper',
-      diaper_type: type === 'both' ? 'mixed' : type,
+      diaper_type: type === 'both' ? 'mixed' : type
     });
     setShowDiaperModal(false);
-    
+
     const typeEmojis = {
       wet: '💧',
       dirty: '💩',
       both: '💧💩'
     };
     toast({ title: `Bez dəyişmə: ${typeEmojis[type]}` });
-    
+
     // Check for achievement
     if (todayStats.diaperCount >= 9) {
       unlockAchievement('diaper_hero', 'mommy');
@@ -984,30 +984,30 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
 
   const getFeedingIcon = (type: string) => {
     switch (type) {
-      case 'left': return '🤱L';
-      case 'right': return '🤱R';
-      case 'formula': return '🍼';
-      case 'solid': return '🥣';
-      default: return '🍼';
+      case 'left':return '🤱L';
+      case 'right':return '🤱R';
+      case 'formula':return '🍼';
+      case 'solid':return '🥣';
+      default:return '🍼';
     }
   };
 
   const getDiaperIcon = (type: string) => {
     switch (type) {
-      case 'wet': return '💧';
-      case 'dirty': return '💩';
-      case 'both': return '💧💩';
-      case 'mixed': return '💧💩';
-      default: return '💧';
+      case 'wet':return '💧';
+      case 'dirty':return '💩';
+      case 'both':return '💧💩';
+      case 'mixed':return '💧💩';
+      default:return '💧';
     }
   };
 
   const handleMilestoneClick = async (milestoneId: string) => {
     await hapticFeedback.medium();
     await toggleMilestone(milestoneId);
-    
+
     // Check for milestone achievements
-    const achievedCount = displayMilestones.filter(m => isMilestoneAchieved(m.id)).length;
+    const achievedCount = displayMilestones.filter((m) => isMilestoneAchieved(m.id)).length;
     if (achievedCount === 0) {
       unlockAchievement('milestone_first', 'mommy');
     } else if (achievedCount >= 4) {
@@ -1017,7 +1017,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
 
   // Calculate exact age using real calendar months
   const exactMonths = babyData.ageInMonths;
-  const remainingDays = (babyData as any).ageRemainingDays ?? (babyData.ageInDays % 30);
+  const remainingDays = (babyData as any).ageRemainingDays ?? babyData.ageInDays % 30;
 
   return (
     <div className="space-y-3">
@@ -1032,28 +1032,28 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           babyData={{
             name: babyData.name,
             ageInMonths: babyData.ageInMonths,
-            ageInDays: babyData.ageInDays,
+            ageInDays: babyData.ageInDays
           }}
           exactMonths={exactMonths}
           remainingDays={remainingDays}
-          babyIllustration={babyIllustration}
-        />
+          babyIllustration={babyIllustration} />
+        
 
         {/* Bu günün məlumatları */}
-        {dailyInfo && (
-          <motion.div 
-            className="bg-gradient-to-b from-amber-50/80 to-amber-100/30 dark:from-amber-900/15 dark:to-amber-900/5 rounded-2xl p-4 border border-amber-100/40 dark:border-amber-800/30 shadow-sm"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
+        {dailyInfo &&
+        <motion.div
+          className="bg-gradient-to-b from-amber-50/80 to-amber-100/30 dark:from-amber-900/15 dark:to-amber-900/5 rounded-2xl p-4 border border-amber-100/40 dark:border-amber-800/30 shadow-sm"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}>
+          
             <div className="flex items-center gap-3 mb-4 pb-3 border-b border-amber-200/40 dark:border-amber-800/40">
               <div className="w-10 h-10 rounded-xl bg-amber-100/60 dark:bg-amber-800/40 flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               </div>
               <div className="flex-1">
                 <p className="text-[10px] font-semibold text-amber-500 dark:text-amber-400 uppercase tracking-widest mb-0.5">
-                  {babyData.ageInDays}. Gün
+                  {babyData.ageInDays}{tr("dashboard_gun_0b1035", ". G\xFCn")}
                 </p>
                 <p className="text-sm font-bold text-amber-900 dark:text-amber-100">
                   {tr('dashboard_todays_info', 'Bu günün məlumatları')}
@@ -1062,28 +1062,28 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             </div>
             
             <div className="space-y-2">
-              {dailyInfo.info
-                .split('\n')
-                .filter(line => line.trim().length > 0)
-                .map((line, index) => (
-                  <p key={index} className="text-[13px] text-amber-800 dark:text-white leading-relaxed font-medium">
+              {dailyInfo.info.
+            split('\n').
+            filter((line) => line.trim().length > 0).
+            map((line, index) =>
+            <p key={index} className="text-[13px] text-amber-800 dark:text-white leading-relaxed font-medium">
                     {line.trim()}
                   </p>
-                ))
-              }
+            )
+            }
             </div>
           </motion.div>
-        )}
+        }
       </div>
 
       {/* Anaya Mesaj */}
-      {mommyMessage && (
-        <motion.div 
-          className="bg-gradient-to-br from-rose-50 via-pink-50 to-rose-50 dark:from-rose-900/20 dark:via-pink-900/15 dark:to-rose-900/20 rounded-2xl p-4 border border-rose-200 dark:border-rose-800/50 shadow-lg relative overflow-hidden"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
+      {mommyMessage &&
+      <motion.div
+        className="bg-gradient-to-br from-rose-50 via-pink-50 to-rose-50 dark:from-rose-900/20 dark:via-pink-900/15 dark:to-rose-900/20 rounded-2xl p-4 border border-rose-200 dark:border-rose-800/50 shadow-lg relative overflow-hidden"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}>
+        
           {/* Decorative elements */}
           <div className="absolute top-2 right-3 opacity-10 text-4xl pointer-events-none">💝</div>
           <div className="absolute bottom-1 left-4 opacity-5 text-5xl pointer-events-none">🌸</div>
@@ -1094,7 +1094,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             </div>
             <div className="flex-1">
               <p className="text-[10px] font-semibold text-rose-400 dark:text-rose-400 uppercase tracking-widest mb-0.5">
-                {babyData?.ageInDays}. Gün
+                {babyData?.ageInDays}{tr("dashboard_gun_0b1035", ". G\xFCn")}
               </p>
               <p className="text-sm font-bold text-rose-800 dark:text-rose-100">
                 {tr('dashboard_message_for_mom', 'Anaya Mesaj')}
@@ -1103,27 +1103,27 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           </div>
           
           <div className="relative z-10">
-            {mommyMessage.message
-              .split('\n')
-              .filter((line: string) => line.trim().length > 0)
-              .map((line: string, index: number) => (
-                <p key={index} className="text-[13px] text-rose-700 dark:text-rose-200 leading-relaxed font-medium mb-1.5 last:mb-0">
+            {mommyMessage.message.
+          split('\n').
+          filter((line: string) => line.trim().length > 0).
+          map((line: string, index: number) =>
+          <p key={index} className="text-[13px] text-rose-700 dark:text-rose-200 leading-relaxed font-medium mb-1.5 last:mb-0">
                   {line.trim()}
                 </p>
-              ))
-            }
+          )
+          }
           </div>
         </motion.div>
-      )}
+      }
 
 
-      {illustrationTitle && (
-        <motion.div
-          className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 dark:from-primary/10 dark:via-primary/15 dark:to-primary/10 rounded-2xl p-4 border border-primary/20"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1 }}
-        >
+      {illustrationTitle &&
+      <motion.div
+        className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 dark:from-primary/10 dark:via-primary/15 dark:to-primary/10 rounded-2xl p-4 border border-primary/20"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.1 }}>
+        
           <div className="flex items-start gap-3">
             <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0 border border-primary/20">
               <Baby className="w-6 h-6 text-primary" />
@@ -1132,15 +1132,15 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
               <h3 className="font-bold text-sm text-foreground">
                 {illustrationTitle}
               </h3>
-              {illustrationDescription && (
-                <p className="text-xs text-muted-foreground mt-1 leading-relaxed line-clamp-3">
+              {illustrationDescription &&
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed line-clamp-3">
                   {illustrationDescription}
                 </p>
-              )}
+            }
             </div>
           </div>
         </motion.div>
-      )}
+      }
 
       {/* Teething Widget */}
 
@@ -1150,16 +1150,16 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
       <QuickActionsBar onNavigateToTool={onNavigateToTool} />
 
       {/* Cakes Widget - navigate to cakes tab, hide after 12 months */}
-      {babyData.ageInMonths < 12 && (
-        <motion.div
-          className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl p-4 border border-primary/20 shadow-card cursor-pointer"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.12 }}
-          whileHover={{ y: -2 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => onNavigateToTool?.('cakes')}
-        >
+      {babyData.ageInMonths < 12 &&
+      <motion.div
+        className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl p-4 border border-primary/20 shadow-card cursor-pointer"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.12 }}
+        whileHover={{ y: -2 }}
+        whileTap={{ scale: 0.98 }}
+        onClick={() => onNavigateToTool?.('cakes')}>
+        
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg">
               <span className="text-2xl">🎂</span>
@@ -1167,21 +1167,21 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             <div className="flex-1">
               <h3 className="font-bold text-sm text-foreground">{tr("dashboard_xususi_tortlar_ba1400", "Xüsusi Tortlar")}</h3>
               <p className="text-[11px] text-muted-foreground mt-0.5">
-                {babyData.ageInMonths > 0 ? tr('dashboard_order_monthly_cake', '{n}-ci aylıq tortunu sifariş ver!').replace('{n}', String(babyData.ageInMonths + 1)) : 'Körpəniz üçün milestone tortları'}
+                {babyData.ageInMonths > 0 ? tr('dashboard_order_monthly_cake', '{n}-ci aylıq tortunu sifariş ver!').replace('{n}', String(babyData.ageInMonths + 1)) : tr("dashboard_korpeniz_ucun_milestone_tortla_3bcbc1", "K\xF6rp\u0259niz \xFC\xE7\xFCn milestone tortlar\u0131")}
               </p>
             </div>
             <ChevronRight className="w-5 h-5 text-primary" />
           </div>
         </motion.div>
-      )}
+      }
 
       {/* Sleep Tracker */}
       <motion.div
         className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1 }}
-      >
+        transition={{ delay: 0.1 }}>
+        
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
@@ -1189,36 +1189,36 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
             </div>
             <div>
               <h3 className="font-bold text-sm text-foreground">{tr("dashboard_yuxu_izleme_adaa4f", "Yuxu İzləmə")}</h3>
-              <p className="text-xs text-muted-foreground">{ tr('dashboard_today_label', 'Bu gün') }: {(() => { const m = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60); const h = Math.floor(m / 60); const rm = m % 60; if (h === 0 && rm === 0) return '0 dəq'; if (h === 0) return `${rm} dəq`; if (rm === 0) return `${h} saat`; return `${h}s ${rm}d`; })()}</p>
+              <p className="text-xs text-muted-foreground">{tr('dashboard_today_label', 'Bu gün')}: {(() => {const m = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60);const h = Math.floor(m / 60);const rm = m % 60;if (h === 0 && rm === 0) return tr("dashboard_0_deq_86d70a", "0 d\u0259q");if (h === 0) return `${rm} dəq`;if (rm === 0) return `${h} saat`;return `${h}s ${rm}d`;})()}</p>
             </div>
           </div>
           <motion.button
             onClick={toggleSleep}
             className={`px-4 py-2.5 rounded-xl font-bold text-xs ${
-              sleepTimer 
-                ? 'bg-primary text-primary-foreground' 
-                : 'bg-primary/10 text-primary'
-            }`}
+            sleepTimer ?
+            'bg-primary text-primary-foreground' :
+            'bg-primary/10 text-primary'}`
+            }
             whileTap={{ scale: 0.95 }}
             animate={sleepTimer ? { scale: [1, 1.05, 1] } : {}}
-            transition={{ duration: 1, repeat: sleepTimer ? Infinity : 0 }}
-          >
-            {sleepTimer ? `☀️ ${formatDuration(getElapsedSeconds(sleepTimer.id))}` : ('😴 ' + tr('dashboard_slept_btn', 'Yatdı'))}
+            transition={{ duration: 1, repeat: sleepTimer ? Infinity : 0 }}>
+            
+            {sleepTimer ? `☀️ ${formatDuration(getElapsedSeconds(sleepTimer.id))}` : '😴 ' + tr('dashboard_slept_btn', 'Yatdı')}
           </motion.button>
         </div>
         
-        {sleepTimer && (
-          <motion.div 
-            className="bg-primary/10 rounded-xl p-3 flex items-center gap-3"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-          >
+        {sleepTimer &&
+        <motion.div
+          className="bg-primary/10 rounded-xl p-3 flex items-center gap-3"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}>
+          
             <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
             <span className="text-sm text-primary font-medium">
               {tr('dashboard_sleep_ongoing', 'Yuxu davam edir')}: {formatDuration(getElapsedSeconds(sleepTimer.id))}
             </span>
           </motion.div>
-        )}
+        }
       </motion.div>
 
       {/* Feeding Tracker */}
@@ -1226,13 +1226,13 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.15 }}
-      >
+        transition={{ delay: 0.15 }}>
+        
         <div className="flex items-center justify-between mb-3">
           <button
             className="flex items-center gap-2 cursor-pointer"
-            onClick={() => feedingSummaryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-          >
+            onClick={() => feedingSummaryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}>
+            
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
               <Baby className="w-5 h-5 text-primary-foreground" />
             </div>
@@ -1244,176 +1244,176 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           <motion.button
             onClick={() => setShowFeedingModal(true)}
             className="px-4 py-2.5 rounded-xl bg-primary/10 text-primary font-bold text-xs"
-            whileTap={{ scale: 0.95 }}
-          >
-            + Əlavə et
+            whileTap={{ scale: 0.95 }}>
+            {tr("dashboard_elave_et_a5fb21", "+ \u018Flav\u0259 et")}
+          
           </motion.button>
         </div>
         
         <AnimatePresence>
-          {showFeedingModal && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="grid grid-cols-2 gap-2 mb-3"
-            >
+          {showFeedingModal &&
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="grid grid-cols-2 gap-2 mb-3">
+            
               {/* Breastfeeding buttons - hide after 12 months */}
-              {babyData && babyData.ageInMonths < 12 && (
-                <>
+              {babyData && babyData.ageInMonths < 12 &&
+            <>
                   <motion.button
-                    onClick={() => toggleFeeding('left')}
-                    className={`p-3 rounded-xl flex flex-col items-center gap-1 ${
-                      leftFeedTimer 
-                        ? 'bg-pink-500 border-2 border-pink-600 text-white' 
-                        : 'bg-pink-50 border-2 border-pink-200'
-                    }`}
-                    whileTap={{ scale: 0.95 }}
-                  >
+                onClick={() => toggleFeeding('left')}
+                className={`p-3 rounded-xl flex flex-col items-center gap-1 ${
+                leftFeedTimer ?
+                'bg-pink-500 border-2 border-pink-600 text-white' :
+                'bg-pink-50 border-2 border-pink-200'}`
+                }
+                whileTap={{ scale: 0.95 }}>
+                
                     <span className="text-2xl">🤱</span>
                     <span className={`text-sm font-medium ${leftFeedTimer ? 'text-white' : 'text-pink-700'}`}>
-                      {leftFeedTimer ? formatDuration(getElapsedSeconds(leftFeedTimer.id)) : 'Sol Sinə'}
+                      {leftFeedTimer ? formatDuration(getElapsedSeconds(leftFeedTimer.id)) : tr("dashboard_sol_sine_92503e", "Sol Sin\u0259")}
                     </span>
                   </motion.button>
                   <motion.button
-                    onClick={() => toggleFeeding('right')}
-                    className={`p-3 rounded-xl flex flex-col items-center gap-1 ${
-                      rightFeedTimer 
-                        ? 'bg-pink-500 border-2 border-pink-600 text-white' 
-                        : 'bg-pink-50 border-2 border-pink-200'
-                    }`}
-                    whileTap={{ scale: 0.95 }}
-                  >
+                onClick={() => toggleFeeding('right')}
+                className={`p-3 rounded-xl flex flex-col items-center gap-1 ${
+                rightFeedTimer ?
+                'bg-pink-500 border-2 border-pink-600 text-white' :
+                'bg-pink-50 border-2 border-pink-200'}`
+                }
+                whileTap={{ scale: 0.95 }}>
+                
                     <span className="text-2xl">🤱</span>
                     <span className={`text-sm font-medium ${rightFeedTimer ? 'text-white' : 'text-pink-700'}`}>
-                      {rightFeedTimer ? formatDuration(getElapsedSeconds(rightFeedTimer.id)) : 'Sağ Sinə'}
+                      {rightFeedTimer ? formatDuration(getElapsedSeconds(rightFeedTimer.id)) : tr("dashboard_sag_sine_590332", "Sa\u011F Sin\u0259")}
                     </span>
                   </motion.button>
                 </>
-              )}
+            }
               <motion.button
-                onClick={handleFormulaClick}
-                className="p-3 rounded-xl bg-blue-50 border-2 border-blue-200 flex flex-col items-center gap-1"
-                whileTap={{ scale: 0.95 }}
-              >
+              onClick={handleFormulaClick}
+              className="p-3 rounded-xl bg-blue-50 border-2 border-blue-200 flex flex-col items-center gap-1"
+              whileTap={{ scale: 0.95 }}>
+              
                 <span className="text-xl">🍼</span>
                 <span className="text-xs font-medium text-blue-700">{tr("dashboard_sud_evezedicisi_4ba2dd", "Süd Əvəzedicisi")}</span>
               </motion.button>
               <motion.button
-                onClick={() => setShowSolidFoodInput(true)}
-                className="p-3 rounded-xl bg-orange-50 border-2 border-orange-200 flex flex-col items-center gap-1"
-                whileTap={{ scale: 0.95 }}
-              >
+              onClick={() => setShowSolidFoodInput(true)}
+              className="p-3 rounded-xl bg-orange-50 border-2 border-orange-200 flex flex-col items-center gap-1"
+              whileTap={{ scale: 0.95 }}>
+              
                 <span className="text-xl">🥣</span>
                 <span className="text-xs font-medium text-orange-700">{tr("dashboard_elave_qida_676032", "Əlavə Qida")}</span>
               </motion.button>
             </motion.div>
-          )}
+          }
         </AnimatePresence>
 
         {/* Formula ML Input Modal */}
         <AnimatePresence>
-          {showFormulaMLInput && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="bg-blue-50 rounded-xl p-3 mb-2 border border-blue-200"
-            >
+          {showFormulaMLInput &&
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="bg-blue-50 rounded-xl p-3 mb-2 border border-blue-200">
+            
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-lg">🍼</span>
                 <span className="text-sm font-semibold text-blue-700">{tr("dashboard_nece_ml_c9f7a6", "Neçə ml?")}</span>
               </div>
               <div className="flex flex-wrap gap-1.5 mb-2">
-                {formulaMLPresets.map(ml => (
-                  <motion.button
-                    key={ml}
-                    onClick={() => addFeeding('formula', ml)}
-                    className="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-700 text-xs font-bold border border-blue-200"
-                    whileTap={{ scale: 0.95 }}
-                  >
+                {formulaMLPresets.map((ml) =>
+              <motion.button
+                key={ml}
+                onClick={() => addFeeding('formula', ml)}
+                className="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-700 text-xs font-bold border border-blue-200"
+                whileTap={{ scale: 0.95 }}>
+                
                     {ml} ml
                   </motion.button>
-                ))}
+              )}
               </div>
               <div className="flex gap-2">
                 <input
-                  type="number"
-                  value={formulaML}
-                  onChange={(e) => setFormulaML(e.target.value)}
-                  placeholder={tr("dashboard_diger_ml_da1e7f", "Digər (ml)")}
-                  className="flex-1 px-3 py-1.5 rounded-lg border border-blue-200 text-sm bg-white"
-                  min="1"
-                  max="500"
-                />
+                type="number"
+                value={formulaML}
+                onChange={(e) => setFormulaML(e.target.value)}
+                placeholder={tr("dashboard_diger_ml_da1e7f", "Digər (ml)")}
+                className="flex-1 px-3 py-1.5 rounded-lg border border-blue-200 text-sm bg-white"
+                min="1"
+                max="500" />
+              
                 <motion.button
-                  onClick={submitFormula}
-                  className="px-4 py-1.5 rounded-lg bg-blue-500 text-white text-xs font-bold"
-                  whileTap={{ scale: 0.95 }}
-                >
+                onClick={submitFormula}
+                className="px-4 py-1.5 rounded-lg bg-blue-500 text-white text-xs font-bold"
+                whileTap={{ scale: 0.95 }}>
+                
                   Qeyd et
                 </motion.button>
                 <motion.button
-                  onClick={() => { setShowFormulaMLInput(false); setFormulaML(''); }}
-                  className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-xs"
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Ləğv
-                </motion.button>
+                onClick={() => {setShowFormulaMLInput(false);setFormulaML('');}}
+                className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-xs"
+                whileTap={{ scale: 0.95 }}>
+                  {tr("dashboard_legv_f7100a", "L\u0259\u011Fv")}
+                
+              </motion.button>
               </div>
             </motion.div>
-          )}
+          }
         </AnimatePresence>
 
         {/* Solid Food Input */}
         <AnimatePresence>
-          {showSolidFoodInput && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="bg-orange-50 rounded-xl p-3 mb-2 border border-orange-200"
-            >
+          {showSolidFoodInput &&
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="bg-orange-50 rounded-xl p-3 mb-2 border border-orange-200">
+            
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-lg">🥣</span>
                 <span className="text-sm font-semibold text-orange-700"><span className="text-sm font-semibold text-orange-700">{tr("dashboard_elave_qida_676032", "Əlavə Qida")}</span></span>
               </div>
               <div className="flex gap-2">
                 <input
-                  type="text"
-                  value={solidFoodName}
-                  onChange={(e) => setSolidFoodName(e.target.value)}
-                  placeholder={tr("dashboard_mes_balkabaqli_pure_27f08d", "Məs: balkabaqlı püre")}
-                  className="flex-1 px-3 py-1.5 rounded-lg border border-orange-200 text-sm bg-white"
-                />
+                type="text"
+                value={solidFoodName}
+                onChange={(e) => setSolidFoodName(e.target.value)}
+                placeholder={tr("dashboard_mes_balkabaqli_pure_27f08d", "Məs: balkabaqlı püre")}
+                className="flex-1 px-3 py-1.5 rounded-lg border border-orange-200 text-sm bg-white" />
+              
                 <motion.button
-                  onClick={() => {
-                    if (solidFoodName.trim()) addFeeding('solid', undefined, solidFoodName.trim());
-                  }}
-                  className="px-4 py-1.5 rounded-lg bg-orange-500 text-white text-xs font-bold"
-                  whileTap={{ scale: 0.95 }}
-                >
+                onClick={() => {
+                  if (solidFoodName.trim()) addFeeding('solid', undefined, solidFoodName.trim());
+                }}
+                className="px-4 py-1.5 rounded-lg bg-orange-500 text-white text-xs font-bold"
+                whileTap={{ scale: 0.95 }}>
+                
                   Qeyd et
                 </motion.button>
                 <motion.button
-                  onClick={() => { setShowSolidFoodInput(false); setSolidFoodName(''); }}
-                  className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-xs"
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Ləğv
-                </motion.button>
+                onClick={() => {setShowSolidFoodInput(false);setSolidFoodName('');}}
+                className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-xs"
+                whileTap={{ scale: 0.95 }}>
+                  {tr("dashboard_legv_f7100a", "L\u0259\u011Fv")}
+                
+              </motion.button>
               </div>
             </motion.div>
-          )}
+          }
         </AnimatePresence>
         
         {/* Active feeding timer indicator */}
-        {(leftFeedTimer || rightFeedTimer) && !showFeedingModal && (
-          <motion.div 
-            className="bg-pink-50 rounded-lg p-2 flex items-center justify-between mb-2"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-          >
+        {(leftFeedTimer || rightFeedTimer) && !showFeedingModal &&
+        <motion.div
+          className="bg-pink-50 rounded-lg p-2 flex items-center justify-between mb-2"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}>
+          
             <div className="flex items-center gap-3">
               <div className="w-3 h-3 rounded-full bg-pink-500 animate-pulse" />
               <span className="text-sm text-pink-700 font-medium">
@@ -1421,14 +1421,14 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
               </span>
             </div>
             <motion.button
-              onClick={() => toggleFeeding(leftFeedTimer ? 'left' : 'right')}
-              className="px-3 py-1 bg-pink-500 text-white rounded-lg text-sm font-medium"
-              whileTap={{ scale: 0.95 }}
-            >
+            onClick={() => toggleFeeding(leftFeedTimer ? 'left' : 'right')}
+            className="px-3 py-1 bg-pink-500 text-white rounded-lg text-sm font-medium"
+            whileTap={{ scale: 0.95 }}>
+            
               Bitir
             </motion.button>
           </motion.div>
-        )}
+        }
       </motion.div>
 
       {/* Diaper Tracker */}
@@ -1436,8 +1436,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
         className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-      >
+        transition={{ delay: 0.2 }}>
+        
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
@@ -1451,74 +1451,74 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           <motion.button
             onClick={() => setShowDiaperModal(true)}
             className="px-4 py-2.5 rounded-xl bg-primary/10 text-primary font-bold text-xs"
-            whileTap={{ scale: 0.95 }}
-          >
-            + Əlavə et
+            whileTap={{ scale: 0.95 }}>
+            {tr("dashboard_elave_et_a5fb21", "+ \u018Flav\u0259 et")}
+          
           </motion.button>
         </div>
         
         <AnimatePresence>
-          {showDiaperModal && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="grid grid-cols-3 gap-2 mb-3"
-            >
+          {showDiaperModal &&
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="grid grid-cols-3 gap-2 mb-3">
+            
               <motion.button
-                onClick={() => addDiaper('wet')}
-                className="p-3 rounded-xl bg-blue-50 border-2 border-blue-200 flex items-center justify-center"
-                whileTap={{ scale: 0.95 }}
-              >
+              onClick={() => addDiaper('wet')}
+              className="p-3 rounded-xl bg-blue-50 border-2 border-blue-200 flex items-center justify-center"
+              whileTap={{ scale: 0.95 }}>
+              
                 <span className="text-2xl">💧</span>
               </motion.button>
               <motion.button
-                onClick={() => addDiaper('dirty')}
-                className="p-3 rounded-xl bg-amber-50 border-2 border-amber-200 flex items-center justify-center"
-                whileTap={{ scale: 0.95 }}
-              >
+              onClick={() => addDiaper('dirty')}
+              className="p-3 rounded-xl bg-amber-50 border-2 border-amber-200 flex items-center justify-center"
+              whileTap={{ scale: 0.95 }}>
+              
                 <span className="text-2xl">💩</span>
               </motion.button>
               <motion.button
-                onClick={() => addDiaper('both')}
-                className="p-3 rounded-xl bg-purple-50 border-2 border-purple-200 flex items-center justify-center"
-                whileTap={{ scale: 0.95 }}
-              >
+              onClick={() => addDiaper('both')}
+              className="p-3 rounded-xl bg-purple-50 border-2 border-purple-200 flex items-center justify-center"
+              whileTap={{ scale: 0.95 }}>
+              
                 <span className="text-xl">💧💩</span>
               </motion.button>
             </motion.div>
-          )}
+          }
         </AnimatePresence>
         
         {/* Recent Diapers */}
         <div className="flex gap-1.5 overflow-x-auto hide-scrollbar">
-          {todayStats.diaperLogs.slice(-5).reverse().map((log) => (
-            <div 
-              key={log.id}
-              className="flex-shrink-0 px-2 py-1.5 rounded-lg bg-muted/50 flex items-center gap-1.5"
-            >
+          {todayStats.diaperLogs.slice(-5).reverse().map((log) =>
+          <div
+            key={log.id}
+            className="flex-shrink-0 px-2 py-1.5 rounded-lg bg-muted/50 flex items-center gap-1.5">
+            
               <span className="text-lg">{getDiaperIcon(log.diaper_type || 'wet')}</span>
               <span className="text-xs text-muted-foreground">
                 {new Date(log.start_time).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
-          ))}
+          )}
         </div>
       </motion.div>
 
       {/* Today's Summary */}
-      <motion.div 
+      <motion.div
         className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3 }}
-      >
+        transition={{ delay: 0.3 }}>
+        
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-base font-bold text-foreground">{tr("dashboard_bugunku_xulase_e1e1b3", "Bugünkü xülasə")}</h3>
           <button
             onClick={() => refetch()}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
-          >
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors">
+            
             <RefreshCw className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -1527,8 +1527,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           <div className="bg-primary/5 rounded-2xl overflow-hidden border border-primary/20">
             <button
               onClick={() => setSleepExpanded(!sleepExpanded)}
-              className="w-full p-3 flex items-center justify-between hover:bg-primary/10 transition-colors"
-            >
+              className="w-full p-3 flex items-center justify-between hover:bg-primary/10 transition-colors">
+              
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Moon className="w-4 h-4 text-primary" />
@@ -1547,7 +1547,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                       const totalMin = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60);
                       const h = Math.floor(totalMin / 60);
                       const m = totalMin % 60;
-                      if (h === 0 && m === 0) return '0 dəq';
+                      if (h === 0 && m === 0) return tr("dashboard_0_deq_86d70a", "0 d\u0259q");
                       if (h === 0) return `${m} dəq`;
                       if (m === 0) return `${h} saat`;
                       return `${h} saat ${m} dəq`;
@@ -1555,35 +1555,35 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                   </p>
                   <p className="text-[10px] text-muted-foreground">{tr("dashboard_bu_gun_7d7f30", "bu gün")}</p>
                 </div>
-                {sleepExpanded ? (
-                  <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                ) : (
-                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                )}
+                {sleepExpanded ?
+                <ChevronUp className="w-4 h-4 text-muted-foreground" /> :
+
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                }
               </div>
             </button>
             <AnimatePresence>
-              {sleepExpanded && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="overflow-hidden"
-                >
+              {sleepExpanded &&
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden">
+                
                   <div className="px-3 pb-3 space-y-1.5">
-                    {(todayStats.sleepLogs && todayStats.sleepLogs.length > 0) ? (
-                      [...todayStats.sleepLogs].reverse().map((log) => {
-                        const start = new Date(log.start_time);
-                        const end = log.end_time ? new Date(log.end_time) : null;
-                        const durationSec = end ? Math.round((end.getTime() - start.getTime()) / 1000) : 0;
-                        const dH = Math.floor(durationSec / 3600);
-                        const dM = Math.floor((durationSec % 3600) / 60);
-                        const dS = durationSec % 60;
-                        const durText = dH > 0 ? `${dH}s ${dM}d` : dM > 0 ? `${dM} dəq ${dS} san` : `${dS} san`;
+                    {todayStats.sleepLogs && todayStats.sleepLogs.length > 0 ?
+                  [...todayStats.sleepLogs].reverse().map((log) => {
+                    const start = new Date(log.start_time);
+                    const end = log.end_time ? new Date(log.end_time) : null;
+                    const durationSec = end ? Math.round((end.getTime() - start.getTime()) / 1000) : 0;
+                    const dH = Math.floor(durationSec / 3600);
+                    const dM = Math.floor(durationSec % 3600 / 60);
+                    const dS = durationSec % 60;
+                    const durText = dH > 0 ? `${dH}s ${dM}d` : dM > 0 ? `${dM} dəq ${dS} san` : `${dS} san`;
 
-                        return (
-                          <div key={log.id} className="flex items-center justify-between p-2 bg-primary/10 rounded-xl">
+                    return (
+                      <div key={log.id} className="flex items-center justify-between p-2 bg-primary/10 rounded-xl">
                             <div className="flex items-center gap-2">
                               <span className="text-sm">😴</span>
                               <div>
@@ -1596,15 +1596,15 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                             <span className="text-[11px] font-semibold text-primary">
                               {end ? durText : 'Davam edir...'}
                             </span>
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <p className="text-[11px] text-muted-foreground text-center py-2">{tr("dashboard_bu_gun_yuxu_qeyde_alinmayib_8a3535", "Bu gün yuxu qeydə alınmayıb")}</p>
-                    )}
+                          </div>);
+
+                  }) :
+
+                  <p className="text-[11px] text-muted-foreground text-center py-2">{tr("dashboard_bu_gun_yuxu_qeyde_alinmayib_8a3535", "Bu gün yuxu qeydə alınmayıb")}</p>
+                  }
                   </div>
                 </motion.div>
-              )}
+              }
             </AnimatePresence>
           </div>
           
@@ -1615,8 +1615,8 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
           <div className="bg-primary/5 rounded-2xl overflow-hidden border border-primary/20">
             <button
               onClick={() => setShowDiaperModal(true)}
-              className="w-full p-3 flex items-center justify-between hover:bg-primary/10 transition-colors"
-            >
+              className="w-full p-3 flex items-center justify-between hover:bg-primary/10 transition-colors">
+              
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Clock className="w-4 h-4 text-primary" />
@@ -1629,7 +1629,7 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
                 </div>
               </div>
               <div className="text-right mr-2">
-                <p className="text-xs font-bold text-primary">{todayStats.diaperCount} dəfə</p>
+                <p className="text-xs font-bold text-primary">{todayStats.diaperCount} {tr("dashboard_defe_420246", "d\u0259f\u0259")}</p>
                 <p className="text-[10px] text-muted-foreground">{tr("dashboard_bu_gun_7d7f30", "bu gün")}</p>
               </div>
             </button>
@@ -1644,104 +1644,104 @@ const MommyDashboard = ({ onNavigateToTool }: { onNavigateToTool?: (tool: string
       <GrowthTrackerWidget />
 
       {/* Milestones with Carousel */}
-      <motion.div 
+      <motion.div
         className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.25 }}
-      >
+        transition={{ delay: 0.25 }}>
+        
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-base font-bold text-foreground">{tr("dashboard_inkisaf_merheleleri_d6d887", "İnkişaf mərhələləri")}</h3>
           <div className="flex items-center gap-2">
             <span className="text-xs text-primary font-bold">
-              {allMilestones.filter(m => m.achieved).length}/{allMilestones.length}
+              {allMilestones.filter((m) => m.achieved).length}/{allMilestones.length}
             </span>
             {/* Carousel navigation */}
-            {hasMoreMilestones && (
-              <div className="flex gap-1">
+            {hasMoreMilestones &&
+            <div className="flex gap-1">
                 <motion.button
-                  onClick={() => setMilestonePageIndex(p => Math.max(0, p - 1))}
-                  disabled={milestonePageIndex === 0}
-                  className="w-6 h-6 rounded-full bg-muted flex items-center justify-center disabled:opacity-40"
-                  whileTap={{ scale: 0.9 }}
-                >
+                onClick={() => setMilestonePageIndex((p) => Math.max(0, p - 1))}
+                disabled={milestonePageIndex === 0}
+                className="w-6 h-6 rounded-full bg-muted flex items-center justify-center disabled:opacity-40"
+                whileTap={{ scale: 0.9 }}>
+                
                   <ChevronRight className="w-3 h-3 rotate-180" />
                 </motion.button>
                 <motion.button
-                  onClick={() => setMilestonePageIndex(p => Math.min(totalMilestonePages - 1, p + 1))}
-                  disabled={milestonePageIndex === totalMilestonePages - 1}
-                  className="w-6 h-6 rounded-full bg-muted flex items-center justify-center disabled:opacity-40"
-                  whileTap={{ scale: 0.9 }}
-                >
+                onClick={() => setMilestonePageIndex((p) => Math.min(totalMilestonePages - 1, p + 1))}
+                disabled={milestonePageIndex === totalMilestonePages - 1}
+                className="w-6 h-6 rounded-full bg-muted flex items-center justify-center disabled:opacity-40"
+                whileTap={{ scale: 0.9 }}>
+                
                   <ChevronRight className="w-3 h-3" />
                 </motion.button>
               </div>
-            )}
+            }
           </div>
         </div>
         
         {/* Page indicator */}
-        {hasMoreMilestones && (
-          <div className="flex justify-center gap-1 mb-3">
-            {Array.from({ length: totalMilestonePages }).map((_, i) => (
-              <div
-                key={i}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === milestonePageIndex ? 'w-4 bg-primary' : 'w-1.5 bg-muted'
-                }`}
-              />
-            ))}
+        {hasMoreMilestones &&
+        <div className="flex justify-center gap-1 mb-3">
+            {Array.from({ length: totalMilestonePages }).map((_, i) =>
+          <div
+            key={i}
+            className={`h-1.5 rounded-full transition-all ${
+            i === milestonePageIndex ? 'w-4 bg-primary' : 'w-1.5 bg-muted'}`
+            } />
+
+          )}
           </div>
-        )}
+        }
         
         <div className="flex justify-between overflow-hidden">
-          {displayMilestones.map((milestone, index) => (
-            <motion.button 
-              key={milestone.id}
-              onClick={() => handleMilestoneClick(milestone.id)}
-              className="text-center flex-1"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.05 + index * 0.05 }}
-              whileTap={{ scale: 0.9 }}
-            >
+          {displayMilestones.map((milestone, index) =>
+          <motion.button
+            key={milestone.id}
+            onClick={() => handleMilestoneClick(milestone.id)}
+            className="text-center flex-1"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.05 + index * 0.05 }}
+            whileTap={{ scale: 0.9 }}>
+            
               <div className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center text-lg mb-1 relative ${
-                milestone.achieved 
-                  ? 'bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg' 
-                  : 'bg-muted opacity-60'
-              }`}>
+            milestone.achieved ?
+            'bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg' :
+            'bg-muted opacity-60'}`
+            }>
                 {milestone.emoji}
-                {milestone.achieved && (
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                {milestone.achieved &&
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
                     <Check className="w-2.5 h-2.5 text-white" />
                   </div>
-                )}
+              }
               </div>
               <span className={`text-[10px] line-clamp-1 ${
-                milestone.achieved ? 'text-foreground font-medium' : 'text-muted-foreground'
-              }`}>
+            milestone.achieved ? 'text-foreground font-medium' : 'text-muted-foreground'}`
+            }>
                 {milestone.label}
               </span>
             </motion.button>
-          ))}
+          )}
         </div>
       </motion.div>
 
       {/* Baby Crisis Calendar Widget - hide after week 75 (last crisis ends) */}
-      {Math.floor(babyData.ageInDays / 7) <= 75 && (
-        <BabyCrisisWidget 
-          babyAgeWeeks={Math.floor(babyData.ageInDays / 7)} 
-          babyName={babyData.name} 
-        />
-      )}
+      {Math.floor(babyData.ageInDays / 7) <= 75 &&
+      <BabyCrisisWidget
+        babyAgeWeeks={Math.floor(babyData.ageInDays / 7)}
+        babyName={babyData.name} />
+
+      }
 
 
 
 
       {/* Development Tips - Dynamic based on age */}
       <DevelopmentTipsWidget />
-    </div>
-  );
+    </div>);
+
 };
 
 interface DashboardProps {
@@ -1772,37 +1772,37 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
   return (
     <div className="pb-20 pt-2 px-3">
       {/* Header */}
-      <motion.div 
+      <motion.div
         className="flex items-center justify-between mb-2"
         initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-      >
+        animate={{ y: 0, opacity: 1 }}>
+        
         <div>
           <p className="text-xs text-muted-foreground font-medium">{getGreeting()}</p>
-          <h1 className="text-lg font-black text-foreground">{name || 'Xanım'} 👋</h1>
+          <h1 className="text-lg font-black text-foreground">{name || tr("dashboard_xanim_39ff6a", "Xan\u0131m")} 👋</h1>
         </div>
         <div className="flex items-center gap-2">
-          {lifeStage === 'mommy' ? (
-            <ChildSelector compact />
-          ) : (
-            <motion.button 
-              onClick={onOpenChat}
-              className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center relative"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
+          {lifeStage === 'mommy' ?
+          <ChildSelector compact /> :
+
+          <motion.button
+            onClick={onOpenChat}
+            className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center relative"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}>
+            
               <MessageCircle className="w-4 h-4 text-primary" />
-              {totalUnread > 0 && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[9px] font-bold text-white flex items-center justify-center"
-                >
+              {totalUnread > 0 &&
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[9px] font-bold text-white flex items-center justify-center">
+              
                   {totalUnread > 9 ? '9+' : totalUnread}
                 </motion.span>
-              )}
+            }
             </motion.button>
-          )}
+          }
           {/* Notification bell temporarily disabled */}
         </div>
 
@@ -1829,8 +1829,8 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
 
       {/* Small medical disclaimer for all modules — Google Play Health Content policy */}
       <MedicalDisclaimer variant="inline" className="mt-3 px-1" />
-    </div>
-  );
+    </div>);
+
 };
 
 export default Dashboard;

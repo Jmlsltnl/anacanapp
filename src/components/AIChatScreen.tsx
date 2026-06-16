@@ -31,7 +31,7 @@ interface Message {
 const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   useScrollToTop();
   useScreenAnalytics('AIChat', 'Chat');
-  
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -41,30 +41,30 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const { user } = useAuth();
   const { messages: savedMessages, addMessage, clearHistory, loading: historyLoading } = useAIChatHistory('woman');
   const { toast } = useToast();
-  
+
   const pregnancyData = getPregnancyData();
-  
+
   // Calculate pregnancy day for dynamic content
   const pregnancyDay = lifeStage === 'bump' ? getPregnancyDay(lastPeriodDate) : 0;
-  
+
   // Fetch dynamic pregnancy content
   const { data: dayContent } = usePregnancyContentByDay(pregnancyDay > 0 && lifeStage === 'bump' ? pregnancyDay : undefined);
   const { data: fruitImages = [] } = useFruitImages();
-  
+
   // Get dynamic fruit data from unified source
   const getDynamicFruitName = () => {
     if (!pregnancyData || lifeStage !== 'bump') return null;
-    
+
     const fruitData = getDynamicFruitData(
       fruitImages,
       pregnancyDay,
       pregnancyData.currentWeek,
       dayContent
     );
-    
+
     return fruitData.fruit;
   };
-  
+
   // Create profile object from store data
   const userProfile = {
     name: name || undefined,
@@ -80,11 +80,11 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     if (!historyLoading && !isInitialized && user) {
       if (savedMessages.length > 0) {
         // Restore saved messages
-        const restoredMessages: Message[] = savedMessages.map(m => ({
+        const restoredMessages: Message[] = savedMessages.map((m) => ({
           id: m.id,
           role: m.role,
           content: m.content,
-          timestamp: new Date(m.created_at),
+          timestamp: new Date(m.created_at)
         }));
         setMessages(restoredMessages);
       } else {
@@ -156,28 +156,28 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     };
 
     const assistantMessageId = `assistant-${Date.now()}`;
-    
-    setMessages(prev => [...prev, userMessage, {
+
+    setMessages((prev) => [...prev, userMessage, {
       id: assistantMessageId,
       role: 'assistant',
       content: '',
       timestamp: new Date(),
       isStreaming: true
     }]);
-    
+
     // Save user message to database
     await addMessage('user', userMessage.content);
-    
+
     setInput('');
     setIsLoading(true);
 
     try {
-      const conversationHistory = messages
-        .filter(m => m.id !== 'welcome')
-        .map(m => ({
-          role: m.role,
-          content: m.content
-        }));
+      const conversationHistory = messages.
+      filter((m) => m.id !== 'welcome').
+      map((m) => ({
+        role: m.role,
+        content: m.content
+      }));
 
       conversationHistory.push({
         role: 'user',
@@ -187,14 +187,14 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       // Use fetch for streaming support — must use the user's session JWT, not the anon key
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
-        throw new Error('Sessiya tapılmadı. Yenidən daxil olun.');
+        throw new Error(tr("aichatscreen_sessiya_tapilmadi_yeniden_daxi_455503", "Sessiya tap\u0131lmad\u0131. Yenid\u0259n daxil olun."));
       }
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dr-anacan-chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
-          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
         },
         body: JSON.stringify({
           messages: conversationHistory,
@@ -207,7 +207,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
             try {
               const info = getPhaseInfoForDate(new Date(), new Date(lastPeriodDate), cycleLength || 28, periodLength || 5);
               return { cyclePhase: info.phase, cycleDay: info.dayInCycle };
-            } catch { return {}; }
+            } catch {return {};}
           })() : {}),
           userProfile: {
             name: userProfile.name,
@@ -222,12 +222,12 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'API xətası');
+        throw new Error(errorData.error || tr("aichatscreen_api_xetasi_1b7c03", "API x\u0259tas\u0131"));
       }
 
       // Handle streaming response
       const reader = response.body?.getReader();
-      
+
       if (reader) {
         const decoder = new TextDecoder();
         let fullContent = '';
@@ -252,10 +252,10 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
                 const content = parsed.choices?.[0]?.delta?.content || '';
                 if (content) {
                   fullContent += content;
-                  setMessages(prev => prev.map(m => 
-                    m.id === assistantMessageId 
-                      ? { ...m, content: fullContent }
-                      : m
+                  setMessages((prev) => prev.map((m) =>
+                  m.id === assistantMessageId ?
+                  { ...m, content: fullContent } :
+                  m
                   ));
                 }
               } catch (parseErr) {
@@ -283,11 +283,11 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
         }
 
         // Mark streaming as complete and save to database
-        const finalContent = fullContent || 'Bağışlayın, cavab ala bilmədim.';
-        setMessages(prev => prev.map(m => 
-          m.id === assistantMessageId 
-            ? { ...m, isStreaming: false, content: finalContent }
-            : m
+        const finalContent = fullContent || tr("aichatscreen_bagislayin_cavab_ala_bilmedim_4078bf", "Ba\u011F\u0131\u015Flay\u0131n, cavab ala bilm\u0259dim.");
+        setMessages((prev) => prev.map((m) =>
+        m.id === assistantMessageId ?
+        { ...m, isStreaming: false, content: finalContent } :
+        m
         ));
         // Save assistant message to database
         if (fullContent) {
@@ -296,11 +296,11 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       } else {
         // Fallback to non-streaming response
         const data = await response.json();
-        const content = data.message || 'Bağışlayın, cavab ala bilmədim.';
-        setMessages(prev => prev.map(m => 
-          m.id === assistantMessageId 
-            ? { ...m, isStreaming: false, content }
-            : m
+        const content = data.message || tr("aichatscreen_bagislayin_cavab_ala_bilmedim_4078bf", "Ba\u011F\u0131\u015Flay\u0131n, cavab ala bilm\u0259dim.");
+        setMessages((prev) => prev.map((m) =>
+        m.id === assistantMessageId ?
+        { ...m, isStreaming: false, content } :
+        m
         ));
         if (data.message) {
           await addMessage('assistant', data.message);
@@ -313,11 +313,11 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
         description: tr("aichatscreen_mesaj_gonderile_bilmedi_yeniden_cehd_edi_aa6662", 'Mesaj göndərilə bilmədi. Yenidən cəhd edin.'),
         variant: 'destructive'
       });
-      
-      setMessages(prev => prev.map(m => 
-        m.id === assistantMessageId 
-          ? { ...m, isStreaming: false, content: tr("aichatscreen_bagislayin_texniki_xeta_bas_verdi_zehmet_feb7d7", "Bağışlayın, texniki xəta baş verdi. Zəhmət olmasa yenidən cəhd edin. 🙏") }
-          : m
+
+      setMessages((prev) => prev.map((m) =>
+      m.id === assistantMessageId ?
+      { ...m, isStreaming: false, content: tr("aichatscreen_bagislayin_texniki_xeta_bas_verdi_zehmet_feb7d7", "Bağışlayın, texniki xəta baş verdi. Zəhmət olmasa yenidən cəhd edin. 🙏") } :
+      m
       ));
     } finally {
       setIsLoading(false);
@@ -343,26 +343,26 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
 
   // Fetch dynamic suggested questions
   const { data: dynamicQuestions = [] } = useAISuggestedQuestions(lifeStage || 'bump', 'mother');
-  
-  const suggestedQuestions = dynamicQuestions.length > 0
-    ? dynamicQuestions.map(q => q.question_az || q.question)
-    : lifeStage === 'bump' 
-    ? [
-        'Bu həftə körpəm necə inkişaf edir?',
-        'Hamiləlikdə hansı qidalar faydalıdır?',
-        'Ürək bulanmasına qarşı nə edə bilərəm?'
-      ]
-    : lifeStage === 'mommy'
-    ? [
-        'Körpəmi necə düzgün əmizdirməliyəm?',
-        'Yenidoğanın yuxu qrafiki necə olmalıdır?',
-        'Körpəm niyə ağlayır?'
-      ]
-    : [
-        'Menstrual tsiklim haqqında məlumat ver',
-        'PMS simptomları ilə necə mübarizə aparım?',
-        'Fertil pəncərəm nə vaxtdır?'
-      ];
+
+  const suggestedQuestions = dynamicQuestions.length > 0 ?
+  dynamicQuestions.map((q) => q.question_az || q.question) :
+  lifeStage === 'bump' ?
+  [tr("aichatscreen_bu_hefte_korpem_nece_inkisaf_e_7ffbca", "Bu h\u0259ft\u0259 k\xF6rp\u0259m nec\u0259 inki\u015Faf edir?"), tr("aichatscreen_hamilelikde_hansi_qidalar_fayd_cfee1a", "Hamil\u0259likd\u0259 hans\u0131 qidalar faydal\u0131d\u0131r?"), tr("aichatscreen_urek_bulanmasina_qarsi_ne_ede__39caf3", "\xDCr\u0259k bulanmas\u0131na qar\u015F\u0131 n\u0259 ed\u0259 bil\u0259r\u0259m?")] :
+
+
+
+
+  lifeStage === 'mommy' ?
+  [tr("aichatscreen_korpemi_nece_duzgun_emizdirmel_05cf51", "K\xF6rp\u0259mi nec\u0259 d\xFCzg\xFCn \u0259mizdirm\u0259liy\u0259m?"), tr("aichatscreen_yenidoganin_yuxu_qrafiki_nece__9e1277", "Yenido\u011Fan\u0131n yuxu qrafiki nec\u0259 olmal\u0131d\u0131r?"), tr("aichatscreen_korpem_niye_aglayir_b5dc07", "K\xF6rp\u0259m niy\u0259 a\u011Flay\u0131r?")] :
+
+
+
+
+  [tr("aichatscreen_menstrual_tsiklim_haqqinda_mel_0616ab", "Menstrual tsiklim haqq\u0131nda m\u0259lumat ver"), tr("aichatscreen_pms_simptomlari_ile_nece_mubar_4c2325", "PMS simptomlar\u0131 il\u0259 nec\u0259 m\xFCbariz\u0259 apar\u0131m?"), tr("aichatscreen_fertil_pencerem_ne_vaxtdir_7a0f65", "Fertil p\u0259nc\u0259r\u0259m n\u0259 vaxtd\u0131r?")];
+
+
+
+
 
   return (
     <div ref={ref} className="fixed inset-0 bottom-[80px] flex flex-col bg-gradient-to-b from-background to-muted/20" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
@@ -401,77 +401,77 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
 
         <div className="space-y-4 pb-4">
           <AnimatePresence>
-            {messages.map((message) => (
-              <motion.div
-                key={message.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.18 }}
-                className={`flex gap-2 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
-              >
+            {messages.map((message) =>
+            <motion.div
+              key={message.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18 }}
+              className={`flex gap-2 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}>
+              
                 <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center ${
-                  message.role === 'user' 
-                    ? 'bg-primary/10' 
-                    : 'gradient-primary'
-                }`}>
-                  {message.role === 'user' 
-                    ? <User className="w-3.5 h-3.5 text-primary" />
-                    : <Bot className="w-3.5 h-3.5 text-white" />
-                  }
+              message.role === 'user' ?
+              'bg-primary/10' :
+              'gradient-primary'}`
+              }>
+                  {message.role === 'user' ?
+                <User className="w-3.5 h-3.5 text-primary" /> :
+                <Bot className="w-3.5 h-3.5 text-white" />
+                }
                 </div>
                 <div className={`max-w-[80%] px-3 py-2 rounded-2xl ${
-                  message.role === 'user'
-                    ? 'bg-primary text-primary-foreground rounded-br-md'
-                    : 'bg-card border border-border shadow-sm rounded-bl-md'
-                }`}>
+              message.role === 'user' ?
+              'bg-primary text-primary-foreground rounded-br-md' :
+              'bg-card border border-border shadow-sm rounded-bl-md'}`
+              }>
                 <div className="text-[13px] leading-relaxed">
-                  {message.role === 'assistant' ? (
-                    <MarkdownContent content={message.content} variant="chat" />
-                  ) : (
-                    <span className="whitespace-pre-wrap">{message.content}</span>
-                  )}
-                  {message.isStreaming && (
-                    <motion.span
-                      className="inline-block w-1.5 h-3.5 bg-primary ml-1"
-                      animate={{ opacity: [1, 0] }}
-                      transition={{ duration: 0.5, repeat: Infinity }}
-                    />
-                  )}
+                  {message.role === 'assistant' ?
+                  <MarkdownContent content={message.content} variant="chat" /> :
+
+                  <span className="whitespace-pre-wrap">{message.content}</span>
+                  }
+                  {message.isStreaming &&
+                  <motion.span
+                    className="inline-block w-1.5 h-3.5 bg-primary ml-1"
+                    animate={{ opacity: [1, 0] }}
+                    transition={{ duration: 0.5, repeat: Infinity }} />
+
+                  }
                 </div>
-                {!message.isStreaming && (
-                  <span className="text-[9px] opacity-50 mt-1 block">
+                {!message.isStreaming &&
+                <span className="text-[9px] opacity-50 mt-1 block">
                     {message.timestamp.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
                   </span>
-                )}
+                }
                 </div>
               </motion.div>
-            ))}
+            )}
           </AnimatePresence>
         </div>
 
         {/* Suggested Questions */}
-        {messages.length <= 1 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="space-y-2 mt-4"
-          >
+        {messages.length <= 1 &&
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="space-y-2 mt-4">
+          
             <p className="text-xs text-muted-foreground text-center mb-3">{tr("aichatscreen_meslehet_ucun_sual_secin_3c0236", "Məsləhət üçün sual seçin:")}</p>
-            {suggestedQuestions.map((question, index) => (
-              <motion.button
-                key={index}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setInput(question)}
-                className="w-full p-3 text-left text-sm bg-card border border-border rounded-xl hover:border-primary/50 hover:bg-primary/5 transition-all"
-              >
+            {suggestedQuestions.map((question, index) =>
+          <motion.button
+            key={index}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setInput(question)}
+            className="w-full p-3 text-left text-sm bg-card border border-border rounded-xl hover:border-primary/50 hover:bg-primary/5 transition-all">
+            
                 {question}
               </motion.button>
-            ))}
+          )}
           </motion.div>
-        )}
+        }
       </ScrollArea>
 
       {/* Input Area */}
@@ -484,20 +484,20 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
               onKeyDown={handleKeyPress}
               placeholder={tr("aichatscreen_anacan_ai_ye_sualinizi_yazin_927a37", "Anacan.AI-yə sualınızı yazın...")}
               className="min-h-[40px] max-h-[100px] pr-4 resize-none rounded-xl border-2 focus:border-primary/50 text-sm py-2"
-              disabled={isLoading}
-            />
+              disabled={isLoading} />
+            
           </div>
           <Button
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
             size="icon"
-            className="h-10 w-10 rounded-xl gradient-primary shadow-lg disabled:opacity-50"
-          >
-            {isLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Send className="w-4 h-4" />
-            )}
+            className="h-10 w-10 rounded-xl gradient-primary shadow-lg disabled:opacity-50">
+            
+            {isLoading ?
+            <Loader2 className="w-4 h-4 animate-spin" /> :
+
+            <Send className="w-4 h-4" />
+            }
           </Button>
         </div>
         <p className="text-[9px] text-center text-muted-foreground mt-1 px-2 leading-tight">
@@ -506,8 +506,8 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       </div>
 
 
-    </div>
-  );
+    </div>);
+
 });
 
 AIChatScreen.displayName = 'AIChatScreen';

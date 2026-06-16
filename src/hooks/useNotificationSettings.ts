@@ -24,7 +24,7 @@ const defaultSettings: NotificationSettings = {
   vitamin_reminder: true,
   exercise_reminder: false,
   vitamin_time: '09:00',
-  exercise_days: [1, 3, 5], // Monday, Wednesday, Friday
+  exercise_days: [1, 3, 5] // Monday, Wednesday, Friday
 };
 
 export const useNotificationSettings = () => {
@@ -41,11 +41,11 @@ export const useNotificationSettings = () => {
       }
 
       try {
-        const { data, error } = await supabase
-          .from('user_preferences')
-          .select('notifications_enabled, sound_enabled, vibration_enabled, water_reminder, vitamin_reminder, exercise_reminder, vitamin_time, exercise_days')
-          .eq('user_id', user.id)
-          .single();
+        const { data, error } = await supabase.
+        from('user_preferences').
+        select('notifications_enabled, sound_enabled, vibration_enabled, water_reminder, vitamin_reminder, exercise_reminder, vitamin_time, exercise_days').
+        eq('user_id', user.id).
+        single();
 
         if (error && error.code !== 'PGRST116') {
           console.error('Error loading notification settings:', error);
@@ -60,7 +60,7 @@ export const useNotificationSettings = () => {
             vitamin_reminder: data.vitamin_reminder ?? true,
             exercise_reminder: data.exercise_reminder ?? false,
             vitamin_time: data.vitamin_time ?? '09:00',
-            exercise_days: data.exercise_days ?? [1, 3, 5],
+            exercise_days: data.exercise_days ?? [1, 3, 5]
           });
         }
 
@@ -82,17 +82,17 @@ export const useNotificationSettings = () => {
 
     const now = new Date();
     const reminders = [];
-    
+
     // Schedule reminders every 2 hours from 8am to 8pm
     for (let hour = 8; hour <= 20; hour += 2) {
       const reminderTime = new Date(now);
       reminderTime.setHours(hour, 0, 0, 0);
-      
+
       if (reminderTime > now) {
         reminders.push({
           id: 100 + hour,
           title: tr("usenotificationsettings_su_icmek_vaxti_cecdf9", "Su içmək vaxtı! 💧"),
-          body: 'Sağlamlığınız və körpəniz üçün su içməyi unutmayın.',
+          body: tr("usenotificationsettings_saglamliginiz_ve_korpeniz_ucun_2d7315", "Sa\u011Flaml\u0131\u011F\u0131n\u0131z v\u0259 k\xF6rp\u0259niz \xFC\xE7\xFCn su i\xE7m\u0259yi unutmay\u0131n."),
           schedule: { at: reminderTime }
         });
       }
@@ -112,10 +112,10 @@ export const useNotificationSettings = () => {
 
     const now = new Date();
     const [hours, minutes] = settings.vitamin_time.split(':').map(Number);
-    
+
     const reminderTime = new Date(now);
     reminderTime.setHours(hours, minutes, 0, 0);
-    
+
     // If time passed today, schedule for tomorrow
     if (reminderTime <= now) {
       reminderTime.setDate(reminderTime.getDate() + 1);
@@ -124,7 +124,7 @@ export const useNotificationSettings = () => {
     await localNotifications.schedule([{
       id: 200,
       title: tr("usenotificationsettings_vitamin_vaxti_9bfc40", "Vitamin vaxtı! 💊"),
-      body: 'Gündəlik prenatal vitaminlərinizi qəbul etməyi unutmayın.',
+      body: tr("usenotificationsettings_gundelik_prenatal_vitaminlerin_645dfe", "G\xFCnd\u0259lik prenatal vitaminl\u0259rinizi q\u0259bul etm\u0259yi unutmay\u0131n."),
       schedule: { at: reminderTime }
     }]);
 
@@ -144,18 +144,18 @@ export const useNotificationSettings = () => {
     for (let i = 0; i < 7; i++) {
       const checkDate = new Date(now);
       checkDate.setDate(checkDate.getDate() + i);
-      
+
       const dayOfWeek = checkDate.getDay();
-      
+
       if (settings.exercise_days.includes(dayOfWeek)) {
         const reminderTime = new Date(checkDate);
         reminderTime.setHours(10, 0, 0, 0);
-        
+
         if (reminderTime > now) {
           reminders.push({
             id: 300 + i,
             title: tr("usenotificationsettings_mesq_vaxti_4a1396", "Məşq vaxtı! 🧘‍♀️"),
-            body: 'Hamiləlik üçün sağlam məşqlər edərək günə enerji ilə başlayın.',
+            body: tr("usenotificationsettings_hamilelik_ucun_saglam_mesqler__015e22", "Hamil\u0259lik \xFC\xE7\xFCn sa\u011Flam m\u0259\u015Fql\u0259r ed\u0259r\u0259k g\xFCn\u0259 enerji il\u0259 ba\u015Flay\u0131n."),
             schedule: { at: reminderTime }
           });
         }
@@ -183,7 +183,7 @@ export const useNotificationSettings = () => {
       // If reminder time passed, set for same day morning
       reminderTime.setTime(appointmentDate.getTime());
       reminderTime.setHours(8, 0, 0, 0);
-      
+
       if (reminderTime <= now) {
         return; // Skip if appointment is too soon
       }
@@ -196,14 +196,14 @@ export const useNotificationSettings = () => {
       schedule: { at: reminderTime }
     }]);
 
-    toast.success('Randevu xatırlatması təyin edildi');
+    toast.success(tr("usenotificationsettings_randevu_xatirlatmasi_teyin_edi_48cc3e", "Randevu xat\u0131rlatmas\u0131 t\u0259yin edildi"));
   }, [settings.notifications_enabled]);
 
   // Update a single setting - persists to database
-  const updateSetting = useCallback(async <K extends keyof NotificationSettings>(
-    key: K,
-    value: NotificationSettings[K]
-  ) => {
+  const updateSetting = useCallback(async <K extends keyof NotificationSettings,>(
+  key: K,
+  value: NotificationSettings[K]) =>
+  {
     if (!user) return;
 
     const newSettings = { ...settings, [key]: value };
@@ -211,16 +211,16 @@ export const useNotificationSettings = () => {
 
     // Persist to database
     try {
-      const { error } = await supabase
-        .from('user_preferences')
-        .update({ [key]: value })
-        .eq('user_id', user.id);
+      const { error } = await supabase.
+      from('user_preferences').
+      update({ [key]: value }).
+      eq('user_id', user.id);
 
       // If no row exists, insert it
       if (error && error.code === 'PGRST116') {
-        await supabase
-          .from('user_preferences')
-          .insert({ user_id: user.id, [key]: value });
+        await supabase.
+        from('user_preferences').
+        insert({ user_id: user.id, [key]: value });
       } else if (error) {
         console.error('Error saving notification setting:', error);
         // Revert on error
@@ -238,7 +238,7 @@ export const useNotificationSettings = () => {
       if (isNative) {
         await localNotifications.cancelAll();
       }
-      toast.info('Bütün bildirişlər deaktiv edildi');
+      toast.info(tr("usenotificationsettings_butun_bildirisler_deaktiv_edil_085777", "B\xFCt\xFCn bildiri\u015Fl\u0259r deaktiv edildi"));
       return;
     }
 
@@ -246,23 +246,23 @@ export const useNotificationSettings = () => {
     if (key === 'water_reminder') {
       if (value) {
         await scheduleWaterReminders();
-        toast.success('Su xatırlatmaları aktivləşdirildi');
+        toast.success(tr("usenotificationsettings_su_xatirlatmalari_aktivlesdiri_dd0c67", "Su xat\u0131rlatmalar\u0131 aktivl\u0259\u015Fdirildi"));
       } else {
-        toast.info('Su xatırlatmaları deaktiv edildi');
+        toast.info(tr("usenotificationsettings_su_xatirlatmalari_deaktiv_edil_153c1c", "Su xat\u0131rlatmalar\u0131 deaktiv edildi"));
       }
     }
 
     if (key === 'vitamin_reminder' || key === 'vitamin_time') {
       if (newSettings.vitamin_reminder) {
         await scheduleVitaminReminder();
-        toast.success('Vitamin xatırlatması aktivləşdirildi');
+        toast.success(tr("usenotificationsettings_vitamin_xatirlatmasi_aktivlesd_866e4a", "Vitamin xat\u0131rlatmas\u0131 aktivl\u0259\u015Fdirildi"));
       }
     }
 
     if (key === 'exercise_reminder' || key === 'exercise_days') {
       if (newSettings.exercise_reminder) {
         await scheduleExerciseReminders();
-        toast.success('Məşq xatırlatmaları aktivləşdirildi');
+        toast.success(tr("usenotificationsettings_mesq_xatirlatmalari_aktivlesdi_ea41d4", "M\u0259\u015Fq xat\u0131rlatmalar\u0131 aktivl\u0259\u015Fdirildi"));
       }
     }
   }, [user, settings, scheduleWaterReminders, scheduleVitaminReminder, scheduleExerciseReminders]);
@@ -274,16 +274,16 @@ export const useNotificationSettings = () => {
     // Request permissions first
     const permStatus = await localNotifications.requestPermissions();
     if (permStatus.display !== 'granted') {
-      toast.error('Bildiriş icazəsi verilmədi');
+      toast.error(tr("usenotificationsettings_bildiris_icazesi_verilmedi_a6583b", "Bildiri\u015F icaz\u0259si verilm\u0259di"));
       return;
     }
 
     // Schedule all enabled reminders
     await Promise.all([
-      settings.water_reminder ? scheduleWaterReminders() : Promise.resolve(),
-      settings.vitamin_reminder ? scheduleVitaminReminder() : Promise.resolve(),
-      settings.exercise_reminder ? scheduleExerciseReminders() : Promise.resolve(),
-    ]);
+    settings.water_reminder ? scheduleWaterReminders() : Promise.resolve(),
+    settings.vitamin_reminder ? scheduleVitaminReminder() : Promise.resolve(),
+    settings.exercise_reminder ? scheduleExerciseReminders() : Promise.resolve()]
+    );
 
     console.log('All reminders initialized');
   }, [settings, scheduleWaterReminders, scheduleVitaminReminder, scheduleExerciseReminders]);
@@ -294,6 +294,6 @@ export const useNotificationSettings = () => {
     updateSetting,
     scheduleAppointmentReminder,
     initializeReminders,
-    isNative,
+    isNative
   };
 };

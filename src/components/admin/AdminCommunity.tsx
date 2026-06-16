@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
-import { 
-  Users, Plus, Search, Edit2, Trash2, Save, X, 
-  Filter, Eye, EyeOff
-} from 'lucide-react';
+import {
+  Users, Plus, Search, Edit2, Trash2, Save, X,
+  Filter, Eye, EyeOff } from
+'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,12 +32,12 @@ interface AdminGroup {
 }
 
 const GROUP_TYPES = [
-  { value: 'birth_month', label: tr("admincommunity_dogum_ayi_47ddbd", "Doğum ayı") },
-  { value: 'gender', label: 'Cins' },
-  { value: 'multiples', label: tr("admincommunity_ekizler_14f521", "Əkizlər") },
-  { value: 'pregnancy_month', label: tr("admincommunity_hamilelik_ayi_f43286", "Hamiləlik ayı") },
-  { value: 'general', label: tr("admincommunity_umumi_1b5521", "Ümumi") },
-];
+{ value: 'birth_month', label: tr("admincommunity_dogum_ayi_47ddbd", "Doğum ayı") },
+{ value: 'gender', label: 'Cins' },
+{ value: 'multiples', label: tr("admincommunity_ekizler_14f521", "Əkizlər") },
+{ value: 'pregnancy_month', label: tr("admincommunity_hamilelik_ayi_f43286", "Hamiləlik ayı") },
+{ value: 'general', label: tr("admincommunity_umumi_1b5521", "Ümumi") }];
+
 
 const AdminCommunity = () => {
   const [groups, setGroups] = useState<AdminGroup[]>([]);
@@ -53,16 +53,16 @@ const AdminCommunity = () => {
   const [headerTexts, setHeaderTexts] = useState({
     flow: '',
     bump: '',
-    mommy: '',
+    mommy: ''
   });
   const [headerSaving, setHeaderSaving] = useState(false);
 
   useEffect(() => {
     const fetchHeaders = async () => {
-      const { data } = await supabase
-        .from('app_settings')
-        .select('*')
-        .in('key', ['community_header_flow', 'community_header_bump', 'community_header_mommy']);
+      const { data } = await supabase.
+      from('app_settings').
+      select('*').
+      in('key', ['community_header_flow', 'community_header_bump', 'community_header_mommy']);
       if (data) {
         const map: Record<string, string> = {};
         data.forEach((s: any) => {
@@ -72,7 +72,7 @@ const AdminCommunity = () => {
         setHeaderTexts({
           flow: map.flow || '',
           bump: map.bump || '',
-          mommy: map.mommy || '',
+          mommy: map.mommy || ''
         });
       }
     };
@@ -83,10 +83,10 @@ const AdminCommunity = () => {
     setHeaderSaving(true);
     try {
       for (const stage of ['flow', 'bump', 'mommy'] as const) {
-        await supabase
-          .from('app_settings')
-          .update({ value: headerTexts[stage] })
-          .eq('key', `community_header_${stage}`);
+        await supabase.
+        from('app_settings').
+        update({ value: headerTexts[stage] }).
+        eq('key', `community_header_${stage}`);
       }
       toast({ title: tr("admincommunity_basliq_metnleri_yenilendi_e71981", "Başlıq mətnləri yeniləndi ✓") });
     } catch {
@@ -103,7 +103,7 @@ const AdminCommunity = () => {
     icon_emoji: '👥',
     is_active: true,
     is_auto_join: false,
-    auto_join_criteria: {} as Record<string, any>,
+    auto_join_criteria: {} as Record<string, any>
   });
 
   useEffect(() => {
@@ -112,14 +112,14 @@ const AdminCommunity = () => {
 
   const fetchGroups = async () => {
     try {
-      const { data, error } = await supabase
-        .from('community_groups')
-        .select('*')
-        .order('group_type', { ascending: true })
-        .order('name', { ascending: true });
+      const { data, error } = await supabase.
+      from('community_groups').
+      select('*').
+      order('group_type', { ascending: true }).
+      order('name', { ascending: true });
 
       if (error) throw error;
-      setGroups((data as AdminGroup[]) || []);
+      setGroups(data as AdminGroup[] || []);
     } catch (error) {
       console.error('Error fetching groups:', error);
       toast({ title: tr("admincommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
@@ -137,7 +137,7 @@ const AdminCommunity = () => {
       icon_emoji: '👥',
       is_active: true,
       is_auto_join: false,
-      auto_join_criteria: {},
+      auto_join_criteria: {}
     });
     setIsModalOpen(true);
   };
@@ -151,7 +151,7 @@ const AdminCommunity = () => {
       icon_emoji: group.icon_emoji || '👥',
       is_active: group.is_active,
       is_auto_join: group.is_auto_join,
-      auto_join_criteria: group.auto_join_criteria || {},
+      auto_join_criteria: group.auto_join_criteria || {}
     });
     setIsModalOpen(true);
   };
@@ -166,35 +166,35 @@ const AdminCommunity = () => {
     try {
       if (editingGroup) {
         // Update
-        const { error } = await supabase
-          .from('community_groups')
-          .update({
-            name: formData.name,
-            description: formData.description || null,
-            group_type: formData.group_type,
-            icon_emoji: formData.icon_emoji,
-            is_active: formData.is_active,
-            is_auto_join: formData.is_auto_join,
-            auto_join_criteria: formData.auto_join_criteria,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', editingGroup.id);
+        const { error } = await supabase.
+        from('community_groups').
+        update({
+          name: formData.name,
+          description: formData.description || null,
+          group_type: formData.group_type,
+          icon_emoji: formData.icon_emoji,
+          is_active: formData.is_active,
+          is_auto_join: formData.is_auto_join,
+          auto_join_criteria: formData.auto_join_criteria,
+          updated_at: new Date().toISOString()
+        }).
+        eq('id', editingGroup.id);
 
         if (error) throw error;
         toast({ title: tr("admincommunity_qrup_yenilendi_d0267d", "Qrup yeniləndi ✅") });
       } else {
         // Create
-        const { error } = await supabase
-          .from('community_groups')
-          .insert({
-            name: formData.name,
-            description: formData.description || null,
-            group_type: formData.group_type,
-            icon_emoji: formData.icon_emoji,
-            is_active: formData.is_active,
-            is_auto_join: formData.is_auto_join,
-            auto_join_criteria: formData.auto_join_criteria,
-          });
+        const { error } = await supabase.
+        from('community_groups').
+        insert({
+          name: formData.name,
+          description: formData.description || null,
+          group_type: formData.group_type,
+          icon_emoji: formData.icon_emoji,
+          is_active: formData.is_active,
+          is_auto_join: formData.is_auto_join,
+          auto_join_criteria: formData.auto_join_criteria
+        });
 
         if (error) throw error;
         toast({ title: tr("admincommunity_qrup_yaradildi_071e0d", "Qrup yaradıldı ✅") });
@@ -211,13 +211,13 @@ const AdminCommunity = () => {
   };
 
   const handleDelete = async (groupId: string) => {
-    if (!confirm('Bu qrupu silmək istədiyinizə əminsiniz?')) return;
+    if (!confirm(tr("admincommunity_bu_qrupu_silmek_istediyinize_e_b145db", "Bu qrupu silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
 
     try {
-      const { error } = await supabase
-        .from('community_groups')
-        .delete()
-        .eq('id', groupId);
+      const { error } = await supabase.
+      from('community_groups').
+      delete().
+      eq('id', groupId);
 
       if (error) throw error;
       toast({ title: 'Qrup silindi' });
@@ -230,10 +230,10 @@ const AdminCommunity = () => {
 
   const toggleActive = async (group: AdminGroup) => {
     try {
-      const { error } = await supabase
-        .from('community_groups')
-        .update({ is_active: !group.is_active, updated_at: new Date().toISOString() })
-        .eq('id', group.id);
+      const { error } = await supabase.
+      from('community_groups').
+      update({ is_active: !group.is_active, updated_at: new Date().toISOString() }).
+      eq('id', group.id);
 
       if (error) throw error;
       fetchGroups();
@@ -242,7 +242,7 @@ const AdminCommunity = () => {
     }
   };
 
-  const filteredGroups = groups.filter(group => {
+  const filteredGroups = groups.filter((group) => {
     const matchesSearch = group.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = filterType === 'all' || group.group_type === filterType;
     return matchesSearch && matchesType;
@@ -261,23 +261,23 @@ const AdminCommunity = () => {
         <h3 className="font-bold text-foreground mb-3">{tr("admincommunity_cemiyyet_basliq_metnleri_fazalara_gore_aa4c16", "📝 Cəmiyyət Başlıq Mətnləri (Fazalara görə)")}</h3>
         <div className="space-y-3">
           {[
-            { key: 'flow' as const, label: '🩸 Menstruasiya', placeholder: tr("admincommunity_diger_qadinlar_ile_elaqede_olun_c330c7", "Digər qadınlar ilə əlaqədə olun") },
-            { key: 'bump' as const, label: tr("admincommunity_hamilelik_c61caf", "🤰 Hamiləlik"), placeholder: tr("admincommunity_diger_hamile_analar_ile_elaqede_olun_1ad833", "Digər hamilə analar ilə əlaqədə olun") },
-            { key: 'mommy' as const, label: tr("admincommunity_analiq_e28953", "👩‍👧 Analıq"), placeholder: tr("admincommunity_diger_analar_ile_elaqede_olun_4830a3", "Digər analar ilə əlaqədə olun") },
-          ].map((stage) => (
-            <div key={stage.key} className="flex items-center gap-3">
+          { key: 'flow' as const, label: '🩸 Menstruasiya', placeholder: tr("admincommunity_diger_qadinlar_ile_elaqede_olun_c330c7", "Digər qadınlar ilə əlaqədə olun") },
+          { key: 'bump' as const, label: tr("admincommunity_hamilelik_c61caf", "🤰 Hamiləlik"), placeholder: tr("admincommunity_diger_hamile_analar_ile_elaqede_olun_1ad833", "Digər hamilə analar ilə əlaqədə olun") },
+          { key: 'mommy' as const, label: tr("admincommunity_analiq_e28953", "👩‍👧 Analıq"), placeholder: tr("admincommunity_diger_analar_ile_elaqede_olun_4830a3", "Digər analar ilə əlaqədə olun") }].
+          map((stage) =>
+          <div key={stage.key} className="flex items-center gap-3">
               <span className="text-sm font-medium w-32 flex-shrink-0">{stage.label}</span>
               <Input
-                value={headerTexts[stage.key]}
-                onChange={(e) => setHeaderTexts(prev => ({ ...prev, [stage.key]: e.target.value }))}
-                placeholder={stage.placeholder}
-                className="flex-1"
-              />
+              value={headerTexts[stage.key]}
+              onChange={(e) => setHeaderTexts((prev) => ({ ...prev, [stage.key]: e.target.value }))}
+              placeholder={stage.placeholder}
+              className="flex-1" />
+            
             </div>
-          ))}
+          )}
           <Button onClick={saveHeaders} disabled={headerSaving} size="sm" className="gap-2">
             <Save className="w-4 h-4" />
-            {headerSaving ? 'Saxlanılır...' : 'Yadda saxla'}
+            {headerSaving ? tr("admincommunity_saxlanilir_ee05ad", "Saxlan\u0131l\u0131r...") : 'Yadda saxla'}
           </Button>
         </div>
       </Card>
@@ -302,8 +302,8 @@ const AdminCommunity = () => {
               placeholder="Qrup axtar..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
+              className="pl-10" />
+            
           </div>
           <Select value={filterType} onValueChange={setFilterType}>
             <SelectTrigger className="w-48">
@@ -312,9 +312,9 @@ const AdminCommunity = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{tr("admincommunity_hamisi_c73c4d", "Hamısı")}</SelectItem>
-              {GROUP_TYPES.map(type => (
-                <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
-              ))}
+              {GROUP_TYPES.map((type) =>
+              <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -329,13 +329,13 @@ const AdminCommunity = () => {
         <Card className="p-4">
           <p className="text-sm text-muted-foreground">Aktiv qruplar</p>
           <p className="text-2xl font-bold text-green-500">
-            {groups.filter(g => g.is_active).length}
+            {groups.filter((g) => g.is_active).length}
           </p>
         </Card>
         <Card className="p-4">
           <p className="text-sm text-muted-foreground">{tr("admincommunity_avtomatik_qosulma_1af00d", "Avtomatik qoşulma")}</p>
           <p className="text-2xl font-bold text-primary">
-            {groups.filter(g => g.is_auto_join).length}
+            {groups.filter((g) => g.is_auto_join).length}
           </p>
         </Card>
         <Card className="p-4">
@@ -347,24 +347,24 @@ const AdminCommunity = () => {
       </div>
 
       {/* Groups List */}
-      {loading ? (
-        <div className="text-center py-12">
+      {loading ?
+      <div className="text-center py-12">
           <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {Object.entries(groupsByType).map(([type, typeGroups]) => (
-            <div key={type}>
+        </div> :
+
+      <div className="space-y-6">
+          {Object.entries(groupsByType).map(([type, typeGroups]) =>
+        <div key={type}>
               <h3 className="text-lg font-semibold mb-3 capitalize">
-                {GROUP_TYPES.find(t => t.value === type)?.label || type}
+                {GROUP_TYPES.find((t) => t.value === type)?.label || type}
               </h3>
               <div className="grid gap-3">
-                {typeGroups.map((group) => (
-                  <motion.div
-                    key={group.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
+                {typeGroups.map((group) =>
+            <motion.div
+              key={group.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}>
+              
                     <Card className={`p-4 ${!group.is_active ? 'opacity-60' : ''}`}>
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-2xl">
@@ -377,58 +377,58 @@ const AdminCommunity = () => {
                             {group.is_auto_join && <Badge className="bg-primary/10 text-primary">Auto-join</Badge>}
                           </div>
                           <p className="text-sm text-muted-foreground truncate">
-                            {group.description || 'Açıqlama yoxdur'}
+                            {group.description || tr("admincommunity_aciqlama_yoxdur_a604ef", "A\xE7\u0131qlama yoxdur")}
                           </p>
                           <div className="flex items-center gap-3 mt-1">
                             <span className="text-xs text-muted-foreground flex items-center gap-1">
                               <Users className="w-3 h-3" />
-                              {group.member_count || 0} üzv
+                              {group.member_count || 0} {tr("admincommunity_uzv_3f0dbc", "\xFCzv")}
                             </span>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
                           <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => toggleActive(group)}
-                          >
-                            {group.is_active ? (
-                              <Eye className="w-4 h-4 text-green-500" />
-                            ) : (
-                              <EyeOff className="w-4 h-4 text-muted-foreground" />
-                            )}
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => toggleActive(group)}>
+                      
+                            {group.is_active ?
+                      <Eye className="w-4 h-4 text-green-500" /> :
+
+                      <EyeOff className="w-4 h-4 text-muted-foreground" />
+                      }
                           </Button>
                           <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => openEditModal(group)}
-                          >
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => openEditModal(group)}>
+                      
                             <Edit2 className="w-4 h-4" />
                           </Button>
                           <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDelete(group.id)}
-                          >
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete(group.id)}>
+                      
                             <Trash2 className="w-4 h-4 text-destructive" />
                           </Button>
                         </div>
                       </div>
                     </Card>
                   </motion.div>
-                ))}
+            )}
               </div>
             </div>
-          ))}
+        )}
         </div>
-      )}
+      }
 
       {/* Create/Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>
-              {editingGroup ? 'Qrupu Redaktə Et' : 'Yeni Qrup Yarat'}
+              {editingGroup ? tr("admincommunity_qrupu_redakte_et_0865bb", "Qrupu Redakt\u0259 Et") : 'Yeni Qrup Yarat'}
             </DialogTitle>
           </DialogHeader>
 
@@ -440,16 +440,16 @@ const AdminCommunity = () => {
                   value={formData.icon_emoji}
                   onChange={(e) => setFormData({ ...formData, icon_emoji: e.target.value })}
                   className="text-center text-2xl"
-                  maxLength={4}
-                />
+                  maxLength={4} />
+                
               </div>
               <div className="flex-1">
                 <label className="text-sm font-medium mb-2 block">{tr("admincommunity_qrup_adi_3ca22e", "Qrup adı")}</label>
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder={tr("admincommunity_qrup_adini_daxil_edin_a15074", "Qrup adını daxil edin")}
-                />
+                  placeholder={tr("admincommunity_qrup_adini_daxil_edin_a15074", "Qrup adını daxil edin")} />
+                
               </div>
             </div>
 
@@ -459,23 +459,23 @@ const AdminCommunity = () => {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder={tr("admincommunity_qrup_haqqinda_qisa_melumat_ef7e85", "Qrup haqqında qısa məlumat")}
-                rows={3}
-              />
+                rows={3} />
+              
             </div>
 
             <div>
               <label className="text-sm font-medium mb-2 block">Qrup tipi</label>
               <Select
                 value={formData.group_type}
-                onValueChange={(value) => setFormData({ ...formData, group_type: value })}
-              >
+                onValueChange={(value) => setFormData({ ...formData, group_type: value })}>
+                
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {GROUP_TYPES.map(type => (
-                    <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
-                  ))}
+                  {GROUP_TYPES.map((type) =>
+                  <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -487,8 +487,8 @@ const AdminCommunity = () => {
               </div>
               <Switch
                 checked={formData.is_active}
-                onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-              />
+                onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })} />
+              
             </div>
 
             <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
@@ -498,36 +498,36 @@ const AdminCommunity = () => {
               </div>
               <Switch
                 checked={formData.is_auto_join}
-                onCheckedChange={(checked) => setFormData({ ...formData, is_auto_join: checked })}
-              />
+                onCheckedChange={(checked) => setFormData({ ...formData, is_auto_join: checked })} />
+              
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsModalOpen(false)}>
               <X className="w-4 h-4 mr-2" />
-              Ləğv et
+              {tr("admincommunity_legv_et_b5e49c", "L\u0259\u011Fv et")}
             </Button>
             <Button onClick={handleSave} disabled={saving}>
-              {saving ? (
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-              ) : (
-                <Save className="w-4 h-4 mr-2" />
-              )}
-              {editingGroup ? 'Yenilə' : 'Yarat'}
+              {saving ?
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" /> :
+
+              <Save className="w-4 h-4 mr-2" />
+              }
+              {editingGroup ? tr("admincommunity_yenile_570ce2", "Yenil\u0259") : 'Yarat'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <AdminUsageStats 
+      <AdminUsageStats
         eventNames={['community_post_created', 'community_post_liked']}
         title={tr("admincommunity_icma_istifade_statistikasi_90d30c", "👥 İcma İstifadə Statistikası")}
         showEventData
-        showUsers
-      />
-    </div>
-  );
+        showUsers />
+      
+    </div>);
+
 };
 
 export default AdminCommunity;

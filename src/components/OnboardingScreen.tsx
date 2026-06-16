@@ -17,7 +17,7 @@ import { tr } from "@/lib/tr";
 const iconMap: Record<string, React.ComponentType<any>> = {
   Calendar,
   Heart,
-  Baby,
+  Baby
 };
 
 const OnboardingScreen = () => {
@@ -31,12 +31,12 @@ const OnboardingScreen = () => {
   const [cycleLength, setCycleLength] = useState(28);
   const [periodLength, setPeriodLength] = useState(5);
   const [isSaving, setIsSaving] = useState(false);
-  
+
   const { setLifeStage, setLastPeriodDate, setBabyData, setOnboarded, setDueDate, setMultiplesData, setCycleLength: setStoreCycleLength, setPeriodLength: setStorePeriodLength, setFunnelCompleted } = useUserStore();
   const { updateProfile } = useAuth();
   const { toast } = useToast();
   const { autoJoin } = useAutoJoinGroups();
-  
+
   // Fetch dynamic data from backend
   const { data: dbStages, isLoading: stagesLoading } = useOnboardingStages();
   const { data: dbMultiples, isLoading: multiplesLoading } = useMultiplesOptions();
@@ -44,7 +44,7 @@ const OnboardingScreen = () => {
 
   // Check which stages are enabled
   const isStageEnabled = (stageId: string) => {
-    const setting = appSettings.find(s => s.key === `${stageId}_mode_enabled`);
+    const setting = appSettings.find((s) => s.key === `${stageId}_mode_enabled`);
     if (!setting) return true; // Default enabled
     const val = setting.value;
     if (val === 'true' || val === true) return true;
@@ -54,46 +54,46 @@ const OnboardingScreen = () => {
 
   // Use database data or fallback, then filter by enabled settings
   const stages = useMemo(() => {
-    const allStages = (!dbStages || dbStages.length === 0)
-      ? FALLBACK_STAGES.map(s => ({
-          id: s.stage_id as LifeStage,
-          title: s.title_az,
-          subtitle: s.subtitle_az,
-          description: s.description_az,
-          icon: iconMap[s.icon_name] || Heart,
-          emoji: s.emoji,
-          color: s.stage_id,
-          bgGradient: s.bg_gradient,
-        }))
-      : dbStages.map(s => ({
-          id: s.stage_id as LifeStage,
-          title: s.title_az || s.title,
-          subtitle: s.subtitle_az || s.subtitle,
-          description: s.description_az || s.description,
-          icon: iconMap[s.icon_name] || Heart,
-          emoji: s.emoji,
-          color: s.stage_id,
-          bgGradient: s.bg_gradient,
-        }));
-    
+    const allStages = !dbStages || dbStages.length === 0 ?
+    FALLBACK_STAGES.map((s) => ({
+      id: s.stage_id as LifeStage,
+      title: s.title_az,
+      subtitle: s.subtitle_az,
+      description: s.description_az,
+      icon: iconMap[s.icon_name] || Heart,
+      emoji: s.emoji,
+      color: s.stage_id,
+      bgGradient: s.bg_gradient
+    })) :
+    dbStages.map((s) => ({
+      id: s.stage_id as LifeStage,
+      title: s.title_az || s.title,
+      subtitle: s.subtitle_az || s.subtitle,
+      description: s.description_az || s.description,
+      icon: iconMap[s.icon_name] || Heart,
+      emoji: s.emoji,
+      color: s.stage_id,
+      bgGradient: s.bg_gradient
+    }));
+
     // Filter by enabled settings
-    return allStages.filter(stage => isStageEnabled(stage.id));
+    return allStages.filter((stage) => isStageEnabled(stage.id));
   }, [dbStages, appSettings]);
 
   const multiplesOptions = useMemo(() => {
     if (!dbMultiples || dbMultiples.length === 0) {
-      return FALLBACK_MULTIPLES.map(m => ({
+      return FALLBACK_MULTIPLES.map((m) => ({
         id: m.option_id,
         label: m.label_az,
         emoji: m.emoji,
-        count: m.baby_count,
+        count: m.baby_count
       }));
     }
-    return dbMultiples.map(m => ({
+    return dbMultiples.map((m) => ({
       id: m.option_id,
       label: m.label_az || m.label,
       emoji: m.emoji,
-      count: m.baby_count,
+      count: m.baby_count
     }));
   }, [dbMultiples]);
 
@@ -111,7 +111,7 @@ const OnboardingScreen = () => {
       setStep(1);
     } else if (step === 1) {
       setIsSaving(true);
-      
+
       try {
         if (selectedStage === 'mommy') {
           if (dateInput && babyName && babyGender) {
@@ -122,14 +122,14 @@ const OnboardingScreen = () => {
               baby_name: babyName,
               baby_gender: babyGender,
               baby_count: babyCount,
-              multiples_type: multiplesType,
+              multiples_type: multiplesType
             });
 
             if (error) {
               toast({
                 title: tr("onboardingscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
                 description: tr("onboardingscreen_melumatlar_saxlanila_bilmedi_a65916", 'Məlumatlar saxlanıla bilmədi'),
-                variant: 'destructive',
+                variant: 'destructive'
               });
               setIsSaving(false);
               return;
@@ -144,7 +144,7 @@ const OnboardingScreen = () => {
                 birth_date: dateInput,
                 gender: babyGender,
                 avatar_emoji: babyGender === 'boy' ? '👦' : '👧',
-                sort_order: 0,
+                sort_order: 0
               });
             }
 
@@ -160,7 +160,7 @@ const OnboardingScreen = () => {
               life_stage: selectedStage,
               baby_birth_date: dateInput,
               baby_gender: babyGender,
-              multiples_type: multiplesType,
+              multiples_type: multiplesType
             });
           }
         } else if (selectedStage === 'bump') {
@@ -168,21 +168,21 @@ const OnboardingScreen = () => {
             // Calculate due date (280 days from LMP)
             const lastPeriod = new Date(dateInput);
             const dueDate = new Date(lastPeriod.getTime() + 280 * 24 * 60 * 60 * 1000);
-            
+
             // Save to Supabase
             const { error } = await updateProfile({
               life_stage: selectedStage,
               last_period_date: dateInput,
               due_date: dueDate.toISOString().split('T')[0],
               baby_count: babyCount,
-              multiples_type: multiplesType,
+              multiples_type: multiplesType
             });
 
             if (error) {
               toast({
                 title: tr("onboardingscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
                 description: tr("onboardingscreen_melumatlar_saxlanila_bilmedi_a65916", 'Məlumatlar saxlanıla bilmədi'),
-                variant: 'destructive',
+                variant: 'destructive'
               });
               setIsSaving(false);
               return;
@@ -200,7 +200,7 @@ const OnboardingScreen = () => {
             await autoJoin({
               life_stage: selectedStage,
               due_date: dueDate.toISOString().split('T')[0],
-              multiples_type: multiplesType,
+              multiples_type: multiplesType
             });
           }
         } else {
@@ -211,14 +211,14 @@ const OnboardingScreen = () => {
               life_stage: selectedStage,
               last_period_date: dateInput,
               cycle_length: cycleLength,
-              period_length: periodLength,
+              period_length: periodLength
             });
 
             if (error) {
               toast({
                 title: tr("onboardingscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
                 description: tr("onboardingscreen_melumatlar_saxlanila_bilmedi_a65916", 'Məlumatlar saxlanıla bilmədi'),
-                variant: 'destructive',
+                variant: 'destructive'
               });
               setIsSaving(false);
               return;
@@ -239,14 +239,14 @@ const OnboardingScreen = () => {
 
         toast({
           title: tr("onboardingscreen_ugurla_saxlanildi_27f111", 'Uğurla saxlanıldı! 🎉'),
-          description: tr("onboardingscreen_profiliniz_hazirdir_7fc314", 'Profiliniz hazırdır'),
+          description: tr("onboardingscreen_profiliniz_hazirdir_7fc314", 'Profiliniz hazırdır')
         });
       } catch (err) {
         console.error('Onboarding error:', err);
         toast({
           title: tr("onboardingscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
           description: tr("onboardingscreen_bir_xeta_bas_verdi_3a783a", 'Bir xəta baş verdi'),
-          variant: 'destructive',
+          variant: 'destructive'
         });
       } finally {
         setIsSaving(false);
@@ -285,30 +285,30 @@ const OnboardingScreen = () => {
 
       {/* Header */}
       <div className="relative px-5 py-5 flex items-center justify-between">
-        {step > 0 ? (
-          <motion.button 
-            onClick={handleBack} 
-            className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
+        {step > 0 ?
+        <motion.button
+          onClick={handleBack}
+          className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}>
+          
             <ArrowLeft className="w-5 h-5 text-foreground" />
-          </motion.button>
-        ) : (
-          <div className="w-12" />
-        )}
+          </motion.button> :
+
+        <div className="w-12" />
+        }
         
         {/* Progress indicators */}
         <div className="flex gap-2">
-          {[0, 1].map((i) => (
-            <motion.div
-              key={i}
-              className={`h-2 rounded-full transition-all duration-500 ${
-                i <= step ? 'bg-primary w-8' : 'bg-muted w-2'
-              }`}
-              layout
-            />
-          ))}
+          {[0, 1].map((i) =>
+          <motion.div
+            key={i}
+            className={`h-2 rounded-full transition-all duration-500 ${
+            i <= step ? 'bg-primary w-8' : 'bg-muted w-2'}`
+            }
+            layout />
+
+          )}
         </div>
         
         <div className="w-12" />
@@ -317,72 +317,72 @@ const OnboardingScreen = () => {
       {/* Content */}
       <div className="flex-1 px-5 py-4 relative overflow-y-auto">
         <AnimatePresence mode="wait">
-          {step === 0 && (
-            <motion.div
-              key="step-0"
-              variants={pageVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="h-full flex flex-col"
-            >
+          {step === 0 &&
+          <motion.div
+            key="step-0"
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="h-full flex flex-col">
+            
               {/* Header Content */}
-              <motion.div 
-                className="text-center mb-8"
-                variants={staggerChildren}
-                initial="initial"
-                animate="animate"
-              >
+              <motion.div
+              className="text-center mb-8"
+              variants={staggerChildren}
+              initial="initial"
+              animate="animate">
+              
                 <motion.div variants={childVariants} className="flex justify-center mb-4">
                   <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center shadow-button">
                     <Sparkles className="w-8 h-8 text-white" />
                   </div>
                 </motion.div>
                 <motion.h1 variants={childVariants} className="text-3xl font-black text-foreground">
-                  Xoş gəldiniz! 
+                  {tr("onboardingscreen_xos_geldiniz_078b52", "Xo\u015F g\u0259ldiniz!")} 
                 </motion.h1>
                 <motion.p variants={childVariants} className="text-muted-foreground mt-2 text-lg">
-                  Hansı mərhələdəsiniz?
+                  {tr("onboardingscreen_hansi_merheledesiniz_4bc6be", "Hans\u0131 m\u0259rh\u0259l\u0259d\u0259siniz?")}
                 </motion.p>
               </motion.div>
 
               {/* Stage Selection */}
-              <motion.div 
-                className="space-y-4 flex-1"
-                variants={staggerChildren}
-                initial="initial"
-                animate="animate"
-              >
+              <motion.div
+              className="space-y-4 flex-1"
+              variants={staggerChildren}
+              initial="initial"
+              animate="animate">
+              
                 {stages.map((stage, index) => {
-                  const Icon = stage.icon;
-                  const isSelected = selectedStage === stage.id;
-                  
-                  return (
-                    <motion.button
-                      key={stage.id}
-                      variants={childVariants}
-                      onClick={() => handleStageSelect(stage.id)}
-                      className={`w-full p-5 rounded-3xl text-left transition-all duration-300 relative overflow-hidden ${
-                        isSelected
-                          ? `bg-gradient-to-r ${stage.bgGradient} text-white shadow-elevated`
-                          : 'bg-card border-2 border-border hover:border-primary/20 hover:shadow-card'
-                      }`}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      {isSelected && (
-                        <motion.div
-                          className="absolute inset-0 bg-white/10"
-                          initial={{ x: '-100%' }}
-                          animate={{ x: '100%' }}
-                          transition={{ duration: 1, repeat: Infinity, repeatDelay: 1 }}
-                        />
-                      )}
+                const Icon = stage.icon;
+                const isSelected = selectedStage === stage.id;
+
+                return (
+                  <motion.button
+                    key={stage.id}
+                    variants={childVariants}
+                    onClick={() => handleStageSelect(stage.id)}
+                    className={`w-full p-5 rounded-3xl text-left transition-all duration-300 relative overflow-hidden ${
+                    isSelected ?
+                    `bg-gradient-to-r ${stage.bgGradient} text-white shadow-elevated` :
+                    'bg-card border-2 border-border hover:border-primary/20 hover:shadow-card'}`
+                    }
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}>
+                    
+                      {isSelected &&
+                    <motion.div
+                      className="absolute inset-0 bg-white/10"
+                      initial={{ x: '-100%' }}
+                      animate={{ x: '100%' }}
+                      transition={{ duration: 1, repeat: Infinity, repeatDelay: 1 }} />
+
+                    }
                       
                       <div className="flex items-center gap-4 relative z-10">
                         <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl ${
-                          isSelected ? 'bg-white/20' : 'bg-muted'
-                        }`}>
+                      isSelected ? 'bg-white/20' : 'bg-muted'}`
+                      }>
                           {stage.emoji}
                         </div>
                         <div className="flex-1">
@@ -393,105 +393,105 @@ const OnboardingScreen = () => {
                             {stage.description}
                           </p>
                         </div>
-                        {isSelected && (
-                          <motion.div
-                            initial={{ scale: 0, rotate: -180 }}
-                            animate={{ scale: 1, rotate: 0 }}
-                            className="w-10 h-10 rounded-xl bg-white/25 flex items-center justify-center"
-                          >
+                        {isSelected &&
+                      <motion.div
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        className="w-10 h-10 rounded-xl bg-white/25 flex items-center justify-center">
+                        
                             <Check className="w-6 h-6 text-white" strokeWidth={3} />
                           </motion.div>
-                        )}
+                      }
                       </div>
-                    </motion.button>
-                  );
-                })}
+                    </motion.button>);
+
+              })}
               </motion.div>
             </motion.div>
-          )}
+          }
 
-          {step === 1 && selectedStage && (
-            <motion.div
-              key="step-1"
-              variants={pageVariants}
+          {step === 1 && selectedStage &&
+          <motion.div
+            key="step-1"
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="h-full flex flex-col">
+            
+              <motion.div
+              className="text-center mb-6"
+              variants={staggerChildren}
               initial="initial"
-              animate="animate"
-              exit="exit"
-              className="h-full flex flex-col"
-            >
-              <motion.div 
-                className="text-center mb-6"
-                variants={staggerChildren}
-                initial="initial"
-                animate="animate"
-              >
+              animate="animate">
+              
                 <motion.div variants={childVariants} className="flex justify-center mb-4">
                   <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${
-                    stages.find(s => s.id === selectedStage)?.bgGradient
-                  } flex items-center justify-center text-3xl shadow-button`}>
-                    {stages.find(s => s.id === selectedStage)?.emoji}
+                stages.find((s) => s.id === selectedStage)?.bgGradient} flex items-center justify-center text-3xl shadow-button`
+                }>
+                    {stages.find((s) => s.id === selectedStage)?.emoji}
                   </div>
                 </motion.div>
                 <motion.h1 variants={childVariants} className="text-2xl font-black text-foreground">
-                  {selectedStage === 'mommy' ? 'Körpəniz haqqında' : selectedStage === 'bump' ? 'Hamiləlik məlumatları' : 'Son dövr tarixi'}
+                  {selectedStage === 'mommy' ? tr("onboardingscreen_korpeniz_haqqinda_dc65a9", "K\xF6rp\u0259niz haqq\u0131nda") : selectedStage === 'bump' ? tr("onboardingscreen_hamilelik_melumatlari_12e64d", "Hamil\u0259lik m\u0259lumatlar\u0131") : tr("onboardingscreen_son_dovr_tarixi_4dc91e", "Son d\xF6vr tarixi")}
                 </motion.h1>
                 <motion.p variants={childVariants} className="text-muted-foreground mt-2">
-                  {selectedStage === 'mommy' 
-                    ? 'Körpənizin məlumatlarını daxil edin'
-                    : selectedStage === 'bump'
-                    ? 'Hamiləlik məlumatlarınızı daxil edin'
-                    : 'Son dövrünüz nə vaxt başladı?'
-                  }
+                  {selectedStage === 'mommy' ? tr("onboardingscreen_korpenizin_melumatlarini_daxil_6e20d3", "K\xF6rp\u0259nizin m\u0259lumatlar\u0131n\u0131 daxil edin") :
+
+                selectedStage === 'bump' ? tr("onboardingscreen_hamilelik_melumatlarinizi_daxi_c132dd", "Hamil\u0259lik m\u0259lumatlar\u0131n\u0131z\u0131 daxil edin") : tr("onboardingscreen_son_dovrunuz_ne_vaxt_basladi_9bc1c3", "Son d\xF6vr\xFCn\xFCz n\u0259 vaxt ba\u015Flad\u0131?")
+
+
+                }
                 </motion.p>
               </motion.div>
 
-              <motion.div 
-                className="space-y-5 flex-1"
-                variants={staggerChildren}
-                initial="initial"
-                animate="animate"
-              >
+              <motion.div
+              className="space-y-5 flex-1"
+              variants={staggerChildren}
+              initial="initial"
+              animate="animate">
+              
                 {/* Multiples selection for bump and mommy stages */}
-                {(selectedStage === 'bump' || selectedStage === 'mommy') && (
-                  <motion.div variants={childVariants}>
+                {(selectedStage === 'bump' || selectedStage === 'mommy') &&
+              <motion.div variants={childVariants}>
                     <label className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
                       <Users className="w-4 h-4" />
-                      Uşaq sayı
+                      {tr("onboardingscreen_usaq_sayi_04c015", "U\u015Faq say\u0131")}
                     </label>
                     <div className="grid grid-cols-2 gap-3">
-                      {multiplesOptions.map((option) => (
-                        <motion.button
-                          key={option.id}
-                          onClick={() => handleMultiplesSelect(option.id as any, option.count)}
-                          className={`p-4 rounded-2xl font-bold transition-all flex flex-col items-center gap-2 ${
-                            multiplesType === option.id
-                              ? 'bg-primary text-primary-foreground shadow-elevated'
-                              : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                          }`}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
+                      {multiplesOptions.map((option) =>
+                  <motion.button
+                    key={option.id}
+                    onClick={() => handleMultiplesSelect(option.id as any, option.count)}
+                    className={`p-4 rounded-2xl font-bold transition-all flex flex-col items-center gap-2 ${
+                    multiplesType === option.id ?
+                    'bg-primary text-primary-foreground shadow-elevated' :
+                    'bg-muted text-muted-foreground hover:bg-muted/80'}`
+                    }
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}>
+                    
                           <span className="text-2xl">{option.emoji}</span>
                           <span className="text-sm">{option.label}</span>
                         </motion.button>
-                      ))}
+                  )}
                     </div>
                   </motion.div>
-                )}
+              }
 
-                {selectedStage === 'mommy' && (
-                  <>
+                {selectedStage === 'mommy' &&
+              <>
                     <motion.div variants={childVariants}>
                       <label className="text-sm font-bold text-foreground mb-3 block">
-                        {babyCount > 1 ? 'Körpələrinizin adları (vergüllə ayırın)' : 'Körpənizin adı'}
+                        {babyCount > 1 ? tr("onboardingscreen_korpelerinizin_adlari_vergulle_96665e", "K\xF6rp\u0259l\u0259rinizin adlar\u0131 (verg\xFCll\u0259 ay\u0131r\u0131n)") : tr("onboardingscreen_korpenizin_adi_10b2c3", "K\xF6rp\u0259nizin ad\u0131")}
                       </label>
                       <Input
-                        type="text"
-                        placeholder={babyCount > 1 ? 'Əli, Vəli' : 'Ad'}
-                        value={babyName}
-                        onChange={(e) => setBabyName(e.target.value)}
-                        className="h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-lg px-5"
-                      />
+                    type="text"
+                    placeholder={babyCount > 1 ? tr("onboardingscreen_eli_veli_e76548", "\u018Fli, V\u0259li") : 'Ad'}
+                    value={babyName}
+                    onChange={(e) => setBabyName(e.target.value)}
+                    className="h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-lg px-5" />
+                  
                     </motion.div>
 
                     <motion.div variants={childVariants}>
@@ -500,44 +500,44 @@ const OnboardingScreen = () => {
                       </label>
                       <div className="flex gap-4">
                         {[
-                          { id: 'boy', label: tr("onboardingscreen_oglan_e9715e", 'Oğlan'), emoji: '👦', gradient: 'from-blue-500 to-indigo-600' },
-                          { id: 'girl', label: tr("onboardingscreen_qiz_79bf6b", 'Qız'), emoji: '👧', gradient: 'from-pink-500 to-rose-600' },
-                        ].map((g) => (
-                          <motion.button
-                            key={g.id}
-                            onClick={() => setBabyGender(g.id as 'boy' | 'girl')}
-                            className={`flex-1 p-4 rounded-2xl font-bold transition-all flex flex-col items-center gap-2 ${
-                              babyGender === g.id
-                                ? `bg-gradient-to-r ${g.gradient} text-white shadow-elevated`
-                                : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                            }`}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                          >
+                    { id: 'boy', label: tr("onboardingscreen_oglan_e9715e", 'Oğlan'), emoji: '👦', gradient: 'from-blue-500 to-indigo-600' },
+                    { id: 'girl', label: tr("onboardingscreen_qiz_79bf6b", 'Qız'), emoji: '👧', gradient: 'from-pink-500 to-rose-600' }].
+                    map((g) =>
+                    <motion.button
+                      key={g.id}
+                      onClick={() => setBabyGender(g.id as 'boy' | 'girl')}
+                      className={`flex-1 p-4 rounded-2xl font-bold transition-all flex flex-col items-center gap-2 ${
+                      babyGender === g.id ?
+                      `bg-gradient-to-r ${g.gradient} text-white shadow-elevated` :
+                      'bg-muted text-muted-foreground hover:bg-muted/80'}`
+                      }
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}>
+                      
                             <span className="text-3xl">{g.emoji}</span>
                             <span>{g.label}</span>
                           </motion.button>
-                        ))}
+                    )}
                       </div>
                     </motion.div>
                   </>
-                )}
+              }
 
                 {/* Cycle Length for Flow stage */}
-                {selectedStage === 'flow' && (
-                  <>
+                {selectedStage === 'flow' &&
+              <>
                     <motion.div variants={childVariants}>
                       <label className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
-                        Tsikl uzunluğu (gün)
+                        {tr("onboardingscreen_tsikl_uzunlugu_gun_642d20", "Tsikl uzunlu\u011Fu (g\xFCn)")}
                       </label>
                       <div className="flex items-center gap-3">
                         <motion.button
-                          type="button"
-                          onClick={() => setCycleLength(Math.max(10, cycleLength - 1))}
-                          className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
-                          whileTap={{ scale: 0.95 }}
-                        >
+                      type="button"
+                      onClick={() => setCycleLength(Math.max(10, cycleLength - 1))}
+                      className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
+                      whileTap={{ scale: 0.95 }}>
+                      
                           -
                         </motion.button>
                         <div className="flex-1 h-14 rounded-2xl bg-muted/50 flex items-center justify-center">
@@ -545,31 +545,31 @@ const OnboardingScreen = () => {
                           <span className="text-muted-foreground ml-2">{tr("onboardingscreen_gun_54e78d", "gün")}</span>
                         </div>
                         <motion.button
-                          type="button"
-                          onClick={() => setCycleLength(Math.min(50, cycleLength + 1))}
-                          className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
-                          whileTap={{ scale: 0.95 }}
-                        >
+                      type="button"
+                      onClick={() => setCycleLength(Math.min(50, cycleLength + 1))}
+                      className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
+                      whileTap={{ scale: 0.95 }}>
+                      
                           +
                         </motion.button>
                       </div>
                       <p className="text-xs text-muted-foreground mt-2 text-center">
-                        Aralıq: 10-50 gün (normal: 21-35 gün)
+                        {tr("onboardingscreen_araliq_10_50_gun_normal_21_35__e2832f", "Aral\u0131q: 10-50 g\xFCn (normal: 21-35 g\xFCn)")}
                       </p>
                     </motion.div>
 
                     <motion.div variants={childVariants}>
                       <label className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
                         <Droplets className="w-4 h-4" />
-                        Period uzunluğu (gün)
+                        {tr("onboardingscreen_period_uzunlugu_gun_a77b92", "Period uzunlu\u011Fu (g\xFCn)")}
                       </label>
                       <div className="flex items-center gap-3">
                         <motion.button
-                          type="button"
-                          onClick={() => setPeriodLength(Math.max(2, periodLength - 1))}
-                          className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
-                          whileTap={{ scale: 0.95 }}
-                        >
+                      type="button"
+                      onClick={() => setPeriodLength(Math.max(2, periodLength - 1))}
+                      className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
+                      whileTap={{ scale: 0.95 }}>
+                      
                           -
                         </motion.button>
                         <div className="flex-1 h-14 rounded-2xl bg-muted/50 flex items-center justify-center">
@@ -577,36 +577,36 @@ const OnboardingScreen = () => {
                           <span className="text-muted-foreground ml-2">{tr("onboardingscreen_gun_54e78d", "gün")}</span>
                         </div>
                         <motion.button
-                          type="button"
-                          onClick={() => setPeriodLength(Math.min(10, periodLength + 1))}
-                          className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
-                          whileTap={{ scale: 0.95 }}
-                        >
+                      type="button"
+                      onClick={() => setPeriodLength(Math.min(10, periodLength + 1))}
+                      className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
+                      whileTap={{ scale: 0.95 }}>
+                      
                           +
                         </motion.button>
                       </div>
                       <p className="text-xs text-muted-foreground mt-2 text-center">
-                        Normal aralıq: 3-7 gün
+                        {tr("onboardingscreen_normal_araliq_3_7_gun_167ed7", "Normal aral\u0131q: 3-7 g\xFCn")}
                       </p>
                     </motion.div>
                   </>
-                )}
+              }
 
                 <motion.div variants={childVariants}>
                   <label className="text-sm font-bold text-foreground mb-3 block">
-                    {selectedStage === 'mommy' ? 'Doğum tarixi' : selectedStage === 'bump' ? 'Son menstruasiya tarixi' : 'Son dövr tarixi'}
+                    {selectedStage === 'mommy' ? tr("onboardingscreen_dogum_tarixi_d96907", "Do\u011Fum tarixi") : selectedStage === 'bump' ? 'Son menstruasiya tarixi' : tr("onboardingscreen_son_dovr_tarixi_4dc91e", "Son d\xF6vr tarixi")}
                   </label>
                   <Input
-                    type="date"
-                    value={dateInput}
-                    onChange={(e) => setDateInput(e.target.value)}
-                    className="h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-lg px-5"
-                    max={new Date().toISOString().split('T')[0]}
-                  />
+                  type="date"
+                  value={dateInput}
+                  onChange={(e) => setDateInput(e.target.value)}
+                  className="h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-lg px-5"
+                  max={new Date().toISOString().split('T')[0]} />
+                
                 </motion.div>
               </motion.div>
             </motion.div>
-          )}
+          }
         </AnimatePresence>
       </div>
 
@@ -615,32 +615,32 @@ const OnboardingScreen = () => {
         <Button
           onClick={handleNext}
           disabled={
-            isSaving ||
-            (step === 0 && !selectedStage) ||
-            (step === 1 && !dateInput) ||
-            (step === 1 && selectedStage === 'mommy' && (!babyName || !babyGender))
+          isSaving ||
+          step === 0 && !selectedStage ||
+          step === 1 && !dateInput ||
+          step === 1 && selectedStage === 'mommy' && (!babyName || !babyGender)
           }
-          className="w-full h-16 rounded-2xl gradient-primary text-white font-bold text-lg shadow-button hover:shadow-glow transition-all duration-300 disabled:opacity-50 disabled:shadow-none"
-        >
+          className="w-full h-16 rounded-2xl gradient-primary text-white font-bold text-lg shadow-button hover:shadow-glow transition-all duration-300 disabled:opacity-50 disabled:shadow-none">
+          
           <span className="flex items-center gap-2">
-            {isSaving ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <>
-                {step === 1 ? 'Başla' : 'Davam et'}
+            {isSaving ?
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> :
+
+            <>
+                {step === 1 ? tr("onboardingscreen_basla_4820bc", "Ba\u015Fla") : 'Davam et'}
                 <motion.div
-                  animate={{ x: [0, 5, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
+                animate={{ x: [0, 5, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}>
+                
                   <ArrowRight className="w-6 h-6" />
                 </motion.div>
               </>
-            )}
+            }
           </span>
         </Button>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default OnboardingScreen;

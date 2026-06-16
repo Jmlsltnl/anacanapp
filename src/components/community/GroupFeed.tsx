@@ -1,4 +1,4 @@
-import { useState, forwardRef, useMemo } from 'react';
+import { tr } from "@/lib/tr";import { useState, forwardRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Plus, Users } from 'lucide-react';
 import { CommunityGroup, useGroupPosts } from '@/hooks/useCommunity';
@@ -23,7 +23,7 @@ interface GroupFeedProps {
 const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, onCreatePost, isEmbedded = false, onUserClick, externalSearchQuery }, ref) => {
   const { data: posts = [], isLoading } = useGroupPosts(group?.id || null);
   const { onlineCount, onlineUsers, typingUsers } = useGroupPresence(group?.id || null);
-  
+
   const [localSearchQuery, setLocalSearchQuery] = useState('');
   const searchQuery = externalSearchQuery !== undefined ? externalSearchQuery : localSearchQuery;
   const setSearchQuery = setLocalSearchQuery;
@@ -33,55 +33,55 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
     let result = [...posts];
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
-      result = result.filter(post => 
-        post.content.toLowerCase().includes(lowerQuery) ||
-        post.author?.name?.toLowerCase().includes(lowerQuery)
+      result = result.filter((post) =>
+      post.content.toLowerCase().includes(lowerQuery) ||
+      post.author?.name?.toLowerCase().includes(lowerQuery)
       );
     }
     if (sortBy === 'popular') {
-      result.sort((a, b) => (b.likes_count + b.comments_count) - (a.likes_count + a.comments_count));
+      result.sort((a, b) => b.likes_count + b.comments_count - (a.likes_count + a.comments_count));
     } else {
       result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     }
     return result;
   }, [posts, searchQuery, sortBy]);
 
-  const EmptyState = ({ emoji, text, subtext }: { emoji: string; text: string; subtext: string }) => (
-    <motion.div className="text-center py-16" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }}>
+  const EmptyState = ({ emoji, text, subtext }: {emoji: string;text: string;subtext: string;}) =>
+  <motion.div className="text-center py-16" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }}>
       <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/8 to-accent/5 flex items-center justify-center mx-auto mb-4">
         <span className="text-3xl">{emoji}</span>
       </div>
       <h3 className="font-bold text-foreground mb-1.5 text-[14px]">{text}</h3>
       <p className="text-[12px] text-muted-foreground/40 mb-5 max-w-[240px] mx-auto leading-relaxed">{subtext}</p>
-      {!searchQuery && (
-        <Button onClick={onCreatePost} size="sm" className="gradient-primary text-[12px] h-9 px-5 rounded-full shadow-sm shadow-primary/20">
-          <Plus className="w-3.5 h-3.5 mr-1.5" /> Paylaşım yarat
+      {!searchQuery &&
+    <Button onClick={onCreatePost} size="sm" className="gradient-primary text-[12px] h-9 px-5 rounded-full shadow-sm shadow-primary/20">
+          <Plus className="w-3.5 h-3.5 mr-1.5" /> {tr("groupfeed_paylasim_yarat_69bdcd", "Payla\u015F\u0131m yarat")}
         </Button>
-      )}
-    </motion.div>
-  );
+    }
+    </motion.div>;
+
 
   if (isEmbedded) {
     return (
       <div ref={ref} className="space-y-3">
         <PostSearchFilter searchQuery={searchQuery} onSearchChange={setSearchQuery} sortBy={sortBy} onSortChange={setSortBy} />
-        {isLoading ? (
-          <div className="space-y-3">
+        {isLoading ?
+        <div className="space-y-3">
             {[1, 2, 3].map((i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}
-          </div>
-        ) : filteredPosts.length === 0 ? (
-          <EmptyState emoji="💬" text={searchQuery ? 'Nəticə tapılmadı' : 'Hələ paylaşım yoxdur'} subtext={searchQuery ? 'Başqa axtarış sözləri sınayın' : 'İlk paylaşımı siz edin!'} />
-        ) : (
-          filteredPosts.map((post, index) => (
-            <motion.div key={post.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }}>
+          </div> :
+        filteredPosts.length === 0 ?
+        <EmptyState emoji="💬" text={searchQuery ? tr("groupfeed_netice_tapilmadi_4b1b52", "N\u0259tic\u0259 tap\u0131lmad\u0131") : tr("groupfeed_hele_paylasim_yoxdur_a0a7fa", "H\u0259l\u0259 payla\u015F\u0131m yoxdur")} subtext={searchQuery ? tr("groupfeed_basqa_axtaris_sozleri_sinayin_20e63c", "Ba\u015Fqa axtar\u0131\u015F s\xF6zl\u0259ri s\u0131nay\u0131n") : tr("groupfeed_i_lk_paylasimi_siz_edin_1ec33a", "\u0130lk payla\u015F\u0131m\u0131 siz edin!")} /> :
+
+        filteredPosts.map((post, index) =>
+        <motion.div key={post.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }}>
               <PostSeenObserver postId={post.id} createdAt={post.created_at} postUserId={post.user_id}>
                 <PostCard post={post} groupId={group?.id || null} onUserClick={onUserClick} />
               </PostSeenObserver>
             </motion.div>
-          ))
-        )}
-      </div>
-    );
+        )
+        }
+      </div>);
+
   }
 
   return (
@@ -98,10 +98,10 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
                 <span className="text-lg">{group?.icon_emoji || '👥'}</span>
               </div>
               <div>
-                <h1 className="text-[16px] font-black text-foreground truncate leading-tight">{group?.name || 'Ümumi'}</h1>
+                <h1 className="text-[16px] font-black text-foreground truncate leading-tight">{group?.name || tr("groupfeed_umumi_1b5521", "\xDCmumi")}</h1>
                 <div className="flex items-center gap-1 text-[10px] text-muted-foreground/40 font-medium">
                   <Users className="w-3 h-3" />
-                  <span>{group?.member_count || 0} üzv</span>
+                  <span>{group?.member_count || 0} {tr("groupfeed_uzv_3f0dbc", "\xFCzv")}</span>
                 </div>
               </div>
             </div>
@@ -113,11 +113,11 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
 
         {group && <GroupPresenceBar onlineCount={onlineCount} onlineUsers={onlineUsers} typingUsers={typingUsers} />}
         
-        {group && (
-          <div className="px-5 pb-2.5">
+        {group &&
+        <div className="px-5 pb-2.5">
             <StoriesBar groupId={group.id} />
           </div>
-        )}
+        }
       </div>
 
       <div className="px-4 pt-3 pb-1">
@@ -125,24 +125,24 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
       </div>
 
       <div className="pt-1">
-        {isLoading ? (
-          <div className="space-y-2 px-4">
+        {isLoading ?
+        <div className="space-y-2 px-4">
             {[1, 2, 3].map((i) => <Skeleton key={i} className="h-36" />)}
-          </div>
-        ) : filteredPosts.length === 0 ? (
-          <EmptyState emoji="🌟" text={searchQuery ? 'Nəticə tapılmadı' : 'Hələ paylaşım yoxdur'} subtext={searchQuery ? 'Başqa axtarış sözləri sınayın' : 'Bu qrupda ilk paylaşımı siz edin!'} />
-        ) : (
-          filteredPosts.map((post, index) => (
-            <motion.div key={post.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}>
+          </div> :
+        filteredPosts.length === 0 ?
+        <EmptyState emoji="🌟" text={searchQuery ? tr("groupfeed_netice_tapilmadi_4b1b52", "N\u0259tic\u0259 tap\u0131lmad\u0131") : tr("groupfeed_hele_paylasim_yoxdur_a0a7fa", "H\u0259l\u0259 payla\u015F\u0131m yoxdur")} subtext={searchQuery ? tr("groupfeed_basqa_axtaris_sozleri_sinayin_20e63c", "Ba\u015Fqa axtar\u0131\u015F s\xF6zl\u0259ri s\u0131nay\u0131n") : tr("groupfeed_bu_qrupda_ilk_paylasimi_siz_ed_124fe7", "Bu qrupda ilk payla\u015F\u0131m\u0131 siz edin!")} /> :
+
+        filteredPosts.map((post, index) =>
+        <motion.div key={post.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}>
               <PostSeenObserver postId={post.id} createdAt={post.created_at} postUserId={post.user_id}>
                 <PostCard post={post} groupId={group?.id || null} onUserClick={onUserClick} />
               </PostSeenObserver>
             </motion.div>
-          ))
-        )}
+        )
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 });
 
 GroupFeed.displayName = 'GroupFeed';

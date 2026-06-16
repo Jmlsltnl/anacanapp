@@ -32,8 +32,8 @@ const AdminRecipes = () => {
     queryFn: async () => {
       const { data, error } = await supabase.from('recipe_tags').select('*').eq('is_active', true).order('sort_order');
       if (error) throw error;
-      return data as { id: string; tag_id: string; name: string; name_az: string | null; emoji: string | null; sort_order: number; is_active: boolean }[];
-    },
+      return data as {id: string;tag_id: string;name: string;name_az: string | null;emoji: string | null;sort_order: number;is_active: boolean;}[];
+    }
   });
 
   // Category management states
@@ -41,20 +41,20 @@ const AdminRecipes = () => {
   const [editingCat, setEditingCat] = useState<any>(null);
   const [catForm, setCatForm] = useState({ category_id: '', name: '', name_az: '', emoji: '', sort_order: 0, is_active: true });
 
-  const categories = dbCategories.map(c => ({ id: c.category_id, label: c.name_az || c.name, emoji: c.emoji }));
+  const categories = dbCategories.map((c) => ({ id: c.category_id, label: c.name_az || c.name, emoji: c.emoji }));
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState<AdminRecipe | null>(null);
   const [formData, setFormData] = useState<Partial<AdminRecipe>>({});
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const initialFormDataRef = useRef<string>('');
-  
+
   // CSV Import states
   const [showImportModal, setShowImportModal] = useState(false);
   const [importData, setImportData] = useState<any[]>([]);
   const [importing, setImporting] = useState(false);
   const csvFileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Image upload states
   const [uploadingImage, setUploadingImage] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -93,7 +93,7 @@ const AdminRecipes = () => {
       instructions: [],
       image_url: '',
       is_active: true,
-      tags: [],
+      tags: []
     };
     setFormData(initialData);
     initialFormDataRef.current = JSON.stringify(initialData);
@@ -117,7 +117,7 @@ const AdminRecipes = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
+    if (!confirm(tr("adminrecipes_silmek_istediyinize_eminsiniz_09658f", "Silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
     await remove.mutateAsync(id);
   };
 
@@ -144,15 +144,15 @@ const AdminRecipes = () => {
       const fileName = `recipe-${Date.now()}.${fileExt}`;
       const filePath = `recipes/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from('assets')
-        .upload(filePath, file, { upsert: true });
+      const { error: uploadError } = await supabase.storage.
+      from('assets').
+      upload(filePath, file, { upsert: true });
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('assets')
-        .getPublicUrl(filePath);
+      const { data: { publicUrl } } = supabase.storage.
+      from('assets').
+      getPublicUrl(filePath);
 
       setFormData({ ...formData, image_url: publicUrl });
       toast({ title: tr("adminrecipes_sekil_yuklendi_474bd5", "Şəkil yükləndi") });
@@ -175,7 +175,7 @@ const AdminRecipes = () => {
     const rows: string[] = [];
     let current = '';
     let inQuotes = false;
-    
+
     for (let i = 0; i < text.length; i++) {
       const char = text[i];
       if (char === '"') {
@@ -209,7 +209,7 @@ const AdminRecipes = () => {
     const result: string[] = [];
     let current = '';
     let inQuotes = false;
-    
+
     for (let i = 0; i < line.length; i++) {
       const char = line[i];
       if (char === '"') {
@@ -239,7 +239,7 @@ const AdminRecipes = () => {
     reader.onload = (event) => {
       const text = event.target?.result as string;
       const lines = splitCSVIntoRows(text);
-      
+
       if (lines.length < 2) {
         toast({ title: tr("adminrecipes_xeta_3cdbb6", "Xəta"), description: tr("adminrecipes_csv_fayli_bosdur_0a908c", "CSV faylı boşdur"), variant: 'destructive' });
         return;
@@ -256,27 +256,27 @@ const AdminRecipes = () => {
         'Kalori': 'calories',
         'İnqredientlər': 'ingredients',
         'Hazırlanma': 'instructions',
-        'Şəkil URL': 'image_url',
+        'Şəkil URL': 'image_url'
       };
 
       const parsedData: any[] = [];
-      
+
       for (let i = 1; i < lines.length; i++) {
         const values = parseCSVLine(lines[i]);
         if (values.length < 2) continue;
 
         const row: any = { is_active: true };
-        
+
         headers.forEach((header, idx) => {
           const dbField = headerMap[header.trim()];
           if (dbField && values[idx]) {
             let value = values[idx].trim().replace(/^"|"$/g, '');
-            
+
             if (dbField === 'prep_time' || dbField === 'cook_time' || dbField === 'servings' || dbField === 'calories') {
               const numValue = parseInt(value);
-              row[dbField] = isNaN(numValue) ? (dbField === 'calories' ? null : 0) : numValue;
+              row[dbField] = isNaN(numValue) ? dbField === 'calories' ? null : 0 : numValue;
             } else if (dbField === 'ingredients' || dbField === 'instructions') {
-              const items = value.split(/[;|\n]/).map(s => s.trim()).filter(s => s);
+              const items = value.split(/[;|\n]/).map((s) => s.trim()).filter((s) => s);
               row[dbField] = items;
             } else {
               row[dbField] = value;
@@ -309,24 +309,24 @@ const AdminRecipes = () => {
 
     setImporting(true);
     try {
-      const { error } = await supabase
-        .from('admin_recipes')
-        .insert(importData);
+      const { error } = await supabase.
+      from('admin_recipes').
+      insert(importData);
 
       if (error) throw error;
 
-      toast({ 
-        title: tr("adminrecipes_ugurlu_5c0191", "Uğurlu!"), 
-        description: `${importData.length} resept əlavə edildi` 
+      toast({
+        title: tr("adminrecipes_ugurlu_5c0191", "Uğurlu!"),
+        description: `${importData.length} resept əlavə edildi`
       });
       setShowImportModal(false);
       setImportData([]);
       refetch();
     } catch (error: any) {
-      toast({ 
-        title: tr("adminrecipes_xeta_3cdbb6", "Xəta"), 
-        description: error.message, 
-        variant: 'destructive' 
+      toast({
+        title: tr("adminrecipes_xeta_3cdbb6", "Xəta"),
+        description: error.message,
+        variant: 'destructive'
       });
     } finally {
       setImporting(false);
@@ -345,7 +345,7 @@ const AdminRecipes = () => {
         const { error } = await supabase.from('recipe_categories').update({
           name: catForm.name, name_az: catForm.name_az, emoji: catForm.emoji,
           sort_order: catForm.sort_order, is_active: catForm.is_active,
-          category_id: catForm.category_id,
+          category_id: catForm.category_id
         }).eq('id', editingCat.id);
         if (error) throw error;
       } else {
@@ -355,16 +355,16 @@ const AdminRecipes = () => {
       queryClient.invalidateQueries({ queryKey: ['recipe-categories-admin'] });
       queryClient.invalidateQueries({ queryKey: ['recipe-categories'] });
       setShowCatModal(false);
-      toast({ title: editingCat ? 'Kateqoriya yeniləndi' : 'Kateqoriya əlavə edildi' });
+      toast({ title: editingCat ? tr("adminrecipes_kateqoriya_yenilendi_02b12b", "Kateqoriya yenil\u0259ndi") : tr("adminrecipes_kateqoriya_elave_edildi_e28f72", "Kateqoriya \u0259lav\u0259 edildi") });
     } catch (e: any) {
       toast({ title: tr("adminrecipes_xeta_3cdbb6", "Xəta"), description: e.message, variant: 'destructive' });
     }
   };
 
   const deleteCat = async (id: string) => {
-    if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
+    if (!confirm(tr("adminrecipes_silmek_istediyinize_eminsiniz_09658f", "Silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
     const { error } = await supabase.from('recipe_categories').delete().eq('id', id);
-    if (error) { toast({ title: tr("adminrecipes_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' }); return; }
+    if (error) {toast({ title: tr("adminrecipes_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });return;}
     queryClient.invalidateQueries({ queryKey: ['recipe-categories-admin'] });
     queryClient.invalidateQueries({ queryKey: ['recipe-categories'] });
     toast({ title: 'Kateqoriya silindi' });
@@ -383,7 +383,7 @@ const AdminRecipes = () => {
   };
 
   const filteredRecipes = recipes.filter((r) =>
-    r.title.toLowerCase().includes(search.toLowerCase())
+  r.title.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -399,11 +399,11 @@ const AdminRecipes = () => {
             ref={csvFileInputRef}
             accept=".csv"
             onChange={handleCSVUpload}
-            className="hidden"
-          />
+            className="hidden" />
+          
           <Button onClick={downloadTemplate} variant="ghost" size="sm" className="gap-1">
             <Download className="w-4 h-4" />
-            Şablon
+            {tr("adminrecipes_sablon_68cce4", "\u015Eablon")}
           </Button>
           <Button onClick={() => csvFileInputRef.current?.click()} variant="outline" className="gap-2">
             <FileUp className="w-4 h-4" />
@@ -416,24 +416,24 @@ const AdminRecipes = () => {
               exportToCSV(
                 recipes,
                 [
-                  { key: 'title', header: tr("adminrecipes_basliq_e1f6c5", "Başlıq") },
-                  { key: 'description', header: tr("adminrecipes_tesvir_f85651", "Təsvir") },
-                  { key: 'category', header: 'Kateqoriya' },
-                  { key: 'prep_time', header: tr("adminrecipes_hazirliq_deq_0e31cf", "Hazırlıq (dəq)") },
-                  { key: 'cook_time', header: tr("adminrecipes_bisirme_deq_88f48d", "Bişirmə (dəq)") },
-                  { key: 'servings', header: 'Porsiya' },
-                  { key: 'calories', header: 'Kalori' },
-                  { key: 'ingredients', header: tr("adminrecipes_inqredientler_ac7a19", "İnqredientlər") },
-                  { key: 'instructions', header: tr("adminrecipes_hazirlanma_13bf8d", "Hazırlanma") },
-                  { key: 'image_url', header: tr("adminrecipes_sekil_url_d302df", "Şəkil URL") },
-                  { key: 'is_active', header: 'Aktiv' },
-                ],
+                { key: 'title', header: tr("adminrecipes_basliq_e1f6c5", "Başlıq") },
+                { key: 'description', header: tr("adminrecipes_tesvir_f85651", "Təsvir") },
+                { key: 'category', header: 'Kateqoriya' },
+                { key: 'prep_time', header: tr("adminrecipes_hazirliq_deq_0e31cf", "Hazırlıq (dəq)") },
+                { key: 'cook_time', header: tr("adminrecipes_bisirme_deq_88f48d", "Bişirmə (dəq)") },
+                { key: 'servings', header: 'Porsiya' },
+                { key: 'calories', header: 'Kalori' },
+                { key: 'ingredients', header: tr("adminrecipes_inqredientler_ac7a19", "İnqredientlər") },
+                { key: 'instructions', header: tr("adminrecipes_hazirlanma_13bf8d", "Hazırlanma") },
+                { key: 'image_url', header: tr("adminrecipes_sekil_url_d302df", "Şəkil URL") },
+                { key: 'is_active', header: 'Aktiv' }],
+
                 'recipes_export.csv'
               );
               toast({ title: `${recipes.length} resept ixrac edildi` });
             }}
-            disabled={recipes.length === 0}
-          >
+            disabled={recipes.length === 0}>
+            
             <FileDown className="w-4 h-4" />
             İxrac
           </Button>
@@ -463,7 +463,7 @@ const AdminRecipes = () => {
               <UtensilsCrossed className="w-5 h-5 text-green-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{recipes.filter(r => r.is_active).length}</p>
+              <p className="text-2xl font-bold">{recipes.filter((r) => r.is_active).length}</p>
               <p className="text-xs text-muted-foreground">Aktiv</p>
             </div>
           </div>
@@ -491,8 +491,8 @@ const AdminRecipes = () => {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
-            {dbCategories.map(cat => (
-              <div key={cat.id} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/50 border border-border/50">
+            {dbCategories.map((cat) =>
+            <div key={cat.id} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/50 border border-border/50">
                 <span>{cat.emoji}</span>
                 <span className="text-sm font-medium">{cat.name_az || cat.name}</span>
                 <Badge variant={cat.is_active ? 'default' : 'secondary'} className="text-[10px] px-1.5">
@@ -505,7 +505,7 @@ const AdminRecipes = () => {
                   <Trash2 className="w-3 h-3 text-destructive" />
                 </Button>
               </div>
-            ))}
+            )}
           </div>
         </CardContent>
       </Card>
@@ -514,33 +514,33 @@ const AdminRecipes = () => {
       <Dialog open={showCatModal} onOpenChange={setShowCatModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingCat ? 'Kateqoriya Redaktə' : 'Yeni Kateqoriya'}</DialogTitle>
+            <DialogTitle>{editingCat ? tr("adminrecipes_kateqoriya_redakte_1b0ef3", "Kateqoriya Redakt\u0259") : 'Yeni Kateqoriya'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
               <Label>Kateqoriya ID (slug)</Label>
-              <Input value={catForm.category_id} onChange={e => setCatForm({ ...catForm, category_id: e.target.value })} placeholder="seher_yemeyi" disabled={!!editingCat} />
+              <Input value={catForm.category_id} onChange={(e) => setCatForm({ ...catForm, category_id: e.target.value })} placeholder="seher_yemeyi" disabled={!!editingCat} />
             </div>
             <div>
               <Label>Ad</Label>
-              <Input value={catForm.name} onChange={e => setCatForm({ ...catForm, name: e.target.value })} placeholder={tr("adminrecipes_seher_yemeyi_b82929", "Səhər yeməyi")} />
+              <Input value={catForm.name} onChange={(e) => setCatForm({ ...catForm, name: e.target.value })} placeholder={tr("adminrecipes_seher_yemeyi_b82929", "Səhər yeməyi")} />
             </div>
             <div>
               <Label>Ad (AZ)</Label>
-              <Input value={catForm.name_az} onChange={e => setCatForm({ ...catForm, name_az: e.target.value })} placeholder={tr("adminrecipes_seher_yemeyi_b82929", "Səhər yeməyi")} />
+              <Input value={catForm.name_az} onChange={(e) => setCatForm({ ...catForm, name_az: e.target.value })} placeholder={tr("adminrecipes_seher_yemeyi_b82929", "Səhər yeməyi")} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>Emoji</Label>
-                <Input value={catForm.emoji} onChange={e => setCatForm({ ...catForm, emoji: e.target.value })} placeholder="🍳" />
+                <Input value={catForm.emoji} onChange={(e) => setCatForm({ ...catForm, emoji: e.target.value })} placeholder="🍳" />
               </div>
               <div>
                 <Label>{tr("adminrecipes_sira_421c5f", "Sıra")}</Label>
-                <Input type="number" value={catForm.sort_order} onChange={e => setCatForm({ ...catForm, sort_order: parseInt(e.target.value) || 0 })} />
+                <Input type="number" value={catForm.sort_order} onChange={(e) => setCatForm({ ...catForm, sort_order: parseInt(e.target.value) || 0 })} />
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Switch checked={catForm.is_active} onCheckedChange={v => setCatForm({ ...catForm, is_active: v })} />
+              <Switch checked={catForm.is_active} onCheckedChange={(v) => setCatForm({ ...catForm, is_active: v })} />
               <Label>Aktiv</Label>
             </div>
           </div>
@@ -559,39 +559,39 @@ const AdminRecipes = () => {
             placeholder="Resept axtar..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
-          />
+            className="pl-10" />
+          
         </div>
       </Card>
 
       {/* Recipes List */}
       <Card>
         <CardHeader>
-          <CardTitle>Reseptlər ({filteredRecipes.length})</CardTitle>
+          <CardTitle>{tr("adminrecipes_reseptler_db28d4", "Reseptl\u0259r (")}{filteredRecipes.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">{tr("adminrecipes_yuklenir_5557de", "Yüklənir...")}</div>
-          ) : filteredRecipes.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">{tr("adminrecipes_resept_tapilmadi_dde89b", "Resept tapılmadı")}</div>
-          ) : (
-            <div className="space-y-3">
-              {filteredRecipes.map((recipe, index) => (
-                <motion.div
-                  key={recipe.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.03 }}
-                  className="flex items-center justify-between p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
-                >
+          {isLoading ?
+          <div className="text-center py-8 text-muted-foreground">{tr("adminrecipes_yuklenir_5557de", "Yüklənir...")}</div> :
+          filteredRecipes.length === 0 ?
+          <div className="text-center py-8 text-muted-foreground">{tr("adminrecipes_resept_tapilmadi_dde89b", "Resept tapılmadı")}</div> :
+
+          <div className="space-y-3">
+              {filteredRecipes.map((recipe, index) =>
+            <motion.div
+              key={recipe.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.03 }}
+              className="flex items-center justify-between p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors">
+              
                   <div className="flex items-center gap-4">
-                    {recipe.image_url ? (
-                      <img src={recipe.image_url} alt={recipe.title} className="w-16 h-16 rounded-lg object-cover" />
-                    ) : (
-                      <div className="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center">
+                    {recipe.image_url ?
+                <img src={recipe.image_url} alt={recipe.title} className="w-16 h-16 rounded-lg object-cover" /> :
+
+                <div className="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center">
                         <UtensilsCrossed className="w-6 h-6 text-primary" />
                       </div>
-                    )}
+                }
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="font-medium text-foreground">{recipe.title}</p>
@@ -603,24 +603,24 @@ const AdminRecipes = () => {
                       <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" />
-                          {(recipe.prep_time || 0) + (recipe.cook_time || 0)} dəq
+                          {(recipe.prep_time || 0) + (recipe.cook_time || 0)} {tr("adminrecipes_deq_780a5c", "d\u0259q")}
                         </span>
                         <span className="flex items-center gap-1">
                           <Users className="w-3 h-3" />
                           {recipe.servings} porsiya
                         </span>
-                        {recipe.calories && (
-                          <span className="text-orange-500 font-medium">{recipe.calories} kcal</span>
-                        )}
-                        <Badge variant="outline">{categories.find(c => c.id === recipe.category)?.label || recipe.category}</Badge>
-                        {(recipe.tags || []).map(t => {
-                          const tagInfo = recipeTags.find(rt => rt.tag_id === t);
-                          return (
-                            <Badge key={t} variant="outline" className="text-[10px]">
+                        {recipe.calories &&
+                    <span className="text-orange-500 font-medium">{recipe.calories} kcal</span>
+                    }
+                        <Badge variant="outline">{categories.find((c) => c.id === recipe.category)?.label || recipe.category}</Badge>
+                        {(recipe.tags || []).map((t) => {
+                      const tagInfo = recipeTags.find((rt) => rt.tag_id === t);
+                      return (
+                        <Badge key={t} variant="outline" className="text-[10px]">
                               {tagInfo ? `${tagInfo.emoji} ${tagInfo.name_az || tagInfo.name}` : t}
-                            </Badge>
-                          );
-                        })}
+                            </Badge>);
+
+                    })}
                       </div>
                     </div>
                   </div>
@@ -633,9 +633,9 @@ const AdminRecipes = () => {
                     </Button>
                   </div>
                 </motion.div>
-              ))}
+            )}
             </div>
-          )}
+          }
         </CardContent>
       </Card>
 
@@ -643,39 +643,39 @@ const AdminRecipes = () => {
       <Dialog open={showModal} onOpenChange={handleModalClose}>
         <DialogContent className="max-w-2xl max-h-[90vh]">
           <DialogHeader>
-            <DialogTitle>{editingItem ? 'Resept Redaktə Et' : 'Yeni Resept'}</DialogTitle>
+            <DialogTitle>{editingItem ? tr("adminrecipes_resept_redakte_et_ca3682", "Resept Redakt\u0259 Et") : 'Yeni Resept'}</DialogTitle>
           </DialogHeader>
           <ScrollArea className="max-h-[60vh] pr-4">
             <div className="space-y-4">
               <Input
                 placeholder={tr("adminrecipes_basliq_e1f6c5", "Başlıq")}
                 value={formData.title || ''}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              />
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
+              
               <Textarea
                 placeholder={tr("adminrecipes_tesvir_f85651", "Təsvir")}
                 value={formData.description || ''}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              />
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+              
               <Select
                 value={formData.category || categories[0]?.id || ''}
-                onValueChange={(v) => setFormData({ ...formData, category: v })}
-              >
+                onValueChange={(v) => setFormData({ ...formData, category: v })}>
+                
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>
+                  {categories.map((cat) =>
+                  <SelectItem key={cat.id} value={cat.id}>
                       {cat.label}
                     </SelectItem>
-                  ))}
+                  )}
                 </SelectContent>
               </Select>
               <div className="space-y-2">
                 <Label>{tr("adminrecipes_alt_kateqoriya_etiketleri_5a3e12", "Alt kateqoriya etiketləri")}</Label>
                 <div className="flex flex-wrap gap-2">
-                  {recipeTags.map(tag => {
+                  {recipeTags.map((tag) => {
                     const selected = (formData.tags || []).includes(tag.tag_id);
                     return (
                       <button
@@ -685,20 +685,20 @@ const AdminRecipes = () => {
                           const current = formData.tags || [];
                           setFormData({
                             ...formData,
-                            tags: selected
-                              ? current.filter(s => s !== tag.tag_id)
-                              : [...current, tag.tag_id],
+                            tags: selected ?
+                            current.filter((s) => s !== tag.tag_id) :
+                            [...current, tag.tag_id]
                           });
                         }}
                         className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
-                          selected
-                            ? 'bg-primary text-primary-foreground border-primary'
-                            : 'bg-muted/50 text-muted-foreground border-border hover:bg-muted'
-                        }`}
-                      >
+                        selected ?
+                        'bg-primary text-primary-foreground border-primary' :
+                        'bg-muted/50 text-muted-foreground border-border hover:bg-muted'}`
+                        }>
+                        
                         {tag.emoji} {tag.name_az || tag.name}
-                      </button>
-                    );
+                      </button>);
+
                   })}
                 </div>
               </div>
@@ -707,26 +707,26 @@ const AdminRecipes = () => {
                   type="number"
                   placeholder={tr("adminrecipes_hazirliq_deq_0e31cf", "Hazırlıq (dəq)")}
                   value={formData.prep_time || ''}
-                  onChange={(e) => setFormData({ ...formData, prep_time: parseInt(e.target.value) })}
-                />
+                  onChange={(e) => setFormData({ ...formData, prep_time: parseInt(e.target.value) })} />
+                
                 <Input
                   type="number"
                   placeholder={tr("adminrecipes_bisirme_deq_88f48d", "Bişirmə (dəq)")}
                   value={formData.cook_time || ''}
-                  onChange={(e) => setFormData({ ...formData, cook_time: parseInt(e.target.value) })}
-                />
+                  onChange={(e) => setFormData({ ...formData, cook_time: parseInt(e.target.value) })} />
+                
                 <Input
                   type="number"
                   placeholder="Porsiya"
                   value={formData.servings || ''}
-                  onChange={(e) => setFormData({ ...formData, servings: parseInt(e.target.value) })}
-                />
+                  onChange={(e) => setFormData({ ...formData, servings: parseInt(e.target.value) })} />
+                
                 <Input
                   type="number"
                   placeholder="Kalori (kcal)"
                   value={formData.calories || ''}
-                  onChange={(e) => setFormData({ ...formData, calories: e.target.value ? parseInt(e.target.value) : null })}
-                />
+                  onChange={(e) => setFormData({ ...formData, calories: e.target.value ? parseInt(e.target.value) : null })} />
+                
               </div>
               <div className="space-y-2">
                 <Label>{tr("adminrecipes_resept_sekli_881c26", "Resept şəkli")}</Label>
@@ -735,73 +735,73 @@ const AdminRecipes = () => {
                   ref={imageInputRef}
                   accept="image/*"
                   onChange={handleImageUpload}
-                  className="hidden"
-                />
+                  className="hidden" />
                 
-                {formData.image_url ? (
-                  <div className="relative">
-                    <img 
-                      src={formData.image_url} 
-                      alt={tr("adminrecipes_resept_sekli_881c26", "Resept şəkli")} 
-                      className="w-full h-48 object-cover rounded-lg border"
-                    />
+                
+                {formData.image_url ?
+                <div className="relative">
+                    <img
+                    src={formData.image_url}
+                    alt={tr("adminrecipes_resept_sekli_881c26", "Resept şəkli")}
+                    className="w-full h-48 object-cover rounded-lg border" />
+                  
                     <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-2 right-2 h-8 w-8"
-                      onClick={handleRemoveImage}
-                    >
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-2 right-2 h-8 w-8"
+                    onClick={handleRemoveImage}>
+                    
                       <X className="w-4 h-4" />
                     </Button>
-                  </div>
-                ) : (
-                  <div
-                    onClick={() => imageInputRef.current?.click()}
-                    className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-                  >
-                    {uploadingImage ? (
-                      <div className="flex flex-col items-center gap-2">
+                  </div> :
+
+                <div
+                  onClick={() => imageInputRef.current?.click()}
+                  className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                  
+                    {uploadingImage ?
+                  <div className="flex flex-col items-center gap-2">
                         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                         <span className="text-sm text-muted-foreground">{tr("adminrecipes_yuklenir_5557de", "Yüklənir...")}</span>
-                      </div>
-                    ) : (
-                      <>
+                      </div> :
+
+                  <>
                         <ImageIcon className="w-10 h-10 text-muted-foreground mb-2" />
                         <span className="text-sm text-muted-foreground">{tr("adminrecipes_sekil_yuklemek_ucun_klikleyin_91a262", "Şəkil yükləmək üçün klikləyin")}</span>
                         <span className="text-xs text-muted-foreground mt-1">PNG, JPG, WEBP (max 5MB)</span>
                       </>
-                    )}
+                  }
                   </div>
-                )}
+                }
               </div>
               <Textarea
                 placeholder={tr("adminrecipes_inqrediyentler_her_setirde_bir_f98891", "İnqrediyentlər (hər sətirdə bir)")}
                 value={(formData.ingredients || []).join('\n')}
                 onChange={(e) => setFormData({ ...formData, ingredients: e.target.value.split('\n').filter(Boolean) })}
-                rows={5}
-              />
+                rows={5} />
+              
               <Textarea
                 placeholder={tr("adminrecipes_telimatlar_her_setirde_bir_addim_0c6e13", "Təlimatlar (hər sətirdə bir addım)")}
                 value={(formData.instructions || []).join('\n')}
                 onChange={(e) => setFormData({ ...formData, instructions: e.target.value.split('\n').filter(Boolean) })}
-                rows={5}
-              />
+                rows={5} />
+              
               <div className="flex items-center gap-2">
                 <Switch
                   checked={formData.is_active ?? true}
-                  onCheckedChange={(v) => setFormData({ ...formData, is_active: v })}
-                />
+                  onCheckedChange={(v) => setFormData({ ...formData, is_active: v })} />
+                
                 <span className="text-sm">Aktiv</span>
               </div>
             </div>
           </ScrollArea>
           <DialogFooter>
             <Button variant="outline" onClick={() => handleModalClose(false)}>
-              Ləğv et
+              {tr("adminrecipes_legv_et_b5e49c", "L\u0259\u011Fv et")}
             </Button>
             <Button onClick={handleSave} disabled={create.isPending || update.isPending}>
-              {editingItem ? 'Yenilə' : 'Əlavə et'}
+              {editingItem ? tr("adminrecipes_yenile_570ce2", "Yenil\u0259") : tr("adminrecipes_elave_et_6e1b9b", "\u018Flav\u0259 et")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -815,8 +815,8 @@ const AdminRecipes = () => {
         onSave={async () => {
           await handleSave();
           setShowUnsavedDialog(false);
-        }}
-      />
+        }} />
+      
 
       {/* CSV Import Modal */}
       <Dialog open={showImportModal} onOpenChange={setShowImportModal}>
@@ -824,51 +824,51 @@ const AdminRecipes = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <UtensilsCrossed className="w-5 h-5 text-primary" />
-              CSV İmport - {importData.length} resept tapıldı
+              CSV İmport - {importData.length} {tr("adminrecipes_resept_tapildi_1d8733", "resept tap\u0131ld\u0131")}
             </DialogTitle>
           </DialogHeader>
           <ScrollArea className="flex-1 max-h-[50vh]">
             <div className="space-y-2 pr-4">
-              {importData.map((recipe, idx) => (
-                <div key={idx} className="p-3 bg-muted/30 rounded-lg">
+              {importData.map((recipe, idx) =>
+              <div key={idx} className="p-3 bg-muted/30 rounded-lg">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium">{recipe.title}</p>
                       <p className="text-sm text-muted-foreground line-clamp-1">{recipe.description}</p>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Badge variant="outline">{categories.find(c => c.id === recipe.category)?.label || recipe.category}</Badge>
-                      <span>{recipe.prep_time || 0}+{recipe.cook_time || 0} dəq</span>
+                      <Badge variant="outline">{categories.find((c) => c.id === recipe.category)?.label || recipe.category}</Badge>
+                      <span>{recipe.prep_time || 0}+{recipe.cook_time || 0} {tr("adminrecipes_deq_780a5c", "d\u0259q")}</span>
                     </div>
                   </div>
                 </div>
-              ))}
+              )}
             </div>
           </ScrollArea>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowImportModal(false)}>
-              Ləğv et
+              {tr("adminrecipes_legv_et_b5e49c", "L\u0259\u011Fv et")}
             </Button>
             <Button onClick={handleImport} disabled={importing} className="gap-2">
-              {importing ? (
-                <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <FileUp className="w-4 h-4" />
-              )}
-              {importing ? 'Yüklənir...' : `${importData.length} Resept İmport Et`}
+              {importing ?
+              <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" /> :
+
+              <FileUp className="w-4 h-4" />
+              }
+              {importing ? tr("adminrecipes_yuklenir_5557de", "Y\xFCkl\u0259nir...") : `${importData.length} Resept İmport Et`}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <AdminUsageStats 
+      <AdminUsageStats
         eventNames={['recipe_viewed']}
         title={tr("adminrecipes_resept_istifade_statistikasi_d6132d", "🍳 Resept İstifadə Statistikası")}
         showEventData
-        showUsers
-      />
-    </div>
-  );
+        showUsers />
+      
+    </div>);
+
 };
 
 export default AdminRecipes;

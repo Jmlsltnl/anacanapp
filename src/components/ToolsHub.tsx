@@ -1,13 +1,13 @@
 import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Search, Shield, Timer, Scale, Baby, Briefcase, 
+import {
+  Search, Shield, Timer, Scale, Baby, Briefcase,
   Volume2, Heart, Footprints, ChevronRight,
   Utensils, Activity, ArrowLeft, Camera, Lock, ShoppingCart, LucideIcon, Wrench, BookOpen, ChefHat,
   Stethoscope, Droplet, ImagePlus, Package, Mic, Scan, CloudSun, Gauge, Store,
   MapPin, Gamepad2, ShieldAlert, BookHeart, Stars, Crown, Ruler, Sparkles, TrendingUp, Zap,
-  Pill, Cake, Syringe
-} from 'lucide-react';
+  Pill, Cake, Syringe } from
+'lucide-react';
 import BlogScreen from '@/components/BlogScreen';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
@@ -102,7 +102,7 @@ const iconMap: Record<string, LucideIcon> = {
   'Stars': Stars,
   'Calculator': Calculator,
   'Pill': Pill,
-  'Syringe': Syringe,
+  'Syringe': Syringe
 };
 
 // Import Calculator icon
@@ -131,8 +131,8 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const { toast } = useToast();
   const pregData = getPregnancyData();
   // Admins see ALL tools regardless of life stage
-  const { data: toolConfigs = [], isLoading: toolsLoading } = useToolConfigs(isAdmin ? undefined : (lifeStage || undefined));
-  
+  const { data: toolConfigs = [], isLoading: toolsLoading } = useToolConfigs(isAdmin ? undefined : lifeStage || undefined);
+
   const hasPartner = !!profile?.linked_partner_id;
 
   // Get locked field based on life stage
@@ -144,31 +144,31 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   };
 
   // Build tools from DB configs
-  const language = useUserStore(state => state.language);
+  const language = useUserStore((state) => state.language);
   const isEn = language === 'en';
   const tools: Tool[] = useMemo(() => {
     if (toolConfigs.length === 0) {
       return [];
     }
-    
-    return toolConfigs.map(config => {
-      const azName = hasPartner && config.requires_partner && config.partner_name_az
-        ? config.partner_name_az
-        : (config as any).display_name_az || config.name_az || config.name;
-      const enName = hasPartner && config.requires_partner && (config as any).partner_name
-        ? (config as any).partner_name
-        : (config as any).display_name || config.name;
-      const name = isEn ? (enName || azName) : azName;
 
-      const azDescription = hasPartner && config.requires_partner && config.partner_description_az
-        ? config.partner_description_az
-        : config.description_az || config.description || '';
-      const enDescription = hasPartner && config.requires_partner && (config as any).partner_description
-        ? (config as any).partner_description
-        : config.description || '';
-      const description = isEn ? (enDescription || azDescription) : azDescription;
+    return toolConfigs.map((config) => {
+      const azName = hasPartner && config.requires_partner && config.partner_name_az ?
+      config.partner_name_az :
+      (config as any).display_name_az || config.name_az || config.name;
+      const enName = hasPartner && config.requires_partner && (config as any).partner_name ?
+      (config as any).partner_name :
+      (config as any).display_name || config.name;
+      const name = isEn ? enName || azName : azName;
 
-      
+      const azDescription = hasPartner && config.requires_partner && config.partner_description_az ?
+      config.partner_description_az :
+      config.description_az || config.description || '';
+      const enDescription = hasPartner && config.requires_partner && (config as any).partner_description ?
+      (config as any).partner_description :
+      config.description || '';
+      const description = isEn ? enDescription || azDescription : azDescription;
+
+
       return {
         id: config.tool_id,
         name,
@@ -181,7 +181,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         isPremium: config.is_premium || false,
         premiumType: config.premium_type || 'none',
         premiumLimit: config.premium_limit || 0,
-        isLocked: getLockedStatus(config),
+        isLocked: getLockedStatus(config)
       };
     });
   }, [toolConfigs, hasPartner, lifeStage, isEn]);
@@ -196,7 +196,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const isToolAvailable = (tool: Tool) => {
     // Admins have full access to everything
     if (isAdmin) return true;
-    
+
     if (tool.stages && !tool.stages.includes(lifeStage || '')) {
       return false;
     }
@@ -221,43 +221,43 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         toast({
           title: `${tool.name} hələ aktiv deyil`,
           description: `Bu alət ${tool.minWeek}. həftədən sonra aktivləşəcək`,
-          variant: 'destructive',
+          variant: 'destructive'
         });
       } else if (tool.stages) {
         toast({
           title: `${tool.name} mövcud deyil`,
           description: `Bu alət yalnız hamiləlik dövründə istifadə oluna bilər`,
-          variant: 'destructive',
+          variant: 'destructive'
         });
       }
       return;
     }
 
     if (tool.isLocked && !isPremium) {
-      import('@/lib/analytics').then(m => m.analytics.logPaywallShown(tool.id)).catch(() => {});
+      import('@/lib/analytics').then((m) => m.analytics.logPaywallShown(tool.id)).catch(() => {});
       setShowPremiumModal(true);
       return;
     }
 
     if (tool.isPremium && !isPremium) {
-      import('@/lib/analytics').then(m => m.analytics.logPaywallShown(tool.id)).catch(() => {});
+      import('@/lib/analytics').then((m) => m.analytics.logPaywallShown(tool.id)).catch(() => {});
       setShowPremiumModal(true);
       return;
     }
 
     // Track tool opened
-    import('@/lib/analytics').then(m => m.analytics.logToolOpened(tool.id, tool.name)).catch(() => {});
+    import('@/lib/analytics').then((m) => m.analytics.logToolOpened(tool.id, tool.name)).catch(() => {});
     openTool(tool.id);
   };
 
   // Get hero tool IDs to exclude from grid
-  const heroToolIds = new Set(toolConfigs.filter(t => t.is_hero).map(t => t.tool_id));
+  const heroToolIds = new Set(toolConfigs.filter((t) => t.is_hero).map((t) => t.tool_id));
 
   // Filter by search and category, exclude hero tools from grid
-  const filteredTools = tools.filter(tool => {
+  const filteredTools = tools.filter((tool) => {
     if (heroToolIds.has(tool.id)) return false;
     const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tool.description.toLowerCase().includes(searchQuery.toLowerCase());
+    tool.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
 
@@ -265,15 +265,15 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const cakesVirtual: Tool = {
     id: 'cakes',
     name: 'Tortlar',
-    description: 'Xüsusi günlər üçün tortlar',
+    description: tr("toolshub_xususi_gunler_ucun_tortlar_8a2248", "X\xFCsusi g\xFCnl\u0259r \xFC\xE7\xFCn tortlar"),
     icon: Cake,
     color: 'pink',
     bgColor: 'pink',
-    stages: ['bump', 'mommy'],
+    stages: ['bump', 'mommy']
   };
-  const showCakes = (lifeStage === 'bump' || lifeStage === 'mommy' || isAdmin) &&
-    (cakesVirtual.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      cakesVirtual.description.toLowerCase().includes(searchQuery.toLowerCase()));
+  const showCakes = (lifeStage === 'bump' || lifeStage === 'mommy' || isAdmin) && (
+  cakesVirtual.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  cakesVirtual.description.toLowerCase().includes(searchQuery.toLowerCase()));
   const displayedTools: Tool[] = showCakes ? [cakesVirtual, ...filteredTools] : filteredTools;
 
   const handleBack = () => {
@@ -293,52 +293,52 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     }
   };
 
-  const toolFallback = (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+  const toolFallback =
+  <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-    </div>
-  );
+    </div>;
+
 
   // Render active tool
   const toolComponent = (() => {
     switch (activeTool) {
-      case 'photoshoot': return <BabyPhotoshoot onBack={handleBack} />;
-      case 'nutrition': return <Nutrition onBack={handleBack} />;
-      case 'shopping': return <ShoppingList onBack={handleBack} />;
-      case 'safety': return <SafetyLookup onBack={handleBack} />;
-      case 'kick': return <KickCounter onBack={handleBack} />;
-      case 'contraction': return <ContractionTimer onBack={handleBack} />;
-      case 'weight': return <WeightTracker onBack={handleBack} />;
-      case 'whitenoise': case 'white-noise': return <WhiteNoise onBack={handleBack} />;
-      case 'names': return <BabyNames onBack={handleBack} />;
-      case 'hospital': return <HospitalBag onBack={handleBack} />;
-      case 'exercise': case 'exercises': return <Exercises onBack={handleBack} />;
-      case 'mood': case 'mood-diary': return <MoodDiary onBack={handleBack} />;
-      case 'blog': return <BlogScreen onBack={handleBack} />;
-      case 'recipes': return <Recipes onBack={handleBack} />;
-      case 'doctors': return <DoctorsHospitals onBack={handleBack} />;
-      case 'blood-sugar': return <BloodSugarTracker onBack={handleBack} />;
-      case 'pregnancy-album': return <PregnancyAlbum onBack={handleBack} />;
-      case 'baby-album': return <BabyMonthlyAlbum onBack={handleBack} />;
-      case 'cry-translator': return <CryTranslator onBack={handleBack} />;
-      case 'poop-scanner': return <PoopScanner onBack={handleBack} />;
-      case 'weather-clothing': return <WeatherClothing onBack={handleBack} />;
-      case 'noise-meter': return <NoiseMeter onBack={handleBack} />;
-      case 'secondhand-market': case 'second-hand-market': return <SecondHandMarket onBack={handleBack} />;
-      case 'mom-friendly-map': return <MomFriendlyMap onBack={handleBack} />;
-      case 'smart-play-box': return <SmartPlayBox onBack={handleBack} />;
-      case 'mental-health': return <MentalHealthTracker onBack={handleBack} />;
-      case 'first-aid': return <FirstAidGuide onBack={handleBack} />;
-      case 'fairy-tale': return <FairyTaleGenerator onBack={handleBack} />;
-      case 'horoscope': return <HoroscopeCompatibility onBack={handleBack} />;
-      case 'baby-growth': case 'growth-tracker': return <BabyGrowthTracker onBack={handleBack} />;
-      case 'affiliate': case 'affiliate-products': return <AffiliateProducts onBack={handleBack} />;
-      case 'maternity-calculator': case 'maternity': return <MaternityCalculator onBack={handleBack} />;
-      case 'teething': case 'teething-tracker': return <TeethingTracker onBack={handleBack} />;
-      case 'vaccine-calendar': case 'vaccines-calendar': return <VaccineCalendar onBack={handleBack} />;
-      case 'vitamin-tracker': case 'vitamins': return <VitaminTracker onBack={handleBack} />;
-      case 'cakes': return <CakesScreen onBack={handleBack} />;
-      default: return null;
+      case 'photoshoot':return <BabyPhotoshoot onBack={handleBack} />;
+      case 'nutrition':return <Nutrition onBack={handleBack} />;
+      case 'shopping':return <ShoppingList onBack={handleBack} />;
+      case 'safety':return <SafetyLookup onBack={handleBack} />;
+      case 'kick':return <KickCounter onBack={handleBack} />;
+      case 'contraction':return <ContractionTimer onBack={handleBack} />;
+      case 'weight':return <WeightTracker onBack={handleBack} />;
+      case 'whitenoise':case 'white-noise':return <WhiteNoise onBack={handleBack} />;
+      case 'names':return <BabyNames onBack={handleBack} />;
+      case 'hospital':return <HospitalBag onBack={handleBack} />;
+      case 'exercise':case 'exercises':return <Exercises onBack={handleBack} />;
+      case 'mood':case 'mood-diary':return <MoodDiary onBack={handleBack} />;
+      case 'blog':return <BlogScreen onBack={handleBack} />;
+      case 'recipes':return <Recipes onBack={handleBack} />;
+      case 'doctors':return <DoctorsHospitals onBack={handleBack} />;
+      case 'blood-sugar':return <BloodSugarTracker onBack={handleBack} />;
+      case 'pregnancy-album':return <PregnancyAlbum onBack={handleBack} />;
+      case 'baby-album':return <BabyMonthlyAlbum onBack={handleBack} />;
+      case 'cry-translator':return <CryTranslator onBack={handleBack} />;
+      case 'poop-scanner':return <PoopScanner onBack={handleBack} />;
+      case 'weather-clothing':return <WeatherClothing onBack={handleBack} />;
+      case 'noise-meter':return <NoiseMeter onBack={handleBack} />;
+      case 'secondhand-market':case 'second-hand-market':return <SecondHandMarket onBack={handleBack} />;
+      case 'mom-friendly-map':return <MomFriendlyMap onBack={handleBack} />;
+      case 'smart-play-box':return <SmartPlayBox onBack={handleBack} />;
+      case 'mental-health':return <MentalHealthTracker onBack={handleBack} />;
+      case 'first-aid':return <FirstAidGuide onBack={handleBack} />;
+      case 'fairy-tale':return <FairyTaleGenerator onBack={handleBack} />;
+      case 'horoscope':return <HoroscopeCompatibility onBack={handleBack} />;
+      case 'baby-growth':case 'growth-tracker':return <BabyGrowthTracker onBack={handleBack} />;
+      case 'affiliate':case 'affiliate-products':return <AffiliateProducts onBack={handleBack} />;
+      case 'maternity-calculator':case 'maternity':return <MaternityCalculator onBack={handleBack} />;
+      case 'teething':case 'teething-tracker':return <TeethingTracker onBack={handleBack} />;
+      case 'vaccine-calendar':case 'vaccines-calendar':return <VaccineCalendar onBack={handleBack} />;
+      case 'vitamin-tracker':case 'vitamins':return <VitaminTracker onBack={handleBack} />;
+      case 'cakes':return <CakesScreen onBack={handleBack} />;
+      default:return null;
     }
   })();
 
@@ -346,16 +346,16 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     return (
       <Suspense fallback={toolFallback}>
         {toolComponent}
-      </Suspense>
-    );
+      </Suspense>);
+
   }
 
   const getLifeStageInfo = () => {
     switch (lifeStage) {
-      case 'flow': return { label: tr("toolshub_dovriyye_f65b93", 'Dövriyyə'), emoji: '🌸', color: 'from-pink-500 to-rose-600' };
-      case 'bump': return { label: tr("toolshub_hamilelik_e86feb", 'Hamiləlik'), emoji: '🤰', color: 'from-primary to-orange-500' };
-      case 'mommy': return { label: tr("toolshub_analiq_9e762d", 'Analıq'), emoji: '👶', color: 'from-teal-500 to-cyan-600' };
-      default: return { label: tr("toolshub_aletler_4778b4", 'Alətlər'), emoji: '✨', color: 'from-primary to-orange-500' };
+      case 'flow':return { label: tr("toolshub_dovriyye_f65b93", 'Dövriyyə'), emoji: '🌸', color: 'from-pink-500 to-rose-600' };
+      case 'bump':return { label: tr("toolshub_hamilelik_e86feb", 'Hamiləlik'), emoji: '🤰', color: 'from-primary to-orange-500' };
+      case 'mommy':return { label: tr("toolshub_analiq_9e762d", 'Analıq'), emoji: '👶', color: 'from-teal-500 to-cyan-600' };
+      default:return { label: tr("toolshub_aletler_4778b4", 'Alətlər'), emoji: '✨', color: 'from-primary to-orange-500' };
     }
   };
 
@@ -378,8 +378,8 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
                 placeholder={tr("toolshub_alet_axtarin_fad58b", "Alət axtarın...")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 pl-10 pr-4 rounded-full bg-muted/60 text-foreground placeholder:text-muted-foreground text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-              />
+                className="w-full h-10 pl-10 pr-4 rounded-full bg-muted/60 text-foreground placeholder:text-muted-foreground text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+              
             </div>
           </div>
         </div>
@@ -391,16 +391,16 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
 
         {/* Hero Tools - DB driven */}
         {(() => {
-          const heroTools = toolConfigs
-            .filter(t => t.is_hero)
-            .sort((a, b) => (a.hero_order || 0) - (b.hero_order || 0));
-          
+          const heroTools = toolConfigs.
+          filter((t) => t.is_hero).
+          sort((a, b) => (a.hero_order || 0) - (b.hero_order || 0));
+
           return heroTools.map((hero, idx) => {
             const HeroIcon = iconMap[hero.icon] || Wrench;
-            const displayName = isEn
-              ? ((hero as any).display_name || hero.name)
-              : (hero.display_name_az || hero.name_az || hero.name);
-            
+            const displayName = isEn ?
+            (hero as any).display_name || hero.name :
+            hero.display_name_az || hero.name_az || hero.name;
+
             return (
               <motion.button
                 key={hero.tool_id}
@@ -409,8 +409,8 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                whileTap={{ scale: 0.98 }}
-              >
+                whileTap={{ scale: 0.98 }}>
+                
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.15),transparent_60%)]" />
                 <div className="absolute right-0 bottom-0 opacity-10">
                   <HeroIcon className="w-32 h-32 text-white -mr-6 -mb-6" />
@@ -421,22 +421,22 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      {hero.hero_badge && (
-                        <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] text-white font-semibold">{hero.hero_badge}</span>
-                      )}
-                      {hero.is_premium && (
-                        <span className="px-2 py-0.5 rounded-full bg-amber-400/30 text-[10px] text-amber-200 font-semibold flex items-center gap-1">
+                      {hero.hero_badge &&
+                      <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] text-white font-semibold">{hero.hero_badge}</span>
+                      }
+                      {hero.is_premium &&
+                      <span className="px-2 py-0.5 rounded-full bg-amber-400/30 text-[10px] text-amber-200 font-semibold flex items-center gap-1">
                           <Crown className="w-3 h-3" /> Premium
                         </span>
-                      )}
+                      }
                     </div>
                     <h3 className="text-white font-bold text-base">{displayName}</h3>
-                    <p className="text-white/70 text-xs">{hero.hero_subtitle || (isEn ? (hero.description || hero.description_az) : hero.description_az) || ''}</p>
+                    <p className="text-white/70 text-xs">{hero.hero_subtitle || (isEn ? hero.description || hero.description_az : hero.description_az) || ''}</p>
                   </div>
                   <ChevronRight className="w-6 h-6 text-white/60" />
                 </div>
-              </motion.button>
-            );
+              </motion.button>);
+
           });
         })()}
 
@@ -445,10 +445,10 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         {/* Tools Count Header */}
         <div className="flex items-center justify-between mb-2.5">
           <h2 className="text-sm font-semibold text-foreground">
-            Bütün Alətlər
+            {tr("toolshub_butun_aletler_88b643", "B\xFCt\xFCn Al\u0259tl\u0259r")}
           </h2>
           <span className="text-[11px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full font-medium">
-            {displayedTools.length} alət
+            {displayedTools.length} {tr("toolshub_alet_9a099a", "al\u0259t")}
           </span>
         </div>
 
@@ -459,7 +459,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
               const Icon = tool.icon;
               const available = isToolAvailable(tool);
               const needsPremium = (tool.isLocked || tool.isPremium) && !isPremium;
-              
+
               return (
                 <motion.button
                   key={tool.id}
@@ -469,73 +469,73 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ delay: Math.min(index * 0.015, 0.18) }}
                   onClick={() => tool.id === 'cakes' ? openTool('cakes') : handleToolClick(tool)}
-                  className={`bg-card rounded-xl p-2.5 text-left border border-border/40 relative overflow-hidden transition-all active:scale-95 ${!available ? 'opacity-40' : 'hover:shadow-md hover:border-primary/20'}`}
-                >
+                  className={`bg-card rounded-xl p-2.5 text-left border border-border/40 relative overflow-hidden transition-all active:scale-95 ${!available ? 'opacity-40' : 'hover:shadow-md hover:border-primary/20'}`}>
+                  
                   {/* Premium/Lock indicator */}
-                  {needsPremium && (
-                    <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-amber-500/15 flex items-center justify-center">
+                  {needsPremium &&
+                  <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-amber-500/15 flex items-center justify-center">
                       <Lock className="w-2.5 h-2.5 text-amber-500" />
                     </div>
-                  )}
-                  {!needsPremium && tool.isPremium && (
-                    <div className="absolute top-1.5 right-1.5">
+                  }
+                  {!needsPremium && tool.isPremium &&
+                  <div className="absolute top-1.5 right-1.5">
                       <Crown className="w-3 h-3 text-amber-400" />
                     </div>
-                  )}
+                  }
                   
                   {/* Icon */}
                   <div className={`w-9 h-9 rounded-lg mb-1.5 flex items-center justify-center ${
-                    needsPremium 
-                      ? 'bg-gradient-to-br from-amber-500/15 to-orange-500/15' 
-                      : 'bg-gradient-to-br from-primary/10 to-primary/20'
-                  }`}>
+                  needsPremium ?
+                  'bg-gradient-to-br from-amber-500/15 to-orange-500/15' :
+                  'bg-gradient-to-br from-primary/10 to-primary/20'}`
+                  }>
                     <Icon className={`w-[18px] h-[18px] ${needsPremium ? 'text-amber-500' : 'text-primary'}`} />
                   </div>
                   
                   <h3 className="font-semibold text-foreground text-[12px] leading-tight mb-0.5 pr-4 line-clamp-2">{tool.name}</h3>
                   <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">{tool.description}</p>
-                </motion.button>
-              );
+                </motion.button>);
+
             })}
           </AnimatePresence>
         </div>
 
         {/* Empty State */}
-        {displayedTools.length === 0 && (
-          <motion.div 
-            className="text-center py-16"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
+        {displayedTools.length === 0 &&
+        <motion.div
+          className="text-center py-16"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}>
+          
             <div className="w-20 h-20 rounded-3xl bg-muted/50 flex items-center justify-center mx-auto mb-4">
               <Search className="w-10 h-10 text-muted-foreground/50" />
             </div>
             <p className="font-semibold text-foreground mb-1">{tr("toolshub_alet_tapilmadi_f358cb", "Alət tapılmadı")}</p>
             <p className="text-sm text-muted-foreground">
-              {searchQuery ? `"${searchQuery}" ilə uyğun alət yoxdur` : 'Bu kateqoriyada alət yoxdur'}
+              {searchQuery ? `"${searchQuery}" ilə uyğun alət yoxdur` : tr("toolshub_bu_kateqoriyada_alet_yoxdur_6c04fc", "Bu kateqoriyada al\u0259t yoxdur")}
             </p>
             <motion.button
-              onClick={() => { setSearchQuery(''); }}
-              className="mt-4 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium"
-              whileTap={{ scale: 0.95 }}
-            >
-              Hamısını göstər
-            </motion.button>
+            onClick={() => {setSearchQuery('');}}
+            className="mt-4 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium"
+            whileTap={{ scale: 0.95 }}>
+              {tr("toolshub_hamisini_goster_b13d82", "Ham\u0131s\u0131n\u0131 g\xF6st\u0259r")}
+            
+          </motion.button>
           </motion.div>
-        )}
+        }
 
         {/* Bottom Banner */}
         <BannerSlot placement="tools_bottom" onNavigate={() => {}} onToolOpen={openTool} className="mt-6" />
       </div>
 
       {/* Premium Modal */}
-      <PremiumModal 
-        isOpen={showPremiumModal} 
-        onClose={() => setShowPremiumModal(false)} 
-        feature="tool"
-      />
-    </div>
-  );
+      <PremiumModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        feature="tool" />
+      
+    </div>);
+
 };
 
 export default ToolsHub;

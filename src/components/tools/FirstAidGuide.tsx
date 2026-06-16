@@ -17,7 +17,7 @@ interface FirstAidGuideProps {
 const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
   useScrollToTop();
   useScreenAnalytics('FirstAidGuide', 'Tools');
-  
+
   const [selectedScenario, setSelectedScenario] = useState<FirstAidScenario | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -37,31 +37,31 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
 
   const nextStep = () => {
     if (currentStep < steps.length - 1) {
-      setCurrentStep(prev => prev + 1);
+      setCurrentStep((prev) => prev + 1);
     }
   };
 
   const prevStep = () => {
     if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1);
+      setCurrentStep((prev) => prev - 1);
     }
   };
 
   const getEmergencyColor = (level: string) => {
     switch (level) {
-      case 'critical': return 'from-red-600 to-red-700';
-      case 'high': return 'from-orange-500 to-red-500';
-      case 'medium': return 'from-amber-500 to-orange-500';
-      default: return 'from-yellow-500 to-amber-500';
+      case 'critical':return 'from-red-600 to-red-700';
+      case 'high':return 'from-orange-500 to-red-500';
+      case 'medium':return 'from-amber-500 to-orange-500';
+      default:return 'from-yellow-500 to-amber-500';
     }
   };
 
   const getEmergencyBg = (level: string) => {
     switch (level) {
-      case 'critical': return 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800';
-      case 'high': return 'bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-800';
-      case 'medium': return 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800';
-      default: return 'bg-yellow-50 dark:bg-yellow-950/30 border-yellow-200 dark:border-yellow-800';
+      case 'critical':return 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800';
+      case 'high':return 'bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-800';
+      case 'medium':return 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800';
+      default:return 'bg-yellow-50 dark:bg-yellow-950/30 border-yellow-200 dark:border-yellow-800';
     }
   };
 
@@ -76,20 +76,20 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
             <motion.button
               onClick={handleBack}
               className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}
-            >
+              whileTap={{ scale: 0.95 }}>
+              
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </motion.button>
             <div className="flex-1">
               <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <Shield className="w-5 h-5 text-red-500" />
-                {selectedScenario ? selectedScenario.title_az : 'Həyat Qurtaran SOS'}
+                {selectedScenario ? selectedScenario.title_az : tr("firstaidguide_heyat_qurtaran_sos_2f76df", "H\u0259yat Qurtaran SOS")}
               </h1>
-              {selectedScenario && (
-                <p className="text-xs text-muted-foreground">
-                  Addım {currentStep + 1} / {steps.length}
+              {selectedScenario &&
+              <p className="text-xs text-muted-foreground">
+                  {tr("firstaidguide_addim_9346cd", "Add\u0131m")} {currentStep + 1} / {steps.length}
                 </p>
-              )}
+              }
             </div>
             {/* TTS button removed */}
           </div>
@@ -97,22 +97,22 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
       </div>
 
       <AnimatePresence mode="wait">
-        {!selectedScenario ? (
-          <motion.div 
-            key="scenarios"
-            className="px-4 pt-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
+        {!selectedScenario ?
+        <motion.div
+          key="scenarios"
+          className="px-4 pt-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}>
+          
             {/* Emergency Call Button */}
             <motion.a
-              href="tel:103"
-              className="block w-full mb-4"
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.1 }}
-            >
+            href="tel:103"
+            className="block w-full mb-4"
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.1 }}>
+            
               <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-2xl p-3 shadow-lg flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
                   <Phone className="w-5 h-5 text-white" />
@@ -133,29 +133,29 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
             {/* Scenario Selection */}
             <h2 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-red-500" />
-              Təcili Vəziyyət Seçin
+              {tr("firstaidguide_tecili_veziyyet_secin_51d6bd", "T\u0259cili V\u0259ziyy\u0259t Se\xE7in")}
             </h2>
 
-            {isLoading ? (
-              <div className="space-y-2">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="bg-card rounded-xl p-4 animate-pulse">
+            {isLoading ?
+          <div className="space-y-2">
+                {[1, 2, 3].map((i) =>
+            <div key={i} className="bg-card rounded-xl p-4 animate-pulse">
                     <div className="h-5 bg-muted rounded w-1/2 mb-1" />
                     <div className="h-3 bg-muted rounded w-3/4" />
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-2 pb-4">
-                {scenarios.map((scenario, index) => (
-                  <motion.button
-                    key={scenario.id}
-                    onClick={() => setSelectedScenario(scenario)}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className={`w-full rounded-xl border p-3 text-left transition-all hover:shadow-md ${getEmergencyBg(scenario.emergency_level)}`}
-                  >
+            )}
+              </div> :
+
+          <div className="space-y-2 pb-4">
+                {scenarios.map((scenario, index) =>
+            <motion.button
+              key={scenario.id}
+              onClick={() => setSelectedScenario(scenario)}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className={`w-full rounded-xl border p-3 text-left transition-all hover:shadow-md ${getEmergencyBg(scenario.emergency_level)}`}>
+              
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${getEmergencyColor(scenario.emergency_level)} flex items-center justify-center text-xl shadow`}>
                         {scenario.icon}
@@ -164,51 +164,51 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                         <h3 className="text-sm font-bold text-foreground">{scenario.title_az}</h3>
                         <p className="text-xs text-muted-foreground line-clamp-1">{scenario.description_az}</p>
                         <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-gradient-to-r ${getEmergencyColor(scenario.emergency_level)} text-white`}>
-                          {scenario.emergency_level === 'critical' ? 'KRİTİK' : scenario.emergency_level === 'high' ? 'YÜKSƏK' : 'ORTA'}
+                          {scenario.emergency_level === 'critical' ? 'KRİTİK' : scenario.emergency_level === 'high' ? tr("firstaidguide_yuksek_22d925", "Y\xDCKS\u018FK") : 'ORTA'}
                         </span>
                       </div>
                       <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
                     </div>
                   </motion.button>
-                ))}
-              </div>
             )}
-          </motion.div>
-        ) : (
-          <motion.div
-            key="steps"
-            className="flex flex-col"
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -30 }}
-          >
+              </div>
+          }
+          </motion.div> :
+
+        <motion.div
+          key="steps"
+          className="flex flex-col"
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -30 }}>
+          
             {/* Progress */}
             <div className="px-3 pt-1.5">
               <div className="flex items-center gap-1">
-                {steps.map((_, i) => (
-                  <div 
-                    key={i}
-                    className={`h-1 flex-1 rounded-full transition-all ${
-                      i <= currentStep 
-                        ? `bg-gradient-to-r ${getEmergencyColor(selectedScenario.emergency_level)}`
-                        : 'bg-muted'
-                    }`}
-                  />
-                ))}
+                {steps.map((_, i) =>
+              <div
+                key={i}
+                className={`h-1 flex-1 rounded-full transition-all ${
+                i <= currentStep ?
+                `bg-gradient-to-r ${getEmergencyColor(selectedScenario.emergency_level)}` :
+                'bg-muted'}`
+                } />
+
+              )}
               </div>
             </div>
 
             {/* Step Content */}
             <div className="flex flex-col items-center px-3 pt-1.5 text-center">
-              {currentStepData && (
-                <AnimatePresence mode="wait">
+              {currentStepData &&
+            <AnimatePresence mode="wait">
                   <motion.div
-                    key={currentStep}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="w-full max-w-sm"
-                  >
+                key={currentStep}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="w-full max-w-sm">
+                
                     <div className="flex items-center gap-2 mb-1.5">
                       <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${getEmergencyColor(selectedScenario.emergency_level)} flex items-center justify-center shadow-sm shrink-0`}>
                         <span className="text-base">
@@ -216,19 +216,19 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                         </span>
                       </div>
                       <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-[10px] font-medium">
-                        Addım {currentStep + 1}
+                        {tr("firstaidguide_addim_9346cd", "Add\u0131m")} {currentStep + 1}
                       </span>
-                      {currentStepData.is_critical && (
-                        <span className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-2 py-0.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1">
+                      {currentStepData.is_critical &&
+                  <span className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-2 py-0.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1">
                           <AlertTriangle className="w-2.5 h-2.5" />
                           Kritik
                         </span>
-                      )}
-                      {currentStepData.duration_seconds && (
-                        <span className="ml-auto text-[10px] text-muted-foreground font-medium">
+                  }
+                      {currentStepData.duration_seconds &&
+                  <span className="ml-auto text-[10px] text-muted-foreground font-medium">
                           ⏱️ {currentStepData.duration_seconds}s
                         </span>
-                      )}
+                  }
                     </div>
 
                     <div className="bg-card rounded-lg p-2.5 shadow-sm border border-border/50">
@@ -242,50 +242,50 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                     <div className="mt-3 space-y-1.5">
                       <div className="flex gap-2">
                         <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1 h-10 rounded-xl text-sm"
-                          onClick={prevStep}
-                          disabled={currentStep === 0}
-                        >
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 h-10 rounded-xl text-sm"
+                      onClick={prevStep}
+                      disabled={currentStep === 0}>
+                      
                           <ChevronLeft className="w-4 h-4 mr-1" />
-                          Əvvəlki
+                          {tr("firstaidguide_evvelki_936896", "\u018Fvv\u0259lki")}
                         </Button>
                         <Button
-                          size="sm"
-                          className={`flex-1 h-10 rounded-xl text-sm font-bold ${
-                            currentStep === steps.length - 1 
-                              ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' 
-                              : `bg-gradient-to-r ${getEmergencyColor(selectedScenario.emergency_level)}`
-                          }`}
-                          onClick={currentStep === steps.length - 1 ? handleBack : nextStep}
-                        >
-                          {currentStep === steps.length - 1 ? 'Tamamla' : 'Növbəti'}
+                      size="sm"
+                      className={`flex-1 h-10 rounded-xl text-sm font-bold ${
+                      currentStep === steps.length - 1 ?
+                      'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' :
+                      `bg-gradient-to-r ${getEmergencyColor(selectedScenario.emergency_level)}`}`
+                      }
+                      onClick={currentStep === steps.length - 1 ? handleBack : nextStep}>
+                      
+                          {currentStep === steps.length - 1 ? 'Tamamla' : tr("firstaidguide_novbeti_6e8661", "N\xF6vb\u0259ti")}
                           <ChevronRight className="w-4 h-4 ml-1" />
                         </Button>
                       </div>
 
                       <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full h-9 rounded-xl border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 text-xs"
-                        asChild
-                      >
+                    variant="outline"
+                    size="sm"
+                    className="w-full h-9 rounded-xl border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 text-xs"
+                    asChild>
+                    
                         <a href="tel:103">
                           <Phone className="w-3.5 h-3.5 mr-1.5" />
-                          103 Zəng Et
+                          {tr("firstaidguide_103_zeng_et_52da85", "103 Z\u0259ng Et")}
                         </a>
                       </Button>
                     </div>
                   </motion.div>
                 </AnimatePresence>
-              )}
+            }
             </div>
           </motion.div>
-        )}
+        }
       </AnimatePresence>
-    </div>
-  );
+    </div>);
+
 };
 
 export default FirstAidGuide;

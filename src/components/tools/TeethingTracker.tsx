@@ -22,29 +22,29 @@ interface TeethingTrackerProps {
 const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
   useScreenAnalytics('TeethingTracker', 'Tools');
   const { selectedChild, hasChildren, hasMultipleChildren, getChildAge } = useChildren();
-  const { 
-    teeth, 
-    tips, 
-    symptoms, 
-    loading, 
-    toggleTooth, 
-    isToothEmerged, 
+  const {
+    teeth,
+    tips,
+    symptoms,
+    loading,
+    toggleTooth,
+    isToothEmerged,
     getToothLog,
     updateToothNote,
-    emergedCount, 
-    totalTeeth, 
-    progress 
+    emergedCount,
+    totalTeeth,
+    progress
   } = useTeething();
-  
+
   const childAge = selectedChild ? getChildAge(selectedChild) : null;
-  
+
   const [selectedTooth, setSelectedTooth] = useState<BabyTooth | null>(null);
   const [showToothModal, setShowToothModal] = useState(false);
   const [emergedDate, setEmergedDate] = useState('');
   const [notes, setNotes] = useState('');
 
-  const upperTeeth = teeth.filter(t => t.position === 'upper');
-  const lowerTeeth = teeth.filter(t => t.position === 'lower');
+  const upperTeeth = teeth.filter((t) => t.position === 'upper');
+  const lowerTeeth = teeth.filter((t) => t.position === 'lower');
 
   const handleToothClick = (tooth: BabyTooth) => {
     setSelectedTooth(tooth);
@@ -61,43 +61,43 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
 
   const handleToggleTooth = async () => {
     if (!selectedTooth) return;
-    
+
     const isCurrentlyEmerged = isToothEmerged(selectedTooth.id);
     await toggleTooth(selectedTooth.id, !isCurrentlyEmerged, emergedDate);
-    
+
     if (!isCurrentlyEmerged && notes) {
       await updateToothNote(selectedTooth.id, notes);
     }
-    
+
     setShowToothModal(false);
   };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'mild': return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
-      case 'moderate': return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
-      case 'severe': return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
-      default: return 'bg-muted text-muted-foreground';
+      case 'mild':return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
+      case 'moderate':return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
+      case 'severe':return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+      default:return 'bg-muted text-muted-foreground';
     }
   };
 
   const getCategoryLabel = (category: string) => {
     switch (category) {
-      case 'before': return 'Əvvəl';
-      case 'during': return 'Zamanı';
-      case 'after': return 'Sonra';
-      case 'pain_relief': return 'Ağrı Kəsici';
-      case 'general': return 'Ümumi';
-      default: return category;
+      case 'before':return tr("teethingtracker_evvel_b41251", "\u018Fvv\u0259l");
+      case 'during':return tr("teethingtracker_zamani_de9ddc", "Zaman\u0131");
+      case 'after':return 'Sonra';
+      case 'pain_relief':return tr("teethingtracker_agri_kesici_9c92cd", "A\u011Fr\u0131 K\u0259sici");
+      case 'general':return tr("teethingtracker_umumi_1b5521", "\xDCmumi");
+      default:return category;
     }
   };
 
   const renderToothDiagram = (teethList: BabyTooth[], position: 'upper' | 'lower') => {
     // Arrange teeth in dental arch order
     const sortedTeeth = [...teethList].sort((a, b) => {
-      const order = position === 'upper' 
-        ? ['upper_second_molar_right', 'upper_first_molar_right', 'upper_canine_right', 'upper_lateral_incisor_right', 'upper_central_incisor_right', 'upper_central_incisor_left', 'upper_lateral_incisor_left', 'upper_canine_left', 'upper_first_molar_left', 'upper_second_molar_left']
-        : ['lower_second_molar_right', 'lower_first_molar_right', 'lower_canine_right', 'lower_lateral_incisor_right', 'lower_central_incisor_right', 'lower_central_incisor_left', 'lower_lateral_incisor_left', 'lower_canine_left', 'lower_first_molar_left', 'lower_second_molar_left'];
+      const order = position === 'upper' ?
+      ['upper_second_molar_right', 'upper_first_molar_right', 'upper_canine_right', 'upper_lateral_incisor_right', 'upper_central_incisor_right', 'upper_central_incisor_left', 'upper_lateral_incisor_left', 'upper_canine_left', 'upper_first_molar_left', 'upper_second_molar_left'] :
+      ['lower_second_molar_right', 'lower_first_molar_right', 'lower_canine_right', 'lower_lateral_incisor_right', 'lower_central_incisor_right', 'lower_central_incisor_left', 'lower_lateral_incisor_left', 'lower_canine_left', 'lower_first_molar_left', 'lower_second_molar_left'];
       return order.indexOf(a.tooth_code) - order.indexOf(b.tooth_code);
     });
 
@@ -105,12 +105,12 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
     const getToothStyle = (tooth: BabyTooth, emerged: boolean) => {
       const isMolar = tooth.tooth_type === 'molar';
       const isCanine = tooth.tooth_type === 'canine';
-      
+
       const baseSize = isMolar ? 'w-8 h-10' : isCanine ? 'w-6 h-9' : 'w-6 h-8';
-      const baseColor = emerged 
-        ? 'bg-gradient-to-b from-pink-300 to-pink-400 dark:from-pink-400 dark:to-pink-500 shadow-md shadow-pink-300/50 dark:shadow-pink-500/30' 
-        : 'bg-gradient-to-b from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700';
-      
+      const baseColor = emerged ?
+      'bg-gradient-to-b from-pink-300 to-pink-400 dark:from-pink-400 dark:to-pink-500 shadow-md shadow-pink-300/50 dark:shadow-pink-500/30' :
+      'bg-gradient-to-b from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700';
+
       return { baseSize, baseColor, isMolar, isCanine };
     };
 
@@ -119,13 +119,13 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
         {sortedTeeth.map((tooth, index) => {
           const emerged = isToothEmerged(tooth.id);
           const { baseSize, baseColor, isMolar, isCanine } = getToothStyle(tooth, emerged);
-          
+
           // Create arch effect with different heights
           const archOffset = Math.abs(index - 4.5);
-          const archMargin = position === 'upper' 
-            ? `mt-${Math.floor(archOffset * 0.5)}`
-            : `mb-${Math.floor(archOffset * 0.5)}`;
-          
+          const archMargin = position === 'upper' ?
+          `mt-${Math.floor(archOffset * 0.5)}` :
+          `mb-${Math.floor(archOffset * 0.5)}`;
+
           return (
             <motion.button
               key={tooth.id}
@@ -133,33 +133,33 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               whileTap={{ scale: 0.95 }}
               onClick={() => handleToothClick(tooth)}
               className={`relative transition-all duration-200 ${baseSize} ${baseColor} ${
-                position === 'upper' ? 'rounded-t-lg rounded-b-[40%]' : 'rounded-b-lg rounded-t-[40%]'
-              } border-2 ${emerged ? 'border-pink-200 dark:border-pink-300' : 'border-gray-300 dark:border-gray-500'}`}
+              position === 'upper' ? 'rounded-t-lg rounded-b-[40%]' : 'rounded-b-lg rounded-t-[40%]'} border-2 ${
+              emerged ? 'border-pink-200 dark:border-pink-300' : 'border-gray-300 dark:border-gray-500'}`}
               style={{
                 marginTop: position === 'upper' ? `${archOffset * 2}px` : 0,
-                marginBottom: position === 'lower' ? `${archOffset * 2}px` : 0,
-              }}
-            >
+                marginBottom: position === 'lower' ? `${archOffset * 2}px` : 0
+              }}>
+              
               {/* Tooth shine effect */}
               <div className={`absolute inset-0 ${position === 'upper' ? 'rounded-t-lg rounded-b-[40%]' : 'rounded-b-lg rounded-t-[40%]'} overflow-hidden`}>
                 <div className="absolute top-0 left-0 w-1/3 h-full bg-white/30 dark:bg-white/20" />
               </div>
               
               {/* Root indication for emerged teeth */}
-              {emerged && (
-                <div className={`absolute ${position === 'upper' ? '-bottom-1' : '-top-1'} left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-pink-200 dark:bg-pink-300`} />
-              )}
+              {emerged &&
+              <div className={`absolute ${position === 'upper' ? '-bottom-1' : '-top-1'} left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-pink-200 dark:bg-pink-300`} />
+              }
               
               {/* Check mark for emerged */}
-              {emerged && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className={`absolute ${position === 'upper' ? '-top-2' : '-bottom-2'} -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center shadow-sm z-10`}
-                >
+              {emerged &&
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className={`absolute ${position === 'upper' ? '-top-2' : '-bottom-2'} -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center shadow-sm z-10`}>
+                
                   <Check className="w-2.5 h-2.5 text-white" />
                 </motion.div>
-              )}
+              }
               
               {/* Tooth label on hover - using tooltip behavior */}
               <div className={`absolute ${position === 'upper' ? 'top-full mt-1' : 'bottom-full mb-1'} left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 pointer-events-none`}>
@@ -167,19 +167,19 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
                   {tooth.name_az || tooth.name}
                 </span>
               </div>
-            </motion.button>
-          );
+            </motion.button>);
+
         })}
-      </div>
-    );
+      </div>);
+
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -194,7 +194,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
             <div>
               <h1 className="text-lg font-semibold">{tr("teethingtracker_dis_cixarma_izleyicisi_109c3d", "Diş Çıxarma İzləyicisi")}</h1>
               <p className="text-xs text-muted-foreground">
-                {selectedChild?.name || 'Körpənizin'} dişlərini izləyin
+                {selectedChild?.name || tr("teethingtracker_korpenizin_383c3e", "K\xF6rp\u0259nizin")} {tr("teethingtracker_dislerini_izleyin_4ea678", "di\u015Fl\u0259rini izl\u0259yin")}
               </p>
             </div>
           </div>
@@ -204,19 +204,19 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
 
       <div className="p-3 space-y-3">
         {/* Child Info Banner */}
-        {selectedChild && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20"
-          >
+        {selectedChild &&
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20">
+          
             <span className="text-lg">{selectedChild.avatar_emoji}</span>
             <div>
               <p className="font-medium text-xs">{selectedChild.name}</p>
               <p className="text-[10px] text-muted-foreground">{childAge?.displayText}</p>
             </div>
           </motion.div>
-        )}
+        }
         {/* Progress Card */}
         <Card className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-950/20 dark:to-rose-950/20 border-pink-200/50">
           <CardContent className="p-3">
@@ -244,7 +244,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
           <CardHeader className="pb-1 pt-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <Heart className="w-3.5 h-3.5 text-rose-500" />
-              Diş Diaqramı
+              {tr("teethingtracker_dis_diaqrami_a219c2", "Di\u015F Diaqram\u0131")}
             </CardTitle>
             <p className="text-[11px] text-muted-foreground">{tr("teethingtracker_dise_toxunaraq_qeyd_edin_65aadb", "Dişə toxunaraq qeyd edin")}</p>
           </CardHeader>
@@ -264,7 +264,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               </div>
               <div className="relative flex justify-center">
                 <span className="bg-background px-2.5 py-0.5 text-[10px] font-medium text-rose-500 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-full">
-                  Diş əti xətti
+                  {tr("teethingtracker_dis_eti_xetti_22266e", "Di\u015F \u0259ti x\u0259tti")}
                 </span>
               </div>
             </div>
@@ -299,12 +299,12 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
           </TabsList>
 
           <TabsContent value="tips" className="space-y-3 mt-4">
-            {tips.map((tip) => (
-              <motion.div
-                key={tip.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
+            {tips.map((tip) =>
+            <motion.div
+              key={tip.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}>
+              
                 <Card>
                   <CardContent className="p-4">
                     <div className="flex gap-3">
@@ -324,16 +324,16 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
                   </CardContent>
                 </Card>
               </motion.div>
-            ))}
+            )}
           </TabsContent>
 
           <TabsContent value="symptoms" className="space-y-3 mt-4">
-            {symptoms.map((symptom) => (
-              <motion.div
-                key={symptom.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
+            {symptoms.map((symptom) =>
+            <motion.div
+              key={symptom.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}>
+              
                 <Card>
                   <CardContent className="p-4">
                     <div className="flex gap-3">
@@ -342,27 +342,27 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-medium text-sm">{symptom.name_az || symptom.name}</h3>
                           <Badge className={getSeverityColor(symptom.severity)}>
-                            {symptom.severity === 'mild' ? 'Yüngül' : symptom.severity === 'moderate' ? 'Orta' : 'Ciddi'}
+                            {symptom.severity === 'mild' ? tr("teethingtracker_yungul_2a8010", "Y\xFCng\xFCl") : symptom.severity === 'moderate' ? 'Orta' : 'Ciddi'}
                           </Badge>
                         </div>
                         <p className="text-xs text-muted-foreground mb-2">
                           {symptom.description_az || symptom.description}
                         </p>
-                        {(symptom.relief_tips_az || symptom.relief_tips)?.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
-                            {(symptom.relief_tips_az || symptom.relief_tips)?.map((tip, i) => (
-                              <Badge key={i} variant="secondary" className="text-[10px]">
+                        {(symptom.relief_tips_az || symptom.relief_tips)?.length > 0 &&
+                      <div className="flex flex-wrap gap-1">
+                            {(symptom.relief_tips_az || symptom.relief_tips)?.map((tip, i) =>
+                        <Badge key={i} variant="secondary" className="text-[10px]">
                                 {tip}
                               </Badge>
-                            ))}
-                          </div>
                         )}
+                          </div>
+                      }
                       </div>
                     </div>
                   </CardContent>
                 </Card>
               </motion.div>
-            ))}
+            )}
           </TabsContent>
         </Tabs>
       </div>
@@ -379,8 +379,8 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
             </DialogTitle>
           </DialogHeader>
 
-          {selectedTooth && (
-            <div className="space-y-4">
+          {selectedTooth &&
+          <div className="space-y-4">
               {/* Tooth Info */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-muted/50 rounded-lg p-3 text-center">
@@ -392,34 +392,34 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
                 <div className="bg-muted/50 rounded-lg p-3 text-center">
                   <p className="text-xs text-muted-foreground">{tr("teethingtracker_dis_novu_07a451", "Diş növü")}</p>
                   <p className="font-medium">
-                    {selectedTooth.tooth_type === 'incisor' ? 'Kəsici' : 
-                     selectedTooth.tooth_type === 'canine' ? 'Köpək dişi' : 'Azı dişi'}
+                    {selectedTooth.tooth_type === 'incisor' ? tr("teethingtracker_kesici_569ec2", "K\u0259sici") :
+                  selectedTooth.tooth_type === 'canine' ? tr("teethingtracker_kopek_disi_a7a461", "K\xF6p\u0259k di\u015Fi") : tr("teethingtracker_azi_disi_fcdef9", "Az\u0131 di\u015Fi")}
                   </p>
                 </div>
               </div>
 
               {/* Current Status */}
               <div className={`rounded-lg p-3 ${
-                isToothEmerged(selectedTooth.id) 
-                  ? 'bg-green-50 dark:bg-green-950/30' 
-                  : 'bg-amber-50 dark:bg-amber-950/30'
-              }`}>
+            isToothEmerged(selectedTooth.id) ?
+            'bg-green-50 dark:bg-green-950/30' :
+            'bg-amber-50 dark:bg-amber-950/30'}`
+            }>
                 <div className="flex items-center gap-2">
-                  {isToothEmerged(selectedTooth.id) ? (
-                    <>
+                  {isToothEmerged(selectedTooth.id) ?
+                <>
                       <Check className="w-4 h-4 text-green-600" />
                       <span className="text-sm font-medium text-green-700 dark:text-green-400">
-                        Bu diş çıxıb
+                        {tr("teethingtracker_bu_dis_cixib_543f0e", "Bu di\u015F \xE7\u0131x\u0131b")}
                       </span>
-                    </>
-                  ) : (
-                    <>
+                    </> :
+
+                <>
                       <AlertCircle className="w-4 h-4 text-amber-600" />
                       <span className="text-sm font-medium text-amber-700 dark:text-amber-400">
-                        Bu diş hələ çıxmayıb
+                        {tr("teethingtracker_bu_dis_hele_cixmayib_df0465", "Bu di\u015F h\u0259l\u0259 \xE7\u0131xmay\u0131b")}
                       </span>
                     </>
-                  )}
+                }
                 </div>
               </div>
 
@@ -427,57 +427,57 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  Çıxma tarixi
+                  {tr("teethingtracker_cixma_tarixi_3c7ae9", "\xC7\u0131xma tarixi")}
                 </label>
                 <Input
-                  type="date"
-                  value={emergedDate}
-                  onChange={(e) => setEmergedDate(e.target.value)}
-                  max={new Date().toISOString().split('T')[0]}
-                />
+                type="date"
+                value={emergedDate}
+                onChange={(e) => setEmergedDate(e.target.value)}
+                max={new Date().toISOString().split('T')[0]} />
+              
               </div>
 
               {/* Notes */}
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2">
                   <Info className="w-4 h-4" />
-                  Qeydlər (istəyə bağlı)
+                  {tr("teethingtracker_qeydler_isteye_bagli_958966", "Qeydl\u0259r (ist\u0259y\u0259 ba\u011Fl\u0131)")}
                 </label>
                 <Textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder={tr("teethingtracker_her_hansi_qeyd_elave_edin_9c35e2", "Hər hansı qeyd əlavə edin...")}
-                  rows={2}
-                />
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder={tr("teethingtracker_her_hansi_qeyd_elave_edin_9c35e2", "Hər hansı qeyd əlavə edin...")}
+                rows={2} />
+              
               </div>
 
               {/* Action Button */}
-              <Button 
-                onClick={handleToggleTooth}
-                className={`w-full ${
-                  isToothEmerged(selectedTooth.id) 
-                    ? 'bg-red-500 hover:bg-red-600' 
-                    : 'bg-green-500 hover:bg-green-600'
-                }`}
-              >
-                {isToothEmerged(selectedTooth.id) ? (
-                  <>
+              <Button
+              onClick={handleToggleTooth}
+              className={`w-full ${
+              isToothEmerged(selectedTooth.id) ?
+              'bg-red-500 hover:bg-red-600' :
+              'bg-green-500 hover:bg-green-600'}`
+              }>
+              
+                {isToothEmerged(selectedTooth.id) ?
+              <>
                     <X className="w-4 h-4 mr-2" />
-                    Çıxıb işarəsini sil
-                  </>
-                ) : (
-                  <>
+                    {tr("teethingtracker_cixib_isaresini_sil_abec15", "\xC7\u0131x\u0131b i\u015Far\u0259sini sil")}
+                  </> :
+
+              <>
                     <Check className="w-4 h-4 mr-2" />
-                    Çıxıb olaraq işarələ
+                    {tr("teethingtracker_cixib_olaraq_isarele_678f2e", "\xC7\u0131x\u0131b olaraq i\u015Far\u0259l\u0259")}
                   </>
-                )}
+              }
               </Button>
             </div>
-          )}
+          }
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 };
 
 export default TeethingTracker;

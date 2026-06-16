@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { tr } from "@/lib/tr";import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
@@ -27,7 +27,7 @@ export const useEpointPayment = () => {
 
   const initiatePayment = async (request: PaymentRequest): Promise<PaymentResponse> => {
     if (!user?.id) {
-      toast.error('Ödəniş üçün daxil olmalısınız');
+      toast.error(tr("useepointpayment_odenis_ucun_daxil_olmalisiniz_6709e1", "\xD6d\u0259ni\u015F \xFC\xE7\xFCn daxil olmal\u0131s\u0131n\u0131z"));
       return { success: false, error: 'Not authenticated' };
     }
 
@@ -44,7 +44,7 @@ export const useEpointPayment = () => {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
-          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
         },
         body: JSON.stringify({
           amount: request.amount,
@@ -52,8 +52,8 @@ export const useEpointPayment = () => {
           orderReferenceId: request.orderReferenceId,
           description: request.description,
           successUrl: request.successUrl || `${window.location.origin}/payment/success`,
-          errorUrl: request.errorUrl || `${window.location.origin}/payment/error`,
-        }),
+          errorUrl: request.errorUrl || `${window.location.origin}/payment/error`
+        })
       });
 
       const result = await response.json();
@@ -63,12 +63,12 @@ export const useEpointPayment = () => {
         window.location.href = result.redirectUrl;
         return result;
       } else {
-        toast.error(result.error || 'Ödəniş başlatıla bilmədi');
+        toast.error(result.error || tr("useepointpayment_odenis_baslatila_bilmedi_8e916c", "\xD6d\u0259ni\u015F ba\u015Flat\u0131la bilm\u0259di"));
         return { success: false, error: result.error };
       }
     } catch (error) {
       console.error('Payment error:', error);
-      toast.error('Ödəniş xətası baş verdi');
+      toast.error(tr("useepointpayment_odenis_xetasi_bas_verdi_93f63a", "\xD6d\u0259ni\u015F x\u0259tas\u0131 ba\u015F verdi"));
       return { success: false, error: 'Payment error' };
     } finally {
       setLoading(false);
@@ -84,17 +84,17 @@ export const usePaymentTransactions = (limit = 50) => {
   return useQuery({
     queryKey: ['payment-transactions', user?.id, limit],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('payment_transactions')
-        .select('*')
-        .eq('user_id', user!.id)
-        .order('created_at', { ascending: false })
-        .limit(limit);
+      const { data, error } = await supabase.
+      from('payment_transactions').
+      select('*').
+      eq('user_id', user!.id).
+      order('created_at', { ascending: false }).
+      limit(limit);
 
       if (error) throw error;
       return data;
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id
   });
 };
 
@@ -102,14 +102,14 @@ export const useAllPaymentTransactions = (limit = 100) => {
   return useQuery({
     queryKey: ['all-payment-transactions', limit],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('payment_transactions')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(limit);
+      const { data, error } = await supabase.
+      from('payment_transactions').
+      select('*').
+      order('created_at', { ascending: false }).
+      limit(limit);
 
       if (error) throw error;
       return data;
-    },
+    }
   });
 };

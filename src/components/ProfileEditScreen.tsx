@@ -24,7 +24,7 @@ type DateInputMode = 'lmp' | 'dueDate';
 
 const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
   useScrollToTop();
-  
+
   const { user, profile, updateProfile } = useAuth();
   const { lifeStage, babyName, dueDate, lastPeriodDate, cycleLength, setLifeStage, setDueDate, setLastPeriodDate, setCycleLength, setBabyData, babyGender, babyBirthDate } = useUserStore();
   const { toast } = useToast();
@@ -32,12 +32,12 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
 
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  
+
   // Date input mode for pregnancy - default to LMP if available, else dueDate
   const [dateInputMode, setDateInputMode] = useState<DateInputMode>(
     lastPeriodDate ? 'lmp' : 'dueDate'
   );
-  
+
   const [formData, setFormData] = useState({
     name: profile?.name || '',
     bio: '',
@@ -48,7 +48,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
     last_period_date: lastPeriodDate ? new Date(lastPeriodDate).toISOString().split('T')[0] : '',
     cycle_length: cycleLength || 28,
     baby_birth_date: babyBirthDate ? new Date(babyBirthDate).toISOString().split('T')[0] : '',
-    baby_gender: babyGender || '' as 'boy' | 'girl' | '',
+    baby_gender: babyGender || '' as 'boy' | 'girl' | ''
   });
 
   // Compute the calculated date based on mode
@@ -58,8 +58,8 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
       const dueDate = calculateDueDate(lmp);
       const week = getPregnancyWeek(lmp);
       const day = getDayInWeek(lmp);
-      return { 
-        calculatedDueDate: dueDate, 
+      return {
+        calculatedDueDate: dueDate,
         calculatedLMP: null,
         week,
         day
@@ -69,8 +69,8 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
       const lmp = calculateLMPFromDueDate(dd);
       const week = lmp ? getPregnancyWeek(lmp) : 0;
       const day = lmp ? getDayInWeek(lmp) : 0;
-      return { 
-        calculatedDueDate: null, 
+      return {
+        calculatedDueDate: null,
         calculatedLMP: lmp,
         week,
         day
@@ -88,13 +88,13 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
     // Load bio from profile if available
     const loadBio = async () => {
       if (!user) return;
-      const { data } = await supabase
-        .from('profiles')
-        .select('bio')
-        .eq('user_id', user.id)
-        .single();
+      const { data } = await supabase.
+      from('profiles').
+      select('bio').
+      eq('user_id', user.id).
+      single();
       if (data && 'bio' in data && data.bio) {
-        setFormData(prev => ({ ...prev, bio: data.bio as string }));
+        setFormData((prev) => ({ ...prev, bio: data.bio as string }));
       }
     };
     loadBio();
@@ -110,17 +110,17 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
       const fileName = `${user.id}-${Date.now()}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from('community-media')
-        .upload(filePath, file);
+      const { error: uploadError } = await supabase.storage.
+      from('community-media').
+      upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage
-        .from('community-media')
-        .getPublicUrl(filePath);
+      const { data: urlData } = supabase.storage.
+      from('community-media').
+      getPublicUrl(filePath);
 
-      setFormData(prev => ({ ...prev, avatar_url: urlData.publicUrl }));
+      setFormData((prev) => ({ ...prev, avatar_url: urlData.publicUrl }));
       toast({ title: tr("profileeditscreen_sekil_yuklendi_0c2f85", 'Şəkil yükləndi!') });
     } catch (error: any) {
       toast({ title: tr("profileeditscreen_xeta_3cdbb6", 'Xəta'), description: error.message, variant: 'destructive' });
@@ -131,13 +131,13 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
 
   const handleSave = async () => {
     if (!user) return;
-    
+
     setLoading(true);
     try {
       // Calculate effective dates for pregnancy
       let effectiveLMP: string | null = null;
       let effectiveDueDate: string | null = null;
-      
+
       if (formData.life_stage === 'bump') {
         if (dateInputMode === 'lmp' && formData.last_period_date) {
           effectiveLMP = formData.last_period_date;
@@ -149,7 +149,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
           effectiveLMP = calculatedLMP ? calculatedLMP.toISOString().split('T')[0] : null;
         }
       }
-      
+
       // Update profile in database
       const updateData: any = {
         name: formData.name,
@@ -157,9 +157,9 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
         bio: formData.bio,
         life_stage: formData.life_stage,
         baby_name: formData.baby_name || null,
-        cycle_length: formData.cycle_length,
+        cycle_length: formData.cycle_length
       };
-      
+
       // Set dates based on life stage
       if (formData.life_stage === 'bump') {
         updateData.due_date = effectiveDueDate;
@@ -171,23 +171,23 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
         updateData.last_period_date = null;
         updateData.due_date = null;
       }
-      
+
       // Add mommy specific fields
       if (formData.life_stage === 'mommy') {
         updateData.baby_birth_date = formData.baby_birth_date || null;
         updateData.baby_gender = formData.baby_gender || null;
       }
-      
-      const { error } = await supabase
-        .from('profiles')
-        .update(updateData)
-        .eq('user_id', user.id);
+
+      const { error } = await supabase.
+      from('profiles').
+      update(updateData).
+      eq('user_id', user.id);
 
       if (error) throw error;
 
       // Update local store using existing actions
       setLifeStage(formData.life_stage);
-      
+
       // Sync pregnancy dates to local store
       if (formData.life_stage === 'bump') {
         if (effectiveLMP) setLastPeriodDate(new Date(effectiveLMP));
@@ -195,14 +195,14 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
       } else if (formData.life_stage === 'flow') {
         if (formData.last_period_date) setLastPeriodDate(new Date(formData.last_period_date));
       }
-      
+
       if (formData.cycle_length) setCycleLength(formData.cycle_length);
-      
+
       // Update baby data for mommy stage
       if (formData.life_stage === 'mommy' && formData.baby_birth_date && formData.baby_gender) {
         setBabyData(
-          new Date(formData.baby_birth_date), 
-          formData.baby_name || 'Körpə', 
+          new Date(formData.baby_birth_date),
+          formData.baby_name || tr("profileeditscreen_korpe_fa2b51", "K\xF6rp\u0259"),
           formData.baby_gender as 'boy' | 'girl'
         );
       } else if (formData.baby_name && babyBirthDate && babyGender) {
@@ -222,7 +222,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
   };
 
   const handleLifeStageChange = (value: string) => {
-    setFormData(prev => ({ ...prev, life_stage: value as LifeStage }));
+    setFormData((prev) => ({ ...prev, life_stage: value as LifeStage }));
   };
 
   return (
@@ -236,8 +236,8 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
           <motion.button
             onClick={onBack}
             className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}
-          >
+            whileTap={{ scale: 0.95 }}>
+            
             <ArrowLeft className="w-5 h-5" />
           </motion.button>
           <h1 className="text-lg font-bold text-foreground flex-1">{tr("profileeditscreen_profili_redakte_et_b5368c", "Profili Redaktə Et")}</h1>
@@ -262,24 +262,24 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
               </AvatarFallback>
             </Avatar>
             <motion.button
-              onClick={() => fileInputRef.current?.click()}
-              className="absolute bottom-0 right-0 w-10 h-10 rounded-full gradient-primary flex items-center justify-center shadow-lg"
-              whileTap={{ scale: 0.95 }}
-              disabled={uploading}
-            >
-              {uploading ? (
-                <Loader2 className="w-5 h-5 text-white animate-spin" />
-              ) : (
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute bottom-0 right-0 w-10 h-10 rounded-full gradient-primary flex items-center justify-center shadow-lg"
+                whileTap={{ scale: 0.95 }}
+                disabled={uploading}>
+                
+              {uploading ?
+                <Loader2 className="w-5 h-5 text-white animate-spin" /> :
+
                 <Camera className="w-5 h-5 text-white" />
-              )}
+                }
             </motion.button>
             <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleAvatarUpload}
-              className="hidden"
-            />
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarUpload}
+                className="hidden" />
+              
           </div>
           <p className="text-sm text-muted-foreground mt-2">{tr("profileeditscreen_profil_seklini_deyis_7dbfc6", "Profil şəklini dəyiş")}</p>
         </div>
@@ -288,26 +288,26 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
         <div className="bg-card rounded-2xl p-5 space-y-4 border border-border/50">
           <h3 className="font-bold text-foreground flex items-center gap-2">
             <User className="w-4 h-4 text-primary" />
-            Əsas Məlumatlar
+            {tr("profileeditscreen_esas_melumatlar_56bfed", "\u018Fsas M\u0259lumatlar")}
           </h3>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-muted-foreground">Ad</label>
             <Input
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder={tr("profileeditscreen_adiniz_b3e84a", "Adınız")}
-            />
+                value={formData.name}
+                onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                placeholder={tr("profileeditscreen_adiniz_b3e84a", "Adınız")} />
+              
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-muted-foreground">Bio</label>
             <Textarea
-              value={formData.bio}
-              onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-              placeholder={tr("profileeditscreen_ozunuz_haqqinda_qisa_melumat_1a283c", "Özünüz haqqında qısa məlumat...")}
-              rows={3}
-            />
+                value={formData.bio}
+                onChange={(e) => setFormData((prev) => ({ ...prev, bio: e.target.value }))}
+                placeholder={tr("profileeditscreen_ozunuz_haqqinda_qisa_melumat_1a283c", "Özünüz haqqında qısa məlumat...")}
+                rows={3} />
+              
           </div>
 
           <div className="space-y-2">
@@ -320,15 +320,15 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
         <div className="bg-card rounded-2xl p-5 space-y-4 border border-border/50">
           <h3 className="font-bold text-foreground flex items-center gap-2">
             <Calendar className="w-4 h-4 text-primary" />
-            Mərhələ
+            {tr("profileeditscreen_merhele_0e09aa", "M\u0259rh\u0259l\u0259")}
           </h3>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_merhele_0e09aa", "Mərhələ")}</label>
             <Select
-              value={formData.life_stage}
-              onValueChange={handleLifeStageChange}
-            >
+                value={formData.life_stage}
+                onValueChange={handleLifeStageChange}>
+                
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -341,28 +341,28 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
           </div>
 
           {/* Pregnancy specific fields */}
-          {formData.life_stage === 'bump' && (
+          {formData.life_stage === 'bump' &&
             <>
               {/* Date Input Mode Toggle */}
               <div className="space-y-3">
                 <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_tarix_novunu_secin_ad6b20", "Tarix növünü seçin")}</label>
-                <ToggleGroup 
-                  type="single" 
-                  value={dateInputMode} 
+                <ToggleGroup
+                  type="single"
+                  value={dateInputMode}
                   onValueChange={(value) => value && setDateInputMode(value as DateInputMode)}
-                  className="grid grid-cols-2 gap-2"
-                >
-                  <ToggleGroupItem 
-                    value="lmp" 
-                    className="flex items-center gap-2 h-auto py-3 px-4 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-xl border"
-                  >
+                  className="grid grid-cols-2 gap-2">
+                  
+                  <ToggleGroupItem
+                    value="lmp"
+                    className="flex items-center gap-2 h-auto py-3 px-4 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-xl border">
+                    
                     <CalendarDays className="w-4 h-4" />
                     <span className="text-sm">Son menstruasiya tarixi</span>
                   </ToggleGroupItem>
-                  <ToggleGroupItem 
-                    value="dueDate" 
-                    className="flex items-center gap-2 h-auto py-3 px-4 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-xl border"
-                  >
+                  <ToggleGroupItem
+                    value="dueDate"
+                    className="flex items-center gap-2 h-auto py-3 px-4 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-xl border">
+                    
                     <Baby className="w-4 h-4" />
                     <span className="text-sm">{tr("profileeditscreen_dogus_tarixi_e2caea", "Doğuş tarixi")}</span>
                   </ToggleGroupItem>
@@ -370,118 +370,118 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
               </div>
 
               {/* Date Input based on mode */}
-              {dateInputMode === 'lmp' ? (
-                <div className="space-y-2">
+              {dateInputMode === 'lmp' ?
+              <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_son_menstruasiyanin_ilk_gunu_c79f76", "Son menstruasiyanın ilk günü")}</label>
                   <Input
-                    type="date"
-                    value={formData.last_period_date}
-                    onChange={(e) => setFormData(prev => ({ ...prev, last_period_date: e.target.value }))}
-                  />
-                </div>
-              ) : (
-                <div className="space-y-2">
+                  type="date"
+                  value={formData.last_period_date}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, last_period_date: e.target.value }))} />
+                
+                </div> :
+
+              <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_texmini_dogus_tarixi_a8b543", "Təxmini doğuş tarixi")}</label>
                   <Input
-                    type="date"
-                    value={formData.due_date}
-                    onChange={(e) => setFormData(prev => ({ ...prev, due_date: e.target.value }))}
-                  />
+                  type="date"
+                  value={formData.due_date}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, due_date: e.target.value }))} />
+                
                 </div>
-              )}
+              }
 
               {/* Calculated Date Info Card */}
-              {(calculatedDates.calculatedDueDate || calculatedDates.calculatedLMP) && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-primary/10 rounded-xl p-4 space-y-2"
-                >
+              {(calculatedDates.calculatedDueDate || calculatedDates.calculatedLMP) &&
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-primary/10 rounded-xl p-4 space-y-2">
+                
                   <div className="flex items-center gap-2 text-primary">
                     <Sparkles className="w-4 h-4" />
                     <span className="text-sm font-medium">{tr("profileeditscreen_hesablanmis_melumatlar_b5a420", "Hesablanmış məlumatlar")}</span>
                   </div>
                   
-                  {calculatedDates.calculatedDueDate && (
-                    <p className="text-sm text-foreground">
-                      🎯 Təxmini doğuş tarixi: <strong>{formatDate(calculatedDates.calculatedDueDate)}</strong>
+                  {calculatedDates.calculatedDueDate &&
+                <p className="text-sm text-foreground">
+                      {tr("profileeditscreen_texmini_dogus_tarixi_011e51", "\uD83C\uDFAF T\u0259xmini do\u011Fu\u015F tarixi:")} <strong>{formatDate(calculatedDates.calculatedDueDate)}</strong>
                     </p>
-                  )}
+                }
                   
-                  {calculatedDates.calculatedLMP && (
-                    <p className="text-sm text-foreground">
+                  {calculatedDates.calculatedLMP &&
+                <p className="text-sm text-foreground">
                       📅 Son menstruasiya tarixi: <strong>{formatDate(calculatedDates.calculatedLMP)}</strong>
                     </p>
-                  )}
+                }
                   
-                  {calculatedDates.week > 0 && (
-                    <p className="text-sm text-muted-foreground">
-                      Hazırda: <strong>{calculatedDates.week} həftə {calculatedDates.day} gün</strong>
+                  {calculatedDates.week > 0 &&
+                <p className="text-sm text-muted-foreground">
+                      {tr("profileeditscreen_hazirda_33b3c8", "Haz\u0131rda:")} <strong>{calculatedDates.week} {tr("profileeditscreen_hefte_d4c248", "h\u0259ft\u0259")} {calculatedDates.day} {tr("profileeditscreen_gun_54e78d", "g\xFCn")}</strong>
                     </p>
-                  )}
+                }
                 </motion.div>
-              )}
+              }
               
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_korpenin_adi_isteye_bagli_4e76c8", "Körpənin adı (istəyə bağlı)")}</label>
                 <Input
                   value={formData.baby_name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, baby_name: e.target.value }))}
-                  placeholder={tr("profileeditscreen_korpenin_adi_8a4e9e", "Körpənin adı")}
-                />
+                  onChange={(e) => setFormData((prev) => ({ ...prev, baby_name: e.target.value }))}
+                  placeholder={tr("profileeditscreen_korpenin_adi_8a4e9e", "Körpənin adı")} />
+                
               </div>
             </>
-          )}
+            }
 
           {/* Flow specific fields */}
-          {formData.life_stage === 'flow' && (
+          {formData.life_stage === 'flow' &&
             <>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground">Son menstruasiya tarixi</label>
                 <Input
                   type="date"
                   value={formData.last_period_date}
-                  onChange={(e) => setFormData(prev => ({ ...prev, last_period_date: e.target.value }))}
-                />
+                  onChange={(e) => setFormData((prev) => ({ ...prev, last_period_date: e.target.value }))} />
+                
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_dovrun_uzunlugu_gun_4d99da", "Dövrün uzunluğu (gün)")}</label>
                 <Input
                   type="number"
                   value={formData.cycle_length}
-                  onChange={(e) => setFormData(prev => ({ ...prev, cycle_length: parseInt(e.target.value) || 28 }))}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, cycle_length: parseInt(e.target.value) || 28 }))}
                   min={10}
-                  max={50}
-                />
+                  max={50} />
+                
               </div>
             </>
-          )}
+            }
 
           {/* Mommy specific fields */}
-          {formData.life_stage === 'mommy' && (
+          {formData.life_stage === 'mommy' &&
             <>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_korpenin_adi_8a4e9e", "Körpənin adı")}</label>
                 <Input
                   value={formData.baby_name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, baby_name: e.target.value }))}
-                  placeholder={tr("profileeditscreen_korpenin_adi_8a4e9e", "Körpənin adı")}
-                />
+                  onChange={(e) => setFormData((prev) => ({ ...prev, baby_name: e.target.value }))}
+                  placeholder={tr("profileeditscreen_korpenin_adi_8a4e9e", "Körpənin adı")} />
+                
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_dogus_tarixi_e2caea", "Doğuş tarixi")}</label>
                 <Input
                   type="date"
                   value={formData.baby_birth_date}
-                  onChange={(e) => setFormData(prev => ({ ...prev, baby_birth_date: e.target.value }))}
-                />
+                  onChange={(e) => setFormData((prev) => ({ ...prev, baby_birth_date: e.target.value }))} />
+                
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground">Cinsi</label>
                 <Select
                   value={formData.baby_gender}
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, baby_gender: value as 'boy' | 'girl' }))}
-                >
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, baby_gender: value as 'boy' | 'girl' }))}>
+                  
                   <SelectTrigger>
                     <SelectValue placeholder={tr("profileeditscreen_secin_5c0c8d", "Seçin")} />
                   </SelectTrigger>
@@ -492,12 +492,12 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                 </Select>
               </div>
             </>
-          )}
+            }
         </div>
       </div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default ProfileEditScreen;

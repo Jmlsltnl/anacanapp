@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { tr } from "@/lib/tr";import { useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import {
   REVENUECAT_CONFIG,
@@ -9,8 +9,8 @@ import {
   checkEntitlement,
   findFreeTrialOption,
   canUseNativePaywallUI,
-  RC_BUILD_MARKER,
-} from '@/lib/revenuecat';
+  RC_BUILD_MARKER } from
+'@/lib/revenuecat';
 
 export default function RevenueCatDebug() {
   const [log, setLog] = useState<string[]>([]);
@@ -29,16 +29,16 @@ export default function RevenueCatDebug() {
       append(`Bundle versiyası: ${RC_BUILD_MARKER}`);
       append(`Platform: ${Capacitor.getPlatform()}`);
       append(`isNativePlatform: ${isNativePlatform()}`);
-      append(`Native paywall UI aktiv: ${canUseNativePaywallUI()} ${Capacitor.getPlatform() === 'android' ? '(Android-də həmişə FALSE olmalıdır)' : ''}`);
+      append(`Native paywall UI aktiv: ${canUseNativePaywallUI()} ${Capacitor.getPlatform() === 'android' ? tr("revenuecatdebug_android_de_hemise_false_olmali_601719", "(Android-d\u0259 h\u0259mi\u015F\u0259 FALSE olmal\u0131d\u0131r)") : ''}`);
       append(`REVENUECAT_ENABLED: ${REVENUECAT_ENABLED}`);
       append(`Entitlement ID: ${REVENUECAT_CONFIG.ENTITLEMENT_ID}`);
       append(`Android key set: ${REVENUECAT_CONFIG.ANDROID_API_KEY.startsWith('goog_')}`);
       append(`iOS key set: ${REVENUECAT_CONFIG.IOS_API_KEY.startsWith('appl_')}`);
       append(`Purchases plugin: ${Capacitor.isPluginAvailable('Purchases')}`);
-      append(`RevenueCatUI plugin: ${Capacitor.isPluginAvailable('RevenueCatUI')} ${Capacitor.isPluginAvailable('RevenueCatUI') ? '✅' : '❌ (npx cap sync lazımdır)'}`);
+      append(`RevenueCatUI plugin: ${Capacitor.isPluginAvailable('RevenueCatUI')} ${Capacitor.isPluginAvailable('RevenueCatUI') ? '✅' : tr("revenuecatdebug_npx_cap_sync_lazimdir_817885", "\u274C (npx cap sync laz\u0131md\u0131r)")}`);
 
       if (!isNativePlatform()) {
-        append('⚠️ Web preview: RevenueCat yalnız native cihazda işləyir. APK/IPA quraşdırın.');
+        append(tr("revenuecatdebug_web_preview_revenuecat_yalniz__2ff9ad", "\u26A0\uFE0F Web preview: RevenueCat yaln\u0131z native cihazda i\u015Fl\u0259yir. APK/IPA qura\u015Fd\u0131r\u0131n."));
         return;
       }
 
@@ -104,25 +104,25 @@ export default function RevenueCatDebug() {
   return (
     <div className="min-h-screen bg-background text-foreground p-4 pb-32" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1rem)' }}>
       <button
-        onClick={() => { window.location.href = '/'; }}
-        className="mb-3 px-3 py-1.5 rounded bg-muted text-foreground text-sm"
-      >
+        onClick={() => {window.location.href = '/';}}
+        className="mb-3 px-3 py-1.5 rounded bg-muted text-foreground text-sm">
+        
         ← Geri
       </button>
       <h1 className="text-xl font-bold mb-2">RevenueCat Debug</h1>
       <button
         onClick={run}
         disabled={loading}
-        className="mb-4 px-4 py-2 rounded bg-primary text-primary-foreground text-sm"
-      >
-        {loading ? 'Loading...' : 'Yenidən yoxla'}
+        className="mb-4 px-4 py-2 rounded bg-primary text-primary-foreground text-sm">
+        
+        {loading ? 'Loading...' : tr("revenuecatdebug_yeniden_yoxla_284ffb", "Yenid\u0259n yoxla")}
       </button>
 
-      {error && (
-        <div className="mb-4 p-3 rounded bg-destructive/10 border border-destructive text-destructive text-sm">
+      {error &&
+      <div className="mb-4 p-3 rounded bg-destructive/10 border border-destructive text-destructive text-sm">
           {error}
         </div>
-      )}
+      }
 
       <h2 className="font-semibold mt-4 mb-1 text-sm">Log</h2>
       <pre className="text-xs bg-muted p-3 rounded whitespace-pre-wrap break-all">
@@ -138,6 +138,6 @@ export default function RevenueCatDebug() {
       <pre className="text-xs bg-muted p-3 rounded whitespace-pre-wrap break-all">
         {JSON.stringify(offerings, null, 2)}
       </pre>
-    </div>
-  );
+    </div>);
+
 }

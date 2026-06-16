@@ -30,7 +30,7 @@ const BulkTipsImport = ({ isOpen, onClose, onSuccess }: BulkTipsImportProps) => 
   const [jsonInput, setJsonInput] = useState('');
   const [importing, setImporting] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [results, setResults] = useState<{ success: number; failed: number }>({ success: 0, failed: 0 });
+  const [results, setResults] = useState<{success: number;failed: number;}>({ success: 0, failed: 0 });
 
   const sampleJson = `[
   {
@@ -56,7 +56,7 @@ const BulkTipsImport = ({ isOpen, onClose, onSuccess }: BulkTipsImportProps) => 
         is_active: true
       });
     }
-    
+
     const blob = new Blob([JSON.stringify(template, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -76,7 +76,7 @@ const BulkTipsImport = ({ isOpen, onClose, onSuccess }: BulkTipsImportProps) => 
     try {
       tips = JSON.parse(jsonInput);
       if (!Array.isArray(tips)) {
-        throw new Error('JSON array olmalıdır');
+        throw new Error(tr("bulktipsimport_json_array_olmalidir_078d8c", "JSON array olmal\u0131d\u0131r"));
       }
     } catch (error) {
       toast({ title: tr("bulktipsimport_xeta_3cdbb6", "Xəta"), description: tr("bulktipsimport_yanlis_json_formati_a42037", "Yanlış JSON formatı"), variant: 'destructive' });
@@ -92,58 +92,58 @@ const BulkTipsImport = ({ isOpen, onClose, onSuccess }: BulkTipsImportProps) => 
 
     for (let i = 0; i < tips.length; i++) {
       const tip = tips[i];
-      
+
       try {
         // Check if tip already exists for this week and life stage
-        const { data: existing } = await supabase
-          .from('weekly_tips')
-          .select('id')
-          .eq('week_number', tip.week_number)
-          .eq('life_stage', lifeStage)
-          .single();
+        const { data: existing } = await supabase.
+        from('weekly_tips').
+        select('id').
+        eq('week_number', tip.week_number).
+        eq('life_stage', lifeStage).
+        single();
 
         if (existing) {
           // Update existing
-          const { error } = await supabase
-            .from('weekly_tips')
-            .update({
-              title: tip.title,
-              content: tip.content,
-              is_active: tip.is_active !== false
-            })
-            .eq('id', existing.id);
-          
+          const { error } = await supabase.
+          from('weekly_tips').
+          update({
+            title: tip.title,
+            content: tip.content,
+            is_active: tip.is_active !== false
+          }).
+          eq('id', existing.id);
+
           if (error) throw error;
         } else {
           // Insert new
-          const { error } = await supabase
-            .from('weekly_tips')
-            .insert({
-              week_number: tip.week_number,
-              life_stage: lifeStage,
-              title: tip.title,
-              content: tip.content,
-              is_active: tip.is_active !== false
-            });
-          
+          const { error } = await supabase.
+          from('weekly_tips').
+          insert({
+            week_number: tip.week_number,
+            life_stage: lifeStage,
+            title: tip.title,
+            content: tip.content,
+            is_active: tip.is_active !== false
+          });
+
           if (error) throw error;
         }
-        
+
         successCount++;
       } catch (error) {
         console.error('Error importing tip:', error);
         failedCount++;
       }
 
-      setProgress(Math.round(((i + 1) / tips.length) * 100));
+      setProgress(Math.round((i + 1) / tips.length * 100));
       setResults({ success: successCount, failed: failedCount });
     }
 
     setImporting(false);
-    
+
     toast({
       title: tr("bulktipsimport_import_tamamlandi_c650ca", "İmport tamamlandı"),
-      description: `${successCount} uğurlu, ${failedCount} uğursuz`,
+      description: `${successCount} uğurlu, ${failedCount} uğursuz`
     });
 
     if (successCount > 0) {
@@ -157,7 +157,7 @@ const BulkTipsImport = ({ isOpen, onClose, onSuccess }: BulkTipsImportProps) => 
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Upload className="w-5 h-5 text-primary" />
-            Həftəlik Tövsiyələri Toplu İmport
+            {tr("bulktipsimport_heftelik_tovsiyeleri_toplu_i_m_e2fbf0", "H\u0259ft\u0259lik T\xF6vsiy\u0259l\u0259ri Toplu \u0130mport")}
           </DialogTitle>
         </DialogHeader>
 
@@ -181,8 +181,8 @@ const BulkTipsImport = ({ isOpen, onClose, onSuccess }: BulkTipsImportProps) => 
           <motion.button
             onClick={downloadTemplate}
             className="w-full p-4 rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 flex items-center justify-center gap-3 text-primary hover:bg-primary/10 transition-colors"
-            whileTap={{ scale: 0.98 }}
-          >
+            whileTap={{ scale: 0.98 }}>
+            
             <Download className="w-5 h-5" />
             <span className="font-medium">{tr("bulktipsimport_1_40_hefte_ucun_sablon_yukle_94a1f6", "1-40 həftə üçün şablon yüklə")}</span>
           </motion.button>
@@ -195,16 +195,16 @@ const BulkTipsImport = ({ isOpen, onClose, onSuccess }: BulkTipsImportProps) => 
               onChange={(e) => setJsonInput(e.target.value)}
               placeholder={sampleJson}
               rows={12}
-              className="font-mono text-xs"
-            />
+              className="font-mono text-xs" />
+            
             <p className="text-xs text-muted-foreground">
-              Hər həftə üçün week_number, title və content sahələri lazımdır
+              {tr("bulktipsimport_her_hefte_ucun_week_number_tit_512607", "H\u0259r h\u0259ft\u0259 \xFC\xE7\xFCn week_number, title v\u0259 content sah\u0259l\u0259ri laz\u0131md\u0131r")}
             </p>
           </div>
 
           {/* Progress */}
-          {importing && (
-            <div className="space-y-2">
+          {importing &&
+          <div className="space-y-2">
               <Progress value={progress} className="h-2" />
               <div className="flex justify-between text-sm text-muted-foreground">
                 <span>İmport edilir... {progress}%</span>
@@ -218,25 +218,25 @@ const BulkTipsImport = ({ isOpen, onClose, onSuccess }: BulkTipsImportProps) => 
                 </div>
               </div>
             </div>
-          )}
+          }
 
           {/* Actions */}
           <div className="flex gap-3 pt-4">
             <Button variant="outline" onClick={onClose} className="flex-1" disabled={importing}>
-              Ləğv et
+              {tr("bulktipsimport_legv_et_b5e49c", "L\u0259\u011Fv et")}
             </Button>
-            <Button 
-              onClick={handleImport} 
-              className="flex-1 gradient-primary" 
-              disabled={importing || !jsonInput.trim()}
-            >
+            <Button
+              onClick={handleImport}
+              className="flex-1 gradient-primary"
+              disabled={importing || !jsonInput.trim()}>
+              
               {importing ? 'İmport edilir...' : 'İmport et'}
             </Button>
           </div>
         </div>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>);
+
 };
 
 export default BulkTipsImport;

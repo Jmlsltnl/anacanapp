@@ -35,7 +35,7 @@ interface AdminUsageStatsProps {
 const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = false, dataLabels }: AdminUsageStatsProps) => {
   const [events, setEvents] = useState<any[]>([]);
   const [users, setUsers] = useState<UsageUser[]>([]);
-  const [profiles, setProfiles] = useState<Map<string, { name: string; email: string | null; is_premium: boolean }>>(new Map());
+  const [profiles, setProfiles] = useState<Map<string, {name: string;email: string | null;is_premium: boolean;}>>(new Map());
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState('30');
   const [refreshing, setRefreshing] = useState(false);
@@ -44,57 +44,57 @@ const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = 
     setLoading(true);
     try {
       const sinceDate = subDays(new Date(), parseInt(dateRange)).toISOString();
-      const { data, error } = await supabase
-        .from('analytics_events')
-        .select('*')
-        .in('event_name', eventNames)
-        .gte('created_at', sinceDate)
-        .order('created_at', { ascending: false })
-        .limit(5000);
+      const { data, error } = await supabase.
+      from('analytics_events').
+      select('*').
+      in('event_name', eventNames).
+      gte('created_at', sinceDate).
+      order('created_at', { ascending: false }).
+      limit(5000);
 
       if (error) throw error;
       const evts = data || [];
       setEvents(evts);
 
       // Get unique user IDs and fetch profiles
-      const userIds = [...new Set(evts.map(e => e.user_id))];
+      const userIds = [...new Set(evts.map((e) => e.user_id))];
       if (userIds.length > 0) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('user_id, name, email, is_premium')
-          .in('user_id', userIds.slice(0, 100));
-        
-        const profileMap = new Map<string, { name: string; email: string | null; is_premium: boolean }>();
-        profileData?.forEach(p => profileMap.set(p.user_id, { name: p.name || 'İstifadəçi', email: p.email, is_premium: p.is_premium || false }));
+        const { data: profileData } = await supabase.
+        from('profiles').
+        select('user_id, name, email, is_premium').
+        in('user_id', userIds.slice(0, 100));
+
+        const profileMap = new Map<string, {name: string;email: string | null;is_premium: boolean;}>();
+        profileData?.forEach((p) => profileMap.set(p.user_id, { name: p.name || tr("adminusagestats_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"), email: p.email, is_premium: p.is_premium || false }));
         setProfiles(profileMap);
 
         // Build user stats
-        const userCounts = new Map<string, { count: number; last_used: string }>();
-        evts.forEach(e => {
+        const userCounts = new Map<string, {count: number;last_used: string;}>();
+        evts.forEach((e) => {
           const existing = userCounts.get(e.user_id);
           if (!existing || e.created_at > existing.last_used) {
-            userCounts.set(e.user_id, { 
-              count: (existing?.count || 0) + 1, 
-              last_used: e.created_at 
+            userCounts.set(e.user_id, {
+              count: (existing?.count || 0) + 1,
+              last_used: e.created_at
             });
           } else {
             existing.count++;
           }
         });
 
-        const usersArr: UsageUser[] = Array.from(userCounts.entries())
-          .map(([userId, { count, last_used }]) => {
-            const profile = profileMap.get(userId);
-            return {
-              user_id: userId,
-              count,
-              name: profile?.name || 'Naməlum',
-              email: profile?.email || '',
-              is_premium: profile?.is_premium || false,
-              last_used,
-            };
-          })
-          .sort((a, b) => b.count - a.count);
+        const usersArr: UsageUser[] = Array.from(userCounts.entries()).
+        map(([userId, { count, last_used }]) => {
+          const profile = profileMap.get(userId);
+          return {
+            user_id: userId,
+            count,
+            name: profile?.name || tr("adminusagestats_namelum_134662", "Nam\u0259lum"),
+            email: profile?.email || '',
+            is_premium: profile?.is_premium || false,
+            last_used
+          };
+        }).
+        sort((a, b) => b.count - a.count);
         setUsers(usersArr);
       }
     } catch (err) {
@@ -104,7 +104,7 @@ const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = 
     }
   };
 
-  useEffect(() => { fetchData(); }, [dateRange, eventNames.join(',')]);
+  useEffect(() => {fetchData();}, [dateRange, eventNames.join(',')]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -113,8 +113,8 @@ const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = 
   };
 
   const totalCount = events.length;
-  const uniqueUsers = new Set(events.map(e => e.user_id)).size;
-  const premiumUsers = new Set(events.filter(e => e.is_premium).map(e => e.user_id)).size;
+  const uniqueUsers = new Set(events.map((e) => e.user_id)).size;
+  const premiumUsers = new Set(events.filter((e) => e.is_premium).map((e) => e.user_id)).size;
 
   // Daily trend
   const dailyTrend = useMemo(() => {
@@ -123,7 +123,7 @@ const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = 
     for (let i = days - 1; i >= 0; i--) {
       const date = subDays(new Date(), i);
       const dateStr = format(date, 'yyyy-MM-dd');
-      const dayCount = events.filter(e => e.created_at?.startsWith(dateStr)).length;
+      const dayCount = events.filter((e) => e.created_at?.startsWith(dateStr)).length;
       trend.push({ date: format(date, 'dd MMM', { locale: az }), count: dayCount });
     }
     return trend;
@@ -133,17 +133,17 @@ const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = 
   const eventDataBreakdown = useMemo(() => {
     if (!showEventData) return [];
     const counts = new Map<string, number>();
-    events.forEach(e => {
+    events.forEach((e) => {
       const data = e.event_data as Record<string, any>;
       if (data) {
         const key = Object.values(data).filter(Boolean).join(' / ') || 'Bilinmir';
         counts.set(key, (counts.get(key) || 0) + 1);
       }
     });
-    return Array.from(counts.entries())
-      .map(([label, count]) => ({ label, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 20);
+    return Array.from(counts.entries()).
+    map(([label, count]) => ({ label, count })).
+    sort((a, b) => b.count - a.count).
+    slice(0, 20);
   }, [events, showEventData]);
 
   return (
@@ -191,38 +191,38 @@ const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = 
       </div>
 
       {/* Daily Chart */}
-      {dailyTrend.length > 0 && (
-        <div className="h-40">
+      {dailyTrend.length > 0 &&
+      <div className="h-40">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={dailyTrend}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="date" fontSize={10} stroke="hsl(var(--muted-foreground))" />
               <YAxis fontSize={10} stroke="hsl(var(--muted-foreground))" />
               <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }} />
-              <Bar dataKey="count" fill="hsl(var(--primary))" radius={[3, 3, 0, 0]} name="İstifadə" />
+              <Bar dataKey="count" fill="hsl(var(--primary))" radius={[3, 3, 0, 0]} name={tr("adminusagestats_i_stifade_9300b8", "\u0130stifad\u0259")} />
             </BarChart>
           </ResponsiveContainer>
         </div>
-      )}
+      }
 
       {/* Event Data Breakdown */}
-      {showEventData && eventDataBreakdown.length > 0 && (
-        <div>
+      {showEventData && eventDataBreakdown.length > 0 &&
+      <div>
           <h4 className="text-sm font-medium mb-2">{tr("adminusagestats_detalli_paylanma_f316d8", "Detallı Paylanma")}</h4>
           <div className="space-y-1 max-h-48 overflow-y-auto">
-            {eventDataBreakdown.map((item, i) => (
-              <div key={i} className="flex items-center justify-between py-1.5 px-2 rounded bg-muted/30 text-sm">
+            {eventDataBreakdown.map((item, i) =>
+          <div key={i} className="flex items-center justify-between py-1.5 px-2 rounded bg-muted/30 text-sm">
                 <span className="truncate flex-1">{item.label}</span>
                 <span className="font-semibold ml-2">{item.count}</span>
               </div>
-            ))}
+          )}
           </div>
         </div>
-      )}
+      }
 
       {/* User Table */}
-      {showUsers && users.length > 0 && (
-        <div>
+      {showUsers && users.length > 0 &&
+      <div>
           <h4 className="text-sm font-medium mb-2">{tr("adminusagestats_en_aktiv_istifadeciler_a5e570", "Ən aktiv istifadəçilər")}</h4>
           <div className="rounded-md border max-h-64 overflow-y-auto">
             <Table>
@@ -235,8 +235,8 @@ const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = 
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users.slice(0, 15).map(u => (
-                  <TableRow key={u.user_id}>
+                {users.slice(0, 15).map((u) =>
+              <TableRow key={u.user_id}>
                     <TableCell className="text-xs font-medium">{u.name}</TableCell>
                     <TableCell className="text-xs text-muted-foreground">{u.email}</TableCell>
                     <TableCell className="text-center">
@@ -244,18 +244,18 @@ const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = 
                     </TableCell>
                     <TableCell className="text-right font-semibold text-xs">{u.count}</TableCell>
                   </TableRow>
-                ))}
+              )}
               </TableBody>
             </Table>
           </div>
         </div>
-      )}
+      }
 
-      {!loading && events.length === 0 && (
-        <p className="text-center text-sm text-muted-foreground py-4">{tr("adminusagestats_bu_muddetde_istifade_melumati_yoxdur_d9a35a", "Bu müddətdə istifadə məlumatı yoxdur")}</p>
-      )}
-    </Card>
-  );
+      {!loading && events.length === 0 &&
+      <p className="text-center text-sm text-muted-foreground py-4">{tr("adminusagestats_bu_muddetde_istifade_melumati_yoxdur_d9a35a", "Bu müddətdə istifadə məlumatı yoxdur")}</p>
+      }
+    </Card>);
+
 };
 
 export default AdminUsageStats;

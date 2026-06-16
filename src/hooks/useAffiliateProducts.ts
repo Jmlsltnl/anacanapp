@@ -41,24 +41,24 @@ export const useAffiliateProducts = (lifeStage?: string) => {
   return useQuery({
     queryKey: ['affiliate-products', lifeStage],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('affiliate_products')
-        .select('*')
-        .eq('is_active', true)
-        .order('is_featured', { ascending: false })
-        .order('sort_order', { ascending: true });
+      const { data, error } = await supabase.
+      from('affiliate_products').
+      select('*').
+      eq('is_active', true).
+      order('is_featured', { ascending: false }).
+      order('sort_order', { ascending: true });
 
       if (error) throw error;
 
       let products = (data || []) as AffiliateProduct[];
-      
+
       // Filter by life stage if provided
       if (lifeStage) {
-        products = products.filter(p => p.life_stages?.includes(lifeStage));
+        products = products.filter((p) => p.life_stages?.includes(lifeStage));
       }
 
       return products;
-    },
+    }
   });
 };
 
@@ -67,17 +67,17 @@ export const useAffiliateProduct = (productId: string | null) => {
     queryKey: ['affiliate-product', productId],
     queryFn: async () => {
       if (!productId) return null;
-      
-      const { data, error } = await supabase
-        .from('affiliate_products')
-        .select('*')
-        .eq('id', productId)
-        .maybeSingle();
+
+      const { data, error } = await supabase.
+      from('affiliate_products').
+      select('*').
+      eq('id', productId).
+      maybeSingle();
 
       if (error) throw error;
       return data as AffiliateProduct | null;
     },
-    enabled: !!productId,
+    enabled: !!productId
   });
 };
 
@@ -89,24 +89,24 @@ export const useSavedProducts = () => {
     queryFn: async () => {
       if (!user?.id) return [];
 
-      const { data, error } = await supabase
-        .from('saved_affiliate_products')
-        .select(`
+      const { data, error } = await supabase.
+      from('saved_affiliate_products').
+      select(`
           id,
           created_at,
           product:affiliate_products(*)
-        `)
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        `).
+      eq('user_id', user.id).
+      order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data?.map(item => ({
+      return data?.map((item) => ({
         savedId: item.id,
         savedAt: item.created_at,
-        ...item.product as unknown as AffiliateProduct
+        ...(item.product as unknown as AffiliateProduct)
       })) || [];
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id
   });
 };
 
@@ -118,17 +118,17 @@ export const useIsProductSaved = (productId: string) => {
     queryFn: async () => {
       if (!user?.id || !productId) return false;
 
-      const { data, error } = await supabase
-        .from('saved_affiliate_products')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('product_id', productId)
-        .maybeSingle();
+      const { data, error } = await supabase.
+      from('saved_affiliate_products').
+      select('id').
+      eq('user_id', user.id).
+      eq('product_id', productId).
+      maybeSingle();
 
       if (error) throw error;
       return !!data;
     },
-    enabled: !!user?.id && !!productId,
+    enabled: !!user?.id && !!productId
   });
 };
 
@@ -139,11 +139,11 @@ export const useSaveProduct = () => {
 
   return useMutation({
     mutationFn: async (productId: string) => {
-      if (!user?.id) throw new Error('Giriş etməlisiniz');
+      if (!user?.id) throw new Error(tr("useaffiliateproducts_giris_etmelisiniz_6c2220", "Giri\u015F etm\u0259lisiniz"));
 
-      const { error } = await supabase
-        .from('saved_affiliate_products')
-        .insert({ user_id: user.id, product_id: productId });
+      const { error } = await supabase.
+      from('saved_affiliate_products').
+      insert({ user_id: user.id, product_id: productId });
 
       if (error) throw error;
     },
@@ -154,7 +154,7 @@ export const useSaveProduct = () => {
     },
     onError: () => {
       toast({ title: tr("useaffiliateproducts_xeta_3cdbb6", "Xəta"), description: tr("useaffiliateproducts_mehsul_saxlanila_bilmedi_b71bb7", "Məhsul saxlanıla bilmədi"), variant: 'destructive' });
-    },
+    }
   });
 };
 
@@ -165,13 +165,13 @@ export const useUnsaveProduct = () => {
 
   return useMutation({
     mutationFn: async (productId: string) => {
-      if (!user?.id) throw new Error('Giriş etməlisiniz');
+      if (!user?.id) throw new Error(tr("useaffiliateproducts_giris_etmelisiniz_6c2220", "Giri\u015F etm\u0259lisiniz"));
 
-      const { error } = await supabase
-        .from('saved_affiliate_products')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('product_id', productId);
+      const { error } = await supabase.
+      from('saved_affiliate_products').
+      delete().
+      eq('user_id', user.id).
+      eq('product_id', productId);
 
       if (error) throw error;
     },
@@ -179,6 +179,6 @@ export const useUnsaveProduct = () => {
       queryClient.invalidateQueries({ queryKey: ['saved-affiliate-products'] });
       queryClient.invalidateQueries({ queryKey: ['is-product-saved', productId] });
       toast({ title: 'Silindi', description: tr("useaffiliateproducts_mehsul_favoritlerden_silindi_d9717b", "Məhsul favoritlərdən silindi") });
-    },
+    }
   });
 };

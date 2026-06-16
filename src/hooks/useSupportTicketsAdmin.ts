@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { tr } from "@/lib/tr";import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface AdminSupportTicket {
@@ -24,30 +24,30 @@ export const useSupportTicketsAdmin = () => {
 
   const fetchTickets = useCallback(async () => {
     try {
-      const { data, error } = await supabase
-        .from('support_tickets')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data, error } = await supabase.
+      from('support_tickets').
+      select('*').
+      order('created_at', { ascending: false });
 
       if (error) throw error;
 
       // Fetch user info
-      const userIds = [...new Set((data || []).map(t => t.user_id))];
-      
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('user_id, name, email')
-        .in('user_id', userIds);
+      const userIds = [...new Set((data || []).map((t) => t.user_id))];
+
+      const { data: profiles } = await supabase.
+      from('profiles').
+      select('user_id, name, email').
+      in('user_id', userIds);
 
       const profileMap = new Map(
-        (profiles || []).map(p => [p.user_id, p])
+        (profiles || []).map((p) => [p.user_id, p])
       );
 
-      const enrichedTickets = (data || []).map(t => {
+      const enrichedTickets = (data || []).map((t) => {
         const profile = profileMap.get(t.user_id);
         return {
           ...t,
-          user_name: profile?.name || 'İstifadəçi',
+          user_name: profile?.name || tr("usesupportticketsadmin_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
           user_email: profile?.email || ''
         };
       });
@@ -62,14 +62,14 @@ export const useSupportTicketsAdmin = () => {
 
   const respondToTicket = async (ticketId: string, response: string, newStatus: AdminSupportTicket['status'] = 'resolved') => {
     try {
-      const { error } = await supabase
-        .from('support_tickets')
-        .update({
-          admin_response: response,
-          status: newStatus,
-          responded_at: new Date().toISOString()
-        })
-        .eq('id', ticketId);
+      const { error } = await supabase.
+      from('support_tickets').
+      update({
+        admin_response: response,
+        status: newStatus,
+        responded_at: new Date().toISOString()
+      }).
+      eq('id', ticketId);
 
       if (error) throw error;
       await fetchTickets();
@@ -82,10 +82,10 @@ export const useSupportTicketsAdmin = () => {
 
   const updateStatus = async (ticketId: string, status: AdminSupportTicket['status']) => {
     try {
-      const { error } = await supabase
-        .from('support_tickets')
-        .update({ status })
-        .eq('id', ticketId);
+      const { error } = await supabase.
+      from('support_tickets').
+      update({ status }).
+      eq('id', ticketId);
 
       if (error) throw error;
       await fetchTickets();
@@ -98,10 +98,10 @@ export const useSupportTicketsAdmin = () => {
 
   const updatePriority = async (ticketId: string, priority: AdminSupportTicket['priority']) => {
     try {
-      const { error } = await supabase
-        .from('support_tickets')
-        .update({ priority })
-        .eq('id', ticketId);
+      const { error } = await supabase.
+      from('support_tickets').
+      update({ priority }).
+      eq('id', ticketId);
 
       if (error) throw error;
       await fetchTickets();

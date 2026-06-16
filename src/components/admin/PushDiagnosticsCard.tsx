@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { tr } from "@/lib/tr";import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -21,14 +21,14 @@ const PushDiagnosticsCard = () => {
 
   const sendDailyToMe = async () => {
     if (!user) {
-      toast.error('Giriş etməlisiniz');
+      toast.error(tr("pushdiagnosticscard_giris_etmelisiniz_6c2220", "Giri\u015F etm\u0259lisiniz"));
       return;
     }
     setLoading('me-daily');
     setLastResult(null);
     try {
       const { data, error } = await supabase.functions.invoke('send-daily-notifications', {
-        body: { manual: true, userId: user.id, skipDedup: true },
+        body: { manual: true, userId: user.id, skipDedup: true }
       });
       if (error) throw error;
       setLastResult({ kind: 'send-daily-notifications', payload: data });
@@ -36,12 +36,12 @@ const PushDiagnosticsCard = () => {
       if (sent > 0) {
         toast.success(`${sent} dinamik push göndərildi (sənin cihazına)`);
       } else {
-        toast.warning('Push hazırlandı, amma 0 göndərildi. Detalları aşağıda gör.');
+        toast.warning(tr("pushdiagnosticscard_push_hazirlandi_amma_0_gonderi_af80a2", "Push haz\u0131rland\u0131, amma 0 g\xF6nd\u0259rildi. Detallar\u0131 a\u015Fa\u011F\u0131da g\xF6r."));
       }
     } catch (err: any) {
       console.error(err);
       setLastResult({ kind: 'error', payload: err?.message || String(err) });
-      toast.error('Xəta: ' + (err?.message || 'naməlum'));
+      toast.error(tr("pushdiagnosticscard_xeta_dbbc36", "X\u0259ta: ") + (err?.message || tr("pushdiagnosticscard_namelum_974fd5", "nam\u0259lum")));
     } finally {
       setLoading(null);
     }
@@ -49,22 +49,22 @@ const PushDiagnosticsCard = () => {
 
   const sendFlowToMe = async () => {
     if (!user) {
-      toast.error('Giriş etməlisiniz');
+      toast.error(tr("pushdiagnosticscard_giris_etmelisiniz_6c2220", "Giri\u015F etm\u0259lisiniz"));
       return;
     }
     setLoading('me-flow');
     setLastResult(null);
     try {
       const { data, error } = await supabase.functions.invoke('send-flow-reminders', {
-        body: { manual: true },
+        body: { manual: true }
       });
       if (error) throw error;
       setLastResult({ kind: 'send-flow-reminders', payload: data });
-      toast.success('Flow reminders icra edildi. Detallar aşağıda.');
+      toast.success(tr("pushdiagnosticscard_flow_reminders_icra_edildi_det_a7156b", "Flow reminders icra edildi. Detallar a\u015Fa\u011F\u0131da."));
     } catch (err: any) {
       console.error(err);
       setLastResult({ kind: 'error', payload: err?.message || String(err) });
-      toast.error('Xəta: ' + (err?.message || 'naməlum'));
+      toast.error(tr("pushdiagnosticscard_xeta_dbbc36", "X\u0259ta: ") + (err?.message || tr("pushdiagnosticscard_namelum_974fd5", "nam\u0259lum")));
     } finally {
       setLoading(null);
     }
@@ -75,27 +75,27 @@ const PushDiagnosticsCard = () => {
     setLoading('check-tokens');
     setLastResult(null);
     try {
-      const { data, error } = await supabase
-        .from('device_tokens')
-        .select('platform, device_name, updated_at, token')
-        .eq('user_id', user.id)
-        .order('updated_at', { ascending: false });
+      const { data, error } = await supabase.
+      from('device_tokens').
+      select('platform, device_name, updated_at, token').
+      eq('user_id', user.id).
+      order('updated_at', { ascending: false });
       if (error) throw error;
       const masked = (data || []).map((t: any) => ({
         platform: t.platform,
         device_name: t.device_name,
         updated_at: t.updated_at,
-        tokenSuffix: '...' + (t.token || '').slice(-12),
+        tokenSuffix: '...' + (t.token || '').slice(-12)
       }));
       setLastResult({ kind: 'my-device-tokens', count: masked.length, payload: masked });
       if (masked.length === 0) {
-        toast.warning('Heç bir cihaz tokeni yoxdur. Mobil tətbiqi aç və icazə ver.');
+        toast.warning(tr("pushdiagnosticscard_hec_bir_cihaz_tokeni_yoxdur_mo_d3fe9f", "He\xE7 bir cihaz tokeni yoxdur. Mobil t\u0259tbiqi a\xE7 v\u0259 icaz\u0259 ver."));
       } else {
         toast.success(`${masked.length} aktiv token tapıldı`);
       }
     } catch (err: any) {
       setLastResult({ kind: 'error', payload: err?.message });
-      toast.error('Xəta: ' + (err?.message || 'naməlum'));
+      toast.error(tr("pushdiagnosticscard_xeta_dbbc36", "X\u0259ta: ") + (err?.message || tr("pushdiagnosticscard_namelum_974fd5", "nam\u0259lum")));
     } finally {
       setLoading(null);
     }
@@ -109,7 +109,7 @@ const PushDiagnosticsCard = () => {
           <div>
             <h3 className="font-semibold">Push Diaqnostika</h3>
             <p className="text-xs text-muted-foreground">
-              Yalnız sənin öz cihazına test push göndərir. Heç kimə kütləvi göndərilmir.
+              {tr("pushdiagnosticscard_yalniz_senin_oz_cihazina_test__194710", "Yaln\u0131z s\u0259nin \xF6z cihaz\u0131na test push g\xF6nd\u0259rir. He\xE7 kim\u0259 k\xFCtl\u0259vi g\xF6nd\u0259rilmir.")}
             </p>
           </div>
         </div>
@@ -118,58 +118,58 @@ const PushDiagnosticsCard = () => {
             variant="outline"
             size="sm"
             onClick={checkMyTokens}
-            disabled={loading !== null}
-          >
-            {loading === 'check-tokens' ? (
-              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-            ) : (
-              <RefreshCw className="h-4 w-4 mr-1" />
-            )}
-            Tokenlərimi yoxla
+            disabled={loading !== null}>
+            
+            {loading === 'check-tokens' ?
+            <Loader2 className="h-4 w-4 mr-1 animate-spin" /> :
+
+            <RefreshCw className="h-4 w-4 mr-1" />
+            }
+            {tr("pushdiagnosticscard_tokenlerimi_yoxla_749170", "Tokenl\u0259rimi yoxla")}
           </Button>
           <Button
             size="sm"
             onClick={sendDailyToMe}
-            disabled={loading !== null}
-          >
-            {loading === 'me-daily' ? (
-              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4 mr-1" />
-            )}
-            Mənə dinamik push göndər
+            disabled={loading !== null}>
+            
+            {loading === 'me-daily' ?
+            <Loader2 className="h-4 w-4 mr-1 animate-spin" /> :
+
+            <Send className="h-4 w-4 mr-1" />
+            }
+            {tr("pushdiagnosticscard_mene_dinamik_push_gonder_642e6b", "M\u0259n\u0259 dinamik push g\xF6nd\u0259r")}
           </Button>
           <Button
             variant="secondary"
             size="sm"
             onClick={sendFlowToMe}
-            disabled={loading !== null}
-          >
-            {loading === 'me-flow' ? (
-              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4 mr-1" />
-            )}
-            Flow reminderlərini icra et
+            disabled={loading !== null}>
+            
+            {loading === 'me-flow' ?
+            <Loader2 className="h-4 w-4 mr-1 animate-spin" /> :
+
+            <Send className="h-4 w-4 mr-1" />
+            }
+            {tr("pushdiagnosticscard_flow_reminderlerini_icra_et_f80582", "Flow reminderl\u0259rini icra et")}
           </Button>
         </div>
       </div>
 
-      {lastResult && (
-        <div className="mt-4">
+      {lastResult &&
+      <div className="mt-4">
           <div className="flex items-center gap-2 mb-2">
             <Badge variant="outline">{lastResult.kind}</Badge>
-            {typeof lastResult.count === 'number' && (
-              <Badge variant="secondary">{lastResult.count} qeyd</Badge>
-            )}
+            {typeof lastResult.count === 'number' &&
+          <Badge variant="secondary">{lastResult.count} qeyd</Badge>
+          }
           </div>
           <pre className="text-xs bg-background border rounded p-3 max-h-80 overflow-auto whitespace-pre-wrap break-words">
             {JSON.stringify(lastResult.payload, null, 2)}
           </pre>
         </div>
-      )}
-    </Card>
-  );
+      }
+    </Card>);
+
 };
 
 export default PushDiagnosticsCard;

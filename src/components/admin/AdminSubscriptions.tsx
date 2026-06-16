@@ -12,14 +12,14 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  DropdownMenuTrigger } from
+'@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle } from
+'@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format, addMonths, addYears } from 'date-fns';
 
@@ -47,10 +47,10 @@ const AdminSubscriptions = () => {
 
   const fetchUsers = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const { data, error } = await supabase.
+    from('profiles').
+    select('*').
+    order('created_at', { ascending: false });
 
     if (error) {
       toast({ title: tr("adminsubscriptions_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
@@ -83,14 +83,14 @@ const AdminSubscriptions = () => {
         break;
     }
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        is_premium: true,
-        premium_until: premiumUntil?.toISOString() || null,
-        badge_type: 'premium',
-      })
-      .eq('id', selectedUser.id);
+    const { error } = await supabase.
+    from('profiles').
+    update({
+      is_premium: true,
+      premium_until: premiumUntil?.toISOString() || null,
+      badge_type: 'premium'
+    }).
+    eq('id', selectedUser.id);
 
     if (error) {
       toast({ title: tr("adminsubscriptions_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
@@ -105,14 +105,14 @@ const AdminSubscriptions = () => {
   const revokePremium = async (user: UserProfile) => {
     if (!confirm(`${user.name} üçün Premium-u ləğv etmək istəyirsiniz?`)) return;
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        is_premium: false,
-        premium_until: null,
-        badge_type: 'user',
-      })
-      .eq('id', user.id);
+    const { error } = await supabase.
+    from('profiles').
+    update({
+      is_premium: false,
+      premium_until: null,
+      badge_type: 'user'
+    }).
+    eq('id', user.id);
 
     if (error) {
       toast({ title: tr("adminsubscriptions_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
@@ -122,18 +122,18 @@ const AdminSubscriptions = () => {
     }
   };
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = 
-      user.name?.toLowerCase().includes(search.toLowerCase()) ||
-      user.email?.toLowerCase().includes(search.toLowerCase());
-    
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
+    user.name?.toLowerCase().includes(search.toLowerCase()) ||
+    user.email?.toLowerCase().includes(search.toLowerCase());
+
     if (filter === 'premium') return matchesSearch && user.is_premium;
     if (filter === 'free') return matchesSearch && !user.is_premium;
     return matchesSearch;
   });
 
-  const premiumCount = users.filter(u => u.is_premium).length;
-  const freeCount = users.filter(u => !u.is_premium).length;
+  const premiumCount = users.filter((u) => u.is_premium).length;
+  const freeCount = users.filter((u) => !u.is_premium).length;
 
   return (
     <div className="p-6">
@@ -185,63 +185,63 @@ const AdminSubscriptions = () => {
       <div className="flex gap-4 mb-6">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input 
+          <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={tr("adminsubscriptions_istifadeci_axtar_4c82f8", "İstifadəçi axtar...")}
-            className="pl-10"
-          />
+            className="pl-10" />
+          
         </div>
         <div className="flex gap-2">
-          {['all', 'premium', 'free'].map((f) => (
-            <Button
-              key={f}
-              variant={filter === f ? 'default' : 'outline'}
-              onClick={() => setFilter(f as any)}
-              size="sm"
-            >
-              {f === 'all' ? 'Hamısı' : f === 'premium' ? 'Premium' : 'Pulsuz'}
+          {['all', 'premium', 'free'].map((f) =>
+          <Button
+            key={f}
+            variant={filter === f ? 'default' : 'outline'}
+            onClick={() => setFilter(f as any)}
+            size="sm">
+            
+              {f === 'all' ? tr("adminsubscriptions_hamisi_c73c4d", "Ham\u0131s\u0131") : f === 'premium' ? 'Premium' : 'Pulsuz'}
             </Button>
-          ))}
+          )}
         </div>
       </div>
 
       {/* Users List */}
-      {loading ? (
-        <div className="flex justify-center py-12">
+      {loading ?
+      <div className="flex justify-center py-12">
           <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {filteredUsers.map((user) => (
-            <motion.div
-              key={user.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-card rounded-xl p-4 border border-border flex items-center gap-4"
-            >
+        </div> :
+
+      <div className="space-y-3">
+          {filteredUsers.map((user) =>
+        <motion.div
+          key={user.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-card rounded-xl p-4 border border-border flex items-center gap-4">
+          
               <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${
-                user.is_premium ? 'bg-gradient-to-r from-amber-400 to-amber-600 text-white' : 'bg-muted text-muted-foreground'
-              }`}>
+          user.is_premium ? 'bg-gradient-to-r from-amber-400 to-amber-600 text-white' : 'bg-muted text-muted-foreground'}`
+          }>
                 {user.name?.charAt(0) || 'İ'}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <h3 className="font-semibold truncate">{user.name}</h3>
-                  {user.is_premium && (
-                    <Badge className="bg-gradient-to-r from-amber-400 to-amber-600 text-white">
+                  {user.is_premium &&
+              <Badge className="bg-gradient-to-r from-amber-400 to-amber-600 text-white">
                       <Crown className="w-3 h-3 mr-1" />
                       Premium
                     </Badge>
-                  )}
+              }
                 </div>
                 <p className="text-sm text-muted-foreground truncate">{user.email}</p>
-                {user.premium_until && (
-                  <p className="text-xs text-muted-foreground">
+                {user.premium_until &&
+            <p className="text-xs text-muted-foreground">
                     <Calendar className="w-3 h-3 inline mr-1" />
-                    Bitmə: {format(new Date(user.premium_until), 'dd.MM.yyyy')}
+                    {tr("adminsubscriptions_bitme_c270e3", "Bitm\u0259:")} {format(new Date(user.premium_until), 'dd.MM.yyyy')}
                   </p>
-                )}
+            }
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -250,23 +250,23 @@ const AdminSubscriptions = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  {user.is_premium ? (
-                    <DropdownMenuItem onClick={() => revokePremium(user)} className="text-red-600">
+                  {user.is_premium ?
+              <DropdownMenuItem onClick={() => revokePremium(user)} className="text-red-600">
                       <X className="w-4 h-4 mr-2" />
-                      Premium Ləğv Et
-                    </DropdownMenuItem>
-                  ) : (
-                    <DropdownMenuItem onClick={() => { setSelectedUser(user); setShowModal(true); }}>
+                      {tr("adminsubscriptions_premium_legv_et_779f4b", "Premium L\u0259\u011Fv Et")}
+                    </DropdownMenuItem> :
+
+              <DropdownMenuItem onClick={() => {setSelectedUser(user);setShowModal(true);}}>
                       <Crown className="w-4 h-4 mr-2 text-amber-500" />
                       Premium Ver
                     </DropdownMenuItem>
-                  )}
+              }
                 </DropdownMenuContent>
               </DropdownMenu>
             </motion.div>
-          ))}
+        )}
         </div>
-      )}
+      }
 
       {/* Grant Premium Modal */}
       <Dialog open={showModal} onOpenChange={setShowModal}>
@@ -276,7 +276,7 @@ const AdminSubscriptions = () => {
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <p className="text-muted-foreground">
-              <strong>{selectedUser?.name}</strong> üçün Premium abunəlik müddəti seçin:
+              <strong>{selectedUser?.name}</strong> {tr("adminsubscriptions_ucun_premium_abunelik_muddeti__9582da", "\xFC\xE7\xFCn Premium abun\u0259lik m\xFCdd\u0259ti se\xE7in:")}
             </p>
             <Select value={premiumDuration} onValueChange={(v: any) => setPremiumDuration(v)}>
               <SelectTrigger>
@@ -291,7 +291,7 @@ const AdminSubscriptions = () => {
             </Select>
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => setShowModal(false)} className="flex-1">
-                Ləğv et
+                {tr("adminsubscriptions_legv_et_b5e49c", "L\u0259\u011Fv et")}
               </Button>
               <Button onClick={grantPremium} className="flex-1 bg-gradient-to-r from-amber-400 to-amber-600">
                 <Crown className="w-4 h-4 mr-2" />
@@ -302,14 +302,14 @@ const AdminSubscriptions = () => {
         </DialogContent>
       </Dialog>
 
-      <AdminUsageStats 
+      <AdminUsageStats
         eventNames={['premium_subscribed', 'premium_cancelled', 'premium_paywall_shown', 'premium_paywall_clicked']}
         title={tr("adminsubscriptions_premium_statistikasi_059afd", "👑 Premium Statistikası")}
         showEventData
-        showUsers
-      />
-    </div>
-  );
+        showUsers />
+      
+    </div>);
+
 };
 
 export default AdminSubscriptions;

@@ -10,10 +10,10 @@ import { toast } from 'sonner';
 import { tr } from "@/lib/tr";
 
 const FLOW_OPTIONS = [
-  { key: 'light', label: tr("flowperiodcalendar_yungul_2a8010", 'Yüngül'), emoji: '💧', color: 'bg-red-200 dark:bg-red-900/30' },
-  { key: 'medium', label: 'Orta', emoji: '💧💧', color: 'bg-red-300 dark:bg-red-800/40' },
-  { key: 'heavy', label: tr("flowperiodcalendar_guclu_0fda31", 'Güclü'), emoji: '💧💧💧', color: 'bg-red-400 dark:bg-red-700/50' },
-];
+{ key: 'light', label: tr("flowperiodcalendar_yungul_2a8010", 'Yüngül'), emoji: '💧', color: 'bg-red-200 dark:bg-red-900/30' },
+{ key: 'medium', label: 'Orta', emoji: '💧💧', color: 'bg-red-300 dark:bg-red-800/40' },
+{ key: 'heavy', label: tr("flowperiodcalendar_guclu_0fda31", 'Güclü'), emoji: '💧💧💧', color: 'bg-red-400 dark:bg-red-700/50' }];
+
 
 const FlowPeriodCalendar = () => {
   const { cycleLength, periodLength, getCycleData } = useUserStore();
@@ -25,20 +25,20 @@ const FlowPeriodCalendar = () => {
   const { data: periodLogs = [] } = usePeriodDayLogs(calendarMonth);
   const toggleMutation = useTogglePeriodDay();
 
-  const lastPeriodDate = cycleData?.lastPeriodDate
-    ? new Date(cycleData.lastPeriodDate)
-    : new Date();
+  const lastPeriodDate = cycleData?.lastPeriodDate ?
+  new Date(cycleData.lastPeriodDate) :
+  new Date();
 
   // Set of logged period day strings for fast lookup
   const loggedPeriodDays = useMemo(() => {
     const set = new Set<string>();
-    periodLogs.forEach(log => set.add(log.log_date));
+    periodLogs.forEach((log) => set.add(log.log_date));
     return set;
   }, [periodLogs]);
 
   // Get flow intensity for a date
   const getFlowIntensity = (dateStr: string) => {
-    return periodLogs.find(l => l.log_date === dateStr)?.flow_intensity || null;
+    return periodLogs.find((l) => l.log_date === dateStr)?.flow_intensity || null;
   };
 
   const calendarDays = useMemo(() => {
@@ -61,7 +61,7 @@ const FlowPeriodCalendar = () => {
       isFertile: phaseInfo.isFertileDay && !isLogged,
       isOvulation: phaseInfo.isOvulationDay && !isLogged,
       flowIntensity: getFlowIntensity(dateStr),
-      isFutureDate,
+      isFutureDate
     };
   };
 
@@ -74,10 +74,10 @@ const FlowPeriodCalendar = () => {
       // Remove directly
       toggleMutation.mutate({ date }, {
         onSuccess: () => {
-          toast.success('Period günü silindi', {
-            description: format(date, 'd MMMM', { locale: az }),
+          toast.success(tr("flowperiodcalendar_period_gunu_silindi_c4a18f", "Period g\xFCn\xFC silindi"), {
+            description: format(date, 'd MMMM', { locale: az })
           });
-        },
+        }
       });
     } else {
       // Show flow intensity picker
@@ -90,20 +90,20 @@ const FlowPeriodCalendar = () => {
     if (!selectedDate) return;
     toggleMutation.mutate({ date: selectedDate, flowIntensity: intensity }, {
       onSuccess: () => {
-        toast.success('Period günü qeyd edildi 🩸', {
-          description: format(selectedDate, 'd MMMM', { locale: az }),
+        toast.success(tr("flowperiodcalendar_period_gunu_qeyd_edildi_0555f5", "Period g\xFCn\xFC qeyd edildi \uD83E\uDE78"), {
+          description: format(selectedDate, 'd MMMM', { locale: az })
         });
         setShowFlowPicker(false);
         setSelectedDate(null);
-      },
+      }
     });
   };
 
   const getFlowDotColor = (intensity: string | null) => {
     switch (intensity) {
-      case 'light': return 'bg-red-300';
-      case 'heavy': return 'bg-red-600';
-      default: return 'bg-red-400';
+      case 'light':return 'bg-red-300';
+      case 'heavy':return 'bg-red-600';
+      default:return 'bg-red-400';
     }
   };
 
@@ -112,19 +112,19 @@ const FlowPeriodCalendar = () => {
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.1 }}
-      className="bg-card rounded-2xl p-4 border border-border"
-    >
+      className="bg-card rounded-2xl p-4 border border-border">
+      
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-bold text-foreground flex items-center gap-2">
           <Calendar className="w-5 h-5 text-primary" />
-          Period Təqvimi
+          {tr("flowperiodcalendar_period_teqvimi_d04269", "Period T\u0259qvimi")}
         </h3>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1))}
-            className="p-1.5 hover:bg-muted rounded-lg transition-colors"
-          >
+            className="p-1.5 hover:bg-muted rounded-lg transition-colors">
+            
             <ChevronLeft className="w-4 h-4" />
           </button>
           <span className="text-sm font-medium min-w-[110px] text-center">
@@ -132,8 +132,8 @@ const FlowPeriodCalendar = () => {
           </span>
           <button
             onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1))}
-            className="p-1.5 hover:bg-muted rounded-lg transition-colors"
-          >
+            className="p-1.5 hover:bg-muted rounded-lg transition-colors">
+            
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
@@ -142,23 +142,23 @@ const FlowPeriodCalendar = () => {
       {/* Instruction */}
       <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1.5">
         <Droplets className="w-3.5 h-3.5" />
-        Günə toxunaraq period günlərini qeyd edin
+        {tr("flowperiodcalendar_gune_toxunaraq_period_gunlerin_3b5f8a", "G\xFCn\u0259 toxunaraq period g\xFCnl\u0259rini qeyd edin")}
       </p>
 
       {/* Day Labels */}
       <div className="grid grid-cols-7 gap-1 mb-2">
-        {['B', 'BE', 'Ç', 'ÇA', 'C', 'C', 'Ş'].map((day, i) => (
-          <div key={i} className="text-center text-xs text-muted-foreground font-medium py-1">
+        {['B', 'BE', tr("flowperiodcalendar_c_b70344", "\xC7"), tr("flowperiodcalendar_ca_f55b0c", "\xC7A"), 'C', 'C', tr("flowperiodcalendar_s_b97106", "\u015E")].map((day, i) =>
+        <div key={i} className="text-center text-xs text-muted-foreground font-medium py-1">
             {day}
           </div>
-        ))}
+        )}
       </div>
 
       {/* Calendar Grid */}
       <div className="grid grid-cols-7 gap-1">
-        {Array.from({ length: calendarDays[0]?.getDay() || 0 }).map((_, i) => (
-          <div key={`empty-${i}`} className="aspect-square" />
-        ))}
+        {Array.from({ length: calendarDays[0]?.getDay() || 0 }).map((_, i) =>
+        <div key={`empty-${i}`} className="aspect-square" />
+        )}
 
         {calendarDays.map((day) => {
           const info = getDayInfo(day);
@@ -170,40 +170,40 @@ const FlowPeriodCalendar = () => {
               onClick={() => handleDayTap(day)}
               disabled={info.isFutureDate || toggleMutation.isPending}
               className={`aspect-square rounded-xl flex flex-col items-center justify-center text-xs font-medium relative transition-all ${
-                isToday ? 'ring-2 ring-primary ring-offset-1 ring-offset-background' : ''
-              } ${
-                info.isLogged
-                  ? info.flowIntensity === 'heavy'
-                    ? 'bg-red-500/90 text-white dark:bg-red-600/80'
-                    : info.flowIntensity === 'light'
-                    ? 'bg-red-200 text-red-800 dark:bg-red-900/40 dark:text-red-300'
-                    : 'bg-red-400/80 text-white dark:bg-red-500/60'
-                  : info.isPredictedPeriod
-                  ? 'bg-red-100/60 text-red-600 dark:bg-red-900/20 dark:text-red-400 border border-dashed border-red-300 dark:border-red-700'
-                  : info.isOvulation
-                  ? 'bg-pink-200 text-pink-800 dark:bg-pink-800/40 dark:text-pink-300'
-                  : info.isFertile
-                  ? 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400'
-                  : info.isFutureDate
-                  ? 'text-muted-foreground/40'
-                  : 'text-foreground hover:bg-muted active:bg-muted/80'
-              }`}
-              whileTap={!info.isFutureDate ? { scale: 0.85 } : undefined}
-            >
+              isToday ? 'ring-2 ring-primary ring-offset-1 ring-offset-background' : ''} ${
+
+              info.isLogged ?
+              info.flowIntensity === 'heavy' ?
+              'bg-red-500/90 text-white dark:bg-red-600/80' :
+              info.flowIntensity === 'light' ?
+              'bg-red-200 text-red-800 dark:bg-red-900/40 dark:text-red-300' :
+              'bg-red-400/80 text-white dark:bg-red-500/60' :
+              info.isPredictedPeriod ?
+              'bg-red-100/60 text-red-600 dark:bg-red-900/20 dark:text-red-400 border border-dashed border-red-300 dark:border-red-700' :
+              info.isOvulation ?
+              'bg-pink-200 text-pink-800 dark:bg-pink-800/40 dark:text-pink-300' :
+              info.isFertile ?
+              'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400' :
+              info.isFutureDate ?
+              'text-muted-foreground/40' :
+              'text-foreground hover:bg-muted active:bg-muted/80'}`
+              }
+              whileTap={!info.isFutureDate ? { scale: 0.85 } : undefined}>
+              
               {format(day, 'd')}
               {/* Flow intensity dot */}
-              {info.isLogged && (
-                <span className={`absolute bottom-0.5 w-1.5 h-1.5 rounded-full ${getFlowDotColor(info.flowIntensity)}`} />
-              )}
+              {info.isLogged &&
+              <span className={`absolute bottom-0.5 w-1.5 h-1.5 rounded-full ${getFlowDotColor(info.flowIntensity)}`} />
+              }
               {/* Predicted period indicator */}
-              {info.isPredictedPeriod && !info.isLogged && (
-                <span className="absolute bottom-0.5 w-1 h-1 rounded-full bg-red-300 dark:bg-red-600" />
-              )}
-              {info.isOvulation && (
-                <span className="absolute -top-0.5 -right-0.5 text-[8px]">🌸</span>
-              )}
-            </motion.button>
-          );
+              {info.isPredictedPeriod && !info.isLogged &&
+              <span className="absolute bottom-0.5 w-1 h-1 rounded-full bg-red-300 dark:bg-red-600" />
+              }
+              {info.isOvulation &&
+              <span className="absolute -top-0.5 -right-0.5 text-[8px]">🌸</span>
+              }
+            </motion.button>);
+
         })}
       </div>
 
@@ -229,57 +229,57 @@ const FlowPeriodCalendar = () => {
 
       {/* Flow Intensity Picker Bottom Sheet */}
       <AnimatePresence>
-        {showFlowPicker && selectedDate && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end justify-center bg-black/40"
-            onClick={() => { setShowFlowPicker(false); setSelectedDate(null); }}
-          >
+        {showFlowPicker && selectedDate &&
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40"
+          onClick={() => {setShowFlowPicker(false);setSelectedDate(null);}}>
+          
             <motion.div
-              initial={{ y: 300 }}
-              animate={{ y: 0 }}
-              exit={{ y: 300 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="w-full max-w-md bg-card rounded-t-3xl p-6 pb-24"
-              onClick={(e) => e.stopPropagation()}
-            >
+            initial={{ y: 300 }}
+            animate={{ y: 0 }}
+            exit={{ y: 300 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="w-full max-w-md bg-card rounded-t-3xl p-6 pb-24"
+            onClick={(e) => e.stopPropagation()}>
+            
               <div className="w-10 h-1 rounded-full bg-muted-foreground/30 mx-auto mb-4" />
               <h4 className="font-bold text-foreground text-center mb-1">
                 🩸 {format(selectedDate, 'd MMMM yyyy', { locale: az })}
               </h4>
               <p className="text-sm text-muted-foreground text-center mb-5">
-                Axıntı intensivliyini seçin
+                {tr("flowperiodcalendar_axinti_intensivliyini_secin_7d78ea", "Ax\u0131nt\u0131 intensivliyini se\xE7in")}
               </p>
 
               <div className="grid grid-cols-3 gap-3">
-                {FLOW_OPTIONS.map((option) => (
-                  <motion.button
-                    key={option.key}
-                    whileTap={{ scale: 0.92 }}
-                    onClick={() => handleFlowSelect(option.key)}
-                    disabled={toggleMutation.isPending}
-                    className={`${option.color} rounded-2xl p-4 flex flex-col items-center gap-2 transition-all hover:opacity-80`}
-                  >
+                {FLOW_OPTIONS.map((option) =>
+              <motion.button
+                key={option.key}
+                whileTap={{ scale: 0.92 }}
+                onClick={() => handleFlowSelect(option.key)}
+                disabled={toggleMutation.isPending}
+                className={`${option.color} rounded-2xl p-4 flex flex-col items-center gap-2 transition-all hover:opacity-80`}>
+                
                     <span className="text-2xl">{option.emoji}</span>
                     <span className="text-xs font-semibold text-foreground">{option.label}</span>
                   </motion.button>
-                ))}
+              )}
               </div>
 
               <button
-                onClick={() => { setShowFlowPicker(false); setSelectedDate(null); }}
-                className="w-full mt-4 text-sm text-muted-foreground py-2"
-              >
-                Ləğv et
-              </button>
+              onClick={() => {setShowFlowPicker(false);setSelectedDate(null);}}
+              className="w-full mt-4 text-sm text-muted-foreground py-2">
+                {tr("flowperiodcalendar_legv_et_b5e49c", "L\u0259\u011Fv et")}
+              
+            </button>
             </motion.div>
           </motion.div>
-        )}
+        }
       </AnimatePresence>
-    </motion.div>
-  );
+    </motion.div>);
+
 };
 
 export default FlowPeriodCalendar;

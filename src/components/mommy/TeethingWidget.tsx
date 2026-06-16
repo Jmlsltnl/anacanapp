@@ -18,8 +18,8 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
     return (
       <div className="bg-card rounded-2xl p-4 animate-pulse">
         <div className="h-20 bg-muted rounded-xl" />
-      </div>
-    );
+      </div>);
+
   }
 
   // Don't show widget if no child is selected
@@ -43,9 +43,9 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
   };
 
   const expectedTeeth = getExpectedTeeth(ageMonths);
-  
+
   // Get next expected teeth
-  const getNextTeethInfo = (months: number): { name: string; timeframe: string } | null => {
+  const getNextTeethInfo = (months: number): {name: string;timeframe: string;} | null => {
     if (months < 6) return { name: tr("teethingwidget_alt_merkezi_kesiciler_63d8b0", "Alt mərkəzi kəsicilər"), timeframe: tr('teethingwidget_timeframe_6_10', '6-10 ay') };
     if (months < 8) return { name: tr("teethingwidget_yuxari_merkezi_kesiciler_456b8c", "Yuxarı mərkəzi kəsicilər"), timeframe: tr('teethingwidget_timeframe_8_12', '8-12 ay') };
     if (months < 10) return { name: tr("teethingwidget_yan_kesiciler_c75ada", "Yan kəsicilər"), timeframe: tr('teethingwidget_timeframe_9_16', '9-16 ay') };
@@ -57,7 +57,7 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
   };
 
   const nextTeeth = getNextTeethInfo(ageMonths);
-  
+
   // Determine status
   const isOnTrack = emergedCount >= expectedTeeth - 2;
   const statusColor = isOnTrack ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400';
@@ -69,8 +69,8 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
       className="w-full text-left"
       whileTap={{ scale: 0.98 }}
       initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-    >
+      animate={{ opacity: 1, y: 0 }}>
+      
       <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-primary/10 dark:from-primary/15 dark:via-primary/10 dark:to-primary/15 rounded-2xl p-4 border border-primary/20 relative overflow-hidden">
         {/* Background decoration */}
         <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-2xl" />
@@ -108,7 +108,7 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
               <div className="flex items-center gap-1.5 mb-0.5">
                 <Check className={`w-3.5 h-3.5 ${statusColor}`} />
                 <span className={`text-xs font-medium ${statusColor}`}>
-                  {isOnTrack ? tr('teethingwidget_normal_development', 'Normal inkişaf') : 'Diqqət'}
+                  {isOnTrack ? tr('teethingwidget_normal_development', 'Normal inkişaf') : tr("teethingwidget_diqqet_764567", "Diqq\u0259t")}
                 </span>
               </div>
               <p className="text-[10px] text-muted-foreground">
@@ -117,8 +117,8 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
             </div>
 
             {/* Next Teeth */}
-            {nextTeeth && (
-              <div className="flex-1 rounded-xl p-2.5 bg-muted/50">
+            {nextTeeth &&
+            <div className="flex-1 rounded-xl p-2.5 bg-muted/50">
                 <div className="flex items-center gap-1 mb-0.5">
                   <Clock className="w-3 h-3 text-muted-foreground" />
                   <p className="text-[10px] text-muted-foreground">{tr("teethingwidget_novbeti_0fff9a", "Növbəti:")}</p>
@@ -126,12 +126,12 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
                 <p className="text-xs font-medium line-clamp-1">{nextTeeth.name}</p>
                 <p className="text-[10px] text-muted-foreground">{nextTeeth.timeframe}</p>
               </div>
-            )}
+            }
           </div>
         </div>
       </div>
-    </motion.button>
-  );
+    </motion.button>);
+
 };
 
 export default TeethingWidget;

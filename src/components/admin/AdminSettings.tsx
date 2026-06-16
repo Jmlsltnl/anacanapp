@@ -11,8 +11,8 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  SelectValue } from
+'@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -24,12 +24,12 @@ interface AppSetting {
 }
 
 const aiModels = [
-  { id: 'google/gemini-2.5-flash', name: tr("adminsettings_gemini_2_5_flash_tovsiyye_olunan_be1e47", "Gemini 2.5 Flash (Tövsiyyə olunan)") },
-  { id: 'google/gemini-2.5-pro', name: 'Gemini 2.5 Pro' },
-  { id: 'google/gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' },
-  { id: 'openai/gpt-5-mini', name: 'GPT-5 Mini' },
-  { id: 'openai/gpt-5', name: 'GPT-5' },
-];
+{ id: 'google/gemini-2.5-flash', name: tr("adminsettings_gemini_2_5_flash_tovsiyye_olunan_be1e47", "Gemini 2.5 Flash (Tövsiyyə olunan)") },
+{ id: 'google/gemini-2.5-pro', name: 'Gemini 2.5 Pro' },
+{ id: 'google/gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' },
+{ id: 'openai/gpt-5-mini', name: 'GPT-5 Mini' },
+{ id: 'openai/gpt-5', name: 'GPT-5' }];
+
 
 const AdminSettings = () => {
   const [settings, setSettings] = useState<AppSetting[]>([]);
@@ -44,29 +44,29 @@ const AdminSettings = () => {
 
   const fetchSettings = async () => {
     try {
-      const { data, error } = await supabase
-        .from('app_settings')
-        .select('*')
-        .order('key');
+      const { data, error } = await supabase.
+      from('app_settings').
+      select('*').
+      order('key');
 
       if (error) throw error;
-      
+
       setSettings(data || []);
-      
+
       const settingsMap: Record<string, any> = {};
-      data?.forEach(setting => {
+      data?.forEach((setting) => {
         // Parse JSON strings to actual values
         let value = setting.value;
         if (typeof value === 'string') {
-          if (value === 'true') value = true;
-          else if (value === 'false') value = false;
-          else {
+          if (value === 'true') value = true;else
+          if (value === 'false') value = false;else
+          {
             try {
               value = JSON.parse(value);
             } catch {
+
               // Keep as string
-            }
-          }
+            }}
         }
         settingsMap[setting.key] = value;
       });
@@ -83,20 +83,20 @@ const AdminSettings = () => {
     try {
       for (const [key, value] of Object.entries(localSettings)) {
         const stringValue = typeof value === 'string' ? value : JSON.stringify(value);
-        
+
         // Check if setting exists
-        const existingSetting = settings.find(s => s.key === key);
-        
+        const existingSetting = settings.find((s) => s.key === key);
+
         if (existingSetting) {
-          const { error } = await supabase
-            .from('app_settings')
-            .update({ value: stringValue })
-            .eq('key', key);
+          const { error } = await supabase.
+          from('app_settings').
+          update({ value: stringValue }).
+          eq('key', key);
           if (error) throw error;
         } else {
-          const { error } = await supabase
-            .from('app_settings')
-            .insert({ key, value: stringValue });
+          const { error } = await supabase.
+          from('app_settings').
+          insert({ key, value: stringValue });
           if (error) throw error;
         }
       }
@@ -104,7 +104,7 @@ const AdminSettings = () => {
       await fetchSettings();
       toast({
         title: tr("adminsettings_ugurlu_7fe64c", "Uğurlu"),
-        description: 'Tənzimləmələr yadda saxlanıldı'
+        description: tr("adminsettings_tenzimlemeler_yadda_saxlanildi_90a034", "T\u0259nziml\u0259m\u0259l\u0259r yadda saxlan\u0131ld\u0131")
       });
     } catch (error) {
       console.error('Error saving settings:', error);
@@ -119,7 +119,7 @@ const AdminSettings = () => {
   };
 
   const updateSetting = (key: string, value: any) => {
-    setLocalSettings(prev => ({ ...prev, [key]: value }));
+    setLocalSettings((prev) => ({ ...prev, [key]: value }));
   };
 
   const getSettingValue = (key: string, defaultValue: any = null) => {
@@ -141,17 +141,17 @@ const AdminSettings = () => {
         </Button>
       </div>
 
-      {loading ? (
-        <Card className="p-8 text-center">
+      {loading ?
+      <Card className="p-8 text-center">
           <RefreshCw className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
-        </Card>
-      ) : (
-        <div className="grid gap-6">
+        </Card> :
+
+      <div className="grid gap-6">
           {/* Life Stage Settings */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}>
+          
             <Card className="p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 rounded-lg bg-purple-500/10">
@@ -170,14 +170,14 @@ const AdminSettings = () => {
                     <div>
                       <label className="text-sm font-medium text-foreground">{tr("adminsettings_flow_dovr_izleme_92cd60", "Flow - Dövr İzləmə")}</label>
                       <p className="text-xs text-muted-foreground">
-                        Menstruasiya izləmə rejimi
+                        {tr("adminsettings_menstruasiya_izleme_rejimi_ee4973", "Menstruasiya izl\u0259m\u0259 rejimi")}
                       </p>
                     </div>
                   </div>
                   <Switch
-                    checked={getSettingValue('flow_mode_enabled', true)}
-                    onCheckedChange={(checked) => updateSetting('flow_mode_enabled', checked)}
-                  />
+                  checked={getSettingValue('flow_mode_enabled', true)}
+                  onCheckedChange={(checked) => updateSetting('flow_mode_enabled', checked)} />
+                
                 </div>
 
                 <div className="flex items-center justify-between p-4 rounded-xl bg-bump-light/50 dark:bg-bump-light">
@@ -186,14 +186,14 @@ const AdminSettings = () => {
                     <div>
                       <label className="text-sm font-medium text-foreground">{tr("adminsettings_bump_hamilelik_de436a", "Bump - Hamiləlik")}</label>
                       <p className="text-xs text-muted-foreground">
-                        Hamiləlik izləmə rejimi
+                        {tr("adminsettings_hamilelik_izleme_rejimi_9a1d2f", "Hamil\u0259lik izl\u0259m\u0259 rejimi")}
                       </p>
                     </div>
                   </div>
                   <Switch
-                    checked={getSettingValue('bump_mode_enabled', true)}
-                    onCheckedChange={(checked) => updateSetting('bump_mode_enabled', checked)}
-                  />
+                  checked={getSettingValue('bump_mode_enabled', true)}
+                  onCheckedChange={(checked) => updateSetting('bump_mode_enabled', checked)} />
+                
                 </div>
 
                 <div className="flex items-center justify-between p-4 rounded-xl bg-mommy-light/50 dark:bg-mommy-light">
@@ -202,14 +202,14 @@ const AdminSettings = () => {
                     <div>
                       <label className="text-sm font-medium text-foreground">{tr("adminsettings_mommy_analiq_4d3d41", "Mommy - Analıq")}</label>
                       <p className="text-xs text-muted-foreground">
-                        Körpə izləmə rejimi
+                        {tr("adminsettings_korpe_izleme_rejimi_af82ab", "K\xF6rp\u0259 izl\u0259m\u0259 rejimi")}
                       </p>
                     </div>
                   </div>
                   <Switch
-                    checked={getSettingValue('mommy_mode_enabled', true)}
-                    onCheckedChange={(checked) => updateSetting('mommy_mode_enabled', checked)}
-                  />
+                  checked={getSettingValue('mommy_mode_enabled', true)}
+                  onCheckedChange={(checked) => updateSetting('mommy_mode_enabled', checked)} />
+                
                 </div>
               </div>
             </Card>
@@ -217,10 +217,10 @@ const AdminSettings = () => {
 
           {/* Mommy Hero Variant */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.04 }}
-          >
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.04 }}>
+          
             <Card className="p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 rounded-lg bg-pink-500/10">
@@ -235,9 +235,9 @@ const AdminSettings = () => {
               <div className="space-y-2">
                 <label className="text-sm font-medium mb-2 block text-foreground">Aktiv variant</label>
                 <Select
-                  value={getSettingValue('mommy_hero_variant', 'classic')}
-                  onValueChange={(value) => updateSetting('mommy_hero_variant', value)}
-                >
+                value={getSettingValue('mommy_hero_variant', 'classic')}
+                onValueChange={(value) => updateSetting('mommy_hero_variant', value)}>
+                
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -253,7 +253,7 @@ const AdminSettings = () => {
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
-                  Dəyişiklik bütün istifadəçilər üçün dərhal tətbiq olunur.
+                  {tr("adminsettings_deyisiklik_butun_istifadeciler_198453", "D\u0259yi\u015Fiklik b\xFCt\xFCn istifad\u0259\xE7il\u0259r \xFC\xE7\xFCn d\u0259rhal t\u0259tbiq olunur.")}
                 </p>
               </div>
             </Card>
@@ -261,10 +261,10 @@ const AdminSettings = () => {
 
           {/* Theme Settings */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 }}
-          >
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}>
+          
             <Card className="p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 rounded-lg bg-indigo-500/10">
@@ -285,14 +285,14 @@ const AdminSettings = () => {
                     <div>
                       <label className="text-sm font-medium text-foreground">{tr("adminsettings_qaranliq_rejim_29c427", "Qaranlıq Rejim")}</label>
                       <p className="text-xs text-muted-foreground">
-                        İstifadəçilər qaranlıq rejimi aktiv edə bilsin
+                        {tr("adminsettings_i_stifadeciler_qaranliq_rejimi_3acc5d", "\u0130stifad\u0259\xE7il\u0259r qaranl\u0131q rejimi aktiv ed\u0259 bilsin")}
                       </p>
                     </div>
                   </div>
                   <Switch
-                    checked={getSettingValue('dark_mode_enabled', true)}
-                    onCheckedChange={(checked) => updateSetting('dark_mode_enabled', checked)}
-                  />
+                  checked={getSettingValue('dark_mode_enabled', true)}
+                  onCheckedChange={(checked) => updateSetting('dark_mode_enabled', checked)} />
+                
                 </div>
               </div>
             </Card>
@@ -300,10 +300,10 @@ const AdminSettings = () => {
 
           {/* AI Settings */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}>
+          
             <Card className="p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 rounded-lg bg-primary/10">
@@ -319,22 +319,22 @@ const AdminSettings = () => {
                 <div>
                   <label className="text-sm font-medium mb-2 block text-foreground">AI Model</label>
                   <Select
-                    value={getSettingValue('ai_model', 'google/gemini-2.5-flash')}
-                    onValueChange={(value) => updateSetting('ai_model', value)}
-                  >
+                  value={getSettingValue('ai_model', 'google/gemini-2.5-flash')}
+                  onValueChange={(value) => updateSetting('ai_model', value)}>
+                  
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {aiModels.map((model) => (
-                        <SelectItem key={model.id} value={model.id}>
+                      {aiModels.map((model) =>
+                    <SelectItem key={model.id} value={model.id}>
                           {model.name}
                         </SelectItem>
-                      ))}
+                    )}
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Anacan.AI chat üçün istifadə olunan model
+                    {tr("adminsettings_anacan_ai_chat_ucun_istifade_o_ea0c30", "Anacan.AI chat \xFC\xE7\xFCn istifad\u0259 olunan model")}
                   </p>
                 </div>
               </div>
@@ -343,10 +343,10 @@ const AdminSettings = () => {
 
           {/* App Settings */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-          >
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}>
+          
             <Card className="p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 rounded-lg bg-blue-500/10">
@@ -362,33 +362,33 @@ const AdminSettings = () => {
                 <div>
                   <label className="text-sm font-medium mb-2 block text-foreground">{tr("adminsettings_tetbiq_versiyasi_9f0928", "Tətbiq Versiyası")}</label>
                   <Input
-                    value={getSettingValue('app_version', '1.0.0')}
-                    onChange={(e) => updateSetting('app_version', e.target.value)}
-                  />
+                  value={getSettingValue('app_version', '1.0.0')}
+                  onChange={(e) => updateSetting('app_version', e.target.value)} />
+                
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div>
                     <label className="text-sm font-medium text-foreground">{tr("adminsettings_temir_rejimi_f48428", "Təmir Rejimi")}</label>
                     <p className="text-xs text-muted-foreground">
-                      Aktiv olduqda istifadəçilər tətbiqə daxil ola bilməz
+                      {tr("adminsettings_aktiv_olduqda_istifadeciler_te_8e0fc6", "Aktiv olduqda istifad\u0259\xE7il\u0259r t\u0259tbiq\u0259 daxil ola bilm\u0259z")}
                     </p>
                   </div>
                   <Switch
-                    checked={getSettingValue('maintenance_mode', false)}
-                    onCheckedChange={(checked) => updateSetting('maintenance_mode', checked)}
-                  />
+                  checked={getSettingValue('maintenance_mode', false)}
+                  onCheckedChange={(checked) => updateSetting('maintenance_mode', checked)} />
+                
                 </div>
 
                 <div>
                   <label className="text-sm font-medium mb-2 block text-foreground">{tr("adminsettings_maksimum_gunluk_qeyd_92e635", "Maksimum Günlük Qeyd")}</label>
                   <Input
-                    type="number"
-                    value={getSettingValue('max_daily_logs', 30)}
-                    onChange={(e) => updateSetting('max_daily_logs', parseInt(e.target.value))}
-                  />
+                  type="number"
+                  value={getSettingValue('max_daily_logs', 30)}
+                  onChange={(e) => updateSetting('max_daily_logs', parseInt(e.target.value))} />
+                
                   <p className="text-xs text-muted-foreground mt-1">
-                    Hər istifadəçi üçün saxlanılacaq maksimum günlük qeyd sayı
+                    {tr("adminsettings_her_istifadeci_ucun_saxlanilac_bb7b78", "H\u0259r istifad\u0259\xE7i \xFC\xE7\xFCn saxlan\u0131lacaq maksimum g\xFCnl\xFCk qeyd say\u0131")}
                   </p>
                 </div>
               </div>
@@ -397,10 +397,10 @@ const AdminSettings = () => {
 
           {/* API Keys Info */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}>
+          
             <Card className="p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 rounded-lg bg-green-500/10">
@@ -434,16 +434,16 @@ const AdminSettings = () => {
                 </div>
 
                 <p className="text-xs text-muted-foreground">
-                  API açarları təhlükəsizlik səbəbindən burada göstərilmir. 
-                  Yeni API açarı əlavə etmək üçün Edge Functions istifadə edin.
-                </p>
+                  {tr("adminsettings_api_acarlari_tehlukesizlik_seb_38465b", "API a\xE7arlar\u0131 t\u0259hl\xFCk\u0259sizlik s\u0259b\u0259bind\u0259n burada g\xF6st\u0259rilmir. \n                  Yeni API a\xE7ar\u0131 \u0259lav\u0259 etm\u0259k \xFC\xE7\xFCn Edge Functions istifad\u0259 edin.")}
+                
+              </p>
               </div>
             </Card>
           </motion.div>
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 
 export default AdminSettings;

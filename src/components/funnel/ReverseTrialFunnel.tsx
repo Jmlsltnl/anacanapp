@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { tr } from "@/lib/tr";import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
 import { QUIZ_QUESTIONS, SYMPTOM_MAPPINGS, RESULTS_TEMPLATES, REVIEWS, FEATURES, PLAN_MILESTONES } from './funnelData';
@@ -28,7 +28,7 @@ export default function ReverseTrialFunnel({ onComplete }: ReverseTrialFunnelPro
   const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
 
   const stage = (lifeStage || 'bump') as LifeStage;
-  const userName = name || 'İstifadəçi';
+  const userName = name || tr("reversetrialfunnel_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i");
 
   const questions = QUIZ_QUESTIONS[stage] || [];
 
@@ -36,11 +36,11 @@ export default function ReverseTrialFunnel({ onComplete }: ReverseTrialFunnelPro
   const contextLine = useMemo(() => {
     if (stage === 'bump') {
       const pd = getPregnancyData();
-      return pd ? `${pd.currentWeek}-ci həftə, ${pd.trimester}-ci trimester` : 'Hamiləlik';
+      return pd ? `${pd.currentWeek}-ci həftə, ${pd.trimester}-ci trimester` : tr("reversetrialfunnel_hamilelik_e86feb", "Hamil\u0259lik");
     }
     if (stage === 'mommy') {
       const bd = getBabyData();
-      return bd ? `${bd.name} — ${bd.ageInMonths} aylıq` : 'Analıq';
+      return bd ? `${bd.name} — ${bd.ageInMonths} aylıq` : tr("reversetrialfunnel_analiq_9e762d", "Anal\u0131q");
     }
     return `Tsikl: ${cycleLength} gün`;
   }, [stage, getPregnancyData, getBabyData, cycleLength]);
@@ -56,7 +56,7 @@ export default function ReverseTrialFunnel({ onComplete }: ReverseTrialFunnelPro
   const relevantMappings = useMemo((): SymptomMapping[] => {
     const seen = new Set<string>();
     const result: SymptomMapping[] = [];
-    Object.values(quizAnswers).forEach(answerId => {
+    Object.values(quizAnswers).forEach((answerId) => {
       const mapping = SYMPTOM_MAPPINGS[answerId];
       if (mapping && !seen.has(mapping.toolId)) {
         seen.add(mapping.toolId);
@@ -65,14 +65,14 @@ export default function ReverseTrialFunnel({ onComplete }: ReverseTrialFunnelPro
     });
     // Ensure at least 3 items
     if (result.length < 3) {
-      const defaults = stage === 'bump'
-        ? ['interrupted', 'high', 'no']
-        : stage === 'mommy'
-        ? ['sleep', 'sometimes_hard', 'some']
-        : ['physical', 'mood', 'low'];
+      const defaults = stage === 'bump' ?
+      ['interrupted', 'high', 'no'] :
+      stage === 'mommy' ?
+      ['sleep', 'sometimes_hard', 'some'] :
+      ['physical', 'mood', 'low'];
       for (const d of defaults) {
         const m = SYMPTOM_MAPPINGS[d];
-        if (m && !result.find(r => r.toolId === m.toolId)) {
+        if (m && !result.find((r) => r.toolId === m.toolId)) {
           result.push(m);
           if (result.length >= 4) break;
         }
@@ -97,17 +97,17 @@ export default function ReverseTrialFunnel({ onComplete }: ReverseTrialFunnelPro
         return (
           <QuizStep
             questions={questions}
-            onComplete={(a) => { setQuizAnswers(a); goTo('analysis'); }}
-          />
-        );
+            onComplete={(a) => {setQuizAnswers(a);goTo('analysis');}} />);
+
+
       case 'analysis':
         return (
           <AnalysisStep
             userName={userName}
             contextLine={contextLine}
-            onComplete={() => goTo('results')}
-          />
-        );
+            onComplete={() => goTo('results')} />);
+
+
       case 'results':
         return <ResultsStep lines={resultLines} onContinue={() => goTo('howhelps')} />;
       case 'howhelps':
@@ -121,23 +121,23 @@ export default function ReverseTrialFunnel({ onComplete }: ReverseTrialFunnelPro
           <CustomPlanStep
             userName={userName}
             milestones={PLAN_MILESTONES[stage] || PLAN_MILESTONES.bump}
-            onContinue={() => goTo('paywall')}
-          />
-        );
+            onContinue={() => goTo('paywall')} />);
+
+
       case 'paywall':
         return (
           <PaywallStep
             onPurchase={() => onComplete()}
-            onClose={() => goTo('discount')}
-          />
-        );
+            onClose={() => goTo('discount')} />);
+
+
       case 'discount':
         return (
           <DiscountedPaywallStep
             onAccept={() => onComplete()}
-            onDecline={() => onComplete()}
-          />
-        );
+            onDecline={() => onComplete()} />);
+
+
       default:
         return null;
     }
@@ -149,16 +149,16 @@ export default function ReverseTrialFunnel({ onComplete }: ReverseTrialFunnelPro
       <div className="bg-background flex-shrink-0" style={{ height: 'env(safe-area-inset-top)' }} />
 
       {/* Global progress bar */}
-      {step !== 'analysis' && (
-        <div className="px-6 pt-3 pb-1 flex-shrink-0">
+      {step !== 'analysis' &&
+      <div className="px-6 pt-3 pb-1 flex-shrink-0">
           <div className="h-1 bg-muted rounded-full overflow-hidden">
             <div
-              className="h-full bg-primary rounded-full transition-all duration-500"
-              style={{ width: `${((stepIndex + 1) / totalSteps) * 100}%` }}
-            />
+            className="h-full bg-primary rounded-full transition-all duration-500"
+            style={{ width: `${(stepIndex + 1) / totalSteps * 100}%` }} />
+          
           </div>
         </div>
-      )}
+      }
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden">
@@ -170,13 +170,13 @@ export default function ReverseTrialFunnel({ onComplete }: ReverseTrialFunnelPro
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -16 }}
               transition={{ duration: 0.25 }}
-              className="min-h-full"
-            >
+              className="min-h-full">
+              
               {renderStep()}
             </motion.div>
           </AnimatePresence>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 }

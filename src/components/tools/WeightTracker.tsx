@@ -20,7 +20,7 @@ interface WeightTrackerProps {
 const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }, ref) => {
   useScrollToTop();
   useScreenAnalytics('WeightTracker', 'Tools');
-  
+
   const { entries, loading, addEntry, getStats, deleteEntry, deleteAllEntries } = useWeightEntries();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const { getPregnancyData } = useUserStore();
@@ -32,16 +32,16 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
   const pregData = getPregnancyData();
   const currentWeek = pregData?.currentWeek || 20;
   const stats = getStats();
-  
+
   const startWeight = stats?.startWeight || 60;
   const currentWeight = stats?.currentWeight || startWeight;
   const totalGain = stats?.totalGain || 0;
-  
+
   const trimester = currentWeek <= 12 ? 1 : currentWeek <= 26 ? 2 : 3;
   const { data: recommendations } = useWeightRecommendations(trimester);
-  
+
   const recommended = useMemo(() => {
-    const rec = recommendations?.find(r => r.bmi_category === 'normal');
+    const rec = recommendations?.find((r) => r.bmi_category === 'normal');
     if (rec) {
       return { min: Number(rec.min_gain_kg), max: Number(rec.max_gain_kg) };
     }
@@ -49,7 +49,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
     if (trimester === 2) return { min: 4, max: 8 };
     return { min: 8, max: 14 };
   }, [recommendations, trimester]);
-  
+
   const getStatus = () => {
     if (totalGain < recommended.min) return { status: 'low', text: 'Az', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-900/30', gradient: 'from-amber-400 to-orange-500' };
     if (totalGain > recommended.max) return { status: 'high', text: tr("weighttracker_cox_72c890", "Çox"), color: 'text-red-600 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-900/30', gradient: 'from-red-400 to-rose-500' };
@@ -61,7 +61,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
   useEffect(() => {
     const fetchAIAdvice = async () => {
       if (entries.length === 0) return;
-      
+
       setAiLoading(true);
       try {
         const { data, error } = await supabase.functions.invoke('dr-anacan-chat', {
@@ -73,7 +73,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
             isWeightAnalysis: true
           }
         });
-        
+
         if (data && !error) {
           setAiAdvice(data.message || data.content);
         }
@@ -83,7 +83,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
         setAiLoading(false);
       }
     };
-    
+
     fetchAIAdvice();
   }, [entries.length, currentWeek, totalGain]);
 
@@ -107,21 +107,21 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
             <motion.button
               onClick={onBack}
               className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}
-            >
+              whileTap={{ scale: 0.95 }}>
+              
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </motion.button>
             <div className="flex-1">
               <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <Scale className="w-5 h-5 text-emerald-500" />
-                Çəki İzləyici
+                {tr("weighttracker_ceki_i_zleyici_9dfe43", "\xC7\u0259ki \u0130zl\u0259yici")}
               </h1>
             </div>
             <motion.button
               onClick={() => setShowAddForm(true)}
               className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}
-            >
+              whileTap={{ scale: 0.95 }}>
+              
               <Plus className="w-5 h-5 text-primary-foreground" />
             </motion.button>
           </div>
@@ -135,8 +135,8 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
             className="bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl p-3 text-center border border-emerald-100 dark:border-emerald-500/20"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
+            transition={{ delay: 0.1 }}>
+            
             <Scale className="w-5 h-5 mx-auto mb-1 text-emerald-500" />
             <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{currentWeight}</p>
             <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70 font-medium">{tr("weighttracker_hazirki_kg_426054", "Hazırkı (kg)")}</p>
@@ -146,8 +146,8 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            title={tr("weighttracker_baslangic_cekiden_ferq_8a58c5", "Başlanğıc çəkidən fərq")}
-          >
+            title={tr("weighttracker_baslangic_cekiden_ferq_8a58c5", "Başlanğıc çəkidən fərq")}>
+            
             <Activity className="w-5 h-5 mx-auto mb-1 text-cyan-500" />
             <p className="text-2xl font-black text-cyan-600 dark:text-cyan-400">{totalGain >= 0 ? '+' : ''}{totalGain.toFixed(1)}</p>
             <p className="text-xs text-cyan-600/70 dark:text-cyan-400/70 font-medium">{tr("weighttracker_ferq_kg_8bd06d", "Fərq (kg)")}</p>
@@ -156,8 +156,8 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
             className="bg-violet-50 dark:bg-violet-500/10 rounded-2xl p-3 text-center border border-violet-100 dark:border-violet-500/20"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
+            transition={{ delay: 0.2 }}>
+            
             <Target className="w-5 h-5 mx-auto mb-1 text-violet-500" />
             <p className="text-2xl font-black text-violet-600 dark:text-violet-400">{recommended.min}-{recommended.max}</p>
             <p className="text-xs text-violet-600/70 dark:text-violet-400/70 font-medium">{tr("weighttracker_tovsiye_kg_6a77a1", "Tövsiyə (kg)")}</p>
@@ -167,8 +167,8 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
         <motion.div
           className="bg-card rounded-3xl p-5 shadow-lg border border-border/50 mb-4"
           initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-        >
+          animate={{ scale: 1, opacity: 1 }}>
+          
           <div className="flex items-center gap-4">
             <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${status.gradient} flex items-center justify-center shadow-lg`}>
               {status.status === 'normal' && <Minus className="w-8 h-8 text-white" />}
@@ -179,7 +179,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
               <p className="text-sm text-muted-foreground">{tr("weighttracker_ceki_statusu_d932ab", "Çəki statusu")}</p>
               <h3 className="text-2xl font-black text-foreground">{status.text}</h3>
               <p className="text-xs text-muted-foreground mt-1">
-                Başlanğıc: {startWeight} kg → İndi: {currentWeight} kg
+                {tr("weighttracker_baslangic_ef1964", "Ba\u015Flan\u011F\u0131c:")} {startWeight} kg → İndi: {currentWeight} kg
               </p>
             </div>
           </div>
@@ -192,14 +192,14 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
               <span>{recommended.max} kg</span>
             </div>
             <div className="h-3 bg-muted rounded-full overflow-hidden relative">
-              <div 
+              <div
                 className={`h-full bg-gradient-to-r ${status.gradient} rounded-full transition-all`}
-                style={{ width: `${Math.min((totalGain / recommended.max) * 100, 100)}%` }}
-              />
-              <div 
+                style={{ width: `${Math.min(totalGain / recommended.max * 100, 100)}%` }} />
+              
+              <div
                 className="absolute top-0 left-0 h-full border-r-2 border-dashed border-emerald-600"
-                style={{ left: `${(recommended.min / recommended.max) * 100}%` }}
-              />
+                style={{ left: `${recommended.min / recommended.max * 100}%` }} />
+              
             </div>
           </div>
         </motion.div>
@@ -209,8 +209,8 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
           className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-3xl p-5 mb-4 border border-emerald-200 dark:border-emerald-800"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
+          transition={{ delay: 0.2 }}>
+          
           <div className="flex items-start gap-4">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg">
               <Sparkles className="w-7 h-7 text-white" />
@@ -221,67 +221,67 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
                 {aiLoading && <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />}
               </h4>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                {aiLoading ? 'Analiz edilir...' : aiAdvice || 'Məlumat yüklənir...'}
+                {aiLoading ? 'Analiz edilir...' : aiAdvice || tr("weighttracker_melumat_yuklenir_355722", "M\u0259lumat y\xFCkl\u0259nir...")}
               </p>
             </div>
           </div>
         </motion.div>
 
         {/* Progress Chart */}
-        {entries.length > 0 && (
-          <motion.div
-            className="bg-card rounded-3xl p-5 shadow-lg border border-border/50 mb-4"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
+        {entries.length > 0 &&
+        <motion.div
+          className="bg-card rounded-3xl p-5 shadow-lg border border-border/50 mb-4"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}>
+          
             <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
               <Activity className="w-5 h-5 text-emerald-500" />
               Son 7 qeyd
             </h3>
             <div className="h-36 flex items-end gap-2">
               {entries.slice(0, 7).reverse().map((entry, index) => {
-                const maxWeight = Math.max(...entries.slice(0, 7).map(e => e.weight));
-                const minWeight = Math.min(...entries.slice(0, 7).map(e => e.weight));
-                const range = maxWeight - minWeight || 1;
-                const height = ((entry.weight - minWeight) / range * 60) + 40;
-                
-                return (
-                  <motion.div
-                    key={entry.id}
-                    className="flex-1 bg-gradient-to-t from-emerald-500 to-teal-400 rounded-xl relative group cursor-pointer"
-                    initial={{ height: 0 }}
-                    animate={{ height: `${height}%` }}
-                    transition={{ delay: 0.4 + index * 0.08 }}
-                  >
+              const maxWeight = Math.max(...entries.slice(0, 7).map((e) => e.weight));
+              const minWeight = Math.min(...entries.slice(0, 7).map((e) => e.weight));
+              const range = maxWeight - minWeight || 1;
+              const height = (entry.weight - minWeight) / range * 60 + 40;
+
+              return (
+                <motion.div
+                  key={entry.id}
+                  className="flex-1 bg-gradient-to-t from-emerald-500 to-teal-400 rounded-xl relative group cursor-pointer"
+                  initial={{ height: 0 }}
+                  animate={{ height: `${height}%` }}
+                  transition={{ delay: 0.4 + index * 0.08 }}>
+                  
                     <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-foreground text-background text-xs font-bold px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-lg">
                       {entry.weight} kg
                     </div>
-                  </motion.div>
-                );
-              })}
+                  </motion.div>);
+
+            })}
             </div>
             <div className="flex justify-between mt-3">
-              {entries.slice(0, 7).reverse().map((entry) => (
-                <span key={entry.id} className="text-[10px] text-muted-foreground text-center flex-1">
+              {entries.slice(0, 7).reverse().map((entry) =>
+            <span key={entry.id} className="text-[10px] text-muted-foreground text-center flex-1">
                   {formatDateAz(entry.entry_date)}
                 </span>
-              ))}
+            )}
             </div>
           </motion.div>
-        )}
+        }
 
         {/* History */}
-        {entries.length > 0 && (
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
-          >
+        {entries.length > 0 &&
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}>
+          
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-bold text-foreground flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-emerald-500" />
-                Tarixçə
+                {tr("weighttracker_tarixce_b09a14", "Tarix\xE7\u0259")}
               </h3>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -290,25 +290,25 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem 
-                    onClick={() => setShowResetConfirm(true)}
-                    className="text-destructive focus:text-destructive"
-                  >
+                  <DropdownMenuItem
+                  onClick={() => setShowResetConfirm(true)}
+                  className="text-destructive focus:text-destructive">
+                  
                     <RotateCcw className="w-4 h-4 mr-2" />
-                    Tarixçəni sıfırla
+                    {tr("weighttracker_tarixceni_sifirla_577dd6", "Tarix\xE7\u0259ni s\u0131f\u0131rla")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
             <div className="space-y-3 pb-24">
-              {entries.slice(0, 10).map((entry, index) => (
-                <motion.div
-                  key={entry.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.05 * index }}
-                  className="bg-card rounded-2xl p-4 shadow-sm border border-border/50 flex items-center justify-between group"
-                >
+              {entries.slice(0, 10).map((entry, index) =>
+            <motion.div
+              key={entry.id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.05 * index }}
+              className="bg-card rounded-2xl p-4 shadow-sm border border-border/50 flex items-center justify-between group">
+              
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 flex items-center justify-center">
                       <Scale className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
@@ -321,115 +321,115 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    {index > 0 && entries[index - 1] && (
-                      <div className={`px-3 py-1.5 rounded-full text-xs font-bold ${
-                        entry.weight > entries[index - 1].weight 
-                          ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                          : entry.weight < entries[index - 1].weight
-                            ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
-                            : 'bg-muted text-muted-foreground'
-                      }`}>
-                        {entry.weight > entries[index - 1].weight 
-                          ? `+${(entry.weight - entries[index - 1].weight).toFixed(1)}` 
-                          : entry.weight < entries[index - 1].weight
-                            ? (entry.weight - entries[index - 1].weight).toFixed(1)
-                            : '0'}
+                    {index > 0 && entries[index - 1] &&
+                <div className={`px-3 py-1.5 rounded-full text-xs font-bold ${
+                entry.weight > entries[index - 1].weight ?
+                'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' :
+                entry.weight < entries[index - 1].weight ?
+                'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' :
+                'bg-muted text-muted-foreground'}`
+                }>
+                        {entry.weight > entries[index - 1].weight ?
+                  `+${(entry.weight - entries[index - 1].weight).toFixed(1)}` :
+                  entry.weight < entries[index - 1].weight ?
+                  (entry.weight - entries[index - 1].weight).toFixed(1) :
+                  '0'}
                       </div>
-                    )}
+                }
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
-                      onClick={() => {
-                        if (confirm('Bu qeydi silmək istəyirsiniz?')) {
-                          deleteEntry(entry.id);
-                        }
-                      }}
-                    >
+                  variant="ghost"
+                  size="icon"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                  onClick={() => {
+                    if (confirm(tr("weighttracker_bu_qeydi_silmek_isteyirsiniz_c4a2fa", "Bu qeydi silm\u0259k ist\u0259yirsiniz?"))) {
+                      deleteEntry(entry.id);
+                    }
+                  }}>
+                  
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </motion.div>
-              ))}
+            )}
             </div>
           </motion.div>
-        )}
+        }
 
         {/* Reset Confirmation Modal */}
         <AnimatePresence>
-          {showResetConfirm && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-              onClick={() => setShowResetConfirm(false)}
-            >
+          {showResetConfirm &&
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowResetConfirm(false)}>
+            
               <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-sm bg-card rounded-3xl p-6 shadow-xl"
-              >
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm bg-card rounded-3xl p-6 shadow-xl">
+              
                 <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
                   <Trash2 className="w-8 h-8 text-red-500" />
                 </div>
                 <h2 className="text-xl font-bold text-foreground text-center mb-2">{tr("weighttracker_tarixceni_sifirla_577dd6", "Tarixçəni sıfırla")}</h2>
                 <p className="text-sm text-muted-foreground text-center mb-6">
-                  Bütün çəki qeydləri silinəcək. Bu əməliyyat geri qaytarıla bilməz.
+                  {tr("weighttracker_butun_ceki_qeydleri_silinecek__3a01e1", "B\xFCt\xFCn \xE7\u0259ki qeydl\u0259ri silin\u0259c\u0259k. Bu \u0259m\u0259liyyat geri qaytar\u0131la bilm\u0259z.")}
                 </p>
                 <div className="flex gap-3">
                   <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => setShowResetConfirm(false)}
-                  >
-                    Ləğv et
-                  </Button>
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setShowResetConfirm(false)}>
+                    {tr("weighttracker_legv_et_b5e49c", "L\u0259\u011Fv et")}
+                  
+                </Button>
                   <Button
-                    variant="destructive"
-                    className="flex-1"
-                    onClick={() => {
-                      deleteAllEntries();
-                      setShowResetConfirm(false);
-                    }}
-                  >
+                  variant="destructive"
+                  className="flex-1"
+                  onClick={() => {
+                    deleteAllEntries();
+                    setShowResetConfirm(false);
+                  }}>
+                  
                     Sil
                   </Button>
                 </div>
               </motion.div>
             </motion.div>
-          )}
+          }
         </AnimatePresence>
       </div>
 
       {/* Add Weight Modal */}
       <AnimatePresence>
-        {showAddForm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end"
-            onClick={() => setShowAddForm(false)}
-          >
+        {showAddForm &&
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end"
+          onClick={() => setShowAddForm(false)}>
+          
             <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 25 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full bg-card rounded-t-3xl overflow-hidden"
-              style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 20px)' }}
-            >
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 25 }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full bg-card rounded-t-3xl overflow-hidden"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 20px)' }}>
+            
               <div className="h-20 bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-                <motion.div 
-                  className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', delay: 0.1 }}
-                >
+                <motion.div
+                className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', delay: 0.1 }}>
+                
                   <Scale className="w-8 h-8 text-white" />
                 </motion.div>
               </div>
@@ -441,32 +441,32 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
                 <div className="mb-6">
                   <div className="relative">
                     <Input
-                      type="number"
-                      step="0.1"
-                      placeholder="65.5"
-                      value={newWeight}
-                      onChange={(e) => setNewWeight(e.target.value)}
-                      className="h-16 rounded-2xl text-center text-3xl font-black border-2 border-emerald-200 dark:border-emerald-800 focus:border-emerald-500"
-                    />
+                    type="number"
+                    step="0.1"
+                    placeholder="65.5"
+                    value={newWeight}
+                    onChange={(e) => setNewWeight(e.target.value)}
+                    className="h-16 rounded-2xl text-center text-3xl font-black border-2 border-emerald-200 dark:border-emerald-800 focus:border-emerald-500" />
+                  
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">kg</span>
                   </div>
                 </div>
 
                 <motion.button
-                  onClick={handleAddWeight}
-                  className="w-full h-14 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold shadow-lg flex items-center justify-center gap-2"
-                  whileTap={{ scale: 0.98 }}
-                >
+                onClick={handleAddWeight}
+                className="w-full h-14 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold shadow-lg flex items-center justify-center gap-2"
+                whileTap={{ scale: 0.98 }}>
+                
                   <Sparkles className="w-5 h-5" />
                   Yadda saxla
                 </motion.button>
               </div>
             </motion.div>
           </motion.div>
-        )}
+        }
       </AnimatePresence>
-    </div>
-  );
+    </div>);
+
 });
 
 WeightTracker.displayName = 'WeightTracker';

@@ -8,14 +8,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  usePhaseTipsAdmin, 
-  PhaseTip, 
-  MenstrualPhase, 
+import {
+  usePhaseTipsAdmin,
+  PhaseTip,
+  MenstrualPhase,
   TipCategory,
   PHASE_INFO,
-  CATEGORY_INFO 
-} from '@/hooks/usePhaseTips';
+  CATEGORY_INFO } from
+'@/hooks/usePhaseTips';
 
 const AdminPhaseTips = () => {
   const { tips, tipsByPhase, isLoading, createTip, updateTip, deleteTip } = usePhaseTipsAdmin();
@@ -95,24 +95,24 @@ const AdminPhaseTips = () => {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('Bu məsləhəti silmək istədiyinizə əminsiniz?')) {
+    if (confirm(tr("adminphasetips_bu_mesleheti_silmek_istediyini_c9671e", "Bu m\u0259sl\u0259h\u0259ti silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) {
       deleteTip(id);
       toast({ title: tr("adminphasetips_meslehet_silindi_0a5099", "Məsləhət silindi") });
     }
   };
 
-  const filteredTips = (tipsByPhase[activePhase] || []).filter(tip =>
-    tip.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    tip.title_az?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    tip.content.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredTips = (tipsByPhase[activePhase] || []).filter((tip) =>
+  tip.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  tip.title_az?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  tip.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -125,30 +125,30 @@ const AdminPhaseTips = () => {
         </div>
         <Button onClick={handleCreate} className="bg-primary">
           <Plus className="w-4 h-4 mr-2" />
-          Yeni Məsləhət
+          {tr("adminphasetips_yeni_meslehet_8a124f", "Yeni M\u0259sl\u0259h\u0259t")}
         </Button>
       </div>
 
       {/* Phase Tabs */}
       <div className="flex gap-2 overflow-x-auto pb-2">
-        {phases.map(phase => (
-          <button
-            key={phase}
-            onClick={() => setActivePhase(phase)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all whitespace-nowrap ${
-              activePhase === phase
-                ? 'text-white shadow-lg'
-                : 'bg-card border border-border text-muted-foreground hover:bg-muted'
-            }`}
-            style={activePhase === phase ? { backgroundColor: PHASE_INFO[phase].color } : {}}
-          >
+        {phases.map((phase) =>
+        <button
+          key={phase}
+          onClick={() => setActivePhase(phase)}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all whitespace-nowrap ${
+          activePhase === phase ?
+          'text-white shadow-lg' :
+          'bg-card border border-border text-muted-foreground hover:bg-muted'}`
+          }
+          style={activePhase === phase ? { backgroundColor: PHASE_INFO[phase].color } : {}}>
+          
             <span className="text-lg">{PHASE_INFO[phase].emoji}</span>
             <span>{PHASE_INFO[phase].labelAz}</span>
             <Badge variant="secondary" className="ml-1 text-xs">
               {tipsByPhase[phase]?.length || 0}
             </Badge>
           </button>
-        ))}
+        )}
       </div>
 
       {/* Search */}
@@ -158,27 +158,27 @@ const AdminPhaseTips = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={tr("adminphasetips_meslehet_axtar_52d3a3", "Məsləhət axtar...")}
-          className="pl-10"
-        />
+          className="pl-10" />
+        
       </div>
 
       {/* Tips Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredTips.map((tip) => (
-          <motion.div
-            key={tip.id}
-            layout
-            className={`bg-card rounded-xl border p-4 ${!tip.is_active ? 'opacity-50' : ''}`}
-            style={{ borderColor: `${PHASE_INFO[tip.phase].color}30` }}
-          >
+        {filteredTips.map((tip) =>
+        <motion.div
+          key={tip.id}
+          layout
+          className={`bg-card rounded-xl border p-4 ${!tip.is_active ? 'opacity-50' : ''}`}
+          style={{ borderColor: `${PHASE_INFO[tip.phase].color}30` }}>
+          
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
                 <span className="text-2xl">{tip.emoji}</span>
-                <Badge 
-                  variant="secondary"
-                  className="text-xs"
-                  style={{ backgroundColor: `${PHASE_INFO[tip.phase].color}20`, color: PHASE_INFO[tip.phase].color }}
-                >
+                <Badge
+                variant="secondary"
+                className="text-xs"
+                style={{ backgroundColor: `${PHASE_INFO[tip.phase].color}20`, color: PHASE_INFO[tip.phase].color }}>
+                
                   {CATEGORY_INFO[tip.category].labelAz}
                 </Badge>
               </div>
@@ -193,52 +193,52 @@ const AdminPhaseTips = () => {
             <div className="flex gap-2">
               <Button size="sm" variant="outline" onClick={() => handleEdit(tip)}>
                 <Edit className="w-3 h-3 mr-1" />
-                Redaktə
+                {tr("adminphasetips_redakte_d53ba7", "Redakt\u0259")}
               </Button>
               <Button
-                size="sm"
-                variant="ghost"
-                className="text-destructive"
-                onClick={() => handleDelete(tip.id)}
-              >
+              size="sm"
+              variant="ghost"
+              className="text-destructive"
+              onClick={() => handleDelete(tip.id)}>
+              
                 <Trash2 className="w-3 h-3" />
               </Button>
             </div>
           </motion.div>
-        ))}
+        )}
       </div>
 
-      {filteredTips.length === 0 && (
-        <div className="text-center py-12">
+      {filteredTips.length === 0 &&
+      <div className="text-center py-12">
           <div className="text-5xl mb-4">{PHASE_INFO[activePhase].emoji}</div>
           <p className="text-muted-foreground">{tr("adminphasetips_bu_faza_ucun_meslehet_yoxdur_c20833", "Bu faza üçün məsləhət yoxdur")}</p>
           <Button onClick={handleCreate} variant="outline" className="mt-4">
             <Plus className="w-4 h-4 mr-2" />
-            İlk məsləhəti əlavə et
+            {tr("adminphasetips_i_lk_mesleheti_elave_et_791422", "\u0130lk m\u0259sl\u0259h\u0259ti \u0259lav\u0259 et")}
           </Button>
         </div>
-      )}
+      }
 
       {/* Editor Modal */}
       <AnimatePresence>
-        {showEditor && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-            onClick={() => setShowEditor(false)}
-          >
+        {showEditor &&
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={() => setShowEditor(false)}>
+          
             <motion.div
-              initial={{ scale: 0.95, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 20 }}
-              className="bg-card rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-              onClick={e => e.stopPropagation()}
-            >
+            initial={{ scale: 0.95, y: 20 }}
+            animate={{ scale: 1, y: 0 }}
+            exit={{ scale: 0.95, y: 20 }}
+            className="bg-card rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}>
+            
               <div className="p-6 border-b border-border flex items-center justify-between sticky top-0 bg-card z-10">
                 <h2 className="text-xl font-bold">
-                  {editingTip ? 'Məsləhəti Redaktə Et' : 'Yeni Məsləhət'}
+                  {editingTip ? tr("adminphasetips_mesleheti_redakte_et_da458b", "M\u0259sl\u0259h\u0259ti Redakt\u0259 Et") : tr("adminphasetips_yeni_meslehet_8a124f", "Yeni M\u0259sl\u0259h\u0259t")}
                 </h2>
                 <Button variant="ghost" size="icon" onClick={() => setShowEditor(false)}>
                   <X className="w-5 h-5" />
@@ -251,40 +251,40 @@ const AdminPhaseTips = () => {
                   <div>
                     <label className="text-sm font-medium mb-2 block">Faza</label>
                     <div className="flex flex-wrap gap-2">
-                      {phases.map(phase => (
-                        <button
-                          key={phase}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, phase })}
-                          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                            formData.phase === phase
-                              ? 'text-white'
-                              : 'bg-muted text-muted-foreground'
-                          }`}
-                          style={formData.phase === phase ? { backgroundColor: PHASE_INFO[phase].color } : {}}
-                        >
+                      {phases.map((phase) =>
+                    <button
+                      key={phase}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, phase })}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                      formData.phase === phase ?
+                      'text-white' :
+                      'bg-muted text-muted-foreground'}`
+                      }
+                      style={formData.phase === phase ? { backgroundColor: PHASE_INFO[phase].color } : {}}>
+                      
                           {PHASE_INFO[phase].emoji} {PHASE_INFO[phase].labelAz.split(' ')[0]}
                         </button>
-                      ))}
+                    )}
                     </div>
                   </div>
                   <div>
                     <label className="text-sm font-medium mb-2 block">Kateqoriya</label>
                     <div className="flex flex-wrap gap-2">
-                      {categories.map(cat => (
-                        <button
-                          key={cat}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, category: cat })}
-                          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                            formData.category === cat
-                              ? 'bg-primary text-primary-foreground'
-                              : 'bg-muted text-muted-foreground'
-                          }`}
-                        >
+                      {categories.map((cat) =>
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, category: cat })}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                      formData.category === cat ?
+                      'bg-primary text-primary-foreground' :
+                      'bg-muted text-muted-foreground'}`
+                      }>
+                      
                           {CATEGORY_INFO[cat].emoji}
                         </button>
-                      ))}
+                    )}
                     </div>
                   </div>
                 </div>
@@ -294,19 +294,19 @@ const AdminPhaseTips = () => {
                   <div>
                     <label className="text-sm font-medium mb-2 block">Emoji</label>
                     <Input
-                      value={formData.emoji}
-                      onChange={(e) => setFormData({ ...formData, emoji: e.target.value })}
-                      placeholder="💡"
-                    />
+                    value={formData.emoji}
+                    onChange={(e) => setFormData({ ...formData, emoji: e.target.value })}
+                    placeholder="💡" />
+                  
                   </div>
                   <div>
                     <label className="text-sm font-medium mb-2 block">{tr("adminphasetips_sira_421c5f", "Sıra")}</label>
                     <Input
-                      type="number"
-                      value={formData.sort_order}
-                      onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
-                      min={0}
-                    />
+                    type="number"
+                    value={formData.sort_order}
+                    onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
+                    min={0} />
+                  
                   </div>
                 </div>
 
@@ -314,69 +314,69 @@ const AdminPhaseTips = () => {
                 <div>
                   <label className="text-sm font-medium mb-2 block">{tr("adminphasetips_basliq_en_4ac905", "Başlıq (EN)")}</label>
                   <Input
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="Tip title in English"
-                  />
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  placeholder="Tip title in English" />
+                
                 </div>
 
                 {/* Title AZ */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">{tr("adminphasetips_basliq_az_2bba90", "Başlıq (AZ) *")}</label>
                   <Input
-                    value={formData.title_az}
-                    onChange={(e) => setFormData({ ...formData, title_az: e.target.value })}
-                    placeholder={tr("adminphasetips_azerbaycan_dilinde_basliq_a39299", "Azərbaycan dilində başlıq")}
-                  />
+                  value={formData.title_az}
+                  onChange={(e) => setFormData({ ...formData, title_az: e.target.value })}
+                  placeholder={tr("adminphasetips_azerbaycan_dilinde_basliq_a39299", "Azərbaycan dilində başlıq")} />
+                
                 </div>
 
                 {/* Content EN */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">{tr("adminphasetips_mezmun_en_7541aa", "Məzmun (EN)")}</label>
                   <Textarea
-                    value={formData.content}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    placeholder="Tip content in English"
-                    rows={3}
-                  />
+                  value={formData.content}
+                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                  placeholder="Tip content in English"
+                  rows={3} />
+                
                 </div>
 
                 {/* Content AZ */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">{tr("adminphasetips_mezmun_az_c325f6", "Məzmun (AZ) *")}</label>
                   <Textarea
-                    value={formData.content_az}
-                    onChange={(e) => setFormData({ ...formData, content_az: e.target.value })}
-                    placeholder={tr("adminphasetips_azerbaycan_dilinde_mezmun_bd2290", "Azərbaycan dilində məzmun")}
-                    rows={3}
-                  />
+                  value={formData.content_az}
+                  onChange={(e) => setFormData({ ...formData, content_az: e.target.value })}
+                  placeholder={tr("adminphasetips_azerbaycan_dilinde_mezmun_bd2290", "Azərbaycan dilində məzmun")}
+                  rows={3} />
+                
                 </div>
 
                 {/* Active Toggle */}
                 <label className="flex items-center gap-2 cursor-pointer">
                   <Switch
-                    checked={formData.is_active}
-                    onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-                  />
+                  checked={formData.is_active}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })} />
+                
                   <span className="text-sm">Aktiv</span>
                 </label>
               </div>
 
               <div className="p-6 border-t border-border flex justify-end gap-3 sticky bottom-0 bg-card">
                 <Button variant="outline" onClick={() => setShowEditor(false)}>
-                  Ləğv et
+                  {tr("adminphasetips_legv_et_b5e49c", "L\u0259\u011Fv et")}
                 </Button>
                 <Button onClick={handleSave} className="bg-primary">
                   <Save className="w-4 h-4 mr-2" />
-                  {editingTip ? 'Yenilə' : 'Yarat'}
+                  {editingTip ? tr("adminphasetips_yenile_570ce2", "Yenil\u0259") : 'Yarat'}
                 </Button>
               </div>
             </motion.div>
           </motion.div>
-        )}
+        }
       </AnimatePresence>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AdminPhaseTips;

@@ -10,8 +10,8 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  SelectValue } from
+'@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -45,11 +45,11 @@ const AdminData = () => {
   const fetchStats = async () => {
     try {
       const [dailyRes, babyRes, msgRes, shopRes] = await Promise.all([
-        supabase.from('daily_logs').select('id', { count: 'exact', head: true }),
-        supabase.from('baby_logs').select('id', { count: 'exact', head: true }),
-        supabase.from('partner_messages').select('id', { count: 'exact', head: true }),
-        supabase.from('shopping_items').select('id', { count: 'exact', head: true })
-      ]);
+      supabase.from('daily_logs').select('id', { count: 'exact', head: true }),
+      supabase.from('baby_logs').select('id', { count: 'exact', head: true }),
+      supabase.from('partner_messages').select('id', { count: 'exact', head: true }),
+      supabase.from('shopping_items').select('id', { count: 'exact', head: true })]
+      );
 
       setStats({
         dailyLogs: dailyRes.count || 0,
@@ -66,11 +66,11 @@ const AdminData = () => {
 
   const fetchTableData = async () => {
     try {
-      const { data, error } = await supabase
-        .from(selectedTable as 'daily_logs' | 'baby_logs' | 'partner_messages' | 'shopping_items')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(50);
+      const { data, error } = await supabase.
+      from(selectedTable as 'daily_logs' | 'baby_logs' | 'partner_messages' | 'shopping_items').
+      select('*').
+      order('created_at', { ascending: false }).
+      limit(50);
 
       if (error) throw error;
       setTableData(data || []);
@@ -87,16 +87,16 @@ const AdminData = () => {
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-      const { error } = await supabase
-        .from(table as 'daily_logs' | 'baby_logs' | 'partner_messages' | 'shopping_items')
-        .delete()
-        .lt('created_at', thirtyDaysAgo.toISOString());
+      const { error } = await supabase.
+      from(table as 'daily_logs' | 'baby_logs' | 'partner_messages' | 'shopping_items').
+      delete().
+      lt('created_at', thirtyDaysAgo.toISOString());
 
       if (error) throw error;
 
       toast({
         title: tr("admindata_ugurlu_7fe64c", "Uğurlu"),
-        description: 'Köhnə məlumatlar silindi'
+        description: tr("admindata_kohne_melumatlar_silindi_14450f", "K\xF6hn\u0259 m\u0259lumatlar silindi")
       });
 
       fetchStats();
@@ -112,35 +112,35 @@ const AdminData = () => {
   };
 
   const dataCards = [
-    { 
-      label: tr("admindata_gunluk_qeydler_c69448", "Günlük Qeydlər"), 
-      value: stats.dailyLogs, 
-      icon: Calendar, 
-      color: 'bg-blue-500',
-      table: 'daily_logs'
-    },
-    { 
-      label: tr("admindata_korpe_qeydleri_53482e", "Körpə Qeydləri"), 
-      value: stats.babyLogs, 
-      icon: Baby, 
-      color: 'bg-pink-500',
-      table: 'baby_logs'
-    },
-    { 
-      label: 'Mesajlar', 
-      value: stats.messages, 
-      icon: Heart, 
-      color: 'bg-red-500',
-      table: 'partner_messages'
-    },
-    { 
-      label: tr("admindata_alis_veris_5f0748", "Alış-veriş"), 
-      value: stats.shoppingItems, 
-      icon: Database, 
-      color: 'bg-green-500',
-      table: 'shopping_items'
-    },
-  ];
+  {
+    label: tr("admindata_gunluk_qeydler_c69448", "Günlük Qeydlər"),
+    value: stats.dailyLogs,
+    icon: Calendar,
+    color: 'bg-blue-500',
+    table: 'daily_logs'
+  },
+  {
+    label: tr("admindata_korpe_qeydleri_53482e", "Körpə Qeydləri"),
+    value: stats.babyLogs,
+    icon: Baby,
+    color: 'bg-pink-500',
+    table: 'baby_logs'
+  },
+  {
+    label: 'Mesajlar',
+    value: stats.messages,
+    icon: Heart,
+    color: 'bg-red-500',
+    table: 'partner_messages'
+  },
+  {
+    label: tr("admindata_alis_veris_5f0748", "Alış-veriş"),
+    value: stats.shoppingItems,
+    icon: Database,
+    color: 'bg-green-500',
+    table: 'shopping_items'
+  }];
+
 
   const getTableColumns = () => {
     switch (selectedTable) {
@@ -164,27 +164,27 @@ const AdminData = () => {
           <h1 className="text-2xl font-bold text-foreground">{tr("admindata_melumatlar_29e562", "Məlumatlar")}</h1>
           <p className="text-muted-foreground">{tr("admindata_istifadeci_melumatlarini_idare_edin_20ce0a", "İstifadəçi məlumatlarını idarə edin")}</p>
         </div>
-        <Button variant="outline" onClick={() => { fetchStats(); fetchTableData(); }} className="gap-2">
+        <Button variant="outline" onClick={() => {fetchStats();fetchTableData();}} className="gap-2">
           <RefreshCw className="w-4 h-4" />
-          Yenilə
+          {tr("admindata_yenile_570ce2", "Yenil\u0259")}
         </Button>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {dataCards.map((card, index) => (
-          <motion.div
-            key={card.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <Card 
-              className={`p-5 cursor-pointer transition-all ${
-                selectedTable === card.table ? 'ring-2 ring-primary' : ''
-              }`}
-              onClick={() => setSelectedTable(card.table)}
-            >
+        {dataCards.map((card, index) =>
+        <motion.div
+          key={card.label}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}>
+          
+            <Card
+            className={`p-5 cursor-pointer transition-all ${
+            selectedTable === card.table ? 'ring-2 ring-primary' : ''}`
+            }
+            onClick={() => setSelectedTable(card.table)}>
+            
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">{card.label}</p>
@@ -198,7 +198,7 @@ const AdminData = () => {
               </div>
             </Card>
           </motion.div>
-        ))}
+        )}
       </div>
 
       {/* Table View */}
@@ -225,14 +225,14 @@ const AdminData = () => {
               <Download className="w-4 h-4" />
               İxrac et
             </Button>
-            <Button 
-              variant="destructive" 
-              size="sm" 
+            <Button
+              variant="destructive"
+              size="sm"
               className="gap-2"
-              onClick={() => handleClearOldData(selectedTable)}
-            >
+              onClick={() => handleClearOldData(selectedTable)}>
+              
               <Trash2 className="w-4 h-4" />
-              Köhnələri sil
+              {tr("admindata_kohneleri_sil_e985e3", "K\xF6hn\u0259l\u0259ri sil")}
             </Button>
           </div>
         </div>
@@ -241,48 +241,48 @@ const AdminData = () => {
           <table className="w-full">
             <thead className="bg-muted/50">
               <tr>
-                {getTableColumns().map((col) => (
-                  <th key={col} className="text-left p-4 font-medium text-muted-foreground">
+                {getTableColumns().map((col) =>
+                <th key={col} className="text-left p-4 font-medium text-muted-foreground">
                     {col}
                   </th>
-                ))}
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {tableData.length === 0 ? (
-                <tr>
+              {tableData.length === 0 ?
+              <tr>
                   <td colSpan={4} className="p-8 text-center text-muted-foreground">
-                    Məlumat tapılmadı
+                    {tr("admindata_melumat_tapilmadi_660de1", "M\u0259lumat tap\u0131lmad\u0131")}
                   </td>
-                </tr>
-              ) : (
-                tableData.map((row, index) => (
-                  <motion.tr
-                    key={row.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: index * 0.02 }}
-                    className="hover:bg-muted/30"
-                  >
-                    {getTableColumns().map((col) => (
-                      <td key={col} className="p-4 text-sm">
-                        {typeof row[col] === 'boolean' 
-                          ? (row[col] ? '✓' : '✗')
-                          : Array.isArray(row[col])
-                          ? row[col].join(', ')
-                          : row[col]?.toString() || '-'
-                        }
+                </tr> :
+
+              tableData.map((row, index) =>
+              <motion.tr
+                key={row.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: index * 0.02 }}
+                className="hover:bg-muted/30">
+                
+                    {getTableColumns().map((col) =>
+                <td key={col} className="p-4 text-sm">
+                        {typeof row[col] === 'boolean' ?
+                  row[col] ? '✓' : '✗' :
+                  Array.isArray(row[col]) ?
+                  row[col].join(', ') :
+                  row[col]?.toString() || '-'
+                  }
                       </td>
-                    ))}
+                )}
                   </motion.tr>
-                ))
-              )}
+              )
+              }
             </tbody>
           </table>
         </div>
       </Card>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AdminData;

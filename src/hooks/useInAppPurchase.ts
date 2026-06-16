@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { tr } from "@/lib/tr";import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import {
@@ -13,8 +13,8 @@ import {
   presentPaywall,
   presentCustomerCenter,
   RC_PRODUCTS,
-  REVENUECAT_CONFIG,
-} from '@/lib/revenuecat';
+  REVENUECAT_CONFIG } from
+'@/lib/revenuecat';
 
 export interface RCPackage {
   identifier: string;
@@ -55,7 +55,7 @@ interface UseInAppPurchaseReturn {
   purchaseLifetime: () => Promise<boolean>;
   restorePurchases: () => Promise<boolean>;
   showPaywall: () => Promise<boolean>;
-  showPaywallSafe: () => Promise<{ didPurchase: boolean; available: boolean }>;
+  showPaywallSafe: () => Promise<{didPurchase: boolean;available: boolean;}>;
   showCustomerCenter: () => Promise<void>;
   refreshEntitlements: () => Promise<void>;
 }
@@ -69,8 +69,8 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
   const [isSupported, setIsSupported] = useState(false);
   const [isPro, setIsPro] = useState(false);
   const syncWithDatabaseRef = useRef<
-    ((isPro: boolean, productId?: string, expiresAtOverride?: string | null) => Promise<void>) | null
-  >(null);
+    ((isPro: boolean, productId?: string, expiresAtOverride?: string | null) => Promise<void>) | null>(
+    null);
 
 
   // Initialize RevenueCat
@@ -108,16 +108,16 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
         if (offerings?.current?.availablePackages) {
           const pkgs: RCPackage[] = offerings.current.availablePackages.map((pkg: any) => {
             const defaultOption = pkg.product?.defaultOption;
-            const subscriptionOptions = Array.isArray(pkg.product?.subscriptionOptions)
-              ? pkg.product.subscriptionOptions.map((option: any) => ({
-                  id: option?.id || '',
-                  isBasePlan: !!option?.isBasePlan,
-                  tags: Array.isArray(option?.tags) ? option.tags : [],
-                  hasFreeTrial: !!option?.freePhase,
-                  trialPeriod: option?.freePhase?.billingPeriod || null,
-                  fullPricePeriod: option?.fullPricePhase?.billingPeriod || null,
-                }))
-              : [];
+            const subscriptionOptions = Array.isArray(pkg.product?.subscriptionOptions) ?
+            pkg.product.subscriptionOptions.map((option: any) => ({
+              id: option?.id || '',
+              isBasePlan: !!option?.isBasePlan,
+              tags: Array.isArray(option?.tags) ? option.tags : [],
+              hasFreeTrial: !!option?.freePhase,
+              trialPeriod: option?.freePhase?.billingPeriod || null,
+              fullPricePeriod: option?.fullPricePhase?.billingPeriod || null
+            })) :
+            [];
 
             return {
               identifier: pkg.identifier,
@@ -133,16 +133,16 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
                 defaultOptionHasFreeTrial: !!defaultOption?.freePhase,
                 defaultOptionTrialPeriod: defaultOption?.freePhase?.billingPeriod || null,
                 defaultOptionTags: Array.isArray(defaultOption?.tags) ? defaultOption.tags : [],
-                subscriptionOptions,
+                subscriptionOptions
               },
-              _raw: pkg,
+              _raw: pkg
             };
           });
           setPackages(pkgs);
         }
       } catch (err) {
         console.error('RevenueCat init error:', err);
-        setError('Ödəniş sistemi yüklənə bilmədi');
+        setError(tr("useinapppurchase_odenis_sistemi_yuklene_bilmedi_90af92", "\xD6d\u0259ni\u015F sistemi y\xFCkl\u0259n\u0259 bilm\u0259di"));
       } finally {
         setIsLoading(false);
       }
@@ -154,41 +154,41 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
   const syncWithDatabase = useCallback(async (isPro: boolean, productId?: string, expiresAtOverride?: string | null) => {
     if (!user) return;
     try {
-      const planType = productId?.includes('yearly') || productId?.includes('lifetime')
-        ? 'premium_plus' : 'premium';
+      const planType = productId?.includes('yearly') || productId?.includes('lifetime') ?
+      'premium_plus' : 'premium';
 
-      const expiresAt = expiresAtOverride
-        ? new Date(expiresAtOverride)
-        : (() => {
-            const fallback = new Date();
-            if (productId?.includes('lifetime')) {
-              fallback.setFullYear(fallback.getFullYear() + 100);
-            } else if (productId?.includes('yearly')) {
-              fallback.setFullYear(fallback.getFullYear() + 1);
-            } else {
-              fallback.setMonth(fallback.getMonth() + 1);
-            }
-            return fallback;
-          })();
+      const expiresAt = expiresAtOverride ?
+      new Date(expiresAtOverride) :
+      (() => {
+        const fallback = new Date();
+        if (productId?.includes('lifetime')) {
+          fallback.setFullYear(fallback.getFullYear() + 100);
+        } else if (productId?.includes('yearly')) {
+          fallback.setFullYear(fallback.getFullYear() + 1);
+        } else {
+          fallback.setMonth(fallback.getMonth() + 1);
+        }
+        return fallback;
+      })();
 
-      const { error: subError } = await supabase
-        .from('subscriptions')
-        .upsert({
-          user_id: user.id,
-          plan_type: isPro ? planType : 'free',
-          status: isPro ? 'active' : 'expired',
-          started_at: new Date().toISOString(),
-          expires_at: expiresAt.toISOString(),
-        }, { onConflict: 'user_id' });
+      const { error: subError } = await supabase.
+      from('subscriptions').
+      upsert({
+        user_id: user.id,
+        plan_type: isPro ? planType : 'free',
+        status: isPro ? 'active' : 'expired',
+        started_at: new Date().toISOString(),
+        expires_at: expiresAt.toISOString()
+      }, { onConflict: 'user_id' });
       if (subError) console.error('Subscription sync error:', subError);
 
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          is_premium: isPro,
-          premium_until: isPro ? expiresAt.toISOString() : null,
-        })
-        .eq('user_id', user.id);
+      const { error: profileError } = await supabase.
+      from('profiles').
+      update({
+        is_premium: isPro,
+        premium_until: isPro ? expiresAt.toISOString() : null
+      }).
+      eq('user_id', user.id);
       if (profileError) console.error('Profile sync error:', profileError);
 
       // Refresh in-memory profile so the UI unlocks premium immediately
@@ -218,15 +218,15 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
         setIsPro(true);
         const entitlement = result.customerInfo?.entitlements?.active?.[REVENUECAT_CONFIG.ENTITLEMENT_ID];
         await syncWithDatabase(true, pkg.product.identifier, entitlement?.expirationDate || null);
-        import('@/lib/analytics').then(m => m.analytics.logPremiumSubscribed(pkg.identifier)).catch(() => {});
+        import('@/lib/analytics').then((m) => m.analytics.logPremiumSubscribed(pkg.identifier)).catch(() => {});
         return true;
       }
 
-      setError(result.error || 'Alış tamamlana bilmədi. Yenidən cəhd edin.');
+      setError(result.error || tr("useinapppurchase_alis_tamamlana_bilmedi_yeniden_8c3980", "Al\u0131\u015F tamamlana bilm\u0259di. Yenid\u0259n c\u0259hd edin."));
       return false;
     } catch (err: any) {
       console.error('Purchase error:', err);
-      setError(`Alış zamanı xəta: ${err?.message || 'Naməlum xəta'}`);
+      setError(`Alış zamanı xəta: ${err?.message || tr("useinapppurchase_namelum_xeta_aa30e7", "Nam\u0259lum x\u0259ta")}`);
       return false;
     } finally {
       setIsPurchasing(false);
@@ -234,12 +234,12 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
   }, [syncWithDatabase]);
 
   const purchaseByIdentifier = useCallback(async (identifier: string): Promise<boolean> => {
-    const pkg = packages.find(p =>
-      p.identifier === identifier ||
-      p.product.identifier.includes(identifier)
+    const pkg = packages.find((p) =>
+    p.identifier === identifier ||
+    p.product.identifier.includes(identifier)
     );
     if (!pkg) {
-      setError('Məhsul tapılmadı');
+      setError(tr("useinapppurchase_mehsul_tapilmadi_ff5957", "M\u0259hsul tap\u0131lmad\u0131"));
       return false;
     }
     return executePurchase(pkg);
@@ -262,7 +262,7 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
       return false;
     } catch (err) {
       console.error('Restore error:', err);
-      setError('Alışlar bərpa edilə bilmədi');
+      setError(tr("useinapppurchase_alislar_berpa_edile_bilmedi_33b266", "Al\u0131\u015Flar b\u0259rpa edil\u0259 bilm\u0259di"));
       return false;
     } finally {
       setIsLoading(false);
@@ -284,7 +284,7 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
   }, [syncWithDatabase]);
 
   // Expose whether the native paywall flow is actually available
-  const showPaywallSafe = useCallback(async (): Promise<{ didPurchase: boolean; available: boolean }> => {
+  const showPaywallSafe = useCallback(async (): Promise<{didPurchase: boolean;available: boolean;}> => {
     const result = await presentPaywall();
     if (result.available && result.didPurchase) {
       setIsPro(true);
@@ -323,6 +323,6 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
     showPaywall,
     showPaywallSafe,
     showCustomerCenter,
-    refreshEntitlements,
+    refreshEntitlements
   };
 }

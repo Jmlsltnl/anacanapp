@@ -15,27 +15,27 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 // CSV Template headers
 const CSV_HEADERS = [
-  'name*', 'name_az*', 'affiliate_url*', 'category', 'platform', 'price', 'original_price', 
-  'currency', 'image_url', 'images', 'video_url', 'store_name', 'store_logo_url', 
-  'description', 'description_az', 'rating', 'review_count', 'review_summary_az',
-  'life_stages', 'is_featured', 'is_active', 'pros', 'cons', 'tags', 'specifications'
-];
+'name*', 'name_az*', 'affiliate_url*', 'category', 'platform', 'price', 'original_price',
+'currency', 'image_url', 'images', 'video_url', 'store_name', 'store_logo_url',
+'description', 'description_az', 'rating', 'review_count', 'review_summary_az',
+'life_stages', 'is_featured', 'is_active', 'pros', 'cons', 'tags', 'specifications'];
+
 
 const CSV_TEMPLATE = `name*,name_az*,affiliate_url*,category,platform,price,original_price,currency,image_url,images,video_url,store_name,store_logo_url,description,description_az,rating,review_count,review_summary_az,life_stages,is_featured,is_active,pros,cons,tags,specifications
 Baby Stroller,Uşaq arabası,https://example.com/product1,baby_gear,trendyol,199.99,249.99,AZN,https://example.com/img.jpg,"https://img1.jpg|https://img2.jpg",,Trendyol,,High quality stroller,Yüksək keyfiyyətli araba,4.5,120,Əla məhsuldur,bump|mommy,true,true,"Rahat|Möhkəm","Ağır",körpə|araba,"{""Çəki"":""8kg"",""Rəng"":""Qara""}"`;
 
 const parseCSV = (text: string) => {
-  const lines = text.split('\n').filter(line => line.trim());
+  const lines = text.split('\n').filter((line) => line.trim());
   if (lines.length < 2) return [];
-  
-  const headers = lines[0].split(',').map(h => h.trim().replace('*', ''));
+
+  const headers = lines[0].split(',').map((h) => h.trim().replace('*', ''));
   const products = [];
-  
+
   for (let i = 1; i < lines.length; i++) {
     const values: string[] = [];
     let current = '';
     let inQuotes = false;
-    
+
     for (const char of lines[i]) {
       if (char === '"') {
         inQuotes = !inQuotes;
@@ -47,7 +47,7 @@ const parseCSV = (text: string) => {
       }
     }
     values.push(current.trim());
-    
+
     const product: Record<string, any> = {};
     headers.forEach((header, index) => {
       const value = values[index] || '';
@@ -55,7 +55,7 @@ const parseCSV = (text: string) => {
     });
     products.push(product);
   }
-  
+
   return products;
 };
 
@@ -67,15 +67,15 @@ const AdminAffiliateProducts = () => {
   const [activeTab, setActiveTab] = useState('basic');
   const [importing, setImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Section enabled toggle
   const sectionEnabled = useAppSetting('affiliate_section_enabled') !== false;
   const updateSetting = useUpdateAppSetting();
-  
+
   const [formData, setFormData] = useState({
     name: '', name_az: '', description: '', description_az: '',
     category: 'general', category_az: '', price: '', original_price: '',
-    currency: 'AZN', affiliate_url: '', platform: 'other', 
+    currency: 'AZN', affiliate_url: '', platform: 'other',
     image_url: '', images: '', video_url: '',
     store_name: '', store_logo_url: '',
     rating: '', review_count: '', review_summary_az: '',
@@ -86,31 +86,31 @@ const AdminAffiliateProducts = () => {
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['admin-affiliate-products'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('affiliate_products')
-        .select('*')
-        .order('sort_order');
+      const { data, error } = await supabase.
+      from('affiliate_products').
+      select('*').
+      order('sort_order');
       if (error) throw error;
       return data;
-    },
+    }
   });
 
   const saveMutation = useMutation({
-    mutationFn: async (data: typeof formData & { id?: string }) => {
+    mutationFn: async (data: typeof formData & {id?: string;}) => {
       // Parse arrays and JSON
       const imagesArray = data.images ? data.images.split('\n').filter(Boolean) : [];
       const prosArray = data.pros ? data.pros.split('\n').filter(Boolean) : [];
       const consArray = data.cons ? data.cons.split('\n').filter(Boolean) : [];
-      const tagsArray = data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
-      
+      const tagsArray = data.tags ? data.tags.split(',').map((t) => t.trim()).filter(Boolean) : [];
+
       let specsObj = {};
       if (data.specifications) {
         try {
           specsObj = JSON.parse(data.specifications);
         } catch {
           // Try to parse as key:value lines
-          data.specifications.split('\n').forEach(line => {
-            const [key, value] = line.split(':').map(s => s.trim());
+          data.specifications.split('\n').forEach((line) => {
+            const [key, value] = line.split(':').map((s) => s.trim());
             if (key && value) (specsObj as Record<string, string>)[key] = value;
           });
         }
@@ -143,7 +143,7 @@ const AdminAffiliateProducts = () => {
         cons: consArray.length > 0 ? consArray : null,
         tags: tagsArray.length > 0 ? tagsArray : null,
         specifications: Object.keys(specsObj).length > 0 ? specsObj : {},
-        price_updated_at: new Date().toISOString(),
+        price_updated_at: new Date().toISOString()
       };
 
       if (data.id) {
@@ -161,7 +161,7 @@ const AdminAffiliateProducts = () => {
     },
     onError: (err) => {
       toast({ title: tr("adminaffiliateproducts_xeta_3cdbb6", "Xəta"), description: String(err), variant: 'destructive' });
-    },
+    }
   });
 
   const deleteMutation = useMutation({
@@ -172,14 +172,14 @@ const AdminAffiliateProducts = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-affiliate-products'] });
       toast({ title: 'Silindi' });
-    },
+    }
   });
 
   const bulkImportMutation = useMutation({
     mutationFn: async (products: Record<string, any>[]) => {
       const errors: string[] = [];
       let successCount = 0;
-      
+
       for (const product of products) {
         try {
           if (!product.name || !product.affiliate_url) {
@@ -214,7 +214,7 @@ const AdminAffiliateProducts = () => {
             cons: product.cons ? product.cons.split('|').filter(Boolean) : null,
             tags: product.tags ? product.tags.split('|').filter(Boolean) : null,
             specifications: product.specifications ? JSON.parse(product.specifications) : {},
-            price_updated_at: new Date().toISOString(),
+            price_updated_at: new Date().toISOString()
           };
 
           const { error } = await supabase.from('affiliate_products').insert(payload);
@@ -224,15 +224,15 @@ const AdminAffiliateProducts = () => {
           errors.push(`"${product.name || 'Unknown'}": ${e.message}`);
         }
       }
-      
+
       return { successCount, errors };
     },
     onSuccess: ({ successCount, errors }) => {
       queryClient.invalidateQueries({ queryKey: ['admin-affiliate-products'] });
       setImporting(false);
       if (errors.length > 0) {
-        toast({ 
-          title: `${successCount} məhsul əlavə edildi`, 
+        toast({
+          title: `${successCount} məhsul əlavə edildi`,
           description: `${errors.length} xəta: ${errors.slice(0, 3).join(', ')}${errors.length > 3 ? '...' : ''}`,
           variant: errors.length > successCount ? 'destructive' : 'default'
         });
@@ -243,25 +243,25 @@ const AdminAffiliateProducts = () => {
     onError: (err) => {
       setImporting(false);
       toast({ title: tr("adminaffiliateproducts_import_xetasi_a3a4fb", "İmport xətası"), description: String(err), variant: 'destructive' });
-    },
+    }
   });
 
   const handleCSVImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     setImporting(true);
     const reader = new FileReader();
     reader.onload = (event) => {
       const text = event.target?.result as string;
       const products = parseCSV(text);
-      
+
       if (products.length === 0) {
         setImporting(false);
         toast({ title: tr("adminaffiliateproducts_csv_bosdur_ve_ya_formati_sehvdir_ece4c1", "CSV boşdur və ya formatı səhvdir"), variant: 'destructive' });
         return;
       }
-      
+
       bulkImportMutation.mutate(products);
     };
     reader.readAsText(file);
@@ -319,18 +319,18 @@ const AdminAffiliateProducts = () => {
       pros: (product.pros || []).join('\n'),
       cons: (product.cons || []).join('\n'),
       tags: (product.tags || []).join(', '),
-      specifications: product.specifications ? JSON.stringify(product.specifications, null, 2) : '',
+      specifications: product.specifications ? JSON.stringify(product.specifications, null, 2) : ''
     });
     setEditingId(product.id);
     setShowAddForm(true);
   };
 
   const toggleLifeStage = (stage: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      life_stages: prev.life_stages.includes(stage)
-        ? prev.life_stages.filter(s => s !== stage)
-        : [...prev.life_stages, stage]
+      life_stages: prev.life_stages.includes(stage) ?
+      prev.life_stages.filter((s) => s !== stage) :
+      [...prev.life_stages, stage]
     }));
   };
 
@@ -344,10 +344,10 @@ const AdminAffiliateProducts = () => {
         <div className="flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2">
             <span className="text-sm">{tr("adminaffiliateproducts_bolme_aktiv_4321ea", "Bölmə aktiv:")}</span>
-            <Switch 
+            <Switch
               checked={sectionEnabled}
-              onCheckedChange={(checked) => updateSetting.mutate({ key: 'affiliate_section_enabled', value: checked })}
-            />
+              onCheckedChange={(checked) => updateSetting.mutate({ key: 'affiliate_section_enabled', value: checked })} />
+            
           </div>
           <div className="flex gap-2">
             <input
@@ -355,61 +355,61 @@ const AdminAffiliateProducts = () => {
               type="file"
               accept=".csv"
               onChange={handleCSVImport}
-              className="hidden"
-            />
+              className="hidden" />
+            
             <Button variant="outline" onClick={downloadCSVTemplate}>
-              <Download className="w-4 h-4 mr-2" /> CSV Şablon
+              <Download className="w-4 h-4 mr-2" /> {tr("adminaffiliateproducts_csv_sablon_dbbc38", "CSV \u015Eablon")}
             </Button>
             <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={importing}>
-              <Upload className="w-4 h-4 mr-2" /> {importing ? 'Yüklənir...' : 'CSV İmport'}
+              <Upload className="w-4 h-4 mr-2" /> {importing ? tr("adminaffiliateproducts_yuklenir_5557de", "Y\xFCkl\u0259nir...") : 'CSV İmport'}
             </Button>
             <Button
               variant="outline"
               onClick={() => {
-              const items = products || [];
+                const items = products || [];
                 exportToCSV(
                   items,
                   [
-                    { key: 'name', header: 'name' },
-                    { key: 'name_az', header: 'name_az' },
-                    { key: 'affiliate_url', header: 'affiliate_url' },
-                    { key: 'category', header: 'category' },
-                    { key: 'platform', header: 'platform' },
-                    { key: 'price', header: 'price' },
-                    { key: 'original_price', header: 'original_price' },
-                    { key: 'currency', header: 'currency' },
-                    { key: 'image_url', header: 'image_url' },
-                    { key: 'images', header: 'images' },
-                    { key: 'store_name', header: 'store_name' },
-                    { key: 'description_az', header: 'description_az' },
-                    { key: 'rating', header: 'rating' },
-                    { key: 'review_count', header: 'review_count' },
-                    { key: 'life_stages', header: 'life_stages' },
-                    { key: 'is_featured', header: 'is_featured' },
-                    { key: 'is_active', header: 'is_active' },
-                    { key: 'pros', header: 'pros' },
-                    { key: 'cons', header: 'cons' },
-                    { key: 'tags', header: 'tags' },
-                  ],
+                  { key: 'name', header: 'name' },
+                  { key: 'name_az', header: 'name_az' },
+                  { key: 'affiliate_url', header: 'affiliate_url' },
+                  { key: 'category', header: 'category' },
+                  { key: 'platform', header: 'platform' },
+                  { key: 'price', header: 'price' },
+                  { key: 'original_price', header: 'original_price' },
+                  { key: 'currency', header: 'currency' },
+                  { key: 'image_url', header: 'image_url' },
+                  { key: 'images', header: 'images' },
+                  { key: 'store_name', header: 'store_name' },
+                  { key: 'description_az', header: 'description_az' },
+                  { key: 'rating', header: 'rating' },
+                  { key: 'review_count', header: 'review_count' },
+                  { key: 'life_stages', header: 'life_stages' },
+                  { key: 'is_featured', header: 'is_featured' },
+                  { key: 'is_active', header: 'is_active' },
+                  { key: 'pros', header: 'pros' },
+                  { key: 'cons', header: 'cons' },
+                  { key: 'tags', header: 'tags' }],
+
                   'affiliate_products_export.csv'
                 );
                 toast({ title: `${items.length} məhsul ixrac edildi` });
               }}
-              disabled={products.length === 0}
-            >
+              disabled={products.length === 0}>
+              
               <FileDown className="w-4 h-4 mr-2" /> İxrac
             </Button>
             <Button onClick={() => setShowAddForm(true)} disabled={showAddForm}>
-              <Plus className="w-4 h-4 mr-2" /> Əlavə et
+              <Plus className="w-4 h-4 mr-2" /> {tr("adminaffiliateproducts_elave_et_6e1b9b", "\u018Flav\u0259 et")}
             </Button>
           </div>
         </div>
       </div>
 
-      {showAddForm && (
-        <div className="bg-card border rounded-lg p-4 space-y-4">
+      {showAddForm &&
+      <div className="bg-card border rounded-lg p-4 space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="font-semibold">{editingId ? 'Redaktə et' : 'Yeni məhsul'}</h3>
+            <h3 className="font-semibold">{editingId ? tr("adminaffiliateproducts_redakte_et_66cf3b", "Redakt\u0259 et") : tr("adminaffiliateproducts_yeni_mehsul_86f592", "Yeni m\u0259hsul")}</h3>
             <Button variant="ghost" size="icon" onClick={resetForm}><X className="w-4 h-4" /></Button>
           </div>
           
@@ -423,18 +423,18 @@ const AdminAffiliateProducts = () => {
 
             <TabsContent value="basic" className="space-y-4 mt-4">
               <div className="grid grid-cols-2 gap-4">
-                <Input placeholder="Ad (EN)" value={formData.name} onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))} />
-                <Input placeholder="Ad (AZ) *" value={formData.name_az} onChange={(e) => setFormData(p => ({ ...p, name_az: e.target.value }))} />
-                <Input placeholder="Affiliate URL *" value={formData.affiliate_url} onChange={(e) => setFormData(p => ({ ...p, affiliate_url: e.target.value }))} className="col-span-2" />
+                <Input placeholder="Ad (EN)" value={formData.name} onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))} />
+                <Input placeholder="Ad (AZ) *" value={formData.name_az} onChange={(e) => setFormData((p) => ({ ...p, name_az: e.target.value }))} />
+                <Input placeholder="Affiliate URL *" value={formData.affiliate_url} onChange={(e) => setFormData((p) => ({ ...p, affiliate_url: e.target.value }))} className="col-span-2" />
                 
-                <select value={formData.platform} onChange={(e) => setFormData(p => ({ ...p, platform: e.target.value }))} className="h-10 rounded-md border bg-background px-3">
+                <select value={formData.platform} onChange={(e) => setFormData((p) => ({ ...p, platform: e.target.value }))} className="h-10 rounded-md border bg-background px-3">
                   <option value="trendyol">Trendyol</option>
                   <option value="amazon">Amazon</option>
                   <option value="aliexpress">AliExpress</option>
                   <option value="other">{tr("adminaffiliateproducts_diger_293b3a", "Digər")}</option>
                 </select>
                 
-                <select value={formData.category} onChange={(e) => setFormData(p => ({ ...p, category: e.target.value }))} className="h-10 rounded-md border bg-background px-3">
+                <select value={formData.category} onChange={(e) => setFormData((p) => ({ ...p, category: e.target.value }))} className="h-10 rounded-md border bg-background px-3">
                   <option value="baby_gear">{tr("adminaffiliateproducts_korpe_esyalari_6e92e1", "Körpə əşyaları")}</option>
                   <option value="maternity">{tr("adminaffiliateproducts_hamilelik_geyimleri_fb1c46", "Hamiləlik geyimləri")}</option>
                   <option value="health">{tr("adminaffiliateproducts_saglamliq_09460a", "Sağlamlıq")}</option>
@@ -443,13 +443,13 @@ const AdminAffiliateProducts = () => {
                   <option value="general">{tr("adminaffiliateproducts_umumi_1b5521", "Ümumi")}</option>
                 </select>
 
-                <Input placeholder={tr("adminaffiliateproducts_magaza_adi_d4e01e", "Mağaza adı")} value={formData.store_name} onChange={(e) => setFormData(p => ({ ...p, store_name: e.target.value }))} />
-                <Input placeholder={tr("adminaffiliateproducts_magaza_logo_url_8308d4", "Mağaza logo URL")} value={formData.store_logo_url} onChange={(e) => setFormData(p => ({ ...p, store_logo_url: e.target.value }))} />
+                <Input placeholder={tr("adminaffiliateproducts_magaza_adi_d4e01e", "Mağaza adı")} value={formData.store_name} onChange={(e) => setFormData((p) => ({ ...p, store_name: e.target.value }))} />
+                <Input placeholder={tr("adminaffiliateproducts_magaza_logo_url_8308d4", "Mağaza logo URL")} value={formData.store_logo_url} onChange={(e) => setFormData((p) => ({ ...p, store_logo_url: e.target.value }))} />
                 
-                <Input type="number" placeholder={tr("adminaffiliateproducts_qiymet_54c4f3", "Qiymət")} value={formData.price} onChange={(e) => setFormData(p => ({ ...p, price: e.target.value }))} />
-                <Input type="number" placeholder={tr("adminaffiliateproducts_kohne_qiymet_endirim_7e46fd", "Köhnə qiymət (endirim)")} value={formData.original_price} onChange={(e) => setFormData(p => ({ ...p, original_price: e.target.value }))} />
+                <Input type="number" placeholder={tr("adminaffiliateproducts_qiymet_54c4f3", "Qiymət")} value={formData.price} onChange={(e) => setFormData((p) => ({ ...p, price: e.target.value }))} />
+                <Input type="number" placeholder={tr("adminaffiliateproducts_kohne_qiymet_endirim_7e46fd", "Köhnə qiymət (endirim)")} value={formData.original_price} onChange={(e) => setFormData((p) => ({ ...p, original_price: e.target.value }))} />
                 
-                <select value={formData.currency} onChange={(e) => setFormData(p => ({ ...p, currency: e.target.value }))} className="h-10 rounded-md border bg-background px-3">
+                <select value={formData.currency} onChange={(e) => setFormData((p) => ({ ...p, currency: e.target.value }))} className="h-10 rounded-md border bg-background px-3">
                   <option value="AZN">AZN</option>
                   <option value="USD">USD</option>
                   <option value="EUR">EUR</option>
@@ -458,35 +458,35 @@ const AdminAffiliateProducts = () => {
                 
                 <div className="flex items-center gap-2">
                   <span className="text-sm">Life stages:</span>
-                  {['flow', 'bump', 'mommy'].map(stage => (
-                    <Badge 
-                      key={stage}
-                      variant={formData.life_stages.includes(stage) ? 'default' : 'outline'}
-                      className="cursor-pointer"
-                      onClick={() => toggleLifeStage(stage)}
-                    >
+                  {['flow', 'bump', 'mommy'].map((stage) =>
+                <Badge
+                  key={stage}
+                  variant={formData.life_stages.includes(stage) ? 'default' : 'outline'}
+                  className="cursor-pointer"
+                  onClick={() => toggleLifeStage(stage)}>
+                  
                       {stage}
                     </Badge>
-                  ))}
+                )}
                 </div>
               </div>
               
-              <Textarea placeholder={tr("adminaffiliateproducts_tesvir_az_2c237a", "Təsvir (AZ)")} value={formData.description_az} onChange={(e) => setFormData(p => ({ ...p, description_az: e.target.value }))} rows={3} />
+              <Textarea placeholder={tr("adminaffiliateproducts_tesvir_az_2c237a", "Təsvir (AZ)")} value={formData.description_az} onChange={(e) => setFormData((p) => ({ ...p, description_az: e.target.value }))} rows={3} />
             </TabsContent>
 
             <TabsContent value="media" className="space-y-4 mt-4">
               <div className="space-y-4">
                 <div>
                   <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_esas_sekil_url_3fdd67", "Əsas şəkil URL")}</label>
-                  <Input placeholder="https://..." value={formData.image_url} onChange={(e) => setFormData(p => ({ ...p, image_url: e.target.value }))} />
+                  <Input placeholder="https://..." value={formData.image_url} onChange={(e) => setFormData((p) => ({ ...p, image_url: e.target.value }))} />
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_elave_sekiller_her_setirde_bir_url_d60242", "Əlavə şəkillər (hər sətirdə bir URL)")}</label>
-                  <Textarea placeholder="https://image1.jpg&#10;https://image2.jpg" value={formData.images} onChange={(e) => setFormData(p => ({ ...p, images: e.target.value }))} rows={4} />
+                  <Textarea placeholder="https://image1.jpg&#10;https://image2.jpg" value={formData.images} onChange={(e) => setFormData((p) => ({ ...p, images: e.target.value }))} rows={4} />
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1 block">Video URL</label>
-                  <Input placeholder="https://video.mp4" value={formData.video_url} onChange={(e) => setFormData(p => ({ ...p, video_url: e.target.value }))} />
+                  <Input placeholder="https://video.mp4" value={formData.video_url} onChange={(e) => setFormData((p) => ({ ...p, video_url: e.target.value }))} />
                 </div>
               </div>
             </TabsContent>
@@ -495,90 +495,90 @@ const AdminAffiliateProducts = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_ustunlukleri_her_setirde_bir_54cbce", "Üstünlükləri (hər sətirdə bir)")}</label>
-                  <Textarea placeholder={tr("adminaffiliateproducts_keyfiyyetli_material_10_uzunomurlu_215f76", "Keyfiyyətli material&#10;Uzunömürlü")} value={formData.pros} onChange={(e) => setFormData(p => ({ ...p, pros: e.target.value }))} rows={4} />
+                  <Textarea placeholder={tr("adminaffiliateproducts_keyfiyyetli_material_10_uzunomurlu_215f76", "Keyfiyyətli material&#10;Uzunömürlü")} value={formData.pros} onChange={(e) => setFormData((p) => ({ ...p, pros: e.target.value }))} rows={4} />
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_catismazliqlari_her_setirde_bir_1f2f46", "Çatışmazlıqları (hər sətirdə bir)")}</label>
-                  <Textarea placeholder={tr("adminaffiliateproducts_bahalidir_10_catdirilma_uzun_cekir_66741d", "Bahalıdır&#10;Çatdırılma uzun çəkir")} value={formData.cons} onChange={(e) => setFormData(p => ({ ...p, cons: e.target.value }))} rows={4} />
+                  <Textarea placeholder={tr("adminaffiliateproducts_bahalidir_10_catdirilma_uzun_cekir_66741d", "Bahalıdır&#10;Çatdırılma uzun çəkir")} value={formData.cons} onChange={(e) => setFormData((p) => ({ ...p, cons: e.target.value }))} rows={4} />
                 </div>
               </div>
               <div>
                 <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_teqler_vergulle_ayirin_cbcd30", "Teqlər (vergüllə ayırın)")}</label>
-                <Input placeholder={tr("adminaffiliateproducts_hamilelik_korpe_yeni_edb521", "hamiləlik, körpə, yeni")} value={formData.tags} onChange={(e) => setFormData(p => ({ ...p, tags: e.target.value }))} />
+                <Input placeholder={tr("adminaffiliateproducts_hamilelik_korpe_yeni_edb521", "hamiləlik, körpə, yeni")} value={formData.tags} onChange={(e) => setFormData((p) => ({ ...p, tags: e.target.value }))} />
               </div>
               <div>
                 <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_xususiyyetler_json_ve_ya_key_value_f5355a", "Xüsusiyyətlər (JSON və ya key:value)")}</label>
-                <Textarea placeholder='{"Çəki": "500g", "Rəng": "Ağ"}' value={formData.specifications} onChange={(e) => setFormData(p => ({ ...p, specifications: e.target.value }))} rows={4} />
+                <Textarea placeholder={tr("adminaffiliateproducts_ceki_500g_reng_ag_25adaf", "{\"\xC7\u0259ki\": \"500g\", \"R\u0259ng\": \"A\u011F\"}")} value={formData.specifications} onChange={(e) => setFormData((p) => ({ ...p, specifications: e.target.value }))} rows={4} />
               </div>
             </TabsContent>
 
             <TabsContent value="reviews" className="space-y-4 mt-4">
               <div className="grid grid-cols-2 gap-4">
-                <Input type="number" placeholder="Reytinq (0-5)" value={formData.rating} onChange={(e) => setFormData(p => ({ ...p, rating: e.target.value }))} step="0.1" max="5" min="0" />
-                <Input type="number" placeholder={tr("adminaffiliateproducts_rey_sayi_8a7896", "Rəy sayı")} value={formData.review_count} onChange={(e) => setFormData(p => ({ ...p, review_count: e.target.value }))} />
+                <Input type="number" placeholder="Reytinq (0-5)" value={formData.rating} onChange={(e) => setFormData((p) => ({ ...p, rating: e.target.value }))} step="0.1" max="5" min="0" />
+                <Input type="number" placeholder={tr("adminaffiliateproducts_rey_sayi_8a7896", "Rəy sayı")} value={formData.review_count} onChange={(e) => setFormData((p) => ({ ...p, review_count: e.target.value }))} />
               </div>
-              <Textarea placeholder={tr("adminaffiliateproducts_rey_xulasesi_az_3a0257", "Rəy xülasəsi (AZ)")} value={formData.review_summary_az} onChange={(e) => setFormData(p => ({ ...p, review_summary_az: e.target.value }))} rows={3} />
+              <Textarea placeholder={tr("adminaffiliateproducts_rey_xulasesi_az_3a0257", "Rəy xülasəsi (AZ)")} value={formData.review_summary_az} onChange={(e) => setFormData((p) => ({ ...p, review_summary_az: e.target.value }))} rows={3} />
             </TabsContent>
           </Tabs>
           
           <div className="flex gap-4 pt-4 border-t">
             <label className="flex items-center gap-2">
-              <Switch checked={formData.is_featured} onCheckedChange={(c) => setFormData(p => ({ ...p, is_featured: c }))} /> 
+              <Switch checked={formData.is_featured} onCheckedChange={(c) => setFormData((p) => ({ ...p, is_featured: c }))} /> 
               <Star className="w-4 h-4 text-amber-500" />
-              Tövsiyyə olunan
+              {tr("adminaffiliateproducts_tovsiyye_olunan_c3bafa", "T\xF6vsiyy\u0259 olunan")}
             </label>
             <label className="flex items-center gap-2">
-              <Switch checked={formData.is_active} onCheckedChange={(c) => setFormData(p => ({ ...p, is_active: c }))} /> 
+              <Switch checked={formData.is_active} onCheckedChange={(c) => setFormData((p) => ({ ...p, is_active: c }))} /> 
               Aktiv
             </label>
           </div>
           
-          <Button 
-            onClick={() => saveMutation.mutate({ ...formData, id: editingId || undefined })} 
-            disabled={!formData.name_az || !formData.affiliate_url || saveMutation.isPending}
-            className="w-full"
-          >
-            <Save className="w-4 h-4 mr-2" /> {saveMutation.isPending ? 'Saxlanılır...' : 'Yadda saxla'}
+          <Button
+          onClick={() => saveMutation.mutate({ ...formData, id: editingId || undefined })}
+          disabled={!formData.name_az || !formData.affiliate_url || saveMutation.isPending}
+          className="w-full">
+          
+            <Save className="w-4 h-4 mr-2" /> {saveMutation.isPending ? tr("adminaffiliateproducts_saxlanilir_ee05ad", "Saxlan\u0131l\u0131r...") : 'Yadda saxla'}
           </Button>
         </div>
-      )}
+      }
 
       <div className="space-y-2">
-        {isLoading ? (
-          <p className="text-muted-foreground">{tr("adminaffiliateproducts_yuklenir_5557de", "Yüklənir...")}</p>
-        ) : products.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
+        {isLoading ?
+        <p className="text-muted-foreground">{tr("adminaffiliateproducts_yuklenir_5557de", "Yüklənir...")}</p> :
+        products.length === 0 ?
+        <div className="text-center py-12 text-muted-foreground">
             <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
             <p>{tr("adminaffiliateproducts_hele_hec_bir_mehsul_yoxdur_1c6e41", "Hələ heç bir məhsul yoxdur")}</p>
-          </div>
-        ) : (
-          products.map((product: any) => (
-            <div key={product.id} className="flex items-center justify-between p-3 bg-card border rounded-lg hover:border-primary/30 transition-colors">
+          </div> :
+
+        products.map((product: any) =>
+        <div key={product.id} className="flex items-center justify-between p-3 bg-card border rounded-lg hover:border-primary/30 transition-colors">
               <div className="flex items-center gap-3">
-                {product.image_url ? (
-                  <img src={product.image_url} alt="" className="w-14 h-14 rounded-lg object-cover" />
-                ) : (
-                  <div className="w-14 h-14 rounded-lg bg-muted flex items-center justify-center">
+                {product.image_url ?
+            <img src={product.image_url} alt="" className="w-14 h-14 rounded-lg object-cover" /> :
+
+            <div className="w-14 h-14 rounded-lg bg-muted flex items-center justify-center">
                     <Package className="w-6 h-6 text-muted-foreground" />
                   </div>
-                )}
+            }
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{product.name_az || product.name}</span>
                     {product.is_featured && <Badge className="text-[10px] bg-amber-500/10 text-amber-600">⭐</Badge>}
                     {!product.is_active && <Badge variant="secondary" className="text-[10px]">Deaktiv</Badge>}
-                    {(product.images?.length > 0 || product.video_url) && (
-                      <div className="flex gap-1">
+                    {(product.images?.length > 0 || product.video_url) &&
+                <div className="flex gap-1">
                         {product.images?.length > 0 && <Image className="w-3 h-3 text-muted-foreground" />}
                         {product.video_url && <Video className="w-3 h-3 text-muted-foreground" />}
                       </div>
-                    )}
+                }
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {product.store_name || product.platform} • {product.price ? `${product.price} ${product.currency}` : 'Qiymət yoxdur'}
-                    {product.original_price && product.original_price > product.price && (
-                      <span className="text-red-500 ml-2">(-{Math.round((1 - product.price/product.original_price) * 100)}%)</span>
-                    )}
+                    {product.store_name || product.platform} • {product.price ? `${product.price} ${product.currency}` : tr("adminaffiliateproducts_qiymet_yoxdur_11556d", "Qiym\u0259t yoxdur")}
+                    {product.original_price && product.original_price > product.price &&
+                <span className="text-red-500 ml-2">(-{Math.round((1 - product.price / product.original_price) * 100)}%)</span>
+                }
                   </div>
                 </div>
               </div>
@@ -594,11 +594,11 @@ const AdminAffiliateProducts = () => {
                 </Button>
               </div>
             </div>
-          ))
-        )}
+        )
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AdminAffiliateProducts;

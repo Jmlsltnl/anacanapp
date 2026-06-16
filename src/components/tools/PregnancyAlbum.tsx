@@ -1,9 +1,9 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
+import {
   ArrowLeft, ImagePlus, Camera, Calendar, Trash2, RefreshCw,
-  ChevronLeft, ChevronRight, X, Edit, Save, Heart, ShoppingBag
-} from 'lucide-react';
+  ChevronLeft, ChevronRight, X, Edit, Save, Heart, ShoppingBag } from
+'lucide-react';
 import AlbumOrderScreen from '@/components/shop/AlbumOrderScreen';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -35,16 +35,16 @@ interface AlbumPhoto {
 
 // Month labels in Azerbaijani
 const monthLabels = [
-  { month: 1, weeks: '1-4', label: '1-ci ay', emoji: '🌱' },
-  { month: 2, weeks: '5-8', label: '2-ci ay', emoji: '🌿' },
-  { month: 3, weeks: '9-13', label: tr("pregnancyalbum_3_cu_ay_cd62b6", '3-cü ay'), emoji: '🌳' },
-  { month: 4, weeks: '14-17', label: tr("pregnancyalbum_4_cu_ay_e2b0d2", '4-cü ay'), emoji: '🍋' },
-  { month: 5, weeks: '18-21', label: '5-ci ay', emoji: '🥭' },
-  { month: 6, weeks: '22-26', label: tr("pregnancyalbum_6_ci_ay_c17c71", '6-cı ay'), emoji: '🥥' },
-  { month: 7, weeks: '27-30', label: '7-ci ay', emoji: '🍉' },
-  { month: 8, weeks: '31-35', label: '8-ci ay', emoji: '🎃' },
-  { month: 9, weeks: '36-40', label: '9-cu ay', emoji: '👶' },
-];
+{ month: 1, weeks: '1-4', label: '1-ci ay', emoji: '🌱' },
+{ month: 2, weeks: '5-8', label: '2-ci ay', emoji: '🌿' },
+{ month: 3, weeks: '9-13', label: tr("pregnancyalbum_3_cu_ay_cd62b6", '3-cü ay'), emoji: '🌳' },
+{ month: 4, weeks: '14-17', label: tr("pregnancyalbum_4_cu_ay_e2b0d2", '4-cü ay'), emoji: '🍋' },
+{ month: 5, weeks: '18-21', label: '5-ci ay', emoji: '🥭' },
+{ month: 6, weeks: '22-26', label: tr("pregnancyalbum_6_ci_ay_c17c71", '6-cı ay'), emoji: '🥥' },
+{ month: 7, weeks: '27-30', label: '7-ci ay', emoji: '🍉' },
+{ month: 8, weeks: '31-35', label: '8-ci ay', emoji: '🎃' },
+{ month: 9, weeks: '36-40', label: '9-cu ay', emoji: '👶' }];
+
 
 const getMonthFromWeek = (week: number): number => {
   if (week <= 4) return 1;
@@ -61,13 +61,13 @@ const getMonthFromWeek = (week: number): number => {
 const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
   useScrollToTop();
   useScreenAnalytics('PregnancyAlbum', 'Tools');
-  
+
   const { user } = useAuth();
   const { getPregnancyData } = useUserStore();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [viewingPhoto, setViewingPhoto] = useState<AlbumPhoto | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -85,23 +85,23 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
     queryKey: ['pregnancy-album-photos', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
-      const { data, error } = await supabase
-        .from('pregnancy_album_photos')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('month_number', { ascending: true });
+      const { data, error } = await supabase.
+      from('pregnancy_album_photos').
+      select('*').
+      eq('user_id', user.id).
+      order('month_number', { ascending: true });
       if (error) throw error;
       return data as AlbumPhoto[];
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id
   });
 
   const uploadPhotoMutation = useMutation({
-    mutationFn: async ({ file, replacePhoto }: { file: File; replacePhoto?: AlbumPhoto | null }) => {
-      if (!user?.id) throw new Error('İstifadəçi tapılmadı');
-      
+    mutationFn: async ({ file, replacePhoto }: {file: File;replacePhoto?: AlbumPhoto | null;}) => {
+      if (!user?.id) throw new Error(tr("pregnancyalbum_i_stifadeci_tapilmadi_4e2156", "\u0130stifad\u0259\xE7i tap\u0131lmad\u0131"));
+
       const monthToUpload = selectedMonth || currentMonth;
-      
+
       // If replacing, delete old photo first
       if (replacePhoto) {
         const oldPath = replacePhoto.photo_url.split('/pregnancy-album/')[1];
@@ -110,33 +110,33 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
         }
         await supabase.from('pregnancy_album_photos').delete().eq('id', replacePhoto.id);
       }
-      
+
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}/${monthToUpload}-${Date.now()}.${fileExt}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from('pregnancy-album')
-        .upload(fileName, file);
-      
+
+      const { error: uploadError } = await supabase.storage.
+      from('pregnancy-album').
+      upload(fileName, file);
+
       if (uploadError) throw uploadError;
-      
-      const { data: { publicUrl } } = supabase.storage
-        .from('pregnancy-album')
-        .getPublicUrl(fileName);
-      
-      const weekForMonth = monthLabels.find(m => m.month === monthToUpload);
+
+      const { data: { publicUrl } } = supabase.storage.
+      from('pregnancy-album').
+      getPublicUrl(fileName);
+
+      const weekForMonth = monthLabels.find((m) => m.month === monthToUpload);
       const weekNumber = parseInt(weekForMonth?.weeks.split('-')[0] || '1');
-      
-      const { error: dbError } = await supabase
-        .from('pregnancy_album_photos')
-        .insert({
-          user_id: user.id,
-          week_number: weekNumber,
-          month_number: monthToUpload,
-          photo_url: publicUrl,
-          caption: caption || null,
-        });
-      
+
+      const { error: dbError } = await supabase.
+      from('pregnancy_album_photos').
+      insert({
+        user_id: user.id,
+        week_number: weekNumber,
+        month_number: monthToUpload,
+        photo_url: publicUrl,
+        caption: caption || null
+      });
+
       if (dbError) throw dbError;
     },
     onSuccess: () => {
@@ -154,7 +154,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
     },
     onSettled: () => {
       setUploading(false);
-    },
+    }
   });
 
   const deletePhotoMutation = useMutation({
@@ -163,10 +163,10 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
       if (path) {
         await supabase.storage.from('pregnancy-album').remove([decodeURIComponent(path)]);
       }
-      const { error } = await supabase
-        .from('pregnancy_album_photos')
-        .delete()
-        .eq('id', photo.id);
+      const { error } = await supabase.
+      from('pregnancy_album_photos').
+      delete().
+      eq('id', photo.id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -174,43 +174,43 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
       setViewingPhoto(null);
       setShowActionSheet(null);
       toast({ title: 'Silindi', description: tr("pregnancyalbum_sekil_albomdan_silindi_0f180a", 'Şəkil albomdan silindi') });
-    },
+    }
   });
 
   const updateCaptionMutation = useMutation({
-    mutationFn: async ({ id, newCaption }: { id: string; newCaption: string }) => {
-      const { error } = await supabase
-        .from('pregnancy_album_photos')
-        .update({ caption: newCaption || null })
-        .eq('id', id);
+    mutationFn: async ({ id, newCaption }: {id: string;newCaption: string;}) => {
+      const { error } = await supabase.
+      from('pregnancy_album_photos').
+      update({ caption: newCaption || null }).
+      eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pregnancy-album-photos'] });
       setEditingCaption(false);
       toast({ title: tr("pregnancyalbum_yenilendi_d10a01", 'Yeniləndi') });
-    },
+    }
   });
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     // Reset the input so the same file can be selected again
     e.target.value = '';
-    
+
     setUploading(true);
-    
+
     // Find the photo being replaced
-    const replacePhoto = replacingPhotoId 
-      ? photos.find(p => p.id === replacingPhotoId) || null 
-      : null;
-    
+    const replacePhoto = replacingPhotoId ?
+    photos.find((p) => p.id === replacingPhotoId) || null :
+    null;
+
     uploadPhotoMutation.mutate({ file, replacePhoto });
   };
 
   const getPhotoForMonth = (month: number) => {
-    return photos.find(p => p.month_number === month);
+    return photos.find((p) => p.month_number === month);
   };
 
   // Handle replace: set state then open file picker (in same user gesture)
@@ -228,7 +228,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
   // Handle delete with confirmation
   const handleDelete = (photo: AlbumPhoto) => {
     setShowActionSheet(null);
-    if (confirm('Bu şəkli silmək istədiyinizə əminsiniz?')) {
+    if (confirm(tr("pregnancyalbum_bu_sekli_silmek_istediyinize_e_b4ecbc", "Bu \u015F\u0259kli silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) {
       deletePhotoMutation.mutate(photo);
     }
   };
@@ -244,8 +244,8 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
         type="file"
         accept="image/*"
         onChange={handleFileSelect}
-        className="hidden"
-      />
+        className="hidden" />
+      
 
       {/* Header */}
       <div className="sticky top-0 z-20 bg-card border-b border-border/50 px-4 py-3">
@@ -265,13 +265,13 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl p-4 border border-purple-500/20"
-        >
+          className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl p-4 border border-purple-500/20">
+          
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-muted-foreground">{tr("pregnancyalbum_hal_hazirda_b78349", "Hal-hazırda")}</p>
               <p className="text-xl font-bold">{currentMonth}-ci ay</p>
-              <p className="text-xs text-muted-foreground">{currentWeek}. həftə</p>
+              <p className="text-xs text-muted-foreground">{currentWeek}{tr("pregnancyalbum_hefte_459cfe", ". h\u0259ft\u0259")}</p>
             </div>
             <div className="text-4xl">{monthLabels[currentMonth - 1]?.emoji}</div>
           </div>
@@ -280,10 +280,10 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
               <motion.div
                 className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
                 initial={{ width: 0 }}
-                animate={{ width: `${(currentMonth / 9) * 100}%` }}
-              />
+                animate={{ width: `${currentMonth / 9 * 100}%` }} />
+              
             </div>
-            <span className="text-xs font-medium">{Math.round((currentMonth / 9) * 100)}%</span>
+            <span className="text-xs font-medium">{Math.round(currentMonth / 9 * 100)}%</span>
           </div>
         </motion.div>
       </div>
@@ -298,7 +298,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
             const isPast = month.month < currentMonth;
             const isCurrent = month.month === currentMonth;
             const isFuture = month.month > currentMonth;
-            
+
             return (
               <motion.button
                 key={month.month}
@@ -316,55 +316,55 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                 }}
                 disabled={isFuture && !photo}
                 className={`aspect-square rounded-2xl overflow-hidden relative ${
-                  isFuture && !photo ? 'opacity-40' : ''
-                }`}
-              >
-                {photo ? (
-                  <>
-                    <img 
-                      src={photo.photo_url} 
-                      alt={month.label}
-                      className="w-full h-full object-cover"
-                    />
+                isFuture && !photo ? 'opacity-40' : ''}`
+                }>
+                
+                {photo ?
+                <>
+                    <img
+                    src={photo.photo_url}
+                    alt={month.label}
+                    className="w-full h-full object-cover" />
+                  
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute bottom-2 left-2 right-2">
                       <Badge className="text-[10px] bg-white/20 text-white border-0">
                         {month.label}
                       </Badge>
                     </div>
-                  </>
-                ) : (
-                  <div className={`w-full h-full flex flex-col items-center justify-center ${
-                    isCurrent 
-                      ? 'bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/30 border-dashed' 
-                      : 'bg-muted/50 border-2 border-border/50 border-dashed'
-                  }`}>
+                  </> :
+
+                <div className={`w-full h-full flex flex-col items-center justify-center ${
+                isCurrent ?
+                'bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/30 border-dashed' :
+                'bg-muted/50 border-2 border-border/50 border-dashed'}`
+                }>
                     <span className="text-2xl mb-1">{month.emoji}</span>
-                    {isCurrent ? (
-                      <>
+                    {isCurrent ?
+                  <>
                         <ImagePlus className="w-5 h-5 text-primary mb-1" />
                         <span className="text-[10px] text-primary font-medium">{tr("pregnancyalbum_elave_et_6e1b9b", "Əlavə et")}</span>
-                      </>
-                    ) : isPast ? (
-                      <>
+                      </> :
+                  isPast ?
+                  <>
                         <ImagePlus className="w-4 h-4 text-muted-foreground mb-1" />
                         <span className="text-[10px] text-muted-foreground">{month.label}</span>
-                      </>
-                    ) : (
-                      <span className="text-[10px] text-muted-foreground">{month.label}</span>
-                    )}
+                      </> :
+
+                  <span className="text-[10px] text-muted-foreground">{month.label}</span>
+                  }
                   </div>
-                )}
+                }
                 
-                {isCurrent && !photo && (
-                  <motion.div
-                    className="absolute inset-0 border-2 border-primary rounded-2xl"
-                    animate={{ opacity: [0.5, 1, 0.5] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  />
-                )}
-              </motion.button>
-            );
+                {isCurrent && !photo &&
+                <motion.div
+                  className="absolute inset-0 border-2 border-primary rounded-2xl"
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 2, repeat: Infinity }} />
+
+                }
+              </motion.button>);
+
           })}
         </div>
       </div>
@@ -379,8 +379,8 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
             <div>
               <h3 className="font-semibold text-sm mb-1">{tr("pregnancyalbum_meslehet_9a0892", "Məsləhət")}</h3>
               <p className="text-xs text-muted-foreground">
-                Hər ay eyni bucaqdan və eyni paltarla şəkil çəkmək daha gözəl albom yaradır. 
-                Beləcə hamiləlik boyunca dəyişiklikləri açıq şəkildə görə bilərsiniz.
+                {tr("pregnancyalbum_her_ay_eyni_bucaqdan_ve_eyni_p_4d07a0", "H\u0259r ay eyni bucaqdan v\u0259 eyni paltarla \u015F\u0259kil \xE7\u0259km\u0259k daha g\xF6z\u0259l albom yarad\u0131r. \n                Bel\u0259c\u0259 hamil\u0259lik boyunca d\u0259yi\u015Fiklikl\u0259ri a\xE7\u0131q \u015F\u0259kild\u0259 g\xF6r\u0259 bil\u0259rsiniz.")}
+              
               </p>
             </div>
           </div>
@@ -388,24 +388,24 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
       </div>
 
       {/* Fiziki Albom CTA */}
-      {currentMonth >= 6 ? (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mx-4 mt-4 mb-4 rounded-2xl bg-gradient-to-br from-primary/15 via-primary/10 to-amber-400/15 border border-primary/30 p-4 shadow-sm"
-        >
+      {currentMonth >= 6 ?
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mx-4 mt-4 mb-4 rounded-2xl bg-gradient-to-br from-primary/15 via-primary/10 to-amber-400/15 border border-primary/30 p-4 shadow-sm">
+        
           <div className="flex items-start gap-3">
             <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-amber-500 flex items-center justify-center flex-shrink-0 shadow-lg">
               <Heart className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-bold text-foreground mb-0.5">Hamiləlik xatirələrini əlinizdə tutun</h3>
+              <h3 className="text-sm font-bold text-foreground mb-0.5">{tr("pregnancyalbum_hamilelik_xatirelerini_elinizd_76d584", "Hamil\u0259lik xatir\u0259l\u0259rini \u0259linizd\u0259 tutun")}</h3>
               <p className="text-[12px] text-muted-foreground leading-snug mb-3">
-                9 ayın hər anını fiziki albom kimi sifariş edin. Premium kağız, hər ay üçün ayrıca səhifə, ömürlük xatirə.
+                {tr("pregnancyalbum_9_ayin_her_anini_fiziki_albom__729db3", "9 ay\u0131n h\u0259r an\u0131n\u0131 fiziki albom kimi sifari\u015F edin. Premium ka\u011F\u0131z, h\u0259r ay \xFC\xE7\xFCn ayr\u0131ca s\u0259hif\u0259, \xF6m\xFCrl\xFCk xatir\u0259.")}
               </p>
               <div className="grid grid-cols-3 gap-2 mb-3">
                 <div className="rounded-xl bg-background/60 border border-border/40 p-2 text-center">
-                  <p className="text-[10px] text-muted-foreground">Səhifə</p>
+                  <p className="text-[10px] text-muted-foreground">{tr("pregnancyalbum_sehife_fd1fa9", "S\u0259hif\u0259")}</p>
                   <p className="text-[13px] font-bold text-foreground">9+</p>
                 </div>
                 <div className="rounded-xl bg-background/60 border border-border/40 p-2 text-center">
@@ -413,26 +413,26 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                   <p className="text-[13px] font-bold text-foreground">A4</p>
                 </div>
                 <div className="rounded-xl bg-background/60 border border-border/40 p-2 text-center">
-                  <p className="text-[10px] text-muted-foreground">Çatdırılma</p>
-                  <p className="text-[13px] font-bold text-foreground">3-5 gün</p>
+                  <p className="text-[10px] text-muted-foreground">{tr("pregnancyalbum_catdirilma_e955cf", "\xC7atd\u0131r\u0131lma")}</p>
+                  <p className="text-[13px] font-bold text-foreground">{tr("pregnancyalbum_3_5_gun_5d513c", "3-5 g\xFCn")}</p>
                 </div>
               </div>
               <Button
-                onClick={() => setShowOrder(true)}
-                className="w-full h-10 rounded-xl gradient-primary text-primary-foreground text-[13px] font-bold gap-1.5"
-              >
+              onClick={() => setShowOrder(true)}
+              className="w-full h-10 rounded-xl gradient-primary text-primary-foreground text-[13px] font-bold gap-1.5">
+              
                 <ShoppingBag className="w-4 h-4" />
-                Fiziki Albom Sifariş Et
+                {tr("pregnancyalbum_fiziki_albom_sifaris_et_26f86e", "Fiziki Albom Sifari\u015F Et")}
               </Button>
             </div>
           </div>
-        </motion.div>
-      ) : (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mx-4 mt-4 mb-4 rounded-2xl bg-card border border-border/50 p-4"
-        >
+        </motion.div> :
+
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mx-4 mt-4 mb-4 rounded-2xl bg-card border border-border/50 p-4">
+        
           <div className="flex items-start gap-3">
             <div className="w-11 h-11 rounded-2xl bg-muted flex items-center justify-center flex-shrink-0">
               <ShoppingBag className="w-5 h-5 text-muted-foreground" />
@@ -440,48 +440,48 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
             <div className="flex-1 min-w-0">
               <h3 className="text-sm font-bold text-foreground mb-0.5">Fiziki Albom</h3>
               <p className="text-[12px] text-muted-foreground leading-snug mb-2">
-                6-cı ayı tamamladıqdan sonra hamiləlik albomunuzu fiziki kitab kimi sifariş edə bilərsiniz.
+                {tr("pregnancyalbum_6_ci_ayi_tamamladiqdan_sonra_h_8a778c", "6-c\u0131 ay\u0131 tamamlad\u0131qdan sonra hamil\u0259lik albomunuzu fiziki kitab kimi sifari\u015F ed\u0259 bil\u0259rsiniz.")}
               </p>
               <div className="flex items-center gap-2">
                 <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-primary/60 rounded-full"
-                    style={{ width: `${Math.min(100, (currentMonth / 6) * 100)}%` }}
-                  />
+                  className="h-full bg-primary/60 rounded-full"
+                  style={{ width: `${Math.min(100, currentMonth / 6 * 100)}%` }} />
+                
                 </div>
                 <span className="text-[11px] font-semibold text-muted-foreground">{currentMonth}/6 ay</span>
               </div>
             </div>
           </div>
         </motion.div>
-      )}
+      }
 
 
       {/* Action Sheet - appears when tapping a photo */}
       <AnimatePresence>
-        {showActionSheet && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 flex items-end justify-center"
-            onClick={() => setShowActionSheet(null)}
-          >
+        {showActionSheet &&
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 bg-black/60 flex items-end justify-center"
+          onClick={() => setShowActionSheet(null)}>
+          
             <motion.div
-              initial={{ y: 300 }}
-              animate={{ y: 0 }}
-              exit={{ y: 300 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="w-full max-w-md bg-card rounded-t-2xl overflow-hidden"
-              onClick={(e) => e.stopPropagation()}
-            >
+            initial={{ y: 300 }}
+            animate={{ y: 0 }}
+            exit={{ y: 300 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="w-full max-w-md bg-card rounded-t-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}>
+            
               {/* Photo preview */}
               <div className="p-4 flex items-center gap-3 border-b border-border/50">
-                <img 
-                  src={showActionSheet.photo_url} 
-                  alt="Preview" 
-                  className="w-16 h-16 rounded-xl object-cover"
-                />
+                <img
+                src={showActionSheet.photo_url}
+                alt="Preview"
+                className="w-16 h-16 rounded-xl object-cover" />
+              
                 <div>
                   <p className="font-semibold text-sm">
                     {monthLabels[showActionSheet.month_number - 1]?.label}
@@ -489,40 +489,40 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                   <p className="text-xs text-muted-foreground">
                     {format(new Date(showActionSheet.photo_date), 'd MMMM yyyy', { locale: az })}
                   </p>
-                  {showActionSheet.caption && (
-                    <p className="text-xs text-muted-foreground mt-0.5">{showActionSheet.caption}</p>
-                  )}
+                  {showActionSheet.caption &&
+                <p className="text-xs text-muted-foreground mt-0.5">{showActionSheet.caption}</p>
+                }
                 </div>
               </div>
 
               {/* Action Buttons */}
               <div className="p-4 grid grid-cols-3 gap-2">
                 <Button
-                  variant="outline"
-                  className="flex flex-col items-center gap-1.5 h-auto py-3 rounded-xl"
-                  onClick={() => {
-                    setViewingPhoto(showActionSheet);
-                    setShowActionSheet(null);
-                  }}
-                >
+                variant="outline"
+                className="flex flex-col items-center gap-1.5 h-auto py-3 rounded-xl"
+                onClick={() => {
+                  setViewingPhoto(showActionSheet);
+                  setShowActionSheet(null);
+                }}>
+                
                   <Camera className="w-5 h-5 text-primary" />
                   <span className="text-xs font-medium">Bax</span>
                 </Button>
                 
                 <Button
-                  variant="outline"
-                  className="flex flex-col items-center gap-1.5 h-auto py-3 rounded-xl"
-                  onClick={() => handleReplace(showActionSheet)}
-                >
+                variant="outline"
+                className="flex flex-col items-center gap-1.5 h-auto py-3 rounded-xl"
+                onClick={() => handleReplace(showActionSheet)}>
+                
                   <RefreshCw className="w-5 h-5 text-blue-500" />
                   <span className="text-xs font-medium">{tr("pregnancyalbum_deyisdir_aca175", "Dəyişdir")}</span>
                 </Button>
                 
                 <Button
-                  variant="outline"
-                  className="flex flex-col items-center gap-1.5 h-auto py-3 rounded-xl border-destructive/30"
-                  onClick={() => handleDelete(showActionSheet)}
-                >
+                variant="outline"
+                className="flex flex-col items-center gap-1.5 h-auto py-3 rounded-xl border-destructive/30"
+                onClick={() => handleDelete(showActionSheet)}>
+                
                   <Trash2 className="w-5 h-5 text-destructive" />
                   <span className="text-xs font-medium text-destructive">Sil</span>
                 </Button>
@@ -531,39 +531,39 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
               {/* Cancel */}
               <div className="px-4 pb-4">
                 <Button
-                  variant="ghost"
-                  className="w-full rounded-xl bg-muted"
-                  onClick={() => setShowActionSheet(null)}
-                >
-                  Ləğv et
-                </Button>
+                variant="ghost"
+                className="w-full rounded-xl bg-muted"
+                onClick={() => setShowActionSheet(null)}>
+                  {tr("pregnancyalbum_legv_et_b5e49c", "L\u0259\u011Fv et")}
+                
+              </Button>
               </div>
               
               <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
             </motion.div>
           </motion.div>
-        )}
+        }
       </AnimatePresence>
 
       {/* Photo Viewer Modal */}
       <AnimatePresence>
-        {viewingPhoto && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black flex flex-col"
-          >
+        {viewingPhoto &&
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 bg-black flex flex-col">
+          
             <div className="flex items-center justify-between px-4 pb-3">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => {
-                  setViewingPhoto(null);
-                  setEditingCaption(false);
-                }} 
-                className="text-white hover:bg-white/20"
-              >
+              <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                setViewingPhoto(null);
+                setEditingCaption(false);
+              }}
+              className="text-white hover:bg-white/20">
+              
                 <X className="w-6 h-6" />
               </Button>
               <div className="text-center text-white">
@@ -573,85 +573,85 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                 </p>
               </div>
               <div className="flex gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="text-white hover:bg-white/20"
-                  onClick={() => handleReplace(viewingPhoto)}
-                >
+                <Button
+                variant="ghost"
+                size="icon"
+                className="text-white hover:bg-white/20"
+                onClick={() => handleReplace(viewingPhoto)}>
+                
                   <RefreshCw className="w-5 h-5" />
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="text-white hover:bg-red-500/20 hover:text-red-400"
-                  onClick={() => handleDelete(viewingPhoto)}
-                >
+                <Button
+                variant="ghost"
+                size="icon"
+                className="text-white hover:bg-red-500/20 hover:text-red-400"
+                onClick={() => handleDelete(viewingPhoto)}>
+                
                   <Trash2 className="w-5 h-5" />
                 </Button>
               </div>
             </div>
 
             <div className="flex-1 flex items-center justify-center p-4">
-              <img 
-                src={viewingPhoto.photo_url} 
-                alt="Pregnancy photo"
-                className="max-w-full max-h-full object-contain rounded-lg"
-              />
+              <img
+              src={viewingPhoto.photo_url}
+              alt="Pregnancy photo"
+              className="max-w-full max-h-full object-contain rounded-lg" />
+            
             </div>
 
             <div className="p-4">
-              {editingCaption ? (
-                <div className="flex gap-2">
+              {editingCaption ?
+            <div className="flex gap-2">
                   <input
-                    type="text"
-                    value={caption}
-                    onChange={(e) => setCaption(e.target.value)}
-                    placeholder={tr("pregnancyalbum_basliq_elave_edin_082901", "Başlıq əlavə edin...")}
-                    className="flex-1 h-10 px-3 rounded-lg bg-white/10 text-white placeholder:text-white/50 outline-none"
-                    autoFocus
-                  />
-                  <Button 
-                    size="icon"
-                    onClick={() => updateCaptionMutation.mutate({ id: viewingPhoto.id, newCaption: caption })}
-                  >
+                type="text"
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+                placeholder={tr("pregnancyalbum_basliq_elave_edin_082901", "Başlıq əlavə edin...")}
+                className="flex-1 h-10 px-3 rounded-lg bg-white/10 text-white placeholder:text-white/50 outline-none"
+                autoFocus />
+              
+                  <Button
+                size="icon"
+                onClick={() => updateCaptionMutation.mutate({ id: viewingPhoto.id, newCaption: caption })}>
+                
                     <Save className="w-4 h-4" />
                   </Button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => {
-                    setCaption(viewingPhoto.caption || '');
-                    setEditingCaption(true);
-                  }}
-                  className="flex items-center gap-2 text-white/70 hover:text-white"
-                >
-                  {viewingPhoto.caption ? (
-                    <p className="text-sm">{viewingPhoto.caption}</p>
-                  ) : (
-                    <>
+                </div> :
+
+            <button
+              onClick={() => {
+                setCaption(viewingPhoto.caption || '');
+                setEditingCaption(true);
+              }}
+              className="flex items-center gap-2 text-white/70 hover:text-white">
+              
+                  {viewingPhoto.caption ?
+              <p className="text-sm">{viewingPhoto.caption}</p> :
+
+              <>
                       <Edit className="w-4 h-4" />
                       <span className="text-sm">{tr("pregnancyalbum_basliq_elave_et_ac912f", "Başlıq əlavə et")}</span>
                     </>
-                  )}
+              }
                 </button>
-              )}
+            }
             </div>
           </motion.div>
-        )}
+        }
       </AnimatePresence>
 
       {/* Uploading Overlay */}
-      {uploading && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+      {uploading &&
+      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
           <div className="bg-card rounded-2xl p-6 text-center">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
             <p className="font-medium">{tr("pregnancyalbum_sekil_yuklenir_babf92", "Şəkil yüklənir...")}</p>
           </div>
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 
 export default PregnancyAlbum;

@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { tr } from "@/lib/tr";import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
 
 /**
@@ -7,7 +7,7 @@ import { az } from 'date-fns/locale';
 export const formatDateAz = (date: Date | string, includeYear = false): string => {
   const d = typeof date === 'string' ? new Date(date) : date;
   if (isNaN(d.getTime())) return '';
-  
+
   const formatStr = includeYear ? 'd MMMM yyyy' : 'd MMMM';
   return format(d, formatStr, { locale: az });
 };
@@ -18,7 +18,7 @@ export const formatDateAz = (date: Date | string, includeYear = false): string =
 export const formatDateTimeAz = (date: Date | string, includeYear = false): string => {
   const d = typeof date === 'string' ? new Date(date) : date;
   if (isNaN(d.getTime())) return '';
-  
+
   const formatStr = includeYear ? 'd MMMM yyyy, HH:mm' : 'd MMMM, HH:mm';
   return format(d, formatStr, { locale: az });
 };
@@ -29,7 +29,7 @@ export const formatDateTimeAz = (date: Date | string, includeYear = false): stri
 export const formatTimeAz = (date: Date | string): string => {
   const d = typeof date === 'string' ? new Date(date) : date;
   if (isNaN(d.getTime())) return '';
-  
+
   return format(d, 'HH:mm', { locale: az });
 };
 
@@ -39,18 +39,18 @@ export const formatTimeAz = (date: Date | string): string => {
 export const formatRelativeDateAz = (date: Date | string): string => {
   const d = typeof date === 'string' ? new Date(date) : date;
   if (isNaN(d.getTime())) return '';
-  
+
   const today = new Date();
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
-  
+
   if (d.toDateString() === today.toDateString()) {
     return `Bu gün, ${formatTimeAz(d)}`;
   }
   if (d.toDateString() === yesterday.toDateString()) {
     return `Dünən, ${formatTimeAz(d)}`;
   }
-  
+
   return formatDateTimeAz(d);
 };
 
@@ -59,56 +59,56 @@ export const formatRelativeDateAz = (date: Date | string): string => {
  */
 export const symptomTranslations: Record<string, string> = {
   // Common symptoms
-  'headache': 'Başağrısı',
-  'Headache': 'Başağrısı',
-  'tired': 'Yorğunluq',
-  'Tired': 'Yorğunluq',
-  'fatigue': 'Yorğunluq',
-  'Fatigue': 'Yorğunluq',
-  'nausea': 'Ürəkbulanma',
-  'Nausea': 'Ürəkbulanma',
-  'cramps': 'Sancı',
-  'Cramps': 'Sancı',
-  'bloating': 'Şişkinlik',
-  'Bloating': 'Şişkinlik',
-  'back_pain': 'Bel ağrısı',
-  'backpain': 'Bel ağrısı',
-  'Back Pain': 'Bel ağrısı',
-  'mood_swings': 'Əhval dəyişikliyi',
-  'Mood Swings': 'Əhval dəyişikliyi',
+  'headache': tr("dateutils_basagrisi_9e17a3", "Ba\u015Fa\u011Fr\u0131s\u0131"),
+  'Headache': tr("dateutils_basagrisi_9e17a3", "Ba\u015Fa\u011Fr\u0131s\u0131"),
+  'tired': tr("dateutils_yorgunluq_c68d62", "Yor\u011Funluq"),
+  'Tired': tr("dateutils_yorgunluq_c68d62", "Yor\u011Funluq"),
+  'fatigue': tr("dateutils_yorgunluq_c68d62", "Yor\u011Funluq"),
+  'Fatigue': tr("dateutils_yorgunluq_c68d62", "Yor\u011Funluq"),
+  'nausea': tr("dateutils_urekbulanma_a42830", "\xDCr\u0259kbulanma"),
+  'Nausea': tr("dateutils_urekbulanma_a42830", "\xDCr\u0259kbulanma"),
+  'cramps': tr("dateutils_sanci_350c2d", "Sanc\u0131"),
+  'Cramps': tr("dateutils_sanci_350c2d", "Sanc\u0131"),
+  'bloating': tr("dateutils_siskinlik_7c7923", "\u015Ei\u015Fkinlik"),
+  'Bloating': tr("dateutils_siskinlik_7c7923", "\u015Ei\u015Fkinlik"),
+  'back_pain': tr("dateutils_bel_agrisi_9e824e", "Bel a\u011Fr\u0131s\u0131"),
+  'backpain': tr("dateutils_bel_agrisi_9e824e", "Bel a\u011Fr\u0131s\u0131"),
+  'Back Pain': tr("dateutils_bel_agrisi_9e824e", "Bel a\u011Fr\u0131s\u0131"),
+  'mood_swings': tr("dateutils_ehval_deyisikliyi_9fa36f", "\u018Fhval d\u0259yi\u015Fikliyi"),
+  'Mood Swings': tr("dateutils_ehval_deyisikliyi_9fa36f", "\u018Fhval d\u0259yi\u015Fikliyi"),
   'insomnia': 'Yuxusuzluq',
   'Insomnia': 'Yuxusuzluq',
-  'appetite_changes': 'İştah dəyişikliyi',
-  'Appetite Changes': 'İştah dəyişikliyi',
-  'breast_tenderness': 'Döş həssaslığı',
-  'Breast Tenderness': 'Döş həssaslığı',
-  'acne': 'Sızanaq',
-  'Acne': 'Sızanaq',
-  'dizziness': 'Başgicəllənmə',
-  'Dizziness': 'Başgicəllənmə',
-  'anxiety': 'Narahatlıq',
-  'Anxiety': 'Narahatlıq',
+  'appetite_changes': tr("dateutils_i_stah_deyisikliyi_fea8a7", "\u0130\u015Ftah d\u0259yi\u015Fikliyi"),
+  'Appetite Changes': tr("dateutils_i_stah_deyisikliyi_fea8a7", "\u0130\u015Ftah d\u0259yi\u015Fikliyi"),
+  'breast_tenderness': tr("dateutils_dos_hessasligi_326b6d", "D\xF6\u015F h\u0259ssasl\u0131\u011F\u0131"),
+  'Breast Tenderness': tr("dateutils_dos_hessasligi_326b6d", "D\xF6\u015F h\u0259ssasl\u0131\u011F\u0131"),
+  'acne': tr("dateutils_sizanaq_0b0664", "S\u0131zanaq"),
+  'Acne': tr("dateutils_sizanaq_0b0664", "S\u0131zanaq"),
+  'dizziness': tr("dateutils_basgicellenme_9e0b89", "Ba\u015Fgic\u0259ll\u0259nm\u0259"),
+  'Dizziness': tr("dateutils_basgicellenme_9e0b89", "Ba\u015Fgic\u0259ll\u0259nm\u0259"),
+  'anxiety': tr("dateutils_narahatliq_33f05c", "Narahatl\u0131q"),
+  'Anxiety': tr("dateutils_narahatliq_33f05c", "Narahatl\u0131q"),
   'stress': 'Stress',
   'Stress': 'Stress',
-  'swelling': 'Şişlik',
-  'Swelling': 'Şişlik',
-  'constipation': 'Qəbizlik',
-  'Constipation': 'Qəbizlik',
-  'heartburn': 'Köpükləmə',
-  'Heartburn': 'Köpükləmə',
-  'frequent_urination': 'Tez-tez sidikə getmə',
-  'Frequent Urination': 'Tez-tez sidikə getmə',
-  'hot_flashes': 'İstiliklər',
-  'Hot Flashes': 'İstiliklər',
-  'cravings': 'İştah artımı',
-  'Cravings': 'İştah artımı',
+  'swelling': tr("dateutils_sislik_cd02e0", "\u015Ei\u015Flik"),
+  'Swelling': tr("dateutils_sislik_cd02e0", "\u015Ei\u015Flik"),
+  'constipation': tr("dateutils_qebizlik_aef088", "Q\u0259bizlik"),
+  'Constipation': tr("dateutils_qebizlik_aef088", "Q\u0259bizlik"),
+  'heartburn': tr("dateutils_kopukleme_2d7a33", "K\xF6p\xFCkl\u0259m\u0259"),
+  'Heartburn': tr("dateutils_kopukleme_2d7a33", "K\xF6p\xFCkl\u0259m\u0259"),
+  'frequent_urination': tr("dateutils_tez_tez_sidike_getme_bfc357", "Tez-tez sidik\u0259 getm\u0259"),
+  'Frequent Urination': tr("dateutils_tez_tez_sidike_getme_bfc357", "Tez-tez sidik\u0259 getm\u0259"),
+  'hot_flashes': tr("dateutils_i_stilikler_9c6091", "\u0130stilikl\u0259r"),
+  'Hot Flashes': tr("dateutils_i_stilikler_9c6091", "\u0130stilikl\u0259r"),
+  'cravings': tr("dateutils_i_stah_artimi_2b1e0b", "\u0130\u015Ftah art\u0131m\u0131"),
+  'Cravings': tr("dateutils_i_stah_artimi_2b1e0b", "\u0130\u015Ftah art\u0131m\u0131"),
   // Flow specific
-  'bas_agrisi': 'Başağrısı',
-  'sanci': 'Sancı',
-  'yorgunluq': 'Yorğunluq',
-  'siskinlik': 'Şişkinlik',
-  'bel_agrisi': 'Bel ağrısı',
-  'ehval_deyisikliyi': 'Əhval dəyişikliyi',
+  'bas_agrisi': tr("dateutils_basagrisi_9e17a3", "Ba\u015Fa\u011Fr\u0131s\u0131"),
+  'sanci': tr("dateutils_sanci_350c2d", "Sanc\u0131"),
+  'yorgunluq': tr("dateutils_yorgunluq_c68d62", "Yor\u011Funluq"),
+  'siskinlik': tr("dateutils_siskinlik_7c7923", "\u015Ei\u015Fkinlik"),
+  'bel_agrisi': tr("dateutils_bel_agrisi_9e824e", "Bel a\u011Fr\u0131s\u0131"),
+  'ehval_deyisikliyi': tr("dateutils_ehval_deyisikliyi_9fa36f", "\u018Fhval d\u0259yi\u015Fikliyi")
 };
 
 /**
@@ -119,13 +119,13 @@ export const translateSymptom = (symptom: string): string => {
   if (symptomTranslations[symptom]) {
     return symptomTranslations[symptom];
   }
-  
+
   // Check lowercase
   const lowerSymptom = symptom.toLowerCase();
   if (symptomTranslations[lowerSymptom]) {
     return symptomTranslations[lowerSymptom];
   }
-  
+
   // Return original if no translation found (already in Azerbaijani)
   return symptom;
 };

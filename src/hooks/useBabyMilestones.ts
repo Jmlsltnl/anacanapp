@@ -29,12 +29,12 @@ export const useBabyMilestones = () => {
     if (!dbMilestones || dbMilestones.length === 0) {
       return [];
     }
-    return dbMilestones.map(m => ({
+    return dbMilestones.map((m) => ({
       id: m.milestone_key,
       week: m.week_number,
       label: m.label_az || m.label,
       emoji: m.emoji,
-      description: m.description_az || m.description,
+      description: m.description_az || m.description
     }));
   }, [dbMilestones]);
 
@@ -42,11 +42,11 @@ export const useBabyMilestones = () => {
     if (!user) return;
 
     try {
-      let query = supabase
-        .from('baby_milestones')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('achieved_at', { ascending: false });
+      let query = supabase.
+      from('baby_milestones').
+      select('*').
+      eq('user_id', user.id).
+      order('achieved_at', { ascending: false });
 
       // Filter by selected child if available
       if (selectedChild) {
@@ -69,21 +69,21 @@ export const useBabyMilestones = () => {
 
     // Subscribe to realtime updates
     if (user) {
-      const channel = supabase
-        .channel('milestones-channel')
-        .on(
-          'postgres_changes',
-          { 
-            event: '*', 
-            schema: 'public', 
-            table: 'baby_milestones',
-            filter: `user_id=eq.${user.id}`
-          },
-          () => {
-            fetchMilestones();
-          }
-        )
-        .subscribe();
+      const channel = supabase.
+      channel('milestones-channel').
+      on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'baby_milestones',
+          filter: `user_id=eq.${user.id}`
+        },
+        () => {
+          fetchMilestones();
+        }
+      ).
+      subscribe();
 
       return () => {
         supabase.removeChannel(channel);
@@ -94,44 +94,44 @@ export const useBabyMilestones = () => {
   const toggleMilestone = useCallback(async (milestoneId: string, notes?: string) => {
     if (!user) return;
 
-    const existing = milestones.find(m => m.milestone_id === milestoneId);
+    const existing = milestones.find((m) => m.milestone_id === milestoneId);
 
     try {
       if (existing) {
         // Remove milestone
-        const { error } = await supabase
-          .from('baby_milestones')
-          .delete()
-          .eq('id', existing.id);
+        const { error } = await supabase.
+        from('baby_milestones').
+        delete().
+        eq('id', existing.id);
 
         if (error) throw error;
 
-        setMilestones(prev => prev.filter(m => m.id !== existing.id));
+        setMilestones((prev) => prev.filter((m) => m.id !== existing.id));
         toast({
           title: tr("usebabymilestones_merhele_silindi_fb7d94", "Mərhələ silindi"),
-          description: tr("usebabymilestones_inkisaf_merhelesi_silindi_6e6a48", "İnkişaf mərhələsi silindi"),
+          description: tr("usebabymilestones_inkisaf_merhelesi_silindi_6e6a48", "İnkişaf mərhələsi silindi")
         });
       } else {
         // Add milestone
-        const { data, error } = await supabase
-          .from('baby_milestones')
-          .insert({
-            user_id: user.id,
-            child_id: selectedChild?.id || null,
-            milestone_id: milestoneId,
-            notes: notes || null,
-          })
-          .select()
-          .single();
+        const { data, error } = await supabase.
+        from('baby_milestones').
+        insert({
+          user_id: user.id,
+          child_id: selectedChild?.id || null,
+          milestone_id: milestoneId,
+          notes: notes || null
+        }).
+        select().
+        single();
 
         if (error) throw error;
 
         if (data) {
-          setMilestones(prev => [data, ...prev]);
-          const milestoneDetails = MILESTONES.find(m => m.id === milestoneId);
+          setMilestones((prev) => [data, ...prev]);
+          const milestoneDetails = MILESTONES.find((m) => m.id === milestoneId);
           toast({
-            title: `🎉 ${milestoneDetails?.label || 'Mərhələ'} qeyd edildi!`,
-            description: milestoneDetails?.description,
+            title: `🎉 ${milestoneDetails?.label || tr("usebabymilestones_merhele_0e09aa", "M\u0259rh\u0259l\u0259")} qeyd edildi!`,
+            description: milestoneDetails?.description
           });
         }
       }
@@ -140,17 +140,17 @@ export const useBabyMilestones = () => {
       toast({
         title: tr("usebabymilestones_xeta_3cdbb6", "Xəta"),
         description: tr("usebabymilestones_merhele_qeyd_edile_bilmedi_b2cb1f", "Mərhələ qeyd edilə bilmədi"),
-        variant: 'destructive',
+        variant: 'destructive'
       });
     }
   }, [user, milestones, toast, MILESTONES, selectedChild]);
 
   const isMilestoneAchieved = useCallback((milestoneId: string) => {
-    return milestones.some(m => m.milestone_id === milestoneId);
+    return milestones.some((m) => m.milestone_id === milestoneId);
   }, [milestones]);
 
   const getMilestoneDate = useCallback((milestoneId: string) => {
-    const milestone = milestones.find(m => m.milestone_id === milestoneId);
+    const milestone = milestones.find((m) => m.milestone_id === milestoneId);
     return milestone?.achieved_at ? new Date(milestone.achieved_at) : null;
   }, [milestones]);
 
@@ -161,6 +161,6 @@ export const useBabyMilestones = () => {
     isMilestoneAchieved,
     getMilestoneDate,
     refetch: fetchMilestones,
-    MILESTONES,
+    MILESTONES
   };
 };

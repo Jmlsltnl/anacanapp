@@ -1,41 +1,41 @@
 import { useState } from 'react';
 import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
-import { 
-  Calendar, Plus, Trash2, Save, Edit2, AlertTriangle, 
-  Sparkles, Clock, ChevronDown, ChevronUp 
-} from 'lucide-react';
+import {
+  Calendar, Plus, Trash2, Save, Edit2, AlertTriangle,
+  Sparkles, Clock, ChevronDown, ChevronUp } from
+'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  useAllBabyCrisisPeriods, 
+import {
+  useAllBabyCrisisPeriods,
   useCreateBabyCrisisPeriod,
   useUpdateBabyCrisisPeriod,
   useDeleteBabyCrisisPeriod,
-  BabyCrisisPeriod 
-} from '@/hooks/useBabyCrisisPeriods';
+  BabyCrisisPeriod } from
+'@/hooks/useBabyCrisisPeriods';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  DialogTitle } from
+"@/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  SelectValue } from
+"@/components/ui/select";
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+  CollapsibleTrigger } from
+"@/components/ui/collapsible";
 
 const AdminBabyCrisisCalendar = () => {
   const { toast } = useToast();
@@ -47,7 +47,7 @@ const AdminBabyCrisisCalendar = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  
+
   const [formData, setFormData] = useState({
     week_start: 5,
     week_end: 5,
@@ -74,9 +74,9 @@ const AdminBabyCrisisCalendar = () => {
   };
 
   const severityLabels = {
-    mild: 'Yüngül',
+    mild: tr("adminbabycrisiscalendar_yungul_2a8010", "Y\xFCng\xFCl"),
     medium: 'Orta',
-    intense: 'Şiddətli'
+    intense: tr("adminbabycrisiscalendar_siddetli_2dc9e7", "\u015Eidd\u0259tli")
   };
 
   const handleCreate = () => {
@@ -161,8 +161,8 @@ const AdminBabyCrisisCalendar = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
-    
+    if (!confirm(tr("adminbabycrisiscalendar_silmek_istediyinize_eminsiniz_09658f", "Silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
+
     try {
       await deleteMutation.mutateAsync(id);
       toast({ title: 'Silindi!' });
@@ -175,8 +175,8 @@ const AdminBabyCrisisCalendar = () => {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -186,15 +186,15 @@ const AdminBabyCrisisCalendar = () => {
         <div>
           <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Calendar className="w-6 h-6 text-primary" />
-            Kriz Təqvimi
+            {tr("adminbabycrisiscalendar_kriz_teqvimi_aa2ea5", "Kriz T\u0259qvimi")}
           </h2>
           <p className="text-muted-foreground mt-1">
-            Körpələrin inkişaf sıçrayışları və kriz dövrləri (Wonder Weeks)
+            {tr("adminbabycrisiscalendar_korpelerin_inkisaf_sicrayislar_89e452", "K\xF6rp\u0259l\u0259rin inki\u015Faf s\u0131\xE7ray\u0131\u015Flar\u0131 v\u0259 kriz d\xF6vrl\u0259ri (Wonder Weeks)")}
           </p>
         </div>
         <Button onClick={handleCreate}>
           <Plus className="w-4 h-4 mr-2" />
-          Yeni Kriz Dövrü
+          {tr("adminbabycrisiscalendar_yeni_kriz_dovru_88ca15", "Yeni Kriz D\xF6vr\xFC")}
         </Button>
       </div>
 
@@ -209,7 +209,7 @@ const AdminBabyCrisisCalendar = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-green-500">
-              {crisisPeriods.filter(p => p.severity === 'mild').length}
+              {crisisPeriods.filter((p) => p.severity === 'mild').length}
             </div>
             <p className="text-sm text-muted-foreground">{tr("adminbabycrisiscalendar_yungul_2a8010", "Yüngül")}</p>
           </CardContent>
@@ -217,7 +217,7 @@ const AdminBabyCrisisCalendar = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-amber-500">
-              {crisisPeriods.filter(p => p.severity === 'medium').length}
+              {crisisPeriods.filter((p) => p.severity === 'medium').length}
             </div>
             <p className="text-sm text-muted-foreground">Orta</p>
           </CardContent>
@@ -225,7 +225,7 @@ const AdminBabyCrisisCalendar = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-red-500">
-              {crisisPeriods.filter(p => p.severity === 'intense').length}
+              {crisisPeriods.filter((p) => p.severity === 'intense').length}
             </div>
             <p className="text-sm text-muted-foreground">{tr("adminbabycrisiscalendar_siddetli_2dc9e7", "Şiddətli")}</p>
           </CardContent>
@@ -234,39 +234,39 @@ const AdminBabyCrisisCalendar = () => {
 
       {/* Crisis Periods List */}
       <div className="space-y-3">
-        {crisisPeriods.map((period, index) => (
-          <Collapsible key={period.id} open={expandedId === period.id}>
+        {crisisPeriods.map((period, index) =>
+        <Collapsible key={period.id} open={expandedId === period.id}>
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className={`border rounded-xl overflow-hidden ${!period.is_active ? 'opacity-50' : ''}`}
-            >
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05 }}
+            className={`border rounded-xl overflow-hidden ${!period.is_active ? 'opacity-50' : ''}`}>
+            
               <CollapsibleTrigger asChild>
                 <button
-                  onClick={() => setExpandedId(expandedId === period.id ? null : period.id)}
-                  className="w-full p-4 flex items-center gap-4 bg-card hover:bg-muted/50 transition-colors text-left"
-                >
+                onClick={() => setExpandedId(expandedId === period.id ? null : period.id)}
+                className="w-full p-4 flex items-center gap-4 bg-card hover:bg-muted/50 transition-colors text-left">
+                
                   <div className="text-3xl">{period.emoji}</div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-bold text-foreground">{period.title_az || period.title}</h3>
-                      {period.leap_number && (
-                        <Badge variant="secondary" className="text-xs">
+                      {period.leap_number &&
+                    <Badge variant="secondary" className="text-xs">
                           Leap #{period.leap_number}
                         </Badge>
-                      )}
+                    }
                     </div>
                     <div className="flex items-center gap-3 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
-                        {period.week_start === period.week_end 
-                          ? `Həftə ${period.week_start}` 
-                          : `Həftə ${period.week_start}-${period.week_end}`}
+                        {period.week_start === period.week_end ?
+                      `Həftə ${period.week_start}` :
+                      `Həftə ${period.week_start}-${period.week_end}`}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        ~{period.duration_days} gün
+                        ~{period.duration_days} {tr("adminbabycrisiscalendar_gun_54e78d", "g\xFCn")}
                       </span>
                     </div>
                   </div>
@@ -275,31 +275,31 @@ const AdminBabyCrisisCalendar = () => {
                   </Badge>
                   <div className="flex items-center gap-2">
                     <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEdit(period);
-                      }}
-                    >
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEdit(period);
+                    }}>
+                    
                       <Edit2 className="w-4 h-4" />
                     </Button>
                     <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-destructive"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(period.id);
-                      }}
-                    >
+                    size="sm"
+                    variant="ghost"
+                    className="text-destructive"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(period.id);
+                    }}>
+                    
                       <Trash2 className="w-4 h-4" />
                     </Button>
-                    {expandedId === period.id ? (
-                      <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                    )}
+                    {expandedId === period.id ?
+                  <ChevronUp className="w-4 h-4 text-muted-foreground" /> :
+
+                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  }
                   </div>
                 </button>
               </CollapsibleTrigger>
@@ -312,35 +312,35 @@ const AdminBabyCrisisCalendar = () => {
                       Simptomlar
                     </h4>
                     <ul className="text-sm text-muted-foreground space-y-1">
-                      {(period.symptoms_az || period.symptoms || []).map((s, i) => (
-                        <li key={i}>• {s}</li>
-                      ))}
+                      {(period.symptoms_az || period.symptoms || []).map((s, i) =>
+                    <li key={i}>• {s}</li>
+                    )}
                     </ul>
                   </div>
                   <div>
                     <h4 className="font-semibold text-sm text-foreground mb-2 flex items-center gap-1">
                       <Sparkles className="w-3 h-3" />
-                      Tövsiyələr
+                      {tr("adminbabycrisiscalendar_tovsiyeler_17a8f7", "T\xF6vsiy\u0259l\u0259r")}
                     </h4>
                     <ul className="text-sm text-muted-foreground space-y-1">
-                      {(period.tips_az || period.tips || []).map((t, i) => (
-                        <li key={i}>• {t}</li>
-                      ))}
+                      {(period.tips_az || period.tips || []).map((t, i) =>
+                    <li key={i}>• {t}</li>
+                    )}
                     </ul>
                   </div>
-                  {(period.description_az || period.description) && (
-                    <div className="md:col-span-2">
+                  {(period.description_az || period.description) &&
+                <div className="md:col-span-2">
                       <h4 className="font-semibold text-sm text-foreground mb-2">{tr("adminbabycrisiscalendar_aciqlama_c33d69", "Açıqlama")}</h4>
                       <p className="text-sm text-muted-foreground">
                         {period.description_az || period.description}
                       </p>
                     </div>
-                  )}
+                }
                 </div>
               </CollapsibleContent>
             </motion.div>
           </Collapsible>
-        ))}
+        )}
       </div>
 
       {/* Edit/Create Dialog */}
@@ -349,7 +349,7 @@ const AdminBabyCrisisCalendar = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-primary" />
-              {editingId ? 'Kriz Dövründü Redaktə Et' : 'Yeni Kriz Dövrü'}
+              {editingId ? tr("adminbabycrisiscalendar_kriz_dovrundu_redakte_et_2ffb08", "Kriz D\xF6vr\xFCnd\xFC Redakt\u0259 Et") : tr("adminbabycrisiscalendar_yeni_kriz_dovru_88ca15", "Yeni Kriz D\xF6vr\xFC")}
             </DialogTitle>
           </DialogHeader>
 
@@ -363,8 +363,8 @@ const AdminBabyCrisisCalendar = () => {
                   min={1}
                   max={100}
                   value={formData.week_start}
-                  onChange={(e) => setFormData(prev => ({ ...prev, week_start: parseInt(e.target.value) }))}
-                />
+                  onChange={(e) => setFormData((prev) => ({ ...prev, week_start: parseInt(e.target.value) }))} />
+                
               </div>
               <div>
                 <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_bitis_heftesi_8cb7ed", "Bitiş həftəsi")}</label>
@@ -373,8 +373,8 @@ const AdminBabyCrisisCalendar = () => {
                   min={1}
                   max={100}
                   value={formData.week_end}
-                  onChange={(e) => setFormData(prev => ({ ...prev, week_end: parseInt(e.target.value) }))}
-                />
+                  onChange={(e) => setFormData((prev) => ({ ...prev, week_end: parseInt(e.target.value) }))} />
+                
               </div>
               <div>
                 <label className="text-sm font-medium">Leap #</label>
@@ -383,8 +383,8 @@ const AdminBabyCrisisCalendar = () => {
                   min={1}
                   max={20}
                   value={formData.leap_number}
-                  onChange={(e) => setFormData(prev => ({ ...prev, leap_number: parseInt(e.target.value) }))}
-                />
+                  onChange={(e) => setFormData((prev) => ({ ...prev, leap_number: parseInt(e.target.value) }))} />
+                
               </div>
             </div>
 
@@ -394,17 +394,17 @@ const AdminBabyCrisisCalendar = () => {
                 <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_basliq_en_4ac905", "Başlıq (EN)")}</label>
                 <Input
                   value={formData.title}
-                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="The World of..."
-                />
+                  onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
+                  placeholder="The World of..." />
+                
               </div>
               <div>
                 <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_basliq_az_3e294a", "Başlıq (AZ)")}</label>
                 <Input
                   value={formData.title_az}
-                  onChange={(e) => setFormData(prev => ({ ...prev, title_az: e.target.value }))}
-                  placeholder={tr("adminbabycrisiscalendar_dunyasi_77862f", "...Dünyası")}
-                />
+                  onChange={(e) => setFormData((prev) => ({ ...prev, title_az: e.target.value }))}
+                  placeholder={tr("adminbabycrisiscalendar_dunyasi_77862f", "...Dünyası")} />
+                
               </div>
             </div>
 
@@ -414,17 +414,17 @@ const AdminBabyCrisisCalendar = () => {
                 <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_aciqlama_en_6fb6db", "Açıqlama (EN)")}</label>
                 <Textarea
                   value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  rows={2}
-                />
+                  onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                  rows={2} />
+                
               </div>
               <div>
                 <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_aciqlama_az_86f364", "Açıqlama (AZ)")}</label>
                 <Textarea
                   value={formData.description_az}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description_az: e.target.value }))}
-                  rows={2}
-                />
+                  onChange={(e) => setFormData((prev) => ({ ...prev, description_az: e.target.value }))}
+                  rows={2} />
+                
               </div>
             </div>
 
@@ -434,19 +434,19 @@ const AdminBabyCrisisCalendar = () => {
                 <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_simptomlar_en_her_setirde_bir_b0a595", "Simptomlar (EN) - hər sətirdə bir")}</label>
                 <Textarea
                   value={formData.symptoms}
-                  onChange={(e) => setFormData(prev => ({ ...prev, symptoms: e.target.value }))}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, symptoms: e.target.value }))}
                   placeholder="Crying more&#10;Sleep problems"
-                  rows={3}
-                />
+                  rows={3} />
+                
               </div>
               <div>
                 <label className="text-sm font-medium">Simptomlar (AZ)</label>
                 <Textarea
                   value={formData.symptoms_az}
-                  onChange={(e) => setFormData(prev => ({ ...prev, symptoms_az: e.target.value }))}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, symptoms_az: e.target.value }))}
                   placeholder={tr("adminbabycrisiscalendar_daha_cox_aglama_10_yuxu_problemleri_c4317e", "Daha çox ağlama&#10;Yuxu problemləri")}
-                  rows={3}
-                />
+                  rows={3} />
+                
               </div>
             </div>
 
@@ -456,19 +456,19 @@ const AdminBabyCrisisCalendar = () => {
                 <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_tovsiyeler_en_28e0bf", "Tövsiyələr (EN)")}</label>
                 <Textarea
                   value={formData.tips}
-                  onChange={(e) => setFormData(prev => ({ ...prev, tips: e.target.value }))}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, tips: e.target.value }))}
                   placeholder="Extra cuddles&#10;Patience"
-                  rows={3}
-                />
+                  rows={3} />
+                
               </div>
               <div>
                 <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_tovsiyeler_az_12e64c", "Tövsiyələr (AZ)")}</label>
                 <Textarea
                   value={formData.tips_az}
-                  onChange={(e) => setFormData(prev => ({ ...prev, tips_az: e.target.value }))}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, tips_az: e.target.value }))}
                   placeholder={tr("adminbabycrisiscalendar_elave_qucaqlasma_10_sebir_8f500e", "Əlavə qucaqlaşma&#10;Səbir")}
-                  rows={3}
-                />
+                  rows={3} />
+                
               </div>
             </div>
 
@@ -479,15 +479,15 @@ const AdminBabyCrisisCalendar = () => {
                 <Input
                   type="number"
                   value={formData.duration_days}
-                  onChange={(e) => setFormData(prev => ({ ...prev, duration_days: parseInt(e.target.value) }))}
-                />
+                  onChange={(e) => setFormData((prev) => ({ ...prev, duration_days: parseInt(e.target.value) }))} />
+                
               </div>
               <div>
                 <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_siddet_afc814", "Şiddət")}</label>
                 <Select
                   value={formData.severity}
-                  onValueChange={(v) => setFormData(prev => ({ ...prev, severity: v }))}
-                >
+                  onValueChange={(v) => setFormData((prev) => ({ ...prev, severity: v }))}>
+                  
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -502,39 +502,39 @@ const AdminBabyCrisisCalendar = () => {
                 <label className="text-sm font-medium">Emoji</label>
                 <Input
                   value={formData.emoji}
-                  onChange={(e) => setFormData(prev => ({ ...prev, emoji: e.target.value }))}
-                  placeholder="😢"
-                />
+                  onChange={(e) => setFormData((prev) => ({ ...prev, emoji: e.target.value }))}
+                  placeholder="😢" />
+                
               </div>
               <div>
                 <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_reng_8c6bc5", "Rəng")}</label>
                 <Input
                   type="color"
                   value={formData.color}
-                  onChange={(e) => setFormData(prev => ({ ...prev, color: e.target.value }))}
-                />
+                  onChange={(e) => setFormData((prev) => ({ ...prev, color: e.target.value }))} />
+                
               </div>
             </div>
 
             {/* Actions */}
             <div className="flex gap-2 pt-4">
               <Button variant="outline" onClick={() => setDialogOpen(false)} className="flex-1">
-                Ləğv et
+                {tr("adminbabycrisiscalendar_legv_et_b5e49c", "L\u0259\u011Fv et")}
               </Button>
-              <Button 
-                onClick={handleSave} 
+              <Button
+                onClick={handleSave}
                 disabled={!formData.title || createMutation.isPending || updateMutation.isPending}
-                className="flex-1"
-              >
+                className="flex-1">
+                
                 <Save className="w-4 h-4 mr-2" />
-                {editingId ? 'Yenilə' : 'Yarat'}
+                {editingId ? tr("adminbabycrisiscalendar_yenile_570ce2", "Yenil\u0259") : 'Yarat'}
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AdminBabyCrisisCalendar;

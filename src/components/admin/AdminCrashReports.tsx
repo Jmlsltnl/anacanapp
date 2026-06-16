@@ -30,11 +30,11 @@ const AdminCrashReports = () => {
 
   const fetchReports = async () => {
     setLoading(true);
-    let query = supabase
-      .from('crash_reports')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(200);
+    let query = supabase.
+    from('crash_reports').
+    select('*').
+    order('created_at', { ascending: false }).
+    limit(200);
 
     if (filter !== 'all') {
       query = query.eq('platform', filter);
@@ -42,26 +42,26 @@ const AdminCrashReports = () => {
 
     const { data, error } = await query;
     if (error) {
-      toast.error('Crash reportları yüklənmədi');
+      toast.error(tr("admincrashreports_crash_reportlari_yuklenmedi_d4ba13", "Crash reportlar\u0131 y\xFCkl\u0259nm\u0259di"));
     } else {
-      setReports((data as any[]) || []);
+      setReports(data as any[] || []);
     }
     setLoading(false);
   };
 
-  useEffect(() => { fetchReports(); }, [filter]);
+  useEffect(() => {fetchReports();}, [filter]);
 
   const deleteReport = async (id: string) => {
     await supabase.from('crash_reports').delete().eq('id', id);
-    setReports(r => r.filter(x => x.id !== id));
+    setReports((r) => r.filter((x) => x.id !== id));
     toast.success('Silindi');
   };
 
   const deleteAll = async () => {
-    if (!confirm('Bütün crash reportları silinsin?')) return;
+    if (!confirm(tr("admincrashreports_butun_crash_reportlari_silinsi_4f4311", "B\xFCt\xFCn crash reportlar\u0131 silinsin?"))) return;
     await supabase.from('crash_reports').delete().neq('id', '00000000-0000-0000-0000-000000000000');
     setReports([]);
-    toast.success('Hamısı silindi');
+    toast.success(tr("admincrashreports_hamisi_silindi_3b8089", "Ham\u0131s\u0131 silindi"));
   };
 
   const platformIcon = (p: string | null) => {
@@ -85,30 +85,30 @@ const AdminCrashReports = () => {
           Crash Reports ({reports.length})
         </h2>
         <div className="flex gap-2">
-          {['all', 'android', 'ios', 'web'].map(f => (
-            <Button key={f} size="sm" variant={filter === f ? 'default' : 'outline'}
-              onClick={() => setFilter(f)}>
-              {f === 'all' ? 'Hamısı' : f}
+          {['all', 'android', 'ios', 'web'].map((f) =>
+          <Button key={f} size="sm" variant={filter === f ? 'default' : 'outline'}
+          onClick={() => setFilter(f)}>
+              {f === 'all' ? tr("admincrashreports_hamisi_c73c4d", "Ham\u0131s\u0131") : f}
             </Button>
-          ))}
+          )}
           <Button size="sm" variant="outline" onClick={fetchReports}>
             <RefreshCw className="w-4 h-4" />
           </Button>
           <Button size="sm" variant="destructive" onClick={deleteAll}>
-            <Trash2 className="w-4 h-4 mr-1" /> Hamısını sil
+            <Trash2 className="w-4 h-4 mr-1" /> {tr("admincrashreports_hamisini_sil_f6a3d6", "Ham\u0131s\u0131n\u0131 sil")}
           </Button>
         </div>
       </div>
 
-      {loading ? (
-        <p className="text-muted-foreground">{tr("admincrashreports_yuklenir_5557de", "Yüklənir...")}</p>
-      ) : reports.length === 0 ? (
-        <Card><CardContent className="py-8 text-center text-muted-foreground">Crash report yoxdur 🎉</CardContent></Card>
-      ) : (
-        <ScrollArea className="h-[calc(100vh-200px)]">
+      {loading ?
+      <p className="text-muted-foreground">{tr("admincrashreports_yuklenir_5557de", "Yüklənir...")}</p> :
+      reports.length === 0 ?
+      <Card><CardContent className="py-8 text-center text-muted-foreground">Crash report yoxdur 🎉</CardContent></Card> :
+
+      <ScrollArea className="h-[calc(100vh-200px)]">
           <div className="space-y-2">
-            {Object.entries(grouped).sort((a, b) => b[1].length - a[1].length).map(([msg, items]) => (
-              <Card key={msg} className="cursor-pointer" onClick={() => setExpandedId(expandedId === msg ? null : msg)}>
+            {Object.entries(grouped).sort((a, b) => b[1].length - a[1].length).map(([msg, items]) =>
+          <Card key={msg} className="cursor-pointer" onClick={() => setExpandedId(expandedId === msg ? null : msg)}>
                 <CardHeader className="py-3 px-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -124,43 +124,43 @@ const AdminCrashReports = () => {
                     </div>
                   </div>
                 </CardHeader>
-                {expandedId === msg && (
-                  <CardContent className="pt-0 px-4 pb-4 space-y-3">
-                    {items.slice(0, 5).map(r => (
-                      <div key={r.id} className="border rounded p-3 text-xs space-y-1">
+                {expandedId === msg &&
+            <CardContent className="pt-0 px-4 pb-4 space-y-3">
+                    {items.slice(0, 5).map((r) =>
+              <div key={r.id} className="border rounded p-3 text-xs space-y-1">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">{new Date(r.created_at).toLocaleString('az')}</span>
                           <div className="flex items-center gap-2">
                             <span>{r.platform}</span>
-                            <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); deleteReport(r.id); }}>
+                            <Button size="sm" variant="ghost" onClick={(e) => {e.stopPropagation();deleteReport(r.id);}}>
                               <Trash2 className="w-3 h-3" />
                             </Button>
                           </div>
                         </div>
                         {r.url && <div><strong>URL:</strong> {r.url}</div>}
                         {r.user_id && <div><strong>User:</strong> {r.user_id.slice(0, 8)}...</div>}
-                        {r.error_stack && (
-                          <pre className="bg-muted p-2 rounded text-[10px] overflow-x-auto max-h-32 whitespace-pre-wrap">
+                        {r.error_stack &&
+                <pre className="bg-muted p-2 rounded text-[10px] overflow-x-auto max-h-32 whitespace-pre-wrap">
                             {r.error_stack}
                           </pre>
-                        )}
-                        {r.extra_data && (
-                          <pre className="bg-muted p-2 rounded text-[10px] overflow-x-auto">
+                }
+                        {r.extra_data &&
+                <pre className="bg-muted p-2 rounded text-[10px] overflow-x-auto">
                             {JSON.stringify(r.extra_data, null, 2)}
                           </pre>
-                        )}
+                }
                       </div>
-                    ))}
+              )}
                     {items.length > 5 && <p className="text-xs text-muted-foreground">+{items.length - 5} daha...</p>}
                   </CardContent>
-                )}
+            }
               </Card>
-            ))}
+          )}
           </div>
         </ScrollArea>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 
 export default AdminCrashReports;

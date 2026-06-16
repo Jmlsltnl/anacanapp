@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { tr } from "@/lib/tr";import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Pill, Clock } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
@@ -15,16 +15,16 @@ const PillReminderCard = () => {
   const { data: reminders = [] } = useFlowReminders();
   const save = useSaveFlowReminder();
   const toggle = useToggleReminder();
-  const pill = reminders.find(r => r.reminder_type === 'pill');
+  const pill = reminders.find((r) => r.reminder_type === 'pill');
 
   const [time, setTime] = useState(pill?.time_of_day?.slice(0, 5) || '09:00');
-  const [title, setTitle] = useState(pill?.title || 'Həbinizi qəbul edin');
+  const [title, setTitle] = useState(pill?.title || tr("pillremindercard_hebinizi_qebul_edin_03c5be", "H\u0259binizi q\u0259bul edin"));
   const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     if (pill) {
       setTime(pill.time_of_day?.slice(0, 5) || '09:00');
-      setTitle(pill.title || 'Həbinizi qəbul edin');
+      setTitle(pill.title || tr("pillremindercard_hebinizi_qebul_edin_03c5be", "H\u0259binizi q\u0259bul edin"));
     }
   }, [pill?.id]);
 
@@ -41,10 +41,10 @@ const PillReminderCard = () => {
       await LocalNotifications.schedule({
         notifications: [{
           id: PILL_NOTIFICATION_ID,
-          title: ttl || 'Həbinizi qəbul edin',
-          body: '💊 Gündəlik həbinizi qəbul etmək vaxtıdır',
-          schedule: { at, repeats: true, every: 'day' },
-        }],
+          title: ttl || tr("pillremindercard_hebinizi_qebul_edin_03c5be", "H\u0259binizi q\u0259bul edin"),
+          body: tr("pillremindercard_gundelik_hebinizi_qebul_etmek__064f3f", "\uD83D\uDC8A G\xFCnd\u0259lik h\u0259binizi q\u0259bul etm\u0259k vaxt\u0131d\u0131r"),
+          schedule: { at, repeats: true, every: 'day' }
+        }]
       });
     } catch (e) {
       console.warn('Pill reminder schedule failed', e);
@@ -59,10 +59,10 @@ const PillReminderCard = () => {
       days_before: 0,
       is_enabled: isEnabled,
       title,
-      message: '💊 Gündəlik həbinizi qəbul edin',
+      message: tr("pillremindercard_gundelik_hebinizi_qebul_edin_ea7547", "\uD83D\uDC8A G\xFCnd\u0259lik h\u0259binizi q\u0259bul edin")
     });
     await scheduleNative(isEnabled, time, title);
-    toast.success('Həb xatırlatması yadda saxlanıldı');
+    toast.success(tr("pillremindercard_heb_xatirlatmasi_yadda_saxlani_27cacb", "H\u0259b xat\u0131rlatmas\u0131 yadda saxlan\u0131ld\u0131"));
     setEditing(false);
   };
 
@@ -74,7 +74,7 @@ const PillReminderCard = () => {
         days_before: 0,
         is_enabled: true,
         title,
-        message: '💊 Gündəlik həbinizi qəbul edin',
+        message: tr("pillremindercard_gundelik_hebinizi_qebul_edin_ea7547", "\uD83D\uDC8A G\xFCnd\u0259lik h\u0259binizi q\u0259bul edin")
       });
       await scheduleNative(true, time, title);
     } else {
@@ -89,22 +89,22 @@ const PillReminderCard = () => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-card rounded-2xl p-4 border border-border"
-    >
+      className="bg-card rounded-2xl p-4 border border-border">
+      
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-bold text-foreground flex items-center gap-2">
           <Pill className="w-5 h-5 text-amber-500" />
-          Həb Xatırlatması
+          {tr("pillremindercard_heb_xatirlatmasi_e3e934", "H\u0259b Xat\u0131rlatmas\u0131")}
         </h3>
         <Switch checked={enabled} onCheckedChange={handleToggle} disabled={save.isPending || toggle.isPending} />
       </div>
 
-      {enabled && (
-        <div className="space-y-3">
-          {editing ? (
-            <>
+      {enabled &&
+      <div className="space-y-3">
+          {editing ?
+        <>
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Başlıq</label>
+                <label className="text-xs text-muted-foreground mb-1 block">{tr("pillremindercard_basliq_e1f6c5", "Ba\u015Fl\u0131q")}</label>
                 <Input value={title} onChange={(e) => setTitle(e.target.value)} className="h-9 text-sm" />
               </div>
               <div>
@@ -113,32 +113,32 @@ const PillReminderCard = () => {
               </div>
               <div className="flex gap-2">
                 <Button size="sm" onClick={handleSave} disabled={save.isPending} className="flex-1">Yadda saxla</Button>
-                <Button size="sm" variant="outline" onClick={() => setEditing(false)}>Ləğv et</Button>
+                <Button size="sm" variant="outline" onClick={() => setEditing(false)}>{tr("pillremindercard_legv_et_b5e49c", "L\u0259\u011Fv et")}</Button>
               </div>
-            </>
-          ) : (
-            <button
-              onClick={() => setEditing(true)}
-              className="w-full flex items-center justify-between p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-left"
-            >
+            </> :
+
+        <button
+          onClick={() => setEditing(true)}
+          className="w-full flex items-center justify-between p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-left">
+          
               <div>
                 <p className="text-sm font-medium text-foreground">{title}</p>
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
                   <Clock className="w-3 h-3" />
-                  Hər gün {time}
+                  {tr("pillremindercard_her_gun_f4fe36", "H\u0259r g\xFCn")} {time}
                 </div>
               </div>
-              <span className="text-xs text-primary font-medium">Redaktə</span>
+              <span className="text-xs text-primary font-medium">{tr("pillremindercard_redakte_d53ba7", "Redakt\u0259")}</span>
             </button>
-          )}
+        }
         </div>
-      )}
+      }
 
-      {!enabled && (
-        <p className="text-xs text-muted-foreground">Gündəlik kontrasepsiya və ya dərman xatırlatması üçün aktiv edin.</p>
-      )}
-    </motion.div>
-  );
+      {!enabled &&
+      <p className="text-xs text-muted-foreground">{tr("pillremindercard_gundelik_kontrasepsiya_ve_ya_d_8f8e44", "G\xFCnd\u0259lik kontrasepsiya v\u0259 ya d\u0259rman xat\u0131rlatmas\u0131 \xFC\xE7\xFCn aktiv edin.")}</p>
+      }
+    </motion.div>);
+
 };
 
 export default PillReminderCard;

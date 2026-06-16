@@ -16,11 +16,11 @@ import MediaCarousel from './MediaCarousel';
 import CommentReply from './CommentReply';
 import { tr } from "@/lib/tr";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from
+'@/components/ui/dropdown-menu';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
-} from '@/components/ui/dialog';
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from
+'@/components/ui/dialog';
 
 interface PostCardProps {
   post: CommunityPost;
@@ -30,15 +30,15 @@ interface PostCardProps {
 
 const getMediaType = (url: string): 'image' | 'video' => {
   const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
-  return videoExtensions.some(ext => url.toLowerCase().includes(ext)) ? 'video' : 'image';
+  return videoExtensions.some((ext) => url.toLowerCase().includes(ext)) ? 'video' : 'image';
 };
 
-const UserBadge = ({ type }: { type: 'admin' | 'premium' | 'moderator' | null }) => {
+const UserBadge = ({ type }: {type: 'admin' | 'premium' | 'moderator' | null;}) => {
   if (!type) return null;
   const config = {
     admin: { label: 'Admin', icon: Shield, className: 'bg-gradient-to-r from-red-500 to-orange-500 text-white' },
     premium: { label: 'Premium', icon: Crown, className: 'bg-gradient-to-r from-amber-400 to-amber-600 text-white' },
-    moderator: { label: 'Mod', icon: Shield, className: 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' },
+    moderator: { label: 'Mod', icon: Shield, className: 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' }
   };
   const b = config[type];
   if (!b) return null;
@@ -47,8 +47,8 @@ const UserBadge = ({ type }: { type: 'admin' | 'premium' | 'moderator' | null })
     <span className={`inline-flex items-center gap-[2px] px-1.5 py-[1px] rounded-md text-[7px] font-extrabold tracking-wider uppercase ${b.className}`}>
       <Icon className="w-[7px] h-[7px]" />
       {b.label}
-    </span>
-  );
+    </span>);
+
 };
 
 const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
@@ -95,14 +95,14 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
     hapticFeedback.light();
     createComment.mutate({
       postId: post.id, content, postAuthorId: post.user_id,
-      commenterName: profile?.name || user?.user_metadata?.name || 'İstifadəçi',
-      isAnonymous: commentAnonymous,
+      commenterName: profile?.name || user?.user_metadata?.name || tr("postcard_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
+      isAnonymous: commentAnonymous
     });
     setCommentText('');
   };
 
   const handleDeletePost = () => {
-    if (!confirm('Bu postu silmək istəyirsiniz?')) return;
+    if (!confirm(tr("postcard_bu_postu_silmek_isteyirsiniz_2fbc75", "Bu postu silm\u0259k ist\u0259yirsiniz?"))) return;
     hapticFeedback.medium();
     deletePost.mutate(post.id);
   };
@@ -115,11 +115,11 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   };
 
   const handleReportPost = async () => {
-    if (!reportReason.trim()) { toast({ title: tr("postcard_xeta_3cdbb6", 'Xəta'), description: tr("postcard_sikayet_sebebini_qeyd_edin_9d11b9", 'Şikayət səbəbini qeyd edin'), variant: 'destructive' }); return; }
-    if (!user) { toast({ title: tr("postcard_xeta_3cdbb6", 'Xəta'), description: tr("postcard_giris_etmelisiniz_6c2220", 'Giriş etməlisiniz'), variant: 'destructive' }); return; }
+    if (!reportReason.trim()) {toast({ title: tr("postcard_xeta_3cdbb6", 'Xəta'), description: tr("postcard_sikayet_sebebini_qeyd_edin_9d11b9", 'Şikayət səbəbini qeyd edin'), variant: 'destructive' });return;}
+    if (!user) {toast({ title: tr("postcard_xeta_3cdbb6", 'Xəta'), description: tr("postcard_giris_etmelisiniz_6c2220", 'Giriş etməlisiniz'), variant: 'destructive' });return;}
     const { error } = await (supabase as any).from('post_reports').insert({ post_id: post.id, reporter_id: user.id, reason: reportReason, status: 'pending' });
-    if (error) { toast({ title: tr("postcard_xeta_3cdbb6", 'Xəta'), description: error.message, variant: 'destructive' }); }
-    else { toast({ title: tr("postcard_sikayet_gonderildi_b7b528", 'Şikayət göndərildi'), description: tr("postcard_sikayetiniz_yoxlanilacaq_ad512c", 'Şikayətiniz yoxlanılacaq') }); setShowReportDialog(false); setReportReason(''); }
+    if (error) {toast({ title: tr("postcard_xeta_3cdbb6", 'Xəta'), description: error.message, variant: 'destructive' });} else
+    {toast({ title: tr("postcard_sikayet_gonderildi_b7b528", 'Şikayət göndərildi'), description: tr("postcard_sikayetiniz_yoxlanilacaq_ad512c", 'Şikayətiniz yoxlanılacaq') });setShowReportDialog(false);setReportReason('');}
   };
 
   const handleShare = async () => {
@@ -128,35 +128,35 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   };
 
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: az });
-  const mediaItems = (post.media_urls || []).map(url => ({ url, type: getMediaType(url) }));
+  const mediaItems = (post.media_urls || []).map((url) => ({ url, type: getMediaType(url) }));
   const authorBadge = post.author?.badge_type as 'admin' | 'premium' | 'moderator' | null;
-  const handleAvatarClick = () => { if (post.user_id && onUserClick && (!isAnonymous || isAdmin)) onUserClick(post.user_id); };
-  const topLevelComments = comments.filter(c => !c.parent_comment_id);
+  const handleAvatarClick = () => {if (post.user_id && onUserClick && (!isAnonymous || isAdmin)) onUserClick(post.user_id);};
+  const topLevelComments = comments.filter((c) => !c.parent_comment_id);
 
   return (
     <>
-      <motion.div 
+      <motion.div
         className="bg-card border-b border-border/30 overflow-hidden"
-        transition={{ duration: 0.1 }}
-      >
+        transition={{ duration: 0.1 }}>
+        
         {/* Author row */}
         <div className="px-4 pt-3.5 pb-2 flex items-center gap-3">
           <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.9 }} disabled={isAnonymous && !isAdmin}>
             <div className="relative">
-              <Avatar className={`w-10 h-10 ${(isAnonymous && !isAdmin) ? '' : 'cursor-pointer ring-2 ring-border/10 hover:ring-primary/30'} transition-all`}>
-                {isAnonymous && !isAdmin ? (
-                  <AvatarFallback className="bg-muted/30 text-muted-foreground/50"><EyeOff className="w-4 h-4" /></AvatarFallback>
-                ) : isAnonymous && isAdmin ? (
-                  <>
+              <Avatar className={`w-10 h-10 ${isAnonymous && !isAdmin ? '' : 'cursor-pointer ring-2 ring-border/10 hover:ring-primary/30'} transition-all`}>
+                {isAnonymous && !isAdmin ?
+                <AvatarFallback className="bg-muted/30 text-muted-foreground/50"><EyeOff className="w-4 h-4" /></AvatarFallback> :
+                isAnonymous && isAdmin ?
+                <>
+                    <AvatarImage src={post.author?.avatar_url || undefined} />
+                    <AvatarFallback className="bg-gradient-to-br from-primary/15 to-accent/10 text-primary font-black text-xs">{post.author?.name?.charAt(0) || 'İ'}</AvatarFallback>
+                  </> :
+
+                <>
                     <AvatarImage src={post.author?.avatar_url || undefined} />
                     <AvatarFallback className="bg-gradient-to-br from-primary/15 to-accent/10 text-primary font-black text-xs">{post.author?.name?.charAt(0) || 'İ'}</AvatarFallback>
                   </>
-                ) : (
-                  <>
-                    <AvatarImage src={post.author?.avatar_url || undefined} />
-                    <AvatarFallback className="bg-gradient-to-br from-primary/15 to-accent/10 text-primary font-black text-xs">{post.author?.name?.charAt(0) || 'İ'}</AvatarFallback>
-                  </>
-                )}
+                }
               </Avatar>
             </div>
           </motion.button>
@@ -166,26 +166,26 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
                 onClick={handleAvatarClick}
                 className={`font-bold text-[16px] leading-tight ${isAnonymous && !isAdmin ? 'text-muted-foreground italic' : 'text-foreground hover:text-primary'} transition-colors`}
                 whileTap={{ scale: 0.98 }}
-                disabled={isAnonymous && !isAdmin}
-              >
-                {isAnonymous ? (
-                  isAdmin ? (
-                    <span className="flex items-center gap-1">
+                disabled={isAnonymous && !isAdmin}>
+                
+                {isAnonymous ?
+                isAdmin ?
+                <span className="flex items-center gap-1">
                       <span className="text-muted-foreground italic">Anonim</span>
-                      <span className="text-[11px] text-primary/70 font-medium">({post.author?.name || 'İstifadəçi'})</span>
-                    </span>
-                  ) : 'Anonim'
-                ) : (post.author?.name || 'İstifadəçi')}
+                      <span className="text-[11px] text-primary/70 font-medium">({post.author?.name || tr("postcard_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")})</span>
+                    </span> :
+                'Anonim' :
+                post.author?.name || tr("postcard_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}
               </motion.button>
               {!isAnonymous && <UserBadge type={authorBadge} />}
               {isAnonymous && isAdmin && <UserBadge type={authorBadge} />}
               <span className="text-[13px] text-muted-foreground font-medium">· {timeAgo}</span>
             </div>
-            {isAnonymous && (
-              <span className="inline-flex items-center gap-[2px] px-1 py-[1px] rounded text-[7px] font-semibold bg-muted/30 text-muted-foreground/40 mt-0.5">
+            {isAnonymous &&
+            <span className="inline-flex items-center gap-[2px] px-1 py-[1px] rounded text-[7px] font-semibold bg-muted/30 text-muted-foreground/40 mt-0.5">
                 <EyeOff className="w-[7px] h-[7px]" /> Anonim
               </span>
-            )}
+            }
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -194,29 +194,29 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-popover border-border/20 z-50 rounded-xl shadow-xl min-w-[150px]">
-              {isOwnPost && (
-                <DropdownMenuItem onClick={() => { setEditContent(post.content); setIsEditing(true); }} className="text-foreground text-[11px] rounded-lg">
-                  <Pencil className="w-3 h-3 mr-2" /> Redaktə et
+              {isOwnPost &&
+              <DropdownMenuItem onClick={() => {setEditContent(post.content);setIsEditing(true);}} className="text-foreground text-[11px] rounded-lg">
+                  <Pencil className="w-3 h-3 mr-2" /> {tr("postcard_redakte_et_66cf3b", "Redakt\u0259 et")}
                 </DropdownMenuItem>
-              )}
-              {!isOwnPost && (
-                <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-amber-600 text-[11px] rounded-lg">
-                  <Flag className="w-3 h-3 mr-2" /> Şikayət et
+              }
+              {!isOwnPost &&
+              <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-amber-600 text-[11px] rounded-lg">
+                  <Flag className="w-3 h-3 mr-2" /> {tr("postcard_sikayet_et_e8b63a", "\u015Eikay\u0259t et")}
                 </DropdownMenuItem>
-              )}
+              }
               {(isAdmin || isOwnPost) && <DropdownMenuSeparator className="bg-border/10" />}
-              {(isAdmin || isOwnPost) && (
-                <DropdownMenuItem onClick={handleDeletePost} className="text-destructive text-[11px] rounded-lg">
+              {(isAdmin || isOwnPost) &&
+              <DropdownMenuItem onClick={handleDeletePost} className="text-destructive text-[11px] rounded-lg">
                   <Trash2 className="w-3 h-3 mr-2" /> Sil
                 </DropdownMenuItem>
-              )}
+              }
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
 
         {/* Content */}
-        {isEditing ? (
-          <div className="px-4 pb-3 space-y-2">
+        {isEditing ?
+        <div className="px-4 pb-3 space-y-2">
             <Textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} className="min-h-[70px] rounded-xl resize-none text-[13px] bg-muted/10 border-border/15" autoFocus />
             <div className="flex gap-1.5 justify-end">
               <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="rounded-lg text-[11px] h-7 px-3">{tr("postcard_legv_et_b5e49c", "Ləğv et")}</Button>
@@ -224,40 +224,40 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
                 {editPost.isPending ? '...' : 'Saxla'}
               </Button>
             </div>
-          </div>
-        ) : (
-          <div onClick={handleDoubleTap} className="relative">
+          </div> :
+
+        <div onClick={handleDoubleTap} className="relative">
             <div className="px-4 pb-2.5">
               <p className="text-foreground whitespace-pre-wrap text-[16px] leading-[1.6]">
                 {post.content.split(/(\s+)/).map((word, index) => {
-                  if (word.startsWith('#')) return <span key={index} className="text-primary font-semibold">{word}</span>;
-                  if (word.startsWith('@')) return <span key={index} className="text-blue-500 font-semibold">{word}</span>;
-                  if (/^https?:\/\/\S+/.test(word)) return <a key={index} href={word} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline break-all" onClick={(e) => e.stopPropagation()}>{word}</a>;
-                  return word;
-                })}
+                if (word.startsWith('#')) return <span key={index} className="text-primary font-semibold">{word}</span>;
+                if (word.startsWith('@')) return <span key={index} className="text-blue-500 font-semibold">{word}</span>;
+                if (/^https?:\/\/\S+/.test(word)) return <a key={index} href={word} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline break-all" onClick={(e) => e.stopPropagation()}>{word}</a>;
+                return word;
+              })}
               </p>
             </div>
-            {mediaItems.length > 0 && (
-              <div className="mt-1">
+            {mediaItems.length > 0 &&
+          <div className="mt-1">
                 <MediaCarousel media={mediaItems} />
               </div>
-            )}
+          }
             {/* Heart burst animation */}
             <AnimatePresence>
-              {showHeartBurst && (
-                <motion.div
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 1.5, opacity: 0 }}
-                  transition={{ duration: 0.4, ease: 'easeOut' }}
-                  className="absolute inset-0 flex items-center justify-center pointer-events-none z-10"
-                >
+              {showHeartBurst &&
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 1.5, opacity: 0 }}
+              transition={{ duration: 0.4, ease: 'easeOut' }}
+              className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+              
                   <Heart className="w-20 h-20 text-rose-500 fill-rose-500 drop-shadow-lg" />
                 </motion.div>
-              )}
+            }
             </AnimatePresence>
           </div>
-        )}
+        }
 
         {/* Actions - Instagram style */}
         <div className="px-4 py-2 flex items-center justify-between">
@@ -280,53 +280,53 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
 
         {/* Comments section */}
         <AnimatePresence>
-          {showComments && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="border-t border-border/8 overflow-hidden"
-            >
+          {showComments &&
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="border-t border-border/8 overflow-hidden">
+            
               <div className="p-4 space-y-3">
                 <div className="flex gap-2.5">
                   <Input
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    placeholder={commentAnonymous ? 'Anonim şərh yaz...' : tr("postcard_serh_yaz_54a89a", "Şərh yaz...")}
-                    className="flex-1 h-9 rounded-full text-[12px] bg-muted/15 border-border/10 px-4"
-                    onKeyPress={(e) => e.key === 'Enter' && handleComment()}
-                  />
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  placeholder={commentAnonymous ? tr("postcard_anonim_serh_yaz_9af1ca", "Anonim \u015F\u0259rh yaz...") : tr("postcard_serh_yaz_54a89a", "Şərh yaz...")}
+                  className="flex-1 h-9 rounded-full text-[12px] bg-muted/15 border-border/10 px-4"
+                  onKeyPress={(e) => e.key === 'Enter' && handleComment()} />
+                
                   <Button onClick={handleComment} disabled={!commentText.trim() || createComment.isPending} className="w-9 h-9 rounded-full gradient-primary p-0">
                     <Send className="w-3.5 h-3.5 text-primary-foreground" />
                   </Button>
                 </div>
                 <button
-                  type="button"
-                  onClick={() => setCommentAnonymous(v => !v)}
-                  className={`flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full transition-colors ${
-                    commentAnonymous ? 'bg-primary/10 text-primary' : 'bg-muted/40 text-muted-foreground'
-                  }`}
-                >
+                type="button"
+                onClick={() => setCommentAnonymous((v) => !v)}
+                className={`flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full transition-colors ${
+                commentAnonymous ? 'bg-primary/10 text-primary' : 'bg-muted/40 text-muted-foreground'}`
+                }>
+                
                   <span className={`w-3 h-3 rounded-full border ${commentAnonymous ? 'border-primary bg-primary' : 'border-muted-foreground/40'}`} />
                   Anonim olaraq yaz
                 </button>
-                {commentsLoading ? (
-                  <div className="text-center py-4">
+                {commentsLoading ?
+              <div className="text-center py-4">
                     <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
-                  </div>
-                ) : topLevelComments.length === 0 ? (
-                  <p className="text-center py-5 text-[11px] text-muted-foreground/30 font-medium">{tr("postcard_hele_serh_yoxdur_89ce09", "Hələ şərh yoxdur 💭")}</p>
-                ) : (
-                  <div className="space-y-2">
-                    {topLevelComments.map((comment) => (
-                      <CommentReply key={comment.id} comment={comment} postId={post.id} postAuthorId={post.user_id} allComments={comments} onRefetch={refetchComments} onUserClick={onUserClick} />
-                    ))}
-                  </div>
+                  </div> :
+              topLevelComments.length === 0 ?
+              <p className="text-center py-5 text-[11px] text-muted-foreground/30 font-medium">{tr("postcard_hele_serh_yoxdur_89ce09", "Hələ şərh yoxdur 💭")}</p> :
+
+              <div className="space-y-2">
+                    {topLevelComments.map((comment) =>
+                <CommentReply key={comment.id} comment={comment} postId={post.id} postAuthorId={post.user_id} allComments={comments} onRefetch={refetchComments} onUserClick={onUserClick} />
                 )}
+                  </div>
+              }
               </div>
             </motion.div>
-          )}
+          }
         </AnimatePresence>
       </motion.div>
 
@@ -344,8 +344,8 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
           </div>
         </DialogContent>
       </Dialog>
-    </>
-  );
+    </>);
+
 };
 
 export default PostCard;

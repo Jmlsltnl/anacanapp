@@ -26,15 +26,15 @@ const FALLBACK_NOISE_THRESHOLDS = {
 const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
   useScrollToTop();
   useScreenAnalytics('NoiseMeter', 'Tools');
-  
+
   // Fetch thresholds from database
   const { data: noiseThresholdsDB = [] } = useNoiseThresholdsDB();
-  
+
   // Build thresholds from DB or use fallback
   const NOISE_THRESHOLDS = useMemo(() => {
     if (noiseThresholdsDB.length > 0) {
       const getThresholdValue = (key: string, defaultVal: number) => {
-        const t = noiseThresholdsDB.find(n => n.threshold_key === key);
+        const t = noiseThresholdsDB.find((n) => n.threshold_key === key);
         return t ? t.min_db : defaultVal;
       };
       return {
@@ -52,22 +52,22 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
   const [avgDb, setAvgDb] = useState(0);
   const [maxDb, setMaxDb] = useState(0);
   const [showWhiteNoisePrompt, setShowWhiteNoisePrompt] = useState(false);
-  const [history, setHistory] = useState<{ db: number; time: Date }[]>([]);
-  
+  const [history, setHistory] = useState<{db: number;time: Date;}[]>([]);
+
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const animationRef = useRef<number | null>(null);
   const dbHistoryRef = useRef<number[]>([]);
-  
+
   const { toast } = useToast();
   const { profile } = useAuth();
 
   const saveToDatabase = useCallback(async (db: number) => {
     if (!profile?.user_id) return;
-    
+
     const isTooLoud = db > NOISE_THRESHOLDS.acceptable;
-    
+
     await supabase.from('noise_measurements').insert({
       user_id: profile.user_id,
       decibel_level: db,
@@ -79,64 +79,64 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
-      
+
       const audioContext = new AudioContext();
       audioContextRef.current = audioContext;
-      
+
       const source = audioContext.createMediaStreamSource(stream);
       const analyser = audioContext.createAnalyser();
       analyser.fftSize = 2048;
       analyser.smoothingTimeConstant = 0.8;
       source.connect(analyser);
       analyserRef.current = analyser;
-      
+
       setIsListening(true);
       dbHistoryRef.current = [];
       setMaxDb(0);
-      
+
       const updateLevel = () => {
         if (!analyserRef.current) return;
-        
+
         const dataArray = new Float32Array(analyserRef.current.frequencyBinCount);
         analyserRef.current.getFloatTimeDomainData(dataArray);
-        
+
         // Calculate RMS value
         let sum = 0;
         for (let i = 0; i < dataArray.length; i++) {
           sum += dataArray[i] * dataArray[i];
         }
         const rms = Math.sqrt(sum / dataArray.length);
-        
+
         // Convert to dB (with calibration offset)
         // The formula: dB = 20 * log10(rms) + calibration
         // We add a calibration factor to approximate real-world dB levels
         const db = Math.max(0, Math.min(120, 20 * Math.log10(rms) + 94));
-        
+
         setCurrentDb(Math.round(db));
-        
+
         // Update history for averaging
         dbHistoryRef.current.push(db);
         if (dbHistoryRef.current.length > 100) {
           dbHistoryRef.current.shift();
         }
-        
+
         // Calculate average
         const avg = dbHistoryRef.current.reduce((a, b) => a + b, 0) / dbHistoryRef.current.length;
         setAvgDb(Math.round(avg));
-        
+
         // Track maximum
-        setMaxDb(prev => Math.max(prev, db));
-        
+        setMaxDb((prev) => Math.max(prev, db));
+
         // Check if too loud for baby sleep
         if (db > NOISE_THRESHOLDS.warning && !showWhiteNoisePrompt) {
           setShowWhiteNoisePrompt(true);
         }
-        
+
         animationRef.current = requestAnimationFrame(updateLevel);
       };
-      
+
       updateLevel();
-      
+
     } catch (error) {
       toast({
         title: tr("noisemeter_mikrofon_xetasi_5f83b3", 'Mikrofon xətası'),
@@ -151,25 +151,25 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
       cancelAnimationFrame(animationRef.current);
     }
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach((track) => track.stop());
     }
     if (audioContextRef.current) {
       await audioContextRef.current.close();
     }
-    
+
     setIsListening(false);
-    
+
     // Save average reading to database
     if (avgDb > 0) {
       await saveToDatabase(avgDb);
-      setHistory(prev => [...prev.slice(-9), { db: avgDb, time: new Date() }]);
+      setHistory((prev) => [...prev.slice(-9), { db: avgDb, time: new Date() }]);
     }
   };
 
   useEffect(() => {
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
-      if (streamRef.current) streamRef.current.getTracks().forEach(track => track.stop());
+      if (streamRef.current) streamRef.current.getTracks().forEach((track) => track.stop());
       if (audioContextRef.current) audioContextRef.current.close();
     };
   }, []);
@@ -183,7 +183,7 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
   };
 
   const noiseLevel = getNoiseLevel(currentDb);
-  const gaugePercentage = Math.min(100, (currentDb / 100) * 100);
+  const gaugePercentage = Math.min(100, currentDb / 100 * 100);
 
   const navigateToWhiteNoise = () => {
     stopListening();
@@ -222,8 +222,8 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="8"
-                    className="text-muted/30"
-                  />
+                    className="text-muted/30" />
+                  
                   {/* Progress circle */}
                   <motion.circle
                     cx="50"
@@ -236,18 +236,18 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
                     className={noiseLevel.color}
                     strokeDasharray={`${gaugePercentage * 2.64} 264`}
                     animate={{ strokeDasharray: `${gaugePercentage * 2.64} 264` }}
-                    transition={{ duration: 0.3 }}
-                  />
+                    transition={{ duration: 0.3 }} />
+                  
                 </svg>
                 
                 {/* Center content */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <motion.span 
+                  <motion.span
                     className={`text-5xl font-bold ${noiseLevel.color}`}
                     key={currentDb}
                     initial={{ scale: 1.1 }}
-                    animate={{ scale: 1 }}
-                  >
+                    animate={{ scale: 1 }}>
+                    
                     {currentDb}
                   </motion.span>
                   <span className="text-lg text-muted-foreground">dB</span>
@@ -257,13 +257,13 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
               {/* Status Label */}
               <div className={`mt-4 px-4 py-2 rounded-full ${noiseLevel.bg}/20`}>
                 <span className={`font-semibold ${noiseLevel.color}`}>
-                  {isListening ? noiseLevel.label: tr("noisemeter_olcum_basladilmayib_46107a", 'Ölçüm başladılmayıb')}
+                  {isListening ? noiseLevel.label : tr("noisemeter_olcum_basladilmayib_46107a", 'Ölçüm başladılmayıb')}
                 </span>
               </div>
 
               {/* Stats */}
-              {isListening && (
-                <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-xs">
+              {isListening &&
+              <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-xs">
                   <div className="bg-muted/50 rounded-lg p-3 text-center">
                     <p className="text-xs text-muted-foreground">Orta</p>
                     <p className="text-xl font-bold">{avgDb} dB</p>
@@ -273,35 +273,35 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
                     <p className="text-xl font-bold">{maxDb} dB</p>
                   </div>
                 </div>
-              )}
+              }
 
               {/* Control Button */}
               <Button
                 size="lg"
                 className={`mt-6 w-32 h-32 rounded-full ${
-                  isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-primary hover:bg-primary/90'
-                }`}
-                onClick={isListening ? stopListening : startListening}
-              >
-                {isListening ? (
-                  <MicOff className="w-12 h-12" />
-                ) : (
-                  <Mic className="w-12 h-12" />
-                )}
+                isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-primary hover:bg-primary/90'}`
+                }
+                onClick={isListening ? stopListening : startListening}>
+                
+                {isListening ?
+                <MicOff className="w-12 h-12" /> :
+
+                <Mic className="w-12 h-12" />
+                }
               </Button>
               <p className="mt-2 text-sm text-muted-foreground">
-                {isListening ? 'Dayandırmaq üçün toxunun' : 'Başlamaq üçün toxunun'}
+                {isListening ? tr("noisemeter_dayandirmaq_ucun_toxunun_d02de1", "Dayand\u0131rmaq \xFC\xE7\xFCn toxunun") : tr("noisemeter_baslamaq_ucun_toxunun_ee2514", "Ba\u015Flamaq \xFC\xE7\xFCn toxunun")}
               </p>
             </div>
           </CardContent>
         </Card>
 
         {/* White Noise Prompt */}
-        {showWhiteNoisePrompt && isListening && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
+        {showWhiteNoisePrompt && isListening &&
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}>
+          
             <Card className="border-orange-500/30 bg-orange-500/5">
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
@@ -309,22 +309,22 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
                   <div className="flex-1">
                     <h3 className="font-semibold text-orange-600">{tr("noisemeter_ses_seviyyesi_yuksekdir_f91956", "Səs səviyyəsi yüksəkdir")}</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Bu səviyyə dərin yuxu üçün çox yüksəkdir. Ağ səs açım?
+                      {tr("noisemeter_bu_seviyye_derin_yuxu_ucun_cox_b27a60", "Bu s\u0259viyy\u0259 d\u0259rin yuxu \xFC\xE7\xFCn \xE7ox y\xFCks\u0259kdir. A\u011F s\u0259s a\xE7\u0131m?")}
                     </p>
                     <div className="flex gap-2 mt-3">
-                      <Button 
-                        size="sm" 
-                        className="bg-orange-500 hover:bg-orange-600"
-                        onClick={navigateToWhiteNoise}
-                      >
+                      <Button
+                      size="sm"
+                      className="bg-orange-500 hover:bg-orange-600"
+                      onClick={navigateToWhiteNoise}>
+                      
                         <Volume2 className="w-4 h-4 mr-1" />
-                        Ağ səs aç
+                        {tr("noisemeter_ag_ses_ac_06be65", "A\u011F s\u0259s a\xE7")}
                       </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => setShowWhiteNoisePrompt(false)}
-                      >
+                      <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setShowWhiteNoisePrompt(false)}>
+                      
                         Sonra
                       </Button>
                     </div>
@@ -333,14 +333,14 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
               </CardContent>
             </Card>
           </motion.div>
-        )}
+        }
 
         {/* Noise Level Guide */}
         <Card>
           <CardContent className="p-4">
             <h3 className="font-semibold mb-3 flex items-center gap-2">
               <Moon className="w-4 h-4" />
-              Körpə yuxusu üçün səs səviyyələri
+              {tr("noisemeter_korpe_yuxusu_ucun_ses_seviyyel_d8f4f9", "K\xF6rp\u0259 yuxusu \xFC\xE7\xFCn s\u0259s s\u0259viyy\u0259l\u0259ri")}
             </h3>
             <div className="space-y-2">
               <div className="flex items-center gap-3">
@@ -373,33 +373,33 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
         </Card>
 
         {/* Recent History */}
-        {history.length > 0 && (
-          <Card>
+        {history.length > 0 &&
+        <Card>
             <CardContent className="p-4">
               <h3 className="font-semibold mb-3 flex items-center gap-2">
                 <History className="w-4 h-4" />
-                Son ölçmələr
+                {tr("noisemeter_son_olcmeler_b024cf", "Son \xF6l\xE7m\u0259l\u0259r")}
               </h3>
               <div className="space-y-2">
                 {history.slice().reverse().map((item, idx) => {
-                  const level = getNoiseLevel(item.db);
-                  return (
-                    <div key={idx} className="flex items-center gap-3 p-2 bg-muted/50 rounded-lg">
+                const level = getNoiseLevel(item.db);
+                return (
+                  <div key={idx} className="flex items-center gap-3 p-2 bg-muted/50 rounded-lg">
                       <div className={`w-2 h-2 rounded-full ${level.bg}`} />
                       <span className="font-medium">{item.db} dB</span>
                       <span className="text-xs text-muted-foreground ml-auto">
                         {item.time.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
                       </span>
-                    </div>
-                  );
-                })}
+                    </div>);
+
+              })}
               </div>
             </CardContent>
           </Card>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default NoiseMeter;

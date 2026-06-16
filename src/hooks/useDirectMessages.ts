@@ -35,12 +35,12 @@ export const useDirectMessages = (otherUserId?: string) => {
   const fetchConversations = useCallback(async () => {
     if (!user) return;
     try {
-      const { data, error } = await supabase
-        .from('direct_messages')
-        .select('*')
-        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
-        .order('created_at', { ascending: false })
-        .limit(500);
+      const { data, error } = await supabase.
+      from('direct_messages').
+      select('*').
+      or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`).
+      order('created_at', { ascending: false }).
+      limit(500);
 
       if (error) throw error;
       if (!data || data.length === 0) {
@@ -50,7 +50,7 @@ export const useDirectMessages = (otherUserId?: string) => {
       }
 
       // Group by conversation partner
-      const convMap = new Map<string, { messages: any[]; unread: number }>();
+      const convMap = new Map<string, {messages: any[];unread: number;}>();
       for (const msg of data) {
         const partnerId = msg.sender_id === user.id ? msg.receiver_id : msg.sender_id;
         if (!convMap.has(partnerId)) {
@@ -63,25 +63,25 @@ export const useDirectMessages = (otherUserId?: string) => {
 
       // Fetch profile info for all partners
       const partnerIds = Array.from(convMap.keys());
-      const { data: profiles } = await (supabase as any)
-        .from('public_profile_cards')
-        .select('user_id, name, avatar_url')
-        .in('user_id', partnerIds);
+      const { data: profiles } = await (supabase as any).
+      from('public_profile_cards').
+      select('user_id, name, avatar_url').
+      in('user_id', partnerIds);
 
       const profileMap = new Map((profiles || []).map((p: any) => [p.user_id, p]));
 
-      const convList: Conversation[] = partnerIds.map(pid => {
+      const convList: Conversation[] = partnerIds.map((pid) => {
         const conv = convMap.get(pid)!;
         const lastMsg = conv.messages[0];
         const profile = profileMap.get(pid) as any;
         return {
           user_id: pid,
-          name: profile?.name || 'İstifadəçi',
+          name: profile?.name || tr("usedirectmessages_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
           avatar_url: profile?.avatar_url || null,
           last_message: lastMsg.content,
           last_message_type: lastMsg.message_type,
           last_message_at: lastMsg.created_at,
-          unread_count: conv.unread,
+          unread_count: conv.unread
         };
       });
 
@@ -97,25 +97,25 @@ export const useDirectMessages = (otherUserId?: string) => {
   const fetchMessages = useCallback(async () => {
     if (!user || !otherUserId) return;
     try {
-      const { data, error } = await supabase
-        .from('direct_messages')
-        .select('*')
-        .or(
-          `and(sender_id.eq.${user.id},receiver_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},receiver_id.eq.${user.id})`
-        )
-        .order('created_at', { ascending: true })
-        .limit(200);
+      const { data, error } = await supabase.
+      from('direct_messages').
+      select('*').
+      or(
+        `and(sender_id.eq.${user.id},receiver_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},receiver_id.eq.${user.id})`
+      ).
+      order('created_at', { ascending: true }).
+      limit(200);
 
       if (error) throw error;
-      setMessages((data as DirectMessage[]) || []);
+      setMessages(data as DirectMessage[] || []);
 
       // Mark unread as read
-      const unread = (data || []).filter(m => m.receiver_id === user.id && !m.is_read);
+      const unread = (data || []).filter((m) => m.receiver_id === user.id && !m.is_read);
       if (unread.length > 0) {
-        await supabase
-          .from('direct_messages')
-          .update({ is_read: true })
-          .in('id', unread.map(m => m.id));
+        await supabase.
+        from('direct_messages').
+        update({ is_read: true }).
+        in('id', unread.map((m) => m.id));
       }
     } catch (err) {
       console.error('Error fetching messages:', err);
@@ -127,17 +127,17 @@ export const useDirectMessages = (otherUserId?: string) => {
   const sendMessage = async (content: string, type: string = 'text', mediaUrl?: string) => {
     if (!user || !otherUserId) return null;
     try {
-      const { data, error } = await supabase
-        .from('direct_messages')
-        .insert({
-          sender_id: user.id,
-          receiver_id: otherUserId,
-          content: type === 'text' ? content : null,
-          message_type: type,
-          media_url: mediaUrl || null,
-        })
-        .select()
-        .single();
+      const { data, error } = await supabase.
+      from('direct_messages').
+      insert({
+        sender_id: user.id,
+        receiver_id: otherUserId,
+        content: type === 'text' ? content : null,
+        message_type: type,
+        media_url: mediaUrl || null
+      }).
+      select().
+      single();
 
       if (error) throw error;
 
@@ -147,13 +147,13 @@ export const useDirectMessages = (otherUserId?: string) => {
           body: {
             userId: otherUserId,
             title: 'Yeni mesaj 💬',
-            body: type === 'text' ? (content.length > 60 ? content.slice(0, 60) + '...' : content)
-              : type === 'image' ? '📷 Şəkil göndərdi'
-              : type === 'video' ? '🎥 Video göndərdi'
-              : type === 'audio' ? '🎤 Səs mesajı göndərdi'
-              : 'Yeni mesaj',
-            data: { type: 'direct_message', sender_id: user.id },
-          },
+            body: type === 'text' ? content.length > 60 ? content.slice(0, 60) + '...' : content :
+            type === 'image' ? tr("usedirectmessages_sekil_gonderdi_9e8836", "\uD83D\uDCF7 \u015E\u0259kil g\xF6nd\u0259rdi") :
+            type === 'video' ? tr("usedirectmessages_video_gonderdi_41246c", "\uD83C\uDFA5 Video g\xF6nd\u0259rdi") :
+            type === 'audio' ? tr("usedirectmessages_ses_mesaji_gonderdi_5b803e", "\uD83C\uDFA4 S\u0259s mesaj\u0131 g\xF6nd\u0259rdi") :
+            'Yeni mesaj',
+            data: { type: 'direct_message', sender_id: user.id }
+          }
         });
       } catch (pushErr) {
         console.warn('Push notification failed:', pushErr);
@@ -173,9 +173,9 @@ export const useDirectMessages = (otherUserId?: string) => {
     const fileName = `dm/${user.id}/${Date.now()}.${ext}`;
     const contentType = type === 'image' ? 'image/jpeg' : type === 'video' ? 'video/mp4' : 'audio/webm';
 
-    const { data, error } = await supabase.storage
-      .from('chat-media')
-      .upload(fileName, file, { contentType, upsert: false });
+    const { data, error } = await supabase.storage.
+    from('chat-media').
+    upload(fileName, file, { contentType, upsert: false });
 
     if (error) throw error;
     const { data: { publicUrl } } = supabase.storage.from('chat-media').getPublicUrl(data.path);
@@ -195,29 +195,29 @@ export const useDirectMessages = (otherUserId?: string) => {
   useEffect(() => {
     if (!user) return;
 
-    const channel = supabase
-      .channel('dm_realtime')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'direct_messages',
-        filter: `receiver_id=eq.${user.id}`,
-      }, () => {
-        if (otherUserId) fetchMessages();
-        else fetchConversations();
-      })
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'direct_messages',
-        filter: `sender_id=eq.${user.id}`,
-      }, () => {
-        if (otherUserId) fetchMessages();
-        else fetchConversations();
-      })
-      .subscribe();
+    const channel = supabase.
+    channel('dm_realtime').
+    on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'direct_messages',
+      filter: `receiver_id=eq.${user.id}`
+    }, () => {
+      if (otherUserId) fetchMessages();else
+      fetchConversations();
+    }).
+    on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'direct_messages',
+      filter: `sender_id=eq.${user.id}`
+    }, () => {
+      if (otherUserId) fetchMessages();else
+      fetchConversations();
+    }).
+    subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => {supabase.removeChannel(channel);};
   }, [user, otherUserId, fetchMessages, fetchConversations]);
 
   const totalUnread = conversations.reduce((sum, c) => sum + c.unread_count, 0);
@@ -229,6 +229,6 @@ export const useDirectMessages = (otherUserId?: string) => {
     sendMessage,
     uploadMedia,
     totalUnread,
-    refetch: otherUserId ? fetchMessages : fetchConversations,
+    refetch: otherUserId ? fetchMessages : fetchConversations
   };
 };

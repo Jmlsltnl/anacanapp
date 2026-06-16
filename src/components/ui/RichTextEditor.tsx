@@ -5,12 +5,12 @@ import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import TextAlign from '@tiptap/extension-text-align';
 import Placeholder from '@tiptap/extension-placeholder';
-import { 
+import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
   List, ListOrdered, Heading1, Heading2, Heading3,
-  AlignLeft, AlignCenter, AlignRight, Link as LinkIcon, 
-  Image as ImageIcon, Undo, Redo, Quote, Minus, Code, Upload
-} from 'lucide-react';
+  AlignLeft, AlignCenter, AlignRight, Link as LinkIcon,
+  Image as ImageIcon, Undo, Redo, Quote, Minus, Code, Upload } from
+'lucide-react';
 import { useEffect, useCallback, useRef, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -42,7 +42,7 @@ const markdownToHtml = (md: string): string => {
   // Inline code
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
   // Wrap remaining plain lines in <p> tags
-  html = html.split('\n').map(line => {
+  html = html.split('\n').map((line) => {
     const trimmed = line.trim();
     if (!trimmed) return '';
     if (/^<(h[1-6]|ul|ol|li|blockquote|hr|p|div|pre|code|img)/.test(trimmed)) return trimmed;
@@ -66,29 +66,29 @@ interface RichTextEditorProps {
   className?: string;
 }
 
-const MenuButton = ({ onClick, active, disabled, children, title }: {
-  onClick: () => void;
-  active?: boolean;
-  disabled?: boolean;
-  children: React.ReactNode;
-  title?: string;
-}) => (
-  <button
-    type="button"
-    onClick={onClick}
-    disabled={disabled}
-    title={title}
-    className={cn(
-      'p-1.5 rounded-md transition-colors',
-      active ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-      disabled && 'opacity-40 cursor-not-allowed'
-    )}
-  >
-    {children}
-  </button>
-);
+const MenuButton = ({ onClick, active, disabled, children, title
 
-const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', disabled, className }: RichTextEditorProps) => {
+
+
+
+
+}: {onClick: () => void;active?: boolean;disabled?: boolean;children: React.ReactNode;title?: string;}) =>
+<button
+  type="button"
+  onClick={onClick}
+  disabled={disabled}
+  title={title}
+  className={cn(
+    'p-1.5 rounded-md transition-colors',
+    active ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+    disabled && 'opacity-40 cursor-not-allowed'
+  )}>
+  
+    {children}
+  </button>;
+
+
+const RichTextEditor = ({ content, onChange, placeholder = tr("richtexteditor_mezmun_yazin_bdbcfa", "M\u0259zmun yaz\u0131n..."), disabled, className }: RichTextEditorProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Convert markdown to HTML if needed
@@ -100,20 +100,20 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', 
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        heading: { levels: [1, 2, 3] },
-      }),
-      Underline,
-      Link.configure({ openOnClick: false, HTMLAttributes: { class: 'text-primary underline' } }),
-      Image.configure({ inline: false, allowBase64: true }),
-      TextAlign.configure({ types: ['heading', 'paragraph'] }),
-      Placeholder.configure({ placeholder }),
-    ],
+    StarterKit.configure({
+      heading: { levels: [1, 2, 3] }
+    }),
+    Underline,
+    Link.configure({ openOnClick: false, HTMLAttributes: { class: 'text-primary underline' } }),
+    Image.configure({ inline: false, allowBase64: true }),
+    TextAlign.configure({ types: ['heading', 'paragraph'] }),
+    Placeholder.configure({ placeholder })],
+
     content: processedContent,
     editable: !disabled,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
-    },
+    }
   });
 
   useEffect(() => {
@@ -134,33 +134,33 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', 
   const handleImageUpload = useCallback(async (file: File) => {
     if (!editor) return;
     if (!file.type.startsWith('image/')) {
-      toast.error('Yalnız şəkil faylları yükləyə bilərsiniz');
+      toast.error(tr("richtexteditor_yalniz_sekil_fayllari_yukleye__ed2541", "Yaln\u0131z \u015F\u0259kil fayllar\u0131 y\xFCkl\u0259y\u0259 bil\u0259rsiniz"));
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Şəkil 5MB-dan böyük ola bilməz');
+      toast.error(tr("richtexteditor_sekil_5mb_dan_boyuk_ola_bilmez_3e4e99", "\u015E\u0259kil 5MB-dan b\xF6y\xFCk ola bilm\u0259z"));
       return;
     }
 
     try {
       const ext = file.name.split('.').pop();
       const fileName = `editor/${Date.now()}-${Math.random().toString(36).substring(2)}.${ext}`;
-      
-      const { error } = await supabase.storage
-        .from('assets')
-        .upload(fileName, file);
+
+      const { error } = await supabase.storage.
+      from('assets').
+      upload(fileName, file);
 
       if (error) throw error;
 
-      const { data: urlData } = supabase.storage
-        .from('assets')
-        .getPublicUrl(fileName);
+      const { data: urlData } = supabase.storage.
+      from('assets').
+      getPublicUrl(fileName);
 
       editor.chain().focus().setImage({ src: urlData.publicUrl }).run();
-      toast.success('Şəkil yükləndi');
+      toast.success(tr("richtexteditor_sekil_yuklendi_474bd5", "\u015E\u0259kil y\xFCkl\u0259ndi"));
     } catch (err) {
       console.error('Image upload error:', err);
-      toast.error('Şəkil yüklənərkən xəta baş verdi');
+      toast.error(tr("richtexteditor_sekil_yuklenerken_xeta_bas_ver_16a2d0", "\u015E\u0259kil y\xFCkl\u0259n\u0259rk\u0259n x\u0259ta ba\u015F verdi"));
     }
   }, [editor]);
 
@@ -188,8 +188,8 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', 
         type="file"
         accept="image/*"
         onChange={onFileChange}
-        className="hidden"
-      />
+        className="hidden" />
+      
 
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 p-1.5 border-b border-border bg-muted/30">
@@ -268,8 +268,8 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', 
       </div>
 
       {/* Editor */}
-      <EditorContent 
-        editor={editor} 
+      <EditorContent
+        editor={editor}
         className={cn(
           'p-4 min-h-[200px] focus-within:outline-none',
           '[&_.ProseMirror]:outline-none [&_.ProseMirror]:min-h-[180px]',
@@ -304,11 +304,11 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Məzmun yazın...', 
           // Images
           '[&_.ProseMirror_img]:max-w-full [&_.ProseMirror_img]:h-auto [&_.ProseMirror_img]:rounded-lg [&_.ProseMirror_img]:my-3',
           // Links
-          '[&_.ProseMirror_a]:text-primary [&_.ProseMirror_a]:underline',
-        )}
-      />
-    </div>
-  );
+          '[&_.ProseMirror_a]:text-primary [&_.ProseMirror_a]:underline'
+        )} />
+      
+    </div>);
+
 };
 
 export default RichTextEditor;

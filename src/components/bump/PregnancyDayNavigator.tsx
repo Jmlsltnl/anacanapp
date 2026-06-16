@@ -17,7 +17,7 @@ const PregnancyDayNavigator = ({
   selectedDay,
   onDayChange,
   isPremium,
-  maxDays = 280,
+  maxDays = 280
 }: PregnancyDayNavigatorProps) => {
   const FREE_RANGE = 3; // Free users can go ±3 days
 
@@ -28,7 +28,7 @@ const PregnancyDayNavigator = ({
     }
     return {
       min: Math.max(1, currentActualDay - FREE_RANGE),
-      max: Math.min(maxDays, currentActualDay + FREE_RANGE),
+      max: Math.min(maxDays, currentActualDay + FREE_RANGE)
     };
   }, [isPremium, currentActualDay, maxDays]);
 
@@ -57,7 +57,7 @@ const PregnancyDayNavigator = ({
   // Determine offset from current day for display
   const dayOffset = selectedDay - currentActualDay;
   const getOffsetLabel = () => {
-    if (dayOffset === 0) return 'Bu gün';
+    if (dayOffset === 0) return tr("pregnancydaynavigator_bu_gun_786fd4", "Bu g\xFCn");
     if (dayOffset > 0) return `+${dayOffset} gün`;
     return `${dayOffset} gün`;
   };
@@ -70,12 +70,12 @@ const PregnancyDayNavigator = ({
         disabled={!canGoBack}
         className={cn(
           "w-9 h-9 rounded-full flex items-center justify-center transition-all border",
-          canGoBack 
-            ? "bg-primary/10 hover:bg-primary/20 text-primary border-primary/30 active:scale-95" 
-            : "bg-muted text-muted-foreground/40 border-transparent cursor-not-allowed"
+          canGoBack ?
+          "bg-primary/10 hover:bg-primary/20 text-primary border-primary/30 active:scale-95" :
+          "bg-muted text-muted-foreground/40 border-transparent cursor-not-allowed"
         )}
-        whileTap={canGoBack ? { scale: 0.9 } : {}}
-      >
+        whileTap={canGoBack ? { scale: 0.9 } : {}}>
+        
         <ChevronLeft className="w-5 h-5" />
       </motion.button>
 
@@ -90,26 +90,26 @@ const PregnancyDayNavigator = ({
             transition={{ duration: 0.15 }}
             className={cn(
               "text-sm font-bold px-3 py-1 rounded-full",
-              isViewingCurrentDay 
-                ? "bg-primary/20 text-primary" 
-                : "bg-primary text-primary-foreground"
-            )}
-          >
+              isViewingCurrentDay ?
+              "bg-primary/20 text-primary" :
+              "bg-primary text-primary-foreground"
+            )}>
+            
             {getOffsetLabel()}
           </motion.span>
         </AnimatePresence>
         
         {/* Premium indicator for limit reached */}
-        {!isPremium && (selectedDay === limits.min || selectedDay === limits.max) && !isViewingCurrentDay && (
-          <motion.div
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-1 mt-1"
-          >
+        {!isPremium && (selectedDay === limits.min || selectedDay === limits.max) && !isViewingCurrentDay &&
+        <motion.div
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-1 mt-1">
+          
             <Crown className="w-3 h-3 text-primary" />
             <span className="text-[10px] text-primary font-medium">{tr("pregnancydaynavigator_premium_ile_daha_cox_2aae14", "Premium ilə daha çox")}</span>
           </motion.div>
-        )}
+        }
       </div>
 
       {/* Forward button */}
@@ -118,33 +118,33 @@ const PregnancyDayNavigator = ({
         disabled={!canGoForward}
         className={cn(
           "w-9 h-9 rounded-full flex items-center justify-center transition-all border",
-          canGoForward 
-            ? "bg-primary/10 hover:bg-primary/20 text-primary border-primary/30 active:scale-95" 
-            : "bg-muted text-muted-foreground/40 border-transparent cursor-not-allowed"
+          canGoForward ?
+          "bg-primary/10 hover:bg-primary/20 text-primary border-primary/30 active:scale-95" :
+          "bg-muted text-muted-foreground/40 border-transparent cursor-not-allowed"
         )}
-        whileTap={canGoForward ? { scale: 0.9 } : {}}
-      >
+        whileTap={canGoForward ? { scale: 0.9 } : {}}>
+        
         <ChevronRight className="w-5 h-5" />
       </motion.button>
 
       {/* Reset button - only show when not viewing current day */}
       <AnimatePresence>
-        {!isViewingCurrentDay && (
-          <motion.button
-            onClick={resetToCurrentDay}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            className="w-8 h-8 rounded-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 flex items-center justify-center ml-1"
-            whileTap={{ scale: 0.9 }}
-            title={tr("pregnancydaynavigator_bu_gune_qayit_9c007f", "Bu günə qayıt")}
-          >
+        {!isViewingCurrentDay &&
+        <motion.button
+          onClick={resetToCurrentDay}
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0, opacity: 0 }}
+          className="w-8 h-8 rounded-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 flex items-center justify-center ml-1"
+          whileTap={{ scale: 0.9 }}
+          title={tr("pregnancydaynavigator_bu_gune_qayit_9c007f", "Bu günə qayıt")}>
+          
             <RotateCcw className="w-4 h-4" />
           </motion.button>
-        )}
+        }
       </AnimatePresence>
-    </div>
-  );
+    </div>);
+
 };
 
 export default PregnancyDayNavigator;

@@ -1,14 +1,14 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { tr } from "@/lib/tr";import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 // Lovable Cloud auth - only available in web builds, not in native Capacitor
 let lovableAuth: any = null;
-const isCapacitorNative = typeof (window as any)?.Capacitor?.isNativePlatform === 'function'
-  && (window as any).Capacitor.isNativePlatform();
-const loadLovableAuth: Promise<void> = isCapacitorNative
-  ? Promise.resolve()
-  : import('@/integrations/lovable/index')
-      .then((mod) => { lovableAuth = mod.lovable; })
-      .catch(() => { console.warn('Lovable Cloud auth not available'); });
+const isCapacitorNative = typeof (window as any)?.Capacitor?.isNativePlatform === 'function' &&
+(window as any).Capacitor.isNativePlatform();
+const loadLovableAuth: Promise<void> = isCapacitorNative ?
+Promise.resolve() :
+import('@/integrations/lovable/index').
+then((mod) => {lovableAuth = mod.lovable;}).
+catch(() => {console.warn('Lovable Cloud auth not available');});
 import { useUserStore } from '@/store/userStore';
 import type { User, Session } from '@supabase/supabase-js';
 
@@ -54,13 +54,13 @@ interface AuthContextValue {
   loading: boolean;
   isAdmin: boolean;
   isModerator: boolean;
-  signUp: (email: string, password: string, name: string) => Promise<{ data: any; error: any }>;
-  signIn: (email: string, password: string) => Promise<{ data: any; error: any }>;
-  signInWithGoogle: () => Promise<{ data: any; error: any }>;
-  signInWithApple: () => Promise<{ data: any; error: any }>;
-  signOut: () => Promise<{ error: any }>;
-  updateProfile: (updates: Partial<Profile>) => Promise<{ data: any; error: any }>;
-  linkPartner: (partnerCode: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, name: string) => Promise<{data: any;error: any;}>;
+  signIn: (email: string, password: string) => Promise<{data: any;error: any;}>;
+  signInWithGoogle: () => Promise<{data: any;error: any;}>;
+  signInWithApple: () => Promise<{data: any;error: any;}>;
+  signOut: () => Promise<{error: any;}>;
+  updateProfile: (updates: Partial<Profile>) => Promise<{data: any;error: any;}>;
+  linkPartner: (partnerCode: string) => Promise<{error: any;}>;
   fetchProfile: (userId: string) => Promise<Profile | null>;
   refreshProfile: () => Promise<void>;
 }
@@ -70,7 +70,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 // ─────────────────────────────────────────
 // Provider
 // ─────────────────────────────────────────
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -89,7 +89,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setBabyData,
     setPartnerCode,
     setLinkedPartnerId,
-    logout: storeLogout,
+    logout: storeLogout
   } = useUserStore();
 
   // ─────────────────────────────────────────
@@ -97,11 +97,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // ─────────────────────────────────────────
   const fetchProfile = useCallback(async (userId: string): Promise<Profile | null> => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle();
+      const { data, error } = await supabase.
+      from('profiles').
+      select('*').
+      eq('user_id', userId).
+      maybeSingle();
 
       if (error) throw error;
       return data as Profile | null;
@@ -113,10 +113,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUserRole = useCallback(async (userId: string): Promise<UserRole | null> => {
     try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId);
+      const { data, error } = await supabase.
+      from('user_roles').
+      select('role').
+      eq('user_id', userId);
 
       if (error) throw error;
       if (!data || data.length === 0) return null;
@@ -165,12 +165,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Set analytics user properties for GA + internal tracking + Mixpanel
       if (userId) {
-        import('@/lib/analytics').then(m => {
+        import('@/lib/analytics').then((m) => {
           m.analytics.setUserId(userId);
           m.analytics.setUserProperties({
             life_stage: profileData.life_stage || 'unknown',
             is_premium: String(profileData.is_premium || false),
-            role: profileData.life_stage === 'partner' ? 'partner' : 'woman',
+            role: profileData.life_stage === 'partner' ? 'partner' : 'woman'
           });
         }).catch(() => {});
 
@@ -184,12 +184,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             role: profileData.life_stage === 'partner' ? 'partner' : 'woman',
             baby_name: profileData.baby_name || undefined,
             baby_gender: profileData.baby_gender || undefined,
-            badge_type: profileData.badge_type || undefined,
+            badge_type: profileData.badge_type || undefined
           });
           setSuperProperties({
             life_stage: profileData.life_stage || 'unknown',
             is_premium: profileData.is_premium || false,
-            user_role: profileData.life_stage === 'partner' ? 'partner' : 'woman',
+            user_role: profileData.life_stage === 'partner' ? 'partner' : 'woman'
           });
         }).catch(() => {});
       }
@@ -207,11 +207,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         password,
         options: {
           emailRedirectTo: window.location.origin,
-          data: { name },
-        },
+          data: { name }
+        }
       });
       if (error) throw error;
-      import('@/lib/analytics').then(m => m.analytics.logSignUp('email')).catch(() => {});
+      import('@/lib/analytics').then((m) => m.analytics.logSignUp('email')).catch(() => {});
       return { data, error: null };
     } catch (error) {
       console.error('Sign up error:', error);
@@ -224,7 +224,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       // Analytics tracking
-      import('@/lib/analytics').then(m => m.analytics.logLogin('email')).catch(() => {});
+      import('@/lib/analytics').then((m) => m.analytics.logLogin('email')).catch(() => {});
       return { data, error: null };
     } catch (error) {
       console.error('Sign in error:', error);
@@ -237,7 +237,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await loadLovableAuth;
       if (!lovableAuth) throw new Error('Social login not available');
       const result = await lovableAuth.auth.signInWithOAuth('google', {
-        redirect_uri: window.location.origin,
+        redirect_uri: window.location.origin
       });
       if (result.error) throw result.error;
       return { data: result, error: null };
@@ -252,7 +252,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await loadLovableAuth;
       if (!lovableAuth) throw new Error('Social login not available');
       const result = await lovableAuth.auth.signInWithOAuth('apple', {
-        redirect_uri: window.location.origin,
+        redirect_uri: window.location.origin
       });
       if (result.error) throw result.error;
       return { data: result, error: null };
@@ -290,12 +290,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user) return { data: null, error: 'No user logged in' };
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('user_id', user.id)
-        .select()
-        .single();
+      const { data, error } = await supabase.
+      from('profiles').
+      update(updates).
+      eq('user_id', user.id).
+      select().
+      single();
 
       if (error) throw error;
       const newProfile = data as Profile;
@@ -311,18 +311,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const linkPartner = async (partnerCode: string) => {
     if (!user) return { error: 'No user logged in' };
     try {
-      const { data: partnerProfile, error: findError } = await supabase
-        .from('profiles')
-        .select('id, user_id')
-        .eq('partner_code', partnerCode)
-        .maybeSingle();
+      const { data: partnerProfile, error: findError } = await supabase.
+      from('profiles').
+      select('id, user_id').
+      eq('partner_code', partnerCode).
+      maybeSingle();
 
       if (findError || !partnerProfile) return { error: 'Partner code not found' };
 
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ linked_partner_id: partnerProfile.id, life_stage: 'partner' as const })
-        .eq('user_id', user.id);
+      const { error: updateError } = await supabase.
+      from('profiles').
+      update({ linked_partner_id: partnerProfile.id, life_stage: 'partner' as const }).
+      eq('user_id', user.id);
 
       if (updateError) throw updateError;
 
@@ -379,9 +379,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const hydrateUser = async (u: User) => {
       try {
         const [profileRes, roleRes] = await Promise.allSettled([
-          fetchProfile(u.id),
-          fetchUserRole(u.id),
-        ]);
+        fetchProfile(u.id),
+        fetchUserRole(u.id)]
+        );
 
         if (!mounted) return;
 
@@ -395,7 +395,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           true,
           u.id,
           u.email || '',
-          profileData?.name || u.user_metadata?.name || 'İstifadəçi'
+          profileData?.name || u.user_metadata?.name || tr("authcontext_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")
         );
         syncProfileToStore(profileData, u.id);
       } catch (error) {
@@ -407,7 +407,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Single source of truth: only onAuthStateChange handles auth state.
     // No separate initializeAuth / getSession call to avoid race conditions.
     const {
-      data: { subscription },
+      data: { subscription }
     } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       console.log('Auth state changed:', event, currentSession?.user?.email);
       if (!mounted) return;
@@ -419,7 +419,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUserRole(null);
         storeLogout();
         finishLoading();
-        import('@/lib/revenuecat').then(m => m.logOutRevenueCat()).catch(() => {});
+        import('@/lib/revenuecat').then((m) => m.logOutRevenueCat()).catch(() => {});
         return;
       }
 
@@ -431,15 +431,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             true,
             currentSession.user.id,
             currentSession.user.email || '',
-            currentSession.user.user_metadata?.name || 'İstifadəçi'
+            currentSession.user.user_metadata?.name || tr("authcontext_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")
           );
           finishLoading();
           // Set analytics user ID
-          import('@/lib/analytics').then(m => {
+          import('@/lib/analytics').then((m) => {
             m.analytics.setUserId(currentSession.user.id);
             m.analytics.setUserProperties({ life_stage: '' });
           }).catch(() => {});
-          import('@/lib/revenuecat').then(m => m.identifyUser(currentSession.user.id)).catch(() => {});
+          import('@/lib/revenuecat').then((m) => m.identifyUser(currentSession.user.id)).catch(() => {});
           void hydrateUser(currentSession.user);
         } else {
           // No session on initial load - user is truly not logged in
@@ -457,7 +457,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             true,
             currentSession.user.id,
             currentSession.user.email || '',
-            currentSession.user.user_metadata?.name || 'İstifadəçi'
+            currentSession.user.user_metadata?.name || tr("authcontext_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")
           );
           finishLoading();
           void hydrateUser(currentSession.user);
@@ -514,12 +514,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateProfile,
         linkPartner,
         fetchProfile,
-        refreshProfile,
-      }}
-    >
+        refreshProfile
+      }}>
+      
       {children}
-    </AuthContext.Provider>
-  );
+    </AuthContext.Provider>);
+
 };
 
 // ─────────────────────────────────────────

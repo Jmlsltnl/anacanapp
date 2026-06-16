@@ -22,31 +22,31 @@ interface Sound {
 
 // Noise type metadata
 const noiseTypes = [
-  { 
-    id: 'white', label: tr("whitenoise_beyaz_kuy_3acf2d", 'Bəyaz Küy'), subtitle: tr("whitenoise_sakitlesdirici_d99d9d", "Sakitləşdirici"),
-    description: tr("whitenoise_ana_betnindeki_sese_benzer_monoton_fon_8d1144", 'Ana bətnindəki səsə bənzər monoton fon'), emoji: '⚪',
-    gradient: 'from-slate-100 to-gray-200 dark:from-slate-800 dark:to-gray-900',
-    borderColor: 'border-slate-300 dark:border-slate-700',
-    textColor: 'text-slate-700 dark:text-slate-300',
-    badgeColor: 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300',
-  },
-  { 
-    id: 'pink', label: tr("whitenoise_cehrayi_kuy_68573d", 'Çəhrayı Küy'), subtitle: tr("whitenoise_tebiet_effekti_45e038", "Təbiət effekti"),
-    description: tr("whitenoise_yungul_yagis_ve_yarpaq_xisiltisi_kimi_d5aea8", 'Yüngül yağış və yarpaq xışıltısı kimi'), emoji: '🌸',
-    gradient: 'from-pink-50 to-rose-100 dark:from-pink-900/30 dark:to-rose-900/20',
-    borderColor: 'border-pink-300 dark:border-pink-800',
-    textColor: 'text-pink-700 dark:text-pink-300',
-    badgeColor: 'bg-pink-200 dark:bg-pink-800 text-pink-700 dark:text-pink-300',
-  },
-  { 
-    id: 'brown', label: tr("whitenoise_qehveyi_kuy_f8e3c6", 'Qəhvəyi Küy'), subtitle: tr("whitenoise_derin_yuxu_b4d583", "Dərin yuxu"),
-    description: tr("whitenoise_derin_ve_boguq_sesler_selale_goy_gurultu_47382e", 'Dərin və boğuq səslər — şəlalə, göy gurultusu'), emoji: '🟤',
-    gradient: 'from-amber-50 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/20',
-    borderColor: 'border-amber-300 dark:border-amber-800',
-    textColor: 'text-amber-800 dark:text-amber-300',
-    badgeColor: 'bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-300',
-  },
-];
+{
+  id: 'white', label: tr("whitenoise_beyaz_kuy_3acf2d", 'Bəyaz Küy'), subtitle: tr("whitenoise_sakitlesdirici_d99d9d", "Sakitləşdirici"),
+  description: tr("whitenoise_ana_betnindeki_sese_benzer_monoton_fon_8d1144", 'Ana bətnindəki səsə bənzər monoton fon'), emoji: '⚪',
+  gradient: 'from-slate-100 to-gray-200 dark:from-slate-800 dark:to-gray-900',
+  borderColor: 'border-slate-300 dark:border-slate-700',
+  textColor: 'text-slate-700 dark:text-slate-300',
+  badgeColor: 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+},
+{
+  id: 'pink', label: tr("whitenoise_cehrayi_kuy_68573d", 'Çəhrayı Küy'), subtitle: tr("whitenoise_tebiet_effekti_45e038", "Təbiət effekti"),
+  description: tr("whitenoise_yungul_yagis_ve_yarpaq_xisiltisi_kimi_d5aea8", 'Yüngül yağış və yarpaq xışıltısı kimi'), emoji: '🌸',
+  gradient: 'from-pink-50 to-rose-100 dark:from-pink-900/30 dark:to-rose-900/20',
+  borderColor: 'border-pink-300 dark:border-pink-800',
+  textColor: 'text-pink-700 dark:text-pink-300',
+  badgeColor: 'bg-pink-200 dark:bg-pink-800 text-pink-700 dark:text-pink-300'
+},
+{
+  id: 'brown', label: tr("whitenoise_qehveyi_kuy_f8e3c6", 'Qəhvəyi Küy'), subtitle: tr("whitenoise_derin_yuxu_b4d583", "Dərin yuxu"),
+  description: tr("whitenoise_derin_ve_boguq_sesler_selale_goy_gurultu_47382e", 'Dərin və boğuq səslər — şəlalə, göy gurultusu'), emoji: '🟤',
+  gradient: 'from-amber-50 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/20',
+  borderColor: 'border-amber-300 dark:border-amber-800',
+  textColor: 'text-amber-800 dark:text-amber-300',
+  badgeColor: 'bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-300'
+}];
+
 
 interface WhiteNoiseProps {
   onBack: () => void;
@@ -55,33 +55,33 @@ interface WhiteNoiseProps {
 const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoiseComponent({ onBack }, ref) {
   useScrollToTop();
   useScreenAnalytics('WhiteNoise', 'Tools');
-  
+
   const { preferences, loading: prefsLoading, updateWhiteNoiseVolume, updateWhiteNoiseTimer, updateLastWhiteNoiseSound } = useUserPreferences();
   const { isPremium, canUseWhiteNoise, trackWhiteNoiseUsage, freeLimits } = useSubscription();
   const { data: dbSounds, isLoading: soundsLoading } = useWhiteNoiseSounds();
-  
+
   // Global audio store
   const whiteNoise = useWhiteNoiseStore();
-  
+
   // Map DB sounds to component format
   const sounds: Sound[] = useMemo(() => {
     if (!dbSounds || dbSounds.length === 0) return [];
-    return dbSounds.map(s => ({
+    return dbSounds.map((s) => ({
       id: s.id,
       name: s.name_az || s.name,
       emoji: s.emoji,
       color: s.color_gradient || 'from-blue-400 to-cyan-500',
       noiseType: s.noise_type || 'white',
       description: s.description_az || s.description || '',
-      audioUrl: s.audio_url || null,
+      audioUrl: s.audio_url || null
     }));
   }, [dbSounds]);
 
   // Group sounds by noise type
   const groupedSounds = useMemo(() => {
     const groups: Record<string, Sound[]> = {};
-    noiseTypes.forEach(nt => { groups[nt.id] = []; });
-    sounds.forEach(s => {
+    noiseTypes.forEach((nt) => {groups[nt.id] = [];});
+    sounds.forEach((s) => {
       if (groups[s.noiseType]) {
         groups[s.noiseType].push(s);
       } else {
@@ -90,11 +90,11 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
     });
     return groups;
   }, [sounds]);
-  
+
   const [timer, setTimer] = useState<number | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
-  
+
   const trackingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastTrackTimeRef = useRef<number>(Date.now());
 
@@ -114,7 +114,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
         const { allowed } = canUseWhiteNoise();
         if (allowed || isPremium) {
           // Find and auto-play last sound
-          const sound = sounds.find(s => s.id === preferences.last_white_noise_sound);
+          const sound = sounds.find((s) => s.id === preferences.last_white_noise_sound);
           if (sound) {
             whiteNoise.play(sound);
             if (preferences.white_noise_timer) {
@@ -134,7 +134,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
     let interval: NodeJS.Timeout | null = null;
     if (activeSound && timeRemaining !== null && timeRemaining > 0) {
       interval = setInterval(() => {
-        setTimeRemaining(prev => {
+        setTimeRemaining((prev) => {
           if (prev === null || prev <= 1) {
             whiteNoise.stop();
             updateLastWhiteNoiseSound(null);
@@ -145,7 +145,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
         });
       }, 1000);
     }
-    return () => { if (interval) clearInterval(interval); };
+    return () => {if (interval) clearInterval(interval);};
   }, [activeSound, timeRemaining, isPremium, timer]);
 
   // Track usage for free users
@@ -180,13 +180,13 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
       await updateLastWhiteNoiseSound(null);
     } else {
       const { allowed, remainingSeconds } = canUseWhiteNoise();
-      if (!allowed && !isPremium) { setShowPremiumModal(true); return; }
+      if (!allowed && !isPremium) {setShowPremiumModal(true);return;}
       lastTrackTimeRef.current = Date.now();
-      const sound = sounds.find(s => s.id === soundId);
+      const sound = sounds.find((s) => s.id === soundId);
       if (!sound) return;
       whiteNoise.play(sound);
       await updateLastWhiteNoiseSound(soundId);
-      if (isPremium) { setTimeRemaining(timer ? timer * 60 : null); return; }
+      if (isPremium) {setTimeRemaining(timer ? timer * 60 : null);return;}
       const requestedSeconds = timer ? timer * 60 : remainingSeconds;
       setTimeRemaining(Math.min(requestedSeconds, remainingSeconds));
     }
@@ -199,11 +199,11 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
   };
 
   const handleTimerChange = async (newTimer: number | null) => {
-    if (!isPremium && newTimer === null) { setShowPremiumModal(true); return; }
+    if (!isPremium && newTimer === null) {setShowPremiumModal(true);return;}
     setTimer(newTimer);
     await updateWhiteNoiseTimer(newTimer);
-    if (!activeSound) { setTimeRemaining(newTimer ? newTimer * 60 : null); return; }
-    if (isPremium) { setTimeRemaining(newTimer ? newTimer * 60 : null); return; }
+    if (!activeSound) {setTimeRemaining(newTimer ? newTimer * 60 : null);return;}
+    if (isPremium) {setTimeRemaining(newTimer ? newTimer * 60 : null);return;}
     const info = canUseWhiteNoise();
     if (!info.allowed) {
       whiteNoise.stop();
@@ -221,29 +221,29 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const timerOptions = isPremium 
-    ? [
-        { value: null, label: 'Limitsiz', icon: '∞' },
-        { value: 15, label: tr("whitenoise_15_deq_3ce4c1", '15 dəq'), icon: '15' },
-        { value: 30, label: tr("whitenoise_30_deq_15eb1f", '30 dəq'), icon: '30' },
-        { value: 60, label: '1 saat', icon: '60' },
-      ]
-    : [
-        { value: 10, label: tr("whitenoise_10_deq_b4f9fd", '10 dəq'), icon: '10' },
-        { value: 15, label: tr("whitenoise_15_deq_3ce4c1", '15 dəq'), icon: '15' },
-        { value: 20, label: tr("whitenoise_20_deq_fb3505", '20 dəq'), icon: '20' },
-      ];
+  const timerOptions = isPremium ?
+  [
+  { value: null, label: 'Limitsiz', icon: '∞' },
+  { value: 15, label: tr("whitenoise_15_deq_3ce4c1", '15 dəq'), icon: '15' },
+  { value: 30, label: tr("whitenoise_30_deq_15eb1f", '30 dəq'), icon: '30' },
+  { value: 60, label: '1 saat', icon: '60' }] :
+
+  [
+  { value: 10, label: tr("whitenoise_10_deq_b4f9fd", '10 dəq'), icon: '10' },
+  { value: 15, label: tr("whitenoise_15_deq_3ce4c1", '15 dəq'), icon: '15' },
+  { value: 20, label: tr("whitenoise_20_deq_fb3505", '20 dəq'), icon: '20' }];
+
 
   if (prefsLoading || soundsLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+      </div>);
+
   }
 
   const remainingMinutes = usageInfo.remainingSeconds === Infinity ? null : Math.floor(usageInfo.remainingSeconds / 60);
-  const activeDbSound = sounds.find(s => s.id === activeSound);
+  const activeDbSound = sounds.find((s) => s.id === activeSound);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30 flex flex-col">
@@ -253,8 +253,8 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
           <motion.button
             onClick={onBack}
             className="w-10 h-10 rounded-xl bg-muted/80 flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}
-          >
+            whileTap={{ scale: 0.95 }}>
+            
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </motion.button>
           <div className="flex-1">
@@ -267,55 +267,55 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24">
         {/* Free tier usage banner */}
-        {!isPremium && remainingMinutes !== null && (
-          <motion.div
-            initial={{ y: -10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            className={`rounded-2xl p-4 mb-5 border ${
-              usageInfo.remainingSeconds < 300 
-                ? 'bg-gradient-to-r from-destructive/10 to-destructive/5 border-destructive/20' 
-                : 'bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20'
-            }`}
-          >
+        {!isPremium && remainingMinutes !== null &&
+        <motion.div
+          initial={{ y: -10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className={`rounded-2xl p-4 mb-5 border ${
+          usageInfo.remainingSeconds < 300 ?
+          'bg-gradient-to-r from-destructive/10 to-destructive/5 border-destructive/20' :
+          'bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20'}`
+          }>
+          
             <div className="flex items-center gap-3">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                usageInfo.remainingSeconds < 300 ? 'bg-destructive/20' : 'bg-primary/20'
-              }`}>
-                {usageInfo.remainingSeconds < 300 ? (
-                  <Lock className="w-5 h-5 text-destructive" />
-                ) : (
-                  <Timer className="w-5 h-5 text-primary" />
-                )}
+            usageInfo.remainingSeconds < 300 ? 'bg-destructive/20' : 'bg-primary/20'}`
+            }>
+                {usageInfo.remainingSeconds < 300 ?
+              <Lock className="w-5 h-5 text-destructive" /> :
+
+              <Timer className="w-5 h-5 text-primary" />
+              }
               </div>
               <div className="flex-1">
                 <p className={`text-sm font-bold ${usageInfo.remainingSeconds < 300 ? 'text-destructive' : 'text-foreground'}`}>
-                  {remainingMinutes} dəqiqə qalıb
+                  {remainingMinutes} {tr("whitenoise_deqiqe_qalib_da6009", "d\u0259qiq\u0259 qal\u0131b")}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Limitsiz dinləmə üçün Premium
+                  {tr("whitenoise_limitsiz_dinleme_ucun_premium_0f0575", "Limitsiz dinl\u0259m\u0259 \xFC\xE7\xFCn Premium")}
                 </p>
               </div>
               <motion.button
-                onClick={() => setShowPremiumModal(true)}
-                className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg"
-                whileTap={{ scale: 0.95 }}
-              >
-                Keç
-              </motion.button>
+              onClick={() => setShowPremiumModal(true)}
+              className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg"
+              whileTap={{ scale: 0.95 }}>
+                {tr("whitenoise_kec_19bd66", "Ke\xE7")}
+              
+            </motion.button>
             </div>
           </motion.div>
-        )}
+        }
 
         {/* Now Playing Card */}
         <AnimatePresence mode="wait">
-          {activeSound && activeDbSound ? (
-            <motion.div
-              key="playing"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className={`bg-gradient-to-br ${activeDbSound.color} rounded-3xl p-6 shadow-xl mb-6 relative overflow-hidden`}
-            >
+          {activeSound && activeDbSound ?
+          <motion.div
+            key="playing"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            className={`bg-gradient-to-br ${activeDbSound.color} rounded-3xl p-6 shadow-xl mb-6 relative overflow-hidden`}>
+            
               <div className="absolute inset-0 opacity-20">
                 <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-white/30 blur-2xl" />
                 <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-white/20 blur-3xl" />
@@ -324,71 +324,71 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
               <div className="relative z-10">
                 <div className="text-center mb-4">
                   <motion.div
-                    className="text-6xl mb-3 drop-shadow-lg"
-                    animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  >
+                  className="text-6xl mb-3 drop-shadow-lg"
+                  animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
+                  
                     {activeDbSound.emoji}
                   </motion.div>
                   <h2 className="text-2xl font-black text-white drop-shadow-md">{activeDbSound.name}</h2>
-                  {activeDbSound.description && (
-                    <p className="text-white/70 text-xs mt-1">{activeDbSound.description}</p>
-                  )}
-                  {timeRemaining !== null && (
-                    <div className="inline-flex items-center gap-2 mt-2 bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full">
+                  {activeDbSound.description &&
+                <p className="text-white/70 text-xs mt-1">{activeDbSound.description}</p>
+                }
+                  {timeRemaining !== null &&
+                <div className="inline-flex items-center gap-2 mt-2 bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full">
                       <Timer className="w-4 h-4 text-white/80" />
                       <span className="text-white font-mono font-bold">{formatTime(timeRemaining)}</span>
                     </div>
-                  )}
+                }
                 </div>
 
                 {/* Waveform Animation */}
                 <div className="flex items-center justify-center gap-1 h-12 mb-5">
-                  {[...Array(24)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      className="w-1.5 bg-white/70 rounded-full"
-                      animate={{ height: [6, 20 + Math.random() * 20, 6] }}
-                      transition={{ duration: 0.4 + Math.random() * 0.4, repeat: Infinity, delay: i * 0.03 }}
-                    />
-                  ))}
+                  {[...Array(24)].map((_, i) =>
+                <motion.div
+                  key={i}
+                  className="w-1.5 bg-white/70 rounded-full"
+                  animate={{ height: [6, 20 + Math.random() * 20, 6] }}
+                  transition={{ duration: 0.4 + Math.random() * 0.4, repeat: Infinity, delay: i * 0.03 }} />
+
+                )}
                 </div>
 
                 {/* Controls */}
                 <div className="flex items-center justify-center gap-4">
                   <motion.button
-                    onClick={() => whiteNoise.toggleMute()}
-                    className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center"
-                    whileTap={{ scale: 0.9 }}
-                  >
+                  onClick={() => whiteNoise.toggleMute()}
+                  className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center"
+                  whileTap={{ scale: 0.9 }}>
+                  
                     {isMuted ? <VolumeX className="w-5 h-5 text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
                   </motion.button>
                   <motion.button
-                    onClick={() => handleSoundToggle(activeSound)}
-                    className="w-16 h-16 rounded-2xl bg-white text-foreground flex items-center justify-center shadow-xl"
-                    whileTap={{ scale: 0.9 }}
-                  >
+                  onClick={() => handleSoundToggle(activeSound)}
+                  className="w-16 h-16 rounded-2xl bg-white text-foreground flex items-center justify-center shadow-xl"
+                  whileTap={{ scale: 0.9 }}>
+                  
                     <Pause className="w-8 h-8" />
                   </motion.button>
                   <div className="w-12 h-12" />
                 </div>
               </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="idle"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="bg-card rounded-3xl p-6 shadow-lg border border-border/50 mb-6 text-center"
-            >
+            </motion.div> :
+
+          <motion.div
+            key="idle"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="bg-card rounded-3xl p-6 shadow-lg border border-border/50 mb-6 text-center">
+            
               <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-3">
                 <Music2 className="w-8 h-8 text-muted-foreground" />
               </div>
               <h3 className="font-bold text-foreground mb-1">{tr("whitenoise_hansi_ses_korpenize_daha_xos_gelir_488ff5", "Hansı səs körpənizə daha xoş gəlir?")}</h3>
               <p className="text-sm text-muted-foreground">{tr("whitenoise_asagidaki_kuy_novlerinden_birini_secerek_ece91d", "Aşağıdakı küy növlərindən birini seçərək başlayın")}</p>
             </motion.div>
-          )}
+          }
         </AnimatePresence>
 
         {/* Volume Control */}
@@ -396,8 +396,8 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
           className="bg-card rounded-2xl p-4 shadow-lg border border-border/50 mb-5"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1 }}
-        >
+          transition={{ delay: 0.1 }}>
+          
           <div className="flex items-center gap-2 mb-3">
             <Volume2 className="w-4 h-4 text-primary" />
             <span className="text-sm font-semibold text-foreground">{tr("whitenoise_ses_seviyyesi_7296d5", "Səs səviyyəsi")}</span>
@@ -405,10 +405,10 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
           </div>
           <div className="relative">
             <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <motion.div 
+              <motion.div
                 className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full"
-                style={{ width: `${isMuted ? 0 : volume}%` }}
-              />
+                style={{ width: `${isMuted ? 0 : volume}%` }} />
+              
             </div>
             <input
               type="range"
@@ -416,8 +416,8 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
               max="100"
               value={isMuted ? 0 : volume}
               onChange={(e) => handleVolumeChange(parseInt(e.target.value))}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            />
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+            
           </div>
         </motion.div>
 
@@ -426,52 +426,52 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
           className="mb-6"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.15 }}
-        >
+          transition={{ delay: 0.15 }}>
+          
           <div className="flex items-center gap-2 mb-3">
             <Timer className="w-4 h-4 text-primary" />
             <span className="text-sm font-semibold text-foreground">Taymer</span>
           </div>
           <div className="grid grid-cols-4 gap-2">
-            {timerOptions.map((option) => (
-              <motion.button
-                key={option.label}
-                onClick={() => handleTimerChange(option.value)}
-                className={`relative py-3 rounded-xl text-center transition-all ${
-                  timer === option.value
-                    ? 'bg-primary text-primary-foreground shadow-lg'
-                    : 'bg-card border border-border/50 text-muted-foreground hover:bg-muted/50'
-                }`}
-                whileTap={{ scale: 0.95 }}
-              >
+            {timerOptions.map((option) =>
+            <motion.button
+              key={option.label}
+              onClick={() => handleTimerChange(option.value)}
+              className={`relative py-3 rounded-xl text-center transition-all ${
+              timer === option.value ?
+              'bg-primary text-primary-foreground shadow-lg' :
+              'bg-card border border-border/50 text-muted-foreground hover:bg-muted/50'}`
+              }
+              whileTap={{ scale: 0.95 }}>
+              
                 <span className="text-lg font-bold">{option.icon}</span>
                 <p className="text-[10px] mt-0.5 opacity-80">
-                  {option.value === null ? 'Limitsiz' : 'dəqiqə'}
+                  {option.value === null ? 'Limitsiz' : tr("whitenoise_deqiqe_94641a", "d\u0259qiq\u0259")}
                 </p>
               </motion.button>
-            ))}
+            )}
           </div>
-          {!isPremium && (
-            <p className="text-[10px] text-muted-foreground mt-2 text-center flex items-center justify-center gap-1">
+          {!isPremium &&
+          <p className="text-[10px] text-muted-foreground mt-2 text-center flex items-center justify-center gap-1">
               <Lock className="w-3 h-3" />
               Limitsiz taymer Premium-a aiddir
             </p>
-          )}
+          }
         </motion.div>
 
         {/* Sounds by Noise Type */}
         {noiseTypes.map((nt, ntIdx) => {
           const typeSounds = groupedSounds[nt.id] || [];
           if (typeSounds.length === 0) return null;
-          
+
           return (
             <motion.div
               key={nt.id}
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 + ntIdx * 0.08 }}
-              className="mb-5"
-            >
+              className="mb-5">
+              
               {/* Section Header */}
               <div className={`rounded-2xl p-3 mb-3 border ${nt.borderColor} ${nt.gradient}`}>
                 <div className="flex items-center gap-3">
@@ -500,71 +500,71 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
                       transition={{ delay: 0.25 + ntIdx * 0.08 + index * 0.03 }}
                       onClick={() => handleSoundToggle(sound.id)}
                       className={`relative rounded-2xl flex flex-col items-center justify-center transition-all overflow-hidden p-3 ${
-                        isActive
-                          ? `bg-gradient-to-br ${sound.color} shadow-xl`
-                          : 'bg-card border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/30'
-                      }`}
+                      isActive ?
+                      `bg-gradient-to-br ${sound.color} shadow-xl` :
+                      'bg-card border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/30'}`
+                      }
                       whileHover={{ scale: 1.03, y: -2 }}
-                      whileTap={{ scale: 0.97 }}
-                    >
-                      {isActive && (
-                        <>
+                      whileTap={{ scale: 0.97 }}>
+                      
+                      {isActive &&
+                      <>
                           <motion.div
-                            className="absolute inset-0 bg-white/10"
-                            animate={{ opacity: [0.1, 0.3, 0.1] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                          />
+                          className="absolute inset-0 bg-white/10"
+                          animate={{ opacity: [0.1, 0.3, 0.1] }}
+                          transition={{ duration: 2, repeat: Infinity }} />
+                        
                           <motion.div
-                            className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-white shadow-lg"
-                            animate={{ scale: [1, 1.3, 1] }}
-                            transition={{ duration: 1, repeat: Infinity }}
-                          />
+                          className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-white shadow-lg"
+                          animate={{ scale: [1, 1.3, 1] }}
+                          transition={{ duration: 1, repeat: Infinity }} />
+                        
                         </>
-                      )}
+                      }
                       <span className={`text-3xl mb-1 relative z-10 drop-shadow-sm ${isActive ? 'drop-shadow-lg' : ''}`}>
                         {sound.emoji}
                       </span>
                       <span className={`text-[11px] font-bold relative z-10 px-1 text-center leading-tight ${
-                        isActive ? 'text-white' : 'text-foreground'
-                      }`}>
+                      isActive ? 'text-white' : 'text-foreground'}`
+                      }>
                         {sound.name}
                       </span>
-                      {sound.description && !isActive && (
-                        <span className="text-[9px] text-muted-foreground mt-0.5 text-center leading-tight line-clamp-1 px-1">
+                      {sound.description && !isActive &&
+                      <span className="text-[9px] text-muted-foreground mt-0.5 text-center leading-tight line-clamp-1 px-1">
                           {sound.description}
                         </span>
-                      )}
-                      {isActive && (
-                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
+                      }
+                      {isActive &&
+                      <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
                           <div className="flex items-center gap-0.5">
-                            {[...Array(3)].map((_, i) => (
-                              <motion.div
-                                key={i}
-                                className="w-1 bg-white/80 rounded-full"
-                                animate={{ height: [4, 8, 4] }}
-                                transition={{ duration: 0.4, repeat: Infinity, delay: i * 0.1 }}
-                              />
-                            ))}
+                            {[...Array(3)].map((_, i) =>
+                          <motion.div
+                            key={i}
+                            className="w-1 bg-white/80 rounded-full"
+                            animate={{ height: [4, 8, 4] }}
+                            transition={{ duration: 0.4, repeat: Infinity, delay: i * 0.1 }} />
+
+                          )}
                           </div>
                         </div>
-                      )}
-                    </motion.button>
-                  );
+                      }
+                    </motion.button>);
+
                 })}
               </div>
-            </motion.div>
-          );
+            </motion.div>);
+
         })}
       </div>
 
       {/* Premium Modal */}
-      <PremiumModal 
-        isOpen={showPremiumModal} 
+      <PremiumModal
+        isOpen={showPremiumModal}
         onClose={() => setShowPremiumModal(false)}
-        feature="Limitsiz yuxu səsləri"
-      />
-    </div>
-  );
+        feature={tr("whitenoise_limitsiz_yuxu_sesleri_b0b439", "Limitsiz yuxu s\u0259sl\u0259ri")} />
+      
+    </div>);
+
 });
 
 WhiteNoise.displayName = 'WhiteNoise';

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
-import { 
-  Ruler, Scale, Brain, TrendingUp, Search, 
-  Trash2, Eye, Calendar, User
-} from 'lucide-react';
+import {
+  Ruler, Scale, Brain, TrendingUp, Search,
+  Trash2, Eye, Calendar, User } from
+'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,28 +38,28 @@ const AdminBabyGrowth = () => {
     queryKey: ['admin-baby-growth'],
     queryFn: async () => {
       // First get growth entries
-      const { data: growthData, error: growthError } = await supabase
-        .from('baby_growth')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(200);
-      
+      const { data: growthData, error: growthError } = await supabase.
+      from('baby_growth').
+      select('*').
+      order('created_at', { ascending: false }).
+      limit(200);
+
       if (growthError) throw growthError;
-      
+
       // Get unique user IDs
-      const userIds = [...new Set((growthData || []).map(e => e.user_id))];
-      
+      const userIds = [...new Set((growthData || []).map((e) => e.user_id))];
+
       // Fetch profiles separately
-      const { data: profilesData } = await supabase
-        .from('profiles')
-        .select('id, name, email')
-        .in('id', userIds);
-      
+      const { data: profilesData } = await supabase.
+      from('profiles').
+      select('id, name, email').
+      in('id', userIds);
+
       // Create a map of profiles
-      const profilesMap = new Map((profilesData || []).map(p => [p.id, p]));
-      
+      const profilesMap = new Map((profilesData || []).map((p) => [p.id, p]));
+
       // Combine data
-      return (growthData || []).map(entry => ({
+      return (growthData || []).map((entry) => ({
         ...entry,
         profiles: profilesMap.get(entry.user_id) || null
       })) as BabyGrowthEntry[];
@@ -69,17 +69,17 @@ const AdminBabyGrowth = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('baby_growth')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.
+      from('baby_growth').
+      delete().
+      eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-baby-growth'] });
       toast({
         title: 'Silindi',
-        description: tr("adminbabygrowth_qeyd_ugurla_silindi_6c9c80", "Qeyd uğurla silindi"),
+        description: tr("adminbabygrowth_qeyd_ugurla_silindi_6c9c80", "Qeyd uğurla silindi")
       });
     }
   });
@@ -87,15 +87,15 @@ const AdminBabyGrowth = () => {
   // Stats
   const stats = {
     totalEntries: entries.length,
-    uniqueUsers: new Set(entries.map(e => e.user_id)).size,
-    avgWeight: entries.filter(e => e.weight_kg).reduce((acc, e) => acc + (e.weight_kg || 0), 0) / 
-      (entries.filter(e => e.weight_kg).length || 1),
-    avgHeight: entries.filter(e => e.height_cm).reduce((acc, e) => acc + (e.height_cm || 0), 0) / 
-      (entries.filter(e => e.height_cm).length || 1),
+    uniqueUsers: new Set(entries.map((e) => e.user_id)).size,
+    avgWeight: entries.filter((e) => e.weight_kg).reduce((acc, e) => acc + (e.weight_kg || 0), 0) / (
+    entries.filter((e) => e.weight_kg).length || 1),
+    avgHeight: entries.filter((e) => e.height_cm).reduce((acc, e) => acc + (e.height_cm || 0), 0) / (
+    entries.filter((e) => e.height_cm).length || 1)
   };
 
   // Filter entries
-  const filteredEntries = entries.filter(entry => {
+  const filteredEntries = entries.filter((entry) => {
     const searchLower = searchQuery.toLowerCase();
     const userName = entry.profiles?.name?.toLowerCase() || '';
     const userEmail = entry.profiles?.email?.toLowerCase() || '';
@@ -178,8 +178,8 @@ const AdminBabyGrowth = () => {
           placeholder={tr("adminbabygrowth_istifadeci_axtar_4c82f8", "İstifadəçi axtar...")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
-        />
+          className="pl-10" />
+        
       </div>
 
       {/* Entries Table */}
@@ -187,23 +187,23 @@ const AdminBabyGrowth = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Ruler className="w-5 h-5 text-rose-500" />
-            Böyümə Qeydləri
+            {tr("adminbabygrowth_boyume_qeydleri_8aa7ed", "B\xF6y\xFCm\u0259 Qeydl\u0259ri")}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <div className="space-y-3">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="h-16 bg-muted/50 rounded-lg animate-pulse" />
-              ))}
-            </div>
-          ) : filteredEntries.length === 0 ? (
-            <div className="text-center py-12">
+          {isLoading ?
+          <div className="space-y-3">
+              {[1, 2, 3, 4, 5].map((i) =>
+            <div key={i} className="h-16 bg-muted/50 rounded-lg animate-pulse" />
+            )}
+            </div> :
+          filteredEntries.length === 0 ?
+          <div className="text-center py-12">
               <Ruler className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
               <p className="text-muted-foreground">{tr("adminbabygrowth_qeyd_tapilmadi_54c905", "Qeyd tapılmadı")}</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
+            </div> :
+
+          <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border">
@@ -217,13 +217,13 @@ const AdminBabyGrowth = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {filteredEntries.map((entry) => (
-                    <motion.tr
-                      key={entry.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="hover:bg-muted/30 transition-colors"
-                    >
+                  {filteredEntries.map((entry) =>
+                <motion.tr
+                  key={entry.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="hover:bg-muted/30 transition-colors">
+                  
                       <td className="py-3 px-4">
                         <div>
                           <p className="font-medium text-foreground text-sm">
@@ -243,34 +243,34 @@ const AdminBabyGrowth = () => {
                         </div>
                       </td>
                       <td className="py-3 px-4 text-center">
-                        {entry.weight_kg ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 rounded-full text-sm font-medium">
+                        {entry.weight_kg ?
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 rounded-full text-sm font-medium">
                             <Scale className="w-3 h-3" />
                             {entry.weight_kg}
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground">—</span>
-                        )}
+                          </span> :
+
+                    <span className="text-muted-foreground">—</span>
+                    }
                       </td>
                       <td className="py-3 px-4 text-center">
-                        {entry.height_cm ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-medium">
+                        {entry.height_cm ?
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-medium">
                             <Ruler className="w-3 h-3" />
                             {entry.height_cm}
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground">—</span>
-                        )}
+                          </span> :
+
+                    <span className="text-muted-foreground">—</span>
+                    }
                       </td>
                       <td className="py-3 px-4 text-center">
-                        {entry.head_cm ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 rounded-full text-sm font-medium">
+                        {entry.head_cm ?
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 rounded-full text-sm font-medium">
                             <Brain className="w-3 h-3" />
                             {entry.head_cm}
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground">—</span>
-                        )}
+                          </span> :
+
+                    <span className="text-muted-foreground">—</span>
+                    }
                       </td>
                       <td className="py-3 px-4">
                         <p className="text-sm text-muted-foreground truncate max-w-[150px]">
@@ -279,28 +279,28 @@ const AdminBabyGrowth = () => {
                       </td>
                       <td className="py-3 px-4 text-right">
                         <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            if (confirm('Bu qeydi silmək istədiyinizə əminsiniz?')) {
-                              deleteMutation.mutate(entry.id);
-                            }
-                          }}
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                        >
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        if (confirm(tr("adminbabygrowth_bu_qeydi_silmek_istediyinize_e_d99550", "Bu qeydi silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) {
+                          deleteMutation.mutate(entry.id);
+                        }
+                      }}
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                      
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </td>
                     </motion.tr>
-                  ))}
+                )}
                 </tbody>
               </table>
             </div>
-          )}
+          }
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AdminBabyGrowth;

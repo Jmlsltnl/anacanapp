@@ -6,7 +6,7 @@ export interface PaywallConfig {
   title: string;
   subtitle: string;
   // Benefit pills
-  pills: { icon: string; text: string }[];
+  pills: {icon: string;text: string;}[];
   // CTA texts
   cta_new_user: string;
   cta_upgrade: string;
@@ -59,7 +59,7 @@ export interface BillingConfig {
   cancelled_notice: string; // {date} placeholder
   // Features section
   features_title: string;
-  features: { icon: string; text: string }[];
+  features: {icon: string;text: string;}[];
   // CTA buttons
   upgrade_cta: string;
   upgrade_savings: string; // {percent} placeholder
@@ -86,70 +86,70 @@ export const defaultPaywallConfig: PaywallConfig = {
   title: 'Anacan Premium',
   subtitle: tr("usepaywallconfig_tam_tecrube_sinirsiz_imkanlar_ce3376", "Tam təcrübə · Sınırsız imkanlar"),
   pills: [
-    { icon: 'Zap', text: 'Limitsiz' },
-    { icon: 'Shield', text: tr("usepaywallconfig_reklamsiz_cc4ba5", "Reklamsız") },
-    { icon: 'Sparkles', text: tr("usepaywallconfig_ai_desteyi_934e62", "AI dəstəyi") },
-  ],
-  cta_new_user: 'Premium-a Keç',
-  cta_upgrade: 'Planı Yenilə',
-  cta_switch_yearly: 'İllik Plana Keç',
+  { icon: 'Zap', text: 'Limitsiz' },
+  { icon: 'Shield', text: tr("usepaywallconfig_reklamsiz_cc4ba5", "Reklamsız") },
+  { icon: 'Sparkles', text: tr("usepaywallconfig_ai_desteyi_934e62", "AI dəstəyi") }],
+
+  cta_new_user: tr("usepaywallconfig_premium_a_kec_2e8b0e", "Premium-a Ke\xE7"),
+  cta_upgrade: tr("usepaywallconfig_plani_yenile_3ad3f4", "Plan\u0131 Yenil\u0259"),
+  cta_switch_yearly: tr("usepaywallconfig_i_llik_plana_kec_bdf27a", "\u0130llik Plana Ke\xE7"),
   yearly_label: 'İllik',
-  monthly_label: 'Aylıq',
-  savings_badge: '{percent}% QƏNAƏT',
+  monthly_label: tr("usepaywallconfig_ayliq_6f265e", "Ayl\u0131q"),
+  savings_badge: tr("usepaywallconfig_percent_qenaet_a627e2", "{percent}% Q\u018FNA\u018FT"),
   yearly_suffix: '/ay',
   monthly_suffix: '/ay',
   yearly_total_suffix: '/il',
-  feature_lock_text: '{feature} üçün Premium lazımdır',
-  restore_text: 'Bərpa et',
-  terms_label: 'Şərtlər',
-  privacy_label: 'Məxfilik',
-  cancel_notice: 'İstənilən vaxt ləğv edə bilərsiniz • Avtomatik yenilənir',
+  feature_lock_text: tr("usepaywallconfig_feature_ucun_premium_lazimdir_4800ff", "{feature} \xFC\xE7\xFCn Premium laz\u0131md\u0131r"),
+  restore_text: tr("usepaywallconfig_berpa_et_6c3210", "B\u0259rpa et"),
+  terms_label: tr("usepaywallconfig_sertler_d86d4e", "\u015E\u0259rtl\u0259r"),
+  privacy_label: tr("usepaywallconfig_mexfilik_b641fc", "M\u0259xfilik"),
+  cancel_notice: tr("usepaywallconfig_i_stenilen_vaxt_legv_ede_biler_cc073d", "\u0130st\u0259nil\u0259n vaxt l\u0259\u011Fv ed\u0259 bil\u0259rsiniz \u2022 Avtomatik yenil\u0259nir"),
   native_notice: '',
-  non_native_notice: 'App Store / Google Play-dən yükləyin',
+  non_native_notice: tr("usepaywallconfig_app_store_google_play_den_yukl_1a75c6", "App Store / Google Play-d\u0259n y\xFCkl\u0259yin"),
   free_trial_enabled: true,
   free_trial_days: 3,
-  free_trial_badge: '3 GÜN PULSUZ',
-  free_trial_cta: 'Pulsuz Başla',
-  free_trial_note: '{days} gün pulsuz sınayın, sonra avtomatik abunəlik başlayır',
+  free_trial_badge: tr("usepaywallconfig_3_gun_pulsuz_9e6197", "3 G\xDCN PULSUZ"),
+  free_trial_cta: tr("usepaywallconfig_pulsuz_basla_4e3982", "Pulsuz Ba\u015Fla"),
+  free_trial_note: tr("usepaywallconfig_days_gun_pulsuz_sinayin_sonra__fa9bb5", "{days} g\xFCn pulsuz s\u0131nay\u0131n, sonra avtomatik abun\u0259lik ba\u015Flay\u0131r"),
   purchasing_text: 'Emal edilir...',
   gradient_from: '#d97706',
   gradient_via: '#ea580c',
-  gradient_to: '#be123c',
+  gradient_to: '#be123c'
 };
 
 export const defaultBillingConfig: BillingConfig = {
-  page_title: 'Abunəliyim',
+  page_title: tr("usepaywallconfig_abuneliyim_f6c8ed", "Abun\u0259liyim"),
   free_plan_name: 'Pulsuz Plan',
-  premium_monthly_name: 'Premium Aylıq',
+  premium_monthly_name: tr("usepaywallconfig_premium_ayliq_7f604a", "Premium Ayl\u0131q"),
   premium_yearly_name: 'Premium İllik',
   active_badge: 'Aktiv',
-  cancelled_badge: 'Ləğv edilib',
-  start_date_label: 'Başlama',
-  renewal_label: 'Yenilənmə',
+  cancelled_badge: tr("usepaywallconfig_legv_edilib_24db12", "L\u0259\u011Fv edilib"),
+  start_date_label: tr("usepaywallconfig_baslama_9f32b6", "Ba\u015Flama"),
+  renewal_label: tr("usepaywallconfig_yenilenme_8e3032", "Yenil\u0259nm\u0259"),
   expiry_label: 'Premium bitir',
-  cancelled_notice: '{date} tarixinə qədər Premium aktiv qalacaq.',
-  features_title: 'Planınıza daxildir',
+  cancelled_notice: tr("usepaywallconfig_date_tarixine_qeder_premium_ak_9c0a37", "{date} tarixin\u0259 q\u0259d\u0259r Premium aktiv qalacaq."),
+  features_title: tr("usepaywallconfig_planiniza_daxildir_4a6141", "Plan\u0131n\u0131za daxildir"),
   features: [
-    { icon: 'Zap', text: 'Limitsiz AI' },
-    { icon: 'Shield', text: tr("usepaywallconfig_reklamsiz_cc4ba5", "Reklamsız") },
-    { icon: 'Crown', text: 'Premium fonlar' },
-    { icon: 'Sparkles', text: tr("usepaywallconfig_prioritet_destek_3f6f91", "Prioritet dəstək") },
-  ],
-  upgrade_cta: 'İllik Plana Keç',
-  upgrade_savings: '{percent}% qənaət',
-  restore_cta: 'Abunəliyi Bərpa Et',
-  cancel_cta: 'Abunəliyi Ləğv Et',
-  get_premium_cta: 'Premium-a Keç',
-  payment_title: 'Son ödəniş',
-  paid_label: 'Ödənildi',
-  support_text: 'Suallarınız üçün:',
+  { icon: 'Zap', text: 'Limitsiz AI' },
+  { icon: 'Shield', text: tr("usepaywallconfig_reklamsiz_cc4ba5", "Reklamsız") },
+  { icon: 'Crown', text: 'Premium fonlar' },
+  { icon: 'Sparkles', text: tr("usepaywallconfig_prioritet_destek_3f6f91", "Prioritet dəstək") }],
+
+  upgrade_cta: tr("usepaywallconfig_i_llik_plana_kec_bdf27a", "\u0130llik Plana Ke\xE7"),
+  upgrade_savings: tr("usepaywallconfig_percent_qenaet_5a6e02", "{percent}% q\u0259na\u0259t"),
+  restore_cta: tr("usepaywallconfig_abuneliyi_berpa_et_9e9e21", "Abun\u0259liyi B\u0259rpa Et"),
+  cancel_cta: tr("usepaywallconfig_abuneliyi_legv_et_83e5de", "Abun\u0259liyi L\u0259\u011Fv Et"),
+  get_premium_cta: tr("usepaywallconfig_premium_a_kec_2e8b0e", "Premium-a Ke\xE7"),
+  payment_title: tr("usepaywallconfig_son_odenis_23031a", "Son \xF6d\u0259ni\u015F"),
+  paid_label: tr("usepaywallconfig_odenildi_504c21", "\xD6d\u0259nildi"),
+  support_text: tr("usepaywallconfig_suallariniz_ucun_872f23", "Suallar\u0131n\u0131z \xFC\xE7\xFCn:"),
   support_email: 'info@anacan.az',
   header_gradient_from: '#d97706',
   header_gradient_via: '#ea580c',
   header_gradient_to: '#be123c',
   header_free_from: '#475569',
   header_free_via: '#334155',
-  header_free_to: '#1e293b',
+  header_free_to: '#1e293b'
 };
 
 export const usePaywallConfig = (): PaywallConfig => {
@@ -168,7 +168,7 @@ export const useUpdatePaywallConfig = () => {
   const updateSetting = useUpdateAppSetting();
   return {
     update: (config: PaywallConfig) => updateSetting.mutateAsync({ key: 'premium_paywall_config', value: config }),
-    isPending: updateSetting.isPending,
+    isPending: updateSetting.isPending
   };
 };
 
@@ -176,6 +176,6 @@ export const useUpdateBillingConfig = () => {
   const updateSetting = useUpdateAppSetting();
   return {
     update: (config: BillingConfig) => updateSetting.mutateAsync({ key: 'billing_page_config', value: config }),
-    isPending: updateSetting.isPending,
+    isPending: updateSetting.isPending
   };
 };

@@ -21,9 +21,9 @@ interface TranslationRow {
 }
 
 const NAMESPACES = [
-  'common', 'nav', 'tools', 'dashboard', 'settings', 'auth',
-  'community', 'blog', 'partner', 'ai', 'admin', 'onboarding', 'ai_prompts',
-];
+'common', 'nav', 'tools', 'dashboard', 'settings', 'auth',
+'community', 'blog', 'partner', 'ai', 'admin', 'onboarding', 'ai_prompts'];
+
 
 const AdminTranslations = () => {
   const queryClient = useQueryClient();
@@ -39,32 +39,32 @@ const AdminTranslations = () => {
   const { data: languages = [] } = useQuery({
     queryKey: ['admin-languages-for-translations'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('app_languages')
-        .select('code, native_name')
-        .neq('code', 'az')
-        .order('sort_order');
+      const { data, error } = await supabase.
+      from('app_languages').
+      select('code, native_name').
+      neq('code', 'az').
+      order('sort_order');
       if (error) throw error;
       return data;
-    },
+    }
   });
 
   // Fetch translations for selected language
   const { data: translations = [], isLoading } = useQuery({
     queryKey: ['admin-translations', selectedLang],
     queryFn: async () => {
-      let query = supabase
-        .from('translations')
-        .select('*')
-        .eq('lang', selectedLang)
-        .order('namespace')
-        .order('key');
-      
+      let query = supabase.
+      from('translations').
+      select('*').
+      eq('lang', selectedLang).
+      order('namespace').
+      order('key');
+
       const allData: TranslationRow[] = [];
       let from = 0;
       const batchSize = 1000;
       let hasMore = true;
-      
+
       while (hasMore) {
         const { data, error } = await query.range(from, from + batchSize - 1);
         if (error) throw error;
@@ -72,52 +72,52 @@ const AdminTranslations = () => {
         hasMore = (data?.length ?? 0) === batchSize;
         from += batchSize;
       }
-      
+
       return allData;
     },
-    enabled: !!selectedLang,
+    enabled: !!selectedLang
   });
 
   const filtered = useMemo(() => {
     let result = translations;
     if (selectedNamespace !== 'all') {
-      result = result.filter(t => t.namespace === selectedNamespace);
+      result = result.filter((t) => t.namespace === selectedNamespace);
     }
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      result = result.filter(t => t.key.toLowerCase().includes(q) || t.value.toLowerCase().includes(q));
+      result = result.filter((t) => t.key.toLowerCase().includes(q) || t.value.toLowerCase().includes(q));
     }
     if (filterMode === 'empty') {
-      result = result.filter(t => !t.value);
+      result = result.filter((t) => !t.value);
     } else if (filterMode === 'filled') {
-      result = result.filter(t => !!t.value);
+      result = result.filter((t) => !!t.value);
     }
     return result;
   }, [translations, selectedNamespace, searchQuery, filterMode]);
 
   const saveTranslation = useMutation({
-    mutationFn: async ({ id, value }: { id: string; value: string }) => {
-      const { error } = await supabase
-        .from('translations')
-        .update({ value, updated_at: new Date().toISOString() })
-        .eq('id', id);
+    mutationFn: async ({ id, value }: {id: string;value: string;}) => {
+      const { error } = await supabase.
+      from('translations').
+      update({ value, updated_at: new Date().toISOString() }).
+      eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-translations', selectedLang] });
-    },
+    }
   });
 
   const saveAll = async () => {
     const entries = Object.entries(editedValues);
     if (entries.length === 0) return;
-    
+
     let saved = 0;
     for (const [id, value] of entries) {
       try {
         await saveTranslation.mutateAsync({ id, value });
         saved++;
-      } catch { /* skip */ }
+      } catch {/* skip */}
     }
     setEditedValues({});
     toast.success(`${saved} tərcümə yadda saxlanıldı`);
@@ -126,12 +126,12 @@ const AdminTranslations = () => {
   const addTranslationKey = useMutation({
     mutationFn: async () => {
       // Add for all non-az languages
-      const langs = languages.map(l => l.code);
-      const inserts = langs.map(lang => ({
+      const langs = languages.map((l) => l.code);
+      const inserts = langs.map((lang) => ({
         key: newKey.key.trim(),
         lang,
         value: '',
-        namespace: newKey.namespace,
+        namespace: newKey.namespace
       }));
       const { error } = await supabase.from('translations').insert(inserts);
       if (error) throw error;
@@ -140,20 +140,20 @@ const AdminTranslations = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-translations'] });
       setShowAddKey(false);
       setNewKey({ key: '', namespace: 'common', defaultValue: '' });
-      toast.success('Açar əlavə edildi');
+      toast.success(tr("admintranslations_acar_elave_edildi_15fb4c", "A\xE7ar \u0259lav\u0259 edildi"));
     },
-    onError: (err) => toast.error((err as Error).message),
+    onError: (err) => toast.error((err as Error).message)
   });
 
   // CSV Export
   const handleExport = () => {
     const rows = [['key', 'namespace', 'value'].join(',')];
-    translations.forEach(t => {
+    translations.forEach((t) => {
       rows.push([
-        `"${t.key}"`,
-        `"${t.namespace}"`,
-        `"${(t.value || '').replace(/"/g, '""')}"`,
-      ].join(','));
+      `"${t.key}"`,
+      `"${t.namespace}"`,
+      `"${(t.value || '').replace(/"/g, '""')}"`].
+      join(','));
     });
     const blob = new Blob(['\ufeff' + rows.join('\n')], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -168,31 +168,31 @@ const AdminTranslations = () => {
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     const reader = new FileReader();
     reader.onload = async (ev) => {
       const text = ev.target?.result as string;
       const lines = text.split('\n').slice(1); // skip header
       let imported = 0;
-      
+
       for (const line of lines) {
         if (!line.trim()) continue;
         // Simple CSV parse: key,namespace,value
         const match = line.match(/^"?([^",]+)"?,\s*"?([^",]+)"?,\s*"?(.*)"?$/);
         if (!match) continue;
-        
+
         const [, key, namespace, value] = match;
         const cleanValue = value.replace(/""/g, '"').replace(/"$/, '');
-        
-        const { error } = await supabase
-          .from('translations')
-          .upsert(
-            { key: key.trim(), lang: selectedLang, value: cleanValue, namespace: namespace.trim() },
-            { onConflict: 'key,lang' }
-          );
+
+        const { error } = await supabase.
+        from('translations').
+        upsert(
+          { key: key.trim(), lang: selectedLang, value: cleanValue, namespace: namespace.trim() },
+          { onConflict: 'key,lang' }
+        );
         if (!error) imported++;
       }
-      
+
       queryClient.invalidateQueries({ queryKey: ['admin-translations', selectedLang] });
       toast.success(`${imported} tərcümə idxal edildi`);
     };
@@ -200,9 +200,9 @@ const AdminTranslations = () => {
     e.target.value = '';
   };
 
-  const filledCount = translations.filter(t => !!t.value).length;
+  const filledCount = translations.filter((t) => !!t.value).length;
   const totalCount = translations.length;
-  const progress = totalCount > 0 ? Math.round((filledCount / totalCount) * 100) : 0;
+  const progress = totalCount > 0 ? Math.round(filledCount / totalCount * 100) : 0;
 
   return (
     <div className="space-y-6">
@@ -213,7 +213,7 @@ const AdminTranslations = () => {
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => setShowAddKey(!showAddKey)}>
-            <Plus className="w-4 h-4 mr-1" /> Açar
+            <Plus className="w-4 h-4 mr-1" /> {tr("admintranslations_acar_644193", "A\xE7ar")}
           </Button>
           <Button variant="outline" size="sm" onClick={handleExport}>
             <Download className="w-4 h-4 mr-1" /> CSV İxrac
@@ -224,11 +224,11 @@ const AdminTranslations = () => {
             </Button>
             <input type="file" accept=".csv" className="hidden" onChange={handleImport} />
           </label>
-          {Object.keys(editedValues).length > 0 && (
-            <Button size="sm" onClick={saveAll}>
-              <Save className="w-4 h-4 mr-1" /> Hamısını Saxla ({Object.keys(editedValues).length})
+          {Object.keys(editedValues).length > 0 &&
+          <Button size="sm" onClick={saveAll}>
+              <Save className="w-4 h-4 mr-1" /> {tr("admintranslations_hamisini_saxla_7a6f24", "Ham\u0131s\u0131n\u0131 Saxla (")}{Object.keys(editedValues).length})
             </Button>
-          )}
+          }
         </div>
       </div>
 
@@ -239,9 +239,9 @@ const AdminTranslations = () => {
           <Select value={selectedLang} onValueChange={setSelectedLang}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              {languages.map(l => (
-                <SelectItem key={l.code} value={l.code}>{l.native_name} ({l.code})</SelectItem>
-              ))}
+              {languages.map((l) =>
+              <SelectItem key={l.code} value={l.code}>{l.native_name} ({l.code})</SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -251,9 +251,9 @@ const AdminTranslations = () => {
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{tr("admintranslations_hamisi_c73c4d", "Hamısı")}</SelectItem>
-              {NAMESPACES.map(ns => (
-                <SelectItem key={ns} value={ns}>{ns}</SelectItem>
-              ))}
+              {NAMESPACES.map((ns) =>
+              <SelectItem key={ns} value={ns}>{ns}</SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -272,7 +272,7 @@ const AdminTranslations = () => {
           <Label>Axtar</Label>
           <div className="relative">
             <Search className="absolute left-2 top-2.5 w-4 h-4 text-muted-foreground" />
-            <Input className="pl-8" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder={tr("admintranslations_acar_ve_ya_deyer_axtar_7422e0", "Açar və ya dəyər axtar...")} />
+            <Input className="pl-8" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={tr("admintranslations_acar_ve_ya_deyer_axtar_7422e0", "Açar və ya dəyər axtar...")} />
           </div>
         </div>
       </div>
@@ -286,80 +286,80 @@ const AdminTranslations = () => {
       </div>
 
       {/* Add Key Form */}
-      {showAddKey && (
-        <Card>
+      {showAddKey &&
+      <Card>
           <CardContent className="pt-4 space-y-3">
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <Label>{tr("admintranslations_acar_644193", "Açar")}</Label>
-                <Input value={newKey.key} onChange={e => setNewKey(p => ({ ...p, key: e.target.value }))} placeholder="nav.home" />
+                <Input value={newKey.key} onChange={(e) => setNewKey((p) => ({ ...p, key: e.target.value }))} placeholder="nav.home" />
               </div>
               <div>
                 <Label>Namespace</Label>
-                <Select value={newKey.namespace} onValueChange={v => setNewKey(p => ({ ...p, namespace: v }))}>
+                <Select value={newKey.namespace} onValueChange={(v) => setNewKey((p) => ({ ...p, namespace: v }))}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {NAMESPACES.map(ns => <SelectItem key={ns} value={ns}>{ns}</SelectItem>)}
+                    {NAMESPACES.map((ns) => <SelectItem key={ns} value={ns}>{ns}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
               <div>
                 <Label>{tr("admintranslations_az_deyeri_referans_814983", "AZ Dəyəri (referans)")}</Label>
-                <Input value={newKey.defaultValue} onChange={e => setNewKey(p => ({ ...p, defaultValue: e.target.value }))} placeholder={tr("admintranslations_esas_6d87f7", "Əsas")} />
+                <Input value={newKey.defaultValue} onChange={(e) => setNewKey((p) => ({ ...p, defaultValue: e.target.value }))} placeholder={tr("admintranslations_esas_6d87f7", "Əsas")} />
               </div>
             </div>
             <Button onClick={() => addTranslationKey.mutate()} disabled={!newKey.key} size="sm">
-              Bütün dillərə əlavə et
+              {tr("admintranslations_butun_dillere_elave_et_422b49", "B\xFCt\xFCn dill\u0259r\u0259 \u0259lav\u0259 et")}
             </Button>
           </CardContent>
         </Card>
-      )}
+      }
 
       {/* Translation List */}
-      {isLoading ? (
-        <div className="text-center py-8 text-muted-foreground">{tr("admintranslations_yuklenir_5557de", "Yüklənir...")}</div>
-      ) : filtered.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">{tr("admintranslations_tercume_tapilmadi_6b4f34", "Tərcümə tapılmadı")}</div>
-      ) : (
-        <div className="space-y-2">
-          {filtered.map(t => (
-            <div key={t.id} className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/5 transition-colors">
+      {isLoading ?
+      <div className="text-center py-8 text-muted-foreground">{tr("admintranslations_yuklenir_5557de", "Yüklənir...")}</div> :
+      filtered.length === 0 ?
+      <div className="text-center py-8 text-muted-foreground">{tr("admintranslations_tercume_tapilmadi_6b4f34", "Tərcümə tapılmadı")}</div> :
+
+      <div className="space-y-2">
+          {filtered.map((t) =>
+        <div key={t.id} className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-accent/5 transition-colors">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <code className="text-xs bg-muted px-1.5 py-0.5 rounded">{t.key}</code>
                   <Badge variant="outline" className="text-[10px]">{t.namespace}</Badge>
                 </div>
                 <Textarea
-                  className="text-sm min-h-[36px] resize-none"
-                  value={editedValues[t.id] !== undefined ? editedValues[t.id] : t.value}
-                  onChange={e => setEditedValues(prev => ({ ...prev, [t.id]: e.target.value }))}
-                  placeholder={tr("admintranslations_tercumeni_daxil_edin_3e150c", "Tərcüməni daxil edin...")}
-                  rows={1}
-                />
+              className="text-sm min-h-[36px] resize-none"
+              value={editedValues[t.id] !== undefined ? editedValues[t.id] : t.value}
+              onChange={(e) => setEditedValues((prev) => ({ ...prev, [t.id]: e.target.value }))}
+              placeholder={tr("admintranslations_tercumeni_daxil_edin_3e150c", "Tərcüməni daxil edin...")}
+              rows={1} />
+            
               </div>
-              {editedValues[t.id] !== undefined && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={async () => {
-                    await saveTranslation.mutateAsync({ id: t.id, value: editedValues[t.id] });
-                    setEditedValues(prev => {
-                      const next = { ...prev };
-                      delete next[t.id];
-                      return next;
-                    });
-                    toast.success('Saxlanıldı');
-                  }}
-                >
+              {editedValues[t.id] !== undefined &&
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={async () => {
+              await saveTranslation.mutateAsync({ id: t.id, value: editedValues[t.id] });
+              setEditedValues((prev) => {
+                const next = { ...prev };
+                delete next[t.id];
+                return next;
+              });
+              toast.success(tr("admintranslations_saxlanildi_66ffe7", "Saxlan\u0131ld\u0131"));
+            }}>
+            
                   <Save className="w-4 h-4" />
                 </Button>
-              )}
+          }
             </div>
-          ))}
+        )}
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 
 export default AdminTranslations;

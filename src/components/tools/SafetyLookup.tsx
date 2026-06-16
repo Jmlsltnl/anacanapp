@@ -32,30 +32,30 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
 
   const categories = useMemo(() => {
     const allOption = { id: 'all', name: tr("safetylookup_hamisi_c73c4d", "Hamısı"), emoji: '✨' };
-    const mapped = dbCategories
-      .filter(cat => cat.category_id !== 'all' && cat.name.toLowerCase() !== 'hamısı')
-      .map(cat => ({ id: cat.category_id, name: cat.name_az || cat.name, emoji: cat.emoji || '📦' }));
+    const mapped = dbCategories.
+    filter((cat) => cat.category_id !== 'all' && cat.name.toLowerCase() !== tr("safetylookup_hamisi_6dc013", "ham\u0131s\u0131")).
+    map((cat) => ({ id: cat.category_id, name: cat.name_az || cat.name, emoji: cat.emoji || '📦' }));
     return [allOption, ...mapped];
   }, [dbCategories]);
 
-  const filteredItems = safetyItems.filter(item => {
+  const filteredItems = safetyItems.filter((item) => {
     const name = item.name_az || item.name;
-    return name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      (activeCategory === 'all' || item.category === activeCategory);
+    return name.toLowerCase().includes(searchQuery.toLowerCase()) && (
+    activeCategory === 'all' || item.category === activeCategory);
   });
 
   const stats = useMemo(() => ({
-    safe: filteredItems.filter(i => i.safety_level === 'safe').length,
-    warning: filteredItems.filter(i => i.safety_level === 'warning').length,
-    danger: filteredItems.filter(i => i.safety_level === 'danger').length,
+    safe: filteredItems.filter((i) => i.safety_level === 'safe').length,
+    warning: filteredItems.filter((i) => i.safety_level === 'warning').length,
+    danger: filteredItems.filter((i) => i.safety_level === 'danger').length
   }), [filteredItems]);
 
   const getStatusConfig = (status: string) => {
     switch (status) {
-      case 'safe': return { gradient: 'from-emerald-500 to-green-600', lightBg: 'bg-emerald-50 dark:bg-emerald-950/40', border: 'border-emerald-200/60 dark:border-emerald-800/60', text: 'text-emerald-700 dark:text-emerald-300', icon: ShieldCheck, label: tr("safetylookup_tehlukesiz_1f31cb", 'Təhlükəsiz'), emoji: '✅' };
-      case 'warning': return { gradient: 'from-amber-500 to-orange-600', lightBg: 'bg-amber-50 dark:bg-amber-950/40', border: 'border-amber-200/60 dark:border-amber-800/60', text: 'text-amber-700 dark:text-amber-300', icon: ShieldAlert, label: tr("safetylookup_ehtiyatli_ba7ebe", 'Ehtiyatlı'), emoji: '⚠️' };
-      case 'danger': return { gradient: 'from-red-500 to-rose-600', lightBg: 'bg-red-50 dark:bg-red-950/40', border: 'border-red-200/60 dark:border-red-800/60', text: 'text-red-700 dark:text-red-300', icon: ShieldX, label: tr("safetylookup_tehlukeli_056934", 'Təhlükəli'), emoji: '🚫' };
-      default: return { gradient: 'from-gray-500 to-gray-600', lightBg: 'bg-muted', border: 'border-border', text: 'text-muted-foreground', icon: Shield, label: tr("safetylookup_namelum_134662", 'Naməlum'), emoji: '❓' };
+      case 'safe':return { gradient: 'from-emerald-500 to-green-600', lightBg: 'bg-emerald-50 dark:bg-emerald-950/40', border: 'border-emerald-200/60 dark:border-emerald-800/60', text: 'text-emerald-700 dark:text-emerald-300', icon: ShieldCheck, label: tr("safetylookup_tehlukesiz_1f31cb", 'Təhlükəsiz'), emoji: '✅' };
+      case 'warning':return { gradient: 'from-amber-500 to-orange-600', lightBg: 'bg-amber-50 dark:bg-amber-950/40', border: 'border-amber-200/60 dark:border-amber-800/60', text: 'text-amber-700 dark:text-amber-300', icon: ShieldAlert, label: tr("safetylookup_ehtiyatli_ba7ebe", 'Ehtiyatlı'), emoji: '⚠️' };
+      case 'danger':return { gradient: 'from-red-500 to-rose-600', lightBg: 'bg-red-50 dark:bg-red-950/40', border: 'border-red-200/60 dark:border-red-800/60', text: 'text-red-700 dark:text-red-300', icon: ShieldX, label: tr("safetylookup_tehlukeli_056934", 'Təhlükəli'), emoji: '🚫' };
+      default:return { gradient: 'from-gray-500 to-gray-600', lightBg: 'bg-muted', border: 'border-border', text: 'text-muted-foreground', icon: Shield, label: tr("safetylookup_namelum_134662", 'Naməlum'), emoji: '❓' };
     }
   };
 
@@ -77,7 +77,7 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
     setAiLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('safety-ai-lookup', {
-        body: { query: searchQuery.trim(), category: activeCategory !== 'all' ? activeCategory : undefined, userContext },
+        body: { query: searchQuery.trim(), category: activeCategory !== 'all' ? activeCategory : undefined, userContext }
       });
       if (error) throw error;
       if (data?.success && data?.item) {
@@ -101,8 +101,8 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
           <Loader2 className="w-8 h-8 text-primary animate-spin" />
           <p className="text-sm text-muted-foreground">{tr("safetylookup_yuklenir_5557de", "Yüklənir...")}</p>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -126,8 +126,8 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
               placeholder={tr("safetylookup_ne_yoxlamaq_isteyirsiniz_33ce31", "Nə yoxlamaq istəyirsiniz?")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-9 pl-8 pr-3 rounded-lg bg-muted border border-border text-sm outline-none focus:ring-1 focus:ring-primary/30"
-            />
+              className="w-full h-9 pl-8 pr-3 rounded-lg bg-muted border border-border text-sm outline-none focus:ring-1 focus:ring-primary/30" />
+            
           </div>
         </div>
       </div>
@@ -141,35 +141,35 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
       <div className="px-4 pt-2.5 pb-1">
         <div className="flex gap-1.5">
           {[
-            { emoji: '✅', count: stats.safe, text: 'text-emerald-600 dark:text-emerald-400' },
-            { emoji: '⚠️', count: stats.warning, text: 'text-amber-600 dark:text-amber-400' },
-            { emoji: '🚫', count: stats.danger, text: 'text-red-600 dark:text-red-400' },
-          ].map((s) => (
-            <div key={s.emoji} className="flex items-center gap-1 bg-muted/60 rounded-lg px-2.5 py-1">
+          { emoji: '✅', count: stats.safe, text: 'text-emerald-600 dark:text-emerald-400' },
+          { emoji: '⚠️', count: stats.warning, text: 'text-amber-600 dark:text-amber-400' },
+          { emoji: '🚫', count: stats.danger, text: 'text-red-600 dark:text-red-400' }].
+          map((s) =>
+          <div key={s.emoji} className="flex items-center gap-1 bg-muted/60 rounded-lg px-2.5 py-1">
               <span className="text-xs">{s.emoji}</span>
               <span className={`text-xs font-bold ${s.text}`}>{s.count}</span>
             </div>
-          ))}
+          )}
         </div>
       </div>
 
       {/* Categories */}
       <div className="px-4 py-1.5">
         <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap shrink-0 transition-colors ${
-                activeCategory === cat.id
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground'
-              }`}
-            >
+          {categories.map((cat) =>
+          <button
+            key={cat.id}
+            onClick={() => setActiveCategory(cat.id)}
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap shrink-0 transition-colors ${
+            activeCategory === cat.id ?
+            'bg-primary text-primary-foreground' :
+            'bg-muted text-muted-foreground'}`
+            }>
+            
               <span className="text-xs">{cat.emoji}</span>
               {cat.name}
             </button>
-          ))}
+          )}
         </div>
       </div>
 
@@ -182,8 +182,8 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
             <button
               key={item.id}
               onClick={() => setSelectedItem(item)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl border text-left ${cfg.lightBg} ${cfg.border}`}
-            >
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl border text-left ${cfg.lightBg} ${cfg.border}`}>
+              
               <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${cfg.gradient} flex items-center justify-center shrink-0`}>
                 <Icon className="w-4 h-4 text-white" />
               </div>
@@ -194,33 +194,33 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
               <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md shrink-0 ${cfg.lightBg} ${cfg.text}`}>
                 {cfg.label}
               </span>
-            </button>
-          );
+            </button>);
+
         })}
 
         {/* No results + AI */}
-        {filteredItems.length === 0 && searchQuery.trim().length >= 2 && (
-          <div className="flex flex-col items-center py-10">
+        {filteredItems.length === 0 && searchQuery.trim().length >= 2 &&
+        <div className="flex flex-col items-center py-10">
             <Search className="w-8 h-8 text-muted-foreground mb-3" />
             <p className="text-sm font-semibold text-foreground mb-1">{tr("safetylookup_bazada_tapilmadi_1e2889", "Bazada tapılmadı")}</p>
-            <p className="text-xs text-muted-foreground mb-4 text-center">"{searchQuery}" — AI ilə axtarış edin</p>
+            <p className="text-xs text-muted-foreground mb-4 text-center">"{searchQuery}{tr("safetylookup_ai_ile_axtaris_edin_780816", "\" \u2014 AI il\u0259 axtar\u0131\u015F edin")}</p>
             <button
-              onClick={handleAISearch}
-              disabled={aiLoading}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50"
-            >
+            onClick={handleAISearch}
+            disabled={aiLoading}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50">
+            
               {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-              {aiLoading ? 'Axtarılır...' : 'AI ilə axtar'}
+              {aiLoading ? tr("safetylookup_axtarilir_f0f94f", "Axtar\u0131l\u0131r...") : tr("safetylookup_ai_ile_axtar_01b8df", "AI il\u0259 axtar")}
             </button>
           </div>
-        )}
+        }
 
-        {filteredItems.length === 0 && searchQuery.trim().length < 2 && (
-          <div className="flex flex-col items-center py-10">
+        {filteredItems.length === 0 && searchQuery.trim().length < 2 &&
+        <div className="flex flex-col items-center py-10">
             <Shield className="w-8 h-8 text-muted-foreground mb-2" />
             <p className="text-sm text-muted-foreground">{tr("safetylookup_axtaris_etmeye_baslayin_5447ec", "Axtarış etməyə başlayın")}</p>
           </div>
-        )}
+        }
       </div>
 
       {/* Detail Modal */}
@@ -234,16 +234,16 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-              onClick={() => setSelectedItem(null)}
-            >
+              onClick={() => setSelectedItem(null)}>
+              
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-sm bg-card rounded-2xl max-h-[80vh] overflow-hidden shadow-xl"
-              >
+                className="w-full max-w-sm bg-card rounded-2xl max-h-[80vh] overflow-hidden shadow-xl">
+                
                 <div className="px-4 py-4 overflow-y-auto max-h-[80vh]">
                   {/* Compact hero */}
                   <div className={`flex items-center gap-3 rounded-xl bg-gradient-to-r ${cfg.gradient} p-3 mb-3`}>
@@ -267,45 +267,45 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
                   <div className="p-3 rounded-xl bg-muted/50 border border-border mb-4">
                     <h3 className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-primary" />
-                      Tövsiyələr
+                      {tr("safetylookup_tovsiyeler_17a8f7", "T\xF6vsiy\u0259l\u0259r")}
                     </h3>
                     <ul className="space-y-1.5">
-                      {selectedItem.safety_level === 'safe' && (
-                        <>
+                      {selectedItem.safety_level === 'safe' &&
+                      <>
                           <li className="text-xs text-muted-foreground flex items-start gap-1.5">
                             <Check className="w-3 h-3 text-emerald-500 mt-0.5 shrink-0" />
-                            Hamiləlik dövründə istifadə edə bilərsiniz
+                            {tr("safetylookup_hamilelik_dovrunde_istifade_ed_b320b9", "Hamil\u0259lik d\xF6vr\xFCnd\u0259 istifad\u0259 ed\u0259 bil\u0259rsiniz")}
                           </li>
                           <li className="text-xs text-muted-foreground flex items-start gap-1.5">
                             <Check className="w-3 h-3 text-emerald-500 mt-0.5 shrink-0" />
-                            Miqdarı normal saxlayın
+                            {tr("safetylookup_miqdari_normal_saxlayin_f90941", "Miqdar\u0131 normal saxlay\u0131n")}
                           </li>
                         </>
-                      )}
-                      {selectedItem.safety_level === 'warning' && (
-                        <>
+                      }
+                      {selectedItem.safety_level === 'warning' &&
+                      <>
                           <li className="text-xs text-muted-foreground flex items-start gap-1.5">
                             <AlertTriangle className="w-3 h-3 text-amber-500 mt-0.5 shrink-0" />
-                            Həkiminizlə məsləhətləşin
+                            {tr("safetylookup_hekiminizle_meslehetlesin_1366f8", "H\u0259kiminizl\u0259 m\u0259sl\u0259h\u0259tl\u0259\u015Fin")}
                           </li>
                           <li className="text-xs text-muted-foreground flex items-start gap-1.5">
                             <AlertTriangle className="w-3 h-3 text-amber-500 mt-0.5 shrink-0" />
-                            Miqdarı məhdudlaşdırın
+                            {tr("safetylookup_miqdari_mehdudlasdirin_9faa97", "Miqdar\u0131 m\u0259hdudla\u015Fd\u0131r\u0131n")}
                           </li>
                         </>
-                      )}
-                      {selectedItem.safety_level === 'danger' && (
-                        <>
+                      }
+                      {selectedItem.safety_level === 'danger' &&
+                      <>
                           <li className="text-xs text-muted-foreground flex items-start gap-1.5">
                             <X className="w-3 h-3 text-red-500 mt-0.5 shrink-0" />
-                            Hamiləlik dövründə istifadə etməyin
+                            {tr("safetylookup_hamilelik_dovrunde_istifade_et_7bc436", "Hamil\u0259lik d\xF6vr\xFCnd\u0259 istifad\u0259 etm\u0259yin")}
                           </li>
                           <li className="text-xs text-muted-foreground flex items-start gap-1.5">
                             <X className="w-3 h-3 text-red-500 mt-0.5 shrink-0" />
-                            Alternativ axtarın
+                            {tr("safetylookup_alternativ_axtarin_7735a0", "Alternativ axtar\u0131n")}
                           </li>
                         </>
-                      )}
+                      }
                     </ul>
                   </div>
 
@@ -317,18 +317,18 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
 
                   <button
                     onClick={() => setSelectedItem(null)}
-                    className="w-full h-10 rounded-xl bg-primary text-primary-foreground text-sm font-semibold"
-                  >
-                    Bağla
+                    className="w-full h-10 rounded-xl bg-primary text-primary-foreground text-sm font-semibold">
+                    {tr("safetylookup_bagla_84bdc9", "Ba\u011Fla")}
+                  
                   </button>
                 </div>
               </motion.div>
-            </motion.div>
-          );
+            </motion.div>);
+
         })()}
       </AnimatePresence>
-    </div>
-  );
+    </div>);
+
 });
 
 SafetyLookup.displayName = 'SafetyLookup';

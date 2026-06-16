@@ -26,8 +26,8 @@ interface CommunityScreenProps {
 
 // Groups temporarily disabled
 const tabs = [
-  { id: 'feed', label: tr("communityscreen_umumi_1b5521", 'Ümumi'), icon: TrendingUp },
-] as const;
+{ id: 'feed', label: tr("communityscreen_umumi_1b5521", 'Ümumi'), icon: TrendingUp }] as
+const;
 
 const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBack }, ref) => {
   const [activeTab, setActiveTab] = useState<'feed' | 'groups' | 'my-groups'>('feed');
@@ -37,7 +37,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [searchFocused, setSearchFocused] = useState(false);
   const [showConversations, setShowConversations] = useState(false);
-  const [dmChat, setDmChat] = useState<{ userId: string; name: string; avatar: string | null } | null>(null);
+  const [dmChat, setDmChat] = useState<{userId: string;name: string;avatar: string | null;} | null>(null);
 
   useScrollToTop([activeTab, selectedGroupId, selectedUserId]);
   useScreenAnalytics('Community', 'Social');
@@ -48,16 +48,16 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   const { lifeStage } = useUserStore();
   const headerKey = `community_header_${lifeStage || 'mommy'}`;
   const dynamicHeader = useAppSetting(headerKey);
-  const defaultHeader = 'Digər analar ilə əlaqədə olun';
+  const defaultHeader = tr("communityscreen_diger_analar_ile_elaqede_olun_4830a3", "Dig\u0259r analar il\u0259 \u0259laq\u0259d\u0259 olun");
   const headerText = typeof dynamicHeader === 'string' ? dynamicHeader : defaultHeader;
 
   const { data: groups = [], isLoading: groupsLoading } = useCommunityGroups();
   const { data: memberships = [] } = useUserMemberships();
   const { totalUnread } = useDirectMessages();
 
-  const memberGroupIds = new Set(memberships.map(m => m.group_id));
-  const myGroups = groups.filter(g => memberGroupIds.has(g.id));
-  const selectedGroup = groups.find(g => g.id === selectedGroupId);
+  const memberGroupIds = new Set(memberships.map((m) => m.group_id));
+  const myGroups = groups.filter((g) => memberGroupIds.has(g.id));
+  const selectedGroup = groups.find((g) => g.id === selectedGroupId);
 
   const handleUserClick = (userId: string) => setSelectedUserId(userId);
 
@@ -92,9 +92,9 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
         group={selectedGroup}
         onBack={() => setSelectedGroupId(null)}
         onCreatePost={() => setShowCreatePost(true)}
-        onUserClick={handleUserClick}
-      />
-    );
+        onUserClick={handleUserClick} />);
+
+
   }
 
   return (
@@ -103,11 +103,11 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
       <div className="bg-card border-b border-border/60 shadow-sm">
         <div className="px-5 pt-4 pb-2">
           <div className="flex items-center gap-3 mb-3">
-            {onBack && (
-              <motion.button onClick={onBack} className="w-9 h-9 rounded-full bg-muted flex items-center justify-center active:bg-muted/80 transition-colors" whileTap={{ scale: 0.9 }}>
+            {onBack &&
+            <motion.button onClick={onBack} className="w-9 h-9 rounded-full bg-muted flex items-center justify-center active:bg-muted/80 transition-colors" whileTap={{ scale: 0.9 }}>
                 <ArrowLeft className="w-4 h-4 text-foreground" />
               </motion.button>
-            )}
+            }
             <div className="flex-1">
               <h1 className="text-[26px] font-black text-foreground tracking-tight leading-none">{tr("communityscreen_cemiyyet_2dc44d", "Cəmiyyət")}</h1>
               <p className="text-[13px] text-muted-foreground mt-1 font-medium">{headerText}</p>
@@ -115,14 +115,14 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
             <motion.button
               onClick={() => setShowConversations(true)}
               className="relative w-9 h-9 rounded-full bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.9 }}
-            >
+              whileTap={{ scale: 0.9 }}>
+              
               <MessageCircle className="w-4 h-4 text-foreground" />
-              {totalUnread > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 rounded-full bg-primary text-primary-foreground text-[9px] font-bold flex items-center justify-center min-w-[18px] h-[18px]">
+              {totalUnread > 0 &&
+              <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 rounded-full bg-primary text-primary-foreground text-[9px] font-bold flex items-center justify-center min-w-[18px] h-[18px]">
                   {totalUnread > 9 ? '9+' : totalUnread}
                 </span>
-              )}
+              }
             </motion.button>
           </div>
 
@@ -136,16 +136,16 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
               className={`w-full h-9 pl-9 pr-8 rounded-xl text-[14px] font-medium outline-none transition-all duration-300 placeholder:text-muted-foreground/60 ${
-                searchFocused ? 'bg-background border border-primary/30 shadow-[0_0_0_3px_hsl(var(--primary)/0.08)]' : 'bg-muted/60 border border-border/40'
-              }`}
-            />
+              searchFocused ? 'bg-background border border-primary/30 shadow-[0_0_0_3px_hsl(var(--primary)/0.08)]' : 'bg-muted/60 border border-border/40'}`
+              } />
+            
             <AnimatePresence>
-              {searchQuery && (
-                <motion.button initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-muted flex items-center justify-center">
+              {searchQuery &&
+              <motion.button initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-muted flex items-center justify-center">
                   <X className="w-2.5 h-2.5 text-muted-foreground" />
                 </motion.button>
-              )}
+              }
             </AnimatePresence>
           </motion.div>
 
@@ -162,8 +162,8 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
         <motion.button
           onClick={() => setShowCreatePost(true)}
           className="w-full flex items-center gap-2.5 active:bg-muted/30 transition-colors rounded-lg"
-          whileTap={{ scale: 0.98 }}
-        >
+          whileTap={{ scale: 0.98 }}>
+          
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/15 to-accent/10 flex items-center justify-center flex-shrink-0">
             <Pen className="w-3.5 h-3.5 text-primary" />
           </div>
@@ -175,8 +175,8 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
         <GroupFeed group={null} onBack={() => {}} onCreatePost={() => setShowCreatePost(true)} isEmbedded onUserClick={handleUserClick} externalSearchQuery={searchQuery} />
       </div>
 
-    </div>
-  );
+    </div>);
+
 });
 
 CommunityScreen.displayName = 'CommunityScreen';

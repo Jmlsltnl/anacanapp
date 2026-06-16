@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
-import { 
-  Package, FileText, Vote, BarChart3, 
-  Gift, AlertTriangle, ChevronRight
-} from 'lucide-react';
+import {
+  Package, FileText, Vote, BarChart3,
+  Gift, AlertTriangle, ChevronRight } from
+'lucide-react';
 import { usePartnerHospitalBag } from '@/hooks/usePartnerHospitalBag';
 import { useDailySummary } from '@/hooks/useDailySummary';
 import { useSurprises } from '@/hooks/useSurprises';
@@ -19,59 +19,59 @@ const SyncedFeaturesGrid = ({ onNavigate, onTabChange }: SyncedFeaturesGridProps
   const { plannedSurprises, totalPoints } = useSurprises();
 
   const features = [
-    {
-      id: 'hospital-bag',
-      title: tr("syncedfeaturesgrid_xestexana_cantasi_045078", 'Xəstəxana Çantası'),
-      subtitle: `${checkedCount}/${totalCount} hazır`,
-      icon: Package,
-      gradient: 'from-teal-500 to-emerald-600',
-      progress: getProgress(),
-      action: () => onNavigate('partner-hospital-bag'),
-    },
-    {
-      id: 'daily-summary',
-      title: tr("syncedfeaturesgrid_gundelik_xulase_3d07a5", 'Gündəlik Xülasə'),
-      subtitle: todaySummary ? 'Bugün göndərildi' : 'Gözləyir...',
-      icon: FileText,
-      gradient: 'from-purple-500 to-violet-600',
-      badge: todaySummary ? ['😢', '😔', '😐', '🙂', '😊'][(todaySummary.mood || 3) - 1] : null,
-      action: () => onNavigate('daily-summary'),
-    },
-    {
-      id: 'name-voting',
-      title: tr("syncedfeaturesgrid_ad_secimi_465d2a", 'Ad Seçimi'),
-      subtitle: tr("syncedfeaturesgrid_swipe_ile_sec_77854e", "Swipe ilə seç"),
-      icon: Vote,
-      gradient: 'from-pink-500 to-rose-600',
-      action: () => onNavigate('name-voting'),
-    },
-    {
-      id: 'weekly-stats',
-      title: tr("syncedfeaturesgrid_heftelik_statistika_292953", 'Həftəlik Statistika'),
-      subtitle: tr("syncedfeaturesgrid_ehval_aktivlik_a0a105", "Əhval & aktivlik"),
-      icon: BarChart3,
-      gradient: 'from-cyan-500 to-blue-600',
-      action: () => onTabChange('stats'),
-    },
-    {
-      id: 'surprises',
-      title: tr("syncedfeaturesgrid_surpriz_planla_d495ce", 'Sürpriz Planla'),
-      subtitle: plannedSurprises.length > 0 ? `${plannedSurprises.length} planlanıb` : 'Planlaşdır',
-      icon: Gift,
-      gradient: 'from-amber-500 to-orange-600',
-      badge: totalPoints > 0 ? `${totalPoints} xal` : null,
-      action: () => onTabChange('surprise'),
-    },
-    {
-      id: 'sos',
-      title: tr("syncedfeaturesgrid_sos_xeberdarliq_6bd6d8", 'SOS Xəbərdarlıq'),
-      subtitle: tr("syncedfeaturesgrid_tecili_bildiris_5e8451", "Təcili bildiriş"),
-      icon: AlertTriangle,
-      gradient: 'from-red-500 to-rose-700',
-      isEmergency: true,
-      action: () => {}, // SOS handled separately
-    },
-  ];
+  {
+    id: 'hospital-bag',
+    title: tr("syncedfeaturesgrid_xestexana_cantasi_045078", 'Xəstəxana Çantası'),
+    subtitle: `${checkedCount}/${totalCount} hazır`,
+    icon: Package,
+    gradient: 'from-teal-500 to-emerald-600',
+    progress: getProgress(),
+    action: () => onNavigate('partner-hospital-bag')
+  },
+  {
+    id: 'daily-summary',
+    title: tr("syncedfeaturesgrid_gundelik_xulase_3d07a5", 'Gündəlik Xülasə'),
+    subtitle: todaySummary ? tr("syncedfeaturesgrid_bugun_gonderildi_1fb520", "Bug\xFCn g\xF6nd\u0259rildi") : tr("syncedfeaturesgrid_gozleyir_7c7f65", "G\xF6zl\u0259yir..."),
+    icon: FileText,
+    gradient: 'from-purple-500 to-violet-600',
+    badge: todaySummary ? ['😢', '😔', '😐', '🙂', '😊'][(todaySummary.mood || 3) - 1] : null,
+    action: () => onNavigate('daily-summary')
+  },
+  {
+    id: 'name-voting',
+    title: tr("syncedfeaturesgrid_ad_secimi_465d2a", 'Ad Seçimi'),
+    subtitle: tr("syncedfeaturesgrid_swipe_ile_sec_77854e", "Swipe ilə seç"),
+    icon: Vote,
+    gradient: 'from-pink-500 to-rose-600',
+    action: () => onNavigate('name-voting')
+  },
+  {
+    id: 'weekly-stats',
+    title: tr("syncedfeaturesgrid_heftelik_statistika_292953", 'Həftəlik Statistika'),
+    subtitle: tr("syncedfeaturesgrid_ehval_aktivlik_a0a105", "Əhval & aktivlik"),
+    icon: BarChart3,
+    gradient: 'from-cyan-500 to-blue-600',
+    action: () => onTabChange('stats')
+  },
+  {
+    id: 'surprises',
+    title: tr("syncedfeaturesgrid_surpriz_planla_d495ce", 'Sürpriz Planla'),
+    subtitle: plannedSurprises.length > 0 ? `${plannedSurprises.length} planlanıb` : tr("syncedfeaturesgrid_planlasdir_933684", "Planla\u015Fd\u0131r"),
+    icon: Gift,
+    gradient: 'from-amber-500 to-orange-600',
+    badge: totalPoints > 0 ? `${totalPoints} xal` : null,
+    action: () => onTabChange('surprise')
+  },
+  {
+    id: 'sos',
+    title: tr("syncedfeaturesgrid_sos_xeberdarliq_6bd6d8", 'SOS Xəbərdarlıq'),
+    subtitle: tr("syncedfeaturesgrid_tecili_bildiris_5e8451", "Təcili bildiriş"),
+    icon: AlertTriangle,
+    gradient: 'from-red-500 to-rose-700',
+    isEmergency: true,
+    action: () => {} // SOS handled separately
+  }];
+
 
   return (
     <div className="space-y-3">
@@ -92,8 +92,8 @@ const SyncedFeaturesGrid = ({ onNavigate, onTabChange }: SyncedFeaturesGridProps
               onClick={feature.action}
               className={`bg-card rounded-2xl p-4 border border-border/50 text-left relative overflow-hidden group`}
               whileHover={{ scale: 1.02, y: -2 }}
-              whileTap={{ scale: 0.98 }}
-            >
+              whileTap={{ scale: 0.98 }}>
+              
               {/* Gradient background on hover */}
               <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity`} />
               
@@ -108,32 +108,32 @@ const SyncedFeaturesGrid = ({ onNavigate, onTabChange }: SyncedFeaturesGridProps
               </div>
 
               {/* Progress bar if applicable */}
-              {feature.progress !== undefined && (
-                <div className="h-2 bg-muted rounded-full overflow-hidden mt-2">
-                  <motion.div 
-                    className={`h-full bg-gradient-to-r ${feature.gradient} rounded-full`}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${feature.progress}%` }}
-                    transition={{ duration: 0.8, ease: 'easeOut' }}
-                  />
+              {feature.progress !== undefined &&
+              <div className="h-2 bg-muted rounded-full overflow-hidden mt-2">
+                  <motion.div
+                  className={`h-full bg-gradient-to-r ${feature.gradient} rounded-full`}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${feature.progress}%` }}
+                  transition={{ duration: 0.8, ease: 'easeOut' }} />
+                
                 </div>
-              )}
+              }
 
               {/* Badge */}
-              {feature.badge && (
-                <div className="absolute top-3 right-3 px-2 py-1 bg-muted/50 rounded-lg text-xs font-medium">
+              {feature.badge &&
+              <div className="absolute top-3 right-3 px-2 py-1 bg-muted/50 rounded-lg text-xs font-medium">
                   {feature.badge}
                 </div>
-              )}
+              }
 
               {/* Arrow indicator */}
               <ChevronRight className="absolute bottom-3 right-3 w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-            </motion.button>
-          );
+            </motion.button>);
+
         })}
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default SyncedFeaturesGrid;

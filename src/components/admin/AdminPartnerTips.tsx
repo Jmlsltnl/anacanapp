@@ -14,10 +14,10 @@ import { useAdminPartnerTips, PartnerDailyTip } from '@/hooks/useAdminPartnerTip
 import UnsavedChangesDialog from './UnsavedChangesDialog';
 
 const lifeStages = [
-  { id: 'flow', label: tr("adminpartnertips_dovr_izleme_9d1cf4", "Dövr İzləmə"), emoji: '🌸' },
-  { id: 'bump', label: tr("adminpartnertips_hamilelik_e86feb", "Hamiləlik"), emoji: '🤰' },
-  { id: 'mommy', label: tr("adminpartnertips_analiq_9e762d", "Analıq"), emoji: '👶' },
-];
+{ id: 'flow', label: tr("adminpartnertips_dovr_izleme_9d1cf4", "Dövr İzləmə"), emoji: '🌸' },
+{ id: 'bump', label: tr("adminpartnertips_hamilelik_e86feb", "Hamiləlik"), emoji: '🤰' },
+{ id: 'mommy', label: tr("adminpartnertips_analiq_9e762d", "Analıq"), emoji: '👶' }];
+
 
 const AdminPartnerTips = () => {
   const { data: tips = [], isLoading, create, update, remove } = useAdminPartnerTips();
@@ -54,7 +54,7 @@ const AdminPartnerTips = () => {
       life_stage: 'bump',
       week_number: null,
       sort_order: 0,
-      is_active: true,
+      is_active: true
     };
     setFormData(initialData);
     initialFormDataRef.current = JSON.stringify(initialData);
@@ -78,12 +78,12 @@ const AdminPartnerTips = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
+    if (!confirm(tr("adminpartnertips_silmek_istediyinize_eminsiniz_09658f", "Silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
     await remove.mutateAsync(id);
   };
 
   const filteredTips = tips.filter((t) =>
-    (t.tip_text_az || t.tip_text).toLowerCase().includes(search.toLowerCase())
+  (t.tip_text_az || t.tip_text).toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -95,7 +95,7 @@ const AdminPartnerTips = () => {
         </div>
         <Button onClick={openCreateModal} className="gap-2">
           <Plus className="w-4 h-4" />
-          Yeni Məsləhət
+          {tr("adminpartnertips_yeni_meslehet_8a124f", "Yeni M\u0259sl\u0259h\u0259t")}
         </Button>
       </div>
 
@@ -112,19 +112,19 @@ const AdminPartnerTips = () => {
             </div>
           </div>
         </Card>
-        {lifeStages.map((stage) => (
-          <Card key={stage.id} className="p-4">
+        {lifeStages.map((stage) =>
+        <Card key={stage.id} className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-muted">
                 <span className="text-lg">{stage.emoji}</span>
               </div>
               <div>
-                <p className="text-2xl font-bold">{tips.filter(t => t.life_stage === stage.id).length}</p>
+                <p className="text-2xl font-bold">{tips.filter((t) => t.life_stage === stage.id).length}</p>
                 <p className="text-xs text-muted-foreground">{stage.label}</p>
               </div>
             </div>
           </Card>
-        ))}
+        )}
       </div>
 
       {/* Search */}
@@ -135,31 +135,31 @@ const AdminPartnerTips = () => {
             placeholder={tr("adminpartnertips_meslehet_axtar_52d3a3", "Məsləhət axtar...")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
-          />
+            className="pl-10" />
+          
         </div>
       </Card>
 
       {/* Tips List */}
       <Card>
         <CardHeader>
-          <CardTitle>Məsləhətlər ({filteredTips.length})</CardTitle>
+          <CardTitle>{tr("adminpartnertips_meslehetler_ac87a6", "M\u0259sl\u0259h\u0259tl\u0259r (")}{filteredTips.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">{tr("adminpartnertips_yuklenir_5557de", "Yüklənir...")}</div>
-          ) : filteredTips.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">{tr("adminpartnertips_meslehet_tapilmadi_614f5a", "Məsləhət tapılmadı")}</div>
-          ) : (
-            <div className="space-y-3">
-              {filteredTips.map((tip, index) => (
-                <motion.div
-                  key={tip.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.03 }}
-                  className="flex items-center justify-between p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
-                >
+          {isLoading ?
+          <div className="text-center py-8 text-muted-foreground">{tr("adminpartnertips_yuklenir_5557de", "Yüklənir...")}</div> :
+          filteredTips.length === 0 ?
+          <div className="text-center py-8 text-muted-foreground">{tr("adminpartnertips_meslehet_tapilmadi_614f5a", "Məsləhət tapılmadı")}</div> :
+
+          <div className="space-y-3">
+              {filteredTips.map((tip, index) =>
+            <motion.div
+              key={tip.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.03 }}
+              className="flex items-center justify-between p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors">
+              
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-2xl">
                       {tip.tip_emoji}
@@ -173,12 +173,12 @@ const AdminPartnerTips = () => {
                       </div>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge variant="outline">
-                          {lifeStages.find(s => s.id === tip.life_stage)?.label}
+                          {lifeStages.find((s) => s.id === tip.life_stage)?.label}
                         </Badge>
-                        {tip.week_number && (
-                          <Badge variant="outline">Həftə {tip.week_number}</Badge>
-                        )}
-                        <span className="text-xs text-muted-foreground">Sıra: {tip.sort_order}</span>
+                        {tip.week_number &&
+                    <Badge variant="outline">{tr("adminpartnertips_hefte_3aa886", "H\u0259ft\u0259")} {tip.week_number}</Badge>
+                    }
+                        <span className="text-xs text-muted-foreground">{tr("adminpartnertips_sira_d654d0", "S\u0131ra:")} {tip.sort_order}</span>
                       </div>
                     </div>
                   </div>
@@ -191,9 +191,9 @@ const AdminPartnerTips = () => {
                     </Button>
                   </div>
                 </motion.div>
-              ))}
+            )}
             </div>
-          )}
+          }
         </CardContent>
       </Card>
 
@@ -201,38 +201,38 @@ const AdminPartnerTips = () => {
       <Dialog open={showModal} onOpenChange={handleModalClose}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>{editingItem ? 'Məsləhət Redaktə Et' : 'Yeni Məsləhət'}</DialogTitle>
+            <DialogTitle>{editingItem ? tr("adminpartnertips_meslehet_redakte_et_3bd83e", "M\u0259sl\u0259h\u0259t Redakt\u0259 Et") : tr("adminpartnertips_yeni_meslehet_8a124f", "Yeni M\u0259sl\u0259h\u0259t")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <Input
               placeholder={tr("adminpartnertips_metn_en_58edcd", "Mətn (EN)")}
               value={formData.tip_text || ''}
-              onChange={(e) => setFormData({ ...formData, tip_text: e.target.value })}
-            />
+              onChange={(e) => setFormData({ ...formData, tip_text: e.target.value })} />
+            
             <Textarea
               placeholder={tr("adminpartnertips_metn_az_0aaa4b", "Mətn (AZ)")}
               value={formData.tip_text_az || ''}
-              onChange={(e) => setFormData({ ...formData, tip_text_az: e.target.value })}
-            />
+              onChange={(e) => setFormData({ ...formData, tip_text_az: e.target.value })} />
+            
             <div className="grid grid-cols-2 gap-3">
               <Input
                 placeholder="Emoji"
                 value={formData.tip_emoji || ''}
-                onChange={(e) => setFormData({ ...formData, tip_emoji: e.target.value })}
-              />
+                onChange={(e) => setFormData({ ...formData, tip_emoji: e.target.value })} />
+              
               <Select
                 value={formData.life_stage || 'bump'}
-                onValueChange={(v) => setFormData({ ...formData, life_stage: v })}
-              >
+                onValueChange={(v) => setFormData({ ...formData, life_stage: v })}>
+                
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {lifeStages.map((stage) => (
-                    <SelectItem key={stage.id} value={stage.id}>
+                  {lifeStages.map((stage) =>
+                  <SelectItem key={stage.id} value={stage.id}>
                       {stage.emoji} {stage.label}
                     </SelectItem>
-                  ))}
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -241,29 +241,29 @@ const AdminPartnerTips = () => {
                 type="number"
                 placeholder={tr("adminpartnertips_hefte_bos_qala_biler_28b6d3", "Həftə (boş qala bilər)")}
                 value={formData.week_number || ''}
-                onChange={(e) => setFormData({ ...formData, week_number: e.target.value ? parseInt(e.target.value) : null })}
-              />
+                onChange={(e) => setFormData({ ...formData, week_number: e.target.value ? parseInt(e.target.value) : null })} />
+              
               <Input
                 type="number"
                 placeholder={tr("adminpartnertips_sira_421c5f", "Sıra")}
                 value={formData.sort_order || 0}
-                onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) })}
-              />
+                onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) })} />
+              
             </div>
             <div className="flex items-center gap-2">
               <Switch
                 checked={formData.is_active ?? true}
-                onCheckedChange={(v) => setFormData({ ...formData, is_active: v })}
-              />
+                onCheckedChange={(v) => setFormData({ ...formData, is_active: v })} />
+              
               <span className="text-sm">Aktiv</span>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => handleModalClose(false)}>
-              Ləğv et
+              {tr("adminpartnertips_legv_et_b5e49c", "L\u0259\u011Fv et")}
             </Button>
             <Button onClick={handleSave} disabled={create.isPending || update.isPending}>
-              {editingItem ? 'Yenilə' : 'Əlavə et'}
+              {editingItem ? tr("adminpartnertips_yenile_570ce2", "Yenil\u0259") : tr("adminpartnertips_elave_et_6e1b9b", "\u018Flav\u0259 et")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -276,10 +276,10 @@ const AdminPartnerTips = () => {
         onSave={async () => {
           await handleSave();
           setShowUnsavedDialog(false);
-        }}
-      />
-    </div>
-  );
+        }} />
+      
+    </div>);
+
 };
 
 export default AdminPartnerTips;

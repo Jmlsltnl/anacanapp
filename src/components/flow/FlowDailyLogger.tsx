@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Smile, Frown, Meh, Heart, Moon, Thermometer, 
+import {
+  Smile, Frown, Meh, Heart, Moon, Thermometer,
   Droplets, ChevronDown, ChevronUp, Check, Plus,
-  Zap, CloudRain, Sun, Sparkles
-} from 'lucide-react';
+  Zap, CloudRain, Sun, Sparkles } from
+'lucide-react';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
@@ -22,36 +22,36 @@ interface FlowDailyLoggerProps {
 }
 
 const MOOD_OPTIONS = [
-  { value: 1, emoji: '😢', label: tr("flowdailylogger_cox_pis_e041c5", 'Çox pis'), color: 'bg-red-100 border-red-300 text-red-700' },
-  { value: 2, emoji: '😔', label: 'Pis', color: 'bg-orange-100 border-orange-300 text-orange-700' },
-  { value: 3, emoji: '😐', label: 'Normal', color: 'bg-yellow-100 border-yellow-300 text-yellow-700' },
-  { value: 4, emoji: '😊', label: tr("flowdailylogger_yaxsi_9d8595", 'Yaxşı'), color: 'bg-green-100 border-green-300 text-green-700' },
-  { value: 5, emoji: '🥰', label: tr("flowdailylogger_ela_720a0e", 'Əla'), color: 'bg-pink-100 border-pink-300 text-pink-700' },
-];
+{ value: 1, emoji: '😢', label: tr("flowdailylogger_cox_pis_e041c5", 'Çox pis'), color: 'bg-red-100 border-red-300 text-red-700' },
+{ value: 2, emoji: '😔', label: 'Pis', color: 'bg-orange-100 border-orange-300 text-orange-700' },
+{ value: 3, emoji: '😐', label: 'Normal', color: 'bg-yellow-100 border-yellow-300 text-yellow-700' },
+{ value: 4, emoji: '😊', label: tr("flowdailylogger_yaxsi_9d8595", 'Yaxşı'), color: 'bg-green-100 border-green-300 text-green-700' },
+{ value: 5, emoji: '🥰', label: tr("flowdailylogger_ela_720a0e", 'Əla'), color: 'bg-pink-100 border-pink-300 text-pink-700' }];
+
 
 const ENERGY_OPTIONS = [
-  { value: 1, icon: CloudRain, label: tr("flowdailylogger_cox_asagi_e45510", 'Çox aşağı'), color: 'text-slate-400' },
-  { value: 2, icon: Meh, label: tr("flowdailylogger_asagi_1c27f1", 'Aşağı'), color: 'text-slate-500' },
-  { value: 3, icon: Sun, label: 'Normal', color: 'text-yellow-500' },
-  { value: 4, icon: Zap, label: tr("flowdailylogger_yuksek_492584", 'Yüksək'), color: 'text-orange-500' },
-  { value: 5, icon: Sparkles, label: tr("flowdailylogger_cox_yuksek_c4d475", 'Çox yüksək'), color: 'text-amber-500' },
-];
+{ value: 1, icon: CloudRain, label: tr("flowdailylogger_cox_asagi_e45510", 'Çox aşağı'), color: 'text-slate-400' },
+{ value: 2, icon: Meh, label: tr("flowdailylogger_asagi_1c27f1", 'Aşağı'), color: 'text-slate-500' },
+{ value: 3, icon: Sun, label: 'Normal', color: 'text-yellow-500' },
+{ value: 4, icon: Zap, label: tr("flowdailylogger_yuksek_492584", 'Yüksək'), color: 'text-orange-500' },
+{ value: 5, icon: Sparkles, label: tr("flowdailylogger_cox_yuksek_c4d475", 'Çox yüksək'), color: 'text-amber-500' }];
+
 
 const FLOW_OPTIONS = [
-  { value: 'none', label: 'Yoxdur', emoji: '⚪', color: 'bg-slate-100' },
-  { value: 'spotting', label: tr("flowdailylogger_lekelenme_8e7b1e", 'Ləkələnmə'), emoji: '🔵', color: 'bg-blue-100' },
-  { value: 'light', label: tr("flowdailylogger_yungul_2a8010", 'Yüngül'), emoji: '🩸', color: 'bg-red-100' },
-  { value: 'medium', label: 'Orta', emoji: '🩸🩸', color: 'bg-red-200' },
-  { value: 'heavy', label: tr("flowdailylogger_guclu_0fda31", 'Güclü'), emoji: '🩸🩸🩸', color: 'bg-red-300' },
-];
+{ value: 'none', label: 'Yoxdur', emoji: '⚪', color: 'bg-slate-100' },
+{ value: 'spotting', label: tr("flowdailylogger_lekelenme_8e7b1e", 'Ləkələnmə'), emoji: '🔵', color: 'bg-blue-100' },
+{ value: 'light', label: tr("flowdailylogger_yungul_2a8010", 'Yüngül'), emoji: '🩸', color: 'bg-red-100' },
+{ value: 'medium', label: 'Orta', emoji: '🩸🩸', color: 'bg-red-200' },
+{ value: 'heavy', label: tr("flowdailylogger_guclu_0fda31", 'Güclü'), emoji: '🩸🩸🩸', color: 'bg-red-300' }];
+
 
 const SLEEP_QUALITY = [
-  { value: 1, label: tr("flowdailylogger_cox_pis_e041c5", 'Çox pis'), emoji: '😫' },
-  { value: 2, label: 'Pis', emoji: '😴' },
-  { value: 3, label: 'Normal', emoji: '😐' },
-  { value: 4, label: tr("flowdailylogger_yaxsi_9d8595", 'Yaxşı'), emoji: '😌' },
-  { value: 5, label: tr("flowdailylogger_ela_720a0e", 'Əla'), emoji: '😇' },
-];
+{ value: 1, label: tr("flowdailylogger_cox_pis_e041c5", 'Çox pis'), emoji: '😫' },
+{ value: 2, label: 'Pis', emoji: '😴' },
+{ value: 3, label: 'Normal', emoji: '😐' },
+{ value: 4, label: tr("flowdailylogger_yaxsi_9d8595", 'Yaxşı'), emoji: '😌' },
+{ value: 5, label: tr("flowdailylogger_ela_720a0e", 'Əla'), emoji: '😇' }];
+
 
 const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDailyLoggerProps) => {
   const dateStr = format(date, 'yyyy-MM-dd');
@@ -70,7 +70,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
     sleep_quality: null,
     temperature: null,
     water_glasses: 0,
-    notes: null,
+    notes: null
   });
 
   useEffect(() => {
@@ -85,17 +85,17 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
         sleep_quality: existingLog.sleep_quality,
         temperature: existingLog.temperature,
         water_glasses: existingLog.water_glasses || 0,
-        notes: existingLog.notes,
+        notes: existingLog.notes
       });
     }
   }, [existingLog]);
 
   const toggleSymptom = (symptomKey: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      symptoms: prev.symptoms?.includes(symptomKey)
-        ? prev.symptoms.filter(s => s !== symptomKey)
-        : [...(prev.symptoms || []), symptomKey],
+      symptoms: prev.symptoms?.includes(symptomKey) ?
+      prev.symptoms.filter((s) => s !== symptomKey) :
+      [...(prev.symptoms || []), symptomKey]
     }));
   };
 
@@ -103,12 +103,12 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
     try {
       await saveLog.mutateAsync({
         log_date: dateStr,
-        ...formData,
+        ...formData
       });
-      toast.success('Gündəlik qeyd saxlanıldı!');
+      toast.success(tr("flowdailylogger_gundelik_qeyd_saxlanildi_03bc8a", "G\xFCnd\u0259lik qeyd saxlan\u0131ld\u0131!"));
       onSave?.();
     } catch (error) {
-      toast.error('Xəta baş verdi');
+      toast.error(tr("flowdailylogger_xeta_bas_verdi_f22fba", "X\u0259ta ba\u015F verdi"));
     }
   };
 
@@ -122,7 +122,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
     sleep_quality: existingLog?.sleep_quality ?? null,
     temperature: existingLog?.temperature ?? null,
     water_glasses: existingLog?.water_glasses || 0,
-    notes: existingLog?.notes ?? null,
+    notes: existingLog?.notes ?? null
   });
 
   if (isLoading) {
@@ -130,21 +130,21 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
       <div className="bg-card rounded-2xl p-4 border border-border animate-pulse">
         <div className="h-6 bg-muted rounded w-1/3 mb-4" />
         <div className="h-12 bg-muted rounded" />
-      </div>
-    );
+      </div>);
+
   }
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-card rounded-2xl border border-border overflow-hidden"
-    >
+      className="bg-card rounded-2xl border border-border overflow-hidden">
+      
       {/* Header */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors"
-      >
+        className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
+        
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center">
             <Heart className="w-5 h-5 text-white" />
@@ -157,43 +157,43 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {existingLog && (
-            <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded-full flex items-center gap-1">
+          {existingLog &&
+          <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded-full flex items-center gap-1">
               <Check className="w-3 h-3" /> Doldurulub
             </span>
-          )}
+          }
           {expanded ? <ChevronUp className="w-5 h-5 text-muted-foreground" /> : <ChevronDown className="w-5 h-5 text-muted-foreground" />}
         </div>
       </button>
 
       {/* Content */}
       <AnimatePresence>
-        {expanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="border-t border-border"
-          >
+        {expanded &&
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          className="border-t border-border">
+          
             <div className="p-4 space-y-6">
               {/* Mood */}
               <div>
                 <label className="text-sm font-medium text-foreground mb-3 block">{tr("flowdailylogger_ehval_0457f9", "Əhval")}</label>
                 <div className="flex gap-2 justify-between">
-                  {MOOD_OPTIONS.map(option => (
-                    <button
-                      key={option.value}
-                      onClick={() => setFormData(prev => ({ ...prev, mood: option.value }))}
-                      className={`flex-1 py-3 rounded-xl text-center transition-all ${
-                        formData.mood === option.value
-                          ? `${option.color} border-2 scale-105`
-                          : 'bg-muted hover:bg-muted/80 border-2 border-transparent'
-                      }`}
-                    >
+                  {MOOD_OPTIONS.map((option) =>
+                <button
+                  key={option.value}
+                  onClick={() => setFormData((prev) => ({ ...prev, mood: option.value }))}
+                  className={`flex-1 py-3 rounded-xl text-center transition-all ${
+                  formData.mood === option.value ?
+                  `${option.color} border-2 scale-105` :
+                  'bg-muted hover:bg-muted/80 border-2 border-transparent'}`
+                  }>
+                  
                       <span className="text-2xl">{option.emoji}</span>
                       <p className="text-[10px] mt-1 font-medium">{option.label}</p>
                     </button>
-                  ))}
+                )}
                 </div>
               </div>
 
@@ -201,23 +201,23 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
               <div>
                 <label className="text-sm font-medium text-foreground mb-3 block">{tr("flowdailylogger_enerji_seviyyesi_961691", "Enerji Səviyyəsi")}</label>
                 <div className="flex gap-2 justify-between">
-                  {ENERGY_OPTIONS.map(option => {
-                    const Icon = option.icon;
-                    return (
-                      <button
-                        key={option.value}
-                        onClick={() => setFormData(prev => ({ ...prev, energy_level: option.value }))}
-                        className={`flex-1 py-3 rounded-xl text-center transition-all ${
-                          formData.energy_level === option.value
-                            ? 'bg-primary/10 border-2 border-primary scale-105'
-                            : 'bg-muted hover:bg-muted/80 border-2 border-transparent'
-                        }`}
-                      >
+                  {ENERGY_OPTIONS.map((option) => {
+                  const Icon = option.icon;
+                  return (
+                    <button
+                      key={option.value}
+                      onClick={() => setFormData((prev) => ({ ...prev, energy_level: option.value }))}
+                      className={`flex-1 py-3 rounded-xl text-center transition-all ${
+                      formData.energy_level === option.value ?
+                      'bg-primary/10 border-2 border-primary scale-105' :
+                      'bg-muted hover:bg-muted/80 border-2 border-transparent'}`
+                      }>
+                      
                         <Icon className={`w-6 h-6 mx-auto ${option.color}`} />
                         <p className="text-[10px] mt-1 font-medium">{option.label}</p>
-                      </button>
-                    );
-                  })}
+                      </button>);
+
+                })}
                 </div>
               </div>
 
@@ -227,37 +227,37 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
                   <Droplets className="w-4 h-4 text-red-500" /> Qanaxma
                 </label>
                 <div className="flex gap-2 flex-wrap">
-                  {FLOW_OPTIONS.map(option => (
-                    <button
-                      key={option.value}
-                      onClick={() => setFormData(prev => ({ 
-                        ...prev, 
-                        flow_intensity: option.value as FlowDailyLog['flow_intensity'] 
-                      }))}
-                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                        formData.flow_intensity === option.value
-                          ? `${option.color} border-2 border-red-300`
-                          : 'bg-muted hover:bg-muted/80 border-2 border-transparent'
-                      }`}
-                    >
+                  {FLOW_OPTIONS.map((option) =>
+                <button
+                  key={option.value}
+                  onClick={() => setFormData((prev) => ({
+                    ...prev,
+                    flow_intensity: option.value as FlowDailyLog['flow_intensity']
+                  }))}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                  formData.flow_intensity === option.value ?
+                  `${option.color} border-2 border-red-300` :
+                  'bg-muted hover:bg-muted/80 border-2 border-transparent'}`
+                  }>
+                  
                       {option.emoji} {option.label}
                     </button>
-                  ))}
+                )}
                 </div>
               </div>
 
               {/* Pain Level */}
               <div>
                 <label className="text-sm font-medium text-foreground mb-3 block">
-                  Ağrı Səviyyəsi: {formData.pain_level ?? 0}/10
+                  {tr("flowdailylogger_agri_seviyyesi_57b383", "A\u011Fr\u0131 S\u0259viyy\u0259si:")} {formData.pain_level ?? 0}/10
                 </label>
                 <Slider
-                  value={[formData.pain_level ?? 0]}
-                  onValueChange={([value]) => setFormData(prev => ({ ...prev, pain_level: value }))}
-                  max={10}
-                  step={1}
-                  className="w-full"
-                />
+                value={[formData.pain_level ?? 0]}
+                onValueChange={([value]) => setFormData((prev) => ({ ...prev, pain_level: value }))}
+                max={10}
+                step={1}
+                className="w-full" />
+              
                 <div className="flex justify-between text-xs text-muted-foreground mt-1">
                   <span>{tr("flowdailylogger_agri_yoxdur_25522a", "Ağrı yoxdur")}</span>
                   <span>{tr("flowdailylogger_cox_agrili_ee7bd3", "Çox ağrılı")}</span>
@@ -268,19 +268,19 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
               <div>
                 <label className="text-sm font-medium text-foreground mb-3 block">Simptomlar</label>
                 <div className="flex flex-wrap gap-2">
-                  {symptoms.map(symptom => (
-                    <button
-                      key={symptom.id}
-                      onClick={() => toggleSymptom(symptom.symptom_key)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                        formData.symptoms?.includes(symptom.symptom_key)
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted hover:bg-muted/80 text-muted-foreground'
-                      }`}
-                    >
+                  {symptoms.map((symptom) =>
+                <button
+                  key={symptom.id}
+                  onClick={() => toggleSymptom(symptom.symptom_key)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  formData.symptoms?.includes(symptom.symptom_key) ?
+                  'bg-primary text-primary-foreground' :
+                  'bg-muted hover:bg-muted/80 text-muted-foreground'}`
+                  }>
+                  
                       {symptom.emoji} {symptom.label_az || symptom.label}
                     </button>
-                  ))}
+                )}
                 </div>
               </div>
 
@@ -291,36 +291,36 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
                     <Moon className="w-4 h-4 text-indigo-500" /> Yuxu (saat)
                   </label>
                   <Input
-                    type="number"
-                    min={0}
-                    max={24}
-                    step={0.5}
-                    value={formData.sleep_hours ?? ''}
-                    onChange={(e) => setFormData(prev => ({ 
-                      ...prev, 
-                      sleep_hours: e.target.value ? parseFloat(e.target.value) : null 
-                    }))}
-                    placeholder="7.5"
-                    className="text-center"
-                  />
+                  type="number"
+                  min={0}
+                  max={24}
+                  step={0.5}
+                  value={formData.sleep_hours ?? ''}
+                  onChange={(e) => setFormData((prev) => ({
+                    ...prev,
+                    sleep_hours: e.target.value ? parseFloat(e.target.value) : null
+                  }))}
+                  placeholder="7.5"
+                  className="text-center" />
+                
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block">{tr("flowdailylogger_yuxu_keyfiyyeti_0bb5f7", "Yuxu Keyfiyyəti")}</label>
                   <div className="flex gap-1">
-                    {SLEEP_QUALITY.map(option => (
-                      <button
-                        key={option.value}
-                        onClick={() => setFormData(prev => ({ ...prev, sleep_quality: option.value }))}
-                        className={`flex-1 py-2 rounded-lg text-lg transition-all ${
-                          formData.sleep_quality === option.value
-                            ? 'bg-indigo-100 dark:bg-indigo-900/30 scale-110'
-                            : 'hover:bg-muted'
-                        }`}
-                        title={option.label}
-                      >
+                    {SLEEP_QUALITY.map((option) =>
+                  <button
+                    key={option.value}
+                    onClick={() => setFormData((prev) => ({ ...prev, sleep_quality: option.value }))}
+                    className={`flex-1 py-2 rounded-lg text-lg transition-all ${
+                    formData.sleep_quality === option.value ?
+                    'bg-indigo-100 dark:bg-indigo-900/30 scale-110' :
+                    'hover:bg-muted'}`
+                    }
+                    title={option.label}>
+                    
                         {option.emoji}
                       </button>
-                    ))}
+                  )}
                   </div>
                 </div>
               </div>
@@ -328,23 +328,23 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
               {/* Temperature */}
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block flex items-center gap-2">
-                  <Thermometer className="w-4 h-4 text-red-500" /> Bədən Temperaturu (°C)
+                  <Thermometer className="w-4 h-4 text-red-500" /> {tr("flowdailylogger_beden_temperaturu_c_527103", "B\u0259d\u0259n Temperaturu (\xB0C)")}
                 </label>
                 <Input
-                  type="number"
-                  min={35}
-                  max={42}
-                  step={0.1}
-                  value={formData.temperature ?? ''}
-                  onChange={(e) => setFormData(prev => ({ 
-                    ...prev, 
-                    temperature: e.target.value ? parseFloat(e.target.value) : null 
-                  }))}
-                  placeholder="36.6"
-                  className="max-w-[150px]"
-                />
+                type="number"
+                min={35}
+                max={42}
+                step={0.1}
+                value={formData.temperature ?? ''}
+                onChange={(e) => setFormData((prev) => ({
+                  ...prev,
+                  temperature: e.target.value ? parseFloat(e.target.value) : null
+                }))}
+                placeholder="36.6"
+                className="max-w-[150px]" />
+              
                 <p className="text-xs text-muted-foreground mt-1">
-                  BBT ölçmə zamanı dəqiq nəticə üçün səhər yuxudan durduqda ölçün
+                  {tr("flowdailylogger_bbt_olcme_zamani_deqiq_netice__7b2954", "BBT \xF6l\xE7m\u0259 zaman\u0131 d\u0259qiq n\u0259tic\u0259 \xFC\xE7\xFCn s\u0259h\u0259r yuxudan durduqda \xF6l\xE7\xFCn")}
                 </p>
               </div>
 
@@ -352,27 +352,27 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">{tr("flowdailylogger_qeydler_a7a98b", "Qeydlər")}</label>
                 <Textarea
-                  value={formData.notes ?? ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value || null }))}
-                  placeholder={tr("flowdailylogger_bu_gun_haqqinda_qeydlerinizi_yazin_eca8f7", "Bu gün haqqında qeydlərinizi yazın...")}
-                  rows={3}
-                />
+                value={formData.notes ?? ''}
+                onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value || null }))}
+                placeholder={tr("flowdailylogger_bu_gun_haqqinda_qeydlerinizi_yazin_eca8f7", "Bu gün haqqında qeydlərinizi yazın...")}
+                rows={3} />
+              
               </div>
 
               {/* Save Button */}
               <Button
-                onClick={handleSave}
-                disabled={saveLog.isPending || !hasChanges}
-                className="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white"
-              >
-                {saveLog.isPending ? 'Saxlanılır...' : existingLog ? 'Yenilə' : 'Saxla'}
+              onClick={handleSave}
+              disabled={saveLog.isPending || !hasChanges}
+              className="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white">
+              
+                {saveLog.isPending ? tr("flowdailylogger_saxlanilir_ee05ad", "Saxlan\u0131l\u0131r...") : existingLog ? tr("flowdailylogger_yenile_570ce2", "Yenil\u0259") : 'Saxla'}
               </Button>
             </div>
           </motion.div>
-        )}
+        }
       </AnimatePresence>
-    </motion.div>
-  );
+    </motion.div>);
+
 };
 
 export default FlowDailyLogger;

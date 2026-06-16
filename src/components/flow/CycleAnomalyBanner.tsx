@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { tr } from "@/lib/tr";import { motion } from 'framer-motion';
 import { AlertTriangle, Info } from 'lucide-react';
 import { useCycleStats, useCycleHistory } from '@/hooks/useCycleHistory';
 
@@ -8,29 +8,29 @@ const CycleAnomalyBanner = () => {
 
   if (cycles.length < 3) return null;
 
-  const anomalies: { severity: 'warn' | 'info'; title: string; message: string }[] = [];
+  const anomalies: {severity: 'warn' | 'info';title: string;message: string;}[] = [];
 
   if (stats.shortestCycle > 0 && stats.shortestCycle < 21) {
     anomalies.push({
       severity: 'warn',
-      title: 'Qısa tsikl aşkar edildi',
-      message: `Ən qısa tsikliniz ${stats.shortestCycle} gündür. 21 gündən az tsikllər həkim müraciəti tələb edə bilər.`,
+      title: tr("cycleanomalybanner_qisa_tsikl_askar_edildi_b0e734", "Q\u0131sa tsikl a\u015Fkar edildi"),
+      message: `Ən qısa tsikliniz ${stats.shortestCycle} gündür. 21 gündən az tsikllər həkim müraciəti tələb edə bilər.`
     });
   }
 
   if (stats.longestCycle > 35) {
     anomalies.push({
       severity: 'warn',
-      title: 'Uzun tsikl aşkar edildi',
-      message: `Ən uzun tsikliniz ${stats.longestCycle} gündür. 35 gündən uzun tsikllər PCOS və ya hormonal disbalans əlaməti ola bilər.`,
+      title: tr("cycleanomalybanner_uzun_tsikl_askar_edildi_14479e", "Uzun tsikl a\u015Fkar edildi"),
+      message: `Ən uzun tsikliniz ${stats.longestCycle} gündür. 35 gündən uzun tsikllər PCOS və ya hormonal disbalans əlaməti ola bilər.`
     });
   }
 
   if (stats.cycleVariation > 7) {
     anomalies.push({
       severity: 'info',
-      title: 'Düzənsiz tsikl',
-      message: `Tsikllər arasında ${stats.cycleVariation} gün fərq var. Bu stress, çəki dəyişikliyi və ya tireoid problemlərlə bağlı ola bilər.`,
+      title: tr("cycleanomalybanner_duzensiz_tsikl_7b2693", "D\xFCz\u0259nsiz tsikl"),
+      message: `Tsikllər arasında ${stats.cycleVariation} gün fərq var. Bu stress, çəki dəyişikliyi və ya tireoid problemlərlə bağlı ola bilər.`
     });
   }
 
@@ -47,11 +47,11 @@ const CycleAnomalyBanner = () => {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             className={`rounded-2xl p-3 border ${
-              isWarn
-                ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'
-                : 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
-            }`}
-          >
+            isWarn ?
+            'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800' :
+            'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'}`
+            }>
+            
             <div className="flex items-start gap-2">
               <Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${isWarn ? 'text-amber-600' : 'text-blue-600'}`} />
               <div className="flex-1">
@@ -63,11 +63,11 @@ const CycleAnomalyBanner = () => {
                 </p>
               </div>
             </div>
-          </motion.div>
-        );
+          </motion.div>);
+
       })}
-    </div>
-  );
+    </div>);
+
 };
 
 export default CycleAnomalyBanner;

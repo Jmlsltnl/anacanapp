@@ -1,4 +1,4 @@
-import { Capacitor } from '@capacitor/core';
+import { tr } from "@/lib/tr";import { Capacitor } from '@capacitor/core';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // DEEPLINK SYSTEM — anacan:// + https://app.anacan.az Universal Links
@@ -16,41 +16,41 @@ export interface DeeplinkRoute {
 
 // All supported deeplink routes
 export const DEEPLINK_ROUTES: DeeplinkRoute[] = [
-  // ─── Tabs ───
-  { key: 'home', label: 'Home', label_az: 'Ana səhifə', pattern: '/', example: '/', category: 'Əsas', description_az: 'Ana səhifəni açır' },
-  { key: 'tools', label: 'Tools', label_az: 'Alətlər', pattern: '/tools', example: '/tools', category: 'Əsas', description_az: 'Alətlər hubunu açır' },
-  { key: 'ai', label: 'AI Chat', label_az: 'AI Söhbət', pattern: '/ai', example: '/ai', category: 'Əsas', description_az: 'AI söhbəti açır' },
-  { key: 'community', label: 'Community', label_az: 'İcma', pattern: '/community', example: '/community', category: 'Əsas', description_az: 'İcma bölməsini açır' },
-  { key: 'profile', label: 'Profile', label_az: 'Profil', pattern: '/profile', example: '/profile', category: 'Əsas', description_az: 'Profil bölməsini açır' },
-  { key: 'cakes', label: 'Cakes', label_az: 'Tortlar', pattern: '/cakes', example: '/cakes', category: 'Əsas', description_az: 'Tortlar bölməsini açır' },
+// ─── Tabs ───
+{ key: 'home', label: 'Home', label_az: tr("deeplink_ana_sehife_39721f", "Ana s\u0259hif\u0259"), pattern: '/', example: '/', category: tr("deeplink_esas_6d87f7", "\u018Fsas"), description_az: tr("deeplink_ana_sehifeni_acir_3d8ab0", "Ana s\u0259hif\u0259ni a\xE7\u0131r") },
+{ key: 'tools', label: 'Tools', label_az: tr("deeplink_aletler_4778b4", "Al\u0259tl\u0259r"), pattern: '/tools', example: '/tools', category: tr("deeplink_esas_6d87f7", "\u018Fsas"), description_az: tr("deeplink_aletler_hubunu_acir_45ec0e", "Al\u0259tl\u0259r hubunu a\xE7\u0131r") },
+{ key: 'ai', label: 'AI Chat', label_az: tr("deeplink_ai_sohbet_b8298c", "AI S\xF6hb\u0259t"), pattern: '/ai', example: '/ai', category: tr("deeplink_esas_6d87f7", "\u018Fsas"), description_az: tr("deeplink_ai_sohbeti_acir_7e3442", "AI s\xF6hb\u0259ti a\xE7\u0131r") },
+{ key: 'community', label: 'Community', label_az: 'İcma', pattern: '/community', example: '/community', category: tr("deeplink_esas_6d87f7", "\u018Fsas"), description_az: tr("deeplink_i_cma_bolmesini_acir_7abff0", "\u0130cma b\xF6lm\u0259sini a\xE7\u0131r") },
+{ key: 'profile', label: 'Profile', label_az: 'Profil', pattern: '/profile', example: '/profile', category: tr("deeplink_esas_6d87f7", "\u018Fsas"), description_az: tr("deeplink_profil_bolmesini_acir_d98cb4", "Profil b\xF6lm\u0259sini a\xE7\u0131r") },
+{ key: 'cakes', label: 'Cakes', label_az: 'Tortlar', pattern: '/cakes', example: '/cakes', category: tr("deeplink_esas_6d87f7", "\u018Fsas"), description_az: tr("deeplink_tortlar_bolmesini_acir_fdf182", "Tortlar b\xF6lm\u0259sini a\xE7\u0131r") },
 
-  // ─── Tools ───
-  { key: 'tool', label: 'Specific Tool', label_az: 'Spesifik Alət', pattern: '/tool/{tool_id}', example: '/tool/baby-names', category: 'Alətlər', description_az: 'Müəyyən bir aləti açır' },
+// ─── Tools ───
+{ key: 'tool', label: 'Specific Tool', label_az: tr("deeplink_spesifik_alet_3c4b49", "Spesifik Al\u0259t"), pattern: '/tool/{tool_id}', example: '/tool/baby-names', category: tr("deeplink_aletler_4778b4", "Al\u0259tl\u0259r"), description_az: tr("deeplink_mueyyen_bir_aleti_acir_c91de9", "M\xFC\u0259yy\u0259n bir al\u0259ti a\xE7\u0131r") },
 
-  // ─── Screens ───
-  { key: 'premium', label: 'Premium', label_az: 'Premium', pattern: '/premium', example: '/premium', category: 'Ekranlar', description_az: 'Premium paywall-u açır' },
-  { key: 'settings', label: 'Settings', label_az: 'Tənzimləmələr', pattern: '/settings', example: '/settings', category: 'Ekranlar', description_az: 'Tənzimləmələri açır' },
-  { key: 'notifications', label: 'Notifications', label_az: 'Bildirişlər', pattern: '/notifications', example: '/notifications', category: 'Ekranlar', description_az: 'Bildirişləri açır' },
-  { key: 'calendar', label: 'Calendar', label_az: 'Təqvim', pattern: '/calendar', example: '/calendar', category: 'Ekranlar', description_az: 'Təqvimi açır' },
-  { key: 'help', label: 'Help', label_az: 'Kömək', pattern: '/help', example: '/help', category: 'Ekranlar', description_az: 'Kömək bölməsini açır' },
-  { key: 'edit-profile', label: 'Edit Profile', label_az: 'Profil Redaktə', pattern: '/edit-profile', example: '/edit-profile', category: 'Ekranlar', description_az: 'Profil redaktə səhifəsini açır' },
-  { key: 'appearance', label: 'Appearance', label_az: 'Görünüş', pattern: '/appearance', example: '/appearance', category: 'Ekranlar', description_az: 'Görünüş tənzimləmələrini açır' },
+// ─── Screens ───
+{ key: 'premium', label: 'Premium', label_az: 'Premium', pattern: '/premium', example: '/premium', category: 'Ekranlar', description_az: tr("deeplink_premium_paywall_u_acir_a7d504", "Premium paywall-u a\xE7\u0131r") },
+{ key: 'settings', label: 'Settings', label_az: tr("deeplink_tenzimlemeler_085659", "T\u0259nziml\u0259m\u0259l\u0259r"), pattern: '/settings', example: '/settings', category: 'Ekranlar', description_az: tr("deeplink_tenzimlemeleri_acir_f49067", "T\u0259nziml\u0259m\u0259l\u0259ri a\xE7\u0131r") },
+{ key: 'notifications', label: 'Notifications', label_az: tr("deeplink_bildirisler_54eb88", "Bildiri\u015Fl\u0259r"), pattern: '/notifications', example: '/notifications', category: 'Ekranlar', description_az: tr("deeplink_bildirisleri_acir_81bd18", "Bildiri\u015Fl\u0259ri a\xE7\u0131r") },
+{ key: 'calendar', label: 'Calendar', label_az: tr("deeplink_teqvim_584bdd", "T\u0259qvim"), pattern: '/calendar', example: '/calendar', category: 'Ekranlar', description_az: tr("deeplink_teqvimi_acir_4bb0e4", "T\u0259qvimi a\xE7\u0131r") },
+{ key: 'help', label: 'Help', label_az: tr("deeplink_komek_2bdf68", "K\xF6m\u0259k"), pattern: '/help', example: '/help', category: 'Ekranlar', description_az: tr("deeplink_komek_bolmesini_acir_c2a6fc", "K\xF6m\u0259k b\xF6lm\u0259sini a\xE7\u0131r") },
+{ key: 'edit-profile', label: 'Edit Profile', label_az: tr("deeplink_profil_redakte_aac872", "Profil Redakt\u0259"), pattern: '/edit-profile', example: '/edit-profile', category: 'Ekranlar', description_az: tr("deeplink_profil_redakte_sehifesini_acir_08b41e", "Profil redakt\u0259 s\u0259hif\u0259sini a\xE7\u0131r") },
+{ key: 'appearance', label: 'Appearance', label_az: tr("deeplink_gorunus_165fe3", "G\xF6r\xFCn\xFC\u015F"), pattern: '/appearance', example: '/appearance', category: 'Ekranlar', description_az: tr("deeplink_gorunus_tenzimlemelerini_acir_0fb0db", "G\xF6r\xFCn\xFC\u015F t\u0259nziml\u0259m\u0259l\u0259rini a\xE7\u0131r") },
 
-  // ─── Blog ───
-  { key: 'blog', label: 'Blog', label_az: 'Bloq', pattern: '/blog', example: '/blog', category: 'Məzmun', description_az: 'Bloq bölməsini açır' },
-  { key: 'blog-post', label: 'Blog Post', label_az: 'Bloq Yazısı', pattern: '/blog/{slug}', example: '/blog/my-article', category: 'Məzmun', description_az: 'Müəyyən bir bloq yazısını açır' },
+// ─── Blog ───
+{ key: 'blog', label: 'Blog', label_az: 'Bloq', pattern: '/blog', example: '/blog', category: tr("deeplink_mezmun_f1d51d", "M\u0259zmun"), description_az: tr("deeplink_bloq_bolmesini_acir_5071e9", "Bloq b\xF6lm\u0259sini a\xE7\u0131r") },
+{ key: 'blog-post', label: 'Blog Post', label_az: tr("deeplink_bloq_yazisi_062ec4", "Bloq Yaz\u0131s\u0131"), pattern: '/blog/{slug}', example: '/blog/my-article', category: tr("deeplink_mezmun_f1d51d", "M\u0259zmun"), description_az: tr("deeplink_mueyyen_bir_bloq_yazisini_acir_15e9fc", "M\xFC\u0259yy\u0259n bir bloq yaz\u0131s\u0131n\u0131 a\xE7\u0131r") },
 
-  // ─── Messages ───
-  { key: 'messages', label: 'Messages', label_az: 'Mesajlar', pattern: '/messages', example: '/messages', category: 'Mesajlar', description_az: 'Mesajlar siyahısını açır' },
-  { key: 'messages-user', label: 'Chat with User', label_az: 'İstifadəçi ilə Söhbət', pattern: '/messages/{user_id}', example: '/messages/abc-123', category: 'Mesajlar', description_az: 'Müəyyən bir istifadəçi ilə söhbəti açır' },
+// ─── Messages ───
+{ key: 'messages', label: 'Messages', label_az: 'Mesajlar', pattern: '/messages', example: '/messages', category: 'Mesajlar', description_az: tr("deeplink_mesajlar_siyahisini_acir_d55b87", "Mesajlar siyah\u0131s\u0131n\u0131 a\xE7\u0131r") },
+{ key: 'messages-user', label: 'Chat with User', label_az: tr("deeplink_i_stifadeci_ile_sohbet_43af6f", "\u0130stifad\u0259\xE7i il\u0259 S\xF6hb\u0259t"), pattern: '/messages/{user_id}', example: '/messages/abc-123', category: 'Mesajlar', description_az: tr("deeplink_mueyyen_bir_istifadeci_ile_soh_619b0a", "M\xFC\u0259yy\u0259n bir istifad\u0259\xE7i il\u0259 s\xF6hb\u0259ti a\xE7\u0131r") },
 
-  // ─── Community ───
-  { key: 'community-post', label: 'Community Post', label_az: 'İcma Paylaşımı', pattern: '/community/post/{post_id}', example: '/community/post/abc-123', category: 'İcma', description_az: 'Müəyyən bir icma paylaşımını açır' },
-  { key: 'user-profile', label: 'User Profile', label_az: 'İstifadəçi Profili', pattern: '/user/{user_id}', example: '/user/abc-123', category: 'İcma', description_az: 'İstifadəçi profilini açır' },
+// ─── Community ───
+{ key: 'community-post', label: 'Community Post', label_az: tr("deeplink_i_cma_paylasimi_0b84e6", "\u0130cma Payla\u015F\u0131m\u0131"), pattern: '/community/post/{post_id}', example: '/community/post/abc-123', category: 'İcma', description_az: tr("deeplink_mueyyen_bir_icma_paylasimini_a_07c886", "M\xFC\u0259yy\u0259n bir icma payla\u015F\u0131m\u0131n\u0131 a\xE7\u0131r") },
+{ key: 'user-profile', label: 'User Profile', label_az: tr("deeplink_i_stifadeci_profili_69e0a9", "\u0130stifad\u0259\xE7i Profili"), pattern: '/user/{user_id}', example: '/user/abc-123', category: 'İcma', description_az: tr("deeplink_i_stifadeci_profilini_acir_d3ae0f", "\u0130stifad\u0259\xE7i profilini a\xE7\u0131r") },
 
-  // ─── Legal ───
-  { key: 'legal', label: 'Legal', label_az: 'Hüquqi', pattern: '/legal/{doc_type}', example: '/legal/privacy', category: 'Digər', description_az: 'Hüquqi sənədi açır' },
-];
+// ─── Legal ───
+{ key: 'legal', label: 'Legal', label_az: tr("deeplink_huquqi_ceb5d3", "H\xFCquqi"), pattern: '/legal/{doc_type}', example: '/legal/privacy', category: tr("deeplink_diger_293b3a", "Dig\u0259r"), description_az: tr("deeplink_huquqi_senedi_acir_bc1b2e", "H\xFCquqi s\u0259n\u0259di a\xE7\u0131r") }];
+
 
 export interface ParsedDeeplink {
   action: string;
@@ -133,10 +133,10 @@ export function parseDeeplink(url: string): ParsedDeeplink | null {
  * Generate a deeplink URL
  */
 export function generateDeeplink(
-  pattern: string,
-  params: Record<string, string> = {},
-  format: 'scheme' | 'universal' = 'universal'
-): string {
+pattern: string,
+params: Record<string, string> = {},
+format: 'scheme' | 'universal' = 'universal')
+: string {
   let path = pattern;
   for (const [key, value] of Object.entries(params)) {
     path = path.replace(`{${key}}`, value);
@@ -169,9 +169,9 @@ export function initDeeplinkListener(handler: (parsed: ParsedDeeplink) => void) 
     });
 
     cleanup = () => {
-      listener.then(l => l.remove());
+      listener.then((l) => l.remove());
     };
-  }).catch(err => {
+  }).catch((err) => {
     console.warn('[Deeplink] Failed to init listener:', err);
   });
 

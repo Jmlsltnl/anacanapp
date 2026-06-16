@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
-import { 
-  Package, Search, Eye, Truck, CheckCircle, XCircle, 
-  Clock, MapPin, Phone, User, ChevronDown, ChevronUp
-} from 'lucide-react';
+import {
+  Package, Search, Eye, Truck, CheckCircle, XCircle,
+  Clock, MapPin, Phone, User, ChevronDown, ChevronUp } from
+'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,13 +15,13 @@ import { useAllOrders, Order } from '@/hooks/useOrders';
 import { format } from 'date-fns';
 import { az } from 'date-fns/locale';
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ComponentType<any> }> = {
+const STATUS_CONFIG: Record<string, {label: string;color: string;icon: React.ComponentType<any>;}> = {
   pending: { label: tr("adminorders_gozleyir_9ac18a", "Gözləyir"), color: 'bg-yellow-100 text-yellow-800', icon: Clock },
   confirmed: { label: tr("adminorders_tesdiqlendi_0c46e4", "Təsdiqləndi"), color: 'bg-blue-100 text-blue-800', icon: CheckCircle },
   processing: { label: tr("adminorders_hazirlanir_c15a4b", "Hazırlanır"), color: 'bg-purple-100 text-purple-800', icon: Package },
   shipped: { label: tr("adminorders_gonderildi_6cf847", "Göndərildi"), color: 'bg-cyan-100 text-cyan-800', icon: Truck },
   delivered: { label: tr("adminorders_catdirildi_324039", "Çatdırıldı"), color: 'bg-green-100 text-green-800', icon: CheckCircle },
-  cancelled: { label: tr("adminorders_legv_edildi_bfa98b", "Ləğv edildi"), color: 'bg-red-100 text-red-800', icon: XCircle },
+  cancelled: { label: tr("adminorders_legv_edildi_bfa98b", "Ləğv edildi"), color: 'bg-red-100 text-red-800', icon: XCircle }
 };
 
 const AdminOrders = () => {
@@ -31,14 +31,14 @@ const AdminOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
 
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = 
-      order.order_number.toLowerCase().includes(search.toLowerCase()) ||
-      order.shipping_address?.name?.toLowerCase().includes(search.toLowerCase()) ||
-      order.shipping_address?.phone?.includes(search);
-    
+  const filteredOrders = orders.filter((order) => {
+    const matchesSearch =
+    order.order_number.toLowerCase().includes(search.toLowerCase()) ||
+    order.shipping_address?.name?.toLowerCase().includes(search.toLowerCase()) ||
+    order.shipping_address?.phone?.includes(search);
+
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -54,18 +54,18 @@ const AdminOrders = () => {
 
   const stats = {
     total: orders.length,
-    pending: orders.filter(o => o.status === 'pending').length,
-    processing: orders.filter(o => ['confirmed', 'processing'].includes(o.status)).length,
-    completed: orders.filter(o => o.status === 'delivered').length,
-    revenue: orders.filter(o => o.status === 'delivered').reduce((sum, o) => sum + o.total_amount, 0),
+    pending: orders.filter((o) => o.status === 'pending').length,
+    processing: orders.filter((o) => ['confirmed', 'processing'].includes(o.status)).length,
+    completed: orders.filter((o) => o.status === 'delivered').length,
+    revenue: orders.filter((o) => o.status === 'delivered').reduce((sum, o) => sum + o.total_amount, 0)
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -120,8 +120,8 @@ const AdminOrders = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={tr("adminorders_sifaris_nomresi_ad_ve_ya_telefon_24cdf0", "Sifariş nömrəsi, ad və ya telefon...")}
-            className="pl-10"
-          />
+            className="pl-10" />
+          
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-[180px]">
@@ -129,38 +129,38 @@ const AdminOrders = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{tr("adminorders_hamisi_c73c4d", "Hamısı")}</SelectItem>
-            {Object.entries(STATUS_CONFIG).map(([key, { label }]) => (
-              <SelectItem key={key} value={key}>{label}</SelectItem>
-            ))}
+            {Object.entries(STATUS_CONFIG).map(([key, { label }]) =>
+            <SelectItem key={key} value={key}>{label}</SelectItem>
+            )}
           </SelectContent>
         </Select>
       </div>
 
       {/* Orders List */}
       <div className="space-y-3">
-        {filteredOrders.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
+        {filteredOrders.length === 0 ?
+        <div className="text-center py-12 text-muted-foreground">
             <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
             <p>{tr("adminorders_sifaris_tapilmadi_08e5bf", "Sifariş tapılmadı")}</p>
-          </div>
-        ) : (
-          filteredOrders.map((order) => {
-            const statusConfig = STATUS_CONFIG[order.status] || STATUS_CONFIG.pending;
-            const StatusIcon = statusConfig.icon;
-            const isExpanded = expandedOrders.has(order.id);
+          </div> :
 
-            return (
-              <motion.div
-                key={order.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-card rounded-xl border border-border overflow-hidden"
-              >
+        filteredOrders.map((order) => {
+          const statusConfig = STATUS_CONFIG[order.status] || STATUS_CONFIG.pending;
+          const StatusIcon = statusConfig.icon;
+          const isExpanded = expandedOrders.has(order.id);
+
+          return (
+            <motion.div
+              key={order.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-card rounded-xl border border-border overflow-hidden">
+              
                 {/* Order Header */}
-                <div 
-                  className="p-4 flex items-center gap-4 cursor-pointer hover:bg-muted/50"
-                  onClick={() => toggleExpand(order.id)}
-                >
+                <div
+                className="p-4 flex items-center gap-4 cursor-pointer hover:bg-muted/50"
+                onClick={() => toggleExpand(order.id)}>
+                
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${statusConfig.color}`}>
                     <StatusIcon className="w-5 h-5" />
                   </div>
@@ -172,26 +172,26 @@ const AdminOrders = () => {
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <span>{format(new Date(order.created_at), 'd MMMM, HH:mm', { locale: az })}</span>
                       <span className="font-medium text-foreground">{order.total_amount.toFixed(2)} ₼</span>
-                      {order.shipping_address?.name && (
-                        <span className="flex items-center gap-1">
+                      {order.shipping_address?.name &&
+                    <span className="flex items-center gap-1">
                           <User className="w-3 h-3" />
                           {order.shipping_address.name}
                         </span>
-                      )}
+                    }
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Select 
-                      value={order.status} 
-                      onValueChange={(value) => updateOrderStatus(order.id, value as Order['status'])}
-                    >
+                    <Select
+                    value={order.status}
+                    onValueChange={(value) => updateOrderStatus(order.id, value as Order['status'])}>
+                    
                       <SelectTrigger className="w-[140px] h-8" onClick={(e) => e.stopPropagation()}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {Object.entries(STATUS_CONFIG).map(([key, { label }]) => (
-                          <SelectItem key={key} value={key}>{label}</SelectItem>
-                        ))}
+                        {Object.entries(STATUS_CONFIG).map(([key, { label }]) =>
+                      <SelectItem key={key} value={key}>{label}</SelectItem>
+                      )}
                       </SelectContent>
                     </Select>
                     {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
@@ -199,62 +199,62 @@ const AdminOrders = () => {
                 </div>
 
                 {/* Expanded Details */}
-                {isExpanded && (
-                  <div className="px-4 pb-4 border-t border-border pt-4 space-y-4">
+                {isExpanded &&
+              <div className="px-4 pb-4 border-t border-border pt-4 space-y-4">
                     {/* Shipping Address */}
-                    {order.shipping_address && (
-                      <div className="bg-muted/50 rounded-lg p-3">
+                    {order.shipping_address &&
+                <div className="bg-muted/50 rounded-lg p-3">
                         <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
                           <MapPin className="w-4 h-4" />
-                          Çatdırılma Ünvanı
+                          {tr("adminorders_catdirilma_unvani_10ea11", "\xC7atd\u0131r\u0131lma \xDCnvan\u0131")}
                         </h4>
                         <div className="text-sm space-y-1 text-muted-foreground">
                           {order.shipping_address.name && <p>{order.shipping_address.name}</p>}
-                          {order.shipping_address.phone && (
-                            <p className="flex items-center gap-1">
+                          {order.shipping_address.phone &&
+                    <p className="flex items-center gap-1">
                               <Phone className="w-3 h-3" />
                               {order.shipping_address.phone}
                             </p>
-                          )}
+                    }
                           {order.shipping_address.address && <p>{order.shipping_address.address}</p>}
                           {order.shipping_address.city && <p>{order.shipping_address.city}</p>}
                         </div>
                       </div>
-                    )}
+                }
 
                     {/* Order Items */}
-                    {order.items && order.items.length > 0 && (
-                      <div>
+                    {order.items && order.items.length > 0 &&
+                <div>
                         <h4 className="font-semibold text-sm mb-2">{tr("adminorders_mehsullar_24a4ce", "Məhsullar")}</h4>
                         <div className="space-y-2">
-                          {order.items.map((item) => (
-                            <div key={item.id} className="flex items-center justify-between bg-muted/30 rounded-lg p-2">
+                          {order.items.map((item) =>
+                    <div key={item.id} className="flex items-center justify-between bg-muted/30 rounded-lg p-2">
                               <span className="text-sm">{item.product_name}</span>
                               <div className="text-sm text-muted-foreground">
                                 {item.quantity} x {item.unit_price.toFixed(2)} ₼ = {item.total_price.toFixed(2)} ₼
                               </div>
                             </div>
-                          ))}
+                    )}
                         </div>
                       </div>
-                    )}
+                }
 
                     {/* Notes */}
-                    {order.notes && (
-                      <div className="bg-yellow-50 dark:bg-yellow-950/30 rounded-lg p-3">
+                    {order.notes &&
+                <div className="bg-yellow-50 dark:bg-yellow-950/30 rounded-lg p-3">
                         <h4 className="font-semibold text-sm mb-1">{tr("adminorders_qeydler_a7a98b", "Qeydlər")}</h4>
                         <p className="text-sm text-muted-foreground">{order.notes}</p>
                       </div>
-                    )}
+                }
                   </div>
-                )}
-              </motion.div>
-            );
-          })
-        )}
+              }
+              </motion.div>);
+
+        })
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AdminOrders;

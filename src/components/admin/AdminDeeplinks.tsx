@@ -15,7 +15,7 @@ const AdminDeeplinks = () => {
 
   const categories = useMemo(() => {
     const cats: Record<string, DeeplinkRoute[]> = {};
-    DEEPLINK_ROUTES.forEach(r => {
+    DEEPLINK_ROUTES.forEach((r) => {
       if (!cats[r.category]) cats[r.category] = [];
       cats[r.category].push(r);
     });
@@ -27,11 +27,11 @@ const AdminDeeplinks = () => {
     const q = search.toLowerCase();
     const result: Record<string, DeeplinkRoute[]> = {};
     Object.entries(categories).forEach(([cat, routes]) => {
-      const filtered = routes.filter(r =>
-        r.label_az.toLowerCase().includes(q) ||
-        r.label.toLowerCase().includes(q) ||
-        r.pattern.toLowerCase().includes(q) ||
-        r.key.toLowerCase().includes(q)
+      const filtered = routes.filter((r) =>
+      r.label_az.toLowerCase().includes(q) ||
+      r.label.toLowerCase().includes(q) ||
+      r.pattern.toLowerCase().includes(q) ||
+      r.key.toLowerCase().includes(q)
       );
       if (filtered.length > 0) result[cat] = filtered;
     });
@@ -41,7 +41,7 @@ const AdminDeeplinks = () => {
   // Extract param placeholders from pattern
   const getParams = (pattern: string): string[] => {
     const matches = pattern.match(/\{([^}]+)\}/g);
-    return matches ? matches.map(m => m.replace(/[{}]/g, '')) : [];
+    return matches ? matches.map((m) => m.replace(/[{}]/g, '')) : [];
   };
 
   const getParamValue = (routeKey: string, paramName: string) => {
@@ -49,7 +49,7 @@ const AdminDeeplinks = () => {
   };
 
   const setParamValue = (routeKey: string, paramName: string, value: string) => {
-    setParamValues(prev => ({
+    setParamValues((prev) => ({
       ...prev,
       [routeKey]: { ...prev[routeKey], [paramName]: value }
     }));
@@ -58,7 +58,7 @@ const AdminDeeplinks = () => {
   const getGeneratedLink = (route: DeeplinkRoute) => {
     const params = getParams(route.pattern);
     const values: Record<string, string> = {};
-    params.forEach(p => {
+    params.forEach((p) => {
       values[p] = getParamValue(route.key, p) || `{${p}}`;
     });
     return generateDeeplink(route.pattern, values, format);
@@ -67,7 +67,7 @@ const AdminDeeplinks = () => {
   const copyLink = (route: DeeplinkRoute) => {
     const link = getGeneratedLink(route);
     navigator.clipboard.writeText(link);
-    toast.success('Link kopyalandı!', { description: link });
+    toast.success(tr("admindeeplinks_link_kopyalandi_63c33e", "Link kopyaland\u0131!"), { description: link });
   };
 
   const categoryEmojis: Record<string, string> = {
@@ -77,7 +77,7 @@ const AdminDeeplinks = () => {
     'Məzmun': '📝',
     'Mesajlar': '💬',
     'İcma': '👥',
-    'Digər': '📋',
+    'Digər': '📋'
   };
 
   return (
@@ -87,10 +87,10 @@ const AdminDeeplinks = () => {
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <Link className="w-6 h-6 text-primary" />
-            Deeplink İdarəetməsi
+            {tr("admindeeplinks_deeplink_i_dareetmesi_64da6a", "Deeplink \u0130dar\u0259etm\u0259si")}
           </h2>
           <p className="text-muted-foreground text-sm mt-1">
-            Bütün deeplink marşrutlarını burada görə və istifadə edə bilərsiniz
+            {tr("admindeeplinks_butun_deeplink_marsrutlarini_b_d5f795", "B\xFCt\xFCn deeplink mar\u015Frutlar\u0131n\u0131 burada g\xF6r\u0259 v\u0259 istifad\u0259 ed\u0259 bil\u0259rsiniz")}
           </p>
         </div>
 
@@ -100,8 +100,8 @@ const AdminDeeplinks = () => {
             size="sm"
             variant={format === 'universal' ? 'default' : 'ghost'}
             onClick={() => setFormat('universal')}
-            className="gap-1.5"
-          >
+            className="gap-1.5">
+            
             <Globe className="w-3.5 h-3.5" />
             Universal
           </Button>
@@ -109,8 +109,8 @@ const AdminDeeplinks = () => {
             size="sm"
             variant={format === 'scheme' ? 'default' : 'ghost'}
             onClick={() => setFormat('scheme')}
-            className="gap-1.5"
-          >
+            className="gap-1.5">
+            
             <Smartphone className="w-3.5 h-3.5" />
             anacan://
           </Button>
@@ -123,9 +123,9 @@ const AdminDeeplinks = () => {
         <Input
           placeholder="Deeplink axtar..."
           value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="pl-9"
-        />
+          onChange={(e) => setSearch(e.target.value)}
+          className="pl-9" />
+        
       </div>
 
       {/* Info cards */}
@@ -151,8 +151,8 @@ const AdminDeeplinks = () => {
       </div>
 
       {/* Route categories */}
-      {Object.entries(filteredCategories).map(([category, routes]) => (
-        <Card key={category}>
+      {Object.entries(filteredCategories).map(([category, routes]) =>
+      <Card key={category}>
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center gap-2">
               <span>{categoryEmojis[category] || '📎'}</span>
@@ -161,15 +161,15 @@ const AdminDeeplinks = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {routes.map(route => {
-              const params = getParams(route.pattern);
-              const generatedLink = getGeneratedLink(route);
+            {routes.map((route) => {
+            const params = getParams(route.pattern);
+            const generatedLink = getGeneratedLink(route);
 
-              return (
-                <div
-                  key={route.key}
-                  className="border rounded-lg p-3 space-y-2 hover:border-primary/50 transition-colors"
-                >
+            return (
+              <div
+                key={route.key}
+                className="border rounded-lg p-3 space-y-2 hover:border-primary/50 transition-colors">
+                
                   <div className="flex items-center justify-between gap-2">
                     <div>
                       <div className="font-medium text-sm">{route.label_az}</div>
@@ -181,19 +181,19 @@ const AdminDeeplinks = () => {
                   </div>
 
                   {/* Param inputs */}
-                  {params.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {params.map(param => (
-                        <Input
-                          key={param}
-                          placeholder={param}
-                          value={getParamValue(route.key, param)}
-                          onChange={e => setParamValue(route.key, param, e.target.value)}
-                          className="h-8 text-xs max-w-[200px]"
-                        />
-                      ))}
-                    </div>
+                  {params.length > 0 &&
+                <div className="flex flex-wrap gap-2">
+                      {params.map((param) =>
+                  <Input
+                    key={param}
+                    placeholder={param}
+                    value={getParamValue(route.key, param)}
+                    onChange={(e) => setParamValue(route.key, param, e.target.value)}
+                    className="h-8 text-xs max-w-[200px]" />
+
                   )}
+                    </div>
+                }
 
                   {/* Generated link + copy */}
                   <div className="flex items-center gap-2">
@@ -205,21 +205,21 @@ const AdminDeeplinks = () => {
                       Kopyala
                     </Button>
                   </div>
-                </div>
-              );
-            })}
+                </div>);
+
+          })}
           </CardContent>
         </Card>
-      ))}
+      )}
 
-      {Object.keys(filteredCategories).length === 0 && (
-        <div className="text-center py-12 text-muted-foreground">
+      {Object.keys(filteredCategories).length === 0 &&
+      <div className="text-center py-12 text-muted-foreground">
           <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
           <p>{tr("admindeeplinks_netice_tapilmadi_4b1b52", "Nəticə tapılmadı")}</p>
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 
 export default AdminDeeplinks;

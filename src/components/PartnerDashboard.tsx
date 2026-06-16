@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Heart, Bell, ShoppingCart, MessageCircle, 
-  Gift, Plus, Home, Send, BarChart3
-} from 'lucide-react';
+import {
+  Heart, Bell, ShoppingCart, MessageCircle,
+  Gift, Plus, Home, Send, BarChart3 } from
+'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { hapticFeedback } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
@@ -36,7 +36,7 @@ interface PartnerDashboardProps {
 
 const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
   useScrollToTop();
-  
+
   const { name } = useUserStore();
   const { toast } = useToast();
   const { profile } = useAuth();
@@ -50,7 +50,7 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
   const [loveMessage, setLoveMessage] = useState('');
 
   // Convert shopping items from DB to local format
-  const shoppingList = shoppingItems.map(item => ({
+  const shoppingList = shoppingItems.map((item) => ({
     id: item.id,
     name: item.name,
     quantity: item.quantity,
@@ -61,29 +61,29 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
   }));
 
   // Use real partner data or fallback
-  const womanName = partnerProfile?.name || 'Həyat yoldaşın';
+  const womanName = partnerProfile?.name || tr("partnerdashboard_heyat_yoldasin_fc543b", "H\u0259yat yolda\u015F\u0131n");
   const womanMood = partnerDailyLog?.mood || 4;
   const womanSymptoms = partnerDailyLog?.symptoms || [];
   const waterIntake = partnerDailyLog?.water_intake || 0;
   const lifeStage = partnerProfile?.life_stage || 'bump';
-  
+
   // Calculate pregnancy week and day
   const currentWeek = getPregnancyWeek() || 0;
   const daysUntilDue = getDaysUntilDue() || 0;
   const babyAgeDays = getBabyAgeDays();
-  const pregnancyDay = partnerProfile?.last_period_date 
-    ? getPregnancyDay(partnerProfile.last_period_date)
-    : 0;
-  
+  const pregnancyDay = partnerProfile?.last_period_date ?
+  getPregnancyDay(partnerProfile.last_period_date) :
+  0;
+
   // Fetch dynamic content
   const { data: dayContent } = usePregnancyContentByDay(pregnancyDay > 0 ? pregnancyDay : undefined);
   const { data: fruitImages = [] } = useFruitImages();
   const { tipText, tipEmoji } = useDailyTip(lifeStage, currentWeek);
-  
+
   // Get fruit data
-  const weekData = currentWeek > 0 
-    ? getDynamicFruitData(fruitImages, pregnancyDay, currentWeek, dayContent)
-    : null;
+  const weekData = currentWeek > 0 ?
+  getDynamicFruitData(fruitImages, pregnancyDay, currentWeek, dayContent) :
+  null;
 
 
 
@@ -102,18 +102,18 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
 
   const sendLove = async () => {
     await hapticFeedback.heavy();
-    
+
     if (profile && partnerProfile) {
       try {
         await supabase.from('partner_messages').insert({
           sender_id: profile.user_id,
           receiver_id: partnerProfile.user_id,
           message_type: 'love',
-          content: '❤️',
+          content: '❤️'
         });
         toast({
           title: tr("partnerdashboard_sevgi_gonderildi_4284b1", '💕 Sevgi göndərildi!'),
-          description: `${womanName} bildiriş alacaq`,
+          description: `${womanName} bildiriş alacaq`
         });
       } catch (err) {
         console.error('Error sending love:', err);
@@ -122,7 +122,7 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
       toast({
         title: tr("partnerdashboard_partner_baglantisi_yoxdur_d0c7c6", 'Partner bağlantısı yoxdur'),
         description: tr("partnerdashboard_evvelce_partner_kodunu_baglayin_9a5906", 'Əvvəlcə partner kodunu bağlayın'),
-        variant: 'destructive',
+        variant: 'destructive'
       });
     }
   };
@@ -130,17 +130,17 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
   const sendMessage = async () => {
     if (loveMessage.trim() && profile && partnerProfile) {
       await hapticFeedback.medium();
-      
+
       try {
         await supabase.from('partner_messages').insert({
           sender_id: profile.user_id,
           receiver_id: partnerProfile.user_id,
           message_type: 'text',
-          content: loveMessage,
+          content: loveMessage
         });
         toast({
           title: tr("partnerdashboard_mesaj_gonderildi_dca65e", '💌 Mesaj göndərildi!'),
-          description: loveMessage,
+          description: loveMessage
         });
         setLoveMessage('');
       } catch (err) {
@@ -151,10 +151,10 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-rose-500';
-      case 'medium': return 'bg-amber-500';
-      case 'low': return 'bg-emerald-500';
-      default: return 'bg-muted';
+      case 'high':return 'bg-rose-500';
+      case 'medium':return 'bg-amber-500';
+      case 'low':return 'bg-emerald-500';
+      default:return 'bg-muted';
     }
   };
 
@@ -167,13 +167,13 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
   if (partnerLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <motion.div 
+        <motion.div
           className="w-16 h-16 rounded-full border-4 border-partner border-t-transparent"
           animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-        />
-      </div>
-    );
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }} />
+        
+      </div>);
+
   }
 
   // No partner linked state — branded empty state
@@ -184,13 +184,13 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 200 }}
-          className="w-28 h-28 rounded-full bg-gradient-to-br from-partner to-partner-dark flex items-center justify-center mb-6 shadow-2xl shadow-partner/30"
-        >
+          className="w-28 h-28 rounded-full bg-gradient-to-br from-partner to-partner-dark flex items-center justify-center mb-6 shadow-2xl shadow-partner/30">
+          
           <Heart className="w-14 h-14 text-white fill-white/30" />
         </motion.div>
         <h1 className="text-2xl font-black mb-2">{tr("partnerdashboard_hele_baglanmamisiniz_bc4f93", "Hələ bağlanmamısınız")}</h1>
         <p className="text-muted-foreground mb-6 max-w-sm">
-          Həyat yoldaşınızın Anacan tətbiqindəki partnyor kodunu daxil edib bağlanın — bütün məlumatlar real vaxtda sinxronlaşacaq.
+          {tr("partnerdashboard_heyat_yoldasinizin_anacan_tetb_9b4f56", "H\u0259yat yolda\u015F\u0131n\u0131z\u0131n Anacan t\u0259tbiqind\u0259ki partnyor kodunu daxil edib ba\u011Flan\u0131n \u2014 b\xFCt\xFCn m\u0259lumatlar real vaxtda sinxronla\u015Facaq.")}
         </p>
         <div className="bg-card rounded-2xl p-6 shadow-lg border border-border/50 max-w-sm">
           <p className="text-sm font-medium mb-2">{tr("partnerdashboard_nece_baglanmali_8234cb", "📲 Necə bağlanmalı?")}</p>
@@ -200,8 +200,8 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
             <li>{tr("partnerdashboard_bir_nece_saniye_icinde_baglanti_yaranaca_99fbd5", "Bir neçə saniyə içində bağlantı yaranacaq")}</li>
           </ol>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -217,19 +217,19 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
           {/* Top bar */}
           <div className="flex items-center justify-between mb-5">
             <div>
-              <motion.p 
+              <motion.p
                 className="text-white/70 text-xs font-medium"
                 initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-              >
+                animate={{ opacity: 1, x: 0 }}>
+                
                 Partner Paneli
               </motion.p>
-              <motion.h1 
+              <motion.h1
                 className="text-xl font-black text-white"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.05 }}
-              >
+                transition={{ delay: 0.05 }}>
+                
                 Salam, {name || 'Partner'}! 👋
               </motion.h1>
             </div>
@@ -255,8 +255,8 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
             weekData={weekData}
             onSendLove={sendLove}
             onOpenNotifications={() => setActiveTab('notifications')}
-            unreadCount={getUnreadCount()}
-          />
+            unreadCount={getUnreadCount()} />
+          
         </div>
       </div>
 
@@ -264,12 +264,12 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
       <div className="px-4 -mt-6 relative z-20">
         <div className="bg-card rounded-2xl p-1.5 flex gap-1 shadow-xl border border-border/50">
           {[
-            { id: 'home', label: tr("partnerdashboard_esas_6d87f7", 'Əsas'), icon: Home },
-            { id: 'stats', label: 'Statistika', icon: BarChart3 },
-            { id: 'notifications', label: tr("partnerdashboard_bildiris_307073", "Bildiriş"), icon: Bell },
-            { id: 'surprise', label: tr("partnerdashboard_surpriz_67b2b2", 'Sürpriz'), icon: Gift },
-            { id: 'shopping', label: tr("partnerdashboard_siyahi_f04aac", 'Siyahı'), icon: ShoppingCart },
-          ].map(tab => {
+          { id: 'home', label: tr("partnerdashboard_esas_6d87f7", 'Əsas'), icon: Home },
+          { id: 'stats', label: 'Statistika', icon: BarChart3 },
+          { id: 'notifications', label: tr("partnerdashboard_bildiris_307073", "Bildiriş"), icon: Bell },
+          { id: 'surprise', label: tr("partnerdashboard_surpriz_67b2b2", 'Sürpriz'), icon: Gift },
+          { id: 'shopping', label: tr("partnerdashboard_siyahi_f04aac", 'Siyahı'), icon: ShoppingCart }].
+          map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
@@ -277,16 +277,16 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all flex items-center justify-center gap-1.5 ${
-                  isActive 
-                    ? 'bg-partner text-white shadow-lg' 
-                    : 'text-muted-foreground hover:bg-muted/50'
-                }`}
-                whileTap={{ scale: 0.98 }}
-              >
+                isActive ?
+                'bg-partner text-white shadow-lg' :
+                'text-muted-foreground hover:bg-muted/50'}`
+                }
+                whileTap={{ scale: 0.98 }}>
+                
                 <Icon className="w-4 h-4" />
                 <span className="hidden xs:inline">{tab.label}</span>
-              </motion.button>
-            );
+              </motion.button>);
+
           })}
         </div>
       </div>
@@ -294,48 +294,48 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
       {/* Content */}
       <div className="px-4 mt-5">
         <AnimatePresence mode="wait">
-          {activeTab === 'home' && (
-            <motion.div
-              key="home"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="space-y-5"
-            >
+          {activeTab === 'home' &&
+          <motion.div
+            key="home"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="space-y-5">
+            
               {/* Live Activity — yalnız hamiləlik mərhələsi üçün */}
               {lifeStage === 'bump' && <LiveActivityCard />}
 
               {/* New Messages Banner */}
-              {getUnreadCount() > 0 && (
-                <motion.button
-                  onClick={() => setShowChat(true)}
-                  className="w-full bg-gradient-to-r from-partner/20 to-indigo-500/20 rounded-2xl p-4 border-2 border-partner/30 flex items-center gap-4 text-left"
-                  initial={{ y: -10, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                >
+              {getUnreadCount() > 0 &&
+            <motion.button
+              onClick={() => setShowChat(true)}
+              className="w-full bg-gradient-to-r from-partner/20 to-indigo-500/20 rounded-2xl p-4 border-2 border-partner/30 flex items-center gap-4 text-left"
+              initial={{ y: -10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}>
+              
                   <div className="w-14 h-14 rounded-2xl bg-partner/20 flex items-center justify-center">
                     <MessageCircle className="w-7 h-7 text-partner" />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-bold text-partner text-lg">{tr("partnerdashboard_yeni_mesajiniz_var_0ef93a", "Yeni mesajınız var!")}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {getUnreadCount()} oxunmamış mesaj
+                      {getUnreadCount()} {tr("partnerdashboard_oxunmamis_mesaj_4cf5d8", "oxunmam\u0131\u015F mesaj")}
                     </p>
                   </div>
                   <div className="w-10 h-10 rounded-full bg-partner flex items-center justify-center">
                     <span className="text-white font-black">{getUnreadCount()}</span>
                   </div>
                 </motion.button>
-              )}
+            }
 
               {/* Quick Message */}
               <motion.div
-                className="bg-card rounded-2xl p-5 shadow-lg border border-border/50"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-              >
+              className="bg-card rounded-2xl p-5 shadow-lg border border-border/50"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}>
+              
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-11 h-11 rounded-xl bg-partner/10 flex items-center justify-center">
                     <MessageCircle className="w-5 h-5 text-partner" />
@@ -347,48 +347,48 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
                 </div>
                 <div className="flex gap-2">
                   <input
-                    type="text"
-                    value={loveMessage}
-                    onChange={(e) => setLoveMessage(e.target.value)}
-                    placeholder={tr("partnerdashboard_sevgi_mesaji_yaz_54b43a", "Sevgi mesajı yaz...")}
-                    className="flex-1 h-12 px-4 rounded-xl bg-muted/50 text-sm outline-none border-2 border-transparent focus:border-partner/30 transition-colors"
-                  />
+                  type="text"
+                  value={loveMessage}
+                  onChange={(e) => setLoveMessage(e.target.value)}
+                  placeholder={tr("partnerdashboard_sevgi_mesaji_yaz_54b43a", "Sevgi mesajı yaz...")}
+                  className="flex-1 h-12 px-4 rounded-xl bg-muted/50 text-sm outline-none border-2 border-transparent focus:border-partner/30 transition-colors" />
+                
                   <motion.button
-                    onClick={sendMessage}
-                    disabled={!loveMessage.trim()}
-                    className="w-12 h-12 rounded-xl bg-partner text-white flex items-center justify-center disabled:opacity-50"
-                    whileTap={{ scale: 0.95 }}
-                  >
+                  onClick={sendMessage}
+                  disabled={!loveMessage.trim()}
+                  className="w-12 h-12 rounded-xl bg-partner text-white flex items-center justify-center disabled:opacity-50"
+                  whileTap={{ scale: 0.95 }}>
+                  
                     <Send className="w-5 h-5" />
                   </motion.button>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-3">
-                  {['❤️ Səni sevirəm!', '🌹 Gözəlsən!', '💪 Güclüsən!', '😘 Öpürəm!'].map(msg => (
-                    <motion.button
-                      key={msg}
-                      onClick={() => setLoveMessage(msg)}
-                      className="px-3 py-1.5 bg-partner/10 text-partner rounded-full text-xs font-medium hover:bg-partner/20 transition-colors"
-                      whileTap={{ scale: 0.95 }}
-                    >
+                  {[tr("partnerdashboard_seni_sevirem_d85d3c", "\u2764\uFE0F S\u0259ni sevir\u0259m!"), tr("partnerdashboard_gozelsen_1124fe", "\uD83C\uDF39 G\xF6z\u0259ls\u0259n!"), tr("partnerdashboard_guclusen_673231", "\uD83D\uDCAA G\xFCcl\xFCs\u0259n!"), tr("partnerdashboard_opurem_34027e", "\uD83D\uDE18 \xD6p\xFCr\u0259m!")].map((msg) =>
+                <motion.button
+                  key={msg}
+                  onClick={() => setLoveMessage(msg)}
+                  className="px-3 py-1.5 bg-partner/10 text-partner rounded-full text-xs font-medium hover:bg-partner/20 transition-colors"
+                  whileTap={{ scale: 0.95 }}>
+                  
                       {msg}
                     </motion.button>
-                  ))}
+                )}
                 </div>
               </motion.div>
 
               {/* Synced Features Grid */}
-              <SyncedFeaturesGrid 
-                onNavigate={onNavigate || (() => {})} 
-                onTabChange={(tab) => setActiveTab(tab as any)}
-              />
+              <SyncedFeaturesGrid
+              onNavigate={onNavigate || (() => {})}
+              onTabChange={(tab) => setActiveTab(tab as any)} />
+            
 
               {/* Daily Tip */}
-              {tipText && (
-                <motion.div
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800"
-                >
+              {tipText &&
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800">
+              
                   <div className="flex items-start gap-3">
                     <span className="text-3xl">{tipEmoji}</span>
                     <div>
@@ -397,12 +397,12 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
                     </div>
                   </div>
                 </motion.div>
-              )}
+            }
 
               {/* Quick Stats */}
               <PartnerQuickStats />
             </motion.div>
-          )}
+          }
 
           {activeTab === 'stats' && <WeeklyStatsTab />}
 
@@ -410,14 +410,14 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
 
           {activeTab === 'notifications' && <NotificationsTab />}
 
-          {activeTab === 'shopping' && (
-            <motion.div
-              key="shopping"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="space-y-4"
-            >
+          {activeTab === 'shopping' &&
+          <motion.div
+            key="shopping"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="space-y-4">
+            
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center">
                   <ShoppingCart className="w-6 h-6 text-white" />
@@ -431,45 +431,45 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
               {/* Add new item */}
               <div className="flex gap-2">
                 <input
-                  type="text"
-                  value={newItem}
-                  onChange={(e) => setNewItem(e.target.value)}
-                  placeholder={tr("partnerdashboard_yeni_mehsul_elave_et_3d6c73", "Yeni məhsul əlavə et...")}
-                  className="flex-1 h-12 px-4 rounded-xl bg-muted/50 text-sm outline-none border-2 border-transparent focus:border-teal-500/30"
-                />
+                type="text"
+                value={newItem}
+                onChange={(e) => setNewItem(e.target.value)}
+                placeholder={tr("partnerdashboard_yeni_mehsul_elave_et_3d6c73", "Yeni məhsul əlavə et...")}
+                className="flex-1 h-12 px-4 rounded-xl bg-muted/50 text-sm outline-none border-2 border-transparent focus:border-teal-500/30" />
+              
                 <motion.button
-                  onClick={addShoppingItem}
-                  disabled={!newItem.trim()}
-                  className="w-12 h-12 rounded-xl bg-teal-500 text-white flex items-center justify-center disabled:opacity-50"
-                  whileTap={{ scale: 0.95 }}
-                >
+                onClick={addShoppingItem}
+                disabled={!newItem.trim()}
+                className="w-12 h-12 rounded-xl bg-teal-500 text-white flex items-center justify-center disabled:opacity-50"
+                whileTap={{ scale: 0.95 }}>
+                
                   <Plus className="w-5 h-5" />
                 </motion.button>
               </div>
 
               {/* Shopping list */}
               <div className="space-y-2">
-                {shoppingList.map((item, idx) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.03 }}
-                    className={`flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all ${
-                      item.isChecked
-                        ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800'
-                        : 'bg-card border-border/50'
-                    }`}
-                  >
+                {shoppingList.map((item, idx) =>
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.03 }}
+                className={`flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all ${
+                item.isChecked ?
+                'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800' :
+                'bg-card border-border/50'}`
+                }>
+                
                     <motion.button
-                      onClick={() => toggleShoppingItem(item.id)}
-                      className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
-                        item.isChecked
-                          ? 'bg-emerald-500 text-white'
-                          : 'bg-muted hover:bg-teal-500/20'
-                      }`}
-                      whileTap={{ scale: 0.9 }}
-                    >
+                  onClick={() => toggleShoppingItem(item.id)}
+                  className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
+                  item.isChecked ?
+                  'bg-emerald-500 text-white' :
+                  'bg-muted hover:bg-teal-500/20'}`
+                  }
+                  whileTap={{ scale: 0.9 }}>
+                  
                       {item.isChecked && <span className="text-sm">✓</span>}
                     </motion.button>
                     
@@ -480,33 +480,33 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className={`w-2 h-2 rounded-full ${getPriorityColor(item.priority)}`} />
                         <span className="text-[10px] text-muted-foreground">
-                          {item.addedBy === 'partner' ? 'Sən əlavə etdin' : 'O əlavə etdi'}
+                          {item.addedBy === 'partner' ? tr("partnerdashboard_sen_elave_etdin_0008cb", "S\u0259n \u0259lav\u0259 etdin") : tr("partnerdashboard_o_elave_etdi_9aa051", "O \u0259lav\u0259 etdi")}
                         </span>
                       </div>
                     </div>
                     
-                    {item.quantity > 1 && (
-                      <span className="text-xs font-bold px-2 py-1 bg-muted rounded-lg">
+                    {item.quantity > 1 &&
+                <span className="text-xs font-bold px-2 py-1 bg-muted rounded-lg">
                         x{item.quantity}
                       </span>
-                    )}
+                }
                   </motion.div>
-                ))}
+              )}
                 
-                {shoppingList.length === 0 && (
-                  <div className="text-center py-12">
+                {shoppingList.length === 0 &&
+              <div className="text-center py-12">
                     <ShoppingCart className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />
                     <p className="text-muted-foreground">{tr("partnerdashboard_siyahi_bosdur_c420ab", "Siyahı boşdur")}</p>
                     <p className="text-sm text-muted-foreground/70">{tr("partnerdashboard_yuxaridaki_formadan_mehsul_elave_edin_32989e", "Yuxarıdakı formadan məhsul əlavə edin")}</p>
                   </div>
-                )}
+              }
               </div>
             </motion.div>
-          )}
+          }
         </AnimatePresence>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default PartnerDashboard;

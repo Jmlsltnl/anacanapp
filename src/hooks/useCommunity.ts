@@ -59,16 +59,16 @@ export const useCommunityGroups = () => {
   return useQuery({
     queryKey: ['community-groups'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('community_groups')
-        .select('*')
-        .eq('is_active', true)
-        .order('group_type', { ascending: true })
-        .order('name', { ascending: true });
+      const { data, error } = await supabase.
+      from('community_groups').
+      select('*').
+      eq('is_active', true).
+      order('group_type', { ascending: true }).
+      order('name', { ascending: true });
 
       if (error) throw error;
       return data as CommunityGroup[];
-    },
+    }
   });
 };
 
@@ -79,14 +79,14 @@ export const useUserMemberships = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
 
-      const { data, error } = await supabase
-        .from('group_memberships')
-        .select('group_id, role, joined_at')
-        .eq('user_id', user.id);
+      const { data, error } = await supabase.
+      from('group_memberships').
+      select('group_id, role, joined_at').
+      eq('user_id', user.id);
 
       if (error) throw error;
       return data;
-    },
+    }
   });
 };
 
@@ -99,9 +99,9 @@ export const useJoinGroup = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('group_memberships')
-        .insert({ group_id: groupId, user_id: user.id });
+      const { error } = await supabase.
+      from('group_memberships').
+      insert({ group_id: groupId, user_id: user.id });
 
       if (error) throw error;
     },
@@ -112,7 +112,7 @@ export const useJoinGroup = () => {
     },
     onError: () => {
       toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
-    },
+    }
   });
 };
 
@@ -125,11 +125,11 @@ export const useLeaveGroup = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('group_memberships')
-        .delete()
-        .eq('group_id', groupId)
-        .eq('user_id', user.id);
+      const { error } = await supabase.
+      from('group_memberships').
+      delete().
+      eq('group_id', groupId).
+      eq('user_id', user.id);
 
       if (error) throw error;
     },
@@ -137,7 +137,7 @@ export const useLeaveGroup = () => {
       queryClient.invalidateQueries({ queryKey: ['user-memberships'] });
       queryClient.invalidateQueries({ queryKey: ['community-groups'] });
       toast({ title: tr("usecommunity_qrupdan_ayrildiniz_2ad166", "Qrupdan ayrıldınız") });
-    },
+    }
   });
 };
 
@@ -146,13 +146,13 @@ export const useGroupPosts = (groupId: string | null) => {
     queryKey: ['group-posts', groupId],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      
-      let query = supabase
-        .from('community_posts')
-        .select('*')
-        .eq('is_active', true)
-        .order('is_pinned', { ascending: false })
-        .order('created_at', { ascending: false });
+
+      let query = supabase.
+      from('community_posts').
+      select('*').
+      eq('is_active', true).
+      order('is_pinned', { ascending: false }).
+      order('created_at', { ascending: false });
 
       if (groupId) {
         query = query.eq('group_id', groupId);
@@ -174,31 +174,31 @@ export const useGroupPosts = (groupId: string | null) => {
           // Check if user liked this post
           let isLiked = false;
           if (user) {
-            const { data: likeData } = await supabase
-              .from('post_likes')
-              .select('id')
-              .eq('post_id', post.id)
-              .eq('user_id', user.id)
-              .single();
+            const { data: likeData } = await supabase.
+            from('post_likes').
+            select('id').
+            eq('post_id', post.id).
+            eq('user_id', user.id).
+            single();
             isLiked = !!likeData;
           }
 
           return {
             ...post,
             is_anonymous: isAnon,
-            author: isAnon
-              ? { name: 'Anonim', avatar_url: null, badge_type: null }
-              : authorData
-                ? { name: authorData.name || 'İstifadəçi', avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null }
-                : { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null },
-            is_liked: isLiked,
+            author: isAnon ?
+            { name: 'Anonim', avatar_url: null, badge_type: null } :
+            authorData ?
+            { name: authorData.name || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"), avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null } :
+            { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null },
+            is_liked: isLiked
           };
         })
       );
 
       return postsWithDetails as CommunityPost[];
     },
-    enabled: groupId !== undefined,
+    enabled: groupId !== undefined
   });
 };
 
@@ -207,19 +207,19 @@ export const useCreatePost = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ groupId, content, mediaUrls, isAnonymous }: { groupId: string | null; content: string; mediaUrls?: string[]; isAnonymous?: boolean }) => {
+    mutationFn: async ({ groupId, content, mediaUrls, isAnonymous }: {groupId: string | null;content: string;mediaUrls?: string[];isAnonymous?: boolean;}) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('community_posts')
-        .insert({
-          group_id: groupId,
-          user_id: user.id,
-          content,
-          media_urls: mediaUrls || [],
-          is_anonymous: isAnonymous || false,
-        } as any);
+      const { error } = await supabase.
+      from('community_posts').
+      insert({
+        group_id: groupId,
+        user_id: user.id,
+        content,
+        media_urls: mediaUrls || [],
+        is_anonymous: isAnonymous || false
+      } as any);
 
       if (error) throw error;
     },
@@ -229,7 +229,7 @@ export const useCreatePost = () => {
     },
     onError: () => {
       toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
-    },
+    }
   });
 };
 
@@ -238,15 +238,15 @@ export const useEditPost = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ postId, content }: { postId: string; content: string }) => {
+    mutationFn: async ({ postId, content }: {postId: string;content: string;}) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('community_posts')
-        .update({ content })
-        .eq('id', postId)
-        .eq('user_id', user.id);
+      const { error } = await supabase.
+      from('community_posts').
+      update({ content }).
+      eq('id', postId).
+      eq('user_id', user.id);
 
       if (error) throw error;
     },
@@ -256,7 +256,7 @@ export const useEditPost = () => {
     },
     onError: () => {
       toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
-    },
+    }
   });
 };
 
@@ -269,11 +269,11 @@ export const useDeletePost = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('community_posts')
-        .delete()
-        .eq('id', postId)
-        .eq('user_id', user.id);
+      const { error } = await supabase.
+      from('community_posts').
+      delete().
+      eq('id', postId).
+      eq('user_id', user.id);
 
       if (error) throw error;
     },
@@ -283,7 +283,7 @@ export const useDeletePost = () => {
     },
     onError: () => {
       toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
-    },
+    }
   });
 };
 
@@ -291,42 +291,42 @@ export const useToggleLike = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ postId, isLiked, groupId }: { postId: string; isLiked: boolean; groupId: string | null }) => {
+    mutationFn: async ({ postId, isLiked, groupId }: {postId: string;isLiked: boolean;groupId: string | null;}) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
       if (isLiked) {
-        await supabase
-          .from('post_likes')
-          .delete()
-          .eq('post_id', postId)
-          .eq('user_id', user.id);
+        await supabase.
+        from('post_likes').
+        delete().
+        eq('post_id', postId).
+        eq('user_id', user.id);
       } else {
-        await supabase
-          .from('post_likes')
-          .insert({ post_id: postId, user_id: user.id });
+        await supabase.
+        from('post_likes').
+        insert({ post_id: postId, user_id: user.id });
 
         // Send push notification (which also stores in-app notification)
         try {
           const { data: post } = await supabase.from('community_posts').select('user_id').eq('id', postId).single();
           if (post && post.user_id !== user.id) {
             const { data: profile } = await supabase.from('public_profile_cards').select('name').eq('user_id', user.id).single();
-            const likerName = profile?.name || 'İstifadəçi';
+            const likerName = profile?.name || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i");
             await supabase.functions.invoke('send-push-notification', {
               body: {
                 userId: post.user_id,
                 title: tr("usecommunity_yeni_beyenme_3fd88a", "Yeni bəyənmə ❤️"),
                 body: `${likerName} paylaşımınızı bəyəndi`,
-                data: { type: 'community_like', postId, groupId },
-              },
+                data: { type: 'community_like', postId, groupId }
+              }
             });
           }
-        } catch (e) { console.error('Like notification error:', e); }
+        } catch (e) {console.error('Like notification error:', e);}
       }
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['group-posts', variables.groupId] });
-    },
+    }
   });
 };
 
@@ -336,12 +336,12 @@ export const usePostComments = (postId: string) => {
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
 
-      const { data: comments, error } = await supabase
-        .from('post_comments')
-        .select('*')
-        .eq('post_id', postId)
-        .eq('is_active', true)
-        .order('created_at', { ascending: true });
+      const { data: comments, error } = await supabase.
+      from('post_comments').
+      select('*').
+      eq('post_id', postId).
+      eq('is_active', true).
+      order('created_at', { ascending: true });
 
       if (error) throw error;
 
@@ -353,31 +353,31 @@ export const usePostComments = (postId: string) => {
 
           let isLiked = false;
           if (user) {
-            const { data: likeData } = await supabase
-              .from('comment_likes')
-              .select('id')
-              .eq('comment_id', comment.id)
-              .eq('user_id', user.id)
-              .single();
+            const { data: likeData } = await supabase.
+            from('comment_likes').
+            select('id').
+            eq('comment_id', comment.id).
+            eq('user_id', user.id).
+            single();
             isLiked = !!likeData;
           }
 
           const isAnon = comment.is_anonymous === true;
           return {
             ...comment,
-            author: isAnon
-              ? { name: 'Anonim', avatar_url: null, badge_type: null }
-              : authorData
-                ? { name: authorData.name || 'İstifadəçi', avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null }
-                : { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null },
-            is_liked: isLiked,
+            author: isAnon ?
+            { name: 'Anonim', avatar_url: null, badge_type: null } :
+            authorData ?
+            { name: authorData.name || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"), avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null } :
+            { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null },
+            is_liked: isLiked
           };
         })
       );
 
       return commentsWithDetails as PostComment[];
     },
-    enabled: !!postId,
+    enabled: !!postId
   });
 };
 
@@ -391,51 +391,51 @@ export const useCreateComment = () => {
       parentCommentId,
       postAuthorId,
       commenterName,
-      isAnonymous,
-    }: {
-      postId: string;
-      content: string;
-      parentCommentId?: string | null;
-      postAuthorId?: string;
-      commenterName?: string;
-      isAnonymous?: boolean;
-    }) => {
+      isAnonymous
+
+
+
+
+
+
+
+    }: {postId: string;content: string;parentCommentId?: string | null;postAuthorId?: string;commenterName?: string;isAnonymous?: boolean;}) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('post_comments')
-        .insert({
-          post_id: postId,
-          user_id: user.id,
-          parent_comment_id: parentCommentId ?? null,
-          content,
-          is_anonymous: isAnonymous || false,
-        });
+      const { error } = await supabase.
+      from('post_comments').
+      insert({
+        post_id: postId,
+        user_id: user.id,
+        parent_comment_id: parentCommentId ?? null,
+        content,
+        is_anonymous: isAnonymous || false
+      });
 
       if (error) throw error;
 
       if (postAuthorId && postAuthorId !== user.id) {
         const preview = content.length > 50 ? `${content.slice(0, 50)}...` : content;
-        const senderName = isAnonymous ? 'Anonim' : (commenterName?.trim() || 'İstifadəçi');
+        const senderName = isAnonymous ? 'Anonim' : commenterName?.trim() || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i");
 
         // Push notification (also stores in-app notification via edge function)
         try {
           await supabase.functions.invoke('send-push-notification', {
             body: {
               userId: postAuthorId,
-              title: parentCommentId ? 'Yeni cavab 💬' : 'Yeni şərh 💬',
+              title: parentCommentId ? 'Yeni cavab 💬' : tr("usecommunity_yeni_serh_25bb56", "Yeni \u015F\u0259rh \uD83D\uDCAC"),
               body: `${senderName}: ${preview}`,
-              data: { type: parentCommentId ? 'community_reply' : 'community_comment', postId },
-            },
+              data: { type: parentCommentId ? 'community_reply' : 'community_comment', postId }
+            }
           });
-        } catch (e) { console.error('Comment notification error:', e); }
+        } catch (e) {console.error('Comment notification error:', e);}
       }
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['post-comments', variables.postId] });
       queryClient.invalidateQueries({ queryKey: ['group-posts'] });
-    },
+    }
   });
 };
 
@@ -453,21 +453,21 @@ export const useAutoJoinGroups = () => {
     if (!user) return;
 
     // Get all auto-join groups
-    const { data: groups } = await supabase
-      .from('community_groups')
-      .select('*')
-      .eq('is_active', true)
-      .eq('is_auto_join', true);
+    const { data: groups } = await supabase.
+    from('community_groups').
+    select('*').
+    eq('is_active', true).
+    eq('is_auto_join', true);
 
     if (!groups) return;
 
     // Get user's current memberships
-    const { data: memberships } = await supabase
-      .from('group_memberships')
-      .select('group_id')
-      .eq('user_id', user.id);
+    const { data: memberships } = await supabase.
+    from('group_memberships').
+    select('group_id').
+    eq('user_id', user.id);
 
-    const memberGroupIds = new Set(memberships?.map(m => m.group_id) || []);
+    const memberGroupIds = new Set(memberships?.map((m) => m.group_id) || []);
 
     // Check each group's criteria
     for (const group of groups) {
@@ -513,10 +513,10 @@ export const useAutoJoinGroups = () => {
       }
 
       if (shouldJoin) {
-        await supabase
-          .from('group_memberships')
-          .insert({ group_id: group.id, user_id: user.id })
-          .then(() => {});
+        await supabase.
+        from('group_memberships').
+        insert({ group_id: group.id, user_id: user.id }).
+        then(() => {});
       }
     }
 

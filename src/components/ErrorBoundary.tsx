@@ -34,18 +34,18 @@ class ErrorBoundary extends Component<Props, State> {
         <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-background text-foreground">
           <p className="text-lg font-semibold mb-2">{tr("errorboundary_xeta_bas_verdi_f22fba", "Xəta baş verdi")}</p>
           <p className="text-sm text-muted-foreground text-center mb-4">
-            {this.state.error?.message || 'Naməlum xəta'}
+            {this.state.error?.message || tr("errorboundary_namelum_xeta_aa30e7", "Nam\u0259lum x\u0259ta")}
           </p>
           <button
             onClick={() => {
               this.setState({ hasError: false, error: null });
             }}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm"
-          >
-            Yenidən cəhd et
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm">
+            {tr("errorboundary_yeniden_cehd_et_d273ac", "Yenid\u0259n c\u0259hd et")}
+          
           </button>
-        </div>
-      );
+        </div>);
+
     }
     return this.props.children;
   }

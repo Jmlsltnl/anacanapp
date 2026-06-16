@@ -22,7 +22,7 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
     purchaseMonthly,
     purchaseYearly,
     showPaywall,
-    error,
+    error
   } = useInAppPurchase();
 
   // ⚡ All paywalls must come from RevenueCat. Auto-present on native.
@@ -45,11 +45,11 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
 
   // Find packages from RevenueCat offerings
   const monthlyPkg = useMemo(
-    () => packages.find(p => p.packageType === 'MONTHLY' || p.identifier === '$rc_monthly' || p.product.identifier.includes('monthly')),
+    () => packages.find((p) => p.packageType === 'MONTHLY' || p.identifier === '$rc_monthly' || p.product.identifier.includes('monthly')),
     [packages]
   );
   const yearlyPkg = useMemo(
-    () => packages.find(p => p.packageType === 'ANNUAL' || p.identifier === '$rc_annual' || p.product.identifier.includes('yearly') || p.product.identifier.includes('annual')),
+    () => packages.find((p) => p.packageType === 'ANNUAL' || p.identifier === '$rc_annual' || p.product.identifier.includes('yearly') || p.product.identifier.includes('annual')),
     [packages]
   );
 
@@ -96,8 +96,8 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
       <button
         onClick={onClose}
         disabled={isPurchasing}
-        className="absolute top-4 right-4 w-8 h-8 rounded-full bg-muted/60 flex items-center justify-center z-10 disabled:opacity-50"
-      >
+        className="absolute top-4 right-4 w-8 h-8 rounded-full bg-muted/60 flex items-center justify-center z-10 disabled:opacity-50">
+        
         <X className="w-4 h-4 text-muted-foreground" />
       </button>
 
@@ -110,34 +110,34 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
           <p className="text-sm text-muted-foreground mt-1">{tr("paywallstep_tam_imkanlardan_yararlanin_4b72fb", "Tam imkanlardan yararlanın")}</p>
         </div>
 
-          {anyTrialDays && (
-            <div className="flex items-center justify-center gap-2 mb-5">
+          {anyTrialDays &&
+        <div className="flex items-center justify-center gap-2 mb-5">
               <div className="flex items-center gap-1.5 px-4 py-2 bg-green-100 dark:bg-green-900/30 rounded-full">
                 <Sparkles className="w-4 h-4 text-green-600 dark:text-green-400" />
-                <span className="text-sm font-bold text-green-700 dark:text-green-400">{anyTrialDays} GÜN PULSUZ SINAQ</span>
+                <span className="text-sm font-bold text-green-700 dark:text-green-400">{anyTrialDays} {tr("paywallstep_gun_pulsuz_sinaq_0787ff", "G\xDCN PULSUZ SINAQ")}</span>
               </div>
             </div>
-          )}
+        }
 
-        {isLoading && isNativePlatform() ? (
-          <div className="flex items-center justify-center py-8">
+        {isLoading && isNativePlatform() ?
+        <div className="flex items-center justify-center py-8">
             <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
             <span className="ml-2 text-sm text-muted-foreground">{tr("paywallstep_qiymetler_yuklenir_15aa82", "Qiymətlər yüklənir...")}</span>
-          </div>
-        ) : (
-          <div className="space-y-3 mb-5">
+          </div> :
+
+        <div className="space-y-3 mb-5">
             <button
-              onClick={() => setSelectedPlan('yearly')}
-              disabled={isPurchasing}
-              className={`w-full p-4 rounded-2xl border-2 transition-all relative ${
-                selectedPlan === 'yearly' ? 'border-primary bg-primary/5 shadow-md' : 'border-border bg-card'
-              }`}
-            >
-              {savingsPercent > 0 && (
-                <span className="absolute -top-2.5 left-4 px-2.5 py-0.5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full">
-                  Ən sərfəli · {savingsPercent}% qənaət
+            onClick={() => setSelectedPlan('yearly')}
+            disabled={isPurchasing}
+            className={`w-full p-4 rounded-2xl border-2 transition-all relative ${
+            selectedPlan === 'yearly' ? 'border-primary bg-primary/5 shadow-md' : 'border-border bg-card'}`
+            }>
+            
+              {savingsPercent > 0 &&
+            <span className="absolute -top-2.5 left-4 px-2.5 py-0.5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full">
+                  {tr("paywallstep_en_serfeli_056ce6", "\u018Fn s\u0259rf\u0259li \xB7")} {savingsPercent}{tr("paywallstep_qenaet_ea8b53", "% q\u0259na\u0259t")}
                 </span>
-              )}
+            }
               <div className="flex items-center justify-between">
                 <div className="text-left">
                   <p className="text-sm font-semibold text-foreground">{tr("paywallstep_illik_4a3cef", "İllik")}</p>
@@ -151,12 +151,12 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
             </button>
 
             <button
-              onClick={() => setSelectedPlan('monthly')}
-              disabled={isPurchasing}
-              className={`w-full p-4 rounded-2xl border-2 transition-all ${
-                selectedPlan === 'monthly' ? 'border-primary bg-primary/5 shadow-md' : 'border-border bg-card'
-              }`}
-            >
+            onClick={() => setSelectedPlan('monthly')}
+            disabled={isPurchasing}
+            className={`w-full p-4 rounded-2xl border-2 transition-all ${
+            selectedPlan === 'monthly' ? 'border-primary bg-primary/5 shadow-md' : 'border-border bg-card'}`
+            }>
+            
               <div className="flex items-center justify-between">
                 <div className="text-left">
                   <p className="text-sm font-semibold text-foreground">{tr("paywallstep_ayliq_6f265e", "Aylıq")}</p>
@@ -169,23 +169,23 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
               </div>
             </button>
           </div>
-        )}
+        }
 
         <div className="space-y-2.5 mb-5">
-          {[
-            'Bütün alətlərə sınırsız giriş',
-            '24/7 AI Asistan',
-            'Yuxu Səsləri & Meditasiya',
-            'Fərdi həftəlik hesabatlar',
-            'Reklamsız təcrübə',
-          ].map((b) => (
-            <div key={b} className="flex items-center gap-2.5">
+          {[tr("paywallstep_butun_aletlere_sinirsiz_giris_2d0db2", "B\xFCt\xFCn al\u0259tl\u0259r\u0259 s\u0131n\u0131rs\u0131z giri\u015F"),
+
+          '24/7 AI Asistan', tr("paywallstep_yuxu_sesleri_meditasiya_fb635f", "Yuxu S\u0259sl\u0259ri & Meditasiya"), tr("paywallstep_ferdi_heftelik_hesabatlar_4ab67b", "F\u0259rdi h\u0259ft\u0259lik hesabatlar"), tr("paywallstep_reklamsiz_tecrube_2e4fa4", "Reklams\u0131z t\u0259cr\xFCb\u0259")].
+
+
+
+          map((b) =>
+          <div key={b} className="flex items-center gap-2.5">
               <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
                 <Check className="w-3 h-3 text-green-600" />
               </div>
               <span className="text-sm text-foreground">{b}</span>
             </div>
-          ))}
+          )}
         </div>
 
         <div className="flex items-center gap-2 justify-center text-xs text-muted-foreground">
@@ -197,21 +197,21 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
       <div className="mt-5 pb-safe space-y-2">
         <Button
           onClick={handlePurchase}
-          disabled={isPurchasing || (isLoading && isNativePlatform())}
-          className="w-full h-14 rounded-2xl text-base font-semibold bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg disabled:opacity-70"
-        >
-          {isPurchasing ? (
-            <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Emal edilir...</>
-          ) : (
-              anyTrialDays ? `${anyTrialDays} Gün Pulsuz Başla` : 'Premium-a Keç'
-          )}
+          disabled={isPurchasing || isLoading && isNativePlatform()}
+          className="w-full h-14 rounded-2xl text-base font-semibold bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg disabled:opacity-70">
+          
+          {isPurchasing ?
+          <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Emal edilir...</> :
+
+          anyTrialDays ? `${anyTrialDays} Gün Pulsuz Başla` : tr("paywallstep_premium_a_kec_2e8b0e", "Premium-a Ke\xE7")
+          }
         </Button>
         <p className="text-[11px] text-center text-muted-foreground">
-            {selectedPlan === 'yearly'
-              ? (yearlyTrialDays ? `${yearlyTrialDays} gün pulsuz sınayın · Sonra ${yearlyPriceStr}/il · İstənilən vaxt ləğv edin` : `${yearlyPriceStr}/il · İstənilən vaxt ləğv edin`)
-              : (monthlyTrialDays ? `${monthlyTrialDays} gün pulsuz sınayın · Sonra ${monthlyPriceStr}/ay · İstənilən vaxt ləğv edin` : `${monthlyPriceStr}/ay · İstənilən vaxt ləğv edin`)}
+            {selectedPlan === 'yearly' ?
+          yearlyTrialDays ? `${yearlyTrialDays} gün pulsuz sınayın · Sonra ${yearlyPriceStr}/il · İstənilən vaxt ləğv edin` : `${yearlyPriceStr}/il · İstənilən vaxt ləğv edin` :
+          monthlyTrialDays ? `${monthlyTrialDays} gün pulsuz sınayın · Sonra ${monthlyPriceStr}/ay · İstənilən vaxt ləğv edin` : `${monthlyPriceStr}/ay · İstənilən vaxt ləğv edin`}
         </p>
       </div>
-    </div>
-  );
+    </div>);
+
 }

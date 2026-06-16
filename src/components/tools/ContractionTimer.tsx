@@ -14,18 +14,18 @@ interface ContractionTimerProps {
 const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ onBack }, ref) => {
   useScrollToTop();
   useScreenAnalytics('ContractionTimer', 'Tools');
-  
+
   const [isActive, setIsActive] = useState(false);
   const [currentDuration, setCurrentDuration] = useState(0);
   const [lastEndTime, setLastEndTime] = useState<Date | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   const { contractions, addContraction, getStats, clearAll, loading } = useContractions();
 
   useEffect(() => {
     if (isActive) {
       intervalRef.current = setInterval(() => {
-        setCurrentDuration(prev => prev + 1);
+        setCurrentDuration((prev) => prev + 1);
       }, 1000);
     } else {
       if (intervalRef.current) {
@@ -55,10 +55,10 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
     await hapticFeedback.heavy();
     setIsActive(false);
     const now = new Date();
-    
-    const interval = lastEndTime 
-      ? Math.floor((now.getTime() - lastEndTime.getTime()) / 1000 - currentDuration)
-      : undefined;
+
+    const interval = lastEndTime ?
+    Math.floor((now.getTime() - lastEndTime.getTime()) / 1000 - currentDuration) :
+    undefined;
 
     await addContraction(currentDuration, interval);
     setLastEndTime(now);
@@ -76,8 +76,8 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
             <motion.button
               onClick={onBack}
               className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}
-            >
+              whileTap={{ scale: 0.95 }}>
+              
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </motion.button>
             <div className="flex-1">
@@ -86,15 +86,15 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
                 {tr("contractiontimer_sanci_olcen_67d681", "Sancı Ölçən")}
               </h1>
             </div>
-            {contractions.length > 0 && (
-              <motion.button
-                onClick={clearAll}
-                className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-                whileTap={{ scale: 0.95 }}
-              >
+            {contractions.length > 0 &&
+            <motion.button
+              onClick={clearAll}
+              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
+              whileTap={{ scale: 0.95 }}>
+              
                 <Trash2 className="w-5 h-5 text-foreground" />
               </motion.button>
-            )}
+            }
           </div>
         </div>
       </div>
@@ -102,13 +102,13 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
       <div className="px-3 pt-2">
         {/* 5-1-1 Alert */}
         <AnimatePresence>
-          {stats.is511 && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="bg-red-100 dark:bg-red-950/50 border-2 border-red-200 dark:border-red-800 rounded-xl p-2.5 mb-2 flex items-center gap-2"
-            >
+          {stats.is511 &&
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-red-100 dark:bg-red-950/50 border-2 border-red-200 dark:border-red-800 rounded-xl p-2.5 mb-2 flex items-center gap-2">
+            
               <div className="w-8 h-8 rounded-lg bg-red-500 flex items-center justify-center">
                 <AlertCircle className="w-4 h-4 text-white" />
               </div>
@@ -117,53 +117,53 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
                 <p className="text-[10px] text-red-600 dark:text-red-300">{tr("contractiontimer_5_1_1_qaydasi_sancilar_5_deqiqeden_bir_1_c1c5ce", "5-1-1 qaydası: Sancılar 5 dəqiqədən bir, 1 dəqiqə davam edir")}</p>
               </div>
             </motion.div>
-          )}
+          }
         </AnimatePresence>
 
         {/* Main Timer Card */}
         <motion.div
           className="bg-card rounded-2xl p-3 shadow-elevated border border-border/50 mb-3"
           initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-        >
+          animate={{ scale: 1, opacity: 1 }}>
+          
           {/* Timer Display */}
           <div className="text-center mb-4">
             <p className="text-muted-foreground text-xs font-medium mb-0.5">
-              {isActive ? 'Sancı müddəti' : 'Hazır'}
+              {isActive ? tr("contractiontimer_sanci_muddeti_0d04f4", "Sanc\u0131 m\xFCdd\u0259ti") : tr("contractiontimer_hazir_3ae38e", "Haz\u0131r")}
             </p>
-            <motion.p 
+            <motion.p
               className={`text-5xl font-black font-mono ${isActive ? 'text-primary' : 'text-foreground'}`}
               animate={isActive ? { scale: [1, 1.02, 1] } : {}}
-              transition={{ duration: 1, repeat: isActive ? Infinity : 0 }}
-            >
+              transition={{ duration: 1, repeat: isActive ? Infinity : 0 }}>
+              
               {formatTime(currentDuration)}
             </motion.p>
           </div>
 
           {/* Control Button */}
-          {!isActive ? (
-            <motion.button
-              onClick={handleStart}
-              className="w-full h-12 rounded-xl gradient-primary text-white font-bold flex items-center justify-center gap-2 shadow-button"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
+          {!isActive ?
+          <motion.button
+            onClick={handleStart}
+            className="w-full h-12 rounded-xl gradient-primary text-white font-bold flex items-center justify-center gap-2 shadow-button"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}>
+            
               <Play className="w-4 h-4" />
-              Sancı başladı
-            </motion.button>
-          ) : (
-            <motion.button
-              onClick={handleStop}
-              className="w-full h-12 rounded-xl bg-red-500 text-white font-bold flex items-center justify-center gap-2 shadow-lg"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              animate={{ scale: [1, 1.02, 1] }}
-              transition={{ duration: 0.5, repeat: Infinity }}
-            >
+              {tr("contractiontimer_sanci_basladi_d99102", "Sanc\u0131 ba\u015Flad\u0131")}
+            </motion.button> :
+
+          <motion.button
+            onClick={handleStop}
+            className="w-full h-12 rounded-xl bg-red-500 text-white font-bold flex items-center justify-center gap-2 shadow-lg"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            animate={{ scale: [1, 1.02, 1] }}
+            transition={{ duration: 0.5, repeat: Infinity }}>
+            
               <Square className="w-4 h-4" />
-              Sancı bitdi
+              {tr("contractiontimer_sanci_bitdi_c1b3e1", "Sanc\u0131 bitdi")}
             </motion.button>
-          )}
+          }
         </motion.div>
 
         {/* Stats Cards */}
@@ -172,8 +172,8 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
             className="bg-card rounded-xl p-3 shadow-card border border-border/50"
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-          >
+            transition={{ delay: 0.1 }}>
+            
             <p className="text-xs text-muted-foreground mb-0.5">{tr("contractiontimer_ort_muddet_b77c4e", "Ort. Müddət")}</p>
             <p className="text-xl font-black text-foreground">{formatTime(stats.avgDuration)}</p>
             <p className="text-[10px] text-muted-foreground mt-0.5">{tr("contractiontimer_hedef_1_deq_6ce02e", "Hədəf: ~1 dəq")}</p>
@@ -183,8 +183,8 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
             className="bg-card rounded-xl p-3 shadow-card border border-border/50"
             initial={{ x: 20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
+            transition={{ delay: 0.2 }}>
+            
             <p className="text-xs text-muted-foreground mb-0.5">{tr("contractiontimer_ort_araliq_711af3", "Ort. Aralıq")}</p>
             <p className="text-xl font-black text-foreground">{formatTime(stats.avgInterval)}</p>
             <p className="text-[10px] text-muted-foreground mt-0.5">{tr("contractiontimer_hedef_5_deq_b2dc81", "Hədəf: ~5 dəq")}</p>
@@ -196,57 +196,57 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
           className="bg-primary/5 dark:bg-primary/10 rounded-xl p-3 mb-4 border border-primary/20"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
+          transition={{ delay: 0.3 }}>
+          
           <h3 className="font-bold text-foreground mb-1.5 flex items-center gap-2 text-sm">
             <Timer className="w-4 h-4 text-primary" />
-            5-1-1 Qaydası
+            {tr("contractiontimer_5_1_1_qaydasi_a3c5d3", "5-1-1 Qaydas\u0131")}
           </h3>
           <p className="text-xs text-muted-foreground">
-            Sancılar <strong className="text-foreground">{tr("contractiontimer_5_deqiqe_ad05bb", "5 dəqiqə")}</strong>{tr("contractiontimer_araliginda_24710a", "aralığında,")}<strong className="text-foreground">{tr("contractiontimer_1_deqiqe_a187ac", "1 dəqiqə")}</strong>{tr("contractiontimer_davam_ederse_ve_bu_7029f5", "davam edərsə və bu")}<strong className="text-foreground">1 saat</strong> boyunca davam edərsə, xəstəxanaya getmə vaxtıdır.
+            {tr("contractiontimer_sancilar_9b16c7", "Sanc\u0131lar")} <strong className="text-foreground">{tr("contractiontimer_5_deqiqe_ad05bb", "5 dəqiqə")}</strong>{tr("contractiontimer_araliginda_24710a", "aralığında,")}<strong className="text-foreground">{tr("contractiontimer_1_deqiqe_a187ac", "1 dəqiqə")}</strong>{tr("contractiontimer_davam_ederse_ve_bu_7029f5", "davam edərsə və bu")}<strong className="text-foreground">1 saat</strong> {tr("contractiontimer_boyunca_davam_ederse_xestexana_2b067a", "boyunca davam ed\u0259rs\u0259, x\u0259st\u0259xanaya getm\u0259 vaxt\u0131d\u0131r.")}
           </p>
         </motion.div>
 
         {/* Contractions List */}
-        {contractions.length > 0 && (
-          <div>
-            <h3 className="font-bold text-foreground mb-3 text-sm">Sancılar ({contractions.length})</h3>
+        {contractions.length > 0 &&
+        <div>
+            <h3 className="font-bold text-foreground mb-3 text-sm">{tr("contractiontimer_sancilar_6f1b69", "Sanc\u0131lar (")}{contractions.length})</h3>
             <div className="space-y-2 pb-6">
-              {contractions.slice(0, 10).map((contraction, index) => (
-                <motion.div
-                  key={contraction.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="bg-card rounded-xl p-3 shadow-card border border-border/50"
-                >
+              {contractions.slice(0, 10).map((contraction, index) =>
+            <motion.div
+              key={contraction.id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className="bg-card rounded-xl p-3 shadow-card border border-border/50">
+              
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                         <span className="text-sm font-bold text-primary">{contractions.length - index}</span>
                       </div>
                       <div>
-                        <p className="font-bold text-foreground text-sm">{formatTime(contraction.duration_seconds)} müddət</p>
+                        <p className="font-bold text-foreground text-sm">{formatTime(contraction.duration_seconds)} {tr("contractiontimer_muddet_a5b45d", "m\xFCdd\u0259t")}</p>
                         <p className="text-[10px] text-muted-foreground">
                           {new Date(contraction.start_time).toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' })}, {new Date(contraction.start_time).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
                     </div>
-                    {contraction.interval_seconds && (
-                      <div className="text-right">
+                    {contraction.interval_seconds &&
+                <div className="text-right">
                         <p className="text-xs font-bold text-muted-foreground">{formatTime(contraction.interval_seconds)}</p>
                         <p className="text-[10px] text-muted-foreground">{tr("contractiontimer_araliq_05bea1", "aralıq")}</p>
                       </div>
-                    )}
+                }
                   </div>
                 </motion.div>
-              ))}
+            )}
             </div>
           </div>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 });
 
 ContractionTimer.displayName = 'ContractionTimer';

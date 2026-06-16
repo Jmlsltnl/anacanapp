@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { tr } from "@/lib/tr";import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { getPublicProfileCard } from '@/lib/public-profile-cards';
@@ -20,7 +20,7 @@ export const useGroupPresence = (groupId: string | null) => {
   const [presenceState, setPresenceState] = useState<PresenceState>({
     onlineCount: 0,
     onlineUsers: [],
-    typingUsers: [],
+    typingUsers: []
   });
   const channelRef = useRef<RealtimeChannel | null>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -42,53 +42,53 @@ export const useGroupPresence = (groupId: string | null) => {
       const channelName = `group_presence:${groupId}`;
       const channel = supabase.channel(channelName, {
         config: {
-          presence: { key: user.id },
-        },
+          presence: { key: user.id }
+        }
       });
 
-      channel
-        .on('presence', { event: 'sync' }, () => {
-          const state = channel.presenceState();
-          const users: PresenceState['onlineUsers'] = [];
-          const typing: PresenceState['typingUsers'] = [];
+      channel.
+      on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState();
+        const users: PresenceState['onlineUsers'] = [];
+        const typing: PresenceState['typingUsers'] = [];
 
-          Object.entries(state).forEach(([userId, presences]) => {
-            const presence = (presences as any[])[0];
-            if (presence) {
-              users.push({
+        Object.entries(state).forEach(([userId, presences]) => {
+          const presence = (presences as any[])[0];
+          if (presence) {
+            users.push({
+              id: userId,
+              name: presence.name || tr("usegrouppresence_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
+              avatar_url: presence.avatar_url
+            });
+            if (presence.isTyping && userId !== user.id) {
+              typing.push({
                 id: userId,
-                name: presence.name || 'İstifadəçi',
-                avatar_url: presence.avatar_url,
+                name: presence.name || tr("usegrouppresence_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")
               });
-              if (presence.isTyping && userId !== user.id) {
-                typing.push({
-                  id: userId,
-                  name: presence.name || 'İstifadəçi',
-                });
-              }
             }
-          });
-
-          setPresenceState({
-            onlineCount: users.length,
-            onlineUsers: users,
-            typingUsers: typing,
-          });
-        })
-        .on('presence', { event: 'join' }, ({ key, newPresences }) => {
-          // Handle user join
-        })
-        .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
-          // Handle user leave
+          }
         });
 
+        setPresenceState({
+          onlineCount: users.length,
+          onlineUsers: users,
+          typingUsers: typing
+        });
+      }).
+      on('presence', { event: 'join' }, ({ key, newPresences }) => {
+
+        // Handle user join
+      }).on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+
+        // Handle user leave
+      });
       await channel.subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
           await channel.track({
-            name: profile?.name || 'İstifadəçi',
+            name: profile?.name || tr("usegrouppresence_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
             avatar_url: profile?.avatar_url,
             isTyping: false,
-            online_at: new Date().toISOString(),
+            online_at: new Date().toISOString()
           });
         }
       });
@@ -108,7 +108,7 @@ export const useGroupPresence = (groupId: string | null) => {
 
   const setTyping = useCallback(async (isTyping: boolean) => {
     if (!channelRef.current || isTypingRef.current === isTyping) return;
-    
+
     isTypingRef.current = isTyping;
 
     const { data: { user } } = await supabase.auth.getUser();
@@ -118,10 +118,10 @@ export const useGroupPresence = (groupId: string | null) => {
     const profile = await getPublicProfileCard(user.id);
 
     await channelRef.current.track({
-      name: profile?.name || 'İstifadəçi',
+      name: profile?.name || tr("usegrouppresence_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
       avatar_url: profile?.avatar_url,
       isTyping,
-      online_at: new Date().toISOString(),
+      online_at: new Date().toISOString()
     });
 
     // Auto-stop typing after 3 seconds
@@ -141,6 +141,6 @@ export const useGroupPresence = (groupId: string | null) => {
   return {
     ...presenceState,
     startTyping,
-    stopTyping,
+    stopTyping
   };
 };

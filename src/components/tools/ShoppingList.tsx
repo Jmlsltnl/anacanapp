@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowLeft, Plus, Trash2, Check, ShoppingCart, 
-  AlertCircle, Users, User, ChevronDown, ChevronUp, Clock, Sparkles
-} from 'lucide-react';
+import {
+  ArrowLeft, Plus, Trash2, Check, ShoppingCart,
+  AlertCircle, Users, User, ChevronDown, ChevronUp, Clock, Sparkles } from
+'lucide-react';
 import { useShoppingItems } from '@/hooks/useShoppingItems';
 import { useAuth } from '@/hooks/useAuth';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
@@ -27,20 +27,20 @@ const priorityColors = {
 };
 
 const priorityLabels = {
-  low: 'Aşağı',
+  low: tr("shoppinglist_asagi_1c27f1", "A\u015Fa\u011F\u0131"),
   medium: 'Orta',
-  high: 'Yüksək'
+  high: tr("shoppinglist_yuksek_492584", "Y\xFCks\u0259k")
 };
 
 const ShoppingList = ({ onBack }: ShoppingListProps) => {
   useScrollToTop();
   useScreenAnalytics('ShoppingList', 'Tools');
-  
+
   const { profile } = useAuth();
   const { items, loading, addItem, toggleItem, deleteItem, uncheckedCount, checkedCount } = useShoppingItems();
   const { items: defaultItems } = useDefaultShoppingItems();
   const { toast } = useToast();
-  
+
   const [newItemName, setNewItemName] = useState('');
   const [newItemPriority, setNewItemPriority] = useState<'low' | 'medium' | 'high'>('medium');
   const [showCompleted, setShowCompleted] = useState(false);
@@ -51,9 +51,9 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
   const isShared = hasPartner;
 
   // Filter out already added items from recommendations
-  const existingItemNames = items.map(i => i.name.toLowerCase());
+  const existingItemNames = items.map((i) => i.name.toLowerCase());
   const filteredRecommendations = defaultItems.filter(
-    d => !existingItemNames.includes((d.name_az || d.name).toLowerCase())
+    (d) => !existingItemNames.includes((d.name_az || d.name).toLowerCase())
   );
 
   const handleAddItem = async () => {
@@ -78,15 +78,15 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
     }
   };
 
-  const uncheckedItems = items.filter(item => !item.is_checked);
-  const checkedItems = items.filter(item => item.is_checked);
+  const uncheckedItems = items.filter((item) => !item.is_checked);
+  const checkedItems = items.filter((item) => item.is_checked);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -97,26 +97,26 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
           <motion.button
             onClick={onBack}
             className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}
-          >
+            whileTap={{ scale: 0.95 }}>
+            
             <ArrowLeft className="w-4 h-4 text-white" />
           </motion.button>
           <div className="flex-1">
             <h1 className="text-lg font-bold text-white">
-              {isShared ? 'Ortaq Alışveriş' : 'Alışveriş Siyahısı'}
+              {isShared ? tr("shoppinglist_ortaq_alisveris_828573", "Ortaq Al\u0131\u015Fveri\u015F") : tr("shoppinglist_alisveris_siyahisi_5fe638", "Al\u0131\u015Fveri\u015F Siyah\u0131s\u0131")}
             </h1>
             <div className="flex items-center gap-1.5 text-white/80 text-xs">
-              {isShared ? (
-                <>
+              {isShared ?
+              <>
                   <Users className="w-3 h-3" />
                   <span>{tr("shoppinglist_partnyor_ile_ortaq_bbdb50", "Partnyor ilə ortaq")}</span>
-                </>
-              ) : (
-                <>
+                </> :
+
+              <>
                   <User className="w-3 h-3" />
                   <span>{tr("shoppinglist_sexsi_siyahi_93858e", "Şəxsi siyahı")}</span>
                 </>
-              )}
+              }
             </div>
           </div>
           <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
@@ -146,97 +146,97 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
               onChange={(e) => setNewItemName(e.target.value)}
               placeholder={tr("shoppinglist_mehsul_adi_a5d2df", "Məhsul adı...")}
               onKeyPress={(e) => e.key === 'Enter' && handleAddItem()}
-              className="flex-1 h-9 text-sm"
-            />
-            <Button 
-              onClick={handleAddItem} 
+              className="flex-1 h-9 text-sm" />
+            
+            <Button
+              onClick={handleAddItem}
               disabled={submitting || !newItemName.trim()}
-              className="shrink-0 h-9 w-9 p-0"
-            >
+              className="shrink-0 h-9 w-9 p-0">
+              
               <Plus className="w-4 h-4" />
             </Button>
           </div>
           
           {/* Priority selector */}
           <div className="flex gap-1.5">
-            {(['low', 'medium', 'high'] as const).map((priority) => (
-              <button
-                key={priority}
-                onClick={() => setNewItemPriority(priority)}
-                className={`flex-1 py-1.5 rounded-lg text-[10px] font-medium transition-all border ${
-                  newItemPriority === priority
-                    ? priorityColors[priority]
-                    : 'bg-muted text-muted-foreground border-transparent'
-                }`}
-              >
+            {(['low', 'medium', 'high'] as const).map((priority) =>
+            <button
+              key={priority}
+              onClick={() => setNewItemPriority(priority)}
+              className={`flex-1 py-1.5 rounded-lg text-[10px] font-medium transition-all border ${
+              newItemPriority === priority ?
+              priorityColors[priority] :
+              'bg-muted text-muted-foreground border-transparent'}`
+              }>
+              
                 {priorityLabels[priority]}
               </button>
-            ))}
+            )}
           </div>
         </div>
 
         {/* Recommendations */}
-        {filteredRecommendations.length > 0 && (
-          <div className="mb-3">
+        {filteredRecommendations.length > 0 &&
+        <div className="mb-3">
             <button
-              onClick={() => setShowRecommendations(!showRecommendations)}
-              className="flex items-center gap-2 text-primary hover:text-primary/80 w-full mb-2"
-            >
+            onClick={() => setShowRecommendations(!showRecommendations)}
+            className="flex items-center gap-2 text-primary hover:text-primary/80 w-full mb-2">
+            
               <Sparkles className="w-4 h-4" />
-              <span className="text-sm font-medium">Platformanın tövsiyələri ({filteredRecommendations.length})</span>
+              <span className="text-sm font-medium">{tr("shoppinglist_platformanin_tovsiyeleri_2e687e", "Platforman\u0131n t\xF6vsiy\u0259l\u0259ri (")}{filteredRecommendations.length})</span>
               {showRecommendations ? <ChevronUp className="w-4 h-4 ml-auto" /> : <ChevronDown className="w-4 h-4 ml-auto" />}
             </button>
 
             <AnimatePresence>
-              {showRecommendations && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
-                >
+              {showRecommendations &&
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden">
+              
                   <div className="flex flex-wrap gap-1.5">
-                    {filteredRecommendations.slice(0, 8).map((item) => (
-                      <motion.button
-                        key={item.id}
-                        onClick={async () => {
-                          const result = await addItem({
-                            name: item.name_az || item.name,
-                            priority: item.priority
-                          });
-                          if (!result.error) {
-                            toast({ title: `${item.name_az || item.name} əlavə edildi!` });
-                          }
-                        }}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 rounded-full text-xs font-medium text-primary transition-colors border border-primary/20"
-                        whileTap={{ scale: 0.95 }}
-                      >
+                    {filteredRecommendations.slice(0, 8).map((item) =>
+                <motion.button
+                  key={item.id}
+                  onClick={async () => {
+                    const result = await addItem({
+                      name: item.name_az || item.name,
+                      priority: item.priority
+                    });
+                    if (!result.error) {
+                      toast({ title: `${item.name_az || item.name} əlavə edildi!` });
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 rounded-full text-xs font-medium text-primary transition-colors border border-primary/20"
+                  whileTap={{ scale: 0.95 }}>
+                  
                         <Plus className="w-3 h-3" />
                         {item.name_az || item.name}
                       </motion.button>
-                    ))}
+                )}
                   </div>
                 </motion.div>
-              )}
+            }
             </AnimatePresence>
           </div>
-        )}
+        }
 
         {/* Unchecked items */}
         <div className="space-y-1.5 mb-3">
           <AnimatePresence>
-            {uncheckedItems.map((item) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, x: -100 }}
-                className="bg-card rounded-xl p-2.5 border border-border/50 flex items-center gap-2"
-              >
+            {uncheckedItems.map((item) =>
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              className="bg-card rounded-xl p-2.5 border border-border/50 flex items-center gap-2">
+              
                 <button
-                  onClick={() => toggleItem(item.id)}
-                  className="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center shrink-0"
-                >
+                onClick={() => toggleItem(item.id)}
+                className="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center shrink-0">
+                
                 </button>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm text-foreground truncate">{item.name}</p>
@@ -251,85 +251,85 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
                   </div>
                 </div>
                 <button
-                  onClick={() => deleteItem(item.id)}
-                  className="w-7 h-7 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-500"
-                >
+                onClick={() => deleteItem(item.id)}
+                className="w-7 h-7 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-500">
+                
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </motion.div>
-            ))}
+            )}
           </AnimatePresence>
 
-          {uncheckedItems.length === 0 && (
-            <div className="text-center py-6">
+          {uncheckedItems.length === 0 &&
+          <div className="text-center py-6">
               <div className="text-3xl mb-1">🛒</div>
               <p className="text-sm text-muted-foreground">{tr("shoppinglist_siyahi_bosdur_c420ab", "Siyahı boşdur")}</p>
             </div>
-          )}
+          }
         </div>
 
         {/* Completed items toggle */}
-        {checkedItems.length > 0 && (
-          <div className="mb-4">
+        {checkedItems.length > 0 &&
+        <div className="mb-4">
             <button
-              onClick={() => setShowCompleted(!showCompleted)}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground w-full"
-            >
+            onClick={() => setShowCompleted(!showCompleted)}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground w-full">
+            
               {showCompleted ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              <span className="text-sm">Alınmış məhsullar ({checkedCount})</span>
+              <span className="text-sm">{tr("shoppinglist_alinmis_mehsullar_957a1f", "Al\u0131nm\u0131\u015F m\u0259hsullar (")}{checkedCount})</span>
             </button>
 
             <AnimatePresence>
-              {showCompleted && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
-                >
+              {showCompleted &&
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden">
+              
                   <div className="space-y-2 mt-3">
-                    {checkedItems.map((item) => (
-                      <div
-                        key={item.id}
-                        className="bg-muted/50 rounded-xl p-4 border border-border/30 flex items-center gap-3 opacity-60"
-                      >
+                    {checkedItems.map((item) =>
+                <div
+                  key={item.id}
+                  className="bg-muted/50 rounded-xl p-4 border border-border/30 flex items-center gap-3 opacity-60">
+                  
                         <button
-                          onClick={() => toggleItem(item.id)}
-                          className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shrink-0"
-                        >
+                    onClick={() => toggleItem(item.id)}
+                    className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shrink-0">
+                    
                           <Check className="w-4 h-4 text-white" />
                         </button>
                         <p className="flex-1 font-medium text-foreground line-through">{item.name}</p>
                         <button
-                          onClick={() => deleteItem(item.id)}
-                          className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-red-500"
-                        >
+                    onClick={() => deleteItem(item.id)}
+                    className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-red-500">
+                    
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
-                    ))}
+                )}
                   </div>
                 </motion.div>
-              )}
+            }
             </AnimatePresence>
           </div>
-        )}
+        }
 
         {/* Partner info */}
-        {isShared && (
-          <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10 flex items-start gap-3">
+        {isShared &&
+        <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-medium text-foreground">{tr("shoppinglist_ortaq_siyahi_e10fff", "Ortaq siyahı")}</p>
               <p className="text-xs text-muted-foreground">
-                Bu siyahıya əlavə etdiyiniz məhsullar partnyorunuz tərəfindən də görünür və real vaxtda sinxronlaşır.
+                {tr("shoppinglist_bu_siyahiya_elave_etdiyiniz_me_0ba1c1", "Bu siyah\u0131ya \u0259lav\u0259 etdiyiniz m\u0259hsullar partnyorunuz t\u0259r\u0259find\u0259n d\u0259 g\xF6r\xFCn\xFCr v\u0259 real vaxtda sinxronla\u015F\u0131r.")}
               </p>
             </div>
           </div>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default ShoppingList;

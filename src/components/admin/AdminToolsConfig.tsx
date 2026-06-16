@@ -35,13 +35,13 @@ function ConfigTable({ tableName, title, columns, defaultValues }: ConfigTablePr
   const { data: items = [], isLoading } = useQuery({
     queryKey: [tableName],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from(tableName as any)
-        .select('*')
-        .order('sort_order');
+      const { data, error } = await supabase.
+      from(tableName as any).
+      select('*').
+      order('sort_order');
       if (error) throw error;
       return data as Record<string, any>[];
-    },
+    }
   });
 
   const saveMutation = useMutation({
@@ -56,12 +56,12 @@ function ConfigTable({ tableName, title, columns, defaultValues }: ConfigTablePr
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [tableName] });
-      toast.success(editItem ? 'Yeniləndi' : 'Əlavə edildi');
+      toast.success(editItem ? tr("admintoolsconfig_yenilendi_d10a01", "Yenil\u0259ndi") : tr("admintoolsconfig_elave_edildi_b7d7e4", "\u018Flav\u0259 edildi"));
       setIsDialogOpen(false);
       setEditItem(null);
       setFormData(defaultValues);
     },
-    onError: () => toast.error('Xəta baş verdi'),
+    onError: () => toast.error(tr("admintoolsconfig_xeta_bas_verdi_f22fba", "X\u0259ta ba\u015F verdi"))
   });
 
   const deleteMutation = useMutation({
@@ -73,7 +73,7 @@ function ConfigTable({ tableName, title, columns, defaultValues }: ConfigTablePr
       queryClient.invalidateQueries({ queryKey: [tableName] });
       toast.success('Silindi');
     },
-    onError: () => toast.error('Xəta baş verdi'),
+    onError: () => toast.error(tr("admintoolsconfig_xeta_bas_verdi_f22fba", "X\u0259ta ba\u015F verdi"))
   });
 
   const openEdit = (item: Record<string, any>) => {
@@ -99,53 +99,53 @@ function ConfigTable({ tableName, title, columns, defaultValues }: ConfigTablePr
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" onClick={openCreate}>
-              <Plus className="w-4 h-4 mr-1" /> Əlavə et
+              <Plus className="w-4 h-4 mr-1" /> {tr("admintoolsconfig_elave_et_6e1b9b", "\u018Flav\u0259 et")}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{editItem ? 'Redaktə et' : 'Yeni əlavə et'}</DialogTitle>
+              <DialogTitle>{editItem ? tr("admintoolsconfig_redakte_et_66cf3b", "Redakt\u0259 et") : tr("admintoolsconfig_yeni_elave_et_bcd4a4", "Yeni \u0259lav\u0259 et")}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 mt-4">
-              {columns.map((col) => (
-                <div key={col.key} className="space-y-2">
+              {columns.map((col) =>
+              <div key={col.key} className="space-y-2">
                   <Label>{col.label}</Label>
-                  {col.type === 'boolean' ? (
-                    <Switch
-                      checked={!!formData[col.key]}
-                      onCheckedChange={(v) => setFormData({ ...formData, [col.key]: v })}
-                    />
-                  ) : col.type === 'color' ? (
-                    <div className="flex gap-2">
+                  {col.type === 'boolean' ?
+                <Switch
+                  checked={!!formData[col.key]}
+                  onCheckedChange={(v) => setFormData({ ...formData, [col.key]: v })} /> :
+
+                col.type === 'color' ?
+                <div className="flex gap-2">
                       <Input
-                        type="color"
-                        value={formData[col.key] as string || '#000000'}
-                        onChange={(e) => setFormData({ ...formData, [col.key]: e.target.value })}
-                        className="w-16 h-10 p-1"
-                      />
+                    type="color"
+                    value={formData[col.key] as string || '#000000'}
+                    onChange={(e) => setFormData({ ...formData, [col.key]: e.target.value })}
+                    className="w-16 h-10 p-1" />
+                  
                       <Input
-                        value={formData[col.key] as string || ''}
-                        onChange={(e) => setFormData({ ...formData, [col.key]: e.target.value })}
-                        placeholder="#RRGGBB"
-                      />
-                    </div>
-                  ) : (
-                    <Input
-                      type={col.type === 'number' ? 'number' : 'text'}
-                      value={formData[col.key] ?? ''}
-                      onChange={(e) => setFormData({ 
-                        ...formData, 
-                        [col.key]: col.type === 'number' ? Number(e.target.value) : e.target.value 
-                      })}
-                    />
-                  )}
+                    value={formData[col.key] as string || ''}
+                    onChange={(e) => setFormData({ ...formData, [col.key]: e.target.value })}
+                    placeholder="#RRGGBB" />
+                  
+                    </div> :
+
+                <Input
+                  type={col.type === 'number' ? 'number' : 'text'}
+                  value={formData[col.key] ?? ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    [col.key]: col.type === 'number' ? Number(e.target.value) : e.target.value
+                  })} />
+
+                }
                 </div>
-              ))}
-              <Button 
-                onClick={() => saveMutation.mutate(formData)} 
+              )}
+              <Button
+                onClick={() => saveMutation.mutate(formData)}
                 className="w-full"
-                disabled={saveMutation.isPending}
-              >
+                disabled={saveMutation.isPending}>
+                
                 {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
                 Saxla
               </Button>
@@ -157,51 +157,51 @@ function ConfigTable({ tableName, title, columns, defaultValues }: ConfigTablePr
         <Table>
           <TableHeader>
             <TableRow>
-              {columns.slice(0, 4).map((col) => (
-                <TableHead key={col.key}>{col.label}</TableHead>
-              ))}
+              {columns.slice(0, 4).map((col) =>
+              <TableHead key={col.key}>{col.label}</TableHead>
+              )}
               <TableHead className="w-24">{tr("admintoolsconfig_emeliyyatlar_54d70c", "Əməliyyatlar")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {items.map((item) => (
-              <TableRow key={item.id}>
-                {columns.slice(0, 4).map((col) => (
-                  <TableCell key={col.key}>
-                    {col.type === 'color' ? (
-                      <div className="flex items-center gap-2">
+            {items.map((item) =>
+            <TableRow key={item.id}>
+                {columns.slice(0, 4).map((col) =>
+              <TableCell key={col.key}>
+                    {col.type === 'color' ?
+                <div className="flex items-center gap-2">
                         <div className="w-6 h-6 rounded" style={{ backgroundColor: item[col.key] as string }} />
                         <span className="text-xs">{item[col.key]}</span>
-                      </div>
-                    ) : col.type === 'boolean' ? (
-                      item[col.key] ? '✓' : '✗'
-                    ) : (
-                      String(item[col.key] ?? '')
-                    )}
+                      </div> :
+                col.type === 'boolean' ?
+                item[col.key] ? '✓' : '✗' :
+
+                String(item[col.key] ?? '')
+                }
                   </TableCell>
-                ))}
+              )}
                 <TableCell>
                   <div className="flex gap-1">
                     <Button size="icon" variant="ghost" onClick={() => openEdit(item)}>
                       <Edit className="w-4 h-4" />
                     </Button>
-                    <Button 
-                      size="icon" 
-                      variant="ghost" 
-                      onClick={() => deleteMutation.mutate(item.id)}
-                      disabled={deleteMutation.isPending}
-                    >
+                    <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => deleteMutation.mutate(item.id)}
+                    disabled={deleteMutation.isPending}>
+                    
                       <Trash2 className="w-4 h-4 text-destructive" />
                     </Button>
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </CardContent>
-    </Card>
-  );
+    </Card>);
+
 }
 
 const AdminToolsConfig = () => {
@@ -227,15 +227,15 @@ const AdminToolsConfig = () => {
             tableName="cry_type_labels"
             title={tr("admintoolsconfig_aglama_tipleri_2ca6d2", "Ağlama Tipləri")}
             columns={[
-              { key: 'cry_type', label: 'Tip Kodu' },
-              { key: 'label_az', label: tr("admintoolsconfig_azerbaycanca_bdc8df", "Azərbaycanca") },
-              { key: 'emoji', label: 'Emoji' },
-              { key: 'color', label: tr("admintoolsconfig_reng_8c6bc5", "Rəng"), type: 'color' },
-              { key: 'description_az', label: tr("admintoolsconfig_tesvir_f85651", "Təsvir") },
-              { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' },
-            ]}
-            defaultValues={{ cry_type: '', label_az: '', emoji: '😢', color: '#EF4444', sort_order: 0 }}
-          />
+            { key: 'cry_type', label: 'Tip Kodu' },
+            { key: 'label_az', label: tr("admintoolsconfig_azerbaycanca_bdc8df", "Azərbaycanca") },
+            { key: 'emoji', label: 'Emoji' },
+            { key: 'color', label: tr("admintoolsconfig_reng_8c6bc5", "Rəng"), type: 'color' },
+            { key: 'description_az', label: tr("admintoolsconfig_tesvir_f85651", "Təsvir") },
+            { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' }]
+            }
+            defaultValues={{ cry_type: '', label_az: '', emoji: '😢', color: '#EF4444', sort_order: 0 }} />
+          
         </TabsContent>
 
         <TabsContent value="poop" className="space-y-4">
@@ -243,16 +243,16 @@ const AdminToolsConfig = () => {
             tableName="poop_color_labels"
             title={tr("admintoolsconfig_necis_rengleri_44d5f6", "Nəcis Rəngləri")}
             columns={[
-              { key: 'color_key', label: tr("admintoolsconfig_reng_kodu_abe5cc", "Rəng Kodu") },
-              { key: 'label_az', label: tr("admintoolsconfig_azerbaycanca_bdc8df", "Azərbaycanca") },
-              { key: 'emoji', label: 'Emoji' },
-              { key: 'hex_color', label: tr("admintoolsconfig_hex_reng_9079bc", "HEX Rəng"), type: 'color' },
-              { key: 'status', label: 'Status' },
-              { key: 'description_az', label: tr("admintoolsconfig_tesvir_f85651", "Təsvir") },
-              { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' },
-            ]}
-            defaultValues={{ color_key: '', label_az: '', emoji: '💩', hex_color: '#8B4513', status: 'normal', sort_order: 0 }}
-          />
+            { key: 'color_key', label: tr("admintoolsconfig_reng_kodu_abe5cc", "Rəng Kodu") },
+            { key: 'label_az', label: tr("admintoolsconfig_azerbaycanca_bdc8df", "Azərbaycanca") },
+            { key: 'emoji', label: 'Emoji' },
+            { key: 'hex_color', label: tr("admintoolsconfig_hex_reng_9079bc", "HEX Rəng"), type: 'color' },
+            { key: 'status', label: 'Status' },
+            { key: 'description_az', label: tr("admintoolsconfig_tesvir_f85651", "Təsvir") },
+            { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' }]
+            }
+            defaultValues={{ color_key: '', label_az: '', emoji: '💩', hex_color: '#8B4513', status: 'normal', sort_order: 0 }} />
+          
         </TabsContent>
 
         <TabsContent value="market" className="space-y-4">
@@ -260,39 +260,39 @@ const AdminToolsConfig = () => {
             tableName="marketplace_categories"
             title={tr("admintoolsconfig_bazar_kateqoriyalari_89d0b8", "Bazar Kateqoriyaları")}
             columns={[
-              { key: 'category_key', label: 'Kateqoriya Kodu' },
-              { key: 'label_az', label: tr("admintoolsconfig_azerbaycanca_bdc8df", "Azərbaycanca") },
-              { key: 'emoji', label: 'Emoji' },
-              { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' },
-            ]}
-            defaultValues={{ category_key: '', label_az: '', emoji: '📦', sort_order: 0 }}
-          />
+            { key: 'category_key', label: 'Kateqoriya Kodu' },
+            { key: 'label_az', label: tr("admintoolsconfig_azerbaycanca_bdc8df", "Azərbaycanca") },
+            { key: 'emoji', label: 'Emoji' },
+            { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' }]
+            }
+            defaultValues={{ category_key: '', label_az: '', emoji: '📦', sort_order: 0 }} />
+          
 
           <ConfigTable
             tableName="product_conditions"
             title={tr("admintoolsconfig_mehsul_veziyyetleri_ac1d2a", "Məhsul Vəziyyətləri")}
             columns={[
-              { key: 'condition_key', label: tr("admintoolsconfig_veziyyet_kodu_2d1018", "Vəziyyət Kodu") },
-              { key: 'label_az', label: tr("admintoolsconfig_azerbaycanca_bdc8df", "Azərbaycanca") },
-              { key: 'emoji', label: 'Emoji' },
-              { key: 'color', label: tr("admintoolsconfig_reng_8c6bc5", "Rəng"), type: 'color' },
-              { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' },
-            ]}
-            defaultValues={{ condition_key: '', label_az: '', emoji: '✨', color: '#22C55E', sort_order: 0 }}
-          />
+            { key: 'condition_key', label: tr("admintoolsconfig_veziyyet_kodu_2d1018", "Vəziyyət Kodu") },
+            { key: 'label_az', label: tr("admintoolsconfig_azerbaycanca_bdc8df", "Azərbaycanca") },
+            { key: 'emoji', label: 'Emoji' },
+            { key: 'color', label: tr("admintoolsconfig_reng_8c6bc5", "Rəng"), type: 'color' },
+            { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' }]
+            }
+            defaultValues={{ condition_key: '', label_az: '', emoji: '✨', color: '#22C55E', sort_order: 0 }} />
+          
 
           <ConfigTable
             tableName="age_ranges"
             title={tr("admintoolsconfig_yas_araliqlari_38035a", "Yaş Aralıqları")}
             columns={[
-              { key: 'range_key', label: tr("admintoolsconfig_araliq_kodu_ac7b82", "Aralıq Kodu") },
-              { key: 'label_az', label: tr("admintoolsconfig_azerbaycanca_bdc8df", "Azərbaycanca") },
-              { key: 'min_months', label: 'Min Ay', type: 'number' },
-              { key: 'max_months', label: 'Max Ay', type: 'number' },
-              { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' },
-            ]}
-            defaultValues={{ range_key: '', label_az: '', min_months: 0, max_months: 12, sort_order: 0 }}
-          />
+            { key: 'range_key', label: tr("admintoolsconfig_araliq_kodu_ac7b82", "Aralıq Kodu") },
+            { key: 'label_az', label: tr("admintoolsconfig_azerbaycanca_bdc8df", "Azərbaycanca") },
+            { key: 'min_months', label: 'Min Ay', type: 'number' },
+            { key: 'max_months', label: 'Max Ay', type: 'number' },
+            { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' }]
+            }
+            defaultValues={{ range_key: '', label_az: '', min_months: 0, max_months: 12, sort_order: 0 }} />
+          
         </TabsContent>
 
         <TabsContent value="providers" className="space-y-4">
@@ -300,26 +300,26 @@ const AdminToolsConfig = () => {
             tableName="provider_types"
             title={tr("admintoolsconfig_provayder_tipleri_7c816f", "Provayder Tipləri")}
             columns={[
-              { key: 'type_key', label: 'Tip Kodu' },
-              { key: 'label_az', label: tr("admintoolsconfig_azerbaycanca_bdc8df", "Azərbaycanca") },
-              { key: 'emoji', label: 'Emoji' },
-              { key: 'color', label: tr("admintoolsconfig_reng_8c6bc5", "Rəng"), type: 'color' },
-              { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' },
-            ]}
-            defaultValues={{ type_key: '', label_az: '', emoji: '🏥', color: '#3B82F6', sort_order: 0 }}
-          />
+            { key: 'type_key', label: 'Tip Kodu' },
+            { key: 'label_az', label: tr("admintoolsconfig_azerbaycanca_bdc8df", "Azərbaycanca") },
+            { key: 'emoji', label: 'Emoji' },
+            { key: 'color', label: tr("admintoolsconfig_reng_8c6bc5", "Rəng"), type: 'color' },
+            { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' }]
+            }
+            defaultValues={{ type_key: '', label_az: '', emoji: '🏥', color: '#3B82F6', sort_order: 0 }} />
+          
 
           <ConfigTable
             tableName="day_labels"
             title={tr("admintoolsconfig_gun_adlari_a072a9", "Gün Adları")}
             columns={[
-              { key: 'day_key', label: tr("admintoolsconfig_gun_kodu_287a99", "Gün Kodu") },
-              { key: 'label_az', label: 'Tam Ad' },
-              { key: 'short_label_az', label: tr("admintoolsconfig_qisa_ad_be64d8", "Qısa Ad") },
-              { key: 'day_number', label: tr("admintoolsconfig_gun_nomresi_760508", "Gün Nömrəsi"), type: 'number' },
-            ]}
-            defaultValues={{ day_key: '', label_az: '', short_label_az: '', day_number: 0 }}
-          />
+            { key: 'day_key', label: tr("admintoolsconfig_gun_kodu_287a99", "Gün Kodu") },
+            { key: 'label_az', label: 'Tam Ad' },
+            { key: 'short_label_az', label: tr("admintoolsconfig_qisa_ad_be64d8", "Qısa Ad") },
+            { key: 'day_number', label: tr("admintoolsconfig_gun_nomresi_760508", "Gün Nömrəsi"), type: 'number' }]
+            }
+            defaultValues={{ day_key: '', label_az: '', short_label_az: '', day_number: 0 }} />
+          
         </TabsContent>
 
         <TabsContent value="horoscope" className="space-y-4">
@@ -327,38 +327,38 @@ const AdminToolsConfig = () => {
             tableName="horoscope_elements"
             title={tr("admintoolsconfig_element_konfiqurasiyasi_ea794d", "Element Konfiqurasiyası")}
             columns={[
-              { key: 'element_key', label: 'Element Kodu' },
-              { key: 'name_az', label: tr("admintoolsconfig_azerbaycanca_bdc8df", "Azərbaycanca") },
-              { key: 'icon', label: tr("admintoolsconfig_ikon_6e73fc", "İkon") },
-              { key: 'color', label: tr("admintoolsconfig_reng_8c6bc5", "Rəng"), type: 'color' },
-              { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' },
-            ]}
-            defaultValues={{ element_key: '', name_az: '', icon: 'Sparkles', color: '#8B5CF6', sort_order: 0 }}
-          />
+            { key: 'element_key', label: 'Element Kodu' },
+            { key: 'name_az', label: tr("admintoolsconfig_azerbaycanca_bdc8df", "Azərbaycanca") },
+            { key: 'icon', label: tr("admintoolsconfig_ikon_6e73fc", "İkon") },
+            { key: 'color', label: tr("admintoolsconfig_reng_8c6bc5", "Rəng"), type: 'color' },
+            { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' }]
+            }
+            defaultValues={{ element_key: '', name_az: '', icon: 'Sparkles', color: '#8B5CF6', sort_order: 0 }} />
+          
 
           <ConfigTable
             tableName="horoscope_loading_steps"
             title={tr("admintoolsconfig_yuklenme_addimlari_bc82be", "Yüklənmə Addımları")}
             columns={[
-              { key: 'step_key', label: tr("admintoolsconfig_addim_kodu_3667fd", "Addım Kodu") },
-              { key: 'label_az', label: tr("admintoolsconfig_azerbaycanca_metn_d6c0c4", "Azərbaycanca Mətn") },
-              { key: 'icon', label: tr("admintoolsconfig_ikon_6e73fc", "İkon") },
-              { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' },
-            ]}
-            defaultValues={{ step_key: '', label_az: '', icon: 'Star', sort_order: 0 }}
-          />
+            { key: 'step_key', label: tr("admintoolsconfig_addim_kodu_3667fd", "Addım Kodu") },
+            { key: 'label_az', label: tr("admintoolsconfig_azerbaycanca_metn_d6c0c4", "Azərbaycanca Mətn") },
+            { key: 'icon', label: tr("admintoolsconfig_ikon_6e73fc", "İkon") },
+            { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' }]
+            }
+            defaultValues={{ step_key: '', label_az: '', icon: 'Star', sort_order: 0 }} />
+          
 
           <ConfigTable
             tableName="time_options"
             title={tr("admintoolsconfig_vaxt_secimleri_065536", "Vaxt Seçimləri")}
             columns={[
-              { key: 'option_key', label: tr("admintoolsconfig_secim_kodu_1c23ed", "Seçim Kodu") },
-              { key: 'label_az', label: tr("admintoolsconfig_azerbaycanca_bdc8df", "Azərbaycanca") },
-              { key: 'hour_value', label: tr("admintoolsconfig_saat_deyeri_e04f39", "Saat Dəyəri"), type: 'number' },
-              { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' },
-            ]}
-            defaultValues={{ option_key: '', label_az: '', hour_value: 12, sort_order: 0 }}
-          />
+            { key: 'option_key', label: tr("admintoolsconfig_secim_kodu_1c23ed", "Seçim Kodu") },
+            { key: 'label_az', label: tr("admintoolsconfig_azerbaycanca_bdc8df", "Azərbaycanca") },
+            { key: 'hour_value', label: tr("admintoolsconfig_saat_deyeri_e04f39", "Saat Dəyəri"), type: 'number' },
+            { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' }]
+            }
+            defaultValues={{ option_key: '', label_az: '', hour_value: 12, sort_order: 0 }} />
+          
         </TabsContent>
 
         <TabsContent value="weather" className="space-y-4">
@@ -366,30 +366,30 @@ const AdminToolsConfig = () => {
             tableName="temperature_emojis"
             title={tr("admintoolsconfig_temperatur_emojiler_68fd01", "Temperatur Emojilər")}
             columns={[
-              { key: 'min_temp', label: 'Min °C', type: 'number' },
-              { key: 'max_temp', label: 'Max °C', type: 'number' },
-              { key: 'emoji', label: 'Emoji' },
-              { key: 'label_az', label: tr("admintoolsconfig_azerbaycanca_bdc8df", "Azərbaycanca") },
-              { key: 'clothing_tip_az', label: tr("admintoolsconfig_geyim_mesleheti_826efc", "Geyim Məsləhəti") },
-              { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' },
-            ]}
-            defaultValues={{ min_temp: 0, max_temp: 10, emoji: '🌡️', label_az: '', clothing_tip_az: '', sort_order: 0 }}
-          />
+            { key: 'min_temp', label: 'Min °C', type: 'number' },
+            { key: 'max_temp', label: 'Max °C', type: 'number' },
+            { key: 'emoji', label: 'Emoji' },
+            { key: 'label_az', label: tr("admintoolsconfig_azerbaycanca_bdc8df", "Azərbaycanca") },
+            { key: 'clothing_tip_az', label: tr("admintoolsconfig_geyim_mesleheti_826efc", "Geyim Məsləhəti") },
+            { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' }]
+            }
+            defaultValues={{ min_temp: 0, max_temp: 10, emoji: '🌡️', label_az: '', clothing_tip_az: '', sort_order: 0 }} />
+          
 
           <ConfigTable
             tableName="exercise_daily_tips"
             title={tr("admintoolsconfig_mesq_gunluk_meslehetleri_280e12", "Məşq Günlük Məsləhətləri")}
             columns={[
-              { key: 'tip_az', label: tr("admintoolsconfig_meslehet_az_9b4a39", "Məsləhət (AZ)") },
-              { key: 'emoji', label: 'Emoji' },
-              { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' },
-            ]}
-            defaultValues={{ tip_az: '', emoji: '💡', sort_order: 0 }}
-          />
+            { key: 'tip_az', label: tr("admintoolsconfig_meslehet_az_9b4a39", "Məsləhət (AZ)") },
+            { key: 'emoji', label: 'Emoji' },
+            { key: 'sort_order', label: tr("admintoolsconfig_sira_421c5f", "Sıra"), type: 'number' }]
+            }
+            defaultValues={{ tip_az: '', emoji: '💡', sort_order: 0 }} />
+          
         </TabsContent>
       </Tabs>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AdminToolsConfig;

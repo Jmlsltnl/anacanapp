@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  ArrowLeft, Heart, Star, ShoppingBag, Search, Filter, Package
-} from 'lucide-react';
+import {
+  ArrowLeft, Heart, Star, ShoppingBag, Search, Filter, Package } from
+'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useUserStore } from '@/store/userStore';
@@ -21,24 +21,24 @@ interface AffiliateProductsProps {
 }
 
 const categoryLabels: Record<string, string> = {
-  baby_gear: 'Körpə əşyaları',
-  maternity: 'Hamiləlik geyimləri',
-  health: 'Sağlamlıq',
+  baby_gear: tr("affiliateproducts_korpe_esyalari_6e92e1", "K\xF6rp\u0259 \u0259\u015Fyalar\u0131"),
+  maternity: tr("affiliateproducts_hamilelik_geyimleri_fb1c46", "Hamil\u0259lik geyiml\u0259ri"),
+  health: tr("affiliateproducts_saglamliq_09460a", "Sa\u011Flaml\u0131q"),
   nutrition: 'Qidalanma',
-  skincare: 'Dəri qulluğu',
-  general: 'Ümumi',
+  skincare: tr("affiliateproducts_deri_qullugu_6c59a3", "D\u0259ri qullu\u011Fu"),
+  general: tr("affiliateproducts_umumi_1b5521", "\xDCmumi")
 };
 
 const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
   useScrollToTop();
   useScreenAnalytics('AffiliateProducts', 'Tools');
-  
+
   const { lifeStage } = useUserStore();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<AffiliateProduct | null>(null);
   const [showSaved, setShowSaved] = useState(false);
-  
+
   const affiliateEnabled = useAppSetting('affiliate_section_enabled');
   const isEnabled = affiliateEnabled !== false;
 
@@ -46,36 +46,36 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
   const { data: savedProducts = [] } = useSavedProducts();
 
   // Get unique categories
-  const categories = ['all', ...new Set(products.map(p => p.category))];
+  const categories = ['all', ...new Set(products.map((p) => p.category))];
 
   // Filter products
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = products.filter((product) => {
     const matchesCategory = activeCategory === 'all' || product.category === activeCategory;
-    const matchesSearch = !searchQuery || 
-      (product.name_az || product.name).toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (product.description_az || product.description || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = !searchQuery ||
+    (product.name_az || product.name).toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (product.description_az || product.description || '').toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
-  const featuredProducts = filteredProducts.filter(p => p.is_featured);
+  const featuredProducts = filteredProducts.filter((p) => p.is_featured);
 
   // Handle views
   if (selectedProduct) {
     return (
-      <AffiliateProductDetail 
-        product={selectedProduct} 
-        onBack={() => setSelectedProduct(null)} 
-      />
-    );
+      <AffiliateProductDetail
+        product={selectedProduct}
+        onBack={() => setSelectedProduct(null)} />);
+
+
   }
 
   if (showSaved) {
     return (
       <SavedProductsList
         onSelectProduct={setSelectedProduct}
-        onBack={() => setShowSaved(false)}
-      />
-    );
+        onBack={() => setShowSaved(false)} />);
+
+
   }
 
   if (!isEnabled) {
@@ -93,11 +93,11 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
           <Package className="w-16 h-16 text-muted-foreground mb-4" />
           <p className="text-lg font-medium mb-2">{tr("affiliateproducts_tezlikle_125239", "Tezliklə")}</p>
           <p className="text-sm text-muted-foreground text-center">
-            Sizin üçün seçilmiş məhsullar tezliklə burada olacaq
+            {tr("affiliateproducts_sizin_ucun_secilmis_mehsullar__85a358", "Sizin \xFC\xE7\xFCn se\xE7ilmi\u015F m\u0259hsullar tezlikl\u0259 burada olacaq")}
           </p>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -114,19 +114,19 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
               <p className="text-xs text-muted-foreground">{tr("affiliateproducts_sizin_ucun_secdiklerimiz_e5dde6", "Sizin üçün seçdiklərimiz")}</p>
             </div>
           </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             className="rounded-xl relative z-30"
-            onClick={() => setShowSaved(true)}
-          >
+            onClick={() => setShowSaved(true)}>
+            
             <Heart className="w-4 h-4 mr-1" />
-            Saxlanılmış
-            {savedProducts.length > 0 && (
-              <Badge className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-[10px] bg-red-500 text-white border-0">
+            {tr("affiliateproducts_saxlanilmis_a1090d", "Saxlan\u0131lm\u0131\u015F")}
+            {savedProducts.length > 0 &&
+            <Badge className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-[10px] bg-red-500 text-white border-0">
                 {savedProducts.length}
               </Badge>
-            )}
+            }
           </Button>
         </div>
 
@@ -138,99 +138,99 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
             placeholder={tr("affiliateproducts_mehsul_axtar_580a05", "Məhsul axtar...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-10 pl-9 pr-3 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-sm transition-all outline-none"
-          />
+            className="w-full h-10 pl-9 pr-3 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-sm transition-all outline-none" />
+          
         </div>
 
         {/* Category Tabs */}
         <div className="overflow-x-auto -mx-4 px-4 scrollbar-hide">
           <div className="flex gap-2 min-w-max pb-1">
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
-                  activeCategory === cat
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted/50 text-muted-foreground hover:bg-muted'
-                }`}
-              >
-                {cat === 'all' ? 'Hamısı' : categoryLabels[cat] || cat}
+            {categories.map((cat) =>
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+              activeCategory === cat ?
+              'bg-primary text-primary-foreground' :
+              'bg-muted/50 text-muted-foreground hover:bg-muted'}`
+              }>
+              
+                {cat === 'all' ? tr("affiliateproducts_hamisi_c73c4d", "Ham\u0131s\u0131") : categoryLabels[cat] || cat}
               </button>
-            ))}
+            )}
           </div>
         </div>
       </div>
 
       {/* Featured Products */}
-      {featuredProducts.length > 0 && activeCategory === 'all' && !searchQuery && (
-        <div className="px-4 py-4">
+      {featuredProducts.length > 0 && activeCategory === 'all' && !searchQuery &&
+      <div className="px-4 py-4">
           <h2 className="font-semibold text-sm mb-3 flex items-center gap-2">
             <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-            Ən çox tövsiyyə olunanlar
+            {tr("affiliateproducts_en_cox_tovsiyye_olunanlar_4493f0", "\u018Fn \xE7ox t\xF6vsiyy\u0259 olunanlar")}
           </h2>
           <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-4 px-4">
-            {featuredProducts.map((product, index) => (
-              <AffiliateProductCard
-                key={product.id}
-                product={product}
-                onSelect={setSelectedProduct}
-                index={index}
-                variant="featured"
-              />
-            ))}
+            {featuredProducts.map((product, index) =>
+          <AffiliateProductCard
+            key={product.id}
+            product={product}
+            onSelect={setSelectedProduct}
+            index={index}
+            variant="featured" />
+
+          )}
           </div>
         </div>
-      )}
+      }
 
       {/* All Products */}
       <div className="px-4 py-4">
         <h2 className="font-semibold text-sm mb-3">
-          {searchQuery ? `Axtarış nəticələri` : 'Bütün məhsullar'}
+          {searchQuery ? `Axtarış nəticələri` : tr("affiliateproducts_butun_mehsullar_c7373f", "B\xFCt\xFCn m\u0259hsullar")}
           <span className="text-muted-foreground font-normal ml-2">({filteredProducts.length})</span>
         </h2>
         
-        {isLoading ? (
-          <div className="grid grid-cols-2 gap-3">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="bg-card rounded-xl overflow-hidden border border-border/50">
+        {isLoading ?
+        <div className="grid grid-cols-2 gap-3">
+            {[1, 2, 3, 4].map((i) =>
+          <div key={i} className="bg-card rounded-xl overflow-hidden border border-border/50">
                 <Skeleton className="aspect-square w-full" />
                 <div className="p-3 space-y-2">
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-3 w-1/2" />
                 </div>
               </div>
-            ))}
-          </div>
-        ) : filteredProducts.length === 0 ? (
-          <div className="text-center py-12">
+          )}
+          </div> :
+        filteredProducts.length === 0 ?
+        <div className="text-center py-12">
             <ShoppingBag className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
             <p className="text-muted-foreground">{tr("affiliateproducts_hec_bir_mehsul_tapilmadi_7ded0c", "Heç bir məhsul tapılmadı")}</p>
+          </div> :
+
+        <div className="grid grid-cols-2 gap-3">
+            {filteredProducts.map((product, index) =>
+          <AffiliateProductCard
+            key={product.id}
+            product={product}
+            onSelect={setSelectedProduct}
+            index={index} />
+
+          )}
           </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-3">
-            {filteredProducts.map((product, index) => (
-              <AffiliateProductCard
-                key={product.id}
-                product={product}
-                onSelect={setSelectedProduct}
-                index={index}
-              />
-            ))}
-          </div>
-        )}
+        }
       </div>
 
       {/* Disclaimer */}
       <div className="px-4 mt-2 mb-4">
         <div className="bg-muted/30 rounded-xl p-3 text-center">
           <p className="text-[10px] text-muted-foreground">
-            Bu səhifədəki linklər affiliate linklərdir. Alış-veriş etdikdə biz kiçik komissiya qazana bilərik.
+            {tr("affiliateproducts_bu_sehifedeki_linkler_affiliat_76280f", "Bu s\u0259hif\u0259d\u0259ki linkl\u0259r affiliate linkl\u0259rdir. Al\u0131\u015F-veri\u015F etdikd\u0259 biz ki\xE7ik komissiya qazana bil\u0259rik.")}
           </p>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AffiliateProducts;

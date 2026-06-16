@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { tr } from "@/lib/tr";import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { CheckCircle2, XCircle, Loader2, Sparkles, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,7 +16,7 @@ interface StatusData {
 }
 
 export default function PartnerVerifyPage() {
-  const { token } = useParams<{ token: string }>();
+  const { token } = useParams<{token: string;}>();
   const [status, setStatus] = useState<StatusData | null>(null);
   const [loading, setLoading] = useState(true);
   const [pin, setPin] = useState('');
@@ -33,7 +33,7 @@ export default function PartnerVerifyPage() {
         setStatus(data as StatusData);
         if ((data as StatusData)?.status === 'verified') setVerified(data as StatusData);
       } catch (e: any) {
-        setError(e?.message || 'Xəta');
+        setError(e?.message || tr("partnerverifypage_xeta_3cdbb6", "X\u0259ta"));
       } finally {
         setLoading(false);
       }
@@ -51,7 +51,7 @@ export default function PartnerVerifyPage() {
       if ((data as any)?.error) throw new Error((data as any).error);
       setVerified(data as StatusData);
     } catch (e: any) {
-      let msg = e?.message || 'Xəta';
+      let msg = e?.message || tr("partnerverifypage_xeta_3cdbb6", "X\u0259ta");
 
       if (e instanceof FunctionsHttpError) {
         try {
@@ -63,11 +63,11 @@ export default function PartnerVerifyPage() {
       }
 
       const map: Record<string, string> = {
-        invalid_pin: 'PIN səhvdir',
-        invalid_token: 'QR yanlışdır',
-        expired: 'QR-ın müddəti bitib',
-        already_verified: 'Bu QR artıq istifadə olunub',
-        pin_not_configured: 'Məkan üçün PIN hələ qurulmayıb',
+        invalid_pin: tr("partnerverifypage_pin_sehvdir_010e18", "PIN s\u0259hvdir"),
+        invalid_token: tr("partnerverifypage_qr_yanlisdir_ed65eb", "QR yanl\u0131\u015Fd\u0131r"),
+        expired: tr("partnerverifypage_qr_in_muddeti_bitib_fc3d41", "QR-\u0131n m\xFCdd\u0259ti bitib"),
+        already_verified: tr("partnerverifypage_bu_qr_artiq_istifade_olunub_3bcb61", "Bu QR art\u0131q istifad\u0259 olunub"),
+        pin_not_configured: tr("partnerverifypage_mekan_ucun_pin_hele_qurulmayib_f9d65d", "M\u0259kan \xFC\xE7\xFCn PIN h\u0259l\u0259 qurulmay\u0131b")
       };
       setError(map[msg] || msg);
     } finally {
@@ -79,72 +79,72 @@ export default function PartnerVerifyPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+      </div>);
+
   }
 
   if (verified) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-green-500 text-white p-6 text-center">
         <CheckCircle2 className="w-24 h-24 mb-4" strokeWidth={2.5} />
-        <h1 className="text-4xl font-black mb-2">TƏSDİQLƏNDİ</h1>
+        <h1 className="text-4xl font-black mb-2">{tr("partnerverifypage_tesdi_qlendi_7e7c87", "T\u018FSD\u0130QL\u018FND\u0130")}</h1>
         <p className="text-2xl font-bold mb-1">{verified.discount_label}</p>
         <p className="text-lg opacity-90 mb-6">{verified.venue_name}</p>
         <div className="bg-white/20 backdrop-blur rounded-2xl px-6 py-4 mb-3">
-          <p className="text-sm opacity-80 mb-1">İstifadəçi</p>
+          <p className="text-sm opacity-80 mb-1">{tr("partnerverifypage_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}</p>
           <p className="text-xl font-bold">{verified.user_name}</p>
-          {verified.is_premium && (
-            <div className="inline-flex items-center gap-1 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full mt-2">
+          {verified.is_premium &&
+          <div className="inline-flex items-center gap-1 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full mt-2">
               <Sparkles className="w-3 h-3" /> PREMIUM
             </div>
-          )}
+          }
         </div>
         <p className="text-xs opacity-70 mt-4">Anacan Partnyor Sistemi</p>
-      </div>
-    );
+      </div>);
+
   }
 
-  if (status?.status === 'expired' || error === 'QR-ın müddəti bitib') {
+  if (status?.status === 'expired' || error === tr("partnerverifypage_qr_in_muddeti_bitib_fc3d41", "QR-\u0131n m\xFCdd\u0259ti bitib")) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-destructive text-white p-6 text-center">
         <XCircle className="w-20 h-20 mb-4" />
-        <h1 className="text-3xl font-bold">Müddəti bitib</h1>
-        <p className="opacity-90 mt-2">Müştəri tətbiqində yeni QR yaratmalıdır.</p>
-      </div>
-    );
+        <h1 className="text-3xl font-bold">{tr("partnerverifypage_muddeti_bitib_68fc0e", "M\xFCdd\u0259ti bitib")}</h1>
+        <p className="opacity-90 mt-2">{tr("partnerverifypage_musteri_tetbiqinde_yeni_qr_yar_32bfe8", "M\xFC\u015Ft\u0259ri t\u0259tbiqind\u0259 yeni QR yaratmal\u0131d\u0131r.")}</p>
+      </div>);
+
   }
 
   if (status?.status === 'cancelled') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-muted p-6 text-center">
         <XCircle className="w-20 h-20 mb-4 text-muted-foreground" />
-        <h1 className="text-2xl font-bold">Ləğv edilib</h1>
-      </div>
-    );
+        <h1 className="text-2xl font-bold">{tr("partnerverifypage_legv_edilib_24db12", "L\u0259\u011Fv edilib")}</h1>
+      </div>);
+
   }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
       <div className="w-full max-w-md bg-card border border-border rounded-3xl p-6 shadow-lg">
         <div className="flex flex-col items-center text-center mb-6">
-          {status?.venue_logo_url ? (
-            <img src={status.venue_logo_url} alt="" className="w-20 h-20 rounded-2xl object-cover border-2 border-border" />
-          ) : (
-            <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center">
+          {status?.venue_logo_url ?
+          <img src={status.venue_logo_url} alt="" className="w-20 h-20 rounded-2xl object-cover border-2 border-border" /> :
+
+          <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center">
               <Sparkles className="w-10 h-10 text-primary" />
             </div>
-          )}
+          }
           <h1 className="text-xl font-bold mt-3">{status?.venue_name}</h1>
           <p className="text-sm text-muted-foreground">{status?.discount_label}</p>
           <div className="mt-3 bg-muted rounded-xl px-4 py-2 text-sm">
-            Müştəri: <strong>{status?.user_name}</strong>
+            {tr("partnerverifypage_musteri_f512e9", "M\xFC\u015Ft\u0259ri:")} <strong>{status?.user_name}</strong>
             {status?.is_premium && <span className="ml-2 text-amber-600">★ Premium</span>}
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <label className="block text-sm font-medium text-foreground flex items-center gap-1">
-            <Shield className="w-4 h-4" /> Məkan PIN kodu
+            <Shield className="w-4 h-4" /> {tr("partnerverifypage_mekan_pin_kodu_138eb6", "M\u0259kan PIN kodu")}
           </label>
           <input
             type="password"
@@ -154,21 +154,21 @@ export default function PartnerVerifyPage() {
             onChange={(e) => setPin(e.target.value)}
             placeholder="••••"
             className="w-full h-14 text-center text-2xl tracking-widest font-bold border-2 border-input rounded-xl bg-background focus:border-primary focus:outline-none"
-            maxLength={12}
-          />
+            maxLength={12} />
+          
           {error && <p className="text-sm text-destructive text-center">{error}</p>}
           <button
             type="submit"
             disabled={submitting || !pin}
-            className="w-full h-12 bg-primary text-primary-foreground font-bold rounded-xl disabled:opacity-50 flex items-center justify-center gap-2"
-          >
+            className="w-full h-12 bg-primary text-primary-foreground font-bold rounded-xl disabled:opacity-50 flex items-center justify-center gap-2">
+            
             {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
-            Təsdiqlə
+            {tr("partnerverifypage_tesdiqle_4ffd4c", "T\u0259sdiql\u0259")}
           </button>
         </form>
 
         <p className="text-[10px] text-muted-foreground text-center mt-4">Anacan Partnyor Endirim Sistemi</p>
       </div>
-    </div>
-  );
+    </div>);
+
 }

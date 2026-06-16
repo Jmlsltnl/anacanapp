@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { tr } from "@/lib/tr";import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
@@ -41,15 +41,15 @@ export const useZodiacSigns = () => {
   return useQuery({
     queryKey: ['zodiac-signs'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('zodiac_signs')
-        .select('*')
-        .order('sort_order');
+      const { data, error } = await supabase.
+      from('zodiac_signs').
+      select('*').
+      order('sort_order');
 
       if (error) throw error;
       return data as ZodiacSign[];
     },
-    staleTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 60
   });
 };
 
@@ -57,14 +57,14 @@ export const useZodiacCompatibility = () => {
   return useQuery({
     queryKey: ['zodiac-compatibility'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('zodiac_compatibility')
-        .select('*');
+      const { data, error } = await supabase.
+      from('zodiac_compatibility').
+      select('*');
 
       if (error) throw error;
       return data as ZodiacCompatibility[];
     },
-    staleTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 60
   });
 };
 
@@ -76,16 +76,16 @@ export const useHoroscopeReadings = () => {
     queryFn: async () => {
       if (!user?.id) return [];
 
-      const { data, error } = await supabase
-        .from('horoscope_readings')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+      const { data, error } = await supabase.
+      from('horoscope_readings').
+      select('*').
+      eq('user_id', user.id).
+      order('created_at', { ascending: false });
 
       if (error) throw error;
       return data as HoroscopeReading[];
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id
   });
 };
 
@@ -102,21 +102,21 @@ export const useSaveHoroscopeReading = () => {
     }) => {
       if (!user?.id) throw new Error('User not authenticated');
 
-      const { data, error } = await supabase
-        .from('horoscope_readings')
-        .insert({
-          user_id: user.id,
-          ...reading,
-        })
-        .select()
-        .single();
+      const { data, error } = await supabase.
+      from('horoscope_readings').
+      insert({
+        user_id: user.id,
+        ...reading
+      }).
+      select().
+      single();
 
       if (error) throw error;
       return data as HoroscopeReading;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['horoscope-readings'] });
-    },
+    }
   });
 };
 
@@ -145,15 +145,15 @@ export const getZodiacSign = (date: Date, signs: ZodiacSign[]): ZodiacSign | nul
 
 // Calculate compatibility between two signs
 export const calculateCompatibility = (
-  sign1: string,
-  sign2: string,
-  compatibilities: ZodiacCompatibility[],
-  relationshipType: string = 'parent_child'
-): ZodiacCompatibility | null => {
-  const match = compatibilities.find(c => 
-    ((c.sign1 === sign1 && c.sign2 === sign2) ||
-     (c.sign1 === sign2 && c.sign2 === sign1)) &&
-    c.relationship_type === relationshipType
+sign1: string,
+sign2: string,
+compatibilities: ZodiacCompatibility[],
+relationshipType: string = 'parent_child')
+: ZodiacCompatibility | null => {
+  const match = compatibilities.find((c) =>
+  (c.sign1 === sign1 && c.sign2 === sign2 ||
+  c.sign1 === sign2 && c.sign2 === sign1) &&
+  c.relationship_type === relationshipType
   );
 
   return match || null;
@@ -164,32 +164,32 @@ export const getElementCompatibility = (element1: string, element2: string): {
   score: number;
   description_az: string;
 } => {
-  const compatibilityMap: Record<string, Record<string, { score: number; description_az: string }>> = {
+  const compatibilityMap: Record<string, Record<string, {score: number;description_az: string;}>> = {
     fire: {
-      fire: { score: 85, description_az: 'Çox enerjili və dinamik bir əlaqə! Birlikdə hər şeyi bacararsınız.' },
-      air: { score: 90, description_az: 'Mükəmməl harmoniya! Hava odu daha da alovlandırır.' },
-      earth: { score: 60, description_az: 'Fərqli yanaşmalar, amma bir-birinizi tamamlaya bilərsiniz.' },
-      water: { score: 50, description_az: 'Bəzən çətin olsa da, dərin emosional bağ qura bilərsiniz.' },
+      fire: { score: 85, description_az: tr("usehoroscope_cox_enerjili_ve_dinamik_bir_el_dfec07", "\xC7ox enerjili v\u0259 dinamik bir \u0259laq\u0259! Birlikd\u0259 h\u0259r \u015Feyi bacarars\u0131n\u0131z.") },
+      air: { score: 90, description_az: tr("usehoroscope_mukemmel_harmoniya_hava_odu_da_75f2b0", "M\xFCk\u0259mm\u0259l harmoniya! Hava odu daha da alovland\u0131r\u0131r.") },
+      earth: { score: 60, description_az: tr("usehoroscope_ferqli_yanasmalar_amma_bir_bir_ba25d5", "F\u0259rqli yana\u015Fmalar, amma bir-birinizi tamamlaya bil\u0259rsiniz.") },
+      water: { score: 50, description_az: tr("usehoroscope_bezen_cetin_olsa_da_derin_emos_8f19ff", "B\u0259z\u0259n \xE7\u0259tin olsa da, d\u0259rin emosional ba\u011F qura bil\u0259rsiniz.") }
     },
     earth: {
-      fire: { score: 60, description_az: 'Fərqli yanaşmalar, amma bir-birinizi tamamlaya bilərsiniz.' },
-      air: { score: 55, description_az: 'Praktik və nəzəri düşüncənin maraqlı birləşməsi.' },
-      earth: { score: 95, description_az: 'Çox sabit və etibarlı əlaqə! Birlikdə dağları yerindən tərpədərsiniz.' },
-      water: { score: 85, description_az: 'Gözəl harmoniya! Su torpağı canlandırır.' },
+      fire: { score: 60, description_az: tr("usehoroscope_ferqli_yanasmalar_amma_bir_bir_ba25d5", "F\u0259rqli yana\u015Fmalar, amma bir-birinizi tamamlaya bil\u0259rsiniz.") },
+      air: { score: 55, description_az: tr("usehoroscope_praktik_ve_nezeri_dusuncenin_m_99c118", "Praktik v\u0259 n\u0259z\u0259ri d\xFC\u015F\xFCnc\u0259nin maraql\u0131 birl\u0259\u015Fm\u0259si.") },
+      earth: { score: 95, description_az: tr("usehoroscope_cox_sabit_ve_etibarli_elaqe_bi_e3baaf", "\xC7ox sabit v\u0259 etibarl\u0131 \u0259laq\u0259! Birlikd\u0259 da\u011Flar\u0131 yerind\u0259n t\u0259rp\u0259d\u0259rsiniz.") },
+      water: { score: 85, description_az: tr("usehoroscope_gozel_harmoniya_su_torpagi_can_abb534", "G\xF6z\u0259l harmoniya! Su torpa\u011F\u0131 canland\u0131r\u0131r.") }
     },
     air: {
-      fire: { score: 90, description_az: 'Mükəmməl harmoniya! Hava odu daha da alovlandırır.' },
-      air: { score: 80, description_az: 'Çox ünsiyyətcil və yaradıcı əlaqə!' },
-      earth: { score: 55, description_az: 'Praktik və nəzəri düşüncənin maraqlı birləşməsi.' },
-      water: { score: 65, description_az: 'Emosional dərinlik və intellektual ünsiyyətin birləşməsi.' },
+      fire: { score: 90, description_az: tr("usehoroscope_mukemmel_harmoniya_hava_odu_da_75f2b0", "M\xFCk\u0259mm\u0259l harmoniya! Hava odu daha da alovland\u0131r\u0131r.") },
+      air: { score: 80, description_az: tr("usehoroscope_cox_unsiyyetcil_ve_yaradici_el_3ae25c", "\xC7ox \xFCnsiyy\u0259tcil v\u0259 yarad\u0131c\u0131 \u0259laq\u0259!") },
+      earth: { score: 55, description_az: tr("usehoroscope_praktik_ve_nezeri_dusuncenin_m_99c118", "Praktik v\u0259 n\u0259z\u0259ri d\xFC\u015F\xFCnc\u0259nin maraql\u0131 birl\u0259\u015Fm\u0259si.") },
+      water: { score: 65, description_az: tr("usehoroscope_emosional_derinlik_ve_intellek_065e73", "Emosional d\u0259rinlik v\u0259 intellektual \xFCnsiyy\u0259tin birl\u0259\u015Fm\u0259si.") }
     },
     water: {
-      fire: { score: 50, description_az: 'Bəzən çətin olsa da, dərin emosional bağ qura bilərsiniz.' },
-      air: { score: 65, description_az: 'Emosional dərinlik və intellektual ünsiyyətin birləşməsi.' },
-      earth: { score: 85, description_az: 'Gözəl harmoniya! Su torpağı canlandırır.' },
-      water: { score: 90, description_az: 'Dərin emosional bağ! Bir-birinizi mükəmməl anlayırsınız.' },
-    },
+      fire: { score: 50, description_az: tr("usehoroscope_bezen_cetin_olsa_da_derin_emos_8f19ff", "B\u0259z\u0259n \xE7\u0259tin olsa da, d\u0259rin emosional ba\u011F qura bil\u0259rsiniz.") },
+      air: { score: 65, description_az: tr("usehoroscope_emosional_derinlik_ve_intellek_065e73", "Emosional d\u0259rinlik v\u0259 intellektual \xFCnsiyy\u0259tin birl\u0259\u015Fm\u0259si.") },
+      earth: { score: 85, description_az: tr("usehoroscope_gozel_harmoniya_su_torpagi_can_abb534", "G\xF6z\u0259l harmoniya! Su torpa\u011F\u0131 canland\u0131r\u0131r.") },
+      water: { score: 90, description_az: tr("usehoroscope_derin_emosional_bag_bir_birini_dc3f52", "D\u0259rin emosional ba\u011F! Bir-birinizi m\xFCk\u0259mm\u0259l anlay\u0131rs\u0131n\u0131z.") }
+    }
   };
 
-  return compatibilityMap[element1]?.[element2] || { score: 70, description_az: 'Unikal və maraqlı əlaqə!' };
+  return compatibilityMap[element1]?.[element2] || { score: 70, description_az: tr("usehoroscope_unikal_ve_maraqli_elaqe_48843d", "Unikal v\u0259 maraql\u0131 \u0259laq\u0259!") };
 };

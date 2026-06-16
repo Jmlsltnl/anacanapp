@@ -8,19 +8,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  useAllBabyMonthIllustrations, 
-  useUpsertBabyMonthIllustration, 
+import {
+  useAllBabyMonthIllustrations,
+  useUpsertBabyMonthIllustration,
   useDeleteBabyMonthIllustration,
-  BabyMonthIllustration 
-} from '@/hooks/useBabyMonthIllustrations';
+  BabyMonthIllustration } from
+'@/hooks/useBabyMonthIllustrations';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  DialogTrigger } from
+"@/components/ui/dialog";
 
 const AdminBabyIllustrations = () => {
   const { toast } = useToast();
@@ -41,7 +41,7 @@ const AdminBabyIllustrations = () => {
   const allMonths = Array.from({ length: 36 }, (_, i) => i + 1);
 
   const getIllustrationForMonth = (month: number) => {
-    return illustrations.find(i => i.month_number === month);
+    return illustrations.find((i) => i.month_number === month);
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, month: number) => {
@@ -54,18 +54,18 @@ const AdminBabyIllustrations = () => {
       const fileName = `baby-month-${month}-${Date.now()}.${fileExt}`;
       const filePath = `baby-illustrations/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from('assets')
-        .upload(filePath, file);
+      const { error: uploadError } = await supabase.storage.
+      from('assets').
+      upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('assets')
-        .getPublicUrl(filePath);
+      const { data: { publicUrl } } = supabase.storage.
+      from('assets').
+      getPublicUrl(filePath);
 
-      setFormData(prev => ({ ...prev, image_url: publicUrl }));
-      
+      setFormData((prev) => ({ ...prev, image_url: publicUrl }));
+
       toast({ title: tr("adminbabyillustrations_sekil_yuklendi_0c2f85", "Şəkil yükləndi!") });
     } catch (error) {
       console.error('Upload error:', error);
@@ -98,8 +98,8 @@ const AdminBabyIllustrations = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
-    
+    if (!confirm(tr("adminbabyillustrations_silmek_istediyinize_eminsiniz_09658f", "Silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
+
     try {
       await deleteMutation.mutateAsync(id);
       toast({ title: 'Silindi!' });
@@ -128,8 +128,8 @@ const AdminBabyIllustrations = () => {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -139,10 +139,10 @@ const AdminBabyIllustrations = () => {
         <div>
           <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Baby className="w-6 h-6 text-primary" />
-            Körpə İllustrasiyaları
+            {tr("adminbabyillustrations_korpe_i_llustrasiyalari_1abfaa", "K\xF6rp\u0259 \u0130llustrasiyalar\u0131")}
           </h2>
           <p className="text-muted-foreground mt-1">
-            Ana bölməsində körpənin yaşına uyğun şəkilləri idarə edin (0-36 ay)
+            {tr("adminbabyillustrations_ana_bolmesinde_korpenin_yasina_3f13f2", "Ana b\xF6lm\u0259sind\u0259 k\xF6rp\u0259nin ya\u015F\u0131na uy\u011Fun \u015F\u0259kill\u0259ri idar\u0259 edin (0-36 ay)")}
           </p>
         </div>
       </div>
@@ -163,7 +163,7 @@ const AdminBabyIllustrations = () => {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-green-500">{Math.round((illustrations.length / 36) * 100)}%</div>
+            <div className="text-2xl font-bold text-green-500">{Math.round(illustrations.length / 36 * 100)}%</div>
             <p className="text-sm text-muted-foreground">Tamamlanma</p>
           </CardContent>
         </Card>
@@ -178,26 +178,26 @@ const AdminBabyIllustrations = () => {
               key={month}
               onClick={() => openEditDialog(month)}
               className={`aspect-square rounded-xl border-2 flex flex-col items-center justify-center gap-1 transition-all hover:scale-105 ${
-                illustration 
-                  ? 'border-primary bg-primary/5' 
-                  : 'border-dashed border-muted-foreground/30 bg-muted/30 hover:border-primary/50'
-              }`}
-              whileTap={{ scale: 0.95 }}
-            >
-              {illustration ? (
-                <img 
-                  src={illustration.image_url} 
-                  alt={`Ay ${month}`}
-                  className="w-10 h-10 object-contain"
-                />
-              ) : (
-                <Plus className="w-5 h-5 text-muted-foreground" />
-              )}
+              illustration ?
+              'border-primary bg-primary/5' :
+              'border-dashed border-muted-foreground/30 bg-muted/30 hover:border-primary/50'}`
+              }
+              whileTap={{ scale: 0.95 }}>
+              
+              {illustration ?
+              <img
+                src={illustration.image_url}
+                alt={`Ay ${month}`}
+                className="w-10 h-10 object-contain" /> :
+
+
+              <Plus className="w-5 h-5 text-muted-foreground" />
+              }
               <span className={`text-xs font-medium ${illustration ? 'text-primary' : 'text-muted-foreground'}`}>
                 {month} ay
               </span>
-            </motion.button>
-          );
+            </motion.button>);
+
         })}
       </div>
 
@@ -207,48 +207,48 @@ const AdminBabyIllustrations = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Baby className="w-5 h-5 text-primary" />
-              {selectedMonth} Aylıq Körpə
+              {selectedMonth} {tr("adminbabyillustrations_ayliq_korpe_ef6d10", "Ayl\u0131q K\xF6rp\u0259")}
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
             {/* Image Preview / Upload */}
             <div className="border-2 border-dashed border-muted-foreground/30 rounded-xl p-6 text-center">
-              {formData.image_url ? (
-                <div className="relative">
-                  <img 
-                    src={formData.image_url} 
-                    alt="Preview"
-                    className="w-32 h-32 object-contain mx-auto"
-                  />
+              {formData.image_url ?
+              <div className="relative">
+                  <img
+                  src={formData.image_url}
+                  alt="Preview"
+                  className="w-32 h-32 object-contain mx-auto" />
+                
                   <Button
-                    size="sm"
-                    variant="destructive"
-                    className="absolute top-0 right-0"
-                    onClick={() => setFormData(prev => ({ ...prev, image_url: '' }))}
-                  >
+                  size="sm"
+                  variant="destructive"
+                  className="absolute top-0 right-0"
+                  onClick={() => setFormData((prev) => ({ ...prev, image_url: '' }))}>
+                  
                     <Trash2 className="w-3 h-3" />
                   </Button>
-                </div>
-              ) : (
-                <label className="cursor-pointer block">
+                </div> :
+
+              <label className="cursor-pointer block">
                   <div className="flex flex-col items-center gap-2">
                     <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
                       <Upload className="w-6 h-6 text-primary" />
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {uploading ? 'Yüklənir...' : 'Şəkil yükləyin'}
+                      {uploading ? tr("adminbabyillustrations_yuklenir_5557de", "Y\xFCkl\u0259nir...") : tr("adminbabyillustrations_sekil_yukleyin_1e520a", "\u015E\u0259kil y\xFCkl\u0259yin")}
                     </p>
                   </div>
                   <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => selectedMonth && handleFileUpload(e, selectedMonth)}
-                    disabled={uploading}
-                  />
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => selectedMonth && handleFileUpload(e, selectedMonth)}
+                  disabled={uploading} />
+                
                 </label>
-              )}
+              }
             </div>
 
             {/* Form Fields */}
@@ -257,41 +257,41 @@ const AdminBabyIllustrations = () => {
                 <label className="text-sm font-medium text-foreground">{tr("adminbabyillustrations_basliq_az_3e294a", "Başlıq (AZ)")}</label>
                 <Input
                   value={formData.title_az}
-                  onChange={(e) => setFormData(prev => ({ ...prev, title_az: e.target.value }))}
-                  placeholder={`${selectedMonth} aylıq körpə`}
-                />
+                  onChange={(e) => setFormData((prev) => ({ ...prev, title_az: e.target.value }))}
+                  placeholder={`${selectedMonth} aylıq körpə`} />
+                
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground">{tr("adminbabyillustrations_aciqlama_az_86f364", "Açıqlama (AZ)")}</label>
                 <Textarea
                   value={formData.description_az}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description_az: e.target.value }))}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, description_az: e.target.value }))}
                   placeholder={tr("adminbabyillustrations_bu_yasda_korpenin_xususiyyetleri_d15028", "Bu yaşda körpənin xüsusiyyətləri...")}
-                  rows={3}
-                />
+                  rows={3} />
+                
               </div>
             </div>
 
             {/* Actions */}
             <div className="flex gap-2">
-              {getIllustrationForMonth(selectedMonth || 0) && (
-                <Button
-                  variant="destructive"
-                  onClick={() => {
-                    const ill = getIllustrationForMonth(selectedMonth || 0);
-                    if (ill) handleDelete(ill.id);
-                    setDialogOpen(false);
-                  }}
-                >
+              {getIllustrationForMonth(selectedMonth || 0) &&
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  const ill = getIllustrationForMonth(selectedMonth || 0);
+                  if (ill) handleDelete(ill.id);
+                  setDialogOpen(false);
+                }}>
+                
                   <Trash2 className="w-4 h-4 mr-2" />
                   Sil
                 </Button>
-              )}
+              }
               <Button
                 onClick={handleSave}
                 disabled={!formData.image_url || upsertMutation.isPending}
-                className="flex-1"
-              >
+                className="flex-1">
+                
                 <Save className="w-4 h-4 mr-2" />
                 Yadda saxla
               </Button>
@@ -299,8 +299,8 @@ const AdminBabyIllustrations = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AdminBabyIllustrations;

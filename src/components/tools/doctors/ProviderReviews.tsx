@@ -42,118 +42,118 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <MessageSquare className="w-4 h-4 text-primary" />
-          <h2 className="font-semibold text-sm">Rəylər ({reviews.length})</h2>
+          <h2 className="font-semibold text-sm">{tr("providerreviews_reyler_8be233", "R\u0259yl\u0259r (")}{reviews.length})</h2>
         </div>
-        {isAuthenticated && !isExpanded && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsExpanded(true)}
-            className="text-xs"
-          >
-            {userReview ? 'Rəyi redaktə et' : 'Rəy yaz'}
+        {isAuthenticated && !isExpanded &&
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsExpanded(true)}
+          className="text-xs">
+          
+            {userReview ? tr("providerreviews_reyi_redakte_et_12797e", "R\u0259yi redakt\u0259 et") : tr("providerreviews_rey_yaz_7b3aab", "R\u0259y yaz")}
           </Button>
-        )}
+        }
       </div>
 
       {/* Review Form */}
       <AnimatePresence>
-        {isExpanded && isAuthenticated && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mb-4 pb-4 border-b border-border/50"
-          >
+        {isExpanded && isAuthenticated &&
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          className="mb-4 pb-4 border-b border-border/50">
+          
             <p className="text-sm text-muted-foreground mb-3">
-              {providerName} haqqında rəyinizi yazın
+              {providerName} {tr("providerreviews_haqqinda_reyinizi_yazin_049e5e", "haqq\u0131nda r\u0259yinizi yaz\u0131n")}
             </p>
             
             {/* Star Rating */}
             <div className="flex items-center gap-1 mb-3">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  onClick={() => setRating(star)}
-                  onMouseEnter={() => setHoverRating(star)}
-                  onMouseLeave={() => setHoverRating(0)}
-                  className="p-1 transition-transform hover:scale-110"
-                >
+              {[1, 2, 3, 4, 5].map((star) =>
+            <button
+              key={star}
+              onClick={() => setRating(star)}
+              onMouseEnter={() => setHoverRating(star)}
+              onMouseLeave={() => setHoverRating(0)}
+              className="p-1 transition-transform hover:scale-110">
+              
                   <Star
-                    className={`w-7 h-7 transition-colors ${
-                      star <= (hoverRating || rating)
-                        ? 'fill-amber-400 text-amber-400'
-                        : 'text-muted-foreground/30'
-                    }`}
-                  />
+                className={`w-7 h-7 transition-colors ${
+                star <= (hoverRating || rating) ?
+                'fill-amber-400 text-amber-400' :
+                'text-muted-foreground/30'}`
+                } />
+              
                 </button>
-              ))}
+            )}
               <span className="ml-2 text-sm text-muted-foreground">
-                {rating > 0 ? `${rating}/5` : 'Qiymətləndirin'}
+                {rating > 0 ? `${rating}/5` : tr("providerreviews_qiymetlendirin_df8e66", "Qiym\u0259tl\u0259ndirin")}
               </span>
             </div>
 
             {/* Comment */}
             <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder={tr("providerreviews_tecrubenizi_bolusun_isteye_bagli_3f9da1", "Təcrübənizi bölüşün (istəyə bağlı)...")}
-              className="w-full p-3 rounded-xl bg-muted border-0 text-sm resize-none h-24 outline-none focus:ring-2 focus:ring-primary/20"
-            />
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder={tr("providerreviews_tecrubenizi_bolusun_isteye_bagli_3f9da1", "Təcrübənizi bölüşün (istəyə bağlı)...")}
+            className="w-full p-3 rounded-xl bg-muted border-0 text-sm resize-none h-24 outline-none focus:ring-2 focus:ring-primary/20" />
+          
 
             {/* Actions */}
             <div className="flex items-center justify-between mt-3">
               <div className="flex gap-2">
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setIsExpanded(false);
-                    setRating(userReview?.rating || 0);
-                    setComment(userReview?.comment || '');
-                  }}
-                >
-                  Ləğv et
-                </Button>
-                {userReview && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleDelete}
-                    className="text-destructive hover:text-destructive"
-                  >
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setIsExpanded(false);
+                  setRating(userReview?.rating || 0);
+                  setComment(userReview?.comment || '');
+                }}>
+                  {tr("providerreviews_legv_et_b5e49c", "L\u0259\u011Fv et")}
+                
+              </Button>
+                {userReview &&
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleDelete}
+                className="text-destructive hover:text-destructive">
+                
                     <Trash2 className="w-4 h-4 mr-1" />
                     Sil
                   </Button>
-                )}
+              }
               </div>
               <Button
-                size="sm"
-                onClick={handleSubmit}
-                disabled={rating === 0 || submitReview.isPending}
-              >
+              size="sm"
+              onClick={handleSubmit}
+              disabled={rating === 0 || submitReview.isPending}>
+              
                 <Send className="w-4 h-4 mr-1" />
-                {userReview ? 'Yenilə' : 'Göndər'}
+                {userReview ? tr("providerreviews_yenile_570ce2", "Yenil\u0259") : tr("providerreviews_gonder_3f11bd", "G\xF6nd\u0259r")}
               </Button>
             </div>
           </motion.div>
-        )}
+        }
       </AnimatePresence>
 
       {/* Not authenticated message */}
-      {!isAuthenticated && (
-        <div className="text-center py-4 mb-4 bg-muted/50 rounded-xl">
+      {!isAuthenticated &&
+      <div className="text-center py-4 mb-4 bg-muted/50 rounded-xl">
           <p className="text-sm text-muted-foreground">
-            Rəy yazmaq üçün hesabınıza daxil olun
+            {tr("providerreviews_rey_yazmaq_ucun_hesabiniza_dax_d75d40", "R\u0259y yazmaq \xFC\xE7\xFCn hesab\u0131n\u0131za daxil olun")}
           </p>
         </div>
-      )}
+      }
 
       {/* Reviews List */}
-      {isLoading ? (
-        <div className="space-y-3">
-          {[1, 2].map((i) => (
-            <div key={i} className="animate-pulse">
+      {isLoading ?
+      <div className="space-y-3">
+          {[1, 2].map((i) =>
+        <div key={i} className="animate-pulse">
               <div className="flex gap-3">
                 <div className="w-10 h-10 rounded-full bg-muted" />
                 <div className="flex-1 space-y-2">
@@ -162,31 +162,31 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      ) : reviews.length === 0 ? (
-        <div className="text-center py-6">
+        )}
+        </div> :
+      reviews.length === 0 ?
+      <div className="text-center py-6">
           <Star className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
           <p className="text-sm text-muted-foreground">{tr("providerreviews_hele_hec_bir_rey_yoxdur_410969", "Hələ heç bir rəy yoxdur")}</p>
           <p className="text-xs text-muted-foreground/70">{tr("providerreviews_ilk_reyi_siz_yazin_cc6119", "İlk rəyi siz yazın!")}</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {reviews.map((review, index) => (
-            <motion.div
-              key={review.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="flex gap-3"
-            >
+        </div> :
+
+      <div className="space-y-4">
+          {reviews.map((review, index) =>
+        <motion.div
+          key={review.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.05 }}
+          className="flex gap-3">
+          
               {/* Avatar */}
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
-                {review.user_avatar ? (
-                  <img src={review.user_avatar} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <User className="w-5 h-5 text-primary" />
-                )}
+                {review.user_avatar ?
+            <img src={review.user_avatar} alt="" className="w-full h-full object-cover" /> :
+
+            <User className="w-5 h-5 text-primary" />
+            }
               </div>
 
               {/* Content */}
@@ -200,28 +200,28 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
                 
                 {/* Stars */}
                 <div className="flex items-center gap-0.5 my-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      className={`w-3 h-3 ${
-                        star <= review.rating
-                          ? 'fill-amber-400 text-amber-400'
-                          : 'text-muted-foreground/30'
-                      }`}
-                    />
-                  ))}
+                  {[1, 2, 3, 4, 5].map((star) =>
+              <Star
+                key={star}
+                className={`w-3 h-3 ${
+                star <= review.rating ?
+                'fill-amber-400 text-amber-400' :
+                'text-muted-foreground/30'}`
+                } />
+
+              )}
                 </div>
 
-                {review.comment && (
-                  <p className="text-sm text-muted-foreground mt-1">{review.comment}</p>
-                )}
+                {review.comment &&
+            <p className="text-sm text-muted-foreground mt-1">{review.comment}</p>
+            }
               </div>
             </motion.div>
-          ))}
+        )}
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 
 export default ProviderReviews;

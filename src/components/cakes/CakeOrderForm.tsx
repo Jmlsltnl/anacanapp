@@ -32,28 +32,28 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
 
   // Set default to first active method
   useEffect(() => {
-    if (activeMethods.length > 0 && !activeMethods.find(m => m.method_key === paymentMethod)) {
+    if (activeMethods.length > 0 && !activeMethods.find((m) => m.method_key === paymentMethod)) {
       setPaymentMethod(activeMethods[0].method_key);
     }
   }, [activeMethods]);
 
-  const c2cMethod = activeMethods.find(m => m.method_key === 'c2c_transfer');
+  const c2cMethod = activeMethods.find((m) => m.method_key === 'c2c_transfer');
   const c2cConfig = c2cMethod?.config || {};
-  
+
   const [formData, setFormData] = useState({
     customer_name: '',
     child_name: '',
     contact_phone: '',
     delivery_date: '',
     delivery_address: '',
-    notes: '',
+    notes: ''
   });
 
   const [cardData, setCardData] = useState({
     number: '',
     expiry: '',
     cvv: '',
-    holder: '',
+    holder: ''
   });
 
   const formatCardNumber = (val: string) => {
@@ -91,7 +91,7 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
   const handleProofUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
     if (!allowedTypes.includes(file.type)) {
       toast({ title: tr("cakeorderform_xeta_3cdbb6", 'Xəta'), description: tr("cakeorderform_yalniz_sekil_jpg_png_ve_ya_pdf_yukleye_b_40df31", 'Yalnız şəkil (JPG, PNG) və ya PDF yükləyə bilərsiniz'), variant: 'destructive' });
@@ -144,7 +144,7 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
     // Simulate card processing
     if (paymentMethod === 'card_simulated') {
       setShowCardProcessing(true);
-      await new Promise(resolve => setTimeout(resolve, 2500));
+      await new Promise((resolve) => setTimeout(resolve, 2500));
       setShowCardProcessing(false);
     }
 
@@ -155,10 +155,10 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
       });
     });
 
-    const itemsSummary = items.map(i => `${i.cake.name} x${i.quantity}`).join(', ');
+    const itemsSummary = items.map((i) => `${i.cake.name} x${i.quantity}`).join(', ');
 
     const paymentLabel = paymentMethod === 'c2c_transfer' ? 'Kartdan Karta' :
-      paymentMethod === 'card_simulated' ? 'Kart' : 'Nağd';
+    paymentMethod === 'card_simulated' ? 'Kart' : tr("cakeorderform_nagd_fdeb10", "Na\u011Fd");
 
     const result = await createOrder({
       cake_id: items[0].cake.id,
@@ -172,20 +172,20 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
       notes: `${formData.notes || ''} [${paymentLabel} ödəniş]`.trim(),
       custom_fields: { ...allCustomFields, payment_method: paymentLabel },
       status: 'pending',
-      total_price: totalPrice,
+      total_price: totalPrice
     });
 
     // Update payment fields separately since they're not in the typed interface
     if (result) {
       try {
-        await supabase
-          .from('cake_orders')
-          .update({
-            payment_method: paymentMethod,
-            payment_proof_url: proofUrl,
-            payment_status: paymentMethod === 'c2c_transfer' ? 'pending' : (paymentMethod === 'card_simulated' ? 'paid' : 'pending'),
-          } as any)
-          .eq('id', (result as any).id);
+        await supabase.
+        from('cake_orders').
+        update({
+          payment_method: paymentMethod,
+          payment_proof_url: proofUrl,
+          payment_status: paymentMethod === 'c2c_transfer' ? 'pending' : paymentMethod === 'card_simulated' ? 'paid' : 'pending'
+        } as any).
+        eq('id', (result as any).id);
       } catch (e) {
         console.error('Error updating payment info:', e);
       }
@@ -206,13 +206,13 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="text-center"
-        >
+          className="text-center">
+          
           <motion.div
             animate={{ rotateY: [0, 180, 360] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-            className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-primary/10 flex items-center justify-center"
-          >
+            className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-primary/10 flex items-center justify-center">
+            
             <CreditCard className="w-10 h-10 text-primary" />
           </motion.div>
           <h2 className="text-lg font-bold text-foreground mb-2">{tr("cakeorderform_odenis_emal_olunur_7b4caf", "Ödəniş emal olunur...")}</h2>
@@ -222,25 +222,25 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
             <span className="text-xs text-muted-foreground">{tr("cakeorderform_tehlukesiz_odenis_4211a5", "Təhlükəsiz ödəniş")}</span>
           </div>
         </motion.div>
-      </div>
-    );
+      </div>);
+
   }
 
   const getMethodIcon = (key: string) => {
     switch (key) {
-      case 'cash': return <Banknote className="w-6 h-6" />;
-      case 'card_simulated': return <CreditCard className="w-6 h-6" />;
-      case 'c2c_transfer': return <ArrowLeftRight className="w-6 h-6" />;
-      default: return <Banknote className="w-6 h-6" />;
+      case 'cash':return <Banknote className="w-6 h-6" />;
+      case 'card_simulated':return <CreditCard className="w-6 h-6" />;
+      case 'c2c_transfer':return <ArrowLeftRight className="w-6 h-6" />;
+      default:return <Banknote className="w-6 h-6" />;
     }
   };
 
   const getMethodLabel = (method: PaymentMethod) => {
     switch (method.method_key) {
-      case 'cash': return { title: tr("cakeorderform_nagd_fdeb10", 'Nağd'), sub: 'Çatdırılmada ödə' };
-      case 'card_simulated': return { title: 'Kart', sub: 'Onlayn ödəniş' };
-      case 'c2c_transfer': return { title: tr("cakeorderform_kocurme_0a57a0", 'Köçürmə'), sub: 'Kartdan karta' };
-      default: return { title: method.label_az || method.label, sub: method.description_az || '' };
+      case 'cash':return { title: tr("cakeorderform_nagd_fdeb10", 'Nağd'), sub: tr("cakeorderform_catdirilmada_ode_fe4277", "\xC7atd\u0131r\u0131lmada \xF6d\u0259") };
+      case 'card_simulated':return { title: 'Kart', sub: tr("cakeorderform_onlayn_odenis_fabfc1", "Onlayn \xF6d\u0259ni\u015F") };
+      case 'c2c_transfer':return { title: tr("cakeorderform_kocurme_0a57a0", 'Köçürmə'), sub: 'Kartdan karta' };
+      default:return { title: method.label_az || method.label, sub: method.description_az || '' };
     }
   };
 
@@ -258,55 +258,55 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
 
       {/* Cart Summary */}
       <div className="space-y-2 mb-6">
-        {items.map((item, i) => (
-          <div key={i} className="flex items-center gap-3 bg-card rounded-xl p-3 border border-border/50">
-            {item.cake.image_url ? (
-              <img src={item.cake.image_url} alt={item.cake.name} className="w-12 h-12 rounded-lg object-cover" />
-            ) : (
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+        {items.map((item, i) =>
+        <div key={i} className="flex items-center gap-3 bg-card rounded-xl p-3 border border-border/50">
+            {item.cake.image_url ?
+          <img src={item.cake.image_url} alt={item.cake.name} className="w-12 h-12 rounded-lg object-cover" /> :
+
+          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
                 <CakeIcon className="w-5 h-5 text-primary" />
               </div>
-            )}
+          }
             <div className="flex-1 min-w-0">
               <h4 className="font-bold text-sm truncate">{item.cake.name}</h4>
               <p className="text-xs text-muted-foreground">x{item.quantity} — {(item.cake.price * item.quantity).toFixed(2)}₼</p>
             </div>
           </div>
-        ))}
+        )}
       </div>
 
       {/* Form */}
       <div className="space-y-4">
         <div>
           <Label className="text-sm font-semibold">{tr("cakeorderform_musteri_adi_e9554d", "Müştəri adı *")}</Label>
-          <Input value={formData.customer_name} onChange={e => setFormData({ ...formData, customer_name: e.target.value })} placeholder={tr("cakeorderform_adinizi_daxil_edin_bd2b57", "Adınızı daxil edin")} className="mt-1" />
+          <Input value={formData.customer_name} onChange={(e) => setFormData({ ...formData, customer_name: e.target.value })} placeholder={tr("cakeorderform_adinizi_daxil_edin_bd2b57", "Adınızı daxil edin")} className="mt-1" />
         </div>
         <div>
           <Label className="text-sm font-semibold">{tr("cakeorderform_usagin_adi_80632b", "Uşağın adı")}</Label>
-          <Input value={formData.child_name} onChange={e => setFormData({ ...formData, child_name: e.target.value })} placeholder={tr("cakeorderform_korpenin_adi_8a4e9e", "Körpənin adı")} className="mt-1" />
+          <Input value={formData.child_name} onChange={(e) => setFormData({ ...formData, child_name: e.target.value })} placeholder={tr("cakeorderform_korpenin_adi_8a4e9e", "Körpənin adı")} className="mt-1" />
         </div>
         <div>
           <Label className="text-sm font-semibold">{tr("cakeorderform_elaqe_nomresi_feb8b9", "Əlaqə nömrəsi *")}</Label>
-          <Input value={formData.contact_phone} onChange={e => setFormData({ ...formData, contact_phone: e.target.value })} placeholder="+994 XX XXX XX XX" className="mt-1" />
+          <Input value={formData.contact_phone} onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })} placeholder="+994 XX XXX XX XX" className="mt-1" />
         </div>
         <div>
           <Label className="text-sm font-semibold">{tr("cakeorderform_catdirilma_tarixi_716cbd", "Çatdırılma tarixi")}</Label>
-          <Input type="date" value={formData.delivery_date} onChange={e => setFormData({ ...formData, delivery_date: e.target.value })} className="mt-1" />
+          <Input type="date" value={formData.delivery_date} onChange={(e) => setFormData({ ...formData, delivery_date: e.target.value })} className="mt-1" />
         </div>
         <div>
           <Label className="text-sm font-semibold">{tr("cakeorderform_catdirilma_unvani_5cec99", "Çatdırılma ünvanı")}</Label>
-          <Input value={formData.delivery_address} onChange={e => setFormData({ ...formData, delivery_address: e.target.value })} placeholder={tr("cakeorderform_unvani_daxil_edin_b8da41", "Ünvanı daxil edin")} className="mt-1" />
+          <Input value={formData.delivery_address} onChange={(e) => setFormData({ ...formData, delivery_address: e.target.value })} placeholder={tr("cakeorderform_unvani_daxil_edin_b8da41", "Ünvanı daxil edin")} className="mt-1" />
         </div>
         <div>
           <Label className="text-sm font-semibold">{tr("cakeorderform_elave_qeydler_c98a42", "Əlavə qeydlər")}</Label>
-          <textarea value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} placeholder={tr("cakeorderform_xususi_istekler_allergiya_ve_s_49d429", "Xüsusi istəklər, allergiya və s.")} className="mt-1 w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm" />
+          <textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} placeholder={tr("cakeorderform_xususi_istekler_allergiya_ve_s_49d429", "Xüsusi istəklər, allergiya və s.")} className="mt-1 w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm" />
         </div>
 
         {/* Payment Method */}
         <div className="space-y-3">
           <Label className="text-sm font-semibold">{tr("cakeorderform_odenis_usulu_b9d87a", "Ödəniş üsulu")}</Label>
           <div className={`grid gap-3 ${activeMethods.length === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
-            {activeMethods.map(method => {
+            {activeMethods.map((method) => {
               const { title, sub } = getMethodLabel(method);
               const isSelected = paymentMethod === method.method_key;
               return (
@@ -314,30 +314,30 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
                   key={method.id}
                   onClick={() => setPaymentMethod(method.method_key)}
                   className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 transition-all ${
-                    isSelected ? 'border-primary bg-primary/5' : 'border-border/50 bg-card'
-                  }`}
-                >
+                  isSelected ? 'border-primary bg-primary/5' : 'border-border/50 bg-card'}`
+                  }>
+                  
                   <span className={isSelected ? 'text-primary' : 'text-muted-foreground'}>
                     {getMethodIcon(method.method_key)}
                   </span>
                   <span className={`text-xs font-bold ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>{title}</span>
                   <span className="text-[9px] text-muted-foreground leading-tight text-center">{sub}</span>
-                </button>
-              );
+                </button>);
+
             })}
           </div>
         </div>
 
         {/* Card Details */}
         <AnimatePresence>
-          {paymentMethod === 'card_simulated' && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="overflow-hidden"
-            >
+          {paymentMethod === 'card_simulated' &&
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden">
+            
               <div className="bg-card rounded-2xl p-4 border border-border/50 space-y-3">
                 <div className="flex items-center gap-2 mb-1">
                   <Lock className="w-3.5 h-3.5 text-muted-foreground" />
@@ -346,89 +346,89 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
                 <div>
                   <Label className="text-xs text-muted-foreground">{tr("cakeorderform_kart_nomresi_ace5c5", "Kart nömrəsi")}</Label>
                   <Input
-                    value={cardData.number}
-                    onChange={e => setCardData({ ...cardData, number: formatCardNumber(e.target.value) })}
-                    placeholder="0000 0000 0000 0000"
-                    maxLength={19}
-                    className="mt-1 font-mono tracking-wider"
-                  />
+                  value={cardData.number}
+                  onChange={(e) => setCardData({ ...cardData, number: formatCardNumber(e.target.value) })}
+                  placeholder="0000 0000 0000 0000"
+                  maxLength={19}
+                  className="mt-1 font-mono tracking-wider" />
+                
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label className="text-xs text-muted-foreground">{tr("cakeorderform_son_istifade_9d3239", "Son istifadə")}</Label>
                     <Input
-                      value={cardData.expiry}
-                      onChange={e => setCardData({ ...cardData, expiry: formatExpiry(e.target.value) })}
-                      placeholder="MM/YY"
-                      maxLength={5}
-                      className="mt-1 font-mono"
-                    />
+                    value={cardData.expiry}
+                    onChange={(e) => setCardData({ ...cardData, expiry: formatExpiry(e.target.value) })}
+                    placeholder="MM/YY"
+                    maxLength={5}
+                    className="mt-1 font-mono" />
+                  
                   </div>
                   <div>
                     <Label className="text-xs text-muted-foreground">CVV</Label>
                     <Input
-                      value={cardData.cvv}
-                      onChange={e => setCardData({ ...cardData, cvv: e.target.value.replace(/\D/g, '').slice(0, 4) })}
-                      placeholder="•••"
-                      maxLength={4}
-                      type="password"
-                      className="mt-1 font-mono"
-                    />
+                    value={cardData.cvv}
+                    onChange={(e) => setCardData({ ...cardData, cvv: e.target.value.replace(/\D/g, '').slice(0, 4) })}
+                    placeholder="•••"
+                    maxLength={4}
+                    type="password"
+                    className="mt-1 font-mono" />
+                  
                   </div>
                 </div>
                 <div>
                   <Label className="text-xs text-muted-foreground">Kart sahibi</Label>
                   <Input
-                    value={cardData.holder}
-                    onChange={e => setCardData({ ...cardData, holder: e.target.value.toUpperCase() })}
-                    placeholder="AD SOYAD"
-                    className="mt-1 uppercase"
-                  />
+                  value={cardData.holder}
+                  onChange={(e) => setCardData({ ...cardData, holder: e.target.value.toUpperCase() })}
+                  placeholder="AD SOYAD"
+                  className="mt-1 uppercase" />
+                
                 </div>
               </div>
             </motion.div>
-          )}
+          }
         </AnimatePresence>
 
         {/* C2C Transfer Details */}
         <AnimatePresence>
-          {paymentMethod === 'c2c_transfer' && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="overflow-hidden"
-            >
+          {paymentMethod === 'c2c_transfer' &&
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden">
+            
               <div className="bg-card rounded-2xl p-4 border border-border/50 space-y-4">
                 {/* Transfer info */}
                 <div className="bg-primary/5 rounded-xl p-3 space-y-2">
                   <h4 className="font-bold text-sm text-primary">{tr("cakeorderform_kocurme_melumatlari_1800d6", "💳 Köçürmə məlumatları")}</h4>
-                  {c2cConfig.card_number && (
-                    <div className="flex justify-between items-center">
+                  {c2cConfig.card_number &&
+                <div className="flex justify-between items-center">
                       <span className="text-xs text-muted-foreground">{tr("cakeorderform_kart_nomresi_3a8392", "Kart nömrəsi:")}</span>
                       <span className="font-mono font-bold text-sm">{c2cConfig.card_number}</span>
                     </div>
-                  )}
-                  {c2cConfig.card_holder && (
-                    <div className="flex justify-between items-center">
+                }
+                  {c2cConfig.card_holder &&
+                <div className="flex justify-between items-center">
                       <span className="text-xs text-muted-foreground">Kart sahibi:</span>
                       <span className="font-bold text-sm">{c2cConfig.card_holder}</span>
                     </div>
-                  )}
-                  {c2cConfig.bank_name && (
-                    <div className="flex justify-between items-center">
+                }
+                  {c2cConfig.bank_name &&
+                <div className="flex justify-between items-center">
                       <span className="text-xs text-muted-foreground">Bank:</span>
                       <span className="text-sm">{c2cConfig.bank_name}</span>
                     </div>
-                  )}
+                }
                   <div className="flex justify-between items-center border-t border-primary/10 pt-2">
                     <span className="text-xs text-muted-foreground">{tr("cakeorderform_mebleg_f038e4", "Məbləğ:")}</span>
                     <span className="font-black text-primary">{totalPrice.toFixed(2)} ₼</span>
                   </div>
-                  {c2cConfig.instructions && (
-                    <p className="text-[10px] text-muted-foreground mt-1">ℹ️ {c2cConfig.instructions}</p>
-                  )}
+                  {c2cConfig.instructions &&
+                <p className="text-[10px] text-muted-foreground mt-1">ℹ️ {c2cConfig.instructions}</p>
+                }
                 </div>
 
                 {/* Upload proof */}
@@ -436,31 +436,31 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
                   <Label className="text-sm font-semibold">{tr("cakeorderform_kocurme_tesdiqi_yukleyin_3bd84d", "Köçürmə təsdiqi yükləyin *")}</Label>
                   <p className="text-[10px] text-muted-foreground mb-2">{tr("cakeorderform_kocurmenin_screenshotunu_ve_ya_pdf_ini_y_ff7238", "Köçürmənin screenshotunu və ya PDF-ini yükləyin")}</p>
                   
-                  {proofUrl ? (
-                    <div className="flex items-center gap-3 bg-green-50 dark:bg-green-950/30 rounded-xl p-3 border border-green-200 dark:border-green-800">
+                  {proofUrl ?
+                <div className="flex items-center gap-3 bg-green-50 dark:bg-green-950/30 rounded-xl p-3 border border-green-200 dark:border-green-800">
                       <FileText className="w-5 h-5 text-green-600" />
                       <span className="text-sm text-green-700 dark:text-green-400 flex-1 truncate">{proofFileName}</span>
-                      <button onClick={() => { setProofUrl(null); setProofFileName(null); }} className="p-1 hover:bg-green-100 dark:hover:bg-green-900 rounded-full">
+                      <button onClick={() => {setProofUrl(null);setProofFileName(null);}} className="p-1 hover:bg-green-100 dark:hover:bg-green-900 rounded-full">
                         <X className="w-4 h-4 text-green-600" />
                       </button>
-                    </div>
-                  ) : (
-                    <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-border rounded-2xl cursor-pointer hover:border-primary/50 transition bg-muted/30">
+                    </div> :
+
+                <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-border rounded-2xl cursor-pointer hover:border-primary/50 transition bg-muted/30">
                       <input type="file" accept="image/*,.pdf" onChange={handleProofUpload} className="hidden" />
-                      {uploadingProof ? (
-                        <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                      ) : (
-                        <>
+                      {uploadingProof ?
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" /> :
+
+                  <>
                           <Upload className="w-6 h-6 text-muted-foreground mb-1" />
                           <span className="text-xs text-muted-foreground">{tr("cakeorderform_sekil_ve_ya_pdf_b7f3aa", "Şəkil və ya PDF")}</span>
                         </>
-                      )}
+                  }
                     </label>
-                  )}
+                }
                 </div>
               </div>
             </motion.div>
-          )}
+          }
         </AnimatePresence>
 
         {/* Total & Submit */}
@@ -470,23 +470,23 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
             <span className="text-xl font-black text-primary">{totalPrice.toFixed(2)}₼</span>
           </div>
           <Button className="w-full h-14 text-base font-bold rounded-2xl" onClick={handleSubmit} disabled={submitting}>
-            {submitting ? (
-              <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <>
-                {paymentMethod === 'card_simulated' ? <CreditCard className="w-5 h-5 mr-2" /> : 
-                 paymentMethod === 'c2c_transfer' ? <ArrowLeftRight className="w-5 h-5 mr-2" /> :
-                 <Send className="w-5 h-5 mr-2" />}
-                {paymentMethod === 'card_simulated' ? `Ödə və sifariş ver` : 
-                 paymentMethod === 'c2c_transfer' ? `Sifarişi təsdiqlə` :
-                 `Sifariş göndər`} — {totalPrice.toFixed(2)}₼
+            {submitting ?
+            <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" /> :
+
+            <>
+                {paymentMethod === 'card_simulated' ? <CreditCard className="w-5 h-5 mr-2" /> :
+              paymentMethod === 'c2c_transfer' ? <ArrowLeftRight className="w-5 h-5 mr-2" /> :
+              <Send className="w-5 h-5 mr-2" />}
+                {paymentMethod === 'card_simulated' ? `Ödə və sifariş ver` :
+              paymentMethod === 'c2c_transfer' ? `Sifarişi təsdiqlə` :
+              `Sifariş göndər`} — {totalPrice.toFixed(2)}₼
               </>
-            )}
+            }
           </Button>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default CakeOrderForm;

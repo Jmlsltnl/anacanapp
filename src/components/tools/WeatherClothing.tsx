@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowLeft, MapPin, Thermometer, Droplets, Wind, Sun, CloudRain, 
-  AlertTriangle, Shirt, Loader2, RefreshCw, Shield, Flower2, CloudSun, MapPinOff, Baby, User, Home
-} from 'lucide-react';
+import {
+  ArrowLeft, MapPin, Thermometer, Droplets, Wind, Sun, CloudRain,
+  AlertTriangle, Shirt, Loader2, RefreshCw, Shield, Flower2, CloudSun, MapPinOff, Baby, User, Home } from
+'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -47,7 +47,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
   const [locationError, setLocationError] = useState<string | null>(null);
   const [cityName, setCityName] = useState<string>('');
   const [advice, setAdvice] = useState<WeatherAdvice | null>(null);
-  
+
   const { toast } = useToast();
   const { profile } = useAuthContext();
   const { lifeStage, babyBirthDate, lastPeriodDate } = useUserStore();
@@ -113,8 +113,8 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
       const userContext = getUserContext();
 
       const { data, error } = await supabase.functions.invoke('weather-clothing', {
-        body: { 
-          lat: latitude, 
+        body: {
+          lat: latitude,
           lng: longitude,
           userContext
         }
@@ -126,13 +126,13 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
         setCityName(data.cityName);
         setAdvice(data.advice);
       } else {
-        throw new Error(data.error || 'Hava məlumatı alınmadı');
+        throw new Error(data.error || tr("weatherclothing_hava_melumati_alinmadi_f903fd", "Hava m\u0259lumat\u0131 al\u0131nmad\u0131"));
       }
     } catch (error: any) {
       console.error('Weather fetch error:', error);
-      const errorMsg = error.message?.includes('permission') || error.message?.includes('denied')
-        ? 'Məkan icazəsi rədd edildi. Parametrlərdən icazə verin.'
-        : 'Hava məlumatı alınarkən xəta baş verdi.';
+      const errorMsg = error.message?.includes('permission') || error.message?.includes('denied') ? tr("weatherclothing_mekan_icazesi_redd_edildi_para_27f7d3", "M\u0259kan icaz\u0259si r\u0259dd edildi. Parametrl\u0259rd\u0259n icaz\u0259 verin.") : tr("weatherclothing_hava_melumati_alinarken_xeta_b_9b0a67", "Hava m\u0259lumat\u0131 al\u0131nark\u0259n x\u0259ta ba\u015F verdi.");
+
+
       setLocationError(errorMsg);
       toast({
         title: tr("weatherclothing_xeta_3cdbb6", 'Xəta'),
@@ -146,10 +146,10 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
 
   const getAlertColor = (level: string) => {
     switch (level) {
-      case 'danger': return 'bg-red-500';
-      case 'warning': return 'bg-orange-500';
-      case 'caution': return 'bg-yellow-500';
-      default: return 'bg-green-500';
+      case 'danger':return 'bg-red-500';
+      case 'warning':return 'bg-orange-500';
+      case 'caution':return 'bg-yellow-500';
+      default:return 'bg-green-500';
     }
   };
 
@@ -173,11 +173,11 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
           <div className="flex-1">
             <h1 className="text-lg font-bold">Hava & Geyim</h1>
             <p className="text-xs text-white/80">
-              {userContext.babyAgeMonths !== undefined 
-                ? `${userContext.babyAgeMonths} aylıq körpə üçün` 
-                : userContext.pregnancyWeek 
-                  ? `Hamiləliyin ${userContext.pregnancyWeek}. həftəsi üçün`
-                  : 'Körpəniz üçün geyim məsləhəti'}
+              {userContext.babyAgeMonths !== undefined ?
+              `${userContext.babyAgeMonths} aylıq körpə üçün` :
+              userContext.pregnancyWeek ?
+              `Hamiləliyin ${userContext.pregnancyWeek}. həftəsi üçün` : tr("weatherclothing_korpeniz_ucun_geyim_mesleheti_f5cbde", "K\xF6rp\u0259niz \xFC\xE7\xFCn geyim m\u0259sl\u0259h\u0259ti")
+              }
             </p>
           </div>
           <Button variant="ghost" size="icon" onClick={fetchWeather} disabled={isLoading} className="text-white hover:bg-white/20 relative z-30">
@@ -188,54 +188,54 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
 
       <div className="p-4 space-y-4">
         {/* User Context Card */}
-        {(userContext.babyAgeMonths !== undefined || userContext.pregnancyWeek) && (
-          <Card className="border-primary/20 bg-primary/5">
+        {(userContext.babyAgeMonths !== undefined || userContext.pregnancyWeek) &&
+        <Card className="border-primary/20 bg-primary/5">
             <CardContent className="p-3">
               <div className="flex items-center gap-3">
-                {userContext.babyAgeMonths !== undefined ? (
-                  <>
+                {userContext.babyAgeMonths !== undefined ?
+              <>
                     <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
                       <Baby className="w-5 h-5 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm font-medium">{tr("weatherclothing_korpenin_yasi_1dfff9", "Körpənin yaşı")}</p>
                       <p className="text-xs text-muted-foreground">
-                        {userContext.babyAgeMonths} ay ({userContext.babyAgeDays} gün)
+                        {userContext.babyAgeMonths} ay ({userContext.babyAgeDays} {tr("weatherclothing_gun_4835dd", "g\xFCn)")}
                       </p>
                     </div>
-                  </>
-                ) : userContext.pregnancyWeek ? (
-                  <>
+                  </> :
+              userContext.pregnancyWeek ?
+              <>
                     <div className="w-10 h-10 rounded-full bg-pink-500/20 flex items-center justify-center">
                       <User className="w-5 h-5 text-pink-500" />
                     </div>
                     <div>
                       <p className="text-sm font-medium">{tr("weatherclothing_hamilelik_heftesi_c9e362", "Hamiləlik həftəsi")}</p>
-                      <p className="text-xs text-muted-foreground">{userContext.pregnancyWeek}. həftə</p>
+                      <p className="text-xs text-muted-foreground">{userContext.pregnancyWeek}{tr("weatherclothing_hefte_459cfe", ". h\u0259ft\u0259")}</p>
                     </div>
-                  </>
-                ) : null}
+                  </> :
+              null}
               </div>
             </CardContent>
           </Card>
-        )}
+        }
 
         {/* Loading State */}
-        {isLoading && (
-          <div className="flex flex-col items-center justify-center py-20">
+        {isLoading &&
+        <div className="flex flex-col items-center justify-center py-20">
             <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            >
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}>
+            
               <CloudSun className="w-16 h-16 text-primary mb-4" />
             </motion.div>
             <p className="text-muted-foreground">{tr("weatherclothing_mekan_teyin_edilir_526792", "Məkan təyin edilir...")}</p>
           </div>
-        )}
+        }
 
         {/* Error State */}
-        {locationError && !isLoading && (
-          <Card className="border-destructive/30 bg-destructive/5">
+        {locationError && !isLoading &&
+        <Card className="border-destructive/30 bg-destructive/5">
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
                 <AlertTriangle className="w-6 h-6 text-destructive shrink-0" />
@@ -243,22 +243,22 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                   <h3 className="font-semibold text-destructive">{tr("weatherclothing_mekan_xetasi_bd9e1d", "Məkan xətası")}</h3>
                   <p className="text-sm text-muted-foreground mt-1">{locationError}</p>
                   <Button variant="outline" size="sm" className="mt-3" onClick={fetchWeather}>
-                    Yenidən cəhd et
+                    {tr("weatherclothing_yeniden_cehd_et_d273ac", "Yenid\u0259n c\u0259hd et")}
                   </Button>
                 </div>
               </div>
             </CardContent>
           </Card>
-        )}
+        }
 
         {/* Weather Data */}
         <AnimatePresence>
-          {advice && !isLoading && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-4"
-            >
+          {advice && !isLoading &&
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4">
+            
               {/* Location & Current Weather */}
               <Card className="overflow-hidden">
                 <div className={`h-1.5 ${getAlertColor(advice.alertLevel)}`} />
@@ -267,9 +267,9 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                     <MapPin className="w-4 h-4 text-primary" />
                     <span className="font-medium">{cityName}</span>
                     <span className={`ml-auto px-3 py-1 rounded-full text-xs font-semibold ${
-                      advice.safeToGoOut ? 'bg-green-500/20 text-green-600' : 'bg-red-500/20 text-red-600'
-                    }`}>
-                      {advice.safeToGoOut ? '✓ Çıxmaq olar' : '⚠ Diqqətli olun'}
+                  advice.safeToGoOut ? 'bg-green-500/20 text-green-600' : 'bg-red-500/20 text-red-600'}`
+                  }>
+                      {advice.safeToGoOut ? tr("weatherclothing_cixmaq_olar_ab7b33", "\u2713 \xC7\u0131xmaq olar") : tr("weatherclothing_diqqetli_olun_c597f9", "\u26A0 Diqq\u0259tli olun")}
                     </span>
                   </div>
                   
@@ -311,110 +311,110 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                 <CardContent className="p-4">
                   <h3 className="font-semibold flex items-center gap-2 mb-3">
                     <Shirt className="w-5 h-5 text-primary" />
-                    {userContext.babyAgeMonths !== undefined 
-                      ? `${userContext.babyAgeMonths} aylıq körpə üçün bayır geyimi` 
-                      : 'Bayırda Geyim Tövsiyəsi'}
+                    {userContext.babyAgeMonths !== undefined ?
+                  `${userContext.babyAgeMonths} aylıq körpə üçün bayır geyimi` : tr("weatherclothing_bayirda_geyim_tovsiyesi_650ba0", "Bay\u0131rda Geyim T\xF6vsiy\u0259si")
+                  }
                   </h3>
                   <p className="text-sm mb-4">{advice.clothingAdvice}</p>
                   
                   <div className="flex flex-wrap gap-2">
-                    {advice.clothingItems.map((item, idx) => (
-                      <motion.span 
-                        key={idx}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: idx * 0.1 }}
-                        className="px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium"
-                      >
+                    {advice.clothingItems.map((item, idx) =>
+                  <motion.span
+                    key={idx}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: idx * 0.1 }}
+                    className="px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                    
                         {item}
                       </motion.span>
-                    ))}
+                  )}
                   </div>
                 </CardContent>
               </Card>
 
               {/* Indoor Clothing & Room Temperature */}
-              {(advice.indoorClothingAdvice || advice.idealRoomTemperature) && (
-                <Card className="border-purple-500/20 bg-purple-500/5">
+              {(advice.indoorClothingAdvice || advice.idealRoomTemperature) &&
+            <Card className="border-purple-500/20 bg-purple-500/5">
                   <CardContent className="p-4">
                     <h3 className="font-semibold flex items-center gap-2 mb-3">
                       <Home className="w-5 h-5 text-purple-500" />
-                      Ev daxilində
+                      {tr("weatherclothing_ev_daxilinde_d10128", "Ev daxilind\u0259")}
                     </h3>
                     
                     {/* Room Temperature */}
-                    {advice.idealRoomTemperature && (
-                      <div className="bg-purple-500/10 rounded-xl p-3 mb-3">
+                    {advice.idealRoomTemperature &&
+                <div className="bg-purple-500/10 rounded-xl p-3 mb-3">
                         <div className="flex items-center gap-2 mb-1">
                           <Thermometer className="w-4 h-4 text-purple-600" />
                           <span className="font-semibold text-sm text-purple-700">{tr("weatherclothing_ideal_otaq_temperaturu_6bf977", "İdeal otaq temperaturu")}</span>
                         </div>
                         <p className="text-2xl font-bold text-purple-600">{advice.idealRoomTemperature}</p>
-                        {advice.roomTemperatureAdvice && (
-                          <p className="text-xs text-muted-foreground mt-1">{advice.roomTemperatureAdvice}</p>
-                        )}
+                        {advice.roomTemperatureAdvice &&
+                  <p className="text-xs text-muted-foreground mt-1">{advice.roomTemperatureAdvice}</p>
+                  }
                       </div>
-                    )}
+                }
 
                     {/* Indoor Clothing */}
-                    {advice.indoorClothingAdvice && (
-                      <>
+                    {advice.indoorClothingAdvice &&
+                <>
                         <p className="text-sm mb-3">{advice.indoorClothingAdvice}</p>
-                        {advice.indoorClothingItems && advice.indoorClothingItems.length > 0 && (
-                          <div className="flex flex-wrap gap-2">
-                            {advice.indoorClothingItems.map((item, idx) => (
-                              <motion.span
-                                key={idx}
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: idx * 0.1 }}
-                                className="px-3 py-1.5 bg-purple-500/10 text-purple-700 rounded-full text-sm font-medium"
-                              >
+                        {advice.indoorClothingItems && advice.indoorClothingItems.length > 0 &&
+                  <div className="flex flex-wrap gap-2">
+                            {advice.indoorClothingItems.map((item, idx) =>
+                    <motion.span
+                      key={idx}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="px-3 py-1.5 bg-purple-500/10 text-purple-700 rounded-full text-sm font-medium">
+                      
                                 {item}
                               </motion.span>
-                            ))}
-                          </div>
-                        )}
-                      </>
                     )}
+                          </div>
+                  }
+                      </>
+                }
                   </CardContent>
                 </Card>
-              )}
+            }
 
               {/* Outdoor Advice */}
               <Card className={advice.safeToGoOut ? 'border-green-500/20 bg-green-500/5' : 'border-orange-500/30 bg-orange-500/5'}>
                 <CardContent className="p-4">
                   <h3 className="font-semibold flex items-center gap-2 mb-2">
                     <CloudSun className={`w-5 h-5 ${advice.safeToGoOut ? 'text-green-500' : 'text-orange-500'}`} />
-                    Bayırda gəzmə
+                    {tr("weatherclothing_bayirda_gezme_0ae215", "Bay\u0131rda g\u0259zm\u0259")}
                   </h3>
                   <p className="text-sm">{advice.outdoorAdvice}</p>
                 </CardContent>
               </Card>
 
               {/* Warnings */}
-              {advice.warnings.length > 0 && (
-                <Card className="border-orange-500/30 bg-orange-500/5">
+              {advice.warnings.length > 0 &&
+            <Card className="border-orange-500/30 bg-orange-500/5">
                   <CardContent className="p-4">
                     <h3 className="font-semibold flex items-center gap-2 text-orange-600 mb-3">
                       <AlertTriangle className="w-5 h-5" />
-                      Xəbərdarlıqlar
+                      {tr("weatherclothing_xeberdarliqlar_5542c4", "X\u0259b\u0259rdarl\u0131qlar")}
                     </h3>
                     <ul className="space-y-2">
-                      {advice.warnings.map((warning, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
+                      {advice.warnings.map((warning, idx) =>
+                  <li key={idx} className="flex items-start gap-2 text-sm">
                           <span className="w-1.5 h-1.5 rounded-full bg-orange-500 mt-2 shrink-0" />
                           {warning}
                         </li>
-                      ))}
+                  )}
                     </ul>
                   </CardContent>
                 </Card>
-              )}
+            }
 
               {/* Pollen Warning */}
-              {advice.pollenWarning && (
-                <Card className="border-yellow-500/30 bg-yellow-500/5">
+              {advice.pollenWarning &&
+            <Card className="border-yellow-500/30 bg-yellow-500/5">
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       <Flower2 className="w-5 h-5 text-yellow-600 shrink-0" />
@@ -425,11 +425,11 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                     </div>
                   </CardContent>
                 </Card>
-              )}
+            }
 
               {/* UV Warning */}
-              {advice.uvWarning && (
-                <Card className="border-orange-500/30 bg-orange-500/5">
+              {advice.uvWarning &&
+            <Card className="border-orange-500/30 bg-orange-500/5">
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       <Shield className="w-5 h-5 text-orange-600 shrink-0" />
@@ -440,13 +440,13 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                     </div>
                   </CardContent>
                 </Card>
-              )}
+            }
             </motion.div>
-          )}
+          }
         </AnimatePresence>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default WeatherClothing;

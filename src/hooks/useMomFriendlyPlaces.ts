@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { tr } from "@/lib/tr";import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -54,11 +54,11 @@ export const useMomFriendlyPlaces = (filters?: {
   return useQuery({
     queryKey: ['mom-friendly-places', filters],
     queryFn: async () => {
-      let query = supabase
-        .from('mom_friendly_places')
-        .select('*')
-        .eq('is_active', true)
-        .order('avg_rating', { ascending: false });
+      let query = supabase.
+      from('mom_friendly_places').
+      select('*').
+      eq('is_active', true).
+      order('avg_rating', { ascending: false });
 
       if (filters?.category && filters.category !== 'all') {
         query = query.eq('category', filters.category as MomFriendlyPlace['category']);
@@ -66,19 +66,19 @@ export const useMomFriendlyPlaces = (filters?: {
 
       const { data, error } = await query;
       if (error) throw error;
-      
+
       let places = data as MomFriendlyPlace[];
-      
+
       // Filter by amenities client-side for flexibility
       if (filters?.amenities?.length) {
-        places = places.filter(place => 
-          filters.amenities!.every(amenity => (place as any)[amenity] === true)
+        places = places.filter((place) =>
+        filters.amenities!.every((amenity) => (place as any)[amenity] === true)
         );
       }
-      
+
       return places;
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 5
   });
 };
 
@@ -86,17 +86,17 @@ export const usePlaceReviews = (placeId: string) => {
   return useQuery({
     queryKey: ['place-reviews', placeId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('place_reviews')
-        .select('*')
-        .eq('place_id', placeId)
-        .eq('is_verified', true)
-        .order('created_at', { ascending: false });
+      const { data, error } = await supabase.
+      from('place_reviews').
+      select('*').
+      eq('place_id', placeId).
+      eq('is_verified', true).
+      order('created_at', { ascending: false });
 
       if (error) throw error;
       return data as PlaceReview[];
     },
-    enabled: !!placeId,
+    enabled: !!placeId
   });
 };
 
@@ -107,29 +107,29 @@ export const useAddPlace = () => {
   return useMutation({
     mutationFn: async (place: Omit<Partial<MomFriendlyPlace>, 'id' | 'created_at' | 'created_by'>) => {
       if (!user?.id) throw new Error('User not authenticated');
-      
-      const { data, error } = await supabase
-        .from('mom_friendly_places')
-        .insert({
-          name: place.name || '',
-          latitude: place.latitude || 0,
-          longitude: place.longitude || 0,
-          category: place.category || 'cafe',
-          ...place,
-          created_by: user.id,
-        })
-        .select()
-        .single();
+
+      const { data, error } = await supabase.
+      from('mom_friendly_places').
+      insert({
+        name: place.name || '',
+        latitude: place.latitude || 0,
+        longitude: place.longitude || 0,
+        category: place.category || 'cafe',
+        ...place,
+        created_by: user.id
+      }).
+      select().
+      single();
       if (error) throw error;
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mom-friendly-places'] });
-      toast.success('Məkan əlavə edildi! Admin təsdiqindən sonra görünəcək.');
+      toast.success(tr("usemomfriendlyplaces_mekan_elave_edildi_admin_tesdi_0c46f2", "M\u0259kan \u0259lav\u0259 edildi! Admin t\u0259sdiqind\u0259n sonra g\xF6r\xFCn\u0259c\u0259k."));
     },
     onError: () => {
-      toast.error('Məkan əlavə edilə bilmədi');
-    },
+      toast.error(tr("usemomfriendlyplaces_mekan_elave_edile_bilmedi_9a9c5b", "M\u0259kan \u0259lav\u0259 edil\u0259 bilm\u0259di"));
+    }
   });
 };
 
@@ -147,15 +147,15 @@ export const useAddReview = () => {
       staff_rating?: number;
     }) => {
       if (!user?.id) throw new Error('User not authenticated');
-      
-      const { data, error } = await supabase
-        .from('place_reviews')
-        .insert({
-          ...review,
-          user_id: user.id,
-        })
-        .select()
-        .single();
+
+      const { data, error } = await supabase.
+      from('place_reviews').
+      insert({
+        ...review,
+        user_id: user.id
+      }).
+      select().
+      single();
 
       if (error) throw error;
       return data;
@@ -163,11 +163,11 @@ export const useAddReview = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['place-reviews', variables.place_id] });
       queryClient.invalidateQueries({ queryKey: ['mom-friendly-places'] });
-      toast.success('Rəyiniz göndərildi! Admin təsdiqindən sonra görünəcək.');
+      toast.success(tr("usemomfriendlyplaces_reyiniz_gonderildi_admin_tesdi_abb220", "R\u0259yiniz g\xF6nd\u0259rildi! Admin t\u0259sdiqind\u0259n sonra g\xF6r\xFCn\u0259c\u0259k."));
     },
     onError: () => {
-      toast.error('Rəy əlavə edilə bilmədi');
-    },
+      toast.error(tr("usemomfriendlyplaces_rey_elave_edile_bilmedi_81a081", "R\u0259y \u0259lav\u0259 edil\u0259 bilm\u0259di"));
+    }
   });
 };
 
@@ -182,22 +182,22 @@ export const useVerifyAmenity = () => {
       is_confirmed: boolean;
     }) => {
       if (!user?.id) throw new Error('User not authenticated');
-      
-      const { data, error } = await supabase
-        .from('place_verifications')
-        .upsert({
-          ...verification,
-          user_id: user.id,
-        })
-        .select()
-        .single();
+
+      const { data, error } = await supabase.
+      from('place_verifications').
+      upsert({
+        ...verification,
+        user_id: user.id
+      }).
+      select().
+      single();
 
       if (error) throw error;
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mom-friendly-places'] });
-      toast.success('Təsdiqiniz üçün təşəkkürlər!');
-    },
+      toast.success(tr("usemomfriendlyplaces_tesdiqiniz_ucun_tesekkurler_71a13f", "T\u0259sdiqiniz \xFC\xE7\xFCn t\u0259\u015F\u0259kk\xFCrl\u0259r!"));
+    }
   });
 };

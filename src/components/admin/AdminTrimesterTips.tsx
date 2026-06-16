@@ -15,9 +15,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const AdminTrimesterTips = () => {
   const { data: dbTrimesterInfo = [] } = useTrimesterInfo();
-  const TRIMESTER_INFO = dbTrimesterInfo.length > 0 
-    ? dbTrimesterInfo.map(t => ({ value: t.trimester_number, label: t.label_az || t.label, emoji: t.emoji, color: t.color_class }))
-    : FALLBACK_TRIMESTER_INFO.map(t => ({ value: t.trimester_number, label: t.label_az, emoji: t.emoji, color: t.color_class }));
+  const TRIMESTER_INFO = dbTrimesterInfo.length > 0 ?
+  dbTrimesterInfo.map((t) => ({ value: t.trimester_number, label: t.label_az || t.label, emoji: t.emoji, color: t.color_class })) :
+  FALLBACK_TRIMESTER_INFO.map((t) => ({ value: t.trimester_number, label: t.label_az, emoji: t.emoji, color: t.color_class }));
 
   const { tips, isLoading, createTip, updateTip, deleteTip } = useTrimesterTipsAdmin();
   const { toast } = useToast();
@@ -29,7 +29,7 @@ const AdminTrimesterTips = () => {
     icon: '💡',
     tip_text: '',
     sort_order: 0,
-    is_active: true,
+    is_active: true
   });
 
   const handleCreate = async () => {
@@ -60,8 +60,8 @@ const AdminTrimesterTips = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bu tövsiyəni silmək istədiyinizə əminsiniz?')) return;
-    
+    if (!confirm(tr("admintrimestertips_bu_tovsiyeni_silmek_istediyini_09d83a", "Bu t\xF6vsiy\u0259ni silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
+
     try {
       await deleteTip.mutateAsync(id);
       toast({ title: tr("admintrimestertips_ugurlu_7fe64c", "Uğurlu"), description: tr("admintrimestertips_tovsiye_silindi_0b982c", "Tövsiyə silindi") });
@@ -75,14 +75,14 @@ const AdminTrimesterTips = () => {
     setEditForm(tip);
   };
 
-  const getTipsByTrimester = (trimester: number) => tips.filter(t => t.trimester === trimester);
+  const getTipsByTrimester = (trimester: number) => tips.filter((t) => t.trimester === trimester);
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -94,13 +94,13 @@ const AdminTrimesterTips = () => {
         </div>
         <Button onClick={() => setIsAdding(true)} disabled={isAdding}>
           <Plus className="w-4 h-4 mr-2" />
-          Yeni Tövsiyə
+          {tr("admintrimestertips_yeni_tovsiye_597286", "Yeni T\xF6vsiy\u0259")}
         </Button>
       </div>
 
       {/* Add New Tip Form */}
-      {isAdding && (
-        <Card className="border-primary/30 bg-primary/5">
+      {isAdding &&
+      <Card className="border-primary/30 bg-primary/5">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg">{tr("admintrimestertips_yeni_tovsiye_elave_et_783455", "Yeni Tövsiyə Əlavə Et")}</CardTitle>
           </CardHeader>
@@ -109,52 +109,52 @@ const AdminTrimesterTips = () => {
               <div className="space-y-2">
                 <Label>Trimester</Label>
                 <Select
-                  value={String(newTip.trimester)}
-                  onValueChange={(v) => setNewTip({ ...newTip, trimester: parseInt(v) })}
-                >
+                value={String(newTip.trimester)}
+                onValueChange={(v) => setNewTip({ ...newTip, trimester: parseInt(v) })}>
+                
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {TRIMESTER_INFO.map((t) => (
-                      <SelectItem key={t.value} value={String(t.value)}>
+                    {TRIMESTER_INFO.map((t) =>
+                  <SelectItem key={t.value} value={String(t.value)}>
                         {t.emoji} {t.label}
                       </SelectItem>
-                    ))}
+                  )}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
                 <Label>{tr("admintrimestertips_ikon_emoji_39cbd9", "İkon (emoji)")}</Label>
                 <Input
-                  value={newTip.icon}
-                  onChange={(e) => setNewTip({ ...newTip, icon: e.target.value })}
-                  placeholder="💡"
-                />
+                value={newTip.icon}
+                onChange={(e) => setNewTip({ ...newTip, icon: e.target.value })}
+                placeholder="💡" />
+              
               </div>
               <div className="space-y-2">
                 <Label>{tr("admintrimestertips_siralama_9e1268", "Sıralama")}</Label>
                 <Input
-                  type="number"
-                  value={newTip.sort_order}
-                  onChange={(e) => setNewTip({ ...newTip, sort_order: parseInt(e.target.value) || 0 })}
-                />
+                type="number"
+                value={newTip.sort_order}
+                onChange={(e) => setNewTip({ ...newTip, sort_order: parseInt(e.target.value) || 0 })} />
+              
               </div>
             </div>
             <div className="space-y-2">
               <Label>{tr("admintrimestertips_tovsiye_metni_783e3d", "Tövsiyə Mətni")}</Label>
               <Textarea
-                value={newTip.tip_text}
-                onChange={(e) => setNewTip({ ...newTip, tip_text: e.target.value })}
-                placeholder={tr("admintrimestertips_tovsiye_metnini_daxil_edin_a87ccc", "Tövsiyə mətnini daxil edin...")}
-                rows={2}
-              />
+              value={newTip.tip_text}
+              onChange={(e) => setNewTip({ ...newTip, tip_text: e.target.value })}
+              placeholder={tr("admintrimestertips_tovsiye_metnini_daxil_edin_a87ccc", "Tövsiyə mətnini daxil edin...")}
+              rows={2} />
+            
             </div>
             <div className="flex items-center gap-2">
               <Switch
-                checked={newTip.is_active}
-                onCheckedChange={(checked) => setNewTip({ ...newTip, is_active: checked })}
-              />
+              checked={newTip.is_active}
+              onCheckedChange={(checked) => setNewTip({ ...newTip, is_active: checked })} />
+            
               <Label>Aktiv</Label>
             </div>
             <div className="flex gap-2">
@@ -164,69 +164,69 @@ const AdminTrimesterTips = () => {
               </Button>
               <Button variant="outline" onClick={() => setIsAdding(false)}>
                 <X className="w-4 h-4 mr-2" />
-                Ləğv Et
+                {tr("admintrimestertips_legv_et_8dc1d6", "L\u0259\u011Fv Et")}
               </Button>
             </div>
           </CardContent>
         </Card>
-      )}
+      }
 
       {/* Tips by Trimester Tabs */}
       <Tabs defaultValue="1">
         <TabsList className="grid w-full grid-cols-3">
-          {TRIMESTER_INFO.map((t) => (
-            <TabsTrigger key={t.value} value={String(t.value)} className="gap-2">
+          {TRIMESTER_INFO.map((t) =>
+          <TabsTrigger key={t.value} value={String(t.value)} className="gap-2">
               <span>{t.emoji}</span>
               <span className="hidden sm:inline">{t.label}</span>
               <span className="text-xs text-muted-foreground">({getTipsByTrimester(t.value).length})</span>
             </TabsTrigger>
-          ))}
+          )}
         </TabsList>
 
-        {TRIMESTER_INFO.map((trimesterInfo) => (
-          <TabsContent key={trimesterInfo.value} value={String(trimesterInfo.value)} className="space-y-3 mt-4">
-            {getTipsByTrimester(trimesterInfo.value).length === 0 ? (
-              <Card className="border-dashed">
+        {TRIMESTER_INFO.map((trimesterInfo) =>
+        <TabsContent key={trimesterInfo.value} value={String(trimesterInfo.value)} className="space-y-3 mt-4">
+            {getTipsByTrimester(trimesterInfo.value).length === 0 ?
+          <Card className="border-dashed">
                 <CardContent className="py-8 text-center text-muted-foreground">
-                  Bu trimester üçün heç bir tövsiyə yoxdur
+                  {tr("admintrimestertips_bu_trimester_ucun_hec_bir_tovs_749f9a", "Bu trimester \xFC\xE7\xFCn he\xE7 bir t\xF6vsiy\u0259 yoxdur")}
                 </CardContent>
-              </Card>
-            ) : (
-              getTipsByTrimester(trimesterInfo.value).map((tip) => (
-                <Card key={tip.id} className={`${trimesterInfo.color} ${!tip.is_active ? 'opacity-50' : ''}`}>
+              </Card> :
+
+          getTipsByTrimester(trimesterInfo.value).map((tip) =>
+          <Card key={tip.id} className={`${trimesterInfo.color} ${!tip.is_active ? 'opacity-50' : ''}`}>
                   <CardContent className="py-3">
-                    {editingId === tip.id ? (
-                      <div className="space-y-3">
+                    {editingId === tip.id ?
+              <div className="space-y-3">
                         <div className="grid grid-cols-2 gap-3">
                           <div className="space-y-1">
                             <Label className="text-xs">{tr("admintrimestertips_ikon_6e73fc", "İkon")}</Label>
                             <Input
-                              value={editForm.icon}
-                              onChange={(e) => setEditForm({ ...editForm, icon: e.target.value })}
-                            />
+                      value={editForm.icon}
+                      onChange={(e) => setEditForm({ ...editForm, icon: e.target.value })} />
+                    
                           </div>
                           <div className="space-y-1">
                             <Label className="text-xs">{tr("admintrimestertips_siralama_9e1268", "Sıralama")}</Label>
                             <Input
-                              type="number"
-                              value={editForm.sort_order}
-                              onChange={(e) => setEditForm({ ...editForm, sort_order: parseInt(e.target.value) || 0 })}
-                            />
+                      type="number"
+                      value={editForm.sort_order}
+                      onChange={(e) => setEditForm({ ...editForm, sort_order: parseInt(e.target.value) || 0 })} />
+                    
                           </div>
                         </div>
                         <div className="space-y-1">
                           <Label className="text-xs">{tr("admintrimestertips_metn_6e9f0f", "Mətn")}</Label>
                           <Textarea
-                            value={editForm.tip_text}
-                            onChange={(e) => setEditForm({ ...editForm, tip_text: e.target.value })}
-                            rows={2}
-                          />
+                    value={editForm.tip_text}
+                    onChange={(e) => setEditForm({ ...editForm, tip_text: e.target.value })}
+                    rows={2} />
+                  
                         </div>
                         <div className="flex items-center gap-2">
                           <Switch
-                            checked={editForm.is_active}
-                            onCheckedChange={(checked) => setEditForm({ ...editForm, is_active: checked })}
-                          />
+                    checked={editForm.is_active}
+                    onCheckedChange={(checked) => setEditForm({ ...editForm, is_active: checked })} />
+                  
                           <Label className="text-xs">Aktiv</Label>
                         </div>
                         <div className="flex gap-2">
@@ -237,13 +237,13 @@ const AdminTrimesterTips = () => {
                             <X className="w-3 h-3" />
                           </Button>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-start gap-3">
+                      </div> :
+
+              <div className="flex items-start gap-3">
                         <span className="text-xl flex-shrink-0">{tip.icon}</span>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm">{tip.tip_text}</p>
-                          <p className="text-xs text-muted-foreground mt-1">Sıra: {tip.sort_order}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{tr("admintrimestertips_sira_d654d0", "S\u0131ra:")} {tip.sort_order}</p>
                         </div>
                         <div className="flex gap-1 flex-shrink-0">
                           <Button size="sm" variant="ghost" onClick={() => startEdit(tip)}>
@@ -254,16 +254,16 @@ const AdminTrimesterTips = () => {
                           </Button>
                         </div>
                       </div>
-                    )}
+              }
                   </CardContent>
                 </Card>
-              ))
-            )}
+          )
+          }
           </TabsContent>
-        ))}
+        )}
       </Tabs>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AdminTrimesterTips;

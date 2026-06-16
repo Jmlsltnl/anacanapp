@@ -13,31 +13,31 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2, Image, Layout, Eye, EyeOff, ExternalLink, MousePointer, BarChart3 } from 'lucide-react';
 
-const PLACEMENTS: { value: BannerPlacement; label: string }[] = [
-  { value: 'home_top', label: tr("adminbanners_ana_sehife_ust_67d37b", "Ana Səhifə - Üst") },
-  { value: 'home_middle', label: tr("adminbanners_ana_sehife_orta_806a99", "Ana Səhifə - Orta") },
-  { value: 'home_bottom', label: tr("adminbanners_ana_sehife_alt_91e4ed", "Ana Səhifə - Alt") },
-  { value: 'tools_top', label: tr("adminbanners_aletler_ust_a0e524", "Alətlər - Üst") },
-  { value: 'tools_bottom', label: tr("adminbanners_aletler_alt_74224f", "Alətlər - Alt") },
-  { value: 'profile_top', label: tr("adminbanners_profil_ust_a0a39d", "Profil - Üst") },
-  { value: 'community_top', label: tr("adminbanners_cemiyyet_ust_c6809f", "Cəmiyyət - Üst") },
-  { value: 'ai_chat_top', label: tr("adminbanners_ai_chat_ust_72c347", "AI Chat - Üst") }
-];
+const PLACEMENTS: {value: BannerPlacement;label: string;}[] = [
+{ value: 'home_top', label: tr("adminbanners_ana_sehife_ust_67d37b", "Ana Səhifə - Üst") },
+{ value: 'home_middle', label: tr("adminbanners_ana_sehife_orta_806a99", "Ana Səhifə - Orta") },
+{ value: 'home_bottom', label: tr("adminbanners_ana_sehife_alt_91e4ed", "Ana Səhifə - Alt") },
+{ value: 'tools_top', label: tr("adminbanners_aletler_ust_a0e524", "Alətlər - Üst") },
+{ value: 'tools_bottom', label: tr("adminbanners_aletler_alt_74224f", "Alətlər - Alt") },
+{ value: 'profile_top', label: tr("adminbanners_profil_ust_a0a39d", "Profil - Üst") },
+{ value: 'community_top', label: tr("adminbanners_cemiyyet_ust_c6809f", "Cəmiyyət - Üst") },
+{ value: 'ai_chat_top', label: tr("adminbanners_ai_chat_ust_72c347", "AI Chat - Üst") }];
 
-const BANNER_TYPES: { value: BannerType; label: string }[] = [
-  { value: 'native', label: 'Native (Dizayn)' },
-  { value: 'image', label: tr("adminbanners_sekil_43e2e3", "Şəkil") }
-];
 
-const LINK_TYPES: { value: LinkType; label: string }[] = [
-  { value: 'external', label: 'Xarici Link' },
-  { value: 'internal', label: tr("adminbanners_daxili_sehife_763453", "Daxili Səhifə") },
-  { value: 'tool', label: tr("adminbanners_alet_acilisi_c88075", "Alət Açılışı") }
-];
+const BANNER_TYPES: {value: BannerType;label: string;}[] = [
+{ value: 'native', label: 'Native (Dizayn)' },
+{ value: 'image', label: tr("adminbanners_sekil_43e2e3", "Şəkil") }];
+
+
+const LINK_TYPES: {value: LinkType;label: string;}[] = [
+{ value: 'external', label: 'Xarici Link' },
+{ value: 'internal', label: tr("adminbanners_daxili_sehife_763453", "Daxili Səhifə") },
+{ value: 'tool', label: tr("adminbanners_alet_acilisi_c88075", "Alət Açılışı") }];
+
 
 const DEFAULT_COLORS = [
-  '#F48155', '#8B5CF6', '#10B981', '#3B82F6', '#EF4444', '#F59E0B', '#EC4899', '#6366F1'
-];
+'#F48155', '#8B5CF6', '#10B981', '#3B82F6', '#EF4444', '#F59E0B', '#EC4899', '#6366F1'];
+
 
 const AdminBanners = () => {
   const { data: banners, isLoading } = useAllBanners();
@@ -121,8 +121,8 @@ const AdminBanners = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bu banneri silmək istədiyinizə əminsiniz?')) return;
-    
+    if (!confirm(tr("adminbanners_bu_banneri_silmek_istediyinize_f822cd", "Bu banneri silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
+
     try {
       await deleteBanner.mutateAsync(id);
       toast({ title: 'Banner silindi' });
@@ -140,12 +140,12 @@ const AdminBanners = () => {
     }
   };
 
-  const filteredBanners = banners?.filter(b => 
-    activeTab === 'all' || b.placement === activeTab
+  const filteredBanners = banners?.filter((b) =>
+  activeTab === 'all' || b.placement === activeTab
   ) || [];
 
   const getPlacementLabel = (placement: string) => {
-    return PLACEMENTS.find(p => p.value === placement)?.label || placement;
+    return PLACEMENTS.find((p) => p.value === placement)?.label || placement;
   };
 
   if (isLoading) {
@@ -183,7 +183,7 @@ const AdminBanners = () => {
             <div className="flex items-center gap-2">
               <Eye className="w-5 h-5 text-green-500" />
               <div>
-                <p className="text-2xl font-bold">{banners?.filter(b => b.is_active).length || 0}</p>
+                <p className="text-2xl font-bold">{banners?.filter((b) => b.is_active).length || 0}</p>
                 <p className="text-xs text-muted-foreground">Aktiv</p>
               </div>
             </div>
@@ -217,74 +217,74 @@ const AdminBanners = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="flex-wrap h-auto gap-1">
           <TabsTrigger value="all">{tr("adminbanners_hamisi_c73c4d", "Hamısı")}</TabsTrigger>
-          {PLACEMENTS.map(p => (
-            <TabsTrigger key={p.value} value={p.value} className="text-xs">
+          {PLACEMENTS.map((p) =>
+          <TabsTrigger key={p.value} value={p.value} className="text-xs">
               {p.label}
             </TabsTrigger>
-          ))}
+          )}
         </TabsList>
 
         <TabsContent value={activeTab} className="mt-4">
           <div className="grid gap-4">
-            {filteredBanners.length === 0 ? (
-              <Card>
+            {filteredBanners.length === 0 ?
+            <Card>
                 <CardContent className="py-8 text-center text-muted-foreground">
-                  Bu bölmədə banner yoxdur
+                  {tr("adminbanners_bu_bolmede_banner_yoxdur_0fc4ad", "Bu b\xF6lm\u0259d\u0259 banner yoxdur")}
                 </CardContent>
-              </Card>
-            ) : (
-              filteredBanners.map((banner) => (
-                <Card key={banner.id} className={!banner.is_active ? 'opacity-60' : ''}>
+              </Card> :
+
+            filteredBanners.map((banner) =>
+            <Card key={banner.id} className={!banner.is_active ? 'opacity-60' : ''}>
                   <CardContent className="p-4">
                     <div className="flex items-start gap-4">
                       {/* Preview */}
-                      <div 
-                        className="w-16 h-16 rounded-lg flex items-center justify-center flex-shrink-0"
-                        style={{ 
-                          backgroundColor: banner.banner_type === 'native' ? banner.background_color || '#F48155' : '#f3f4f6',
-                          color: banner.text_color || '#FFFFFF'
-                        }}
-                      >
-                        {banner.banner_type === 'image' && banner.image_url ? (
-                          <img src={banner.image_url} alt="" className="w-full h-full object-cover rounded-lg" />
-                        ) : (
-                          <Image className="w-6 h-6" />
-                        )}
+                      <div
+                    className="w-16 h-16 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{
+                      backgroundColor: banner.banner_type === 'native' ? banner.background_color || '#F48155' : '#f3f4f6',
+                      color: banner.text_color || '#FFFFFF'
+                    }}>
+                    
+                        {banner.banner_type === 'image' && banner.image_url ?
+                    <img src={banner.image_url} alt="" className="w-full h-full object-cover rounded-lg" /> :
+
+                    <Image className="w-6 h-6" />
+                    }
                       </div>
 
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold truncate">{banner.title_az || banner.title}</h3>
-                          {!banner.is_active && (
-                            <span className="text-xs bg-muted px-2 py-0.5 rounded">Deaktiv</span>
-                          )}
-                          {banner.is_premium_only && (
-                            <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded">Premium</span>
-                          )}
+                          {!banner.is_active &&
+                      <span className="text-xs bg-muted px-2 py-0.5 rounded">Deaktiv</span>
+                      }
+                          {banner.is_premium_only &&
+                      <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded">Premium</span>
+                      }
                         </div>
                         <p className="text-sm text-muted-foreground truncate">
-                          {banner.description_az || banner.description || 'Təsvir yoxdur'}
+                          {banner.description_az || banner.description || tr("adminbanners_tesvir_yoxdur_12f487", "T\u0259svir yoxdur")}
                         </p>
                         <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                           <span className="bg-muted px-2 py-0.5 rounded">{getPlacementLabel(banner.placement)}</span>
-                          <span>{banner.banner_type === 'native' ? 'Native' : 'Şəkil'}</span>
-                          {banner.link_url && (
-                            <span className="flex items-center gap-1">
+                          <span>{banner.banner_type === 'native' ? 'Native' : tr("adminbanners_sekil_43e2e3", "\u015E\u0259kil")}</span>
+                          {banner.link_url &&
+                      <span className="flex items-center gap-1">
                               <ExternalLink className="w-3 h-3" />
                               {banner.link_type}
                             </span>
-                          )}
+                      }
                           <span>Klik: {banner.click_count || 0}</span>
                         </div>
                       </div>
 
                       {/* Actions */}
                       <div className="flex items-center gap-2">
-                        <Switch 
-                          checked={banner.is_active} 
-                          onCheckedChange={() => handleToggleActive(banner)}
-                        />
+                        <Switch
+                      checked={banner.is_active}
+                      onCheckedChange={() => handleToggleActive(banner)} />
+                    
                         <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(banner)}>
                           <Pencil className="w-4 h-4" />
                         </Button>
@@ -295,8 +295,8 @@ const AdminBanners = () => {
                     </div>
                   </CardContent>
                 </Card>
-              ))
-            )}
+            )
+            }
           </div>
         </TabsContent>
       </Tabs>
@@ -305,7 +305,7 @@ const AdminBanners = () => {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingBanner ? 'Banneri Redaktə Et' : 'Yeni Banner'}</DialogTitle>
+            <DialogTitle>{editingBanner ? tr("adminbanners_banneri_redakte_et_484526", "Banneri Redakt\u0259 Et") : 'Yeni Banner'}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -313,40 +313,40 @@ const AdminBanners = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>{tr("adminbanners_basliq_en_4ac905", "Başlıq (EN)")}</Label>
-                <Input 
-                  value={formData.title || ''} 
+                <Input
+                  value={formData.title || ''}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Banner Title"
-                />
+                  placeholder="Banner Title" />
+                
               </div>
               <div>
                 <Label>{tr("adminbanners_basliq_az_3e294a", "Başlıq (AZ)")}</Label>
-                <Input 
-                  value={formData.title_az || ''} 
+                <Input
+                  value={formData.title_az || ''}
                   onChange={(e) => setFormData({ ...formData, title_az: e.target.value })}
-                  placeholder={tr("adminbanners_banner_basligi_0722c5", "Banner Başlığı")}
-                />
+                  placeholder={tr("adminbanners_banner_basligi_0722c5", "Banner Başlığı")} />
+                
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>{tr("adminbanners_tesvir_en_c64521", "Təsvir (EN)")}</Label>
-                <Textarea 
-                  value={formData.description || ''} 
+                <Textarea
+                  value={formData.description || ''}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Description"
-                  rows={2}
-                />
+                  rows={2} />
+                
               </div>
               <div>
                 <Label>{tr("adminbanners_tesvir_az_2c237a", "Təsvir (AZ)")}</Label>
-                <Textarea 
-                  value={formData.description_az || ''} 
+                <Textarea
+                  value={formData.description_az || ''}
                   onChange={(e) => setFormData({ ...formData, description_az: e.target.value })}
                   placeholder={tr("adminbanners_tesvir_f85651", "Təsvir")}
-                  rows={2}
-                />
+                  rows={2} />
+                
               </div>
             </div>
 
@@ -354,143 +354,143 @@ const AdminBanners = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Banner Tipi</Label>
-                <Select 
-                  value={formData.banner_type} 
-                  onValueChange={(v) => setFormData({ ...formData, banner_type: v as BannerType })}
-                >
+                <Select
+                  value={formData.banner_type}
+                  onValueChange={(v) => setFormData({ ...formData, banner_type: v as BannerType })}>
+                  
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {BANNER_TYPES.map(t => (
-                      <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
-                    ))}
+                    {BANNER_TYPES.map((t) =>
+                    <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
               <div>
                 <Label>{tr("adminbanners_yerlesdirme_6c3e92", "Yerləşdirmə")}</Label>
-                <Select 
-                  value={formData.placement} 
-                  onValueChange={(v) => setFormData({ ...formData, placement: v as BannerPlacement })}
-                >
+                <Select
+                  value={formData.placement}
+                  onValueChange={(v) => setFormData({ ...formData, placement: v as BannerPlacement })}>
+                  
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {PLACEMENTS.map(p => (
-                      <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
-                    ))}
+                    {PLACEMENTS.map((p) =>
+                    <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
             {/* Native Banner Colors */}
-            {formData.banner_type === 'native' && (
-              <div className="space-y-3">
+            {formData.banner_type === 'native' &&
+            <div className="space-y-3">
                 <div>
                   <Label>{tr("adminbanners_arxa_fon_rengi_c914c9", "Arxa Fon Rəngi")}</Label>
                   <div className="flex items-center gap-2 mt-1">
-                    <Input 
-                      type="color"
-                      value={formData.background_color || '#F48155'} 
-                      onChange={(e) => setFormData({ ...formData, background_color: e.target.value })}
-                      className="w-12 h-10 p-1"
-                    />
+                    <Input
+                    type="color"
+                    value={formData.background_color || '#F48155'}
+                    onChange={(e) => setFormData({ ...formData, background_color: e.target.value })}
+                    className="w-12 h-10 p-1" />
+                  
                     <div className="flex gap-1">
-                      {DEFAULT_COLORS.map(color => (
-                        <button
-                          key={color}
-                          className="w-6 h-6 rounded-full border-2 border-transparent hover:border-gray-400"
-                          style={{ backgroundColor: color }}
-                          onClick={() => setFormData({ ...formData, background_color: color })}
-                        />
-                      ))}
+                      {DEFAULT_COLORS.map((color) =>
+                    <button
+                      key={color}
+                      className="w-6 h-6 rounded-full border-2 border-transparent hover:border-gray-400"
+                      style={{ backgroundColor: color }}
+                      onClick={() => setFormData({ ...formData, background_color: color })} />
+
+                    )}
                     </div>
                   </div>
                 </div>
                 <div>
                   <Label>{tr("adminbanners_metn_rengi_b3857e", "Mətn Rəngi")}</Label>
                   <div className="flex items-center gap-2 mt-1">
-                    <Input 
-                      type="color"
-                      value={formData.text_color || '#FFFFFF'} 
-                      onChange={(e) => setFormData({ ...formData, text_color: e.target.value })}
-                      className="w-12 h-10 p-1"
-                    />
+                    <Input
+                    type="color"
+                    value={formData.text_color || '#FFFFFF'}
+                    onChange={(e) => setFormData({ ...formData, text_color: e.target.value })}
+                    className="w-12 h-10 p-1" />
+                  
                     <button
-                      className="w-6 h-6 rounded-full bg-white border"
-                      onClick={() => setFormData({ ...formData, text_color: '#FFFFFF' })}
-                    />
+                    className="w-6 h-6 rounded-full bg-white border"
+                    onClick={() => setFormData({ ...formData, text_color: '#FFFFFF' })} />
+                  
                     <button
-                      className="w-6 h-6 rounded-full bg-black border"
-                      onClick={() => setFormData({ ...formData, text_color: '#000000' })}
-                    />
+                    className="w-6 h-6 rounded-full bg-black border"
+                    onClick={() => setFormData({ ...formData, text_color: '#000000' })} />
+                  
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label>{tr("adminbanners_duyme_metni_en_f2f4bd", "Düymə Mətni (EN)")}</Label>
-                    <Input 
-                      value={formData.button_text || ''} 
-                      onChange={(e) => setFormData({ ...formData, button_text: e.target.value })}
-                      placeholder="Learn More"
-                    />
+                    <Input
+                    value={formData.button_text || ''}
+                    onChange={(e) => setFormData({ ...formData, button_text: e.target.value })}
+                    placeholder="Learn More" />
+                  
                   </div>
                   <div>
                     <Label>{tr("adminbanners_duyme_metni_az_75db00", "Düymə Mətni (AZ)")}</Label>
-                    <Input 
-                      value={formData.button_text_az || ''} 
-                      onChange={(e) => setFormData({ ...formData, button_text_az: e.target.value })}
-                      placeholder={tr("adminbanners_daha_cox_7d8a93", "Daha Çox")}
-                    />
+                    <Input
+                    value={formData.button_text_az || ''}
+                    onChange={(e) => setFormData({ ...formData, button_text_az: e.target.value })}
+                    placeholder={tr("adminbanners_daha_cox_7d8a93", "Daha Çox")} />
+                  
                   </div>
                 </div>
               </div>
-            )}
+            }
 
             {/* Image Banner */}
-            {formData.banner_type === 'image' && (
-              <div>
+            {formData.banner_type === 'image' &&
+            <div>
                 <Label>{tr("adminbanners_sekil_url_d302df", "Şəkil URL")}</Label>
-                <Input 
-                  value={formData.image_url || ''} 
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  placeholder="https://example.com/banner.jpg"
-                />
+                <Input
+                value={formData.image_url || ''}
+                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                placeholder="https://example.com/banner.jpg" />
+              
               </div>
-            )}
+            }
 
             {/* Link */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Link Tipi</Label>
-                <Select 
-                  value={formData.link_type} 
-                  onValueChange={(v) => setFormData({ ...formData, link_type: v as LinkType })}
-                >
+                <Select
+                  value={formData.link_type}
+                  onValueChange={(v) => setFormData({ ...formData, link_type: v as LinkType })}>
+                  
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {LINK_TYPES.map(t => (
-                      <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
-                    ))}
+                    {LINK_TYPES.map((t) =>
+                    <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
               <div>
                 <Label>
-                  {formData.link_type === 'external' ? 'URL' : 
-                   formData.link_type === 'internal' ? 'Səhifə (/billing, /community)' : 
-                   'Alət ID (baby-names, kick-counter)'}
+                  {formData.link_type === 'external' ? 'URL' :
+                  formData.link_type === 'internal' ? tr("adminbanners_sehife_billing_community_0eddb5", "S\u0259hif\u0259 (/billing, /community)") : tr("adminbanners_alet_id_baby_names_kick_counte_28c887", "Al\u0259t ID (baby-names, kick-counter)")
+                  }
                 </Label>
-                <Input 
-                  value={formData.link_url || ''} 
+                <Input
+                  value={formData.link_url || ''}
                   onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
-                  placeholder={formData.link_type === 'external' ? 'https://...' : formData.link_type === 'internal' ? '/billing' : 'baby-names'}
-                />
+                  placeholder={formData.link_type === 'external' ? 'https://...' : formData.link_type === 'internal' ? '/billing' : 'baby-names'} />
+                
               </div>
             </div>
 
@@ -498,62 +498,62 @@ const AdminBanners = () => {
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <Label>{tr("adminbanners_sira_421c5f", "Sıra")}</Label>
-                <Input 
+                <Input
                   type="number"
-                  value={formData.sort_order || 0} 
-                  onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
-                />
+                  value={formData.sort_order || 0}
+                  onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })} />
+                
               </div>
               <div className="flex items-center gap-2 pt-6">
-                <Switch 
-                  checked={formData.is_active} 
-                  onCheckedChange={(v) => setFormData({ ...formData, is_active: v })}
-                />
+                <Switch
+                  checked={formData.is_active}
+                  onCheckedChange={(v) => setFormData({ ...formData, is_active: v })} />
+                
                 <Label>Aktiv</Label>
               </div>
               <div className="flex items-center gap-2 pt-6">
-                <Switch 
-                  checked={formData.is_premium_only} 
-                  onCheckedChange={(v) => setFormData({ ...formData, is_premium_only: v })}
-                />
+                <Switch
+                  checked={formData.is_premium_only}
+                  onCheckedChange={(v) => setFormData({ ...formData, is_premium_only: v })} />
+                
                 <Label>Premium Only</Label>
               </div>
             </div>
 
             {/* Preview */}
-            {formData.banner_type === 'native' && (
-              <div>
+            {formData.banner_type === 'native' &&
+            <div>
                 <Label>{tr("adminbanners_onizleme_1f8cc7", "Önizləmə")}</Label>
-                <div 
-                  className="mt-2 rounded-2xl p-4 flex items-center gap-4"
-                  style={{ 
-                    background: `linear-gradient(135deg, ${formData.background_color || '#F48155'} 0%, ${formData.background_color || '#F48155'}cc 100%)`,
-                    color: formData.text_color || '#FFFFFF'
-                  }}
-                >
+                <div
+                className="mt-2 rounded-2xl p-4 flex items-center gap-4"
+                style={{
+                  background: `linear-gradient(135deg, ${formData.background_color || '#F48155'} 0%, ${formData.background_color || '#F48155'}cc 100%)`,
+                  color: formData.text_color || '#FFFFFF'
+                }}>
+                
                   <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
                     <Layout className="w-6 h-6" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold">{formData.title_az || formData.title || 'Banner Başlığı'}</h3>
-                    <p className="text-sm opacity-90">{formData.description_az || formData.description || 'Təsvir'}</p>
+                    <h3 className="font-semibold">{formData.title_az || formData.title || tr("adminbanners_banner_basligi_0722c5", "Banner Ba\u015Fl\u0131\u011F\u0131")}</h3>
+                    <p className="text-sm opacity-90">{formData.description_az || formData.description || tr("adminbanners_tesvir_f85651", "T\u0259svir")}</p>
                   </div>
-                  <span className="text-sm font-medium">{formData.button_text_az || formData.button_text || 'Daha Çox'}</span>
+                  <span className="text-sm font-medium">{formData.button_text_az || formData.button_text || tr("adminbanners_daha_cox_7d8a93", "Daha \xC7ox")}</span>
                 </div>
               </div>
-            )}
+            }
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{tr("adminbanners_legv_et_b5e49c", "Ləğv et")}</Button>
             <Button onClick={handleSave} disabled={createBanner.isPending || updateBanner.isPending}>
-              {editingBanner ? 'Yenilə' : 'Yarat'}
+              {editingBanner ? tr("adminbanners_yenile_570ce2", "Yenil\u0259") : 'Yarat'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AdminBanners;

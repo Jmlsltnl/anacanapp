@@ -23,7 +23,7 @@ const ConversationListScreen = ({ onBack, onOpenChat, partnerId }: ConversationL
     const list = [...conversations];
     if (partnerMessages) {
       // Check if partner already exists in DM conversations
-      const existingIdx = list.findIndex(c => c.user_id === partnerId);
+      const existingIdx = list.findIndex((c) => c.user_id === partnerId);
       if (existingIdx === -1 && partnerMessages.conversation) {
         list.unshift(partnerMessages.conversation);
       }
@@ -33,10 +33,10 @@ const ConversationListScreen = ({ onBack, onOpenChat, partnerId }: ConversationL
 
   const getLastMessagePreview = (type: string, content: string | null) => {
     switch (type) {
-      case 'image': return '📷 Şəkil';
-      case 'video': return '🎥 Video';
-      case 'audio': return '🎤 Səs mesajı';
-      default: return content?.slice(0, 50) || '';
+      case 'image':return tr("conversationlistscreen_sekil_25710e", "\uD83D\uDCF7 \u015E\u0259kil");
+      case 'video':return '🎥 Video';
+      case 'audio':return tr("conversationlistscreen_ses_mesaji_acd8d9", "\uD83C\uDFA4 S\u0259s mesaj\u0131");
+      default:return content?.slice(0, 50) || '';
     }
   };
 
@@ -50,37 +50,37 @@ const ConversationListScreen = ({ onBack, onOpenChat, partnerId }: ConversationL
         <h1 className="text-lg font-bold text-foreground flex-1">Mesajlar</h1>
       </div>
 
-      {loading || partnerLoading ? (
-        <div className="flex items-center justify-center py-16">
+      {loading || partnerLoading ?
+      <div className="flex items-center justify-center py-16">
           <Loader2 className="w-6 h-6 animate-spin text-primary" />
-        </div>
-      ) : allConversations.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
+        </div> :
+      allConversations.length === 0 ?
+      <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
             <MessageCircle className="w-7 h-7 text-primary" />
           </div>
           <p className="text-base font-semibold text-foreground mb-1">{tr("conversationlistscreen_hele_mesajiniz_yoxdur_79d3c7", "Hələ mesajınız yoxdur")}</p>
           <p className="text-sm text-muted-foreground">{tr("conversationlistscreen_istifadeci_profilinden_mesaj_gondere_bil_777661", "İstifadəçi profilindən mesaj göndərə bilərsiniz")}</p>
-        </div>
-      ) : (
-        <div className="divide-y divide-border/30">
-          {allConversations.map((conv) => (
-            <motion.button
-              key={conv.user_id}
-              onClick={() => onOpenChat(conv.user_id, conv.name, conv.avatar_url)}
-              className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-muted/30 transition-colors text-left"
-              whileTap={{ scale: 0.98 }}
-            >
+        </div> :
+
+      <div className="divide-y divide-border/30">
+          {allConversations.map((conv) =>
+        <motion.button
+          key={conv.user_id}
+          onClick={() => onOpenChat(conv.user_id, conv.name, conv.avatar_url)}
+          className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-muted/30 transition-colors text-left"
+          whileTap={{ scale: 0.98 }}>
+          
               <div className="relative">
                 <Avatar className="w-12 h-12">
                   <AvatarImage src={conv.avatar_url || undefined} />
                   <AvatarFallback className="bg-primary/10 text-primary font-bold">{conv.name?.charAt(0)}</AvatarFallback>
                 </Avatar>
-                {conv.unread_count > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+                {conv.unread_count > 0 &&
+            <span className="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
                     {conv.unread_count > 9 ? '9+' : conv.unread_count}
                   </span>
-                )}
+            }
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
@@ -96,11 +96,11 @@ const ConversationListScreen = ({ onBack, onOpenChat, partnerId }: ConversationL
                 </p>
               </div>
             </motion.button>
-          ))}
+        )}
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 
 export default ConversationListScreen;

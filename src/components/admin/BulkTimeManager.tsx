@@ -13,11 +13,11 @@ import { supabase } from '@/integrations/supabase/client';
 
 type SourceKey = 'pregnancy_day_notifications' | 'mommy_day_notifications' | 'flow_reminders';
 
-const SOURCES: { key: SourceKey; label: string; timeCol: string; labelCol: string }[] = [
-  { key: 'pregnancy_day_notifications', label: tr("bulktimemanager_hamilelik_bump_b450c6", "Hamiləlik (bump)"), timeCol: 'send_time', labelCol: 'title' },
-  { key: 'mommy_day_notifications', label: 'Ana (mommy)', timeCol: 'send_time', labelCol: 'title' },
-  { key: 'flow_reminders', label: 'Tsikl (flow)', timeCol: 'send_time', labelCol: 'title' },
-];
+const SOURCES: {key: SourceKey;label: string;timeCol: string;labelCol: string;}[] = [
+{ key: 'pregnancy_day_notifications', label: tr("bulktimemanager_hamilelik_bump_b450c6", "Hamiləlik (bump)"), timeCol: 'send_time', labelCol: 'title' },
+{ key: 'mommy_day_notifications', label: 'Ana (mommy)', timeCol: 'send_time', labelCol: 'title' },
+{ key: 'flow_reminders', label: 'Tsikl (flow)', timeCol: 'send_time', labelCol: 'title' }];
+
 
 /** Normalize "9:00" / "09:00:00" → "09:00" */
 function normTime(v: string | null | undefined): string {
@@ -26,7 +26,7 @@ function normTime(v: string | null | undefined): string {
   return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`;
 }
 
-type Row = { id: string; send_time: string; title?: string; day_number?: number | null };
+type Row = {id: string;send_time: string;title?: string;day_number?: number | null;};
 
 const BulkTimeManager = () => {
   const [source, setSource] = useState<SourceKey>('pregnancy_day_notifications');
@@ -43,26 +43,26 @@ const BulkTimeManager = () => {
     setLoading(true);
     setSelected(new Set());
     try {
-      const { data, error } = await supabase
-        .from(source as any)
-        .select('*')
-        .limit(5000);
+      const { data, error } = await supabase.
+      from(source as any).
+      select('*').
+      limit(5000);
       if (error) throw error;
       const mapped: Row[] = (data ?? []).map((r: any) => ({
         id: r.id,
         send_time: normTime(r[cfg.timeCol]),
         title: r[cfg.labelCol] ?? '—',
-        day_number: r.day_number ?? null,
+        day_number: r.day_number ?? null
       }));
       setRows(mapped);
     } catch (e: any) {
-      toast.error('Yükləmə xətası: ' + (e?.message ?? 'naməlum'));
+      toast.error(tr("bulktimemanager_yukleme_xetasi_7738cd", "Y\xFCkl\u0259m\u0259 x\u0259tas\u0131: ") + (e?.message ?? tr("bulktimemanager_namelum_974fd5", "nam\u0259lum")));
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [source]);
+  useEffect(() => {load(); /* eslint-disable-next-line */}, [source]);
 
   const uniqueTimes = useMemo(() => {
     const counts = new Map<string, number>();
@@ -97,11 +97,11 @@ const BulkTimeManager = () => {
 
   const applyBulk = async () => {
     if (selected.size === 0) {
-      toast.error('Heç bir sətir seçilməyib');
+      toast.error(tr("bulktimemanager_hec_bir_setir_secilmeyib_db256d", "He\xE7 bir s\u0259tir se\xE7ilm\u0259yib"));
       return;
     }
     if (!/^\d{2}:\d{2}$/.test(newTime)) {
-      toast.error('Yeni saat formatı yanlışdır (HH:MM)');
+      toast.error(tr("bulktimemanager_yeni_saat_formati_yanlisdir_hh_b2aa81", "Yeni saat format\u0131 yanl\u0131\u015Fd\u0131r (HH:MM)"));
       return;
     }
     if (!confirm(`${selected.size} sətrin saatı "${newTime}" olaraq dəyişdiriləcək. Davam edək?`)) return;
@@ -111,16 +111,16 @@ const BulkTimeManager = () => {
       const chunk = 500;
       for (let i = 0; i < ids.length; i += chunk) {
         const slice = ids.slice(i, i + chunk);
-        const { error } = await supabase
-          .from(source as any)
-          .update({ [cfg.timeCol]: newTime } as any)
-          .in('id', slice);
+        const { error } = await supabase.
+        from(source as any).
+        update({ [cfg.timeCol]: newTime } as any).
+        in('id', slice);
         if (error) throw error;
       }
       toast.success(`${ids.length} bildirişin saatı ${newTime} oldu`);
       await load();
     } catch (e: any) {
-      toast.error('Yeniləmə xətası: ' + (e?.message ?? 'naməlum'));
+      toast.error(tr("bulktimemanager_yenileme_xetasi_c88be0", "Yenil\u0259m\u0259 x\u0259tas\u0131: ") + (e?.message ?? tr("bulktimemanager_namelum_974fd5", "nam\u0259lum")));
     } finally {
       setSaving(false);
     }
@@ -134,7 +134,7 @@ const BulkTimeManager = () => {
           <div>
             <h3 className="font-semibold">{tr("bulktimemanager_toplu_saat_deyisdirici_9723b3", "Toplu saat dəyişdirici")}</h3>
             <p className="text-xs text-muted-foreground">
-              Mənbə seçin → mövcud saata görə filterləyin → yeni saatı təyin edib seçilənləri toplu yeniləyin.
+              {tr("bulktimemanager_menbe_secin_movcud_saata_gore__e6c167", "M\u0259nb\u0259 se\xE7in \u2192 m\xF6vcud saata g\xF6r\u0259 filterl\u0259yin \u2192 yeni saat\u0131 t\u0259yin edib se\xE7il\u0259nl\u0259ri toplu yenil\u0259yin.")}
             </p>
           </div>
         </div>
@@ -145,9 +145,9 @@ const BulkTimeManager = () => {
             <Select value={source} onValueChange={(v) => setSource(v as SourceKey)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                {SOURCES.map((s) => (
-                  <SelectItem key={s.key} value={s.key}>{s.label}</SelectItem>
-                ))}
+                {SOURCES.map((s) =>
+                <SelectItem key={s.key} value={s.key}>{s.label}</SelectItem>
+                )}
               </SelectContent>
             </Select>
           </div>
@@ -157,10 +157,10 @@ const BulkTimeManager = () => {
             <Select value={timeFilter} onValueChange={setTimeFilter}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Hamısı ({rows.length})</SelectItem>
-                {uniqueTimes.map(([t, c]) => (
-                  <SelectItem key={t} value={t}>{t} ({c})</SelectItem>
-                ))}
+                <SelectItem value="all">{tr("bulktimemanager_hamisi_3ff72c", "Ham\u0131s\u0131 (")}{rows.length})</SelectItem>
+                {uniqueTimes.map(([t, c]) =>
+                <SelectItem key={t} value={t}>{t} ({c})</SelectItem>
+                )}
               </SelectContent>
             </Select>
           </div>
@@ -170,24 +170,24 @@ const BulkTimeManager = () => {
             <Input
               type="time"
               value={newTime}
-              onChange={(e) => setNewTime(e.target.value)}
-            />
+              onChange={(e) => setNewTime(e.target.value)} />
+            
           </div>
 
           <div className="flex items-end">
             <Button onClick={applyBulk} disabled={saving || selected.size === 0} className="w-full">
               {saving ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <ArrowRight className="h-4 w-4 mr-1" />}
-              {selected.size} sətrə tətbiq et
+              {selected.size} {tr("bulktimemanager_setre_tetbiq_et_873f93", "s\u0259tr\u0259 t\u0259tbiq et")}
             </Button>
           </div>
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-          <Badge variant="outline">Cəmi yüklənən: {rows.length}</Badge>
-          <Badge variant="outline">Filterlənmiş: {filtered.length}</Badge>
-          <Badge variant="secondary">Seçilmiş: {selected.size}</Badge>
+          <Badge variant="outline">{tr("bulktimemanager_cemi_yuklenen_c5d1cb", "C\u0259mi y\xFCkl\u0259n\u0259n:")} {rows.length}</Badge>
+          <Badge variant="outline">{tr("bulktimemanager_filterlenmis_fdc550", "Filterl\u0259nmi\u015F:")} {filtered.length}</Badge>
+          <Badge variant="secondary">{tr("bulktimemanager_secilmis_3c154a", "Se\xE7ilmi\u015F:")} {selected.size}</Badge>
           <Button size="sm" variant="ghost" onClick={load} disabled={loading}>
-            {loading ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : null} Yenilə
+            {loading ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : null} {tr("bulktimemanager_yenile_570ce2", "Yenil\u0259")}
           </Button>
         </div>
       </Card>
@@ -207,8 +207,8 @@ const BulkTimeManager = () => {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((r) => (
-                <tr key={r.id} className="border-t hover:bg-muted/20">
+              {filtered.map((r) =>
+              <tr key={r.id} className="border-t hover:bg-muted/20">
                   <td className="p-2">
                     <Checkbox checked={selected.has(r.id)} onCheckedChange={() => toggleOne(r.id)} />
                   </td>
@@ -217,16 +217,16 @@ const BulkTimeManager = () => {
                   <td className="p-2 truncate max-w-md">{r.title}</td>
                   <td className="p-2 font-mono text-muted-foreground truncate max-w-[180px]">{r.id}</td>
                 </tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">{tr("bulktimemanager_setir_yoxdur_08da0f", "Sətir yoxdur")}</td></tr>
               )}
+              {filtered.length === 0 &&
+              <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">{tr("bulktimemanager_setir_yoxdur_08da0f", "Sətir yoxdur")}</td></tr>
+              }
             </tbody>
           </table>
         </div>
       </Card>
-    </div>
-  );
+    </div>);
+
 };
 
 export default BulkTimeManager;

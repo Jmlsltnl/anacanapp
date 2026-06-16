@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowLeft, Plus, Search, Filter, Heart, MessageCircle, MapPin, 
-  Camera, X, Check, Loader2, Package, Tag, User, Clock, Send, 
-  ChevronRight, Sparkles, ImagePlus, Trash2, Image as ImageIcon
-} from 'lucide-react';
+import {
+  ArrowLeft, Plus, Search, Filter, Heart, MessageCircle, MapPin,
+  Camera, X, Check, Loader2, Package, Tag, User, Clock, Send,
+  ChevronRight, Sparkles, ImagePlus, Trash2, Image as ImageIcon } from
+'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -40,30 +40,30 @@ interface Listing {
 }
 
 const categories = [
-  { id: 'clothing', label: 'Geyim', emoji: '👕', color: 'from-pink-500 to-rose-600' },
-  { id: 'toys', label: 'Oyuncaqlar', emoji: '🧸', color: 'from-amber-500 to-orange-600' },
-  { id: 'furniture', label: 'Mebel', emoji: '🛏️', color: 'from-blue-500 to-indigo-600' },
-  { id: 'stroller', label: 'Araba', emoji: '👶', color: 'from-violet-500 to-purple-600' },
-  { id: 'feeding', label: 'Qidalanma', emoji: '🍼', color: 'from-emerald-500 to-green-600' },
-  { id: 'hygiene', label: 'Gigiyena', emoji: '🛁', color: 'from-cyan-500 to-teal-600' },
-  { id: 'other', label: tr("secondhandmarket_diger_293b3a", 'Digər'), emoji: '📦', color: 'from-gray-500 to-slate-600' },
-];
+{ id: 'clothing', label: 'Geyim', emoji: '👕', color: 'from-pink-500 to-rose-600' },
+{ id: 'toys', label: 'Oyuncaqlar', emoji: '🧸', color: 'from-amber-500 to-orange-600' },
+{ id: 'furniture', label: 'Mebel', emoji: '🛏️', color: 'from-blue-500 to-indigo-600' },
+{ id: 'stroller', label: 'Araba', emoji: '👶', color: 'from-violet-500 to-purple-600' },
+{ id: 'feeding', label: 'Qidalanma', emoji: '🍼', color: 'from-emerald-500 to-green-600' },
+{ id: 'hygiene', label: 'Gigiyena', emoji: '🛁', color: 'from-cyan-500 to-teal-600' },
+{ id: 'other', label: tr("secondhandmarket_diger_293b3a", 'Digər'), emoji: '📦', color: 'from-gray-500 to-slate-600' }];
+
 
 const conditions = [
-  { id: 'new', label: 'Yeni', color: 'bg-emerald-500', textColor: 'text-emerald-600' },
-  { id: 'like_new', label: 'Yeni kimi', color: 'bg-green-500', textColor: 'text-green-600' },
-  { id: 'good', label: tr("secondhandmarket_yaxsi_9d8595", 'Yaxşı'), color: 'bg-blue-500', textColor: 'text-blue-600' },
-  { id: 'fair', label: 'Normal', color: 'bg-amber-500', textColor: 'text-amber-600' },
-];
+{ id: 'new', label: 'Yeni', color: 'bg-emerald-500', textColor: 'text-emerald-600' },
+{ id: 'like_new', label: 'Yeni kimi', color: 'bg-green-500', textColor: 'text-green-600' },
+{ id: 'good', label: tr("secondhandmarket_yaxsi_9d8595", 'Yaxşı'), color: 'bg-blue-500', textColor: 'text-blue-600' },
+{ id: 'fair', label: 'Normal', color: 'bg-amber-500', textColor: 'text-amber-600' }];
+
 
 const ageRanges = [
-  '0-3 ay', '3-6 ay', '6-12 ay', '1-2 yaş', '2-3 yaş', '3+ yaş'
-];
+'0-3 ay', '3-6 ay', '6-12 ay', tr("secondhandmarket_1_2_yas_aa6324", "1-2 ya\u015F"), tr("secondhandmarket_2_3_yas_d49317", "2-3 ya\u015F"), tr("secondhandmarket_3_yas_dec51d", "3+ ya\u015F")];
+
 
 const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
   useScrollToTop();
   useScreenAnalytics('SecondHandMarket', 'Tools');
-  
+
   const [listings, setListings] = useState<Listing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -77,12 +77,12 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
   const [contactMessage, setContactMessage] = useState('');
   const [contactMessages, setContactMessages] = useState<any[]>([]);
   const [sendingMessage, setSendingMessage] = useState(false);
-  
+
   // Image upload state
   const [uploadingImages, setUploadingImages] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -91,10 +91,10 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
     price: 0,
     is_free: true,
     age_range: '',
-    location_city: '',
+    location_city: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const { toast } = useToast();
   const { profile, user } = useAuth();
 
@@ -105,22 +105,22 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
   const loadListings = async () => {
     setIsLoading(true);
     try {
-      let query = supabase
-        .from('marketplace_listings')
-        .select('*')
-        .eq('status', 'active')
-        .order('created_at', { ascending: false });
-      
+      let query = supabase.
+      from('marketplace_listings').
+      select('*').
+      eq('status', 'active').
+      order('created_at', { ascending: false });
+
       if (selectedCategory) {
         query = query.eq('category', selectedCategory);
       }
-      
+
       if (showMyListings && profile?.user_id) {
         query = query.eq('user_id', profile.user_id);
       }
-      
+
       const { data, error } = await query;
-      
+
       if (error) throw error;
       setListings(data || []);
     } catch (error) {
@@ -137,30 +137,30 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0 || !user) return;
-    
+
     setUploadingImages(true);
     const newImages: string[] = [];
-    
+
     try {
       for (let i = 0; i < Math.min(files.length, 5 - uploadedImages.length); i++) {
         const file = files[i];
         const fileExt = file.name.split('.').pop();
         const fileName = `${user.id}/${Date.now()}-${i}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('community-media')
-          .upload(fileName, file);
-        
+
+        const { error: uploadError } = await supabase.storage.
+        from('community-media').
+        upload(fileName, file);
+
         if (uploadError) throw uploadError;
-        
-        const { data: { publicUrl } } = supabase.storage
-          .from('community-media')
-          .getPublicUrl(fileName);
-        
+
+        const { data: { publicUrl } } = supabase.storage.
+        from('community-media').
+        getPublicUrl(fileName);
+
         newImages.push(publicUrl);
       }
-      
-      setUploadedImages(prev => [...prev, ...newImages]);
+
+      setUploadedImages((prev) => [...prev, ...newImages]);
       toast({ title: tr("secondhandmarket_sekiller_yuklendi_5f1633", 'Şəkillər yükləndi!') });
     } catch (error) {
       console.error('Image upload error:', error);
@@ -178,7 +178,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
   };
 
   const removeImage = (index: number) => {
-    setUploadedImages(prev => prev.filter((_, i) => i !== index));
+    setUploadedImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleCreateListing = async () => {
@@ -202,29 +202,29 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase
-        .from('marketplace_listings')
-        .insert({
-          user_id: profile.user_id,
-          title: formData.title,
-          description: formData.description,
-          category: formData.category,
-          condition: formData.condition,
-          price: formData.is_free ? 0 : formData.price,
-          is_free: formData.is_free,
-          age_range: formData.age_range,
-          location_city: formData.location_city,
-          images: uploadedImages,
-          status: 'pending'
-        });
+      const { error } = await supabase.
+      from('marketplace_listings').
+      insert({
+        user_id: profile.user_id,
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        condition: formData.condition,
+        price: formData.is_free ? 0 : formData.price,
+        is_free: formData.is_free,
+        age_range: formData.age_range,
+        location_city: formData.location_city,
+        images: uploadedImages,
+        status: 'pending'
+      });
 
       if (error) throw error;
 
       toast({
         title: tr("secondhandmarket_ugurlu_5c0191", 'Uğurlu!'),
-        description: tr("secondhandmarket_elan_yaradildi_ve_tesdiq_ucun_gonderildi_2869bb", 'Elan yaradıldı və təsdiq üçün göndərildi'),
+        description: tr("secondhandmarket_elan_yaradildi_ve_tesdiq_ucun_gonderildi_2869bb", 'Elan yaradıldı və təsdiq üçün göndərildi')
       });
-      
+
       setShowCreateModal(false);
       resetForm();
       loadListings();
@@ -248,7 +248,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
       price: 0,
       is_free: true,
       age_range: '',
-      location_city: '',
+      location_city: ''
     });
     setUploadedImages([]);
   };
@@ -256,12 +256,12 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
   // Load messages for a listing contact
   const loadContactMessages = async (listing: Listing) => {
     if (!profile?.user_id) return;
-    const { data } = await supabase
-      .from('marketplace_messages')
-      .select('*')
-      .eq('listing_id', listing.id)
-      .or(`sender_id.eq.${profile.user_id},receiver_id.eq.${profile.user_id}`)
-      .order('created_at', { ascending: true });
+    const { data } = await supabase.
+    from('marketplace_messages').
+    select('*').
+    eq('listing_id', listing.id).
+    or(`sender_id.eq.${profile.user_id},receiver_id.eq.${profile.user_id}`).
+    order('created_at', { ascending: true });
     setContactMessages(data || []);
   };
 
@@ -275,14 +275,14 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
     if (!contactMessage.trim() || !contactListing || !profile?.user_id) return;
     setSendingMessage(true);
     try {
-      const { error } = await supabase
-        .from('marketplace_messages')
-        .insert({
-          listing_id: contactListing.id,
-          sender_id: profile.user_id,
-          receiver_id: contactListing.user_id,
-          content: contactMessage.trim(),
-        });
+      const { error } = await supabase.
+      from('marketplace_messages').
+      insert({
+        listing_id: contactListing.id,
+        sender_id: profile.user_id,
+        receiver_id: contactListing.user_id,
+        content: contactMessage.trim()
+      });
       if (error) throw error;
       setContactMessage('');
       await loadContactMessages(contactListing);
@@ -298,20 +298,20 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
   };
 
   const getCategoryInfo = (catId: string) => {
-    return categories.find(c => c.id === catId) || categories[6];
+    return categories.find((c) => c.id === catId) || categories[6];
   };
 
   const getConditionInfo = (condId: string) => {
-    return conditions.find(c => c.id === condId) || conditions[2];
+    return conditions.find((c) => c.id === condId) || conditions[2];
   };
 
-  const filteredListings = listings.filter(listing =>
-    listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    listing.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredListings = listings.filter((listing) =>
+  listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  listing.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Stats
-  const freeCount = listings.filter(l => l.is_free).length;
+  const freeCount = listings.filter((l) => l.is_free).length;
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -322,21 +322,21 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             <motion.button
               onClick={onBack}
               className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}
-            >
+              whileTap={{ scale: 0.95 }}>
+              
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </motion.button>
             <div className="flex-1">
               <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <Package className="w-5 h-5 text-emerald-500" />
-                İkinci Əl Bazarı
+                {tr("secondhandmarket_i_kinci_el_bazari_ad9f9f", "\u0130kinci \u018Fl Bazar\u0131")}
               </h1>
             </div>
             <motion.button
               onClick={() => setShowCreateModal(true)}
               className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}
-            >
+              whileTap={{ scale: 0.95 }}>
+              
               <Plus className="w-5 h-5 text-primary-foreground" />
             </motion.button>
           </div>
@@ -351,8 +351,8 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             placeholder="Axtar..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 h-12 rounded-2xl bg-muted/50 border-border"
-          />
+            className="pl-12 h-12 rounded-2xl bg-muted/50 border-border" />
+          
         </div>
 
         {/* Stats */}
@@ -361,8 +361,8 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             className="bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl p-3 text-center border border-emerald-100 dark:border-emerald-500/20"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
+            transition={{ delay: 0.1 }}>
+            
             <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{listings.length}</p>
             <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70 font-medium">Elan</p>
           </motion.div>
@@ -370,8 +370,8 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             className="bg-amber-50 dark:bg-amber-500/10 rounded-2xl p-3 text-center border border-amber-100 dark:border-amber-500/20"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-          >
+            transition={{ delay: 0.15 }}>
+            
             <p className="text-2xl font-black text-amber-600 dark:text-amber-400">{freeCount}</p>
             <p className="text-xs text-amber-600/70 dark:text-amber-400/70 font-medium">Pulsuz</p>
           </motion.div>
@@ -379,8 +379,8 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             className="bg-violet-50 dark:bg-violet-500/10 rounded-2xl p-3 text-center border border-violet-100 dark:border-violet-500/20"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
+            transition={{ delay: 0.2 }}>
+            
             <p className="text-2xl font-black text-violet-600 dark:text-violet-400">{categories.length}</p>
             <p className="text-xs text-violet-600/70 dark:text-violet-400/70 font-medium">Kateqoriya</p>
           </motion.div>
@@ -393,35 +393,35 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
           className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-        >
+          transition={{ delay: 0.25 }}>
+          
           <motion.button
             onClick={() => setSelectedCategory(null)}
             className={`shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-              selectedCategory === null
-                ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30' 
-                : 'bg-card text-foreground border border-border/50'
-            }`}
-            whileTap={{ scale: 0.95 }}
-          >
+            selectedCategory === null ?
+            'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30' :
+            'bg-card text-foreground border border-border/50'}`
+            }
+            whileTap={{ scale: 0.95 }}>
+            
             <Sparkles className="w-4 h-4" />
-            Hamısı
+            {tr("secondhandmarket_hamisi_c73c4d", "Ham\u0131s\u0131")}
           </motion.button>
-          {categories.map(cat => (
-            <motion.button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
-              className={`shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-                selectedCategory === cat.id
-                  ? `bg-gradient-to-r ${cat.color} text-white shadow-lg` 
-                  : 'bg-card text-foreground border border-border/50'
-              }`}
-              whileTap={{ scale: 0.95 }}
-            >
+          {categories.map((cat) =>
+          <motion.button
+            key={cat.id}
+            onClick={() => setSelectedCategory(cat.id)}
+            className={`shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
+            selectedCategory === cat.id ?
+            `bg-gradient-to-r ${cat.color} text-white shadow-lg` :
+            'bg-card text-foreground border border-border/50'}`
+            }
+            whileTap={{ scale: 0.95 }}>
+            
               <span>{cat.emoji}</span>
               {cat.label}
             </motion.button>
-          ))}
+          )}
         </motion.div>
 
         {/* Toggle My Listings */}
@@ -429,101 +429,101 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
           <Button
             variant={!showMyListings ? 'default' : 'outline'}
             className={`flex-1 ${!showMyListings ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : ''}`}
-            onClick={() => setShowMyListings(false)}
-          >
-            Bütün elanlar
+            onClick={() => setShowMyListings(false)}>
+            {tr("secondhandmarket_butun_elanlar_033e6a", "B\xFCt\xFCn elanlar")}
+          
           </Button>
           <Button
             variant={showMyListings ? 'default' : 'outline'}
             className={`flex-1 ${showMyListings ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : ''}`}
-            onClick={() => setShowMyListings(true)}
-          >
-            Mənim elanlarım
+            onClick={() => setShowMyListings(true)}>
+            {tr("secondhandmarket_menim_elanlarim_cec2c2", "M\u0259nim elanlar\u0131m")}
+          
           </Button>
         </div>
 
         {/* Listings */}
-        {isLoading ? (
-          <div className="grid grid-cols-2 gap-3">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="bg-card rounded-2xl overflow-hidden animate-pulse">
+        {isLoading ?
+        <div className="grid grid-cols-2 gap-3">
+            {[1, 2, 3, 4].map((i) =>
+          <div key={i} className="bg-card rounded-2xl overflow-hidden animate-pulse">
                 <div className="aspect-square bg-muted" />
                 <div className="p-3">
                   <div className="h-4 bg-muted rounded w-3/4 mb-2" />
                   <div className="h-3 bg-muted rounded w-1/2" />
                 </div>
               </div>
-            ))}
-          </div>
-        ) : filteredListings.length === 0 ? (
-          <Card className="border-dashed">
+          )}
+          </div> :
+        filteredListings.length === 0 ?
+        <Card className="border-dashed">
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 flex items-center justify-center">
                 <Package className="w-8 h-8 text-emerald-500" />
               </div>
               <h3 className="font-bold text-foreground mb-1">{tr("secondhandmarket_hele_elan_yoxdur_89fb8c", "Hələ elan yoxdur")}</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                İlk elanı siz yerləşdirin!
+                {tr("secondhandmarket_i_lk_elani_siz_yerlesdirin_02683c", "\u0130lk elan\u0131 siz yerl\u0259\u015Fdirin!")}
               </p>
               <Button onClick={() => setShowCreateModal(true)} className="bg-gradient-to-r from-emerald-500 to-teal-600">
                 <Plus className="w-4 h-4 mr-2" />
-                İlk elanı yarat
+                {tr("secondhandmarket_i_lk_elani_yarat_a4e8b2", "\u0130lk elan\u0131 yarat")}
               </Button>
             </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-2 gap-3">
+          </Card> :
+
+        <div className="grid grid-cols-2 gap-3">
             {filteredListings.map((listing, index) => {
-              const catInfo = getCategoryInfo(listing.category);
-              const condInfo = getConditionInfo(listing.condition);
-              
-              return (
-                <motion.div
-                  key={listing.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => {
-                    setSelectedListing(listing);
-                    setShowDetailModal(true);
-                  }}
-                >
+            const catInfo = getCategoryInfo(listing.category);
+            const condInfo = getConditionInfo(listing.condition);
+
+            return (
+              <motion.div
+                key={listing.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  setSelectedListing(listing);
+                  setShowDetailModal(true);
+                }}>
+                
                   <Card className="overflow-hidden cursor-pointer hover:shadow-lg transition-all group">
                     {/* Image */}
                     <div className="aspect-square bg-muted relative overflow-hidden">
-                      {listing.images && listing.images.length > 0 ? (
-                        <img 
-                          src={listing.images[0]} 
-                          alt={listing.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                        />
-                      ) : (
-                        <div className={`w-full h-full bg-gradient-to-br ${catInfo.color} flex items-center justify-center`}>
+                      {listing.images && listing.images.length > 0 ?
+                    <img
+                      src={listing.images[0]}
+                      alt={listing.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform" /> :
+
+
+                    <div className={`w-full h-full bg-gradient-to-br ${catInfo.color} flex items-center justify-center`}>
                           <span className="text-5xl">{catInfo.emoji}</span>
                         </div>
-                      )}
+                    }
                       
                       {/* Price badge */}
                       <div className="absolute top-2 left-2">
-                        {listing.is_free ? (
-                          <Badge className="bg-emerald-500 text-white border-0 shadow-lg">
+                        {listing.is_free ?
+                      <Badge className="bg-emerald-500 text-white border-0 shadow-lg">
                             Pulsuz
-                          </Badge>
-                        ) : (
-                          <Badge className="bg-white/90 dark:bg-card/90 text-foreground border-0 shadow-lg">
+                          </Badge> :
+
+                      <Badge className="bg-white/90 dark:bg-card/90 text-foreground border-0 shadow-lg">
                             {listing.price} ₼
                           </Badge>
-                        )}
+                      }
                       </div>
                       
                       {/* Image count */}
-                      {listing.images && listing.images.length > 1 && (
-                        <div className="absolute bottom-2 right-2 bg-black/50 backdrop-blur-md px-2 py-1 rounded-lg text-white text-xs flex items-center gap-1">
+                      {listing.images && listing.images.length > 1 &&
+                    <div className="absolute bottom-2 right-2 bg-black/50 backdrop-blur-md px-2 py-1 rounded-lg text-white text-xs flex items-center gap-1">
                           <ImageIcon className="w-3 h-3" />
                           {listing.images.length}
                         </div>
-                      )}
+                    }
                     </div>
                     
                     <CardContent className="p-3">
@@ -532,31 +532,31 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                       <div className="flex items-center gap-1.5 mt-1.5">
                         <span className={`w-2 h-2 rounded-full ${condInfo.color}`} />
                         <span className="text-xs text-muted-foreground">{condInfo.label}</span>
-                        {listing.age_range && (
-                          <>
+                        {listing.age_range &&
+                      <>
                             <span className="text-muted-foreground">•</span>
                             <span className="text-xs text-muted-foreground">{listing.age_range}</span>
                           </>
-                        )}
+                      }
                       </div>
                       
-                      {listing.location_city && (
-                        <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+                      {listing.location_city &&
+                    <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
                           <MapPin className="w-3 h-3" />
                           {listing.location_city}
                         </div>
-                      )}
+                    }
                     </CardContent>
                   </Card>
-                </motion.div>
-              );
-            })}
+                </motion.div>);
+
+          })}
           </div>
-        )}
+        }
       </div>
 
       {/* Create Listing Modal */}
-      <Dialog open={showCreateModal} onOpenChange={(open) => { if (!open) resetForm(); setShowCreateModal(open); }}>
+      <Dialog open={showCreateModal} onOpenChange={(open) => {if (!open) resetForm();setShowCreateModal(open);}}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -572,36 +572,36 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             <div>
               <label className="text-sm font-medium mb-2 block">{tr("secondhandmarket_sekiller_maks_5_4281f8", "Şəkillər (maks. 5)")}</label>
               <div className="grid grid-cols-5 gap-2">
-                {uploadedImages.map((img, index) => (
-                  <div key={index} className="aspect-square relative rounded-xl overflow-hidden group">
+                {uploadedImages.map((img, index) =>
+                <div key={index} className="aspect-square relative rounded-xl overflow-hidden group">
                     <img src={img} alt="" className="w-full h-full object-cover" />
                     <motion.button
-                      onClick={() => removeImage(index)}
-                      className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                      whileTap={{ scale: 0.9 }}
-                    >
+                    onClick={() => removeImage(index)}
+                    className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    whileTap={{ scale: 0.9 }}>
+                    
                       <X className="w-3 h-3" />
                     </motion.button>
                   </div>
-                ))}
+                )}
                 
-                {uploadedImages.length < 5 && (
-                  <motion.button
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploadingImages}
-                    className="aspect-square rounded-xl border-2 border-dashed border-border hover:border-primary flex flex-col items-center justify-center gap-1 transition-colors"
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    {uploadingImages ? (
-                      <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-                    ) : (
-                      <>
+                {uploadedImages.length < 5 &&
+                <motion.button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingImages}
+                  className="aspect-square rounded-xl border-2 border-dashed border-border hover:border-primary flex flex-col items-center justify-center gap-1 transition-colors"
+                  whileTap={{ scale: 0.95 }}>
+                  
+                    {uploadingImages ?
+                  <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /> :
+
+                  <>
                         <ImagePlus className="w-5 h-5 text-muted-foreground" />
                         <span className="text-[10px] text-muted-foreground">{tr("secondhandmarket_elave_et_6e1b9b", "Əlavə et")}</span>
                       </>
-                    )}
+                  }
                   </motion.button>
-                )}
+                }
               </div>
               <input
                 ref={fileInputRef}
@@ -609,8 +609,8 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 accept="image/*"
                 multiple
                 onChange={handleImageUpload}
-                className="hidden"
-              />
+                className="hidden" />
+              
             </div>
             
             <div>
@@ -619,8 +619,8 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 placeholder={tr("secondhandmarket_meselen_0_3_ay_oglan_geyimleri_55b327", "Məsələn: 0-3 ay oğlan geyimləri")}
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="bg-muted/50"
-              />
+                className="bg-muted/50" />
+              
             </div>
             
             <div>
@@ -630,71 +630,71 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
-                className="bg-muted/50"
-              />
+                className="bg-muted/50" />
+              
             </div>
             
             <div>
               <label className="text-sm font-medium mb-2 block">Kateqoriya</label>
               <div className="flex flex-wrap gap-2">
-                {categories.map(cat => (
-                  <motion.button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, category: cat.id })}
-                    className={`px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 ${
-                      formData.category === cat.id 
-                        ? `bg-gradient-to-r ${cat.color} text-white shadow-lg` 
-                        : 'bg-muted hover:bg-muted/80'
-                    }`}
-                    whileTap={{ scale: 0.95 }}
-                  >
+                {categories.map((cat) =>
+                <motion.button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, category: cat.id })}
+                  className={`px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 ${
+                  formData.category === cat.id ?
+                  `bg-gradient-to-r ${cat.color} text-white shadow-lg` :
+                  'bg-muted hover:bg-muted/80'}`
+                  }
+                  whileTap={{ scale: 0.95 }}>
+                  
                     {cat.emoji} {cat.label}
                   </motion.button>
-                ))}
+                )}
               </div>
             </div>
             
             <div>
               <label className="text-sm font-medium mb-2 block">{tr("secondhandmarket_veziyyet_f0e993", "Vəziyyət")}</label>
               <div className="flex flex-wrap gap-2">
-                {conditions.map(cond => (
-                  <motion.button
-                    key={cond.id}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, condition: cond.id })}
-                    className={`px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 ${
-                      formData.condition === cond.id 
-                        ? `${cond.color} text-white shadow-lg` 
-                        : 'bg-muted hover:bg-muted/80'
-                    }`}
-                    whileTap={{ scale: 0.95 }}
-                  >
+                {conditions.map((cond) =>
+                <motion.button
+                  key={cond.id}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, condition: cond.id })}
+                  className={`px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 ${
+                  formData.condition === cond.id ?
+                  `${cond.color} text-white shadow-lg` :
+                  'bg-muted hover:bg-muted/80'}`
+                  }
+                  whileTap={{ scale: 0.95 }}>
+                  
                     <span className={`w-2 h-2 rounded-full ${formData.condition === cond.id ? 'bg-white' : cond.color}`} />
                     {cond.label}
                   </motion.button>
-                ))}
+                )}
               </div>
             </div>
             
             <div>
               <label className="text-sm font-medium mb-2 block">{tr("secondhandmarket_yas_araligi_2e277e", "Yaş aralığı")}</label>
               <div className="flex flex-wrap gap-2">
-                {ageRanges.map(age => (
-                  <motion.button
-                    key={age}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, age_range: age })}
-                    className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${
-                      formData.age_range === age 
-                        ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg' 
-                        : 'bg-muted hover:bg-muted/80'
-                    }`}
-                    whileTap={{ scale: 0.95 }}
-                  >
+                {ageRanges.map((age) =>
+                <motion.button
+                  key={age}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, age_range: age })}
+                  className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                  formData.age_range === age ?
+                  'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg' :
+                  'bg-muted hover:bg-muted/80'}`
+                  }
+                  whileTap={{ scale: 0.95 }}>
+                  
                     {age}
                   </motion.button>
-                ))}
+                )}
               </div>
             </div>
             
@@ -705,31 +705,31 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                   type="button"
                   variant={formData.is_free ? 'default' : 'outline'}
                   className={formData.is_free ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : ''}
-                  onClick={() => setFormData({ ...formData, is_free: true, price: 0 })}
-                >
+                  onClick={() => setFormData({ ...formData, is_free: true, price: 0 })}>
+                  
                   Pulsuz
                 </Button>
                 <Button
                   type="button"
                   variant={!formData.is_free ? 'default' : 'outline'}
                   className={!formData.is_free ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : ''}
-                  onClick={() => setFormData({ ...formData, is_free: false })}
-                >
+                  onClick={() => setFormData({ ...formData, is_free: false })}>
+                  
                   Pullu
                 </Button>
               </div>
-              {!formData.is_free && (
-                <div className="flex items-center gap-2">
+              {!formData.is_free &&
+              <div className="flex items-center gap-2">
                   <Input
-                    type="number"
-                    placeholder="0"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                    className="w-24 bg-muted/50"
-                  />
+                  type="number"
+                  placeholder="0"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                  className="w-24 bg-muted/50" />
+                
                   <span className="text-muted-foreground">₼</span>
                 </div>
-              )}
+              }
             </div>
             
             <div>
@@ -738,26 +738,26 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 placeholder={tr("secondhandmarket_meselen_baki_425cda", "Məsələn: Bakı")}
                 value={formData.location_city}
                 onChange={(e) => setFormData({ ...formData, location_city: e.target.value })}
-                className="bg-muted/50"
-              />
+                className="bg-muted/50" />
+              
             </div>
             
-            <Button 
-              className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700" 
+            <Button
+              className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
               onClick={handleCreateListing}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
+              disabled={isSubmitting}>
+              
+              {isSubmitting ?
+              <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Yaradılır...
-                </>
-              ) : (
-                <>
+                  {tr("secondhandmarket_yaradilir_9bb5ed", "Yarad\u0131l\u0131r...")}
+                </> :
+
+              <>
                   <Check className="w-4 h-4 mr-2" />
                   Elan yarat
                 </>
-              )}
+              }
             </Button>
           </div>
         </DialogContent>
@@ -766,42 +766,42 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
       {/* Listing Detail Modal */}
       <Dialog open={showDetailModal} onOpenChange={setShowDetailModal}>
         <DialogContent className="max-h-[90vh] overflow-y-auto p-0">
-          {selectedListing && (
-            <>
+          {selectedListing &&
+          <>
               {/* Image Gallery */}
               <div className="relative">
-                {selectedListing.images && selectedListing.images.length > 0 ? (
-                  <div className="aspect-video bg-muted">
-                    <img 
-                      src={selectedListing.images[0]} 
-                      alt={selectedListing.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className={`aspect-video bg-gradient-to-br ${getCategoryInfo(selectedListing.category).color} flex items-center justify-center`}>
+                {selectedListing.images && selectedListing.images.length > 0 ?
+              <div className="aspect-video bg-muted">
+                    <img
+                  src={selectedListing.images[0]}
+                  alt={selectedListing.title}
+                  className="w-full h-full object-cover" />
+                
+                  </div> :
+
+              <div className={`aspect-video bg-gradient-to-br ${getCategoryInfo(selectedListing.category).color} flex items-center justify-center`}>
                     <span className="text-7xl">{getCategoryInfo(selectedListing.category).emoji}</span>
                   </div>
-                )}
+              }
                 
                 <motion.button
-                  onClick={() => setShowDetailModal(false)}
-                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center"
-                  whileTap={{ scale: 0.95 }}
-                >
+                onClick={() => setShowDetailModal(false)}
+                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center"
+                whileTap={{ scale: 0.95 }}>
+                
                   <X className="w-4 h-4 text-white" />
                 </motion.button>
 
                 {/* Image thumbnails */}
-                {selectedListing.images && selectedListing.images.length > 1 && (
-                  <div className="absolute bottom-3 left-3 right-3 flex gap-2 overflow-x-auto">
-                    {selectedListing.images.map((img, i) => (
-                      <div key={i} className="w-12 h-12 rounded-lg overflow-hidden shrink-0 border-2 border-white/50">
+                {selectedListing.images && selectedListing.images.length > 1 &&
+              <div className="absolute bottom-3 left-3 right-3 flex gap-2 overflow-x-auto">
+                    {selectedListing.images.map((img, i) =>
+                <div key={i} className="w-12 h-12 rounded-lg overflow-hidden shrink-0 border-2 border-white/50">
                         <img src={img} alt="" className="w-full h-full object-cover" />
                       </div>
-                    ))}
-                  </div>
                 )}
+                  </div>
+              }
               </div>
               
               <div className="p-5 space-y-4">
@@ -811,9 +811,9 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                     <Badge className={`${getConditionInfo(selectedListing.condition).color} text-white border-0`}>
                       {getConditionInfo(selectedListing.condition).label}
                     </Badge>
-                    {selectedListing.age_range && (
-                      <Badge variant="secondary">{selectedListing.age_range}</Badge>
-                    )}
+                    {selectedListing.age_range &&
+                  <Badge variant="secondary">{selectedListing.age_range}</Badge>
+                  }
                   </div>
                 </div>
                 
@@ -832,27 +832,27 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                   </CardContent>
                 </Card>
                 
-                {selectedListing.description && (
-                  <div>
+                {selectedListing.description &&
+              <div>
                     <h4 className="font-bold mb-2">{tr("secondhandmarket_tesvir_f85651", "Təsvir")}</h4>
                     <p className="text-muted-foreground">{selectedListing.description}</p>
                   </div>
-                )}
+              }
                 
-                {selectedListing.location_city && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
+                {selectedListing.location_city &&
+              <div className="flex items-center gap-2 text-muted-foreground">
                     <MapPin className="w-4 h-4" />
                     {selectedListing.location_city}
                   </div>
-                )}
+              }
                 
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Clock className="w-4 h-4" />
                   {format(new Date(selectedListing.created_at), 'd MMMM yyyy', { locale: az })}
                 </div>
                 
-              <Button 
-                className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700" 
+              <Button
+                className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
                 size="lg"
                 onClick={() => {
                   setShowDetailModal(false);
@@ -861,14 +861,14 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                     setShowContactModal(true);
                   }
                 }}
-                disabled={selectedListing?.user_id === profile?.user_id}
-              >
+                disabled={selectedListing?.user_id === profile?.user_id}>
+                
                 <MessageCircle className="w-5 h-5 mr-2" />
-                {selectedListing?.user_id === profile?.user_id ? 'Öz elanınızdır' : 'Satıcı ilə əlaqə'}
+                {selectedListing?.user_id === profile?.user_id ? tr("secondhandmarket_oz_elaninizdir_4cfb3d", "\xD6z elan\u0131n\u0131zd\u0131r") : tr("secondhandmarket_satici_ile_elaqe_a7f3e8", "Sat\u0131c\u0131 il\u0259 \u0259laq\u0259")}
               </Button>
               </div>
             </>
-          )}
+          }
         </DialogContent>
       </Dialog>
 
@@ -878,21 +878,21 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <MessageCircle className="w-5 h-5 text-emerald-500" />
-              Satıcı ilə əlaqə
+              {tr("secondhandmarket_satici_ile_elaqe_a7f3e8", "Sat\u0131c\u0131 il\u0259 \u0259laq\u0259")}
             </DialogTitle>
           </DialogHeader>
           
-          {contactListing && (
-            <div className="space-y-4 mt-2">
+          {contactListing &&
+          <div className="space-y-4 mt-2">
               {/* Listing info */}
               <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
-                {contactListing.images?.[0] ? (
-                  <img src={contactListing.images[0]} alt="" className="w-12 h-12 rounded-lg object-cover" />
-                ) : (
-                  <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${getCategoryInfo(contactListing.category).color} flex items-center justify-center`}>
+                {contactListing.images?.[0] ?
+              <img src={contactListing.images[0]} alt="" className="w-12 h-12 rounded-lg object-cover" /> :
+
+              <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${getCategoryInfo(contactListing.category).color} flex items-center justify-center`}>
                     <span className="text-xl">{getCategoryInfo(contactListing.category).emoji}</span>
                   </div>
-                )}
+              }
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm truncate">{contactListing.title}</p>
                   <p className="text-xs text-muted-foreground">
@@ -903,58 +903,58 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
 
               {/* Messages */}
               <div className="max-h-60 overflow-y-auto space-y-2 p-2">
-                {contactMessages.length === 0 ? (
-                  <div className="text-center py-6">
+                {contactMessages.length === 0 ?
+              <div className="text-center py-6">
                     <MessageCircle className="w-10 h-10 mx-auto text-muted-foreground/30 mb-2" />
                     <p className="text-sm text-muted-foreground">{tr("secondhandmarket_hele_mesaj_yoxdur_cf0b5e", "Hələ mesaj yoxdur")}</p>
                     <p className="text-xs text-muted-foreground">{tr("secondhandmarket_saticiya_mesaj_gonderin_ad78e2", "Satıcıya mesaj göndərin")}</p>
-                  </div>
-                ) : (
-                  contactMessages.map(msg => (
-                    <div 
-                      key={msg.id}
-                      className={`flex ${msg.sender_id === profile?.user_id ? 'justify-end' : 'justify-start'}`}
-                    >
+                  </div> :
+
+              contactMessages.map((msg) =>
+              <div
+                key={msg.id}
+                className={`flex ${msg.sender_id === profile?.user_id ? 'justify-end' : 'justify-start'}`}>
+                
                       <div className={`max-w-[75%] px-3 py-2 rounded-2xl text-sm ${
-                        msg.sender_id === profile?.user_id 
-                          ? 'bg-primary text-primary-foreground rounded-br-sm' 
-                          : 'bg-muted rounded-bl-sm'
-                      }`}>
+                msg.sender_id === profile?.user_id ?
+                'bg-primary text-primary-foreground rounded-br-sm' :
+                'bg-muted rounded-bl-sm'}`
+                }>
                         <p>{msg.content}</p>
                         <p className={`text-[10px] mt-1 ${
-                          msg.sender_id === profile?.user_id ? 'text-primary-foreground/60' : 'text-muted-foreground'
-                        }`}>
+                  msg.sender_id === profile?.user_id ? 'text-primary-foreground/60' : 'text-muted-foreground'}`
+                  }>
                           {format(new Date(msg.created_at), 'HH:mm')}
                         </p>
                       </div>
                     </div>
-                  ))
-                )}
+              )
+              }
               </div>
 
               {/* Message input */}
               <div className="flex gap-2">
                 <Input
-                  placeholder={tr("secondhandmarket_mesajinizi_yazin_21d48f", "Mesajınızı yazın...")}
-                  value={contactMessage}
-                  onChange={(e) => setContactMessage(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={handleSendMessage}
-                  disabled={!contactMessage.trim() || sendingMessage}
-                  className="bg-gradient-to-r from-emerald-500 to-teal-600"
-                >
+                placeholder={tr("secondhandmarket_mesajinizi_yazin_21d48f", "Mesajınızı yazın...")}
+                value={contactMessage}
+                onChange={(e) => setContactMessage(e.target.value)}
+                onKeyDown={(e) => {if (e.key === 'Enter' && !e.shiftKey) {e.preventDefault();handleSendMessage();}}}
+                className="flex-1" />
+              
+                <Button
+                onClick={handleSendMessage}
+                disabled={!contactMessage.trim() || sendingMessage}
+                className="bg-gradient-to-r from-emerald-500 to-teal-600">
+                
                   {sendingMessage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 </Button>
               </div>
             </div>
-          )}
+          }
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 };
 
 export default SecondHandMarket;

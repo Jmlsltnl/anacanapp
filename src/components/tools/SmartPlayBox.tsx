@@ -23,15 +23,15 @@ const SKILL_COLORS: Record<string, string> = {
   sensory: 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300',
   language: 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300',
   cognitive: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300',
-  social: 'bg-pink-100 text-pink-700 dark:bg-pink-900/50 dark:text-pink-300',
+  social: 'bg-pink-100 text-pink-700 dark:bg-pink-900/50 dark:text-pink-300'
 };
 
 const SKILL_LABELS: Record<string, string> = {
   motor: '💪 Motor',
-  sensory: '✋ Duyğu',
+  sensory: tr("smartplaybox_duygu_a3bf01", "\u270B Duy\u011Fu"),
   language: '🗣️ Dil',
   cognitive: '🧠 İdrak',
-  social: '👥 Sosial',
+  social: '👥 Sosial'
 };
 
 const SKILL_ICONS: Record<string, string> = {
@@ -39,13 +39,13 @@ const SKILL_ICONS: Record<string, string> = {
   sensory: '✋',
   language: '🗣️',
   cognitive: '🧠',
-  social: '👥',
+  social: '👥'
 };
 
-const DIFFICULTY_LABELS: Record<string, { label: string; color: string }> = {
+const DIFFICULTY_LABELS: Record<string, {label: string;color: string;}> = {
   easy: { label: 'Asan', color: 'bg-green-100 text-green-700' },
   medium: { label: 'Orta', color: 'bg-amber-100 text-amber-700' },
-  hard: { label: tr("smartplaybox_cetin_4bf032", 'Çətin'), color: 'bg-red-100 text-red-700' },
+  hard: { label: tr("smartplaybox_cetin_4bf032", 'Çətin'), color: 'bg-red-100 text-red-700' }
 };
 
 const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
@@ -62,7 +62,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
     const birthDate = new Date(profile.baby_birth_date);
     const days = differenceInDays(new Date(), birthDate);
     const months = differenceInMonths(new Date(), birthDate);
-    
+
     let label = '';
     if (months < 1) {
       label = `${days} günlük`;
@@ -73,18 +73,18 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
       const remainingMonths = months % 12;
       label = `${years} yaş${remainingMonths > 0 ? ` ${remainingMonths} ay` : ''}`;
     }
-    
+
     return { days, months, label };
   }, [profile?.baby_birth_date]);
 
   const { data: inventoryItems = [] } = usePlayInventoryItems();
   const { data: userInventory = [] } = useUserPlayInventory();
   const { data: allActivities = [], isLoading } = usePlayActivities();
-  
+
   const toggleInventory = useToggleInventoryItem();
   const logActivity = useLogPlayActivity();
 
-  const userInventoryNames = userInventory.map(i => i.item_name.toLowerCase().replace(/\s+/g, '_'));
+  const userInventoryNames = userInventory.map((i) => i.item_name.toLowerCase().replace(/\s+/g, '_'));
 
   // Filter activities based on baby age and available items
   const { filteredActivities, matchedActivities, allAgeActivities } = useMemo(() => {
@@ -94,8 +94,8 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
 
     // Filter by age if baby age is known
     if (babyInfo.days !== undefined) {
-      activities = activities.filter(a => 
-        babyInfo.days! >= a.min_age_days && babyInfo.days! <= a.max_age_days
+      activities = activities.filter((a) =>
+      babyInfo.days! >= a.min_age_days && babyInfo.days! <= a.max_age_days
       );
     }
 
@@ -103,20 +103,20 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
 
     // Find activities that match user's inventory
     if (userInventoryNames.length > 0) {
-      matched = activities.filter(a => {
+      matched = activities.filter((a) => {
         if (!a.required_items?.length) return true;
-        return a.required_items.some(item => 
-          userInventoryNames.includes(item.toLowerCase().replace(/\s+/g, '_'))
+        return a.required_items.some((item) =>
+        userInventoryNames.includes(item.toLowerCase().replace(/\s+/g, '_'))
         );
       });
 
       // Sort matched by number of matching items
       matched = [...matched].sort((a, b) => {
-        const aMatches = a.required_items?.filter(item => 
-          userInventoryNames.includes(item.toLowerCase().replace(/\s+/g, '_'))
+        const aMatches = a.required_items?.filter((item) =>
+        userInventoryNames.includes(item.toLowerCase().replace(/\s+/g, '_'))
         ).length || 0;
-        const bMatches = b.required_items?.filter(item => 
-          userInventoryNames.includes(item.toLowerCase().replace(/\s+/g, '_'))
+        const bMatches = b.required_items?.filter((item) =>
+        userInventoryNames.includes(item.toLowerCase().replace(/\s+/g, '_'))
         ).length || 0;
         return bMatches - aMatches;
       });
@@ -130,12 +130,12 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
 
   const handleCompleteActivity = async () => {
     if (!selectedActivity) return;
-    
-    await logActivity.mutateAsync({ 
-      activityId: selectedActivity.id, 
-      rating: rating > 0 ? rating : undefined 
+
+    await logActivity.mutateAsync({
+      activityId: selectedActivity.id,
+      rating: rating > 0 ? rating : undefined
     });
-    
+
     setShowComplete(false);
     setSelectedActivity(null);
     setRating(0);
@@ -145,17 +145,17 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
     return userInventoryNames.includes(itemName.toLowerCase().replace(/\s+/g, '_'));
   };
 
-  const handleToggleItem = async (item: { name: string; name_az: string }) => {
+  const handleToggleItem = async (item: {name: string;name_az: string;}) => {
     await toggleInventory.mutateAsync({
       itemName: item.name,
-      itemNameAz: item.name_az,
+      itemNameAz: item.name_az
     });
   };
 
   // Group inventory items by category
   const groupedInventory = useMemo(() => {
     const groups: Record<string, typeof inventoryItems> = {};
-    inventoryItems.forEach(item => {
+    inventoryItems.forEach((item) => {
       const cat = item.category || 'general';
       if (!groups[cat]) groups[cat] = [];
       groups[cat].push(item);
@@ -165,14 +165,14 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
 
   const categoryLabels: Record<string, string> = {
     home: '🏠 Ev',
-    kitchen: '🍳 Mətbəx',
-    recyclable: '♻️ Təkrar istifadə',
+    kitchen: tr("smartplaybox_metbex_4f67cc", "\uD83C\uDF73 M\u0259tb\u0259x"),
+    recyclable: tr("smartplaybox_tekrar_istifade_4effdb", "\u267B\uFE0F T\u0259krar istifad\u0259"),
     office: '📎 Ofis',
     clothing: '👕 Paltar',
     toys: '🧸 Oyuncaq',
-    education: '📚 Təhsil',
+    education: tr("smartplaybox_tehsil_ce8208", "\uD83D\uDCDA T\u0259hsil"),
     electronics: '📱 Elektronika',
-    general: '📦 Ümumi',
+    general: tr("smartplaybox_umumi_980283", "\uD83D\uDCE6 \xDCmumi")
   };
 
   const getActivityEmoji = (skills: string[]) => {
@@ -195,38 +195,38 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
           <div className="flex-1">
             <h1 className="text-lg font-bold flex items-center gap-2">
               <Sparkles className="h-5 w-5" />
-              Ağıllı Oyun Qutusu
+              {tr("smartplaybox_agilli_oyun_qutusu_db6ef9", "A\u011F\u0131ll\u0131 Oyun Qutusu")}
             </h1>
-            {babyInfo.label && (
-              <p className="text-xs text-white/80 flex items-center gap-1">
+            {babyInfo.label &&
+            <p className="text-xs text-white/80 flex items-center gap-1">
                 <Baby className="h-3 w-3" />
-                Körpəniz {babyInfo.label}
+                {tr("smartplaybox_korpeniz_da99de", "K\xF6rp\u0259niz")} {babyInfo.label}
               </p>
-            )}
+            }
           </div>
           <Button
             variant="ghost"
             size="icon"
             className="text-white hover:bg-white/20 relative z-30"
-            onClick={() => setShowInventory(true)}
-          >
+            onClick={() => setShowInventory(true)}>
+            
             <Package className="h-5 w-5" />
-            {userInventory.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-white text-violet-600 text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+            {userInventory.length > 0 &&
+            <span className="absolute -top-1 -right-1 bg-white text-violet-600 text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
                 {userInventory.length}
               </span>
-            )}
+            }
           </Button>
         </div>
       </div>
 
       <div className="p-4 space-y-4">
         {/* Setup prompt if no inventory */}
-        {userInventory.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
+        {userInventory.length === 0 &&
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}>
+          
             <Card className="border-violet-200 bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20">
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
@@ -235,31 +235,31 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-violet-800 dark:text-violet-200">
-                      Evdəki əşyaları seçin
+                      {tr("smartplaybox_evdeki_esyalari_secin_3b81dd", "Evd\u0259ki \u0259\u015Fyalar\u0131 se\xE7in")}
                     </h3>
                     <p className="text-sm text-violet-700 dark:text-violet-300 mt-1">
-                      Daha dəqiq oyun təklifləri üçün evinizdəki əşyaları qeyd edin.
+                      {tr("smartplaybox_daha_deqiq_oyun_teklifleri_ucu_c0c456", "Daha d\u0259qiq oyun t\u0259klifl\u0259ri \xFC\xE7\xFCn evinizd\u0259ki \u0259\u015Fyalar\u0131 qeyd edin.")}
                     </p>
-                    <Button 
-                      size="sm" 
-                      className="mt-3 bg-violet-600 hover:bg-violet-700"
-                      onClick={() => setShowInventory(true)}
-                    >
-                      Əşyaları seç
-                    </Button>
+                    <Button
+                    size="sm"
+                    className="mt-3 bg-violet-600 hover:bg-violet-700"
+                    onClick={() => setShowInventory(true)}>
+                      {tr("smartplaybox_esyalari_sec_67bfb1", "\u018F\u015Fyalar\u0131 se\xE7")}
+                    
+                  </Button>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </motion.div>
-        )}
+        }
 
         {/* Today's Activity Card */}
-        {todaysActivity && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-          >
+        {todaysActivity &&
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}>
+          
             <Card className="overflow-hidden border-0 shadow-xl">
               <div className="bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-500 text-white p-5">
                 <div className="flex items-center gap-2 mb-3">
@@ -267,11 +267,11 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                   <span className="font-semibold">{tr("smartplaybox_bugunku_tovsiye_ec6c3a", "Bugünkü Tövsiyə")}</span>
                 </div>
                 <div className="flex items-start gap-4">
-                  <motion.div 
-                    className="text-5xl"
-                    animate={{ rotate: [0, 5, -5, 0] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
+                  <motion.div
+                  className="text-5xl"
+                  animate={{ rotate: [0, 5, -5, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}>
+                  
                     {getActivityEmoji(todaysActivity.skill_tags || [])}
                   </motion.div>
                   <div className="flex-1">
@@ -284,60 +284,60 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                 <div className="flex items-center gap-4 mb-4">
                   <div className="flex items-center gap-1 text-muted-foreground">
                     <Clock className="h-4 w-4" />
-                    <span className="text-sm font-medium">{todaysActivity.duration_minutes} dəq</span>
+                    <span className="text-sm font-medium">{todaysActivity.duration_minutes} {tr("smartplaybox_deq_780a5c", "d\u0259q")}</span>
                   </div>
-                  {todaysActivity.difficulty_level && DIFFICULTY_LABELS[todaysActivity.difficulty_level] && (
-                    <Badge className={DIFFICULTY_LABELS[todaysActivity.difficulty_level].color}>
+                  {todaysActivity.difficulty_level && DIFFICULTY_LABELS[todaysActivity.difficulty_level] &&
+                <Badge className={DIFFICULTY_LABELS[todaysActivity.difficulty_level].color}>
                       {DIFFICULTY_LABELS[todaysActivity.difficulty_level].label}
                     </Badge>
-                  )}
+                }
                   <div className="flex gap-1">
-                    {todaysActivity.skill_tags?.map(skill => (
-                      <span key={skill} className="text-lg" title={SKILL_LABELS[skill]}>
+                    {todaysActivity.skill_tags?.map((skill) =>
+                  <span key={skill} className="text-lg" title={SKILL_LABELS[skill]}>
                         {SKILL_ICONS[skill]}
                       </span>
-                    ))}
+                  )}
                   </div>
                 </div>
 
-                {todaysActivity.required_items?.length > 0 && (
-                  <div className="mb-4">
+                {todaysActivity.required_items?.length > 0 &&
+              <div className="mb-4">
                     <p className="text-xs text-muted-foreground mb-2">{tr("smartplaybox_lazim_olan_esyalar_b33d1b", "Lazım olan əşyalar:")}</p>
                     <div className="flex flex-wrap gap-2">
-                      {todaysActivity.required_items.map(item => {
-                        const invItem = inventoryItems.find(i => 
-                          i.name.toLowerCase().replace(/\s+/g, '_') === item.toLowerCase().replace(/\s+/g, '_')
-                        );
-                        const hasItem = isItemSelected(item);
-                        return (
-                          <span 
-                            key={item}
-                            className={`text-sm px-3 py-1 rounded-full flex items-center gap-1 ${
-                              hasItem 
-                                ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300' 
-                                : 'bg-muted'
-                            }`}
-                          >
+                      {todaysActivity.required_items.map((item) => {
+                    const invItem = inventoryItems.find((i) =>
+                    i.name.toLowerCase().replace(/\s+/g, '_') === item.toLowerCase().replace(/\s+/g, '_')
+                    );
+                    const hasItem = isItemSelected(item);
+                    return (
+                      <span
+                        key={item}
+                        className={`text-sm px-3 py-1 rounded-full flex items-center gap-1 ${
+                        hasItem ?
+                        'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300' :
+                        'bg-muted'}`
+                        }>
+                        
                             {hasItem && <Check className="h-3 w-3" />}
                             {invItem?.emoji} {invItem?.name_az || item}
-                          </span>
-                        );
-                      })}
+                          </span>);
+
+                  })}
                     </div>
                   </div>
-                )}
+              }
 
-                <Button 
-                  className="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
-                  onClick={() => setSelectedActivity(todaysActivity)}
-                >
+                <Button
+                className="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+                onClick={() => setSelectedActivity(todaysActivity)}>
+                
                   <Play className="h-4 w-4 mr-2" />
-                  Oyuna Başla
+                  {tr("smartplaybox_oyuna_basla_fe4574", "Oyuna Ba\u015Fla")}
                 </Button>
               </CardContent>
             </Card>
           </motion.div>
-        )}
+        }
 
         {/* Skills Overview */}
         <Card>
@@ -347,13 +347,13 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
           <CardContent>
             <div className="grid grid-cols-5 gap-2">
               {Object.entries(SKILL_ICONS).map(([skill, icon]) => {
-                const count = filteredActivities.filter(a => a.skill_tags?.includes(skill)).length;
+                const count = filteredActivities.filter((a) => a.skill_tags?.includes(skill)).length;
                 return (
                   <div key={skill} className="text-center">
                     <div className="text-2xl mb-1">{icon}</div>
                     <p className="text-xs text-muted-foreground">{count}</p>
-                  </div>
-                );
+                  </div>);
+
               })}
             </div>
           </CardContent>
@@ -363,39 +363,39 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
         <div>
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-semibold">
-              {matchedActivities.length > 0 
-                ? `Sizin üçün (${matchedActivities.length})` 
-                : `Bütün Oyunlar (${filteredActivities.length})`}
+              {matchedActivities.length > 0 ?
+              `Sizin üçün (${matchedActivities.length})` :
+              `Bütün Oyunlar (${filteredActivities.length})`}
             </h2>
           </div>
           
-          {isLoading ? (
-            <div className="text-center py-12">
+          {isLoading ?
+          <div className="text-center py-12">
               <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary mb-2" />
               <p className="text-muted-foreground">{tr("smartplaybox_oyunlar_yuklenir_d1edd2", "Oyunlar yüklənir...")}</p>
-            </div>
-          ) : filteredActivities.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
+            </div> :
+          filteredActivities.length === 0 ?
+          <div className="text-center py-12 text-muted-foreground">
               <Baby className="h-12 w-12 mx-auto mb-2 opacity-50" />
               <p>{tr("smartplaybox_bu_yasa_uygun_oyun_tapilmadi_72e443", "Bu yaşa uyğun oyun tapılmadı")}</p>
-              {!profile?.baby_birth_date && (
-                <p className="text-sm mt-2">{tr("smartplaybox_profilde_korpenin_dogum_tarixini_elave_e_696d85", "Profildə körpənin doğum tarixini əlavə edin")}</p>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-3">
+              {!profile?.baby_birth_date &&
+            <p className="text-sm mt-2">{tr("smartplaybox_profilde_korpenin_dogum_tarixini_elave_e_696d85", "Profildə körpənin doğum tarixini əlavə edin")}</p>
+            }
+            </div> :
+
+          <div className="space-y-3">
               <AnimatePresence>
-                {(matchedActivities.length > 0 ? matchedActivities : filteredActivities).map((activity, index) => (
-                  <motion.div
-                    key={activity.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <Card 
-                      className="cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden group"
-                      onClick={() => setSelectedActivity(activity)}
-                    >
+                {(matchedActivities.length > 0 ? matchedActivities : filteredActivities).map((activity, index) =>
+              <motion.div
+                key={activity.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}>
+                
+                    <Card
+                  className="cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden group"
+                  onClick={() => setSelectedActivity(activity)}>
+                  
                       <CardContent className="p-0">
                         <div className="flex">
                           <div className="w-2 bg-gradient-to-b from-violet-500 to-purple-500 group-hover:w-3 transition-all" />
@@ -409,14 +409,14 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                                 <p className="text-sm text-muted-foreground line-clamp-1">{activity.description_az}</p>
                                 <div className="flex items-center gap-3 mt-2">
                                   <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                    <Clock className="h-3 w-3" /> {activity.duration_minutes} dəq
+                                    <Clock className="h-3 w-3" /> {activity.duration_minutes} {tr("smartplaybox_deq_780a5c", "d\u0259q")}
                                   </span>
                                   <div className="flex gap-1">
-                                    {activity.skill_tags?.slice(0, 3).map(skill => (
-                                      <span key={skill} className="text-sm" title={SKILL_LABELS[skill]}>
+                                    {activity.skill_tags?.slice(0, 3).map((skill) =>
+                                <span key={skill} className="text-sm" title={SKILL_LABELS[skill]}>
                                         {SKILL_ICONS[skill]}
                                       </span>
-                                    ))}
+                                )}
                                   </div>
                                 </div>
                               </div>
@@ -427,18 +427,18 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                       </CardContent>
                     </Card>
                   </motion.div>
-                ))}
+              )}
               </AnimatePresence>
             </div>
-          )}
+          }
         </div>
       </div>
 
       {/* Activity Detail Modal */}
       <Dialog open={!!selectedActivity && !showComplete} onOpenChange={(open) => !open && setSelectedActivity(null)}>
         <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto p-0">
-          {selectedActivity && (
-            <>
+          {selectedActivity &&
+          <>
               <div className="bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-500 text-white p-6">
                 <div className="flex items-center gap-4">
                   <div className="text-5xl">
@@ -448,7 +448,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                     <h2 className="text-xl font-bold">{selectedActivity.title_az}</h2>
                     <div className="flex items-center gap-2 mt-1 text-sm text-white/80">
                       <Clock className="h-4 w-4" />
-                      <span>{selectedActivity.duration_minutes} dəqiqə</span>
+                      <span>{selectedActivity.duration_minutes} {tr("smartplaybox_deqiqe_94641a", "d\u0259qiq\u0259")}</span>
                     </div>
                   </div>
                 </div>
@@ -459,49 +459,49 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                 
                 {/* Skills */}
                 <div className="flex flex-wrap gap-2">
-                  {selectedActivity.skill_tags?.map(skill => (
-                    <Badge key={skill} className={SKILL_COLORS[skill]}>
+                  {selectedActivity.skill_tags?.map((skill) =>
+                <Badge key={skill} className={SKILL_COLORS[skill]}>
                       {SKILL_LABELS[skill]}
                     </Badge>
-                  ))}
-                  {selectedActivity.difficulty_level && DIFFICULTY_LABELS[selectedActivity.difficulty_level] && (
-                    <Badge className={DIFFICULTY_LABELS[selectedActivity.difficulty_level].color}>
+                )}
+                  {selectedActivity.difficulty_level && DIFFICULTY_LABELS[selectedActivity.difficulty_level] &&
+                <Badge className={DIFFICULTY_LABELS[selectedActivity.difficulty_level].color}>
                       {DIFFICULTY_LABELS[selectedActivity.difficulty_level].label}
                     </Badge>
-                  )}
+                }
                 </div>
 
                 {/* Required items */}
-                {selectedActivity.required_items?.length > 0 && (
-                  <div>
+                {selectedActivity.required_items?.length > 0 &&
+              <div>
                     <h4 className="font-semibold mb-2">{tr("smartplaybox_lazim_olan_esyalar_8e1429", "📦 Lazım olan əşyalar")}</h4>
                     <div className="flex flex-wrap gap-2">
-                      {selectedActivity.required_items.map(item => {
-                        const invItem = inventoryItems.find(i => 
-                          i.name.toLowerCase().replace(/\s+/g, '_') === item.toLowerCase().replace(/\s+/g, '_')
-                        );
-                        const hasItem = isItemSelected(item);
-                        return (
-                          <span 
-                            key={item} 
-                            className={`px-3 py-1.5 rounded-full text-sm flex items-center gap-1 ${
-                              hasItem 
-                                ? 'bg-green-100 text-green-700 dark:bg-green-900/50' 
-                                : 'bg-muted'
-                            }`}
-                          >
+                      {selectedActivity.required_items.map((item) => {
+                    const invItem = inventoryItems.find((i) =>
+                    i.name.toLowerCase().replace(/\s+/g, '_') === item.toLowerCase().replace(/\s+/g, '_')
+                    );
+                    const hasItem = isItemSelected(item);
+                    return (
+                      <span
+                        key={item}
+                        className={`px-3 py-1.5 rounded-full text-sm flex items-center gap-1 ${
+                        hasItem ?
+                        'bg-green-100 text-green-700 dark:bg-green-900/50' :
+                        'bg-muted'}`
+                        }>
+                        
                             {hasItem && <Check className="h-3 w-3" />}
                             {invItem?.emoji} {invItem?.name_az || item}
-                          </span>
-                        );
-                      })}
+                          </span>);
+
+                  })}
                     </div>
                   </div>
-                )}
+              }
 
                 {/* Instructions */}
-                {selectedActivity.instructions_az && (
-                  <div>
+                {selectedActivity.instructions_az &&
+              <div>
                     <h4 className="font-semibold mb-2">{tr("smartplaybox_nece_oynamali_6cadac", "📝 Necə oynamalı")}</h4>
                     <div className="bg-muted rounded-lg p-4">
                       <p className="text-sm whitespace-pre-line leading-relaxed">
@@ -509,18 +509,18 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                       </p>
                     </div>
                   </div>
-                )}
+              }
 
                 <Button
-                  className="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
-                  onClick={() => setShowComplete(true)}
-                >
+                className="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+                onClick={() => setShowComplete(true)}>
+                
                   <Check className="h-4 w-4 mr-2" />
-                  Oyunu Tamamladım!
+                  {tr("smartplaybox_oyunu_tamamladim_51cdab", "Oyunu Tamamlad\u0131m!")}
                 </Button>
               </div>
             </>
-          )}
+          }
         </DialogContent>
       </Dialog>
 
@@ -533,28 +533,28 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
           <div className="text-center space-y-4">
             <p className="text-muted-foreground">{tr("smartplaybox_oyun_nece_kecdi_c5f5f4", "Oyun necə keçdi?")}</p>
             <div className="flex justify-center gap-2">
-              {[1, 2, 3, 4, 5].map(star => (
-                <motion.button
-                  key={star}
-                  whileHover={{ scale: 1.2 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => setRating(star)}
-                  className="text-3xl"
-                >
+              {[1, 2, 3, 4, 5].map((star) =>
+              <motion.button
+                key={star}
+                whileHover={{ scale: 1.2 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setRating(star)}
+                className="text-3xl">
+                
                   {rating >= star ? '⭐' : '☆'}
                 </motion.button>
-              ))}
+              )}
             </div>
             <Button
               className="w-full bg-gradient-to-r from-violet-600 to-purple-600"
               onClick={handleCompleteActivity}
-              disabled={logActivity.isPending}
-            >
-              {logActivity.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                'Qeyd et'
-              )}
+              disabled={logActivity.isPending}>
+              
+              {logActivity.isPending ?
+              <Loader2 className="h-4 w-4 animate-spin" /> :
+
+              'Qeyd et'
+              }
             </Button>
           </div>
         </DialogContent>
@@ -566,52 +566,52 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Package className="h-5 w-5 text-violet-500" />
-              Evdə Olan Əşyalar
+              {tr("smartplaybox_evde_olan_esyalar_382e9a", "Evd\u0259 Olan \u018F\u015Fyalar")}
             </DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            Evinizdə olan əşyaları seçin, sizə uyğun oyunlar tövsiyə edək.
+            {tr("smartplaybox_evinizde_olan_esyalari_secin_s_ec7864", "Evinizd\u0259 olan \u0259\u015Fyalar\u0131 se\xE7in, siz\u0259 uy\u011Fun oyunlar t\xF6vsiy\u0259 ed\u0259k.")}
           </p>
           
-          {userInventory.length > 0 && (
-            <div className="bg-violet-50 dark:bg-violet-900/20 p-3 rounded-lg">
+          {userInventory.length > 0 &&
+          <div className="bg-violet-50 dark:bg-violet-900/20 p-3 rounded-lg">
               <p className="text-sm font-medium text-violet-700 dark:text-violet-300">
-                ✓ {userInventory.length} əşya seçilib
+                ✓ {userInventory.length} {tr("smartplaybox_esya_secilib_cfd789", "\u0259\u015Fya se\xE7ilib")}
               </p>
             </div>
-          )}
+          }
 
           <div className="space-y-4">
-            {Object.entries(groupedInventory).map(([category, items]) => (
-              <div key={category}>
+            {Object.entries(groupedInventory).map(([category, items]) =>
+            <div key={category}>
                 <h4 className="font-semibold text-sm mb-2">{categoryLabels[category] || category}</h4>
                 <div className="flex flex-wrap gap-2">
-                  {items.map(item => (
-                    <motion.button
-                      key={item.id}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleToggleItem(item)}
-                      disabled={toggleInventory.isPending}
-                      className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm transition-all ${
-                        isItemSelected(item.name)
-                          ? 'bg-violet-500 text-white shadow-md'
-                          : 'bg-muted hover:bg-muted/80'
-                      }`}
-                    >
+                  {items.map((item) =>
+                <motion.button
+                  key={item.id}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleToggleItem(item)}
+                  disabled={toggleInventory.isPending}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm transition-all ${
+                  isItemSelected(item.name) ?
+                  'bg-violet-500 text-white shadow-md' :
+                  'bg-muted hover:bg-muted/80'}`
+                  }>
+                  
                       <span>{item.emoji}</span>
                       <span>{item.name_az}</span>
                       {isItemSelected(item.name) && <Check className="h-3 w-3" />}
                     </motion.button>
-                  ))}
+                )}
                 </div>
               </div>
-            ))}
+            )}
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 };
 
 export default SmartPlayBox;

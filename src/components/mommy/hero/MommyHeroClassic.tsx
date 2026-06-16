@@ -24,11 +24,11 @@ const MommyHeroClassic = ({ babyData, exactMonths, remainingDays, babyIllustrati
     accent: 'bg-primary/10 dark:bg-primary/20',
     text: 'text-primary',
     badge: 'bg-primary/10 text-primary',
-    progress: 'bg-primary',
+    progress: 'bg-primary'
   };
 
   const totalFirstYearDays = 365;
-  const progressPercent = Math.min((babyData.ageInDays / totalFirstYearDays) * 100, 100);
+  const progressPercent = Math.min(babyData.ageInDays / totalFirstYearDays * 100, 100);
 
 
   return (
@@ -36,8 +36,8 @@ const MommyHeroClassic = ({ babyData, exactMonths, remainingDays, babyIllustrati
       className={`relative overflow-hidden bg-gradient-to-br ${colors.bg} rounded-2xl p-4 shadow-card ${colors.border}`}
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.1 }}
-    >
+      transition={{ delay: 0.1 }}>
+      
       {/* Background blur orbs — same style as pregnancy hero */}
       <div className="absolute -top-12 -right-12 w-36 h-36 rounded-full bg-primary/10 blur-2xl" />
       <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-amber-200/40 blur-xl opacity-60" />
@@ -50,44 +50,44 @@ const MommyHeroClassic = ({ babyData, exactMonths, remainingDays, babyIllustrati
           animate={{
             scale: 1,
             opacity: 1,
-            y: [0, -4, 0],
+            y: [0, -4, 0]
           }}
           transition={{
             scale: { delay: 0.2, type: 'spring' },
             opacity: { delay: 0.2 },
-            y: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
-          }}
-        >
+            y: { duration: 4, repeat: Infinity, ease: 'easeInOut' }
+          }}>
+          
           <img
             src={babyIllustration}
             alt={`${babyData.name} — ${babyData.ageInMonths} aylıq`}
             className="w-full h-full object-contain drop-shadow-lg"
             onError={(e) => {
               (e.target as HTMLImageElement).src = '/placeholder.svg';
-            }}
-          />
+            }} />
+          
         </motion.div>
 
         {/* Main Text — baby name + day info */}
         <div className="text-center">
           <p className="text-lg font-bold text-foreground mb-1">
-            {babyData.name} • {babyData.ageInDays}. gün
+            {babyData.name} • {babyData.ageInDays}{tr("mommyheroclassic_gun_d96b5d", ". g\xFCn")}
           </p>
 
           {/* Badge chips — same style as pregnancy badges */}
           <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
-            {exactMonths > 0 && (
-              <span className={`text-xs font-semibold ${colors.badge} px-2 py-0.5 rounded-full`}>
+            {exactMonths > 0 &&
+            <span className={`text-xs font-semibold ${colors.badge} px-2 py-0.5 rounded-full`}>
                 {exactMonths} ay
               </span>
-            )}
-            {remainingDays > 0 && (
-              <span className={`text-xs font-semibold ${colors.badge} px-2 py-0.5 rounded-full`}>
-                {remainingDays} gün
-              </span>
-            )}
+            }
+            {remainingDays > 0 &&
             <span className={`text-xs font-semibold ${colors.badge} px-2 py-0.5 rounded-full`}>
-              {babyData.ageInDays} gün
+                {remainingDays} {tr("mommyheroclassic_gun_54e78d", "g\xFCn")}
+              </span>
+            }
+            <span className={`text-xs font-semibold ${colors.badge} px-2 py-0.5 rounded-full`}>
+              {babyData.ageInDays} {tr("mommyheroclassic_gun_54e78d", "g\xFCn")}
             </span>
           </div>
         </div>
@@ -104,13 +104,13 @@ const MommyHeroClassic = ({ babyData, exactMonths, remainingDays, babyIllustrati
               className={`h-full ${colors.progress} rounded-full`}
               initial={{ width: 0 }}
               animate={{ width: `${progressPercent}%` }}
-              transition={{ duration: 1, delay: 0.3 }}
-            />
+              transition={{ duration: 1, delay: 0.3 }} />
+            
           </div>
         </div>
       </div>
-    </motion.div>
-  );
+    </motion.div>);
+
 };
 
 export default MommyHeroClassic;

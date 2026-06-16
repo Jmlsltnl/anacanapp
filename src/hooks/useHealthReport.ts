@@ -25,7 +25,7 @@ export const useHealthReport = (period: string = '1month'): HealthReportData => 
   const { startDate, endDate } = useMemo(() => {
     const now = new Date();
     let start: Date;
-    
+
     switch (period) {
       case '1week':
         start = subDays(now, 7);
@@ -42,7 +42,7 @@ export const useHealthReport = (period: string = '1month'): HealthReportData => 
       default:
         start = subMonths(now, 1);
     }
-    
+
     return { startDate: start, endDate: now };
   }, [period]);
 
@@ -51,17 +51,17 @@ export const useHealthReport = (period: string = '1month'): HealthReportData => 
     queryKey: ['weight-entries-report', profile?.user_id, period],
     queryFn: async () => {
       if (!profile?.user_id) return [];
-      const { data, error } = await supabase
-        .from('weight_entries')
-        .select('*')
-        .eq('user_id', profile.user_id)
-        .gte('recorded_at', startDate.toISOString())
-        .lte('recorded_at', endDate.toISOString())
-        .order('recorded_at', { ascending: true });
+      const { data, error } = await supabase.
+      from('weight_entries').
+      select('*').
+      eq('user_id', profile.user_id).
+      gte('recorded_at', startDate.toISOString()).
+      lte('recorded_at', endDate.toISOString()).
+      order('recorded_at', { ascending: true });
       if (error) return [];
       return data || [];
     },
-    enabled: !!profile?.user_id,
+    enabled: !!profile?.user_id
   });
 
   // Fetch daily logs for water and mood
@@ -69,17 +69,17 @@ export const useHealthReport = (period: string = '1month'): HealthReportData => 
     queryKey: ['daily-logs-report', profile?.user_id, period],
     queryFn: async () => {
       if (!profile?.user_id) return [];
-      const { data, error } = await supabase
-        .from('daily_logs')
-        .select('*')
-        .eq('user_id', profile.user_id)
-        .gte('log_date', format(startDate, 'yyyy-MM-dd'))
-        .lte('log_date', format(endDate, 'yyyy-MM-dd'))
-        .order('log_date', { ascending: true });
+      const { data, error } = await supabase.
+      from('daily_logs').
+      select('*').
+      eq('user_id', profile.user_id).
+      gte('log_date', format(startDate, 'yyyy-MM-dd')).
+      lte('log_date', format(endDate, 'yyyy-MM-dd')).
+      order('log_date', { ascending: true });
       if (error) return [];
       return data || [];
     },
-    enabled: !!profile?.user_id,
+    enabled: !!profile?.user_id
   });
 
   // Fetch exercise logs
@@ -87,16 +87,16 @@ export const useHealthReport = (period: string = '1month'): HealthReportData => 
     queryKey: ['exercise-logs-report', profile?.user_id, period],
     queryFn: async () => {
       if (!profile?.user_id) return [];
-      const { data, error } = await supabase
-        .from('exercise_logs')
-        .select('*')
-        .eq('user_id', profile.user_id)
-        .gte('completed_at', startDate.toISOString())
-        .lte('completed_at', endDate.toISOString());
+      const { data, error } = await supabase.
+      from('exercise_logs').
+      select('*').
+      eq('user_id', profile.user_id).
+      gte('completed_at', startDate.toISOString()).
+      lte('completed_at', endDate.toISOString());
       if (error) return [];
       return data || [];
     },
-    enabled: !!profile?.user_id,
+    enabled: !!profile?.user_id
   });
 
   // Calculate trends
@@ -112,14 +112,14 @@ export const useHealthReport = (period: string = '1month'): HealthReportData => 
         label: tr("usehealthreport_orta_ceki_9c02ad", "Orta çəki"),
         value: `${latestWeight.toFixed(1)} kq`,
         trend: weightChange >= 0 ? `+${weightChange.toFixed(1)} kq` : `${weightChange.toFixed(1)} kq`,
-        positive: profile?.life_stage === 'bump' ? weightChange >= 0 : weightChange <= 0,
+        positive: profile?.life_stage === 'bump' ? weightChange >= 0 : weightChange <= 0
       });
     } else {
       result.push({
         label: tr("usehealthreport_orta_ceki_9c02ad", "Orta çəki"),
-        value: 'Məlumat yoxdur',
+        value: tr("usehealthreport_melumat_yoxdur_a3e271", "M\u0259lumat yoxdur"),
         trend: '-',
-        positive: true,
+        positive: true
       });
     }
 
@@ -127,42 +127,42 @@ export const useHealthReport = (period: string = '1month'): HealthReportData => 
     if (dailyLogs.length > 0) {
       const avgWater = dailyLogs.reduce((sum, log) => sum + (log.water_intake || 0), 0) / dailyLogs.length;
       const halfIndex = Math.floor(dailyLogs.length / 2);
-      const firstHalfAvg = halfIndex > 0 
-        ? dailyLogs.slice(0, halfIndex).reduce((sum, log) => sum + (log.water_intake || 0), 0) / halfIndex 
-        : avgWater;
-      const secondHalfAvg = halfIndex > 0 
-        ? dailyLogs.slice(halfIndex).reduce((sum, log) => sum + (log.water_intake || 0), 0) / (dailyLogs.length - halfIndex)
-        : avgWater;
-      const waterChange = firstHalfAvg > 0 ? ((secondHalfAvg - firstHalfAvg) / firstHalfAvg * 100) : 0;
-      
+      const firstHalfAvg = halfIndex > 0 ?
+      dailyLogs.slice(0, halfIndex).reduce((sum, log) => sum + (log.water_intake || 0), 0) / halfIndex :
+      avgWater;
+      const secondHalfAvg = halfIndex > 0 ?
+      dailyLogs.slice(halfIndex).reduce((sum, log) => sum + (log.water_intake || 0), 0) / (dailyLogs.length - halfIndex) :
+      avgWater;
+      const waterChange = firstHalfAvg > 0 ? (secondHalfAvg - firstHalfAvg) / firstHalfAvg * 100 : 0;
+
       result.push({
         label: tr("usehealthreport_su_qebulu_db1f3e", "Su qəbulu"),
         value: `${avgWater.toFixed(1)} stəkan/gün`,
         trend: waterChange >= 0 ? `+${waterChange.toFixed(0)}%` : `${waterChange.toFixed(0)}%`,
-        positive: waterChange >= 0,
+        positive: waterChange >= 0
       });
     } else {
       result.push({
         label: tr("usehealthreport_su_qebulu_db1f3e", "Su qəbulu"),
-        value: 'Məlumat yoxdur',
+        value: tr("usehealthreport_melumat_yoxdur_a3e271", "M\u0259lumat yoxdur"),
         trend: '-',
-        positive: true,
+        positive: true
       });
     }
 
     // Mood trend (average mood)
     if (dailyLogs.length > 0) {
-      const logsWithMood = dailyLogs.filter(log => log.mood != null);
+      const logsWithMood = dailyLogs.filter((log) => log.mood != null);
       if (logsWithMood.length > 0) {
         const avgMood = logsWithMood.reduce((sum, log) => sum + (log.mood || 0), 0) / logsWithMood.length;
-        const moodLabels = ['Çox pis', 'Pis', 'Normal', 'Yaxşı', 'Əla'];
+        const moodLabels = [tr("usehealthreport_cox_pis_e041c5", "\xC7ox pis"), 'Pis', 'Normal', tr("usehealthreport_yaxsi_9d8595", "Yax\u015F\u0131"), tr("usehealthreport_ela_720a0e", "\u018Fla")];
         const moodText = moodLabels[Math.round(avgMood) - 1] || 'Normal';
-        
+
         result.push({
           label: tr("usehealthreport_orta_ehval_1f8ef9", "Orta əhval"),
           value: moodText,
           trend: avgMood >= 3.5 ? '😊' : avgMood >= 2.5 ? '😐' : '😔',
-          positive: avgMood >= 3,
+          positive: avgMood >= 3
         });
       }
     }
@@ -171,12 +171,12 @@ export const useHealthReport = (period: string = '1month'): HealthReportData => 
     const daysInPeriod = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     const weeksInPeriod = Math.max(1, Math.ceil(daysInPeriod / 7));
     const exercisePerWeek = exerciseLogs.length / weeksInPeriod;
-    
+
     result.push({
       label: tr("usehealthreport_mesqler_603be9", "Məşqlər"),
       value: `${exercisePerWeek.toFixed(1)} dəfə/həftə`,
-      trend: exercisePerWeek >= 3 ? 'Əla!' : exercisePerWeek >= 1 ? 'Yaxşı' : 'Artırın',
-      positive: exercisePerWeek >= 2,
+      trend: exercisePerWeek >= 3 ? tr("usehealthreport_ela_e6330a", "\u018Fla!") : exercisePerWeek >= 1 ? tr("usehealthreport_yaxsi_9d8595", "Yax\u015F\u0131") : tr("usehealthreport_artirin_c4ea43", "Art\u0131r\u0131n"),
+      positive: exercisePerWeek >= 2
     });
 
     return result;
@@ -184,6 +184,6 @@ export const useHealthReport = (period: string = '1month'): HealthReportData => 
 
   return {
     trends,
-    isLoading: weightLoading || logsLoading || exerciseLoading,
+    isLoading: weightLoading || logsLoading || exerciseLoading
   };
 };

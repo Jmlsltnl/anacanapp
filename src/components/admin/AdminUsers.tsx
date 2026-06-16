@@ -11,21 +11,21 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  DropdownMenuTrigger } from
+'@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle } from
+'@/components/ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  SelectValue } from
+'@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -67,10 +67,10 @@ const AdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data, error } = await supabase.
+      from('profiles').
+      select('*').
+      order('created_at', { ascending: false });
 
       if (error) throw error;
       setUsers(data || []);
@@ -88,9 +88,9 @@ const AdminUsers = () => {
 
   const fetchUserRoles = async () => {
     try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('user_id, role');
+      const { data, error } = await supabase.
+      from('user_roles').
+      select('user_id, role');
 
       if (error) throw error;
       setUserRoles(data || []);
@@ -100,7 +100,7 @@ const AdminUsers = () => {
   };
 
   const getUserRole = (userId: string): 'admin' | 'moderator' | 'user' => {
-    const role = userRoles.find(r => r.user_id === userId);
+    const role = userRoles.find((r) => r.user_id === userId);
     if (role?.role === 'admin') return 'admin';
     if (role?.role === 'moderator') return 'moderator';
     return 'user';
@@ -108,16 +108,16 @@ const AdminUsers = () => {
 
   const handleUpdateUser = async (userId: string, updates: Partial<UserProfile>) => {
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('id', userId);
+      const { error } = await supabase.
+      from('profiles').
+      update(updates).
+      eq('id', userId);
 
       if (error) throw error;
 
       toast({
         title: tr("adminusers_ugurlu_7fe64c", "Uğurlu"),
-        description: 'İstifadəçi məlumatları yeniləndi'
+        description: tr("adminusers_i_stifadeci_melumatlari_yenile_b7069b", "\u0130stifad\u0259\xE7i m\u0259lumatlar\u0131 yenil\u0259ndi")
       });
 
       fetchUsers();
@@ -137,21 +137,21 @@ const AdminUsers = () => {
 
     try {
       // Check if user already has a role entry
-      const existingRole = userRoles.find(r => r.user_id === selectedUser.user_id);
+      const existingRole = userRoles.find((r) => r.user_id === selectedUser.user_id);
 
       if (existingRole) {
         // Update existing role
-        const { error } = await supabase
-          .from('user_roles')
-          .update({ role: selectedRole })
-          .eq('user_id', selectedUser.user_id);
+        const { error } = await supabase.
+        from('user_roles').
+        update({ role: selectedRole }).
+        eq('user_id', selectedUser.user_id);
 
         if (error) throw error;
       } else {
         // Insert new role
-        const { error } = await supabase
-          .from('user_roles')
-          .insert([{ user_id: selectedUser.user_id, role: selectedRole }]);
+        const { error } = await supabase.
+        from('user_roles').
+        insert([{ user_id: selectedUser.user_id, role: selectedRole }]);
 
         if (error) throw error;
       }
@@ -186,7 +186,7 @@ const AdminUsers = () => {
     setChangingPassword(true);
     try {
       const { data, error } = await supabase.functions.invoke('admin-change-user-password', {
-        body: { user_id: selectedUser.user_id, new_password: newPassword },
+        body: { user_id: selectedUser.user_id, new_password: newPassword }
       });
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
@@ -196,58 +196,58 @@ const AdminUsers = () => {
       setConfirmPassword('');
     } catch (err: any) {
       console.error('Error changing password:', err);
-      toast({ title: tr("adminusers_xeta_3cdbb6", "Xəta"), description: err?.message || 'Şifrə yenilənə bilmədi', variant: 'destructive' });
+      toast({ title: tr("adminusers_xeta_3cdbb6", "Xəta"), description: err?.message || tr("adminusers_sifre_yenilene_bilmedi_4ba698", "\u015Eifr\u0259 yenil\u0259n\u0259 bilm\u0259di"), variant: 'destructive' });
     } finally {
       setChangingPassword(false);
     }
   };
 
-  const filteredUsers = users.filter(user =>
-    user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredUsers = users.filter((user) =>
+  user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  user.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const getLifeStageLabel = (stage: string | null) => {
     switch (stage) {
-      case 'flow': return 'Menstruasiya';
-      case 'bump': return 'Hamiləlik';
-      case 'mommy': return 'Analıq';
-      case 'partner': return 'Partnyor';
-      default: return 'Müəyyən edilməyib';
+      case 'flow':return 'Menstruasiya';
+      case 'bump':return tr("adminusers_hamilelik_e86feb", "Hamil\u0259lik");
+      case 'mommy':return tr("adminusers_analiq_9e762d", "Anal\u0131q");
+      case 'partner':return 'Partnyor';
+      default:return tr("adminusers_mueyyen_edilmeyib_2d0de2", "M\xFC\u0259yy\u0259n edilm\u0259yib");
     }
   };
 
   const getLifeStageColor = (stage: string | null) => {
     switch (stage) {
-      case 'flow': return 'bg-pink-500/10 text-pink-500';
-      case 'bump': return 'bg-purple-500/10 text-purple-500';
-      case 'mommy': return 'bg-green-500/10 text-green-500';
-      case 'partner': return 'bg-blue-500/10 text-blue-500';
-      default: return 'bg-muted text-muted-foreground';
+      case 'flow':return 'bg-pink-500/10 text-pink-500';
+      case 'bump':return 'bg-purple-500/10 text-purple-500';
+      case 'mommy':return 'bg-green-500/10 text-green-500';
+      case 'partner':return 'bg-blue-500/10 text-blue-500';
+      default:return 'bg-muted text-muted-foreground';
     }
   };
 
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case 'admin': return 'Admin';
-      case 'moderator': return 'Moderator';
-      default: return 'İstifadəçi';
+      case 'admin':return 'Admin';
+      case 'moderator':return 'Moderator';
+      default:return tr("adminusers_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i");
     }
   };
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'admin': return 'bg-red-500/10 text-red-500 border-red-500/20';
-      case 'moderator': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-      default: return 'bg-muted text-muted-foreground';
+      case 'admin':return 'bg-red-500/10 text-red-500 border-red-500/20';
+      case 'moderator':return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+      default:return 'bg-muted text-muted-foreground';
     }
   };
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case 'admin': return <Crown className="w-3 h-3" />;
-      case 'moderator': return <Shield className="w-3 h-3" />;
-      default: return <User className="w-3 h-3" />;
+      case 'admin':return <Crown className="w-3 h-3" />;
+      case 'moderator':return <Shield className="w-3 h-3" />;
+      default:return <User className="w-3 h-3" />;
     }
   };
 
@@ -259,7 +259,7 @@ const AdminUsers = () => {
           <p className="text-muted-foreground">{tr("adminusers_butun_istifadecileri_idare_edin_42b284", "Bütün istifadəçiləri idarə edin")}</p>
         </div>
         <Badge variant="secondary" className="text-lg px-4 py-2">
-          {users.length} istifadəçi
+          {users.length} {tr("adminusers_istifadeci_84a198", "istifad\u0259\xE7i")}
         </Badge>
       </div>
 
@@ -272,8 +272,8 @@ const AdminUsers = () => {
               placeholder={tr("adminusers_ad_ve_ya_email_ile_axtar_335c5a", "Ad və ya email ilə axtar...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
+              className="pl-10" />
+            
           </div>
           <Button variant="outline" className="gap-2">
             <Filter className="w-4 h-4" />
@@ -297,29 +297,29 @@ const AdminUsers = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {loading ? (
-                <tr>
+              {loading ?
+              <tr>
                   <td colSpan={6} className="p-8 text-center text-muted-foreground">
-                    Yüklənir...
+                    {tr("adminusers_yuklenir_5557de", "Y\xFCkl\u0259nir...")}
                   </td>
-                </tr>
-              ) : filteredUsers.length === 0 ? (
-                <tr>
+                </tr> :
+              filteredUsers.length === 0 ?
+              <tr>
                   <td colSpan={6} className="p-8 text-center text-muted-foreground">
-                    İstifadəçi tapılmadı
+                    {tr("adminusers_i_stifadeci_tapilmadi_4e2156", "\u0130stifad\u0259\xE7i tap\u0131lmad\u0131")}
                   </td>
-                </tr>
-              ) : (
-                filteredUsers.map((user, index) => {
-                  const userRole = getUserRole(user.user_id);
-                  return (
-                    <motion.tr
-                      key={user.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="hover:bg-muted/30"
-                    >
+                </tr> :
+
+              filteredUsers.map((user, index) => {
+                const userRole = getUserRole(user.user_id);
+                return (
+                  <motion.tr
+                    key={user.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="hover:bg-muted/30">
+                    
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -361,28 +361,28 @@ const AdminUsers = () => {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => {
-                              setSelectedUser(user);
-                              setEditDialogOpen(true);
-                            }}>
+                            setSelectedUser(user);
+                            setEditDialogOpen(true);
+                          }}>
                               <Edit className="w-4 h-4 mr-2" />
-                              Redaktə et
+                              {tr("adminusers_redakte_et_66cf3b", "Redakt\u0259 et")}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => {
-                              setSelectedUser(user);
-                              setSelectedRole(getUserRole(user.user_id));
-                              setRoleDialogOpen(true);
-                            }}>
+                            setSelectedUser(user);
+                            setSelectedRole(getUserRole(user.user_id));
+                            setRoleDialogOpen(true);
+                          }}>
                               <Shield className="w-4 h-4 mr-2" />
-                              Rol təyin et
+                              {tr("adminusers_rol_teyin_et_41b431", "Rol t\u0259yin et")}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => {
-                              setSelectedUser(user);
-                              setNewPassword('');
-                              setConfirmPassword('');
-                              setPasswordDialogOpen(true);
-                            }}>
+                            setSelectedUser(user);
+                            setNewPassword('');
+                            setConfirmPassword('');
+                            setPasswordDialogOpen(true);
+                          }}>
                               <KeyRound className="w-4 h-4 mr-2" />
-                              Şifrəni dəyiş
+                              {tr("adminusers_sifreni_deyis_a48972", "\u015Eifr\u0259ni d\u0259yi\u015F")}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem className="text-destructive">
@@ -392,10 +392,10 @@ const AdminUsers = () => {
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </td>
-                    </motion.tr>
-                  );
-                })
-              )}
+                    </motion.tr>);
+
+              })
+              }
             </tbody>
           </table>
         </div>
@@ -407,21 +407,21 @@ const AdminUsers = () => {
           <DialogHeader>
             <DialogTitle>{tr("adminusers_istifadecini_redakte_et_f6c153", "İstifadəçini Redaktə Et")}</DialogTitle>
           </DialogHeader>
-          {selectedUser && (
-            <div className="space-y-4 mt-4">
+          {selectedUser &&
+          <div className="space-y-4 mt-4">
               <div>
                 <label className="text-sm font-medium">Ad</label>
                 <Input
-                  value={selectedUser.name}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, name: e.target.value })}
-                />
+                value={selectedUser.name}
+                onChange={(e) => setSelectedUser({ ...selectedUser, name: e.target.value })} />
+              
               </div>
               <div>
                 <label className="text-sm font-medium">{tr("adminusers_merhele_0e09aa", "Mərhələ")}</label>
                 <Select
-                  value={selectedUser.life_stage || ''}
-                  onValueChange={(value) => setSelectedUser({ ...selectedUser, life_stage: value })}
-                >
+                value={selectedUser.life_stage || ''}
+                onValueChange={(value) => setSelectedUser({ ...selectedUser, life_stage: value })}>
+                
                   <SelectTrigger>
                     <SelectValue placeholder={tr("adminusers_merhele_secin_a3f9bb", "Mərhələ seçin")} />
                   </SelectTrigger>
@@ -434,16 +434,16 @@ const AdminUsers = () => {
                 </Select>
               </div>
               <Button
-                className="w-full"
-                onClick={() => handleUpdateUser(selectedUser.id, {
-                  name: selectedUser.name,
-                  life_stage: selectedUser.life_stage
-                })}
-              >
+              className="w-full"
+              onClick={() => handleUpdateUser(selectedUser.id, {
+                name: selectedUser.name,
+                life_stage: selectedUser.life_stage
+              })}>
+              
                 Yadda saxla
               </Button>
             </div>
-          )}
+          }
         </DialogContent>
       </Dialog>
 
@@ -453,8 +453,8 @@ const AdminUsers = () => {
           <DialogHeader>
             <DialogTitle>{tr("adminusers_rol_teyin_et_ec751c", "Rol Təyin Et")}</DialogTitle>
           </DialogHeader>
-          {selectedUser && (
-            <div className="space-y-4 mt-4">
+          {selectedUser &&
+          <div className="space-y-4 mt-4">
               <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="text-primary font-bold">
@@ -470,9 +470,9 @@ const AdminUsers = () => {
               <div>
                 <label className="text-sm font-medium mb-2 block">{tr("adminusers_rol_secin_7dccbd", "Rol seçin")}</label>
                 <Select
-                  value={selectedRole}
-                  onValueChange={(value) => setSelectedRole(value as 'admin' | 'moderator' | 'user')}
-                >
+                value={selectedRole}
+                onValueChange={(value) => setSelectedRole(value as 'admin' | 'moderator' | 'user')}>
+                
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -480,7 +480,7 @@ const AdminUsers = () => {
                     <SelectItem value="user">
                       <div className="flex items-center gap-2">
                         <User className="w-4 h-4" />
-                        İstifadəçi
+                        {tr("adminusers_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}
                       </div>
                     </SelectItem>
                     <SelectItem value="moderator">
@@ -501,15 +501,15 @@ const AdminUsers = () => {
 
               <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
                 <p className="text-sm text-amber-600 dark:text-amber-400">
-                  ⚠️ Admin rollu istifadəçilər bütün sistem funksiyalarına tam giriş əldə edəcək.
+                  {tr("adminusers_admin_rollu_istifadeciler_butu_789e17", "\u26A0\uFE0F Admin rollu istifad\u0259\xE7il\u0259r b\xFCt\xFCn sistem funksiyalar\u0131na tam giri\u015F \u0259ld\u0259 ed\u0259c\u0259k.")}
                 </p>
               </div>
 
               <Button className="w-full" onClick={handleAssignRole}>
-                Rolu Təyin Et
+                {tr("adminusers_rolu_teyin_et_e61864", "Rolu T\u0259yin Et")}
               </Button>
             </div>
-          )}
+          }
         </DialogContent>
       </Dialog>
 
@@ -519,8 +519,8 @@ const AdminUsers = () => {
           <DialogHeader>
             <DialogTitle>{tr("adminusers_istifadecinin_sifresini_deyis_15d6c7", "İstifadəçinin şifrəsini dəyiş")}</DialogTitle>
           </DialogHeader>
-          {selectedUser && (
-            <div className="space-y-4 mt-4">
+          {selectedUser &&
+          <div className="space-y-4 mt-4">
               <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="text-primary font-bold">
@@ -537,17 +537,17 @@ const AdminUsers = () => {
                 <label className="text-sm font-medium mb-2 block">{tr("adminusers_yeni_sifre_8f04c6", "Yeni şifrə")}</label>
                 <div className="relative">
                   <Input
-                    type={showPassword ? 'text' : 'password'}
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder={tr("adminusers_en_azi_8_simvol_168104", "Ən azı 8 simvol")}
-                    className="pr-10"
-                  />
+                  type={showPassword ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder={tr("adminusers_en_azi_8_simvol_168104", "Ən azı 8 simvol")}
+                  className="pr-10" />
+                
                   <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                  
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
@@ -556,32 +556,32 @@ const AdminUsers = () => {
               <div>
                 <label className="text-sm font-medium mb-2 block">{tr("adminusers_sifreni_tesdiqle_6b3e17", "Şifrəni təsdiqlə")}</label>
                 <Input
-                  type={showPassword ? 'text' : 'password'}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder={tr("adminusers_yeni_sifreni_tekrar_daxil_edin_3c87dd", "Yeni şifrəni təkrar daxil edin")}
-                />
+                type={showPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder={tr("adminusers_yeni_sifreni_tekrar_daxil_edin_3c87dd", "Yeni şifrəni təkrar daxil edin")} />
+              
               </div>
 
               <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
                 <p className="text-sm text-amber-600 dark:text-amber-400">
-                  ⚠️ İstifadəçi yeni şifrə ilə yenidən daxil olmalı olacaq.
+                  {tr("adminusers_i_stifadeci_yeni_sifre_ile_yen_60d0cc", "\u26A0\uFE0F \u0130stifad\u0259\xE7i yeni \u015Fifr\u0259 il\u0259 yenid\u0259n daxil olmal\u0131 olacaq.")}
                 </p>
               </div>
 
               <Button
-                className="w-full"
-                onClick={handleChangePassword}
-                disabled={changingPassword || !newPassword || !confirmPassword}
-              >
-                {changingPassword ? 'Yenilənir...' : 'Şifrəni Dəyiş'}
+              className="w-full"
+              onClick={handleChangePassword}
+              disabled={changingPassword || !newPassword || !confirmPassword}>
+              
+                {changingPassword ? tr("adminusers_yenilenir_3017dc", "Yenil\u0259nir...") : tr("adminusers_sifreni_deyis_1d1a1f", "\u015Eifr\u0259ni D\u0259yi\u015F")}
               </Button>
             </div>
-          )}
+          }
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AdminUsers;

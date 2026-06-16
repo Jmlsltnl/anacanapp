@@ -17,8 +17,8 @@ interface CakesScreenProps {
 
 const getOrdinalSuffix = (n: number): string => {
   const suffixes: Record<number, string> = {
-    1: 'ci', 2: 'ci', 3: 'cü', 4: 'cü', 5: 'ci', 6: 'cı',
-    7: 'ci', 8: 'ci', 9: 'cu', 10: 'cu', 11: 'ci', 12: 'ci',
+    1: 'ci', 2: 'ci', 3: tr("cakesscreen_cu_a8237f", "c\xFC"), 4: tr("cakesscreen_cu_a8237f", "c\xFC"), 5: 'ci', 6: tr("cakesscreen_ci_581209", "c\u0131"),
+    7: 'ci', 8: 'ci', 9: 'cu', 10: 'cu', 11: 'ci', 12: 'ci'
   };
   return suffixes[n] || 'ci';
 };
@@ -26,7 +26,7 @@ const getOrdinalSuffix = (n: number): string => {
 const MONTHS = Array.from({ length: 12 }, (_, i) => ({
   id: i + 1,
   label: `${i + 1}-${getOrdinalSuffix(i + 1)} ay`,
-  emoji: ['🎂', '🧁', '🎀', '🌸', '⭐', '🎈', '🌈', '🎪', '🎠', '🎡', '🎆', '🎊'][i],
+  emoji: ['🎂', '🧁', '🎀', '🌸', '⭐', '🎈', '🌈', '🎪', '🎠', '🎡', '🎆', '🎊'][i]
 }));
 
 const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
@@ -34,7 +34,7 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
   useScreenAnalytics('Cakes', 'Shop');
   const { cakes, loading } = useCakes();
   const { totalItems } = useCakeCart();
-  
+
   const [activeFilter, setActiveFilter] = useState<'all' | 'milestone' | number>(initialMonth || 'all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCake, setSelectedCake] = useState<Cake | null>(null);
@@ -45,14 +45,14 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
   const filteredCakes = useMemo(() => {
     let filtered = cakes;
     if (activeFilter === 'milestone') {
-      filtered = filtered.filter(c => c.category === 'milestone');
+      filtered = filtered.filter((c) => c.category === 'milestone');
     } else if (typeof activeFilter === 'number') {
-      filtered = filtered.filter(c => c.category === 'month' && c.month_number === activeFilter);
+      filtered = filtered.filter((c) => c.category === 'month' && c.month_number === activeFilter);
     }
     if (searchQuery.trim()) {
-      filtered = filtered.filter(c => 
-        c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      filtered = filtered.filter((c) =>
+      c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.description?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
     return filtered;
@@ -64,48 +64,48 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200 }} className="text-8xl mb-6">🎂</motion.div>
         <h2 className="text-2xl font-black text-foreground mb-2">{tr("cakesscreen_sifarisiniz_qebul_edildi_ae5b9e", "Sifarişiniz qəbul edildi!")}</h2>
         <p className="text-muted-foreground mb-8">{tr("cakesscreen_tezlikle_sizinle_elaqe_saxlanilacaq_806311", "Tezliklə sizinlə əlaqə saxlanılacaq")}</p>
-        <button 
-          onClick={() => { setShowOrderSuccess(false); setShowCheckout(false); setSelectedCake(null); }}
-          className="px-8 py-3 rounded-2xl bg-primary text-primary-foreground font-bold"
-        >
-          Tortlara qayıt
+        <button
+          onClick={() => {setShowOrderSuccess(false);setShowCheckout(false);setSelectedCake(null);}}
+          className="px-8 py-3 rounded-2xl bg-primary text-primary-foreground font-bold">
+          {tr("cakesscreen_tortlara_qayit_c533c2", "Tortlara qay\u0131t")}
+        
         </button>
-      </div>
-    );
+      </div>);
+
   }
 
   if (showCheckout) {
     return (
-      <CakeOrderForm 
+      <CakeOrderForm
         onBack={() => setShowCheckout(false)}
-        onSuccess={() => setShowOrderSuccess(true)}
-      />
-    );
+        onSuccess={() => setShowOrderSuccess(true)} />);
+
+
   }
 
   if (selectedCake) {
     return (
       <>
-        <CakeDetailScreen 
+        <CakeDetailScreen
           cake={selectedCake}
           onBack={() => setSelectedCake(null)}
-          onOpenCart={() => setShowCart(true)}
-        />
-        <CakeCartDrawer 
-          open={showCart} 
-          onClose={() => setShowCart(false)} 
-          onCheckout={() => { setShowCart(false); setShowCheckout(true); }}
-        />
-      </>
-    );
+          onOpenCart={() => setShowCart(true)} />
+        
+        <CakeCartDrawer
+          open={showCart}
+          onClose={() => setShowCart(false)}
+          onCheckout={() => {setShowCart(false);setShowCheckout(true);}} />
+        
+      </>);
+
   }
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -113,11 +113,11 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
       {/* Header */}
       <motion.div className="flex items-center justify-between mb-5" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
         <div className="flex items-center gap-3">
-          {onBack && (
-            <button onClick={onBack} className="p-2 -ml-2 rounded-full hover:bg-muted">
+          {onBack &&
+          <button onClick={onBack} className="p-2 -ml-2 rounded-full hover:bg-muted">
               <ArrowLeft className="w-5 h-5" />
             </button>
-          )}
+          }
           <div>
             <h1 className="text-2xl font-black text-foreground">Tortlar 🎂</h1>
             <p className="text-muted-foreground text-sm mt-0.5">{tr("cakesscreen_ayliq_milestone_tortlari_81907e", "Aylıq & Milestone tortları")}</p>
@@ -125,11 +125,11 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
         </div>
         <button onClick={() => setShowCart(true)} className="relative w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
           <ShoppingCart className="w-6 h-6 text-primary" />
-          {totalItems > 0 && (
-            <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+          {totalItems > 0 &&
+          <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
               {totalItems}
             </span>
-          )}
+          }
         </button>
       </motion.div>
 
@@ -137,13 +137,13 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
       {/* Filters */}
       <motion.div className="flex gap-2 mb-5 overflow-x-auto hide-scrollbar pb-2" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }}>
         <button onClick={() => setActiveFilter('all')} className={`flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all ${activeFilter === 'all' ? 'gradient-primary text-white shadow-button' : 'bg-card border border-border/50 text-muted-foreground'}`}>
-          ✨ Hamısı
+          {tr("cakesscreen_hamisi_a6c712", "\u2728 Ham\u0131s\u0131")}
         </button>
-        {MONTHS.map(m => (
-          <button key={m.id} onClick={() => setActiveFilter(m.id)} className={`flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all ${activeFilter === m.id ? 'gradient-primary text-white shadow-button' : 'bg-card border border-border/50 text-muted-foreground'}`}>
+        {MONTHS.map((m) =>
+        <button key={m.id} onClick={() => setActiveFilter(m.id)} className={`flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all ${activeFilter === m.id ? 'gradient-primary text-white shadow-button' : 'bg-card border border-border/50 text-muted-foreground'}`}>
             {m.emoji} {m.label}
           </button>
-        ))}
+        )}
         <button onClick={() => setActiveFilter('milestone')} className={`flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all ${activeFilter === 'milestone' ? 'gradient-primary text-white shadow-button' : 'bg-card border border-border/50 text-muted-foreground'}`}>
           🏆 Milestone
         </button>
@@ -161,31 +161,31 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
 
       {/* Cakes Grid */}
       <motion.div className="grid grid-cols-2 gap-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }}>
-        {filteredCakes.map((cake, index) => (
-          <motion.div
-            key={cake.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 * index }}
-            className="bg-card rounded-2xl overflow-hidden shadow-card border border-border/50 cursor-pointer"
-            whileHover={{ y: -4 }}
-            onClick={() => setSelectedCake(cake)}
-          >
-            {cake.image_url ? (
-              <div className="relative h-36">
+        {filteredCakes.map((cake, index) =>
+        <motion.div
+          key={cake.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 * index }}
+          className="bg-card rounded-2xl overflow-hidden shadow-card border border-border/50 cursor-pointer"
+          whileHover={{ y: -4 }}
+          onClick={() => setSelectedCake(cake)}>
+          
+            {cake.image_url ?
+          <div className="relative h-36">
                 <img src={cake.image_url} alt={cake.name} className="w-full h-full object-cover" />
-                {cake.category === 'milestone' && cake.milestone_label && (
-                  <span className="absolute top-2 left-2 px-2 py-0.5 bg-amber-500/90 rounded-full text-[10px] font-bold text-white">{cake.milestone_label}</span>
-                )}
-                {cake.category === 'month' && cake.month_number && (
-                  <span className="absolute top-2 left-2 px-2 py-0.5 bg-primary/90 rounded-full text-[10px] font-bold text-white">{cake.month_number}-{getOrdinalSuffix(cake.month_number!)} ay</span>
-                )}
-              </div>
-            ) : (
-              <div className="h-36 bg-primary/5 flex items-center justify-center">
+                {cake.category === 'milestone' && cake.milestone_label &&
+            <span className="absolute top-2 left-2 px-2 py-0.5 bg-amber-500/90 rounded-full text-[10px] font-bold text-white">{cake.milestone_label}</span>
+            }
+                {cake.category === 'month' && cake.month_number &&
+            <span className="absolute top-2 left-2 px-2 py-0.5 bg-primary/90 rounded-full text-[10px] font-bold text-white">{cake.month_number}-{getOrdinalSuffix(cake.month_number!)} ay</span>
+            }
+              </div> :
+
+          <div className="h-36 bg-primary/5 flex items-center justify-center">
                 <CakeIcon className="w-12 h-12 text-primary/30" />
               </div>
-            )}
+          }
             <div className="p-3">
               <h3 className="font-bold text-foreground text-sm mb-1 line-clamp-2">{cake.name}</h3>
               {cake.description && <p className="text-[11px] text-muted-foreground line-clamp-2 mb-2">{cake.description}</p>}
@@ -197,40 +197,40 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
               </div>
             </div>
           </motion.div>
-        ))}
+        )}
       </motion.div>
 
-      {filteredCakes.length === 0 && (
-        <motion.div className="text-center py-12" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      {filteredCakes.length === 0 &&
+      <motion.div className="text-center py-12" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <div className="text-6xl mb-4">🎂</div>
           <p className="text-muted-foreground">{tr("cakesscreen_bu_kateqoriyada_tort_tapilmadi_330a9b", "Bu kateqoriyada tort tapılmadı")}</p>
         </motion.div>
-      )}
+      }
 
       {/* Floating Cart Button - above BottomNav */}
-      {totalItems > 0 && (
-        <motion.button
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          onClick={() => setShowCart(true)}
-          className="fixed right-4 z-40 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center"
-          style={{ bottom: 'calc(80px + env(safe-area-inset-bottom))' }}
-        >
+      {totalItems > 0 &&
+      <motion.button
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        onClick={() => setShowCart(true)}
+        className="fixed right-4 z-40 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center"
+        style={{ bottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
+        
           <ShoppingCart className="w-6 h-6" />
           <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-destructive text-destructive-foreground text-xs font-bold flex items-center justify-center">
             {totalItems}
           </span>
         </motion.button>
-      )}
+      }
 
       {/* Cart Drawer */}
-      <CakeCartDrawer 
-        open={showCart} 
-        onClose={() => setShowCart(false)} 
-        onCheckout={() => { setShowCart(false); setShowCheckout(true); }}
-      />
-    </div>
-  );
+      <CakeCartDrawer
+        open={showCart}
+        onClose={() => setShowCart(false)}
+        onCheckout={() => {setShowCart(false);setShowCheckout(true);}} />
+      
+    </div>);
+
 };
 
 export default CakesScreen;

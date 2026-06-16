@@ -14,28 +14,28 @@ import { useAdminDefaultShoppingItems, DefaultShoppingItem } from '@/hooks/useDe
 import UnsavedChangesDialog from './UnsavedChangesDialog';
 
 const categories = [
-  { value: 'baby_care', label: tr("admindefaultshoppingitems_korpe_baximi_1ba070", "Körpə Baxımı") },
-  { value: 'feeding', label: 'Qidalanma' },
-  { value: 'clothing', label: 'Geyim' },
-  { value: 'bedding', label: 'Yataq' },
-  { value: 'health', label: tr("admindefaultshoppingitems_saglamliq_09460a", "Sağlamlıq") },
-  { value: 'safety', label: tr("admindefaultshoppingitems_tehlukesizlik_8bc156", "Təhlükəsizlik") },
-  { value: 'transport', label: tr("admindefaultshoppingitems_neqliyyat_a179ff", "Nəqliyyat") },
-  { value: 'general', label: tr("admindefaultshoppingitems_umumi_1b5521", "Ümumi") },
-];
+{ value: 'baby_care', label: tr("admindefaultshoppingitems_korpe_baximi_1ba070", "Körpə Baxımı") },
+{ value: 'feeding', label: 'Qidalanma' },
+{ value: 'clothing', label: 'Geyim' },
+{ value: 'bedding', label: 'Yataq' },
+{ value: 'health', label: tr("admindefaultshoppingitems_saglamliq_09460a", "Sağlamlıq") },
+{ value: 'safety', label: tr("admindefaultshoppingitems_tehlukesizlik_8bc156", "Təhlükəsizlik") },
+{ value: 'transport', label: tr("admindefaultshoppingitems_neqliyyat_a179ff", "Nəqliyyat") },
+{ value: 'general', label: tr("admindefaultshoppingitems_umumi_1b5521", "Ümumi") }];
+
 
 const lifeStages = [
-  { value: 'all', label: tr("admindefaultshoppingitems_hamisi_c73c4d", "Hamısı") },
-  { value: 'bump', label: tr("admindefaultshoppingitems_hamile_0080af", "Hamilə") },
-  { value: 'mommy', label: tr("admindefaultshoppingitems_ana_korpe_d5b4be", "Ana (Körpə)") },
-  { value: 'flow', label: 'Menstruasiya' },
-];
+{ value: 'all', label: tr("admindefaultshoppingitems_hamisi_c73c4d", "Hamısı") },
+{ value: 'bump', label: tr("admindefaultshoppingitems_hamile_0080af", "Hamilə") },
+{ value: 'mommy', label: tr("admindefaultshoppingitems_ana_korpe_d5b4be", "Ana (Körpə)") },
+{ value: 'flow', label: 'Menstruasiya' }];
+
 
 const priorities = [
-  { value: 'high', label: tr("admindefaultshoppingitems_yuksek_492584", "Yüksək"), color: 'bg-red-500' },
-  { value: 'medium', label: 'Orta', color: 'bg-yellow-500' },
-  { value: 'low', label: tr("admindefaultshoppingitems_asagi_1c27f1", "Aşağı"), color: 'bg-green-500' },
-];
+{ value: 'high', label: tr("admindefaultshoppingitems_yuksek_492584", "Yüksək"), color: 'bg-red-500' },
+{ value: 'medium', label: 'Orta', color: 'bg-yellow-500' },
+{ value: 'low', label: tr("admindefaultshoppingitems_asagi_1c27f1", "Aşağı"), color: 'bg-green-500' }];
+
 
 const AdminDefaultShoppingItems = () => {
   const { items, loading, createItem, updateItem, deleteItem } = useAdminDefaultShoppingItems();
@@ -44,7 +44,7 @@ const AdminDefaultShoppingItems = () => {
   const [editingItem, setEditingItem] = useState<DefaultShoppingItem | null>(null);
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const initialFormDataRef = useRef<string>('');
-  
+
   const [formData, setFormData] = useState({
     name: '',
     name_az: '',
@@ -52,7 +52,7 @@ const AdminDefaultShoppingItems = () => {
     priority: 'medium' as 'low' | 'medium' | 'high',
     life_stage: 'all',
     is_active: true,
-    sort_order: 0,
+    sort_order: 0
   });
 
   const hasUnsavedChanges = () => {
@@ -78,7 +78,7 @@ const AdminDefaultShoppingItems = () => {
       priority: 'medium',
       life_stage: 'all',
       is_active: true,
-      sort_order: 0,
+      sort_order: 0
     });
   };
 
@@ -90,7 +90,7 @@ const AdminDefaultShoppingItems = () => {
       priority: 'medium' as const,
       life_stage: 'all',
       is_active: true,
-      sort_order: items.length,
+      sort_order: items.length
     };
     setFormData(initialData);
     initialFormDataRef.current = JSON.stringify(initialData);
@@ -106,7 +106,7 @@ const AdminDefaultShoppingItems = () => {
       priority: item.priority,
       life_stage: item.life_stage,
       is_active: item.is_active,
-      sort_order: item.sort_order,
+      sort_order: item.sort_order
     };
     setFormData(data);
     initialFormDataRef.current = JSON.stringify(data);
@@ -130,14 +130,14 @@ const AdminDefaultShoppingItems = () => {
     if (result.error) {
       toast({ title: tr("admindefaultshoppingitems_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     } else {
-      toast({ title: editingItem ? 'Yeniləndi' : 'Əlavə edildi' });
+      toast({ title: editingItem ? tr("admindefaultshoppingitems_yenilendi_d10a01", "Yenil\u0259ndi") : tr("admindefaultshoppingitems_elave_edildi_b7d7e4", "\u018Flav\u0259 edildi") });
       closeModal();
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
-    
+    if (!confirm(tr("admindefaultshoppingitems_silmek_istediyinize_eminsiniz_09658f", "Silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
+
     const result = await deleteItem(id);
     if (result.error) {
       toast({ title: tr("admindefaultshoppingitems_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
@@ -156,40 +156,40 @@ const AdminDefaultShoppingItems = () => {
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <ShoppingCart className="w-6 h-6 text-primary" />
-            Default Alışveriş Məhsulları
+            {tr("admindefaultshoppingitems_default_alisveris_mehsullari_9f5944", "Default Al\u0131\u015Fveri\u015F M\u0259hsullar\u0131")}
           </h2>
           <p className="text-muted-foreground">
-            Platformanın tövsiyə etdiyi məhsullar
+            {tr("admindefaultshoppingitems_platformanin_tovsiye_etdiyi_me_aea892", "Platforman\u0131n t\xF6vsiy\u0259 etdiyi m\u0259hsullar")}
           </p>
         </div>
         <Button onClick={openCreateModal}>
           <Plus className="w-4 h-4 mr-2" />
-          Yeni Məhsul
+          {tr("admindefaultshoppingitems_yeni_mehsul_cd3d1a", "Yeni M\u0259hsul")}
         </Button>
       </div>
 
       <div className="grid gap-3">
-        {items.map((item) => (
-          <motion.div
-            key={item.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-between p-4 bg-card rounded-xl border"
-          >
+        {items.map((item) =>
+        <motion.div
+          key={item.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center justify-between p-4 bg-card rounded-xl border">
+          
             <div className="flex items-center gap-4">
-              <div className={`w-3 h-3 rounded-full ${priorities.find(p => p.value === item.priority)?.color}`} />
+              <div className={`w-3 h-3 rounded-full ${priorities.find((p) => p.value === item.priority)?.color}`} />
               <div>
                 <p className="font-medium">{item.name_az || item.name}</p>
                 <div className="flex items-center gap-2 mt-1">
                   <Badge variant="outline" className="text-xs">
-                    {categories.find(c => c.value === item.category)?.label}
+                    {categories.find((c) => c.value === item.category)?.label}
                   </Badge>
                   <Badge variant="outline" className="text-xs">
-                    {lifeStages.find(l => l.value === item.life_stage)?.label}
+                    {lifeStages.find((l) => l.value === item.life_stage)?.label}
                   </Badge>
-                  {!item.is_active && (
-                    <Badge variant="secondary" className="text-xs">Deaktiv</Badge>
-                  )}
+                  {!item.is_active &&
+                <Badge variant="secondary" className="text-xs">Deaktiv</Badge>
+                }
                 </div>
               </div>
             </div>
@@ -202,20 +202,20 @@ const AdminDefaultShoppingItems = () => {
               </Button>
             </div>
           </motion.div>
-        ))}
-
-        {items.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            Heç bir məhsul yoxdur
-          </div>
         )}
+
+        {items.length === 0 &&
+        <div className="text-center py-12 text-muted-foreground">
+            {tr("admindefaultshoppingitems_hec_bir_mehsul_yoxdur_8e5ff5", "He\xE7 bir m\u0259hsul yoxdur")}
+          </div>
+        }
       </div>
 
       <Dialog open={showModal} onOpenChange={handleModalClose}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {editingItem ? 'Məhsulu Redaktə Et' : 'Yeni Məhsul'}
+              {editingItem ? tr("admindefaultshoppingitems_mehsulu_redakte_et_0a1ac6", "M\u0259hsulu Redakt\u0259 Et") : tr("admindefaultshoppingitems_yeni_mehsul_cd3d1a", "Yeni M\u0259hsul")}
             </DialogTitle>
           </DialogHeader>
           
@@ -225,8 +225,8 @@ const AdminDefaultShoppingItems = () => {
               <Input
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Baby diapers"
-              />
+                placeholder="Baby diapers" />
+              
             </div>
 
             <div>
@@ -234,8 +234,8 @@ const AdminDefaultShoppingItems = () => {
               <Input
                 value={formData.name_az}
                 onChange={(e) => setFormData({ ...formData, name_az: e.target.value })}
-                placeholder={tr("admindefaultshoppingitems_korpe_bezleri_0bc848", "Körpə bezləri")}
-              />
+                placeholder={tr("admindefaultshoppingitems_korpe_bezleri_0bc848", "Körpə bezləri")} />
+              
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -243,15 +243,15 @@ const AdminDefaultShoppingItems = () => {
                 <Label>Kateqoriya</Label>
                 <Select
                   value={formData.category}
-                  onValueChange={(v) => setFormData({ ...formData, category: v })}
-                >
+                  onValueChange={(v) => setFormData({ ...formData, category: v })}>
+                  
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories.map((c) => (
-                      <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
-                    ))}
+                    {categories.map((c) =>
+                    <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -260,15 +260,15 @@ const AdminDefaultShoppingItems = () => {
                 <Label>Prioritet</Label>
                 <Select
                   value={formData.priority}
-                  onValueChange={(v: 'low' | 'medium' | 'high') => setFormData({ ...formData, priority: v })}
-                >
+                  onValueChange={(v: 'low' | 'medium' | 'high') => setFormData({ ...formData, priority: v })}>
+                  
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {priorities.map((p) => (
-                      <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
-                    ))}
+                    {priorities.map((p) =>
+                    <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -278,15 +278,15 @@ const AdminDefaultShoppingItems = () => {
               <Label>{tr("admindefaultshoppingitems_heyat_merhelesi_c3ab6b", "Həyat Mərhələsi")}</Label>
               <Select
                 value={formData.life_stage}
-                onValueChange={(v) => setFormData({ ...formData, life_stage: v })}
-              >
+                onValueChange={(v) => setFormData({ ...formData, life_stage: v })}>
+                
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {lifeStages.map((l) => (
-                    <SelectItem key={l.value} value={l.value}>{l.label}</SelectItem>
-                  ))}
+                  {lifeStages.map((l) =>
+                  <SelectItem key={l.value} value={l.value}>{l.label}</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -296,22 +296,22 @@ const AdminDefaultShoppingItems = () => {
               <Input
                 type="number"
                 value={formData.sort_order}
-                onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
-              />
+                onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })} />
+              
             </div>
 
             <div className="flex items-center justify-between">
               <Label>Aktiv</Label>
               <Switch
                 checked={formData.is_active}
-                onCheckedChange={(v) => setFormData({ ...formData, is_active: v })}
-              />
+                onCheckedChange={(v) => setFormData({ ...formData, is_active: v })} />
+              
             </div>
 
             <div className="flex gap-2 pt-4">
               <Button variant="outline" className="flex-1" onClick={handleModalClose}>
                 <X className="w-4 h-4 mr-2" />
-                Ləğv et
+                {tr("admindefaultshoppingitems_legv_et_b5e49c", "L\u0259\u011Fv et")}
               </Button>
               <Button className="flex-1" onClick={handleSave}>
                 <Save className="w-4 h-4 mr-2" />
@@ -325,10 +325,10 @@ const AdminDefaultShoppingItems = () => {
       <UnsavedChangesDialog
         open={showUnsavedDialog}
         onOpenChange={setShowUnsavedDialog}
-        onDiscard={closeModal}
-      />
-    </div>
-  );
+        onDiscard={closeModal} />
+      
+    </div>);
+
 };
 
 export default AdminDefaultShoppingItems;

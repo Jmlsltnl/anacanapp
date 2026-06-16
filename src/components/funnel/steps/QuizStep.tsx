@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { tr } from "@/lib/tr";import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import type { QuizQuestion } from '../funnelData';
@@ -32,14 +32,14 @@ export default function QuizStep({ questions, onComplete }: QuizStepProps) {
     <div className="flex flex-col min-h-full px-6 py-8">
       {/* Mini progress */}
       <div className="flex gap-1.5 mb-8">
-        {questions.map((_, i) => (
-          <div
-            key={i}
-            className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-              i <= currentQ ? 'bg-primary' : 'bg-muted'
-            }`}
-          />
-        ))}
+        {questions.map((_, i) =>
+        <div
+          key={i}
+          className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+          i <= currentQ ? 'bg-primary' : 'bg-muted'}`
+          } />
+
+        )}
       </div>
 
       <motion.div
@@ -48,27 +48,27 @@ export default function QuizStep({ questions, onComplete }: QuizStepProps) {
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -30 }}
         transition={{ duration: 0.25 }}
-        className="flex-1"
-      >
+        className="flex-1">
+        
         <h2 className="text-xl font-bold text-foreground mb-6 leading-tight">
           {question.question}
         </h2>
 
         <div className="space-y-3">
-          {question.options.map((opt) => (
-            <button
-              key={opt.id}
-              onClick={() => setSelected(opt.id)}
-              className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
-                selected === opt.id
-                  ? 'border-primary bg-primary/10 shadow-md'
-                  : 'border-border bg-card hover:border-primary/40'
-              }`}
-            >
+          {question.options.map((opt) =>
+          <button
+            key={opt.id}
+            onClick={() => setSelected(opt.id)}
+            className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
+            selected === opt.id ?
+            'border-primary bg-primary/10 shadow-md' :
+            'border-border bg-card hover:border-primary/40'}`
+            }>
+            
               <span className="text-2xl">{opt.emoji}</span>
               <span className="text-sm font-medium text-foreground">{opt.label}</span>
             </button>
-          ))}
+          )}
         </div>
       </motion.div>
 
@@ -76,11 +76,11 @@ export default function QuizStep({ questions, onComplete }: QuizStepProps) {
         <Button
           onClick={handleNext}
           disabled={!selected}
-          className="w-full h-14 rounded-2xl text-base font-semibold bg-gradient-to-r from-primary to-[hsl(var(--primary-glow,20_90%_60%))] text-primary-foreground shadow-lg"
-        >
-          {currentQ < questions.length - 1 ? 'Davam et' : 'Nəticələri gör'}
+          className="w-full h-14 rounded-2xl text-base font-semibold bg-gradient-to-r from-primary to-[hsl(var(--primary-glow,20_90%_60%))] text-primary-foreground shadow-lg">
+          
+          {currentQ < questions.length - 1 ? 'Davam et' : tr("quizstep_neticeleri_gor_ddd101", "N\u0259tic\u0259l\u0259ri g\xF6r")}
         </Button>
       </div>
-    </div>
-  );
+    </div>);
+
 }

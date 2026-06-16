@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowLeft, MapPin, Star, Filter, Plus, Check, Baby, Heart, Car, 
+import {
+  ArrowLeft, MapPin, Star, Filter, Plus, Check, Baby, Heart, Car,
   Utensils, Building2, TreePine, Train, Pill, PlayCircle, X, Phone,
-  Navigation, Sparkles, ChevronRight, Search
-} from 'lucide-react';
+  Navigation, Sparkles, ChevronRight, Search } from
+'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -27,50 +27,50 @@ interface MomFriendlyMapProps {
 
 // Icon mapping for dynamic categories
 const ICON_MAP: Record<string, any> = {
-  MapPin, Utensils, Building2, TreePine, Heart, Train, Pill, PlayCircle,
+  MapPin, Utensils, Building2, TreePine, Heart, Train, Pill, PlayCircle
 };
 
 const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
   useScrollToTop();
   useScreenAnalytics('MomFriendlyMap', 'Tools');
-  
+
   // Fetch dynamic categories and amenities
   const { data: dbCategories = [] } = usePlaceCategories();
   const { data: dbAmenities = [] } = usePlaceAmenities();
-  
+
   // Map to component format
   const CATEGORIES = useMemo(() => {
     if (dbCategories.length > 0) {
-      return dbCategories.map(c => ({
+      return dbCategories.map((c) => ({
         value: c.category_key,
         label: c.label_az || c.label,
         icon: ICON_MAP[c.icon_name] || MapPin,
-        color: c.color_gradient,
+        color: c.color_gradient
       }));
     }
-    return FALLBACK_CATEGORIES.map(c => ({
+    return FALLBACK_CATEGORIES.map((c) => ({
       value: c.category_key,
       label: c.label_az,
       icon: ICON_MAP[c.icon_name] || MapPin,
-      color: c.color_gradient,
+      color: c.color_gradient
     }));
   }, [dbCategories]);
 
   const AMENITIES = useMemo(() => {
     if (dbAmenities.length > 0) {
-      return dbAmenities.map(a => ({
+      return dbAmenities.map((a) => ({
         key: a.amenity_key,
         label: a.label_az || a.label,
-        icon: a.emoji,
+        icon: a.emoji
       }));
     }
-    return FALLBACK_AMENITIES.map(a => ({
+    return FALLBACK_AMENITIES.map((a) => ({
       key: a.amenity_key,
       label: a.label_az,
-      icon: a.emoji,
+      icon: a.emoji
     }));
   }, [dbAmenities]);
-  
+
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [selectedPlace, setSelectedPlace] = useState<MomFriendlyPlace | null>(null);
@@ -80,7 +80,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
 
   const { data: places = [], isLoading } = useMomFriendlyPlaces({
     category: selectedCategory,
-    amenities: selectedAmenities,
+    amenities: selectedAmenities
   });
 
   const { data: placeReviews = [] } = usePlaceReviews(selectedPlace?.id || '');
@@ -107,15 +107,15 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
     has_kids_menu: false,
     has_play_area: false,
     has_high_chair: false,
-    has_parking: false,
+    has_parking: false
   });
 
   const handleAddPlace = async () => {
     if (!newPlace.name) {
-      toast.error('Məkan adı tələb olunur');
+      toast.error(tr("momfriendlymap_mekan_adi_teleb_olunur_989a8a", "M\u0259kan ad\u0131 t\u0259l\u0259b olunur"));
       return;
     }
-    
+
     await addPlaceMutation.mutateAsync(newPlace);
     setShowAddPlace(false);
     setNewPlace({
@@ -133,34 +133,34 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
       has_kids_menu: false,
       has_play_area: false,
       has_high_chair: false,
-      has_parking: false,
+      has_parking: false
     });
   };
 
   const toggleAmenity = (key: string) => {
-    setSelectedAmenities(prev => 
-      prev.includes(key) ? prev.filter(a => a !== key) : [...prev, key]
+    setSelectedAmenities((prev) =>
+    prev.includes(key) ? prev.filter((a) => a !== key) : [...prev, key]
     );
   };
 
   const getCategoryInfo = (category: string) => {
-    return CATEGORIES.find(c => c.value === category) || CATEGORIES[0];
+    return CATEGORIES.find((c) => c.value === category) || CATEGORIES[0];
   };
 
   const getPlaceAmenities = (place: MomFriendlyPlace) => {
-    return AMENITIES.filter(a => (place as any)[a.key]);
+    return AMENITIES.filter((a) => (place as any)[a.key]);
   };
 
-  const filteredPlaces = places.filter(place => 
-    (place.name_az || place.name).toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (place.address_az || place.address || '').toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredPlaces = places.filter((place) =>
+  (place.name_az || place.name).toLowerCase().includes(searchQuery.toLowerCase()) ||
+  (place.address_az || place.address || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Statistics
-  const verifiedCount = places.filter(p => p.is_verified).length;
-  const avgRating = places.length > 0 
-    ? (places.reduce((sum, p) => sum + (p.avg_rating || 0), 0) / places.length).toFixed(1)
-    : '0';
+  const verifiedCount = places.filter((p) => p.is_verified).length;
+  const avgRating = places.length > 0 ?
+  (places.reduce((sum, p) => sum + (p.avg_rating || 0), 0) / places.length).toFixed(1) :
+  '0';
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -178,8 +178,8 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
             variant={showFilters || selectedAmenities.length > 0 ? "default" : "ghost"}
             size="icon"
             onClick={() => setShowFilters(!showFilters)}
-            className={showFilters || selectedAmenities.length > 0 ? "bg-rose-500 hover:bg-rose-600" : ""}
-          >
+            className={showFilters || selectedAmenities.length > 0 ? "bg-rose-500 hover:bg-rose-600" : ""}>
+            
             <Filter className="w-5 h-5" />
           </Button>
           <Button variant="ghost" size="icon" onClick={() => setShowAddPlace(true)}>
@@ -194,19 +194,19 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={tr("momfriendlymap_mekan_axtar_8b889d", "Məkan axtar...")}
-            className="pl-10 h-10 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30"
-          />
+            className="pl-10 h-10 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30" />
+          
         </div>
 
         {/* Mini Stats */}
         <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <MapPin className="w-3 h-3" />
-            <strong className="text-foreground">{places.length}</strong> məkan
+            <strong className="text-foreground">{places.length}</strong> {tr("momfriendlymap_mekan_ea55b2", "m\u0259kan")}
           </span>
           <span className="flex items-center gap-1">
             <Check className="w-3 h-3 text-emerald-500" />
-            <strong className="text-foreground">{verifiedCount}</strong> təsdiqlənmiş
+            <strong className="text-foreground">{verifiedCount}</strong> {tr("momfriendlymap_tesdiqlenmis_b28f33", "t\u0259sdiql\u0259nmi\u015F")}
           </span>
           <span className="flex items-center gap-1">
             <Star className="w-3 h-3 text-amber-500 fill-current" />
@@ -221,79 +221,79 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
           className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-        >
-          {CATEGORIES.map((cat, index) => (
-            <motion.button
-              key={cat.value}
-              onClick={() => setSelectedCategory(cat.value)}
-              className={`shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
-                selectedCategory === cat.value
-                  ? 'bg-rose-500 text-white shadow-md'
-                  : 'bg-card text-foreground border border-border'
-              }`}
-              whileTap={{ scale: 0.95 }}
-            >
+          transition={{ delay: 0.25 }}>
+          
+          {CATEGORIES.map((cat, index) =>
+          <motion.button
+            key={cat.value}
+            onClick={() => setSelectedCategory(cat.value)}
+            className={`shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
+            selectedCategory === cat.value ?
+            'bg-rose-500 text-white shadow-md' :
+            'bg-card text-foreground border border-border'}`
+            }
+            whileTap={{ scale: 0.95 }}>
+            
               <cat.icon className="w-4 h-4" />
               <span className="text-sm">{cat.label}</span>
             </motion.button>
-          ))}
+          )}
         </motion.div>
 
         {/* Amenity Filters */}
         <AnimatePresence>
-          {showFilters && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-            >
+          {showFilters &&
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}>
+            
               <Card className="border-border">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-bold text-foreground flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-rose-500" />
-                      İmkanlara görə süz
+                      {tr("momfriendlymap_i_mkanlara_gore_suz_f2f5d6", "\u0130mkanlara g\xF6r\u0259 s\xFCz")}
                     </h3>
-                    {selectedAmenities.length > 0 && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedAmenities([])}
-                        className="text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300"
-                      >
-                        Təmizlə
-                      </Button>
-                    )}
+                    {selectedAmenities.length > 0 &&
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedAmenities([])}
+                    className="text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300">
+                        {tr("momfriendlymap_temizle_1c3651", "T\u0259mizl\u0259")}
+                      
+                  </Button>
+                  }
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {AMENITIES.map(amenity => (
-                      <motion.button
-                        key={amenity.key}
-                        onClick={() => toggleAmenity(amenity.key)}
-                        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
-                          selectedAmenities.includes(amenity.key)
-                            ? 'bg-rose-500 text-white shadow-md'
-                            : 'bg-muted text-foreground hover:bg-muted/80'
-                        }`}
-                        whileTap={{ scale: 0.95 }}
-                      >
+                    {AMENITIES.map((amenity) =>
+                  <motion.button
+                    key={amenity.key}
+                    onClick={() => toggleAmenity(amenity.key)}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                    selectedAmenities.includes(amenity.key) ?
+                    'bg-rose-500 text-white shadow-md' :
+                    'bg-muted text-foreground hover:bg-muted/80'}`
+                    }
+                    whileTap={{ scale: 0.95 }}>
+                    
                         <span>{amenity.icon}</span>
                         <span>{amenity.label}</span>
                       </motion.button>
-                    ))}
+                  )}
                   </div>
                 </CardContent>
               </Card>
             </motion.div>
-          )}
+          }
         </AnimatePresence>
 
         {/* Places List */}
-        {isLoading ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="bg-card rounded-2xl p-4 animate-pulse">
+        {isLoading ?
+        <div className="space-y-3">
+            {[1, 2, 3].map((i) =>
+          <div key={i} className="bg-card rounded-2xl p-4 animate-pulse">
                 <div className="flex gap-4">
                   <div className="w-16 h-16 rounded-xl bg-muted" />
                   <div className="flex-1">
@@ -302,41 +302,41 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        ) : filteredPlaces.length === 0 ? (
-          <Card className="border-dashed border-border">
+          )}
+          </div> :
+        filteredPlaces.length === 0 ?
+        <Card className="border-dashed border-border">
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-rose-100 dark:bg-rose-900/20 flex items-center justify-center">
                 <MapPin className="w-8 h-8 text-rose-500" />
               </div>
               <h3 className="font-bold text-foreground mb-1">{tr("momfriendlymap_mekan_tapilmadi_ffea6b", "Məkan tapılmadı")}</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Bu filtrlərə uyğun məkan yoxdur
+                {tr("momfriendlymap_bu_filtrlere_uygun_mekan_yoxdu_d1f970", "Bu filtrl\u0259r\u0259 uy\u011Fun m\u0259kan yoxdur")}
               </p>
               <Button onClick={() => setShowAddPlace(true)} className="bg-rose-500 hover:bg-rose-600 text-white">
                 <Plus className="w-4 h-4 mr-2" />
-                İlk məkanı əlavə et
+                {tr("momfriendlymap_i_lk_mekani_elave_et_47627a", "\u0130lk m\u0259kan\u0131 \u0259lav\u0259 et")}
               </Button>
             </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-3">
+          </Card> :
+
+        <div className="space-y-3">
             {filteredPlaces.map((place, index) => {
-              const catInfo = getCategoryInfo(place.category);
-              const amenities = getPlaceAmenities(place);
-              
-              return (
-                <motion.div
-                  key={place.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                >
-                  <Card 
-                    className="overflow-hidden cursor-pointer hover:shadow-lg transition-all group"
-                    onClick={() => setSelectedPlace(place)}
-                  >
+            const catInfo = getCategoryInfo(place.category);
+            const amenities = getPlaceAmenities(place);
+
+            return (
+              <motion.div
+                key={place.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}>
+                
+                  <Card
+                  className="overflow-hidden cursor-pointer hover:shadow-lg transition-all group"
+                  onClick={() => setSelectedPlace(place)}>
+                  
                     <CardContent className="p-4">
                       <div className="flex items-start gap-4">
                         <div className="w-14 h-14 rounded-xl bg-rose-500 flex items-center justify-center shrink-0">
@@ -346,15 +346,15 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className="font-bold text-foreground truncate">{place.name_az || place.name}</h3>
-                            {place.is_verified && (
-                              <Badge className="shrink-0 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-0 text-xs">
-                                <Check className="w-3 h-3 mr-1" /> Təsdiqlənib
+                            {place.is_verified &&
+                          <Badge className="shrink-0 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-0 text-xs">
+                                <Check className="w-3 h-3 mr-1" /> {tr("momfriendlymap_tesdiqlenib_96c431", "T\u0259sdiql\u0259nib")}
                               </Badge>
-                            )}
+                          }
                           </div>
                           
                           <p className="text-sm text-muted-foreground truncate mb-2">
-                            {place.address_az || place.address || 'Ünvan göstərilməyib'}
+                            {place.address_az || place.address || tr("momfriendlymap_unvan_gosterilmeyib_06305d", "\xDCnvan g\xF6st\u0259rilm\u0259yib")}
                           </p>
                           
                           <div className="flex items-center gap-3 mb-2">
@@ -366,20 +366,20 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                           </div>
                           
                           <div className="flex flex-wrap gap-1">
-                            {amenities.slice(0, 5).map(a => (
-                              <span 
-                                key={a.key} 
-                                className="text-sm bg-muted/50 px-1.5 py-0.5 rounded" 
-                                title={a.label}
-                              >
+                            {amenities.slice(0, 5).map((a) =>
+                          <span
+                            key={a.key}
+                            className="text-sm bg-muted/50 px-1.5 py-0.5 rounded"
+                            title={a.label}>
+                            
                                 {a.icon}
                               </span>
-                            ))}
-                            {amenities.length > 5 && (
-                              <span className="text-xs text-muted-foreground px-1.5 py-0.5">
+                          )}
+                            {amenities.length > 5 &&
+                          <span className="text-xs text-muted-foreground px-1.5 py-0.5">
                                 +{amenities.length - 5}
                               </span>
-                            )}
+                          }
                           </div>
                         </div>
                         
@@ -387,11 +387,11 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
-              );
-            })}
+                </motion.div>);
+
+          })}
           </div>
-        )}
+        }
       </div>
 
       {/* Add Place Modal */}
@@ -402,7 +402,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center">
                 <Plus className="w-4 h-4 text-white" />
               </div>
-              Yeni Məkan Əlavə Et
+              {tr("momfriendlymap_yeni_mekan_elave_et_53fb45", "Yeni M\u0259kan \u018Flav\u0259 Et")}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 mt-4">
@@ -412,8 +412,8 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                 value={newPlace.name}
                 onChange={(e) => setNewPlace({ ...newPlace, name: e.target.value, name_az: e.target.value })}
                 placeholder={tr("momfriendlymap_meselen_port_baku_mall_760801", "Məsələn: Port Baku Mall")}
-                className="mt-1.5 bg-muted/50"
-              />
+                className="mt-1.5 bg-muted/50" />
+              
             </div>
             <div>
               <Label className="text-sm font-medium">{tr("momfriendlymap_unvan_b8651a", "Ünvan")}</Label>
@@ -421,56 +421,56 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                 value={newPlace.address_az || ''}
                 onChange={(e) => setNewPlace({ ...newPlace, address_az: e.target.value })}
                 placeholder={tr("momfriendlymap_baki_neftciler_prospekti_a5d7c0", "Bakı, Neftçilər prospekti")}
-                className="mt-1.5 bg-muted/50"
-              />
+                className="mt-1.5 bg-muted/50" />
+              
             </div>
             <div>
               <Label className="text-sm font-medium">Kateqoriya</Label>
               <Select
                 value={newPlace.category}
-                onValueChange={(v) => setNewPlace({ ...newPlace, category: v as any })}
-              >
+                onValueChange={(v) => setNewPlace({ ...newPlace, category: v as any })}>
+                
                 <SelectTrigger className="mt-1.5 bg-muted/50">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {CATEGORIES.filter(c => c.value !== 'all').map(cat => (
-                    <SelectItem key={cat.value} value={cat.value}>
+                  {CATEGORIES.filter((c) => c.value !== 'all').map((cat) =>
+                  <SelectItem key={cat.value} value={cat.value}>
                       <div className="flex items-center gap-2">
                         <cat.icon className="w-4 h-4" />
                         {cat.label}
                       </div>
                     </SelectItem>
-                  ))}
+                  )}
                 </SelectContent>
               </Select>
             </div>
             <div>
               <Label className="text-sm font-medium mb-3 block">{tr("momfriendlymap_imkanlar_60eb86", "İmkanlar")}</Label>
               <div className="grid grid-cols-1 gap-2">
-                {AMENITIES.map(amenity => (
-                  <div 
-                    key={amenity.key} 
-                    className="flex items-center justify-between p-3 bg-muted/30 rounded-xl"
-                  >
+                {AMENITIES.map((amenity) =>
+                <div
+                  key={amenity.key}
+                  className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
+                  
                     <span className="text-sm flex items-center gap-2">
                       <span className="text-lg">{amenity.icon}</span>
                       {amenity.label}
                     </span>
                     <Switch
-                      checked={(newPlace as any)[amenity.key]}
-                      onCheckedChange={(checked) => setNewPlace({ ...newPlace, [amenity.key]: checked })}
-                    />
+                    checked={(newPlace as any)[amenity.key]}
+                    onCheckedChange={(checked) => setNewPlace({ ...newPlace, [amenity.key]: checked })} />
+                  
                   </div>
-                ))}
+                )}
               </div>
             </div>
-            <Button 
-              className="w-full bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700" 
+            <Button
+              className="w-full bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700"
               onClick={handleAddPlace}
-              disabled={addPlaceMutation.isPending}
-            >
-              {addPlaceMutation.isPending ? 'Əlavə edilir...' : 'Məkan Əlavə Et'}
+              disabled={addPlaceMutation.isPending}>
+              
+              {addPlaceMutation.isPending ? tr("momfriendlymap_elave_edilir_3c28b4", "\u018Flav\u0259 edilir...") : tr("momfriendlymap_mekan_elave_et_dd9c6e", "M\u0259kan \u018Flav\u0259 Et")}
             </Button>
           </div>
         </DialogContent>
@@ -479,21 +479,21 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
       {/* Place Detail Modal */}
       <Dialog open={!!selectedPlace} onOpenChange={(open) => !open && setSelectedPlace(null)}>
         <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto p-0">
-          {selectedPlace && (
-            <>
+          {selectedPlace &&
+          <>
               {/* Hero */}
               <div className={`relative h-32 bg-gradient-to-br ${getCategoryInfo(selectedPlace.category).color}`}>
                 <div className="absolute inset-0 flex items-center justify-center">
                   {(() => {
-                    const CatIcon = getCategoryInfo(selectedPlace.category).icon;
-                    return <CatIcon className="w-16 h-16 text-white/30" />;
-                  })()}
+                  const CatIcon = getCategoryInfo(selectedPlace.category).icon;
+                  return <CatIcon className="w-16 h-16 text-white/30" />;
+                })()}
                 </div>
                 <motion.button
-                  onClick={() => setSelectedPlace(null)}
-                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center"
-                  whileTap={{ scale: 0.95 }}
-                >
+                onClick={() => setSelectedPlace(null)}
+                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center"
+                whileTap={{ scale: 0.95 }}>
+                
                   <X className="w-4 h-4 text-white" />
                 </motion.button>
               </div>
@@ -502,11 +502,11 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <h2 className="text-xl font-bold text-foreground">{selectedPlace.name_az || selectedPlace.name}</h2>
-                    {selectedPlace.is_verified && (
-                      <Badge className="bg-emerald-500/10 text-emerald-600 border-0">
-                        <Check className="w-3 h-3 mr-1" /> Təsdiqlənib
+                    {selectedPlace.is_verified &&
+                  <Badge className="bg-emerald-500/10 text-emerald-600 border-0">
+                        <Check className="w-3 h-3 mr-1" /> {tr("momfriendlymap_tesdiqlenib_96c431", "T\u0259sdiql\u0259nib")}
                       </Badge>
-                    )}
+                  }
                   </div>
                   <p className="text-muted-foreground">{selectedPlace.address_az || selectedPlace.address}</p>
                 </div>
@@ -520,7 +520,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                       </div>
                       <div>
                         <p className="text-2xl font-black text-foreground">{selectedPlace.avg_rating?.toFixed(1) || '–'}</p>
-                        <p className="text-sm text-muted-foreground">{selectedPlace.review_count} rəy</p>
+                        <p className="text-sm text-muted-foreground">{selectedPlace.review_count} {tr("momfriendlymap_rey_bd4873", "r\u0259y")}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -533,122 +533,122 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                     İmkanlar
                   </h4>
                   <div className="grid grid-cols-2 gap-2">
-                    {getPlaceAmenities(selectedPlace).map(a => (
-                      <div key={a.key} className="flex items-center gap-2 text-sm bg-muted/50 p-2.5 rounded-xl">
+                    {getPlaceAmenities(selectedPlace).map((a) =>
+                  <div key={a.key} className="flex items-center gap-2 text-sm bg-muted/50 p-2.5 rounded-xl">
                         <span className="text-lg">{a.icon}</span>
                         <span>{a.label}</span>
                       </div>
-                    ))}
-                  </div>
-                  {getPlaceAmenities(selectedPlace).length === 0 && (
-                    <p className="text-sm text-muted-foreground text-center py-4">{tr("momfriendlymap_imkan_gosterilmeyib_1f22f8", "İmkan göstərilməyib")}</p>
                   )}
+                  </div>
+                  {getPlaceAmenities(selectedPlace).length === 0 &&
+                <p className="text-sm text-muted-foreground text-center py-4">{tr("momfriendlymap_imkan_gosterilmeyib_1f22f8", "İmkan göstərilməyib")}</p>
+                }
                 </div>
 
                 {/* Contact */}
-                {selectedPlace.phone && (
-                  <Button variant="outline" className="w-full" asChild>
+                {selectedPlace.phone &&
+              <Button variant="outline" className="w-full" asChild>
                     <a href={`tel:${selectedPlace.phone}`} className="flex items-center gap-2">
                       <Phone className="w-4 h-4" />
                       {selectedPlace.phone}
                     </a>
                   </Button>
-                )}
+              }
 
                 {/* Reviews Section */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <h4 className="font-bold flex items-center gap-2">
                       <Star className="w-4 h-4 text-amber-500" />
-                      Rəylər ({placeReviews.length})
+                      {tr("momfriendlymap_reyler_8be233", "R\u0259yl\u0259r (")}{placeReviews.length})
                     </h4>
                     <Button
-                      size="sm"
-                      variant={showReviewForm ? "outline" : "default"}
-                      onClick={() => setShowReviewForm(!showReviewForm)}
-                      className={!showReviewForm ? "bg-rose-500 hover:bg-rose-600 text-white" : ""}
-                    >
-                      {showReviewForm ? 'Ləğv et' : 'Rəy yaz'}
+                    size="sm"
+                    variant={showReviewForm ? "outline" : "default"}
+                    onClick={() => setShowReviewForm(!showReviewForm)}
+                    className={!showReviewForm ? "bg-rose-500 hover:bg-rose-600 text-white" : ""}>
+                    
+                      {showReviewForm ? tr("momfriendlymap_legv_et_b5e49c", "L\u0259\u011Fv et") : tr("momfriendlymap_rey_yaz_7b3aab", "R\u0259y yaz")}
                     </Button>
                   </div>
 
                   {/* Review Form */}
-                  {showReviewForm && (
-                    <Card className="mb-3 border-rose-200 dark:border-rose-900/30">
+                  {showReviewForm &&
+                <Card className="mb-3 border-rose-200 dark:border-rose-900/30">
                       <CardContent className="p-4 space-y-3">
                         <div>
                           <p className="text-sm font-medium mb-2">{tr("momfriendlymap_qiymetlendirme_1fde6b", "Qiymətləndirmə")}</p>
                           <div className="flex gap-1">
-                            {[1, 2, 3, 4, 5].map(star => (
-                              <button
-                                key={star}
-                                onClick={() => setReviewRating(star)}
-                                className="p-1"
-                              >
+                            {[1, 2, 3, 4, 5].map((star) =>
+                        <button
+                          key={star}
+                          onClick={() => setReviewRating(star)}
+                          className="p-1">
+                          
                                 <Star className={`w-7 h-7 transition-colors ${star <= reviewRating ? 'text-amber-500 fill-current' : 'text-muted-foreground'}`} />
                               </button>
-                            ))}
+                        )}
                           </div>
                         </div>
                         <div>
                           <p className="text-sm font-medium mb-2">{tr("momfriendlymap_serh_isteye_bagli_0acfd0", "Şərh (istəyə bağlı)")}</p>
                           <Textarea
-                            value={reviewComment}
-                            onChange={(e) => setReviewComment(e.target.value)}
-                            placeholder={tr("momfriendlymap_tecrubenizi_paylasin_aeca62", "Təcrübənizi paylaşın...")}
-                            className="bg-muted/50 resize-none"
-                            rows={3}
-                          />
+                        value={reviewComment}
+                        onChange={(e) => setReviewComment(e.target.value)}
+                        placeholder={tr("momfriendlymap_tecrubenizi_paylasin_aeca62", "Təcrübənizi paylaşın...")}
+                        className="bg-muted/50 resize-none"
+                        rows={3} />
+                      
                         </div>
                         <Button
-                          className="w-full bg-rose-500 hover:bg-rose-600 text-white"
-                          disabled={reviewRating === 0 || addReviewMutation.isPending}
-                          onClick={async () => {
-                            if (!selectedPlace) return;
-                            await addReviewMutation.mutateAsync({
-                              place_id: selectedPlace.id,
-                              rating: reviewRating,
-                              comment: reviewComment || undefined,
-                            });
-                            setReviewRating(0);
-                            setReviewComment('');
-                            setShowReviewForm(false);
-                          }}
-                        >
-                          {addReviewMutation.isPending ? 'Göndərilir...' : 'Rəy göndər'}
+                      className="w-full bg-rose-500 hover:bg-rose-600 text-white"
+                      disabled={reviewRating === 0 || addReviewMutation.isPending}
+                      onClick={async () => {
+                        if (!selectedPlace) return;
+                        await addReviewMutation.mutateAsync({
+                          place_id: selectedPlace.id,
+                          rating: reviewRating,
+                          comment: reviewComment || undefined
+                        });
+                        setReviewRating(0);
+                        setReviewComment('');
+                        setShowReviewForm(false);
+                      }}>
+                      
+                          {addReviewMutation.isPending ? tr("momfriendlymap_gonderilir_1d548c", "G\xF6nd\u0259rilir...") : tr("momfriendlymap_rey_gonder_027e80", "R\u0259y g\xF6nd\u0259r")}
                         </Button>
                       </CardContent>
                     </Card>
-                  )}
+                }
 
                   {/* Reviews List */}
-                  {placeReviews.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-4">{tr("momfriendlymap_hele_rey_yoxdur_ilk_reyi_siz_yazin_156bd8", "Hələ rəy yoxdur. İlk rəyi siz yazın!")}</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {placeReviews.map(review => (
-                        <div key={review.id} className="bg-muted/30 rounded-xl p-3">
+                  {placeReviews.length === 0 ?
+                <p className="text-sm text-muted-foreground text-center py-4">{tr("momfriendlymap_hele_rey_yoxdur_ilk_reyi_siz_yazin_156bd8", "Hələ rəy yoxdur. İlk rəyi siz yazın!")}</p> :
+
+                <div className="space-y-2">
+                      {placeReviews.map((review) =>
+                  <div key={review.id} className="bg-muted/30 rounded-xl p-3">
                           <div className="flex items-center gap-1 mb-1">
-                            {[1, 2, 3, 4, 5].map(s => (
-                              <Star key={s} className={`w-3.5 h-3.5 ${s <= review.rating ? 'text-amber-500 fill-current' : 'text-muted-foreground'}`} />
-                            ))}
+                            {[1, 2, 3, 4, 5].map((s) =>
+                      <Star key={s} className={`w-3.5 h-3.5 ${s <= review.rating ? 'text-amber-500 fill-current' : 'text-muted-foreground'}`} />
+                      )}
                             <span className="text-xs text-muted-foreground ml-2">
                               {new Date(review.created_at).toLocaleDateString('az-AZ')}
                             </span>
                           </div>
                           {review.comment && <p className="text-sm text-foreground">{review.comment}</p>}
                         </div>
-                      ))}
-                    </div>
                   )}
+                    </div>
+                }
                 </div>
               </div>
             </>
-          )}
+          }
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 };
 
 export default MomFriendlyMap;

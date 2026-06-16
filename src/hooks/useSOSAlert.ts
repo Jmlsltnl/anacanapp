@@ -29,11 +29,11 @@ export const useSOSAlert = () => {
     if (!profile?.linked_partner_id) return null;
 
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('user_id')
-        .eq('id', profile.linked_partner_id)
-        .single();
+      const { data, error } = await supabase.
+      from('profiles').
+      select('user_id').
+      eq('id', profile.linked_partner_id).
+      single();
 
       if (error || !data) return null;
       return data.user_id;
@@ -46,19 +46,19 @@ export const useSOSAlert = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
-        .from('sos_alerts')
-        .select('*')
-        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
-        .order('created_at', { ascending: false })
-        .limit(20);
+      const { data, error } = await supabase.
+      from('sos_alerts').
+      select('*').
+      or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`).
+      order('created_at', { ascending: false }).
+      limit(20);
 
       if (error) throw error;
       setAlerts((data || []) as SOSAlert[]);
 
       // Check for unacknowledged alerts where I'm the receiver
       const pending = data?.find(
-        a => a.receiver_id === user.id && !a.is_acknowledged
+        (a) => a.receiver_id === user.id && !a.is_acknowledged
       );
       setPendingAlert(pending as SOSAlert || null);
     } catch (error) {
@@ -82,12 +82,12 @@ export const useSOSAlert = () => {
 
       const position = await Geolocation.getCurrentPosition({
         enableHighAccuracy: true,
-        timeout: 10000,
+        timeout: 10000
       });
 
       return {
         latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
+        longitude: position.coords.longitude
       };
     } catch (error) {
       console.error('Error getting location:', error);
@@ -116,19 +116,19 @@ export const useSOSAlert = () => {
         location = await getCurrentLocation();
       }
 
-      const { data, error } = await supabase
-        .from('sos_alerts')
-        .insert({
-          sender_id: user.id,
-          receiver_id: partnerUserId,
-          alert_type: 'emergency',
-          message: message || 'TƏCİLİ! Mənə kömək lazımdır!',
-          latitude: location?.latitude || null,
-          longitude: location?.longitude || null,
-          location_name: location?.locationName || null,
-        })
-        .select()
-        .single();
+      const { data, error } = await supabase.
+      from('sos_alerts').
+      insert({
+        sender_id: user.id,
+        receiver_id: partnerUserId,
+        alert_type: 'emergency',
+        message: message || tr("usesosalert_teci_li_mene_komek_lazimdir_032838", "T\u018FC\u0130L\u0130! M\u0259n\u0259 k\xF6m\u0259k laz\u0131md\u0131r!"),
+        latitude: location?.latitude || null,
+        longitude: location?.longitude || null,
+        location_name: location?.locationName || null
+      }).
+      select().
+      single();
 
       if (error) throw error;
 
@@ -140,12 +140,12 @@ export const useSOSAlert = () => {
         content: JSON.stringify({
           type: 'sos_alert',
           title: tr("usesosalert_tecili_xeberdarliq_5bfb41", "🆘 TƏCİLİ XƏBƏRDARLIQ!"),
-          body: message || 'Partnyorunuz təcili kömək istəyir!',
+          body: message || tr("usesosalert_partnyorunuz_tecili_komek_iste_b7a70c", "Partnyorunuz t\u0259cili k\xF6m\u0259k ist\u0259yir!"),
           alertId: data.id,
           latitude: location?.latitude,
           longitude: location?.longitude,
           timestamp: new Date().toISOString()
-        }),
+        })
       });
 
       await fetchAlerts();
@@ -162,14 +162,14 @@ export const useSOSAlert = () => {
     if (!user) return;
 
     try {
-      const { error } = await supabase
-        .from('sos_alerts')
-        .update({
-          is_acknowledged: true,
-          acknowledged_at: new Date().toISOString(),
-        })
-        .eq('id', alertId)
-        .eq('receiver_id', user.id);
+      const { error } = await supabase.
+      from('sos_alerts').
+      update({
+        is_acknowledged: true,
+        acknowledged_at: new Date().toISOString()
+      }).
+      eq('id', alertId).
+      eq('receiver_id', user.id);
 
       if (error) throw error;
 
@@ -184,31 +184,31 @@ export const useSOSAlert = () => {
   useEffect(() => {
     fetchAlerts();
 
-    const channel = supabase
-      .channel('sos_alerts_changes')
-      .on(
-        'postgres_changes',
+    const channel = supabase.
+    channel('sos_alerts_changes').
+    on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'sos_alerts'
+      },
+      async (payload) => {
+        // If new alert where I'm receiver, trigger haptic
+        if (
+        payload.eventType === 'INSERT' &&
+        (payload.new as SOSAlert).receiver_id === user?.id)
         {
-          event: '*',
-          schema: 'public',
-          table: 'sos_alerts'
-        },
-        async (payload) => {
-          // If new alert where I'm receiver, trigger haptic
-          if (
-            payload.eventType === 'INSERT' &&
-            (payload.new as SOSAlert).receiver_id === user?.id
-          ) {
-            try {
-              await Haptics.impact({ style: ImpactStyle.Heavy });
-              await Haptics.impact({ style: ImpactStyle.Heavy });
-              await Haptics.impact({ style: ImpactStyle.Heavy });
-            } catch {}
-          }
-          fetchAlerts();
+          try {
+            await Haptics.impact({ style: ImpactStyle.Heavy });
+            await Haptics.impact({ style: ImpactStyle.Heavy });
+            await Haptics.impact({ style: ImpactStyle.Heavy });
+          } catch {}
         }
-      )
-      .subscribe();
+        fetchAlerts();
+      }
+    ).
+    subscribe();
 
     return () => {
       supabase.removeChannel(channel);
@@ -222,6 +222,6 @@ export const useSOSAlert = () => {
     sendSOS,
     acknowledgeAlert,
     hasPartner: !!profile?.linked_partner_id,
-    refetch: fetchAlerts,
+    refetch: fetchAlerts
   };
 };

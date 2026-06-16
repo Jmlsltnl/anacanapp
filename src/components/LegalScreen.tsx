@@ -19,27 +19,27 @@ const documentIcons: Record<string, any> = {
   gdpr_ccpa: Scale,
   disclaimer: AlertTriangle,
   refund_policy: CreditCard,
-  data_usage: Database,
+  data_usage: Database
 };
 
 const documentOrder = [
-  'terms_of_service',
-  'privacy_policy',
-  'gdpr_ccpa',
-  'disclaimer',
-  'refund_policy',
-  'data_usage',
-];
+'terms_of_service',
+'privacy_policy',
+'gdpr_ccpa',
+'disclaimer',
+'refund_policy',
+'data_usage'];
+
 
 const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
   useScrollToTop();
-  
+
   const { data: documents = [], isLoading } = useLegalDocuments();
   const [selectedDoc, setSelectedDoc] = useState<LegalDocument | null>(null);
 
   useEffect(() => {
     if (initialDocument && documents.length > 0 && !selectedDoc) {
-      const doc = documents.find(d => d.document_type === initialDocument);
+      const doc = documents.find((d) => d.document_type === initialDocument);
       if (doc) setSelectedDoc(doc);
     }
   }, [initialDocument, documents]);
@@ -63,7 +63,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
         <ScrollArea className="flex-1 p-4">
           <div className="max-w-3xl mx-auto">
             <div className="mb-4 text-sm text-muted-foreground">
-              Versiya: {selectedDoc.version} | Son yenilənmə: {new Date(selectedDoc.updated_at).toLocaleDateString('az-AZ')}
+              Versiya: {selectedDoc.version} {tr("legalscreen_son_yenilenme_8a61f0", "| Son yenil\u0259nm\u0259:")} {new Date(selectedDoc.updated_at).toLocaleDateString('az-AZ')}
             </div>
             <div className="prose prose-xs dark:prose-invert max-w-none text-sm [&_h1]:text-lg [&_h2]:text-base [&_h3]:text-sm [&_p]:text-sm [&_li]:text-sm">
               {(() => {
@@ -74,8 +74,8 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
             </div>
           </div>
         </ScrollArea>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -89,19 +89,19 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
 
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-2">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
+          {isLoading ?
+          <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-            </div>
-          ) : (
-            sortedDocuments.map((doc) => {
-              const Icon = documentIcons[doc.document_type] || FileText;
-              return (
-                <button
-                  key={doc.id}
-                  onClick={() => setSelectedDoc(doc)}
-                  className="w-full flex items-center gap-4 p-4 bg-card rounded-xl border hover:bg-accent/50 transition-colors text-left"
-                >
+            </div> :
+
+          sortedDocuments.map((doc) => {
+            const Icon = documentIcons[doc.document_type] || FileText;
+            return (
+              <button
+                key={doc.id}
+                onClick={() => setSelectedDoc(doc)}
+                className="w-full flex items-center gap-4 p-4 bg-card rounded-xl border hover:bg-accent/50 transition-colors text-left">
+                
                   <div className="p-2 rounded-lg bg-primary/10">
                     <Icon className="h-5 w-5 text-primary" />
                   </div>
@@ -112,14 +112,14 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
                     </p>
                   </div>
                   <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                </button>
-              );
-            })
-          )}
+                </button>);
+
+          })
+          }
         </div>
       </ScrollArea>
-    </div>
-  );
+    </div>);
+
 };
 
 export default LegalScreen;

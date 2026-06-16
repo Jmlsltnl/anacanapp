@@ -13,7 +13,7 @@ interface AppearanceScreenProps {
 const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
   useScrollToTop();
   useScreenAnalytics('Appearance', 'Settings');
-  
+
   const { theme, setTheme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -29,28 +29,28 @@ const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
   const currentTheme = theme === 'system' ? systemTheme : theme;
 
   const themeOptions = [
-    {
-      id: 'light',
-      label: tr("appearancescreen_aciq_rejim_800daa", 'Açıq rejim'),
-      description: tr("appearancescreen_klassik_aciq_rengler_7c8359", 'Klassik açıq rənglər'),
-      icon: Sun,
-      preview: 'bg-gradient-to-br from-amber-50 to-orange-100',
-    },
-    {
-      id: 'dark',
-      label: tr("appearancescreen_qaranliq_rejim_ef2f9f", 'Qaranlıq rejim'),
-      description: tr("appearancescreen_gozlere_rahat_qaranliq_tema_4d59d5", 'Gözlərə rahat qaranlıq tema'),
-      icon: Moon,
-      preview: 'bg-gradient-to-br from-slate-800 to-slate-900',
-    },
-    {
-      id: 'system',
-      label: 'Sistem',
-      description: tr("appearancescreen_cihazinizin_ayarina_uygun_9b4fa7", 'Cihazınızın ayarına uyğun'),
-      icon: Monitor,
-      preview: 'bg-gradient-to-r from-amber-100 via-slate-300 to-slate-800',
-    },
-  ];
+  {
+    id: 'light',
+    label: tr("appearancescreen_aciq_rejim_800daa", 'Açıq rejim'),
+    description: tr("appearancescreen_klassik_aciq_rengler_7c8359", 'Klassik açıq rənglər'),
+    icon: Sun,
+    preview: 'bg-gradient-to-br from-amber-50 to-orange-100'
+  },
+  {
+    id: 'dark',
+    label: tr("appearancescreen_qaranliq_rejim_ef2f9f", 'Qaranlıq rejim'),
+    description: tr("appearancescreen_gozlere_rahat_qaranliq_tema_4d59d5", 'Gözlərə rahat qaranlıq tema'),
+    icon: Moon,
+    preview: 'bg-gradient-to-br from-slate-800 to-slate-900'
+  },
+  {
+    id: 'system',
+    label: 'Sistem',
+    description: tr("appearancescreen_cihazinizin_ayarina_uygun_9b4fa7", 'Cihazınızın ayarına uyğun'),
+    icon: Monitor,
+    preview: 'bg-gradient-to-r from-amber-100 via-slate-300 to-slate-800'
+  }];
+
 
   return (
     <div className="min-h-screen bg-background pb-28 overflow-y-auto">
@@ -60,8 +60,8 @@ const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
           <motion.button
             onClick={onBack}
             className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}
-          >
+            whileTap={{ scale: 0.95 }}>
+            
             <ArrowLeft className="w-5 h-5 text-white" />
           </motion.button>
           <div className="flex-1">
@@ -76,29 +76,29 @@ const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
         <motion.div
           className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
           initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-        >
+          animate={{ y: 0, opacity: 1 }}>
+          
           <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
             <Palette className="w-5 h-5 text-primary" />
-            Tema Seçimi
+            {tr("appearancescreen_tema_secimi_73a672", "Tema Se\xE7imi")}
           </h3>
           
           <div className="space-y-3">
             {themeOptions.map((option) => {
               const Icon = option.icon;
               const isSelected = theme === option.id;
-              
+
               return (
                 <motion.button
                   key={option.id}
                   onClick={() => setTheme(option.id)}
                   className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
-                    isSelected 
-                      ? 'border-primary bg-primary/5' 
-                      : 'border-border hover:border-primary/30 hover:bg-muted/50'
-                  }`}
-                  whileTap={{ scale: 0.98 }}
-                >
+                  isSelected ?
+                  'border-primary bg-primary/5' :
+                  'border-border hover:border-primary/30 hover:bg-muted/50'}`
+                  }
+                  whileTap={{ scale: 0.98 }}>
+                  
                   {/* Preview */}
                   <div className={`w-14 h-14 rounded-xl ${option.preview} flex items-center justify-center shadow-inner`}>
                     <Icon className={`w-6 h-6 ${option.id === 'dark' ? 'text-white' : 'text-foreground'}`} />
@@ -109,17 +109,17 @@ const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
                     <p className="text-xs text-muted-foreground">{option.description}</p>
                   </div>
                   
-                  {isSelected && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center"
-                    >
+                  {isSelected &&
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center">
+                    
                       <Check className="w-5 h-5 text-white" />
                     </motion.div>
-                  )}
-                </motion.button>
-              );
+                  }
+                </motion.button>);
+
             })}
           </div>
         </motion.div>
@@ -129,8 +129,8 @@ const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
           className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1 }}
-        >
+          transition={{ delay: 0.1 }}>
+          
           <h3 className="font-bold text-foreground mb-4">{tr("appearancescreen_cari_gorunus_aeba05", "Cari Görünüş")}</h3>
           
           <div className="space-y-3">
@@ -167,18 +167,18 @@ const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
           className="bg-muted/50 rounded-2xl p-4"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
+          transition={{ delay: 0.2 }}>
+          
           <p className="text-sm text-muted-foreground text-center">
-            {theme === 'system' 
-              ? `Hal-hazırda sistem teması (${currentTheme === 'dark' ? 'qaranlıq' : 'açıq'}) istifadə olunur.`
-              : `${theme === 'dark' ? 'Qaranlıq' : 'Açıq'} rejim aktiv edilib.`
+            {theme === 'system' ?
+            `Hal-hazırda sistem teması (${currentTheme === 'dark' ? tr("appearancescreen_qaranliq_affa8e", "qaranl\u0131q") : tr("appearancescreen_aciq_79bf9c", "a\xE7\u0131q")}) istifadə olunur.` :
+            `${theme === 'dark' ? tr("appearancescreen_qaranliq_34c5e3", "Qaranl\u0131q") : tr("appearancescreen_aciq_306cc4", "A\xE7\u0131q")} rejim aktiv edilib.`
             }
           </p>
         </motion.div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AppearanceScreen;

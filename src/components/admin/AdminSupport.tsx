@@ -1,10 +1,10 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
-import { 
-  MessageSquare, Clock, CheckCircle, AlertCircle, 
-  Send, User, Mail, Filter, ArrowLeft, XCircle, Loader2
-} from 'lucide-react';
+import {
+  MessageSquare, Clock, CheckCircle, AlertCircle,
+  Send, User, Mail, Filter, ArrowLeft, XCircle, Loader2 } from
+'lucide-react';
 import { useSupportTicketsAdmin, AdminSupportTicket } from '@/hooks/useSupportTicketsAdmin';
 import { useSupportTicketReplies } from '@/hooks/useSupportTicketReplies';
 import { useSupportCategories } from '@/hooks/useDynamicTools';
@@ -19,8 +19,8 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  SelectValue } from
+'@/components/ui/select';
 
 const AdminSupport = () => {
   const { tickets, loading, respondToTicket, updateStatus, updatePriority, refetch } = useSupportTicketsAdmin();
@@ -44,28 +44,28 @@ const AdminSupport = () => {
   // Build category labels from DB
   const categoryLabels = useMemo(() => {
     const labels: Record<string, string> = {};
-    supportCategories.forEach(cat => {
+    supportCategories.forEach((cat) => {
       labels[cat.category_key] = cat.name_az || cat.name;
     });
     // Add fallback for common categories
-    if (!labels['general']) labels['general'] = 'Ümumi';
+    if (!labels['general']) labels['general'] = tr("adminsupport_umumi_1b5521", "\xDCmumi");
     if (!labels['technical']) labels['technical'] = 'Texniki';
-    if (!labels['billing']) labels['billing'] = 'Ödəniş';
-    if (!labels['feature']) labels['feature'] = 'Xüsusiyyət';
-    if (!labels['other']) labels['other'] = 'Digər';
+    if (!labels['billing']) labels['billing'] = tr("adminsupport_odenis_a4610e", "\xD6d\u0259ni\u015F");
+    if (!labels['feature']) labels['feature'] = tr("adminsupport_xususiyyet_73f16d", "X\xFCsusiyy\u0259t");
+    if (!labels['other']) labels['other'] = tr("adminsupport_diger_293b3a", "Dig\u0259r");
     return labels;
   }, [supportCategories]);
 
-  const filteredTickets = filterStatus === 'all' 
-    ? tickets 
-    : tickets.filter(t => t.status === filterStatus);
+  const filteredTickets = filterStatus === 'all' ?
+  tickets :
+  tickets.filter((t) => t.status === filterStatus);
 
   const getStatusIcon = (status: AdminSupportTicket['status']) => {
     switch (status) {
-      case 'open': return <AlertCircle className="w-4 h-4 text-amber-500" />;
-      case 'in_progress': return <Clock className="w-4 h-4 text-blue-500" />;
-      case 'resolved': return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'closed': return <XCircle className="w-4 h-4 text-muted-foreground" />;
+      case 'open':return <AlertCircle className="w-4 h-4 text-amber-500" />;
+      case 'in_progress':return <Clock className="w-4 h-4 text-blue-500" />;
+      case 'resolved':return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case 'closed':return <XCircle className="w-4 h-4 text-muted-foreground" />;
     }
   };
 
@@ -77,10 +77,10 @@ const AdminSupport = () => {
       closed: 'bg-muted text-muted-foreground'
     };
     const labels = {
-      open: 'Açıq',
-      in_progress: 'İşlənir',
-      resolved: 'Həll edildi',
-      closed: 'Bağlı'
+      open: tr("adminsupport_aciq_306cc4", "A\xE7\u0131q"),
+      in_progress: tr("adminsupport_i_slenir_65a15d", "\u0130\u015Fl\u0259nir"),
+      resolved: tr("adminsupport_hell_edildi_beceb9", "H\u0259ll edildi"),
+      closed: tr("adminsupport_bagli_713069", "Ba\u011Fl\u0131")
     };
     return <Badge variant="outline" className={styles[status]}>{labels[status]}</Badge>;
   };
@@ -93,10 +93,10 @@ const AdminSupport = () => {
       urgent: 'bg-red-500/10 text-red-600'
     };
     const labels = {
-      low: 'Aşağı',
+      low: tr("adminsupport_asagi_1c27f1", "A\u015Fa\u011F\u0131"),
       normal: 'Normal',
-      high: 'Yüksək',
-      urgent: 'Təcili'
+      high: tr("adminsupport_yuksek_492584", "Y\xFCks\u0259k"),
+      urgent: tr("adminsupport_tecili_ab784b", "T\u0259cili")
     };
     return <Badge variant="outline" className={styles[priority]}>{labels[priority]}</Badge>;
   };
@@ -141,17 +141,17 @@ const AdminSupport = () => {
 
   const stats = {
     total: tickets.length,
-    open: tickets.filter(t => t.status === 'open').length,
-    inProgress: tickets.filter(t => t.status === 'in_progress').length,
-    resolved: tickets.filter(t => t.status === 'resolved').length
+    open: tickets.filter((t) => t.status === 'open').length,
+    inProgress: tickets.filter((t) => t.status === 'in_progress').length,
+    resolved: tickets.filter((t) => t.status === 'resolved').length
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+      </div>);
+
   }
 
   // Chat view for selected ticket
@@ -166,8 +166,8 @@ const AdminSupport = () => {
                 setSelectedTicket(null);
                 refetch();
               }}
-              className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center hover:bg-muted/80"
-            >
+              className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center hover:bg-muted/80">
+              
               <ArrowLeft className="w-4 h-4" />
             </button>
             <div className="flex-1 min-w-0">
@@ -185,13 +185,13 @@ const AdminSupport = () => {
 
           {/* Quick Actions */}
           <div className="flex gap-2 mt-3">
-            <Select 
+            <Select
               value={selectedTicket.status}
               onValueChange={(value) => {
                 updateStatus(selectedTicket.id, value as AdminSupportTicket['status']);
                 setSelectedTicket({ ...selectedTicket, status: value as AdminSupportTicket['status'] });
-              }}
-            >
+              }}>
+              
               <SelectTrigger className="w-32 h-8 text-xs">
                 <SelectValue />
               </SelectTrigger>
@@ -202,13 +202,13 @@ const AdminSupport = () => {
                 <SelectItem value="closed">{tr("adminsupport_bagli_713069", "Bağlı")}</SelectItem>
               </SelectContent>
             </Select>
-            <Select 
+            <Select
               value={selectedTicket.priority}
               onValueChange={(value) => {
                 updatePriority(selectedTicket.id, value as AdminSupportTicket['priority']);
                 setSelectedTicket({ ...selectedTicket, priority: value as AdminSupportTicket['priority'] });
-              }}
-            >
+              }}>
+              
               <SelectTrigger className="w-28 h-8 text-xs">
                 <SelectValue />
               </SelectTrigger>
@@ -219,18 +219,18 @@ const AdminSupport = () => {
                 <SelectItem value="urgent">{tr("adminsupport_tecili_ab784b", "Təcili")}</SelectItem>
               </SelectContent>
             </Select>
-            {selectedTicket.status !== 'closed' && (
-              <Button variant="outline" size="sm" className="h-8 text-xs" onClick={handleCloseTicket}>
+            {selectedTicket.status !== 'closed' &&
+            <Button variant="outline" size="sm" className="h-8 text-xs" onClick={handleCloseTicket}>
                 <XCircle className="w-3 h-3 mr-1" />
-                Bağla
+                {tr("adminsupport_bagla_84bdc9", "Ba\u011Fla")}
               </Button>
-            )}
-            {selectedTicket.status !== 'resolved' && selectedTicket.status !== 'closed' && (
-              <Button variant="outline" size="sm" className="h-8 text-xs text-green-600" onClick={handleResolveTicket}>
+            }
+            {selectedTicket.status !== 'resolved' && selectedTicket.status !== 'closed' &&
+            <Button variant="outline" size="sm" className="h-8 text-xs text-green-600" onClick={handleResolveTicket}>
                 <CheckCircle className="w-3 h-3 mr-1" />
-                Həll et
+                {tr("adminsupport_hell_et_aae47e", "H\u0259ll et")}
               </Button>
-            )}
+            }
           </div>
         </div>
 
@@ -253,94 +253,94 @@ const AdminSupport = () => {
           </div>
 
           {/* Legacy admin response */}
-          {selectedTicket.admin_response && (
-            <div className="flex justify-end">
+          {selectedTicket.admin_response &&
+          <div className="flex justify-end">
               <div className="max-w-[75%] bg-primary text-primary-foreground p-3 rounded-2xl rounded-br-md">
                 <p className="text-sm">{selectedTicket.admin_response}</p>
-                {selectedTicket.responded_at && (
-                  <p className="text-[10px] opacity-70 mt-1 text-right">
+                {selectedTicket.responded_at &&
+              <p className="text-[10px] opacity-70 mt-1 text-right">
                     {format(new Date(selectedTicket.responded_at), 'd MMM, HH:mm', { locale: az })}
                   </p>
-                )}
+              }
               </div>
             </div>
-          )}
+          }
 
           {/* Chat replies */}
-          {repliesLoading ? (
-            <div className="flex justify-center py-4">
+          {repliesLoading ?
+          <div className="flex justify-center py-4">
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-            </div>
-          ) : (
-            replies.map((reply) => (
-              <div key={reply.id} className={`flex ${reply.is_admin ? 'justify-end' : 'justify-start'}`}>
+            </div> :
+
+          replies.map((reply) =>
+          <div key={reply.id} className={`flex ${reply.is_admin ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[75%] p-3 rounded-2xl ${
-                  reply.is_admin 
-                    ? 'bg-primary text-primary-foreground rounded-br-md' 
-                    : 'bg-card border border-border rounded-bl-md'
-                }`}>
-                  {!reply.is_admin && (
-                    <div className="flex items-center gap-1.5 mb-1">
+            reply.is_admin ?
+            'bg-primary text-primary-foreground rounded-br-md' :
+            'bg-card border border-border rounded-bl-md'}`
+            }>
+                  {!reply.is_admin &&
+              <div className="flex items-center gap-1.5 mb-1">
                       <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
                         <User className="w-3 h-3 text-primary" />
                       </div>
                       <span className="text-[10px] font-medium text-muted-foreground">{selectedTicket.user_name}</span>
                     </div>
-                  )}
+              }
                   <p className={`text-sm ${reply.is_admin ? '' : 'text-foreground'}`}>{reply.message}</p>
                   <p className={`text-[10px] mt-1 ${
-                    reply.is_admin ? 'opacity-70 text-right' : 'text-muted-foreground'
-                  }`}>
+              reply.is_admin ? 'opacity-70 text-right' : 'text-muted-foreground'}`
+              }>
                     {format(new Date(reply.created_at), 'd MMMM, HH:mm', { locale: az })}
                   </p>
                 </div>
               </div>
-            ))
-          )}
+          )
+          }
 
           <div ref={messagesEndRef} />
         </div>
 
         {/* Reply Input */}
-        {selectedTicket.status !== 'closed' ? (
-          <div className="p-4 border-t border-border bg-card">
+        {selectedTicket.status !== 'closed' ?
+        <div className="p-4 border-t border-border bg-card">
             <div className="flex gap-2">
               <Textarea
-                value={replyMessage}
-                onChange={(e) => setReplyMessage(e.target.value)}
-                placeholder={tr("adminsupport_cavabinizi_yazin_2cda33", "Cavabınızı yazın...")}
-                rows={1}
-                className="flex-1 min-h-[44px] max-h-[120px] resize-none"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSendReply();
-                  }
-                }}
-              />
+              value={replyMessage}
+              onChange={(e) => setReplyMessage(e.target.value)}
+              placeholder={tr("adminsupport_cavabinizi_yazin_2cda33", "Cavabınızı yazın...")}
+              rows={1}
+              className="flex-1 min-h-[44px] max-h-[120px] resize-none"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendReply();
+                }
+              }} />
+            
               <Button
-                onClick={handleSendReply}
-                disabled={submitting || !replyMessage.trim()}
-                size="icon"
-                className="h-11 w-11"
-              >
-                {submitting ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Send className="w-4 h-4" />
-                )}
+              onClick={handleSendReply}
+              disabled={submitting || !replyMessage.trim()}
+              size="icon"
+              className="h-11 w-11">
+              
+                {submitting ?
+              <Loader2 className="w-4 h-4 animate-spin" /> :
+
+              <Send className="w-4 h-4" />
+              }
               </Button>
             </div>
-          </div>
-        ) : (
-          <div className="p-4 border-t border-border bg-muted/50">
+          </div> :
+
+        <div className="p-4 border-t border-border bg-muted/50">
             <p className="text-sm text-muted-foreground text-center">
-              Bu müraciət bağlanıb.
+              {tr("adminsupport_bu_muraciet_baglanib_ca3d3c", "Bu m\xFCraci\u0259t ba\u011Flan\u0131b.")}
             </p>
           </div>
-        )}
-      </div>
-    );
+        }
+      </div>);
+
   }
 
   return (
@@ -372,41 +372,41 @@ const AdminSupport = () => {
           <span className="text-sm text-muted-foreground">Status:</span>
         </div>
         <div className="flex gap-2 flex-wrap">
-          {['all', 'open', 'in_progress', 'resolved', 'closed'].map(status => (
-            <button
-              key={status}
-              onClick={() => setFilterStatus(status)}
-              className={`px-3 py-1.5 rounded-full text-sm transition-all ${
-                filterStatus === status 
-                  ? 'bg-primary text-primary-foreground' 
-                  : 'bg-muted text-muted-foreground'
-              }`}
-            >
-              {status === 'all' ? 'Hamısı' : 
-               status === 'open' ? 'Açıq' :
-               status === 'in_progress' ? 'İşlənir' :
-               status === 'resolved' ? 'Həll edildi' : 'Bağlı'}
+          {['all', 'open', 'in_progress', 'resolved', 'closed'].map((status) =>
+          <button
+            key={status}
+            onClick={() => setFilterStatus(status)}
+            className={`px-3 py-1.5 rounded-full text-sm transition-all ${
+            filterStatus === status ?
+            'bg-primary text-primary-foreground' :
+            'bg-muted text-muted-foreground'}`
+            }>
+            
+              {status === 'all' ? tr("adminsupport_hamisi_c73c4d", "Ham\u0131s\u0131") :
+            status === 'open' ? tr("adminsupport_aciq_306cc4", "A\xE7\u0131q") :
+            status === 'in_progress' ? tr("adminsupport_i_slenir_65a15d", "\u0130\u015Fl\u0259nir") :
+            status === 'resolved' ? tr("adminsupport_hell_edildi_beceb9", "H\u0259ll edildi") : tr("adminsupport_bagli_713069", "Ba\u011Fl\u0131")}
             </button>
-          ))}
+          )}
         </div>
       </div>
 
       {/* Tickets List */}
-      {filteredTickets.length === 0 ? (
-        <div className="text-center py-12 bg-card rounded-xl border border-border/50">
+      {filteredTickets.length === 0 ?
+      <div className="text-center py-12 bg-card rounded-xl border border-border/50">
           <div className="text-5xl mb-4">📩</div>
           <p className="text-muted-foreground">{tr("adminsupport_muraciet_tapilmadi_b93f2d", "Müraciət tapılmadı")}</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {filteredTickets.map(ticket => (
-            <motion.div
-              key={ticket.id}
-              className="bg-card rounded-xl p-4 border border-border/50 cursor-pointer hover:shadow-md transition-shadow"
-              onClick={() => setSelectedTicket(ticket)}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
+        </div> :
+
+      <div className="space-y-3">
+          {filteredTickets.map((ticket) =>
+        <motion.div
+          key={ticket.id}
+          className="bg-card rounded-xl p-4 border border-border/50 cursor-pointer hover:shadow-md transition-shadow"
+          onClick={() => setSelectedTicket(ticket)}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}>
+          
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
                   <h3 className="font-semibold text-foreground mb-1">{ticket.subject}</h3>
@@ -415,12 +415,12 @@ const AdminSupport = () => {
                       <User className="w-3.5 h-3.5" />
                       {ticket.user_name}
                     </span>
-                    {ticket.user_email && (
-                      <span className="flex items-center gap-1">
+                    {ticket.user_email &&
+                <span className="flex items-center gap-1">
                         <Mail className="w-3.5 h-3.5" />
                         {ticket.user_email}
                       </span>
-                    )}
+                }
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -436,11 +436,11 @@ const AdminSupport = () => {
                 <span>{format(new Date(ticket.created_at), 'd MMM yyyy, HH:mm', { locale: az })}</span>
               </div>
             </motion.div>
-          ))}
+        )}
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 
 export default AdminSupport;

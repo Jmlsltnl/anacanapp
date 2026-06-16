@@ -14,18 +14,18 @@ interface KickCounterProps {
 const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, ref) => {
   useScrollToTop();
   useScreenAnalytics('KickCounter', 'Tools');
-  
+
   const [kicks, setKicks] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [time, setTime] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   const { sessions, addSession, getTodayStats, loading } = useKickSessions();
 
   useEffect(() => {
     if (isActive) {
       intervalRef.current = setInterval(() => {
-        setTime(prev => prev + 1);
+        setTime((prev) => prev + 1);
       }, 1000);
     } else {
       if (intervalRef.current) {
@@ -50,7 +50,7 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
     if (!isActive) {
       setIsActive(true);
     }
-    setKicks(prev => prev + 1);
+    setKicks((prev) => prev + 1);
   };
 
   const handleStop = async () => {
@@ -67,10 +67,10 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
   };
 
   const getKickMessage = () => {
-    if (kicks === 0) return 'Başlamaq üçün düyməyə toxunun';
-    if (kicks < 5) return 'Davam edin, izləyirsiniz! 👶';
-    if (kicks < 10) return 'Əla gedir! Körpəniz aktivdir 💪';
-    return 'Super! 10 təpikə çatdınız! 🎉';
+    if (kicks === 0) return tr("kickcounter_baslamaq_ucun_duymeye_toxunun_38b541", "Ba\u015Flamaq \xFC\xE7\xFCn d\xFCym\u0259y\u0259 toxunun");
+    if (kicks < 5) return tr("kickcounter_davam_edin_izleyirsiniz_815868", "Davam edin, izl\u0259yirsiniz! \uD83D\uDC76");
+    if (kicks < 10) return tr("kickcounter_ela_gedir_korpeniz_aktivdir_b54853", "\u018Fla gedir! K\xF6rp\u0259niz aktivdir \uD83D\uDCAA");
+    return tr("kickcounter_super_10_tepike_catdiniz_22fdc0", "Super! 10 t\u0259pik\u0259 \xE7atd\u0131n\u0131z! \uD83C\uDF89");
   };
 
   const todayStats = getTodayStats();
@@ -84,8 +84,8 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
             <motion.button
               onClick={onBack}
               className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}
-            >
+              whileTap={{ scale: 0.95 }}>
+              
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </motion.button>
             <div className="flex-1">
@@ -103,8 +103,8 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
         <motion.div
           className="bg-card rounded-2xl p-3 shadow-elevated border border-border/50 mb-3"
           initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-        >
+          animate={{ scale: 1, opacity: 1 }}>
+          
           {/* Timer */}
           <div className="text-center mb-4">
             <p className="text-muted-foreground text-xs font-medium mb-0.5">{tr("kickcounter_kecen_vaxt_0258bf", "Keçən vaxt")}</p>
@@ -116,16 +116,16 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
             onClick={handleKick}
             className="w-36 h-36 mx-auto rounded-full gradient-primary flex flex-col items-center justify-center shadow-glow mb-4 relative overflow-hidden"
             whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {isActive && (
-              <motion.div
-                className="absolute inset-0 bg-white/20"
-                initial={{ scale: 0 }}
-                animate={{ scale: [0, 2], opacity: [0.5, 0] }}
-                transition={{ duration: 0.5, repeat: Infinity }}
-              />
-            )}
+            whileTap={{ scale: 0.95 }}>
+            
+            {isActive &&
+            <motion.div
+              className="absolute inset-0 bg-white/20"
+              initial={{ scale: 0 }}
+              animate={{ scale: [0, 2], opacity: [0.5, 0] }}
+              transition={{ duration: 0.5, repeat: Infinity }} />
+
+            }
              <Footprints className="w-12 h-12 text-white mb-1" />
             <span className="text-5xl font-black text-white">{kicks}</span>
           </motion.button>
@@ -137,33 +137,33 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
 
           {/* Controls */}
           <div className="flex gap-3">
-            {isActive ? (
-              <motion.button
-                onClick={handleStop}
-                className="flex-1 h-12 rounded-xl bg-destructive text-white font-bold flex items-center justify-center gap-2"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
+            {isActive ?
+            <motion.button
+              onClick={handleStop}
+              className="flex-1 h-12 rounded-xl bg-destructive text-white font-bold flex items-center justify-center gap-2"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}>
+              
                 <Pause className="w-4 h-4" />
-                Dayandır
-              </motion.button>
-            ) : (
-              <motion.button
-                onClick={() => setIsActive(true)}
-                className="flex-1 h-12 rounded-xl gradient-primary text-white font-bold flex items-center justify-center gap-2 shadow-button"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
+                {tr("kickcounter_dayandir_b2ea06", "Dayand\u0131r")}
+              </motion.button> :
+
+            <motion.button
+              onClick={() => setIsActive(true)}
+              className="flex-1 h-12 rounded-xl gradient-primary text-white font-bold flex items-center justify-center gap-2 shadow-button"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}>
+              
                 <Play className="w-4 h-4" />
-                Başla
+                {tr("kickcounter_basla_4820bc", "Ba\u015Fla")}
               </motion.button>
-            )}
+            }
             <motion.button
               onClick={handleReset}
               className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center"
               whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
+              whileTap={{ scale: 0.95 }}>
+              
               <RotateCcw className="w-4 h-4 text-muted-foreground" />
             </motion.button>
           </div>
@@ -174,73 +174,73 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
           className="bg-primary/5 dark:bg-primary/10 rounded-2xl p-4 mb-4 border border-primary/20"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1 }}
-        >
+          transition={{ delay: 0.1 }}>
+          
           <div className="flex items-center justify-between mb-3">
             <span className="font-bold text-foreground">{tr("kickcounter_bugunku_umumi_bc878f", "Bugünkü ümumi")}</span>
-            <span className="text-primary font-bold">{todayStats.totalKicks}/10 təpik</span>
+            <span className="text-primary font-bold">{todayStats.totalKicks}{tr("kickcounter_10_tepik_c7e77f", "/10 t\u0259pik")}</span>
           </div>
           <div className="h-3 bg-muted dark:bg-muted/50 rounded-full overflow-hidden">
             <motion.div
               className="h-full gradient-primary rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${Math.min(todayStats.totalKicks / 10 * 100, 100)}%` }}
-              transition={{ duration: 0.5 }}
-            />
+              transition={{ duration: 0.5 }} />
+            
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            Həkimlər gündə ən azı 10 hərəkət hiss etməyi tövsiyə edirlər
+            {tr("kickcounter_hekimler_gunde_en_azi_10_herek_c80f9f", "H\u0259kiml\u0259r g\xFCnd\u0259 \u0259n az\u0131 10 h\u0259r\u0259k\u0259t hiss etm\u0259yi t\xF6vsiy\u0259 edirl\u0259r")}
           </p>
         </motion.div>
 
         {/* Recent Sessions - Grouped by Day */}
-        {sessions.length > 0 && (
-          <div className="pb-8">
+        {sessions.length > 0 &&
+        <div className="pb-8">
             <h3 className="font-bold text-foreground mb-4">Son sessiyalar</h3>
             {(() => {
-              // Group sessions by date
-              const grouped: { [date: string]: typeof sessions } = {};
-              sessions.forEach(session => {
-                const date = session.session_date;
-                if (!grouped[date]) grouped[date] = [];
-                grouped[date].push(session);
-              });
-              
-              const formatDateLabel = (dateStr: string) => {
-                const date = new Date(dateStr);
-                const today = new Date().toISOString().split('T')[0];
-                const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-                
-                if (dateStr === today) return 'Bu gün';
-                if (dateStr === yesterday) return 'Dünən';
-                return date.toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' });
-              };
-              
-              return Object.entries(grouped).slice(0, 5).map(([date, daySessions]) => (
-                <div key={date} className="mb-4">
+            // Group sessions by date
+            const grouped: {[date: string]: typeof sessions;} = {};
+            sessions.forEach((session) => {
+              const date = session.session_date;
+              if (!grouped[date]) grouped[date] = [];
+              grouped[date].push(session);
+            });
+
+            const formatDateLabel = (dateStr: string) => {
+              const date = new Date(dateStr);
+              const today = new Date().toISOString().split('T')[0];
+              const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+              if (dateStr === today) return tr("kickcounter_bu_gun_786fd4", "Bu g\xFCn");
+              if (dateStr === yesterday) return tr("kickcounter_dunen_52b701", "D\xFCn\u0259n");
+              return date.toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' });
+            };
+
+            return Object.entries(grouped).slice(0, 5).map(([date, daySessions]) =>
+            <div key={date} className="mb-4">
                   {/* Date Header */}
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-sm font-bold text-primary">{formatDateLabel(date)}</span>
                     <span className="text-xs text-muted-foreground">
-                      ({daySessions.reduce((sum, s) => sum + s.kick_count, 0)} təpik)
+                      ({daySessions.reduce((sum, s) => sum + s.kick_count, 0)} {tr("kickcounter_tepik_c35745", "t\u0259pik)")}
                     </span>
                   </div>
                   
                   <div className="space-y-2">
-                    {daySessions.map((session, index) => (
-                      <motion.div
-                        key={session.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        className="bg-card rounded-2xl p-4 shadow-card border border-border/50 flex items-center justify-between"
-                      >
+                    {daySessions.map((session, index) =>
+                <motion.div
+                  key={session.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="bg-card rounded-2xl p-4 shadow-card border border-border/50 flex items-center justify-between">
+                  
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                             <Footprints className="w-5 h-5 text-primary" />
                           </div>
                           <div>
-                            <p className="font-bold text-foreground">{session.kick_count} təpik</p>
+                            <p className="font-bold text-foreground">{session.kick_count} {tr("kickcounter_tepik_6483fe", "t\u0259pik")}</p>
                             <p className="text-xs text-muted-foreground">
                               {new Date(session.created_at).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
                             </p>
@@ -250,16 +250,16 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
                           {formatTime(session.duration_seconds)}
                         </span>
                       </motion.div>
-                    ))}
+                )}
                   </div>
                 </div>
-              ));
-            })()}
+            );
+          })()}
           </div>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 });
 
 KickCounter.displayName = 'KickCounter';

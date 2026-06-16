@@ -35,42 +35,42 @@ const AdminFairyTales = () => {
   const { data: themes = [], isLoading } = useQuery({
     queryKey: ['admin-fairy-tale-themes'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('fairy_tale_themes')
-        .select('*')
-        .order('sort_order');
+      const { data, error } = await supabase.
+      from('fairy_tale_themes').
+      select('*').
+      order('sort_order');
       if (error) throw error;
       return data as FairyTaleTheme[];
-    },
+    }
   });
 
   // Fetch user-generated tales count
   const { data: talesStats } = useQuery({
     queryKey: ['admin-fairy-tales-stats'],
     queryFn: async () => {
-      const { count, error } = await supabase
-        .from('fairy_tales')
-        .select('*', { count: 'exact', head: true });
+      const { count, error } = await supabase.
+      from('fairy_tales').
+      select('*', { count: 'exact', head: true });
       if (error) throw error;
       return { totalTales: count || 0 };
-    },
+    }
   });
 
   // Save theme mutation
   const saveMutation = useMutation({
     mutationFn: async (theme: Partial<FairyTaleTheme>) => {
       if (theme.id) {
-        const { error } = await supabase
-          .from('fairy_tale_themes')
-          .update(theme)
-          .eq('id', theme.id);
+        const { error } = await supabase.
+        from('fairy_tale_themes').
+        update(theme).
+        eq('id', theme.id);
         if (error) throw error;
       } else {
         const { name, name_az, ...rest } = theme;
         if (!name || !name_az) throw new Error('Name required');
-        const { error } = await supabase
-          .from('fairy_tale_themes')
-          .insert({ name, name_az, ...rest });
+        const { error } = await supabase.
+        from('fairy_tale_themes').
+        insert({ name, name_az, ...rest });
         if (error) throw error;
       }
     },
@@ -82,22 +82,22 @@ const AdminFairyTales = () => {
     },
     onError: () => {
       toast({ title: tr("adminfairytales_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
-    },
+    }
   });
 
   // Delete theme mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('fairy_tale_themes')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.
+      from('fairy_tale_themes').
+      delete().
+      eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-fairy-tale-themes'] });
       toast({ title: 'Tema silindi' });
-    },
+    }
   });
 
   // Toggle active status
@@ -111,10 +111,10 @@ const AdminFairyTales = () => {
         <div>
           <h2 className="text-xl font-bold flex items-center gap-2">
             <BookHeart className="w-5 h-5 text-indigo-500" />
-            Sehrli Nağılçı
+            {tr("adminfairytales_sehrli_nagilci_25f8c2", "Sehrli Na\u011F\u0131l\xE7\u0131")}
           </h2>
           <p className="text-sm text-muted-foreground">
-            AI nağıl temaları və statistika
+            {tr("adminfairytales_ai_nagil_temalari_ve_statistik_f771a0", "AI na\u011F\u0131l temalar\u0131 v\u0259 statistika")}
           </p>
         </div>
         <Button onClick={() => setNewTheme(true)}>
@@ -133,51 +133,51 @@ const AdminFairyTales = () => {
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-green-500">{themes.filter(t => t.is_active).length}</div>
+            <div className="text-2xl font-bold text-green-500">{themes.filter((t) => t.is_active).length}</div>
             <p className="text-sm text-muted-foreground">Aktiv Temalar</p>
           </CardContent>
         </Card>
       </div>
 
       {/* New Theme Form */}
-      {newTheme && (
-        <Card>
+      {newTheme &&
+      <Card>
           <CardHeader>
             <CardTitle>Yeni Tema</CardTitle>
           </CardHeader>
           <CardContent>
-            <ThemeForm 
-              onSave={(data) => saveMutation.mutate(data)}
-              onCancel={() => setNewTheme(false)}
-              isLoading={saveMutation.isPending}
-            />
+            <ThemeForm
+            onSave={(data) => saveMutation.mutate(data)}
+            onCancel={() => setNewTheme(false)}
+            isLoading={saveMutation.isPending} />
+          
           </CardContent>
         </Card>
-      )}
+      }
 
       {/* Themes List */}
-      {isLoading ? (
-        <div className="text-center py-8">{tr("adminfairytales_yuklenir_5557de", "Yüklənir...")}</div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {themes.map((theme, index) => (
-            <motion.div
-              key={theme.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-            >
+      {isLoading ?
+      <div className="text-center py-8">{tr("adminfairytales_yuklenir_5557de", "Yüklənir...")}</div> :
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {themes.map((theme, index) =>
+        <motion.div
+          key={theme.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.05 }}>
+          
               <Card className={!theme.is_active ? 'opacity-60' : ''}>
                 <CardContent className="p-4">
-                  {editingTheme?.id === theme.id ? (
-                    <ThemeForm 
-                      theme={theme}
-                      onSave={(data) => saveMutation.mutate({ ...data, id: theme.id })}
-                      onCancel={() => setEditingTheme(null)}
-                      isLoading={saveMutation.isPending}
-                    />
-                  ) : (
-                    <div className="space-y-3">
+                  {editingTheme?.id === theme.id ?
+              <ThemeForm
+                theme={theme}
+                onSave={(data) => saveMutation.mutate({ ...data, id: theme.id })}
+                onCancel={() => setEditingTheme(null)}
+                isLoading={saveMutation.isPending} /> :
+
+
+              <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <span className="text-3xl">{theme.emoji || '📖'}</span>
@@ -186,10 +186,10 @@ const AdminFairyTales = () => {
                             <p className="text-xs text-muted-foreground">{theme.name}</p>
                           </div>
                         </div>
-                        <Switch 
-                          checked={theme.is_active ?? true}
-                          onCheckedChange={() => toggleActive(theme)}
-                        />
+                        <Switch
+                    checked={theme.is_active ?? true}
+                    onCheckedChange={() => toggleActive(theme)} />
+                  
                       </div>
                       
                       <p className="text-sm text-muted-foreground line-clamp-2">
@@ -199,34 +199,34 @@ const AdminFairyTales = () => {
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" onClick={() => setEditingTheme(theme)}>
                           <Edit className="w-3 h-3 mr-1" />
-                          Redaktə
+                          {tr("adminfairytales_redakte_d53ba7", "Redakt\u0259")}
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="text-destructive"
-                          onClick={() => deleteMutation.mutate(theme.id)}
-                        >
+                        <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-destructive"
+                    onClick={() => deleteMutation.mutate(theme.id)}>
+                    
                           <Trash2 className="w-3 h-3" />
                         </Button>
                       </div>
                     </div>
-                  )}
+              }
                 </CardContent>
               </Card>
             </motion.div>
-          ))}
+        )}
         </div>
-      )}
+      }
 
-      <AdminUsageStats 
+      <AdminUsageStats
         eventNames={['fairy_tale_generated']}
         title={tr("adminfairytales_nagil_generatoru_istifade_statistikasi_b567b1", "📖 Nağıl Generatoru İstifadə Statistikası")}
         showEventData
-        showUsers
-      />
-    </div>
-  );
+        showUsers />
+      
+    </div>);
+
 };
 
 interface ThemeFormProps {
@@ -245,7 +245,7 @@ const ThemeForm = ({ theme, onSave, onCancel, isLoading }: ThemeFormProps) => {
     emoji: theme?.emoji || '📖',
     cover_image_url: theme?.cover_image_url || '',
     sort_order: theme?.sort_order || 0,
-    is_active: theme?.is_active ?? true,
+    is_active: theme?.is_active ?? true
   });
 
   return (
@@ -253,77 +253,77 @@ const ThemeForm = ({ theme, onSave, onCancel, isLoading }: ThemeFormProps) => {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="text-sm font-medium">Ad (EN)</label>
-          <Input 
-            value={form.name} 
+          <Input
+            value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            placeholder="Forest Adventure"
-          />
+            placeholder="Forest Adventure" />
+          
         </div>
         <div>
           <label className="text-sm font-medium">Ad (AZ)</label>
-          <Input 
-            value={form.name_az} 
+          <Input
+            value={form.name_az}
             onChange={(e) => setForm({ ...form, name_az: e.target.value })}
-            placeholder={tr("adminfairytales_mese_macerasi_6112a8", "Meşə Macərası")}
-          />
+            placeholder={tr("adminfairytales_mese_macerasi_6112a8", "Meşə Macərası")} />
+          
         </div>
       </div>
       
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="text-sm font-medium">{tr("adminfairytales_tesvir_en_c64521", "Təsvir (EN)")}</label>
-          <Textarea 
-            value={form.description} 
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-          />
+          <Textarea
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })} />
+          
         </div>
         <div>
           <label className="text-sm font-medium">{tr("adminfairytales_tesvir_az_2c237a", "Təsvir (AZ)")}</label>
-          <Textarea 
-            value={form.description_az} 
-            onChange={(e) => setForm({ ...form, description_az: e.target.value })}
-          />
+          <Textarea
+            value={form.description_az}
+            onChange={(e) => setForm({ ...form, description_az: e.target.value })} />
+          
         </div>
       </div>
       
       <div className="grid grid-cols-3 gap-4">
         <div>
           <label className="text-sm font-medium">Emoji</label>
-          <Input 
-            value={form.emoji} 
-            onChange={(e) => setForm({ ...form, emoji: e.target.value })}
-          />
+          <Input
+            value={form.emoji}
+            onChange={(e) => setForm({ ...form, emoji: e.target.value })} />
+          
         </div>
         <div>
           <label className="text-sm font-medium">{tr("adminfairytales_sira_421c5f", "Sıra")}</label>
-          <Input 
+          <Input
             type="number"
-            value={form.sort_order} 
-            onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })}
-          />
+            value={form.sort_order}
+            onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} />
+          
         </div>
         <div>
           <label className="text-sm font-medium">Cover URL</label>
-          <Input 
-            value={form.cover_image_url} 
+          <Input
+            value={form.cover_image_url}
             onChange={(e) => setForm({ ...form, cover_image_url: e.target.value })}
-            placeholder="https://..."
-          />
+            placeholder="https://..." />
+          
         </div>
       </div>
       
       <div className="flex gap-2">
         <Button onClick={() => onSave(form)} disabled={isLoading}>
           <Save className="w-4 h-4 mr-1" />
-          {isLoading ? 'Saxlanır...' : 'Yadda saxla'}
+          {isLoading ? tr("adminfairytales_saxlanir_9ea540", "Saxlan\u0131r...") : 'Yadda saxla'}
         </Button>
         <Button variant="outline" onClick={onCancel}>
           <X className="w-4 h-4 mr-1" />
-          Ləğv et
+          {tr("adminfairytales_legv_et_b5e49c", "L\u0259\u011Fv et")}
         </Button>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AdminFairyTales;

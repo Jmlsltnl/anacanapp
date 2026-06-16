@@ -15,13 +15,13 @@ import { useAdminFAQ, FAQ } from '@/hooks/useAdminFAQ';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
 
 const categories = [
-  { id: 'general', label: tr("adminfaq_umumi_1b5521", "Ümumi") },
-  { id: 'account', label: 'Hesab' },
-  { id: 'subscription', label: tr("adminfaq_abunelik_ce9af7", "Abunəlik") },
-  { id: 'pregnancy', label: tr("adminfaq_hamilelik_e86feb", "Hamiləlik") },
-  { id: 'baby', label: tr("adminfaq_korpe_fa2b51", "Körpə") },
-  { id: 'partner', label: 'Partnyor' },
-];
+{ id: 'general', label: tr("adminfaq_umumi_1b5521", "Ümumi") },
+{ id: 'account', label: 'Hesab' },
+{ id: 'subscription', label: tr("adminfaq_abunelik_ce9af7", "Abunəlik") },
+{ id: 'pregnancy', label: tr("adminfaq_hamilelik_e86feb", "Hamiləlik") },
+{ id: 'baby', label: tr("adminfaq_korpe_fa2b51", "Körpə") },
+{ id: 'partner', label: 'Partnyor' }];
+
 
 const AdminFAQ = () => {
   const { data: faqs = [], isLoading, create, update, remove } = useAdminFAQ();
@@ -58,7 +58,7 @@ const AdminFAQ = () => {
       answer_az: '',
       category: 'general',
       sort_order: 0,
-      is_active: true,
+      is_active: true
     };
     setFormData(initialData);
     initialFormDataRef.current = JSON.stringify(initialData);
@@ -82,12 +82,12 @@ const AdminFAQ = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
+    if (!confirm(tr("adminfaq_silmek_istediyinize_eminsiniz_09658f", "Silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
     await remove.mutateAsync(id);
   };
 
   const filteredFaqs = faqs.filter((f) =>
-    (f.question_az || f.question).toLowerCase().includes(search.toLowerCase())
+  (f.question_az || f.question).toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -122,7 +122,7 @@ const AdminFAQ = () => {
               <HelpCircle className="w-5 h-5 text-green-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{faqs.filter(f => f.is_active).length}</p>
+              <p className="text-2xl font-bold">{faqs.filter((f) => f.is_active).length}</p>
               <p className="text-xs text-muted-foreground">Aktiv</p>
             </div>
           </div>
@@ -133,7 +133,7 @@ const AdminFAQ = () => {
               <HelpCircle className="w-5 h-5 text-blue-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{new Set(faqs.map(f => f.category)).size}</p>
+              <p className="text-2xl font-bold">{new Set(faqs.map((f) => f.category)).size}</p>
               <p className="text-xs text-muted-foreground">Kateqoriya</p>
             </div>
           </div>
@@ -144,7 +144,7 @@ const AdminFAQ = () => {
               <HelpCircle className="w-5 h-5 text-orange-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{faqs.filter(f => !f.is_active).length}</p>
+              <p className="text-2xl font-bold">{faqs.filter((f) => !f.is_active).length}</p>
               <p className="text-xs text-muted-foreground">Gizli</p>
             </div>
           </div>
@@ -159,8 +159,8 @@ const AdminFAQ = () => {
             placeholder="Sual axtar..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
-          />
+            className="pl-10" />
+          
         </div>
       </Card>
 
@@ -170,20 +170,20 @@ const AdminFAQ = () => {
           <CardTitle>Suallar ({filteredFaqs.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">{tr("adminfaq_yuklenir_5557de", "Yüklənir...")}</div>
-          ) : filteredFaqs.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">{tr("adminfaq_sual_tapilmadi_ba44fc", "Sual tapılmadı")}</div>
-          ) : (
-            <div className="space-y-3">
-              {filteredFaqs.map((faq, index) => (
-                <motion.div
-                  key={faq.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.03 }}
-                  className="p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
-                >
+          {isLoading ?
+          <div className="text-center py-8 text-muted-foreground">{tr("adminfaq_yuklenir_5557de", "Yüklənir...")}</div> :
+          filteredFaqs.length === 0 ?
+          <div className="text-center py-8 text-muted-foreground">{tr("adminfaq_sual_tapilmadi_ba44fc", "Sual tapılmadı")}</div> :
+
+          <div className="space-y-3">
+              {filteredFaqs.map((faq, index) =>
+            <motion.div
+              key={faq.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.03 }}
+              className="p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors">
+              
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
@@ -192,7 +192,7 @@ const AdminFAQ = () => {
                           {faq.is_active ? 'Aktiv' : 'Gizli'}
                         </Badge>
                         <Badge variant="outline">
-                          {categories.find(c => c.id === faq.category)?.label || faq.category}
+                          {categories.find((c) => c.id === faq.category)?.label || faq.category}
                         </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground line-clamp-2">
@@ -209,9 +209,9 @@ const AdminFAQ = () => {
                     </div>
                   </div>
                 </motion.div>
-              ))}
+            )}
             </div>
-          )}
+          }
         </CardContent>
       </Card>
 
@@ -219,70 +219,70 @@ const AdminFAQ = () => {
       <Dialog open={showModal} onOpenChange={handleModalClose}>
         <DialogContent className="max-w-2xl max-h-[90vh]">
           <DialogHeader>
-            <DialogTitle>{editingItem ? 'Sual Redaktə Et' : 'Yeni Sual'}</DialogTitle>
+            <DialogTitle>{editingItem ? tr("adminfaq_sual_redakte_et_85d075", "Sual Redakt\u0259 Et") : 'Yeni Sual'}</DialogTitle>
           </DialogHeader>
           <ScrollArea className="max-h-[60vh] pr-4">
             <div className="space-y-4">
               <Input
                 placeholder="Sual (EN)"
                 value={formData.question || ''}
-                onChange={(e) => setFormData({ ...formData, question: e.target.value })}
-              />
+                onChange={(e) => setFormData({ ...formData, question: e.target.value })} />
+              
               <Input
                 placeholder="Sual (AZ)"
                 value={formData.question_az || ''}
-                onChange={(e) => setFormData({ ...formData, question_az: e.target.value })}
-              />
+                onChange={(e) => setFormData({ ...formData, question_az: e.target.value })} />
+              
               <Textarea
                 placeholder="Cavab (EN)"
                 value={formData.answer || ''}
                 onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
-                rows={4}
-              />
+                rows={4} />
+              
               <Textarea
                 placeholder="Cavab (AZ)"
                 value={formData.answer_az || ''}
                 onChange={(e) => setFormData({ ...formData, answer_az: e.target.value })}
-                rows={4}
-              />
+                rows={4} />
+              
               <div className="grid grid-cols-2 gap-3">
                 <Select
                   value={formData.category || 'general'}
-                  onValueChange={(v) => setFormData({ ...formData, category: v })}
-                >
+                  onValueChange={(v) => setFormData({ ...formData, category: v })}>
+                  
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id}>
+                    {categories.map((cat) =>
+                    <SelectItem key={cat.id} value={cat.id}>
                         {cat.label}
                       </SelectItem>
-                    ))}
+                    )}
                   </SelectContent>
                 </Select>
                 <Input
                   type="number"
                   placeholder={tr("adminfaq_sira_421c5f", "Sıra")}
                   value={formData.sort_order || 0}
-                  onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) })}
-                />
+                  onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) })} />
+                
               </div>
               <div className="flex items-center gap-2">
                 <Switch
                   checked={formData.is_active ?? true}
-                  onCheckedChange={(v) => setFormData({ ...formData, is_active: v })}
-                />
+                  onCheckedChange={(v) => setFormData({ ...formData, is_active: v })} />
+                
                 <span className="text-sm">Aktiv</span>
               </div>
             </div>
           </ScrollArea>
           <DialogFooter>
             <Button variant="outline" onClick={() => handleModalClose(false)}>
-              Ləğv et
+              {tr("adminfaq_legv_et_b5e49c", "L\u0259\u011Fv et")}
             </Button>
             <Button onClick={handleSave} disabled={create.isPending || update.isPending}>
-              {editingItem ? 'Yenilə' : 'Əlavə et'}
+              {editingItem ? tr("adminfaq_yenile_570ce2", "Yenil\u0259") : tr("adminfaq_elave_et_6e1b9b", "\u018Flav\u0259 et")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -295,10 +295,10 @@ const AdminFAQ = () => {
         onSave={async () => {
           await handleSave();
           setShowUnsavedDialog(false);
-        }}
-      />
-    </div>
-  );
+        }} />
+      
+    </div>);
+
 };
 
 export default AdminFAQ;

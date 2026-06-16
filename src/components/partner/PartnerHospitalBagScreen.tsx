@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowLeft, 
-  Package, 
-  Baby, 
-  FileText, 
-  Check, 
+import {
+  ArrowLeft,
+  Package,
+  Baby,
+  FileText,
+  Check,
   Plus,
   RefreshCw,
-  User
-} from 'lucide-react';
+  User } from
+'lucide-react';
 import { usePartnerHospitalBag } from '@/hooks/usePartnerHospitalBag';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -22,39 +22,39 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+  DialogTrigger } from
+'@/components/ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  SelectValue } from
+'@/components/ui/select';
 
 interface PartnerHospitalBagScreenProps {
   onBack: () => void;
 }
 
 const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onBack }) => {
-  const { 
-    items, 
-    loading, 
-    toggleItem, 
-    addItem, 
-    getProgress, 
-    checkedCount, 
+  const {
+    items,
+    loading,
+    toggleItem,
+    addItem,
+    getProgress,
+    checkedCount,
     totalCount,
-    refetch 
+    refetch
   } = usePartnerHospitalBag();
 
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newItemName, setNewItemName] = useState('');
   const [newItemCategory, setNewItemCategory] = useState<'mom' | 'baby' | 'documents'>('mom');
 
-  const momItems = items.filter(i => i.category === 'mom');
-  const babyItems = items.filter(i => i.category === 'baby');
-  const docItems = items.filter(i => i.category === 'documents');
+  const momItems = items.filter((i) => i.category === 'mom');
+  const babyItems = items.filter((i) => i.category === 'baby');
+  const docItems = items.filter((i) => i.category === 'documents');
 
   const handleAddItem = async () => {
     if (!newItemName.trim()) return;
@@ -67,27 +67,27 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
   const categoryIcons = {
     mom: Package,
     baby: Baby,
-    documents: FileText,
+    documents: FileText
   };
 
   const categoryLabels = {
-    mom: 'Ana üçün',
-    baby: 'Körpə üçün',
-    documents: 'Sənədlər',
+    mom: tr("partnerhospitalbagscreen_ana_ucun_8f885e", "Ana \xFC\xE7\xFCn"),
+    baby: tr("partnerhospitalbagscreen_korpe_ucun_27c058", "K\xF6rp\u0259 \xFC\xE7\xFCn"),
+    documents: tr("partnerhospitalbagscreen_senedler_d60b5e", "S\u0259n\u0259dl\u0259r")
   };
 
   const categoryColors = {
     mom: 'from-pink-500 to-rose-500',
     baby: 'from-blue-500 to-cyan-500',
-    documents: 'from-amber-500 to-orange-500',
+    documents: 'from-amber-500 to-orange-500'
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <RefreshCw className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+      </div>);
+
   }
 
   if (items.length === 0) {
@@ -106,14 +106,14 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
         <div className="flex flex-col items-center justify-center py-20 text-center px-4">
           <Package className="w-16 h-16 text-muted-foreground/30 mb-4" />
           <h3 className="text-lg font-semibold text-foreground mb-2">
-            Partnyorunuz hələ çanta hazırlamayıb
+            {tr("partnerhospitalbagscreen_partnyorunuz_hele_canta_hazirl_1f9cce", "Partnyorunuz h\u0259l\u0259 \xE7anta haz\u0131rlamay\u0131b")}
           </h3>
           <p className="text-muted-foreground text-sm max-w-xs">
-            Partnyorunuz xəstəxana çantası siyahısı yaratdıqda burada görəcəksiniz
+            {tr("partnerhospitalbagscreen_partnyorunuz_xestexana_cantasi_f29448", "Partnyorunuz x\u0259st\u0259xana \xE7antas\u0131 siyah\u0131s\u0131 yaratd\u0131qda burada g\xF6r\u0259c\u0259ksiniz")}
           </p>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -139,12 +139,12 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
                 <Input
                   placeholder={tr("partnerhospitalbagscreen_esya_adi_176586", "Əşya adı")}
                   value={newItemName}
-                  onChange={(e) => setNewItemName(e.target.value)}
-                />
-                <Select 
-                  value={newItemCategory} 
-                  onValueChange={(v) => setNewItemCategory(v as 'mom' | 'baby' | 'documents')}
-                >
+                  onChange={(e) => setNewItemName(e.target.value)} />
+                
+                <Select
+                  value={newItemCategory}
+                  onValueChange={(v) => setNewItemCategory(v as 'mom' | 'baby' | 'documents')}>
+                  
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -154,13 +154,13 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
                     <SelectItem value="documents">{tr("partnerhospitalbagscreen_senedler_d60b5e", "Sənədlər")}</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button 
-                  className="w-full" 
+                <Button
+                  className="w-full"
                   onClick={handleAddItem}
-                  disabled={!newItemName.trim()}
-                >
+                  disabled={!newItemName.trim()}>
+                  
                   <Plus className="w-4 h-4 mr-2" />
-                  Əlavə et
+                  {tr("partnerhospitalbagscreen_elave_et_6e1b9b", "\u018Flav\u0259 et")}
                 </Button>
               </div>
             </DialogContent>
@@ -179,7 +179,7 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
           </div>
           <Progress value={getProgress()} className="h-3" />
           <p className="text-xs text-muted-foreground mt-2 text-center">
-            {getProgress().toFixed(0)}% tamamlandı
+            {getProgress().toFixed(0)}{tr("partnerhospitalbagscreen_tamamlandi_357fc9", "% tamamland\u0131")}
           </p>
         </div>
       </div>
@@ -202,63 +202,63 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
         </TabsList>
 
         {(['mom', 'baby', 'documents'] as const).map((category) => {
-          const categoryItems = items.filter(i => i.category === category);
+          const categoryItems = items.filter((i) => i.category === category);
           const Icon = categoryIcons[category];
-          
+
           return (
             <TabsContent key={category} value={category} className="mt-4 space-y-2">
               <AnimatePresence>
-                {categoryItems.map((item, index) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ delay: index * 0.05 }}
-                    onClick={() => toggleItem(item.item_id)}
-                    className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
-                      item.is_checked
-                        ? 'bg-primary/5 border-primary/20'
-                        : 'bg-card border-border hover:border-primary/30'
-                    }`}
-                  >
+                {categoryItems.map((item, index) =>
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ delay: index * 0.05 }}
+                  onClick={() => toggleItem(item.item_id)}
+                  className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
+                  item.is_checked ?
+                  'bg-primary/5 border-primary/20' :
+                  'bg-card border-border hover:border-primary/30'}`
+                  }>
+                  
                     <div
-                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-                        item.is_checked
-                          ? 'bg-primary border-primary'
-                          : 'border-muted-foreground/30'
-                      }`}
-                    >
+                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                    item.is_checked ?
+                    'bg-primary border-primary' :
+                    'border-muted-foreground/30'}`
+                    }>
+                    
                       {item.is_checked && <Check className="w-4 h-4 text-primary-foreground" />}
                     </div>
                     <span
-                      className={`flex-1 ${
-                        item.is_checked ? 'text-muted-foreground line-through' : ''
-                      }`}
-                    >
+                    className={`flex-1 ${
+                    item.is_checked ? 'text-muted-foreground line-through' : ''}`
+                    }>
+                    
                       {item.item_name}
                     </span>
-                    {item.added_by === 'partner' && (
-                      <Badge variant="outline" className="text-xs">
+                    {item.added_by === 'partner' &&
+                  <Badge variant="outline" className="text-xs">
                         <User className="w-3 h-3 mr-1" />
-                        Sən
+                        {tr("partnerhospitalbagscreen_sen_0580e7", "S\u0259n")}
                       </Badge>
-                    )}
+                  }
                   </motion.div>
-                ))}
+                )}
               </AnimatePresence>
 
-              {categoryItems.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">
-                  Bu kateqoriyada əşya yoxdur
+              {categoryItems.length === 0 &&
+              <div className="text-center py-8 text-muted-foreground">
+                  {tr("partnerhospitalbagscreen_bu_kateqoriyada_esya_yoxdur_f91aa7", "Bu kateqoriyada \u0259\u015Fya yoxdur")}
                 </div>
-              )}
-            </TabsContent>
-          );
+              }
+            </TabsContent>);
+
         })}
       </Tabs>
-    </div>
-  );
+    </div>);
+
 };
 
 export default PartnerHospitalBagScreen;

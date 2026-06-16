@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { tr } from "@/lib/tr";import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { isNative, isIOS, isAndroid } from '@/lib/native';
@@ -23,25 +23,25 @@ export const useDeviceToken = () => {
       console.log('[DeviceToken] Upserting token:', {
         userId,
         platform: platformValue,
-        tokenSuffix: '...' + deviceToken.slice(-12),
+        tokenSuffix: '...' + deviceToken.slice(-12)
       });
 
       // 1) Upsert on `token` (unique). If this physical device was previously bound
       //    to a different profile on the same device (multi-account testing),
       //    ownership transfers to the currently logged-in user — preventing
       //    the same push from arriving multiple times to one device.
-      const { error: upsertError } = await supabase
-        .from('device_tokens')
-        .upsert(
-          {
-            user_id: userId,
-            token: deviceToken,
-            platform: platformValue,
-            device_name: deviceName,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: 'token' }
-        );
+      const { error: upsertError } = await supabase.
+      from('device_tokens').
+      upsert(
+        {
+          user_id: userId,
+          token: deviceToken,
+          platform: platformValue,
+          device_name: deviceName,
+          updated_at: new Date().toISOString()
+        },
+        { onConflict: 'token' }
+      );
 
       if (upsertError) {
         console.error('[DeviceToken] Upsert error:', upsertError);
@@ -49,12 +49,12 @@ export const useDeviceToken = () => {
       }
 
       // 2) Clean up stale tokens for this user on this platform (different token strings).
-      const { error: cleanupError } = await supabase
-        .from('device_tokens')
-        .delete()
-        .eq('user_id', userId)
-        .eq('platform', platformValue)
-        .neq('token', deviceToken);
+      const { error: cleanupError } = await supabase.
+      from('device_tokens').
+      delete().
+      eq('user_id', userId).
+      eq('platform', platformValue).
+      neq('token', deviceToken);
 
       if (cleanupError) {
         console.warn('[DeviceToken] Stale-token cleanup warning:', cleanupError);
@@ -118,7 +118,7 @@ export const useDeviceToken = () => {
 
       if (!deviceToken) {
         console.error('[DeviceToken] No token returned from FirebaseMessaging.getToken()');
-        setError('FCM token alına bilmədi');
+        setError(tr("usedevicetoken_fcm_token_alina_bilmedi_10d88a", "FCM token al\u0131na bilm\u0259di"));
         setLoading(false);
         return null;
       }
@@ -128,7 +128,7 @@ export const useDeviceToken = () => {
 
       const saved = await saveTokenToDatabase(deviceToken, user.id);
       if (!saved) {
-        setError('Token alındı amma saxlanmadı');
+        setError(tr("usedevicetoken_token_alindi_amma_saxlanmadi_98a023", "Token al\u0131nd\u0131 amma saxlanmad\u0131"));
       }
 
       // Token refresh listener
@@ -142,7 +142,7 @@ export const useDeviceToken = () => {
       FirebaseMessaging.addListener('notificationReceived', (notification) => {
         console.log('[DeviceToken] Push received in foreground:', notification);
         // Show in-app toast so user is not blind to incoming notifications
-        const title = notification?.notification?.title || 'Yeni bildiriş';
+        const title = notification?.notification?.title || tr("usedevicetoken_yeni_bildiris_c68787", "Yeni bildiri\u015F");
         const body = notification?.notification?.body || '';
         toast(title, { description: body });
       });
@@ -154,10 +154,10 @@ export const useDeviceToken = () => {
           const data: any = action?.notification?.data || {};
           const type = data.type;
           if (typeof window === 'undefined') return;
-          if (type === 'message' || type === 'partner_message') window.location.hash = '#/?tab=chat';
-          else if (type === 'comment' || type === 'like' || type === 'community') window.location.hash = '#/?tab=community';
-          else if (type === 'premium_expired') window.location.hash = '#/?tab=profile';
-          else if (data.deeplink) window.location.href = data.deeplink;
+          if (type === 'message' || type === 'partner_message') window.location.hash = '#/?tab=chat';else
+          if (type === 'comment' || type === 'like' || type === 'community') window.location.hash = '#/?tab=community';else
+          if (type === 'premium_expired') window.location.hash = '#/?tab=profile';else
+          if (data.deeplink) window.location.href = data.deeplink;
         } catch (e) {
           console.warn('[DeviceToken] Routing failed:', e);
         }
@@ -229,11 +229,11 @@ export const useDeviceToken = () => {
 
     console.log('[DeviceToken] Unregistering device...');
     try {
-      const { error } = await supabase
-        .from('device_tokens')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('token', token);
+      const { error } = await supabase.
+      from('device_tokens').
+      delete().
+      eq('user_id', user.id).
+      eq('token', token);
 
       if (error) {
         console.error('[DeviceToken] Unregister error:', error);
@@ -245,9 +245,9 @@ export const useDeviceToken = () => {
         const { FirebaseMessaging } = await import('@capacitor-firebase/messaging');
         await FirebaseMessaging.deleteToken();
       } catch {
+
         // Ignore if Firebase Messaging not available
       }
-
       setToken(null);
       registrationAttempted.current = false;
     } catch (err) {
@@ -282,6 +282,6 @@ export const useDeviceToken = () => {
     isIOS,
     isAndroid,
     registerDevice,
-    unregisterDevice,
+    unregisterDevice
   };
 };

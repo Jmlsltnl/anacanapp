@@ -27,6 +27,5 @@ function getPersistedLanguage(): string {
  */
 export function tr(key: string, defaultValue: string): string {
   const lang = getPersistedLanguage();
-  if (lang === 'az') return defaultValue;
   return getCachedTranslation(key, lang) || defaultValue;
 }

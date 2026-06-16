@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { tr } from "@/lib/tr";import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { getPregnancyWeek, getDaysUntilDue as calcDaysUntilDue, getDaysElapsed, getRealCalendarAge } from '@/lib/pregnancy-utils';
@@ -40,15 +40,15 @@ export const usePartnerData = () => {
 
     try {
       // Fetch partner's profile using the linked_partner_id
-      const { data: partnerData, error: profileError } = await supabase
-        .from('profiles')
-        .select('id, user_id, name, life_stage, last_period_date, due_date, baby_birth_date, baby_name, baby_gender, cycle_length, period_length')
-        .eq('id', profile.linked_partner_id)
-        .maybeSingle();
+      const { data: partnerData, error: profileError } = await supabase.
+      from('profiles').
+      select('id, user_id, name, life_stage, last_period_date, due_date, baby_birth_date, baby_name, baby_gender, cycle_length, period_length').
+      eq('id', profile.linked_partner_id).
+      maybeSingle();
 
       if (profileError) {
         console.error('Error fetching partner profile:', profileError);
-        setError('Partner məlumatları yüklənə bilmədi');
+        setError(tr("usepartnerdata_partner_melumatlari_yuklene_bi_430423", "Partner m\u0259lumatlar\u0131 y\xFCkl\u0259n\u0259 bilm\u0259di"));
         setLoading(false);
         return;
       }
@@ -58,12 +58,12 @@ export const usePartnerData = () => {
 
         // Fetch today's daily log for the partner
         const today = new Date().toISOString().split('T')[0];
-        const { data: logData, error: logError } = await supabase
-          .from('daily_logs')
-          .select('mood, symptoms, water_intake, log_date')
-          .eq('user_id', partnerData.user_id)
-          .eq('log_date', today)
-          .maybeSingle();
+        const { data: logData, error: logError } = await supabase.
+        from('daily_logs').
+        select('mood, symptoms, water_intake, log_date').
+        eq('user_id', partnerData.user_id).
+        eq('log_date', today).
+        maybeSingle();
 
         if (!logError && logData) {
           setPartnerDailyLog(logData);
@@ -71,7 +71,7 @@ export const usePartnerData = () => {
       }
     } catch (err) {
       console.error('Error in fetchPartnerData:', err);
-      setError('Xəta baş verdi');
+      setError(tr("usepartnerdata_xeta_bas_verdi_f22fba", "X\u0259ta ba\u015F verdi"));
     } finally {
       setLoading(false);
     }
@@ -82,25 +82,25 @@ export const usePartnerData = () => {
 
     // Set up realtime subscription for partner's daily logs (filtered to this partner only)
     if (profile?.linked_partner_id) {
-      const channel = supabase
-        .channel(`partner-logs-${profile.linked_partner_id}`)
-        .on(
-          'postgres_changes',
-          { 
-            event: '*', 
-            schema: 'public', 
-            table: 'daily_logs',
-          },
-          (payload: any) => {
-            // Client-side guard: only refetch when this partner's log changes
-            const changedUserId = payload?.new?.user_id || payload?.old?.user_id;
-            if (changedUserId && partnerProfile?.user_id && changedUserId !== partnerProfile.user_id) {
-              return;
-            }
-            fetchPartnerData();
+      const channel = supabase.
+      channel(`partner-logs-${profile.linked_partner_id}`).
+      on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'daily_logs'
+        },
+        (payload: any) => {
+          // Client-side guard: only refetch when this partner's log changes
+          const changedUserId = payload?.new?.user_id || payload?.old?.user_id;
+          if (changedUserId && partnerProfile?.user_id && changedUserId !== partnerProfile.user_id) {
+            return;
           }
-        )
-        .subscribe();
+          fetchPartnerData();
+        }
+      ).
+      subscribe();
 
       return () => {
         supabase.removeChannel(channel);
@@ -154,7 +154,7 @@ export const usePartnerData = () => {
     const lmp = new Date(partnerProfile.last_period_date);
     const today = new Date();
     const daysSince = Math.floor((today.getTime() - lmp.getTime()) / (1000 * 60 * 60 * 24));
-    const daysIntoCycle = ((daysSince % cycleLength) + cycleLength) % cycleLength;
+    const daysIntoCycle = (daysSince % cycleLength + cycleLength) % cycleLength;
     return Math.max(0, cycleLength - daysIntoCycle);
   };
 
@@ -168,6 +168,6 @@ export const usePartnerData = () => {
     getDaysUntilDue: getPartnerDaysUntilDue,
     getBabyAgeDays,
     getCyclePhaseInfo,
-    getDaysUntilNextPeriod,
+    getDaysUntilNextPeriod
   };
 };

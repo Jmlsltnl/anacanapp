@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { tr } from "@/lib/tr";import { motion } from 'framer-motion';
 import { Shield, ArrowUpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Capacitor } from '@capacitor/core';
@@ -25,9 +25,9 @@ const ForceUpdateScreen = ({ title, message, androidUrl, iosUrl }: ForceUpdateSc
       animate={{ opacity: 1 }}
       style={{
         paddingTop: 'env(safe-area-inset-top)',
-        paddingBottom: 'env(safe-area-inset-bottom)',
-      }}
-    >
+        paddingBottom: 'env(safe-area-inset-bottom)'
+      }}>
+      
       <div className="flex flex-col items-center text-center max-w-sm">
         <motion.img
           src={logoImage}
@@ -35,15 +35,15 @@ const ForceUpdateScreen = ({ title, message, androidUrl, iosUrl }: ForceUpdateSc
           className="w-20 h-20 object-contain mb-6"
           initial={{ scale: 0.8 }}
           animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 200 }}
-        />
+          transition={{ type: 'spring', stiffness: 200 }} />
+        
 
         <motion.div
           className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
+          transition={{ delay: 0.2 }}>
+          
           <ArrowUpCircle className="w-8 h-8 text-primary" />
         </motion.div>
 
@@ -51,8 +51,8 @@ const ForceUpdateScreen = ({ title, message, androidUrl, iosUrl }: ForceUpdateSc
           className="text-2xl font-bold text-foreground mb-3"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
+          transition={{ delay: 0.3 }}>
+          
           {title}
         </motion.h1>
 
@@ -60,8 +60,8 @@ const ForceUpdateScreen = ({ title, message, androidUrl, iosUrl }: ForceUpdateSc
           className="text-muted-foreground text-sm leading-relaxed mb-8"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
-        >
+          transition={{ delay: 0.4 }}>
+          
           {message}
         </motion.p>
 
@@ -69,16 +69,16 @@ const ForceUpdateScreen = ({ title, message, androidUrl, iosUrl }: ForceUpdateSc
           className="w-full"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
+          transition={{ delay: 0.5 }}>
+          
           <Button onClick={handleUpdate} size="lg" className="w-full rounded-2xl text-base font-semibold h-14">
             <Shield className="w-5 h-5 mr-2" />
-            Tətbiqi yenilə
+            {tr("forceupdatescreen_tetbiqi_yenile_18f4f3", "T\u0259tbiqi yenil\u0259")}
           </Button>
         </motion.div>
       </div>
-    </motion.div>
-  );
+    </motion.div>);
+
 };
 
 export default ForceUpdateScreen;

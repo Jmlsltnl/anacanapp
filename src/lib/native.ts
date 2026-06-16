@@ -71,8 +71,8 @@ export const pushNotifications = {
 
     if (isAndroid && !androidPushAutoRegister) {
       console.warn(
-        'Android push auto-register deaktivdir (Firebase qurulmayıb ola bilər). ' +
-          'Aktiv etmək üçün: VITE_ANDROID_PUSH_AUTO_REGISTER=true'
+        tr("native_android_push_auto_register_dea_fcc9e3", "Android push auto-register deaktivdir (Firebase qurulmay\u0131b ola bil\u0259r). ") + tr("native_aktiv_etmek_ucun_vite_android__e20df2", "Aktiv etm\u0259k \xFC\xE7\xFCn: VITE_ANDROID_PUSH_AUTO_REGISTER=true")
+
       );
       return;
     }
@@ -80,7 +80,7 @@ export const pushNotifications = {
     try {
       // Try Firebase Messaging first (returns proper FCM token on both platforms)
       const { FirebaseMessaging } = await import('@capacitor-firebase/messaging');
-      
+
       let permStatus = await FirebaseMessaging.checkPermissions();
 
       if (permStatus.receive === 'prompt') {
@@ -96,11 +96,11 @@ export const pushNotifications = {
       console.log('Firebase Messaging token obtained:', tokenResult.token.substring(0, 30) + '...');
     } catch (error) {
       console.warn('Firebase Messaging not available, falling back to Capacitor PushNotifications:', error);
-      
+
       // Fallback to @capacitor/push-notifications
       try {
         const { PushNotifications: CapPush } = await import('@capacitor/push-notifications');
-        
+
         let permStatus = await CapPush.checkPermissions();
         if (permStatus.receive === 'prompt') {
           permStatus = await CapPush.requestPermissions();
@@ -121,33 +121,33 @@ export const pushNotifications = {
 
     // Try Firebase Messaging listeners first
     import('@capacitor-firebase/messaging').then(({ FirebaseMessaging }) => {
-      FirebaseMessaging.addListener('tokenReceived', token => {
+      FirebaseMessaging.addListener('tokenReceived', (token) => {
         console.log('Firebase Messaging token refreshed:', token.token.substring(0, 30) + '...');
       });
 
-      FirebaseMessaging.addListener('notificationReceived', notification => {
+      FirebaseMessaging.addListener('notificationReceived', (notification) => {
         console.log('Push notification received:', notification);
       });
 
-      FirebaseMessaging.addListener('notificationActionPerformed', action => {
+      FirebaseMessaging.addListener('notificationActionPerformed', (action) => {
         console.log('Push notification action performed:', action);
       });
     }).catch(() => {
       // Fallback to capacitor push listeners
       import('@capacitor/push-notifications').then(({ PushNotifications: CapPush }) => {
-        CapPush.addListener('registration', token => {
+        CapPush.addListener('registration', (token) => {
           console.log('Push registration success, token: ' + token.value);
         });
 
-        CapPush.addListener('registrationError', err => {
+        CapPush.addListener('registrationError', (err) => {
           console.error('Registration error: ', err.error);
         });
 
-        CapPush.addListener('pushNotificationReceived', notification => {
+        CapPush.addListener('pushNotificationReceived', (notification) => {
           console.log('Push notification received: ', notification);
         });
 
-        CapPush.addListener('pushNotificationActionPerformed', notification => {
+        CapPush.addListener('pushNotificationActionPerformed', (notification) => {
           console.log('Push notification action performed', notification.actionId, notification.inputValue);
         });
       });
@@ -171,7 +171,7 @@ export const localNotifications = {
     id: number;
     title: string;
     body: string;
-    schedule?: { at: Date };
+    schedule?: {at: Date;};
   }[]) => {
     if (!isNative) {
       console.log('Local notification scheduled (web mode):', notifications);
@@ -185,7 +185,7 @@ export const localNotifications = {
     }
 
     await LocalNotifications.schedule({
-      notifications: notifications.map(n => ({
+      notifications: notifications.map((n) => ({
         ...n,
         sound: undefined,
         attachments: undefined,
@@ -199,17 +199,17 @@ export const localNotifications = {
   scheduleWaterReminder: async () => {
     const now = new Date();
     const reminders = [];
-    
+
     // Schedule reminders every 2 hours from 8am to 8pm
     for (let hour = 8; hour <= 20; hour += 2) {
       const reminderTime = new Date(now);
       reminderTime.setHours(hour, 0, 0, 0);
-      
+
       if (reminderTime > now) {
         reminders.push({
           id: 100 + hour,
           title: tr("native_su_icmek_vaxti_cecdf9", "Su içmək vaxtı! 💧"),
-          body: 'Sağlamlığınız üçün su içməyi unutmayın.',
+          body: tr("native_saglamliginiz_ucun_su_icmeyi_u_cdc36d", "Sa\u011Flaml\u0131\u011F\u0131n\u0131z \xFC\xE7\xFCn su i\xE7m\u0259yi unutmay\u0131n."),
           schedule: { at: reminderTime }
         });
       }
@@ -225,7 +225,7 @@ export const localNotifications = {
     await localNotifications.schedule([{
       id: 200,
       title: tr("native_vitamin_vaxti_9bfc40", "Vitamin vaxtı! 💊"),
-      body: 'Gündəlik vitaminlərinizi qəbul etməyi unutmayın.',
+      body: tr("native_gundelik_vitaminlerinizi_qebul_6a3811", "G\xFCnd\u0259lik vitaminl\u0259rinizi q\u0259bul etm\u0259yi unutmay\u0131n."),
       schedule: { at: time }
     }]);
   },
@@ -246,18 +246,18 @@ export const localNotifications = {
 
   cancelAll: async () => {
     if (!isNative) return;
-    
+
     const pending = await LocalNotifications.getPending();
     if (pending.notifications.length > 0) {
       await LocalNotifications.cancel({
-        notifications: pending.notifications.map(n => ({ id: n.id }))
+        notifications: pending.notifications.map((n) => ({ id: n.id }))
       });
     }
   }
 };
 
 // Native Share
-export const nativeShare = async (data: { title?: string; text?: string; url?: string }) => {
+export const nativeShare = async (data: {title?: string;text?: string;url?: string;}) => {
   // Check if native share is available
   if (navigator.share) {
     try {
@@ -291,14 +291,14 @@ export const nativeShare = async (data: { title?: string; text?: string; url?: s
  */
 export const saveImageToGallery = async (imageUrl: string, fileName?: string): Promise<boolean> => {
   const finalFileName = fileName || `anacan-photo-${Date.now()}.jpg`;
-  
+
   // Web fallback
   if (!isNative) {
     try {
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
-      
+
       const link = document.createElement('a');
       link.href = blobUrl;
       link.download = finalFileName;
@@ -306,7 +306,7 @@ export const saveImageToGallery = async (imageUrl: string, fileName?: string): P
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(blobUrl);
-      
+
       return true;
     } catch (error) {
       console.error('Web download failed:', error);
@@ -316,15 +316,15 @@ export const saveImageToGallery = async (imageUrl: string, fileName?: string): P
 
   try {
     console.log('Starting native image download:', imageUrl);
-    
+
     // Fetch the image as blob
     const response = await fetch(imageUrl);
     if (!response.ok) {
       throw new Error(`Failed to fetch image: ${response.status}`);
     }
-    
+
     const blob = await response.blob();
-    
+
     // Convert blob to base64
     const base64Data = await new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
@@ -345,16 +345,16 @@ export const saveImageToGallery = async (imageUrl: string, fileName?: string): P
         const writeResult = await Filesystem.writeFile({
           path: finalFileName,
           data: base64Data,
-          directory: Directory.Documents,
+          directory: Directory.Documents
         });
         console.log('iOS: File saved to Documents:', writeResult.uri);
-        
+
         // Now read it back as a blob for sharing
         const readResult = await Filesystem.readFile({
           path: finalFileName,
-          directory: Directory.Documents,
+          directory: Directory.Documents
         });
-        
+
         // Convert base64 back to blob for sharing
         const byteCharacters = atob(readResult.data as string);
         const byteNumbers = new Array(byteCharacters.length);
@@ -364,18 +364,18 @@ export const saveImageToGallery = async (imageUrl: string, fileName?: string): P
         const byteArray = new Uint8Array(byteNumbers);
         const shareBlob = new Blob([byteArray], { type: 'image/jpeg' });
         const file = new File([shareBlob], finalFileName, { type: 'image/jpeg' });
-        
+
         // Open share sheet - user can "Save Image" from here
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({
             files: [file],
-            title: tr("native_sekli_yadda_saxla_dfbccd", "Şəkli yadda saxla"),
+            title: tr("native_sekli_yadda_saxla_dfbccd", "Şəkli yadda saxla")
           });
           console.log('iOS: Share sheet opened successfully');
         } else {
           console.log('iOS: Sharing files not supported, file saved to Documents');
         }
-        
+
         return true;
       } catch (iosError) {
         console.error('iOS save error:', iosError);
@@ -384,7 +384,7 @@ export const saveImageToGallery = async (imageUrl: string, fileName?: string): P
           await Filesystem.writeFile({
             path: finalFileName,
             data: base64Data,
-            directory: Directory.Documents,
+            directory: Directory.Documents
           });
           return true;
         } catch {
@@ -398,7 +398,7 @@ export const saveImageToGallery = async (imageUrl: string, fileName?: string): P
         const result = await Filesystem.writeFile({
           path: `Pictures/${finalFileName}`,
           data: base64Data,
-          directory: Directory.ExternalStorage,
+          directory: Directory.ExternalStorage
         });
         console.log('Android: File saved to Pictures:', result.uri);
         return true;
@@ -408,7 +408,7 @@ export const saveImageToGallery = async (imageUrl: string, fileName?: string): P
         const result = await Filesystem.writeFile({
           path: finalFileName,
           data: base64Data,
-          directory: Directory.Documents,
+          directory: Directory.Documents
         });
         console.log('Android: File saved to Documents:', result.uri);
         return true;
@@ -418,12 +418,12 @@ export const saveImageToGallery = async (imageUrl: string, fileName?: string): P
     return false;
   } catch (error) {
     console.error('Native image save failed:', error);
-    
+
     // Final fallback: Try cache directory
     try {
       const response = await fetch(imageUrl);
       const blob = await response.blob();
-      
+
       const base64Data = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -438,9 +438,9 @@ export const saveImageToGallery = async (imageUrl: string, fileName?: string): P
       await Filesystem.writeFile({
         path: finalFileName,
         data: base64Data,
-        directory: Directory.Cache,
+        directory: Directory.Cache
       });
-      
+
       console.log('Fallback: File saved to cache');
       return true;
     } catch (fallbackError) {
@@ -458,10 +458,10 @@ export const initializeNativeFeatures = async () => {
   }
 
   console.log('Initializing native features...');
-  
+
   // Set status bar style
   await statusBar.setDark();
-  
+
   // Hide splash screen as soon as app is ready
   try {
     const { SplashScreen } = await import('@capacitor/splash-screen');
@@ -469,13 +469,13 @@ export const initializeNativeFeatures = async () => {
   } catch (e) {
     console.warn('SplashScreen hide failed:', e);
   }
-  
+
   // Register for push notifications
   await pushNotifications.register();
   pushNotifications.addListeners();
-  
+
   // Schedule default reminders
   await localNotifications.scheduleWaterReminder();
-  
+
   console.log('Native features initialized');
 };

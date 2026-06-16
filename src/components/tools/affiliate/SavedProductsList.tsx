@@ -24,53 +24,53 @@ const SavedProductsList = ({ onSelectProduct, onBack }: SavedProductsListProps) 
           </Button>
           <div>
             <h1 className="text-lg font-bold">{tr("savedproductslist_saxlanilmis_mehsullar_28bd17", "Saxlanılmış məhsullar")}</h1>
-            <p className="text-xs text-muted-foreground">{savedProducts.length} məhsul</p>
+            <p className="text-xs text-muted-foreground">{savedProducts.length} {tr("savedproductslist_mehsul_2d6a33", "m\u0259hsul")}</p>
           </div>
         </div>
       </div>
 
       <div className="px-4 py-4">
-        {isLoading ? (
-          <div className="grid grid-cols-2 gap-3">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="bg-card rounded-xl overflow-hidden border border-border/50">
+        {isLoading ?
+        <div className="grid grid-cols-2 gap-3">
+            {[1, 2, 3, 4].map((i) =>
+          <div key={i} className="bg-card rounded-xl overflow-hidden border border-border/50">
                 <Skeleton className="aspect-square w-full" />
                 <div className="p-3 space-y-2">
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-3 w-1/2" />
                 </div>
               </div>
-            ))}
-          </div>
-        ) : savedProducts.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-16"
-          >
+          )}
+          </div> :
+        savedProducts.length === 0 ?
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center py-16">
+          
             <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
               <Heart className="w-10 h-10 text-muted-foreground" />
             </div>
             <h2 className="text-lg font-semibold mb-2">{tr("savedproductslist_hele_hec_ne_saxlanmayib_70769c", "Hələ heç nə saxlanmayıb")}</h2>
             <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-              Bəyəndiyiniz məhsulları ❤️ ilə saxlayın, sonra buradan asanlıqla tapın
+              {tr("savedproductslist_beyendiyiniz_mehsullari_ile_sa_7ecb02", "B\u0259y\u0259ndiyiniz m\u0259hsullar\u0131 \u2764\uFE0F il\u0259 saxlay\u0131n, sonra buradan asanl\u0131qla tap\u0131n")}
             </p>
-          </motion.div>
-        ) : (
-          <div className="grid grid-cols-2 gap-3">
-            {savedProducts.map((product, index) => (
-              <AffiliateProductCard
-                key={product.id}
-                product={product as AffiliateProduct}
-                onSelect={onSelectProduct}
-                index={index}
-              />
-            ))}
+          </motion.div> :
+
+        <div className="grid grid-cols-2 gap-3">
+            {savedProducts.map((product, index) =>
+          <AffiliateProductCard
+            key={product.id}
+            product={product as AffiliateProduct}
+            onSelect={onSelectProduct}
+            index={index} />
+
+          )}
           </div>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default SavedProductsList;

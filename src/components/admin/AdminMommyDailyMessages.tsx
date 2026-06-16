@@ -17,17 +17,17 @@ const AdminMommyDailyMessages = () => {
   const [searchDay, setSearchDay] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const filteredData = searchDay
-    ? data.filter(d => d.day_number.toString().includes(searchDay))
-    : data;
+  const filteredData = searchDay ?
+  data.filter((d) => d.day_number.toString().includes(searchDay)) :
+  data;
 
   const handleCreate = () => {
-    const nextDay = data.length > 0 ? Math.max(...data.map(d => d.day_number)) + 1 : 1;
+    const nextDay = data.length > 0 ? Math.max(...data.map((d) => d.day_number)) + 1 : 1;
     createMessage.mutate(
       { day_number: nextDay, message: 'Yeni anaya mesaj' },
       {
-        onSuccess: () => toast.success('Əlavə edildi'),
-        onError: (e: any) => toast.error(e.message || 'Xəta'),
+        onSuccess: () => toast.success(tr("adminmommydailymessages_elave_edildi_b7d7e4", "\u018Flav\u0259 edildi")),
+        onError: (e: any) => toast.error(e.message || tr("adminmommydailymessages_xeta_3cdbb6", "X\u0259ta"))
       }
     );
   };
@@ -36,22 +36,22 @@ const AdminMommyDailyMessages = () => {
     updateMessage.mutate(
       { id, ...formData },
       {
-        onSuccess: () => { toast.success('Yeniləndi'); setEditingId(null); setFormData({}); },
-        onError: () => toast.error('Xəta'),
+        onSuccess: () => {toast.success(tr("adminmommydailymessages_yenilendi_d10a01", "Yenil\u0259ndi"));setEditingId(null);setFormData({});},
+        onError: () => toast.error(tr("adminmommydailymessages_xeta_3cdbb6", "X\u0259ta"))
       }
     );
   };
 
   const handleDelete = (id: string) => {
-    if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
+    if (!confirm(tr("adminmommydailymessages_silmek_istediyinize_eminsiniz_09658f", "Silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
     deleteMessage.mutate(id, {
       onSuccess: () => toast.success('Silindi'),
-      onError: () => toast.error('Xəta'),
+      onError: () => toast.error(tr("adminmommydailymessages_xeta_3cdbb6", "X\u0259ta"))
     });
   };
 
   const parseCSV = (text: string) => {
-    const items: { day_number: number; message: string }[] = [];
+    const items: {day_number: number;message: string;}[] = [];
     const lines = text.split('\n');
     let i = 0;
     // Skip header
@@ -59,15 +59,15 @@ const AdminMommyDailyMessages = () => {
 
     while (i < lines.length) {
       const line = lines[i].trim();
-      if (!line) { i++; continue; }
+      if (!line) {i++;continue;}
 
       // Handle quoted multi-line fields
       const firstComma = line.indexOf(',');
-      if (firstComma === -1) { i++; continue; }
+      if (firstComma === -1) {i++;continue;}
 
       const dayStr = line.substring(0, firstComma).trim();
       const dayNum = parseInt(dayStr, 10);
-      if (isNaN(dayNum) || dayNum < 1 || dayNum > 1460) { i++; continue; }
+      if (isNaN(dayNum) || dayNum < 1 || dayNum > 1460) {i++;continue;}
 
       let rest = line.substring(firstComma + 1).trim();
 
@@ -93,7 +93,7 @@ const AdminMommyDailyMessages = () => {
     if (!file) return;
     const text = await file.text();
     const items = parseCSV(text);
-    if (items.length === 0) { toast.error('CSV-dən heç bir məlumat tapılmadı'); return; }
+    if (items.length === 0) {toast.error(tr("adminmommydailymessages_csv_den_hec_bir_melumat_tapilm_d9b834", "CSV-d\u0259n he\xE7 bir m\u0259lumat tap\u0131lmad\u0131"));return;}
 
     toast.info(`${items.length} mesaj import edilir...`);
     bulkImport.mutate(items, {
@@ -101,7 +101,7 @@ const AdminMommyDailyMessages = () => {
         toast.success(`${result.success} uğurlu, ${result.failed} uğursuz`);
         if (result.errors.length > 0) toast.error(result.errors.slice(0, 3).join(', '));
       },
-      onError: () => toast.error('Import xətası'),
+      onError: () => toast.error(tr("adminmommydailymessages_import_xetasi_84d70f", "Import x\u0259tas\u0131"))
     });
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
@@ -131,12 +131,12 @@ const AdminMommyDailyMessages = () => {
             <Input
               placeholder={tr("adminmommydailymessages_gun_axtar_4c2871", "Gün axtar...")}
               value={searchDay}
-              onChange={e => setSearchDay(e.target.value)}
-              className="pl-8 w-32 h-9"
-            />
+              onChange={(e) => setSearchDay(e.target.value)}
+              className="pl-8 w-32 h-9" />
+            
           </div>
           <Button size="sm" variant="outline" onClick={downloadTemplate}>
-            <Download className="w-4 h-4 mr-1" /> Nümunə
+            <Download className="w-4 h-4 mr-1" /> {tr("adminmommydailymessages_numune_19d1f6", "N\xFCmun\u0259")}
           </Button>
           <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}>
             <Upload className="w-4 h-4 mr-1" /> CSV Import
@@ -148,65 +148,65 @@ const AdminMommyDailyMessages = () => {
               exportToCSV(
                 data,
                 [
-                  { key: 'day_number', header: 'day_number' },
-                  { key: 'message', header: 'message' },
-                  { key: 'is_active', header: 'is_active' },
-                ],
+                { key: 'day_number', header: 'day_number' },
+                { key: 'message', header: 'message' },
+                { key: 'is_active', header: 'is_active' }],
+
                 'mommy_daily_messages_export.csv'
               );
               toast.success(`${data.length} mesaj ixrac edildi`);
             }}
-            disabled={data.length === 0}
-          >
+            disabled={data.length === 0}>
+            
             <FileDown className="w-4 h-4 mr-1" /> İxrac
           </Button>
           <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleCSVImport} />
           <Button size="sm" onClick={handleCreate}>
-            <Plus className="w-4 h-4 mr-1" /> Əlavə et
+            <Plus className="w-4 h-4 mr-1" /> {tr("adminmommydailymessages_elave_et_6e1b9b", "\u018Flav\u0259 et")}
           </Button>
         </div>
       </div>
 
       <div className="grid gap-2 max-h-[65vh] overflow-y-auto pr-1">
-        {filteredData.map(item => (
-          <Card key={item.id} className="border-border/50">
+        {filteredData.map((item) =>
+        <Card key={item.id} className="border-border/50">
             <CardContent className="p-3">
-              {editingId === item.id ? (
-                <div className="space-y-2">
+              {editingId === item.id ?
+            <div className="space-y-2">
                   <div className="flex gap-2">
                     <Input
-                      type="number"
-                      min={1} max={1460}
-                      value={formData.day_number ?? item.day_number}
-                      onChange={e => setFormData(p => ({ ...p, day_number: parseInt(e.target.value) }))}
-                      className="w-24 h-9"
-                      placeholder={tr("adminmommydailymessages_gun_18b2f4", "Gün")}
-                    />
+                  type="number"
+                  min={1} max={1460}
+                  value={formData.day_number ?? item.day_number}
+                  onChange={(e) => setFormData((p) => ({ ...p, day_number: parseInt(e.target.value) }))}
+                  className="w-24 h-9"
+                  placeholder={tr("adminmommydailymessages_gun_18b2f4", "Gün")} />
+                
                     <div className="flex items-center gap-1">
                       <Switch
-                        checked={formData.is_active ?? item.is_active}
-                        onCheckedChange={v => setFormData(p => ({ ...p, is_active: v }))}
-                      />
+                    checked={formData.is_active ?? item.is_active}
+                    onCheckedChange={(v) => setFormData((p) => ({ ...p, is_active: v }))} />
+                  
                       <span className="text-xs text-muted-foreground">Aktiv</span>
                     </div>
                   </div>
                   <Textarea
-                    value={formData.message ?? item.message}
-                    onChange={e => setFormData(p => ({ ...p, message: e.target.value }))}
-                    rows={4}
-                    placeholder="Anaya mesaj..."
-                  />
+                value={formData.message ?? item.message}
+                onChange={(e) => setFormData((p) => ({ ...p, message: e.target.value }))}
+                rows={4}
+                placeholder="Anaya mesaj..." />
+              
                   <div className="flex gap-2">
                     <Button size="sm" onClick={() => handleUpdate(item.id)}>
                       <Save className="w-3 h-3 mr-1" /> Saxla
                     </Button>
-                    <Button size="sm" variant="ghost" onClick={() => { setEditingId(null); setFormData({}); }}>
-                      <X className="w-3 h-3 mr-1" /> Ləğv et
+                    <Button size="sm" variant="ghost" onClick={() => {setEditingId(null);setFormData({});}}>
+                      <X className="w-3 h-3 mr-1" /> {tr("adminmommydailymessages_legv_et_b5e49c", "L\u0259\u011Fv et")}
                     </Button>
                   </div>
-                </div>
-              ) : (
-                <div className="flex items-start gap-3">
+                </div> :
+
+            <div className="flex items-start gap-3">
                   <div className="flex flex-col items-center gap-1 min-w-[48px]">
                     <span className="text-xs font-bold bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 px-2 py-0.5 rounded-full">
                       {item.day_number}
@@ -215,7 +215,7 @@ const AdminMommyDailyMessages = () => {
                   </div>
                   <p className="flex-1 text-sm text-foreground leading-relaxed line-clamp-2">{item.message}</p>
                   <div className="flex gap-1">
-                    <Button size="sm" variant="ghost" onClick={() => { setEditingId(item.id); setFormData({}); }}>
+                    <Button size="sm" variant="ghost" onClick={() => {setEditingId(item.id);setFormData({});}}>
                       ✏️
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => handleDelete(item.id)}>
@@ -223,19 +223,19 @@ const AdminMommyDailyMessages = () => {
                     </Button>
                   </div>
                 </div>
-              )}
+            }
             </CardContent>
           </Card>
-        ))}
-        {filteredData.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
+        )}
+        {filteredData.length === 0 &&
+        <div className="text-center py-8 text-muted-foreground">
             <Heart className="w-8 h-8 mx-auto mb-2 opacity-30" />
             <p>{tr("adminmommydailymessages_hec_bir_mesaj_tapilmadi_12db36", "Heç bir mesaj tapılmadı")}</p>
           </div>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AdminMommyDailyMessages;

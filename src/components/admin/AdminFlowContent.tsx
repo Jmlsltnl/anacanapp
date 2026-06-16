@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
-import { 
+import {
   Heart, Lightbulb, MessageSquare, Plus, Pencil, Trash2, Search,
-  Droplets, Tag, Save
-} from 'lucide-react';
+  Droplets, Tag, Save } from
+'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,11 +21,11 @@ import { useToast } from '@/hooks/use-toast';
 type ContentType = 'symptoms' | 'tips' | 'insights' | 'labels';
 
 const PHASES = [
-  { id: 'menstrual', label: 'Menstruasiya', emoji: '🌸' },
-  { id: 'follicular', label: 'Follikulyar', emoji: '🌱' },
-  { id: 'ovulation', label: 'Ovulyasiya', emoji: '✨' },
-  { id: 'luteal', label: 'Luteal', emoji: '🌙' },
-];
+{ id: 'menstrual', label: 'Menstruasiya', emoji: '🌸' },
+{ id: 'follicular', label: 'Follikulyar', emoji: '🌱' },
+{ id: 'ovulation', label: 'Ovulyasiya', emoji: '✨' },
+{ id: 'luteal', label: 'Luteal', emoji: '🌙' }];
+
 
 const AdminFlowContent = () => {
   const [activeTab, setActiveTab] = useState<ContentType>('symptoms');
@@ -40,58 +40,58 @@ const AdminFlowContent = () => {
   const symptomsQuery = useQuery({
     queryKey: ['flow-symptoms-admin'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('flow_symptoms_db')
-        .select('*')
-        .order('sort_order');
+      const { data, error } = await supabase.
+      from('flow_symptoms_db').
+      select('*').
+      order('sort_order');
       if (error) throw error;
       return data;
-    },
+    }
   });
 
   // Fetch tips (phase tips from menstruation_phase_tips)
   const tipsQuery = useQuery({
     queryKey: ['flow-tips-admin'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('menstruation_phase_tips')
-        .select('*')
-        .order('sort_order');
+      const { data, error } = await supabase.
+      from('menstruation_phase_tips').
+      select('*').
+      order('sort_order');
       if (error) throw error;
       return data;
-    },
+    }
   });
 
   // Fetch insights
   const insightsQuery = useQuery({
     queryKey: ['flow-insights-admin'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('flow_insights')
-        .select('*')
-        .order('sort_order');
+      const { data, error } = await supabase.
+      from('flow_insights').
+      select('*').
+      order('sort_order');
       if (error) throw error;
       return data;
-    },
+    }
   });
 
   // Flow upcoming labels state
   const [flowLabels, setFlowLabels] = useState({
-    flow_label_next_period: 'Növbəti Period',
-    flow_label_fertile_window: 'Reproduktiv Dövr',
-    flow_label_ovulation_day: 'Ovulyasiya Günü',
+    flow_label_next_period: tr("adminflowcontent_novbeti_period_b29c4a", "N\xF6vb\u0259ti Period"),
+    flow_label_fertile_window: tr("adminflowcontent_reproduktiv_dovr_80642c", "Reproduktiv D\xF6vr"),
+    flow_label_ovulation_day: tr("adminflowcontent_ovulyasiya_gunu_811e84", "Ovulyasiya G\xFCn\xFC")
   });
   const [labelsLoading, setLabelsLoading] = useState(false);
 
   const labelsQuery = useQuery({
     queryKey: ['flow-labels-admin'],
     queryFn: async () => {
-      const { data } = await supabase
-        .from('app_settings')
-        .select('key, value')
-        .in('key', ['flow_label_next_period', 'flow_label_fertile_window', 'flow_label_ovulation_day']);
+      const { data } = await supabase.
+      from('app_settings').
+      select('key, value').
+      in('key', ['flow_label_next_period', 'flow_label_fertile_window', 'flow_label_ovulation_day']);
       return data || [];
-    },
+    }
   });
 
   useEffect(() => {
@@ -109,10 +109,10 @@ const AdminFlowContent = () => {
     setLabelsLoading(true);
     try {
       for (const [key, value] of Object.entries(flowLabels)) {
-        await supabase
-          .from('app_settings')
-          .update({ value: JSON.stringify(value) })
-          .eq('key', key);
+        await supabase.
+        from('app_settings').
+        update({ value: JSON.stringify(value) }).
+        eq('key', key);
       }
       queryClient.invalidateQueries({ queryKey: ['flow-upcoming-labels'] });
       toast({ title: tr("adminflowcontent_basliqlar_saxlanildi_a9004c", "Başlıqlar saxlanıldı ✅") });
@@ -123,36 +123,36 @@ const AdminFlowContent = () => {
   };
 
   const tabs = [
-    { id: 'symptoms', label: 'Simptomlar', icon: Heart, count: symptomsQuery.data?.length || 0 },
-    { id: 'tips', label: tr("adminflowcontent_faza_tovsiyeleri_5a303a", "Faza Tövsiyələri"), icon: Lightbulb, count: tipsQuery.data?.length || 0 },
-    { id: 'insights', label: tr("adminflowcontent_meslehetler_fafd97", "Məsləhətlər"), icon: MessageSquare, count: insightsQuery.data?.length || 0 },
-    { id: 'labels', label: tr("adminflowcontent_basliqlar_b19a1f", "Başlıqlar"), icon: Tag, count: 3 },
-  ];
+  { id: 'symptoms', label: 'Simptomlar', icon: Heart, count: symptomsQuery.data?.length || 0 },
+  { id: 'tips', label: tr("adminflowcontent_faza_tovsiyeleri_5a303a", "Faza Tövsiyələri"), icon: Lightbulb, count: tipsQuery.data?.length || 0 },
+  { id: 'insights', label: tr("adminflowcontent_meslehetler_fafd97", "Məsləhətlər"), icon: MessageSquare, count: insightsQuery.data?.length || 0 },
+  { id: 'labels', label: tr("adminflowcontent_basliqlar_b19a1f", "Başlıqlar"), icon: Tag, count: 3 }];
+
 
   const getCurrentData = () => {
     switch (activeTab) {
-      case 'symptoms': return symptomsQuery.data || [];
-      case 'tips': return tipsQuery.data || [];
-      case 'insights': return insightsQuery.data || [];
-      default: return [];
+      case 'symptoms':return symptomsQuery.data || [];
+      case 'tips':return tipsQuery.data || [];
+      case 'insights':return insightsQuery.data || [];
+      default:return [];
     }
   };
 
   const getTableName = () => {
     switch (activeTab) {
-      case 'symptoms': return 'flow_symptoms_db';
-      case 'tips': return 'menstruation_phase_tips';
-      case 'insights': return 'flow_insights';
-      default: return 'flow_symptoms_db';
+      case 'symptoms':return 'flow_symptoms_db';
+      case 'tips':return 'menstruation_phase_tips';
+      case 'insights':return 'flow_insights';
+      default:return 'flow_symptoms_db';
     }
   };
 
   const getQueryKey = () => {
     switch (activeTab) {
-      case 'symptoms': return 'flow-symptoms-admin';
-      case 'tips': return 'flow-tips-admin';
-      case 'insights': return 'flow-insights-admin';
-      default: return 'flow-symptoms-admin';
+      case 'symptoms':return 'flow-symptoms-admin';
+      case 'tips':return 'flow-tips-admin';
+      case 'insights':return 'flow-insights-admin';
+      default:return 'flow-symptoms-admin';
     }
   };
 
@@ -181,7 +181,7 @@ const AdminFlowContent = () => {
       queryClient.invalidateQueries({ queryKey: ['flow-insights'] });
       toast({ title: tr("adminflowcontent_elave_edildi_b7d7e4", "Əlavə edildi") });
       setShowModal(false);
-    },
+    }
   });
 
   const updateMutation = useMutation({
@@ -196,7 +196,7 @@ const AdminFlowContent = () => {
       queryClient.invalidateQueries({ queryKey: ['flow-insights'] });
       toast({ title: tr("adminflowcontent_yenilendi_d10a01", "Yeniləndi") });
       setShowModal(false);
-    },
+    }
   });
 
   const deleteMutation = useMutation({
@@ -210,7 +210,7 @@ const AdminFlowContent = () => {
       queryClient.invalidateQueries({ queryKey: ['flow-phase-tips'] });
       queryClient.invalidateQueries({ queryKey: ['flow-insights'] });
       toast({ title: 'Silindi' });
-    },
+    }
   });
 
   const openCreateModal = () => {
@@ -250,18 +250,18 @@ const AdminFlowContent = () => {
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Droplets className="w-6 h-6 text-flow" />
-            Menstruasiya Məzmunu
+            {tr("adminflowcontent_menstruasiya_mezmunu_bf5904", "Menstruasiya M\u0259zmunu")}
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Flow Dashboard-da göstərilən simptomlar, tövsiyələr və məsləhətləri idarə edin
+            {tr("adminflowcontent_flow_dashboard_da_gosterilen_s_a48913", "Flow Dashboard-da g\xF6st\u0259ril\u0259n simptomlar, t\xF6vsiy\u0259l\u0259r v\u0259 m\u0259sl\u0259h\u0259tl\u0259ri idar\u0259 edin")}
           </p>
         </div>
-        {activeTab !== 'labels' && (
-          <Button onClick={openCreateModal} className="gradient-primary gap-2">
+        {activeTab !== 'labels' &&
+        <Button onClick={openCreateModal} className="gradient-primary gap-2">
             <Plus className="w-4 h-4" />
-            Əlavə et
+            {tr("adminflowcontent_elave_et_6e1b9b", "\u018Flav\u0259 et")}
           </Button>
-        )}
+        }
       </div>
 
       {/* Tabs */}
@@ -273,80 +273,80 @@ const AdminFlowContent = () => {
               key={tab.id}
               onClick={() => setActiveTab(tab.id as ContentType)}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl whitespace-nowrap transition-all ${
-                activeTab === tab.id
-                  ? 'bg-flow text-white'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
-              }`}
-            >
+              activeTab === tab.id ?
+              'bg-flow text-white' :
+              'bg-muted text-muted-foreground hover:bg-muted/80'}`
+              }>
+              
               <Icon className="w-4 h-4" />
               {tab.label}
               <Badge variant="secondary" className="ml-1">{tab.count}</Badge>
-            </button>
-          );
+            </button>);
+
         })}
       </div>
 
-      {activeTab === 'labels' ? (
-        <Card>
+      {activeTab === 'labels' ?
+      <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Tag className="w-5 h-5" />
-              Qarşıdan Gələnlər Başlıqları
+              {tr("adminflowcontent_qarsidan_gelenler_basliqlari_6f943e", "Qar\u015F\u0131dan G\u0259l\u0259nl\u0259r Ba\u015Fl\u0131qlar\u0131")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <label className="text-sm font-medium text-foreground mb-1 block">{tr("adminflowcontent_period_basligi_6a6736", "🩸 Period başlığı")}</label>
               <Input
-                value={flowLabels.flow_label_next_period}
-                onChange={(e) => setFlowLabels({ ...flowLabels, flow_label_next_period: e.target.value })}
-                placeholder={tr("adminflowcontent_novbeti_period_b29c4a", "Növbəti Period")}
-              />
+              value={flowLabels.flow_label_next_period}
+              onChange={(e) => setFlowLabels({ ...flowLabels, flow_label_next_period: e.target.value })}
+              placeholder={tr("adminflowcontent_novbeti_period_b29c4a", "Növbəti Period")} />
+            
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1 block">{tr("adminflowcontent_reproduktiv_dovr_basligi_836250", "💕 Reproduktiv dövr başlığı")}</label>
               <Input
-                value={flowLabels.flow_label_fertile_window}
-                onChange={(e) => setFlowLabels({ ...flowLabels, flow_label_fertile_window: e.target.value })}
-                placeholder={tr("adminflowcontent_reproduktiv_dovr_80642c", "Reproduktiv Dövr")}
-              />
+              value={flowLabels.flow_label_fertile_window}
+              onChange={(e) => setFlowLabels({ ...flowLabels, flow_label_fertile_window: e.target.value })}
+              placeholder={tr("adminflowcontent_reproduktiv_dovr_80642c", "Reproduktiv Dövr")} />
+            
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1 block">{tr("adminflowcontent_ovulyasiya_basligi_0264bd", "✨ Ovulyasiya başlığı")}</label>
               <Input
-                value={flowLabels.flow_label_ovulation_day}
-                onChange={(e) => setFlowLabels({ ...flowLabels, flow_label_ovulation_day: e.target.value })}
-                placeholder={tr("adminflowcontent_ovulyasiya_gunu_811e84", "Ovulyasiya Günü")}
-              />
+              value={flowLabels.flow_label_ovulation_day}
+              onChange={(e) => setFlowLabels({ ...flowLabels, flow_label_ovulation_day: e.target.value })}
+              placeholder={tr("adminflowcontent_ovulyasiya_gunu_811e84", "Ovulyasiya Günü")} />
+            
             </div>
             <Button onClick={saveLabels} disabled={labelsLoading} className="gap-2">
               <Save className="w-4 h-4" />
-              {labelsLoading ? 'Saxlanılır...' : 'Saxla'}
+              {labelsLoading ? tr("adminflowcontent_saxlanilir_ee05ad", "Saxlan\u0131l\u0131r...") : 'Saxla'}
             </Button>
           </CardContent>
-        </Card>
-      ) : (
+        </Card> :
+
       <>
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
-          placeholder="Axtar..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-10"
-        />
+            placeholder="Axtar..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10" />
+          
       </div>
 
       {/* Content Grid */}
       <div className="grid gap-3">
-        {filteredData.map((item: any) => (
+        {filteredData.map((item: any) =>
           <motion.div
             key={item.id}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-card rounded-xl p-4 border border-border/50 flex items-center justify-between"
-          >
+            className="bg-card rounded-xl p-4 border border-border/50 flex items-center justify-between">
+            
             <div className="flex items-center gap-3">
               <span className="text-2xl">{item.emoji}</span>
               <div>
@@ -356,11 +356,11 @@ const AdminFlowContent = () => {
                   {activeTab === 'insights' && (item.title_az || item.title)}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
-                  {item.phase && (
-                    <Badge variant="outline" className="text-xs">
-                      {PHASES.find(p => p.id === item.phase)?.label || item.phase}
+                  {item.phase &&
+                  <Badge variant="outline" className="text-xs">
+                      {PHASES.find((p) => p.id === item.phase)?.label || item.phase}
                     </Badge>
-                  )}
+                  }
                   <Badge variant={item.is_active ? 'default' : 'secondary'} className="text-xs">
                     {item.is_active ? 'Aktiv' : 'Deaktiv'}
                   </Badge>
@@ -376,13 +376,13 @@ const AdminFlowContent = () => {
               </Button>
             </div>
           </motion.div>
-        ))}
+          )}
 
-        {filteredData.length === 0 && (
+        {filteredData.length === 0 &&
           <div className="text-center py-12 text-muted-foreground">
-            Heç bir məzmun tapılmadı
+            {tr("adminflowcontent_hec_bir_mezmun_tapilmadi_a7be84", "He\xE7 bir m\u0259zmun tap\u0131lmad\u0131")}
           </div>
-        )}
+          }
       </div>
 
       {/* Edit/Create Modal */}
@@ -390,12 +390,12 @@ const AdminFlowContent = () => {
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {editingItem ? 'Redaktə et' : 'Yeni əlavə et'}
+              {editingItem ? tr("adminflowcontent_redakte_et_66cf3b", "Redakt\u0259 et") : tr("adminflowcontent_yeni_elave_et_bcd4a4", "Yeni \u0259lav\u0259 et")}
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            {activeTab === 'symptoms' && (
+            {activeTab === 'symptoms' &&
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -403,61 +403,61 @@ const AdminFlowContent = () => {
                     <Input
                       value={formData.symptom_key || ''}
                       onChange={(e) => setFormData({ ...formData, symptom_key: e.target.value })}
-                      placeholder="headache"
-                    />
+                      placeholder="headache" />
+                    
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Emoji</label>
                     <Input
                       value={formData.emoji || ''}
                       onChange={(e) => setFormData({ ...formData, emoji: e.target.value })}
-                      placeholder="🤕"
-                    />
+                      placeholder="🤕" />
+                    
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Ad (EN)</label>
                   <Input
                     value={formData.label || ''}
-                    onChange={(e) => setFormData({ ...formData, label: e.target.value })}
-                  />
+                    onChange={(e) => setFormData({ ...formData, label: e.target.value })} />
+                  
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Ad (AZ)</label>
                   <Input
                     value={formData.label_az || ''}
-                    onChange={(e) => setFormData({ ...formData, label_az: e.target.value })}
-                  />
+                    onChange={(e) => setFormData({ ...formData, label_az: e.target.value })} />
+                  
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{tr("adminflowcontent_reng_8c6bc5", "Rəng")}</label>
                   <Input
                     type="color"
                     value={formData.color || '#F97316'}
-                    onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                  />
+                    onChange={(e) => setFormData({ ...formData, color: e.target.value })} />
+                  
                 </div>
               </>
-            )}
+              }
 
-            {activeTab === 'tips' && (
+            {activeTab === 'tips' &&
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Faza</label>
                     <Select
                       value={formData.phase || ''}
-                      onValueChange={(value) => setFormData({ ...formData, phase: value })}
-                    >
+                      onValueChange={(value) => setFormData({ ...formData, phase: value })}>
+                      
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {PHASES.map((phase) => (
-                          <SelectItem key={phase.id} value={phase.id}>
+                        {PHASES.map((phase) =>
+                        <SelectItem key={phase.id} value={phase.id}>
                             {phase.emoji} {phase.label}
                           </SelectItem>
-                        ))}
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
@@ -465,8 +465,8 @@ const AdminFlowContent = () => {
                     <label className="text-sm font-medium">Emoji</label>
                     <Input
                       value={formData.emoji || ''}
-                      onChange={(e) => setFormData({ ...formData, emoji: e.target.value })}
-                    />
+                      onChange={(e) => setFormData({ ...formData, emoji: e.target.value })} />
+                    
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -474,55 +474,55 @@ const AdminFlowContent = () => {
                   <Input
                     value={formData.title || ''}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="Tip title"
-                  />
+                    placeholder="Tip title" />
+                  
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{tr("adminflowcontent_basliq_az_3e294a", "Başlıq (AZ)")}</label>
                   <Input
                     value={formData.title_az || ''}
                     onChange={(e) => setFormData({ ...formData, title_az: e.target.value })}
-                    placeholder={tr("adminflowcontent_azerbaycan_dilinde_basliq_a39299", "Azərbaycan dilində başlıq")}
-                  />
+                    placeholder={tr("adminflowcontent_azerbaycan_dilinde_basliq_a39299", "Azərbaycan dilində başlıq")} />
+                  
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{tr("adminflowcontent_mezmun_en_7541aa", "Məzmun (EN)")}</label>
                   <Textarea
                     value={formData.content || ''}
                     onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    rows={2}
-                  />
+                    rows={2} />
+                  
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{tr("adminflowcontent_mezmun_az_d18d5f", "Məzmun (AZ)")}</label>
                   <Textarea
                     value={formData.content_az || ''}
                     onChange={(e) => setFormData({ ...formData, content_az: e.target.value })}
-                    rows={2}
-                  />
+                    rows={2} />
+                  
                 </div>
               </>
-            )}
+              }
 
-            {activeTab === 'insights' && (
+            {activeTab === 'insights' &&
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Faza (optional)</label>
                     <Select
                       value={formData.phase || 'all'}
-                      onValueChange={(value) => setFormData({ ...formData, phase: value === 'all' ? null : value })}
-                    >
+                      onValueChange={(value) => setFormData({ ...formData, phase: value === 'all' ? null : value })}>
+                      
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">{tr("adminflowcontent_hamisi_c73c4d", "Hamısı")}</SelectItem>
-                        {PHASES.map((phase) => (
-                          <SelectItem key={phase.id} value={phase.id}>
+                        {PHASES.map((phase) =>
+                        <SelectItem key={phase.id} value={phase.id}>
                             {phase.emoji} {phase.label}
                           </SelectItem>
-                        ))}
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
@@ -530,76 +530,76 @@ const AdminFlowContent = () => {
                     <label className="text-sm font-medium">Emoji</label>
                     <Input
                       value={formData.emoji || ''}
-                      onChange={(e) => setFormData({ ...formData, emoji: e.target.value })}
-                    />
+                      onChange={(e) => setFormData({ ...formData, emoji: e.target.value })} />
+                    
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{tr("adminflowcontent_basliq_en_4ac905", "Başlıq (EN)")}</label>
                   <Input
                     value={formData.title || ''}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  />
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
+                  
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{tr("adminflowcontent_basliq_az_3e294a", "Başlıq (AZ)")}</label>
                   <Input
                     value={formData.title_az || ''}
-                    onChange={(e) => setFormData({ ...formData, title_az: e.target.value })}
-                  />
+                    onChange={(e) => setFormData({ ...formData, title_az: e.target.value })} />
+                  
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{tr("adminflowcontent_mezmun_en_7541aa", "Məzmun (EN)")}</label>
                   <Textarea
                     value={formData.content || ''}
                     onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    rows={3}
-                  />
+                    rows={3} />
+                  
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{tr("adminflowcontent_mezmun_az_d18d5f", "Məzmun (AZ)")}</label>
                   <Textarea
                     value={formData.content_az || ''}
                     onChange={(e) => setFormData({ ...formData, content_az: e.target.value })}
-                    rows={3}
-                  />
+                    rows={3} />
+                  
                 </div>
               </>
-            )}
+              }
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">{tr("adminflowcontent_sira_421c5f", "Sıra")}</label>
                 <Input
-                  type="number"
-                  value={formData.sort_order || 0}
-                  onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
-                />
+                    type="number"
+                    value={formData.sort_order || 0}
+                    onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })} />
+                  
               </div>
               <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                 <label className="text-sm font-medium">Aktiv</label>
                 <Switch
-                  checked={formData.is_active ?? true}
-                  onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-                />
+                    checked={formData.is_active ?? true}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })} />
+                  
               </div>
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowModal(false)}>
-              Ləğv et
+              {tr("adminflowcontent_legv_et_b5e49c", "L\u0259\u011Fv et")}
             </Button>
             <Button onClick={handleSave} disabled={createMutation.isPending || updateMutation.isPending}>
-              {editingItem ? 'Saxla' : 'Əlavə et'}
+              {editingItem ? 'Saxla' : tr("adminflowcontent_elave_et_6e1b9b", "\u018Flav\u0259 et")}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
       </>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 
 export default AdminFlowContent;

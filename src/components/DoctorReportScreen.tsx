@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
+import {
   ArrowLeft, FileText, Download, Share2, Calendar,
   Heart, Droplets, Activity, Scale, ChevronRight,
-  Printer, Mail
-} from 'lucide-react';
+  Printer, Mail } from
+'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useToast } from '@/hooks/use-toast';
 import { useHealthReport } from '@/hooks/useHealthReport';
@@ -26,7 +26,7 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
 
   const cycleData = getCycleData();
   const pregData = getPregnancyData();
-  
+
   // Derive baby data from selectedChild for multi-child support
   const childAge = selectedChild ? getChildAge(selectedChild) : null;
   const babyData = selectedChild && childAge ? {
@@ -35,54 +35,54 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
     birthDate: new Date(selectedChild.birth_date),
     gender: selectedChild.gender as 'boy' | 'girl',
     ageInDays: childAge.days,
-    ageInMonths: childAge.months,
+    ageInMonths: childAge.months
   } : null;
 
   const periods = [
-    { id: '1week', label: tr("doctorreportscreen_1_hefte_6d1cb4", '1 Həftə') },
-    { id: '1month', label: '1 Ay' },
-    { id: '3months', label: '3 Ay' },
-    { id: 'all', label: tr("doctorreportscreen_hamisi_c73c4d", 'Hamısı') },
-  ];
+  { id: '1week', label: tr("doctorreportscreen_1_hefte_6d1cb4", '1 Həftə') },
+  { id: '1month', label: '1 Ay' },
+  { id: '3months', label: '3 Ay' },
+  { id: 'all', label: tr("doctorreportscreen_hamisi_c73c4d", 'Hamısı') }];
+
 
   const handleDownload = () => {
     toast({
       title: tr("doctorreportscreen_hesabat_hazirlanir_37c97d", 'Hesabat hazırlanır...'),
-      description: tr("doctorreportscreen_pdf_fayli_bir_nece_saniyeye_hazir_olacaq_0304da", 'PDF faylı bir neçə saniyəyə hazır olacaq.'),
+      description: tr("doctorreportscreen_pdf_fayli_bir_nece_saniyeye_hazir_olacaq_0304da", 'PDF faylı bir neçə saniyəyə hazır olacaq.')
     });
   };
 
   const handleShare = () => {
     toast({
       title: tr("doctorreportscreen_paylasim_791727", 'Paylaşım'),
-      description: tr("doctorreportscreen_hesabat_hekiminize_gonderildi_bf58ee", 'Hesabat həkiminizə göndərildi.'),
+      description: tr("doctorreportscreen_hesabat_hekiminize_gonderildi_bf58ee", 'Hesabat həkiminizə göndərildi.')
     });
   };
 
   const getStageSpecificData = () => {
     if (lifeStage === 'flow' && cycleData) {
       return [
-        { label: tr("doctorreportscreen_dovre_uzunlugu_c81215", 'Dövrə uzunluğu'), value: `${cycleData.cycleLength} gün`, icon: Calendar },
-        { label: 'Menstruasiya', value: `${cycleData.periodLength} gün`, icon: Droplets },
-        { label: 'Cari faza', value: cycleData.phase, icon: Activity },
-        { label: tr("doctorreportscreen_dovrenin_gunu_7549f2", 'Dövrənin günü'), value: `${cycleData.currentDay}`, icon: Heart },
-      ];
+      { label: tr("doctorreportscreen_dovre_uzunlugu_c81215", 'Dövrə uzunluğu'), value: `${cycleData.cycleLength} gün`, icon: Calendar },
+      { label: 'Menstruasiya', value: `${cycleData.periodLength} gün`, icon: Droplets },
+      { label: 'Cari faza', value: cycleData.phase, icon: Activity },
+      { label: tr("doctorreportscreen_dovrenin_gunu_7549f2", 'Dövrənin günü'), value: `${cycleData.currentDay}`, icon: Heart }];
+
     }
     if (lifeStage === 'bump' && pregData) {
       return [
-        { label: tr("doctorreportscreen_hamilelik_heftesi_c9e362", 'Hamiləlik həftəsi'), value: `${pregData.currentWeek} həftə`, icon: Calendar },
-        { label: 'Trimester', value: `${pregData.trimester}-cü`, icon: Activity },
-        { label: tr("doctorreportscreen_korpe_olcusu_cccfc2", 'Körpə ölçüsü'), value: pregData.babySize.fruit, icon: Heart },
-        { label: tr("doctorreportscreen_texmini_dogus_98eb77", 'Təxmini doğuş'), value: pregData.dueDate?.toLocaleDateString('az-AZ'), icon: Calendar },
-      ];
+      { label: tr("doctorreportscreen_hamilelik_heftesi_c9e362", 'Hamiləlik həftəsi'), value: `${pregData.currentWeek} həftə`, icon: Calendar },
+      { label: 'Trimester', value: `${pregData.trimester}-cü`, icon: Activity },
+      { label: tr("doctorreportscreen_korpe_olcusu_cccfc2", 'Körpə ölçüsü'), value: pregData.babySize.fruit, icon: Heart },
+      { label: tr("doctorreportscreen_texmini_dogus_98eb77", 'Təxmini doğuş'), value: pregData.dueDate?.toLocaleDateString('az-AZ'), icon: Calendar }];
+
     }
     if (lifeStage === 'mommy' && babyData) {
       return [
-        { label: tr("doctorreportscreen_korpenin_adi_8a4e9e", 'Körpənin adı'), value: babyData.name, icon: Heart },
-        { label: tr("doctorreportscreen_yas_95595b", 'Yaş'), value: babyData.ageInMonths > 0 ? `${babyData.ageInMonths} ay` : `${babyData.ageInDays} gün`, icon: Calendar },
-        { label: tr("doctorreportscreen_dogum_tarixi_d96907", 'Doğum tarixi'), value: babyData.birthDate.toLocaleDateString('az-AZ'), icon: Calendar },
-        { label: tr("doctorreportscreen_cinsiyyet_1526fb", 'Cinsiyyət'), value: babyData.gender === 'boy' ? 'Oğlan' : 'Qız', icon: Activity },
-      ];
+      { label: tr("doctorreportscreen_korpenin_adi_8a4e9e", 'Körpənin adı'), value: babyData.name, icon: Heart },
+      { label: tr("doctorreportscreen_yas_95595b", 'Yaş'), value: babyData.ageInMonths > 0 ? `${babyData.ageInMonths} ay` : `${babyData.ageInDays} gün`, icon: Calendar },
+      { label: tr("doctorreportscreen_dogum_tarixi_d96907", 'Doğum tarixi'), value: babyData.birthDate.toLocaleDateString('az-AZ'), icon: Calendar },
+      { label: tr("doctorreportscreen_cinsiyyet_1526fb", 'Cinsiyyət'), value: babyData.gender === 'boy' ? tr("doctorreportscreen_oglan_e9715e", "O\u011Flan") : tr("doctorreportscreen_qiz_79bf6b", "Q\u0131z"), icon: Activity }];
+
     }
     return [];
   };
@@ -95,8 +95,8 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
           <motion.button
             onClick={onBack}
             className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}
-          >
+            whileTap={{ scale: 0.95 }}>
+            
             <ArrowLeft className="w-5 h-5 text-white" />
           </motion.button>
           <div className="flex-1">
@@ -108,17 +108,17 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
 
       <div className="px-5 -mt-3 space-y-4">
         {/* Report Preview Card */}
-        <motion.div 
+        <motion.div
           className="bg-card rounded-3xl p-5 shadow-card border border-border/50"
           initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-        >
+          animate={{ y: 0, opacity: 1 }}>
+          
           <div className="flex items-center gap-4 mb-4">
             <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
               <FileText className="w-7 h-7 text-primary" />
             </div>
             <div className="flex-1">
-              <h2 className="font-bold text-lg">{name || 'İstifadəçi'}</h2>
+              <h2 className="font-bold text-lg">{name || tr("doctorreportscreen_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}</h2>
               <p className="text-sm text-muted-foreground">
                 Hesabat tarixi: {new Date().toLocaleDateString('az-AZ')}
               </p>
@@ -127,19 +127,19 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
 
           {/* Period Selector */}
           <div className="flex gap-2 mb-4 overflow-x-auto hide-scrollbar">
-            {periods.map(period => (
-              <button
-                key={period.id}
-                onClick={() => setSelectedPeriod(period.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-                  selectedPeriod === period.id
-                    ? 'bg-primary text-white'
-                    : 'bg-muted text-muted-foreground'
-                }`}
-              >
+            {periods.map((period) =>
+            <button
+              key={period.id}
+              onClick={() => setSelectedPeriod(period.id)}
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+              selectedPeriod === period.id ?
+              'bg-primary text-white' :
+              'bg-muted text-muted-foreground'}`
+              }>
+              
                 {period.label}
               </button>
-            ))}
+            )}
           </div>
 
           {/* Action Buttons */}
@@ -147,23 +147,23 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
             <motion.button
               onClick={handleDownload}
               className="flex flex-col items-center gap-2 p-4 bg-muted rounded-2xl"
-              whileTap={{ scale: 0.95 }}
-            >
+              whileTap={{ scale: 0.95 }}>
+              
               <Download className="w-6 h-6 text-primary" />
               <span className="text-xs font-medium">{tr("doctorreportscreen_yukle_2b8e67", "Yüklə")}</span>
             </motion.button>
             <motion.button
               onClick={handleShare}
               className="flex flex-col items-center gap-2 p-4 bg-muted rounded-2xl"
-              whileTap={{ scale: 0.95 }}
-            >
+              whileTap={{ scale: 0.95 }}>
+              
               <Share2 className="w-6 h-6 text-primary" />
               <span className="text-xs font-medium">{tr("doctorreportscreen_paylas_b4be3b", "Paylaş")}</span>
             </motion.button>
             <motion.button
               className="flex flex-col items-center gap-2 p-4 bg-muted rounded-2xl"
-              whileTap={{ scale: 0.95 }}
-            >
+              whileTap={{ scale: 0.95 }}>
+              
               <Mail className="w-6 h-6 text-primary" />
               <span className="text-xs font-medium">Email</span>
             </motion.button>
@@ -171,78 +171,78 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
         </motion.div>
 
         {/* Stage Specific Data */}
-        <motion.div 
+        <motion.div
           className="bg-card rounded-3xl p-5 shadow-card border border-border/50"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1 }}
-        >
+          transition={{ delay: 0.1 }}>
+          
           <h3 className="font-bold mb-4">{tr("doctorreportscreen_esas_melumatlar_56bfed", "Əsas Məlumatlar")}</h3>
           <div className="grid grid-cols-2 gap-3">
             {getStageSpecificData().map((item, index) => {
               const Icon = item.icon;
               return (
-                <div 
+                <div
                   key={index}
-                  className="bg-muted/50 rounded-2xl p-4"
-                >
+                  className="bg-muted/50 rounded-2xl p-4">
+                  
                   <div className="flex items-center gap-2 mb-2">
                     <Icon className="w-4 h-4 text-primary" />
                     <span className="text-xs text-muted-foreground">{item.label}</span>
                   </div>
                   <p className="font-bold text-lg">{item.value}</p>
-                </div>
-              );
+                </div>);
+
             })}
           </div>
         </motion.div>
 
         {/* Health Trends - Real data from backend */}
-        <motion.div 
+        <motion.div
           className="bg-card rounded-3xl p-5 shadow-card border border-border/50"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
+          transition={{ delay: 0.2 }}>
+          
           <h3 className="font-bold mb-4">{tr("doctorreportscreen_saglamliq_trendleri_5c9dd9", "Sağlamlıq Trendləri")}</h3>
-          {healthLoading ? (
-            <div className="flex items-center justify-center py-8">
+          {healthLoading ?
+          <div className="flex items-center justify-center py-8">
               <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {healthData.map((item, index) => (
-                <div 
-                  key={index}
-                  className="flex items-center justify-between p-3 bg-muted/50 rounded-2xl"
-                >
+            </div> :
+
+          <div className="space-y-3">
+              {healthData.map((item, index) =>
+            <div
+              key={index}
+              className="flex items-center justify-between p-3 bg-muted/50 rounded-2xl">
+              
                   <div>
                     <p className="text-sm font-medium">{item.label}</p>
                     <p className="text-xs text-muted-foreground">{item.value}</p>
                   </div>
                   <span className={`text-sm font-bold ${
-                    item.positive ? 'text-emerald-600' : 'text-amber-600'
-                  }`}>
+              item.positive ? 'text-emerald-600' : 'text-amber-600'}`
+              }>
                     {item.trend}
                   </span>
                 </div>
-              ))}
+            )}
             </div>
-          )}
+          }
         </motion.div>
 
         {/* Notes Section */}
-        <motion.div 
+        <motion.div
           className="bg-card rounded-3xl p-5 shadow-card border border-border/50"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
+          transition={{ delay: 0.3 }}>
+          
           <h3 className="font-bold mb-4">{tr("doctorreportscreen_hekim_ucun_qeydler_052b91", "Həkim üçün Qeydlər")}</h3>
           <textarea
             placeholder={tr("doctorreportscreen_hekiminiz_ucun_elave_qeydler_yazin_2bd3dc", "Həkiminiz üçün əlavə qeydlər yazın...")}
-            className="w-full h-24 p-4 rounded-2xl bg-muted/50 resize-none outline-none focus:ring-2 focus:ring-primary/20"
-          />
+            className="w-full h-24 p-4 rounded-2xl bg-muted/50 resize-none outline-none focus:ring-2 focus:ring-primary/20" />
+          
         </motion.div>
 
         {/* Export Full Report */}
@@ -252,14 +252,14 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
           whileTap={{ scale: 0.98 }}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
-        >
+          transition={{ delay: 0.4 }}>
+          
           <FileText className="w-5 h-5" />
-          Tam Hesabatı Yüklə (PDF)
+          {tr("doctorreportscreen_tam_hesabati_yukle_pdf_108b98", "Tam Hesabat\u0131 Y\xFCkl\u0259 (PDF)")}
         </motion.button>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default DoctorReportScreen;

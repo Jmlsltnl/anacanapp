@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  ArrowLeft, Clock, Eye, Heart, Bookmark, MessageCircle, 
-  Send, Trash2, ChevronDown, ChevronUp, Share2, User
-} from 'lucide-react';
+import {
+  ArrowLeft, Clock, Eye, Heart, Bookmark, MessageCircle,
+  Send, Trash2, ChevronDown, ChevronUp, Share2, User } from
+'lucide-react';
 import { BlogPost, BlogCategory } from '@/hooks/useBlog';
 import { useBlogInteractions, BlogComment } from '@/hooks/useBlogInteractions';
 import { useAuth } from '@/hooks/useAuth';
@@ -85,10 +85,10 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
   };
 
   const toggleReplies = (commentId: string) => {
-    setExpandedComments(prev => 
-      prev.includes(commentId) 
-        ? prev.filter(id => id !== commentId)
-        : [...prev, commentId]
+    setExpandedComments((prev) =>
+    prev.includes(commentId) ?
+    prev.filter((id) => id !== commentId) :
+    [...prev, commentId]
     );
   };
 
@@ -101,13 +101,13 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
     });
   };
 
-  const renderComment = (comment: BlogComment, isReply = false) => (
-    <motion.div 
-      key={comment.id} 
-      className={`${isReply ? 'ml-10 mt-3' : ''}`}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-    >
+  const renderComment = (comment: BlogComment, isReply = false) =>
+  <motion.div
+    key={comment.id}
+    className={`${isReply ? 'ml-10 mt-3' : ''}`}
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}>
+    
       <div className="flex gap-3">
         <Avatar className="w-10 h-10 border-2 border-border">
           <AvatarImage src={comment.user_avatar || undefined} />
@@ -120,126 +120,126 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           <div className="bg-muted/50 rounded-2xl rounded-tl-none p-3">
             <div className="flex items-center gap-2 mb-1">
               <span className="font-semibold text-sm text-foreground">{comment.user_name}</span>
-              {comment.user_badge && (
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-violet-500/10 text-violet-600">
-                  {comment.user_badge === 'admin' ? '👑 Admin' : 
-                   comment.user_badge === 'premium' ? '⭐ Premium' : '🛡️ Mod'}
+              {comment.user_badge &&
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-violet-500/10 text-violet-600">
+                  {comment.user_badge === 'admin' ? '👑 Admin' :
+              comment.user_badge === 'premium' ? '⭐ Premium' : '🛡️ Mod'}
                 </Badge>
-              )}
+            }
             </div>
             <p className="text-sm text-foreground">{comment.content}</p>
           </div>
 
           <div className="flex items-center gap-4 mt-2 px-2">
             <button
-              onClick={() => toggleCommentLike(comment.id)}
-              className={`flex items-center gap-1 text-xs font-medium transition-colors ${comment.is_liked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'}`}
-            >
+            onClick={() => toggleCommentLike(comment.id)}
+            className={`flex items-center gap-1 text-xs font-medium transition-colors ${comment.is_liked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'}`}>
+            
               <Heart className={`w-3.5 h-3.5 ${comment.is_liked ? 'fill-current' : ''}`} />
               <span>{comment.likes_count || ''}</span>
             </button>
 
-            {!isReply && (
-              <button
-                onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-                className="text-xs font-medium text-muted-foreground hover:text-violet-500 transition-colors"
-              >
+            {!isReply &&
+          <button
+            onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
+            className="text-xs font-medium text-muted-foreground hover:text-violet-500 transition-colors">
+            
                 Cavab yaz
               </button>
-            )}
+          }
 
             <span className="text-xs text-muted-foreground">
               {format(new Date(comment.created_at), 'd MMM', { locale: az })}
             </span>
 
-            {user?.id === comment.user_id && (
-              <button
-                onClick={() => deleteComment(comment.id)}
-                className="text-xs text-red-500 hover:text-red-600 ml-auto"
-              >
+            {user?.id === comment.user_id &&
+          <button
+            onClick={() => deleteComment(comment.id)}
+            className="text-xs text-red-500 hover:text-red-600 ml-auto">
+            
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
-            )}
+          }
           </div>
 
           {/* Reply input */}
-          {replyingTo === comment.id && (
-            <motion.div 
-              className="mt-3 flex gap-2"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-            >
+          {replyingTo === comment.id &&
+        <motion.div
+          className="mt-3 flex gap-2"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}>
+          
               <Textarea
-                value={replyContent}
-                onChange={(e) => setReplyContent(e.target.value)}
-                placeholder={tr("blogpostdetail_cavabinizi_yazin_2cda33", "Cavabınızı yazın...")}
-                className="text-sm min-h-[60px] rounded-xl bg-muted/50"
-              />
+            value={replyContent}
+            onChange={(e) => setReplyContent(e.target.value)}
+            placeholder={tr("blogpostdetail_cavabinizi_yazin_2cda33", "Cavabınızı yazın...")}
+            className="text-sm min-h-[60px] rounded-xl bg-muted/50" />
+          
               <div className="flex flex-col gap-1">
-                <Button 
-                  size="sm" 
-                  onClick={() => handleReply(comment.id)}
-                  disabled={submitting}
-                  className="bg-gradient-to-r from-violet-600 to-purple-600"
-                >
+                <Button
+              size="sm"
+              onClick={() => handleReply(comment.id)}
+              disabled={submitting}
+              className="bg-gradient-to-r from-violet-600 to-purple-600">
+              
                   <Send className="w-4 h-4" />
                 </Button>
-                <Button 
-                  size="sm" 
-                  variant="ghost"
-                  onClick={() => setReplyingTo(null)}
-                >
+                <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setReplyingTo(null)}>
+              
                   ✕
                 </Button>
               </div>
             </motion.div>
-          )}
+        }
 
           {/* Replies toggle */}
-          {comment.replies && comment.replies.length > 0 && (
-            <button
-              onClick={() => toggleReplies(comment.id)}
-              className="flex items-center gap-1 mt-2 px-2 text-xs font-medium text-violet-600"
-            >
-              {expandedComments.includes(comment.id) ? (
-                <>
+          {comment.replies && comment.replies.length > 0 &&
+        <button
+          onClick={() => toggleReplies(comment.id)}
+          className="flex items-center gap-1 mt-2 px-2 text-xs font-medium text-violet-600">
+          
+              {expandedComments.includes(comment.id) ?
+          <>
                   <ChevronUp className="w-3.5 h-3.5" />
-                  Cavabları gizlə
-                </>
-              ) : (
-                <>
+                  {tr("blogpostdetail_cavablari_gizle_bc19d3", "Cavablar\u0131 gizl\u0259")}
+                </> :
+
+          <>
                   <ChevronDown className="w-3.5 h-3.5" />
-                  {comment.replies.length} cavab göstər
+                  {comment.replies.length} {tr("blogpostdetail_cavab_goster_faef92", "cavab g\xF6st\u0259r")}
                 </>
-              )}
+          }
             </button>
-          )}
+        }
 
           {/* Replies */}
-          {expandedComments.includes(comment.id) && comment.replies?.map(reply => 
-            renderComment(reply, true)
-          )}
+          {expandedComments.includes(comment.id) && comment.replies?.map((reply) =>
+        renderComment(reply, true)
+        )}
         </div>
       </div>
-    </motion.div>
-  );
+    </motion.div>;
+
 
   return (
     <div className="min-h-screen bg-background pb-24 overflow-y-auto">
       {/* Hero Image */}
       <div className="relative">
-        {post.cover_image_url ? (
-          <div className="relative h-64 w-full">
-            <img 
-              src={post.cover_image_url} 
-              alt={post.title}
-              className="w-full h-full object-cover"
-            />
+        {post.cover_image_url ?
+        <div className="relative h-64 w-full">
+            <img
+            src={post.cover_image_url}
+            alt={post.title}
+            className="w-full h-full object-cover" />
+          
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
-          </div>
-        ) : (
-          <div className="h-40 bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600" />
-        )}
+          </div> :
+
+        <div className="h-40 bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600" />
+        }
         
         {/* Floating Back Button */}
         <motion.button
@@ -249,8 +249,8 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           }}
           className="absolute left-4 z-50 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center cursor-pointer"
           style={{ top: 'calc(env(safe-area-inset-top, 12px) + 12px)' }}
-          whileTap={{ scale: 0.95 }}
-        >
+          whileTap={{ scale: 0.95 }}>
+          
           <ArrowLeft className="w-5 h-5 text-white" />
         </motion.button>
 
@@ -262,8 +262,8 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           }}
           className="absolute right-4 z-50 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center cursor-pointer"
           style={{ top: 'calc(env(safe-area-inset-top, 12px) + 12px)' }}
-          whileTap={{ scale: 0.95 }}
-        >
+          whileTap={{ scale: 0.95 }}>
+          
           <Share2 className="w-5 h-5 text-white" />
         </motion.button>
       </div>
@@ -273,11 +273,11 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
         <motion.div
           className="bg-card rounded-3xl shadow-xl border border-border/50 p-5"
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+          animate={{ opacity: 1, y: 0 }}>
+          
           {/* Category */}
           <Badge className="mb-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0">
-            {categories.find(c => c.slug === post.category)?.icon} {categories.find(c => c.slug === post.category)?.name || post.category}
+            {categories.find((c) => c.slug === post.category)?.icon} {categories.find((c) => c.slug === post.category)?.name || post.category}
           </Badge>
 
           {/* Title */}
@@ -289,11 +289,11 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-4">
             <span className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
-              {post.reading_time} dəq
+              {post.reading_time} {tr("blogpostdetail_deq_780a5c", "d\u0259q")}
             </span>
             <span className="flex items-center gap-1">
               <Eye className="w-4 h-4" />
-              {post.view_count} baxış
+              {post.view_count} {tr("blogpostdetail_baxis_d4da3e", "bax\u0131\u015F")}
             </span>
             <span>
               {format(new Date(post.created_at), 'd MMMM yyyy', { locale: az })}
@@ -305,12 +305,12 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
             <motion.button
               onClick={toggleLike}
               className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition-all ${
-                isLiked 
-                  ? 'bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-lg shadow-red-500/30' 
-                  : 'bg-muted hover:bg-muted/80 text-foreground'
-              }`}
-              whileTap={{ scale: 0.98 }}
-            >
+              isLiked ?
+              'bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-lg shadow-red-500/30' :
+              'bg-muted hover:bg-muted/80 text-foreground'}`
+              }
+              whileTap={{ scale: 0.98 }}>
+              
               <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
               <span>{likesCount}</span>
             </motion.button>
@@ -318,14 +318,14 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
             <motion.button
               onClick={toggleSave}
               className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition-all ${
-                isSaved 
-                  ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg shadow-amber-500/30' 
-                  : 'bg-muted hover:bg-muted/80 text-foreground'
-              }`}
-              whileTap={{ scale: 0.98 }}
-            >
+              isSaved ?
+              'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg shadow-amber-500/30' :
+              'bg-muted hover:bg-muted/80 text-foreground'}`
+              }
+              whileTap={{ scale: 0.98 }}>
+              
               <Bookmark className={`w-5 h-5 ${isSaved ? 'fill-current' : ''}`} />
-              <span>{isSaved ? 'Saxlanıldı' : 'Saxla'}</span>
+              <span>{isSaved ? tr("blogpostdetail_saxlanildi_66ffe7", "Saxlan\u0131ld\u0131") : 'Saxla'}</span>
             </motion.button>
 
             <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-muted text-muted-foreground">
@@ -336,42 +336,42 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
         </motion.div>
 
         {/* Content */}
-        <motion.div 
+        <motion.div
           className="mt-4 bg-card rounded-3xl shadow-lg border border-border/50 p-5"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          {post.content.trim().startsWith('<') || /<[a-z][\s\S]*>/i.test(post.content) ? (
-            <HtmlContent content={post.content} />
-          ) : (
-            <MarkdownContent content={post.content} variant="blog" />
-          )}
+          transition={{ delay: 0.1 }}>
+          
+          {post.content.trim().startsWith('<') || /<[a-z][\s\S]*>/i.test(post.content) ?
+          <HtmlContent content={post.content} /> :
+
+          <MarkdownContent content={post.content} variant="blog" />
+          }
         </motion.div>
 
         {/* Tags */}
-        {post.tags && post.tags.length > 0 && (
-          <motion.div 
-            className="flex flex-wrap gap-2 mt-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-          >
-            {post.tags.map(tag => (
-              <Badge key={tag} variant="outline" className="rounded-full text-sm px-3 py-1">
+        {post.tags && post.tags.length > 0 &&
+        <motion.div
+          className="flex flex-wrap gap-2 mt-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}>
+          
+            {post.tags.map((tag) =>
+          <Badge key={tag} variant="outline" className="rounded-full text-sm px-3 py-1">
                 #{tag}
               </Badge>
-            ))}
+          )}
           </motion.div>
-        )}
+        }
 
         {/* Author */}
-        <motion.div 
+        <motion.div
           className="mt-4 p-4 bg-gradient-to-r from-violet-500/10 to-purple-500/10 rounded-2xl border border-violet-500/20 flex items-center gap-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
+          transition={{ delay: 0.2 }}>
+          
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
             <User className="w-7 h-7 text-white" />
           </div>
@@ -382,17 +382,17 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
         </motion.div>
 
         {/* Comments Section */}
-        <motion.div 
+        <motion.div
           className="mt-4 bg-card rounded-3xl shadow-lg border border-border/50 p-5"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-        >
+          transition={{ delay: 0.25 }}>
+          
           <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
               <MessageCircle className="w-4 h-4 text-white" />
             </div>
-            Şərhlər ({commentsCount})
+            {tr("blogpostdetail_serhler_8b3fc3", "\u015E\u0259rhl\u0259r (")}{commentsCount})
           </h3>
 
           {/* New comment */}
@@ -406,45 +406,45 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
               <Textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder={user ? "Şərhinizi yazın..." : "Şərh yazmaq üçün giriş edin"}
+                placeholder={user ? tr("blogpostdetail_serhinizi_yazin_9d6066", "\u015E\u0259rhinizi yaz\u0131n...") : tr("blogpostdetail_serh_yazmaq_ucun_giris_edin_d02910", "\u015E\u0259rh yazmaq \xFC\xE7\xFCn giri\u015F edin")}
                 className="min-h-[50px] rounded-xl bg-muted/50 resize-none"
-                disabled={!user}
-              />
-              <Button 
-                onClick={handleAddComment} 
+                disabled={!user} />
+              
+              <Button
+                onClick={handleAddComment}
                 disabled={submitting || !newComment.trim()}
-                className="shrink-0 bg-gradient-to-r from-violet-600 to-purple-600"
-              >
+                className="shrink-0 bg-gradient-to-r from-violet-600 to-purple-600">
+                
                 <Send className="w-4 h-4" />
               </Button>
             </div>
           </div>
 
           {/* Comments list */}
-          {comments.length === 0 ? (
-            <div className="text-center py-8 bg-muted/30 rounded-2xl">
+          {comments.length === 0 ?
+          <div className="text-center py-8 bg-muted/30 rounded-2xl">
               <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-violet-100 to-purple-100 dark:from-violet-900/30 dark:to-purple-900/30 flex items-center justify-center">
                 <MessageCircle className="w-7 h-7 text-violet-500" />
               </div>
               <p className="font-semibold text-foreground">{tr("blogpostdetail_hele_serh_yoxdur_1dfc90", "Hələ şərh yoxdur")}</p>
               <p className="text-sm text-muted-foreground">{tr("blogpostdetail_ilk_serhi_siz_yazin_00a364", "İlk şərhi siz yazın!")}</p>
+            </div> :
+
+          <div className="space-y-4">
+              {comments.map((comment) => renderComment(comment))}
             </div>
-          ) : (
-            <div className="space-y-4">
-              {comments.map(comment => renderComment(comment))}
-            </div>
-          )}
+          }
         </motion.div>
 
         {/* Related Posts */}
-        <RelatedPosts 
-          currentPost={post} 
-          allPosts={allPosts} 
-          onSelectPost={onSelectPost} 
-        />
+        <RelatedPosts
+          currentPost={post}
+          allPosts={allPosts}
+          onSelectPost={onSelectPost} />
+        
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default BlogPostDetail;

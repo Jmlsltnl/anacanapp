@@ -79,7 +79,7 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
 
       recorder.onstop = async () => {
         const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        stream.getTracks().forEach(t => t.stop());
+        stream.getTracks().forEach((t) => t.stop());
         setUploading(true);
         try {
           const url = await uploadMedia(blob, 'audio');
@@ -95,7 +95,7 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
       setIsRecording(true);
       setRecordingTime(0);
       await hapticFeedback.medium();
-      timerRef.current = setInterval(() => setRecordingTime(p => p + 1), 1000);
+      timerRef.current = setInterval(() => setRecordingTime((p) => p + 1), 1000);
     } catch (err) {
       console.error('Recording failed:', err);
     }
@@ -105,17 +105,17 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
-      if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+      if (timerRef.current) {clearInterval(timerRef.current);timerRef.current = null;}
       await hapticFeedback.heavy();
     }
   };
 
   const cancelRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stream.getTracks().forEach(t => t.stop());
+      mediaRecorderRef.current.stream.getTracks().forEach((t) => t.stop());
       setIsRecording(false);
       setRecordingTime(0);
-      if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+      if (timerRef.current) {clearInterval(timerRef.current);timerRef.current = null;}
     }
   };
 
@@ -138,30 +138,30 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
+        {loading ?
+        <div className="flex items-center justify-center py-12">
             <Loader2 className="w-6 h-6 animate-spin text-primary" />
-          </div>
-        ) : messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
+          </div> :
+        messages.length === 0 ?
+        <div className="flex flex-col items-center justify-center py-16 text-center">
             <Avatar className="w-16 h-16 mb-3">
               <AvatarImage src={userAvatar || undefined} />
               <AvatarFallback className="bg-primary/10 text-primary text-xl font-bold">{userName?.charAt(0)}</AvatarFallback>
             </Avatar>
             <p className="text-sm text-muted-foreground">
-              {userName} ilə söhbətə başlayın
+              {userName} {tr("directmessagescreen_ile_sohbete_baslayin_3ce758", "il\u0259 s\xF6hb\u0259t\u0259 ba\u015Flay\u0131n")}
             </p>
-          </div>
-        ) : (
-          messages.map((msg) => {
-            const isMe = msg.sender_id === user?.id;
-            return (
-              <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+          </div> :
+
+        messages.map((msg) => {
+          const isMe = msg.sender_id === user?.id;
+          return (
+            <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                 <MessageBubble message={msg} isMe={isMe} formatTime={formatMsgTime} />
-              </div>
-            );
-          })
-        )}
+              </div>);
+
+        })
+        }
         <div ref={messagesEndRef} />
       </div>
 
@@ -170,13 +170,13 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
         <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
         <input ref={videoInputRef} type="file" accept="video/*" onChange={handleVideoSelect} className="hidden" />
 
-        {uploading ? (
-          <div className="flex items-center justify-center gap-2 py-2">
+        {uploading ?
+        <div className="flex items-center justify-center gap-2 py-2">
             <Loader2 className="w-5 h-5 animate-spin text-primary" />
             <span className="text-xs text-muted-foreground">{tr("directmessagescreen_yuklenir_5557de", "Yüklənir...")}</span>
-          </div>
-        ) : isRecording ? (
-          <div className="flex items-center gap-3 py-1">
+          </div> :
+        isRecording ?
+        <div className="flex items-center gap-3 py-1">
             <motion.div className="w-3 h-3 rounded-full bg-red-500" animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1, repeat: Infinity }} />
             <span className="text-sm text-muted-foreground min-w-[40px]">{formatTime(recordingTime)}</span>
             <div className="flex-1" />
@@ -186,9 +186,9 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
             <motion.button onClick={stopRecording} className="w-9 h-9 rounded-full bg-red-500 flex items-center justify-center" whileTap={{ scale: 0.9 }}>
               <Square className="w-3 h-3 text-white fill-white" />
             </motion.button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-1.5">
+          </div> :
+
+        <div className="flex items-center gap-1.5">
             <motion.button onClick={() => fileInputRef.current?.click()} className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted" whileTap={{ scale: 0.9 }}>
               <Image className="w-[18px] h-[18px]" />
             </motion.button>
@@ -200,38 +200,38 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
             </motion.button>
 
             <input
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendText())}
-              placeholder={tr("directmessagescreen_mesaj_yazin_e69f84", "Mesaj yazın...")}
-              className="flex-1 h-10 px-3.5 rounded-full bg-muted/50 border border-border/30 text-sm outline-none placeholder:text-muted-foreground/40 focus:border-primary/30"
-            />
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendText())}
+            placeholder={tr("directmessagescreen_mesaj_yazin_e69f84", "Mesaj yazın...")}
+            className="flex-1 h-10 px-3.5 rounded-full bg-muted/50 border border-border/30 text-sm outline-none placeholder:text-muted-foreground/40 focus:border-primary/30" />
+          
 
             <motion.button
-              onClick={handleSendText}
-              disabled={!text.trim()}
-              className="w-9 h-9 rounded-full bg-primary flex items-center justify-center disabled:opacity-40"
-              whileTap={{ scale: 0.9 }}
-            >
+            onClick={handleSendText}
+            disabled={!text.trim()}
+            className="w-9 h-9 rounded-full bg-primary flex items-center justify-center disabled:opacity-40"
+            whileTap={{ scale: 0.9 }}>
+            
               <Send className="w-4 h-4 text-primary-foreground" />
             </motion.button>
           </div>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 // --- Message Bubble sub-component ---
-const MessageBubble = ({ message, isMe, formatTime }: { message: any; isMe: boolean; formatTime: (d: string) => string }) => {
+const MessageBubble = ({ message, isMe, formatTime }: {message: any;isMe: boolean;formatTime: (d: string) => string;}) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const toggleAudio = () => {
     if (!audioRef.current) return;
-    if (isPlaying) audioRef.current.pause();
-    else audioRef.current.play();
+    if (isPlaying) audioRef.current.pause();else
+    audioRef.current.play();
     setIsPlaying(!isPlaying);
   };
 
@@ -245,8 +245,8 @@ const MessageBubble = ({ message, isMe, formatTime }: { message: any; isMe: bool
         <div className={`px-3 py-1 ${isMe ? 'bg-primary' : 'bg-muted'}`}>
           <p className={`text-[10px] ${isMe ? 'text-primary-foreground/60' : 'text-muted-foreground'}`}>{formatTime(message.created_at)}</p>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   // Video
@@ -257,8 +257,8 @@ const MessageBubble = ({ message, isMe, formatTime }: { message: any; isMe: bool
         <div className={`px-3 py-1 ${isMe ? 'bg-primary' : 'bg-muted'}`}>
           <p className={`text-[10px] ${isMe ? 'text-primary-foreground/60' : 'text-muted-foreground'}`}>{formatTime(message.created_at)}</p>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   // Audio
@@ -268,10 +268,10 @@ const MessageBubble = ({ message, isMe, formatTime }: { message: any; isMe: bool
         <audio
           ref={audioRef}
           src={message.media_url}
-          onTimeUpdate={() => audioRef.current && setProgress((audioRef.current.currentTime / audioRef.current.duration) * 100)}
-          onEnded={() => { setIsPlaying(false); setProgress(0); }}
-          preload="metadata"
-        />
+          onTimeUpdate={() => audioRef.current && setProgress(audioRef.current.currentTime / audioRef.current.duration * 100)}
+          onEnded={() => {setIsPlaying(false);setProgress(0);}}
+          preload="metadata" />
+        
         <motion.button onClick={toggleAudio} className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${isMe ? 'bg-primary-foreground/20' : 'bg-primary/10'}`} whileTap={{ scale: 0.9 }}>
           {isPlaying ? <Pause className={`w-3.5 h-3.5 ${isMe ? 'text-primary-foreground' : 'text-primary'}`} /> : <Play className={`w-3.5 h-3.5 ${isMe ? 'text-primary-foreground' : 'text-primary'}`} />}
         </motion.button>
@@ -281,8 +281,8 @@ const MessageBubble = ({ message, isMe, formatTime }: { message: any; isMe: bool
           </div>
           <p className={`text-[10px] mt-1 text-right ${isMe ? 'text-primary-foreground/60' : 'text-muted-foreground'}`}>{formatTime(message.created_at)}</p>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   // Text (default)
@@ -290,8 +290,8 @@ const MessageBubble = ({ message, isMe, formatTime }: { message: any; isMe: bool
     <div className={`max-w-[72%] px-3.5 py-2 rounded-2xl ${isMe ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-muted text-foreground rounded-bl-md'}`}>
       <p className="text-[13px] whitespace-pre-wrap break-words leading-relaxed">{message.content}</p>
       <p className={`text-[10px] mt-0.5 ${isMe ? 'text-primary-foreground/60' : 'text-muted-foreground'}`}>{formatTime(message.created_at)}</p>
-    </div>
-  );
+    </div>);
+
 };
 
 export default DirectMessageScreen;

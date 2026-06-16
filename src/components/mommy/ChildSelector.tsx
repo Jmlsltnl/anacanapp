@@ -13,34 +13,34 @@ interface ChildSelectorProps {
 }
 
 const genderOptions = [
-  { value: 'boy', label: tr("childselector_oglan_e9715e", 'Oğlan'), emoji: '👦' },
-  { value: 'girl', label: tr("childselector_qiz_79bf6b", 'Qız'), emoji: '👧' },
-];
+{ value: 'boy', label: tr("childselector_oglan_e9715e", 'Oğlan'), emoji: '👦' },
+{ value: 'girl', label: tr("childselector_qiz_79bf6b", 'Qız'), emoji: '👧' }];
+
 
 const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
-  const { 
-    children, 
-    selectedChild, 
-    setSelectedChild, 
-    addChild, 
+  const {
+    children,
+    selectedChild,
+    setSelectedChild,
+    addChild,
     updateChild,
     deleteChild,
     getChildAge,
-    hasChildren 
+    hasChildren
   } = useChildren();
-  
+
   const [showDropdown, setShowDropdown] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingChild, setEditingChild] = useState<Child | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     birth_date: '',
-    gender: 'boy' as 'boy' | 'girl',
+    gender: 'boy' as 'boy' | 'girl'
   });
 
   const handleAddChild = async () => {
     if (!formData.name || !formData.birth_date) {
-      toast.error('Ad və doğum tarixi tələb olunur');
+      toast.error(tr("childselector_ad_ve_dogum_tarixi_teleb_olunu_bdab04", "Ad v\u0259 do\u011Fum tarixi t\u0259l\u0259b olunur"));
       return;
     }
 
@@ -51,7 +51,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
       setFormData({ name: '', birth_date: '', gender: 'boy' });
       setSelectedChild(child);
     } else {
-      toast.error('Xəta baş verdi');
+      toast.error(tr("childselector_xeta_bas_verdi_f22fba", "X\u0259ta ba\u015F verdi"));
     }
   };
 
@@ -62,11 +62,11 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
       name: formData.name,
       birth_date: formData.birth_date,
       gender: formData.gender,
-      avatar_emoji: genderOptions.find(g => g.value === formData.gender)?.emoji || '👶',
+      avatar_emoji: genderOptions.find((g) => g.value === formData.gender)?.emoji || '👶'
     });
 
     if (success) {
-      toast.success('Yeniləndi');
+      toast.success(tr("childselector_yenilendi_d10a01", "Yenil\u0259ndi"));
       setEditingChild(null);
     }
   };
@@ -84,7 +84,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
     setFormData({
       name: child.name,
       birth_date: child.birth_date,
-      gender: child.gender === 'unknown' ? 'boy' : child.gender,
+      gender: child.gender === 'unknown' ? 'boy' : child.gender
     });
     setEditingChild(child);
   };
@@ -95,8 +95,8 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
   };
 
   // Render add child modal (used in both cases)
-  const renderAddModal = () => (
-    <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
+  const renderAddModal = () =>
+  <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>{tr("childselector_usaq_elave_et_d57c06", "Uşaq Əlavə Et")}</DialogTitle>
@@ -105,46 +105,46 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
           <div>
             <label className="text-sm font-medium">Ad</label>
             <Input
-              value={formData.name}
-              onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
-              placeholder={tr("childselector_korpenin_adi_8a4e9e", "Körpənin adı")}
-            />
+            value={formData.name}
+            onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
+            placeholder={tr("childselector_korpenin_adi_8a4e9e", "Körpənin adı")} />
+          
           </div>
           <div>
             <label className="text-sm font-medium">{tr("childselector_dogum_tarixi_d96907", "Doğum tarixi")}</label>
             <Input
-              type="date"
-              value={formData.birth_date}
-              onChange={(e) => setFormData(p => ({ ...p, birth_date: e.target.value }))}
-              max={new Date().toISOString().split('T')[0]}
-            />
+            type="date"
+            value={formData.birth_date}
+            onChange={(e) => setFormData((p) => ({ ...p, birth_date: e.target.value }))}
+            max={new Date().toISOString().split('T')[0]} />
+          
           </div>
           <div>
             <label className="text-sm font-medium">Cins</label>
             <div className="flex gap-2 mt-2">
-              {genderOptions.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => setFormData(p => ({ ...p, gender: opt.value as any }))}
-                  className={`flex-1 flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all ${
-                    formData.gender === opt.value 
-                      ? 'border-primary bg-primary/10' 
-                      : 'border-muted hover:border-muted-foreground/30'
-                  }`}
-                >
+              {genderOptions.map((opt) =>
+            <button
+              key={opt.value}
+              onClick={() => setFormData((p) => ({ ...p, gender: opt.value as any }))}
+              className={`flex-1 flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all ${
+              formData.gender === opt.value ?
+              'border-primary bg-primary/10' :
+              'border-muted hover:border-muted-foreground/30'}`
+              }>
+              
                   <span className="text-2xl">{opt.emoji}</span>
                   <span className="text-xs">{opt.label}</span>
                 </button>
-              ))}
+            )}
             </div>
           </div>
           <Button onClick={handleAddChild} className="w-full">
-            Əlavə et
+            {tr("childselector_elave_et_6e1b9b", "\u018Flav\u0259 et")}
           </Button>
         </div>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
+
 
   // If no children, show add button
   if (!hasChildren) {
@@ -153,14 +153,14 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
         <motion.button
           onClick={openAddModal}
           className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-medium text-sm"
-          whileTap={{ scale: 0.95 }}
-        >
+          whileTap={{ scale: 0.95 }}>
+          
           <Plus className="w-4 h-4" />
-          Uşaq əlavə et
+          {tr("childselector_usaq_elave_et_48f1f0", "U\u015Faq \u0259lav\u0259 et")}
         </motion.button>
         {renderAddModal()}
-      </>
-    );
+      </>);
+
   }
 
   return (
@@ -169,53 +169,53 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
         <motion.button
           onClick={() => setShowDropdown(!showDropdown)}
           className={`flex items-center gap-2 ${
-            compact 
-              ? 'px-3 py-1.5 rounded-full bg-muted/50' 
-              : 'px-4 py-2 rounded-2xl bg-card border shadow-sm'
-          }`}
-          whileTap={{ scale: 0.98 }}
-        >
+          compact ?
+          'px-3 py-1.5 rounded-full bg-muted/50' :
+          'px-4 py-2 rounded-2xl bg-card border shadow-sm'}`
+          }
+          whileTap={{ scale: 0.98 }}>
+          
           <span className="text-lg">{selectedChild?.avatar_emoji || '👶'}</span>
           <span className={`font-medium ${compact ? 'text-sm' : ''}`}>
-            {selectedChild?.name || 'Uşaq seç'}
+            {selectedChild?.name || tr("childselector_usaq_sec_bbe44f", "U\u015Faq se\xE7")}
           </span>
-          {children.length > 1 && (
-            <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
-          )}
+          {children.length > 1 &&
+          <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+          }
         </motion.button>
 
         <AnimatePresence>
-          {showDropdown && (
-            <>
+          {showDropdown &&
+          <>
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-40"
-                onClick={() => setShowDropdown(false)}
-              />
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40"
+              onClick={() => setShowDropdown(false)} />
+            
               <motion.div
-                initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                className={`absolute top-full mt-2 w-64 bg-card rounded-2xl border shadow-xl z-50 overflow-hidden ${compact ? 'right-0' : 'left-0'}`}
-              >
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              className={`absolute top-full mt-2 w-64 bg-card rounded-2xl border shadow-xl z-50 overflow-hidden ${compact ? 'right-0' : 'left-0'}`}>
+              
                 <div className="p-2">
                   {children.map((child) => {
-                    const age = getChildAge(child);
-                    const isSelected = selectedChild?.id === child.id;
-                    
-                    return (
-                      <motion.div
-                        key={child.id}
-                        className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${
-                          isSelected ? 'bg-primary/10' : 'hover:bg-muted/50'
-                        }`}
-                        onClick={() => {
-                          setSelectedChild(child);
-                          setShowDropdown(false);
-                        }}
-                      >
+                  const age = getChildAge(child);
+                  const isSelected = selectedChild?.id === child.id;
+
+                  return (
+                    <motion.div
+                      key={child.id}
+                      className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${
+                      isSelected ? 'bg-primary/10' : 'hover:bg-muted/50'}`
+                      }
+                      onClick={() => {
+                        setSelectedChild(child);
+                        setShowDropdown(false);
+                      }}>
+                      
                         <span className="text-2xl">{child.avatar_emoji}</span>
                         <div className="flex-1 min-w-0">
                           <p className="font-medium truncate">{child.name}</p>
@@ -223,35 +223,35 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
                         </div>
                         {isSelected && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openEditModal(child);
-                            setShowDropdown(false);
-                          }}
-                          className="p-1.5 rounded-lg hover:bg-muted"
-                        >
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openEditModal(child);
+                          setShowDropdown(false);
+                        }}
+                        className="p-1.5 rounded-lg hover:bg-muted">
+                        
                           <Edit className="w-3.5 h-3.5 text-muted-foreground" />
                         </button>
-                      </motion.div>
-                    );
-                  })}
+                      </motion.div>);
+
+                })}
                 </div>
                 
                 <div className="border-t p-2">
                   <button
-                    onClick={() => {
-                      setShowDropdown(false);
-                      openAddModal();
-                    }}
-                    className="flex items-center gap-2 w-full p-3 rounded-xl text-primary hover:bg-primary/10 transition-colors"
-                  >
+                  onClick={() => {
+                    setShowDropdown(false);
+                    openAddModal();
+                  }}
+                  className="flex items-center gap-2 w-full p-3 rounded-xl text-primary hover:bg-primary/10 transition-colors">
+                  
                     <Plus className="w-4 h-4" />
                     <span className="font-medium text-sm">{tr("childselector_yeni_usaq_elave_et_bb2a07", "Yeni uşaq əlavə et")}</span>
                   </button>
                 </div>
               </motion.div>
             </>
-          )}
+          }
         </AnimatePresence>
       </div>
 
@@ -269,59 +269,59 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
               <label className="text-sm font-medium">Ad</label>
               <Input
                 value={formData.name}
-                onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
-              />
+                onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))} />
+              
             </div>
             <div>
               <label className="text-sm font-medium">{tr("childselector_dogum_tarixi_d96907", "Doğum tarixi")}</label>
               <Input
                 type="date"
                 value={formData.birth_date}
-                onChange={(e) => setFormData(p => ({ ...p, birth_date: e.target.value }))}
-                max={new Date().toISOString().split('T')[0]}
-              />
+                onChange={(e) => setFormData((p) => ({ ...p, birth_date: e.target.value }))}
+                max={new Date().toISOString().split('T')[0]} />
+              
             </div>
             <div>
               <label className="text-sm font-medium">Cins</label>
               <div className="flex gap-2 mt-2">
-                {genderOptions.map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => setFormData(p => ({ ...p, gender: opt.value as any }))}
-                    className={`flex-1 flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all ${
-                      formData.gender === opt.value 
-                        ? 'border-primary bg-primary/10' 
-                        : 'border-muted hover:border-muted-foreground/30'
-                    }`}
-                  >
+                {genderOptions.map((opt) =>
+                <button
+                  key={opt.value}
+                  onClick={() => setFormData((p) => ({ ...p, gender: opt.value as any }))}
+                  className={`flex-1 flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all ${
+                  formData.gender === opt.value ?
+                  'border-primary bg-primary/10' :
+                  'border-muted hover:border-muted-foreground/30'}`
+                  }>
+                  
                     <span className="text-2xl">{opt.emoji}</span>
                     <span className="text-xs">{opt.label}</span>
                   </button>
-                ))}
+                )}
               </div>
             </div>
             <div className="flex gap-2">
               <Button onClick={handleUpdateChild} className="flex-1">
                 Yadda saxla
               </Button>
-              {editingChild && (
-                <Button 
-                  variant="destructive" 
-                  size="icon"
-                  onClick={() => {
-                    handleDeleteChild(editingChild);
-                    setEditingChild(null);
-                  }}
-                >
+              {editingChild &&
+              <Button
+                variant="destructive"
+                size="icon"
+                onClick={() => {
+                  handleDeleteChild(editingChild);
+                  setEditingChild(null);
+                }}>
+                
                   <Trash2 className="w-4 h-4" />
                 </Button>
-              )}
+              }
             </div>
           </div>
         </DialogContent>
       </Dialog>
-    </>
-  );
+    </>);
+
 };
 
 export default ChildSelector;

@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { tr } from "@/lib/tr";import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -38,16 +38,16 @@ export const useFairyTales = () => {
     queryFn: async () => {
       if (!user?.id) return [];
 
-      const { data, error } = await supabase
-        .from('fairy_tales')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+      const { data, error } = await supabase.
+      from('fairy_tales').
+      select('*').
+      eq('user_id', user.id).
+      order('created_at', { ascending: false });
 
       if (error) throw error;
       return data as FairyTale[];
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id
   });
 };
 
@@ -55,16 +55,16 @@ export const useFairyTaleThemes = () => {
   return useQuery({
     queryKey: ['fairy-tale-themes'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('fairy_tale_themes')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order');
+      const { data, error } = await supabase.
+      from('fairy_tale_themes').
+      select('*').
+      eq('is_active', true).
+      order('sort_order');
 
       if (error) throw error;
       return data as FairyTaleTheme[];
     },
-    staleTime: 1000 * 60 * 30,
+    staleTime: 1000 * 60 * 30
   });
 };
 
@@ -86,7 +86,7 @@ export const useGenerateFairyTale = () => {
       if (!user?.id) throw new Error('User not authenticated');
 
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) throw new Error('Sessiya tapılmadı');
+      if (!session?.access_token) throw new Error(tr("usefairytales_sessiya_tapilmadi_2d6594", "Sessiya tap\u0131lmad\u0131"));
 
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-fairy-tale`,
@@ -94,7 +94,7 @@ export const useGenerateFairyTale = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`,
+            'Authorization': `Bearer ${session.access_token}`
           },
           body: JSON.stringify({
             childName: params.child_name,
@@ -104,8 +104,8 @@ export const useGenerateFairyTale = () => {
             language: params.language || 'az',
             ageRange: params.age_range,
             storyStyle: params.story_style,
-            customPrompt: params.custom_prompt,
-          }),
+            customPrompt: params.custom_prompt
+          })
         }
       );
 
@@ -117,30 +117,30 @@ export const useGenerateFairyTale = () => {
       const { title, content } = await response.json();
 
       // Save to database
-      const { data, error } = await supabase
-        .from('fairy_tales')
-        .insert({
-          user_id: user.id,
-          title,
-          content,
-          child_name: params.child_name,
-          theme: params.theme,
-          hero: params.hero,
-          moral_lesson: params.moral_lesson,
-        })
-        .select()
-        .single();
+      const { data, error } = await supabase.
+      from('fairy_tales').
+      insert({
+        user_id: user.id,
+        title,
+        content,
+        child_name: params.child_name,
+        theme: params.theme,
+        hero: params.hero,
+        moral_lesson: params.moral_lesson
+      }).
+      select().
+      single();
 
       if (error) throw error;
       return data as FairyTale;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fairy-tales'] });
-      toast.success('Nağıl yaradıldı! ✨');
+      toast.success(tr("usefairytales_nagil_yaradildi_45e374", "Na\u011F\u0131l yarad\u0131ld\u0131! \u2728"));
     },
     onError: (error) => {
       toast.error(`Nağıl yaradıla bilmədi: ${error.message}`);
-    },
+    }
   });
 };
 
@@ -148,17 +148,17 @@ export const useToggleFavorite = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, isFavorite }: { id: string; isFavorite: boolean }) => {
-      const { error } = await supabase
-        .from('fairy_tales')
-        .update({ is_favorite: isFavorite })
-        .eq('id', id);
+    mutationFn: async ({ id, isFavorite }: {id: string;isFavorite: boolean;}) => {
+      const { error } = await supabase.
+      from('fairy_tales').
+      update({ is_favorite: isFavorite }).
+      eq('id', id);
 
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fairy-tales'] });
-    },
+    }
   });
 };
 
@@ -167,22 +167,22 @@ export const useIncrementPlayCount = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data: current } = await supabase
-        .from('fairy_tales')
-        .select('play_count')
-        .eq('id', id)
-        .single();
+      const { data: current } = await supabase.
+      from('fairy_tales').
+      select('play_count').
+      eq('id', id).
+      single();
 
-      const { error } = await supabase
-        .from('fairy_tales')
-        .update({ play_count: (current?.play_count || 0) + 1 })
-        .eq('id', id);
+      const { error } = await supabase.
+      from('fairy_tales').
+      update({ play_count: (current?.play_count || 0) + 1 }).
+      eq('id', id);
 
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fairy-tales'] });
-    },
+    }
   });
 };
 
@@ -191,16 +191,16 @@ export const useDeleteFairyTale = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('fairy_tales')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.
+      from('fairy_tales').
+      delete().
+      eq('id', id);
 
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fairy-tales'] });
-      toast.success('Nağıl silindi');
-    },
+      toast.success(tr("usefairytales_nagil_silindi_a2f24c", "Na\u011F\u0131l silindi"));
+    }
   });
 };

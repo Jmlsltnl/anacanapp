@@ -10,14 +10,14 @@ interface PartnerMissionsCardProps {
 }
 
 const PartnerMissionsCard = ({ showAll = false }: PartnerMissionsCardProps) => {
-  const { 
-    missions, 
-    toggleMission, 
-    totalPoints, 
-    level, 
-    levelProgress, 
+  const {
+    missions,
+    toggleMission,
+    totalPoints,
+    level,
+    levelProgress,
     pointsToNextLevel,
-    completedCount 
+    completedCount
   } = usePartnerMissions();
   const { toast } = useToast();
 
@@ -26,30 +26,30 @@ const PartnerMissionsCard = ({ showAll = false }: PartnerMissionsCardProps) => {
   const handleToggleMission = async (id: string, points: number, title: string) => {
     await hapticFeedback.medium();
     const result = await toggleMission(id, points);
-    
+
     if (result?.completed) {
       toast({
         title: `+${result.pointsEarned} xal qazandın! 🎉`,
-        description: title,
+        description: title
       });
     }
   };
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'easy': return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400';
-      case 'medium': return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
-      case 'hard': return 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400';
-      default: return 'bg-muted text-muted-foreground';
+      case 'easy':return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400';
+      case 'medium':return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
+      case 'hard':return 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400';
+      default:return 'bg-muted text-muted-foreground';
     }
   };
 
   const getDifficultyLabel = (difficulty: string) => {
     switch (difficulty) {
-      case 'easy': return 'Asan';
-      case 'medium': return 'Orta';
-      case 'hard': return 'Çətin';
-      default: return difficulty;
+      case 'easy':return 'Asan';
+      case 'medium':return 'Orta';
+      case 'hard':return tr("partnermissionscard_cetin_4bf032", "\xC7\u0259tin");
+      default:return difficulty;
     }
   };
 
@@ -63,7 +63,7 @@ const PartnerMissionsCard = ({ showAll = false }: PartnerMissionsCardProps) => {
           </div>
           <div>
             <h3 className="font-bold">{tr("partnermissionscard_gundelik_tapsiriqlar_f54fc3", "Gündəlik Tapşırıqlar")}</h3>
-            <p className="text-xs text-muted-foreground">{completedCount}/{missions.length} tamamlandı</p>
+            <p className="text-xs text-muted-foreground">{completedCount}/{missions.length} {tr("partnermissionscard_tamamlandi_d6728f", "tamamland\u0131")}</p>
           </div>
         </div>
         
@@ -76,47 +76,47 @@ const PartnerMissionsCard = ({ showAll = false }: PartnerMissionsCardProps) => {
       {/* Level Progress Bar */}
       <div className="bg-muted/50 rounded-2xl p-3">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium">Səviyyə {level}</span>
-          <span className="text-xs text-muted-foreground">{pointsToNextLevel} xal sonrakı səviyyəyə</span>
+          <span className="text-sm font-medium">{tr("partnermissionscard_seviyye_8266e7", "S\u0259viyy\u0259")} {level}</span>
+          <span className="text-xs text-muted-foreground">{pointsToNextLevel} {tr("partnermissionscard_xal_sonraki_seviyyeye_760fcd", "xal sonrak\u0131 s\u0259viyy\u0259y\u0259")}</span>
         </div>
         <div className="h-3 bg-muted rounded-full overflow-hidden">
           <motion.div
             className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${levelProgress}%` }}
-            transition={{ duration: 0.8 }}
-          />
+            transition={{ duration: 0.8 }} />
+          
         </div>
       </div>
 
       {/* Missions List */}
       <div className="space-y-2">
-        {displayMissions.map((mission, idx) => (
-          <motion.div
-            key={mission.id}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: idx * 0.05 }}
-            className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
-              mission.isCompleted
-                ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800'
-                : 'bg-card border-border/50 hover:border-partner/30'
-            }`}
-          >
+        {displayMissions.map((mission, idx) =>
+        <motion.div
+          key={mission.id}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: idx * 0.05 }}
+          className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
+          mission.isCompleted ?
+          'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800' :
+          'bg-card border-border/50 hover:border-partner/30'}`
+          }>
+          
             <motion.button
-              onClick={() => handleToggleMission(mission.id, mission.points, mission.title)}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                mission.isCompleted
-                  ? 'bg-emerald-500 text-white'
-                  : 'bg-muted text-muted-foreground hover:bg-partner/20 hover:text-partner'
-              }`}
-              whileTap={{ scale: 0.9 }}
-            >
-              {mission.isCompleted ? (
-                <CheckCircle className="w-5 h-5" />
-              ) : (
-                <mission.icon className="w-5 h-5" />
-              )}
+            onClick={() => handleToggleMission(mission.id, mission.points, mission.title)}
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+            mission.isCompleted ?
+            'bg-emerald-500 text-white' :
+            'bg-muted text-muted-foreground hover:bg-partner/20 hover:text-partner'}`
+            }
+            whileTap={{ scale: 0.9 }}>
+            
+              {mission.isCompleted ?
+            <CheckCircle className="w-5 h-5" /> :
+
+            <mission.icon className="w-5 h-5" />
+            }
             </motion.button>
 
             <div className="flex-1 min-w-0">
@@ -134,14 +134,14 @@ const PartnerMissionsCard = ({ showAll = false }: PartnerMissionsCardProps) => {
               </div>
             </div>
 
-            {!mission.isCompleted && (
-              <Timer className="w-4 h-4 text-muted-foreground" />
-            )}
+            {!mission.isCompleted &&
+          <Timer className="w-4 h-4 text-muted-foreground" />
+          }
           </motion.div>
-        ))}
+        )}
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default PartnerMissionsCard;

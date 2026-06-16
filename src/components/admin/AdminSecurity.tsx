@@ -11,15 +11,15 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+  DialogTrigger } from
+'@/components/ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  SelectValue } from
+'@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -49,10 +49,10 @@ const AdminSecurity = () => {
 
   const fetchRoles = async () => {
     try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('*')
-        .order('role');
+      const { data, error } = await supabase.
+      from('user_roles').
+      select('*').
+      order('role');
 
       if (error) throw error;
       setRoles(data || []);
@@ -65,9 +65,9 @@ const AdminSecurity = () => {
 
   const fetchProfiles = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('user_id, name, email');
+      const { data, error } = await supabase.
+      from('profiles').
+      select('user_id, name, email');
 
       if (error) throw error;
       setProfiles(data || []);
@@ -78,16 +78,16 @@ const AdminSecurity = () => {
 
   const handleUpdateRole = async (userId: string, newRole: 'admin' | 'user' | 'moderator') => {
     try {
-      const { error } = await supabase
-        .from('user_roles')
-        .update({ role: newRole })
-        .eq('user_id', userId);
+      const { error } = await supabase.
+      from('user_roles').
+      update({ role: newRole }).
+      eq('user_id', userId);
 
       if (error) throw error;
 
       toast({
         title: tr("adminsecurity_ugurlu_7fe64c", "Uğurlu"),
-        description: 'İstifadəçi rolu yeniləndi'
+        description: tr("adminsecurity_i_stifadeci_rolu_yenilendi_8b3152", "\u0130stifad\u0259\xE7i rolu yenil\u0259ndi")
       });
 
       fetchRoles();
@@ -106,20 +106,20 @@ const AdminSecurity = () => {
 
     try {
       // Check if user already has a role
-      const existingRole = roles.find(r => r.user_id === selectedUserId);
-      
+      const existingRole = roles.find((r) => r.user_id === selectedUserId);
+
       if (existingRole) {
         await handleUpdateRole(selectedUserId, selectedRole);
       } else {
-        const { error } = await supabase
-          .from('user_roles')
-          .insert([{ user_id: selectedUserId, role: selectedRole }]);
+        const { error } = await supabase.
+        from('user_roles').
+        insert([{ user_id: selectedUserId, role: selectedRole }]);
 
         if (error) throw error;
 
         toast({
           title: tr("adminsecurity_ugurlu_7fe64c", "Uğurlu"),
-          description: 'İstifadəçiyə rol təyin edildi'
+          description: tr("adminsecurity_i_stifadeciye_rol_teyin_edildi_4de664", "\u0130stifad\u0259\xE7iy\u0259 rol t\u0259yin edildi")
         });
       }
 
@@ -137,28 +137,28 @@ const AdminSecurity = () => {
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'admin': return 'bg-red-500/10 text-red-500';
-      case 'moderator': return 'bg-blue-500/10 text-blue-500';
-      default: return 'bg-muted text-muted-foreground';
+      case 'admin':return 'bg-red-500/10 text-red-500';
+      case 'moderator':return 'bg-blue-500/10 text-blue-500';
+      default:return 'bg-muted text-muted-foreground';
     }
   };
 
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case 'admin': return 'Admin';
-      case 'moderator': return 'Moderator';
-      default: return 'İstifadəçi';
+      case 'admin':return 'Admin';
+      case 'moderator':return 'Moderator';
+      default:return tr("adminsecurity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i");
     }
   };
 
   const getProfileByUserId = (userId: string) => {
-    return profiles.find(p => p.user_id === userId);
+    return profiles.find((p) => p.user_id === userId);
   };
 
   const stats = {
-    admins: roles.filter(r => r.role === 'admin').length,
-    moderators: roles.filter(r => r.role === 'moderator').length,
-    users: roles.filter(r => r.role === 'user').length
+    admins: roles.filter((r) => r.role === 'admin').length,
+    moderators: roles.filter((r) => r.role === 'moderator').length,
+    users: roles.filter((r) => r.role === 'user').length
   };
 
   return (
@@ -172,7 +172,7 @@ const AdminSecurity = () => {
           <DialogTrigger asChild>
             <Button className="gap-2">
               <UserPlus className="w-4 h-4" />
-              Rol təyin et
+              {tr("adminsecurity_rol_teyin_et_41b431", "Rol t\u0259yin et")}
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -187,11 +187,11 @@ const AdminSecurity = () => {
                     <SelectValue placeholder={tr("adminsecurity_istifadeci_secin_3e7045", "İstifadəçi seçin")} />
                   </SelectTrigger>
                   <SelectContent>
-                    {profiles.map((profile) => (
-                      <SelectItem key={profile.user_id} value={profile.user_id}>
+                    {profiles.map((profile) =>
+                    <SelectItem key={profile.user_id} value={profile.user_id}>
                         {profile.name} ({profile.email})
                       </SelectItem>
-                    ))}
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -209,7 +209,7 @@ const AdminSecurity = () => {
                 </Select>
               </div>
               <Button className="w-full" onClick={handleAddRole}>
-                Təyin et
+                {tr("adminsecurity_teyin_et_0354d4", "T\u0259yin et")}
               </Button>
             </div>
           </DialogContent>
@@ -257,7 +257,7 @@ const AdminSecurity = () => {
       <Card className="p-5">
         <h3 className="font-semibold mb-4 flex items-center gap-2">
           <CheckCircle className="w-5 h-5 text-green-500" />
-          Təhlükəsizlik Statusu
+          {tr("adminsecurity_tehlukesizlik_statusu_677fe9", "T\u0259hl\xFCk\u0259sizlik Statusu")}
         </h3>
         <div className="space-y-3">
           <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
@@ -294,29 +294,29 @@ const AdminSecurity = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {loading ? (
-                <tr>
+              {loading ?
+              <tr>
                   <td colSpan={3} className="p-8 text-center text-muted-foreground">
-                    Yüklənir...
+                    {tr("adminsecurity_yuklenir_5557de", "Y\xFCkl\u0259nir...")}
                   </td>
-                </tr>
-              ) : roles.length === 0 ? (
-                <tr>
+                </tr> :
+              roles.length === 0 ?
+              <tr>
                   <td colSpan={3} className="p-8 text-center text-muted-foreground">
-                    Rol tapılmadı
+                    {tr("adminsecurity_rol_tapilmadi_c24400", "Rol tap\u0131lmad\u0131")}
                   </td>
-                </tr>
-              ) : (
-                roles.map((role, index) => {
-                  const profile = getProfileByUserId(role.user_id);
-                  return (
-                    <motion.tr
-                      key={role.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="hover:bg-muted/30"
-                    >
+                </tr> :
+
+              roles.map((role, index) => {
+                const profile = getProfileByUserId(role.user_id);
+                return (
+                  <motion.tr
+                    key={role.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="hover:bg-muted/30">
+                    
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -325,7 +325,7 @@ const AdminSecurity = () => {
                             </span>
                           </div>
                           <div>
-                            <p className="font-medium">{profile?.name || 'Naməlum'}</p>
+                            <p className="font-medium">{profile?.name || tr("adminsecurity_namelum_134662", "Nam\u0259lum")}</p>
                             <p className="text-sm text-muted-foreground">{profile?.email}</p>
                           </div>
                         </div>
@@ -337,9 +337,9 @@ const AdminSecurity = () => {
                       </td>
                       <td className="p-4 text-right">
                         <Select
-                          value={role.role}
-                          onValueChange={(v) => handleUpdateRole(role.user_id, v as any)}
-                        >
+                        value={role.role}
+                        onValueChange={(v) => handleUpdateRole(role.user_id, v as any)}>
+                        
                           <SelectTrigger className="w-32">
                             <SelectValue />
                           </SelectTrigger>
@@ -350,16 +350,16 @@ const AdminSecurity = () => {
                           </SelectContent>
                         </Select>
                       </td>
-                    </motion.tr>
-                  );
-                })
-              )}
+                    </motion.tr>);
+
+              })
+              }
             </tbody>
           </table>
         </div>
       </Card>
-    </div>
-  );
+    </div>);
+
 };
 
 export default AdminSecurity;

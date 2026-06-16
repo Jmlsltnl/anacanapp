@@ -12,21 +12,21 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAllPaymentTransactions } from '@/hooks/useEpointPayment';
 
-const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
+const statusConfig: Record<string, {label: string;color: string;icon: any;}> = {
   pending: { label: tr("adminepoint_gozleyir_9ac18a", "Gözləyir"), color: 'bg-yellow-500/10 text-yellow-600', icon: Clock },
   processing: { label: 'Emal olunur', color: 'bg-blue-500/10 text-blue-600', icon: RefreshCw },
   success: { label: tr("adminepoint_ugurlu_7fe64c", "Uğurlu"), color: 'bg-green-500/10 text-green-600', icon: CheckCircle },
   failed: { label: tr("adminepoint_ugursuz_541932", "Uğursuz"), color: 'bg-red-500/10 text-red-600', icon: XCircle },
   returned: { label: tr("adminepoint_geri_qaytarilib_d80beb", "Geri qaytarılıb"), color: 'bg-orange-500/10 text-orange-600', icon: RotateCcw },
-  error: { label: tr("adminepoint_xeta_3cdbb6", "Xəta"), color: 'bg-red-500/10 text-red-600', icon: AlertTriangle },
+  error: { label: tr("adminepoint_xeta_3cdbb6", "Xəta"), color: 'bg-red-500/10 text-red-600', icon: AlertTriangle }
 };
 
 const orderTypeLabels: Record<string, string> = {
   cake: 'Tort',
-  shop: 'Mağaza',
+  shop: tr("adminepoint_magaza_defaa2", "Ma\u011Faza"),
   album: 'Albom',
   premium: 'Premium',
-  general: 'Ümumi',
+  general: tr("adminepoint_umumi_1b5521", "\xDCmumi")
 };
 
 const AdminEpoint = () => {
@@ -46,15 +46,15 @@ const AdminEpoint = () => {
 
   const fetchSettings = async () => {
     try {
-      const { data } = await supabase
-        .from('app_settings')
-        .select('key, value')
-        .in('key', ['epoint_public_key', 'epoint_private_key', 'epoint_mode']);
+      const { data } = await supabase.
+      from('app_settings').
+      select('key, value').
+      in('key', ['epoint_public_key', 'epoint_private_key', 'epoint_mode']);
 
       data?.forEach((s: any) => {
         let val = s.value;
         if (typeof val === 'string') {
-          try { val = JSON.parse(val); } catch { /* keep */ }
+          try {val = JSON.parse(val);} catch {/* keep */}
         }
         const cleanVal = String(val).replace(/^"|"$/g, '');
         if (s.key === 'epoint_public_key') setPublicKey(cleanVal === 'null' ? '' : cleanVal);
@@ -72,17 +72,17 @@ const AdminEpoint = () => {
     setSaving(true);
     try {
       const settingsToSave = [
-        { key: 'epoint_public_key', value: JSON.stringify(publicKey) },
-        { key: 'epoint_private_key', value: JSON.stringify(privateKey) },
-        { key: 'epoint_mode', value: JSON.stringify(mode) },
-      ];
+      { key: 'epoint_public_key', value: JSON.stringify(publicKey) },
+      { key: 'epoint_private_key', value: JSON.stringify(privateKey) },
+      { key: 'epoint_mode', value: JSON.stringify(mode) }];
+
 
       for (const setting of settingsToSave) {
-        const { data: existing } = await supabase
-          .from('app_settings')
-          .select('id')
-          .eq('key', setting.key)
-          .single();
+        const { data: existing } = await supabase.
+        from('app_settings').
+        select('id').
+        eq('key', setting.key).
+        single();
 
         if (existing) {
           await supabase.from('app_settings').update({ value: setting.value }).eq('key', setting.key);
@@ -99,11 +99,11 @@ const AdminEpoint = () => {
     }
   };
 
-  const totalAmount = transactions?.filter(t => t.status === 'success')
-    .reduce((sum: number, t: any) => sum + parseFloat(t.amount || 0), 0) || 0;
+  const totalAmount = transactions?.filter((t) => t.status === 'success').
+  reduce((sum: number, t: any) => sum + parseFloat(t.amount || 0), 0) || 0;
 
-  const successCount = transactions?.filter(t => t.status === 'success').length || 0;
-  const failedCount = transactions?.filter(t => t.status === 'failed' || t.status === 'error').length || 0;
+  const successCount = transactions?.filter((t) => t.status === 'success').length || 0;
+  const failedCount = transactions?.filter((t) => t.status === 'failed' || t.status === 'error').length || 0;
 
   return (
     <div className="space-y-6">
@@ -119,23 +119,23 @@ const AdminEpoint = () => {
         <Button
           variant={activeTab === 'settings' ? 'default' : 'outline'}
           onClick={() => setActiveTab('settings')}
-          className="gap-2"
-        >
+          className="gap-2">
+          
           <Settings2 className="w-4 h-4" />
-          Tənzimləmələr
+          {tr("adminepoint_tenzimlemeler_085659", "T\u0259nziml\u0259m\u0259l\u0259r")}
         </Button>
         <Button
           variant={activeTab === 'transactions' ? 'default' : 'outline'}
-          onClick={() => { setActiveTab('transactions'); refetchTxns(); }}
-          className="gap-2"
-        >
+          onClick={() => {setActiveTab('transactions');refetchTxns();}}
+          className="gap-2">
+          
           <List className="w-4 h-4" />
-          Əməliyyatlar
+          {tr("adminepoint_emeliyyatlar_54d70c", "\u018Fm\u0259liyyatlar")}
         </Button>
       </div>
 
-      {activeTab === 'settings' ? (
-        <div className="grid gap-6">
+      {activeTab === 'settings' ?
+      <div className="grid gap-6">
           {/* API Keys */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <Card className="p-6">
@@ -149,12 +149,12 @@ const AdminEpoint = () => {
                 </div>
               </div>
 
-              {loading ? (
-                <div className="flex justify-center py-8">
+              {loading ?
+            <div className="flex justify-center py-8">
                   <RefreshCw className="w-6 h-6 animate-spin text-muted-foreground" />
-                </div>
-              ) : (
-                <div className="space-y-4">
+                </div> :
+
+            <div className="space-y-4">
                   <div>
                     <label className="text-sm font-medium mb-2 block text-foreground">Rejim</label>
                     <Select value={mode} onValueChange={setMode}>
@@ -167,19 +167,19 @@ const AdminEpoint = () => {
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Test rejimində real ödəniş aparılmır
+                      {tr("adminepoint_test_rejiminde_real_odenis_apa_0bbcf3", "Test rejimind\u0259 real \xF6d\u0259ni\u015F apar\u0131lm\u0131r")}
                     </p>
                   </div>
 
                   <div>
                     <label className="text-sm font-medium mb-2 block text-foreground">Public Key</label>
                     <Input
-                      value={publicKey}
-                      onChange={(e) => setPublicKey(e.target.value)}
-                      placeholder={tr("adminepoint_meselen_i000000001_56e9a2", "Məsələn: i000000001")}
-                    />
+                  value={publicKey}
+                  onChange={(e) => setPublicKey(e.target.value)}
+                  placeholder={tr("adminepoint_meselen_i000000001_56e9a2", "Məsələn: i000000001")} />
+                
                     <p className="text-xs text-muted-foreground mt-1">
-                      Epoint dashboard-da "Tacir identifikatoru" olaraq göstərilir
+                      {tr("adminepoint_epoint_dashboard_da_tacir_iden_48b270", "Epoint dashboard-da \"Tacir identifikatoru\" olaraq g\xF6st\u0259rilir")}
                     </p>
                   </div>
 
@@ -187,23 +187,23 @@ const AdminEpoint = () => {
                     <label className="text-sm font-medium mb-2 block text-foreground">Private Key</label>
                     <div className="relative">
                       <Input
-                        type={showPrivateKey ? 'text' : 'password'}
-                        value={privateKey}
-                        onChange={(e) => setPrivateKey(e.target.value)}
-                        placeholder={tr("adminepoint_api_giris_acari_34edbe", "API giriş açarı")}
-                        className="pr-10"
-                      />
+                    type={showPrivateKey ? 'text' : 'password'}
+                    value={privateKey}
+                    onChange={(e) => setPrivateKey(e.target.value)}
+                    placeholder={tr("adminepoint_api_giris_acari_34edbe", "API giriş açarı")}
+                    className="pr-10" />
+                  
                       <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-0 top-0 h-full"
-                        onClick={() => setShowPrivateKey(!showPrivateKey)}
-                      >
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-full"
+                    onClick={() => setShowPrivateKey(!showPrivateKey)}>
+                    
                         {showPrivateKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </Button>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Epoint dashboard-da verilən gizli API açarı
+                      {tr("adminepoint_epoint_dashboard_da_verilen_gi_c85785", "Epoint dashboard-da veril\u0259n gizli API a\xE7ar\u0131")}
                     </p>
                   </div>
 
@@ -212,7 +212,7 @@ const AdminEpoint = () => {
                     Yadda saxla
                   </Button>
                 </div>
-              )}
+            }
             </Card>
           </motion.div>
 
@@ -246,14 +246,14 @@ const AdminEpoint = () => {
                   </code>
                 </div>
                 <p className="text-muted-foreground">
-                  Bu URL-ləri Epoint.az şəxsi kabinetinizdə tacir tənzimləmələrində qeyd edin.
+                  {tr("adminepoint_bu_url_leri_epoint_az_sexsi_ka_703d38", "Bu URL-l\u0259ri Epoint.az \u015F\u0259xsi kabinetinizd\u0259 tacir t\u0259nziml\u0259m\u0259l\u0259rind\u0259 qeyd edin.")}
                 </p>
               </div>
             </Card>
           </motion.div>
-        </div>
-      ) : (
-        <div className="space-y-4">
+        </div> :
+
+      <div className="space-y-4">
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4">
             <Card className="p-4 text-center">
@@ -285,29 +285,29 @@ const AdminEpoint = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {txnLoading ? (
-                    <tr>
+                  {txnLoading ?
+                <tr>
                       <td colSpan={6} className="text-center py-8 text-muted-foreground">
                         <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2" />
-                        Yüklənir...
+                        {tr("adminepoint_yuklenir_5557de", "Y\xFCkl\u0259nir...")}
                       </td>
-                    </tr>
-                  ) : !transactions?.length ? (
-                    <tr>
+                    </tr> :
+                !transactions?.length ?
+                <tr>
                       <td colSpan={6} className="text-center py-8 text-muted-foreground">
-                        Əməliyyat tapılmadı
+                        {tr("adminepoint_emeliyyat_tapilmadi_1ddf69", "\u018Fm\u0259liyyat tap\u0131lmad\u0131")}
                       </td>
-                    </tr>
-                  ) : (
-                    transactions.map((txn: any) => {
-                      const sc = statusConfig[txn.status] || statusConfig.pending;
-                      const StatusIcon = sc.icon;
-                      return (
-                        <tr key={txn.id} className="border-b border-border/50 hover:bg-muted/30">
+                    </tr> :
+
+                transactions.map((txn: any) => {
+                  const sc = statusConfig[txn.status] || statusConfig.pending;
+                  const StatusIcon = sc.icon;
+                  return (
+                    <tr key={txn.id} className="border-b border-border/50 hover:bg-muted/30">
                           <td className="p-3 text-foreground whitespace-nowrap">
                             {new Date(txn.created_at).toLocaleDateString('az-AZ', {
-                              day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit'
-                            })}
+                          day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit'
+                        })}
                           </td>
                           <td className="p-3">
                             <code className="text-xs text-muted-foreground">{txn.order_id}</code>
@@ -329,18 +329,18 @@ const AdminEpoint = () => {
                           <td className="p-3 text-xs text-muted-foreground">
                             {txn.card_mask || '-'}
                           </td>
-                        </tr>
-                      );
-                    })
-                  )}
+                        </tr>);
+
+                })
+                }
                 </tbody>
               </table>
             </div>
           </Card>
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 
 export default AdminEpoint;
