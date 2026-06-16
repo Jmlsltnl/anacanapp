@@ -708,25 +708,13 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
         </motion.button>
       }
 
-      {/* Birth Onboarding Modal */}
-      <BirthOnboardingModal
-        isOpen={showBirthModal}
-        onClose={() => setShowBirthModal(false)}
-        onComplete={() => {
-          setShowBirthModal(false);
+al(false);
           window.location.reload();
         }} />
       
     </div>);
 
 };
-
-// Daily fun facts about baby - changes every day
-const BABY_FUN_FACTS = [tr("dashboard_bu_gun_elleri_ile_esyalari_tut_5ce101", "Bu g\xFCn \u0259ll\u0259ri il\u0259 \u0259\u015Fyalar\u0131 tutma\u011F\u0131 \xF6yr\u0259nir! \uD83E\uDD32"), tr("dashboard_sesleri_tanimaq_qabiliyyeti_ar_c1f670", "S\u0259sl\u0259ri tan\u0131maq qabiliyy\u0259ti art\u0131r \uD83C\uDFB5"), tr("dashboard_bu_gun_gulusleri_daha_menali_o_0ca2b5", "Bu g\xFCn g\xFCl\xFC\u015Fl\u0259ri daha m\u0259nal\u0131 olacaq \uD83D\uDE0A"), tr("dashboard_rengleri_daha_aydin_gormeye_ba_4ee0b0", "R\u0259ngl\u0259ri daha ayd\u0131n g\xF6rm\u0259y\u0259 ba\u015Flay\u0131r \uD83C\uDF08"), tr("dashboard_hereketleri_daha_koordinasiyal_c4d7d4", "H\u0259r\u0259k\u0259tl\u0259ri daha koordinasiyal\u0131 olur \uD83C\uDFC3"), tr("dashboard_bu_gun_yeni_dadlar_kesf_ede_bi_6a1832", "Bu g\xFCn yeni dadlar k\u0259\u015Ff ed\u0259 bil\u0259r \uD83C\uDF4E"), tr("dashboard_emosiyalarini_daha_yaxsi_ifade_a98a2f", "Emosiyalar\u0131n\u0131 daha yax\u015F\u0131 ifad\u0259 edir \uD83D\uDC95"), tr("dashboard_diqqet_muddeti_artmaga_davam_e_8ef858", "Diqq\u0259t m\xFCdd\u0259ti artma\u011Fa davam edir \uD83D\uDC40"), tr("dashboard_yatma_qaydalari_daha_muntezem__296d25", "Yatma qaydalar\u0131 daha m\xFCnt\u0259z\u0259m olur \uD83D\uDE34"), tr("dashboard_etrafi_tanimaq_bacarigi_inkisa_183398", "\u018Ftraf\u0131 tan\u0131maq bacar\u0131\u011F\u0131 inki\u015Faf edir \uD83C\uDF0D"), tr("dashboard_elaqe_qurma_bacariqlari_guclen_c24991", "\u018Flaq\u0259 qurma bacar\u0131qlar\u0131 g\xFCcl\u0259nir \uD83E\uDD1D"), tr("dashboard_korpenin_yaddasi_her_gun_gucle_3932c3", "K\xF6rp\u0259nin yadda\u015F\u0131 h\u0259r g\xFCn g\xFCcl\u0259nir \uD83E\uDDE0"), tr("dashboard_bu_gun_yeni_sesler_cixara_bile_cf83d8", "Bu g\xFCn yeni s\u0259sl\u0259r \xE7\u0131xara bil\u0259r \uD83D\uDDE3\uFE0F"), tr("dashboard_hereket_koordinasiyasi_inkisaf_56f22b", "H\u0259r\u0259k\u0259t koordinasiyas\u0131 inki\u015Faf edir \u26A1"), tr("dashboard_mimikalar_daha_zengin_olur_71f33d", "Mimikalar daha z\u0259ngin olur \uD83D\uDE2E"), tr("dashboard_etrafdakilara_diqqet_artir_29f3e2", "\u018Ftrafdak\u0131lara diqq\u0259t art\u0131r \uD83D\uDC41\uFE0F"), tr("dashboard_gulumsemeleri_daha_tez_tez_olu_22ffaa", "G\xFCl\xFCms\u0259m\u0259l\u0259ri daha tez-tez olur \uD83D\uDE0D"), tr("dashboard_oyun_zamani_daha_aktiv_olur_b55fb7", "Oyun zaman\u0131 daha aktiv olur \uD83C\uDFAE"), tr("dashboard_valideynleri_tanima_guclenir_0de81e", "Valideynl\u0259ri tan\u0131ma g\xFCcl\u0259nir \uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67"), tr("dashboard_yeni_nailiyyetlere_dogru_ireli_500201", "Yeni nailiyy\u0259tl\u0259r\u0259 do\u011Fru ir\u0259lil\u0259yir \uD83C\uDF1F"), tr("dashboard_bu_gun_elleri_agzina_apara_bil_a3b801", "Bu g\xFCn \u0259ll\u0259ri a\u011Fz\u0131na apara bil\u0259r \uD83D\uDD90\uFE0F"), tr("dashboard_sekillere_baxmagi_xoslayir_824e23", "\u015E\u0259kill\u0259r\u0259 baxma\u011F\u0131 xo\u015Flay\u0131r \uD83D\uDDBC\uFE0F"), tr("dashboard_musiqi_dinlemekden_zovq_alir_bbc189", "Musiqi dinl\u0259m\u0259kd\u0259n z\xF6vq al\u0131r \uD83C\uDFB6"), tr("dashboard_ayaqlarini_hereket_etdirmeyi_s_f3dbce", "Ayaqlar\u0131n\u0131 h\u0259r\u0259k\u0259t etdirm\u0259yi sevir \uD83E\uDDB6"), tr("dashboard_yuxu_zamani_yuxu_gore_biler_4fee2a", "Yuxu zaman\u0131 yuxu g\xF6r\u0259 bil\u0259r \uD83D\uDCAD"), tr("dashboard_uzlere_baxmagi_cox_xoslayir_628158", "\xDCzl\u0259r\u0259 baxma\u011F\u0131 \xE7ox xo\u015Flay\u0131r \uD83D\uDC76"), tr("dashboard_bu_gun_qiciqlanmaya_reaksiya_a_d65dc4", "Bu g\xFCn q\u0131c\u0131qlanmaya reaksiya art\u0131r \uD83E\uDD2D"), tr("dashboard_toxunma_hissi_daha_hessas_olur_cb038e", "Toxunma hissi daha h\u0259ssas olur \uD83E\uDD1A"), tr("dashboard_barmaqlarini_kesf_etmeye_davam_17caad", "Barmaqlar\u0131n\u0131 k\u0259\u015Ff etm\u0259y\u0259 davam edir \u270B"), tr("dashboard_etraf_seslere_daha_cox_reaksiy_c929eb", "\u018Ftraf s\u0259sl\u0259r\u0259 daha \xE7ox reaksiya verir \uD83D\uDC42")];
-
-
-
-
 
 
 
@@ -758,8 +746,9 @@ const BABY_FUN_FACTS = [tr("dashboard_bu_gun_elleri_ile_esyalari_tut_5ce101", "B
 const getBabyDailyFunFact = (ageInDays: number): string => {
   // Use age + current day to get a rotating fact
   const dayOfYear = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
-  const factIndex = (ageInDays + dayOfYear) % BABY_FUN_FACTS.length;
-  return BABY_FUN_FACTS[factIndex];
+  const facts = getBabyFunFacts();
+  const factIndex = (ageInDays + dayOfYear) % facts.length;
+  return facts[factIndex];
 };
 
 const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) => void;}) => {
