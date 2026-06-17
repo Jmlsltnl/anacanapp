@@ -1,5 +1,5 @@
-import { tr } from "@/lib/tr";import { motion } from 'framer-motion';
-import { tr } from '@/lib/tr';
+import { tr } from "@/lib/tr";
+import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import type { MommyHeroProps } from './MommyHeroClassic';
 
