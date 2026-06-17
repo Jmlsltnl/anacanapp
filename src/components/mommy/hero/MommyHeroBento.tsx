@@ -53,12 +53,12 @@ const MommyHeroBento = ({ babyData, exactMonths, remainingDays, babyIllustration
             {exactMonths > 0 ? exactMonths : babyData.ageInDays}
           </span>
           <span className="text-xs font-black tracking-[0.2em] uppercase opacity-70">
-            {exactMonths > 0 ? 'AY' : tr("mommyherobento_gun_b74b92", "G\xDCN")}
+            {exactMonths > 0 ? (exactMonths > 1 ? tr("time_months", "ay").toUpperCase() : tr("time_month", "ay").toUpperCase()) : tr("mommyherobento_gun_b74b92", "GÜN")}
           </span>
         </div>
         <p className="text-[11px] font-medium opacity-60 mt-1">
           {exactMonths > 0 && remainingDays > 0 ?
-          `+ ${remainingDays} gün böyüməyə davam edir` : tr("mommyherobento_yas_95595b", "Ya\u015F")
+          `+ ${remainingDays} ${remainingDays > 1 ? tr("time_days", "gün") : tr("time_day", "gün")} ${tr("mommyherobento_boyumeye_davam_edir", "böyüməyə davam edir")}` : tr("mommyherobento_yas_95595b", "Yaş")
           }
         </p>
         <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[hsl(15,85%,60%)] flex items-center justify-center">
@@ -79,7 +79,7 @@ const MommyHeroBento = ({ babyData, exactMonths, remainingDays, babyIllustration
             {weeks}
           </div>
           <div className="text-[9px] font-bold uppercase tracking-wider text-[hsl(15,55%,40%)]/70 mt-0.5">
-            {tr("mommyherobento_hefte_3aa886", "H\u0259ft\u0259")}
+            {tr("mommyherobento_hefte_3aa886", "Həftə")}
           </div>
         </div>
       </motion.div>
@@ -93,10 +93,10 @@ const MommyHeroBento = ({ babyData, exactMonths, remainingDays, babyIllustration
         
         <div className="min-w-0">
           <div className="text-[9px] font-bold uppercase tracking-wider text-[hsl(15,55%,30%)]/70">
-            {tr("mommyherobento_bu_gun_786fd4", "Bu g\xFCn")}
+            {tr("mommyherobento_bu_gun_786fd4", "Bu gün")}
           </div>
           <div className="text-[13px] font-black text-[hsl(15,55%,25%)] leading-tight mt-0.5 truncate">
-            {tr("mommyherobento_sevgi_ile_boyuyur_6b7588", "Sevgi il\u0259 b\xF6y\xFCy\xFCr \u2728")}
+            {tr("mommyherobento_sevgi_ile_boyuyur_6b7588", "Sevgi ilə böyüyür ✨")}
           </div>
         </div>
         <div className="w-9 h-9 rounded-full bg-white/70 backdrop-blur-sm flex items-center justify-center shadow-sm shrink-0 ml-2">

@@ -219,14 +219,14 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     if (!isToolAvailable(tool)) {
       if (tool.minWeek && lifeStage === 'bump') {
         toast({
-          title: `${tool.name} hələ aktiv deyil`,
-          description: `Bu alət ${tool.minWeek}. həftədən sonra aktivləşəcək`,
+          title: `${tool.name} ${tr("toolshub_not_active_yet", "hələ aktiv deyil")}`,
+          description: `${tr("toolshub_activate_after_week_prefix", "Bu alət")} ${tool.minWeek}${tr("toolshub_activate_after_week_suffix", ". həftədən sonra aktivləşəcək")}`,
           variant: 'destructive'
         });
       } else if (tool.stages) {
         toast({
-          title: `${tool.name} mövcud deyil`,
-          description: `Bu alət yalnız hamiləlik dövründə istifadə oluna bilər`,
+          title: `${tool.name} ${tr("toolshub_not_available", "mövcud deyil")}`,
+          description: tr("toolshub_only_maternity_use", "Bu alət yalnız hamiləlik dövründə istifadə oluna bilər"),
           variant: 'destructive'
         });
       }
@@ -512,7 +512,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
             </div>
             <p className="font-semibold text-foreground mb-1">{tr("toolshub_alet_tapilmadi_f358cb", "Alət tapılmadı")}</p>
             <p className="text-sm text-muted-foreground">
-              {searchQuery ? `"${searchQuery}" ilə uyğun alət yoxdur` : tr("toolshub_bu_kateqoriyada_alet_yoxdur_6c04fc", "Bu kateqoriyada al\u0259t yoxdur")}
+              {searchQuery ? `"${searchQuery}" ${tr("toolshub_no_matching_tools", "ilə uyğun alət yoxdur")}` : tr("toolshub_bu_kateqoriyada_alet_yoxdur_6c04fc", "Bu kateqoriyada al\u0259t yoxdur")}
             </p>
             <motion.button
             onClick={() => {setSearchQuery('');}}

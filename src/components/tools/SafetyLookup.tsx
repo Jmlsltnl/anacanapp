@@ -83,7 +83,7 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
       if (data?.success && data?.item) {
         await queryClient.invalidateQueries({ queryKey: ['safety_items'] });
         setSelectedItem(data.item);
-        toast({ title: tr("safetylookup_ai_ile_tapildi_5c2d49", 'AI ilə tapıldı! ✨'), description: `${data.item.name_az} bazaya əlavə edildi` });
+        toast({ title: tr("safetylookup_ai_ile_tapildi_5c2d49", 'AI ilə tapıldı! ✨'), description: `${data.item.name_az || data.item.name} ${tr("safety_added_to_database", "bazaya əlavə edildi")}` });
       } else {
         toast({ title: tr("safetylookup_hec_ne_tapilmadi_6a4eca", 'Heç nə tapılmadı'), variant: 'destructive' });
       }

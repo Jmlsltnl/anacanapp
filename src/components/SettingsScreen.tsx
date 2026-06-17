@@ -118,7 +118,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
 
   // ── Delete Account ──
   const handleDeleteAccount = async () => {
-    if (deleteConfirmText !== 'SİL') return;
+    if (deleteConfirmText !== tr("settingsscreen_delete_confirm_keyword", "SİL")) return;
     setIsDeleting(true);
 
     try {
@@ -247,6 +247,8 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
               disabled={!settings.notifications_enabled} />
             
           </SettingRow>
+            
+          </SettingRow>
         </div>
 
         {/* Silent Hours */}
@@ -257,13 +259,13 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
           <SettingRow
             icon={BellOff}
             label="Sakit rejim"
-            description={silentSettings.enabled ? `${silentSettings.startTime} - ${silentSettings.endTime} arası bildiriş yoxdur` : tr("settingsscreen_gece_saatlarinda_bildirisleri__45007d", "Gec\u0259 saatlar\u0131nda bildiri\u015Fl\u0259ri s\xF6nd\xFCr")}>
+            description={silentSettings.enabled ? `${silentSettings.startTime} - ${silentSettings.endTime} ${tr("settingsscreen_silent_hours_desc", "arası bildiriş yoxdur")}` : tr("settingsscreen_gece_saatlarinda_bildirisleri__45007d", "Gecə saatlarında bildirişləri söndür")}>
             
             <Switch
               checked={silentSettings.enabled}
               onCheckedChange={(checked) => {
                 updateSilentSettings({ enabled: checked });
-                toast.success(checked ? tr("settingsscreen_sakit_saatlar_aktivlesdirildi_2ab4f3", "Sakit saatlar aktivl\u0259\u015Fdirildi") : 'Sakit saatlar deaktiv edildi');
+                toast.success(checked ? tr("settingsscreen_sakit_saatlar_aktivlesdirildi_2ab4f3", "Sakit saatlar aktivləşdirildi") : 'Sakit saatlar deaktiv edildi');
               }}
               disabled={!settings.notifications_enabled} />
             
@@ -319,7 +321,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
               disabled={!settings.notifications_enabled} />
             
           </SettingRow>
-          <SettingRow icon={Pill} label={tr("settingsscreen_vitamin_xatirlatmasi_531a3d", "Vitamin xatırlatması")} description={`Hər gün saat ${settings.vitamin_time}`}>
+          <SettingRow icon={Pill} label={tr("settingsscreen_vitamin_xatirlatmasi_531a3d", "Vitamin xatırlatması")} description={`${tr("settingsscreen_every_day_at", "Hər gün saat")} ${settings.vitamin_time}`}>
             <Switch
               checked={settings.vitamin_reminder}
               onCheckedChange={(checked) => updateSetting('vitamin_reminder', checked)}
@@ -472,7 +474,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteAccount}
-              disabled={deleteConfirmText !== 'SİL' || isDeleting}
+              disabled={deleteConfirmText !== tr("settingsscreen_delete_confirm_keyword", "SİL") || isDeleting}
               className="bg-destructive hover:bg-destructive/90 rounded-xl">
               
               {isDeleting ?

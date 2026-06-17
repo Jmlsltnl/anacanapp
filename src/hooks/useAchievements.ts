@@ -18,16 +18,16 @@ export const ACHIEVEMENTS = {
     { id: 'first_kick', name: tr("useachievements_ilk_tepik_c4991e", "İlk təpik"), description: tr("useachievements_ilk_tepiki_qeyd_etdiniz_6cb5de", "İlk təpiki qeyd etdiniz"), emoji: '👣', points: 10 },
     { id: 'kick_master', name: tr("useachievements_tepik_ustasi_8d8ddd", "Təpik ustası"), description: tr("useachievements_100_tepik_qeyd_etdiniz_7cff23", "100 təpik qeyd etdiniz"), emoji: '🦶', points: 50 },
     { id: 'weight_tracker', name: tr("useachievements_ceki_izleyicisi_a28936", "Çəki izləyicisi"), description: tr("useachievements_10_ceki_qeydi_etdiniz_15ea30", "10 çəki qeydi etdiniz"), emoji: '⚖️', points: 30 },
-    { id: 'trimester_1', name: '1-ci trimester', description: tr("useachievements_1_ci_trimestri_tamamladiniz_82953e", "1-ci trimestri tamamladınız"), emoji: '🌱', points: 100 },
-    { id: 'trimester_2', name: '2-ci trimester', description: tr("useachievements_2_ci_trimestri_tamamladiniz_bd7d13", "2-ci trimestri tamamladınız"), emoji: '🌿', points: 150 },
+    { id: 'trimester_1', name: tr("useachievements_1_ci_trimester_12345", "1-ci trimester"), description: tr("useachievements_1_ci_trimestri_tamamladiniz_82953e", "1-ci trimestri tamamladınız"), emoji: '🌱', points: 100 },
+    { id: 'trimester_2', name: tr("useachievements_2_ci_trimester_23456", "2-ci trimester"), description: tr("useachievements_2_ci_trimestri_tamamladiniz_bd7d13", "2-ci trimestri tamamladınız"), emoji: '🌿', points: 150 },
     { id: 'trimester_3', name: tr("useachievements_3_cu_trimester_03fa4b", "3-cü trimester"), description: tr("useachievements_3_cu_trimestri_tamamladiniz_7a26a5", "3-cü trimestri tamamladınız"), emoji: '🌳', points: 200 },
     { id: 'hospital_bag_ready', name: tr("useachievements_xestexana_cantasi_hazir_71cd1a", "Xəstəxana çantası hazır"), description: tr("useachievements_xestexana_cantasini_tamamladiniz_7825f8", "Xəstəxana çantasını tamamladınız"), emoji: '🎒', points: 75 },
   ],
   // Mommy achievements
   mommy: [
     { id: 'first_feed', name: tr("useachievements_ilk_qidalanma_d5b330", "İlk qidalanma"), description: tr("useachievements_ilk_qidalanmani_qeyd_etdiniz_d2ba0b", "İlk qidalanmanı qeyd etdiniz"), emoji: '🍼', points: 10 },
-    { id: 'feeding_pro', name: tr("useachievements_qidalanma_ustasi_7ee87c", "Qidalanma ustası"), description: '100 qidalanma qeyd etdiniz', emoji: '🤱', points: 100 },
-    { id: 'sleep_tracker', name: tr("useachievements_yuxu_izleyicisi_1ed3f5", "Yuxu izləyicisi"), description: '50 yuxu qeyd etdiniz', emoji: '😴', points: 50 },
+    { id: 'feeding_pro', name: tr("useachievements_qidalanma_ustasi_7ee87c", "Qidalanma ustası"), description: tr("useachievements_100_qidalanma_qeyd_etdiniz_34567", "100 qidalanma qeyd etdiniz"), emoji: '🤱', points: 100 },
+    { id: 'sleep_tracker', name: tr("useachievements_yuxu_izleyicisi_1ed3f5", "Yuxu izləyicisi"), description: tr("useachievements_50_yuxu_qeyd_etdiniz_45678", "50 yuxu qeyd etdiniz"), emoji: '😴', points: 50 },
     { id: 'diaper_hero', name: tr("useachievements_bez_qehremani_72c596", "Bez qəhrəmanı"), description: tr("useachievements_100_bez_deyisme_qeyd_etdiniz_5fd4f5", "100 bez dəyişmə qeyd etdiniz"), emoji: '👶', points: 75 },
     { id: 'milestone_first', name: tr("useachievements_ilk_merhele_a06a58", "İlk mərhələ"), description: tr("useachievements_ilk_inkisaf_merhelesini_qeyd_etdiniz_50d5c9", "İlk inkişaf mərhələsini qeyd etdiniz"), emoji: '⭐', points: 25 },
     { id: 'milestone_5', name: tr("useachievements_5_merhele_aaa997", "5 mərhələ"), description: tr("useachievements_5_inkisaf_merhelesini_qeyd_etdiniz_831f29", "5 inkişaf mərhələsini qeyd etdiniz"), emoji: '🏆', points: 100 },
@@ -37,7 +37,7 @@ export const ACHIEVEMENTS = {
     { id: 'first_message', name: tr("useachievements_ilk_mesaj_c2af7d", "İlk mesaj"), description: tr("useachievements_ilk_mesaji_gonderdiniz_cb17f2", "İlk mesajı göndərdiniz"), emoji: '💬', points: 10 },
     { id: 'support_star', name: tr("useachievements_destek_ulduzu_843f2b", "Dəstək ulduzu"), description: tr("useachievements_10_sevgi_gonderdiniz_daf5b1", "10 sevgi göndərdiniz"), emoji: '❤️', points: 30 },
     { id: 'shopping_helper', name: tr("useachievements_alis_veris_komekcisi_429aaa", "Alış-veriş köməkçisi"), description: tr("useachievements_10_mehsul_elave_etdiniz_269710", "10 məhsul əlavə etdiniz"), emoji: '🛒', points: 50 },
-    { id: 'active_partner', name: 'Aktiv partner', description: tr("useachievements_7_gun_ardicil_tetbiqi_istifade_etdiniz_74a7d5", "7 gün ardıcıl tətbiqi istifadə etdiniz"), emoji: '🌟', points: 100 },
+    { id: 'active_partner', name: tr("useachievements_aktiv_partner_56789", "Aktiv partner"), description: tr("useachievements_7_gun_ardicil_tetbiqi_istifade_etdiniz_74a7d5", "7 gün ardıcıl tətbiqi istifadə etdiniz"), emoji: '🌟', points: 100 },
   ],
   // General achievements
   general: [
@@ -106,7 +106,7 @@ export const useAchievements = () => {
             
             if (details && !newAchievement.notified) {
               toast({
-                title: `🎉 Nailiyyət: ${details.name}`,
+                title: `${tr("useachievements_nailiyyet", "🎉 Nailiyyət:")} ${details.name}`,
                 description: details.description,
               });
             }

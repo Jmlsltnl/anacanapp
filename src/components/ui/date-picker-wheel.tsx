@@ -17,9 +17,7 @@ interface DatePickerWheelProps {
   className?: string;
 }
 
-const MONTHS_AZ = [
-"Yanvar", "Fevral", "Mart", "Aprel", "May", "İyun",
-"İyul", "Avqust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr"];
+// Months are localized inside the component dynamically
 
 
 const getDaysInMonth = (year: number, month: number) => {
@@ -35,6 +33,20 @@ export function DatePickerWheel({
   placeholder = tr("datepickerwheel_tarix_secin_3377b4", "Tarix se\xE7in"),
   className
 }: DatePickerWheelProps) {
+  const months = [
+    tr("month_january", "Yanvar"),
+    tr("month_february", "Fevral"),
+    tr("month_march", "Mart"),
+    tr("month_april", "Aprel"),
+    tr("month_may", "May"),
+    tr("month_june", "İyun"),
+    tr("month_july", "İyul"),
+    tr("month_august", "Avqust"),
+    tr("month_september", "Sentyabr"),
+    tr("month_october", "Oktyabr"),
+    tr("month_november", "Noyabr"),
+    tr("month_december", "Dekabr")
+  ];
   const [isOpen, setIsOpen] = React.useState(false);
   const [view, setView] = React.useState<'calendar' | 'year' | 'month'>('calendar');
   const [displayYear, setDisplayYear] = React.useState(value?.getFullYear() || 1990);
@@ -102,7 +114,15 @@ export function DatePickerWheel({
   const firstDayOfMonth = new Date(displayYear, displayMonth, 1).getDay();
   const adjustedFirstDay = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
 
-  const weekDays = ["Baz.e.", tr("datepickerwheel_c_ax_6cdba6", "\xC7.ax."), tr("datepickerwheel_cer_879279", "\xC7\u0259r."), "C.ax.", tr("datepickerwheel_cum_a58b1a", "C\xFCm."), tr("datepickerwheel_sen_60edd8", "\u015E\u0259n."), "Baz."];
+  const weekDays = [
+    tr("datepickerwheel_mon", "Baz.e."),
+    tr("datepickerwheel_c_ax_6cdba6", "Ç.ax."),
+    tr("datepickerwheel_cer_879279", "Çər."),
+    tr("datepickerwheel_thu", "C.ax."),
+    tr("datepickerwheel_cum_a58b1a", "Cüm."),
+    tr("datepickerwheel_sen_60edd8", "Şən."),
+    tr("datepickerwheel_sun", "Baz.")
+  ];
 
   const renderCalendarView = () =>
   <motion.div
@@ -129,7 +149,7 @@ export function DatePickerWheel({
           onClick={() => setView('month')}
           className="font-semibold text-base px-3 h-9 rounded-xl hover:bg-primary/10">
           
-            {MONTHS_AZ[displayMonth]}
+            {months[displayMonth]}
           </Button>
           <Button
           variant="ghost"
@@ -283,7 +303,7 @@ export function DatePickerWheel({
       </div>
 
       <div className="grid grid-cols-3 gap-2">
-        {MONTHS_AZ.map((month, i) =>
+        {months.map((month, i) =>
       <motion.button
         key={month}
         whileHover={{ scale: 1.05 }}

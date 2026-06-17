@@ -11,7 +11,7 @@ const notificationMessages: Record<NotificationType, {title: string;getBody: (da
     getBody: (data) => {
       const moodEmojis = ['😢', '😔', '😐', '🙂', '😊'];
       const mood = data?.mood;
-      return mood ? `Partnyorunuz bu gün ${moodEmojis[mood - 1]} hiss edir` : tr("usepartnernotifications_partnyorunuz_ehvalini_qeyd_etd_612302", "Partnyorunuz \u0259hval\u0131n\u0131 qeyd etdi");
+      return mood ? tr("usepartnernotifications_partnyor_mood", "Partnyorunuz bu gün {mood} hiss edir").replace("{mood}", moodEmojis[mood - 1]) : tr("usepartnernotifications_partnyorunuz_ehvalini_qeyd_etd_612302", "Partnyorunuz əhvalını qeyd etdi");
     }
   },
   contraction_started: {
@@ -24,7 +24,7 @@ const notificationMessages: Record<NotificationType, {title: string;getBody: (da
   },
   kick_session: {
     title: tr("usepartnernotifications_korpe_tepik_atdi_628b12", "Körpə təpik atdı! 👶"),
-    getBody: (data) => `Körpə ${data?.kickCount || 0} dəfə təpik atdı!`
+    getBody: (data) => tr("usepartnernotifications_baby_kicked", "Körpə {count} dəfə təpik atdı!").replace("{count}", String(data?.kickCount || 0))
   },
   water_goal: {
     title: tr("usepartnernotifications_su_hedefine_catdi_55f2fb", "Su hədəfinə çatdı! 💧"),

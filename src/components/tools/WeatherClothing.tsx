@@ -171,12 +171,12 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold">Hava & Geyim</h1>
+            <h1 className="text-lg font-bold">{tr("weatherclothing_title", "Hava & Geyim")}</h1>
             <p className="text-xs text-white/80">
               {userContext.babyAgeMonths !== undefined ?
-              `${userContext.babyAgeMonths} aylıq körpə üçün` :
+              tr("weatherclothing_baby_age_for", "{months} aylıq körpə üçün").replace("{months}", String(userContext.babyAgeMonths)) :
               userContext.pregnancyWeek ?
-              `Hamiləliyin ${userContext.pregnancyWeek}. həftəsi üçün` : tr("weatherclothing_korpeniz_ucun_geyim_mesleheti_f5cbde", "K\xF6rp\u0259niz \xFC\xE7\xFCn geyim m\u0259sl\u0259h\u0259ti")
+              tr("weatherclothing_pregnancy_week_for", "Hamiləliyin {week}. həftəsi üçün").replace("{week}", String(userContext.pregnancyWeek)) : tr("weatherclothing_korpeniz_ucun_geyim_mesleheti_f5cbde", "Körpəniz üçün geyim məsləhəti")
               }
             </p>
           </div>
@@ -278,7 +278,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                     <div>
                       <div className="text-5xl font-bold">{Math.round(advice.temperature)}°C</div>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Hiss: {Math.round(advice.feelsLike)}°C
+                        {tr("weatherclothing_feels_like", "Hiss:")} {Math.round(advice.feelsLike)}°C
                       </p>
                     </div>
                   </div>
@@ -312,7 +312,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                   <h3 className="font-semibold flex items-center gap-2 mb-3">
                     <Shirt className="w-5 h-5 text-primary" />
                     {userContext.babyAgeMonths !== undefined ?
-                  `${userContext.babyAgeMonths} aylıq körpə üçün bayır geyimi` : tr("weatherclothing_bayirda_geyim_tovsiyesi_650ba0", "Bay\u0131rda Geyim T\xF6vsiy\u0259si")
+                  tr("weatherclothing_baby_outdoor_clothing", "{months} aylıq körpə üçün bayır geyimi").replace("{months}", String(userContext.babyAgeMonths)) : tr("weatherclothing_bayirda_geyim_tovsiyesi_650ba0", "Bayırda Geyim Tövsiyəsi")
                   }
                   </h3>
                   <p className="text-sm mb-4">{advice.clothingAdvice}</p>

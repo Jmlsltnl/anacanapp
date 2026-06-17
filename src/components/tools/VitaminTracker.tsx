@@ -69,13 +69,13 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
       if (log) await undoIntake.mutateAsync(log.id);
     } else {
       await logIntake.mutateAsync(schedule);
-      toast.success(`${schedule.vitamin_name} qəbul edildi ✓`);
+      toast.success(`${schedule.vitamin_name} ${tr("vitamintracker_taken_status", "qəbul edildi ✓")}`);
     }
   };
 
   const handleDelete = async (id: string) => {
     await deleteSchedule.mutateAsync(id);
-    toast.success('Vitamin silindi');
+    toast.success(tr("vitamintracker_vitamin_deleted", "Vitamin silindi"));
   };
 
   const handleToggleNotification = async (schedule: VitaminSchedule) => {

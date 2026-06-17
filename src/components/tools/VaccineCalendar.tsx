@@ -246,8 +246,8 @@ export default function VaccineCalendar({ onBack }: Props) {
           {/* Progress */}
           <div className="mt-3 grid grid-cols-4 gap-2">
             <Stat label={tr("vaccinecalendar_cemi_84214a", "C\u0259mi")} value={stats.total} />
-            <Stat label="Tamam" value={stats.done} color="text-emerald-600" />
-            <Stat label="Qalan" value={stats.upcoming} color="text-amber-600" />
+            <Stat label={tr("vaccine_stat_done", "Tamam")} value={stats.done} color="text-emerald-600" />
+            <Stat label={tr("vaccine_stat_pending", "Qalan")} value={stats.upcoming} color="text-amber-600" />
             <Stat label={tr("vaccinecalendar_geciken_c7adb0", "Gecik\u0259n")} value={stats.overdue} color="text-red-600" />
           </div>
           <div className="mt-2.5">
@@ -260,13 +260,10 @@ export default function VaccineCalendar({ onBack }: Props) {
                 className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500"
                 animate={{ width: `${stats.pct}%` }}
                 transition={{ duration: 0.6 }} />
-              
             </div>
           </div>
         </div>
       </div>
-
-      {/* Tabs */}
       <div className="px-3 mt-3 sticky top-0 z-10">
         <div className="flex bg-card rounded-full border border-border p-0.5 shadow-sm">
           {([
@@ -453,7 +450,7 @@ function Header({ onBack }: {onBack: () => void;}) {
         </button>
         <div className="flex-1">
           <h1 className="text-sm font-bold text-foreground leading-tight">{tr("vaccinecalendar_peyvend_teqvimi_d84c87", "Peyv\u0259nd T\u0259qvimi")}</h1>
-          <p className="text-[10px] text-muted-foreground leading-tight">Milli İmmunizasiya Qrafiki</p>
+          <p className="text-[10px] text-muted-foreground leading-tight">{tr("vaccine_national_schedule", "Milli İmmunizasiya Qrafiki")}</p>
         </div>
         <Sparkles className="w-4 h-4 text-primary" />
       </div>

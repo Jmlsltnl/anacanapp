@@ -76,14 +76,14 @@ const ELEMENT_COLORS: Record<string, string> = {
 };
 
 const ELEMENT_NAMES: Record<string, string> = {
-  fire: 'Od',
-  water: 'Su',
-  air: 'Hava',
-  earth: 'Torpaq'
+  fire: tr("horoscope_element_fire", "Od"),
+  water: tr("horoscope_element_water", "Su"),
+  air: tr("horoscope_element_air", "Hava"),
+  earth: tr("horoscope_element_earth", "Torpaq")
 };
 
 const LOADING_STEPS = [
-{ icon: Star, text: 'Ulduzlar oxunur...', color: 'text-yellow-500' },
+{ icon: Star, text: tr("horoscope_reading_stars", "Ulduzlar oxunur..."), color: 'text-yellow-500' },
 { icon: Moon, text: tr("horoscopecompatibility_ay_fazasi_hesablanir_63cb3c", "Ay fazası hesablanır..."), color: 'text-blue-400' },
 { icon: Sun, text: tr("horoscopecompatibility_gunes_movqeyi_teyin_edilir_bfba89", "Günəş mövqeyi təyin edilir..."), color: 'text-orange-500' },
 { icon: Compass, text: tr("horoscopecompatibility_yukselen_burc_axtarilir_f2408d", "Yüksələn bürc axtarılır..."), color: 'text-purple-500' },
@@ -205,15 +205,15 @@ const HoroscopeCompatibility = ({ onBack }: HoroscopeCompatibilityProps) => {
     if (!analysisResult) return;
 
     const { charts, analysis } = analysisResult;
-    const text = `✨ Ailə Doğum Xəritəsi Analizi ✨
+    const text = `${tr("horoscope_share_title", "✨ Ailə Doğum Xəritəsi Analizi ✨")}
 
-👩 Ana: ${charts.mom.sun.symbol} ${charts.mom.sun.signAz}
-${charts.dad ? `👨 Ata: ${charts.dad.sun.symbol} ${charts.dad.sun.signAz}` : ''}
-${charts.baby ? `👶 ${charts.baby.isExpected ? tr("horoscopecompatibility_gozlenilen_4885bf", "G\xF6zl\u0259nil\u0259n") : ''} Körpə: ${charts.baby.sun.symbol} ${charts.baby.sun.signAz}` : ''}
+👩 ${tr("horoscope_share_mom", "Ana")}: ${charts.mom.sun.symbol} ${charts.mom.sun.signAz}
+${charts.dad ? `👨 ${tr("horoscope_share_dad", "Ata")}: ${charts.dad.sun.symbol} ${charts.dad.sun.signAz}` : ''}
+${charts.baby ? `👶 ${charts.baby.isExpected ? tr("horoscopecompatibility_gozlenilen_4885bf", "G\xF6zl\u0259nil\u0259n") : ''} ${tr("horoscope_share_baby", "Körpə")}: ${charts.baby.sun.symbol} ${charts.baby.sun.signAz}` : ''}
 
-🌟 Ümumi Uyğunluq: ${analysis.overallScore}%
+🌟 ${tr("horoscope_share_compatibility", "Ümumi Uyğunluq")}: ${analysis.overallScore}%
 
-Anacan tətbiqi ilə yaradılıb 💜`;
+${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
 
     const { nativeShare } = await import('@/lib/native');
     await nativeShare({ text });
@@ -564,6 +564,11 @@ Anacan tətbiqi ilə yaradılıb 💜`;
         </div>
       </div>
 
+            )}
+          </div>
+        </div>
+      </div>
+
       <div className="p-4 space-y-4">
         <div className="rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900/40 px-3 py-2">
           <p className="text-[11px] text-purple-800 dark:text-purple-200 leading-relaxed">
@@ -585,7 +590,7 @@ Anacan tətbiqi ilə yaradılıb 💜`;
             className="flex-1 h-12">
             
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Geri
+              {tr("horoscope_back", "Geri")}
             </Button>
           }
           
@@ -603,13 +608,12 @@ Anacan tətbiqi ilə yaradılıb 💜`;
             onClick={handleAnalyze}
             disabled={!momData.birthDate || isAnalyzing}
             className="flex-1 h-12 bg-gradient-to-r from-purple-600 to-pink-500">
-            
-              {isAnalyzing ?
+{isAnalyzing ?
             <Loader2 className="h-5 w-5 animate-spin mr-2" /> :
 
             <Sparkles className="h-5 w-5 mr-2" />
             }
-              Analiz Et
+              {tr("horoscope_analyze_now", "Analiz Et")}
             </Button>
           }
         </div>

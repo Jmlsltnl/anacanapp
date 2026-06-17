@@ -160,7 +160,7 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
           {loading ?
           <><Loader2 className="w-5 h-5 mr-2 animate-spin" />{tr("checkoutscreen_gozleyin_9c465b", "Gözləyin...")}</> :
 
-          `Sifariş Ver - ${finalPrice.toFixed(2)} ₼`
+          `${tr("checkout_place_order", "Sifariş Ver")} - ${finalPrice.toFixed(2)} ₼`
           }
         </Button>
       </div>

@@ -42,7 +42,7 @@ const LiveActivityCard = () => {
         const newEvent: LiveEvent = {
           id: payload.new.id,
           type: 'kick',
-          message: `${payload.new.kick_count || 1} təpik qeyd olundu!`,
+          message: tr("liveactivitycard_kick_registered", "{count} təpik qeyd olundu!").replace("{count}", String(payload.new.kick_count || 1)),
           emoji: '👶',
           timestamp: new Date(),
           value: payload.new.kick_count
@@ -72,8 +72,8 @@ const LiveActivityCard = () => {
               id: `water-${Date.now()}`,
               type: 'water',
               message: newWater >= 2000 ?
-              `Hədəfə çatdı! 🎉 ${newWater}ml içdi!` :
-              `+${diff}ml su içdi (${newWater}ml)`,
+              tr("liveactivitycard_water_reached", "Hədəfə çatdı! 🎉 {amount}ml içdi!").replace("{amount}", String(newWater)) :
+              tr("liveactivitycard_water_drank", "+{diff}ml su içdi ({total}ml)").replace("{diff}", String(diff)).replace("{total}", String(newWater)),
               emoji: newWater >= 2000 ? '🏆' : '💧',
               timestamp: new Date(),
               value: newWater
@@ -84,13 +84,13 @@ const LiveActivityCard = () => {
           // Mood update
           if (newMood && newMood !== oldMood) {
             const moodEmojis = ['😢', '😔', '😐', '🙂', '😊'];
-            const moodTexts = [tr("liveactivitycard_cox_pis_e041c5", "\xC7ox pis"), 'Pis', 'Normal', tr("liveactivitycard_yaxsi_9d8595", "Yax\u015F\u0131"), tr("liveactivitycard_ela_720a0e", "\u018Fla")];
+            const moodTexts = [tr("liveactivitycard_cox_pis_e041c5", "Çox pis"), tr("liveactivitycard_pis", "Pis"), tr("liveactivitycard_normal", "Normal"), tr("liveactivitycard_yaxsi_9d8595", "Yaxşı"), tr("liveactivitycard_ela_720a0e", "Əla")];
             const moodEvent: LiveEvent = {
               id: `mood-${Date.now()}`,
               type: 'mood',
               message: newMood <= 2 ?
-              `Əhvalı ${moodTexts[newMood - 1]} - dəstəyə ehtiyacı ola bilər` :
-              `Əhvalı: ${moodTexts[newMood - 1]}`,
+              tr("liveactivitycard_mood_needs_support", "Əhvalı {mood} - dəstəyə ehtiyacı ola bilər").replace("{mood}", moodTexts[newMood - 1]) :
+              tr("liveactivitycard_mood_status", "Əhvalı: {mood}").replace("{mood}", moodTexts[newMood - 1]),
               emoji: moodEmojis[newMood - 1],
               timestamp: new Date(),
               value: newMood

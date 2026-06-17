@@ -46,7 +46,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
 
     const child = await addChild(formData);
     if (child) {
-      toast.success(`${formData.name} əlavə edildi`);
+      toast.success(`${formData.name} ${tr("childselector_added", "əlavə edildi")}`);
       setShowAddModal(false);
       setFormData({ name: '', birth_date: '', gender: 'boy' });
       setSelectedChild(child);
@@ -72,10 +72,10 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
   };
 
   const handleDeleteChild = async (child: Child) => {
-    if (confirm(`${child.name} silinsin?`)) {
+    if (confirm(`${child.name} ${tr("childselector_delete_confirm", "silinsin?")}`)) {
       const success = await deleteChild(child.id);
       if (success) {
-        toast.success('Silindi');
+        toast.success(tr("childselector_deleted", "Silindi"));
       }
     }
   };
@@ -103,7 +103,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium">Ad</label>
+            <label className="text-sm font-medium">{tr("childselector_label_name", "Ad")}</label>
             <Input
             value={formData.name}
             onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
@@ -120,7 +120,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
           
           </div>
           <div>
-            <label className="text-sm font-medium">Cins</label>
+            <label className="text-sm font-medium">{tr("childselector_label_gender", "Cins")}</label>
             <div className="flex gap-2 mt-2">
               {genderOptions.map((opt) =>
             <button
@@ -139,7 +139,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
             </div>
           </div>
           <Button onClick={handleAddChild} className="w-full">
-            {tr("childselector_elave_et_6e1b9b", "\u018Flav\u0259 et")}
+            {tr("childselector_elave_et_6e1b9b", "Əlavə et")}
           </Button>
         </div>
       </DialogContent>
@@ -156,7 +156,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
           whileTap={{ scale: 0.95 }}>
           
           <Plus className="w-4 h-4" />
-          {tr("childselector_usaq_elave_et_48f1f0", "U\u015Faq \u0259lav\u0259 et")}
+          {tr("childselector_usaq_elave_et_48f1f0", "Uşaq əlavə et")}
         </motion.button>
         {renderAddModal()}
       </>);
@@ -177,7 +177,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
           
           <span className="text-lg">{selectedChild?.avatar_emoji || '👶'}</span>
           <span className={`font-medium ${compact ? 'text-sm' : ''}`}>
-            {selectedChild?.name || tr("childselector_usaq_sec_bbe44f", "U\u015Faq se\xE7")}
+            {selectedChild?.name || tr("childselector_usaq_sec_bbe44f", "Uşaq seç")}
           </span>
           {children.length > 1 &&
           <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
@@ -266,7 +266,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Ad</label>
+              <label className="text-sm font-medium">{tr("childselector_label_name", "Ad")}</label>
               <Input
                 value={formData.name}
                 onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))} />
@@ -282,7 +282,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
               
             </div>
             <div>
-              <label className="text-sm font-medium">Cins</label>
+              <label className="text-sm font-medium">{tr("childselector_label_gender", "Cins")}</label>
               <div className="flex gap-2 mt-2">
                 {genderOptions.map((opt) =>
                 <button
@@ -302,7 +302,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
             </div>
             <div className="flex gap-2">
               <Button onClick={handleUpdateChild} className="flex-1">
-                Yadda saxla
+                {tr("childselector_save", "Yadda saxla")}
               </Button>
               {editingChild &&
               <Button

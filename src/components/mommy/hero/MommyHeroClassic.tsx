@@ -60,7 +60,7 @@ const MommyHeroClassic = ({ babyData, exactMonths, remainingDays, babyIllustrati
           
           <img
             src={babyIllustration}
-            alt={`${babyData.name} — ${babyData.ageInMonths} aylıq`}
+            alt={tr("mommyheroclassic_alt_age", "{name} — {months} aylıq").replace("{name}", babyData.name).replace("{months}", String(babyData.ageInMonths))}
             className="w-full h-full object-contain drop-shadow-lg"
             onError={(e) => {
               (e.target as HTMLImageElement).src = '/placeholder.svg';
@@ -71,23 +71,23 @@ const MommyHeroClassic = ({ babyData, exactMonths, remainingDays, babyIllustrati
         {/* Main Text — baby name + day info */}
         <div className="text-center">
           <p className="text-lg font-bold text-foreground mb-1">
-            {babyData.name} • {babyData.ageInDays}{tr("mommyheroclassic_gun_d96b5d", ". g\xFCn")}
+            {babyData.name} • {babyData.ageInDays}{tr("mommyheroclassic_gun_d96b5d", ". gün")}
           </p>
 
           {/* Badge chips — same style as pregnancy badges */}
           <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
             {exactMonths > 0 &&
             <span className={`text-xs font-semibold ${colors.badge} px-2 py-0.5 rounded-full`}>
-                {exactMonths} ay
+                {exactMonths} {exactMonths > 1 ? tr("time_months", "ay") : tr("time_month", "ay")}
               </span>
             }
             {remainingDays > 0 &&
             <span className={`text-xs font-semibold ${colors.badge} px-2 py-0.5 rounded-full`}>
-                {remainingDays} {tr("mommyheroclassic_gun_54e78d", "g\xFCn")}
+                {remainingDays} {remainingDays > 1 ? tr("time_days", "gün") : tr("time_day", "gün")}
               </span>
             }
             <span className={`text-xs font-semibold ${colors.badge} px-2 py-0.5 rounded-full`}>
-              {babyData.ageInDays} {tr("mommyheroclassic_gun_54e78d", "g\xFCn")}
+              {babyData.ageInDays} {babyData.ageInDays > 1 ? tr("time_days", "gün") : tr("time_day", "gün")}
             </span>
           </div>
         </div>

@@ -346,7 +346,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               <div className="bg-card rounded-3xl p-6 shadow-card border border-border/50">
                 <div className="flex items-center gap-3 mb-4">
                   <Sparkles className="w-6 h-6 text-fuchsia-500" />
-                  <h2 className="font-bold text-lg">AI Analizi</h2>
+                  <h2 className="font-bold text-lg">{tr("mooddiary_ai_analizi_070626", "AI Analizi")}</h2>
                 </div>
                 <p className="text-muted-foreground mb-4">
                   {tr("mooddiary_son_bir_heftede_ehvaliniz_umum_c383f6", "Son bir h\u0259ft\u0259d\u0259 \u0259hval\u0131n\u0131z \xFCmumiyy\u0259tl\u0259 yax\u015F\u0131 olub. \u018Fn \xE7ox qeyd etdiyiniz simptomlar\u0131 izl\u0259yin.")}

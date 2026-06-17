@@ -51,9 +51,9 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
   }, [recommendations, trimester]);
 
   const getStatus = () => {
-    if (totalGain < recommended.min) return { status: 'low', text: 'Az', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-900/30', gradient: 'from-amber-400 to-orange-500' };
+    if (totalGain < recommended.min) return { status: 'low', text: tr("weighttracker_status_low", "Az"), color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-900/30', gradient: 'from-amber-400 to-orange-500' };
     if (totalGain > recommended.max) return { status: 'high', text: tr("weighttracker_cox_72c890", "Çox"), color: 'text-red-600 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-900/30', gradient: 'from-red-400 to-rose-500' };
-    return { status: 'normal', text: 'Normal', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-100 dark:bg-emerald-900/30', gradient: 'from-emerald-400 to-green-500' };
+    return { status: 'normal', text: tr("weighttracker_status_normal", "Normal"), color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-100 dark:bg-emerald-900/30', gradient: 'from-emerald-400 to-green-500' };
   };
 
   const status = getStatus();
@@ -217,11 +217,11 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
             </div>
             <div className="flex-1">
               <h4 className="font-bold text-foreground mb-1 flex items-center gap-2">
-                AI Analiz
+                {tr("weighttracker_ai_analiz_41639d", "AI Analiz")}
                 {aiLoading && <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />}
               </h4>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                {aiLoading ? 'Analiz edilir...' : aiAdvice || tr("weighttracker_melumat_yuklenir_355722", "M\u0259lumat y\xFCkl\u0259nir...")}
+                {aiLoading ? tr("weighttracker_analiz_edilir_e11d27", "Analiz edilir...") : aiAdvice || tr("weighttracker_melumat_yuklenir_355722", "Məlumat yüklənir...")}
               </p>
             </div>
           </div>
@@ -237,7 +237,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
           
             <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
               <Activity className="w-5 h-5 text-emerald-500" />
-              Son 7 qeyd
+              {tr("weighttracker_son_7_qeyd", "Son 7 qeyd")}
             </h3>
             <div className="h-36 flex items-end gap-2">
               {entries.slice(0, 7).reverse().map((entry, index) => {
@@ -281,7 +281,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-bold text-foreground flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-emerald-500" />
-                {tr("weighttracker_tarixce_b09a14", "Tarix\xE7\u0259")}
+                {tr("weighttracker_tarixce_b09a14", "Tarixçə")}
               </h3>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -295,7 +295,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
                   className="text-destructive focus:text-destructive">
                   
                     <RotateCcw className="w-4 h-4 mr-2" />
-                    {tr("weighttracker_tarixceni_sifirla_577dd6", "Tarix\xE7\u0259ni s\u0131f\u0131rla")}
+                    {tr("weighttracker_tarixceni_sifirla_577dd6", "Tarixçəni sıfırla")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -341,7 +341,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
                   size="icon"
                   className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
                   onClick={() => {
-                    if (confirm(tr("weighttracker_bu_qeydi_silmek_isteyirsiniz_c4a2fa", "Bu qeydi silm\u0259k ist\u0259yirsiniz?"))) {
+                    if (confirm(tr("weighttracker_bu_qeydi_silmek_isteyirsiniz_c4a2fa", "Bu qeydi silmək istəyirsiniz?"))) {
                       deleteEntry(entry.id);
                     }
                   }}>
@@ -377,14 +377,14 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
                 </div>
                 <h2 className="text-xl font-bold text-foreground text-center mb-2">{tr("weighttracker_tarixceni_sifirla_577dd6", "Tarixçəni sıfırla")}</h2>
                 <p className="text-sm text-muted-foreground text-center mb-6">
-                  {tr("weighttracker_butun_ceki_qeydleri_silinecek__3a01e1", "B\xFCt\xFCn \xE7\u0259ki qeydl\u0259ri silin\u0259c\u0259k. Bu \u0259m\u0259liyyat geri qaytar\u0131la bilm\u0259z.")}
+                  {tr("weighttracker_butun_ceki_qeydleri_silinecek__3a01e1", "Bütün çəki qeydləri silinəcək. Bu əməliyyat geri qaytarıla bilməz.")}
                 </p>
                 <div className="flex gap-3">
                   <Button
                   variant="outline"
                   className="flex-1"
                   onClick={() => setShowResetConfirm(false)}>
-                    {tr("weighttracker_legv_et_b5e49c", "L\u0259\u011Fv et")}
+                    {tr("weighttracker_legv_et_b5e49c", "Ləğv et")}
                   
                 </Button>
                   <Button
@@ -395,7 +395,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
                     setShowResetConfirm(false);
                   }}>
                   
-                    Sil
+                    {tr("weighttracker_sil", "Sil")}
                   </Button>
                 </div>
               </motion.div>
@@ -458,7 +458,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
                 whileTap={{ scale: 0.98 }}>
                 
                   <Sparkles className="w-5 h-5" />
-                  Yadda saxla
+                  {tr("weighttracker_yadda_saxla", "Yadda saxla")}
                 </motion.button>
               </div>
             </motion.div>

@@ -8,7 +8,7 @@ import type { MommyHeroProps } from './MommyHeroClassic';
  */
 const MommyHeroMesh = ({ babyData, exactMonths, remainingDays, babyIllustration }: MommyHeroProps) => {
   const primary = exactMonths > 0 ? exactMonths : babyData.ageInDays;
-  const primaryUnit = exactMonths > 0 ? 'AY' : tr("mommyheromesh_gun_b74b92", "G\xDCN");
+  const primaryUnit = exactMonths > 0 ? (exactMonths > 1 ? tr("time_months", "ay").toUpperCase() : tr("time_month", "ay").toUpperCase()) : tr("mommyheromesh_gun_b74b92", "GÜN");
 
   return (
     <motion.div
@@ -89,7 +89,7 @@ const MommyHeroMesh = ({ babyData, exactMonths, remainingDays, babyIllustration 
           </div>
           {exactMonths > 0 && remainingDays > 0 &&
           <p className="text-[11px] text-white/50 font-medium mt-1">
-              + {remainingDays} {tr("mommyheromesh_gun_54e78d", "g\xFCn")}
+              + {remainingDays} {remainingDays > 1 ? tr("time_days", "gün") : tr("time_day", "gün")}
             </p>
           }
         </div>

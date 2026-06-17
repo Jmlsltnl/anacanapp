@@ -474,6 +474,11 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
             </Button>
           </div>
         </DialogContent>
+              
+              {addPlaceMutation.isPending ? tr("momfriendlymap_elave_edilir_3c28b4", "\u018Flav\u0259 edilir...") : tr("momfriendlymap_mekan_elave_et_dd9c6e", "M\u0259kan \u018Flav\u0259 Et")}
+            </Button>
+          </div>
+        </DialogContent>
       </Dialog>
 
       {/* Place Detail Modal */}
@@ -504,8 +509,8 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                     <h2 className="text-xl font-bold text-foreground">{selectedPlace.name_az || selectedPlace.name}</h2>
                     {selectedPlace.is_verified &&
                   <Badge className="bg-emerald-500/10 text-emerald-600 border-0">
-                        <Check className="w-3 h-3 mr-1" /> {tr("momfriendlymap_tesdiqlenib_96c431", "T\u0259sdiql\u0259nib")}
-                      </Badge>
+                    <Check className="w-3 h-3 mr-1" /> {tr("momfriendlymap_tesdiqlenib_96c431", "Təsdiqlənib")}
+                  </Badge>
                   }
                   </div>
                   <p className="text-muted-foreground">{selectedPlace.address_az || selectedPlace.address}</p>
@@ -520,7 +525,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                       </div>
                       <div>
                         <p className="text-2xl font-black text-foreground">{selectedPlace.avg_rating?.toFixed(1) || '–'}</p>
-                        <p className="text-sm text-muted-foreground">{selectedPlace.review_count} {tr("momfriendlymap_rey_bd4873", "r\u0259y")}</p>
+                        <p className="text-sm text-muted-foreground">{selectedPlace.review_count} {tr("momfriendlymap_rey_bd4873", "rəy")}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -530,15 +535,15 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                 <div>
                   <h4 className="font-bold mb-3 flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-pink-500" />
-                    İmkanlar
+                    {tr("momfriendlymap_imkanlar_60eb86", "İmkanlar")}
                   </h4>
                   <div className="grid grid-cols-2 gap-2">
                     {getPlaceAmenities(selectedPlace).map((a) =>
-                  <div key={a.key} className="flex items-center gap-2 text-sm bg-muted/50 p-2.5 rounded-xl">
+                      <div key={a.key} className="flex items-center gap-2 text-sm bg-muted/50 p-2.5 rounded-xl">
                         <span className="text-lg">{a.icon}</span>
                         <span>{a.label}</span>
                       </div>
-                  )}
+                    )}
                   </div>
                   {getPlaceAmenities(selectedPlace).length === 0 &&
                 <p className="text-sm text-muted-foreground text-center py-4">{tr("momfriendlymap_imkan_gosterilmeyib_1f22f8", "İmkan göstərilməyib")}</p>
@@ -547,13 +552,13 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
 
                 {/* Contact */}
                 {selectedPlace.phone &&
-              <Button variant="outline" className="w-full" asChild>
-                    <a href={`tel:${selectedPlace.phone}`} className="flex items-center gap-2">
-                      <Phone className="w-4 h-4" />
-                      {selectedPlace.phone}
-                    </a>
-                  </Button>
-              }
+                <Button variant="outline" className="w-full" asChild>
+                  <a href={`tel:${selectedPlace.phone}`} className="flex items-center gap-2">
+                    <Phone className="w-4 h-4" />
+                    {selectedPlace.phone}
+                  </a>
+                </Button>
+                }
 
                 {/* Reviews Section */}
                 <div>

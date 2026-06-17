@@ -27,11 +27,11 @@ interface CryAnalysis {
 type AnalysisStage = 'idle' | 'recording' | 'processing' | 'analyzing' | 'complete' | 'no_cry' | 'false_positive' | 'error';
 
 const cryTypeLabels: Record<string, {label: string;emoji: string;color: string;}> = {
-  hungry: { label: 'Ac', emoji: '🍼', color: 'from-orange-500 to-amber-500' },
-  tired: { label: 'Yuxulu', emoji: '😴', color: 'from-indigo-500 to-purple-500' },
+  hungry: { label: tr("crytranslator_ac_baba8d", 'Ac'), emoji: '🍼', color: 'from-orange-500 to-amber-500' },
+  tired: { label: tr("crytranslator_yuxulu_90ba1f", 'Yuxulu'), emoji: '😴', color: 'from-indigo-500 to-purple-500' },
   pain: { label: tr("crytranslator_agri_76d612", 'Ağrı'), emoji: '😢', color: 'from-red-500 to-rose-500' },
   discomfort: { label: tr("crytranslator_narahatliq_33f05c", 'Narahatlıq'), emoji: '😣', color: 'from-yellow-500 to-orange-500' },
-  colic: { label: 'Kolik', emoji: '😫', color: 'from-purple-500 to-pink-500' },
+  colic: { label: tr("crytranslator_kolik_29d81f", 'Kolik'), emoji: '😫', color: 'from-purple-500 to-pink-500' },
   attention: { label: tr("crytranslator_diqqet_isteyir_d50473", 'Diqqət istəyir'), emoji: '🤗', color: 'from-blue-500 to-cyan-500' },
   overstimulated: { label: tr("crytranslator_hedden_artiq_yorulub_7849bb", 'Həddən artıq yorulub'), emoji: '🥱', color: 'from-gray-500 to-slate-500' },
   sick: { label: tr("crytranslator_xestelik_7c06be", 'Xəstəlik'), emoji: '🤒', color: 'from-rose-600 to-red-600' },
@@ -43,7 +43,7 @@ const stageMessages: Record<AnalysisStage, string> = {
   idle: tr("crytranslator_yazmaga_baslayin_55a5eb", "Yazma\u011Fa ba\u015Flay\u0131n"),
   recording: tr("crytranslator_ses_yazilir_c555e8", "S\u0259s yaz\u0131l\u0131r..."),
   processing: tr("crytranslator_ses_emal_edilir_918818", "S\u0259s emal edilir..."),
-  analyzing: 'AI analiz edir...',
+  analyzing: tr("crytranslator_ai_analiz_edir_daba4c", "AI analiz edir..."),
   complete: tr("crytranslator_analiz_tamamlandi_7dd77f", "Analiz tamamland\u0131"),
   no_cry: tr("crytranslator_aglama_askarlanmadi_15a23e", "A\u011Flama a\u015Fkarlanmad\u0131"),
   false_positive: tr("crytranslator_saxta_ses_askarlandi_d6f6bf", "Saxta s\u0259s a\u015Fkarland\u0131"),

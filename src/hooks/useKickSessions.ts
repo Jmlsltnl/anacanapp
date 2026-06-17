@@ -64,7 +64,7 @@ export const useKickSessions = () => {
 
       toast({
         title: tr("usekicksessions_sessiya_yadda_saxlandi_241831", "Sessiya yadda saxlandı! 👶"),
-        description: `${kickCount} təpik, ${Math.floor(durationSeconds / 60)} dəqiqə`,
+        description: `${kickCount} ${tr("usekicksessions_tepik", "təpik")}, ${Math.floor(durationSeconds / 60)} ${tr("usekicksessions_deqiqe", "dəqiqə")}`,
       });
 
       // Calculate total kicks today including new session

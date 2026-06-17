@@ -30,7 +30,7 @@ const SKILL_LABELS: Record<string, string> = {
   motor: '💪 Motor',
   sensory: tr("smartplaybox_duygu_a3bf01", "\u270B Duy\u011Fu"),
   language: '🗣️ Dil',
-  cognitive: '🧠 İdrak',
+  cognitive: '🧠 ' + tr("playbox_cognitive", "İdrak"),
   social: '👥 Sosial'
 };
 
@@ -357,6 +357,9 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
               })}
             </div>
           </CardContent>
+              })}
+            </div>
+          </CardContent>
         </Card>
 
         {/* All Activities */}
@@ -364,13 +367,12 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-semibold">
               {matchedActivities.length > 0 ?
-              `Sizin üçün (${matchedActivities.length})` :
-              `Bütün Oyunlar (${filteredActivities.length})`}
+              `${tr("playbox_for_you", "Sizin üçün")} (${matchedActivities.length})` :
+              `${tr("playbox_all_games", "Bütün Oyunlar")} (${filteredActivities.length})`}
             </h2>
           </div>
           
           {isLoading ?
-          <div className="text-center py-12">
               <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary mb-2" />
               <p className="text-muted-foreground">{tr("smartplaybox_oyunlar_yuklenir_d1edd2", "Oyunlar yüklənir...")}</p>
             </div> :
@@ -553,7 +555,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
               {logActivity.isPending ?
               <Loader2 className="h-4 w-4 animate-spin" /> :
 
-              'Qeyd et'
+              tr("playbox_log_note", "Qeyd et")
               }
             </Button>
           </div>

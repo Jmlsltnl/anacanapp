@@ -24,7 +24,7 @@ const categoryLabels: Record<string, string> = {
   baby_gear: tr("affiliateproducts_korpe_esyalari_6e92e1", "K\xF6rp\u0259 \u0259\u015Fyalar\u0131"),
   maternity: tr("affiliateproducts_hamilelik_geyimleri_fb1c46", "Hamil\u0259lik geyiml\u0259ri"),
   health: tr("affiliateproducts_saglamliq_09460a", "Sa\u011Flaml\u0131q"),
-  nutrition: 'Qidalanma',
+  nutrition: tr("affiliateproducts_qidalanma_7e8b65", "Qidalanma"),
   skincare: tr("affiliateproducts_deri_qullugu_6c59a3", "D\u0259ri qullu\u011Fu"),
   general: tr("affiliateproducts_umumi_1b5521", "\xDCmumi")
 };
@@ -179,6 +179,7 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
             variant="featured" />
 
           )}
+          )}
           </div>
         </div>
       }
@@ -186,14 +187,13 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
       {/* All Products */}
       <div className="px-4 py-4">
         <h2 className="font-semibold text-sm mb-3">
-          {searchQuery ? `Axtarış nəticələri` : tr("affiliateproducts_butun_mehsullar_c7373f", "B\xFCt\xFCn m\u0259hsullar")}
+          {searchQuery ? tr("affiliateproducts_search_results", "Axtarış nəticələri") : tr("affiliateproducts_butun_mehsullar_c7373f", "B\xFCt\xFCn m\u0259hsullar")}
           <span className="text-muted-foreground font-normal ml-2">({filteredProducts.length})</span>
         </h2>
         
         {isLoading ?
         <div className="grid grid-cols-2 gap-3">
             {[1, 2, 3, 4].map((i) =>
-          <div key={i} className="bg-card rounded-xl overflow-hidden border border-border/50">
                 <Skeleton className="aspect-square w-full" />
                 <div className="p-3 space-y-2">
                   <Skeleton className="h-4 w-3/4" />

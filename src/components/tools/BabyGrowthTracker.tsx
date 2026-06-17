@@ -241,7 +241,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
             <p className="text-2xl font-black text-rose-600 dark:text-rose-400">
               {latestEntry?.weight_kg ? `${latestEntry.weight_kg}` : '—'}
             </p>
-            <p className="text-xs text-rose-600/70 dark:text-rose-400/70 font-medium">kq</p>
+            <p className="text-xs text-rose-600/70 dark:text-rose-400/70 font-medium">{tr('unit_kg', 'kq')}</p>
             {weightChange !== null && weightChange !== 0 &&
             <div className={`flex items-center justify-center gap-0.5 mt-1 text-xs font-semibold ${weightChange > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
                 {weightChange > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
@@ -260,7 +260,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
             <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
               {latestEntry?.height_cm ? `${latestEntry.height_cm}` : '—'}
             </p>
-            <p className="text-xs text-indigo-600/70 dark:text-indigo-400/70 font-medium">sm</p>
+            <p className="text-xs text-indigo-600/70 dark:text-indigo-400/70 font-medium">{tr('unit_cm', 'sm')}</p>
             {heightChange !== null && heightChange !== 0 &&
             <div className={`flex items-center justify-center gap-0.5 mt-1 text-xs font-semibold ${heightChange > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
                 {heightChange > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
@@ -352,19 +352,19 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
                               {entry.weight_kg &&
                           <span className="flex items-center gap-1 text-rose-600 dark:text-rose-400">
                                   <Scale className="w-3.5 h-3.5" />
-                                  {entry.weight_kg} kq
+                                  {entry.weight_kg} {tr('unit_kg', 'kq')}
                                 </span>
                           }
                               {entry.height_cm &&
                           <span className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400">
                                   <Ruler className="w-3.5 h-3.5" />
-                                  {entry.height_cm} sm
+                                  {entry.height_cm} {tr('unit_cm', 'sm')}
                                 </span>
                           }
                               {entry.head_cm &&
                           <span className="flex items-center gap-1 text-violet-600 dark:text-violet-400">
                                   <Baby className="w-3.5 h-3.5" />
-                                  {entry.head_cm} sm
+                                  {entry.head_cm} {tr('unit_cm', 'sm')}
                                 </span>
                           }
                             </div>
@@ -443,7 +443,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
               <div>
                 <label className="text-sm font-medium mb-1.5 block flex items-center gap-1">
                   <Ruler className="w-3.5 h-3.5 text-indigo-500" />
-                  Boy (sm)
+                  {tr("babygrowthtracker_boy_sm_3bc841", "Boy (sm)")}
                 </label>
                 <Input
                   type="number"

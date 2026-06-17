@@ -773,7 +773,8 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
     birthDate: new Date(selectedChild.birth_date),
     gender: selectedChild.gender as 'boy' | 'girl',
     ageInDays: childAge.days,
-    ageInMonths: childAge.months
+    ageInMonths: childAge.months,
+    ageRemainingDays: childAge.remainingDays
   } : null;
 
   const babyAgeMonths = childAge?.months || 1;

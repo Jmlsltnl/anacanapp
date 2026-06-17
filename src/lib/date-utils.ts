@@ -50,10 +50,10 @@ export const formatRelativeDateAz = (date: Date | string): string => {
   yesterday.setDate(yesterday.getDate() - 1);
 
   if (d.toDateString() === today.toDateString()) {
-    return `Bu gün, ${formatTimeAz(d)}`;
+    return `${tr("dateutils_today", "Bu gün")}, ${formatTimeAz(d)}`;
   }
   if (d.toDateString() === yesterday.toDateString()) {
-    return `Dünən, ${formatTimeAz(d)}`;
+    return `${tr("dateutils_yesterday", "Dünən")}, ${formatTimeAz(d)}`;
   }
 
   return formatDateTimeAz(d);
@@ -81,8 +81,8 @@ export const symptomTranslations: Record<string, string> = {
   'Back Pain': tr("dateutils_bel_agrisi_9e824e", "Bel a\u011Fr\u0131s\u0131"),
   'mood_swings': tr("dateutils_ehval_deyisikliyi_9fa36f", "\u018Fhval d\u0259yi\u015Fikliyi"),
   'Mood Swings': tr("dateutils_ehval_deyisikliyi_9fa36f", "\u018Fhval d\u0259yi\u015Fikliyi"),
-  'insomnia': 'Yuxusuzluq',
-  'Insomnia': 'Yuxusuzluq',
+  'insomnia': tr("dateutils_yuxusuzluq_68d6ab", "Yuxusuzluq"),
+  'Insomnia': tr("dateutils_yuxusuzluq_68d6ab", "Yuxusuzluq"),
   'appetite_changes': tr("dateutils_i_stah_deyisikliyi_fea8a7", "\u0130\u015Ftah d\u0259yi\u015Fikliyi"),
   'Appetite Changes': tr("dateutils_i_stah_deyisikliyi_fea8a7", "\u0130\u015Ftah d\u0259yi\u015Fikliyi"),
   'breast_tenderness': tr("dateutils_dos_hessasligi_326b6d", "D\xF6\u015F h\u0259ssasl\u0131\u011F\u0131"),

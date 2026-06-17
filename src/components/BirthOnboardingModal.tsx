@@ -90,7 +90,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
         avatar_emoji: gender === 'girl' ? '👧' : '👦',
         is_active: true,
         sort_order: 0,
-        notes: `Doğum çəkisi: ${birthWeight || '-'} kq, Boy: ${birthHeight || '-'} sm, Doğum tipi: ${deliveryType}`
+        notes: `Doğum çəkisi: ${birthWeight || '-'} ${tr('unit_kg', 'kq')}, Boy: ${birthHeight || '-'} ${tr('unit_cm', 'sm')}, Doğum tipi: ${deliveryType}`
       });
 
       // Ignore if child already exists
@@ -363,7 +363,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                       </div>
                     </div>
                     <div>
-                      <Label className="text-xs text-muted-foreground mb-1 block">Boy (sm)</Label>
+                      <Label className="text-xs text-muted-foreground mb-1 block">{tr("birthonboardingmodal_boy_sm_3bc841", "Boy (sm)")}</Label>
                       <div className="relative">
                         <Ruler className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input

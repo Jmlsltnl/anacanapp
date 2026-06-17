@@ -25,15 +25,15 @@ const NotificationsTab = () => {
   { id: 'contraction_started', label: tr("notificationstab_sanci_350c2d", 'Sancı'), icon: Activity, color: 'bg-amber-100 text-amber-600' },
   { id: 'contraction_511', label: '5-1-1', icon: AlertCircle, color: 'bg-red-100 text-red-600' },
   { id: 'kick_session', label: tr("notificationstab_tepik_9a873a", 'Təpik'), icon: Footprints, color: 'bg-blue-100 text-blue-600' },
-  { id: 'water_goal', label: 'Su', icon: Droplets, color: 'bg-cyan-100 text-cyan-600' },
-  { id: 'love', label: 'Sevgi', icon: Heart, color: 'bg-pink-100 text-pink-600' }];
+  { id: 'water_goal', label: tr("notificationstab_su_label", "Su"), icon: Droplets, color: 'bg-cyan-100 text-cyan-600' },
+  { id: 'love', label: tr("notificationstab_love_label", "Sevgi"), icon: Heart, color: 'bg-pink-100 text-pink-600' }];
 
 
   const dateRanges: {id: typeof dateRange;label: string;}[] = [
   { id: 'all', label: tr("notificationstab_hamisi_c73c4d", 'Hamısı') },
   { id: 'today', label: tr("notificationstab_bu_gun_786fd4", 'Bu gün') },
   { id: 'week', label: tr("notificationstab_bu_hefte_a5f60b", 'Bu həftə') },
-  { id: 'month', label: 'Bu ay' }];
+  { id: 'month', label: tr("notificationstab_this_month", "Bu ay") }];
 
 
   const filteredMessages = useMemo(() => {
@@ -144,7 +144,7 @@ const NotificationsTab = () => {
         return {
           icon: MessageCircle,
           color: 'bg-emerald-100 text-emerald-600',
-          title: 'Mesaj',
+          title: tr("notificationstab_message_title", "Mesaj"),
           body: msg.content || ''
         };
       default:
@@ -166,8 +166,8 @@ const NotificationsTab = () => {
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
     if (diffMins < 1) return tr("notificationstab_i_ndice_3c9745", "\u0130ndic\u0259");
-    if (diffMins < 60) return `${diffMins} dəq əvvəl`;
-    if (diffHours < 24) return `${diffHours} saat əvvəl`;
+    if (diffMins < 60) return tr("notificationstab_mins_ago", "{n} dəq əvvəl").replace("{n}", String(diffMins));
+    if (diffHours < 24) return tr("notificationstab_hours_ago", "{n} saat əvvəl").replace("{n}", String(diffHours));
     if (diffDays === 1) return tr("notificationstab_dunen_52b701", "D\xFCn\u0259n");
     return date.toLocaleDateString('az-AZ', { day: 'numeric', month: 'short' });
   };
@@ -216,7 +216,7 @@ const NotificationsTab = () => {
         {showFilters ? tr("notificationstab_filterleri_gizlet_dd774e", "Filterl\u0259ri gizl\u0259t") : tr("notificationstab_filterleri_goster_da2ab9", "Filterl\u0259ri g\xF6st\u0259r")}
         {activeFilter !== 'all' || dateRange !== 'all' ?
         <span className="px-1.5 py-0.5 bg-primary text-white text-xs rounded-full">
-            Aktiv
+            {tr("notificationstab_active", "Aktiv")}
           </span> :
         null}
       </motion.button>
@@ -358,7 +358,7 @@ const NotificationsTab = () => {
                         <p className="text-sm text-muted-foreground mt-1">{details.body}</p>
                         {!message.is_read &&
                       <span className="inline-block mt-2 px-2 py-0.5 bg-primary/20 text-primary text-[10px] font-medium rounded-full">
-                            Yeni
+                            {tr("notificationstab_new", "Yeni")}
                           </span>
                       }
                       </div>

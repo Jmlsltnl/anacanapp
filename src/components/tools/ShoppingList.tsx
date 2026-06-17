@@ -205,7 +205,7 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
                       priority: item.priority
                     });
                     if (!result.error) {
-                      toast({ title: `${item.name_az || item.name} əlavə edildi!` });
+                      toast({ title: `${item.name_az || item.name} ${tr("shopping_item_added", "əlavə edildi!")}` });
                     }
                   }}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 rounded-full text-xs font-medium text-primary transition-colors border border-primary/20"

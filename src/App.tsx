@@ -37,8 +37,11 @@ const App = () => {
   const language = useUserStore((s) => s.language);
 
   useEffect(() => {
-    if (language && language !== 'az') {
-      loadTranslations(language).catch(console.error);
+    if (language) {
+      document.documentElement.setAttribute('lang', language);
+      if (language !== 'az') {
+        loadTranslations(language).catch(console.error);
+      }
     }
   }, [language]);
 

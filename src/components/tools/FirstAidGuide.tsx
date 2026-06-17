@@ -157,6 +157,8 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
               className={`w-full rounded-xl border p-3 text-left transition-all hover:shadow-md ${getEmergencyBg(scenario.emergency_level)}`}>
               
                     <div className="flex items-center gap-3">
+              
+                    <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${getEmergencyColor(scenario.emergency_level)} flex items-center justify-center text-xl shadow`}>
                         {scenario.icon}
                       </div>
@@ -164,13 +166,12 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                         <h3 className="text-sm font-bold text-foreground">{scenario.title_az}</h3>
                         <p className="text-xs text-muted-foreground line-clamp-1">{scenario.description_az}</p>
                         <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-gradient-to-r ${getEmergencyColor(scenario.emergency_level)} text-white`}>
-                          {scenario.emergency_level === 'critical' ? 'KRİTİK' : scenario.emergency_level === 'high' ? tr("firstaidguide_yuksek_22d925", "Y\xDCKS\u018FK") : 'ORTA'}
+                          {scenario.emergency_level === 'critical' ? tr("firstaid_critical", "KRİTİK") : scenario.emergency_level === 'high' ? tr("firstaidguide_yuksek_22d925", "Y\xDCKS\u018FK") : tr("firstaid_medium", "ORTA")}
                         </span>
                       </div>
                       <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
                     </div>
                   </motion.button>
-            )}
               </div>
           }
           </motion.div> :
@@ -214,6 +215,12 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                         <span className="text-base">
                           {currentStep === 0 ? '👋' : currentStep === steps.length - 1 ? '✅' : selectedScenario.icon}
                         </span>
+                
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${getEmergencyColor(selectedScenario.emergency_level)} flex items-center justify-center shadow-sm shrink-0`}>
+                        <span className="text-base">
+                          {currentStep === 0 ? '👋' : currentStep === steps.length - 1 ? '✅' : selectedScenario.icon}
+                        </span>
                       </div>
                       <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-[10px] font-medium">
                         {tr("firstaidguide_addim_9346cd", "Add\u0131m")} {currentStep + 1}
@@ -221,7 +228,7 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                       {currentStepData.is_critical &&
                   <span className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-2 py-0.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1">
                           <AlertTriangle className="w-2.5 h-2.5" />
-                          Kritik
+                          {tr("firstaid_critical_badge", "Kritik")}
                         </span>
                   }
                       {currentStepData.duration_seconds &&
@@ -260,7 +267,7 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                       }
                       onClick={currentStep === steps.length - 1 ? handleBack : nextStep}>
                       
-                          {currentStep === steps.length - 1 ? 'Tamamla' : tr("firstaidguide_novbeti_6e8661", "N\xF6vb\u0259ti")}
+                          {currentStep === steps.length - 1 ? tr("firstaid_complete", "Tamamla") : tr("firstaidguide_novbeti_6e8661", "N\xF6vb\u0259ti")}
                           <ChevronRight className="w-4 h-4 ml-1" />
                         </Button>
                       </div>

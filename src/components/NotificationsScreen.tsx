@@ -51,8 +51,8 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     if (diffMins < 1) return tr("notificationsscreen_i_ndice_3c9745", "\u0130ndic\u0259");
-    if (diffMins < 60) return `${diffMins} dəq`;
-    if (diffHours < 24) return `${diffHours} saat`;
+    if (diffMins < 60) return `${diffMins} ${tr("notificationsscreen_mins", "dəq")}`;
+    if (diffHours < 24) return `${diffHours} ${tr("notificationsscreen_hours", "saat")}`;
     if (diffDays === 1) return tr("notificationsscreen_dunen_52b701", "D\xFCn\u0259n");
     return date.toLocaleDateString('az-AZ', { day: 'numeric', month: 'short' });
   };
@@ -67,7 +67,7 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
   const filters: {id: FilterType;label: string;}[] = [
   { id: 'all', label: tr("notificationsscreen_hamisi_c73c4d", 'Hamısı') },
   { id: 'community', label: tr("notificationsscreen_cemiyyet_2dc44d", 'Cəmiyyət') },
-  { id: 'system', label: 'Sistem' }];
+  { id: 'system', label: tr("notificationsscreen_filter_system", "Sistem") }];
 
 
   return (
@@ -156,12 +156,12 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
                     {!notification.is_read &&
                   <button onClick={(e) => {e.stopPropagation();markAsRead(notification.id);}}
                   className="px-2.5 py-1 rounded-full bg-primary/8 text-primary text-[9px] font-bold">
-                        Oxundu
+                        {tr("notificationsscreen_read", "Oxundu")}
                       </button>
                   }
                     <button onClick={(e) => {e.stopPropagation();deleteNotification(notification.id);}}
                   className="px-2.5 py-1 rounded-full bg-destructive/8 text-destructive text-[9px] font-bold">
-                      <Trash2 className="w-2.5 h-2.5 inline mr-0.5" />Sil
+                      <Trash2 className="w-2.5 h-2.5 inline mr-0.5" />{tr("notificationsscreen_delete", "Sil")}
                     </button>
                   </div>
                 </motion.div>);

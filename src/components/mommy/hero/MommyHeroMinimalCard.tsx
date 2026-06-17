@@ -1,5 +1,5 @@
-import { tr } from "@/lib/tr";import { motion } from 'framer-motion';
-import { tr } from '@/lib/tr';
+import { tr } from "@/lib/tr";
+import { motion } from 'framer-motion';
 import { TrendingUp } from 'lucide-react';
 import type { MommyHeroProps } from './MommyHeroClassic';
 
@@ -9,7 +9,7 @@ import type { MommyHeroProps } from './MommyHeroClassic';
  */
 const MommyHeroMinimalCard = ({ babyData, exactMonths, remainingDays, babyIllustration }: MommyHeroProps) => {
   const primary = exactMonths > 0 ? exactMonths : babyData.ageInDays;
-  const primaryUnit = exactMonths > 0 ? 'ay' : tr("mommyherominimalcard_gun_54e78d", "g\xFCn");
+  const primaryUnit = exactMonths > 0 ? (exactMonths > 1 ? tr("time_months", "ay") : tr("time_month", "ay")) : (primary > 1 ? tr("time_days", "gün") : tr("time_day", "gün"));
 
   return (
     <motion.div
@@ -45,7 +45,7 @@ const MommyHeroMinimalCard = ({ babyData, exactMonths, remainingDays, babyIllust
         {/* Right column */}
         <div className="flex-1 min-w-0">
           <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-[hsl(15,80%,55%)]">
-            {tr("mommyherominimalcard_menim_korpem_1dd673", "M\u0259nim k\xF6rp\u0259m")}
+            {tr("mommyherominimalcard_menim_korpem_1dd673", "Mənim körpəm")}
           </p>
           <h2 className="text-2xl font-black text-foreground tracking-tight leading-tight mt-0.5 truncate">
             {babyData.name}
@@ -57,15 +57,14 @@ const MommyHeroMinimalCard = ({ babyData, exactMonths, remainingDays, babyIllust
               {primary}
             </span>
             <span className="text-sm font-bold text-muted-foreground">{primaryUnit}</span>
-            {exactMonths > 0 && remainingDays > 0 &&
-            <span className="text-xs font-medium text-muted-foreground/70 ml-1">
-                {remainingDays} {tr("mommyherominimalcard_gun_54e78d", "g\xFCn")}
+            {exactMonths > 0 && remainingDays > 0 && (
+              <span className="text-xs font-medium text-muted-foreground/70 ml-1">
+                {remainingDays} {remainingDays > 1 ? tr("time_days", "gün") : tr("time_day", "gün")}
               </span>
-            }
+            )}
           </div>
         </div>
       </div>
-
       {/* Subtle footer with single complementary metric */}
       <div className="relative flex items-center justify-between px-4 py-2.5 border-t border-black/5 bg-[hsl(15,30%,98%)]">
         <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
