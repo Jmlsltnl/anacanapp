@@ -172,6 +172,7 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                   </motion.button>
             )}
               </div>
+          }
           </motion.div> :
 
         <motion.div
