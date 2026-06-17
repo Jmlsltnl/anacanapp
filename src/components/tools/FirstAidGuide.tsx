@@ -207,13 +207,7 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 className="w-full max-w-sm">
-                
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${getEmergencyColor(selectedScenario.emergency_level)} flex items-center justify-center shadow-sm shrink-0`}>
-                        <span className="text-base">
-                          {currentStep === 0 ? '👋' : currentStep === steps.length - 1 ? '✅' : selectedScenario.icon}
-                        </span>
-                
+                    
                     <div className="flex items-center gap-2 mb-1.5">
                       <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${getEmergencyColor(selectedScenario.emergency_level)} flex items-center justify-center shadow-sm shrink-0`}>
                         <span className="text-base">

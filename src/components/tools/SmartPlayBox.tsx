@@ -370,6 +370,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
           </div>
           
           {isLoading ?
+          <div className="text-center py-12">
               <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary mb-2" />
               <p className="text-muted-foreground">{tr("smartplaybox_oyunlar_yuklenir_d1edd2", "Oyunlar yüklənir...")}</p>
             </div> :

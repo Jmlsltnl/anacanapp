@@ -247,9 +247,8 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
               disabled={!settings.notifications_enabled} />
             
           </SettingRow>
-            
-          </SettingRow>
         </div>
+
 
         {/* Silent Hours */}
         <div className="bg-card rounded-2xl overflow-hidden shadow-card border border-border/50">
