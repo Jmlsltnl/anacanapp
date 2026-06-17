@@ -131,7 +131,7 @@ export const useCommunityPushNotifications = () => {
         body: {
           userId: postAuthorId,
           title: tr("usepushnotifications_yeni_beyenme_b60a41", "Yeni bəyənmə! ❤️"),
-          body: `${likerName} paylaşımınızı bəyəndi`,
+          body: `${likerName} ${tr("usepushnotifications_paylasiminizi_beyendi", "paylaşımınızı bəyəndi")}`,
           data: { type: 'like' },
         },
       });

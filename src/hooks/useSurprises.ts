@@ -148,7 +148,7 @@ export const useSurprises = () => {
   // Get last 6 months data for chart
   const getMonthlyChartData = () => {
     const months: { month: string; points: number; label: string }[] = [];
-    const monthNames = ['Yan', 'Fev', 'Mar', 'Apr', 'May', 'İyn', 'İyl', 'Avq', 'Sen', 'Okt', 'Noy', 'Dek'];
+    const monthNames = [tr('month_jan_short', 'Yan'), tr('month_feb_short', 'Fev'), tr('month_mar_short', 'Mar'), tr('month_apr_short', 'Apr'), tr('month_may_short', 'May'), tr('month_jun_short', 'İyn'), tr('month_jul_short', 'İyl'), tr('month_aug_short', 'Avq'), tr('month_sep_short', 'Sen'), tr('month_oct_short', 'Okt'), tr('month_nov_short', 'Noy'), tr('month_dec_short', 'Dek')];
     
     for (let i = 5; i >= 0; i--) {
       const date = new Date();

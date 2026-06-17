@@ -33,6 +33,6 @@ export const useSkillCategories = () => {
 export const FALLBACK_SKILL_CATEGORIES = [
 { skill_key: 'motor', label_az: tr("useskillcategories_motor_bacariqlari_c2d526", "Motor Bacar\u0131qlar\u0131"), emoji: '🏃', color: 'bg-blue-500' },
 { skill_key: 'sensory', label_az: tr("useskillcategories_hissi_i_nkisaf_48af28", "Hissi \u0130nki\u015Faf"), emoji: '👁️', color: 'bg-purple-500' },
-{ skill_key: 'cognitive', label_az: 'İdrak', emoji: '🧠', color: 'bg-amber-500' },
-{ skill_key: 'language', label_az: 'Dil', emoji: '💬', color: 'bg-green-500' },
-{ skill_key: 'social', label_az: 'Sosial', emoji: '👥', color: 'bg-pink-500' }];
+{ skill_key: 'cognitive', label_az: tr("useskillcategories_idrak", "İdrak"), emoji: '🧠', color: 'bg-amber-500' },
+{ skill_key: 'language', label_az: tr("useskillcategories_dil", "Dil"), emoji: '💬', color: 'bg-green-500' },
+{ skill_key: 'social', label_az: tr("useskillcategories_sosial", "Sosial"), emoji: '👥', color: 'bg-pink-500' }];

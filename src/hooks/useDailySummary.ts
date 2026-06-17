@@ -206,7 +206,7 @@ export const useDailySummary = () => {
         content: JSON.stringify({
           type: 'daily_summary',
           title: tr("usedailysummary_gundelik_xulase_42932d", "📊 Gündəlik Xülasə"),
-          body: `Əhval: ${moodText} | Su: ${dailyLog?.water_intake || 0}ml | Təpiklər: ${totalKicks}`,
+          body: `${tr("usedailysummary_ehval", "Əhval:")} ${moodText} | ${tr("usedailysummary_su", "Su:")} ${dailyLog?.water_intake || 0}ml | ${tr("usedailysummary_tepikler", "Təpiklər:")} ${totalKicks}`,
           summary: data,
           timestamp: new Date().toISOString()
         }),

@@ -104,7 +104,7 @@ export const useShoppingItems = () => {
         body: {
           userId: partnerUserId,
           title: tr("useshoppingitems_alisveris_siyahisina_elave_5d9c87", "🛒 Alışveriş siyahısına əlavə"),
-          body: `${adderName} "${itemName}" əlavə etdi. Siyahını yoxla!`,
+          body: `${adderName} "${itemName}" ${tr("useshoppingitems_elave_etdi_siyahini_yoxla", "əlavə etdi. Siyahını yoxla!")}`,
           data: { type: 'shopping_list' }
         }
       });

@@ -316,7 +316,7 @@ export const useToggleLike = () => {
               body: {
                 userId: post.user_id,
                 title: tr("usecommunity_yeni_beyenme_3fd88a", "Yeni bəyənmə ❤️"),
-                body: `${likerName} paylaşımınızı bəyəndi`,
+                body: `${likerName} ${tr("usecommunity_paylasiminizi_beyendi", "paylaşımınızı bəyəndi")}`,
                 data: { type: 'community_like', postId, groupId }
               }
             });

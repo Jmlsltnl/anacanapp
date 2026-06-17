@@ -21,13 +21,14 @@ interface AlbumPhoto {
   url: string;
 }
 
-const monthLabels = Array.from({ length: 12 }, (_, i) => ({
+const getMonthLabels = () => Array.from({ length: 12 }, (_, i) => ({
   month: i + 1,
-  label: `${i + 1}-ci ay`,
+  label: `${i + 1} ${tr('babymonthlyalbum_month_suffix', '-ci ay')}`,
   emoji: ['🌱', '🌿', '🌳', '🌻', '🌺', '🌸', '🍀', '🌈', '⭐', '🎈', '🎉', '🎂'][i]
 }));
 
 const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
+  const monthLabels = getMonthLabels();
   useScrollToTop();
   const { user } = useAuth();
   const { selectedChild, getChildAge } = useChildren();
@@ -214,9 +215,9 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
               <ShoppingBag className="w-5 h-5 text-muted-foreground" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-bold text-foreground mb-0.5">Fiziki Albom</h3>
+              <h3 className="text-sm font-bold text-foreground mb-0.5">{tr("babymonthlyalbum_fiziki_albom_title", "Fiziki Albom")}</h3>
               <p className="text-[12px] text-muted-foreground leading-snug mb-2">
-                {selectedChild?.name || tr("babymonthlyalbum_korpeniz_da99de", "K\xF6rp\u0259niz")} {tr("babymonthlyalbum_1_yasina_catdiqda_ilk_ilin_but_b845cd", "1 ya\u015F\u0131na \xE7atd\u0131qda ilk ilin b\xFCt\xFCn xatir\u0259l\u0259rini fiziki albom kimi sifari\u015F ed\u0259 bil\u0259rsiniz.")}
+                {selectedChild?.name || tr("babymonthlyalbum_korpeniz_da99de", "Körpəniz")} {tr("babymonthlyalbum_1_yasina_catdiqda_ilk_ilin_but_b845cd", "1 yaşına çatdıqda ilk ilin bütün xatirələrini fiziki albom kimi sifariş edə bilərsiniz.")}
               </p>
               <div className="flex items-center gap-2">
                 <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
@@ -264,7 +265,7 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
                 size="icon"
                 className="text-white hover:bg-red-500/20 hover:text-red-400"
                 onClick={() => {
-                  if (confirm(tr("babymonthlyalbum_bu_sekli_silmek_istediyinize_e_b4ecbc", "Bu \u015F\u0259kli silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) {
+                  if (confirm(tr("babymonthlyalbum_bu_sekli_silmek_istediyinize_e_b4ecbc", "Bu şəkli silmək istədiyinizə əminsiniz?"))) {
                     handleDelete(viewingPhoto);
                   }
                 }}>
@@ -315,7 +316,7 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
                 }}>
                 
                   <Camera className="w-5 h-5 text-primary" />
-                  <span className="text-xs font-medium">Bax</span>
+                  <span className="text-xs font-medium">{tr("babymonthlyalbum_bax", "Bax")}</span>
                 </Button>
 
                 <Button
@@ -335,19 +336,19 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
                 className="flex flex-col items-center gap-1.5 h-auto py-3 rounded-xl border-destructive/30"
                 onClick={() => {
                   setShowActionSheet(null);
-                  if (confirm(tr("babymonthlyalbum_bu_sekli_silmek_istediyinize_e_b4ecbc", "Bu \u015F\u0259kli silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) {
+                  if (confirm(tr("babymonthlyalbum_bu_sekli_silmek_istediyinize_e_b4ecbc", "Bu şəkli silmək istədiyinizə əminsiniz?"))) {
                     handleDelete(showActionSheet);
                   }
                 }}>
                 
                   <Trash2 className="w-5 h-5 text-destructive" />
-                  <span className="text-xs font-medium text-destructive">Sil</span>
+                  <span className="text-xs font-medium text-destructive">{tr("babymonthlyalbum_sil", "Sil")}</span>
                 </Button>
               </div>
 
               <div className="px-4 pb-4">
                 <Button variant="ghost" className="w-full rounded-xl bg-muted" onClick={() => setShowActionSheet(null)}>
-                  {tr("babymonthlyalbum_legv_et_b5e49c", "L\u0259\u011Fv et")}
+                  {tr("babymonthlyalbum_legv_et", "Ləğv et")}
                 </Button>
               </div>
               <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />

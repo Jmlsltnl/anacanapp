@@ -3,10 +3,10 @@ import { isNative } from '@/lib/native';
 import type { TimerType } from '@/store/timerStore';
 
 const timerLabels: Record<TimerType, string> = {
-  sleep: '😴 Yuxu',
-  feeding: tr("timernotifications_emizdirme_af3cc9", "\uD83C\uDF7C \u018Fmizdirm\u0259"),
-  diaper: tr("timernotifications_bez_deyisdirme_cfec83", "\uD83E\uDDF7 Bez d\u0259yi\u015Fdirm\u0259"),
-  'white-noise': tr("timernotifications_kuy_sesi_1de6fc", "\uD83D\uDD0A K\xFCy S\u0259si")
+  sleep: tr("timernotifications_yuxu_eb2b53", "😴 Yuxu"),
+  feeding: tr("timernotifications_emizdirme_af3cc9", "🍼 Əmizdirmə"),
+  diaper: tr("timernotifications_bez_deyisdirme_cfec83", "🧷 Bez dəyişdirmə"),
+  'white-noise': tr("timernotifications_kuy_sesi_1de6fc", "🔊 Küy Səsi")
 };
 
 // Generate a stable numeric ID from timer string ID
@@ -34,7 +34,7 @@ feedType?: 'left' | 'right')
     }
 
     const title = label || timerLabels[type] || 'Timer';
-    const feedSuffix = feedType ? ` (${feedType === 'left' ? 'Sol' : tr("timernotifications_sag_edbe12", "Sa\u011F")})` : '';
+    const feedSuffix = feedType ? ` (${feedType === 'left' ? tr("timernotifications_sol", "Sol") : tr("timernotifications_sag_edbe12", "Sağ")})` : '';
 
     await LocalNotifications.schedule({
       notifications: [

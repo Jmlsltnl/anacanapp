@@ -328,7 +328,7 @@ export const useBlogAdmin = () => {
       // First check if category is used
       const postsUsingCategory = postCategories.filter(pc => pc.category_id === id);
       if (postsUsingCategory.length > 0) {
-        return { error: new Error(`Bu kateqoriya ${postsUsingCategory.length} məqalədə istifadə olunur. Əvvəlcə məqalələrdən çıxarın.`) };
+        return { error: new Error(`${tr("useblog_bu_kateqoriya", "Bu kateqoriya")} ${postsUsingCategory.length} ${tr("useblog_meqalede_istifade_olunur", "məqalədə istifadə olunur. Əvvəlcə məqalələrdən çıxarın.")}`) };
       }
 
       const { error } = await supabase

@@ -137,7 +137,7 @@ export const useHealthReport = (period: string = '1month'): HealthReportData => 
 
       result.push({
         label: tr("usehealthreport_su_qebulu_db1f3e", "Su qəbulu"),
-        value: `${avgWater.toFixed(1)} stəkan/gün`,
+        value: `${avgWater.toFixed(1)} ${tr("usehealthreport_stekan_gun", "stəkan/gün")}`,
         trend: waterChange >= 0 ? `+${waterChange.toFixed(0)}%` : `${waterChange.toFixed(0)}%`,
         positive: waterChange >= 0
       });
@@ -174,7 +174,7 @@ export const useHealthReport = (period: string = '1month'): HealthReportData => 
 
     result.push({
       label: tr("usehealthreport_mesqler_603be9", "Məşqlər"),
-      value: `${exercisePerWeek.toFixed(1)} dəfə/həftə`,
+      value: `${exercisePerWeek.toFixed(1)} ${tr("usehealthreport_defe_hefte", "dəfə/həftə")}`,
       trend: exercisePerWeek >= 3 ? tr("usehealthreport_ela_e6330a", "\u018Fla!") : exercisePerWeek >= 1 ? tr("usehealthreport_yaxsi_9d8595", "Yax\u015F\u0131") : tr("usehealthreport_artirin_c4ea43", "Art\u0131r\u0131n"),
       positive: exercisePerWeek >= 2
     });

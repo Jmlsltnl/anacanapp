@@ -139,7 +139,7 @@ export const useGenerateFairyTale = () => {
       toast.success(tr("usefairytales_nagil_yaradildi_45e374", "Na\u011F\u0131l yarad\u0131ld\u0131! \u2728"));
     },
     onError: (error) => {
-      toast.error(`Nağıl yaradıla bilmədi: ${error.message}`);
+      toast.error(`${tr("usefairytales_nagil_yaradila_bilmedi", "Nağıl yaradıla bilmədi:")} ${error.message}`);
     }
   });
 };
