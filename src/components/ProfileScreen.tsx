@@ -61,7 +61,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
       avatar_emoji: genderOptions.find((g) => g.value === childForm.gender)?.emoji || '👶'
     });
     if (child) {
-      toast({ title: `${childForm.name} əlavə edildi` });
+      toast({ title: `${childForm.name} ${tr("profile_child_added", "əlavə edildi")}` });
       setShowChildModal(false);
       setChildForm({ name: '', birth_date: '', gender: 'boy' });
     }
@@ -116,7 +116,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   };
 
   const sharePartnerCode = async () => {
-    const shareText = `Anacan tətbiqinə qoşul və hamiləlik səyahətimizdə mənə dəstək ol! Partnyor kodum: ${partnerCode}\n\nTətbiqi yüklə: https://anacanapp.lovable.app`;
+    const shareText = `${tr("profile_share_partner_text", "Anacan tətbiqinə qoşul və hamiləlik səyahətimizdə mənə dəstək ol! Partnyor kodum:")} ${partnerCode}\n\n${tr("profile_download_app", "Tətbiqi yüklə:")} https://anacanapp.lovable.app`;
 
     const success = await nativeShare({
       title: 'Partnyor Kodu',

@@ -258,7 +258,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
             <Avatar className="w-28 h-28 border-4 border-primary/20">
               <AvatarImage src={formData.avatar_url || undefined} />
               <AvatarFallback className="bg-primary/10 text-primary text-3xl font-bold">
-                {formData.name?.charAt(0) || 'İ'}
+                {formData.name?.charAt(0) || tr("common_initial_i", "İ")}
               </AvatarFallback>
             </Avatar>
             <motion.button

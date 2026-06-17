@@ -26,7 +26,7 @@ export default function RevenueCatDebug() {
     setError(null);
     setLog([]);
     try {
-      append(`Bundle versiyası: ${RC_BUILD_MARKER}`);
+      append(`${tr("rc_bundle_version", "Bundle versiyası:")} ${RC_BUILD_MARKER}`);
       append(`Platform: ${Capacitor.getPlatform()}`);
       append(`isNativePlatform: ${isNativePlatform()}`);
       append(`Native paywall UI aktiv: ${canUseNativePaywallUI()} ${Capacitor.getPlatform() === 'android' ? tr("revenuecatdebug_android_de_hemise_false_olmali_601719", "(Android-d\u0259 h\u0259mi\u015F\u0259 FALSE olmal\u0131d\u0131r)") : ''}`);

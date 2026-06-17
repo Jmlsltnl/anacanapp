@@ -155,7 +155,7 @@ const SurpriseTab = () => {
             sender_id: profile.user_id,
             receiver_id: partnerProfile.user_id,
             message_type: 'surprise_planned',
-            content: `🎁 Həyat yoldaşın sənin üçün xüsusi bir sürpriz planladı!`
+            content: tr("partner_surprise_planned", `🎁 Həyat yoldaşın sənin üçün xüsusi bir sürpriz planladı!`)
           });
         } catch (err) {
           console.error('Error sending surprise notification:', err);
@@ -185,7 +185,7 @@ const SurpriseTab = () => {
             sender_id: profile.user_id,
             receiver_id: partnerProfile.user_id,
             message_type: 'surprise_completed',
-            content: `${emoji} Həyat yoldaşın "${title}" sürprizini sənin üçün tamamladı! 🎉`
+            content: `${emoji} ${tr("partner_surprise_completed_1", "Həyat yoldaşın")} "${title}" ${tr("partner_surprise_completed_2", "sürprizini sənin üçün tamamladı! 🎉")}`
           });
 
           // Also add to notifications table
@@ -201,8 +201,8 @@ const SurpriseTab = () => {
       }
 
       toast({
-        title: `+${points} xal qazandın! 🏆`,
-        description: `${title} tamamlandı!`
+        title: `+${points} ${tr("partner_points_earned_2", "xal qazandın! 🏆")}`,
+        description: `${title} ${tr("partner_surprise_done", "tamamlandı!")}`
       });
     }
   };

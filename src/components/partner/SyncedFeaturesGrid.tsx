@@ -22,7 +22,7 @@ const SyncedFeaturesGrid = ({ onNavigate, onTabChange }: SyncedFeaturesGridProps
   {
     id: 'hospital-bag',
     title: tr("syncedfeaturesgrid_xestexana_cantasi_045078", 'Xəstəxana Çantası'),
-    subtitle: `${checkedCount}/${totalCount} hazır`,
+    subtitle: `${checkedCount}/${totalCount} ${tr("partner_ready", "hazır")}`,
     icon: Package,
     gradient: 'from-teal-500 to-emerald-600',
     progress: getProgress(),

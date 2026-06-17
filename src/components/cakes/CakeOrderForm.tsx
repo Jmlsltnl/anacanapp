@@ -169,7 +169,7 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
       contact_phone: formData.contact_phone,
       delivery_date: formData.delivery_date || null,
       delivery_address: formData.delivery_address || null,
-      notes: `${formData.notes || ''} [${paymentLabel} ödəniş]`.trim(),
+      notes: `${formData.notes || ''} [${paymentLabel} ${tr("cake_payment", "ödəniş")} ]`.trim(),
       custom_fields: { ...allCustomFields, payment_method: paymentLabel },
       status: 'pending',
       total_price: totalPrice
@@ -477,9 +477,9 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
                 {paymentMethod === 'card_simulated' ? <CreditCard className="w-5 h-5 mr-2" /> :
               paymentMethod === 'c2c_transfer' ? <ArrowLeftRight className="w-5 h-5 mr-2" /> :
               <Send className="w-5 h-5 mr-2" />}
-                {paymentMethod === 'card_simulated' ? `Ödə və sifariş ver` :
-              paymentMethod === 'c2c_transfer' ? `Sifarişi təsdiqlə` :
-              `Sifariş göndər`} — {totalPrice.toFixed(2)}₼
+                {paymentMethod === 'card_simulated' ? tr("cake_pay_and_order", "Ödə və sifariş ver") :
+              paymentMethod === 'c2c_transfer' ? tr("cake_confirm_order", "Sifarişi təsdiqlə") :
+              tr("cake_send_order", "Sifariş göndər")} — {totalPrice.toFixed(2)}₼
               </>
             }
           </Button>

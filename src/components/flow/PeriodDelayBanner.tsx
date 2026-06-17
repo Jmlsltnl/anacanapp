@@ -41,7 +41,7 @@ const PeriodDelayBanner = () => {
       await supabase.from('notifications').insert({
         user_id: user.id,
         title: 'Period gecikir',
-        message: `Periodunuz təxmini tarixdən ${delayDays} gün gecikir. Hamiləlik testi etməyi və ya Dr. Anacan-dan soruşmağı düşünün.`,
+        message: `${tr("flow_period_delay_1", "Periodunuz təxmini tarixdən")} ${delayDays} ${tr("flow_period_delay_2", "gün gecikir. Hamiləlik testi etməyi və ya Dr. Anacan-dan soruşmağı düşünün.")}`,
         notification_type: 'flow_delay',
         is_read: false
       });
@@ -71,7 +71,7 @@ const PeriodDelayBanner = () => {
             Orta tsikliniz {avgCycle} {tr("perioddelaybanner_gundur_stress_ceki_deyisikliyi_96ebc4", "g\xFCnd\xFCr. Stress, \xE7\u0259ki d\u0259yi\u015Fikliyi, hormonal dal\u011Falanma v\u0259 ya hamil\u0259lik s\u0259b\u0259b ola bil\u0259r. Hamil\u0259lik testi etm\u0259yi d\xFC\u015F\xFCn\xFCn.")}
           </p>
           <button
-            onClick={() => navigate(`/ai-chat?prompt=${encodeURIComponent(`Periodum ${delayDays} gün gecikib, nə edə bilərəm?`)}`)}
+            onClick={() => navigate(`/ai-chat?prompt=${encodeURIComponent(`${tr("flow_period_delay_prompt_1", "Periodum")} ${delayDays} ${tr("flow_period_delay_prompt_2", "gün gecikib, nə edə bilərəm?")}`)}`)}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-600 text-white text-xs font-semibold hover:bg-rose-700 transition-colors">
             
             <MessageCircle className="w-3.5 h-3.5" />

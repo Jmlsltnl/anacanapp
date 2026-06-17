@@ -103,7 +103,7 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
           <Avatar className={`${level === 0 ? 'w-8 h-8' : 'w-6 h-6'} cursor-pointer`}>
             <AvatarImage src={comment.author?.avatar_url || undefined} />
             <AvatarFallback className="bg-primary/8 text-primary font-bold text-[8px]">
-              {comment.author?.name?.charAt(0) || 'İ'}
+              {comment.author?.name?.charAt(0) || tr("common_initial_i", "İ")}
             </AvatarFallback>
           </Avatar>
         </motion.button>

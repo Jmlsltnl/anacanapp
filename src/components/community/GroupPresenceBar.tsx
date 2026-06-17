@@ -1,3 +1,4 @@
+import { tr } from "@/lib/tr";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Circle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -44,7 +45,7 @@ const GroupPresenceBar = ({ onlineCount, onlineUsers, typingUsers }: GroupPresen
               ))}
             </div>
             <span className="text-[10px] text-muted-foreground/40 font-medium">
-              {typingUsers.length === 1 ? `${typingUsers[0].name} yazır...` : `${typingUsers.length} nəfər yazır...`}
+              {typingUsers.length === 1 ? `${typingUsers[0].name} ${tr("community_is_typing", "yazır...")}` : `${typingUsers.length} ${tr("community_people_are_typing", "nəfər yazır...")}`}
             </span>
           </motion.div>
         )}

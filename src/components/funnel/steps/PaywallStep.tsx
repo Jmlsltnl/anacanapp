@@ -208,8 +208,8 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
         </Button>
         <p className="text-[11px] text-center text-muted-foreground">
             {selectedPlan === 'yearly' ?
-          yearlyTrialDays ? `${yearlyTrialDays} gün pulsuz sınayın · Sonra ${yearlyPriceStr}/il · İstənilən vaxt ləğv edin` : `${yearlyPriceStr}/il · İstənilən vaxt ləğv edin` :
-          monthlyTrialDays ? `${monthlyTrialDays} gün pulsuz sınayın · Sonra ${monthlyPriceStr}/ay · İstənilən vaxt ləğv edin` : `${monthlyPriceStr}/ay · İstənilən vaxt ləğv edin`}
+          yearlyTrialDays ? `${yearlyTrialDays} ${tr("paywall_trial_days", "gün pulsuz sınayın · Sonra")} ${yearlyPriceStr}${tr("paywall_per_year", "/il")} · ${tr("paywall_cancel_anytime", "İstənilən vaxt ləğv edin")}` : `${yearlyPriceStr}${tr("paywall_per_year", "/il")} · ${tr("paywall_cancel_anytime", "İstənilən vaxt ləğv edin")}` :
+          monthlyTrialDays ? `${monthlyTrialDays} ${tr("paywall_trial_days", "gün pulsuz sınayın · Sonra")} ${monthlyPriceStr}${tr("paywall_per_month", "/ay")} · ${tr("paywall_cancel_anytime", "İstənilən vaxt ləğv edin")}` : `${monthlyPriceStr}${tr("paywall_per_month", "/ay")} · ${tr("paywall_cancel_anytime", "İstənilən vaxt ləğv edin")}`}
         </p>
       </div>
     </div>);

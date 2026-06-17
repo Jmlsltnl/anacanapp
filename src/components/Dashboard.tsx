@@ -307,7 +307,7 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
     await addSession(1, 0);
     toast({
       title: tr("dashboard_tepik_qeyd_edildi_284f06", "Təpik qeyd edildi! 👶"),
-      description: `Bu gün ${kickCount + 1} təpik`
+      description: `${tr("dashboard_today", "Bu gün")} ${kickCount + 1} ${tr("dashboard_kick", "təpik")}`
     });
   };
 
@@ -316,7 +316,7 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
     await updateWaterIntake(1);
     toast({
       title: tr("dashboard_su_elave_edildi_7b894d", "Su əlavə edildi! 💧"),
-      description: `${waterCount + 1}/8 stəkan`
+      description: `${waterCount + 1}/8 ${tr("dashboard_glasses", "stəkan")}`
     });
   };
 
@@ -373,7 +373,7 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
             
             <img
               src={FETUS_IMAGES[Math.min(Math.ceil(selectedWeek / 4.4), 9)] || FETUS_IMAGES[1]}
-              alt={`${selectedWeek} həftəlik körpə`}
+              alt={`${selectedWeek} ${tr("dashboard_week_baby", "həftəlik körpə")}`}
               className="w-full h-full object-contain drop-shadow-lg" />
             
           </motion.div>
@@ -888,7 +888,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
           start_time: new Date(Date.now() - result.durationSeconds * 1000).toISOString(),
           end_time: new Date().toISOString()
         });
-        toast({ title: "Yuxu bitdi! ☀️", description: `${formatDuration(result.durationSeconds)} yatdı` });
+        toast({ title: tr("dashboard_sleep_ended", "Yuxu bitdi! ☀️"), description: `${formatDuration(result.durationSeconds)} ${tr("dashboard_slept", "yatdı")}` });
       }
     } else {
       // Start sleep
@@ -913,7 +913,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
         });
         toast({
           title: `${type === 'left' ? 'Sol' : tr("dashboard_sag_edbe12", "Sa\u011F")} sinə bitti!`,
-          description: `Müddət: ${formatDuration(result.durationSeconds)}`
+          description: `${tr("dashboard_duration", "Müddət:")} ${formatDuration(result.durationSeconds)}`
         });
 
         // Check for achievement
@@ -974,7 +974,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
       dirty: '💩',
       both: '💧💩'
     };
-    toast({ title: `Bez dəyişmə: ${typeEmojis[type]}` });
+    toast({ title: `${tr("dashboard_diaper_change", "Bez dəyişmə:")} ${typeEmojis[type]}` });
 
     // Check for achievement
     if (todayStats.diaperCount >= 9) {
@@ -1548,9 +1548,9 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
                       const h = Math.floor(totalMin / 60);
                       const m = totalMin % 60;
                       if (h === 0 && m === 0) return tr("dashboard_0_deq_86d70a", "0 d\u0259q");
-                      if (h === 0) return `${m} dəq`;
+                      if (h === 0) return `${m} ${tr("dashboard_min", "dəq")}`;
                       if (m === 0) return `${h} saat`;
-                      return `${h} saat ${m} dəq`;
+                      return `${h} ${tr("dashboard_hour", "saat")} ${m} ${tr("dashboard_min", "dəq")}`;
                     })()}
                   </p>
                   <p className="text-[10px] text-muted-foreground">{tr("dashboard_bu_gun_7d7f30", "bu gün")}</p>
@@ -1580,7 +1580,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
                     const dH = Math.floor(durationSec / 3600);
                     const dM = Math.floor(durationSec % 3600 / 60);
                     const dS = durationSec % 60;
-                    const durText = dH > 0 ? `${dH}s ${dM}d` : dM > 0 ? `${dM} dəq ${dS} san` : `${dS} san`;
+                    const durText = dH > 0 ? `${dH}${tr("dashboard_h", "s")} ${dM}${tr("dashboard_m", "d")}` : dM > 0 ? `${dM} ${tr("dashboard_min", "dəq")} ${dS} ${tr("dashboard_sec", "san")}` : `${dS} ${tr("dashboard_sec", "san")}`;
 
                     return (
                       <div key={log.id} className="flex items-center justify-between p-2 bg-primary/10 rounded-xl">

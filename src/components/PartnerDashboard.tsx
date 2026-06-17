@@ -113,7 +113,7 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
         });
         toast({
           title: tr("partnerdashboard_sevgi_gonderildi_4284b1", '💕 Sevgi göndərildi!'),
-          description: `${womanName} bildiriş alacaq`
+          description: `${womanName} ${tr("partner_will_receive_notification", "bildiriş alacaq")}`
         });
       } catch (err) {
         console.error('Error sending love:', err);

@@ -198,7 +198,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
           <Avatar className="w-20 h-20 border-2 border-primary/20">
             <AvatarImage src={profile.avatar_url || undefined} />
             <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
-              {profile.name?.charAt(0) || 'İ'}
+              {profile.name?.charAt(0) || tr("common_initial_i", "İ")}
             </AvatarFallback>
           </Avatar>
 

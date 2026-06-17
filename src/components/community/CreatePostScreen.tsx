@@ -128,7 +128,7 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
       const fileExt = file.name.split('.').pop() || 'jpg';
       const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const { error } = await supabase.storage.from('community-media').upload(fileName, file, { cacheControl: '3600', upsert: false });
-      if (error) throw new Error(`Fayl yüklənə bilmədi: ${error.message}`);
+      if (error) throw new Error(`${tr("community_file_upload_failed", "Fayl yüklənə bilmədi:")} ${error.message}`);
       const { data: { publicUrl } } = supabase.storage.from('community-media').getPublicUrl(fileName);
       urls.push(publicUrl);
     }

@@ -14,7 +14,7 @@ const CycleAnomalyBanner = () => {
     anomalies.push({
       severity: 'warn',
       title: tr("cycleanomalybanner_qisa_tsikl_askar_edildi_b0e734", "Q\u0131sa tsikl a\u015Fkar edildi"),
-      message: `Ən qısa tsikliniz ${stats.shortestCycle} gündür. 21 gündən az tsikllər həkim müraciəti tələb edə bilər.`
+      message: `${tr("flow_shortest_cycle", "Ən qısa tsikliniz")} ${stats.shortestCycle} ${tr("flow_days", "gündür.")} ${tr("flow_short_cycle_warn", "21 gündən az tsikllər həkim müraciəti tələb edə bilər.")}`
     });
   }
 
@@ -22,7 +22,7 @@ const CycleAnomalyBanner = () => {
     anomalies.push({
       severity: 'warn',
       title: tr("cycleanomalybanner_uzun_tsikl_askar_edildi_14479e", "Uzun tsikl a\u015Fkar edildi"),
-      message: `Ən uzun tsikliniz ${stats.longestCycle} gündür. 35 gündən uzun tsikllər PCOS və ya hormonal disbalans əlaməti ola bilər.`
+      message: `${tr("flow_longest_cycle", "Ən uzun tsikliniz")} ${stats.longestCycle} ${tr("flow_days", "gündür.")} ${tr("flow_long_cycle_warn", "35 gündən uzun tsikllər PCOS və ya hormonal disbalans əlaməti ola bilər.")}`
     });
   }
 
@@ -30,7 +30,7 @@ const CycleAnomalyBanner = () => {
     anomalies.push({
       severity: 'info',
       title: tr("cycleanomalybanner_duzensiz_tsikl_7b2693", "D\xFCz\u0259nsiz tsikl"),
-      message: `Tsikllər arasında ${stats.cycleVariation} gün fərq var. Bu stress, çəki dəyişikliyi və ya tireoid problemlərlə bağlı ola bilər.`
+      message: `${tr("flow_cycle_diff", "Tsikllər arasında")} ${stats.cycleVariation} ${tr("flow_cycle_diff_2", "gün fərq var. Bu stress, çəki dəyişikliyi və ya tireoid problemlərlə bağlı ola bilər.")}`
     });
   }
 

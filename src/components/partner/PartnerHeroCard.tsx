@@ -60,7 +60,7 @@ const PartnerHeroCard = ({
 
   // Subtitle per stage
   const subtitle = (() => {
-    if (lifeStage === 'bump' && currentWeek > 0) return `Hamiləlik: ${currentWeek}. həftə`;
+    if (lifeStage === 'bump' && currentWeek > 0) return `${tr("partner_pregnancy_week", "Hamiləlik:")} ${currentWeek}. ${tr("partner_week", "həftə")}`;
     if (lifeStage === 'mommy') {
       const baby = babyName || tr("partnerherocard_korpe_fa2b51", "K\xF6rp\u0259");
       if (babyMonths >= 1) return `${baby}: ${babyMonths} ay ${babyAgeDays % 30} gün`;

@@ -103,7 +103,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
 
       toast({
         title: tr("birthonboardingmodal_tebrik_edirik_4dc427", 'Təbrik edirik! 🎉'),
-        description: `${babyName} dünyaya xoş gəldi! Analıq səyahətinizə başlayırıq.`
+        description: `${babyName} ${tr("birth_welcome_world", "dünyaya xoş gəldi! Analıq səyahətinizə başlayırıq.")}`
       });
 
       onComplete();

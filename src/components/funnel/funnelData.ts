@@ -171,7 +171,7 @@ export const SYMPTOM_MAPPINGS: Record<string, SymptomMapping> = {
 export const RESULTS_TEMPLATES: Record<LifeStage, (name: string, weekOrAge: number, answers: Record<string, string>) => string[]> = {
   bump: (name, week, answers) => {
     const lines: string[] = [];
-    lines.push(`${name}, ${week}-ci həftədə olan hamilə qadınların 78%-i müəyyən narahatlıqlar yaşayır.`);
+    lines.push(`${name}, ${week}${tr("funnel_week_stats", "-ci həftədə olan hamilə qadınların 78%-i müəyyən narahatlıqlar yaşayır.")}`);
     if (answers.sleep === 'interrupted' || answers.sleep === 'bad') {
       lines.push(tr("funneldata_yuxu_problemleri_3_cu_trimestr_32906e", "Yuxu probleml\u0259ri 3-c\xFC trimestrd\u0259 \xE7ox yay\u0131lm\u0131\u015F hald\u0131r \u2014 siz t\u0259k deyilsiniz."));
     }
@@ -186,7 +186,7 @@ export const RESULTS_TEMPLATES: Record<LifeStage, (name: string, weekOrAge: numb
   },
   mommy: (name, ageMonths, answers) => {
     const lines: string[] = [];
-    lines.push(`${name}, ${ageMonths} aylıq körpəsi olan anaların 82%-i oxşar çətinliklərlə üzləşir.`);
+    lines.push(`${name}, ${ageMonths} ${tr("funnel_month_stats", "aylıq körpəsi olan anaların 82%-i oxşar çətinliklərlə üzləşir.")}`);
     if (answers.emotional === 'very_hard') {
       lines.push(tr("funneldata_dogusdan_sonraki_emosional_cet_a584c9", "Do\u011Fu\u015Fdan sonrak\u0131 emosional \xE7\u0259tinlikl\u0259r tamamil\u0259 normald\u0131r \u2014 k\xF6m\u0259k almaq g\xFCcd\xFCr."));
     }
@@ -198,7 +198,7 @@ export const RESULTS_TEMPLATES: Record<LifeStage, (name: string, weekOrAge: numb
   },
   flow: (name, cycleLen, answers) => {
     const lines: string[] = [];
-    lines.push(`${name}, ${cycleLen} günlük tsiklinizə əsasən fərdi təhlil hazırladıq.`);
+    lines.push(`${name}, ${cycleLen} ${tr("funnel_cycle_stats", "günlük tsiklinizə əsasən fərdi təhlil hazırladıq.")}`);
     if (answers.pain === 'physical') {
       lines.push(tr("funneldata_qadinlarin_65_i_menstruasiya_z_08edb4", "Qad\u0131nlar\u0131n 65%-i menstruasiya zaman\u0131 fiziki a\u011Fr\u0131larla m\xFCbariz\u0259 apar\u0131r."));
     }

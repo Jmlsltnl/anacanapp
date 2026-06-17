@@ -29,7 +29,7 @@ const PartnerMissionsCard = ({ showAll = false }: PartnerMissionsCardProps) => {
 
     if (result?.completed) {
       toast({
-        title: `+${result.pointsEarned} xal qazandın! 🎉`,
+        title: `+${result.pointsEarned} ${tr("partner_points_earned", "xal qazandın! 🎉")}`,
         description: title
       });
     }

@@ -245,7 +245,7 @@ const AuthScreen = () => {
 
       toast({
         title: tr("authscreen_ugurla_baglandiniz_62b079", 'Uğurla bağlandınız! 🎉'),
-        description: `${partnerProfile.name} ilə əlaqələndirildiniz.`
+        description: `${partnerProfile.name} ${tr("auth_linked_with", "ilə əlaqələndirildiniz.")}`
       });
 
       // Force page refresh to update auth state

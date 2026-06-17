@@ -121,13 +121,13 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
 
     switch (lifeStage) {
       case 'flow':
-        return `Salam${userName}. Mən Anacan.AI. Menstrual tsikl, simptomlar və ümumi sağlamlıq üzrə suallarınıza peşəkar cavab verməyə hazıram.`;
+        return `${tr("aichat_welcome_flow_1", "Salam")}${userName}. ${tr("aichat_welcome_flow_2", "Mən Anacan.AI. Menstrual tsikl, simptomlar və ümumi sağlamlıq üzrə suallarınıza peşəkar cavab verməyə hazıram.")}`;
       case 'bump':
-        return `Salam${userName}. Mən Anacan.AI. ${pregnancyData ? `Hazırda hamiləliyin ${pregnancyData.currentWeek}-ci həftəsindəsiniz; körpəniz təxminən ${dynamicFruit || pregnancyData.babySize.fruit} böyüklüyündədir. ` : ''}Hamiləlik dövrü ilə bağlı suallarınızı verə bilərsiniz.`;
+        return `${tr("aichat_welcome_bump_1", "Salam")}${userName}. ${tr("aichat_welcome_bump_2", "Mən Anacan.AI.")} ${pregnancyData ? tr("aichat_welcome_bump_3", "Hazırda hamiləliyin {0}-ci həftəsindəsiniz; körpəniz təxminən {1} böyüklüyündədir. ").replace('{0}', String(pregnancyData.currentWeek)).replace('{1}', dynamicFruit || pregnancyData.babySize.fruit) : ''}${tr("aichat_welcome_bump_4", "Hamiləlik dövrü ilə bağlı suallarınızı verə bilərsiniz.")}`;
       case 'mommy':
-        return `Salam${userName}. Mən Anacan.AI. Körpə baxımı, əmizdirmə, yuxu rejimi və doğuşdan sonrakı bərpa ilə bağlı suallarınıza dəstək olmağa hazıram.`;
+        return `${tr("aichat_welcome_mommy_1", "Salam")}${userName}. ${tr("aichat_welcome_mommy_2", "Mən Anacan.AI. Körpə baxımı, əmizdirmə, yuxu rejimi və doğuşdan sonrakı bərpa ilə bağlı suallarınıza dəstək olmağa hazıram.")}`;
       default:
-        return `Salam${userName}. Mən Anacan.AI. Sizə necə kömək edə bilərəm?`;
+        return `${tr("aichat_welcome_default_1", "Salam")}${userName}. ${tr("aichat_welcome_default_2", "Mən Anacan.AI. Sizə necə kömək edə bilərəm?")}`;
     }
   };
 

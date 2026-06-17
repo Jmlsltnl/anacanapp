@@ -13,7 +13,7 @@ interface MedicalDisclaimerProps {
 const MedicalDisclaimer = ({ variant = 'banner', className = '' }: MedicalDisclaimerProps) => {
   const text = tr(
     'medical_disclaimer_full',
-    'Bu məlumat yalnız maarifləndirmə məqsədi daşıyır və tibbi məsləhət, diaqnoz və ya müalicə əvəzi DEYİL. Hər hansı tibbi qərar verməzdən əvvəl mütləq həkiminizə və ya ixtisaslı tibb işçisinə müraciət edin. Təcili hallarda 103-ə zəng edin.'
+    tr("medical_disclaimer_text", 'Bu məlumat yalnız maarifləndirmə məqsədi daşıyır və tibbi məsləhət, diaqnoz və ya müalicə əvəzi DEYİL. Hər hansı tibbi qərar verməzdən əvvəl mütləq həkiminizə və ya ixtisaslı tibb işçisinə müraciət edin. Təcili hallarda 103-ə zəng edin.')
   );
 
   if (variant === 'inline') {

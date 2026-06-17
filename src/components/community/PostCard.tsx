@@ -149,12 +149,12 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
                 isAnonymous && isAdmin ?
                 <>
                     <AvatarImage src={post.author?.avatar_url || undefined} />
-                    <AvatarFallback className="bg-gradient-to-br from-primary/15 to-accent/10 text-primary font-black text-xs">{post.author?.name?.charAt(0) || 'İ'}</AvatarFallback>
+                    <AvatarFallback className="bg-gradient-to-br from-primary/15 to-accent/10 text-primary font-black text-xs">{post.author?.name?.charAt(0) || tr("common_initial_i", "İ")}</AvatarFallback>
                   </> :
 
                 <>
                     <AvatarImage src={post.author?.avatar_url || undefined} />
-                    <AvatarFallback className="bg-gradient-to-br from-primary/15 to-accent/10 text-primary font-black text-xs">{post.author?.name?.charAt(0) || 'İ'}</AvatarFallback>
+                    <AvatarFallback className="bg-gradient-to-br from-primary/15 to-accent/10 text-primary font-black text-xs">{post.author?.name?.charAt(0) || tr("common_initial_i", "İ")}</AvatarFallback>
                   </>
                 }
               </Avatar>
