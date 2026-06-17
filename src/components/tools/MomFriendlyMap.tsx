@@ -474,11 +474,6 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
             </Button>
           </div>
         </DialogContent>
-              
-              {addPlaceMutation.isPending ? tr("momfriendlymap_elave_edilir_3c28b4", "\u018Flav\u0259 edilir...") : tr("momfriendlymap_mekan_elave_et_dd9c6e", "M\u0259kan \u018Flav\u0259 Et")}
-            </Button>
-          </div>
-        </DialogContent>
       </Dialog>
 
       {/* Place Detail Modal */}

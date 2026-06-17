@@ -157,8 +157,6 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
               className={`w-full rounded-xl border p-3 text-left transition-all hover:shadow-md ${getEmergencyBg(scenario.emergency_level)}`}>
               
                     <div className="flex items-center gap-3">
-              
-                    <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${getEmergencyColor(scenario.emergency_level)} flex items-center justify-center text-xl shadow`}>
                         {scenario.icon}
                       </div>
@@ -172,8 +170,8 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                       <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
                     </div>
                   </motion.button>
+            )}
               </div>
-          }
           </motion.div> :
 
         <motion.div

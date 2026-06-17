@@ -357,9 +357,6 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
               })}
             </div>
           </CardContent>
-              })}
-            </div>
-          </CardContent>
         </Card>
 
         {/* All Activities */}
