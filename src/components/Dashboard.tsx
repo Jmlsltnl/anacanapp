@@ -748,8 +748,13 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
 
 
 
+const getBabyFunFacts = (): string[] => [
+  tr('baby_fun_fact_1', 'Körpəniz hər gün yeni şeylər öyrənir!'),
+  tr('baby_fun_fact_2', 'Sevgi və qulluq beynin sağlam inkişafına kömək edir.'),
+  tr('baby_fun_fact_3', 'Körpələr ana səsini doğumdan əvvəl tanıyır.'),
+];
+
 const getBabyDailyFunFact = (ageInDays: number): string => {
-  // Use age + current day to get a rotating fact
   const dayOfYear = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
   const facts = getBabyFunFacts();
   const factIndex = (ageInDays + dayOfYear) % facts.length;
