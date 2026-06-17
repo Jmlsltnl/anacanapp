@@ -377,7 +377,7 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
                 {tr("horoscopecompatibility_dogum_xeriteleri_c9a3ce", "Do\u011Fum X\u0259rit\u0259l\u0259ri")}
               </h3>
               
-              <BirthChartCard chart={analysisResult.charts.mom} label="Ana" emoji="👩" />
+              <BirthChartCard chart={analysisResult.charts.mom} label={tr("untranslated_ana_tubxbv", "Ana")} emoji="👩" />
               {analysisResult.charts.dad &&
               <BirthChartCard chart={analysisResult.charts.dad} label="Ata" emoji="👨" />
               }
@@ -861,7 +861,7 @@ const PersonInput = ({
           {data.hasBirthTime &&
         <div className="text-right">
               <p className="text-xs text-muted-foreground">{tr("horoscopecompatibility_yukselen_b35c71", "Yüksələn")}</p>
-              <p className="text-xs font-medium text-purple-500">Hesablanacaq ↗</p>
+              <p className="text-xs font-medium text-purple-500">{tr("untranslated_hesablanacaq_w6pf63", "Hesablanacaq ↗")}</p>
             </div>
         }
         </motion.div>
@@ -895,7 +895,7 @@ const BirthChartCard = ({ chart, label, emoji }: {chart: ChartData;label: string
         <Moon className="h-4 w-4 mx-auto text-blue-400 mb-1" />
         <span className="text-2xl block">{chart.moon.symbol}</span>
         <p className="text-xs font-medium mt-1">{chart.moon.signAz}</p>
-        <p className="text-[10px] text-muted-foreground">Ay</p>
+        <p className="text-[10px] text-muted-foreground">{tr("untranslated_ay_m6wwbp", "Ay")}</p>
       </div>
 
       <div className={cn(
@@ -913,7 +913,7 @@ const BirthChartCard = ({ chart, label, emoji }: {chart: ChartData;label: string
 
       <>
             <span className="text-lg block text-muted-foreground">?</span>
-            <p className="text-xs text-muted-foreground mt-1">Bilinmir</p>
+            <p className="text-xs text-muted-foreground mt-1">{tr("untranslated_bilinmir_iqd3o8", "Bilinmir")}</p>
           </>
       }
         <p className="text-[10px] text-muted-foreground">{tr("horoscopecompatibility_yukselen_b35c71", "Yüksələn")}</p>

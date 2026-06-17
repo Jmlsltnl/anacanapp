@@ -171,7 +171,7 @@ const AppIntroduction = ({ onComplete }: AppIntroductionProps) => {
             {currentSlide === slides.length - 1 ?
             <>{tr("appintroduction_basla_4820bc", "Başla")}<Sparkles className="w-5 h-5 ml-2" /></> :
 
-            <>Davam et <ChevronRight className="w-5 h-5 ml-2" /></>
+            <>{tr("untranslated_davam_et_rchhd5", "Davam et")}<ChevronRight className="w-5 h-5 ml-2" /></>
             }
           </Button>
         </div>

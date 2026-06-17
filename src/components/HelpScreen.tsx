@@ -379,7 +379,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                     <Phone className="w-6 h-6 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold text-foreground">Telefon</p>
+                    <p className="font-semibold text-foreground">{tr("untranslated_telefon_vwjgg5", "Telefon")}</p>
                     <p className="text-sm text-primary">+994 12 000 00 00</p>
                   </div>
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
@@ -437,7 +437,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
 
                   <div className="space-y-4">
                     <div>
-                      <label className="text-sm text-muted-foreground mb-1 block">Kateqoriya</label>
+                      <label className="text-sm text-muted-foreground mb-1 block">{tr("untranslated_kateqoriya_d7bf4y", "Kateqoriya")}</label>
                       <div className="flex flex-wrap gap-2">
                         {ticketCategories.map((cat) =>
                     <button
@@ -465,7 +465,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                     </div>
 
                     <div>
-                      <label className="text-sm text-muted-foreground mb-1 block">Mesaj</label>
+                      <label className="text-sm text-muted-foreground mb-1 block">{tr("untranslated_mesaj_3c09op", "Mesaj")}</label>
                       <Textarea
                     value={newTicket.message}
                     onChange={(e) => setNewTicket({ ...newTicket, message: e.target.value })}

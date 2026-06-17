@@ -134,7 +134,7 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
           )}
           {discountAmount > 0 &&
           <div className="flex justify-between text-sm text-green-600">
-              <span>Kupon endirimi</span>
+              <span>{tr("untranslated_kupon_endirimi_itwejz", "Kupon endirimi")}</span>
               <span>-{discountAmount.toFixed(2)} ₼</span>
             </div>
           }

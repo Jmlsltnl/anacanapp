@@ -495,9 +495,7 @@ const OnboardingScreen = () => {
                     </motion.div>
 
                     <motion.div variants={childVariants}>
-                      <label className="text-sm font-bold text-foreground mb-3 block">
-                        Cinsi
-                      </label>
+                      <label className="text-sm font-bold text-foreground mb-3 block">{tr("untranslated_cinsi_az7fty", "Cinsi")}</label>
                       <div className="flex gap-4">
                         {[
                     { id: 'boy', label: tr("onboardingscreen_oglan_e9715e", 'Oğlan'), emoji: '👦', gradient: 'from-blue-500 to-indigo-600' },

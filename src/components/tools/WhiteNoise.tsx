@@ -430,7 +430,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
           
           <div className="flex items-center gap-2 mb-3">
             <Timer className="w-4 h-4 text-primary" />
-            <span className="text-sm font-semibold text-foreground">Taymer</span>
+            <span className="text-sm font-semibold text-foreground">{tr("untranslated_taymer_uen6sv", "Taymer")}</span>
           </div>
           <div className="grid grid-cols-4 gap-2">
             {timerOptions.map((option) =>

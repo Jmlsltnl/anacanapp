@@ -190,7 +190,7 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
                     <div className="w-12 h-12 rounded-full bg-primary/8 flex items-center justify-center">
                       <ImageIcon className="w-5 h-5 text-primary/60" />
                     </div>
-                    <span className="font-bold text-[12px] text-foreground">Qalereyadan</span>
+                    <span className="font-bold text-[12px] text-foreground">{tr("untranslated_qalereyadan_w37f0m", "Qalereyadan")}</span>
                   </motion.button>
                   <motion.button
                   onClick={() => toast({ title: tr("storiesbar_kamera_tezlikle_elave_olunacaq_0a3aad", 'Kamera tezliklə əlavə olunacaq') })}
@@ -200,7 +200,7 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
                     <div className="w-12 h-12 rounded-full bg-blue-500/8 flex items-center justify-center">
                       <Camera className="w-5 h-5 text-blue-500/60" />
                     </div>
-                    <span className="font-bold text-[12px] text-foreground">Kamera</span>
+                    <span className="font-bold text-[12px] text-foreground">{tr("untranslated_kamera_qucuxi", "Kamera")}</span>
                   </motion.button>
                 </div>
               </div>

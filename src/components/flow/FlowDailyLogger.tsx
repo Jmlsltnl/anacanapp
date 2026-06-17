@@ -266,7 +266,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
 
               {/* Symptoms */}
               <div>
-                <label className="text-sm font-medium text-foreground mb-3 block">Simptomlar</label>
+                <label className="text-sm font-medium text-foreground mb-3 block">{tr("untranslated_simptomlar_xhm7bx", "Simptomlar")}</label>
                 <div className="flex flex-wrap gap-2">
                   {symptoms.map((symptom) =>
                 <button

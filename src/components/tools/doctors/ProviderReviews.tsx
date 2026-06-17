@@ -122,9 +122,7 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
                 onClick={handleDelete}
                 className="text-destructive hover:text-destructive">
                 
-                    <Trash2 className="w-4 h-4 mr-1" />
-                    Sil
-                  </Button>
+                    <Trash2 className="w-4 h-4 mr-1" />{tr("untranslated_sil_zwa7lz", "Sil")}</Button>
               }
               </div>
               <Button

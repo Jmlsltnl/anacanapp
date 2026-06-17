@@ -40,7 +40,7 @@ const FlowCycleStats = () => {
         <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-xl p-3">
           <div className="flex items-center gap-2 mb-1">
             <Calendar className="w-4 h-4 text-purple-500" />
-            <span className="text-xs text-muted-foreground">Orta Tsikl</span>
+            <span className="text-xs text-muted-foreground">{tr("untranslated_orta_tsikl_vxzcvs", "Orta Tsikl")}</span>
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.averageCycleLength}</p>
           <p className="text-xs text-muted-foreground">{tr("flowcyclestats_gun_54e78d", "gün")}</p>
@@ -49,7 +49,7 @@ const FlowCycleStats = () => {
         <div className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 rounded-xl p-3">
           <div className="flex items-center gap-2 mb-1">
             <Clock className="w-4 h-4 text-pink-500" />
-            <span className="text-xs text-muted-foreground">Orta Period</span>
+            <span className="text-xs text-muted-foreground">{tr("untranslated_orta_period_tvx5me", "Orta Period")}</span>
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.averagePeriodLength}</p>
           <p className="text-xs text-muted-foreground">{tr("flowcyclestats_gun_54e78d", "gün")}</p>
@@ -58,7 +58,7 @@ const FlowCycleStats = () => {
         <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-3">
           <div className="flex items-center gap-2 mb-1">
             <TrendingUp className="w-4 h-4 text-green-500" />
-            <span className="text-xs text-muted-foreground">Diapazon</span>
+            <span className="text-xs text-muted-foreground">{tr("untranslated_diapazon_dgfplg", "Diapazon")}</span>
           </div>
           <p className="text-xl font-bold text-foreground">
             {stats.shortestCycle}-{stats.longestCycle}
@@ -69,7 +69,7 @@ const FlowCycleStats = () => {
         <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-3">
           <div className="flex items-center gap-2 mb-1">
             <Activity className="w-4 h-4 text-amber-500" />
-            <span className="text-xs text-muted-foreground">Variasiya</span>
+            <span className="text-xs text-muted-foreground">{tr("untranslated_variasiya_nbjh0m", "Variasiya")}</span>
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.cycleVariation}</p>
           <p className="text-xs text-muted-foreground">{tr("flowcyclestats_gun_ferq_d595f3", "gün fərq")}</p>

@@ -170,10 +170,7 @@ const LevelUpCelebration = ({ show, level, onClose }: LevelUpCelebrationProps) =
                 setIsVisible(false);
                 setTimeout(onClose, 300);
               }}
-              className="mt-4 px-8 py-3 bg-white text-partner font-bold rounded-xl hover:bg-white/90 transition-colors">
-              
-                Davam et
-              </motion.button>
+              className="mt-4 px-8 py-3 bg-white text-partner font-bold rounded-xl hover:bg-white/90 transition-colors">{tr("untranslated_davam_et_rchhd5", "Davam et")}</motion.button>
             </div>
           </motion.div>
         </motion.div>

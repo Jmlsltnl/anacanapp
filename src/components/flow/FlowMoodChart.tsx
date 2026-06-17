@@ -105,7 +105,7 @@ const FlowMoodChart = () => {
         <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 text-center">
           <Zap className="w-5 h-5 text-amber-500 mx-auto mb-1" />
           <p className="text-lg font-bold text-foreground">{averages.energy}</p>
-          <p className="text-[10px] text-muted-foreground">Orta Enerji</p>
+          <p className="text-[10px] text-muted-foreground">{tr("untranslated_orta_enerji_ojxdi0", "Orta Enerji")}</p>
         </div>
         <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-3 text-center">
           <Heart className="w-5 h-5 text-indigo-500 mx-auto mb-1" />
@@ -180,7 +180,7 @@ const FlowMoodChart = () => {
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-full bg-amber-500" />
-          <span className="text-xs text-muted-foreground">Enerji</span>
+          <span className="text-xs text-muted-foreground">{tr("untranslated_enerji_q6zcss", "Enerji")}</span>
         </div>
       </div>
     </motion.div>);

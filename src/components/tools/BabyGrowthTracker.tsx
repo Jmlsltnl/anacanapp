@@ -416,7 +416,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
           
           <div className="space-y-4 mt-4">
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Tarix</label>
+              <label className="text-sm font-medium mb-1.5 block">{tr("untranslated_tarix_6hhkyx", "Tarix")}</label>
               <Input
                 type="date"
                 value={formData.entry_date}

@@ -649,7 +649,7 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
       <div className="grid grid-cols-4 gap-1.5">
         <QuickActionButton
           icon={Droplets}
-          label="Su"
+          label={tr("untranslated_su_yvcozn", "Su")}
           color="bg-primary/10 dark:bg-primary/20 text-primary"
           value={`${waterCount}/8`}
           onClick={addWater} />

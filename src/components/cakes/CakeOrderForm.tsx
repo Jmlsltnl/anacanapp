@@ -377,11 +377,11 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Kart sahibi</Label>
+                  <Label className="text-xs text-muted-foreground">{tr("untranslated_kart_sahibi_hixmbt", "Kart sahibi")}</Label>
                   <Input
                   value={cardData.holder}
                   onChange={(e) => setCardData({ ...cardData, holder: e.target.value.toUpperCase() })}
-                  placeholder="AD SOYAD"
+                  placeholder={tr("untranslated_ad_soyad_by9a9b", "AD SOYAD")}
                   className="mt-1 uppercase" />
                 
                 </div>
@@ -412,13 +412,13 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
                 }
                   {c2cConfig.card_holder &&
                 <div className="flex justify-between items-center">
-                      <span className="text-xs text-muted-foreground">Kart sahibi:</span>
+                      <span className="text-xs text-muted-foreground">{tr("untranslated_kart_sahibi_lpyfn9", "Kart sahibi:")}</span>
                       <span className="font-bold text-sm">{c2cConfig.card_holder}</span>
                     </div>
                 }
                   {c2cConfig.bank_name &&
                 <div className="flex justify-between items-center">
-                      <span className="text-xs text-muted-foreground">Bank:</span>
+                      <span className="text-xs text-muted-foreground">{tr("untranslated_bank_cclvmv", "Bank:")}</span>
                       <span className="text-sm">{c2cConfig.bank_name}</span>
                     </div>
                 }

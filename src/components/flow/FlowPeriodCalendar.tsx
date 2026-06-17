@@ -215,7 +215,7 @@ const FlowPeriodCalendar = () => {
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-full bg-red-200 border border-dashed border-red-300" />
-          <span className="text-[10px] text-muted-foreground">Proqnoz</span>
+          <span className="text-[10px] text-muted-foreground">{tr("untranslated_proqnoz_rt0tdx", "Proqnoz")}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-full bg-pink-300" />
@@ -223,7 +223,7 @@ const FlowPeriodCalendar = () => {
         </div>
         <div className="flex items-center gap-1.5">
           <span className="text-xs">🌸</span>
-          <span className="text-[10px] text-muted-foreground">Ovulyasiya</span>
+          <span className="text-[10px] text-muted-foreground">{tr("untranslated_ovulyasiya_h9aw8t", "Ovulyasiya")}</span>
         </div>
       </div>
 

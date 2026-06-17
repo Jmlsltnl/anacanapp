@@ -362,7 +362,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
           <Input
             value={recipeSearch}
             onChange={(e) => setRecipeSearch(e.target.value)}
-            placeholder="Resept axtar..."
+            placeholder={tr("untranslated_resept_axtar_8odzsd", "Resept axtar...")}
             className="pl-12 h-12 text-base bg-card shadow-lg rounded-2xl border-0" />
           
         </motion.div>

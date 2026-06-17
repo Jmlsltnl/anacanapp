@@ -119,7 +119,7 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
             </button>
           }
           <div>
-            <h1 className="text-2xl font-black text-foreground">Tortlar 🎂</h1>
+            <h1 className="text-2xl font-black text-foreground">{tr("untranslated_tortlar_go6yj8", "Tortlar 🎂")}</h1>
             <p className="text-muted-foreground text-sm mt-0.5">{tr("cakesscreen_ayliq_milestone_tortlari_81907e", "Aylıq & Milestone tortları")}</p>
           </div>
         </div>

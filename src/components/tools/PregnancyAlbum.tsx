@@ -438,7 +438,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
               <ShoppingBag className="w-5 h-5 text-muted-foreground" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-bold text-foreground mb-0.5">Fiziki Albom</h3>
+              <h3 className="text-sm font-bold text-foreground mb-0.5">{tr("untranslated_fiziki_albom_3i3l4j", "Fiziki Albom")}</h3>
               <p className="text-[12px] text-muted-foreground leading-snug mb-2">
                 {tr("pregnancyalbum_6_ci_ayi_tamamladiqdan_sonra_h_8a778c", "6-c\u0131 ay\u0131 tamamlad\u0131qdan sonra hamil\u0259lik albomunuzu fiziki kitab kimi sifari\u015F ed\u0259 bil\u0259rsiniz.")}
               </p>
@@ -506,7 +506,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                 }}>
                 
                   <Camera className="w-5 h-5 text-primary" />
-                  <span className="text-xs font-medium">Bax</span>
+                  <span className="text-xs font-medium">{tr("untranslated_bax_1yplss", "Bax")}</span>
                 </Button>
                 
                 <Button
@@ -524,7 +524,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                 onClick={() => handleDelete(showActionSheet)}>
                 
                   <Trash2 className="w-5 h-5 text-destructive" />
-                  <span className="text-xs font-medium text-destructive">Sil</span>
+                  <span className="text-xs font-medium text-destructive">{tr("untranslated_sil_zwa7lz", "Sil")}</span>
                 </Button>
               </div>
 

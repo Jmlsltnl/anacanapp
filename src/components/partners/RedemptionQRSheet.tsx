@@ -70,7 +70,7 @@ export default function RedemptionQRSheet({ open, onClose, venueId, venueName }:
 
           <div className="flex items-center gap-2 mb-1">
             <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-xs font-bold text-primary uppercase tracking-wider">Anacan Endirimi</span>
+            <span className="text-xs font-bold text-primary uppercase tracking-wider">{tr("untranslated_anacan_endirimi_eg7euj", "Anacan Endirimi")}</span>
           </div>
           <h2 className="text-xl font-bold text-foreground mb-1">{venueName}</h2>
           {data && <p className="text-sm text-muted-foreground mb-4">{data.discount_label}</p>}

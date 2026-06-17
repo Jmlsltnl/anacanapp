@@ -180,7 +180,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
             
             <ArrowLeft className="w-5 h-5" />
           </motion.button>
-          <h1 className="text-lg font-bold text-foreground flex-1">Profil</h1>
+          <h1 className="text-lg font-bold text-foreground flex-1">{tr("untranslated_profil_v8b0sk", "Profil")}</h1>
           {isCurrentUser &&
           <motion.button
             className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"

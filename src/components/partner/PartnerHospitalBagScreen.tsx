@@ -189,7 +189,7 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="mom" className="flex items-center gap-1">
             <Package className="w-4 h-4" />
-            <span className="hidden sm:inline">Ana</span>
+            <span className="hidden sm:inline">{tr("untranslated_ana_tubxbv", "Ana")}</span>
           </TabsTrigger>
           <TabsTrigger value="baby" className="flex items-center gap-1">
             <Baby className="w-4 h-4" />

@@ -277,7 +277,7 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
                   onClick={handleCameraCapture}>
                   
                     <Camera className="w-8 h-8 text-primary" />
-                    <span className="text-sm">Kamera</span>
+                    <span className="text-sm">{tr("untranslated_kamera_qucuxi", "Kamera")}</span>
                   </Button>
                   <Button
                   variant="outline"
@@ -285,7 +285,7 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
                   onClick={handleGalleryPick}>
                   
                     <Upload className="w-8 h-8 text-primary" />
-                    <span className="text-sm">Qalereyadan</span>
+                    <span className="text-sm">{tr("untranslated_qalereyadan_w37f0m", "Qalereyadan")}</span>
                   </Button>
                 </div>
                 
@@ -318,7 +318,7 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                       <div className="text-center text-white">
                         <Loader2 className="w-10 h-10 animate-spin mx-auto mb-2" />
-                        <p className="text-sm">Analiz edilir...</p>
+                        <p className="text-sm">{tr("untranslated_analiz_edilir_hf0m1t", "Analiz edilir...")}</p>
                       </div>
                     </div>
                 }

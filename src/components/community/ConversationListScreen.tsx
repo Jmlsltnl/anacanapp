@@ -47,7 +47,7 @@ const ConversationListScreen = ({ onBack, onOpenChat, partnerId }: ConversationL
         <motion.button onClick={onBack} className="w-9 h-9 rounded-full bg-muted flex items-center justify-center" whileTap={{ scale: 0.9 }}>
           <ArrowLeft className="w-4 h-4" />
         </motion.button>
-        <h1 className="text-lg font-bold text-foreground flex-1">Mesajlar</h1>
+        <h1 className="text-lg font-bold text-foreground flex-1">{tr("untranslated_mesajlar_ak8wzw", "Mesajlar")}</h1>
       </div>
 
       {loading || partnerLoading ?

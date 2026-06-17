@@ -269,7 +269,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
             
             <Smile className="w-5 h-5 mx-auto mb-1 text-teal-500" />
             <p className="text-2xl font-black text-teal-600 dark:text-teal-400">{moodCheckins.length}</p>
-            <p className="text-xs text-teal-600/70 dark:text-teal-400/70 font-medium">Qeyd</p>
+            <p className="text-xs text-teal-600/70 dark:text-teal-400/70 font-medium">{tr("untranslated_qeyd_z0999u", "Qeyd")}</p>
           </motion.div>
           <motion.div
             className="bg-cyan-50 dark:bg-cyan-500/10 rounded-2xl p-3 text-center border border-cyan-100 dark:border-cyan-500/20"
@@ -279,7 +279,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
             
             <Activity className="w-5 h-5 mx-auto mb-1 text-cyan-500" />
             <p className="text-2xl font-black text-cyan-600 dark:text-cyan-400">{moodTrend ? moodTrend.toFixed(1) : '—'}</p>
-            <p className="text-xs text-cyan-600/70 dark:text-cyan-400/70 font-medium">Ortalama</p>
+            <p className="text-xs text-cyan-600/70 dark:text-cyan-400/70 font-medium">{tr("untranslated_ortalama_qxgps6", "Ortalama")}</p>
           </motion.div>
           <motion.div
             className="bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl p-3 text-center border border-emerald-100 dark:border-emerald-500/20"

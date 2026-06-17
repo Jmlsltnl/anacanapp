@@ -174,7 +174,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}>
         
-        <h1 className="text-lg font-black text-foreground">Profil</h1>
+        <h1 className="text-lg font-black text-foreground">{tr("untranslated_profil_v8b0sk", "Profil")}</h1>
         <motion.button
           onClick={() => onNavigate?.('settings')}
           className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center"
@@ -529,7 +529,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Ad</label>
+              <label className="text-sm font-medium">{tr("untranslated_ad_i34vkg", "Ad")}</label>
               <Input
                 value={childForm.name}
                 onChange={(e) => setChildForm((p) => ({ ...p, name: e.target.value }))}
@@ -546,7 +546,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
               
             </div>
             <div>
-              <label className="text-sm font-medium">Cins</label>
+              <label className="text-sm font-medium">{tr("untranslated_cins_f3ymi9", "Cins")}</label>
               <div className="flex gap-2 mt-2">
                 {genderOptions.map((opt) =>
                 <button

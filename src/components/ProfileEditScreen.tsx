@@ -292,7 +292,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
           </h3>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">Ad</label>
+            <label className="text-sm font-medium text-muted-foreground">{tr("untranslated_ad_i34vkg", "Ad")}</label>
             <Input
                 value={formData.name}
                 onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
@@ -357,7 +357,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                     className="flex items-center gap-2 h-auto py-3 px-4 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-xl border">
                     
                     <CalendarDays className="w-4 h-4" />
-                    <span className="text-sm">Son menstruasiya tarixi</span>
+                    <span className="text-sm">{tr("untranslated_son_menstruasiya_tarixi_fgz9t7", "Son menstruasiya tarixi")}</span>
                   </ToggleGroupItem>
                   <ToggleGroupItem
                     value="dueDate"
@@ -437,7 +437,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
           {formData.life_stage === 'flow' &&
             <>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">Son menstruasiya tarixi</label>
+                <label className="text-sm font-medium text-muted-foreground">{tr("untranslated_son_menstruasiya_tarixi_fgz9t7", "Son menstruasiya tarixi")}</label>
                 <Input
                   type="date"
                   value={formData.last_period_date}
@@ -477,7 +477,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                 
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">Cinsi</label>
+                <label className="text-sm font-medium text-muted-foreground">{tr("untranslated_cinsi_az7fty", "Cinsi")}</label>
                 <Select
                   value={formData.baby_gender}
                   onValueChange={(value) => setFormData((prev) => ({ ...prev, baby_gender: value as 'boy' | 'girl' }))}>

@@ -265,11 +265,11 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
               {isListening &&
               <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-xs">
                   <div className="bg-muted/50 rounded-lg p-3 text-center">
-                    <p className="text-xs text-muted-foreground">Orta</p>
+                    <p className="text-xs text-muted-foreground">{tr("untranslated_orta_yslkg0", "Orta")}</p>
                     <p className="text-xl font-bold">{avgDb} dB</p>
                   </div>
                   <div className="bg-muted/50 rounded-lg p-3 text-center">
-                    <p className="text-xs text-muted-foreground">Maks</p>
+                    <p className="text-xs text-muted-foreground">{tr("untranslated_maks_6z8ju8", "Maks")}</p>
                     <p className="text-xl font-bold">{maxDb} dB</p>
                   </div>
                 </div>

@@ -212,7 +212,7 @@ function VenueDetail({ venue, isPremium, onBack, onRedeem }: {venue: PartnerVenu
             {venue.website &&
             <a href={venue.website} target="_blank" rel="noreferrer" className="flex flex-col items-center gap-1 p-2 bg-muted rounded-xl">
                 <Globe className="w-4 h-4 text-primary" />
-                <span className="text-[10px] text-muted-foreground">Veb sayt</span>
+                <span className="text-[10px] text-muted-foreground">{tr("untranslated_veb_sayt_16w317", "Veb sayt")}</span>
               </a>
             }
             {venue.instagram &&
@@ -241,7 +241,7 @@ function VenueDetail({ venue, isPremium, onBack, onRedeem }: {venue: PartnerVenu
         <div className="fixed left-0 right-0 bottom-0 p-4 bg-gradient-to-t from-background to-transparent">
           <Button onClick={onRedeem} className="w-full h-12 text-base font-bold" size="lg">
             {isPremium ?
-            <><Sparkles className="w-5 h-5 mr-2" /> Endirimi al — QR yarat</> :
+            <><Sparkles className="w-5 h-5 mr-2" />{tr("untranslated_endirimi_al_qr_yarat_6yd90i", "Endirimi al — QR yarat")}</> :
 
             <><Lock className="w-5 h-5 mr-2" /> {tr("partnersscreen_premium_ile_endirim_al_634879", "Premium il\u0259 endirim al")}</>
             }

@@ -235,7 +235,7 @@ const PartnerPrivacyScreen = ({ onBack }: PartnerPrivacyScreenProps) => {
               {tr("partnerprivacyscreen_bu_emeliyyat_geri_qaytarila_bi_fdaca8", "Bu \u0259m\u0259liyyat geri qaytar\u0131la bilm\u0259z. B\xFCt\xFCn m\u0259lumatlar\u0131n\u0131z, o c\xFCml\u0259d\u0259n:")}
               <ul className="list-disc list-inside mt-2 space-y-1">
                 <li>{tr("partnerprivacyscreen_profil_melumatlari_82c76c", "Profil məlumatları")}</li>
-                <li>Mesajlar</li>
+                <li>{tr("untranslated_mesajlar_ak8wzw", "Mesajlar")}</li>
                 <li>{tr("partnerprivacyscreen_tapsiriqlar_f5dbad", "Tapşırıqlar")}</li>
                 <li>{tr("partnerprivacyscreen_bildirisler_54eb88", "Bildirişlər")}</li>
               </ul>

@@ -536,7 +536,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                   </div>
                   <div className="text-center">
                     <p className="font-bold text-foreground">{tr("babyphotoshoot_sekil_secin_e3e1f3", "Şəkil seçin")}</p>
-                    <p className="text-sm text-muted-foreground mt-1">Maksimum 5MB</p>
+                    <p className="text-sm text-muted-foreground mt-1">{tr("untranslated_maksimum_5mb_86tog9", "Maksimum 5MB")}</p>
                   </div>
                 </motion.button>
               }
@@ -751,7 +751,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             <div className="bg-card rounded-3xl p-4 shadow-elevated">
               <div className="flex items-center gap-2 mb-3">
                 <Shirt className="w-5 h-5 text-rose-500" />
-                <h2 className="font-bold text-foreground text-sm">Geyim</h2>
+                <h2 className="font-bold text-foreground text-sm">{tr("untranslated_geyim_hftttf", "Geyim")}</h2>
               </div>
               <div className="grid grid-cols-5 sm:grid-cols-6 gap-1.5">
                 {currentOutfits.map((outfit) =>
@@ -916,10 +916,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
           <Button
             onClick={nextStep}
             disabled={!canProceed()}
-            className="flex-1 h-14 rounded-2xl gradient-primary text-white font-bold">
-            
-              Davam et
-            </Button> :
+            className="flex-1 h-14 rounded-2xl gradient-primary text-white font-bold">{tr("untranslated_davam_et_rchhd5", "Davam et")}</Button> :
 
           <Button
             onClick={handleGenerate}

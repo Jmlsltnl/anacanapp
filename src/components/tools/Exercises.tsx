@@ -115,7 +115,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
             
             <Flame className="w-5 h-5 mx-auto mb-1 text-orange-500" />
             <p className="text-2xl font-black text-orange-600 dark:text-orange-400">{todayStats.totalCalories}</p>
-            <p className="text-xs text-orange-600/70 dark:text-orange-400/70 font-medium">Kalori</p>
+            <p className="text-xs text-orange-600/70 dark:text-orange-400/70 font-medium">{tr("untranslated_kalori_y6oaf2", "Kalori")}</p>
           </motion.div>
           <motion.div
             className="bg-amber-50 dark:bg-amber-500/10 rounded-2xl p-3 text-center border border-amber-100 dark:border-amber-500/20"

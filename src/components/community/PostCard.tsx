@@ -171,7 +171,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
                 {isAnonymous ?
                 isAdmin ?
                 <span className="flex items-center gap-1">
-                      <span className="text-muted-foreground italic">Anonim</span>
+                      <span className="text-muted-foreground italic">{tr("untranslated_anonim_89j5l6", "Anonim")}</span>
                       <span className="text-[11px] text-primary/70 font-medium">({post.author?.name || tr("postcard_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")})</span>
                     </span> :
                 'Anonim' :
@@ -183,8 +183,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
             </div>
             {isAnonymous &&
             <span className="inline-flex items-center gap-[2px] px-1 py-[1px] rounded text-[7px] font-semibold bg-muted/30 text-muted-foreground/40 mt-0.5">
-                <EyeOff className="w-[7px] h-[7px]" /> Anonim
-              </span>
+                <EyeOff className="w-[7px] h-[7px]" />{tr("untranslated_anonim_89j5l6", "Anonim")}</span>
             }
           </div>
           <DropdownMenu>
@@ -207,8 +206,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
               {(isAdmin || isOwnPost) && <DropdownMenuSeparator className="bg-border/10" />}
               {(isAdmin || isOwnPost) &&
               <DropdownMenuItem onClick={handleDeletePost} className="text-destructive text-[11px] rounded-lg">
-                  <Trash2 className="w-3 h-3 mr-2" /> Sil
-                </DropdownMenuItem>
+                  <Trash2 className="w-3 h-3 mr-2" />{tr("untranslated_sil_zwa7lz", "Sil")}</DropdownMenuItem>
               }
             </DropdownMenuContent>
           </DropdownMenu>

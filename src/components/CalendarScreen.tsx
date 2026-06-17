@@ -315,7 +315,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
           <div className="grid grid-cols-2 gap-2">
             <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-2">
               <div className="w-3 h-3 rounded-full bg-rose-500" />
-              <span className="text-xs text-muted-foreground">Menstruasiya</span>
+              <span className="text-xs text-muted-foreground">{tr("untranslated_menstruasiya_6pect0", "Menstruasiya")}</span>
             </div>
             <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-2">
               <div className="w-3 h-3 rounded-full bg-emerald-500" />
@@ -323,11 +323,11 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
             </div>
             <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-2">
               <div className="w-3 h-3 rounded-full bg-amber-500" />
-              <span className="text-xs text-muted-foreground">Ovulyasiya</span>
+              <span className="text-xs text-muted-foreground">{tr("untranslated_ovulyasiya_h9aw8t", "Ovulyasiya")}</span>
             </div>
             <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-2">
               <div className="w-3 h-3 rounded-full bg-violet-500" />
-              <span className="text-xs text-muted-foreground">Randevu</span>
+              <span className="text-xs text-muted-foreground">{tr("untranslated_randevu_xc37do", "Randevu")}</span>
             </div>
           </div>
         </motion.div>
@@ -379,10 +379,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
                       <motion.button
                   onClick={() => deleteAppointment(apt.id)}
                   className="text-destructive text-xs px-2 py-1 bg-destructive/10 rounded-lg"
-                  whileTap={{ scale: 0.95 }}>
-                  
-                        Sil
-                      </motion.button>
+                  whileTap={{ scale: 0.95 }}>{tr("untranslated_sil_zwa7lz", "Sil")}</motion.button>
                     </div>
               )}
                 </div> :
@@ -470,10 +467,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
               <button
               onClick={handleAddEvent}
               disabled={!newEventTitle}
-              className="w-full h-14 rounded-2xl gradient-primary text-white font-bold shadow-button disabled:opacity-50">
-              
-                Yadda saxla
-              </button>
+              className="w-full h-14 rounded-2xl gradient-primary text-white font-bold shadow-button disabled:opacity-50">{tr("untranslated_yadda_saxla_bpdu9v", "Yadda saxla")}</button>
             </motion.div>
           </motion.div>
         }

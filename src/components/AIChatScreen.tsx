@@ -376,7 +376,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
             <h1 className="font-bold text-sm text-foreground">Anacan.AI</h1>
             <div className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-              <span className="text-[10px] text-muted-foreground">Onlayn</span>
+              <span className="text-[10px] text-muted-foreground">{tr("untranslated_onlayn_xfaffi", "Onlayn")}</span>
             </div>
           </div>
         </div>

@@ -58,9 +58,7 @@ export default function FeaturesStep({ features, onContinue }: FeaturesStepProps
         <Button
           onClick={onContinue}
           className="w-full h-14 rounded-2xl text-base font-semibold bg-gradient-to-r from-primary to-[hsl(var(--primary-glow,20_90%_60%))] text-primary-foreground shadow-lg"
-        >
-          Davam et
-        </Button>
+        >{tr("untranslated_davam_et_rchhd5", "Davam et")}</Button>
       </div>
     </div>
   );

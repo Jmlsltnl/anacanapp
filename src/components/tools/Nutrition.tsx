@@ -305,7 +305,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                   
                   </div>
                   <div>
-                    <label className="text-xs text-muted-foreground mb-1 block">Kalori</label>
+                    <label className="text-xs text-muted-foreground mb-1 block">{tr("untranslated_kalori_y6oaf2", "Kalori")}</label>
                     <Input
                     type="number"
                     value={customFood.calories}

@@ -99,7 +99,7 @@ export default function PartnerVerifyPage() {
             </div>
           }
         </div>
-        <p className="text-xs opacity-70 mt-4">Anacan Partnyor Sistemi</p>
+        <p className="text-xs opacity-70 mt-4">{tr("untranslated_anacan_partnyor_sistemi_xadwvm", "Anacan Partnyor Sistemi")}</p>
       </div>);
 
   }
@@ -167,7 +167,7 @@ export default function PartnerVerifyPage() {
           </button>
         </form>
 
-        <p className="text-[10px] text-muted-foreground text-center mt-4">Anacan Partnyor Endirim Sistemi</p>
+        <p className="text-[10px] text-muted-foreground text-center mt-4">{tr("untranslated_anacan_partnyor_endirim_sistem_qfwnst", "Anacan Partnyor Endirim Sistemi")}</p>
       </div>
     </div>);
 

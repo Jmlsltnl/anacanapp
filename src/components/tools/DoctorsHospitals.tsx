@@ -435,7 +435,7 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
                 <Phone className="w-4 h-4 text-green-600" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Telefon</p>
+                <p className="text-xs text-muted-foreground">{tr("untranslated_telefon_vwjgg5", "Telefon")}</p>
                 <p className="text-sm text-primary">{provider.phone}</p>
               </div>
             </a>
@@ -459,7 +459,7 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
                 <Globe className="w-4 h-4 text-purple-600" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Vebsayt</p>
+                <p className="text-xs text-muted-foreground">{tr("untranslated_vebsayt_7bupzh", "Vebsayt")}</p>
                 <p className="text-sm text-primary">{provider.website}</p>
               </div>
             </a>

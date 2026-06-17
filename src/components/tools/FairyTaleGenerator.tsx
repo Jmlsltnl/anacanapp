@@ -247,7 +247,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
               <p className="text-2xl font-bold text-amber-500">
                 {tales.reduce((sum, t) => sum + (t.play_count || 0), 0)}
               </p>
-              <p className="text-xs text-muted-foreground">Oxunub</p>
+              <p className="text-xs text-muted-foreground">{tr("untranslated_oxunub_u7g1tz", "Oxunub")}</p>
             </Card>
           </div>
         }
@@ -434,7 +434,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
               {/* Language & Age */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label className="text-sm font-medium">Dil</Label>
+                  <Label className="text-sm font-medium">{tr("untranslated_dil_g90qr5", "Dil")}</Label>
                   <div className="grid grid-cols-2 gap-1 mt-1">
                     {LANGUAGES.map((lang) =>
                   <button
@@ -569,9 +569,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                   </div>
                 </div>
 
-                <Button className="w-full" onClick={() => setCreateStep(2)} disabled={!formData.child_name.trim()}>
-                  Davam et
-                </Button>
+                <Button className="w-full" onClick={() => setCreateStep(2)} disabled={!formData.child_name.trim()}>{tr("untranslated_davam_et_rchhd5", "Davam et")}</Button>
               </motion.div>
               }
 
@@ -632,9 +630,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
 
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={() => setCreateStep(1)}>Geri</Button>
-                  <Button className="flex-1" onClick={() => setCreateStep(3)} disabled={!formData.theme}>
-                    Davam et
-                  </Button>
+                  <Button className="flex-1" onClick={() => setCreateStep(3)} disabled={!formData.theme}>{tr("untranslated_davam_et_rchhd5", "Davam et")}</Button>
                 </div>
               </motion.div>
               }
@@ -676,7 +672,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
 
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={() => setCreateStep(2)}>Geri</Button>
-                  <Button className="flex-1" onClick={() => setCreateStep(4)}>Davam et</Button>
+                  <Button className="flex-1" onClick={() => setCreateStep(4)}>{tr("untranslated_davam_et_rchhd5", "Davam et")}</Button>
                 </div>
               </motion.div>
               }
@@ -713,7 +709,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
 
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={() => setCreateStep(3)}>Geri</Button>
-                  <Button className="flex-1" onClick={() => setCreateStep(5)}>Davam et</Button>
+                  <Button className="flex-1" onClick={() => setCreateStep(5)}>{tr("untranslated_davam_et_rchhd5", "Davam et")}</Button>
                 </div>
               </motion.div>
               }
@@ -743,7 +739,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                       <p className="font-medium">{themes.find((t) => t.name === formData.theme)?.name_az || formData.theme}</p>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Dil:</span>
+                      <span className="text-muted-foreground">{tr("untranslated_dil_rfnolb", "Dil:")}</span>
                       <p className="font-medium">{LANGUAGES.find((l) => l.code === formData.language)?.flag} {LANGUAGES.find((l) => l.code === formData.language)?.label}</p>
                     </div>
                     {formData.hero &&
@@ -754,7 +750,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     }
                     {formData.moral_lesson &&
                     <div>
-                        <span className="text-muted-foreground">Mesaj:</span>
+                        <span className="text-muted-foreground">{tr("untranslated_mesaj_x98xat", "Mesaj:")}</span>
                         <p className="font-medium">{MORAL_LESSONS.find((m) => m.value === formData.moral_lesson)?.label}</p>
                       </div>
                     }

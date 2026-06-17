@@ -253,7 +253,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
         {/* Silent Hours */}
         <div className="bg-card rounded-2xl overflow-hidden shadow-card border border-border/50">
           <div className="px-3 pt-3 pb-1">
-            <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Sakit saatlar</h2>
+            <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{tr("untranslated_sakit_saatlar_myw4sq", "Sakit saatlar")}</h2>
           </div>
           <SettingRow
             icon={BellOff}

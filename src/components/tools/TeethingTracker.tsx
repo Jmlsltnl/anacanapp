@@ -295,7 +295,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
         <Tabs defaultValue="tips" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="tips">{tr("teethingtracker_qulluq_meslehetleri_1be08c", "Qulluq Məsləhətləri")}</TabsTrigger>
-            <TabsTrigger value="symptoms">Simptomlar</TabsTrigger>
+            <TabsTrigger value="symptoms">{tr("untranslated_simptomlar_xhm7bx", "Simptomlar")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="tips" className="space-y-3 mt-4">

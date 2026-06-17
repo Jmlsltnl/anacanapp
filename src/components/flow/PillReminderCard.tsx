@@ -108,11 +108,11 @@ const PillReminderCard = () => {
                 <Input value={title} onChange={(e) => setTitle(e.target.value)} className="h-9 text-sm" />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Vaxt</label>
+                <label className="text-xs text-muted-foreground mb-1 block">{tr("untranslated_vaxt_8etncj", "Vaxt")}</label>
                 <Input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="h-9 text-sm" />
               </div>
               <div className="flex gap-2">
-                <Button size="sm" onClick={handleSave} disabled={save.isPending} className="flex-1">Yadda saxla</Button>
+                <Button size="sm" onClick={handleSave} disabled={save.isPending} className="flex-1">{tr("untranslated_yadda_saxla_bpdu9v", "Yadda saxla")}</Button>
                 <Button size="sm" variant="outline" onClick={() => setEditing(false)}>{tr("pillremindercard_legv_et_b5e49c", "L\u0259\u011Fv et")}</Button>
               </div>
             </> :

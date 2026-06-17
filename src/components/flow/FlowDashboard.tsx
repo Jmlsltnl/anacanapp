@@ -584,7 +584,7 @@ const FlowDashboard = () => {
           <p className="font-bold text-foreground text-lg">
             {currentPhase === 'menstrual' ? tr("flowdashboard_demir_30bf6c", "D\u0259mir") : currentPhase === 'luteal' ? 'Maqnezium' : 'Protein'}
           </p>
-          <p className="text-xs text-muted-foreground">Fokus Qida</p>
+          <p className="text-xs text-muted-foreground">{tr("untranslated_fokus_qida_lyi3h2", "Fokus Qida")}</p>
         </div>
 
         <div className="bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 rounded-2xl p-4 border border-purple-100 dark:border-purple-800/30">

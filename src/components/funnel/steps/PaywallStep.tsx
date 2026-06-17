@@ -201,7 +201,7 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
           className="w-full h-14 rounded-2xl text-base font-semibold bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg disabled:opacity-70">
           
           {isPurchasing ?
-          <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Emal edilir...</> :
+          <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{tr("untranslated_emal_edilir_hf0m1t", "Emal edilir...")}</> :
 
           anyTrialDays ? `${anyTrialDays} Gün Pulsuz Başla` : tr("paywallstep_premium_a_kec_2e8b0e", "Premium-a Ke\xE7")
           }

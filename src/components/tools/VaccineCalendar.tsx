@@ -375,7 +375,7 @@ export default function VaccineCalendar({ onBack }: Props) {
                 {detailRow.vaccine.contraindications_az &&
               <DetailRow label={tr("vaccinecalendar_eks_gosterisler_f34875", "\u018Fks-g\xF6st\u0259ri\u015Fl\u0259r")} value={detailRow.vaccine.contraindications_az} />
               }
-                {detailRow.notes_az && <DetailRow label="Qeyd" value={detailRow.notes_az} />}
+                {detailRow.notes_az && <DetailRow label={tr("untranslated_qeyd_z0999u", "Qeyd")} value={detailRow.notes_az} />}
 
                 {/* Actions */}
                 <div className="grid grid-cols-2 gap-2 pt-2">
@@ -504,7 +504,7 @@ function ActionDialog({
         {mode === 'done' ?
         <div className="space-y-3 mt-2">
             <div>
-              <Label className="text-xs">Tarix</Label>
+              <Label className="text-xs">{tr("untranslated_tarix_6hhkyx", "Tarix")}</Label>
               <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} max={today} />
             </div>
             <div>
@@ -516,7 +516,7 @@ function ActionDialog({
               <Input value={batch} onChange={(e) => setBatch(e.target.value)} />
             </div>
             <div>
-              <Label className="text-xs">Qeyd</Label>
+              <Label className="text-xs">{tr("untranslated_qeyd_z0999u", "Qeyd")}</Label>
               <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
             </div>
             <Button
@@ -524,10 +524,7 @@ function ActionDialog({
             onClick={() => onSubmit({
               administered_at: date, is_skipped: false, skip_reason: null,
               location_az: location || null, batch_number: batch || null, notes: notes || null
-            })}>
-            
-              Yadda saxla
-            </Button>
+            })}>{tr("untranslated_yadda_saxla_bpdu9v", "Yadda saxla")}</Button>
           </div> :
 
         <div className="space-y-3 mt-2">

@@ -242,7 +242,7 @@ const SurpriseTab = () => {
         <div className="flex items-center gap-2 bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 px-4 py-2 rounded-2xl">
           <Trophy className="w-5 h-5 text-amber-600" />
           <div className="text-right">
-            <p className="text-xs text-amber-700 dark:text-amber-400">Toplam</p>
+            <p className="text-xs text-amber-700 dark:text-amber-400">{tr("untranslated_toplam_lheej5", "Toplam")}</p>
             <p className="font-bold text-amber-800 dark:text-amber-300">{totalPoints} xal</p>
           </div>
         </div>

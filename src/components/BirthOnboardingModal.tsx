@@ -387,10 +387,10 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                       {tr("birthonboardingmodal_xulase_029c8a", "X\xFClas\u0259")}
                     </h4>
                     <div className="grid grid-cols-2 gap-2 text-sm">
-                      <p className="text-muted-foreground">Ad: <span className="text-foreground font-medium">{babyName}</span></p>
+                      <p className="text-muted-foreground">{tr("untranslated_ad_w3td2c", "Ad:")}<span className="text-foreground font-medium">{babyName}</span></p>
                       <p className="text-muted-foreground">Cins: <span className="text-foreground font-medium">{gender === 'boy' ? tr("birthonboardingmodal_oglan_e9715e", "O\u011Flan") : tr("birthonboardingmodal_qiz_79bf6b", "Q\u0131z")}</span></p>
-                      <p className="text-muted-foreground">Tarix: <span className="text-foreground font-medium">{birthDate ? format(birthDate, 'd MMM yyyy', { locale: getCurrentDateLocale() }) : '-'}</span></p>
-                      <p className="text-muted-foreground">Tip: <span className="text-foreground font-medium">{deliveryOptions.find((d) => d.value === deliveryType)?.label}</span></p>
+                      <p className="text-muted-foreground">{tr("untranslated_tarix_15qhck", "Tarix:")}<span className="text-foreground font-medium">{birthDate ? format(birthDate, 'd MMM yyyy', { locale: getCurrentDateLocale() }) : '-'}</span></p>
+                      <p className="text-muted-foreground">{tr("untranslated_tip_5d1vhb", "Tip:")}<span className="text-foreground font-medium">{deliveryOptions.find((d) => d.value === deliveryType)?.label}</span></p>
                     </div>
                   </div>
                 </motion.div>
@@ -415,10 +415,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
             <Button
               onClick={nextStep}
               disabled={!canProceed()}
-              className="flex-1 h-12 bg-gradient-to-r from-pink-500 to-rose-500">
-              
-                Davam et
-                <ChevronRight className="w-4 h-4 ml-1" />
+              className="flex-1 h-12 bg-gradient-to-r from-pink-500 to-rose-500">{tr("untranslated_davam_et_rchhd5", "Davam et")}<ChevronRight className="w-4 h-4 ml-1" />
               </Button> :
 
             <Button

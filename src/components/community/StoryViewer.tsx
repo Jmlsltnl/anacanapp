@@ -322,16 +322,14 @@ const StoryViewer = ({
       }}>
         <AlertDialogContent className="rounded-3xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Story silinsin?</AlertDialogTitle>
+            <AlertDialogTitle>{tr("untranslated_story_silinsin_yil9td", "Story silinsin?")}</AlertDialogTitle>
             <AlertDialogDescription>
               {tr("storyviewer_bu_story_hemiselik_silinecek_b_577f00", "Bu story h\u0259mi\u015F\u0259lik silin\u0259c\u0259k. Bu \u0259m\u0259liyyat geri al\u0131na bilm\u0259z.")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setIsPaused(false)}>{tr("storyviewer_legv_et_b5e49c", "Ləğv et")}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-500 hover:bg-red-600">
-              Sil
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleDelete} className="bg-red-500 hover:bg-red-600">{tr("untranslated_sil_zwa7lz", "Sil")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

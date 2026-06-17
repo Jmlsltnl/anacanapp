@@ -112,7 +112,7 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}>
         
-        <h1 className="text-2xl font-black text-foreground">Partner Profili</h1>
+        <h1 className="text-2xl font-black text-foreground">{tr("untranslated_partner_profili_lip00f", "Partner Profili")}</h1>
         <motion.button
           className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center"
           whileHover={{ scale: 1.05 }}
@@ -158,7 +158,7 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
         <div className="bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl p-4 text-white">
           <Trophy className="w-6 h-6 mb-2" />
           <p className="text-3xl font-black">{stats.totalPoints + surprisePoints}</p>
-          <p className="text-xs text-white/80">Toplam Xal</p>
+          <p className="text-xs text-white/80">{tr("untranslated_toplam_xal_dy1dwr", "Toplam Xal")}</p>
         </div>
         <div className="bg-gradient-to-br from-violet-400 to-purple-600 rounded-2xl p-4 text-white">
           <Target className="w-6 h-6 mb-2" />
@@ -173,7 +173,7 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
         <div className="bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl p-4 text-white">
           <MessageCircle className="w-6 h-6 mb-2" />
           <p className="text-3xl font-black">{stats.messagesSent}</p>
-          <p className="text-xs text-white/80">Mesaj</p>
+          <p className="text-xs text-white/80">{tr("untranslated_mesaj_3c09op", "Mesaj")}</p>
         </div>
       </motion.div>
 

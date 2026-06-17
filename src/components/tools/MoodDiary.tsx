@@ -233,7 +233,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
 
               {/* Symptoms */}
               <div className="bg-card rounded-2xl p-4 shadow-card border border-border/50">
-                <h2 className="font-bold text-sm mb-2.5">Simptomlar</h2>
+                <h2 className="font-bold text-sm mb-2.5">{tr("untranslated_simptomlar_xhm7bx", "Simptomlar")}</h2>
                 <div className="flex flex-wrap gap-1.5">
                   {symptomOptions.map((symptom) =>
                 <motion.button
@@ -269,10 +269,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               onClick={handleSave}
               disabled={selectedMood === null}
               className="w-full gradient-primary text-white font-bold py-4 rounded-2xl shadow-elevated disabled:opacity-50"
-              whileTap={{ scale: 0.98 }}>
-              
-                Yadda saxla
-              </motion.button>
+              whileTap={{ scale: 0.98 }}>{tr("untranslated_yadda_saxla_bpdu9v", "Yadda saxla")}</motion.button>
             </motion.div>
           }
 

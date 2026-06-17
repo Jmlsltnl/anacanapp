@@ -167,7 +167,7 @@ const ResetPassword = () => {
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
                   <Input
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Minimum 6 simvol"
+                  placeholder={tr("untranslated_minimum_6_simvol_nifi5y", "Minimum 6 simvol")}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-12 pr-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all" />

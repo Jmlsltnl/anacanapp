@@ -50,7 +50,7 @@ const CouponInput = ({
           type="text"
           value={couponCode}
           onChange={(e) => onCodeChange(e.target.value.toUpperCase())}
-          placeholder="Kupon kodu"
+          placeholder={tr("untranslated_kupon_kodu_xiawxh", "Kupon kodu")}
           className="w-full h-9 pl-9 pr-3 rounded-lg bg-muted/50 border border-border text-sm outline-none focus:border-primary/40 transition-colors" />
         
       </div>

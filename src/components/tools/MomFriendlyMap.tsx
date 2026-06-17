@@ -425,7 +425,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
               
             </div>
             <div>
-              <Label className="text-sm font-medium">Kateqoriya</Label>
+              <Label className="text-sm font-medium">{tr("untranslated_kateqoriya_d7bf4y", "Kateqoriya")}</Label>
               <Select
                 value={newPlace.category}
                 onValueChange={(v) => setNewPlace({ ...newPlace, category: v as any })}>

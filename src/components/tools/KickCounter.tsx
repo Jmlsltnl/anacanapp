@@ -196,7 +196,7 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
         {/* Recent Sessions - Grouped by Day */}
         {sessions.length > 0 &&
         <div className="pb-8">
-            <h3 className="font-bold text-foreground mb-4">Son sessiyalar</h3>
+            <h3 className="font-bold text-foreground mb-4">{tr("untranslated_son_sessiyalar_dkgjsl", "Son sessiyalar")}</h3>
             {(() => {
             // Group sessions by date
             const grouped: {[date: string]: typeof sessions;} = {};

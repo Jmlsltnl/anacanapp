@@ -97,7 +97,7 @@ const FloatingTimerWidget = () => {
         
           <div className="bg-card/95 backdrop-blur-xl rounded-2xl shadow-lg border border-border/60 overflow-hidden">
             <div className="flex items-center justify-between px-3 pt-2 pb-1">
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Taymer</span>
+              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{tr("untranslated_taymer_uen6sv", "Taymer")}</span>
               <button
               onClick={() => setExpanded(false)}
               className="w-5 h-5 rounded-full bg-muted/60 flex items-center justify-center">

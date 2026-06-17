@@ -161,7 +161,7 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
             {tr("albumorderscreen_elaqe_melumatlari_8a7aae", "\u018Flaq\u0259 M\u0259lumatlar\u0131")}
           </h2>
           <div>
-            <Label className="text-xs text-muted-foreground">Ad, Soyad *</Label>
+            <Label className="text-xs text-muted-foreground">{tr("untranslated_ad_soyad_lm5srh", "Ad, Soyad *")}</Label>
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={tr("albumorderscreen_adinizi_daxil_edin_bd2b57", "Adınızı daxil edin")} className="rounded-xl mt-1 h-11" />
           </div>
           <div>

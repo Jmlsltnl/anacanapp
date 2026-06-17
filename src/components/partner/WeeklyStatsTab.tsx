@@ -101,7 +101,7 @@ const WeeklyStatsTab = () => {
           
           <Flame className="w-6 h-6 mb-2 opacity-80" />
           <p className="text-2xl font-black">{stats.totalCalories}</p>
-          <p className="text-white/70 text-sm">Kalori</p>
+          <p className="text-white/70 text-sm">{tr("untranslated_kalori_y6oaf2", "Kalori")}</p>
         </motion.div>
 
         <motion.div

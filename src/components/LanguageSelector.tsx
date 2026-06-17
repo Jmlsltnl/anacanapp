@@ -70,7 +70,7 @@ export default function LanguageSelector() {
             <Globe className="w-4.5 h-4.5 text-primary" />
           </div>
           <div className="text-left">
-            <div className="text-sm font-semibold text-foreground">Dil / Language</div>
+            <div className="text-sm font-semibold text-foreground">{tr("untranslated_dil_language_7oaxzb", "Dil / Language")}</div>
             <div className="text-xs text-muted-foreground">{current.native}</div>
           </div>
         </div>
@@ -86,7 +86,7 @@ export default function LanguageSelector() {
           className="bg-card w-full max-w-sm rounded-3xl p-4 shadow-2xl"
           onClick={(e) => e.stopPropagation()}>
           
-            <h3 className="text-base font-bold text-foreground mb-3 px-1">Dil / Language</h3>
+            <h3 className="text-base font-bold text-foreground mb-3 px-1">{tr("untranslated_dil_language_7oaxzb", "Dil / Language")}</h3>
             <div className="space-y-2">
               {LANGS.map((l) =>
             <button

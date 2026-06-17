@@ -167,7 +167,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
             <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
               {summary.water_intake}ml
             </div>
-            <div className="text-xs text-muted-foreground">Su</div>
+            <div className="text-xs text-muted-foreground">{tr("untranslated_su_yvcozn", "Su")}</div>
           </div>
 
           <div className="bg-pink-50 dark:bg-pink-900/20 rounded-xl p-3 text-center">
@@ -190,7 +190,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
         {/* Symptoms */}
         {summary.symptoms && summary.symptoms.length > 0 &&
         <div>
-            <div className="text-sm text-muted-foreground mb-2">Simptomlar</div>
+            <div className="text-sm text-muted-foreground mb-2">{tr("untranslated_simptomlar_xhm7bx", "Simptomlar")}</div>
             <div className="flex flex-wrap gap-2">
               {summary.symptoms.map((symptom) =>
             <Badge key={symptom} variant="secondary">

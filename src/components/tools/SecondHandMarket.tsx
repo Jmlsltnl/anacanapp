@@ -348,7 +348,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
         <div className="relative mb-4">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
-            placeholder="Axtar..."
+            placeholder={tr("untranslated_axtar_92w4nn", "Axtar...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-12 h-12 rounded-2xl bg-muted/50 border-border" />
@@ -364,7 +364,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             transition={{ delay: 0.1 }}>
             
             <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{listings.length}</p>
-            <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70 font-medium">Elan</p>
+            <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70 font-medium">{tr("untranslated_elan_voiz8p", "Elan")}</p>
           </motion.div>
           <motion.div
             className="bg-amber-50 dark:bg-amber-500/10 rounded-2xl p-3 text-center border border-amber-100 dark:border-amber-500/20"
@@ -373,7 +373,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             transition={{ delay: 0.15 }}>
             
             <p className="text-2xl font-black text-amber-600 dark:text-amber-400">{freeCount}</p>
-            <p className="text-xs text-amber-600/70 dark:text-amber-400/70 font-medium">Pulsuz</p>
+            <p className="text-xs text-amber-600/70 dark:text-amber-400/70 font-medium">{tr("untranslated_pulsuz_27d02z", "Pulsuz")}</p>
           </motion.div>
           <motion.div
             className="bg-violet-50 dark:bg-violet-500/10 rounded-2xl p-3 text-center border border-violet-100 dark:border-violet-500/20"
@@ -382,7 +382,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             transition={{ delay: 0.2 }}>
             
             <p className="text-2xl font-black text-violet-600 dark:text-violet-400">{categories.length}</p>
-            <p className="text-xs text-violet-600/70 dark:text-violet-400/70 font-medium">Kateqoriya</p>
+            <p className="text-xs text-violet-600/70 dark:text-violet-400/70 font-medium">{tr("untranslated_kateqoriya_d7bf4y", "Kateqoriya")}</p>
           </motion.div>
         </div>
       </div>
@@ -507,9 +507,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                       {/* Price badge */}
                       <div className="absolute top-2 left-2">
                         {listing.is_free ?
-                      <Badge className="bg-emerald-500 text-white border-0 shadow-lg">
-                            Pulsuz
-                          </Badge> :
+                      <Badge className="bg-emerald-500 text-white border-0 shadow-lg">{tr("untranslated_pulsuz_27d02z", "Pulsuz")}</Badge> :
 
                       <Badge className="bg-white/90 dark:bg-card/90 text-foreground border-0 shadow-lg">
                             {listing.price} ₼
@@ -635,7 +633,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-2 block">Kateqoriya</label>
+              <label className="text-sm font-medium mb-2 block">{tr("untranslated_kateqoriya_d7bf4y", "Kateqoriya")}</label>
               <div className="flex flex-wrap gap-2">
                 {categories.map((cat) =>
                 <motion.button
@@ -705,10 +703,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                   type="button"
                   variant={formData.is_free ? 'default' : 'outline'}
                   className={formData.is_free ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : ''}
-                  onClick={() => setFormData({ ...formData, is_free: true, price: 0 })}>
-                  
-                  Pulsuz
-                </Button>
+                  onClick={() => setFormData({ ...formData, is_free: true, price: 0 })}>{tr("untranslated_pulsuz_27d02z", "Pulsuz")}</Button>
                 <Button
                   type="button"
                   variant={!formData.is_free ? 'default' : 'outline'}
