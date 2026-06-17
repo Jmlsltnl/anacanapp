@@ -179,7 +179,6 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
             variant="featured" />
 
           )}
-          )}
           </div>
         </div>
       }
@@ -194,6 +193,7 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
         {isLoading ?
         <div className="grid grid-cols-2 gap-3">
             {[1, 2, 3, 4].map((i) =>
+            <div key={i} className="bg-card rounded-xl overflow-hidden border border-border/50">
                 <Skeleton className="aspect-square w-full" />
                 <div className="p-3 space-y-2">
                   <Skeleton className="h-4 w-3/4" />

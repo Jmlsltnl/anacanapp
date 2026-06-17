@@ -9,6 +9,7 @@ import {
 import { useUserStore } from '@/store/userStore';
 import { usePhaseTips, PHASE_INFO, CATEGORY_INFO, MenstrualPhase, TipCategory } from '@/hooks/usePhaseTips';
 import { format, addDays, differenceInDays } from 'date-fns';
+import { az } from 'date-fns/locale';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { Calendar } from '@/components/ui/calendar';
 import { useQuery, useQueryClient } from '@tanstack/react-query';

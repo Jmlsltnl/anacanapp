@@ -564,10 +564,7 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
         </div>
       </div>
 
-            )}
-          </div>
-        </div>
-      </div>
+
 
       <div className="p-4 space-y-4">
         <div className="rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900/40 px-3 py-2">
