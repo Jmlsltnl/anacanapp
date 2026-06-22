@@ -38,3 +38,6 @@ verify_jwt = false
 
 [functions.send-flow-reminders]
 verify_jwt = false
+
+[functions.bulk-import-csv]
+verify_jwt = false
