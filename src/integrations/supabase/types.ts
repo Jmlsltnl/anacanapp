@@ -6586,10 +6586,13 @@ export type Database = {
           baby_message_en: string | null
           baby_size_cm: number | null
           baby_size_fruit: string | null
+          baby_size_fruit_en: string | null
           baby_weight_gram: number | null
           body_changes: string | null
+          body_changes_en: string | null
           created_at: string
           daily_tip: string | null
+          daily_tip_en: string | null
           day_number: number | null
           days_until_birth: number | null
           doctor_visit_tip: string | null
@@ -6623,10 +6626,13 @@ export type Database = {
           baby_message_en?: string | null
           baby_size_cm?: number | null
           baby_size_fruit?: string | null
+          baby_size_fruit_en?: string | null
           baby_weight_gram?: number | null
           body_changes?: string | null
+          body_changes_en?: string | null
           created_at?: string
           daily_tip?: string | null
+          daily_tip_en?: string | null
           day_number?: number | null
           days_until_birth?: number | null
           doctor_visit_tip?: string | null
@@ -6660,10 +6666,13 @@ export type Database = {
           baby_message_en?: string | null
           baby_size_cm?: number | null
           baby_size_fruit?: string | null
+          baby_size_fruit_en?: string | null
           baby_weight_gram?: number | null
           body_changes?: string | null
+          body_changes_en?: string | null
           created_at?: string
           daily_tip?: string | null
+          daily_tip_en?: string | null
           day_number?: number | null
           days_until_birth?: number | null
           doctor_visit_tip?: string | null
