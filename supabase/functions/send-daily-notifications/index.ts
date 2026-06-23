@@ -250,7 +250,7 @@ Deno.serve(async (req) => {
     const { data: children } = await childrenQuery;
 
     let prefsQuery = supabase
-      .from('user_preferences').select('user_id, push_enabled, daily_push_enabled');
+      .from('user_preferences').select('user_id, push_enabled, daily_push_enabled, language');
     if (body.userId) prefsQuery = prefsQuery.eq('user_id', body.userId);
     const { data: preferences } = await prefsQuery;
 
