@@ -78,10 +78,14 @@ function normalizeSourceTypeForDedup(value: string | null | undefined): string |
 // Each slot maps 1:1 to a cron run. Content times are matched EXACTLY (no ±30min spillover)
 // so that e.g. 15:00 content does not get sent on the 15:30 run.
 const DAILY_RUN_SLOTS: DailyRunSlot[] = [
+  { runAt: '09:00', contentTimes: ['09:00'] },
+  { runAt: '10:00', contentTimes: ['10:00'] },
   { runAt: '12:00', contentTimes: ['12:00'] },
+  { runAt: '14:00', contentTimes: ['14:00'] },
   { runAt: '14:30', contentTimes: ['14:30'] },
   { runAt: '15:00', contentTimes: ['15:00'] },
   { runAt: '15:30', contentTimes: ['15:30'] },
+  { runAt: '19:00', contentTimes: ['19:00'] },
   { runAt: '19:30', contentTimes: ['19:30'] },
 ];
 
