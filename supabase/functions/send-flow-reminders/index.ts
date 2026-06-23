@@ -173,6 +173,13 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Fetch user language preferences
+    let prefsQuery = supabase.from('user_preferences').select('user_id, language');
+    if (body.userId) prefsQuery = prefsQuery.eq('user_id', body.userId);
+    const { data: prefs } = await prefsQuery;
+    const langByUser = new Map<string, string>();
+    prefs?.forEach((p: any) => { langByUser.set(p.user_id, p.language || 'az'); });
+
     const profileMap = new Map<string, UserProfile>();
     profiles?.forEach((p: UserProfile) => { if (p.last_period_date) profileMap.set(p.user_id, p); });
 
