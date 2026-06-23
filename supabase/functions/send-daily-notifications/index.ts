@@ -368,10 +368,12 @@ Deno.serve(async (req) => {
             for (const dn of dayNotifications) {
               const dedupKey = `${user.user_id}:mommy_day:${dn.id}`;
               if (!alreadySent.has(dedupKey)) {
+                const localizedTitle = pickLang(dn.title, dn.title_en, user.language);
+                const localizedBody = pickLang(dn.body, dn.body_en, user.language);
                 notificationsToSend.push({
                   id: dn.id,
-                  title: `${dn.emoji || ''} ${dn.title}`.trim(),
-                  body: dn.body, type: 'mommy_day', day: childAgeDays,
+                  title: `${dn.emoji || ''} ${localizedTitle}`.trim(),
+                  body: localizedBody, type: 'mommy_day', day: childAgeDays,
                 });
               }
             }
