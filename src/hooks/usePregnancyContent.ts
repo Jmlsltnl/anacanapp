@@ -1,5 +1,28 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
+
+const EN_FIELDS = [
+  'baby_development',
+  'baby_message',
+  'baby_size_fruit',
+  'body_changes',
+  'daily_tip',
+  'exercise_tip',
+  'mother_tips',
+  'mother_warnings',
+  'nutrition_tip',
+] as const;
+
+function applyEnglish<T extends Record<string, any> | null>(row: T, lang: string): T {
+  if (!row || lang !== 'en') return row;
+  const out: any = { ...row };
+  for (const f of EN_FIELDS) {
+    const enVal = (row as any)[`${f}_en`];
+    if (enVal) out[f] = enVal;
+  }
+  return out as T;
+}
 
 export interface PregnancyContent {
   id: string;
