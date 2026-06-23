@@ -17,6 +17,23 @@ interface FlowReminder {
   is_enabled: boolean;
   title: string | null;
   message: string | null;
+  title_en: string | null;
+  message_en: string | null;
+}
+
+const EN_DEFAULTS: Record<string, { title: (d: number) => string; body: (d: number) => string }> = {
+  period_start: { title: () => 'Period is coming 🔴', body: (d) => `${d} day(s) until your period!` },
+  period_end: { title: () => 'Period ended ✅', body: () => 'Your period is over!' },
+  ovulation: { title: () => 'Ovulation day 🌸', body: (d) => `${d} day(s) until ovulation!` },
+  fertile_start: { title: () => 'Fertile window 💕', body: () => 'Your fertile window starts!' },
+  fertile_end: { title: () => 'Fertile window ending 📅', body: () => 'Your fertile window is ending.' },
+  pms: { title: () => 'PMS period ⚡', body: () => 'PMS is coming, take care of yourself!' },
+  pill: { title: () => 'Pill time 💊', body: () => "Don't forget to take your daily pill!" },
+};
+
+function pickLang(value: string | null | undefined, valueEn: string | null | undefined, lang: string): string {
+  if (lang === 'en' && valueEn && valueEn.trim()) return valueEn;
+  return value || '';
 }
 
 interface UserProfile {
