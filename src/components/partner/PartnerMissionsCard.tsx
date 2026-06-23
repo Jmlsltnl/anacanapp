@@ -46,8 +46,8 @@ const PartnerMissionsCard = ({ showAll = false }: PartnerMissionsCardProps) => {
 
   const getDifficultyLabel = (difficulty: string) => {
     switch (difficulty) {
-      case 'easy':return 'Asan';
-      case 'medium':return 'Orta';
+      case 'easy':return tr("partnermissionscard_difficulty_easy", 'Asan');
+      case 'medium':return tr("partnermissionscard_difficulty_orta", 'Orta');
       case 'hard':return tr("partnermissionscard_cetin_4bf032", "\xC7\u0259tin");
       default:return difficulty;
     }

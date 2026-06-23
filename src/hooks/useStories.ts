@@ -186,7 +186,7 @@ export const useStories = (groupId?: string | null) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stories'] });
-      toast({ title: 'Story silindi' });
+      toast({ title: tr("stories_story_silindi", 'Story silindi') });
     }
   });
 

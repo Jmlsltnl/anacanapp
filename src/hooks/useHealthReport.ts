@@ -155,7 +155,7 @@ export const useHealthReport = (period: string = '1month'): HealthReportData => 
       const logsWithMood = dailyLogs.filter((log) => log.mood != null);
       if (logsWithMood.length > 0) {
         const avgMood = logsWithMood.reduce((sum, log) => sum + (log.mood || 0), 0) / logsWithMood.length;
-        const moodLabels = [tr("usehealthreport_cox_pis_e041c5", "\xC7ox pis"), 'Pis', 'Normal', tr("usehealthreport_yaxsi_9d8595", "Yax\u015F\u0131"), tr("usehealthreport_ela_720a0e", "\u018Fla")];
+        const moodLabels = [tr("usehealthreport_cox_pis_e041c5", "\xC7ox pis"), tr("usehealthreport_pis", "Pis"), tr("usehealthreport_normal", "Normal"), tr("usehealthreport_yaxsi_9d8595", "Yax\u015F\u0131"), tr("usehealthreport_ela_720a0e", "\u018Fla")];
         const moodText = moodLabels[Math.round(avgMood) - 1] || 'Normal';
 
         result.push({

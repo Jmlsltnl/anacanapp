@@ -147,7 +147,7 @@ const NoSearchResultsEmptyState = () => (
 const NoStoriesEmptyState = () => (
   <EmptyState
     emoji="📸"
-    title="Story yoxdur"
+    title={tr("empty-state_story_yoxdur", "Story yoxdur")}
     description={tr("empty-state_hele_ki_hec_kim_story_paylasmayib_81525f", "Hələ ki, heç kim story paylaşmayıb.")}
     variant="minimal"
   />
@@ -156,7 +156,7 @@ const NoStoriesEmptyState = () => (
 const NoGroupsEmptyState = () => (
   <EmptyState
     emoji="👥"
-    title="Qrup yoxdur"
+    title={tr("empty-state_qrup_yoxdur", "Qrup yoxdur")}
     description={tr("empty-state_size_uygun_qruplar_tezlikle_elave_olunac_a9d784", "Sizə uyğun qruplar tezliklə əlavə olunacaq.")}
     variant="gradient"
   />

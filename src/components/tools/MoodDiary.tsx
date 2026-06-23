@@ -165,9 +165,9 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
       <div className="px-3 -mt-3">
         <div className="bg-card rounded-xl p-1 flex gap-1 shadow-lg">
           {[
-          { id: 'log', label: 'Qeyd', icon: Plus },
+          { id: 'log', label: tr("mooddiary_qeyd", 'Qeyd'), icon: Plus },
           { id: 'history', label: tr("mooddiary_tarixce_b09a14", 'Tarixçə'), icon: Calendar },
-          { id: 'insights', label: 'Analiz', icon: TrendingUp }].
+          { id: 'insights', label: tr("mooddiary_analiz", 'Analiz'), icon: TrendingUp }].
           map((tab) => {
             const Icon = tab.icon;
             return (

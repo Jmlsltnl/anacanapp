@@ -291,7 +291,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
             {tr("shopscreen_xususi_teklif_d781d9", "X\xFCsusi T\u0259klif")}
           </span>
           <h3 className="text-white font-bold text-sm mb-0.5">{tr("shopscreen_ilk_sifarise_20_endirim_444b7e", "İlk sifarişə 20% endirim!")}</h3>
-          <p className="text-white/80 text-xs">ANACAN20 kodunu daxil edin</p>
+          <p className="text-white/80 text-xs">{tr("shopscreen_anacan20_kodunu_daxil_edin", "ANACAN20 kodunu daxil edin")}</p>
         </div>
       </div>
 

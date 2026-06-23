@@ -279,7 +279,7 @@ export const useDeletePost = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['group-posts'] });
-      toast({ title: 'Post silindi 🗑️' });
+      toast({ title: tr("usecommunity_post_silindi", 'Post silindi') + ' 🗑️' });
     },
     onError: () => {
       toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });

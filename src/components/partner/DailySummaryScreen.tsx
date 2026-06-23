@@ -32,9 +32,9 @@ const DailySummaryScreen: React.FC<DailySummaryScreenProps> = ({ onBack }) => {
   };
 
   const getMoodLabel = (mood: number | null) => {
-    if (!mood) return 'Qeyd yox';
-    const labels = [tr("dailysummaryscreen_cox_pis_e041c5", "\xC7ox pis"), 'Pis', 'Normal', tr("dailysummaryscreen_yaxsi_9d8595", "Yax\u015F\u0131"), tr("dailysummaryscreen_ela_720a0e", "\u018Fla")];
-    return labels[mood - 1] || 'Qeyd yox';
+    if (!mood) return tr("partner_qeyd_yox", 'Qeyd yox');
+    const labels = [tr("dailysummaryscreen_cox_pis_e041c5", "\xC7ox pis"), tr("common_pis", 'Pis'), 'Normal', tr("dailysummaryscreen_yaxsi_9d8595", "Yax\u015F\u0131"), tr("dailysummaryscreen_ela_720a0e", "\u018Fla")];
+    return labels[mood - 1] || tr("partner_qeyd_yox", 'Qeyd yox');
   };
 
   const formatDate = (dateStr: string) => {

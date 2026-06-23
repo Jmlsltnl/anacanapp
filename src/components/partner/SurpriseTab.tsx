@@ -75,7 +75,7 @@ const SurpriseTab = () => {
     const uniqueCategories = new Set(surpriseIdeasData?.map((s) => s.category) || []);
 
     const categoryLabels: Record<string, {label: string;emoji: string;}> = {
-      romantic: { label: 'Romantik', emoji: '❤️' },
+      romantic: { label: tr("surprisetab_romantic", 'Romantik'), emoji: '❤️' },
       care: { label: tr("surprisetab_qaygi_868e7d", 'Qayğı'), emoji: '🤗' },
       adventure: { label: tr("surprisetab_macera_bc3bdc", 'Macəra'), emoji: '🌟' },
       gift: { label: tr("surprisetab_hediyye_8578f3", 'Hədiyyə'), emoji: '🎁' },
@@ -406,7 +406,7 @@ const SurpriseTab = () => {
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <h3 className="font-semibold">{idea.title}</h3>
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${getDifficultyColor(idea.difficulty)}`}>
-                      {idea.difficulty === 'easy' ? 'Asan' : idea.difficulty === 'medium' ? 'Orta' : tr("surprisetab_cetin_4bf032", "\xC7\u0259tin")}
+                      {idea.difficulty === 'easy' ? tr("surprisetab_difficulty_easy", 'Asan') : idea.difficulty === 'medium' ? tr("surprisetab_difficulty_orta", 'Orta') : tr("surprisetab_cetin_4bf032", "\xC7\u0259tin")}
                     </span>
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-2">{idea.description}</p>
@@ -427,7 +427,7 @@ const SurpriseTab = () => {
                       whileTap={{ scale: 0.95 }}>
                       
                         <Sparkles className="w-4 h-4" />
-                        Planla
+                        {tr("surprisetab_planla", "Planla")}
                       </motion.button>
                     }
                   </div>

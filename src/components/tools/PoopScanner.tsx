@@ -315,13 +315,13 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
                   className="w-full h-full object-cover" />
                 
                   {isAnalyzing &&
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <div className="text-center text-white">
-                        <Loader2 className="w-10 h-10 animate-spin mx-auto mb-2" />
-                        <p className="text-sm">{tr("untranslated_analiz_edilir_hf0m1t", "Analiz edilir...")}</p>
-                      </div>
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <div className="text-center text-white">
+                      <Loader2 className="w-10 h-10 animate-spin mx-auto mb-2" />
+                      <p className="text-sm">{tr("untranslated_analiz_edilir_hf0m1t", "Analiz edilir...")}</p>
                     </div>
-                }
+                  </div>
+                  }
                 </div>
                 
                 <div className="flex gap-2">
@@ -343,10 +343,10 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
                     {isAnalyzing ?
                   <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Analiz...
+                        {tr("common_analiz_loading", 'Analiz...')}
                       </> :
 
-                  'Analiz et'
+                  tr("poopscanner_analiz_et", 'Analiz et')
                   }
                   </Button>
                 </div>

@@ -133,6 +133,7 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
             selectedPlan === 'yearly' ? 'border-primary bg-primary/5 shadow-md' : 'border-border bg-card'}`
             }>
             
+            
               {savingsPercent > 0 &&
             <span className="absolute -top-2.5 left-4 px-2.5 py-0.5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full">
                   {tr("paywallstep_en_serfeli_056ce6", "\u018Fn s\u0259rf\u0259li \xB7")} {savingsPercent}{tr("paywallstep_qenaet_ea8b53", "% q\u0259na\u0259t")}
@@ -141,11 +142,11 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
               <div className="flex items-center justify-between">
                 <div className="text-left">
                   <p className="text-sm font-semibold text-foreground">{tr("paywallstep_illik_4a3cef", "İllik")}</p>
-                  <p className="text-xs text-muted-foreground">{yearlyTrialDays ? `${yearlyTrialDays} gün pulsuz, sonra ${yearlyPriceStr}/il` : `${yearlyPriceStr}/il`}</p>
+                  <p className="text-xs text-muted-foreground">{yearlyTrialDays ? `${yearlyTrialDays} ${tr("paywall_trial_days_short", "gün pulsuz, sonra")} ${yearlyPriceStr}${tr("paywall_per_year", "/il")}` : `${yearlyPriceStr}${tr("paywall_per_year", "/il")}`}</p>
                 </div>
                 <div className="text-right">
                   <span className="text-lg font-bold text-foreground">{yearlyMonthlyStr}</span>
-                  <span className="text-xs text-muted-foreground">/ay</span>
+                  <span className="text-xs text-muted-foreground">{tr("paywall_per_month", "/ay")}</span>
                 </div>
               </div>
             </button>
@@ -156,21 +157,17 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
             className={`w-full p-4 rounded-2xl border-2 transition-all ${
             selectedPlan === 'monthly' ? 'border-primary bg-primary/5 shadow-md' : 'border-border bg-card'}`
             }>
-            
               <div className="flex items-center justify-between">
                 <div className="text-left">
                   <p className="text-sm font-semibold text-foreground">{tr("paywallstep_ayliq_6f265e", "Aylıq")}</p>
-                  <p className="text-xs text-muted-foreground">{monthlyTrialDays ? `${monthlyTrialDays} gün pulsuz, sonra ${monthlyPriceStr}/ay` : `${monthlyPriceStr}/ay`}</p>
+                  <p className="text-xs text-muted-foreground">{monthlyTrialDays ? `${monthlyTrialDays} ${tr("paywall_trial_days_short", "gün pulsuz, sonra")} ${monthlyPriceStr}${tr("paywall_per_month", "/ay")}` : `${monthlyPriceStr}${tr("paywall_per_month", "/ay")}`}</p>
                 </div>
                 <div className="text-right">
                   <span className="text-lg font-bold text-foreground">{monthlyPriceStr}</span>
-                  <span className="text-xs text-muted-foreground">/ay</span>
+                  <span className="text-xs text-muted-foreground">{tr("paywall_per_month", "/ay")}</span>
                 </div>
               </div>
             </button>
-          </div>
-        }
-
         <div className="space-y-2.5 mb-5">
           {[tr("paywallstep_butun_aletlere_sinirsiz_giris_2d0db2", "B\xFCt\xFCn al\u0259tl\u0259r\u0259 s\u0131n\u0131rs\u0131z giri\u015F"),
 
@@ -203,7 +200,7 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
           {isPurchasing ?
           <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{tr("untranslated_emal_edilir_hf0m1t", "Emal edilir...")}</> :
 
-          anyTrialDays ? `${anyTrialDays} Gün Pulsuz Başla` : tr("paywallstep_premium_a_kec_2e8b0e", "Premium-a Ke\xE7")
+          anyTrialDays ? `${anyTrialDays} ${tr("paywall_days_free_start", "Gün Pulsuz Başla")}` : tr("paywallstep_premium_a_kec_2e8b0e", "Premium-a Ke\xE7")
           }
         </Button>
         <p className="text-[11px] text-center text-muted-foreground">

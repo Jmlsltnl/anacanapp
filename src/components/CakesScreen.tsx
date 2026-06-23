@@ -25,7 +25,7 @@ const getOrdinalSuffix = (n: number): string => {
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => ({
   id: i + 1,
-  label: `${i + 1}-${getOrdinalSuffix(i + 1)} ay`,
+  label: tr(`common_month_label_${i + 1}`, `${i + 1}-${getOrdinalSuffix(i + 1)} ay`),
   emoji: ['🎂', '🧁', '🎀', '🌸', '⭐', '🎈', '🌈', '🎪', '🎠', '🎡', '🎆', '🎊'][i]
 }));
 
@@ -178,7 +178,7 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
             <span className="absolute top-2 left-2 px-2 py-0.5 bg-amber-500/90 rounded-full text-[10px] font-bold text-white">{cake.milestone_label}</span>
             }
                 {cake.category === 'month' && cake.month_number &&
-            <span className="absolute top-2 left-2 px-2 py-0.5 bg-primary/90 rounded-full text-[10px] font-bold text-white">{cake.month_number}-{getOrdinalSuffix(cake.month_number!)} ay</span>
+            <span className="absolute top-2 left-2 px-2 py-0.5 bg-primary/90 rounded-full text-[10px] font-bold text-white">{tr(`common_month_label_${cake.month_number}`, `${cake.month_number}-${getOrdinalSuffix(cake.month_number!)} ay`)}</span>
             }
               </div> :
 

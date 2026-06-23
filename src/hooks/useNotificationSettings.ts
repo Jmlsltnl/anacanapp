@@ -191,7 +191,7 @@ export const useNotificationSettings = () => {
 
     await localNotifications.schedule([{
       id: 400 + Math.floor(Math.random() * 100),
-      title: 'Sabah randevunuz var! 📅',
+      title: tr("appointments_sabah_randevunuz_var", 'Sabah randevunuz var!') + ' 📅',
       body: title,
       schedule: { at: reminderTime }
     }]);

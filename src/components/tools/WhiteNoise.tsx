@@ -223,10 +223,10 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
 
   const timerOptions = isPremium ?
   [
-  { value: null, label: 'Limitsiz', icon: '∞' },
+  { value: null, label: tr("common_limitsiz", 'Limitsiz'), icon: '∞' },
   { value: 15, label: tr("whitenoise_15_deq_3ce4c1", '15 dəq'), icon: '15' },
   { value: 30, label: tr("whitenoise_30_deq_15eb1f", '30 dəq'), icon: '30' },
-  { value: 60, label: '1 saat', icon: '60' }] :
+  { value: 60, label: tr("common_1_saat", '1 saat'), icon: '60' }] :
 
   [
   { value: 10, label: tr("whitenoise_10_deq_b4f9fd", '10 dəq'), icon: '10' },
@@ -446,7 +446,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
               
                 <span className="text-lg font-bold">{option.icon}</span>
                 <p className="text-[10px] mt-0.5 opacity-80">
-                  {option.value === null ? 'Limitsiz' : tr("whitenoise_deqiqe_94641a", "d\u0259qiq\u0259")}
+                  {option.value === null ? tr("common_limitsiz", 'Limitsiz') : tr("whitenoise_deqiqe_94641a", "d\u0259qiq\u0259")}
                 </p>
               </motion.button>
             )}
@@ -454,7 +454,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
           {!isPremium &&
           <p className="text-[10px] text-muted-foreground mt-2 text-center flex items-center justify-center gap-1">
               <Lock className="w-3 h-3" />
-              Limitsiz taymer Premium-a aiddir
+              {tr("whitenoise_limitsiz_taymer_premium_info", 'Limitsiz taymer Premium-a aiddir')}
             </p>
           }
         </motion.div>

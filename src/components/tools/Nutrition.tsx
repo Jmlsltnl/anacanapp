@@ -24,7 +24,7 @@ interface NutritionProps {
 // Fallback meal types
 const fallbackMealTypes = [
 { meal_id: 'breakfast', name: tr("nutrition_seher_yemeyi_b82929", "Səhər yeməyi"), emoji: '🍳', time_range: '07:00 - 09:00' },
-{ meal_id: 'lunch', name: 'Nahar', emoji: '🍲', time_range: '12:00 - 14:00' },
+{ meal_id: 'lunch', name: tr("nutrition_nahar_lunch", 'Nahar'), emoji: '🍲', time_range: '12:00 - 14:00' },
 { meal_id: 'dinner', name: tr("nutrition_sam_yemeyi_6002e9", "Şam yeməyi"), emoji: '🍽️', time_range: '18:00 - 20:00' },
 { meal_id: 'snack', name: tr("nutrition_qelyanalti_42fb71", "Qəlyanaltı"), emoji: '🍎', time_range: tr("nutrition_i_stenilen_vaxt_ec15be", "İstənilən vaxt") }];
 
@@ -38,9 +38,9 @@ const fallbackTargets = {
 
 // Common foods will be fetched from DB, fallback for loading
 const fallbackFoods = [
-{ name: 'Yumurta', calories: 78, emoji: '🥚' },
+{ name: tr("nutrition_yumurta_egg", 'Yumurta'), calories: 78, emoji: '🥚' },
 { name: tr("nutrition_corek_1_dilim_6ad54a", "Çörək (1 dilim)"), calories: 80, emoji: '🍞' },
-{ name: 'Pendir', calories: 113, emoji: '🧀' },
+{ name: tr("nutrition_pendir_cheese", 'Pendir'), calories: 113, emoji: '🧀' },
 { name: tr("nutrition_sud_1_stekan_45357d", "Süd (1 stəkan)"), calories: 150, emoji: '🥛' }];
 
 
@@ -347,9 +347,8 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
             <div className="flex-1">
               <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <Utensils className="w-5 h-5 text-primary" />
-                Qidalanma
+                {tr("nutrition_qidalanma_title", 'Qidalanma')}
               </h1>
-              
             </div>
           </div>
         </div>
@@ -387,7 +386,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
           { id: 'log', label: tr("nutrition_yemek_b1fd56", 'Yemək') },
           { id: 'vitamins', label: tr("nutrition_vitaminler_e49129", 'Vitaminlər') },
           { id: 'tips', label: tr("nutrition_tovsiyeler_17a8f7", 'Tövsiyələr') },
-          { id: 'water', label: 'Su' }].
+          { id: 'water', label: tr("common_su_water", 'Su') }].
           map((tab) =>
           <button
             key={tab.id}

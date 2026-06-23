@@ -137,7 +137,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
     switch (stage) {
       case 'flow':return { label: 'Flow', color: 'bg-pink-100 text-pink-700' };
       case 'bump':return { label: tr("userprofilescreen_hamile_0080af", 'Hamilə'), color: 'bg-orange-100 text-orange-700' };
-      case 'mommy':return { label: 'Ana', color: 'bg-purple-100 text-purple-700' };
+      case 'mommy':return { label: tr("common_ana", 'Ana'), color: 'bg-purple-100 text-purple-700' };
       case 'partner':return { label: 'Partner', color: 'bg-blue-100 text-blue-700' };
       default:return null;
     }
@@ -156,7 +156,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
       <div className="min-h-screen bg-background p-5">
         <button onClick={onBack} className="flex items-center gap-2 text-muted-foreground mb-6">
           <ArrowLeft className="w-5 h-5" />
-          Geri
+          {tr("common_geri", "Geri")}
         </button>
         <div className="text-center py-12">
           <p className="text-muted-foreground">{tr("userprofilescreen_istifadeci_tapilmadi_4e2156", "İstifadəçi tapılmadı")}</p>
@@ -238,6 +238,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
           <div className="text-center p-3 bg-muted/50 rounded-xl">
             <p className="text-2xl font-bold text-foreground">{stats.likesCount}</p>
             <p className="text-xs text-muted-foreground">{tr("userprofilescreen_beyenme_488df4", "Bəyənmə")}</p>
+          </div>
         </div>
 
         {/* Message Button */}
@@ -248,10 +249,9 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
             whileTap={{ scale: 0.97 }}>
             
             <MessageCircle className="w-4 h-4" />
-            {tr("userprofilescreen_mesaj_gonder_ad33c9", "Mesaj g\xF6nd\u0259r")}
+            {tr("userprofilescreen_mesaj_gonder_ad33c9", "Mesaj göndər")}
           </motion.button>
-          }
-      </div>
+        }
       </div>
 
       {/* Tabs */}
@@ -259,11 +259,11 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
         <TabsList className="w-full grid grid-cols-2">
           <TabsTrigger value="posts" className="flex items-center gap-2">
             <Grid3X3 className="w-4 h-4" />
-            Postlar
+            {tr("userprofilescreen_postlar", "Postlar")}
           </TabsTrigger>
           <TabsTrigger value="stories" className="flex items-center gap-2">
             <Film className="w-4 h-4" />
-            {tr("userprofilescreen_story_ler_670373", "Story-l\u0259r")}
+            {tr("userprofilescreen_story_ler_670373", "Story-lər")}
           </TabsTrigger>
         </TabsList>
 

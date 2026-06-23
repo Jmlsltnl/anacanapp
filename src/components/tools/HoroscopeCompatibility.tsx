@@ -96,8 +96,8 @@ const TIME_OPTIONS = Array.from({ length: 24 }, (_, h) =>
 ).flat();
 
 const STEPS = [
-{ id: 1, title: 'Ana', icon: User, emoji: '👩' },
-{ id: 2, title: 'Ata', icon: User, emoji: '👨' },
+{ id: 1, title: tr("common_ana", 'Ana'), icon: User, emoji: '👩' },
+{ id: 2, title: tr("common_ata", 'Ata'), icon: User, emoji: '👨' },
 { id: 3, title: tr("horoscopecompatibility_korpe_fa2b51", 'Körpə'), icon: Baby, emoji: '👶' }];
 
 
@@ -377,9 +377,9 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
                 {tr("horoscopecompatibility_dogum_xeriteleri_c9a3ce", "Do\u011Fum X\u0259rit\u0259l\u0259ri")}
               </h3>
               
-              <BirthChartCard chart={analysisResult.charts.mom} label={tr("untranslated_ana_tubxbv", "Ana")} emoji="👩" />
+              <BirthChartCard chart={analysisResult.charts.mom} label={tr("common_ana", "Ana")} emoji="👩" />
               {analysisResult.charts.dad &&
-              <BirthChartCard chart={analysisResult.charts.dad} label="Ata" emoji="👨" />
+              <BirthChartCard chart={analysisResult.charts.dad} label={tr("common_ata", "Ata")} emoji="👨" />
               }
               {analysisResult.charts.baby &&
               <BirthChartCard
@@ -394,7 +394,7 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
           {/* Analysis Sections */}
           {analysisResult.analysis.momAnalysis &&
           <AnalysisCard
-            title="Ana Analizi"
+            title={tr("horoscope_ana_analizi", "Ana Analizi")}
             emoji="👩"
             content={analysisResult.analysis.momAnalysis}
             color="from-pink-500/10 to-rose-500/10" />
@@ -403,7 +403,7 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
 
           {analysisResult.analysis.dadAnalysis && analysisResult.charts.dad &&
           <AnalysisCard
-            title="Ata Analizi"
+            title={tr("horoscope_ata_analizi", "Ata Analizi")}
             emoji="👨"
             content={analysisResult.analysis.dadAnalysis}
             color="from-blue-500/10 to-indigo-500/10" />

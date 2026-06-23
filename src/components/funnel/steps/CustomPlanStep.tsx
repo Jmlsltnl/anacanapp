@@ -41,6 +41,14 @@ export default function CustomPlanStep({ userName, milestones, onContinue }: Cus
                 <p className="text-xs font-semibold text-primary mb-1">{m.week}</p>
                 <p className="text-sm text-foreground font-medium">{m.label}</p>
               </div>
+            }>
+                <span className="text-xs font-bold">{i + 1}</span>
+              </div>
+
+              <div className="bg-card rounded-2xl border border-border p-4">
+                <p className="text-xs font-semibold text-primary mb-1">{m.week}</p>
+                <p className="text-sm text-foreground font-medium">{m.label}</p>
+              </div>
             </motion.div>
           )}
         </div>
@@ -49,7 +57,7 @@ export default function CustomPlanStep({ userName, milestones, onContinue }: Cus
         <div className="mt-8 bg-card rounded-2xl border border-border p-4">
           <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
             <span>{tr("customplanstep_indi_a5d6f3", "İndi 😟")}</span>
-            <span>3 ay sonra 😌</span>
+            <span>3 {tr("funnel_ay_sonra", 'ay sonra')} 😌</span>
           </div>
           <div className="h-3 bg-muted rounded-full overflow-hidden">
             <motion.div

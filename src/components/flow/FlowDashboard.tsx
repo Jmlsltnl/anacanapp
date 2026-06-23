@@ -574,7 +574,7 @@ const FlowDashboard = () => {
         <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-2xl p-4 border border-blue-100 dark:border-blue-800/30">
           <Moon className="w-6 h-6 text-blue-500 mb-2" />
           <p className="font-bold text-foreground text-lg">
-            {currentPhase === 'luteal' ? '8-9 saat' : '7-8 saat'}
+            {currentPhase === 'luteal' ? `8-9 ${tr("common_hours", 'saat')}` : `7-8 ${tr("common_hours", 'saat')}`}
           </p>
           <p className="text-xs text-muted-foreground">{tr("flowdashboard_tovsiye_edilen_yuxu_e219dd", "Tövsiyə Edilən Yuxu")}</p>
         </div>
@@ -628,7 +628,7 @@ const FlowDashboard = () => {
               disabled={markingPeriod}
               className="bg-red-500 hover:bg-red-600">
               
-              {markingPeriod ? 'Qeyd edilir...' : 'Qeyd et'}
+              {markingPeriod ? tr("untranslated_qeyd_edilir_df7cba", "Qeyd edilir...") : tr("flow_qeyd_et", 'Qeyd et')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -669,7 +669,7 @@ const FlowDashboard = () => {
               disabled={markingPeriod}
               className="bg-green-600 hover:bg-green-700">
               
-              {markingPeriod ? 'Qeyd edilir...' : 'Qeyd et'}
+              {markingPeriod ? tr("untranslated_qeyd_edilir_df7cba", "Qeyd edilir...") : tr("flow_qeyd_et", 'Qeyd et')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

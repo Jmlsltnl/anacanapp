@@ -576,7 +576,7 @@ export const useSymptomsAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['symptoms-admin'] });
       queryClient.invalidateQueries({ queryKey: ['symptoms'] });
-      toast({ title: 'Simptom silindi' });
+      toast({ title: tr("dynamicconfig_simptom_silindi", 'Simptom silindi') });
     },
   });
 
@@ -686,7 +686,7 @@ export const useShopCategoriesAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['shop-categories-admin'] });
       queryClient.invalidateQueries({ queryKey: ['shop-categories'] });
-      toast({ title: 'Kateqoriya silindi' });
+      toast({ title: tr("dynamicconfig_kateqoriya_silindi", 'Kateqoriya silindi') });
     },
   });
 

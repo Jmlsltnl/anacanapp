@@ -63,10 +63,10 @@ const providerTypeLabels: Record<string, {label: string;icon: typeof Stethoscope
 const specialtyCategories = [
 { id: 'all', label: tr("doctorshospitals_hamisi_c73c4d", 'Hamısı'), emoji: '✨' },
 { id: 'hospital', label: tr("doctorshospitals_xestexana_04539b", 'Xəstəxana'), emoji: '🏥' },
-{ id: 'gynecology', label: 'Ginekologiya', emoji: '👩‍⚕️' },
+{ id: 'gynecology', label: tr("common_ginekologiya", 'Ginekologiya'), emoji: '👩‍⚕️' },
 { id: 'ivf', label: 'IVF', emoji: '🔬' },
-{ id: 'pediatrics', label: 'Pediatriya', emoji: '👶' },
-{ id: 'mammology', label: 'Mamologiya', emoji: '🩺' }];
+{ id: 'pediatrics', label: tr("common_pediatriya", 'Pediatriya'), emoji: '👶' },
+{ id: 'mammology', label: tr("common_mamologiya", 'Mamologiya'), emoji: '🩺' }];
 
 
 const dayLabels: Record<string, string> = {
@@ -76,7 +76,7 @@ const dayLabels: Record<string, string> = {
   thursday: tr("doctorshospitals_cume_axsami_8a8cf4", "C\xFCm\u0259 ax\u015Fam\u0131"),
   friday: tr("doctorshospitals_cume_faba24", "C\xFCm\u0259"),
   saturday: tr("doctorshospitals_senbe_02045c", "\u015E\u0259nb\u0259"),
-  sunday: 'Bazar'
+  sunday: tr("common_bazar", 'Bazar')
 };
 
 const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {

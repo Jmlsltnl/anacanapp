@@ -65,7 +65,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
 
     try {
       const tables = [
-      { name: 'profiles', label: 'Profil' },
+      { name: 'profiles', label: tr("untranslated_profil_v8b0sk", 'Profil') },
       { name: 'daily_logs', label: tr("settingsscreen_gundelik_qeydler_285ea0", 'Gündəlik qeydlər') },
       { name: 'appointments', label: 'Randevular' },
       { name: 'baby_growth', label: tr("settingsscreen_korpe_inkisafi_8816ce", 'Körpə inkişafı') },

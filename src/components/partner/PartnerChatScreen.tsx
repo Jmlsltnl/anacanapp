@@ -135,7 +135,7 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
       supabase.functions.invoke('send-push-notification', {
         body: {
           userId: partnerProfile.user_id,
-          title: `${profile?.name || 'Partnyor'} 💌`,
+          title: `${profile?.name || tr("common_partnyor", 'Partnyor')} 💌`,
           body: content.slice(0, 80),
           data: { type: 'partner_message' }
         }

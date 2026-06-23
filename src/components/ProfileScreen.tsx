@@ -83,9 +83,9 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   };
 
   const handleDeleteChild = async (child: Child) => {
-    if (confirm(`${child.name} silinsin?`)) {
+    if (confirm(`${child.name} ${tr("profilescreen_silinsin_question", "silinsin?")}`)) {
       await deleteChild(child.id);
-      toast({ title: 'Silindi' });
+      toast({ title: tr("common_silindi", 'Silindi') });
     }
   };
 
@@ -96,22 +96,22 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
 
   const menuItems = [
   { id: 'billing', icon: CreditCard, label: tr("profilescreen_abuneliyim_f6c8ed", 'Abunəliyim') },
-  { id: 'partners', icon: Sparkles, label: tr("profilescreen_partnyor_endirimleri_e44036", "Partnyor Endiriml\u0259ri"), badge: 'Yeni' },
+  { id: 'partners', icon: Sparkles, label: tr("profilescreen_partnyor_endirimleri_e44036", "Partnyor Endirimləri"), badge: tr("profilescreen_badge_yeni", "Yeni") },
   { id: 'notifications', icon: Bell, label: tr("profilescreen_bildirisler_54eb88", 'Bildirişlər'), badge: unreadCount > 0 ? String(unreadCount) : undefined },
   { id: 'appearance', icon: Palette, label: tr("profilescreen_gorunus_165fe3", 'Görünüş') },
   { id: 'calendar', icon: Calendar, label: tr("profilescreen_teqvim_ayarlari_012790", 'Təqvim Ayarları') },
-  { id: 'privacy', icon: Shield, label: 'Gizlilik' },
+  { id: 'privacy', icon: Shield, label: tr("profilescreen_gizlilik", "Gizlilik") },
   { id: 'help', icon: HelpCircle, label: tr("profilescreen_yardim_da857a", 'Yardım') },
   ...(isAdmin ? [
   { id: 'shop', icon: ShoppingCart, label: tr("profilescreen_magaza_test_72b060", 'Mağaza (Test)'), badge: 'Beta' },
-  { id: 'admin', icon: ShieldCheck, label: 'Admin Panel', badge: 'Admin' }] :
+  { id: 'admin', icon: ShieldCheck, label: tr("profilescreen_admin_panel", "Admin Panel"), badge: 'Admin' }] :
   [])];
 
 
   const copyPartnerCode = async () => {
     await nativeShare({
-      title: 'Partnyor Kodu',
-      text: `Partnyor kodum: ${partnerCode}`
+      title: tr("profile_partnyor_kodu", 'Partnyor Kodu'),
+      text: `${tr("profile_partnyor_kodum", 'Partnyor kodum')}: ${partnerCode}`
     });
   };
 
@@ -119,7 +119,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
     const shareText = `${tr("profile_share_partner_text", "Anacan tətbiqinə qoşul və hamiləlik səyahətimizdə mənə dəstək ol! Partnyor kodum:")} ${partnerCode}\n\n${tr("profile_download_app", "Tətbiqi yüklə:")} https://anacanapp.lovable.app`;
 
     const success = await nativeShare({
-      title: 'Partnyor Kodu',
+      title: tr("profile_partnyor_kodu", 'Partnyor Kodu'),
       text: shareText
     });
 
@@ -288,7 +288,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
               </div>
               <div>
                 <h3 className="font-bold text-foreground text-sm flex items-center gap-1.5">
-                  Partnyor Kodu
+                  {tr("profile_partnyor_kodu", "Partnyor Kodu")}
                   {!isPremium && <Crown className="w-3.5 h-3.5 text-amber-500" />}
                 </h3>
                 <p className="text-[10px] text-muted-foreground">

@@ -27,11 +27,11 @@ const SKILL_COLORS: Record<string, string> = {
 };
 
 const SKILL_LABELS: Record<string, string> = {
-  motor: '💪 Motor',
+  motor: '💪 ' + tr("smartplaybox_motor", 'Motor'),
   sensory: tr("smartplaybox_duygu_a3bf01", "\u270B Duy\u011Fu"),
-  language: '🗣️ Dil',
+  language: '🗣️ ' + tr("smartplaybox_dil", 'Dil'),
   cognitive: '🧠 ' + tr("playbox_cognitive", "İdrak"),
-  social: '👥 Sosial'
+  social: '👥 ' + tr("smartplaybox_sosial", 'Sosial')
 };
 
 const SKILL_ICONS: Record<string, string> = {
@@ -43,8 +43,8 @@ const SKILL_ICONS: Record<string, string> = {
 };
 
 const DIFFICULTY_LABELS: Record<string, {label: string;color: string;}> = {
-  easy: { label: 'Asan', color: 'bg-green-100 text-green-700' },
-  medium: { label: 'Orta', color: 'bg-amber-100 text-amber-700' },
+  easy: { label: tr("smartplaybox_easy", 'Asan'), color: 'bg-green-100 text-green-700' },
+  medium: { label: tr("smartplaybox_medium", 'Orta'), color: 'bg-amber-100 text-amber-700' },
   hard: { label: tr("smartplaybox_cetin_4bf032", 'Çətin'), color: 'bg-red-100 text-red-700' }
 };
 
@@ -164,14 +164,14 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
   }, [inventoryItems]);
 
   const categoryLabels: Record<string, string> = {
-    home: '🏠 Ev',
+    home: `🏠 ${tr("common_ev", 'Ev')}`,
     kitchen: tr("smartplaybox_metbex_4f67cc", "\uD83C\uDF73 M\u0259tb\u0259x"),
     recyclable: tr("smartplaybox_tekrar_istifade_4effdb", "\u267B\uFE0F T\u0259krar istifad\u0259"),
-    office: '📎 Ofis',
-    clothing: '👕 Paltar',
-    toys: '🧸 Oyuncaq',
-    education: tr("smartplaybox_tehsil_ce8208", "\uD83D\uDCDA T\u0259hsil"),
-    electronics: '📱 Elektronika',
+    office: tr("common_ofis_label", '📎 Ofis'),
+    clothing: tr("common_paltar_label", '👕 Paltar'),
+    toys: tr("common_oyuncaq_label", '🧸 Oyuncaq'),
+    education: tr("smartplaybox_tehsil_ce8208", "📚 Təhsil"),
+    electronics: tr("common_elektronika_label", '📱 Elektronika'),
     general: tr("smartplaybox_umumi_980283", "\uD83D\uDCE6 \xDCmumi")
   };
 

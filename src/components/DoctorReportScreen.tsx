@@ -40,8 +40,8 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
 
   const periods = [
   { id: '1week', label: tr("doctorreportscreen_1_hefte_6d1cb4", '1 Həftə') },
-  { id: '1month', label: '1 Ay' },
-  { id: '3months', label: '3 Ay' },
+  { id: '1month', label: tr("doctorreport_1_ay", '1 Ay') },
+  { id: '3months', label: tr("doctorreport_3_ay", '3 Ay') },
   { id: 'all', label: tr("doctorreportscreen_hamisi_c73c4d", 'Hamısı') }];
 
 
@@ -120,7 +120,7 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
             <div className="flex-1">
               <h2 className="font-bold text-lg">{name || tr("doctorreportscreen_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}</h2>
               <p className="text-sm text-muted-foreground">
-                Hesabat tarixi: {new Date().toLocaleDateString('az-AZ')}
+                {tr("doctorreport_hesabat_tarixi", 'Hesabat tarixi:')} {new Date().toLocaleDateString('az-AZ')}
               </p>
             </div>
           </div>

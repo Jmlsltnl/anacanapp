@@ -6,9 +6,9 @@ import { useWhiteNoiseStore } from '@/store/whiteNoiseStore';
 import { tr } from "@/lib/tr";
 
 const timerConfig: Record<TimerType, {icon: typeof Moon;color: string;label: string;}> = {
-  sleep: { icon: Moon, color: 'text-indigo-500', label: 'Yuxu' },
+  sleep: { icon: Moon, color: 'text-indigo-500', label: tr("common_yuxu", 'Yuxu') },
   feeding: { icon: Baby, color: 'text-rose-500', label: tr("floatingtimerwidget_emizdirme_20d46a", 'Əmizdirmə') },
-  diaper: { icon: Clock, color: 'text-amber-500', label: 'Bez' },
+  diaper: { icon: Clock, color: 'text-amber-500', label: tr("common_bez", 'Bez') },
   'white-noise': { icon: Volume2, color: 'text-emerald-500', label: tr("floatingtimerwidget_kuy_sesi_7b0cd5", 'Küy Səsi') }
 };
 
@@ -145,7 +145,7 @@ const FloatingTimerWidget = () => {
                     <div className="flex-1 min-w-0">
                       <p className="text-[11px] font-semibold text-foreground truncate leading-tight">
                         {timer.label || tc.label}
-                        {timer.feedType ? ` (${timer.feedType === 'left' ? 'Sol' : tr("floatingtimerwidget_sag_edbe12", "Sa\u011F")})` : ''}
+                        {timer.feedType ? ` (${timer.feedType === 'left' ? tr("dashboard_sol", 'Sol') : tr("floatingtimerwidget_sag_edbe12", "Sağ")})` : ''}
                       </p>
                       <p className="text-xs font-mono font-bold text-foreground tabular-nums">
                         {formatTime(getElapsedSeconds(timer.id))}

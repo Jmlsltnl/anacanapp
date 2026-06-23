@@ -912,7 +912,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
           end_time: new Date().toISOString()
         });
         toast({
-          title: `${type === 'left' ? 'Sol' : tr("dashboard_sag_edbe12", "Sa\u011F")} sinə bitti!`,
+          title: `${type === 'left' ? tr("dashboard_sol", "Sol") : tr("dashboard_sag_edbe12", "Sa\u011F")} sinə bitti!`,
           description: `${tr("dashboard_duration", "Müddət:")} ${formatDuration(result.durationSeconds)}`
         });
 
@@ -949,7 +949,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
       formula: amountMl ? `Süd əvəzedicisi ${amountMl} ml 🍼` : tr("dashboard_sud_evezedicisi_057b37", "S\xFCd \u0259v\u0259zedicisi \uD83C\uDF7C"),
       solid: foodName ? `${foodName} 🥣` : tr("dashboard_elave_qida_0e11a2", "\u018Flav\u0259 qida \uD83E\uDD63")
     };
-    toast({ title: `${typeLabels[type]} qeyd edildi!` });
+    toast({ title: `${typeLabels[type]} ${tr("dashboard_qeyd_edildi", "qeyd edildi!")}` });
   };
 
   const handleFormulaClick = () => {
@@ -1189,7 +1189,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
             </div>
             <div>
               <h3 className="font-bold text-sm text-foreground">{tr("dashboard_yuxu_izleme_adaa4f", "Yuxu İzləmə")}</h3>
-              <p className="text-xs text-muted-foreground">{tr('dashboard_today_label', 'Bu gün')}: {(() => {const m = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60);const h = Math.floor(m / 60);const rm = m % 60;if (h === 0 && rm === 0) return tr("dashboard_0_deq_86d70a", "0 d\u0259q");if (h === 0) return `${rm} dəq`;if (rm === 0) return `${h} saat`;return `${h}s ${rm}d`;})()}</p>
+              <p className="text-xs text-muted-foreground">{tr('dashboard_today_label', 'Bu gün')}: {(() => {const m = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60);const h = Math.floor(m / 60);const rm = m % 60;if (h === 0 && rm === 0) return tr("dashboard_0_deq_86d70a", "0 d\u0259q");if (h === 0) return `${rm} dəq`;if (rm === 0) return `${h} ${tr("common_hours", "saat")}`;return `${h}s ${rm}d`;})()}</p>
             </div>
           </div>
           <motion.button
@@ -1549,7 +1549,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
                       const m = totalMin % 60;
                       if (h === 0 && m === 0) return tr("dashboard_0_deq_86d70a", "0 d\u0259q");
                       if (h === 0) return `${m} ${tr("dashboard_min", "dəq")}`;
-                      if (m === 0) return `${h} saat`;
+                      if (m === 0) return `${h} ${tr("common_hours", "saat")}`;
                       return `${h} ${tr("dashboard_hour", "saat")} ${m} ${tr("dashboard_min", "dəq")}`;
                     })()}
                   </p>

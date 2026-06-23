@@ -190,13 +190,14 @@ const RichTextEditor = ({ content, onChange, placeholder = tr("richtexteditor_me
         onChange={onFileChange}
         className="hidden" />
       
+      
 
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 p-1.5 border-b border-border bg-muted/30">
         <MenuButton onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')} title={tr("richtexteditor_qalin_c4d6bc", "Qalın")}>
           <Bold size={s} />
         </MenuButton>
-        <MenuButton onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive('italic')} title="Kursiv">
+        <MenuButton onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive('italic')} title={tr("richtexteditor_kursiv", 'Kursiv')}>
           <Italic size={s} />
         </MenuButton>
         <MenuButton onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive('underline')} title={tr("richtexteditor_altixetli_c40fd6", "Altıxətli")}>
@@ -226,10 +227,10 @@ const RichTextEditor = ({ content, onChange, placeholder = tr("richtexteditor_me
         <MenuButton onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive('orderedList')} title={tr("richtexteditor_nomreli_siyahi_0adbc6", "Nömrəli siyahı")}>
           <ListOrdered size={s} />
         </MenuButton>
-        <MenuButton onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive('blockquote')} title="Sitat">
+        <MenuButton onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive('blockquote')} title={tr("richtexteditor_sitat", 'Sitat')}>
           <Quote size={s} />
         </MenuButton>
-        <MenuButton onClick={() => editor.chain().focus().toggleCodeBlock().run()} active={editor.isActive('codeBlock')} title="Kod">
+        <MenuButton onClick={() => editor.chain().focus().toggleCodeBlock().run()} active={editor.isActive('codeBlock')} title={tr("richtexteditor_kod", 'Kod')}>
           <Code size={s} />
         </MenuButton>
         <MenuButton onClick={() => editor.chain().focus().setHorizontalRule().run()} title={tr("richtexteditor_xett_c1e83c", "Xətt")}>
@@ -238,10 +239,10 @@ const RichTextEditor = ({ content, onChange, placeholder = tr("richtexteditor_me
 
         <div className="w-px h-5 bg-border mx-1" />
 
-        <MenuButton onClick={() => editor.chain().focus().setTextAlign('left').run()} active={editor.isActive({ textAlign: 'left' })} title="Sola">
+        <MenuButton onClick={() => editor.chain().focus().setTextAlign('left').run()} active={editor.isActive({ textAlign: 'left' })} title={tr("richtexteditor_sola", 'Sola')}>
           <AlignLeft size={s} />
         </MenuButton>
-        <MenuButton onClick={() => editor.chain().focus().setTextAlign('center').run()} active={editor.isActive({ textAlign: 'center' })} title="Ortaya">
+        <MenuButton onClick={() => editor.chain().focus().setTextAlign('center').run()} active={editor.isActive({ textAlign: 'center' })} title={tr("richtexteditor_ortaya", 'Ortaya')}>
           <AlignCenter size={s} />
         </MenuButton>
         <MenuButton onClick={() => editor.chain().focus().setTextAlign('right').run()} active={editor.isActive({ textAlign: 'right' })} title={tr("richtexteditor_saga_804f56", "Sağa")}>
@@ -259,14 +260,13 @@ const RichTextEditor = ({ content, onChange, placeholder = tr("richtexteditor_me
 
         <div className="w-px h-5 bg-border mx-1" />
 
-        <MenuButton onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} title="Geri al">
+        <MenuButton onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} title={tr("richtexteditor_geri_al", 'Geri al')}>
           <Undo size={s} />
         </MenuButton>
         <MenuButton onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} title={tr("richtexteditor_i_reli_3bc432", "İrəli")}>
           <Redo size={s} />
         </MenuButton>
       </div>
-
       {/* Editor */}
       <EditorContent
         editor={editor}

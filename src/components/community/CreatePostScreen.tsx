@@ -26,10 +26,23 @@ interface Suggestion {
   avatar?: string;
 }
 
-const POPULAR_HASHTAGS = [tr("createpostscreen_hamilelik_64e7fe", "hamil\u0259lik"),
-'ana', tr("createpostscreen_korpe_4abca7", "k\xF6rp\u0259"), tr("createpostscreen_saglamliq_d183d2", "sa\u011Flaml\u0131q"), 'qidalanma', tr("createpostscreen_dogus_01c8e6", "do\u011Fu\u015F"), tr("createpostscreen_emzirme_1e11e5", "\u0259mzirm\u0259"),
-'yuxu', tr("createpostscreen_inkisaf_abc234", "inki\u015Faf"), 'oyun', tr("createpostscreen_aile_894dfb", "ail\u0259"),
-'sevgi', tr("createpostscreen_xosbextlik_55f22a", "xo\u015Fb\u0259xtlik"), 'analar', tr("createpostscreen_usaq_36b348", "u\u015Faq")];
+const POPULAR_HASHTAGS = [
+  tr("createpostscreen_hamilelik_64e7fe", "hamil\u0259lik"),
+  tr("createpostscreen_ana_hashtag", "ana"),
+  tr("createpostscreen_korpe_4abca7", "k\xF6rp\u0259"),
+  tr("createpostscreen_saglamliq_d183d2", "sa\u011Flaml\u0131q"),
+  tr("createpostscreen_qidalanma_hashtag", "qidalanma"),
+  tr("createpostscreen_dogus_01c8e6", "do\u011Fu\u015F"),
+  tr("createpostscreen_emzirme_1e11e5", "\u0259mzirm\u0259"),
+  tr("createpostscreen_yuxu_hashtag", "yuxu"),
+  tr("createpostscreen_inkisaf_abc234", "inki\u015Faf"),
+  tr("createpostscreen_oyun_hashtag", "oyun"),
+  tr("createpostscreen_aile_894dfb", "ail\u0259"),
+  tr("createpostscreen_sevgi_hashtag", "sevgi"),
+  tr("createpostscreen_xosbextlik_55f22a", "xo\u015Fb\u0259xtlik"),
+  tr("createpostscreen_analar_hashtag", "analar"),
+  tr("createpostscreen_usaq_36b348", "u\u015Faq")
+];
 
 
 const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) => {

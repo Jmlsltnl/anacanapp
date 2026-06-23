@@ -298,7 +298,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
   const handleSelectBackground = (bgId: string, isPremiumBg: boolean) => {
     if (isPremiumBg && !isPremium) {
-      setPremiumFeature('Premium fonlar');
+      setPremiumFeature(tr("babyphotoshoot_premium_fonlar", 'Premium fonlar'));
       setShowPremiumModal(true);
       return;
     }
@@ -408,7 +408,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
       setPhotos((prev) => prev.filter((p) => p.id !== photoId));
 
       toast({
-        title: 'Foto silindi',
+        title: tr("babyphotoshoot_foto_silindi", 'Foto silindi'),
         description: tr("babyphotoshoot_foto_ugurla_silindi_a3226a", 'Foto uğurla silindi')
       });
     } catch (error) {

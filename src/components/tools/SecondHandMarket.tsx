@@ -50,8 +50,8 @@ const categories = [
 
 
 const conditions = [
-{ id: 'new', label: 'Yeni', color: 'bg-emerald-500', textColor: 'text-emerald-600' },
-{ id: 'like_new', label: 'Yeni kimi', color: 'bg-green-500', textColor: 'text-green-600' },
+{ id: 'new', label: tr("secondhandmarket_yeni", 'Yeni'), color: 'bg-emerald-500', textColor: 'text-emerald-600' },
+{ id: 'like_new', label: tr("secondhandmarket_yeni_kimi", 'Yeni kimi'), color: 'bg-green-500', textColor: 'text-green-600' },
 { id: 'good', label: tr("secondhandmarket_yaxsi_9d8595", 'Yaxşı'), color: 'bg-blue-500', textColor: 'text-blue-600' },
 { id: 'fair', label: 'Normal', color: 'bg-amber-500', textColor: 'text-amber-600' }];
 
@@ -818,7 +818,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                     <div>
                       <p className="text-sm text-muted-foreground">{tr("secondhandmarket_qiymet_54c4f3", "Qiymət")}</p>
                       <p className={`text-2xl font-black ${selectedListing.is_free ? 'text-emerald-600' : 'text-foreground'}`}>
-                        {selectedListing.is_free ? 'Pulsuz' : `${selectedListing.price} ₼`}
+                        {selectedListing.is_free ? tr("secondhandmarket_pulsuz", 'Pulsuz') : `${selectedListing.price} ₼`}
                       </p>
                     </div>
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedListing.is_free ? 'bg-emerald-500' : 'bg-muted'}`}>
@@ -891,7 +891,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm truncate">{contactListing.title}</p>
                   <p className="text-xs text-muted-foreground">
-                    {contactListing.is_free ? 'Pulsuz' : `${contactListing.price} ₼`}
+                    {contactListing.is_free ? tr("secondhandmarket_pulsuz", 'Pulsuz') : `${contactListing.price} ₼`}
                   </p>
                 </div>
               </div>

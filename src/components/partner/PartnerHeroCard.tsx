@@ -48,7 +48,7 @@ const PartnerHeroCard = ({
   unreadCount
 }: PartnerHeroCardProps) => {
   const getMoodEmoji = (mood: number) => ['😢', '😔', '😐', '🙂', '😊'][mood - 1] || '😊';
-  const getMoodText = (mood: number) => [tr("partnerherocard_cox_pis_e041c5", "\xC7ox pis"), 'Pis', 'Normal', tr("partnerherocard_yaxsi_9d8595", "Yax\u015F\u0131"), tr("partnerherocard_ela_720a0e", "\u018Fla")][mood - 1] || tr("partnerherocard_yaxsi_9d8595", "Yax\u015F\u0131");
+  const getMoodText = (mood: number) => [tr("partnerherocard_cox_pis_e041c5", "\xC7ox pis"), tr("common_pis", 'Pis'), 'Normal', tr("partnerherocard_yaxsi_9d8595", "Yax\u015F\u0131"), tr("partnerherocard_ela_720a0e", "\u018Fla")][mood - 1] || tr("partnerherocard_yaxsi_9d8595", "Yax\u015F\u0131");
   const getMoodColor = (mood: number) => {
     if (mood >= 4) return 'from-emerald-400 to-green-500';
     if (mood === 3) return 'from-amber-400 to-yellow-500';
@@ -63,7 +63,7 @@ const PartnerHeroCard = ({
     if (lifeStage === 'bump' && currentWeek > 0) return `${tr("partner_pregnancy_week", "Hamiləlik:")} ${currentWeek}. ${tr("partner_week", "həftə")}`;
     if (lifeStage === 'mommy') {
       const baby = babyName || tr("partnerherocard_korpe_fa2b51", "K\xF6rp\u0259");
-      if (babyMonths >= 1) return `${baby}: ${babyMonths} ay ${babyAgeDays % 30} gün`;
+      if (babyMonths >= 1) return `${baby}: ${babyMonths} ${tr("common_ay", 'ay')} ${babyAgeDays % 30} gün`;
       return `${baby}: ${babyAgeDays} günlük`;
     }
     if (lifeStage === 'flow' && cyclePhase) return `${PHASE_LABEL[cyclePhase.phase].label} • ${cyclePhase.dayInCycle}. gün`;
@@ -140,7 +140,7 @@ const PartnerHeroCard = ({
       <div className="grid grid-cols-3 gap-3 mt-5">
           <StatTile icon={Calendar} value={daysUntilDue} label={tr("partnerherocard_gun_qaldi_309c87", "Gün qaldı")} delay={0.1} />
           <StatTile emoji={weekData?.emoji || '👶'} label={weekData?.fruit || tr("partnerherocard_korpe_fa2b51", "K\xF6rp\u0259")} delay={0.15} />
-          <StatTile icon={Droplets} value={waterIntake} label="ml su" delay={0.2} />
+          <StatTile icon={Droplets} value={waterIntake} label={tr("partner_ml_su", 'ml su')} delay={0.2} />
         </div>
       }
 
@@ -153,7 +153,7 @@ const PartnerHeroCard = ({
           delay={0.1} />
         
           <StatTile icon={Baby} value={babyMonths} label={tr("partnerherocard_ayliq_0c8da3", "aylıq")} delay={0.15} />
-          <StatTile icon={Droplets} value={waterIntake} label="ml su" delay={0.2} />
+          <StatTile icon={Droplets} value={waterIntake} label={tr("partner_ml_su", 'ml su')} delay={0.2} />
         </div>
       }
 

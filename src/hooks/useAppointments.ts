@@ -67,7 +67,7 @@ export const useAppointments = () => {
       if (reminderTime > now) {
         await localNotifications.schedule([{
           id: 400 + Math.floor(Math.random() * 1000),
-          title: 'Sabah randevunuz var! 📅',
+          title: tr("appointments_sabah_randevunuz_var", 'Sabah randevunuz var!') + ' 📅',
           body: appointment.title,
           schedule: { at: reminderTime }
         }]);
@@ -81,7 +81,7 @@ export const useAppointments = () => {
         if (twoHoursBefore > now) {
           await localNotifications.schedule([{
             id: 500 + Math.floor(Math.random() * 1000),
-            title: '2 saat sonra randevunuz var! ⏰',
+            title: tr("appointments_saat_sonra_randevunuz_var", '2 saat sonra randevunuz var!') + ' ⏰',
             body: appointment.title,
             schedule: { at: twoHoursBefore }
           }]);
@@ -172,7 +172,7 @@ export const useAppointments = () => {
       if (error) throw error;
 
       toast({
-        title: 'Randevu silindi',
+        title: tr("appointments_randevu_silindi", 'Randevu silindi'),
       });
 
       await fetchAppointments();

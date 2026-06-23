@@ -67,7 +67,7 @@ export const EPDS_QUESTIONS = [
   options: [
   { value: 3, label: tr("usementalhealth_beli_cox_vaxt_b3c387", "Bəli, çox vaxt") },
   { value: 2, label: tr("usementalhealth_beli_bezen_3972c9", "Bəli, bəzən") },
-  { value: 1, label: 'Tez-tez deyil' },
+  { value: 1, label: tr("mentalhealth_tez_tez_deyil", 'Tez-tez deyil') },
   { value: 0, label: tr("usementalhealth_xeyr_hec_vaxt_b57661", "Xeyr, heç vaxt") }]
 
 },
@@ -107,7 +107,7 @@ export const EPDS_QUESTIONS = [
   options: [
   { value: 3, label: tr("usementalhealth_beli_cox_vaxt_b3c387", "Bəli, çox vaxt") },
   { value: 2, label: tr("usementalhealth_beli_bezen_3972c9", "Bəli, bəzən") },
-  { value: 1, label: 'Tez-tez deyil' },
+  { value: 1, label: tr("mentalhealth_tez_tez_deyil", 'Tez-tez deyil') },
   { value: 0, label: tr("usementalhealth_xeyr_umumiyyetle_yox_e2352c", "Xeyr, ümumiyyətlə yox") }]
 
 },
@@ -117,7 +117,7 @@ export const EPDS_QUESTIONS = [
   options: [
   { value: 3, label: tr("usementalhealth_beli_cox_vaxt_b3c387", "Bəli, çox vaxt") },
   { value: 2, label: tr("usementalhealth_beli_kifayet_qeder_tez_tez_784be6", "Bəli, kifayət qədər tez-tez") },
-  { value: 1, label: 'Tez-tez deyil' },
+  { value: 1, label: tr("mentalhealth_tez_tez_deyil", 'Tez-tez deyil') },
   { value: 0, label: tr("usementalhealth_xeyr_umumiyyetle_yox_e2352c", "Xeyr, ümumiyyətlə yox") }]
 
 },

@@ -203,7 +203,7 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
             {tr("contractiontimer_5_1_1_qaydasi_a3c5d3", "5-1-1 Qaydas\u0131")}
           </h3>
           <p className="text-xs text-muted-foreground">
-            {tr("contractiontimer_sancilar_9b16c7", "Sanc\u0131lar")} <strong className="text-foreground">{tr("contractiontimer_5_deqiqe_ad05bb", "5 dəqiqə")}</strong>{tr("contractiontimer_araliginda_24710a", "aralığında,")}<strong className="text-foreground">{tr("contractiontimer_1_deqiqe_a187ac", "1 dəqiqə")}</strong>{tr("contractiontimer_davam_ederse_ve_bu_7029f5", "davam edərsə və bu")}<strong className="text-foreground">1 saat</strong> {tr("contractiontimer_boyunca_davam_ederse_xestexana_2b067a", "boyunca davam ed\u0259rs\u0259, x\u0259st\u0259xanaya getm\u0259 vaxt\u0131d\u0131r.")}
+            {tr("contractiontimer_sancilar_9b16c7", "Sanc\u0131lar")} <strong className="text-foreground">{tr("contractiontimer_5_deqiqe_ad05bb", "5 dəqiqə")}</strong>{tr("contractiontimer_araliginda_24710a", "aralığında,")}<strong className="text-foreground">{tr("contractiontimer_1_deqiqe_a187ac", "1 dəqiqə")}</strong>{tr("contractiontimer_davam_ederse_ve_bu_7029f5", "davam edərsə və bu")}<strong className="text-foreground">{tr("contractiontimer_1_saat_hardcoded", "1 saat")}</strong> {tr("contractiontimer_boyunca_davam_ederse_xestexana_2b067a", "boyunca davam ed\u0259rs\u0259, x\u0259st\u0259xanaya getm\u0259 vaxt\u0131d\u0131r.")}
           </p>
         </motion.div>
 

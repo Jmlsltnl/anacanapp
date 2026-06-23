@@ -152,7 +152,7 @@ const PhotoGalleryViewer = ({
       }
 
       toast({
-        title: 'Silindi! 🗑️',
+        title: tr("untranslated_silindi_u8c6ca", 'Silindi!') + ' 🗑️',
         description: tr("photogalleryviewer_foto_ugurla_silindi_a3226a", 'Foto uğurla silindi')
       });
     } catch (error) {
@@ -344,14 +344,14 @@ const PhotoGalleryViewer = ({
             </AlertDialogHeader>
             <AlertDialogFooter className="gap-2">
               <AlertDialogCancel className="rounded-2xl h-12" disabled={isDeleting}>
-                {tr("photogalleryviewer_legv_et_b5e49c", "L\u0259\u011Fv et")}
+                {tr("photogalleryviewer_legv_et_b5e49c", "Ləğv et")}
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDelete}
                 disabled={isDeleting}
                 className="rounded-2xl h-12 bg-red-500 hover:bg-red-600">
                 
-                {isDeleting ? 'Silinir...' : 'Sil'}
+                {isDeleting ? tr("untranslated_silinir_u86cva", "Silinir...") : tr("common_sil", 'Sil')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

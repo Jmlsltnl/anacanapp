@@ -161,7 +161,7 @@ const AuthScreen = () => {
 
       if (!ownerIsPremium) {
         toast({
-          title: 'Partnyor modu Premium-dur',
+          title: tr("authscreen_partner_premium_title", 'Partnyor modu Premium-dur'),
           description: tr("authscreen_bu_kodun_sahibi_premium_abuneliye_malik__de7345", "Bu kodun sahibi Premium abunəliyə malik olmalıdır. Həyat yoldaşınızdan Premium aktivləşdirməsini xahiş edin."),
           variant: 'destructive'
         });

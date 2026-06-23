@@ -28,7 +28,7 @@ const priorityColors = {
 
 const priorityLabels = {
   low: tr("shoppinglist_asagi_1c27f1", "A\u015Fa\u011F\u0131"),
-  medium: 'Orta',
+  medium: tr("shoppinglist_priority_orta", 'Orta'),
   high: tr("shoppinglist_yuksek_492584", "Y\xFCks\u0259k")
 };
 

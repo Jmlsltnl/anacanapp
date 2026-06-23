@@ -23,7 +23,7 @@ interface FlowDailyLoggerProps {
 
 const MOOD_OPTIONS = [
 { value: 1, emoji: '😢', label: tr("flowdailylogger_cox_pis_e041c5", 'Çox pis'), color: 'bg-red-100 border-red-300 text-red-700' },
-{ value: 2, emoji: '😔', label: 'Pis', color: 'bg-orange-100 border-orange-300 text-orange-700' },
+{ value: 2, emoji: '😔', label: tr("common_pis", 'Pis'), color: 'bg-orange-100 border-orange-300 text-orange-700' },
 { value: 3, emoji: '😐', label: 'Normal', color: 'bg-yellow-100 border-yellow-300 text-yellow-700' },
 { value: 4, emoji: '😊', label: tr("flowdailylogger_yaxsi_9d8595", 'Yaxşı'), color: 'bg-green-100 border-green-300 text-green-700' },
 { value: 5, emoji: '🥰', label: tr("flowdailylogger_ela_720a0e", 'Əla'), color: 'bg-pink-100 border-pink-300 text-pink-700' }];
@@ -38,16 +38,16 @@ const ENERGY_OPTIONS = [
 
 
 const FLOW_OPTIONS = [
-{ value: 'none', label: 'Yoxdur', emoji: '⚪', color: 'bg-slate-100' },
+{ value: 'none', label: tr("common_yoxdur", 'Yoxdur'), emoji: '⚪', color: 'bg-slate-100' },
 { value: 'spotting', label: tr("flowdailylogger_lekelenme_8e7b1e", 'Ləkələnmə'), emoji: '🔵', color: 'bg-blue-100' },
 { value: 'light', label: tr("flowdailylogger_yungul_2a8010", 'Yüngül'), emoji: '🩸', color: 'bg-red-100' },
-{ value: 'medium', label: 'Orta', emoji: '🩸🩸', color: 'bg-red-200' },
+{ value: 'medium', label: tr("common_orta", 'Orta'), emoji: '🩸🩸', color: 'bg-red-200' },
 { value: 'heavy', label: tr("flowdailylogger_guclu_0fda31", 'Güclü'), emoji: '🩸🩸🩸', color: 'bg-red-300' }];
 
 
 const SLEEP_QUALITY = [
 { value: 1, label: tr("flowdailylogger_cox_pis_e041c5", 'Çox pis'), emoji: '😫' },
-{ value: 2, label: 'Pis', emoji: '😴' },
+{ value: 2, label: tr("common_pis", 'Pis'), emoji: '😴' },
 { value: 3, label: 'Normal', emoji: '😐' },
 { value: 4, label: tr("flowdailylogger_yaxsi_9d8595", 'Yaxşı'), emoji: '😌' },
 { value: 5, label: tr("flowdailylogger_ela_720a0e", 'Əla'), emoji: '😇' }];

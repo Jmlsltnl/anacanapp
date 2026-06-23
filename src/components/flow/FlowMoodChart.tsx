@@ -67,12 +67,12 @@ const FlowMoodChart = () => {
           }
           {data.energy &&
           <p className="text-xs text-muted-foreground">
-              Enerji: {data.energy}/5
+              {tr("common_enerji_label", 'Enerji:')} {data.energy}/5
             </p>
           }
           {data.sleep &&
           <p className="text-xs text-muted-foreground">
-              Yuxu: {data.sleep}/5
+              {tr("flowmoodchart_yuxu_label", 'Yuxu:')} {data.sleep}/5
             </p>
           }
         </div>);

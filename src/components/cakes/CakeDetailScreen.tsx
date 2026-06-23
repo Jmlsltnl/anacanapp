@@ -154,7 +154,7 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
         {/* Badge */}
         {cake.category === 'month' && cake.month_number &&
         <span className="absolute top-3 left-3 px-3 py-1 bg-primary/90 rounded-full text-xs font-bold text-primary-foreground shadow">
-            {cake.month_number}-ci ay
+            {tr(`common_month_label_${cake.month_number}`, `${cake.month_number}-ci ay`)}
           </span>
         }
         {cake.category === 'milestone' && cake.milestone_label &&

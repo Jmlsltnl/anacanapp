@@ -20,7 +20,7 @@ const categoryConfig = {
 
 const priorityConfig = {
   1: { label: tr("hospitalbag_cox_vacib_c4e66f", 'Çox Vacib'), color: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400', dot: '🔴' },
-  2: { label: 'Orta', color: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400', dot: '🟡' },
+  2: { label: tr("hospitalbag_priority_orta", 'Orta'), color: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400', dot: '🟡' },
   3: { label: tr("hospitalbag_i_steye_bagli_43582b", 'İstəyə bağlı'), color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400', dot: '🟢' },
 };
 
@@ -35,7 +35,7 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
   const categories = [
     { id: 'all', label: tr("hospitalbag_hamisi_c73c4d", 'Hamısı'), emoji: '👜' },
     { id: 'documents', label: tr("hospitalbag_senedler_d60b5e", 'Sənədlər'), emoji: '📄' },
-    { id: 'mom', label: 'Ana', emoji: '👩' },
+    { id: 'mom', label: tr("common_ana", 'Ana'), emoji: '👩' },
     { id: 'baby', label: tr("hospitalbag_korpe_fa2b51", 'Körpə'), emoji: '👶' },
   ];
 

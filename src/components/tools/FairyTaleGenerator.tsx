@@ -629,7 +629,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setCreateStep(1)}>Geri</Button>
+                  <Button variant="outline" onClick={() => setCreateStep(1)}>{tr("common_geri", "Geri")}</Button>
                   <Button className="flex-1" onClick={() => setCreateStep(3)} disabled={!formData.theme}>{tr("untranslated_davam_et_rchhd5", "Davam et")}</Button>
                 </div>
               </motion.div>
@@ -671,7 +671,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setCreateStep(2)}>Geri</Button>
+                  <Button variant="outline" onClick={() => setCreateStep(2)}>{tr("common_geri", "Geri")}</Button>
                   <Button className="flex-1" onClick={() => setCreateStep(4)}>{tr("untranslated_davam_et_rchhd5", "Davam et")}</Button>
                 </div>
               </motion.div>
@@ -708,7 +708,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setCreateStep(3)}>Geri</Button>
+                  <Button variant="outline" onClick={() => setCreateStep(3)}>{tr("common_geri", "Geri")}</Button>
                   <Button className="flex-1" onClick={() => setCreateStep(5)}>{tr("untranslated_davam_et_rchhd5", "Davam et")}</Button>
                 </div>
               </motion.div>
@@ -764,7 +764,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setCreateStep(4)}>Geri</Button>
+                  <Button variant="outline" onClick={() => setCreateStep(4)}>{tr("common_geri", "Geri")}</Button>
                   <Button
                     className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600"
                     onClick={handleGenerate}

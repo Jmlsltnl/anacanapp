@@ -81,14 +81,16 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
         </div>
       </div>
 
+
+
       <form onSubmit={handleSubmit} className="p-4 space-y-5 pb-32">
         <div className="space-y-3">
           <h2 className="text-base font-semibold flex items-center gap-2">
             <User className="w-4 h-4 text-primary" />
             {tr("checkoutscreen_elaqe_melumatlari_8a7aae", "\u018Flaq\u0259 M\u0259lumatlar\u0131")}
           </h2>
-          <Input placeholder="Ad Soyad" value={formData.name} onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))} className="h-11" />
-          <Input placeholder="Telefon (+994 XX XXX XX XX)" value={formData.phone} onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))} className="h-11" />
+          <Input placeholder={tr("checkout_full_name", 'Ad Soyad')} value={formData.name} onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))} className="h-11" />
+          <Input placeholder={tr("checkout_phone_placeholder", 'Telefon (+994 XX XXX XX XX)')} value={formData.phone} onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))} className="h-11" />
         </div>
 
         <div className="space-y-3">
@@ -103,7 +105,7 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
         <div className="space-y-3">
           <h2 className="text-base font-semibold flex items-center gap-2">
             <Truck className="w-4 h-4 text-primary" />
-            {tr("checkoutscreen_elave_qeydler_49e1f1", "\u018Flav\u0259 Qeydl\u0259r")}
+            {tr("checkoutscreen_elave_qeydler_49e1f1", "Əlavə Qeydlər")}
           </h2>
           <Textarea placeholder={tr("checkoutscreen_kuryere_mesaj_isteye_bagli_56df8d", "Kuryerə mesaj (istəyə bağlı)")} value={formData.notes} onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))} rows={2} />
         </div>
@@ -111,7 +113,7 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
         {/* Coupon */}
         <div className="space-y-2">
           <h2 className="text-base font-semibold flex items-center gap-2">
-            Kupon Kodu
+            {tr("checkout_coupon_code_label", 'Kupon Kodu')}
           </h2>
           <CouponInput
             couponCode={couponCode}

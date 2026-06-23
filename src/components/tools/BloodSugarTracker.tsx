@@ -44,7 +44,7 @@ const readingTypes = [
 
 const mealContexts = [
 { id: 'breakfast', label: tr("bloodsugartracker_seher_yemeyi_b82929", 'Səhər yeməyi'), emoji: '🥞' },
-{ id: 'lunch', label: 'Nahar', emoji: '🍲' },
+{ id: 'lunch', label: tr("bloodsugartracker_nahar", 'Nahar'), emoji: '🍲' },
 { id: 'dinner', label: tr("bloodsugartracker_sam_yemeyi_6002e9", 'Şam yeməyi'), emoji: '🍛' },
 { id: 'snack', label: tr("bloodsugartracker_qelyanalti_42fb71", 'Qəlyanaltı'), emoji: '🍎' }];
 
@@ -53,12 +53,12 @@ const mealContexts = [
 const getReadingStatus = (value: number, type: string) => {
   if (type === 'fasting') {
     if (value < 70) return { status: 'low', label: tr("bloodsugartracker_asagi_1c27f1", 'Aşağı'), color: 'text-blue-600', bg: 'bg-blue-500/10' };
-    if (value <= 95) return { status: 'normal', label: 'Normal', color: 'text-green-600', bg: 'bg-green-500/10' };
+    if (value <= 95) return { status: 'normal', label: tr("common_normal", 'Normal'), color: 'text-green-600', bg: 'bg-green-500/10' };
     if (value <= 125) return { status: 'elevated', label: tr("bloodsugartracker_yukselmis_1fee34", 'Yüksəlmiş'), color: 'text-amber-600', bg: 'bg-amber-500/10' };
     return { status: 'high', label: tr("bloodsugartracker_yuksek_492584", 'Yüksək'), color: 'text-red-600', bg: 'bg-red-500/10' };
   } else {
     if (value < 70) return { status: 'low', label: tr("bloodsugartracker_asagi_1c27f1", 'Aşağı'), color: 'text-blue-600', bg: 'bg-blue-500/10' };
-    if (value <= 140) return { status: 'normal', label: 'Normal', color: 'text-green-600', bg: 'bg-green-500/10' };
+    if (value <= 140) return { status: 'normal', label: tr("common_normal", 'Normal'), color: 'text-green-600', bg: 'bg-green-500/10' };
     if (value <= 180) return { status: 'elevated', label: tr("bloodsugartracker_yukselmis_1fee34", 'Yüksəlmiş'), color: 'text-amber-600', bg: 'bg-amber-500/10' };
     return { status: 'high', label: tr("bloodsugartracker_yuksek_492584", 'Yüksək'), color: 'text-red-600', bg: 'bg-red-500/10' };
   }
@@ -133,7 +133,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['blood-sugar-logs'] });
-      toast({ title: 'Silindi', description: 'Qeyd silindi' });
+      toast({ title: tr("common_silindi", 'Silindi'), description: tr("bloodsugartracker_qeyd_silindi", 'Qeyd silindi') });
     }
   });
 

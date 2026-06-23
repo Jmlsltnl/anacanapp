@@ -14,7 +14,7 @@ interface DashboardPremiumBannerProps {
 const BENEFITS = [
 { icon: '🤖', text: tr("dashboardpremiumbanner_ai_beledci_8bfb55", "AI Bələdçi") },
 { icon: '🎵', text: tr("dashboardpremiumbanner_yuxu_sesleri_4b518b", "Yuxu Səsləri") },
-{ icon: '📸', text: 'AI Fotosessiya' },
+{ icon: '📸', text: tr("common_ai_fotosessiya", 'AI Fotosessiya') },
 { icon: '📊', text: tr("dashboardpremiumbanner_heftelik_hesabat_283d76", "Həftəlik Hesabat") },
 { icon: '💊', text: tr("dashboardpremiumbanner_vitamin_izleyici_31ce7c", "Vitamin İzləyici") },
 { icon: '🍽️', text: tr("dashboardpremiumbanner_qidalanma_plani_a3dde8", "Qidalanma Planı") },
@@ -114,8 +114,8 @@ export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremi
                 </span>
               }
               <p className="text-xs font-semibold text-foreground">{tr("dashboardpremiumbanner_illik_4a3cef", "İllik")}</p>
-              <p className="text-sm font-bold text-foreground">${YEARLY_MONTHLY}<span className="text-[10px] text-muted-foreground font-normal">/ay</span></p>
-              <p className="text-[10px] text-muted-foreground">${YEARLY_PRICE}/il</p>
+              <p className="text-sm font-bold text-foreground">${YEARLY_MONTHLY}<span className="text-[10px] text-muted-foreground font-normal">{tr("common_per_month", '/ay')}</span></p>
+              <p className="text-[10px] text-muted-foreground">${YEARLY_PRICE}{tr("usepaywallconfig_yearly_total_suffix", '/il')}</p>
             </button>
             <button
               onClick={() => setSelectedPlan('monthly')}
@@ -126,7 +126,7 @@ export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremi
               }>
               
               <p className="text-xs font-semibold text-foreground">{tr("dashboardpremiumbanner_ayliq_6f265e", "Aylıq")}</p>
-              <p className="text-sm font-bold text-foreground">${MONTHLY_PRICE}<span className="text-[10px] text-muted-foreground font-normal">/ay</span></p>
+              <p className="text-sm font-bold text-foreground">${MONTHLY_PRICE}<span className="text-[10px] text-muted-foreground font-normal">{tr("common_per_month", '/ay')}</span></p>
               <p className="text-[10px] text-muted-foreground">&nbsp;</p>
             </button>
           </div>
@@ -144,7 +144,7 @@ export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremi
           <div className="flex items-center justify-center gap-1.5 mt-3">
             <Shield className="w-3 h-3 text-muted-foreground" />
             <span className="text-[10px] text-muted-foreground">
-              {tr("dashboardpremiumbanner_3_gun_pulsuz_sonra_77de61", "3 g\xFCn pulsuz \xB7 Sonra")} {selectedPlan === 'yearly' ? `$${YEARLY_PRICE}/il` : `$${MONTHLY_PRICE}/ay`} {tr("dashboardpremiumbanner_i_stenilen_vaxt_legv_edin_d41c16", "\xB7 \u0130st\u0259nil\u0259n vaxt l\u0259\u011Fv edin")}
+              {tr("dashboardpremiumbanner_3_gun_pulsuz_sonra_77de61", "3 g\xFCn pulsuz \xB7 Sonra")} {selectedPlan === 'yearly' ? `$${YEARLY_PRICE}${tr("usepaywallconfig_yearly_total_suffix", '/il')}` : `$${MONTHLY_PRICE}${tr("common_per_month", '/ay')}`} {tr("dashboardpremiumbanner_i_stenilen_vaxt_legv_edin_d41c16", "\xB7 \u0130st\u0259nil\u0259n vaxt l\u0259\u011Fv edin")}
             </span>
           </div>
 

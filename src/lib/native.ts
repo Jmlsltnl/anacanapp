@@ -238,7 +238,7 @@ export const localNotifications = {
 
     await localNotifications.schedule([{
       id: 300,
-      title: 'Sabah randevunuz var! 📅',
+      title: tr("appointments_sabah_randevunuz_var", 'Sabah randevunuz var!') + ' 📅',
       body: title,
       schedule: { at: reminderTime }
     }]);

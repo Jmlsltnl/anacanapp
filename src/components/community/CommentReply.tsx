@@ -136,13 +136,13 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
             </motion.button>
             {canReply &&
             <button onClick={() => setShowReplyInput(!showReplyInput)} className="text-[9px] text-muted-foreground/30 active:text-primary transition-colors font-semibold">
-                Cavab
+                {tr("commentreply_action_reply", "Cavab")}
               </button>
             }
             {replies.length > 0 &&
             <button onClick={() => setShowReplies(!showReplies)} className="flex items-center gap-0.5 text-[9px] text-primary/60 font-bold">
                 {showReplies ? <ChevronUp className="w-2.5 h-2.5" /> : <ChevronDown className="w-2.5 h-2.5" />}
-                {replies.length} cavab
+                {replies.length} {tr("commentreply_reply_count", "cavab")}
               </button>
             }
           </div>

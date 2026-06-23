@@ -85,7 +85,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
     switch (category) {
       case 'before':return tr("teethingtracker_evvel_b41251", "\u018Fvv\u0259l");
       case 'during':return tr("teethingtracker_zamani_de9ddc", "Zaman\u0131");
-      case 'after':return 'Sonra';
+      case 'after':return tr("common_sonra", 'Sonra');
       case 'pain_relief':return tr("teethingtracker_agri_kesici_9c92cd", "A\u011Fr\u0131 K\u0259sici");
       case 'general':return tr("teethingtracker_umumi_1b5521", "\xDCmumi");
       default:return category;
@@ -342,7 +342,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-medium text-sm">{symptom.name}</h3>
                           <Badge className={getSeverityColor(symptom.severity)}>
-                            {symptom.severity === 'mild' ? tr("teethingtracker_yungul_2a8010", "Y\xFCng\xFCl") : symptom.severity === 'moderate' ? 'Orta' : 'Ciddi'}
+                            {symptom.severity === 'mild' ? tr("teethingtracker_yungul_2a8010", "Y\xFCng\xFCl") : symptom.severity === 'moderate' ? tr("teethingtracker_severity_orta", 'Orta') : tr("teethingtracker_severity_ciddi", 'Ciddi')}
                           </Badge>
                         </div>
                         <p className="text-xs text-muted-foreground mb-2">

@@ -216,8 +216,8 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
   const getRiskLabel = (level: string) => {
     switch (level) {
       case 'high':return tr("mentalhealthtracker_yuksek_risk_29a5a3", "Y\xFCks\u0259k Risk");
-      case 'moderate':return 'Orta Risk';
-      default:return 'Normal';
+      case 'moderate':return tr("mentalhealthtracker_risk_orta", 'Orta Risk');
+      default:return tr("mentalhealthtracker_risk_normal", 'Normal');
     }
   };
 
@@ -729,7 +729,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 disabled={currentQuestion === 0}>
                 
                 <ChevronLeft className="w-4 h-4 mr-1" />
-                Geri
+                {tr("common_back", "Geri")}
               </Button>
               
               {currentQuestion < EPDS_QUESTIONS.length - 1 ?

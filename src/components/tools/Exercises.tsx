@@ -218,7 +218,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
                         'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' :
                         'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'}`
                         }>
-                              {exercise.level === 'easy' ? 'Asan' : exercise.level === 'medium' ? 'Orta' : tr("exercises_cetin_4bf032", "\xC7\u0259tin")}
+                              {exercise.level === 'easy' ? tr("exercises_level_easy", 'Asan') : exercise.level === 'medium' ? tr("exercises_level_medium", 'Orta') : tr("exercises_cetin_4bf032", "\xC7\u0259tin")}
                             </span>
                           </div>
                         </div>
@@ -279,7 +279,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
                       <Award className="w-5 h-5 text-purple-600" />
                     </div>
                     <p className="font-bold text-foreground capitalize">
-                      {selectedExercise.level === 'easy' ? 'Asan' : selectedExercise.level === 'medium' ? 'Orta' : tr("exercises_cetin_4bf032", "\xC7\u0259tin")}
+                      {selectedExercise.level === 'easy' ? tr("exercises_level_easy", 'Asan') : selectedExercise.level === 'medium' ? tr("exercises_level_medium", 'Orta') : tr("exercises_cetin_4bf032", "\xC7\u0259tin")}
                     </p>
                     <p className="text-[10px] text-muted-foreground">{tr("exercises_seviyye_f242cf", "səviyyə")}</p>
                   </div>
@@ -329,7 +329,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
                   className="flex-1 py-3.5 rounded-2xl border-2 border-border font-bold text-foreground"
                   whileTap={{ scale: 0.98 }}>
                   
-                    Geri
+                    {tr("common_back", "Geri")}
                   </motion.button>
                   <motion.button
                   onClick={handleComplete}
@@ -337,7 +337,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
                   whileTap={{ scale: 0.98 }}>
                   
                     <Check className="w-5 h-5" />
-                    Bitirdim
+                    {tr("exercises_bitirdim", "Bitirdim")}
                   </motion.button>
                 </div>
               </div>

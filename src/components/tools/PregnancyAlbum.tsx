@@ -35,15 +35,15 @@ interface AlbumPhoto {
 
 // Month labels in Azerbaijani
 const monthLabels = [
-{ month: 1, weeks: '1-4', label: '1-ci ay', emoji: '🌱' },
-{ month: 2, weeks: '5-8', label: '2-ci ay', emoji: '🌿' },
+{ month: 1, weeks: '1-4', label: tr("pregnancyalbum_label_1", '1-ci ay'), emoji: '🌱' },
+{ month: 2, weeks: '5-8', label: tr("pregnancyalbum_label_2", '2-ci ay'), emoji: '🌿' },
 { month: 3, weeks: '9-13', label: tr("pregnancyalbum_3_cu_ay_cd62b6", '3-cü ay'), emoji: '🌳' },
 { month: 4, weeks: '14-17', label: tr("pregnancyalbum_4_cu_ay_e2b0d2", '4-cü ay'), emoji: '🍋' },
-{ month: 5, weeks: '18-21', label: '5-ci ay', emoji: '🥭' },
+{ month: 5, weeks: '18-21', label: tr("pregnancyalbum_label_5", '5-ci ay'), emoji: '🥭' },
 { month: 6, weeks: '22-26', label: tr("pregnancyalbum_6_ci_ay_c17c71", '6-cı ay'), emoji: '🥥' },
-{ month: 7, weeks: '27-30', label: '7-ci ay', emoji: '🍉' },
-{ month: 8, weeks: '31-35', label: '8-ci ay', emoji: '🎃' },
-{ month: 9, weeks: '36-40', label: '9-cu ay', emoji: '👶' }];
+{ month: 7, weeks: '27-30', label: tr("pregnancyalbum_label_7", '7-ci ay'), emoji: '🍉' },
+{ month: 8, weeks: '31-35', label: tr("pregnancyalbum_label_8", '8-ci ay'), emoji: '🎃' },
+{ month: 9, weeks: '36-40', label: tr("pregnancyalbum_label_9", '9-cu ay'), emoji: '👶' }];
 
 
 const getMonthFromWeek = (week: number): number => {
