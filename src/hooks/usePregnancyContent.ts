@@ -1,5 +1,28 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
+
+const EN_FIELDS = [
+  'baby_development',
+  'baby_message',
+  'baby_size_fruit',
+  'body_changes',
+  'daily_tip',
+  'exercise_tip',
+  'mother_tips',
+  'mother_warnings',
+  'nutrition_tip',
+] as const;
+
+function applyEnglish<T extends Record<string, any> | null>(row: T, lang: string): T {
+  if (!row || lang !== 'en') return row;
+  const out: any = { ...row };
+  for (const f of EN_FIELDS) {
+    const enVal = (row as any)[`${f}_en`];
+    if (enVal) out[f] = enVal;
+  }
+  return out as T;
+}
 
 export interface PregnancyContent {
   id: string;
@@ -35,8 +58,9 @@ export interface PregnancyContent {
 
 // Fetch content by pregnancy day (1-280)
 export const usePregnancyContentByDay = (pregnancyDay?: number) => {
+  const language = useUserStore((s) => s.language);
   return useQuery({
-    queryKey: ['pregnancy_content_day', pregnancyDay],
+    queryKey: ['pregnancy_content_day', pregnancyDay, language],
     queryFn: async () => {
       if (!pregnancyDay) return null;
       
@@ -63,7 +87,7 @@ export const usePregnancyContentByDay = (pregnancyDay?: number) => {
       }
 
       if (error) throw error;
-      return data as PregnancyContent | null;
+      return applyEnglish(data as PregnancyContent | null, language);
     },
     enabled: !!pregnancyDay,
     staleTime: 1000 * 60 * 5,

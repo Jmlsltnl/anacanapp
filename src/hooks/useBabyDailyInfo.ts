@@ -1,18 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
 
 export interface BabyDailyInfo {
   id: string;
   day_number: number;
   info: string;
+  info_en?: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
 }
 
 export const useBabyDailyInfoByDay = (dayNumber: number | null) => {
+  const language = useUserStore((s) => s.language);
   return useQuery({
-    queryKey: ['baby-daily-info', dayNumber],
+    queryKey: ['baby-daily-info', dayNumber, language],
     queryFn: async () => {
       if (!dayNumber || dayNumber < 1 || dayNumber > 1460) return null;
 
@@ -27,7 +30,11 @@ export const useBabyDailyInfoByDay = (dayNumber: number | null) => {
         console.error('Error fetching baby daily info:', error);
         return null;
       }
-      return data as BabyDailyInfo | null;
+      if (!data) return null;
+      if (language === 'en' && data.info_en) {
+        return { ...data, info: data.info_en } as BabyDailyInfo;
+      }
+      return data as BabyDailyInfo;
     },
     enabled: !!dayNumber && dayNumber >= 1 && dayNumber <= 1460,
     staleTime: 1000 * 60 * 5,
