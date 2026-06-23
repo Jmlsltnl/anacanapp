@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { tr } from '@/lib/tr';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,6 +25,48 @@ const NAMESPACES = [
 'common', 'nav', 'tools', 'dashboard', 'settings', 'auth',
 'community', 'blog', 'partner', 'ai', 'admin', 'onboarding', 'ai_prompts'];
 
+const HARDCODED_TABLES = [
+  'translations',
+  'mommy_daily_messages',
+  'baby_daily_info',
+  'pregnancy_daily_content',
+  'weekly_tips',
+  'admin_recipes',
+  'blog_posts',
+  'banners',
+  'faqs',
+  'exercises',
+  'vitamins',
+  'vaccines',
+  'baby_crisis_periods',
+  'teething_care_tips',
+  'white_noise_sounds',
+  'affiliate_products',
+  'age_ranges',
+  'ai_suggested_questions'
+];
+
+const TABLE_LABELS: Record<string, string> = {
+  translations: 'translations (UI tərcümələri)',
+  mommy_daily_messages: 'mommy_daily_messages (Anaya gündəlik mesaj)',
+  baby_daily_info: 'baby_daily_info (Körpə üçün günlük məlumatlar)',
+  pregnancy_daily_content: 'pregnancy_daily_content (Hamiləlik günlük kontenti)',
+  weekly_tips: 'weekly_tips (Həftəlik məsləhətlər)',
+  admin_recipes: 'admin_recipes (Reseptlər)',
+  blog_posts: 'blog_posts (Bloq yazıları)',
+  banners: 'banners (Bannerlər)',
+  faqs: 'faqs (FAQ / Sual-cavab)',
+  exercises: 'exercises (Məşqlər)',
+  vitamins: 'vitamins (Vitaminlər)',
+  vaccines: 'vaccines (Peyvəndlər)',
+  baby_crisis_periods: 'baby_crisis_periods (Kriz dövrləri)',
+  teething_care_tips: 'teething_care_tips (Diş çıxarma tövsiyələri)',
+  white_noise_sounds: 'white_noise_sounds (Ağ küy səsləri)',
+  affiliate_products: 'affiliate_products (Tərəfdaş məhsulları)',
+  age_ranges: 'age_ranges (Yaş diapazonları)',
+  ai_suggested_questions: 'ai_suggested_questions (Süni intellekt sualları)'
+};
+
 
 const AdminTranslations = () => {
   const queryClient = useQueryClient();
@@ -38,12 +80,18 @@ const AdminTranslations = () => {
 
   // States for DB Translation Uploader
   const [uploadTable, setUploadTable] = useState('translations');
+  const [customTable, setCustomTable] = useState('');
   const [uploadLang, setUploadLang] = useState('en');
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [parsedRows, setParsedRows] = useState<any[]>([]);
   const [csvColumns, setCsvColumns] = useState<string[]>([]);
+  
+  // Dynamic uploader key/column selections
+  const [idColumn, setIdColumn] = useState('day_number');
+  const [selectedUpdateColumns, setSelectedUpdateColumns] = useState<string[]>([]);
+  
   const [uploadResults, setUploadResults] = useState<{
     total: number;
     inserted: number;
@@ -65,6 +113,141 @@ const AdminTranslations = () => {
       return data;
     }
   });
+
+  // Fetch ALL tables from database
+  const { data: dbTables = [] } = useQuery({
+    queryKey: ['admin-db-tables'],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from('database_tables')
+        .select('table_name');
+      if (error) {
+        console.warn('Failed to load dynamic tables:', error);
+        throw error;
+      }
+      return data.map((d: any) => d.table_name);
+    },
+    retry: 1,
+  });
+
+  const tablesList = useMemo(() => {
+    if (dbTables && dbTables.length > 0) {
+      // Ensure 'translations' is first, and combine with any hardcoded ones to preserve labels
+      const uniqueTables = Array.from(new Set([...dbTables, ...HARDCODED_TABLES]));
+      return uniqueTables;
+    }
+    return HARDCODED_TABLES;
+  }, [dbTables]);
+
+  // Fetch columns for selected table
+  const { data: dbColumns = [] } = useQuery({
+    queryKey: ['admin-db-columns', uploadTable, customTable],
+    queryFn: async () => {
+      const targetTable = uploadTable === 'custom' ? customTable.trim() : uploadTable;
+      if (!targetTable) return [];
+      const { data, error } = await (supabase as any)
+        .from('database_columns')
+        .select('column_name, data_type')
+        .eq('table_name', targetTable);
+      if (error) throw error;
+      return data as { column_name: string; data_type: string }[];
+    },
+    enabled: !!uploadTable && (uploadTable !== 'custom' || !!customTable),
+    retry: false
+  });
+
+  // Fetch constraints (primary keys) for selected table
+  const { data: dbConstraints = [] } = useQuery({
+    queryKey: ['admin-db-constraints', uploadTable, customTable],
+    queryFn: async () => {
+      const targetTable = uploadTable === 'custom' ? customTable.trim() : uploadTable;
+      if (!targetTable) return [];
+      const { data, error } = await (supabase as any)
+        .from('database_table_constraints')
+        .select('column_name, constraint_type')
+        .eq('table_name', targetTable);
+      if (error) throw error;
+      return data as { column_name: string; constraint_type: string }[];
+    },
+    enabled: !!uploadTable && (uploadTable !== 'custom' || !!customTable),
+    retry: false
+  });
+
+  // Reset preview and selections on table change
+  useEffect(() => {
+    setUploadFile(null);
+    setParsedRows([]);
+    setCsvColumns([]);
+    setSelectedUpdateColumns([]);
+    
+    // Initial guess for default ID column based on table name
+    const targetTable = uploadTable === 'custom' ? customTable.trim() : uploadTable;
+    if (targetTable === 'translations') {
+      setIdColumn('key');
+    } else if (targetTable === 'pregnancy_daily_content') {
+      setIdColumn('pregnancy_day');
+    } else {
+      setIdColumn('day_number');
+    }
+  }, [uploadTable, customTable]);
+
+  // Auto-guess ID column when parsedRows or database constraints change
+  useEffect(() => {
+    if (parsedRows.length === 0) return;
+    const csvCols = Object.keys(parsedRows[0]);
+    
+    // 1. Try to find a primary key from the database that is also in the CSV
+    const dbPk = dbConstraints.find(c => csvCols.includes(c.column_name));
+    if (dbPk) {
+      setIdColumn(dbPk.column_name);
+      return;
+    }
+
+    // 2. Fall back to hardcoded guesses
+    const idGuesses = ['day_number', 'pregnancy_day', 'key', 'id', 'code', 'day', 'week_number'];
+    const matchedId = csvCols.find(c => idGuesses.includes(c.toLowerCase()));
+    if (matchedId) {
+      setIdColumn(matchedId);
+    } else {
+      setIdColumn(csvCols[0] || 'id');
+    }
+  }, [parsedRows, dbConstraints]);
+
+  const availableCsvColumns = useMemo(() => {
+    if (parsedRows.length === 0) return [];
+    const csvCols = Object.keys(parsedRows[0]);
+    
+    if (dbColumns && dbColumns.length > 0) {
+      // Filter CSV columns to only those that exist in the database
+      const dbColNames = dbColumns.map(c => c.column_name);
+      return csvCols.filter(col => dbColNames.includes(col));
+    }
+    
+    return csvCols;
+  }, [parsedRows, dbColumns]);
+
+  // Auto-select update columns when file is parsed or language / table changes
+  useEffect(() => {
+    if (parsedRows.length === 0) return;
+    const csvCols = Object.keys(parsedRows[0]);
+    
+    // Filter to columns that exist in the database (or all if dbColumns is empty)
+    const validCols = dbColumns.length > 0 
+      ? csvCols.filter(c => dbColumns.some(dbc => dbc.column_name === c)) 
+      : csvCols;
+
+    const suffix = `_${uploadLang}`;
+    const guessedUpdateCols = validCols.filter(c => 
+      c.toLowerCase().endsWith(suffix.toLowerCase()) || 
+      (uploadTable === 'translations' && (c === 'value' || c === 'value_en'))
+    );
+    
+    setSelectedUpdateColumns(
+      guessedUpdateCols.length > 0 
+        ? guessedUpdateCols 
+        : validCols.filter(c => c !== idColumn)
+    );
+  }, [parsedRows, uploadLang, uploadTable, dbColumns, idColumn]);
 
   const parseCSV = (text: string): Record<string, string>[] => {
     const rows: string[][] = [];
@@ -115,6 +298,7 @@ const AdminTranslations = () => {
       const cols = Object.keys(rows[0]);
       setCsvColumns(cols);
       setParsedRows(rows);
+      
       toast.success(`Fayl oxundu: ${rows.length} sətir tapıldı.`);
     } catch (err: any) {
       toast.error(`Fayl oxunarkən xəta: ${err.message}`);
@@ -124,6 +308,22 @@ const AdminTranslations = () => {
   const handleDbUpload = async () => {
     if (parsedRows.length === 0) {
       toast.error('Zəhmət olmasa əvvəlcə CSV faylı yükləyin');
+      return;
+    }
+
+    const targetTable = uploadTable === 'custom' ? customTable.trim() : uploadTable;
+    if (!targetTable) {
+      toast.error('Zəhmət olmasa hədəf cədvəl adını daxil edin');
+      return;
+    }
+
+    if (!idColumn) {
+      toast.error('Zəhmət olmasa ID sütununu seçin');
+      return;
+    }
+
+    if (selectedUpdateColumns.length === 0) {
+      toast.error('Zəhmət olmasa yenilənəcək sütunları seçin');
       return;
     }
 
@@ -145,375 +345,181 @@ const AdminTranslations = () => {
     const errors: string[] = [];
 
     try {
-      if (uploadTable === 'translations') {
-        const { data: dbData, error: dbErr } = await supabase
-          .from('translations')
-          .select('key, value, namespace')
-          .eq('lang', uploadLang);
-        
-        if (dbErr) throw dbErr;
-        const dbMap = new Map(dbData?.map(r => [r.key, r.value || '']) || []);
-
-        const batchSize = 100;
-        for (let i = 0; i < parsedRows.length; i += batchSize) {
-          const batch = parsedRows.slice(i, i + batchSize);
-          const toInsert: any[] = [];
-          const toUpdate: any[] = [];
-
-          for (const item of batch) {
-            const key = (item.key || item.Key || '').trim();
-            const val = (
-              item[`value_${uploadLang}`] || 
-              item[`value_${uploadLang.toUpperCase()}`] ||
-              item.value || 
-              item.Value ||
-              item.text ||
-              item.defaultValue || 
-              ''
-            ).trim();
-            const ns = (item.namespace || item.Namespace || 'common').trim();
-
-            if (!key) {
-              failed++;
-              errors.push(`Mətndə açar (key) tapılmadı`);
-              continue;
-            }
-
-            if (dbMap.has(key)) {
-              const dbVal = dbMap.get(key);
-              if (!dbVal && val) {
-                toUpdate.push({ key, value: val, namespace: ns });
-              } else {
-                skipped++;
-              }
-            } else {
-              toInsert.push({ key, lang: uploadLang, value: val, namespace: ns });
-            }
-          }
-
-          if (toInsert.length > 0) {
-            const { error: insErr } = await supabase.from('translations').insert(toInsert);
-            if (insErr) {
-              failed += toInsert.length;
-              errors.push(`Insert xətası: ${insErr.message}`);
-            } else {
-              inserted += toInsert.length;
-            }
-          }
-
-          if (toUpdate.length > 0) {
-            const updatePromises = toUpdate.map(async (up) => {
-              const { error: updErr } = await supabase
-                .from('translations')
-                .update({ value: up.value, updated_at: new Date().toISOString() })
-                .eq('key', up.key)
-                .eq('lang', uploadLang);
-              if (updErr) {
-                failed++;
-                errors.push(`Update xətası (key: ${up.key}): ${updErr.message}`);
-              } else {
-                updated++;
-              }
-            });
-            await Promise.all(updatePromises);
-          }
-
-          setUploadProgress(Math.min(100, Math.round(((i + batch.length) / parsedRows.length) * 100)));
-          setUploadResults({
-            total: parsedRows.length,
-            inserted,
-            updated,
-            skipped,
-            failed,
-            errors: errors.slice(0, 10)
-          });
-        }
-      } 
-      else if (uploadTable === 'mommy_daily_messages') {
-        const langCol = `message_${uploadLang}`;
-        const { data: dbData, error: dbErr } = await supabase
-          .from('mommy_daily_messages')
-          .select(`id, day_number, message, ${langCol}`);
-        
-        if (dbErr) throw dbErr;
-        const dbMap = new Map(dbData?.map(r => [r.day_number, r]) || []);
-
-        const batchSize = 100;
-        for (let i = 0; i < parsedRows.length; i += batchSize) {
-          const batch = parsedRows.slice(i, i + batchSize);
-          const toInsert: any[] = [];
-          const toUpdate: any[] = [];
-
-          for (const item of batch) {
-            const dayNum = parseInt(item.day_number || item.day || item.Day || '');
-            const msgVal = (
-              item[langCol] || 
-              item[langCol.toUpperCase()] ||
-              item.message || 
-              item.Message ||
-              item.message_en || 
-              ''
-            ).trim();
-
-            if (isNaN(dayNum)) {
-              failed++;
-              errors.push(`Sətirdə day_number düzgün deyil`);
-              continue;
-            }
-
-            if (dbMap.has(dayNum)) {
-              const dbRow = dbMap.get(dayNum);
-              const dbVal = dbRow[langCol];
-              if (!dbVal && msgVal) {
-                toUpdate.push({ id: dbRow.id, [langCol]: msgVal, day_number: dayNum });
-              } else {
-                skipped++;
-              }
-            } else {
-              toInsert.push({
-                day_number: dayNum,
-                message: item.message || item.Message || '',
-                [langCol]: msgVal,
-                is_active: item.is_active !== 'false' && item.is_active !== false
-              });
-            }
-          }
-
-          if (toInsert.length > 0) {
-            const { error: insErr } = await supabase.from('mommy_daily_messages').insert(toInsert);
-            if (insErr) {
-              failed += toInsert.length;
-              errors.push(`Insert xətası: ${insErr.message}`);
-            } else {
-              inserted += toInsert.length;
-            }
-          }
-
-          if (toUpdate.length > 0) {
-            const updatePromises = toUpdate.map(async (up) => {
-              const { id, day_number, ...restUpdate } = up;
-              const { error: updErr } = await supabase
-                .from('mommy_daily_messages')
-                .update({ ...restUpdate, updated_at: new Date().toISOString() })
-                .eq('id', id);
-              if (updErr) {
-                failed++;
-                errors.push(`Update xətası (day: ${day_number}): ${updErr.message}`);
-              } else {
-                updated++;
-              }
-            });
-            await Promise.all(updatePromises);
-          }
-
-          setUploadProgress(Math.min(100, Math.round(((i + batch.length) / parsedRows.length) * 100)));
-          setUploadResults({
-            total: parsedRows.length,
-            inserted,
-            updated,
-            skipped,
-            failed,
-            errors: errors.slice(0, 10)
-          });
-        }
+      // 1. Fetch existing rows (selecting ID and update columns to optimize)
+      let query = supabase.from(targetTable).select([idColumn, ...selectedUpdateColumns].join(', '));
+      
+      // If translations table, filter by language to prevent getting too many rows
+      if (targetTable === 'translations') {
+        query = query.eq('lang', uploadLang);
       }
-      else if (uploadTable === 'baby_daily_info') {
-        const langCol = `info_${uploadLang}`;
-        const { data: dbData, error: dbErr } = await supabase
-          .from('baby_daily_info')
-          .select(`id, day_number, info, ${langCol}`);
-        
-        if (dbErr) throw dbErr;
-        const dbMap = new Map(dbData?.map(r => [r.day_number, r]) || []);
 
-        const batchSize = 100;
-        for (let i = 0; i < parsedRows.length; i += batchSize) {
-          const batch = parsedRows.slice(i, i + batchSize);
-          const toInsert: any[] = [];
-          const toUpdate: any[] = [];
-
-          for (const item of batch) {
-            const dayNum = parseInt(item.day_number || item.day || item.Day || '');
-            const infoVal = (
-              item[langCol] || 
-              item[langCol.toUpperCase()] ||
-              item.info || 
-              item.Info ||
-              item.info_en || 
-              ''
-            ).trim();
-
-            if (isNaN(dayNum)) {
-              failed++;
-              errors.push(`Sətirdə day_number düzgün deyil`);
-              continue;
-            }
-
-            if (dbMap.has(dayNum)) {
-              const dbRow = dbMap.get(dayNum);
-              const dbVal = dbRow[langCol];
-              if (!dbVal && infoVal) {
-                toUpdate.push({ id: dbRow.id, [langCol]: infoVal, day_number: dayNum });
-              } else {
-                skipped++;
-              }
-            } else {
-              toInsert.push({
-                day_number: dayNum,
-                info: item.info || item.Info || '',
-                [langCol]: infoVal,
-                is_active: item.is_active !== 'false' && item.is_active !== false
-              });
-            }
-          }
-
-          if (toInsert.length > 0) {
-            const { error: insErr } = await supabase.from('baby_daily_info').insert(toInsert);
-            if (insErr) {
-              failed += toInsert.length;
-              errors.push(`Insert xətası: ${insErr.message}`);
-            } else {
-              inserted += toInsert.length;
-            }
-          }
-
-          if (toUpdate.length > 0) {
-            const updatePromises = toUpdate.map(async (up) => {
-              const { id, day_number, ...restUpdate } = up;
-              const { error: updErr } = await supabase
-                .from('baby_daily_info')
-                .update({ ...restUpdate, updated_at: new Date().toISOString() })
-                .eq('id', id);
-              if (updErr) {
-                failed++;
-                errors.push(`Update xətası (day: ${day_number}): ${updErr.message}`);
-              } else {
-                updated++;
-              }
-            });
-            await Promise.all(updatePromises);
-          }
-
-          setUploadProgress(Math.min(100, Math.round(((i + batch.length) / parsedRows.length) * 100)));
-          setUploadResults({
-            total: parsedRows.length,
-            inserted,
-            updated,
-            skipped,
-            failed,
-            errors: errors.slice(0, 10)
-          });
-        }
+      const { data: dbData, error: dbErr } = await query;
+      
+      if (dbErr) {
+        throw new Error(`Məlumat bazasından oxuma xətası: ${dbErr.message}`);
       }
-      else if (uploadTable === 'pregnancy_daily_content') {
-        const suffix = `_${uploadLang}`;
-        const transFields = [
-          'baby_development',
-          'baby_message',
-          'mother_tips',
-          'mother_warnings',
-          'nutrition_tip',
-          'exercise_tip'
-        ];
-        
-        const selectCols = ['id', 'pregnancy_day', ...transFields.map(f => `${f}${suffix}`)];
-        const { data: dbData, error: dbErr } = await supabase
-          .from('pregnancy_daily_content')
-          .select(selectCols.join(', '));
-        
-        if (dbErr) throw dbErr;
-        const dbMap = new Map(dbData?.map(r => [r.pregnancy_day, r]) || []);
 
-        const batchSize = 50;
-        for (let i = 0; i < parsedRows.length; i += batchSize) {
-          const batch = parsedRows.slice(i, i + batchSize);
-          const toInsert: any[] = [];
-          const toUpdate: any[] = [];
+      const dbMap = new Map(dbData?.map(r => [String(r[idColumn]), r]) || []);
 
-          for (const item of batch) {
-            const pDay = parseInt(item.pregnancy_day || item.pregnancyDay || item.day || item.Day || '');
-            if (isNaN(pDay)) {
-              failed++;
-              errors.push(`Sətirdə pregnancy_day düzgün deyil`);
-              continue;
-            }
+      const batchSize = 100;
+      for (let i = 0; i < parsedRows.length; i += batchSize) {
+        const batch = parsedRows.slice(i, i + batchSize);
+        const toInsert: any[] = [];
+        const toUpdate: any[] = [];
 
-            const transValues: Record<string, string> = {};
-            let hasNewTrans = false;
+        for (const item of batch) {
+          const idVal = (item[idColumn] || '').trim();
+          if (!idVal) {
+            failed++;
+            errors.push(`ID dəyəri boş olan sətir keçildi`);
+            continue;
+          }
 
-            transFields.forEach(f => {
-              const colName = `${f}${suffix}`;
-              const val = (item[colName] || item[colName.toUpperCase()] || item[f] || item[f.toUpperCase()] || '').trim();
-              if (val) {
-                transValues[colName] = val;
-              }
-            });
-
-            if (dbMap.has(pDay)) {
-              const dbRow = dbMap.get(pDay);
-              const individualUpdate: Record<string, string> = {};
+          // Build fields dictionary with casting
+          const fields: Record<string, any> = {};
+          selectedUpdateColumns.forEach(col => {
+            if (item[col] !== undefined) {
+              const valStr = item[col].trim();
               
-              transFields.forEach(f => {
-                const colName = `${f}${suffix}`;
-                if (!dbRow[colName] && transValues[colName]) {
-                  individualUpdate[colName] = transValues[colName];
-                  hasNewTrans = true;
+              // Find database column type if available
+              const dbCol = dbColumns.find(c => c.column_name === col);
+              if (dbCol) {
+                const type = dbCol.data_type.toLowerCase();
+                if (type.includes('int') || type.includes('num') || type.includes('double') || type.includes('real')) {
+                  fields[col] = valStr === '' ? null : Number(valStr);
+                } else if (type.includes('bool')) {
+                  fields[col] = valStr === '' ? null : (valStr.toLowerCase() === 'true' || valStr === '1');
+                } else {
+                  fields[col] = valStr;
                 }
-              });
-
-              if (hasNewTrans) {
-                toUpdate.push({ id: dbRow.id, pregnancy_day: pDay, ...individualUpdate });
               } else {
-                skipped++;
+                // Fallback: guess type
+                if (valStr.toLowerCase() === 'true') fields[col] = true;
+                else if (valStr.toLowerCase() === 'false') fields[col] = false;
+                else fields[col] = valStr;
               }
-            } else {
-              toInsert.push({
-                pregnancy_day: pDay,
-                week_number: parseInt(item.week_number || item.week || '0') || Math.ceil(pDay / 7),
-                day_number: parseInt(item.day_number || item.day || '0') || (pDay % 7 === 0 ? 7 : pDay % 7),
-                ...transValues,
-                is_active: item.is_active !== 'false' && item.is_active !== false
-              });
             }
-          }
+          });
 
-          if (toInsert.length > 0) {
-            const { error: insErr } = await supabase.from('pregnancy_daily_content').insert(toInsert);
-            if (insErr) {
-              failed += toInsert.length;
-              errors.push(`Insert xətası: ${insErr.message}`);
-            } else {
-              inserted += toInsert.length;
-            }
-          }
+          // Check if exists
+          if (dbMap.has(idVal)) {
+            const dbRow = dbMap.get(idVal);
+            const updateFields: Record<string, any> = {};
+            let hasUpdates = false;
 
-          if (toUpdate.length > 0) {
-            const updatePromises = toUpdate.map(async (up) => {
-              const { id, pregnancy_day, ...fieldsToUpdate } = up;
-              const { error: updErr } = await supabase
-                .from('pregnancy_daily_content')
-                .update({ ...fieldsToUpdate, updated_at: new Date().toISOString() })
-                .eq('id', id);
-              if (updErr) {
-                failed++;
-                errors.push(`Update xətası (day: ${pregnancy_day}): ${updErr.message}`);
-              } else {
-                updated++;
+            selectedUpdateColumns.forEach(col => {
+              const csvVal = fields[col];
+              const dbVal = dbRow ? dbRow[col] : null;
+
+              // Strict "eyni olanlara dəyməsin" - only update if database field is empty/null, and CSV has a value
+              const isEmptyDb = dbVal === null || dbVal === undefined || dbVal === '';
+              const hasCsvVal = csvVal !== null && csvVal !== undefined && csvVal !== '';
+
+              if (isEmptyDb && hasCsvVal) {
+                updateFields[col] = csvVal;
+                hasUpdates = true;
               }
             });
-            await Promise.all(updatePromises);
-          }
 
-          setUploadProgress(Math.min(100, Math.round(((i + batch.length) / parsedRows.length) * 100)));
-          setUploadResults({
-            total: parsedRows.length,
-            inserted,
-            updated,
-            skipped,
-            failed,
-            errors: errors.slice(0, 10)
-          });
+            if (hasUpdates) {
+              toUpdate.push({ idVal, ...updateFields });
+            } else {
+              skipped++;
+            }
+          } else {
+            // New record insertion
+            const dbIdCol = dbColumns.find(c => c.column_name === idColumn);
+            let castedIdVal: any = idVal;
+            if (dbIdCol) {
+              const type = dbIdCol.data_type.toLowerCase();
+              if (type.includes('int') || type.includes('num') || type.includes('double') || type.includes('real')) {
+                castedIdVal = parseInt(idVal);
+              }
+            } else {
+              if (idColumn === 'day_number' || idColumn === 'pregnancy_day' || idColumn === 'week_number') {
+                castedIdVal = parseInt(idVal);
+              }
+            }
+
+            const insertFields: Record<string, any> = {
+              [idColumn]: castedIdVal,
+              ...fields
+            };
+
+            // Set default is_active if column exists in schema
+            if (item.is_active !== undefined) {
+              insertFields['is_active'] = item.is_active !== 'false' && item.is_active !== false;
+            }
+
+            // Set lang if translations table
+            if (targetTable === 'translations') {
+              insertFields['lang'] = uploadLang;
+            }
+
+            // Try to set other standard fallback columns if present in CSV
+            const fallbacks = ['message', 'info', 'title', 'content', 'description'];
+            fallbacks.forEach(col => {
+              if (item[col] && !selectedUpdateColumns.includes(col) && col !== idColumn) {
+                insertFields[col] = item[col].trim();
+              }
+            });
+
+            toInsert.push(insertFields);
+          }
         }
+
+        // Execute inserts in batch
+        if (toInsert.length > 0) {
+          const { error: insErr } = await supabase.from(targetTable).insert(toInsert);
+          if (insErr) {
+            failed += toInsert.length;
+            errors.push(`Insert xətası: ${insErr.message}`);
+          } else {
+            inserted += toInsert.length;
+          }
+        }
+
+        // Execute updates one by one
+        if (toUpdate.length > 0) {
+          const updatePromises = toUpdate.map(async (up) => {
+            const { idVal, ...fieldsToUpdate } = up;
+            
+            const dbIdCol = dbColumns.find(c => c.column_name === idColumn);
+            let castedIdVal: any = idVal;
+            if (dbIdCol) {
+              const type = dbIdCol.data_type.toLowerCase();
+              if (type.includes('int') || type.includes('num') || type.includes('double') || type.includes('real')) {
+                castedIdVal = parseInt(idVal);
+              }
+            } else {
+              if (idColumn === 'day_number' || idColumn === 'pregnancy_day' || idColumn === 'week_number') {
+                castedIdVal = parseInt(idVal);
+              }
+            }
+
+            const { error: updErr } = await supabase
+              .from(targetTable)
+              .update({ ...fieldsToUpdate, updated_at: new Date().toISOString() })
+              .eq(idColumn, castedIdVal);
+            if (updErr) {
+              failed++;
+              errors.push(`Update xətası (${idColumn}: ${idVal}): ${updErr.message}`);
+            } else {
+              updated++;
+            }
+          });
+          await Promise.all(updatePromises);
+        }
+
+        setUploadProgress(Math.min(100, Math.round(((i + batch.length) / parsedRows.length) * 100)));
+        setUploadResults({
+          total: parsedRows.length,
+          inserted,
+          updated,
+          skipped,
+          failed,
+          errors: errors.slice(0, 10)
+        });
       }
       toast.success('Yükləmə tamamlandı!');
     } catch (err: any) {
@@ -869,7 +875,7 @@ const AdminTranslations = () => {
               <div>
                 <h4 className="font-semibold mb-1">Mühüm Xəbərdarlıq ("Eyni olanlara dəyməsin")</h4>
                 <p className="leading-relaxed">
-                  Bu alət verilənlər bazasındakı mövcud yazıları qoruyur. Seçilmiş dil sütununda (məsələn, <code>message_en</code> və ya <code>info_en</code>) artıq mətn varsa, o dəyişdirilməyəcək (üzərindən yazılmayacaq). Yalnız həmin sütun boş (NULL və ya boş sətir) olduqda və ya yeni sətir əlavə edildikdə məlumat yazılacaq.
+                  Bu alət verilənlər bazasındakı mövcud yazıları qoruyur. Seçilmiş dil sütunlarında (məsələn, <code>message_en</code> və ya <code>info_en</code>) artıq mətn varsa, o dəyişdirilməyəcək (üzərindən yazılmayacaq). Yalnız həmin sütun boş (NULL və ya boş sətir) olduqda və ya yeni sətir əlavə edildikdə məlumat yazılacaq.
                 </p>
               </div>
             </div>
@@ -877,16 +883,29 @@ const AdminTranslations = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Hədəf Cədvəl</Label>
-                <Select value={uploadTable} onValueChange={(val) => { setUploadTable(val); setUploadFile(null); setParsedRows([]); }}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                <Select value={uploadTable} onValueChange={setUploadTable}>
+                  <SelectTrigger><SelectValue placeholder="Cədvəl seçin" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="translations">translations (UI tərcümələri)</SelectItem>
-                    <SelectItem value="mommy_daily_messages">mommy_daily_messages (Anaya gündəlik mesaj)</SelectItem>
-                    <SelectItem value="baby_daily_info">baby_daily_info (Körpə üçün günlük məlumatlar)</SelectItem>
-                    <SelectItem value="pregnancy_daily_content">pregnancy_daily_content (Hamiləlik günlük kontenti)</SelectItem>
+                    {tablesList.map(table => (
+                      <SelectItem key={table} value={table}>
+                        {TABLE_LABELS[table] || table}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value="custom">-- Digər (Cədvəl adını əllə yazın) --</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+
+              {uploadTable === 'custom' && (
+                <div className="space-y-2">
+                  <Label>Cədvəl Adı (Database Table Name)</Label>
+                  <Input 
+                    placeholder="Məs: affiliate_products" 
+                    value={customTable} 
+                    onChange={(e) => setCustomTable(e.target.value)} 
+                  />
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label>Hədəf Dil</Label>
@@ -900,42 +919,6 @@ const AdminTranslations = () => {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-            </div>
-
-            <div className="bg-muted/50 border border-border p-4 rounded-xl space-y-2">
-              <h4 className="font-semibold text-sm">Gözlənilən CSV/Excel Sütunları:</h4>
-              <div className="text-xs space-y-1 text-muted-foreground font-mono">
-                {uploadTable === 'translations' && (
-                  <>
-                    <p>• <span className="text-foreground font-semibold">key</span> - Açar (məsələn: common.save)</p>
-                    <p>• <span className="text-foreground font-semibold">value_{uploadLang}</span> (və ya sadəcə <span className="text-foreground font-semibold">value</span>) - Tərcümə mətni</p>
-                    <p>• <span className="text-foreground font-semibold">namespace</span> (opsional) - Namespace (məsələn: common)</p>
-                  </>
-                )}
-                {uploadTable === 'mommy_daily_messages' && (
-                  <>
-                    <p>• <span className="text-foreground font-semibold">day_number</span> (və ya <span className="text-foreground font-semibold">day</span>) - Gün nömrəsi (1-1460)</p>
-                    <p>• <span className="text-foreground font-semibold">message_{uploadLang}</span> (və ya <span className="text-foreground font-semibold">message</span>) - Tərcümə mətni</p>
-                  </>
-                )}
-                {uploadTable === 'baby_daily_info' && (
-                  <>
-                    <p>• <span className="text-foreground font-semibold">day_number</span> (və ya <span className="text-foreground font-semibold">day</span>) - Gün nömrəsi (1-1460)</p>
-                    <p>• <span className="text-foreground font-semibold">info_{uploadLang}</span> (və ya <span className="text-foreground font-semibold">info</span>) - Tərcümə mətni</p>
-                  </>
-                )}
-                {uploadTable === 'pregnancy_daily_content' && (
-                  <>
-                    <p>• <span className="text-foreground font-semibold">pregnancy_day</span> (və ya <span className="text-foreground font-semibold">day</span>) - Hamiləlik günü (1-280)</p>
-                    <p>• <span className="text-foreground font-semibold">baby_development_{uploadLang}</span> - Körpə inkişafı tərcüməsi</p>
-                    <p>• <span className="text-foreground font-semibold">baby_message_{uploadLang}</span> - Körpədən mesaj tərcüməsi</p>
-                    <p>• <span className="text-foreground font-semibold">mother_tips_{uploadLang}</span> - Ana üçün məsləhətlər tərcüməsi</p>
-                    <p>• <span className="text-foreground font-semibold">mother_warnings_{uploadLang}</span> - Xəbərdarlıqlar tərcüməsi</p>
-                    <p>• <span className="text-foreground font-semibold">nutrition_tip_{uploadLang}</span> - Qidalanma məsləhəti tərcüməsi</p>
-                    <p>• <span className="text-foreground font-semibold">exercise_tip_{uploadLang}</span> - Məşq məsləhəti tərcüməsi</p>
-                  </>
-                )}
               </div>
             </div>
 
@@ -957,6 +940,59 @@ const AdminTranslations = () => {
                 </div>
               )}
             </div>
+
+            {parsedRows.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border p-4 rounded-xl bg-card">
+                <div className="space-y-2">
+                  <Label>ID / Unikal Açar Sütunu (Primary Key)</Label>
+                  <Select value={idColumn} onValueChange={setIdColumn}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {csvColumns.map(col => (
+                        <SelectItem key={col} value={col}>{col}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">Sətirləri verilənlər bazasındakı uyğun qeydlərlə eşləşdirmək üçün istifadə olunur.</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Yüklənəcək / Yenilənəcək Sütunlar</Label>
+                  <div className="max-h-40 overflow-y-auto space-y-1.5 border p-3 rounded-lg bg-muted/20">
+                    {availableCsvColumns.map(col => {
+                      if (col === idColumn) return null;
+                      return (
+                        <div key={col} className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id={`col-chk-${col}`}
+                            checked={selectedUpdateColumns.includes(col)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedUpdateColumns([...selectedUpdateColumns, col]);
+                              } else {
+                                setSelectedUpdateColumns(selectedUpdateColumns.filter(c => c !== col));
+                              }
+                            }}
+                            className="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4"
+                          />
+                          <label htmlFor={`col-chk-${col}`} className="text-xs font-medium cursor-pointer">
+                            {col}
+                          </label>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {csvColumns.some(c => !availableCsvColumns.includes(c)) && (
+                    <p className="text-[10px] text-amber-500 font-semibold mt-1">
+                      ⚠️ Diqqət: CSV-dəki bəzi sütunlar verilənlər bazasında yoxdur və keçiləcək: {' '}
+                      {csvColumns.filter(c => !availableCsvColumns.includes(c)).join(', ')}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground">Seçilmiş sütunlardakı mətnlər verilənlər bazasına yüklənəcək.</p>
+                </div>
+              </div>
+            )}
 
             {uploading && (
               <div className="space-y-2">
