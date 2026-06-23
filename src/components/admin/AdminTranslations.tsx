@@ -39,9 +39,11 @@ const AdminTranslations = () => {
   // States for DB Translation Uploader
   const [uploadTable, setUploadTable] = useState('translations');
   const [uploadLang, setUploadLang] = useState('en');
-  const [uploadJson, setUploadJson] = useState('');
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [parsedRows, setParsedRows] = useState<any[]>([]);
+  const [csvColumns, setCsvColumns] = useState<string[]>([]);
   const [uploadResults, setUploadResults] = useState<{
     total: number;
     inserted: number;
@@ -64,81 +66,71 @@ const AdminTranslations = () => {
     }
   });
 
-  const getSampleJson = () => {
-    switch (uploadTable) {
-      case 'translations':
-        return `[
-  {
-    "key": "common.save",
-    "value": "Save",
-    "namespace": "common"
-  },
-  {
-    "key": "nav.home",
-    "value": "Home",
-    "namespace": "nav"
-  }
-]`;
-      case 'mommy_daily_messages':
-        return `[
-  {
-    "day_number": 1,
-    "message_en": "Welcome to motherhood! You are doing great."
-  },
-  {
-    "day_number": 2,
-    "message_en": "Remember to rest as much as possible today."
-  }
-]`;
-      case 'baby_daily_info':
-        return `[
-  {
-    "day_number": 1,
-    "info_en": "Your newborn's stomach is only the size of a cherry."
-  },
-  {
-    "day_number": 2,
-    "info_en": "Your baby starts adjusting to life outside the womb."
-  }
-]`;
-      case 'pregnancy_daily_content':
-        return `[
-  {
-    "pregnancy_day": 1,
-    "baby_development_en": "The fertilized egg is dividing.",
-    "baby_message_en": "I am starting my journey!",
-    "mother_tips_en": "Take prenatal vitamins.",
-    "mother_warnings_en": "Avoid alcohol and smoking.",
-    "nutrition_tip_en": "Eat folate-rich foods.",
-    "exercise_tip_en": "Keep active with gentle walks."
-  }
-]`;
-      default:
-        return '';
+  const parseCSV = (text: string): Record<string, string>[] => {
+    const rows: string[][] = [];
+    let cur: string[] = [];
+    let field = "";
+    let inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i++; }
+          else inQuotes = false;
+        } else field += c;
+      } else {
+        if (c === '"') inQuotes = true;
+        else if (c === ",") { cur.push(field); field = ""; }
+        else if (c === "\n") { cur.push(field); rows.push(cur); cur = []; field = ""; }
+        else if (c === "\r") { /* skip */ }
+        else field += c;
+      }
+    }
+    if (field.length > 0 || cur.length > 0) { cur.push(field); rows.push(cur); }
+    const header = rows.shift();
+    if (!header) return [];
+    
+    // Clean headers from BOM or extra whitespace
+    const cleanHeader = header.map(h => h.replace(/^\uFEFF/, '').trim());
+
+    return rows.filter(r => r.length > 1 || (r.length === 1 && r[0] !== ""))
+      .map(r => Object.fromEntries(cleanHeader.map((h, i) => [h, r[i] ?? ""])));
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadFile(file);
+    setUploadResults(null);
+
+    try {
+      const text = await file.text();
+      const rows = parseCSV(text);
+      if (rows.length === 0) {
+        toast.error('Faylda heç bir məlumat tapılmadı.');
+        return;
+      }
+      
+      const cols = Object.keys(rows[0]);
+      setCsvColumns(cols);
+      setParsedRows(rows);
+      toast.success(`Fayl oxundu: ${rows.length} sətir tapıldı.`);
+    } catch (err: any) {
+      toast.error(`Fayl oxunarkən xəta: ${err.message}`);
     }
   };
 
   const handleDbUpload = async () => {
-    if (!uploadJson.trim()) {
-      toast.error('Zəhmət olmasa JSON məlumatı daxil edin');
-      return;
-    }
-
-    let items: any[];
-    try {
-      items = JSON.parse(uploadJson);
-      if (!Array.isArray(items)) {
-        throw new Error('Məlumat bir JSON array olmalıdır.');
-      }
-    } catch (e: any) {
-      toast.error(`JSON formatı səhvdir: ${e.message}`);
+    if (parsedRows.length === 0) {
+      toast.error('Zəhmət olmasa əvvəlcə CSV faylı yükləyin');
       return;
     }
 
     setUploading(true);
     setUploadProgress(0);
     setUploadResults({
-      total: items.length,
+      total: parsedRows.length,
       inserted: 0,
       updated: 0,
       skipped: 0,
@@ -163,19 +155,27 @@ const AdminTranslations = () => {
         const dbMap = new Map(dbData?.map(r => [r.key, r.value || '']) || []);
 
         const batchSize = 100;
-        for (let i = 0; i < items.length; i += batchSize) {
-          const batch = items.slice(i, i + batchSize);
+        for (let i = 0; i < parsedRows.length; i += batchSize) {
+          const batch = parsedRows.slice(i, i + batchSize);
           const toInsert: any[] = [];
           const toUpdate: any[] = [];
 
           for (const item of batch) {
-            const key = item.key?.trim();
-            const val = (item.value !== undefined ? item.value : item[`value_${uploadLang}`] || item.defaultValue || '').trim();
-            const ns = (item.namespace || 'common').trim();
+            const key = (item.key || item.Key || '').trim();
+            const val = (
+              item[`value_${uploadLang}`] || 
+              item[`value_${uploadLang.toUpperCase()}`] ||
+              item.value || 
+              item.Value ||
+              item.text ||
+              item.defaultValue || 
+              ''
+            ).trim();
+            const ns = (item.namespace || item.Namespace || 'common').trim();
 
             if (!key) {
               failed++;
-              errors.push(`Mətndə açar tapılmadı`);
+              errors.push(`Mətndə açar (key) tapılmadı`);
               continue;
             }
 
@@ -218,9 +218,9 @@ const AdminTranslations = () => {
             await Promise.all(updatePromises);
           }
 
-          setUploadProgress(Math.min(100, Math.round(((i + batch.length) / items.length) * 100)));
+          setUploadProgress(Math.min(100, Math.round(((i + batch.length) / parsedRows.length) * 100)));
           setUploadResults({
-            total: items.length,
+            total: parsedRows.length,
             inserted,
             updated,
             skipped,
@@ -239,14 +239,21 @@ const AdminTranslations = () => {
         const dbMap = new Map(dbData?.map(r => [r.day_number, r]) || []);
 
         const batchSize = 100;
-        for (let i = 0; i < items.length; i += batchSize) {
-          const batch = items.slice(i, i + batchSize);
+        for (let i = 0; i < parsedRows.length; i += batchSize) {
+          const batch = parsedRows.slice(i, i + batchSize);
           const toInsert: any[] = [];
           const toUpdate: any[] = [];
 
           for (const item of batch) {
-            const dayNum = parseInt(item.day_number);
-            const msgVal = (item[langCol] || item.message || item.message_en || '').trim();
+            const dayNum = parseInt(item.day_number || item.day || item.Day || '');
+            const msgVal = (
+              item[langCol] || 
+              item[langCol.toUpperCase()] ||
+              item.message || 
+              item.Message ||
+              item.message_en || 
+              ''
+            ).trim();
 
             if (isNaN(dayNum)) {
               failed++;
@@ -258,16 +265,16 @@ const AdminTranslations = () => {
               const dbRow = dbMap.get(dayNum);
               const dbVal = dbRow[langCol];
               if (!dbVal && msgVal) {
-                toUpdate.push({ id: dbRow.id, [langCol]: msgVal });
+                toUpdate.push({ id: dbRow.id, [langCol]: msgVal, day_number: dayNum });
               } else {
                 skipped++;
               }
             } else {
               toInsert.push({
                 day_number: dayNum,
-                message: item.message || '',
+                message: item.message || item.Message || '',
                 [langCol]: msgVal,
-                is_active: item.is_active !== false
+                is_active: item.is_active !== 'false' && item.is_active !== false
               });
             }
           }
@@ -284,13 +291,14 @@ const AdminTranslations = () => {
 
           if (toUpdate.length > 0) {
             const updatePromises = toUpdate.map(async (up) => {
+              const { id, day_number, ...restUpdate } = up;
               const { error: updErr } = await supabase
                 .from('mommy_daily_messages')
-                .update({ [langCol]: up[langCol], updated_at: new Date().toISOString() })
-                .eq('id', up.id);
+                .update({ ...restUpdate, updated_at: new Date().toISOString() })
+                .eq('id', id);
               if (updErr) {
                 failed++;
-                errors.push(`Update xətası (day: ${up.day_number}): ${updErr.message}`);
+                errors.push(`Update xətası (day: ${day_number}): ${updErr.message}`);
               } else {
                 updated++;
               }
@@ -298,9 +306,9 @@ const AdminTranslations = () => {
             await Promise.all(updatePromises);
           }
 
-          setUploadProgress(Math.min(100, Math.round(((i + batch.length) / items.length) * 100)));
+          setUploadProgress(Math.min(100, Math.round(((i + batch.length) / parsedRows.length) * 100)));
           setUploadResults({
-            total: items.length,
+            total: parsedRows.length,
             inserted,
             updated,
             skipped,
@@ -319,14 +327,21 @@ const AdminTranslations = () => {
         const dbMap = new Map(dbData?.map(r => [r.day_number, r]) || []);
 
         const batchSize = 100;
-        for (let i = 0; i < items.length; i += batchSize) {
-          const batch = items.slice(i, i + batchSize);
+        for (let i = 0; i < parsedRows.length; i += batchSize) {
+          const batch = parsedRows.slice(i, i + batchSize);
           const toInsert: any[] = [];
           const toUpdate: any[] = [];
 
           for (const item of batch) {
-            const dayNum = parseInt(item.day_number);
-            const infoVal = (item[langCol] || item.info || item.info_en || '').trim();
+            const dayNum = parseInt(item.day_number || item.day || item.Day || '');
+            const infoVal = (
+              item[langCol] || 
+              item[langCol.toUpperCase()] ||
+              item.info || 
+              item.Info ||
+              item.info_en || 
+              ''
+            ).trim();
 
             if (isNaN(dayNum)) {
               failed++;
@@ -338,16 +353,16 @@ const AdminTranslations = () => {
               const dbRow = dbMap.get(dayNum);
               const dbVal = dbRow[langCol];
               if (!dbVal && infoVal) {
-                toUpdate.push({ id: dbRow.id, [langCol]: infoVal });
+                toUpdate.push({ id: dbRow.id, [langCol]: infoVal, day_number: dayNum });
               } else {
                 skipped++;
               }
             } else {
               toInsert.push({
                 day_number: dayNum,
-                info: item.info || '',
+                info: item.info || item.Info || '',
                 [langCol]: infoVal,
-                is_active: item.is_active !== false
+                is_active: item.is_active !== 'false' && item.is_active !== false
               });
             }
           }
@@ -364,13 +379,14 @@ const AdminTranslations = () => {
 
           if (toUpdate.length > 0) {
             const updatePromises = toUpdate.map(async (up) => {
+              const { id, day_number, ...restUpdate } = up;
               const { error: updErr } = await supabase
                 .from('baby_daily_info')
-                .update({ [langCol]: up[langCol], updated_at: new Date().toISOString() })
-                .eq('id', up.id);
+                .update({ ...restUpdate, updated_at: new Date().toISOString() })
+                .eq('id', id);
               if (updErr) {
                 failed++;
-                errors.push(`Update xətası (day: ${up.day_number}): ${updErr.message}`);
+                errors.push(`Update xətası (day: ${day_number}): ${updErr.message}`);
               } else {
                 updated++;
               }
@@ -378,9 +394,9 @@ const AdminTranslations = () => {
             await Promise.all(updatePromises);
           }
 
-          setUploadProgress(Math.min(100, Math.round(((i + batch.length) / items.length) * 100)));
+          setUploadProgress(Math.min(100, Math.round(((i + batch.length) / parsedRows.length) * 100)));
           setUploadResults({
-            total: items.length,
+            total: parsedRows.length,
             inserted,
             updated,
             skipped,
@@ -409,13 +425,13 @@ const AdminTranslations = () => {
         const dbMap = new Map(dbData?.map(r => [r.pregnancy_day, r]) || []);
 
         const batchSize = 50;
-        for (let i = 0; i < items.length; i += batchSize) {
-          const batch = items.slice(i, i + batchSize);
+        for (let i = 0; i < parsedRows.length; i += batchSize) {
+          const batch = parsedRows.slice(i, i + batchSize);
           const toInsert: any[] = [];
           const toUpdate: any[] = [];
 
           for (const item of batch) {
-            const pDay = parseInt(item.pregnancy_day);
+            const pDay = parseInt(item.pregnancy_day || item.pregnancyDay || item.day || item.Day || '');
             if (isNaN(pDay)) {
               failed++;
               errors.push(`Sətirdə pregnancy_day düzgün deyil`);
@@ -427,7 +443,7 @@ const AdminTranslations = () => {
 
             transFields.forEach(f => {
               const colName = `${f}${suffix}`;
-              const val = (item[colName] || item[f] || '').trim();
+              const val = (item[colName] || item[colName.toUpperCase()] || item[f] || item[f.toUpperCase()] || '').trim();
               if (val) {
                 transValues[colName] = val;
               }
@@ -453,10 +469,10 @@ const AdminTranslations = () => {
             } else {
               toInsert.push({
                 pregnancy_day: pDay,
-                week_number: item.week_number || Math.ceil(pDay / 7),
-                day_number: item.day_number || (pDay % 7 === 0 ? 7 : pDay % 7),
+                week_number: parseInt(item.week_number || item.week || '0') || Math.ceil(pDay / 7),
+                day_number: parseInt(item.day_number || item.day || '0') || (pDay % 7 === 0 ? 7 : pDay % 7),
                 ...transValues,
-                is_active: item.is_active !== false
+                is_active: item.is_active !== 'false' && item.is_active !== false
               });
             }
           }
@@ -488,9 +504,9 @@ const AdminTranslations = () => {
             await Promise.all(updatePromises);
           }
 
-          setUploadProgress(Math.min(100, Math.round(((i + batch.length) / items.length) * 100)));
+          setUploadProgress(Math.min(100, Math.round(((i + batch.length) / parsedRows.length) * 100)));
           setUploadResults({
-            total: items.length,
+            total: parsedRows.length,
             inserted,
             updated,
             skipped,
@@ -861,7 +877,7 @@ const AdminTranslations = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Hədəf Cədvəl</Label>
-                <Select value={uploadTable} onValueChange={setUploadTable}>
+                <Select value={uploadTable} onValueChange={(val) => { setUploadTable(val); setUploadFile(null); setParsedRows([]); }}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="translations">translations (UI tərcümələri)</SelectItem>
@@ -887,24 +903,59 @@ const AdminTranslations = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <Label>JSON Məlumatı (Array formatında)</Label>
-                <Button 
-                  variant="link" 
-                  className="p-0 h-auto text-xs text-primary"
-                  onClick={() => setUploadJson(getSampleJson())}
-                >
-                  Nümunəni doldur
-                </Button>
+            <div className="bg-muted/50 border border-border p-4 rounded-xl space-y-2">
+              <h4 className="font-semibold text-sm">Gözlənilən CSV/Excel Sütunları:</h4>
+              <div className="text-xs space-y-1 text-muted-foreground font-mono">
+                {uploadTable === 'translations' && (
+                  <>
+                    <p>• <span className="text-foreground font-semibold">key</span> - Açar (məsələn: common.save)</p>
+                    <p>• <span className="text-foreground font-semibold">value_{uploadLang}</span> (və ya sadəcə <span className="text-foreground font-semibold">value</span>) - Tərcümə mətni</p>
+                    <p>• <span className="text-foreground font-semibold">namespace</span> (opsional) - Namespace (məsələn: common)</p>
+                  </>
+                )}
+                {uploadTable === 'mommy_daily_messages' && (
+                  <>
+                    <p>• <span className="text-foreground font-semibold">day_number</span> (və ya <span className="text-foreground font-semibold">day</span>) - Gün nömrəsi (1-1460)</p>
+                    <p>• <span className="text-foreground font-semibold">message_{uploadLang}</span> (və ya <span className="text-foreground font-semibold">message</span>) - Tərcümə mətni</p>
+                  </>
+                )}
+                {uploadTable === 'baby_daily_info' && (
+                  <>
+                    <p>• <span className="text-foreground font-semibold">day_number</span> (və ya <span className="text-foreground font-semibold">day</span>) - Gün nömrəsi (1-1460)</p>
+                    <p>• <span className="text-foreground font-semibold">info_{uploadLang}</span> (və ya <span className="text-foreground font-semibold">info</span>) - Tərcümə mətni</p>
+                  </>
+                )}
+                {uploadTable === 'pregnancy_daily_content' && (
+                  <>
+                    <p>• <span className="text-foreground font-semibold">pregnancy_day</span> (və ya <span className="text-foreground font-semibold">day</span>) - Hamiləlik günü (1-280)</p>
+                    <p>• <span className="text-foreground font-semibold">baby_development_{uploadLang}</span> - Körpə inkişafı tərcüməsi</p>
+                    <p>• <span className="text-foreground font-semibold">baby_message_{uploadLang}</span> - Körpədən mesaj tərcüməsi</p>
+                    <p>• <span className="text-foreground font-semibold">mother_tips_{uploadLang}</span> - Ana üçün məsləhətlər tərcüməsi</p>
+                    <p>• <span className="text-foreground font-semibold">mother_warnings_{uploadLang}</span> - Xəbərdarlıqlar tərcüməsi</p>
+                    <p>• <span className="text-foreground font-semibold">nutrition_tip_{uploadLang}</span> - Qidalanma məsləhəti tərcüməsi</p>
+                    <p>• <span className="text-foreground font-semibold">exercise_tip_{uploadLang}</span> - Məşq məsləhəti tərcüməsi</p>
+                  </>
+                )}
               </div>
-              <Textarea
-                value={uploadJson}
-                onChange={(e) => setUploadJson(e.target.value)}
-                placeholder={getSampleJson()}
-                rows={10}
-                className="font-mono text-xs"
-              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>CSV / Excel (CSV formatlı) Faylı Seçin</Label>
+              <div className="flex items-center gap-3">
+                <Input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileChange}
+                  className="flex-1"
+                />
+              </div>
+              {uploadFile && (
+                <div className="text-xs text-muted-foreground p-3 bg-muted rounded-lg space-y-1">
+                  <div><strong>Fayl adı:</strong> {uploadFile.name}</div>
+                  <div><strong>Tapılan sətirlər:</strong> {parsedRows.length}</div>
+                  <div><strong>Sütunlar:</strong> {csvColumns.join(', ')}</div>
+                </div>
+              )}
             </div>
 
             {uploading && (
@@ -926,7 +977,7 @@ const AdminTranslations = () => {
                   <div className="text-lg font-bold">{uploadResults.total}</div>
                 </div>
                 <div className="text-center text-emerald-600 dark:text-emerald-400">
-                  <div className="text-xs text-muted-foreground">Yeni yaradılan</div>
+                  <div className="text-xs text-muted-foreground font-semibold">Yeni yaradılan</div>
                   <div className="text-lg font-bold">{uploadResults.inserted}</div>
                 </div>
                 <div className="text-center text-blue-600 dark:text-blue-400">
@@ -934,18 +985,18 @@ const AdminTranslations = () => {
                   <div className="text-lg font-bold">{uploadResults.updated}</div>
                 </div>
                 <div className="text-center text-amber-600 dark:text-amber-400">
-                  <div className="text-xs text-muted-foreground">Dəyişməyən (Keçilən)</div>
+                  <div className="text-xs text-muted-foreground font-semibold">Dəyişməyən (Keçilən)</div>
                   <div className="text-lg font-bold">{uploadResults.skipped}</div>
                 </div>
                 <div className="text-center text-destructive">
-                  <div className="text-xs text-muted-foreground">Uğursuz</div>
+                  <div className="text-xs text-muted-foreground font-semibold">Uğursuz</div>
                   <div className="text-lg font-bold">{uploadResults.failed}</div>
                 </div>
               </div>
             )}
 
             {uploadResults && uploadResults.errors.length > 0 && (
-              <div className="space-y-1 p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-xl text-xs">
+              <div className="space-y-1 p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-xl text-xs font-mono">
                 <div className="font-semibold mb-1">Xətalar (Maks 10):</div>
                 {uploadResults.errors.map((err, idx) => (
                   <div key={idx}>• {err}</div>
@@ -955,7 +1006,7 @@ const AdminTranslations = () => {
 
             <Button
               onClick={handleDbUpload}
-              disabled={uploading || !uploadJson.trim()}
+              disabled={uploading || parsedRows.length === 0}
               className="w-full gradient-primary gap-2"
             >
               {uploading ? (
@@ -972,7 +1023,9 @@ const AdminTranslations = () => {
             </Button>
           </CardContent>
         </Card>
-
+      </TabsContent>
+    </Tabs>
+  );
 };
 
 export default AdminTranslations;
