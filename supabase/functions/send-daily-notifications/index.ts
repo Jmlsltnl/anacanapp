@@ -301,6 +301,7 @@ Deno.serve(async (req) => {
         user_id: p.user_id, life_stage: p.life_stage || 'flow', role: p.role || 'user',
         due_date: p.due_date, last_period_date: p.last_period_date,
         daily_push_enabled: true,
+        language: 'az',
       });
     });
 
@@ -308,6 +309,7 @@ Deno.serve(async (req) => {
       const user = userMap.get(pref.user_id);
       if (user) {
         user.daily_push_enabled = pref.daily_push_enabled ?? pref.push_enabled ?? true;
+        if (pref.language) user.language = pref.language;
       }
     });
 
