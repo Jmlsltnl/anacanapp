@@ -51,14 +51,18 @@ export const useHospitalBag = () => {
     if (!user || templates.length === 0) return;
 
     try {
-      const itemsToInsert = templates.map((template, index) => ({
+      const itemsToInsert = templates.map((template) => ({
         user_id: user.id,
         item_id: template.id,
         item_name: template.item_name,
+        item_name_az: template.item_name_az,
+        item_name_en: template.item_name_en,
         category: template.category as 'mom' | 'baby' | 'documents',
         is_checked: false,
         priority: template.priority || 2,
         notes: template.notes || null,
+        notes_az: template.notes_az || null,
+        notes_en: template.notes_en || null,
       }));
 
       const { data, error } = await supabase

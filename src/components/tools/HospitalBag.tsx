@@ -5,7 +5,8 @@ import { useHospitalBag } from '@/hooks/useHospitalBag';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { Progress } from '@/components/ui/progress';
-import { tr } from "@/lib/tr";
+import { tr, mapRowsTranslation } from "@/lib/tr";
+import { useUserStore } from '@/store/userStore';
 
 interface HospitalBagProps {
   onBack: () => void;
@@ -38,11 +39,15 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
     { id: 'baby', label: tr("hospitalbag_korpe_fa2b51", 'Körpə'), emoji: '👶' },
   ];
 
+  const language = useUserStore(state => state.language);
+
   const filteredItems = activeCategory === 'all' 
     ? items 
     : items.filter(item => item.category === activeCategory);
 
-  const sortedItems = [...filteredItems].sort((a, b) => (a.priority || 2) - (b.priority || 2));
+  const translatedFilteredItems = mapRowsTranslation(filteredItems, language, ['item_name', 'notes']);
+
+  const sortedItems = [...translatedFilteredItems].sort((a, b) => (a.priority || 2) - (b.priority || 2));
 
   const progress = getProgress();
 

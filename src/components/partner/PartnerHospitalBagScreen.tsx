@@ -16,7 +16,8 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { tr } from "@/lib/tr";
+import { tr, mapRowsTranslation } from "@/lib/tr";
+import { useUserStore } from '@/store/userStore';
 import {
   Dialog,
   DialogContent,
@@ -52,9 +53,14 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
   const [newItemName, setNewItemName] = useState('');
   const [newItemCategory, setNewItemCategory] = useState<'mom' | 'baby' | 'documents'>('mom');
 
-  const momItems = items.filter((i) => i.category === 'mom');
-  const babyItems = items.filter((i) => i.category === 'baby');
-  const docItems = items.filter((i) => i.category === 'documents');
+  const language = useUserStore(state => state.language);
+
+  // Add translated fields map for the items array
+  const translatedItems = mapRowsTranslation(items, language, ['item_name', 'notes']);
+
+  const momItems = translatedItems.filter((i) => i.category === 'mom');
+  const babyItems = translatedItems.filter((i) => i.category === 'baby');
+  const docItems = translatedItems.filter((i) => i.category === 'documents');
 
   const handleAddItem = async () => {
     if (!newItemName.trim()) return;
@@ -202,7 +208,7 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
         </TabsList>
 
         {(['mom', 'baby', 'documents'] as const).map((category) => {
-          const categoryItems = items.filter((i) => i.category === category);
+          const categoryItems = translatedItems.filter((i) => i.category === category);
           const Icon = categoryIcons[category];
 
           return (
