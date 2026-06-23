@@ -446,6 +446,17 @@ const AdminTranslations = () => {
             continue;
           }
 
+          // Also skip if the dbIdColumn is numeric and the value can't be parsed
+          if (['day_number', 'pregnancy_day', 'week_number'].includes(dbIdColumn) || 
+              (dbColumns.find(c => c.column_name === dbIdColumn)?.data_type || '').toLowerCase().includes('int')) {
+            const numVal = parseInt(idVal);
+            if (isNaN(numVal)) {
+              failed++;
+              errors.push(`ID dəyəri rəqəm deyil (${dbIdColumn}: "${idVal}") – sətir keçildi`);
+              continue;
+            }
+          }
+
           // Build fields dictionary with casting
           const fields: Record<string, any> = {};
           selectedUpdateColumns.forEach(col => {
@@ -517,6 +528,34 @@ const AdminTranslations = () => {
               ...fields
             };
 
+            // For inserts, also include ALL other CSV columns that exist in the DB
+            // (not just selectedUpdateColumns) to avoid NOT NULL constraint violations
+            const dbColNames = dbColumns.map(c => c.column_name);
+            Object.keys(item).forEach(csvCol => {
+              if (csvCol === idColumn) return; // already set via dbIdColumn
+              if (insertFields[csvCol] !== undefined) return; // already set
+              if (dbColNames.length > 0 && !dbColNames.includes(csvCol)) return; // not in DB
+
+              const val = (item[csvCol] || '').trim();
+              if (!val) return;
+
+              // Cast the value based on DB column type
+              const dbCol = dbColumns.find(c => c.column_name === csvCol);
+              if (dbCol) {
+                const type = dbCol.data_type.toLowerCase();
+                if (type.includes('int') || type.includes('num') || type.includes('double') || type.includes('real')) {
+                  const numVal = Number(val);
+                  if (!isNaN(numVal)) insertFields[csvCol] = numVal;
+                } else if (type.includes('bool')) {
+                  insertFields[csvCol] = val.toLowerCase() === 'true' || val === '1';
+                } else {
+                  insertFields[csvCol] = val;
+                }
+              } else {
+                insertFields[csvCol] = val;
+              }
+            });
+
             // Set default is_active if column exists in schema
             if (item.is_active !== undefined) {
               insertFields['is_active'] = item.is_active !== 'false' && item.is_active !== false;
@@ -526,14 +565,6 @@ const AdminTranslations = () => {
             if (targetTable === 'translations') {
               insertFields['lang'] = uploadLang;
             }
-
-            // Try to set other standard fallback columns if present in CSV
-            const fallbacks = ['message', 'info', 'title', 'content', 'description'];
-            fallbacks.forEach(col => {
-              if (item[col] && !selectedUpdateColumns.includes(col) && col !== idColumn) {
-                insertFields[col] = item[col].trim();
-              }
-            });
 
             toInsert.push(insertFields);
           }
