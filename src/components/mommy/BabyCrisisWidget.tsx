@@ -100,7 +100,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                     </span>
                   </div>
                   <h3 className="font-bold text-foreground mt-0.5">
-                    {currentCrisis.title_az || currentCrisis.title}
+                    {currentCrisis.title || currentCrisis.title}
                   </h3>
                 </div>
               </div>
@@ -128,13 +128,13 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
             </div>
 
             <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
-              {currentCrisis.description_az || currentCrisis.description}
+              {currentCrisis.description}
             </p>
 
             {/* Quick symptoms */}
-            {currentCrisis.symptoms_az && currentCrisis.symptoms_az.length > 0 && (
+            {currentCrisis.symptoms && currentCrisis.symptoms.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-3">
-                {currentCrisis.symptoms_az.slice(0, 3).map((symptom, i) => (
+                {currentCrisis.symptoms.slice(0, 3).map((symptom, i) => (
                   <span 
                     key={i}
                     className="px-2 py-1 rounded-full bg-white/60 dark:bg-black/20 text-[10px] font-medium text-foreground"
@@ -142,9 +142,9 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                     {symptom}
                   </span>
                 ))}
-                {currentCrisis.symptoms_az.length > 3 && (
+                {currentCrisis.symptoms.length > 3 && (
                   <span className="px-2 py-1 text-[10px] text-muted-foreground">
-                    +{currentCrisis.symptoms_az.length - 3}
+                    +{currentCrisis.symptoms.length - 3}
                   </span>
                 )}
               </div>
@@ -184,7 +184,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                     <span className="text-xl">{crisis.emoji}</span>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium text-foreground truncate">
-                        {crisis.title_az || crisis.title}
+                        {crisis.title}
                       </p>
                       <p className="text-[10px] text-muted-foreground">
                         {tr('babycrisiswidget_weeks_range','Həftə {s}-{e}').replace('{s}',String(crisis.week_start)).replace('{e}',String(crisis.week_end))} • {crisis.week_start - babyAgeWeeks} {tr('babycrisiswidget_week_unit_later','həftə sonra')}
@@ -260,7 +260,6 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                     {allCrisisPeriods.map((crisis, index) => {
                       const isPast = babyAgeWeeks > crisis.week_end;
                       const isCurrent = babyAgeWeeks >= crisis.week_start && babyAgeWeeks <= crisis.week_end;
-                      const isFuture = babyAgeWeeks < crisis.week_start;
                       
                       return (
                         <motion.div
@@ -298,7 +297,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-1">
                                   <h3 className={`font-bold ${isCurrent ? getSeverityConfig(crisis.severity).textColor : 'text-foreground'}`}>
-                                    {crisis.title_az || crisis.title}
+                                    {crisis.title}
                                   </h3>
                                   {isCurrent && (
                                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/50 dark:bg-black/20 ${getSeverityConfig(crisis.severity).textColor}`}>
@@ -316,7 +315,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                                 </div>
                                 {isCurrent && (
                                   <p className="text-xs text-muted-foreground mt-2 line-clamp-2">
-                                    {crisis.description_az || crisis.description}
+                                    {crisis.description}
                                   </p>
                                 )}
                               </div>
@@ -375,7 +374,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                   </motion.div>
                   <div>
                     <h2 className="text-xl font-bold text-white">
-                      {selectedCrisis.title_az || selectedCrisis.title}
+                      {selectedCrisis.title}
                     </h2>
                     <div className="flex items-center gap-2 mt-1">
                       <Clock className="w-3.5 h-3.5 text-white/80" />
@@ -395,12 +394,12 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                 {/* Description */}
                 <div className="bg-muted/30 rounded-xl p-4">
                   <p className="text-sm text-foreground leading-relaxed">
-                    {selectedCrisis.description_az || selectedCrisis.description}
+                    {selectedCrisis.description}
                   </p>
                 </div>
 
                 {/* Symptoms */}
-                {selectedCrisis.symptoms_az && selectedCrisis.symptoms_az.length > 0 && (
+                {selectedCrisis.symptoms && selectedCrisis.symptoms.length > 0 && (
                   <div className={`rounded-xl p-4 ${getSeverityConfig(selectedCrisis.severity).bgColor} border ${getSeverityConfig(selectedCrisis.severity).borderColor}`}>
                     <div className="flex items-center gap-2 mb-3">
                       <AlertTriangle className={`w-4 h-4 ${getSeverityConfig(selectedCrisis.severity).textColor}`} />
@@ -409,7 +408,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                       </h3>
                     </div>
                     <div className="space-y-2">
-                      {selectedCrisis.symptoms_az.map((symptom, i) => (
+                      {selectedCrisis.symptoms.map((symptom, i) => (
                         <div key={i} className="flex items-start gap-2">
                           <div className={`w-1.5 h-1.5 rounded-full mt-1.5 ${getSeverityConfig(selectedCrisis.severity).textColor.replace('text-', 'bg-')}`} />
                           <span className="text-sm text-foreground">{symptom}</span>
@@ -420,14 +419,14 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                 )}
 
                 {/* Tips */}
-                {selectedCrisis.tips_az && selectedCrisis.tips_az.length > 0 && (
+                {selectedCrisis.tips && selectedCrisis.tips.length > 0 && (
                   <div className="bg-primary/5 dark:bg-primary/10 rounded-xl p-4 border border-primary/20">
                     <div className="flex items-center gap-2 mb-3">
                       <Lightbulb className="w-4 h-4 text-primary" />
                       <h3 className="font-bold text-sm text-primary">{tr("babycrisiswidget_tovsiyeler_17a8f7", "Tövsiyələr")}</h3>
                     </div>
                     <div className="space-y-2">
-                      {selectedCrisis.tips_az.map((tip, i) => (
+                      {selectedCrisis.tips.map((tip, i) => (
                         <div key={i} className="flex items-start gap-2">
                           <Sparkles className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
                           <span className="text-sm text-foreground">{tip}</span>
