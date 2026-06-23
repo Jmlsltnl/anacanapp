@@ -15,6 +15,7 @@ interface UserForNotification {
   due_date: string | null;
   last_period_date: string | null;
   daily_push_enabled: boolean;
+  language: string;
 }
 
 interface ScheduledNotification {
@@ -30,9 +31,16 @@ interface DayNotification {
   day_number: number;
   title: string;
   body: string;
+  title_en: string | null;
+  body_en: string | null;
   emoji: string;
   send_time: string;
   is_active: boolean;
+}
+
+function pickLang(value: string | null | undefined, valueEn: string | null | undefined, lang: string): string {
+  if (lang === 'en' && valueEn && valueEn.trim()) return valueEn;
+  return value || '';
 }
 
 interface DeviceToken {
