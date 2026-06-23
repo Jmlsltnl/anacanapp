@@ -1,13 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
+import { mapRowsTranslation } from '@/lib/tr';
 
 // ===========================================
 // SAFETY LOOKUP HOOKS
 // ===========================================
 
 export const useSafetyCategories = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['safety-categories'],
+    queryKey: ['safety-categories', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('safety_categories')
@@ -15,14 +18,15 @@ export const useSafetyCategories = () => {
         .eq('is_active', true)
         .order('sort_order');
       if (error) throw error;
-      return data;
+      return mapRowsTranslation(data, language, ['name']);
     },
   });
 };
 
 export const useSafetyItems = (categoryId?: string) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['safety-items', categoryId],
+    queryKey: ['safety-items', categoryId, language],
     queryFn: async () => {
       let query = supabase
         .from('safety_items')
@@ -36,7 +40,7 @@ export const useSafetyItems = (categoryId?: string) => {
       
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      return mapRowsTranslation(data, language, ['name', 'description', 'hazard_notes', 'tips']);
     },
   });
 };
@@ -46,8 +50,9 @@ export const useSafetyItems = (categoryId?: string) => {
 // ===========================================
 
 export const useShopCategories = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['shop-categories'],
+    queryKey: ['shop-categories', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('shop_categories')
@@ -55,7 +60,7 @@ export const useShopCategories = () => {
         .eq('is_active', true)
         .order('sort_order');
       if (error) throw error;
-      return data;
+      return mapRowsTranslation(data, language, ['name']);
     },
   });
 };
@@ -65,22 +70,24 @@ export const useShopCategories = () => {
 // ===========================================
 
 export const useNutritionTargets = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['nutrition-targets'],
+    queryKey: ['nutrition-targets', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('nutrition_targets')
         .select('*')
         .eq('is_active', true);
       if (error) throw error;
-      return data;
+      return mapRowsTranslation(data, language, ['title', 'description']);
     },
   });
 };
 
 export const useMealTypes = (lifeStage?: string) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['meal-types', lifeStage],
+    queryKey: ['meal-types', lifeStage, language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('meal_types')
@@ -89,17 +96,19 @@ export const useMealTypes = (lifeStage?: string) => {
         .order('sort_order');
       if (error) throw error;
       
-      if (lifeStage && data) {
-        return data.filter(m => m.life_stages?.includes(lifeStage));
+      const mapped = mapRowsTranslation(data, language, ['name']);
+      if (lifeStage && mapped) {
+        return mapped.filter(m => m.life_stages?.includes(lifeStage));
       }
-      return data;
+      return mapped;
     },
   });
 };
 
 export const useRecipeCategories = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['recipe-categories'],
+    queryKey: ['recipe-categories', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('recipe_categories')
@@ -107,7 +116,7 @@ export const useRecipeCategories = () => {
         .eq('is_active', true)
         .order('sort_order');
       if (error) throw error;
-      return data;
+      return mapRowsTranslation(data, language, ['name']);
     },
   });
 };
@@ -131,8 +140,9 @@ export const useRecipeCategoriesAdmin = () => {
 // ===========================================
 
 export const usePhotoshootBackgrounds = (gender?: string) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['photoshoot-backgrounds', gender],
+    queryKey: ['photoshoot-backgrounds', gender, language],
     queryFn: async () => {
       let query = supabase
         .from('photoshoot_backgrounds')
@@ -144,18 +154,20 @@ export const usePhotoshootBackgrounds = (gender?: string) => {
       const { data, error } = await query;
       if (error) throw error;
       
+      const mapped = mapRowsTranslation(data, language, ['name', 'prompt_text']);
       // Filter by gender: 'all' or 'unisex' means universal, otherwise match specific gender
-      if (gender && data) {
-        return data.filter(bg => bg.gender === 'all' || bg.gender === 'unisex' || bg.gender === gender);
+      if (gender && mapped) {
+        return mapped.filter(bg => bg.gender === 'all' || bg.gender === 'unisex' || bg.gender === gender);
       }
-      return data;
+      return mapped;
     },
   });
 };
 
 export const usePhotoshootEyeColors = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['photoshoot-eye-colors'],
+    queryKey: ['photoshoot-eye-colors', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('photoshoot_eye_colors')
@@ -163,14 +175,15 @@ export const usePhotoshootEyeColors = () => {
         .eq('is_active', true)
         .order('sort_order');
       if (error) throw error;
-      return data;
+      return mapRowsTranslation(data, language, ['name']);
     },
   });
 };
 
 export const usePhotoshootHairColors = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['photoshoot-hair-colors'],
+    queryKey: ['photoshoot-hair-colors', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('photoshoot_hair_colors')
@@ -178,14 +191,15 @@ export const usePhotoshootHairColors = () => {
         .eq('is_active', true)
         .order('sort_order');
       if (error) throw error;
-      return data;
+      return mapRowsTranslation(data, language, ['name']);
     },
   });
 };
 
 export const usePhotoshootHairStyles = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['photoshoot-hair-styles'],
+    queryKey: ['photoshoot-hair-styles', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('photoshoot_hair_styles')
@@ -193,14 +207,15 @@ export const usePhotoshootHairStyles = () => {
         .eq('is_active', true)
         .order('sort_order');
       if (error) throw error;
-      return data;
+      return mapRowsTranslation(data, language, ['name']);
     },
   });
 };
 
 export const usePhotoshootOutfits = (gender?: string) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['photoshoot-outfits', gender],
+    queryKey: ['photoshoot-outfits', gender, language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('photoshoot_outfits')
@@ -209,11 +224,12 @@ export const usePhotoshootOutfits = (gender?: string) => {
         .order('sort_order');
       if (error) throw error;
       
+      const mapped = mapRowsTranslation(data, language, ['name', 'prompt_text']);
       // Filter by gender: 'all' or 'unisex' means universal, otherwise match specific gender
-      if (gender && data) {
-        return data.filter(o => o.gender === 'all' || o.gender === 'unisex' || o.gender === gender);
+      if (gender && mapped) {
+        return mapped.filter(o => o.gender === 'all' || o.gender === 'unisex' || o.gender === gender);
       }
-      return data;
+      return mapped;
     },
   });
 };
@@ -256,8 +272,9 @@ export interface WeightRecommendation {
 }
 
 export const useFaqs = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['faqs'],
+    queryKey: ['faqs', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('faqs')
@@ -265,14 +282,15 @@ export const useFaqs = () => {
         .eq('is_active', true)
         .order('sort_order');
       if (error) throw error;
-      return data as FAQ[];
+      return mapRowsTranslation(data, language, ['question', 'answer']) as FAQ[];
     },
   });
 };
 
 export const useSupportCategories = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['support-categories'],
+    queryKey: ['support-categories', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('support_categories')
@@ -280,14 +298,15 @@ export const useSupportCategories = () => {
         .eq('is_active', true)
         .order('sort_order');
       if (error) throw error;
-      return data as SupportCategory[];
+      return mapRowsTranslation(data, language, ['name']) as SupportCategory[];
     },
   });
 };
 
 export const useWeightRecommendations = (trimester?: number) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['weight-recommendations', trimester],
+    queryKey: ['weight-recommendations', trimester, language],
     queryFn: async () => {
       let query = supabase
         .from('weight_recommendations')
@@ -300,7 +319,7 @@ export const useWeightRecommendations = (trimester?: number) => {
       
       const { data, error } = await query.order('trimester');
       if (error) throw error;
-      return data as WeightRecommendation[];
+      return mapRowsTranslation(data, language, ['description']) as WeightRecommendation[];
     },
   });
 };
@@ -323,8 +342,9 @@ export interface AISuggestedQuestion {
 }
 
 export const useAISuggestedQuestions = (lifeStage: string, userType: 'mother' | 'partner') => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['ai-suggested-questions', lifeStage, userType],
+    queryKey: ['ai-suggested-questions', lifeStage, userType, language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('ai_suggested_questions')
@@ -334,7 +354,7 @@ export const useAISuggestedQuestions = (lifeStage: string, userType: 'mother' | 
         .eq('user_type', userType)
         .order('sort_order');
       if (error) throw error;
-      return data as AISuggestedQuestion[];
+      return mapRowsTranslation(data, language, ['question']) as AISuggestedQuestion[];
     },
   });
 };
@@ -388,8 +408,9 @@ export interface ToolConfig {
 }
 
 export const useToolConfigs = (lifeStage?: string) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['tool-configs', lifeStage],
+    queryKey: ['tool-configs', lifeStage, language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('tool_configs')
@@ -397,8 +418,17 @@ export const useToolConfigs = (lifeStage?: string) => {
         .eq('is_active', true);
       if (error) throw error;
       
+      const mapped = mapRowsTranslation(data, language, [
+        'name',
+        'description',
+        'partner_name',
+        'partner_description',
+        'hero_subtitle',
+        'hero_badge'
+      ]) as ToolConfig[];
+
       // Filter by phase-specific active status
-      let filtered = data as ToolConfig[];
+      let filtered = mapped;
       if (lifeStage === 'flow') {
         filtered = filtered.filter(t => t.flow_active !== false);
       } else if (lifeStage === 'bump') {
@@ -440,8 +470,9 @@ export interface PhotoshootImageStyle {
 }
 
 export const usePhotoshootImageStyles = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['photoshoot-image-styles'],
+    queryKey: ['photoshoot-image-styles', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('photoshoot_image_styles')
@@ -449,7 +480,7 @@ export const usePhotoshootImageStyles = () => {
         .eq('is_active', true)
         .order('sort_order');
       if (error) throw error;
-      return data as PhotoshootImageStyle[];
+      return mapRowsTranslation(data, language, ['style_name']) as PhotoshootImageStyle[];
     },
   });
 };
@@ -471,8 +502,9 @@ export interface HospitalBagTemplate {
 }
 
 export const useHospitalBagTemplates = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['hospital-bag-templates'],
+    queryKey: ['hospital-bag-templates', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('hospital_bag_templates')
@@ -480,7 +512,7 @@ export const useHospitalBagTemplates = () => {
         .eq('is_active', true)
         .order('sort_order');
       if (error) throw error;
-      return data as HospitalBagTemplate[];
+      return mapRowsTranslation(data, language, ['item_name', 'notes']) as HospitalBagTemplate[];
     },
   });
 };

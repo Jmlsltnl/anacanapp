@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useUserStore } from '@/store/userStore';
+import { mapRowsTranslation } from '@/lib/tr';
 
 export interface VaccineCountry {
   id: string;
@@ -67,9 +69,10 @@ export interface VaccineScheduleRow extends VaccineSchedule {
   status?: ChildVaccination | null;
 }
 
-export const useVaccineCountries = () =>
-  useQuery({
-    queryKey: ['vaccine-countries'],
+export const useVaccineCountries = () => {
+  const language = useUserStore((state) => state.language);
+  return useQuery({
+    queryKey: ['vaccine-countries', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('vaccine_countries' as any)
@@ -77,13 +80,15 @@ export const useVaccineCountries = () =>
         .eq('is_active', true)
         .order('sort_order');
       if (error) throw error;
-      return (data || []) as unknown as VaccineCountry[];
+      return mapRowsTranslation(data, language, ['name']) as unknown as VaccineCountry[];
     },
   });
+};
 
-export const useVaccineScheduleForCountry = (countryCode: string | null) =>
-  useQuery({
-    queryKey: ['vaccine-schedule', countryCode],
+export const useVaccineScheduleForCountry = (countryCode: string | null) => {
+  const language = useUserStore((state) => state.language);
+  return useQuery({
+    queryKey: ['vaccine-schedule', countryCode, language],
     enabled: !!countryCode,
     queryFn: async () => {
       const { data: vaccines, error: vErr } = await supabase
@@ -101,15 +106,30 @@ export const useVaccineScheduleForCountry = (countryCode: string | null) =>
         .order('recommended_age_days');
       if (sErr) throw sErr;
 
-      const vMap = new Map(
-        ((vaccines || []) as unknown as Vaccine[]).map(v => [v.id, v])
-      );
-      const rows: VaccineScheduleRow[] = ((schedules || []) as unknown as VaccineSchedule[])
+      const mappedVaccines = mapRowsTranslation(vaccines, language, [
+        'name',
+        'short_description',
+        'full_description',
+        'disease',
+        'route',
+        'side_effects',
+        'contraindications'
+      ]) as unknown as Vaccine[];
+
+      const mappedSchedules = mapRowsTranslation(schedules, language, [
+        'dose_label',
+        'age_label',
+        'notes'
+      ]) as unknown as VaccineSchedule[];
+
+      const vMap = new Map(mappedVaccines.map(v => [v.id, v]));
+      const rows: VaccineScheduleRow[] = mappedSchedules
         .filter(s => vMap.has(s.vaccine_id))
         .map(s => ({ ...s, vaccine: vMap.get(s.vaccine_id)! }));
       return rows;
     },
   });
+};
 
 export const useChildVaccinations = (childId: string | null) => {
   const { user } = useAuth();

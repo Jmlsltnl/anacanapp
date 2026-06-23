@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
+import { mapRowsTranslation } from '@/lib/tr';
 
 export interface FirstAidScenario {
   id: string;
@@ -28,8 +30,9 @@ export interface FirstAidStep {
 }
 
 export const useFirstAidScenarios = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['first-aid-scenarios'],
+    queryKey: ['first-aid-scenarios', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('first_aid_scenarios')
@@ -38,7 +41,7 @@ export const useFirstAidScenarios = () => {
         .order('sort_order');
 
       if (error) throw error;
-      return data as FirstAidScenario[];
+      return mapRowsTranslation(data, language, ['title', 'description']) as FirstAidScenario[];
     },
     staleTime: 1000 * 60 * 60, // 1 hour - this data rarely changes
     gcTime: 1000 * 60 * 60 * 24, // Keep in cache for 24 hours for offline
@@ -46,8 +49,9 @@ export const useFirstAidScenarios = () => {
 };
 
 export const useFirstAidSteps = (scenarioId: string) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['first-aid-steps', scenarioId],
+    queryKey: ['first-aid-steps', scenarioId, language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('first_aid_steps')
@@ -56,7 +60,7 @@ export const useFirstAidSteps = (scenarioId: string) => {
         .order('step_number');
 
       if (error) throw error;
-      return data as FirstAidStep[];
+      return mapRowsTranslation(data, language, ['title', 'instruction']) as FirstAidStep[];
     },
     enabled: !!scenarioId,
     staleTime: 1000 * 60 * 60,
@@ -66,10 +70,12 @@ export const useFirstAidSteps = (scenarioId: string) => {
 
 // Preload all first aid data for offline use
 export const usePreloadFirstAidData = () => {
-  const { data: scenarios } = useFirstAidScenarios();
+  const scenariosQuery = useFirstAidScenarios();
+  const scenarios = scenariosQuery.data;
+  const language = useUserStore((state) => state.language);
 
   return useQuery({
-    queryKey: ['first-aid-all-steps'],
+    queryKey: ['first-aid-all-steps', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('first_aid_steps')
@@ -78,7 +84,7 @@ export const usePreloadFirstAidData = () => {
         .order('step_number');
 
       if (error) throw error;
-      return data as FirstAidStep[];
+      return mapRowsTranslation(data, language, ['title', 'instruction']) as FirstAidStep[];
     },
     enabled: !!scenarios?.length,
     staleTime: 1000 * 60 * 60,

@@ -1,6 +1,8 @@
-import { tr } from "@/lib/tr";import { useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { FRUIT_SIZES } from '@/types/anacan';
+import { tr, mapRowsTranslation } from "@/lib/tr";
+import { useUserStore } from "@/store/userStore";
 
 interface FruitImage {
   week_number: number;
@@ -22,8 +24,9 @@ interface FruitData {
 
 // Fetch all fruit images from database
 export const useFruitImages = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['fruit-images'],
+    queryKey: ['fruit-images', language],
     queryFn: async () => {
       const { data, error } = await supabase.
       from('fruit_size_images').
@@ -35,7 +38,7 @@ export const useFruitImages = () => {
         return [];
       }
 
-      return data as FruitImage[];
+      return mapRowsTranslation(data, language, ['fruit_name']) as FruitImage[];
     },
     staleTime: 1000 * 60 * 30 // 30 minutes
   });

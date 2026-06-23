@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { tr } from '@/lib/tr';
+import { tr, mapRowsTranslation } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useUserStore } from '@/store/userStore';
 
 // ============ EXERCISES ============
 export interface Exercise {
@@ -20,8 +21,9 @@ export interface Exercise {
 }
 
 export const useExercises = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['exercises'],
+    queryKey: ['exercises', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('exercises')
@@ -30,7 +32,8 @@ export const useExercises = () => {
         .order('sort_order');
       
       if (error) throw error;
-      return (data || []).map(e => ({
+      const mapped = mapRowsTranslation(data, language, ['name', 'description', 'steps']);
+      return mapped.map(e => ({
         ...e,
         steps: Array.isArray(e.steps) ? e.steps : JSON.parse(e.steps as string || '[]')
       })) as Exercise[];
@@ -55,8 +58,9 @@ export interface WhiteNoiseSound {
 }
 
 export const useWhiteNoiseSounds = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['white-noise-sounds'],
+    queryKey: ['white-noise-sounds', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('white_noise_sounds')
@@ -65,7 +69,7 @@ export const useWhiteNoiseSounds = () => {
         .order('sort_order');
       
       if (error) throw error;
-      return data as WhiteNoiseSound[];
+      return mapRowsTranslation(data, language, ['name', 'description']) as WhiteNoiseSound[];
     },
     staleTime: 1000 * 60 * 10,
   });
@@ -86,8 +90,9 @@ export interface PhotoshootTheme {
 }
 
 export const usePhotoshootThemes = (category?: string) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['photoshoot-themes', category],
+    queryKey: ['photoshoot-themes', category, language],
     queryFn: async () => {
       let query = supabase
         .from('photoshoot_themes')
@@ -101,7 +106,7 @@ export const usePhotoshootThemes = (category?: string) => {
       
       const { data, error } = await query;
       if (error) throw error;
-      return data as PhotoshootTheme[];
+      return mapRowsTranslation(data, language, ['name', 'prompt_text']) as PhotoshootTheme[];
     },
     staleTime: 1000 * 60 * 10,
   });
@@ -125,8 +130,9 @@ export interface SurpriseIdea {
 }
 
 export const useSurpriseIdeas = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['surprise-ideas'],
+    queryKey: ['surprise-ideas', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('surprise_ideas')
@@ -135,7 +141,7 @@ export const useSurpriseIdeas = () => {
         .order('sort_order');
       
       if (error) throw error;
-      return data as SurpriseIdea[];
+      return mapRowsTranslation(data, language, ['title', 'description']) as SurpriseIdea[];
     },
     staleTime: 1000 * 60 * 10,
   });
@@ -156,8 +162,9 @@ export interface BabyMilestoneDB {
 }
 
 export const useBabyMilestonesDB = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['baby-milestones-db'],
+    queryKey: ['baby-milestones-db', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('baby_milestones_db')
@@ -166,7 +173,7 @@ export const useBabyMilestonesDB = () => {
         .order('sort_order');
       
       if (error) throw error;
-      return data as BabyMilestoneDB[];
+      return mapRowsTranslation(data, language, ['label', 'description']) as BabyMilestoneDB[];
     },
     staleTime: 1000 * 60 * 10,
   });
@@ -185,8 +192,9 @@ export interface Symptom {
 }
 
 export const useSymptoms = (lifeStage?: string) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['symptoms', lifeStage],
+    queryKey: ['symptoms', lifeStage, language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('symptoms')
@@ -196,7 +204,7 @@ export const useSymptoms = (lifeStage?: string) => {
       
       if (error) throw error;
       
-      let symptoms = data as Symptom[];
+      let symptoms = mapRowsTranslation(data, language, ['label']) as Symptom[];
       if (lifeStage) {
         symptoms = symptoms.filter(s => s.life_stages.includes(lifeStage));
       }
@@ -218,8 +226,9 @@ export interface MoodOption {
 }
 
 export const useMoodOptions = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['mood-options'],
+    queryKey: ['mood-options', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('mood_options')
@@ -228,7 +237,7 @@ export const useMoodOptions = () => {
         .order('value');
       
       if (error) throw error;
-      return data as MoodOption[];
+      return mapRowsTranslation(data, language, ['label']) as MoodOption[];
     },
     staleTime: 1000 * 60 * 10,
   });
@@ -248,8 +257,9 @@ export interface CommonFood {
 }
 
 export const useCommonFoods = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['common-foods'],
+    queryKey: ['common-foods', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('common_foods')
@@ -258,7 +268,7 @@ export const useCommonFoods = () => {
         .order('sort_order');
       
       if (error) throw error;
-      return data as CommonFood[];
+      return mapRowsTranslation(data, language, ['name']) as CommonFood[];
     },
     staleTime: 1000 * 60 * 10,
   });
@@ -276,8 +286,9 @@ export interface ShopCategory {
 }
 
 export const useShopCategories = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['shop-categories'],
+    queryKey: ['shop-categories', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('shop_categories')
@@ -286,11 +297,12 @@ export const useShopCategories = () => {
         .order('sort_order');
       
       if (error) throw error;
-      return data as ShopCategory[];
+      return mapRowsTranslation(data, language, ['name']) as ShopCategory[];
     },
     staleTime: 1000 * 60 * 10,
   });
 };
+
 
 // ============ ADMIN HOOKS ============
 export const useExercisesAdmin = () => {

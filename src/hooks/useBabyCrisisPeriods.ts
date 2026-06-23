@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
+import { mapRowsTranslation } from '@/lib/tr';
 
 export interface BabyCrisisPeriod {
   id: string;
@@ -25,8 +27,9 @@ export interface BabyCrisisPeriod {
 }
 
 export const useBabyCrisisPeriods = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['baby-crisis-periods'],
+    queryKey: ['baby-crisis-periods', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('baby_crisis_periods')
@@ -35,7 +38,7 @@ export const useBabyCrisisPeriods = () => {
         .order('week_start');
       
       if (error) throw error;
-      return (data || []) as BabyCrisisPeriod[];
+      return mapRowsTranslation(data, language, ['title', 'description', 'symptoms', 'tips']) as BabyCrisisPeriod[];
     },
     staleTime: 1000 * 60 * 30,
   });

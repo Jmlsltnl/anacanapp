@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
+import { mapRowsTranslation } from '@/lib/tr';
 
 export interface Vitamin {
   id: string;
@@ -24,8 +26,9 @@ export interface Vitamin {
 
 // Fetch vitamins for a specific week and life stage
 export const useVitamins = (weekNumber?: number, lifeStage?: string) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['vitamins', weekNumber, lifeStage],
+    queryKey: ['vitamins', weekNumber, lifeStage, language],
     queryFn: async () => {
       let query = (supabase as any)
         .from('vitamins')
@@ -40,8 +43,17 @@ export const useVitamins = (weekNumber?: number, lifeStage?: string) => {
       const { data, error } = await query;
       if (error) throw error;
 
+      const mapped = mapRowsTranslation(data, language, [
+        'name',
+        'description',
+        'benefits',
+        'food_sources',
+        'dosage',
+        'importance'
+      ]) as Vitamin[];
+
       // Filter vitamins based on week number if provided
-      let vitamins = (data || []) as Vitamin[];
+      let vitamins = mapped;
       
       if (weekNumber && lifeStage === 'bump') {
         const currentTrimester = weekNumber <= 13 ? 1 : weekNumber <= 26 ? 2 : 3;

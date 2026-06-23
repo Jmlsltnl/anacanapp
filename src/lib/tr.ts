@@ -29,3 +29,37 @@ export function tr(key: string, defaultValue: string): string {
   const lang = getPersistedLanguage();
   return getCachedTranslation(key, lang) || defaultValue;
 }
+
+/**
+ * Maps translatable fields on a database row to the current language.
+ * Checks for field_lang first, then field_az, and finally defaults to the base field value.
+ */
+export function mapRowTranslation<T extends Record<string, any>>(
+  row: T | null | undefined,
+  language: string,
+  fields: string[]
+): T | null {
+  if (!row) return null;
+  const result = { ...row } as any;
+  for (const field of fields) {
+    if (language === 'az') {
+      result[field] = row[`${field}_az`] ?? row[field];
+    } else {
+      result[field] = row[`${field}_${language}`] ?? row[`${field}_az`] ?? row[field];
+    }
+  }
+  return result as T;
+}
+
+/**
+ * Maps translatable fields on an array of database rows to the current language.
+ */
+export function mapRowsTranslation<T extends Record<string, any>>(
+  rows: T[] | null | undefined,
+  language: string,
+  fields: string[]
+): T[] {
+  if (!rows) return [];
+  return rows.map(row => mapRowTranslation(row, language, fields) as T);
+}
+

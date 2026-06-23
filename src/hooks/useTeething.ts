@@ -1,7 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useChildren } from './useChildren';
+import { useUserStore } from '@/store/userStore';
+import { mapRowsTranslation } from '@/lib/tr';
 
 export interface BabyTooth {
   id: string;
@@ -64,6 +66,19 @@ export const useTeething = () => {
   const [tips, setTips] = useState<TeethingCareTip[]>([]);
   const [symptoms, setSymptoms] = useState<TeethingSymptom[]>([]);
   const [loading, setLoading] = useState(true);
+  const language = useUserStore((state) => state.language);
+
+  const mappedTeeth = useMemo(() => {
+    return mapRowsTranslation(teeth, language, ['name', 'description']) as BabyTooth[];
+  }, [teeth, language]);
+
+  const mappedTips = useMemo(() => {
+    return mapRowsTranslation(tips, language, ['title', 'content']) as TeethingCareTip[];
+  }, [tips, language]);
+
+  const mappedSymptoms = useMemo(() => {
+    return mapRowsTranslation(symptoms, language, ['name', 'description', 'relief_tips']) as TeethingSymptom[];
+  }, [symptoms, language]);
 
   const fetchTeeth = useCallback(async () => {
     const { data, error } = await supabase
@@ -198,10 +213,10 @@ export const useTeething = () => {
   const progress = totalTeeth > 0 ? (emergedCount / totalTeeth) * 100 : 0;
 
   return {
-    teeth,
+    teeth: mappedTeeth,
     logs,
-    tips,
-    symptoms,
+    tips: mappedTips,
+    symptoms: mappedSymptoms,
     loading,
     toggleTooth,
     updateToothNote,

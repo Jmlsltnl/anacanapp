@@ -5,6 +5,7 @@ import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { useBabyMilestonesDB } from './useDynamicConfig';
 import { useChildren } from './useChildren';
+import { useUserStore } from '@/store/userStore';
 
 export interface BabyMilestone {
   id: string;
@@ -23,20 +24,25 @@ export const useBabyMilestones = () => {
   const [milestones, setMilestones] = useState<BabyMilestone[]>([]);
   const [loading, setLoading] = useState(true);
   const { data: dbMilestones, isLoading: dbLoading } = useBabyMilestonesDB();
+  const language = useUserStore((state) => state.language);
 
   // Map DB milestones to the format expected by components (no fallback needed - DB is the source)
   const MILESTONES = useMemo(() => {
     if (!dbMilestones || dbMilestones.length === 0) {
       return [];
     }
-    return dbMilestones.map((m) => ({
-      id: m.milestone_key,
-      week: m.week_number,
-      label: m.label_az || m.label,
-      emoji: m.emoji,
-      description: m.description_az || m.description
-    }));
-  }, [dbMilestones]);
+    return dbMilestones.map((m) => {
+      const label = language === 'az' ? (m.label_az || m.label) : ((m as any)[`label_${language}`] || m.label_az || m.label);
+      const description = language === 'az' ? (m.description_az || m.description) : ((m as any)[`description_${language}`] || m.description_az || m.description);
+      return {
+        id: m.milestone_key,
+        week: m.week_number,
+        label,
+        emoji: m.emoji,
+        description
+      };
+    });
+  }, [dbMilestones, language]);
 
   const fetchMilestones = useCallback(async () => {
     if (!user) return;

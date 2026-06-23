@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
+import { mapRowsTranslation } from '@/lib/tr';
 
 export interface DevelopmentTip {
   id: string;
@@ -15,8 +17,9 @@ export interface DevelopmentTip {
 }
 
 export const useDevelopmentTips = (ageGroup?: string) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['development-tips', ageGroup],
+    queryKey: ['development-tips', ageGroup, language],
     queryFn: async () => {
       let query = supabase
         .from('development_tips')
@@ -30,7 +33,7 @@ export const useDevelopmentTips = (ageGroup?: string) => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as DevelopmentTip[];
+      return mapRowsTranslation(data, language, ['title', 'content']) as DevelopmentTip[];
     },
   });
 };
