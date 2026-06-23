@@ -496,6 +496,11 @@ function ActionDialog({
         </DialogHeader>
         {row && <p className="text-xs text-muted-foreground -mt-2">{row.vaccine.name} • {row.dose_label}</p>}
         {mode === 'done' ?
+          <div className="space-y-3 mt-2">
+            <div>
+              <Label className="text-xs">{tr("untranslated_tarix_6hhkyx", "Tarix")}</Label>
+              <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} max={today} />
+            </div>
             <div>
               <Label className="text-xs">{tr("vaccinecalendar_yer_xestexana_klinika_d8c111", "Yer (x\u0259st\u0259xana/klinika)")}</Label>
               <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder={tr("vaccinecalendar_mes_baki_usaq_klinik_xestexana_8a2157", "m\u0259s. Bak\u0131 U\u015Faq Klinik X\u0259st\u0259xanas\u0131")} />

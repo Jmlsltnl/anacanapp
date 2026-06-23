@@ -306,8 +306,6 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               animate={{ opacity: 1, y: 0 }}>
               
                 <Card>
-              
-                <Card>
                   <CardContent className="p-4">
                     <div className="flex gap-3">
                       <div className="text-2xl">{tip.emoji || '💡'}</div>
@@ -351,13 +349,19 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
                           {symptom.description}
                         </p>
                         {symptom.relief_tips && symptom.relief_tips.length > 0 &&
-                      <div className="flex flex-wrap gap-1">
+                        <div className="flex flex-wrap gap-1">
                             {symptom.relief_tips.map((tip, i) =>
-                        <Badge key={i} variant="secondary" className="text-[10px]">
+                            <Badge key={i} variant="secondary" className="text-[10px]">
                                 {tip}
                               </Badge>
-                        )}
+                            )}
                           </div>
+                        }
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             )}
           </TabsContent>
         </Tabs>

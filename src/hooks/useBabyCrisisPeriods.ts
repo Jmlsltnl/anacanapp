@@ -70,17 +70,19 @@ export const useUpcomingBabyCrises = (babyAgeWeeks: number, limit = 3) => {
 
 // Admin hooks
 export const useAllBabyCrisisPeriods = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['baby-crisis-periods', 'all'],
+    queryKey: ['baby-crisis-periods', 'all', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('baby_crisis_periods')
         .select('*')
         .order('week_start');
-      
+
       if (error) throw error;
-      return (data || []) as BabyCrisisPeriod[];
+      return mapRowsTranslation(data, language, ['title', 'description', 'symptoms', 'tips']) as BabyCrisisPeriod[];
     },
+    staleTime: 1000 * 60 * 30,
   });
 };
 

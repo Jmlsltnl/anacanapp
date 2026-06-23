@@ -64,10 +64,11 @@ const VitaminsTab = ({ className }: VitaminsTabProps) => {
           
           {/* Dosage */}
           {vitamin.dosage &&
+            <div className="mt-2 flex items-center gap-1 text-[10px] text-primary font-medium">
               <Pill className="w-3 h-3" />
               {vitamin.dosage}
             </div>
-        }
+          }
         </div>
       </div>
 

@@ -219,6 +219,8 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
                 </motion.div>
             }
             </AnimatePresence>
+          </div>
+        }
 
         {/* Unchecked items */}
         <div className="space-y-1.5 mb-3">

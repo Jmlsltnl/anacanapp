@@ -522,8 +522,6 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
               <Phone className="w-5 h-5 text-red-500" />
               {tr("mentalhealthtracker_tecili_yardim_283100", "T\u0259cili Yard\u0131m")}
             </h3>
-              {tr("mentalhealthtracker_tecili_yardim_283100", "Təcili Yardım")}
-            </h3>
             <div className="space-y-2">
               {emergencyResources.map((resource) =>
             <div key={resource.id} className="bg-red-50 dark:bg-red-900/20 rounded-2xl p-4 border border-red-200 dark:border-red-800">

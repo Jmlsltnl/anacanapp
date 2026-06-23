@@ -315,6 +315,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                 }
                 </AnimatePresence>
               </motion.div>
+            )}
             {/* DSMF Contact */}
             <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl p-4 border border-primary/20">
               <div className="flex items-center gap-3">
