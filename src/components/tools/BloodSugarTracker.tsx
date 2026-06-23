@@ -328,7 +328,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
 
       {/* Add Modal */}
       {showAddModal &&
-      <div className="fixed inset-0 z-50 bg-black/50 flex items-end">
+      <div className="fixed inset-0 z-[60] bg-black/50 flex items-end">
           <motion.div
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
