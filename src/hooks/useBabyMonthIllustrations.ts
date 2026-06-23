@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
+import { mapRowsTranslation } from '@/lib/tr';
 
 // Default placeholder for months without illustrations
 export const DEFAULT_BABY_ILLUSTRATION = '/placeholder.svg';
@@ -20,8 +22,9 @@ export interface BabyMonthIllustration {
 }
 
 export const useBabyMonthIllustrations = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['baby-month-illustrations'],
+    queryKey: ['baby-month-illustrations', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('baby_month_illustrations')
@@ -30,7 +33,7 @@ export const useBabyMonthIllustrations = () => {
         .order('month_number');
       
       if (error) throw error;
-      return (data || []) as BabyMonthIllustration[];
+      return mapRowsTranslation(data, language, ['title', 'description']) as BabyMonthIllustration[];
     },
     staleTime: 1000 * 60 * 30, // Cache for 30 mins
   });
@@ -43,8 +46,8 @@ export const useBabyIllustrationByMonth = (monthNumber: number) => {
     const illustration = illustrations.find(i => i.month_number === monthNumber);
     return {
       imageUrl: illustration?.image_url || DEFAULT_BABY_ILLUSTRATION,
-      title: illustration?.title_az || illustration?.title || null,
-      description: illustration?.description_az || illustration?.description || null,
+      title: illustration?.title || null,
+      description: illustration?.description || null,
       hasIllustration: !!illustration
     };
   }, [illustrations, monthNumber]);

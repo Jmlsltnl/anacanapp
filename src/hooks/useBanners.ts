@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
+import { mapRowsTranslation } from '@/lib/tr';
 
 export type BannerPlacement = 
   | 'home_top' 
@@ -38,11 +40,12 @@ export interface Banner {
   view_count: number;
   created_at: string;
   updated_at: string;
-}
+  }
 
 export const useBanners = (placement?: BannerPlacement) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['banners', placement],
+    queryKey: ['banners', placement, language],
     queryFn: async () => {
       let query = supabase
         .from('banners')
@@ -56,7 +59,7 @@ export const useBanners = (placement?: BannerPlacement) => {
       
       const { data, error } = await query;
       if (error) throw error;
-      return (data || []) as Banner[];
+      return mapRowsTranslation(data, language, ['title', 'description', 'button_text']) as Banner[];
     }
   });
 };

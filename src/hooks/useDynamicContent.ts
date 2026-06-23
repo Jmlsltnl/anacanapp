@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
+import { mapRowsTranslation } from '@/lib/tr';
 
 // Types for dynamic content - matching database schema
 export interface Recipe {
@@ -74,12 +76,14 @@ export interface WeeklyTip {
   title: string;
   content: string | null;
   is_active: boolean;
+  tips?: any;
 }
 
 // Hooks for fetching dynamic content
 export const useRecipes = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['recipes'],
+    queryKey: ['recipes', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('admin_recipes')
@@ -88,8 +92,10 @@ export const useRecipes = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      
+      const mapped = mapRowsTranslation(data, language, ['title', 'description', 'category', 'ingredients', 'instructions', 'tags']);
       // Map DB data to our interface with defaults for missing fields
-      return (data || []).map(item => ({
+      return mapped.map(item => ({
         ...item,
         ingredients: Array.isArray(item.ingredients) ? item.ingredients as string[] : [],
         instructions: Array.isArray(item.instructions) ? item.instructions as string[] : [],
@@ -104,8 +110,9 @@ export const useRecipes = () => {
 };
 
 export const useSafetyItems = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['safety_items'],
+    queryKey: ['safety_items', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('safety_items')
@@ -114,15 +121,16 @@ export const useSafetyItems = () => {
         .order('name_az', { ascending: true });
 
       if (error) throw error;
-      return (data || []) as SafetyItem[];
+      return mapRowsTranslation(data, language, ['name', 'description']) as SafetyItem[];
     },
     staleTime: 1000 * 60 * 5,
   });
 };
 
 export const useBabyNames = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['baby_names'],
+    queryKey: ['baby_names', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('baby_names_db')
@@ -131,15 +139,16 @@ export const useBabyNames = () => {
         .order('popularity', { ascending: false });
 
       if (error) throw error;
-      return (data || []) as BabyName[];
+      return mapRowsTranslation(data, language, ['meaning']) as BabyName[];
     },
     staleTime: 1000 * 60 * 5,
   });
 };
 
 export const useHospitalBagTemplates = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['hospital_bag_templates'],
+    queryKey: ['hospital_bag_templates', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('hospital_bag_templates')
@@ -148,15 +157,16 @@ export const useHospitalBagTemplates = () => {
         .order('sort_order', { ascending: true });
 
       if (error) throw error;
-      return (data || []) as HospitalBagItem[];
+      return mapRowsTranslation(data, language, ['item_name']) as HospitalBagItem[];
     },
     staleTime: 1000 * 60 * 5,
   });
 };
 
 export const useNutritionTips = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['nutrition_tips'],
+    queryKey: ['nutrition_tips', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('nutrition_tips')
@@ -165,8 +175,10 @@ export const useNutritionTips = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      
+      const mapped = mapRowsTranslation(data, language, ['title', 'content']);
       // Map DB data to our interface with defaults
-      return (data || []).map(item => ({
+      return mapped.map(item => ({
         ...item,
         nutrients: Array.isArray(item.nutrients) ? item.nutrients as string[] : [],
         emoji: '🍎', // Default emoji
@@ -178,8 +190,9 @@ export const useNutritionTips = () => {
 };
 
 export const useWeeklyTips = (weekNumber?: number, lifeStage?: string) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['weekly_tips', weekNumber, lifeStage],
+    queryKey: ['weekly_tips', weekNumber, lifeStage, language],
     queryFn: async () => {
       let query = supabase
         .from('weekly_tips')
@@ -196,7 +209,7 @@ export const useWeeklyTips = (weekNumber?: number, lifeStage?: string) => {
       const { data, error } = await query.order('week_number', { ascending: true });
 
       if (error) throw error;
-      return (data || []) as WeeklyTip[];
+      return mapRowsTranslation(data, language, ['title', 'content', 'tips']) as WeeklyTip[];
     },
     staleTime: 1000 * 60 * 5,
   });

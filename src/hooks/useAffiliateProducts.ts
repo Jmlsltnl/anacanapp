@@ -1,8 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { tr } from '@/lib/tr';
+import { tr, mapRowsTranslation, mapRowTranslation } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useUserStore } from '@/store/userStore';
 
 export interface AffiliateProduct {
   id: string;
@@ -38,8 +39,9 @@ export interface AffiliateProduct {
 }
 
 export const useAffiliateProducts = (lifeStage?: string) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['affiliate-products', lifeStage],
+    queryKey: ['affiliate-products', lifeStage, language],
     queryFn: async () => {
       const { data, error } = await supabase.
       from('affiliate_products').
@@ -50,7 +52,8 @@ export const useAffiliateProducts = (lifeStage?: string) => {
 
       if (error) throw error;
 
-      let products = (data || []) as AffiliateProduct[];
+      const mapped = mapRowsTranslation(data, language, ['name', 'description', 'category', 'review_summary']) as AffiliateProduct[];
+      let products = mapped;
 
       // Filter by life stage if provided
       if (lifeStage) {
@@ -63,8 +66,9 @@ export const useAffiliateProducts = (lifeStage?: string) => {
 };
 
 export const useAffiliateProduct = (productId: string | null) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['affiliate-product', productId],
+    queryKey: ['affiliate-product', productId, language],
     queryFn: async () => {
       if (!productId) return null;
 
@@ -75,7 +79,7 @@ export const useAffiliateProduct = (productId: string | null) => {
       maybeSingle();
 
       if (error) throw error;
-      return data as AffiliateProduct | null;
+      return mapRowTranslation(data, language, ['name', 'description', 'category', 'review_summary']) as AffiliateProduct | null;
     },
     enabled: !!productId
   });
@@ -83,9 +87,10 @@ export const useAffiliateProduct = (productId: string | null) => {
 
 export const useSavedProducts = () => {
   const { user } = useAuth();
+  const language = useUserStore((state) => state.language);
 
   return useQuery({
-    queryKey: ['saved-affiliate-products', user?.id],
+    queryKey: ['saved-affiliate-products', user?.id, language],
     queryFn: async () => {
       if (!user?.id) return [];
 
@@ -100,11 +105,14 @@ export const useSavedProducts = () => {
       order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data?.map((item) => ({
-        savedId: item.id,
-        savedAt: item.created_at,
-        ...(item.product as unknown as AffiliateProduct)
-      })) || [];
+      return data?.map((item) => {
+        const product = mapRowTranslation(item.product as any, language, ['name', 'description', 'category', 'review_summary']);
+        return {
+          savedId: item.id,
+          savedAt: item.created_at,
+          ...(product as unknown as AffiliateProduct)
+        };
+      }) || [];
     },
     enabled: !!user?.id
   });

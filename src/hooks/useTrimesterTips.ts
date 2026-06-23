@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
+import { mapRowsTranslation } from '@/lib/tr';
 
 export interface TrimesterTip {
   id: string;
@@ -14,8 +16,9 @@ export interface TrimesterTip {
 
 // Fetch tips by trimester
 export const useTrimesterTips = (trimester?: number) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['trimester_tips', trimester],
+    queryKey: ['trimester_tips', trimester, language],
     queryFn: async () => {
       let query = (supabase as any)
         .from('trimester_tips')
@@ -29,7 +32,7 @@ export const useTrimesterTips = (trimester?: number) => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return (data || []) as TrimesterTip[];
+      return mapRowsTranslation(data, language, ['tip_text']) as TrimesterTip[];
     },
     staleTime: 1000 * 60 * 5,
   });
