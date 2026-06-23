@@ -67,6 +67,14 @@ const TABLE_LABELS: Record<string, string> = {
   ai_suggested_questions: 'ai_suggested_questions (Süni intellekt sualları)'
 };
 
+const TABLE_PRIMARY_KEYS: Record<string, string> = {
+  translations: 'key',
+  mommy_daily_messages: 'day_number',
+  baby_daily_info: 'day_number',
+  pregnancy_daily_content: 'pregnancy_day',
+  weekly_tips: 'week_number',
+};
+
 
 const AdminTranslations = () => {
   const queryClient = useQueryClient();
@@ -172,6 +180,16 @@ const AdminTranslations = () => {
     enabled: !!uploadTable && (uploadTable !== 'custom' || !!customTable),
     retry: false
   });
+
+  const dbIdColumn = useMemo(() => {
+    if (dbConstraints && dbConstraints.length > 0) {
+      const pk = dbConstraints.find(c => c.constraint_type === 'PRIMARY KEY');
+      if (pk) return pk.column_name;
+      return dbConstraints[0].column_name;
+    }
+    const targetTable = uploadTable === 'custom' ? customTable.trim() : uploadTable;
+    return TABLE_PRIMARY_KEYS[targetTable] || 'id';
+  }, [dbConstraints, uploadTable, customTable]);
 
   // Reset preview and selections on table change
   useEffect(() => {
@@ -346,7 +364,7 @@ const AdminTranslations = () => {
 
     try {
       // 1. Fetch existing rows (selecting ID and update columns to optimize)
-      let query = supabase.from(targetTable).select([idColumn, ...selectedUpdateColumns].join(', '));
+      let query = supabase.from(targetTable).select([dbIdColumn, ...selectedUpdateColumns].join(', '));
       
       // If translations table, filter by language to prevent getting too many rows
       if (targetTable === 'translations') {
@@ -359,7 +377,7 @@ const AdminTranslations = () => {
         throw new Error(`Məlumat bazasından oxuma xətası: ${dbErr.message}`);
       }
 
-      const dbMap = new Map(dbData?.map(r => [String(r[idColumn]), r]) || []);
+      const dbMap = new Map(dbData?.map(r => [String(r[dbIdColumn]), r]) || []);
 
       const batchSize = 100;
       for (let i = 0; i < parsedRows.length; i += batchSize) {
@@ -428,7 +446,7 @@ const AdminTranslations = () => {
             }
           } else {
             // New record insertion
-            const dbIdCol = dbColumns.find(c => c.column_name === idColumn);
+            const dbIdCol = dbColumns.find(c => c.column_name === dbIdColumn);
             let castedIdVal: any = idVal;
             if (dbIdCol) {
               const type = dbIdCol.data_type.toLowerCase();
@@ -436,13 +454,13 @@ const AdminTranslations = () => {
                 castedIdVal = parseInt(idVal);
               }
             } else {
-              if (idColumn === 'day_number' || idColumn === 'pregnancy_day' || idColumn === 'week_number') {
+              if (dbIdColumn === 'day_number' || dbIdColumn === 'pregnancy_day' || dbIdColumn === 'week_number') {
                 castedIdVal = parseInt(idVal);
               }
             }
 
             const insertFields: Record<string, any> = {
-              [idColumn]: castedIdVal,
+              [dbIdColumn]: castedIdVal,
               ...fields
             };
 
@@ -484,7 +502,7 @@ const AdminTranslations = () => {
           const updatePromises = toUpdate.map(async (up) => {
             const { idVal, ...fieldsToUpdate } = up;
             
-            const dbIdCol = dbColumns.find(c => c.column_name === idColumn);
+            const dbIdCol = dbColumns.find(c => c.column_name === dbIdColumn);
             let castedIdVal: any = idVal;
             if (dbIdCol) {
               const type = dbIdCol.data_type.toLowerCase();
@@ -492,7 +510,7 @@ const AdminTranslations = () => {
                 castedIdVal = parseInt(idVal);
               }
             } else {
-              if (idColumn === 'day_number' || idColumn === 'pregnancy_day' || idColumn === 'week_number') {
+              if (dbIdColumn === 'day_number' || dbIdColumn === 'pregnancy_day' || dbIdColumn === 'week_number') {
                 castedIdVal = parseInt(idVal);
               }
             }
@@ -500,10 +518,10 @@ const AdminTranslations = () => {
             const { error: updErr } = await supabase
               .from(targetTable)
               .update({ ...fieldsToUpdate, updated_at: new Date().toISOString() })
-              .eq(idColumn, castedIdVal);
+              .eq(dbIdColumn, castedIdVal);
             if (updErr) {
               failed++;
-              errors.push(`Update xətası (${idColumn}: ${idVal}): ${updErr.message}`);
+              errors.push(`Update xətası (${dbIdColumn}: ${idVal}): ${updErr.message}`);
             } else {
               updated++;
             }
