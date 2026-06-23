@@ -1,18 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
 
 export interface MommyDailyMessage {
   id: string;
   day_number: number;
   message: string;
+  message_en?: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
 }
 
 export const useMommyDailyMessageByDay = (dayNumber: number | null) => {
+  const language = useUserStore((s) => s.language);
   return useQuery({
-    queryKey: ['mommy-daily-message', dayNumber],
+    queryKey: ['mommy-daily-message', dayNumber, language],
     queryFn: async () => {
       if (!dayNumber || dayNumber < 1 || dayNumber > 1460) return null;
       const { data, error } = await (supabase as any)
@@ -22,7 +25,11 @@ export const useMommyDailyMessageByDay = (dayNumber: number | null) => {
         .eq('is_active', true)
         .maybeSingle();
       if (error) { console.error('Error fetching mommy daily message:', error); return null; }
-      return data as MommyDailyMessage | null;
+      if (!data) return null;
+      if (language === 'en' && data.message_en) {
+        return { ...data, message: data.message_en } as MommyDailyMessage;
+      }
+      return data as MommyDailyMessage;
     },
     enabled: !!dayNumber && dayNumber >= 1 && dayNumber <= 1460,
     staleTime: 1000 * 60 * 5,
