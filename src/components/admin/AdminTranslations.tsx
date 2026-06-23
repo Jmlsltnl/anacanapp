@@ -182,14 +182,53 @@ const AdminTranslations = () => {
   });
 
   const dbIdColumn = useMemo(() => {
+    const targetTable = uploadTable === 'custom' ? customTable.trim() : uploadTable;
+    
+    // Clean target table name
+    const table = targetTable.toLowerCase();
+    
+    // 1. Hardcoded logical key mappings for daily content tables (which use UUID id but logical daily keys)
+    if (table === 'mommy_daily_messages' || table === 'baby_daily_info') {
+      return 'day_number';
+    }
+    if (table === 'pregnancy_daily_content') {
+      return 'pregnancy_day';
+    }
+    if (table === 'weekly_tips') {
+      return 'week_number';
+    }
+    if (table === 'translations') {
+      return 'key';
+    }
+
+    // 2. If the user-selected idColumn exists directly in the database columns, use it!
+    if (dbColumns && dbColumns.some(c => c.column_name === idColumn)) {
+      return idColumn;
+    }
+
+    // 3. Try to match by guessing from CSV column name
+    if (dbColumns && dbColumns.length > 0) {
+      const dbColNames = dbColumns.map(c => c.column_name);
+      
+      if (idColumn.toLowerCase() === 'day' || idColumn.toLowerCase() === 'day_number') {
+        if (dbColNames.includes('day_number')) return 'day_number';
+        if (dbColNames.includes('pregnancy_day')) return 'pregnancy_day';
+      }
+      if (idColumn.toLowerCase() === 'week' || idColumn.toLowerCase() === 'week_number') {
+        if (dbColNames.includes('week_number')) return 'week_number';
+      }
+    }
+
+    // 4. Try to find primary key from database constraints
     if (dbConstraints && dbConstraints.length > 0) {
       const pk = dbConstraints.find(c => c.constraint_type === 'PRIMARY KEY');
       if (pk) return pk.column_name;
       return dbConstraints[0].column_name;
     }
-    const targetTable = uploadTable === 'custom' ? customTable.trim() : uploadTable;
+
+    // Default fallback
     return TABLE_PRIMARY_KEYS[targetTable] || 'id';
-  }, [dbConstraints, uploadTable, customTable]);
+  }, [dbConstraints, dbColumns, uploadTable, customTable, idColumn, parsedRows]);
 
   // Reset preview and selections on table change
   useEffect(() => {
