@@ -140,6 +140,15 @@ Deno.serve(async (req) => {
       (userSchedules[s.user_id] ||= []).push(s);
     }
 
+    // Pre-fetch language preferences for involved users
+    const userIds = Object.keys(userSchedules);
+    const { data: prefs } = await supabase
+      .from('user_preferences')
+      .select('user_id, language')
+      .in('user_id', userIds);
+    const langByUser = new Map<string, string>();
+    prefs?.forEach((p: any) => langByUser.set(p.user_id, p.language || 'az'));
+
     for (const [userId, userVitamins] of Object.entries(userSchedules)) {
       const { data: tokens } = await supabase
         .from('device_tokens')
@@ -148,11 +157,19 @@ Deno.serve(async (req) => {
 
       if (!tokens?.length) { skippedCount++; bumpReason(reasons, 'no_device_token'); continue; }
 
+      const userLang = langByUser.get(userId) || 'az';
+      const isEn = userLang === 'en';
       const vitaminNames = userVitamins.map((v: any) => `${v.icon_emoji} ${v.vitamin_name}`).join(', ');
-      const title = body.manual ? '[TEST] 💊 Vitamin bildirişi' : '💊 Vitamin qəbulu vaxtıdır!';
+      const title = body.manual
+        ? (isEn ? '[TEST] 💊 Vitamin reminder' : '[TEST] 💊 Vitamin bildirişi')
+        : (isEn ? '💊 Time to take your vitamins!' : '💊 Vitamin qəbulu vaxtıdır!');
       const bodyText = userVitamins.length === 1
-        ? `${userVitamins[0].vitamin_name} qəbul etmə vaxtıdır`
-        : `${userVitamins.length} vitamin qəbul etmə vaxtıdır: ${vitaminNames}`;
+        ? (isEn
+            ? `Time to take ${userVitamins[0].vitamin_name}`
+            : `${userVitamins[0].vitamin_name} qəbul etmə vaxtıdır`)
+        : (isEn
+            ? `Time to take ${userVitamins.length} vitamins: ${vitaminNames}`
+            : `${userVitamins.length} vitamin qəbul etmə vaxtıdır: ${vitaminNames}`);
 
       // Store notification in DB (skip for test to avoid pollution)
       if (!body.manual) {
