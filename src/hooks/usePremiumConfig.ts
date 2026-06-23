@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
+import { mapRowsTranslation } from '@/lib/tr';
 
 export interface PremiumFeature {
   id: string;
@@ -40,6 +42,7 @@ export const usePremiumConfig = () => {
   const [features, setFeatures] = useState<PremiumFeature[]>([]);
   const [plans, setPlans] = useState<PremiumPlan[]>([]);
   const [loading, setLoading] = useState(true);
+  const language = useUserStore((state) => state.language);
 
   const fetchData = async () => {
     try {
@@ -59,8 +62,11 @@ export const usePremiumConfig = () => {
       if (featuresRes.error) throw featuresRes.error;
       if (plansRes.error) throw plansRes.error;
 
-      setFeatures((featuresRes.data || []) as PremiumFeature[]);
-      setPlans((plansRes.data || []) as PremiumPlan[]);
+      const translatedFeatures = mapRowsTranslation(featuresRes.data, language, ['title', 'description']) as PremiumFeature[];
+      const translatedPlans = mapRowsTranslation(plansRes.data, language, ['name', 'description', 'badge_text']) as PremiumPlan[];
+
+      setFeatures(translatedFeatures);
+      setPlans(translatedPlans);
     } catch (error) {
       console.error('Error fetching premium config:', error);
     } finally {
@@ -70,7 +76,7 @@ export const usePremiumConfig = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [language]);
 
   return {
     features,

@@ -13,7 +13,8 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { Skeleton } from '@/components/ui/skeleton';
 import ProviderReviews from './doctors/ProviderReviews';
-import { tr } from "@/lib/tr";
+import { tr, mapRowsTranslation } from "@/lib/tr";
+import { useUserStore } from '@/store/userStore';
 
 interface DoctorsHospitalsProps {
   onBack: () => void;
@@ -86,9 +87,10 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [selectedProvider, setSelectedProvider] = useState<HealthcareProvider | null>(null);
   const [showReservationModal, setShowReservationModal] = useState(false);
+  const language = useUserStore((state) => state.language);
 
   const { data: providers = [], isLoading } = useQuery({
-    queryKey: ['healthcare-providers'],
+    queryKey: ['healthcare-providers', language],
     queryFn: async () => {
       const { data, error } = (await supabase.
       from('healthcare_providers').
@@ -97,13 +99,27 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
       order('is_featured', { ascending: false }).
       order('rating', { ascending: false })) as {data: HealthcareProvider[] | null;error: unknown;};
       if (error) throw error;
-      return data as HealthcareProvider[];
+      
+      const translated = mapRowsTranslation(data, language, ['name', 'specialty', 'description', 'address']) as HealthcareProvider[];
+      return translated.map(p => {
+        let services = p.services;
+        if (Array.isArray(services)) {
+          services = services.map((s: any) => ({
+            ...s,
+            name: language === 'az' ? (s.name_az ?? s.name) : (s[`name_${language}`] ?? s.name_az ?? s.name)
+          }));
+        }
+        return {
+          ...p,
+          services
+        };
+      });
     }
   });
 
   const filteredProviders = providers.filter((provider) => {
-    const matchesSearch = (provider.name_az || provider.name).toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (provider.specialty_az || provider.specialty || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = (provider.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (provider.specialty || '').toLowerCase().includes(searchQuery.toLowerCase());
 
     let matchesFilter = false;
     if (activeFilter === 'all') {
@@ -112,21 +128,21 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
       matchesFilter = provider.provider_type === 'hospital' || provider.provider_type === 'clinic';
     } else if (activeFilter === 'gynecology') {
       matchesFilter = provider.provider_type === 'doctor' && (
-      (provider.specialty_az || '').toLowerCase().includes('ginekoloq') ||
-      (provider.specialty_az || '').toLowerCase().includes('mama'));
+      (provider.specialty || '').toLowerCase().includes('ginekoloq') ||
+      (provider.specialty || '').toLowerCase().includes('mama'));
     } else if (activeFilter === 'ivf') {
       matchesFilter = provider.provider_type === 'doctor' && (
-      (provider.specialty_az || '').toLowerCase().includes('ivf') ||
-      (provider.specialty_az || '').toLowerCase().includes('fertillik'));
+      (provider.specialty || '').toLowerCase().includes('ivf') ||
+      (provider.specialty || '').toLowerCase().includes('fertillik'));
     } else if (activeFilter === 'pediatrics') {
       matchesFilter = provider.provider_type === 'doctor' && (
-      (provider.specialty_az || '').toLowerCase().includes('pediatr') ||
-      (provider.specialty_az || '').toLowerCase().includes('neonatoloq') ||
-      (provider.specialty_az || '').toLowerCase().includes(tr("doctorshospitals_usaq_36b348", "u\u015Faq")));
+      (provider.specialty || '').toLowerCase().includes('pediatr') ||
+      (provider.specialty || '').toLowerCase().includes('neonatoloq') ||
+      (provider.specialty || '').toLowerCase().includes(tr("doctorshospitals_usaq_36b348", "u\u015Faq")));
     } else if (activeFilter === 'mammology') {
       matchesFilter = provider.provider_type === 'doctor' && (
-      (provider.specialty_az || '').toLowerCase().includes('mamoloq') ||
-      (provider.specialty_az || '').toLowerCase().includes('onkoloq'));
+      (provider.specialty || '').toLowerCase().includes('mamoloq') ||
+      (provider.specialty || '').toLowerCase().includes('onkoloq'));
     }
 
     return matchesSearch && matchesFilter;
@@ -236,7 +252,7 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
                 {/* Image */}
                 <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0 overflow-hidden">
                   {provider.image_url ?
-              <img src={provider.image_url} alt={provider.name_az || provider.name} className="w-full h-full object-cover" /> :
+              <img src={provider.image_url} alt={provider.name} className="w-full h-full object-cover" /> :
 
               <Building2 className="w-8 h-8 text-primary" />
               }
@@ -251,7 +267,7 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
                           {tr("doctorshospitals_tovsiyye_olunan_626cbb", "\u2B50 T\xF6vsiyy\u0259 olunan")}
                         </Badge>
                   }
-                      <h3 className="font-semibold text-sm line-clamp-1">{provider.name_az || provider.name}</h3>
+                      <h3 className="font-semibold text-sm line-clamp-1">{provider.name}</h3>
                     </div>
                     <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 mt-1" />
                   </div>
@@ -262,18 +278,18 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
                   return <TypeIcon className="w-3 h-3" />;
                 })()}
                     <span>{providerTypeLabels[provider.provider_type]?.label || provider.provider_type}</span>
-                    {provider.specialty_az &&
+                    {provider.specialty &&
                 <>
                         <span className="mx-1">•</span>
-                        <span>{provider.specialty_az}</span>
+                        <span>{provider.specialty}</span>
                       </>
                 }
                   </div>
 
-                  {provider.address_az &&
+                  {provider.address &&
               <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                       <MapPin className="w-3 h-3 shrink-0" />
-                      <span className="line-clamp-1">{provider.address_az}</span>
+                      <span className="line-clamp-1">{provider.address}</span>
                     </div>
               }
 
@@ -357,7 +373,7 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
         {provider.image_url &&
         <img
           src={provider.image_url}
-          alt={provider.name_az || provider.name}
+          alt={provider.name}
           className="w-full h-full object-cover" />
 
         }
@@ -378,19 +394,19 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
         <div className="bg-card rounded-2xl p-4 border border-border/50 shadow-lg mb-4">
           {provider.is_featured &&
           <Badge className="mb-2 text-[10px] bg-amber-500/10 text-amber-600 border-amber-500/20">
-              {tr("doctorshospitals_tovsiyye_olunan_626cbb", "\u2B50 T\xF6vsiyy\u0259 olunan")}
+              {tr("doctorshospitals_tovsiyye_olunan_626cbb", "⭐ Tövsiyyə olunan")}
             </Badge>
           }
           
-          <h1 className="text-xl font-bold mb-1">{provider.name_az || provider.name}</h1>
+          <h1 className="text-xl font-bold mb-1">{provider.name}</h1>
           
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
             <TypeIcon className="w-4 h-4" />
             <span>{providerTypeLabels[provider.provider_type]?.label}</span>
-            {provider.specialty_az &&
+            {provider.specialty &&
             <>
                 <span>•</span>
-                <span>{provider.specialty_az}</span>
+                <span>{provider.specialty}</span>
               </>
             }
           </div>
@@ -405,11 +421,11 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
               )}
             </div>
             <span className="font-semibold">{currentRating > 0 ? currentRating.toFixed(1) : '0.0'}</span>
-            <span className="text-muted-foreground text-sm">({currentReviewCount} {tr("doctorshospitals_rey_f2285f", "r\u0259y)")}</span>
+            <span className="text-muted-foreground text-sm">({currentReviewCount} {tr("doctorshospitals_rey_f2285f", "rəy)")}</span>
           </div>
 
-          {provider.description_az &&
-          <p className="text-sm text-muted-foreground">{provider.description_az}</p>
+          {provider.description &&
+          <p className="text-sm text-muted-foreground">{provider.description}</p>
           }
         </div>
 
@@ -417,14 +433,14 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
         <div className="bg-card rounded-2xl p-4 border border-border/50 mb-4 space-y-3">
           <h2 className="font-semibold text-sm">{tr("doctorshospitals_elaqe_melumatlari_ddd442", "Əlaqə məlumatları")}</h2>
           
-          {provider.address_az &&
+          {provider.address &&
           <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                 <MapPin className="w-4 h-4 text-primary" />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">{tr("doctorshospitals_unvan_b8651a", "Ünvan")}</p>
-                <p className="text-sm">{provider.address_az}, {provider.city}</p>
+                <p className="text-sm">{provider.address}{provider.city ? `, ${provider.city}` : ''}</p>
               </div>
             </div>
           }
@@ -494,7 +510,7 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
             <div className="space-y-2">
               {(provider.services as Service[]).map((service, index) =>
             <div key={index} className="flex justify-between items-center py-2 border-b border-border/50 last:border-0">
-                  <span className="text-sm">{service.name_az || service.name}</span>
+                  <span className="text-sm">{service.name}</span>
                   <Badge variant="secondary" className="font-semibold">
                     {service.price} AZN
                   </Badge>
@@ -505,7 +521,7 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
         }
 
         {/* Reviews Section */}
-        <ProviderReviews providerId={provider.id} providerName={provider.name_az || provider.name} />
+        <ProviderReviews providerId={provider.id} providerName={provider.name} />
 
         {/* Reserve Button - Disabled for now */}
         {provider.accepts_reservations &&

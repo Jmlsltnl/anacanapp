@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
+import { mapRowsTranslation } from '@/lib/tr';
 
 export interface MaternityConfigItem {
   id: string;
@@ -41,6 +43,7 @@ export const useMaternityBenefits = () => {
   const [config, setConfig] = useState<MaternityConfig | null>(null);
   const [guidelines, setGuidelines] = useState<MaternityGuideline[]>([]);
   const [loading, setLoading] = useState(true);
+  const language = useUserStore((state) => state.language);
 
   const fetchData = async () => {
     try {
@@ -76,7 +79,8 @@ export const useMaternityBenefits = () => {
         minSalary: configMap['min_salary'] || 345,
       });
 
-      setGuidelines((guidelinesRes.data || []) as MaternityGuideline[]);
+      const translatedGuidelines = mapRowsTranslation(guidelinesRes.data, language, ['title', 'content']) as MaternityGuideline[];
+      setGuidelines(translatedGuidelines);
     } catch (error) {
       console.error('Error fetching maternity data:', error);
     } finally {
@@ -86,7 +90,7 @@ export const useMaternityBenefits = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [language]);
 
   // Calculate maternity benefit
   const calculateBenefit = (

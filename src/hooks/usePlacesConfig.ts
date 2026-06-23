@@ -62,14 +62,14 @@ export const usePlaceAmenities = () => {
 
 // Fallbacks for offline/loading
 export const FALLBACK_CATEGORIES = [
-{ category_key: 'all', label_az: tr("useplacesconfig_hamisi_c73c4d", "Ham\u0131s\u0131"), icon_name: 'MapPin', color_gradient: 'from-pink-500 to-rose-600' },
-{ category_key: 'cafe', label_az: 'Kafe', icon_name: 'Utensils', color_gradient: 'from-amber-500 to-orange-600' },
-{ category_key: 'restaurant', label_az: 'Restoran', icon_name: 'Utensils', color_gradient: 'from-red-500 to-rose-600' },
-{ category_key: 'mall', label_az: 'Mall', icon_name: 'Building2', color_gradient: 'from-blue-500 to-indigo-600' },
-{ category_key: 'park', label_az: 'Park', icon_name: 'TreePine', color_gradient: 'from-emerald-500 to-green-600' }];
+{ category_key: 'all', label: tr("useplacesconfig_hamisi_c73c4d", "Ham\u0131s\u0131"), icon_name: 'MapPin', color_gradient: 'from-pink-500 to-rose-600' },
+{ category_key: 'cafe', label: 'Kafe', icon_name: 'Utensils', color_gradient: 'from-amber-500 to-orange-600' },
+{ category_key: 'restaurant', label: 'Restoran', icon_name: 'Utensils', color_gradient: 'from-red-500 to-rose-600' },
+{ category_key: 'mall', label: 'Mall', icon_name: 'Building2', color_gradient: 'from-blue-500 to-indigo-600' },
+{ category_key: 'park', label: 'Park', icon_name: 'TreePine', color_gradient: 'from-emerald-500 to-green-600' }];
 
 
 export const FALLBACK_AMENITIES = [
-{ amenity_key: 'has_breastfeeding_room', label_az: tr("useplacesconfig_emizdirme_otagi_029c1d", "\u018Fmizdirm\u0259 ota\u011F\u0131"), emoji: '🤱' },
-{ amenity_key: 'has_changing_table', label_az: tr("useplacesconfig_deyisdirme_masasi_99a9aa", "D\u0259yi\u015Fdirm\u0259 masas\u0131"), emoji: '👶' },
-{ amenity_key: 'has_elevator', label_az: 'Lift', emoji: '🛗' }];
+{ amenity_key: 'has_breastfeeding_room', label: tr("useplacesconfig_emizdirme_otagi_029c1d", "\u018Fmizdirm\u0259 ota\u011F\u0131"), emoji: '🤱' },
+{ amenity_key: 'has_changing_table', label: tr("useplacesconfig_deyisdirme_masasi_99a9aa", "D\u0259yi\u015Fdirm\u0259 masas\u0131"), emoji: '👶' },
+{ amenity_key: 'has_elevator', label: 'Lift', emoji: '🛗' }];

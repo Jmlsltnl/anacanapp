@@ -600,7 +600,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                       }>
                       
                         <span className="text-3xl block mb-1">{theme.emoji}</span>
-                        <span className="text-xs font-medium">{theme.name_az}</span>
+                        <span className="text-xs font-medium">{theme.name}</span>
                       </motion.button>
                     )}
                   </div>
@@ -736,7 +736,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     </div>
                     <div>
                       <span className="text-muted-foreground">{tr("fairytalegenerator_movzu_5a3526", "Mövzu:")}</span>
-                      <p className="font-medium">{themes.find((t) => t.name === formData.theme)?.name_az || formData.theme}</p>
+                      <p className="font-medium">{themes.find((t) => t.name === formData.theme)?.name || formData.theme}</p>
                     </div>
                     <div>
                       <span className="text-muted-foreground">{tr("untranslated_dil_rfnolb", "Dil:")}</span>

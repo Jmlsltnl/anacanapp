@@ -284,12 +284,13 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
               transition={{ delay: index * 0.05 }}
               className="bg-card rounded-xl border border-border overflow-hidden">
               
+              
                 <button
                 onClick={() => setExpandedGuideline(expandedGuideline === guide.id ? null : guide.id)}
                 className="w-full flex items-center gap-3 p-4 text-left">
                 
                   <span className="text-2xl">{guide.icon}</span>
-                  <span className="flex-1 font-medium">{guide.title_az || guide.title}</span>
+                  <span className="flex-1 font-medium">{guide.title}</span>
                   <ChevronRight
                   className={`w-5 h-5 text-muted-foreground transition-transform ${
                   expandedGuideline === guide.id ? 'rotate-90' : ''}`
@@ -307,15 +308,13 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                   
                       <div className="px-4 pb-4 pt-0">
                         <div className="bg-muted/50 rounded-xl p-4">
-                          <MarkdownContent content={guide.content_az || guide.content} />
+                          <MarkdownContent content={guide.content} />
                         </div>
                       </div>
                     </motion.div>
                 }
                 </AnimatePresence>
               </motion.div>
-            )}
-
             {/* DSMF Contact */}
             <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl p-4 border border-primary/20">
               <div className="flex items-center gap-3">

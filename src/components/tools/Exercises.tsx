@@ -33,7 +33,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
     if (!dbExercises) return [];
     return dbExercises.map((e) => ({
       id: e.id,
-      name: e.name_az || e.name,
+      name: e.name,
       duration: e.duration_minutes,
       calories: e.calories,
       level: e.level,

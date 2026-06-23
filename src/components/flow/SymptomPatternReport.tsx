@@ -49,7 +49,7 @@ const SymptomPatternReport = ({ onUpgrade }: Props) => {
       const symInfo = symptomsList.find((s) => s.symptom_key === sym);
       return {
         symptom: sym,
-        label: symInfo?.label_az || symInfo?.label || sym,
+        label: symInfo?.label || sym,
         emoji: symInfo?.emoji || '•',
         dominantPhase: dominantPhase?.[0] || 'unknown',
         dominantCount: dominantPhase?.[1] || 0,

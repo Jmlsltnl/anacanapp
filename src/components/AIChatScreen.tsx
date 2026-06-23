@@ -345,7 +345,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const { data: dynamicQuestions = [] } = useAISuggestedQuestions(lifeStage || 'bump', 'mother');
 
   const suggestedQuestions = dynamicQuestions.length > 0 ?
-  dynamicQuestions.map((q) => q.question_az || q.question) :
+  dynamicQuestions.map((q) => q.question) :
   lifeStage === 'bump' ?
   [tr("aichatscreen_bu_hefte_korpem_nece_inkisaf_e_7ffbca", "Bu h\u0259ft\u0259 k\xF6rp\u0259m nec\u0259 inki\u015Faf edir?"), tr("aichatscreen_hamilelikde_hansi_qidalar_fayd_cfee1a", "Hamil\u0259likd\u0259 hans\u0131 qidalar faydal\u0131d\u0131r?"), tr("aichatscreen_urek_bulanmasina_qarsi_ne_ede__39caf3", "\xDCr\u0259k bulanmas\u0131na qar\u015F\u0131 n\u0259 ed\u0259 bil\u0259r\u0259m?")] :
 

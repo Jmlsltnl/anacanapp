@@ -23,17 +23,17 @@ interface NutritionProps {
 
 // Fallback meal types
 const fallbackMealTypes = [
-{ meal_id: 'breakfast', name: tr("nutrition_seher_yemeyi_b82929", "Səhər yeməyi"), name_az: tr("nutrition_seher_yemeyi_b82929", "S\u0259h\u0259r yem\u0259yi"), emoji: '🍳', time_range: '07:00 - 09:00' },
-{ meal_id: 'lunch', name: 'Nahar', name_az: 'Nahar', emoji: '🍲', time_range: '12:00 - 14:00' },
-{ meal_id: 'dinner', name: tr("nutrition_sam_yemeyi_6002e9", "Şam yeməyi"), name_az: tr("nutrition_sam_yemeyi_6002e9", "\u015Eam yem\u0259yi"), emoji: '🍽️', time_range: '18:00 - 20:00' },
-{ meal_id: 'snack', name: tr("nutrition_qelyanalti_42fb71", "Qəlyanaltı"), name_az: tr("nutrition_qelyanalti_42fb71", "Q\u0259lyanalt\u0131"), emoji: '🍎', time_range: tr("nutrition_i_stenilen_vaxt_ec15be", "\u0130st\u0259nil\u0259n vaxt") }];
+{ meal_id: 'breakfast', name: tr("nutrition_seher_yemeyi_b82929", "Səhər yeməyi"), emoji: '🍳', time_range: '07:00 - 09:00' },
+{ meal_id: 'lunch', name: 'Nahar', emoji: '🍲', time_range: '12:00 - 14:00' },
+{ meal_id: 'dinner', name: tr("nutrition_sam_yemeyi_6002e9", "Şam yeməyi"), emoji: '🍽️', time_range: '18:00 - 20:00' },
+{ meal_id: 'snack', name: tr("nutrition_qelyanalti_42fb71", "Qəlyanaltı"), emoji: '🍎', time_range: tr("nutrition_i_stenilen_vaxt_ec15be", "İstənilən vaxt") }];
 
 
 // Fallback targets
 const fallbackTargets = {
-  bump: { calories: 2300, water_glasses: 10, description_az: tr("nutrition_hamilelik_dovru_57af7a", "Hamil\u0259lik d\xF6vr\xFC") },
-  mommy: { calories: 2500, water_glasses: 12, description_az: tr("nutrition_emizdirme_dovru_6f45f4", "\u018Fmizdirm\u0259 d\xF6vr\xFC") },
-  flow: { calories: 2000, water_glasses: 8, description_az: tr("nutrition_umumi_saglamliq_6c20a8", "\xDCmumi sa\u011Flaml\u0131q") }
+  bump: { calories: 2300, water_glasses: 10, description: tr("nutrition_hamilelik_dovru_57af7a", "Hamiləlik dövrü") },
+  mommy: { calories: 2500, water_glasses: 12, description: tr("nutrition_emizdirme_dovru_6f45f4", "Əmizdirmə dövrü") },
+  flow: { calories: 2000, water_glasses: 8, description: tr("nutrition_umumi_saglamliq_6c20a8", "Ümumi sağlamlıq") }
 };
 
 // Common foods will be fetched from DB, fallback for loading
@@ -100,7 +100,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
     }
     return fallbackMealTypes.map((m) => ({
       id: m.meal_id,
-      name: m.name_az || m.name,
+      name: m.name,
       icon: mealIcons[m.meal_id] || Utensils,
       time: m.time_range || '',
       emoji: m.emoji || '🍽️'
@@ -119,7 +119,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
       };
     }
     const fallback = fallbackTargets[stage as keyof typeof fallbackTargets] || fallbackTargets.flow;
-    return { calories: fallback.calories, water: fallback.water_glasses, description: fallback.description_az };
+    return { calories: fallback.calories, water: fallback.water_glasses, description: fallback.description };
   }, [dbTargets, lifeStage]);
 
   const waterGlasses = todayLog?.water_intake || 0;

@@ -76,7 +76,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
     return FALLBACK_MOOD_LEVELS.map((m) => ({
       value: m.mood_value,
       emoji: m.emoji,
-      label: m.label_az || m.label,
+      label: m.label,
       gradient: m.mood_value === 1 ? 'from-red-500 to-rose-600' :
       m.mood_value === 2 ? 'from-orange-500 to-amber-600' :
       m.mood_value === 3 ? 'from-yellow-500 to-amber-500' :
@@ -100,11 +100,11 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
       }));
     }
     return FALLBACK_BREATHING_EXERCISES.map((e) => ({
-      name: e.name_az || e.name,
+      name: e.name,
       inhale: e.inhale_seconds,
       hold: e.hold_seconds,
       exhale: e.exhale_seconds,
-      description: e.description_az || e.description || '',
+      description: e.description || '',
       emoji: e.icon === 'Wind' ? '🌙' : e.icon === 'Square' ? '📦' : '💨'
     }));
   }, [breathingExercisesDB]);

@@ -1,5 +1,7 @@
-import { tr } from "@/lib/tr";import { useQuery } from '@tanstack/react-query';
+import { tr, mapRowsTranslation } from "@/lib/tr";
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
 import { useMemo } from 'react';
 
 interface PartnerDailyTip {
@@ -14,8 +16,9 @@ interface PartnerDailyTip {
 
 // Fetch partner daily tips from database
 export const usePartnerDailyTips = (lifeStage?: string) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['partner-daily-tips', lifeStage],
+    queryKey: ['partner-daily-tips', lifeStage, language],
     queryFn: async () => {
       let query = supabase.
       from('partner_daily_tips').
@@ -34,7 +37,7 @@ export const usePartnerDailyTips = (lifeStage?: string) => {
         return [];
       }
 
-      return data as PartnerDailyTip[];
+      return mapRowsTranslation(data, language, ['tip_text']) as unknown as PartnerDailyTip[];
     },
     staleTime: 1000 * 60 * 30 // 30 minutes
   });
@@ -77,7 +80,7 @@ export const useDailyTip = (lifeStage?: string, weekNumber?: number) => {
   return {
     tip: dailyTip,
     isLoading,
-    tipText: dailyTip?.tip_text_az || dailyTip?.tip_text || tr("usepartnerdailytips_heyat_yoldasiniza_bu_gun_gozel_b30548", "H\u0259yat yolda\u015F\u0131n\u0131za bu g\xFCn g\xF6z\u0259l bir jest edin!"),
+    tipText: dailyTip?.tip_text || tr("usepartnerdailytips_heyat_yoldasiniza_bu_gun_gozel_b30548", "H\u0259yat yolda\u015F\u0131n\u0131za bu g\xFCn g\xF6z\u0259l bir jest edin!"),
     tipEmoji: dailyTip?.tip_emoji || '💕'
   };
 };

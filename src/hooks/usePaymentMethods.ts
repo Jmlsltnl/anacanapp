@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
+import { mapRowsTranslation } from '@/lib/tr';
 
 export interface PaymentMethod {
   id: string;
@@ -19,6 +21,7 @@ export interface PaymentMethod {
 export const usePaymentMethods = () => {
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(true);
+  const language = useUserStore((state) => state.language);
 
   const fetchMethods = async () => {
     try {
@@ -28,7 +31,8 @@ export const usePaymentMethods = () => {
       if (error) throw error;
       // `config` is intentionally not returned; default to empty object for type compatibility
       const normalized = (data || []).map((m: any) => ({ ...m, config: {} }));
-      setMethods(normalized as PaymentMethod[]);
+      const translated = mapRowsTranslation(normalized, language, ['label', 'description']) as PaymentMethod[];
+      setMethods(translated);
     } catch (error) {
       console.error('Error fetching payment methods:', error);
     } finally {
@@ -38,7 +42,7 @@ export const usePaymentMethods = () => {
 
   useEffect(() => {
     fetchMethods();
-  }, []);
+  }, [language]);
 
   const getActiveMethods = () => methods.filter(m => m.is_active);
 

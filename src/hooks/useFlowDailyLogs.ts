@@ -2,6 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format, subDays, startOfMonth, endOfMonth } from 'date-fns';
+import { useUserStore } from '@/store/userStore';
+import { mapRowsTranslation } from '@/lib/tr';
 
 export interface FlowDailyLog {
   id: string;
@@ -33,8 +35,9 @@ export interface FlowSymptom {
 }
 
 export const useFlowSymptoms = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['flow-symptoms'],
+    queryKey: ['flow-symptoms', language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('flow_symptoms_db')
@@ -43,7 +46,7 @@ export const useFlowSymptoms = () => {
         .order('sort_order');
 
       if (error) throw error;
-      return data as FlowSymptom[];
+      return mapRowsTranslation(data, language, ['label']) as FlowSymptom[];
     },
     staleTime: 1000 * 60 * 30, // 30 minutes
   });

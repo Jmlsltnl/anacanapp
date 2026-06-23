@@ -216,8 +216,8 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
                 return IconComp ? <IconComp className="w-5 h-5 text-primary" /> : <CreditCard className="w-5 h-5 text-primary" />;
               })()}
                   <div className="flex-1">
-                    <p className="text-sm font-medium">{m.label_az || m.label}</p>
-                    {m.description_az && <p className="text-[11px] text-muted-foreground">{m.description_az}</p>}
+                    <p className="text-sm font-medium">{m.label}</p>
+                    {m.description && <p className="text-[11px] text-muted-foreground">{m.description}</p>}
                   </div>
                   {paymentMethod === m.method_key &&
               <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">

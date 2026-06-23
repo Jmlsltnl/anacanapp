@@ -54,7 +54,7 @@ export const useHospitalBag = () => {
       const itemsToInsert = templates.map((template, index) => ({
         user_id: user.id,
         item_id: template.id,
-        item_name: template.item_name_az || template.item_name,
+        item_name: template.item_name,
         category: template.category as 'mom' | 'baby' | 'documents',
         is_checked: false,
         priority: template.priority || 2,

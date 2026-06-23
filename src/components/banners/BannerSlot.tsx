@@ -88,19 +88,19 @@ const NativeBanner = ({ banner, onClick }: BannerItemProps) => {
       
       <div className="flex-1 text-left">
         <h3 className="font-semibold text-base" style={{ color: textColor }}>
-          {banner.title_az || banner.title}
+          {banner.title}
         </h3>
-        {(banner.description_az || banner.description) && (
+        {banner.description && (
           <p className="text-sm opacity-90 line-clamp-1" style={{ color: textColor }}>
-            {banner.description_az || banner.description}
+            {banner.description}
           </p>
         )}
       </div>
       
       <div className="flex items-center gap-1 flex-shrink-0">
-        {(banner.button_text_az || banner.button_text) && (
+        {banner.button_text && (
           <span className="text-sm font-medium hidden sm:block" style={{ color: textColor }}>
-            {banner.button_text_az || banner.button_text}
+            {banner.button_text}
           </span>
         )}
         {banner.link_type === 'external' ? (
@@ -123,7 +123,7 @@ const ImageBanner = ({ banner, onClick }: BannerItemProps) => {
     >
       <img 
         src={banner.image_url} 
-        alt={banner.title_az || banner.title}
+        alt={banner.title}
         className="w-full h-auto object-cover"
       />
       {banner.link_type === 'external' && (

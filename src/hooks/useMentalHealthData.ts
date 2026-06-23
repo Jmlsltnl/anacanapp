@@ -131,19 +131,19 @@ export const useNoiseThresholdsDB = () => {
 
 // Fallback data for when DB is empty
 export const FALLBACK_MOOD_LEVELS: MoodLevel[] = [
-{ id: '1', mood_value: 1, label: 'Very Bad', label_az: tr("usementalhealthdata_cox_pis_e041c5", "\xC7ox pis"), emoji: '😢', color: '#ef4444' },
-{ id: '2', mood_value: 2, label: 'Bad', label_az: 'Pis', emoji: '😔', color: '#f97316' },
-{ id: '3', mood_value: 3, label: 'Okay', label_az: 'Normal', emoji: '😐', color: '#eab308' },
-{ id: '4', mood_value: 4, label: 'Good', label_az: tr("usementalhealthdata_yaxsi_9d8595", "Yax\u015F\u0131"), emoji: '😊', color: '#22c55e' },
-{ id: '5', mood_value: 5, label: 'Great', label_az: tr("usementalhealthdata_ela_720a0e", "\u018Fla"), emoji: '🥰', color: '#10b981' }];
+{ id: '1', mood_value: 1, label: tr("usementalhealthdata_cox_pis_e041c5", "\xC7ox pis"), label_az: tr("usementalhealthdata_cox_pis_e041c5", "\xC7ox pis"), emoji: '😢', color: '#ef4444' },
+{ id: '2', mood_value: 2, label: tr("usementalhealthdata_pis_e041c6", "Pis"), label_az: tr("usementalhealthdata_pis_e041c6", "Pis"), emoji: '😔', color: '#f97316' },
+{ id: '3', mood_value: 3, label: tr("usementalhealthdata_normal_e041c7", "Normal"), label_az: tr("usementalhealthdata_normal_e041c7", "Normal"), emoji: '😐', color: '#eab308' },
+{ id: '4', mood_value: 4, label: tr("usementalhealthdata_yaxsi_9d8595", "Yax\u015F\u0131"), label_az: tr("usementalhealthdata_yaxsi_9d8595", "Yax\u015F\u0131"), emoji: '😊', color: '#22c55e' },
+{ id: '5', mood_value: 5, label: tr("usementalhealthdata_ela_720a0e", "\u018Fla"), label_az: tr("usementalhealthdata_ela_720a0e", "\u018Fla"), emoji: '🥰', color: '#10b981' }];
 
 
 export const FALLBACK_BREATHING_EXERCISES: BreathingExercise[] = [
 {
   id: '1',
-  name: '4-7-8 Breathing',
+  name: tr("usementalhealthdata_4_7_8_nefes_3ae243", "4-7-8 N\u0259f\u0259s"),
   name_az: tr("usementalhealthdata_4_7_8_nefes_3ae243", "4-7-8 N\u0259f\u0259s"),
-  description: 'A relaxation technique that promotes calm and sleep',
+  description: tr("usementalhealthdata_sakitlik_ve_yuxuya_komek_eden__f1b25c", "Sakitlik v\u0259 yuxuya k\xF6m\u0259k ed\u0259n relaksasiya texnikas\u0131"),
   description_az: tr("usementalhealthdata_sakitlik_ve_yuxuya_komek_eden__f1b25c", "Sakitlik v\u0259 yuxuya k\xF6m\u0259k ed\u0259n relaksasiya texnikas\u0131"),
   icon: 'Wind',
   color: '#8b5cf6',
@@ -156,9 +156,9 @@ export const FALLBACK_BREATHING_EXERCISES: BreathingExercise[] = [
 },
 {
   id: '2',
-  name: 'Box Breathing',
+  name: tr("usementalhealthdata_qutu_nefesi_7667cf", "Qutu N\u0259f\u0259si"),
   name_az: tr("usementalhealthdata_qutu_nefesi_7667cf", "Qutu N\u0259f\u0259si"),
-  description: 'A technique used by Navy SEALs for stress control',
+  description: tr("usementalhealthdata_stress_nezareti_ucun_texnika_83964c", "Stress n\u0259zar\u0259ti \xFC\xE7\xFCn texnika"),
   description_az: tr("usementalhealthdata_stress_nezareti_ucun_texnika_83964c", "Stress n\u0259zar\u0259ti \xFC\xE7\xFCn texnika"),
   icon: 'Square',
   color: '#3b82f6',

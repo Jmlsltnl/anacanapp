@@ -50,7 +50,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
     }
     return FALLBACK_CATEGORIES.map((c) => ({
       value: c.category_key,
-      label: c.label_az,
+      label: c.label,
       icon: ICON_MAP[c.icon_name] || MapPin,
       color: c.color_gradient
     }));
@@ -66,7 +66,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
     }
     return FALLBACK_AMENITIES.map((a) => ({
       key: a.amenity_key,
-      label: a.label_az,
+      label: a.label,
       icon: a.emoji
     }));
   }, [dbAmenities]);

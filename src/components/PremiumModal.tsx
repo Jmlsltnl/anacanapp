@@ -287,7 +287,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                   {allFeatures.slice(0, 8).map((item) =>
               <div key={item.id} className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-2.5 py-2">
                       <span className="text-sm shrink-0">{item.icon}</span>
-                      <span className="text-[10px] font-medium text-white/90 leading-tight line-clamp-2">{item.title_az || item.title}</span>
+                      <span className="text-[10px] font-medium text-white/90 leading-tight line-clamp-2">{item.title}</span>
                     </div>
               )}
                 </div>

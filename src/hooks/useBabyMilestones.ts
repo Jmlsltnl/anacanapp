@@ -32,17 +32,15 @@ export const useBabyMilestones = () => {
       return [];
     }
     return dbMilestones.map((m) => {
-      const label = language === 'az' ? (m.label_az || m.label) : ((m as any)[`label_${language}`] || m.label_az || m.label);
-      const description = language === 'az' ? (m.description_az || m.description) : ((m as any)[`description_${language}`] || m.description_az || m.description);
       return {
         id: m.milestone_key,
         week: m.week_number,
-        label,
+        label: m.label,
         emoji: m.emoji,
-        description
+        description: m.description
       };
     });
-  }, [dbMilestones, language]);
+  }, [dbMilestones]);
 
   const fetchMilestones = useCallback(async () => {
     if (!user) return;

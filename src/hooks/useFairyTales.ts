@@ -1,7 +1,9 @@
-import { tr } from "@/lib/tr";import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { tr, mapRowsTranslation } from "@/lib/tr";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { useUserStore } from '@/store/userStore';
 
 export interface FairyTale {
   id: string;
@@ -52,8 +54,9 @@ export const useFairyTales = () => {
 };
 
 export const useFairyTaleThemes = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['fairy-tale-themes'],
+    queryKey: ['fairy-tale-themes', language],
     queryFn: async () => {
       const { data, error } = await supabase.
       from('fairy_tale_themes').
@@ -62,7 +65,7 @@ export const useFairyTaleThemes = () => {
       order('sort_order');
 
       if (error) throw error;
-      return data as FairyTaleTheme[];
+      return mapRowsTranslation(data, language, ['name', 'description']) as FairyTaleTheme[];
     },
     staleTime: 1000 * 60 * 30
   });
