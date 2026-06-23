@@ -568,9 +568,15 @@ const AdminTranslations = () => {
               }
             }
 
+            const updatePayload: Record<string, any> = { ...fieldsToUpdate };
+            const hasUpdatedAt = dbColumns.some(c => c.column_name === 'updated_at');
+            if (hasUpdatedAt) {
+              updatePayload['updated_at'] = new Date().toISOString();
+            }
+
             const { error: updErr } = await supabase
               .from(targetTable)
-              .update({ ...fieldsToUpdate, updated_at: new Date().toISOString() })
+              .update(updatePayload)
               .eq(dbIdColumn, castedIdVal);
             if (updErr) {
               failed++;
