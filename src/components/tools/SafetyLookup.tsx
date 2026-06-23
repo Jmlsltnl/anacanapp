@@ -34,12 +34,12 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
     const allOption = { id: 'all', name: tr("safetylookup_hamisi_c73c4d", "Hamısı"), emoji: '✨' };
     const mapped = dbCategories.
     filter((cat) => cat.category_id !== 'all' && cat.name.toLowerCase() !== tr("safetylookup_hamisi_6dc013", "ham\u0131s\u0131")).
-    map((cat) => ({ id: cat.category_id, name: cat.name_az || cat.name, emoji: cat.emoji || '📦' }));
+    map((cat) => ({ id: cat.category_id, name: cat.name, emoji: cat.emoji || '📦' }));
     return [allOption, ...mapped];
   }, [dbCategories]);
 
   const filteredItems = safetyItems.filter((item) => {
-    const name = item.name_az || item.name;
+    const name = item.name;
     return name.toLowerCase().includes(searchQuery.toLowerCase()) && (
     activeCategory === 'all' || item.category === activeCategory);
   });
@@ -83,7 +83,7 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
       if (data?.success && data?.item) {
         await queryClient.invalidateQueries({ queryKey: ['safety_items'] });
         setSelectedItem(data.item);
-        toast({ title: tr("safetylookup_ai_ile_tapildi_5c2d49", 'AI ilə tapıldı! ✨'), description: `${data.item.name_az || data.item.name} ${tr("safety_added_to_database", "bazaya əlavə edildi")}` });
+        toast({ title: tr("safetylookup_ai_ile_tapildi_5c2d49", 'AI ilə tapıldı! ✨'), description: `${data.item.name} ${tr("safety_added_to_database", "bazaya əlavə edildi")}` });
       } else {
         toast({ title: tr("safetylookup_hec_ne_tapilmadi_6a4eca", 'Heç nə tapılmadı'), variant: 'destructive' });
       }
@@ -188,8 +188,8 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
                 <Icon className="w-4 h-4 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground truncate">{item.name_az || item.name}</p>
-                <p className="text-xs text-muted-foreground truncate">{item.description_az || item.description}</p>
+                <p className="text-sm font-semibold text-foreground truncate">{item.name}</p>
+                <p className="text-xs text-muted-foreground truncate">{item.description}</p>
               </div>
               <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md shrink-0 ${cfg.lightBg} ${cfg.text}`}>
                 {cfg.label}
@@ -251,7 +251,7 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
                       <Icon className="w-5 h-5 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h2 className="text-base font-bold text-white truncate">{selectedItem.name_az || selectedItem.name}</h2>
+                      <h2 className="text-base font-bold text-white truncate">{selectedItem.name}</h2>
                       <span className="text-white/80 text-xs font-medium">{cfg.emoji} {cfg.label}</span>
                     </div>
                   </div>
@@ -259,7 +259,7 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
                   {/* Description */}
                   <div className={`p-3 rounded-xl border mb-2.5 ${cfg.lightBg} ${cfg.border}`}>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      {selectedItem.description_az || selectedItem.description}
+                      {selectedItem.description}
                     </p>
                   </div>
 

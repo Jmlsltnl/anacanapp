@@ -152,25 +152,13 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     }
 
     return toolConfigs.map((config) => {
-      const azName = hasPartner && config.requires_partner && config.partner_name_az ?
-      config.partner_name_az :
-      (config as any).display_name_az || config.name_az || config.name;
-      const langName = isNonAz ? (
-        hasPartner && config.requires_partner && (config as any)[`partner_name_${language}`] ?
-        (config as any)[`partner_name_${language}`] :
-        (config as any)[`display_name_${language}`] || (config as any)[`name_${language}`] || (config as any).display_name || config.name
-      ) : null;
-      const name = isNonAz ? langName || azName : azName;
+      const name = hasPartner && config.requires_partner && config.partner_name ?
+      config.partner_name :
+      (config as any).display_name || config.name;
 
-      const azDescription = hasPartner && config.requires_partner && config.partner_description_az ?
-      config.partner_description_az :
-      config.description_az || config.description || '';
-      const langDescription = isNonAz ? (
-        hasPartner && config.requires_partner && (config as any)[`partner_description_${language}`] ?
-        (config as any)[`partner_description_${language}`] :
-        (config as any)[`description_${language}`] || config.description || ''
-      ) : null;
-      const description = isNonAz ? langDescription || azDescription : azDescription;
+      const description = hasPartner && config.requires_partner && config.partner_description ?
+      config.partner_description :
+      config.description || '';
 
 
       return {
@@ -401,9 +389,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
 
           return heroTools.map((hero, idx) => {
             const HeroIcon = iconMap[hero.icon] || Wrench;
-            const displayName = isNonAz ?
-            (hero as any)[`display_name_${language}`] || (hero as any)[`name_${language}`] || (hero as any).display_name || hero.name :
-            hero.display_name_az || hero.name_az || hero.name;
+            const displayName = (hero as any).display_name || hero.name;
 
             return (
               <motion.button
@@ -435,7 +421,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
                       }
                     </div>
                     <h3 className="text-white font-bold text-base">{displayName}</h3>
-                    <p className="text-white/70 text-xs">{hero.hero_subtitle || (isNonAz ? (hero as any)[`description_${language}`] || hero.description || hero.description_az : hero.description_az) || ''}</p>
+                    <p className="text-white/70 text-xs">{hero.hero_subtitle || hero.description || ''}</p>
                   </div>
                   <ChevronRight className="w-6 h-6 text-white/60" />
                 </div>

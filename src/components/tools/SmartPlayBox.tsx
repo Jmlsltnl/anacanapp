@@ -275,8 +275,8 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                     {getActivityEmoji(todaysActivity.skill_tags || [])}
                   </motion.div>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold mb-1">{todaysActivity.title_az}</h3>
-                    <p className="text-sm text-white/90">{todaysActivity.description_az}</p>
+                    <h3 className="text-xl font-bold mb-1">{todaysActivity.title}</h3>
+                    <p className="text-sm text-white/90">{todaysActivity.description}</p>
                   </div>
                 </div>
               </div>
@@ -319,7 +319,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                         }>
                         
                             {hasItem && <Check className="h-3 w-3" />}
-                            {invItem?.emoji} {invItem?.name_az || item}
+                            {invItem?.emoji} {invItem?.name || item}
                           </span>);
 
                   })}
@@ -405,8 +405,8 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                                 {getActivityEmoji(activity.skill_tags || [])}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h3 className="font-semibold">{activity.title_az}</h3>
-                                <p className="text-sm text-muted-foreground line-clamp-1">{activity.description_az}</p>
+                                <h3 className="font-semibold">{activity.title}</h3>
+                                <p className="text-sm text-muted-foreground line-clamp-1">{activity.description}</p>
                                 <div className="flex items-center gap-3 mt-2">
                                   <span className="text-xs text-muted-foreground flex items-center gap-1">
                                     <Clock className="h-3 w-3" /> {activity.duration_minutes} {tr("smartplaybox_deq_780a5c", "d\u0259q")}
@@ -445,7 +445,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                     {getActivityEmoji(selectedActivity.skill_tags || [])}
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold">{selectedActivity.title_az}</h2>
+                    <h2 className="text-xl font-bold">{selectedActivity.title}</h2>
                     <div className="flex items-center gap-2 mt-1 text-sm text-white/80">
                       <Clock className="h-4 w-4" />
                       <span>{selectedActivity.duration_minutes} {tr("smartplaybox_deqiqe_94641a", "d\u0259qiq\u0259")}</span>
@@ -455,7 +455,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
               </div>
               
               <div className="p-6 space-y-5">
-                <p className="text-muted-foreground">{selectedActivity.description_az}</p>
+                <p className="text-muted-foreground">{selectedActivity.description}</p>
                 
                 {/* Skills */}
                 <div className="flex flex-wrap gap-2">
@@ -491,7 +491,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                         }>
                         
                             {hasItem && <Check className="h-3 w-3" />}
-                            {invItem?.emoji} {invItem?.name_az || item}
+                            {invItem?.emoji} {invItem?.name || item}
                           </span>);
 
                   })}
@@ -500,12 +500,12 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
               }
 
                 {/* Instructions */}
-                {selectedActivity.instructions_az &&
+                {selectedActivity.instructions &&
               <div>
                     <h4 className="font-semibold mb-2">{tr("smartplaybox_nece_oynamali_6cadac", "📝 Necə oynamalı")}</h4>
                     <div className="bg-muted rounded-lg p-4">
                       <p className="text-sm whitespace-pre-line leading-relaxed">
-                        {selectedActivity.instructions_az}
+                        {selectedActivity.instructions}
                       </p>
                     </div>
                   </div>
@@ -600,7 +600,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                   }>
                   
                       <span>{item.emoji}</span>
-                      <span>{item.name_az}</span>
+                      <span>{item.name}</span>
                       {isItemSelected(item.name) && <Check className="h-3 w-3" />}
                     </motion.button>
                 )}

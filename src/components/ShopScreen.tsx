@@ -75,7 +75,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
       { id: 'all', name: tr("shopscreen_hamisi_c73c4d", "Hamısı"), emoji: '✨' },
       ...dbCategories.map((cat) => ({
         id: cat.category_key,
-        name: cat.name_az || cat.name,
+        name: cat.name,
         emoji: cat.emoji || categoryEmojis[cat.category_key] || categoryEmojis.default
       }))];
 

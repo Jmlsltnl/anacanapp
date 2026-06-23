@@ -164,7 +164,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               {/* Tooth label on hover - using tooltip behavior */}
               <div className={`absolute ${position === 'upper' ? 'top-full mt-1' : 'bottom-full mb-1'} left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 pointer-events-none`}>
                 <span className="text-[8px] whitespace-nowrap bg-foreground/80 text-background px-1 py-0.5 rounded">
-                  {tooth.name_az || tooth.name}
+                  {tooth.name}
                 </span>
               </div>
             </motion.button>);
@@ -306,18 +306,20 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               animate={{ opacity: 1, y: 0 }}>
               
                 <Card>
+              
+                <Card>
                   <CardContent className="p-4">
                     <div className="flex gap-3">
                       <div className="text-2xl">{tip.emoji || '💡'}</div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-medium text-sm">{tip.title_az || tip.title}</h3>
+                          <h3 className="font-medium text-sm">{tip.title}</h3>
                           <Badge variant="outline" className="text-[10px]">
                             {getCategoryLabel(tip.category)}
                           </Badge>
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          {tip.content_az || tip.content}
+                          {tip.content}
                         </p>
                       </div>
                     </div>
@@ -340,28 +342,22 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
                       <div className="text-2xl">{symptom.emoji || '⚠️'}</div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-medium text-sm">{symptom.name_az || symptom.name}</h3>
+                          <h3 className="font-medium text-sm">{symptom.name}</h3>
                           <Badge className={getSeverityColor(symptom.severity)}>
                             {symptom.severity === 'mild' ? tr("teethingtracker_yungul_2a8010", "Y\xFCng\xFCl") : symptom.severity === 'moderate' ? 'Orta' : 'Ciddi'}
                           </Badge>
                         </div>
                         <p className="text-xs text-muted-foreground mb-2">
-                          {symptom.description_az || symptom.description}
+                          {symptom.description}
                         </p>
-                        {(symptom.relief_tips_az || symptom.relief_tips)?.length > 0 &&
+                        {symptom.relief_tips && symptom.relief_tips.length > 0 &&
                       <div className="flex flex-wrap gap-1">
-                            {(symptom.relief_tips_az || symptom.relief_tips)?.map((tip, i) =>
+                            {symptom.relief_tips.map((tip, i) =>
                         <Badge key={i} variant="secondary" className="text-[10px]">
                                 {tip}
                               </Badge>
                         )}
                           </div>
-                      }
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
             )}
           </TabsContent>
         </Tabs>
@@ -375,7 +371,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-rose-500" />
               </div>
-              {selectedTooth?.name_az || selectedTooth?.name}
+              {selectedTooth?.name}
             </DialogTitle>
           </DialogHeader>
 

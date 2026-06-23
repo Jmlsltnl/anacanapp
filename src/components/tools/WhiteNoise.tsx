@@ -68,11 +68,11 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
     if (!dbSounds || dbSounds.length === 0) return [];
     return dbSounds.map((s) => ({
       id: s.id,
-      name: s.name_az || s.name,
+      name: s.name,
       emoji: s.emoji,
       color: s.color_gradient || 'from-blue-400 to-cyan-500',
       noiseType: s.noise_type || 'white',
-      description: s.description_az || s.description || '',
+      description: s.description || '',
       audioUrl: s.audio_url || null
     }));
   }, [dbSounds]);

@@ -43,7 +43,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
     if (dbCategories.length > 0) {
       return dbCategories.map((c) => ({
         value: c.category_key,
-        label: c.label_az || c.label,
+        label: c.label,
         icon: ICON_MAP[c.icon_name] || MapPin,
         color: c.color_gradient
       }));
@@ -60,7 +60,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
     if (dbAmenities.length > 0) {
       return dbAmenities.map((a) => ({
         key: a.amenity_key,
-        label: a.label_az || a.label,
+        label: a.label,
         icon: a.emoji
       }));
     }
@@ -152,8 +152,8 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
   };
 
   const filteredPlaces = places.filter((place) =>
-  (place.name_az || place.name).toLowerCase().includes(searchQuery.toLowerCase()) ||
-  (place.address_az || place.address || '').toLowerCase().includes(searchQuery.toLowerCase())
+  place.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  (place.address || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Statistics
@@ -345,7 +345,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                         
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-bold text-foreground truncate">{place.name_az || place.name}</h3>
+                            <h3 className="font-bold text-foreground truncate">{place.name}</h3>
                             {place.is_verified &&
                           <Badge className="shrink-0 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-0 text-xs">
                                 <Check className="w-3 h-3 mr-1" /> {tr("momfriendlymap_tesdiqlenib_96c431", "T\u0259sdiql\u0259nib")}
@@ -354,7 +354,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                           </div>
                           
                           <p className="text-sm text-muted-foreground truncate mb-2">
-                            {place.address_az || place.address || tr("momfriendlymap_unvan_gosterilmeyib_06305d", "\xDCnvan g\xF6st\u0259rilm\u0259yib")}
+                            {place.address || tr("momfriendlymap_unvan_gosterilmeyib_06305d", "\xDCnvan g\xF6st\u0259rilm\u0259yib")}
                           </p>
                           
                           <div className="flex items-center gap-3 mb-2">
@@ -501,14 +501,14 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
               <div className="p-5 space-y-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <h2 className="text-xl font-bold text-foreground">{selectedPlace.name_az || selectedPlace.name}</h2>
+                    <h2 className="text-xl font-bold text-foreground">{selectedPlace.name}</h2>
                     {selectedPlace.is_verified &&
                   <Badge className="bg-emerald-500/10 text-emerald-600 border-0">
                     <Check className="w-3 h-3 mr-1" /> {tr("momfriendlymap_tesdiqlenib_96c431", "Təsdiqlənib")}
                   </Badge>
                   }
                   </div>
-                  <p className="text-muted-foreground">{selectedPlace.address_az || selectedPlace.address}</p>
+                  <p className="text-muted-foreground">{selectedPlace.address}</p>
                 </div>
 
                 {/* Rating Card */}

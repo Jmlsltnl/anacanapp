@@ -1,5 +1,7 @@
-import { tr } from "@/lib/tr";import { useQuery } from '@tanstack/react-query';
+import { tr, mapRowsTranslation } from "@/lib/tr";
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
 
 export interface EPDSQuestion {
   id: string;
@@ -48,8 +50,9 @@ export interface NoiseThreshold {
 }
 
 export const useEPDSQuestionsDB = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['epds-questions'],
+    queryKey: ['epds-questions', language],
     queryFn: async () => {
       const { data, error } = await supabase.
       from('epds_questions').
@@ -58,9 +61,14 @@ export const useEPDSQuestionsDB = () => {
       order('sort_order');
 
       if (error) throw error;
-      return (data || []).map((q) => ({
+      const mapped = mapRowsTranslation(data, language, ['question_text']);
+      return (mapped || []).map((q) => ({
         ...q,
-        options: q.options as {value: number;text: string;text_az: string;}[] || []
+        options: (q.options as any[] || []).map((o) => ({
+          value: o.value,
+          text: language === 'az' ? (o.text_az ?? o.text) : (o[`text_${language}`] ?? o.text_az ?? o.text),
+          text_az: o.text_az
+        }))
       })) as EPDSQuestion[];
     },
     staleTime: 1000 * 60 * 5 // 5 minutes
@@ -68,8 +76,9 @@ export const useEPDSQuestionsDB = () => {
 };
 
 export const useMoodLevelsDB = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['mood-levels'],
+    queryKey: ['mood-levels', language],
     queryFn: async () => {
       const { data, error } = await supabase.
       from('mood_levels').
@@ -78,15 +87,16 @@ export const useMoodLevelsDB = () => {
       order('sort_order');
 
       if (error) throw error;
-      return data as MoodLevel[];
+      return mapRowsTranslation(data, language, ['label']) as unknown as MoodLevel[];
     },
     staleTime: 1000 * 60 * 30
   });
 };
 
 export const useBreathingExercisesDB = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['breathing-exercises'],
+    queryKey: ['breathing-exercises', language],
     queryFn: async () => {
       const { data, error } = await supabase.
       from('breathing_exercises').
@@ -95,15 +105,16 @@ export const useBreathingExercisesDB = () => {
       order('sort_order');
 
       if (error) throw error;
-      return data as BreathingExercise[];
+      return mapRowsTranslation(data, language, ['name', 'description']) as unknown as BreathingExercise[];
     },
     staleTime: 1000 * 60 * 30
   });
 };
 
 export const useNoiseThresholdsDB = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['noise-thresholds'],
+    queryKey: ['noise-thresholds', language],
     queryFn: async () => {
       const { data, error } = await supabase.
       from('noise_thresholds').
@@ -112,7 +123,7 @@ export const useNoiseThresholdsDB = () => {
       order('sort_order');
 
       if (error) throw error;
-      return data as NoiseThreshold[];
+      return mapRowsTranslation(data, language, ['label', 'description']) as unknown as NoiseThreshold[];
     },
     staleTime: 1000 * 60 * 30
   });

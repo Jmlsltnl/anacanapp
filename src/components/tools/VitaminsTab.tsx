@@ -49,22 +49,21 @@ const VitaminsTab = ({ className }: VitaminsTabProps) => {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-sm">{vitamin.name_az || vitamin.name}</h3>
+            <h3 className="font-semibold text-sm">{vitamin.name}</h3>
             {isEssential &&
           <span className="text-[9px] px-1.5 py-0.5 rounded bg-primary/20 text-primary font-medium">
                 Vacib
               </span>
           }
           </div>
-          {vitamin.description_az &&
+          {vitamin.description &&
         <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-              {vitamin.description_az}
+              {vitamin.description}
             </p>
         }
           
           {/* Dosage */}
           {vitamin.dosage &&
-        <div className="mt-2 flex items-center gap-1 text-[10px] text-primary font-medium">
               <Pill className="w-3 h-3" />
               {vitamin.dosage}
             </div>

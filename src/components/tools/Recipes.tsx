@@ -46,7 +46,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
       filter((c) => c.category_id !== 'all' && c.name.toLowerCase() !== tr("recipes_hamisi_6dc013", "ham\u0131s\u0131")).
       map((c) => ({
         id: c.category_id,
-        name: c.name_az || c.name,
+        name: c.name,
         emoji: c.emoji || '🍽️'
       }));
       return [...base, ...filtered];

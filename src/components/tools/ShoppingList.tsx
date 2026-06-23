@@ -53,7 +53,7 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
   // Filter out already added items from recommendations
   const existingItemNames = items.map((i) => i.name.toLowerCase());
   const filteredRecommendations = defaultItems.filter(
-    (d) => !existingItemNames.includes((d.name_az || d.name).toLowerCase())
+    (d) => !existingItemNames.includes(d.name.toLowerCase())
   );
 
   const handleAddItem = async () => {
@@ -201,26 +201,24 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
                   key={item.id}
                   onClick={async () => {
                     const result = await addItem({
-                      name: item.name_az || item.name,
+                      name: item.name,
                       priority: item.priority
                     });
                     if (!result.error) {
-                      toast({ title: `${item.name_az || item.name} ${tr("shopping_item_added", "əlavə edildi!")}` });
+                      toast({ title: `${item.name} ${tr("shopping_item_added", "əlavə edildi!")}` });
                     }
                   }}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 rounded-full text-xs font-medium text-primary transition-colors border border-primary/20"
                   whileTap={{ scale: 0.95 }}>
                   
                         <Plus className="w-3 h-3" />
-                        {item.name_az || item.name}
+                        {item.name}
                       </motion.button>
                 )}
                   </div>
                 </motion.div>
             }
             </AnimatePresence>
-          </div>
-        }
 
         {/* Unchecked items */}
         <div className="space-y-1.5 mb-3">

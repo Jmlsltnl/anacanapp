@@ -1,6 +1,8 @@
-import { tr } from "@/lib/tr";import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { tr, mapRowsTranslation } from "@/lib/tr";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useUserStore } from '@/store/userStore';
 import { toast } from 'sonner';
 
 export interface PlayActivity {
@@ -30,8 +32,9 @@ export interface PlayInventoryItem {
 }
 
 export const usePlayActivities = (babyAgeDays?: number, availableItems?: string[]) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['play-activities', babyAgeDays, availableItems],
+    queryKey: ['play-activities', babyAgeDays, availableItems, language],
     queryFn: async () => {
       let query = supabase.
       from('play_activities').
@@ -48,7 +51,7 @@ export const usePlayActivities = (babyAgeDays?: number, availableItems?: string[
       const { data, error } = await query;
       if (error) throw error;
 
-      let activities = data as PlayActivity[];
+      let activities = mapRowsTranslation(data, language, ['title', 'description', 'instructions']) as unknown as PlayActivity[];
 
       // Filter by available items if provided
       if (availableItems?.length) {
@@ -67,8 +70,9 @@ export const usePlayActivities = (babyAgeDays?: number, availableItems?: string[
 };
 
 export const usePlayInventoryItems = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['play-inventory-items'],
+    queryKey: ['play-inventory-items', language],
     queryFn: async () => {
       const { data, error } = await supabase.
       from('play_inventory_items').
@@ -77,7 +81,7 @@ export const usePlayInventoryItems = () => {
       order('sort_order');
 
       if (error) throw error;
-      return data as PlayInventoryItem[];
+      return mapRowsTranslation(data, language, ['name']) as unknown as PlayInventoryItem[];
     },
     staleTime: 1000 * 60 * 10
   });

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useUserStore } from '@/store/userStore';
+import { mapRowsTranslation } from '@/lib/tr';
 
 export interface DefaultShoppingItem {
   id: string;
@@ -17,6 +19,7 @@ export interface DefaultShoppingItem {
 
 export const useDefaultShoppingItems = () => {
   const { profile } = useAuth();
+  const language = useUserStore((state) => state.language);
   const [items, setItems] = useState<DefaultShoppingItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,8 +33,12 @@ export const useDefaultShoppingItems = () => {
 
       if (error) throw error;
       
-      // Filter by life_stage if user has a profile
       let filteredData = data || [];
+      
+      // Map translations
+      filteredData = mapRowsTranslation(filteredData, language, ['name']);
+
+      // Filter by life_stage if user has a profile
       if (profile?.life_stage) {
         filteredData = filteredData.filter(
           item => item.life_stage === 'all' || item.life_stage === profile.life_stage
@@ -48,7 +55,7 @@ export const useDefaultShoppingItems = () => {
 
   useEffect(() => {
     fetchItems();
-  }, [profile?.life_stage]);
+  }, [profile?.life_stage, language]);
 
   return {
     items,

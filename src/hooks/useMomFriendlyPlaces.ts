@@ -1,6 +1,8 @@
-import { tr } from "@/lib/tr";import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { tr, mapRowsTranslation } from "@/lib/tr";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useUserStore } from '@/store/userStore';
 import { toast } from 'sonner';
 
 export interface MomFriendlyPlace {
@@ -51,8 +53,9 @@ export const useMomFriendlyPlaces = (filters?: {
   category?: string;
   amenities?: string[];
 }) => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['mom-friendly-places', filters],
+    queryKey: ['mom-friendly-places', filters, language],
     queryFn: async () => {
       let query = supabase.
       from('mom_friendly_places').
@@ -67,7 +70,7 @@ export const useMomFriendlyPlaces = (filters?: {
       const { data, error } = await query;
       if (error) throw error;
 
-      let places = data as MomFriendlyPlace[];
+      let places = mapRowsTranslation(data, language, ['name', 'description', 'address']) as unknown as MomFriendlyPlace[];
 
       // Filter by amenities client-side for flexibility
       if (filters?.amenities?.length) {

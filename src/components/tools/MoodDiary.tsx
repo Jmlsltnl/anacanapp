@@ -45,7 +45,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
     return dbMoods.map((m) => ({
       value: m.value,
       emoji: m.emoji,
-      label: m.label_az || m.label,
+      label: m.label,
       color: m.color_class || 'bg-gray-100 border-gray-300'
     }));
   }, [dbMoods]);
@@ -60,7 +60,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
     }
     return dbSymptoms.map((s) => ({
       id: s.symptom_key,
-      label: s.label_az || s.label,
+      label: s.label,
       emoji: s.icon || '🩺'
     }));
   }, [dbSymptoms]);

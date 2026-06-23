@@ -52,10 +52,10 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
     if (epdsQuestionsDB.length > 0) {
       return epdsQuestionsDB.map((q) => ({
         id: q.question_number,
-        question: q.question_text_az || q.question_text,
+        question: q.question_text,
         options: (q.options || []).map((o) => ({
           value: o.value,
-          label: o.text_az || o.text
+          label: o.text
         }))
       }));
     }
@@ -68,7 +68,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
       return moodLevelsDB.map((m) => ({
         value: m.mood_value,
         emoji: m.emoji,
-        label: m.label_az || m.label,
+        label: m.label,
         gradient: `from-[${m.color}] to-[${m.color}]`,
         bg: `bg-[${m.color}]/10`
       }));
@@ -91,11 +91,11 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
   const BREATHING_EXERCISES = useMemo(() => {
     if (breathingExercisesDB.length > 0) {
       return breathingExercisesDB.map((e) => ({
-        name: e.name_az || e.name,
+        name: e.name,
         inhale: e.inhale_seconds,
         hold: e.hold_seconds,
         exhale: e.exhale_seconds,
-        description: e.description_az || e.description || '',
+        description: e.description || '',
         emoji: e.icon === 'Wind' ? '🌙' : e.icon === 'Square' ? '📦' : '💨'
       }));
     }
@@ -522,13 +522,15 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
               <Phone className="w-5 h-5 text-red-500" />
               {tr("mentalhealthtracker_tecili_yardim_283100", "T\u0259cili Yard\u0131m")}
             </h3>
+              {tr("mentalhealthtracker_tecili_yardim_283100", "Təcili Yardım")}
+            </h3>
             <div className="space-y-2">
               {emergencyResources.map((resource) =>
             <div key={resource.id} className="bg-red-50 dark:bg-red-900/20 rounded-2xl p-4 border border-red-200 dark:border-red-800">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-bold text-red-700 dark:text-red-300">{resource.name_az}</p>
-                      <p className="text-xs text-red-600 dark:text-red-400">{resource.description_az}</p>
+                      <p className="font-bold text-red-700 dark:text-red-300">{resource.name}</p>
+                      <p className="text-xs text-red-600 dark:text-red-400">{resource.description}</p>
                     </div>
                     {resource.phone &&
                 <Button size="sm" className="bg-gradient-to-r from-red-500 to-rose-600 border-0" asChild>
@@ -556,14 +558,14 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
             <div className="space-y-2">
               {otherResources.map((resource) =>
             <div key={resource.id} className="bg-card rounded-2xl p-4 shadow-sm border border-border/50">
-                  <p className="font-bold text-foreground">{resource.name_az}</p>
-                  <p className="text-xs text-muted-foreground">{resource.description_az}</p>
+                  <p className="font-bold text-foreground">{resource.name}</p>
+                  <p className="text-xs text-muted-foreground">{resource.description}</p>
                   <div className="flex gap-2 mt-3">
                     {resource.phone &&
                 <Button size="sm" variant="outline" className="rounded-xl" asChild>
                         <a href={`tel:${resource.phone}`}>
                           <Phone className="w-3.5 h-3.5 mr-1" />
-                          {tr("mentalhealthtracker_zeng_et_15094d", "Z\u0259ng et")}
+                          {tr("mentalhealthtracker_zeng_et_15094d", "Zəng et")}
                         </a>
                       </Button>
                 }
@@ -589,7 +591,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Wind className="w-5 h-5 text-cyan-500" />
-              {tr("mentalhealthtracker_nefes_mesqi_8d98bb", "N\u0259f\u0259s M\u0259\u015Fqi")}
+              {tr("mentalhealthtracker_nefes_mesqi_8d98bb", "Nəfəs Məşqi")}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-6">
@@ -614,7 +616,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                         <p className="font-bold text-foreground">{ex.name}</p>
                         <p className="text-xs text-muted-foreground">{ex.description}</p>
                         <p className="text-xs mt-1 text-teal-600 dark:text-teal-400 font-medium">
-                          {tr("mentalhealthtracker_nefes_al_56f3c5", "N\u0259f\u0259s al:")} {ex.inhale}s • Saxla: {ex.hold}s • Burax: {ex.exhale}s
+                          {tr("mentalhealthtracker_nefes_al_56f3c5", "Nəfəs al:")} {ex.inhale}s • Saxla: {ex.hold}s • Burax: {ex.exhale}s
                         </p>
                       </div>
                     </motion.button>
@@ -625,7 +627,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 onClick={startBreathing}>
                 
                   <Wind className="w-5 h-5 mr-2" />
-                  {tr("mentalhealthtracker_basla_4820bc", "Ba\u015Fla")}
+                  {tr("mentalhealthtracker_basla_4820bc", "Başla")}
                 </Button>
               </> :
 
@@ -643,15 +645,15 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 }}>
                 
                   <span className="text-white text-2xl font-bold">
-                    {breathingPhase === 'inhale' ? tr("mentalhealthtracker_nefes_al_50ff18", "N\u0259f\u0259s al") :
+                    {breathingPhase === 'inhale' ? tr("mentalhealthtracker_nefes_al_50ff18", "Nəfəs al") :
                   breathingPhase === 'hold' ? 'Saxla' : 'Burax'}
                   </span>
                 </motion.div>
                 <p className="mt-8 text-xl font-bold text-foreground">
-                  {tr("mentalhealthtracker_dovre_a52cde", "D\xF6vr\u0259:")} {breathingCount + 1} / 4
+                  {tr("mentalhealthtracker_dovre_a52cde", "Dövrə:")} {breathingCount + 1} / 4
                 </p>
                 <Button variant="outline" className="mt-4 rounded-xl" onClick={() => setBreathingPhase('idle')}>
-                  {tr("mentalhealthtracker_dayandir_b2ea06", "Dayand\u0131r")}
+                  {tr("mentalhealthtracker_dayandir_b2ea06", "Dayandır")}
                 </Button>
               </div>
             }
@@ -665,7 +667,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Brain className="w-5 h-5 text-teal-500" />
-              {tr("mentalhealthtracker_epds_sorgusu_564f52", "EPDS Sor\u011Fusu")}
+              {tr("mentalhealthtracker_epds_sorgusu_564f52", "EPDS Sorğusu")}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
@@ -737,7 +739,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 className="flex-1 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-600 border-0"
                 onClick={goToNextQuestion}
                 disabled={epdsAnswers[EPDS_QUESTIONS[currentQuestion].id] === undefined}>
-                  {tr("mentalhealthtracker_novbeti_6e8661", "N\xF6vb\u0259ti")}
+                  {tr("mentalhealthtracker_novbeti_6e8661", "Növbəti")}
                   
                 <ChevronRight className="w-4 h-4 ml-1" />
                 </Button> :
@@ -746,7 +748,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 className="flex-1 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-600 border-0"
                 onClick={handleSubmitEPDS}
                 disabled={submitEPDS.isPending || Object.keys(epdsAnswers).length < EPDS_QUESTIONS.length}>
-                  {tr("mentalhealthtracker_neticeni_gor_d2fef0", "N\u0259tic\u0259ni G\xF6r")}
+                  {tr("mentalhealthtracker_neticeni_gor_d2fef0", "Nəticəni Gör")}
                 
               </Button>
               }
@@ -783,13 +785,13 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 {showResult.risk_level === 'high' && emergencyResources.length > 0 &&
               <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl border border-red-200 dark:border-red-800">
                     <p className="text-sm font-bold text-red-700 dark:text-red-300 mb-3">
-                      {tr("mentalhealthtracker_zehmet_olmasa_mutexessisle_ela_07b456", "\uD83C\uDD98 Z\u0259hm\u0259t olmasa m\xFCt\u0259x\u0259ssisl\u0259 \u0259laq\u0259 saxlay\u0131n:")}
+                      {tr("mentalhealthtracker_zehmet_olmasa_mutexessisle_ela_07b456", "🆘 Zəhmət olmasa mütəxəssislə əlaqə saxlayın:")}
                     </p>
                     {emergencyResources.map((r) =>
                 <Button key={r.id} className="w-full bg-gradient-to-r from-red-500 to-rose-600 border-0" asChild>
                         <a href={`tel:${r.phone}`}>
                           <Phone className="w-4 h-4 mr-2" />
-                          {r.name_az}: {r.phone}
+                          {r.name}: {r.phone}
                         </a>
                       </Button>
                 )}

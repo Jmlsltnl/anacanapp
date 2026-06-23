@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { tr } from '@/lib/tr';
+import { tr, mapRowsTranslation } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useUserStore } from '@/store/userStore';
 import { subDays, format } from 'date-fns';
 
 export interface MoodCheckin {
@@ -291,8 +292,9 @@ export const useSubmitEPDS = () => {
 };
 
 export const useMentalHealthResources = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['mental-health-resources'],
+    queryKey: ['mental-health-resources', language],
     queryFn: async () => {
       const { data, error } = await supabase.
       from('mental_health_resources').
@@ -301,7 +303,7 @@ export const useMentalHealthResources = () => {
       order('sort_order');
 
       if (error) throw error;
-      return data as MentalHealthResource[];
+      return mapRowsTranslation(data, language, ['name', 'description', 'address']) as unknown as MentalHealthResource[];
     },
     staleTime: 1000 * 60 * 30
   });

@@ -1,6 +1,8 @@
-import { tr } from "@/lib/tr";import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { tr, mapRowsTranslation } from "@/lib/tr";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useUserStore } from '@/store/userStore';
 import { format } from 'date-fns';
 
 export interface ZodiacSign {
@@ -13,6 +15,7 @@ export interface ZodiacSign {
   element: string | null;
   ruling_planet: string | null;
   characteristics_az: string[] | null;
+  characteristics?: string[] | null;
   color: string | null;
 }
 
@@ -38,8 +41,9 @@ export interface HoroscopeReading {
 }
 
 export const useZodiacSigns = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['zodiac-signs'],
+    queryKey: ['zodiac-signs', language],
     queryFn: async () => {
       const { data, error } = await supabase.
       from('zodiac_signs').
@@ -47,22 +51,23 @@ export const useZodiacSigns = () => {
       order('sort_order');
 
       if (error) throw error;
-      return data as ZodiacSign[];
+      return mapRowsTranslation(data, language, ['name', 'characteristics']) as unknown as ZodiacSign[];
     },
     staleTime: 1000 * 60 * 60
   });
 };
 
 export const useZodiacCompatibility = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['zodiac-compatibility'],
+    queryKey: ['zodiac-compatibility', language],
     queryFn: async () => {
       const { data, error } = await supabase.
       from('zodiac_compatibility').
       select('*');
 
       if (error) throw error;
-      return data as ZodiacCompatibility[];
+      return mapRowsTranslation(data, language, ['description']) as unknown as ZodiacCompatibility[];
     },
     staleTime: 1000 * 60 * 60
   });

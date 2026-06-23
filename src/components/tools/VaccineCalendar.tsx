@@ -63,7 +63,7 @@ const computeStatus = (row: VaccineScheduleRow, ageDays: number, log?: ChildVacc
 const groupByAge = (rows: VaccineScheduleRow[]) => {
   const groups = new Map<string, {label: string;days: number;rows: VaccineScheduleRow[];}>();
   rows.forEach((r) => {
-    const key = r.age_label_az;
+    const key = r.age_label || '';
     if (!groups.has(key)) groups.set(key, { label: key, days: r.recommended_age_days, rows: [] });
     groups.get(key)!.rows.push(r);
   });
@@ -159,13 +159,13 @@ export default function VaccineCalendar({ onBack }: Props) {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <h4 className="text-[13px] font-bold text-foreground truncate">{row.vaccine.name_az}</h4>
+              <h4 className="text-[13px] font-bold text-foreground truncate">{row.vaccine.name}</h4>
               {!row.vaccine.is_mandatory &&
               <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">{tr("vaccinecalendar_konullu_6b1c0e", "k\xF6n\xFCll\xFC")}</span>
               }
             </div>
             <p className="text-[11px] text-muted-foreground mt-0.5">
-              {row.age_label_az} • {row.dose_label_az}
+              {row.age_label} • {row.dose_label}
             </p>
             <div className="flex items-center justify-between mt-1.5">
               {renderStatusBadge(status)}
@@ -229,14 +229,14 @@ export default function VaccineCalendar({ onBack }: Props) {
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8 px-2.5 gap-1.5 rounded-full">
                   <span className="text-base leading-none">{country?.flag_emoji || '🌍'}</span>
-                  <span className="text-[11px] font-semibold">{country?.name_az || effectiveCountry}</span>
+                  <span className="text-[11px] font-semibold">{country?.name || effectiveCountry}</span>
                   <ChevronDown className="w-3 h-3" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 {countries.map((c) =>
                 <DropdownMenuItem key={c.code} onClick={() => handleChangeCountry(c.code)}>
-                    <span className="mr-2">{c.flag_emoji}</span>{c.name_az}
+                    <span className="mr-2">{c.flag_emoji}</span>{c.name}
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
@@ -302,7 +302,7 @@ export default function VaccineCalendar({ onBack }: Props) {
         doneRows.map(renderCard))
         }
         {tab === 'all' && groupedAll.map((g) => {
-          const groupRows = rowsWithStatus.filter((x) => x.row.age_label_az === g.label);
+          const groupRows = rowsWithStatus.filter((x) => x.row.age_label === g.label);
           return (
             <div key={g.label} className="mt-3 first:mt-0">
               <div className="flex items-center gap-2 mb-1.5 px-1">
@@ -346,36 +346,36 @@ export default function VaccineCalendar({ onBack }: Props) {
                     <Syringe className="w-6 h-6" />
                   </div>
                   <div className="flex-1 text-left">
-                    <SheetTitle className="text-base">{detailRow.vaccine.name_az}</SheetTitle>
-                    <p className="text-[11px] text-muted-foreground">{detailRow.age_label_az} • {detailRow.dose_label_az}</p>
+                    <SheetTitle className="text-base">{detailRow.vaccine.name}</SheetTitle>
+                    <p className="text-[11px] text-muted-foreground">{detailRow.age_label} • {detailRow.dose_label}</p>
                   </div>
                 </div>
               </SheetHeader>
 
               <div className="mt-4 space-y-3 text-sm">
-                {detailRow.vaccine.short_description_az &&
-              <p className="text-[13px] text-foreground leading-relaxed">{detailRow.vaccine.short_description_az}</p>
+                {detailRow.vaccine.short_description &&
+              <p className="text-[13px] text-foreground leading-relaxed">{detailRow.vaccine.short_description}</p>
               }
-                {detailRow.vaccine.full_description_az &&
+                {detailRow.vaccine.full_description &&
               <div className="bg-primary/5 rounded-xl p-3">
                     <p className="text-[12px] text-foreground leading-relaxed whitespace-pre-line">
-                      {detailRow.vaccine.full_description_az}
+                      {detailRow.vaccine.full_description}
                     </p>
                   </div>
               }
-                {detailRow.vaccine.disease_az &&
-              <DetailRow label={tr("vaccinecalendar_qarsisi_alinan_xestelik_862a71", "Qar\u015F\u0131s\u0131 al\u0131nan x\u0259st\u0259lik")} value={detailRow.vaccine.disease_az} />
+                {detailRow.vaccine.disease &&
+              <DetailRow label={tr("vaccinecalendar_qarsisi_alinan_xestelik_862a71", "Qar\u015F\u0131s\u0131 al\u0131nan x\u0259st\u0259lik")} value={detailRow.vaccine.disease} />
               }
-                {detailRow.vaccine.route_az &&
-              <DetailRow label={tr("vaccinecalendar_vurma_usulu_689cd3", "Vurma \xFCsulu")} value={detailRow.vaccine.route_az} />
+                {detailRow.vaccine.route &&
+              <DetailRow label={tr("vaccinecalendar_vurma_usulu_689cd3", "Vurma \xFCsulu")} value={detailRow.vaccine.route} />
               }
-                {detailRow.vaccine.side_effects_az &&
-              <DetailRow label={tr("vaccinecalendar_mumkun_yan_tesirler_fc6796", "M\xFCmk\xFCn yan t\u0259sirl\u0259r")} value={detailRow.vaccine.side_effects_az} />
+                {detailRow.vaccine.side_effects &&
+              <DetailRow label={tr("vaccinecalendar_mumkun_yan_tesirler_fc6796", "M\xFCmk\xFCn yan t\u0259sirl\u0259r")} value={detailRow.vaccine.side_effects} />
               }
-                {detailRow.vaccine.contraindications_az &&
-              <DetailRow label={tr("vaccinecalendar_eks_gosterisler_f34875", "\u018Fks-g\xF6st\u0259ri\u015Fl\u0259r")} value={detailRow.vaccine.contraindications_az} />
+                {detailRow.vaccine.contraindications &&
+              <DetailRow label={tr("vaccinecalendar_eks_gosterisler_f34875", "\u018Fks-g\xF6st\u0259ri\u015Fl\u0259r")} value={detailRow.vaccine.contraindications} />
               }
-                {detailRow.notes_az && <DetailRow label={tr("untranslated_qeyd_z0999u", "Qeyd")} value={detailRow.notes_az} />}
+                {detailRow.notes && <DetailRow label={tr("untranslated_qeyd_z0999u", "Qeyd")} value={detailRow.notes} />}
 
                 {/* Actions */}
                 <div className="grid grid-cols-2 gap-2 pt-2">
@@ -432,7 +432,7 @@ export default function VaccineCalendar({ onBack }: Props) {
             country_code: effectiveCountry,
             ...payload
           });
-          toast({ title: tr("vaccinecalendar_yadda_saxlandi_f72ffd", "Yadda saxland\u0131"), description: actionRow.vaccine.name_az });
+          toast({ title: tr("vaccinecalendar_yadda_saxlandi_f72ffd", "Yadda saxland\u0131"), description: actionRow.vaccine.name });
           setActionRow(null);
           setActionMode(null);
         }} />
@@ -478,12 +478,6 @@ function DetailRow({ label, value }: {label: string;value: string;}) {
 
 function ActionDialog({
   open, mode, row, onClose, onSubmit
-
-
-
-
-
-
 }: {open: boolean;mode: 'done' | 'skip' | null;row: VaccineScheduleRow | null;onClose: () => void;onSubmit: (payload: any) => Promise<void>;}) {
   const today = new Date().toISOString().slice(0, 10);
   const [date, setDate] = useState(today);
@@ -500,13 +494,8 @@ function ActionDialog({
             {mode === 'done' ? tr("vaccinecalendar_peyvend_vuruldu_22c2e5", "Peyv\u0259nd vuruldu") : tr("vaccinecalendar_peyvendi_buraxildi_kimi_qeyd_e_64265a", "Peyv\u0259ndi burax\u0131ld\u0131 kimi qeyd et")}
           </DialogTitle>
         </DialogHeader>
-        {row && <p className="text-xs text-muted-foreground -mt-2">{row.vaccine.name_az} • {row.dose_label_az}</p>}
+        {row && <p className="text-xs text-muted-foreground -mt-2">{row.vaccine.name} • {row.dose_label}</p>}
         {mode === 'done' ?
-        <div className="space-y-3 mt-2">
-            <div>
-              <Label className="text-xs">{tr("untranslated_tarix_6hhkyx", "Tarix")}</Label>
-              <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} max={today} />
-            </div>
             <div>
               <Label className="text-xs">{tr("vaccinecalendar_yer_xestexana_klinika_d8c111", "Yer (x\u0259st\u0259xana/klinika)")}</Label>
               <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder={tr("vaccinecalendar_mes_baki_usaq_klinik_xestexana_8a2157", "m\u0259s. Bak\u0131 U\u015Faq Klinik X\u0259st\u0259xanas\u0131")} />

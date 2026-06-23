@@ -74,7 +74,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
 
   // Use DB foods or fallback
   const allCommonFoods = dbFoods.length > 0 ?
-  dbFoods.map((f) => ({ name: f.name_az || f.name, calories: f.calories, emoji: f.emoji, meal_types: f.meal_types })) :
+  dbFoods.map((f) => ({ name: f.name, calories: f.calories, emoji: f.emoji, meal_types: f.meal_types })) :
   fallbackFoods.map((f) => ({ ...f, meal_types: ['breakfast', 'lunch', 'dinner', 'snack'] }));
 
   // Filter foods by selected meal type using meal_types array directly
@@ -92,7 +92,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
     if (dbMealTypes.length > 0) {
       return dbMealTypes.map((m) => ({
         id: m.meal_id,
-        name: m.name_az || m.name,
+        name: m.name,
         icon: mealIcons[m.meal_id] || Utensils,
         time: m.time_range || '',
         emoji: m.emoji || '🍽️'
@@ -115,7 +115,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
       return {
         calories: dbTarget.calories,
         water: dbTarget.water_glasses,
-        description: dbTarget.description_az || dbTarget.description || ''
+        description: dbTarget.description || ''
       };
     }
     const fallback = fallbackTargets[stage as keyof typeof fallbackTargets] || fallbackTargets.flow;

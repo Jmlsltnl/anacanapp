@@ -631,7 +631,7 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
                     className="text-center p-2 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
                     
                     <span className="text-xl block">{sign.symbol}</span>
-                    <p className="text-[10px] mt-1 text-muted-foreground">{sign.name_az}</p>
+                    <p className="text-[10px] mt-1 text-muted-foreground">{sign.name}</p>
                   </div>);
 
               })}
@@ -845,7 +845,7 @@ const PersonInput = ({
         
           <span className="text-3xl">{selectedSign.symbol}</span>
           <div className="flex-1">
-            <p className="font-semibold">{selectedSign.name_az}</p>
+            <p className="font-semibold">{selectedSign.name}</p>
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               {selectedSign.element && ELEMENT_ICONS[selectedSign.element] &&
             <>

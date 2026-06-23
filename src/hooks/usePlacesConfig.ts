@@ -1,5 +1,7 @@
-import { tr } from "@/lib/tr";import { useQuery } from '@tanstack/react-query';
+import { tr, mapRowsTranslation } from "@/lib/tr";
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
 
 export interface PlaceCategory {
   id: string;
@@ -23,8 +25,9 @@ export interface PlaceAmenity {
 }
 
 export const usePlaceCategories = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['place-categories'],
+    queryKey: ['place-categories', language],
     queryFn: async () => {
       const { data, error } = await supabase.
       from('place_categories').
@@ -33,15 +36,16 @@ export const usePlaceCategories = () => {
       order('sort_order');
 
       if (error) throw error;
-      return (data || []) as PlaceCategory[];
+      return mapRowsTranslation(data, language, ['label']) as unknown as PlaceCategory[];
     },
     staleTime: 1000 * 60 * 30
   });
 };
 
 export const usePlaceAmenities = () => {
+  const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['place-amenities'],
+    queryKey: ['place-amenities', language],
     queryFn: async () => {
       const { data, error } = await supabase.
       from('place_amenities').
@@ -50,7 +54,7 @@ export const usePlaceAmenities = () => {
       order('sort_order');
 
       if (error) throw error;
-      return (data || []) as PlaceAmenity[];
+      return mapRowsTranslation(data, language, ['label']) as unknown as PlaceAmenity[];
     },
     staleTime: 1000 * 60 * 30
   });

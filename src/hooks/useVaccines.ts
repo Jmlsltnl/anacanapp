@@ -9,6 +9,7 @@ export interface VaccineCountry {
   code: string;
   name_az: string;
   name_en: string;
+  name?: string;
   flag_emoji: string | null;
   source_url: string | null;
   source_label: string | null;
@@ -23,12 +24,19 @@ export interface Vaccine {
   code: string;
   name_az: string;
   name_en: string | null;
+  name?: string;
   short_description_az: string | null;
+  short_description?: string | null;
   full_description_az: string | null;
+  full_description?: string | null;
   disease_az: string | null;
+  disease?: string | null;
   route_az: string | null;
+  route?: string | null;
   side_effects_az: string | null;
+  side_effects?: string | null;
   contraindications_az: string | null;
+  contraindications?: string | null;
   is_mandatory: boolean;
   is_active: boolean;
   sort_order: number;
@@ -42,13 +50,17 @@ export interface VaccineSchedule {
   country_code: string;
   dose_number: number;
   dose_label_az: string;
+  dose_label?: string;
   recommended_age_days: number;
   age_label_az: string;
+  age_label?: string;
   min_age_days: number | null;
   max_age_days: number | null;
   notes_az: string | null;
+  notes?: string | null;
   sort_order: number;
 }
+
 
 export interface ChildVaccination {
   id: string;
