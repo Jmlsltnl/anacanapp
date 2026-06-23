@@ -42,11 +42,27 @@ export function mapRowTranslation<T extends Record<string, any>>(
   if (!row) return null;
   const result = { ...row } as any;
   for (const field of fields) {
+    let val: any;
     if (language === 'az') {
-      result[field] = row[`${field}_az`] ?? row[field];
+      val = row[`${field}_az`] ?? row[field];
     } else {
-      result[field] = row[`${field}_${language}`] ?? row[`${field}_az`] ?? row[field];
+      val = row[`${field}_${language}`] ?? row[`${field}_az`] ?? row[field];
     }
+
+    // Safely parse array fields if the translation is stored as a JSON string
+    if (Array.isArray(row[field]) && typeof val === 'string') {
+      try {
+        val = JSON.parse(val);
+      } catch {
+        if (val.includes('\n')) {
+          val = val.split('\n').map((s: string) => s.trim()).filter(Boolean);
+        } else {
+          val = row[field]; // fallback to base array
+        }
+      }
+    }
+
+    result[field] = val;
   }
   return result as T;
 }

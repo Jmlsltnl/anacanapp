@@ -399,7 +399,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                 </div>
 
                 {/* Symptoms */}
-                {selectedCrisis.symptoms && selectedCrisis.symptoms.length > 0 && (
+                {Array.isArray(selectedCrisis.symptoms) && selectedCrisis.symptoms.length > 0 && (
                   <div className={`rounded-xl p-4 ${getSeverityConfig(selectedCrisis.severity).bgColor} border ${getSeverityConfig(selectedCrisis.severity).borderColor}`}>
                     <div className="flex items-center gap-2 mb-3">
                       <AlertTriangle className={`w-4 h-4 ${getSeverityConfig(selectedCrisis.severity).textColor}`} />
@@ -419,7 +419,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                 )}
 
                 {/* Tips */}
-                {selectedCrisis.tips && selectedCrisis.tips.length > 0 && (
+                {Array.isArray(selectedCrisis.tips) && selectedCrisis.tips.length > 0 && (
                   <div className="bg-primary/5 dark:bg-primary/10 rounded-xl p-4 border border-primary/20">
                     <div className="flex items-center gap-2 mb-3">
                       <Lightbulb className="w-4 h-4 text-primary" />
