@@ -89,6 +89,12 @@ Deno.serve(async (req) => {
       skipCols: ["created_at", "updated_at"],
     },
     {
+      bucket: "assets", path: "csv-import/mommy_daily_messages.csv",
+      table: "mommy_daily_messages", conflict: "id",
+      intCols: ["day_number"], boolCols: ["is_active"],
+      skipCols: ["created_at", "updated_at"],
+    },
+    {
       bucket: "assets", path: "csv-import/mommy_day_notifications.csv",
       table: "mommy_day_notifications", conflict: "id",
       intCols: ["day_number"], boolCols: ["is_active"],
