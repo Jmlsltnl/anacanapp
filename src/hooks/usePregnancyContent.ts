@@ -58,8 +58,9 @@ export interface PregnancyContent {
 
 // Fetch content by pregnancy day (1-280)
 export const usePregnancyContentByDay = (pregnancyDay?: number) => {
+  const language = useUserStore((s) => s.language);
   return useQuery({
-    queryKey: ['pregnancy_content_day', pregnancyDay],
+    queryKey: ['pregnancy_content_day', pregnancyDay, language],
     queryFn: async () => {
       if (!pregnancyDay) return null;
       
@@ -86,7 +87,7 @@ export const usePregnancyContentByDay = (pregnancyDay?: number) => {
       }
 
       if (error) throw error;
-      return data as PregnancyContent | null;
+      return applyEnglish(data as PregnancyContent | null, language);
     },
     enabled: !!pregnancyDay,
     staleTime: 1000 * 60 * 5,
