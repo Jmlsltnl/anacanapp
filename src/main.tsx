@@ -3,6 +3,22 @@
 import "./lib/polyfills";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
+
+// Catch dynamic import / chunk load errors (happens when a new version is deployed
+// and the browser tries to fetch old, deleted chunk hashes). Automatically
+// reload the page to fetch the latest index.html and assets.
+window.addEventListener("error", (e) => {
+  if (e.message && (e.message.includes("Failed to fetch dynamically imported module") || e.message.includes("ChunkLoadError"))) {
+    console.warn("Dynamic import error detected. Reloading page...");
+    window.location.reload();
+  }
+});
+window.addEventListener("unhandledrejection", (e) => {
+  if (e.reason && e.reason.message && (e.reason.message.includes("Failed to fetch dynamically imported module") || e.reason.message.includes("ChunkLoadError"))) {
+    console.warn("Unhandled dynamic import error detected. Reloading page...");
+    window.location.reload();
+  }
+});
 import "./index.css";
 import { initializeNativeFeatures } from "./lib/native";
 import { initMixpanel } from "./lib/mixpanel";
