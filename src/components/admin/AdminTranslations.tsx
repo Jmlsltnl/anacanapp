@@ -187,23 +187,15 @@ const AdminTranslations = () => {
     // Clean target table name
     const table = targetTable.toLowerCase();
     
-    // 1. Hardcoded logical key mappings for daily content tables (which use UUID id but logical daily keys)
-    if (table === 'mommy_daily_messages' || table === 'baby_daily_info') {
-      return 'day_number';
-    }
-    if (table === 'pregnancy_daily_content') {
-      return 'pregnancy_day';
-    }
-    if (table === 'weekly_tips') {
-      return 'week_number';
-    }
-    if (table === 'translations') {
-      return 'key';
-    }
-
-    // 2. If the user-selected idColumn exists directly in the database columns, use it!
+    // 1. If the user-selected idColumn exists directly in the database columns, use it!
     if (dbColumns && dbColumns.some(c => c.column_name === idColumn)) {
       return idColumn;
+    }
+
+    // 2. If the user-selected idColumn exists case-insensitively in the database columns, use that database column!
+    if (dbColumns && dbColumns.length > 0) {
+      const matchedDbCol = dbColumns.find(c => c.column_name.toLowerCase() === idColumn.toLowerCase());
+      if (matchedDbCol) return matchedDbCol.column_name;
     }
 
     // 3. Try to match by guessing from CSV column name
@@ -219,7 +211,21 @@ const AdminTranslations = () => {
       }
     }
 
-    // 4. Try to find primary key from database constraints
+    // 4. Hardcoded logical key mappings for daily content tables as a fallback
+    if (table === 'mommy_daily_messages' || table === 'baby_daily_info') {
+      return 'day_number';
+    }
+    if (table === 'pregnancy_daily_content') {
+      return 'pregnancy_day';
+    }
+    if (table === 'weekly_tips') {
+      return 'week_number';
+    }
+    if (table === 'translations') {
+      return 'key';
+    }
+
+    // 5. Try to find primary key from database constraints
     if (dbConstraints && dbConstraints.length > 0) {
       const pk = dbConstraints.find(c => c.constraint_type === 'PRIMARY KEY');
       if (pk) return pk.column_name;
@@ -260,11 +266,19 @@ const AdminTranslations = () => {
       return;
     }
 
-    // 2. Fall back to hardcoded guesses
+    // 2. Fall back to hardcoded guesses (looping over guess priority first to avoid matching surrogate 'id' first)
     const idGuesses = ['day_number', 'pregnancy_day', 'key', 'id', 'code', 'day', 'week_number'];
-    const matchedId = csvCols.find(c => idGuesses.includes(c.toLowerCase()));
-    if (matchedId) {
-      setIdColumn(matchedId);
+    const matchedId = idGuesses.find(guess => 
+      csvCols.some(c => c.toLowerCase() === guess.toLowerCase())
+    );
+    
+    // Find the exact casing of the column in the CSV
+    const exactMatchedCol = matchedId 
+      ? csvCols.find(c => c.toLowerCase() === matchedId.toLowerCase()) 
+      : null;
+
+    if (exactMatchedCol) {
+      setIdColumn(exactMatchedCol);
     } else {
       setIdColumn(csvCols[0] || 'id');
     }
