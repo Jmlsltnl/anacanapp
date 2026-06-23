@@ -200,31 +200,61 @@ Deno.serve(async (req) => {
       const periodLength = profile.period_length || 5;
       const cycleInfo = getCycleInfo(profile.last_period_date, cycleLength, periodLength);
 
+      const userLang = langByUser.get(reminder.user_id) || 'az';
       let shouldSend = false;
-      let notificationTitle = reminder.title || '';
-      let notificationBody = reminder.message || '';
+      let notificationTitle = pickLang(reminder.title, reminder.title_en, userLang);
+      let notificationBody = pickLang(reminder.message, reminder.message_en, userLang);
+
+      const enDef = EN_DEFAULTS[reminder.reminder_type];
+      const useEn = userLang === 'en' && enDef;
 
       switch (reminder.reminder_type) {
         case 'period_start':
-          if (cycleInfo.daysUntilPeriod === reminder.days_before) { shouldSend = true; notificationTitle = notificationTitle || 'Period yaxınlaşır 🔴'; notificationBody = notificationBody || `Perioda ${reminder.days_before} gün qaldı!`; }
+          if (cycleInfo.daysUntilPeriod === reminder.days_before) {
+            shouldSend = true;
+            notificationTitle = notificationTitle || (useEn ? enDef.title(reminder.days_before) : 'Period yaxınlaşır 🔴');
+            notificationBody = notificationBody || (useEn ? enDef.body(reminder.days_before) : `Perioda ${reminder.days_before} gün qaldı!`);
+          }
           break;
         case 'period_end':
-          if (cycleInfo.isPeriodDay && cycleInfo.currentCycleDay === periodLength) { shouldSend = true; notificationTitle = notificationTitle || 'Period bitdi ✅'; notificationBody = notificationBody || 'Periodunuz sona çatdı!'; }
+          if (cycleInfo.isPeriodDay && cycleInfo.currentCycleDay === periodLength) {
+            shouldSend = true;
+            notificationTitle = notificationTitle || (useEn ? enDef.title(0) : 'Period bitdi ✅');
+            notificationBody = notificationBody || (useEn ? enDef.body(0) : 'Periodunuz sona çatdı!');
+          }
           break;
         case 'ovulation':
-          if (cycleInfo.daysUntilOvulation === reminder.days_before) { shouldSend = true; notificationTitle = notificationTitle || 'Ovulyasiya günü 🌸'; notificationBody = notificationBody || `Ovulyasiyaya ${reminder.days_before} gün qaldı!`; }
+          if (cycleInfo.daysUntilOvulation === reminder.days_before) {
+            shouldSend = true;
+            notificationTitle = notificationTitle || (useEn ? enDef.title(reminder.days_before) : 'Ovulyasiya günü 🌸');
+            notificationBody = notificationBody || (useEn ? enDef.body(reminder.days_before) : `Ovulyasiyaya ${reminder.days_before} gün qaldı!`);
+          }
           break;
         case 'fertile_start':
-          if (cycleInfo.daysUntilFertile === reminder.days_before) { shouldSend = true; notificationTitle = notificationTitle || 'Məhsuldar günlər 💕'; notificationBody = notificationBody || 'Məhsuldar günlər başlayır!'; }
+          if (cycleInfo.daysUntilFertile === reminder.days_before) {
+            shouldSend = true;
+            notificationTitle = notificationTitle || (useEn ? enDef.title(0) : 'Məhsuldar günlər 💕');
+            notificationBody = notificationBody || (useEn ? enDef.body(0) : 'Məhsuldar günlər başlayır!');
+          }
           break;
         case 'fertile_end':
-          if (cycleInfo.daysUntilFertile === -(6 - reminder.days_before)) { shouldSend = true; notificationTitle = notificationTitle || 'Məhsuldar günlər bitir 📅'; notificationBody = notificationBody || 'Məhsuldar günlər sona çatır.'; }
+          if (cycleInfo.daysUntilFertile === -(6 - reminder.days_before)) {
+            shouldSend = true;
+            notificationTitle = notificationTitle || (useEn ? enDef.title(0) : 'Məhsuldar günlər bitir 📅');
+            notificationBody = notificationBody || (useEn ? enDef.body(0) : 'Məhsuldar günlər sona çatır.');
+          }
           break;
         case 'pms':
-          if (cycleInfo.daysUntilPMS === reminder.days_before) { shouldSend = true; notificationTitle = notificationTitle || 'PMS dövrü ⚡'; notificationBody = notificationBody || 'PMS dövrü yaxınlaşır, özünüzə baxın!'; }
+          if (cycleInfo.daysUntilPMS === reminder.days_before) {
+            shouldSend = true;
+            notificationTitle = notificationTitle || (useEn ? enDef.title(0) : 'PMS dövrü ⚡');
+            notificationBody = notificationBody || (useEn ? enDef.body(0) : 'PMS dövrü yaxınlaşır, özünüzə baxın!');
+          }
           break;
         case 'pill':
-          shouldSend = true; notificationTitle = notificationTitle || 'Həb vaxtı 💊'; notificationBody = notificationBody || 'Gündəlik həbinizi qəbul etməyi unutmayın!';
+          shouldSend = true;
+          notificationTitle = notificationTitle || (useEn ? enDef.title(0) : 'Həb vaxtı 💊');
+          notificationBody = notificationBody || (useEn ? enDef.body(0) : 'Gündəlik həbinizi qəbul etməyi unutmayın!');
           break;
       }
 
