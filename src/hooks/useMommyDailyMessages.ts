@@ -26,8 +26,11 @@ export const useMommyDailyMessageByDay = (dayNumber: number | null) => {
         .maybeSingle();
       if (error) { console.error('Error fetching mommy daily message:', error); return null; }
       if (!data) return null;
-      if (language === 'en' && data.message_en) {
-        return { ...data, message: data.message_en } as MommyDailyMessage;
+      if (language !== 'az') {
+        const langField = (data as any)[`message_${language}`];
+        if (langField) {
+          return { ...data, message: langField } as MommyDailyMessage;
+        }
       }
       return data as MommyDailyMessage;
     },

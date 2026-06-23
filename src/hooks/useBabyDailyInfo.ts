@@ -31,8 +31,11 @@ export const useBabyDailyInfoByDay = (dayNumber: number | null) => {
         return null;
       }
       if (!data) return null;
-      if (language === 'en' && data.info_en) {
-        return { ...data, info: data.info_en } as BabyDailyInfo;
+      if (language !== 'az') {
+        const langField = (data as any)[`info_${language}`];
+        if (langField) {
+          return { ...data, info: langField } as BabyDailyInfo;
+        }
       }
       return data as BabyDailyInfo;
     },
