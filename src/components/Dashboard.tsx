@@ -1189,7 +1189,17 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
             </div>
             <div>
               <h3 className="font-bold text-sm text-foreground">{tr("dashboard_yuxu_izleme_adaa4f", "Yuxu İzləmə")}</h3>
-              <p className="text-xs text-muted-foreground">{tr('dashboard_today_label', 'Bu gün')}: {(() => {const m = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60);const h = Math.floor(m / 60);const rm = m % 60;if (h === 0 && rm === 0) return tr("dashboard_0_deq_86d70a", "0 d\u0259q");if (h === 0) return `${rm} dəq`;if (rm === 0) return `${h} ${tr("common_hours", "saat")}`;return `${h}s ${rm}d`;})()}</p>
+              <p className="text-xs text-muted-foreground">
+                {tr('dashboard_today_label', 'Bu gün')}: {(() => {
+                  const m = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60);
+                  const h = Math.floor(m / 60);
+                  const rm = m % 60;
+                  if (h === 0 && rm === 0) return tr("dashboard_0_deq_86d70a", "0 dəq");
+                  if (h === 0) return `${rm} ${tr("common_minutes_short", "dəq")}`;
+                  if (rm === 0) return `${h} ${tr("common_hours", "saat")}`;
+                  return `${h}${tr("common_h_short", "s")} ${rm}${tr("common_m_short", "d")}`;
+                })()}
+              </p>
             </div>
           </div>
           <motion.button
