@@ -243,7 +243,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
           <h1 className="text-lg font-bold text-foreground flex-1">{tr("profileeditscreen_profili_redakte_et_b5368c", "Profili Redaktə Et")}</h1>
           <Button onClick={handleSave} disabled={loading} className="gradient-primary">
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-            Saxla
+            {tr("profileeditscreen_saxla", "Saxla")}
           </Button>
         </div>
       </div>
@@ -335,7 +335,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
               <SelectContent>
                 <SelectItem value="flow">{tr("profileeditscreen_menstruasiya_izleyicisi_b0d2dd", "🌸 Menstruasiya izləyicisi")}</SelectItem>
                 <SelectItem value="bump">{tr("profileeditscreen_hamileyem_01937d", "🤰 Hamiləyəm")}</SelectItem>
-                <SelectItem value="mommy">👶 Anayam</SelectItem>
+                <SelectItem value="mommy">{tr("profileeditscreen_anayam_mommy", "👶 Anayam")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -357,7 +357,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                     className="flex items-center gap-2 h-auto py-3 px-4 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-xl border">
                     
                     <CalendarDays className="w-4 h-4" />
-                    <span className="text-sm">{tr("untranslated_son_menstruasiya_tarixi_fgz9t7", "Son menstruasiya tarixi")}</span>
+                    <span className="text-sm">{tr("profileeditscreen_son_menstruasiya_tarixi_7c9f8a", "📅 Son menstruasiya tarixi:")}</span>
                   </ToggleGroupItem>
                   <ToggleGroupItem
                     value="dueDate"
@@ -372,7 +372,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
               {/* Date Input based on mode */}
               {dateInputMode === 'lmp' ?
               <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_son_menstruasiyanin_ilk_gunu_c79f76", "Son menstruasiyanın ilk günü")}</label>
+                  <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_son_menstruasiyan_ilk_gunu_c79f76", "Son menstruasiyanın ilk günü")}</label>
                   <Input
                   type="date"
                   value={formData.last_period_date}
@@ -410,13 +410,13 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                   
                   {calculatedDates.calculatedLMP &&
                 <p className="text-sm text-foreground">
-                      📅 Son menstruasiya tarixi: <strong>{formatDate(calculatedDates.calculatedLMP)}</strong>
+                      {tr("profileeditscreen_son_menstruasiya_tarixi_7c9f8a", "📅 Son menstruasiya tarixi:")} <strong>{formatDate(calculatedDates.calculatedLMP)}</strong>
                     </p>
                 }
                   
                   {calculatedDates.week > 0 &&
                 <p className="text-sm text-muted-foreground">
-                      {tr("profileeditscreen_hazirda_33b3c8", "Haz\u0131rda:")} <strong>{calculatedDates.week} {tr("profileeditscreen_hefte_d4c248", "h\u0259ft\u0259")} {calculatedDates.day} {tr("profileeditscreen_gun_54e78d", "g\xFCn")}</strong>
+                      {tr("profileeditscreen_hazirda_33b3c8", "Hazırda:")} <strong>{calculatedDates.week} {tr("profileeditscreen_hefte_d4c248", "həftə")} {calculatedDates.day} {tr("profileeditscreen_gun_54e78d", "gün")}</strong>
                     </p>
                 }
                 </motion.div>

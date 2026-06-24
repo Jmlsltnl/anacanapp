@@ -21,6 +21,23 @@ interface RecipesProps {
   onBack: () => void;
 }
 
+const getOptimizedRecipeImageUrl = (url: string | undefined | null, width?: number) => {
+  if (!url) return '';
+  if (url.includes('/storage/v1/object/public/')) {
+    const transformedUrl = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
+    const w = width || 400;
+    return `${transformedUrl}?width=${w}&quality=75&format=webp`;
+  }
+  return url;
+};
+
+const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>, originalUrl: string) => {
+  const target = e.currentTarget;
+  if (target.src !== originalUrl) {
+    target.src = originalUrl;
+  }
+};
+
 const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
   useScrollToTop();
   useScreenAnalytics('Recipes', 'Tools');
@@ -266,7 +283,8 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
             
             {selectedRecipe.image_url ?
             <img
-              src={selectedRecipe.image_url}
+              src={getOptimizedRecipeImageUrl(selectedRecipe.image_url, 600)}
+              onError={(e) => handleImageError(e, selectedRecipe.image_url || '')}
               alt={selectedRecipe.title}
               loading="lazy"
               decoding="async"
@@ -557,7 +575,8 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
                   <div className="relative h-28 overflow-hidden">
                     {recipe.image_url ?
                 <img
-                  src={recipe.image_url}
+                  src={getOptimizedRecipeImageUrl(recipe.image_url, 300)}
+                  onError={(e) => handleImageError(e, recipe.image_url || '')}
                   alt={recipe.title}
                   loading="lazy"
                   decoding="async"
