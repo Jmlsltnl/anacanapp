@@ -842,7 +842,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     </motion.div>;
 
 
-  const stepTitles = [tr("babyphotoshoot_sekil_43e2e3", "\u015E\u0259kil"), 'Fon', 'Detallar'];
+  const stepTitles = [tr("babyphotoshoot_sekil_43e2e3", "Şəkil"), tr("babyphotoshoot_fon_e484a2", "Fon"), tr("babyphotoshoot_detallar_8614ad", "Detallar")];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -908,9 +908,8 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             variant="outline"
             onClick={prevStep}
             className="flex-1 h-14 rounded-2xl">
-            
-              Geri
-            </Button>
+            {tr("common_geri", "Geri")}
+          </Button>
           }
           {step < 2 ?
           <Button

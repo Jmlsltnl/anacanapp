@@ -407,7 +407,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
               className="flex-1 h-12">
               
                 <ChevronLeft className="w-4 h-4 mr-1" />
-                Geri
+                {tr("common_geri", "Geri")}
               </Button>
             }
             
