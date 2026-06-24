@@ -417,12 +417,13 @@ const AdminTranslations = () => {
 
     try {
       // 1. Fetch existing rows (selecting ID and update columns to optimize)
-      let query = supabase.from(targetTable).select([dbIdColumn, ...selectedUpdateColumns].join(', '));
+      let query: any = (supabase as any).from(targetTable).select([dbIdColumn, ...selectedUpdateColumns].join(', '));
       
       // If translations table, filter by language to prevent getting too many rows
       if (targetTable === 'translations') {
         query = query.eq('lang', uploadLang);
       }
+
 
       const { data: dbData, error: dbErr } = await query;
       
