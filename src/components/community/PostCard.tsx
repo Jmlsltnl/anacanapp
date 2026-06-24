@@ -172,10 +172,10 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
                 isAdmin ?
                 <span className="flex items-center gap-1">
                       <span className="text-muted-foreground italic">{tr("untranslated_anonim_89j5l6", "Anonim")}</span>
-                      <span className="text-[11px] text-primary/70 font-medium">({post.author?.name || tr("postcard_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")})</span>
+                      <span className="text-[11px] text-primary/70 font-medium">({post.author?.name || tr("postcard_i_stifadeci_b6bdd6", "İstifadəçi")})</span>
                     </span> :
-                'Anonim' :
-                post.author?.name || tr("postcard_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}
+                tr("untranslated_anonim_89j5l6", "Anonim") :
+                post.author?.name || tr("postcard_i_stifadeci_b6bdd6", "İstifadəçi")}
               </motion.button>
               {!isAnonymous && <UserBadge type={authorBadge} />}
               {isAnonymous && isAdmin && <UserBadge type={authorBadge} />}
@@ -307,7 +307,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
                 }>
                 
                   <span className={`w-3 h-3 rounded-full border ${commentAnonymous ? 'border-primary bg-primary' : 'border-muted-foreground/40'}`} />
-                  Anonim olaraq yaz
+                  {tr("postcard_anonim_olaraq_yaz_abc123", "Anonim olaraq yaz")}
                 </button>
                 {commentsLoading ?
               <div className="text-center py-4">

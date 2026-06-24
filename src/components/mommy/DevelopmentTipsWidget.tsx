@@ -102,9 +102,9 @@ const DevelopmentTipsWidget = () => {
           <div className="flex items-start gap-3">
             <span className="text-2xl flex-shrink-0">{currentTip.emoji}</span>
             <div className="flex-1 min-w-0">
-              <h4 className="font-bold text-foreground text-sm leading-tight">{currentTip.title_az || currentTip.title}</h4>
+              <h4 className="font-bold text-foreground text-sm leading-tight">{currentTip.title}</h4>
               <p className="text-xs text-muted-foreground mt-1 leading-relaxed line-clamp-3">
-                {currentTip.content_az || currentTip.content}
+                {currentTip.content}
               </p>
             </div>
           </div>

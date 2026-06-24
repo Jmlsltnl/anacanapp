@@ -134,7 +134,7 @@ export const useBabyMilestones = () => {
           setMilestones((prev) => [data, ...prev]);
           const milestoneDetails = MILESTONES.find((m) => m.id === milestoneId);
           toast({
-            title: `🎉 ${milestoneDetails?.label || tr("usebabymilestones_merhele_0e09aa", "M\u0259rh\u0259l\u0259")} qeyd edildi!`,
+            title: `🎉 ${milestoneDetails?.label || tr("usebabymilestones_merhele_0e09aa", "M\u0259rh\u0259l\u0259")} ${tr("usebabymilestones_qeyd_edildi_xyz123", "qeyd edildi!")}`,
             description: milestoneDetails?.description
           });
         }

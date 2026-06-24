@@ -49,7 +49,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   const headerKey = `community_header_${lifeStage || 'mommy'}`;
   const dynamicHeader = useAppSetting(headerKey);
   const defaultHeader = tr("communityscreen_diger_analar_ile_elaqede_olun_4830a3", "Dig\u0259r analar il\u0259 \u0259laq\u0259d\u0259 olun");
-  const headerText = typeof dynamicHeader === 'string' ? dynamicHeader : defaultHeader;
+  const headerText = typeof dynamicHeader === 'string' ? tr(headerKey, dynamicHeader) : defaultHeader;
 
   const { data: groups = [], isLoading: groupsLoading } = useCommunityGroups();
   const { data: memberships = [] } = useUserMemberships();

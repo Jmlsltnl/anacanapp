@@ -139,7 +139,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
   const isPremiumPlus = subscription?.plan_type === 'premium_plus';
   const planName = !hasPremiumSub && !isPremium ? config.free_plan_name : isPremiumPlus ? config.premium_yearly_name : config.premium_monthly_name;
   const planPrice = !hasPremiumSub && !isPremium ? '₼0' : isPremiumPlus ? '₼79.99' : '₼9.99';
-  const planPeriod = !hasPremiumSub && !isPremium ? '' : isPremiumPlus ? '/il' : '/ay';
+  const planPeriod = !hasPremiumSub && !isPremium ? '' : isPremiumPlus ? tr("common_per_year", '/il') : tr("common_per_month", '/ay');
 
   const renderIcon = (iconName: string, className: string) => {
     const IconComp = icons[iconName as keyof typeof icons];
@@ -446,7 +446,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
                 <div key={`${p.productId}-${p.date}-${i}`} className="flex items-center justify-between p-3 bg-muted/40 rounded-xl">
                       <div className="min-w-0">
                         <p className="font-semibold text-foreground text-sm truncate">
-                          {isYearly ? 'İllik Premium' : tr("billingscreen_ayliq_premium_45f3bf", "Ayl\u0131q Premium")}
+                          {isYearly ? tr("billingscreen_illik_premium", 'İllik Premium') : tr("billingscreen_ayliq_premium_45f3bf", "Aylıq Premium")}
                         </p>
                         <p className="text-[10px] text-muted-foreground mt-0.5">
                           {format(new Date(p.date), 'd MMM yyyy, HH:mm', { locale: getCurrentDateLocale() })} · {itemLabel}
