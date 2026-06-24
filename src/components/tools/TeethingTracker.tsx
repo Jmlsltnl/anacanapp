@@ -164,7 +164,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               {/* Tooth label on hover - using tooltip behavior */}
               <div className={`absolute ${position === 'upper' ? 'top-full mt-1' : 'bottom-full mb-1'} left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 pointer-events-none`}>
                 <span className="text-[8px] whitespace-nowrap bg-foreground/80 text-background px-1 py-0.5 rounded">
-                  {tooth.name}
+                  {tr("tooth_name_" + tooth.tooth_code, tooth.name)}
                 </span>
               </div>
             </motion.button>);
@@ -375,7 +375,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-rose-500" />
               </div>
-              {selectedTooth?.name}
+              {selectedTooth ? tr("tooth_name_" + selectedTooth.tooth_code, selectedTooth.name) : ''}
             </DialogTitle>
           </DialogHeader>
 
@@ -386,7 +386,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
                 <div className="bg-muted/50 rounded-lg p-3 text-center">
                   <p className="text-xs text-muted-foreground">{tr("teethingtracker_tipik_cixma_yasi_1c2740", "Tipik çıxma yaşı")}</p>
                   <p className="font-medium">
-                    {selectedTooth.typical_emergence_months_min}-{selectedTooth.typical_emergence_months_max} ay
+                    {selectedTooth.typical_emergence_months_min}-{selectedTooth.typical_emergence_months_max} {tr("time_months", "ay")}
                   </p>
                 </div>
                 <div className="bg-muted/50 rounded-lg p-3 text-center">
