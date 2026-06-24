@@ -573,7 +573,7 @@ const AdminTranslations = () => {
 
         // Execute inserts in batch
         if (toInsert.length > 0) {
-          const { error: insErr } = await supabase.from(targetTable).insert(toInsert);
+          const { error: insErr } = await (supabase as any).from(targetTable).insert(toInsert);
           if (insErr) {
             failed += toInsert.length;
             errors.push(`Insert xətası: ${insErr.message}`);
