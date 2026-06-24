@@ -343,7 +343,7 @@ const FlowDashboard = () => {
                 className="w-full bg-white/30 hover:bg-white/40 backdrop-blur text-white border-0 rounded-xl h-12 text-sm font-bold gap-2"
                 variant="outline">
                 
-                  ✅ Periodum bitdi
+                  {tr("flowdashboard_periodum_bitdi_c1b3ea", "✅ Periodum bitdi")}
                 </Button>
               </motion.div>
             }

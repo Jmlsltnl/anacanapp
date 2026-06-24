@@ -150,7 +150,7 @@ const ProgressRing = ({ progress, size = 100, strokeWidth = 8, color = "stroke-p
 
 
 const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) => void;}) => {
-  const { getPregnancyData, setLifeStage } = useUserStore();
+  const { getPregnancyData, setLifeStage, language } = useUserStore();
   const { toast } = useToast();
   const pregData = getPregnancyData();
   const { todayLog, updateWaterIntake, updateMood } = useDailyLogs();
@@ -912,7 +912,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
           end_time: new Date().toISOString()
         });
         toast({
-          title: `${type === 'left' ? tr("dashboard_sol", "Sol") : tr("dashboard_sag_edbe12", "Sa\u011F")} sinə bitti!`,
+          title: type === 'left' ? tr("dashboard_left_breast_done", "Sol sinə bitti!") : tr("dashboard_right_breast_done", "Sağ sinə bitti!"),
           description: `${tr("dashboard_duration", "Müddət:")} ${formatDuration(result.durationSeconds)}`
         });
 
@@ -1425,7 +1425,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
             className="px-3 py-1 bg-pink-500 text-white rounded-lg text-sm font-medium"
             whileTap={{ scale: 0.95 }}>
             
-              Bitir
+              {tr("dashboard_bitir_btn", "Bitir")}
             </motion.button>
           </motion.div>
         }

@@ -23,7 +23,7 @@ interface QuickActionsBarProps {
 
 const QuickActionsBar = ({ onNavigateToTool }: QuickActionsBarProps) => {
   const { selectedChild, getChildAge } = useChildren();
-  const { lifeStage } = useUserStore();
+  const { lifeStage, language } = useUserStore();
   const { isPremium } = useSubscription();
   const { data: toolConfigs = [] } = useToolConfigs(lifeStage);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
@@ -69,6 +69,13 @@ const QuickActionsBar = ({ onNavigateToTool }: QuickActionsBarProps) => {
     );
   }
 
+  const getTranslationKey = (toolKey: string): string => {
+    const normalized = toolKey.replace(/-/g, '_');
+    if (normalized === 'baby_photo') return 'quick_action_baby_photoshoot';
+    if (normalized === 'fairy_tales') return 'quick_action_fairy_tale';
+    return `quick_action_${normalized}`;
+  };
+
   return (
     <>
       <motion.div
@@ -100,7 +107,7 @@ const QuickActionsBar = ({ onNavigateToTool }: QuickActionsBarProps) => {
                   </div>
                 )}
                 <IconComponent className="w-5 h-5" />
-                <span className="text-[10px] font-bold">{tr(`quick_action_${action.tool_key}`, action.label_az || action.label)}</span>
+                <span className="text-[10px] font-bold">{tr(getTranslationKey(action.tool_key), action.label_az || action.label)}</span>
               </motion.button>
             );
           })}
