@@ -457,7 +457,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
               <div>
                 <h3 className="font-bold text-foreground text-sm">{tr("profilescreen_usaqlarim_d988f7", "Uşaqlarım")}</h3>
                 <p className="text-[10px] text-muted-foreground">
-                  {children.length === 0 ? tr("profilescreen_usaq_elave_et_48f1f0", "U\u015Faq \u0259lav\u0259 et") : `${children.length} uşaq`}
+                  {children.length === 0 ? tr("profilescreen_usaq_elave_et_48f1f0", "U\u015Faq \u0259lav\u0259 et") : children.length === 1 ? tr("profilescreen_one_child_count", "1 uşaq") : `${children.length} ${tr("profilescreen_child_plural_suffix", "uşaq")}`}
                 </p>
               </div>
             </div>
