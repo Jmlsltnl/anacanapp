@@ -62,16 +62,16 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
   const getStageSpecificData = () => {
     if (lifeStage === 'flow' && cycleData) {
       return [
-      { label: tr("doctorreportscreen_dovre_uzunlugu_c81215", 'Dövrə uzunluğu'), value: `${cycleData.cycleLength} gün`, icon: Calendar },
-      { label: 'Menstruasiya', value: `${cycleData.periodLength} gün`, icon: Droplets },
-      { label: 'Cari faza', value: cycleData.phase, icon: Activity },
+      { label: tr("doctorreportscreen_dovre_uzunlugu_c81215", 'Dövrə uzunluğu'), value: `${cycleData.cycleLength} ${tr("common_gun", "gün")}`, icon: Calendar },
+      { label: tr("doctorreportscreen_menstruasiya_1c9b68", 'Menstruasiya'), value: `${cycleData.periodLength} ${tr("common_gun", "gün")}`, icon: Droplets },
+      { label: tr("doctorreportscreen_cari_faza_b4862a", 'Cari faza'), value: cycleData.phase, icon: Activity },
       { label: tr("doctorreportscreen_dovrenin_gunu_7549f2", 'Dövrənin günü'), value: `${cycleData.currentDay}`, icon: Heart }];
 
     }
     if (lifeStage === 'bump' && pregData) {
       return [
-      { label: tr("doctorreportscreen_hamilelik_heftesi_c9e362", 'Hamiləlik həftəsi'), value: `${pregData.currentWeek} həftə`, icon: Calendar },
-      { label: 'Trimester', value: `${pregData.trimester}-cü`, icon: Activity },
+      { label: tr("doctorreportscreen_hamilelik_heftesi_c9e362", 'Hamiləlik həftəsi'), value: `${pregData.currentWeek} ${tr("common_hefte_suffix", "həftə")}`, icon: Calendar },
+      { label: tr("doctorreportscreen_trimester_4dc81e", 'Trimester'), value: tr("doctorreportscreen_trimester_value_8dc81e", "{trimester}-cü").replace("{trimester}", String(pregData.trimester)), icon: Activity },
       { label: tr("doctorreportscreen_korpe_olcusu_cccfc2", 'Körpə ölçüsü'), value: pregData.babySize.fruit, icon: Heart },
       { label: tr("doctorreportscreen_texmini_dogus_98eb77", 'Təxmini doğuş'), value: pregData.dueDate?.toLocaleDateString('az-AZ'), icon: Calendar }];
 

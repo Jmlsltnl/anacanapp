@@ -145,7 +145,7 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
             <div className="flex-1">
               <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-violet-500" />
-                Ana Bloqu
+                {tr("blogscreen_ana_bloqu_28124b", "Ana Bloqu")}
               </h1>
             </div>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -314,7 +314,7 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
                 selectedCategory ?
                 categories.find((c) => c.slug === selectedCategory)?.name :
                 searchQuery ?
-                `"${searchQuery}" üçün nəticələr` : tr("blogscreen_butun_meqaleler_df9384", "B\xFCt\xFCn M\u0259qal\u0259l\u0259r")
+                tr("blogscreen_x_ucun_neticeler_b1a2c3", '"{query}" üçün nəticələr').replace('{query}', searchQuery) : tr("blogscreen_butun_meqaleler_df9384", "B\xFCt\xFCn M\u0259qal\u0259l\u0259r")
 
                 }
               </h2>

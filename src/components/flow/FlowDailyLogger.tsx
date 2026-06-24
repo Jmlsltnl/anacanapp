@@ -224,7 +224,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
               {/* Flow Intensity */}
               <div>
                 <label className="text-sm font-medium text-foreground mb-3 block flex items-center gap-2">
-                  <Droplets className="w-4 h-4 text-red-500" /> Qanaxma
+                  <Droplets className="w-4 h-4 text-red-500" /> {tr("flowdailylogger_qanaxma_e42bdc", "Qanaxma")}
                 </label>
                 <div className="flex gap-2 flex-wrap">
                   {FLOW_OPTIONS.map((option) =>
@@ -288,7 +288,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block flex items-center gap-2">
-                    <Moon className="w-4 h-4 text-indigo-500" /> Yuxu (saat)
+                    <Moon className="w-4 h-4 text-indigo-500" /> {tr("flowdailylogger_yuxu_saat_33bd1e", "Yuxu (saat)")}
                   </label>
                   <Input
                   type="number"
@@ -365,7 +365,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
               disabled={saveLog.isPending || !hasChanges}
               className="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white">
               
-                {saveLog.isPending ? tr("flowdailylogger_saxlanilir_ee05ad", "Saxlan\u0131l\u0131r...") : existingLog ? tr("flowdailylogger_yenile_570ce2", "Yenil\u0259") : 'Saxla'}
+                {saveLog.isPending ? tr("flowdailylogger_saxlanilir_ee05ad", "Saxlan\u0131l\u0131r...") : existingLog ? tr("flowdailylogger_yenile_570ce2", "Yenil\u0259") : tr("flowdailylogger_saxla_7dcde1", "Saxla")}
               </Button>
             </div>
           </motion.div>

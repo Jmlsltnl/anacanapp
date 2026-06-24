@@ -1361,7 +1361,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
                 className="px-4 py-1.5 rounded-lg bg-blue-500 text-white text-xs font-bold"
                 whileTap={{ scale: 0.95 }}>
                 
-                  Qeyd et
+                  {tr("dashboard_qeyd_et_f12345", "Qeyd et")}
                 </motion.button>
                 <motion.button
                 onClick={() => {setShowFormulaMLInput(false);setFormulaML('');}}
@@ -1403,7 +1403,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
                 className="px-4 py-1.5 rounded-lg bg-orange-500 text-white text-xs font-bold"
                 whileTap={{ scale: 0.95 }}>
                 
-                  Qeyd et
+                  {tr("dashboard_qeyd_et_f12345", "Qeyd et")}
                 </motion.button>
                 <motion.button
                 onClick={() => {setShowSolidFoodInput(false);setSolidFoodName('');}}
@@ -1604,7 +1604,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
                               </div>
                             </div>
                             <span className="text-[11px] font-semibold text-primary">
-                              {end ? durText : 'Davam edir...'}
+                              {end ? durText : tr("dashboard_davam_edir_88d3a2", 'Davam edir...')}
                             </span>
                           </div>);
 

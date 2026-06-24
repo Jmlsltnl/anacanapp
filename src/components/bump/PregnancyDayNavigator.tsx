@@ -58,8 +58,8 @@ const PregnancyDayNavigator = ({
   const dayOffset = selectedDay - currentActualDay;
   const getOffsetLabel = () => {
     if (dayOffset === 0) return tr("pregnancydaynavigator_bu_gun_786fd4", "Bu g\xFCn");
-    if (dayOffset > 0) return `+${dayOffset} gün`;
-    return `${dayOffset} gün`;
+    if (dayOffset > 0) return `+${dayOffset} ${tr("common_gun", "gün")}`;
+    return `${dayOffset} ${tr("common_gun", "gün")}`;
   };
 
   return (

@@ -158,7 +158,7 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
     const itemsSummary = items.map((i) => `${i.cake.name} x${i.quantity}`).join(', ');
 
     const paymentLabel = paymentMethod === 'c2c_transfer' ? 'Kartdan Karta' :
-    paymentMethod === 'card_simulated' ? 'Kart' : tr("cakeorderform_nagd_fdeb10", "Na\u011Fd");
+    paymentMethod === 'card_simulated' ? tr("cakeorderform_kart_de91aa", "Kart") : tr("cakeorderform_nagd_fdeb10", "Na\u011Fd");
 
     const result = await createOrder({
       cake_id: items[0].cake.id,
@@ -238,7 +238,7 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
   const getMethodLabel = (method: PaymentMethod) => {
     switch (method.method_key) {
       case 'cash':return { title: tr("cakeorderform_nagd_fdeb10", 'Nağd'), sub: tr("cakeorderform_catdirilmada_ode_fe4277", "\xC7atd\u0131r\u0131lmada \xF6d\u0259") };
-      case 'card_simulated':return { title: 'Kart', sub: tr("cakeorderform_onlayn_odenis_fabfc1", "Onlayn \xF6d\u0259ni\u015F") };
+      case 'card_simulated':return { title: tr("cakeorderform_kart_de91aa", "Kart"), sub: tr("cakeorderform_onlayn_odenis_fabfc1", "Onlayn \xF6d\u0259ni\u015F") };
       case 'c2c_transfer':return { title: tr("cakeorderform_kocurme_0a57a0", 'Köçürmə'), sub: 'Kartdan karta' };
       default:return { title: method.label_az || method.label, sub: method.description_az || '' };
     }

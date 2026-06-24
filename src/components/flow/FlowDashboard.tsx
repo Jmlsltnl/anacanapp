@@ -168,7 +168,7 @@ const FlowDashboard = () => {
         queryClient.invalidateQueries({ queryKey: ['cycle-history'] });
 
         toast.success(tr("flowdashboard_period_bitisi_qeyd_edildi_7aef98", "Period biti\u015Fi qeyd edildi! \u2705"), {
-          description: `Period ${actualPeriodLength} gün davam etdi`
+          description: tr("flowdashboard_period_duration_notice_f7c1d3", "Period {days} gün davam etdi").replace("{days}", String(actualPeriodLength))
         });
       }
     } catch (error) {
@@ -566,7 +566,7 @@ const FlowDashboard = () => {
         <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-2xl p-4 border border-orange-100 dark:border-orange-800/30">
           <Flame className="w-6 h-6 text-orange-500 mb-2" />
           <p className="font-bold text-foreground text-lg">
-            {currentPhase === 'follicular' || currentPhase === 'ovulation' ? tr("flowdashboard_yuksek_492584", "Y\xFCks\u0259k") : 'Normal'}
+            {currentPhase === 'follicular' || currentPhase === 'ovulation' ? tr("flowdashboard_yuksek_492584", "Y\xFCks\u0259k") : tr("common_normal", "Normal")}
           </p>
           <p className="text-xs text-muted-foreground">{tr("flowdashboard_enerji_seviyyesi_961691", "Enerji Səviyyəsi")}</p>
         </div>
@@ -582,7 +582,7 @@ const FlowDashboard = () => {
         <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-4 border border-green-100 dark:border-green-800/30">
           <Apple className="w-6 h-6 text-green-500 mb-2" />
           <p className="font-bold text-foreground text-lg">
-            {currentPhase === 'menstrual' ? tr("flowdashboard_demir_30bf6c", "D\u0259mir") : currentPhase === 'luteal' ? 'Maqnezium' : 'Protein'}
+            {currentPhase === 'menstrual' ? tr("flowdashboard_demir_30bf6c", "D\u0259mir") : currentPhase === 'luteal' ? tr("flowdashboard_maqnezium_f7238a", "Maqnezium") : tr("flowdashboard_protein_a47bc2", "Protein")}
           </p>
           <p className="text-xs text-muted-foreground">{tr("untranslated_fokus_qida_lyi3h2", "Fokus Qida")}</p>
         </div>
@@ -590,7 +590,7 @@ const FlowDashboard = () => {
         <div className="bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 rounded-2xl p-4 border border-purple-100 dark:border-purple-800/30">
           <Dumbbell className="w-6 h-6 text-purple-500 mb-2" />
           <p className="font-bold text-foreground text-lg">
-            {currentPhase === 'menstrual' ? tr("flowdashboard_yungul_2a8010", "Y\xFCng\xFCl") : currentPhase === 'ovulation' ? 'İntensiv' : 'Orta'}
+            {currentPhase === 'menstrual' ? tr("flowdashboard_yungul_2a8010", "Y\xFCng\xFCl") : currentPhase === 'ovulation' ? tr("flowdashboard_intensiv_f123bc", "İntensiv") : tr("common_orta", "Orta")}
           </p>
           <p className="text-xs text-muted-foreground">{tr("flowdashboard_mesq_intensivliyi_f59d1b", "Məşq İntensivliyi")}</p>
         </div>

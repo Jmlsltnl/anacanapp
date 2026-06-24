@@ -67,11 +67,11 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
       const tables = [
       { name: 'profiles', label: tr("untranslated_profil_v8b0sk", 'Profil') },
       { name: 'daily_logs', label: tr("settingsscreen_gundelik_qeydler_285ea0", 'Gündəlik qeydlər') },
-      { name: 'appointments', label: 'Randevular' },
+      { name: 'appointments', label: tr("settingsscreen_randevular_a452fc", 'Randevular') },
       { name: 'baby_growth', label: tr("settingsscreen_korpe_inkisafi_8816ce", 'Körpə inkişafı') },
       { name: 'baby_logs', label: tr("settingsscreen_korpe_qeydleri_8d99a2", 'Körpə qeydləri') },
       { name: 'weight_entries', label: tr("settingsscreen_ceki_qeydleri_43f237", 'Çəki qeydləri') },
-      { name: 'cycle_history', label: 'Tsikl tarixi' },
+      { name: 'cycle_history', label: tr("settingsscreen_tsikl_tarixi_f723ad", 'Tsikl tarixi') },
       { name: 'kick_sessions', label: tr("settingsscreen_tepik_sessiyalari_87edad", 'Təpik sessiyaları') },
       { name: 'contractions', label: tr("settingsscreen_buzusmeler_1ec368", 'Büzüşmələr') },
       { name: 'blood_sugar_logs', label: tr("settingsscreen_qan_sekeri_c922e6", 'Qan şəkəri') }];
@@ -257,14 +257,14 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
           </div>
           <SettingRow
             icon={BellOff}
-            label="Sakit rejim"
+            label={tr("settingsscreen_sakit_rejim_8a42bd", "Sakit rejim")}
             description={silentSettings.enabled ? `${silentSettings.startTime} - ${silentSettings.endTime} ${tr("settingsscreen_silent_hours_desc", "arası bildiriş yoxdur")}` : tr("settingsscreen_gece_saatlarinda_bildirisleri__45007d", "Gecə saatlarında bildirişləri söndür")}>
             
             <Switch
               checked={silentSettings.enabled}
               onCheckedChange={(checked) => {
                 updateSilentSettings({ enabled: checked });
-                toast.success(checked ? tr("settingsscreen_sakit_saatlar_aktivlesdirildi_2ab4f3", "Sakit saatlar aktivləşdirildi") : 'Sakit saatlar deaktiv edildi');
+                toast.success(checked ? tr("settingsscreen_sakit_saatlar_aktivlesdirildi_2ab4f3", "Sakit saatlar aktivləşdirildi") : tr("settingsscreen_sakit_saatlar_deaktiv_edildi_f723bc", "Sakit saatlar deaktiv edildi"));
               }}
               disabled={!settings.notifications_enabled} />
             

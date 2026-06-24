@@ -226,7 +226,7 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
                   style={{ width: `${Math.min(100, babyMonths / 12 * 100)}%` }} />
                 
                 </div>
-                <span className="text-[11px] font-semibold text-muted-foreground">{babyMonths}/12 ay</span>
+                <span className="text-[11px] font-semibold text-muted-foreground">{babyMonths}/12 {tr("common_ay", "ay")}</span>
               </div>
             </div>
           </div>

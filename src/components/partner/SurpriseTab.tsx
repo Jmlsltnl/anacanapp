@@ -193,7 +193,7 @@ const SurpriseTab = () => {
             user_id: partnerProfile.user_id,
             notification_type: 'surprise',
             title: tr("surprisetab_surpriz_tamamlandi_ff52dd", 'Sürpriz Tamamlandı! 🎁'),
-            message: `${profile.name || tr("surprisetab_heyat_yoldasin_fc543b", "H\u0259yat yolda\u015F\u0131n")} sənin üçün "${title}" sürprizini tamamladı! ${emoji}`
+            message: tr("surprisetab_partner_completed_msg_f123bc", "{partnerName} sənin üçün \"{title}\" sürprizini tamamladı! {emoji}").replace("{partnerName}", profile.name || tr("surprisetab_heyat_yoldasin_fc543b", "Həyat yoldaşın")).replace("{title}", title).replace("{emoji}", emoji)
           });
         } catch (err) {
           console.error('Error sending surprise completion notification:', err);

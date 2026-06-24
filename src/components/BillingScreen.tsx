@@ -274,7 +274,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
             className="bg-card rounded-2xl p-4 border border-border/50 shadow-sm">
             
               <h3 className="text-xs font-bold text-foreground mb-3 flex items-center gap-1.5">
-                <Shield className="w-3.5 h-3.5 text-muted-foreground" />Pulsuz plana daxildir
+                <Shield className="w-3.5 h-3.5 text-muted-foreground" />{tr("billingscreen_pulsuz_plana_daxildir_77c152", "Pulsuz plana daxildir")}
               </h3>
               <div className="space-y-2">
                 {[

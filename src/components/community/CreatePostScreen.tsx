@@ -223,7 +223,7 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
               </button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0 border-0" align="end" side="top">
-              <EmojiPicker onEmojiClick={handleEmojiSelect} theme={theme === 'dark' ? Theme.DARK : Theme.LIGHT} width={300} height={350} searchPlaceholder="Emoji axtar..." previewConfig={{ showPreview: false }} />
+              <EmojiPicker onEmojiClick={handleEmojiSelect} theme={theme === 'dark' ? Theme.DARK : Theme.LIGHT} width={300} height={350} searchPlaceholder={tr("community_emoji_axtar_placeholder_f123bc", "Emoji axtar...")} previewConfig={{ showPreview: false }} />
             </PopoverContent>
           </Popover>
 

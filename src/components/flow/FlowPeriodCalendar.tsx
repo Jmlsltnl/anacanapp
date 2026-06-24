@@ -11,7 +11,7 @@ import { tr } from "@/lib/tr";
 
 const FLOW_OPTIONS = [
 { key: 'light', label: tr("flowperiodcalendar_yungul_2a8010", 'Yüngül'), emoji: '💧', color: 'bg-red-200 dark:bg-red-900/30' },
-{ key: 'medium', label: 'Orta', emoji: '💧💧', color: 'bg-red-300 dark:bg-red-800/40' },
+{ key: 'medium', label: tr("common_orta", 'Orta'), emoji: '💧💧', color: 'bg-red-300 dark:bg-red-800/40' },
 { key: 'heavy', label: tr("flowperiodcalendar_guclu_0fda31", 'Güclü'), emoji: '💧💧💧', color: 'bg-red-400 dark:bg-red-700/50' }];
 
 

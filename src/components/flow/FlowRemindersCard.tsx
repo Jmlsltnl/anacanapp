@@ -40,7 +40,7 @@ const FlowRemindersCard = () => {
           {tr("flowreminderscard_xatirlatmalar_ddd8e7", "Xat\u0131rlatmalar")}
         </h3>
         <span className="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-1 rounded-full">
-          {enabledCount} aktiv
+          {enabledCount} {tr("flowreminderscard_aktiv_d7a82c", "aktiv")}
         </span>
       </div>
 
@@ -86,7 +86,7 @@ const FlowRemindersCard = () => {
           onClick={() => setShowAll(!showAll)}
           className="w-full py-2 text-sm text-primary hover:text-primary/80 flex items-center justify-center gap-1">
           
-              {showAll ? tr("flowreminderscard_daha_az_goster_47a81d", "Daha az g\xF6st\u0259r") : `Hamısını göstər (${reminders.length})`}
+              {showAll ? tr("flowreminderscard_daha_az_goster_47a81d", "Daha az g\xF6st\u0259r") : tr("flowreminderscard_hamisini_goster_f123bc", "Hamısını göstər ({count})").replace("{count}", String(reminders.length))}
               <ChevronRight className={`w-4 h-4 transition-transform ${showAll ? 'rotate-90' : ''}`} />
             </button>
         }

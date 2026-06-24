@@ -13,10 +13,10 @@ interface Props {
 }
 
 const PHASE_LABEL: Record<string, {label: string;emoji: string;}> = {
-  menstrual: { label: 'Menstruasiya', emoji: '🩸' },
-  follicular: { label: 'Follikular', emoji: '🌱' },
-  ovulation: { label: 'Ovulyasiya', emoji: '🌸' },
-  luteal: { label: 'Lutein', emoji: '🌙' }
+  menstrual: { label: tr("symptompatternreport_menstruasiya_1c9b68", 'Menstruasiya'), emoji: '🩸' },
+  follicular: { label: tr("symptompatternreport_follikular_f123bc", 'Follikular'), emoji: '🌱' },
+  ovulation: { label: tr("symptompatternreport_ovulyasiya_f123bc", 'Ovulyasiya'), emoji: '🌸' },
+  luteal: { label: tr("symptompatternreport_lutein_f123bc", 'Lutein'), emoji: '🌙' }
 };
 
 const SymptomPatternReport = ({ onUpgrade }: Props) => {
@@ -71,7 +71,7 @@ const SymptomPatternReport = ({ onUpgrade }: Props) => {
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-bold text-foreground flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-amber-600" />
-            Simptom Pattern Analizi
+            {tr("symptompatternreport_title_e8cbea", "Simptom Pattern Analizi")}
           </h3>
           <Lock className="w-4 h-4 text-amber-600" />
         </div>
@@ -102,7 +102,7 @@ const SymptomPatternReport = ({ onUpgrade }: Props) => {
       <div className="bg-card rounded-2xl p-4 border border-border">
         <h3 className="font-bold text-foreground flex items-center gap-2 mb-2">
           <Sparkles className="w-5 h-5 text-fuchsia-500" />
-          Simptom Pattern Analizi
+          {tr("symptompatternreport_title_e8cbea", "Simptom Pattern Analizi")}
         </h3>
         <p className="text-xs text-muted-foreground">
           {tr("symptompatternreport_hele_kifayet_qeder_data_yoxdur_8ad930", "H\u0259l\u0259 kifay\u0259t q\u0259d\u0259r data yoxdur. G\xFCnd\u0259lik simptomlar\u0131n\u0131z\u0131 qeyd edin v\u0259 1-2 tsikld\u0259n sonra burada paylanma g\xF6r\u0259c\u0259ksiniz.")}
@@ -119,7 +119,7 @@ const SymptomPatternReport = ({ onUpgrade }: Props) => {
       
       <h3 className="font-bold text-foreground flex items-center gap-2 mb-3">
         <Sparkles className="w-5 h-5 text-fuchsia-500" />
-        Simptom Pattern Analizi
+        {tr("symptompatternreport_title_e8cbea", "Simptom Pattern Analizi")}
       </h3>
       <p className="text-xs text-muted-foreground mb-3">{tr("symptompatternreport_son_90_gun_uzre_top_5_simptom__c1b6a8", "Son 90 g\xFCn \xFCzr\u0259 top 5 simptom v\u0259 dominant faza:")}</p>
 

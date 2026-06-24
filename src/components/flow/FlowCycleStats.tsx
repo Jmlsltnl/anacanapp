@@ -32,7 +32,7 @@ const FlowCycleStats = () => {
           <BarChart3 className="w-5 h-5 text-indigo-500" />
           {tr("flowcyclestats_tsikl_statistikasi_e8cbea", "Tsikl Statistikas\u0131")}
         </h3>
-        <span className="text-xs text-muted-foreground">{stats.totalCycles} tsikl</span>
+        <span className="text-xs text-muted-foreground">{tr("flowcyclestats_tsikl_count", "{count} tsikl").replace("{count}", String(stats.totalCycles))}</span>
       </div>
 
       {/* Stats Grid */}
@@ -101,7 +101,7 @@ const FlowCycleStats = () => {
                   }
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {cycle.cycle_length ? `${cycle.cycle_length} gün tsikl` : 'Davam edir'}
+                      {cycle.cycle_length ? tr("flowcyclestats_gun_tsikl_f123bc", "{length} gün tsikl").replace("{length}", String(cycle.cycle_length)) : tr("flowcyclestats_davam_edir_f842cd", "Davam edir")}
                     </p>
                   </div>
                 </div>
@@ -120,7 +120,7 @@ const FlowCycleStats = () => {
       <div className="text-center py-6">
           <Calendar className="w-10 h-10 text-muted-foreground/50 mx-auto mb-2" />
           <p className="text-sm text-muted-foreground">
-            Tsikl tarixi yoxdur
+            {tr("flowcyclestats_tsikl_tarixi_yoxdur_b78f8c", "Tsikl tarixi yoxdur")}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
             {tr("flowcyclestats_period_gunlerini_qeyd_etdikde__f44b96", "Period g\xFCnl\u0259rini qeyd etdikd\u0259 tarix yaranacaq")}

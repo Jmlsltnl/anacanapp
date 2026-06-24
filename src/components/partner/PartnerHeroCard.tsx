@@ -23,10 +23,10 @@ interface PartnerHeroCardProps {
 }
 
 const PHASE_LABEL: Record<CyclePhaseInfo['phase'], {label: string;emoji: string;tip: string;}> = {
-  menstrual: { label: 'Menstruasiya', emoji: '🌸', tip: tr("partnerherocard_onu_rahat_saxla_isti_icki_geti_a99254", "Onu rahat saxla, isti i\xE7ki g\u0259tir") },
-  follicular: { label: 'Follikulyar faza', emoji: '🌱', tip: tr("partnerherocard_enerjisi_artir_birge_fealiyyet_0f82ed", "Enerjisi art\u0131r \u2014 birg\u0259 f\u0259aliyy\u0259t t\u0259klif et") },
-  ovulation: { label: 'Ovulyasiya', emoji: '✨', tip: tr("partnerherocard_en_enerjili_dovru_diqqetli_ol_980ebb", "\u018Fn enerjili d\xF6vr\xFC \u2014 diqq\u0259tli ol") },
-  luteal: { label: 'Luteal faza', emoji: '🌙', tip: tr("partnerherocard_ehvali_deyisken_ola_biler_sebi_a69be8", "\u018Fhval\u0131 d\u0259yi\u015Fk\u0259n ola bil\u0259r \u2014 s\u0259birli ol") }
+  menstrual: { label: tr("partnerherocard_menstruasiya_1c9b68", 'Menstruasiya'), emoji: '🌸', tip: tr("partnerherocard_onu_rahat_saxla_isti_icki_geti_a99254", "Onu rahat saxla, isti i\xE7ki g\u0259tir") },
+  follicular: { label: tr("partnerherocard_follikulyar_faza_f123bc", 'Follikulyar faza'), emoji: '🌱', tip: tr("partnerherocard_enerjisi_artir_birge_fealiyyet_0f82ed", "Enerjisi art\u0131r \u2014 birg\u0259 f\u0259aliyy\u0259t t\u0259klif et") },
+  ovulation: { label: tr("partnerherocard_ovulyasiya_f123bc", 'Ovulyasiya'), emoji: '✨', tip: tr("partnerherocard_en_enerjili_dovru_diqqetli_ol_980ebb", "\u018Fn enerjili d\xF6vr\xFC \u2014 diqq\u0259tli ol") },
+  luteal: { label: tr("partnerherocard_luteal_faza_f123bc", 'Luteal faza'), emoji: '🌙', tip: tr("partnerherocard_ehvali_deyisken_ola_biler_sebi_a69be8", "\u018Fhval\u0131 d\u0259yi\u015Fk\u0259n ola bil\u0259r \u2014 s\u0259birli ol") }
 };
 
 const PartnerHeroCard = ({
@@ -63,10 +63,10 @@ const PartnerHeroCard = ({
     if (lifeStage === 'bump' && currentWeek > 0) return `${tr("partner_pregnancy_week", "Hamiləlik:")} ${currentWeek}. ${tr("partner_week", "həftə")}`;
     if (lifeStage === 'mommy') {
       const baby = babyName || tr("partnerherocard_korpe_fa2b51", "K\xF6rp\u0259");
-      if (babyMonths >= 1) return `${baby}: ${babyMonths} ${tr("common_ay", 'ay')} ${babyAgeDays % 30} gün`;
-      return `${baby}: ${babyAgeDays} günlük`;
+      if (babyMonths >= 1) return `${baby}: ${babyMonths} ${tr("common_ay", 'ay')} ${babyAgeDays % 30} ${tr("common_gun", "gün")}`;
+      return `${baby}: ${babyAgeDays} ${tr("partnerherocard_gunluk_f123bc", "günlük")}`;
     }
-    if (lifeStage === 'flow' && cyclePhase) return `${PHASE_LABEL[cyclePhase.phase].label} • ${cyclePhase.dayInCycle}. gün`;
+    if (lifeStage === 'flow' && cyclePhase) return `${PHASE_LABEL[cyclePhase.phase].label} • ${cyclePhase.dayInCycle}. ${tr("common_gun", "gün")}`;
     return tr("partnerherocard_bagli_713069", "Ba\u011Fl\u0131");
   })();
 

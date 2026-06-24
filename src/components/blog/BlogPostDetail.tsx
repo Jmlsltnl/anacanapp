@@ -144,7 +144,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
             onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
             className="text-xs font-medium text-muted-foreground hover:text-violet-500 transition-colors">
             
-                Cavab yaz
+                {tr("blogpostdetail_cavab_yaz_2cd434", "Cavab yaz")}
               </button>
           }
 
@@ -325,7 +325,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
               whileTap={{ scale: 0.98 }}>
               
               <Bookmark className={`w-5 h-5 ${isSaved ? 'fill-current' : ''}`} />
-              <span>{isSaved ? tr("blogpostdetail_saxlanildi_66ffe7", "Saxlan\u0131ld\u0131") : 'Saxla'}</span>
+              <span>{isSaved ? tr("blogpostdetail_saxlanildi_66ffe7", "Saxlan\u0131ld\u0131") : tr("blogpostdetail_saxla_d9cfd1", "Saxla")}</span>
             </motion.button>
 
             <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-muted text-muted-foreground">

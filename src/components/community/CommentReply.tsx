@@ -152,7 +152,7 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
             {showReplyInput &&
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="mt-2 overflow-hidden">
                 <div className="flex gap-2">
-                  <Input value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder={`@${comment.author?.name || tr("commentreply_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")} cavab...`}
+                  <Input value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder={tr("commentreply_cavab_yaz_placeholder_123456", "{username} cavab...").replace("{username}", comment.author?.name || tr("commentreply_i_stifadeci_b6bdd6", "İstifadəçi"))}
                 className="flex-1 h-8 text-[11px] rounded-full bg-muted/10 border-border/10 px-3.5" onKeyPress={(e) => e.key === 'Enter' && handleReply()} />
                   <Button onClick={handleReply} disabled={!replyText.trim()} size="sm" className="h-8 w-8 rounded-full gradient-primary p-0">
                     <Send className="w-3 h-3 text-primary-foreground" />

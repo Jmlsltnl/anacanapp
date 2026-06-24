@@ -49,7 +49,7 @@ export default function DiscountedPaywallStep({ onAccept, onDecline }: Discounte
           onClick={onDecline}
           className="w-full py-3 text-sm text-muted-foreground hover:text-foreground transition-colors">
           
-          Xeyr, davam et
+          {tr("discountedpaywallstep_xeyr_davam_et_a831bc", "Xeyr, davam et")}
         </button>
       </div>
     </motion.div>);

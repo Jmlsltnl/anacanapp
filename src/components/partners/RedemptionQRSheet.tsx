@@ -114,7 +114,7 @@ export default function RedemptionQRSheet({ open, onClose, venueId, venueName }:
 
               {expired &&
             <Button onClick={generate} className="mt-4 w-full" size="lg">
-                  <RefreshCw className="w-4 h-4 mr-2" /> Yeni QR yarat
+                  <RefreshCw className="w-4 h-4 mr-2" /> {tr("redemptionqrsheet_yeni_qr_yarat_f123bc", "Yeni QR yarat")}
                 </Button>
             }
             </>

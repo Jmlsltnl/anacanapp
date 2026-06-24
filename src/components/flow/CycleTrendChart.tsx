@@ -40,7 +40,7 @@ const CycleTrendChart = () => {
           <TrendingUp className="w-5 h-5 text-indigo-500" />
           {tr("cycletrendchart_tsikl_uzunlugu_trendi_13a67d", "Tsikl Uzunlu\u011Fu Trendi")}
         </h3>
-        <span className="text-xs text-muted-foreground">{chartData.length} tsikl</span>
+        <span className="text-xs text-muted-foreground">{tr("cycletrendchart_tsikl_count", "{count} tsikl").replace("{count}", String(chartData.length))}</span>
       </div>
 
       <div className="h-44 -ml-2">
@@ -56,9 +56,9 @@ const CycleTrendChart = () => {
                 borderRadius: 12,
                 fontSize: 12
               }}
-              formatter={(v: number) => [`${v} gün`, 'Uzunluq']} />
+              formatter={(v: number) => [`${v} ${tr("common_gun", "gün")}`, tr("cycletrendchart_uzunluq_f427cd", "Uzunluq")]} />
             
-            <ReferenceLine y={stats.averageCycleLength} stroke="hsl(var(--primary))" strokeDasharray="4 4" label={{ value: `Orta ${stats.averageCycleLength}`, position: 'insideTopRight', fontSize: 10, fill: 'hsl(var(--primary))' }} />
+            <ReferenceLine y={stats.averageCycleLength} stroke="hsl(var(--primary))" strokeDasharray="4 4" label={{ value: `${tr("common_orta", "Orta")} ${stats.averageCycleLength}`, position: 'insideTopRight', fontSize: 10, fill: 'hsl(var(--primary))' }} />
             <ReferenceLine y={21} stroke="hsl(var(--destructive))" strokeOpacity={0.3} strokeDasharray="2 4" />
             <ReferenceLine y={35} stroke="hsl(var(--destructive))" strokeOpacity={0.3} strokeDasharray="2 4" />
             <Line type="monotone" dataKey="length" stroke="hsl(var(--primary))" strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} />

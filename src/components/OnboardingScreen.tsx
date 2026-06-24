@@ -592,7 +592,7 @@ const OnboardingScreen = () => {
 
                 <motion.div variants={childVariants}>
                   <label className="text-sm font-bold text-foreground mb-3 block">
-                    {selectedStage === 'mommy' ? tr("onboardingscreen_dogum_tarixi_d96907", "Do\u011Fum tarixi") : selectedStage === 'bump' ? 'Son menstruasiya tarixi' : tr("onboardingscreen_son_dovr_tarixi_4dc91e", "Son d\xF6vr tarixi")}
+                    {selectedStage === 'mommy' ? tr("onboardingscreen_dogum_tarixi_d96907", "Do\u011Fum tarixi") : selectedStage === 'bump' ? tr("onboardingscreen_son_menstruasiya_tarixi_9f3b8a", "Son menstruasiya tarixi") : tr("onboardingscreen_son_dovr_tarixi_4dc91e", "Son d\xF6vr tarixi")}
                   </label>
                   <Input
                   type="date"
@@ -625,7 +625,7 @@ const OnboardingScreen = () => {
             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> :
 
             <>
-                {step === 1 ? tr("onboardingscreen_basla_4820bc", "Ba\u015Fla") : 'Davam et'}
+                {step === 1 ? tr("onboardingscreen_basla_4820bc", "Ba\u015Fla") : tr("onboardingscreen_davam_et_7bc3d8", "Davam et")}
                 <motion.div
                 animate={{ x: [0, 5, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity }}>

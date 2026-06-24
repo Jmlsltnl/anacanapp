@@ -78,7 +78,7 @@ export default function QuizStep({ questions, onComplete }: QuizStepProps) {
           disabled={!selected}
           className="w-full h-14 rounded-2xl text-base font-semibold bg-gradient-to-r from-primary to-[hsl(var(--primary-glow,20_90%_60%))] text-primary-foreground shadow-lg">
           
-          {currentQ < questions.length - 1 ? 'Davam et' : tr("quizstep_neticeleri_gor_ddd101", "N\u0259tic\u0259l\u0259ri g\xF6r")}
+          {currentQ < questions.length - 1 ? tr("quizstep_davam_et_a832bc", "Davam et") : tr("quizstep_neticeleri_gor_ddd101", "N\u0259tic\u0259l\u0259ri g\xF6r")}
         </Button>
       </div>
     </div>);
