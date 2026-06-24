@@ -111,7 +111,7 @@ export const useAdminEPDSQuestions = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-epds-questions'] });
       queryClient.invalidateQueries({ queryKey: ['epds-questions'] });
-      toast({ title: 'Sual silindi' });
+      toast({ title: tr("hooks_adminfaq_sual_silindi", "Sual silindi") });
     },
   });
 
@@ -351,7 +351,7 @@ export const useAdminMentalHealthResources = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-mental-health-resources'] });
       queryClient.invalidateQueries({ queryKey: ['mental-health-resources'] });
-      toast({ title: 'Resurs silindi' });
+      toast({ title: tr("hooks_adminmh_resurs_silindi", "Resurs silindi") });
     },
   });
 

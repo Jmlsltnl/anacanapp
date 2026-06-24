@@ -166,7 +166,7 @@ export const usePartnerMessages = () => {
           }
           // Trigger native phone notification for text/love messages
           if (['text', 'love'].includes(newMessage.message_type)) {
-            const title = newMessage.message_type === 'love' ? tr("usepartnermessages_sevgi_aldiniz_346423", "Sevgi ald\u0131n\u0131z! \u2764\uFE0F") : 'Yeni mesaj 💬';
+            const title = newMessage.message_type === 'love' ? tr("usepartnermessages_sevgi_aldiniz_346423", "Sevgi ald\u0131n\u0131z! \u2764\uFE0F") : tr("usepartnermessages_yeni_mesaj_title", "Yeni mesaj 💬");
             const body = newMessage.message_type === 'love' ? tr("usepartnermessages_partnyorunuz_size_sevgi_gonder_765fb4", "Partnyorunuz siz\u0259 sevgi g\xF6nd\u0259rdi") :
 
             typeof newMessage.content === 'string' ? newMessage.content.slice(0, 60) : tr("usepartnermessages_mesaj_geldi_9e478b", "Mesaj g\u0259ldi");

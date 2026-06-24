@@ -73,14 +73,14 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
       { label: tr("doctorreportscreen_hamilelik_heftesi_c9e362", 'Hamiləlik həftəsi'), value: `${pregData.currentWeek} ${tr("common_hefte_suffix", "həftə")}`, icon: Calendar },
       { label: tr("doctorreportscreen_trimester_4dc81e", 'Trimester'), value: tr("doctorreportscreen_trimester_value_8dc81e", "{trimester}-cü").replace("{trimester}", String(pregData.trimester)), icon: Activity },
       { label: tr("doctorreportscreen_korpe_olcusu_cccfc2", 'Körpə ölçüsü'), value: pregData.babySize.fruit, icon: Heart },
-      { label: tr("doctorreportscreen_texmini_dogus_98eb77", 'Təxmini doğuş'), value: pregData.dueDate?.toLocaleDateString('az-AZ'), icon: Calendar }];
+      { label: tr("doctorreportscreen_texmini_dogus_98eb77", 'Təxmini doğuş'), value: pregData.dueDate?.toLocaleDateString(localStorage.getItem('language') === 'en' ? 'en-US' : 'az-AZ'), icon: Calendar }];
 
     }
     if (lifeStage === 'mommy' && babyData) {
       return [
       { label: tr("doctorreportscreen_korpenin_adi_8a4e9e", 'Körpənin adı'), value: babyData.name, icon: Heart },
-      { label: tr("doctorreportscreen_yas_95595b", 'Yaş'), value: babyData.ageInMonths > 0 ? `${babyData.ageInMonths} ay` : `${babyData.ageInDays} gün`, icon: Calendar },
-      { label: tr("doctorreportscreen_dogum_tarixi_d96907", 'Doğum tarixi'), value: babyData.birthDate.toLocaleDateString('az-AZ'), icon: Calendar },
+      { label: tr("doctorreportscreen_yas_95595b", 'Yaş'), value: babyData.ageInMonths > 0 ? `${babyData.ageInMonths} ${tr("common_ay", "ay")}` : `${babyData.ageInDays} ${tr("common_gun", "gün")}`, icon: Calendar },
+      { label: tr("doctorreportscreen_dogum_tarixi_d96907", 'Doğum tarixi'), value: babyData.birthDate.toLocaleDateString(localStorage.getItem('language') === 'en' ? 'en-US' : 'az-AZ'), icon: Calendar },
       { label: tr("doctorreportscreen_cinsiyyet_1526fb", 'Cinsiyyət'), value: babyData.gender === 'boy' ? tr("doctorreportscreen_oglan_e9715e", "O\u011Flan") : tr("doctorreportscreen_qiz_79bf6b", "Q\u0131z"), icon: Activity }];
 
     }

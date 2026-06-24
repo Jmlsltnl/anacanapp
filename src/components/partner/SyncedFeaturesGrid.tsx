@@ -59,7 +59,7 @@ const SyncedFeaturesGrid = ({ onNavigate, onTabChange }: SyncedFeaturesGridProps
     subtitle: plannedSurprises.length > 0 ? `${plannedSurprises.length} planlanıb` : tr("syncedfeaturesgrid_planlasdir_933684", "Planla\u015Fd\u0131r"),
     icon: Gift,
     gradient: 'from-amber-500 to-orange-600',
-    badge: totalPoints > 0 ? `${totalPoints} xal` : null,
+    badge: totalPoints > 0 ? tr("syncedfeaturesgrid_points", "{points} xal").replace("{points}", String(totalPoints)) : null,
     action: () => onTabChange('surprise')
   },
   {
@@ -77,7 +77,7 @@ const SyncedFeaturesGrid = ({ onNavigate, onTabChange }: SyncedFeaturesGridProps
     <div className="space-y-3">
       <h2 className="font-bold text-lg flex items-center gap-2">
         <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-        Sinxron Funksiyalar
+        {tr("syncedfeaturesgrid_sinxron_funksiyalar", "Sinxron Funksiyalar")}
       </h2>
 
       <div className="grid grid-cols-2 gap-3">

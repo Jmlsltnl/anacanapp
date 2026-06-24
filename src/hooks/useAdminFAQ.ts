@@ -80,7 +80,7 @@ export const useAdminFAQ = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['faqs-admin'] });
       queryClient.invalidateQueries({ queryKey: ['faqs'] });
-      toast({ title: 'Sual silindi' });
+      toast({ title: tr("hooks_adminfaq_sual_silindi", "Sual silindi") });
     },
   });
 

@@ -226,7 +226,7 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
       return false;
     } catch (err: any) {
       console.error('Purchase error:', err);
-      setError(`Alış zamanı xəta: ${err?.message || tr("useinapppurchase_namelum_xeta_aa30e7", "Nam\u0259lum x\u0259ta")}`);
+      setError(tr("useinapppurchase_purchase_error", "Alış zamanı xəta: {error}").replace("{error}", err?.message || tr("useinapppurchase_namelum_xeta_aa30e7", "Nam\u0259lum x\u0259ta")));
       return false;
     } finally {
       setIsPurchasing(false);

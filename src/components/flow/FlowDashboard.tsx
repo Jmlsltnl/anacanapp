@@ -471,7 +471,7 @@ const FlowDashboard = () => {
             <div className="flex-1">
               <p className="font-semibold text-foreground text-sm">{labelNextPeriod}</p>
               <p className="text-xs text-muted-foreground">
-                {format(nextPeriodDate, 'd MMMM', { locale: getCurrentDateLocale() })} • {daysUntilPeriod > 0 ? `${daysUntilPeriod} gün qaldı` : tr("flowdashboard_bu_gun_786fd4", "Bu g\xFCn")}
+                {format(nextPeriodDate, 'd MMMM', { locale: getCurrentDateLocale() })} • {daysUntilPeriod > 0 ? tr("flowdashboard_x_gun_qaldi", "{days} gün qaldı").replace("{days}", String(daysUntilPeriod)) : tr("flowdashboard_bu_gun_786fd4", "Bu g\xFCn")}
               </p>
             </div>
           </div>

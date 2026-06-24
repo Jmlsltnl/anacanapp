@@ -487,7 +487,7 @@ const OnboardingScreen = () => {
                       </label>
                       <Input
                     type="text"
-                    placeholder={babyCount > 1 ? tr("onboardingscreen_eli_veli_e76548", "\u018Fli, V\u0259li") : 'Ad'}
+                    placeholder={babyCount > 1 ? tr("onboardingscreen_eli_veli_e76548", "\u018Fli, V\u0259li") : tr("common_ad_placeholder", "Ad")}
                     value={babyName}
                     onChange={(e) => setBabyName(e.target.value)}
                     className="h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-lg px-5" />

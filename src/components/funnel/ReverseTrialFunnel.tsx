@@ -42,7 +42,7 @@ export default function ReverseTrialFunnel({ onComplete }: ReverseTrialFunnelPro
       const bd = getBabyData();
       return bd ? `${bd.name} — ${bd.ageInMonths} aylıq` : tr("reversetrialfunnel_analiq_9e762d", "Anal\u0131q");
     }
-    return `Tsikl: ${cycleLength} gün`;
+    return tr("reversetrialfunnel_cycle_status", "Tsikl: {length} gün").replace("{length}", String(cycleLength));
   }, [stage, getPregnancyData, getBabyData, cycleLength]);
 
   // Week/age number for results

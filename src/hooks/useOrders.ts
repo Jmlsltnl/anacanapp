@@ -312,7 +312,7 @@ export const useCart = () => {
       // Clear cart
       await clearCart();
 
-      toast({ title: tr("useorders_sifaris_yaradildi_6c3ee9", "Sifariş yaradıldı!"), description: `Sifariş nömrəsi: ${order.order_number}` });
+      toast({ title: tr("useorders_sifaris_yaradildi_6c3ee9", "Sifariş yaradıldı!"), description: tr("useorders_order_number_desc", "Sifariş nömrəsi: {number}").replace("{number}", order.order_number) });
       return order;
     } catch (error: any) {
       toast({ title: tr("useorders_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });

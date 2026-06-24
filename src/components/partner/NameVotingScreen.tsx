@@ -15,7 +15,7 @@ interface NameVotingScreenProps {
 const genderLabels: Record<string, string> = {
   boy: tr("namevotingscreen_oglan_e9715e", "O\u011Flan"),
   girl: tr("namevotingscreen_qiz_79bf6b", "Q\u0131z"),
-  unisex: 'Uniseks'
+  unisex: tr("namevotingscreen_uniseks_label", "Uniseks")
 };
 
 const NameVotingScreen: React.FC<NameVotingScreenProps> = ({ onBack }) => {
@@ -101,7 +101,7 @@ const NameVotingScreen: React.FC<NameVotingScreenProps> = ({ onBack }) => {
             <span className="text-[10px] text-muted-foreground">{genderLabels[n.gender] || n.gender}</span>
             {partnerFav &&
             <span className="text-[10px] text-pink-600 dark:text-pink-400 flex items-center gap-0.5">
-                <Heart className="w-2.5 h-2.5 fill-current" /> Partnyor
+                <Heart className="w-2.5 h-2.5 fill-current" /> {tr("namevotingscreen_partnyor_label", "Partnyor")}
               </span>
             }
           </div>

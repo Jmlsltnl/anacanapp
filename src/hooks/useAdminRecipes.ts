@@ -77,7 +77,7 @@ export const useAdminRecipesAdmin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-recipes'] });
       queryClient.invalidateQueries({ queryKey: ['recipes'] });
-      toast({ title: 'Resept silindi' });
+      toast({ title: tr("hooks_adminrecipes_resept_silindi", "Resept silindi") });
     },
   });
 

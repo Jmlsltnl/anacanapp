@@ -324,7 +324,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                   <p className="text-lg font-black">{currencySymbol}{yearlyMonthly}<span className="text-[10px] font-normal opacity-60">{paywallConfig.yearly_suffix}</span></p>
                   <p className={`text-[10px] mt-0.5 ${selectedPlan === 'yearly' ? 'text-muted-foreground' : 'text-white/50'}`}>
                     {yearlyProduct?.product?.defaultOptionHasFreeTrial ?
-                  `${parseIsoTrialDays(yearlyProduct.product.defaultOptionTrialPeriod) ?? paywallConfig.free_trial_days} gün pulsuz, sonra ${currencySymbol}${yearlyPrice}${paywallConfig.yearly_total_suffix}` :
+                  tr("premiummodal_trial_then_price", "{days} gün pulsuz, sonra {price}").replace("{days}", String(parseIsoTrialDays(yearlyProduct.product.defaultOptionTrialPeriod) ?? paywallConfig.free_trial_days)).replace("{price}", `${currencySymbol}${yearlyPrice}${paywallConfig.yearly_total_suffix}`) :
                   `${currencySymbol}${yearlyPrice}${paywallConfig.yearly_total_suffix}`}
                   </p>
                 </motion.button>
@@ -351,7 +351,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                   <p className="text-lg font-black">{currencySymbol}{monthlyPrice}<span className="text-[10px] font-normal opacity-60">{paywallConfig.monthly_suffix}</span></p>
                   <p className={`text-[10px] mt-0.5 ${selectedPlan === 'monthly' ? 'text-muted-foreground' : 'text-white/50'}`}>
                     {monthlyProduct?.product?.defaultOptionHasFreeTrial ?
-                  `${parseIsoTrialDays(monthlyProduct.product.defaultOptionTrialPeriod) ?? paywallConfig.free_trial_days} gün pulsuz, sonra ${currencySymbol}${monthlyPrice}${paywallConfig.monthly_suffix}` :
+                  tr("premiummodal_trial_then_price", "{days} gün pulsuz, sonra {price}").replace("{days}", String(parseIsoTrialDays(monthlyProduct.product.defaultOptionTrialPeriod) ?? paywallConfig.free_trial_days)).replace("{price}", `${currencySymbol}${monthlyPrice}${paywallConfig.monthly_suffix}`) :
                   '\u00A0'}
                   </p>
                 </motion.button>

@@ -424,7 +424,7 @@ export const useCreateComment = () => {
           await supabase.functions.invoke('send-push-notification', {
             body: {
               userId: postAuthorId,
-              title: parentCommentId ? 'Yeni cavab 💬' : tr("usecommunity_yeni_serh_25bb56", "Yeni \u015F\u0259rh \uD83D\uDCAC"),
+              title: parentCommentId ? tr("usecommunity_yeni_cavab_3b1b2c", "Yeni cavab 💬") : tr("usecommunity_yeni_serh_25bb56", "Yeni \u015F\u0259rh \uD83D\uDCAC"),
               body: `${senderName}: ${preview}`,
               data: { type: parentCommentId ? 'community_reply' : 'community_comment', postId }
             }

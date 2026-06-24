@@ -65,7 +65,7 @@ export const QUIZ_QUESTIONS: Record<LifeStage, QuizQuestion[]> = {
     question: tr("funneldata_gundelik_stres_seviyyeniz_necedir_88a723", "Gündəlik stres səviyyəniz necədir?"),
     options: [
     { id: 'low', label: tr("funneldata_asagi_1c27f1", "Aşağı"), emoji: '😌' },
-    { id: 'medium', label: 'Orta', emoji: '😐' },
+    { id: 'medium', label: tr("common_orta", "Orta"), emoji: '😐' },
     { id: 'high', label: tr("funneldata_yuksek_492584", "Yüksək"), emoji: '😣' },
     { id: 'very_high', label: tr("funneldata_cox_yuksek_c4d475", "Çox yüksək"), emoji: '🤯' }]
 
@@ -76,7 +76,7 @@ export const QUIZ_QUESTIONS: Record<LifeStage, QuizQuestion[]> = {
     id: 'struggle',
     question: tr("funneldata_analiqda_en_cox_hansi_movzu_sizi_yorur_c719dc", "Analıqda ən çox hansı mövzu sizi yorur?"),
     options: [
-    { id: 'sleep', label: 'Yuxusuzluq', emoji: '😴' },
+    { id: 'sleep', label: tr("funneldata_yuxusuzluq_label", "Yuxusuzluq"), emoji: '😴' },
     { id: 'loneliness', label: tr("funneldata_tenhaliq_hissi_d0e57e", "Tənhalıq hissi"), emoji: '💔' },
     { id: 'feeding', label: tr("funneldata_korpenin_qidalanmasi_a1d9db", "Körpənin qidalanması"), emoji: '🍼' },
     { id: 'no_time', label: tr("funneldata_oz_vaxtimin_olmamasi_a3f3e9", "Öz vaxtımın olmaması"), emoji: '⏰' }]
@@ -117,7 +117,7 @@ export const QUIZ_QUESTIONS: Record<LifeStage, QuizQuestion[]> = {
     question: tr("funneldata_reproduktiv_saglamliginizla_bagli_meluma_287540", "Reproduktiv sağlamlığınızla bağlı məlumatlılıq səviyyəniz?"),
     options: [
     { id: 'high', label: tr("funneldata_cox_bilirem_b798d9", "Çox bilirəm"), emoji: '🧠' },
-    { id: 'medium', label: 'Orta', emoji: '📖' },
+    { id: 'medium', label: tr("common_orta", "Orta"), emoji: '📖' },
     { id: 'low', label: tr("funneldata_az_bilirem_0f191a", "Az bilirəm"), emoji: '🤷‍♀️' }]
 
   },
@@ -126,7 +126,7 @@ export const QUIZ_QUESTIONS: Record<LifeStage, QuizQuestion[]> = {
     question: tr("funneldata_tsiklinizi_duzgun_izlemek_sizin_ucun_ne__46b605", "Tsiklinizi düzgün izləmək sizin üçün nə qədər vacibdir?"),
     options: [
     { id: 'very', label: tr("funneldata_cox_vacib_24d1a3", "Çox vacib"), emoji: '⭐' },
-    { id: 'medium', label: 'Orta', emoji: '👌' },
+    { id: 'medium', label: tr("common_orta", "Orta"), emoji: '👌' },
     { id: 'low', label: tr("funneldata_o_qeder_de_yox_e54ae3", "O qədər də yox"), emoji: '🤷‍♀️' }]
 
   }],
@@ -233,9 +233,9 @@ export const REVIEWS: Record<LifeStage, Review[]> = {
 
 // ─── Feature Showcase ───
 export const FEATURES: Feature[] = [
-{ title: 'AI Fotosessiya', description: tr("funneldata_korpenizin_professional_fotolarini_suni__ec1b0b", "Körpənizin professional fotolarını süni intellekt ilə yaradın"), emoji: '📸' },
+{ title: tr("funneldata_ai_fotosessiya_title", "AI Fotosessiya"), description: tr("funneldata_korpenizin_professional_fotolarini_suni__ec1b0b", "Körpənizin professional fotolarını süni intellekt ilə yaradın"), emoji: '📸' },
 { title: tr("funneldata_partnyor_hesabi_ba746f", "Partnyor Hesabı"), description: tr("funneldata_heyat_yoldasinizi_baglayin_birlikde_izle_762187", "Həyat yoldaşınızı bağlayın, birlikdə izləyin"), emoji: '💑' },
-{ title: '24/7 AI Asistan', description: tr("funneldata_istenilen_sualiniza_derhal_cavab_alin_8938d5", "İstənilən sualınıza dərhal cavab alın"), emoji: '🤖' },
+{ title: tr("funneldata_ai_asistan_title", "24/7 AI Asistan"), description: tr("funneldata_istenilen_sualiniza_derhal_cavab_alin_8938d5", "İstənilən sualınıza dərhal cavab alın"), emoji: '🤖' },
 { title: tr("funneldata_heftelik_hesabat_283d76", "Həftəlik Hesabat"), description: tr("funneldata_hamileliyin_ve_ya_korpenin_heftelik_inki_ad5912", "Hamiləliyin və ya körpənin həftəlik inkişaf hesabatı"), emoji: '📊' }];
 
 
@@ -248,7 +248,7 @@ export const PLAN_MILESTONES: Record<LifeStage, {week: string;label: string;}[]>
 
   mommy: [
   { week: tr("funneldata_hefte_1_1efd81", "H\u0259ft\u0259 1"), label: tr("funneldata_korpe_izlemeye_basla_bd8634", "Körpə izləməyə başla") },
-  { week: 'Ay 1', label: 'Rutin qur, rahatla' },
+  { week: 'Ay 1', label: tr("funneldata_rutin_qur_rahatla_label", "Rutin qur, rahatla") },
   { week: 'Ay 3', label: tr("funneldata_tam_nezaretde_ol_2630cf", "Tam nəzarətdə ol") }],
 
   flow: [

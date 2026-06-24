@@ -76,7 +76,7 @@ export const useCouponValidator = (orderType: string = 'shop') => {
 
       // Check min order amount
       if (coupon.min_order_amount && orderTotal < coupon.min_order_amount) {
-        toast({ title: tr("usecoupons_minimum_mebleg_435135", "Minimum məbləğ"), description: `Bu kupon minimum ${coupon.min_order_amount}₼ sifariş üçün keçərlidir`, variant: 'destructive' });
+        toast({ title: tr("usecoupons_minimum_mebleg_435135", "Minimum məbləğ"), description: tr("usecoupons_min_order_desc", "Bu kupon minimum {amount}₼ sifariş üçün keçərlidir").replace("{amount}", String(coupon.min_order_amount)), variant: 'destructive' });
         return null;
       }
 
@@ -104,7 +104,7 @@ export const useCouponValidator = (orderType: string = 'shop') => {
 
       const applied: AppliedCoupon = { coupon, discountAmount };
       setAppliedCoupon(applied);
-      toast({ title: tr("usecoupons_kupon_tetbiq_edildi_e2143c", "Kupon tətbiq edildi! ✅"), description: `${discountAmount.toFixed(2)}₼ endirim` });
+      toast({ title: tr("usecoupons_kupon_tetbiq_edildi_e2143c", "Kupon tətbiq edildi! ✅"), description: tr("usecoupons_discount_desc", "{amount}₼ endirim").replace("{amount}", discountAmount.toFixed(2)) });
       return applied;
     } catch (err) {
       toast({ title: tr("usecoupons_xeta_3cdbb6", "Xəta"), description: tr("usecoupons_kupon_yoxlanarken_xeta_bas_verdi_9f76a4", "Kupon yoxlanarkən xəta baş verdi"), variant: 'destructive' });

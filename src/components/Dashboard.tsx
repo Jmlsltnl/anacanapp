@@ -946,7 +946,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
     setSolidFoodName('');
 
     const typeLabels = {
-      formula: amountMl ? `Süd əvəzedicisi ${amountMl} ml 🍼` : tr("dashboard_sud_evezedicisi_057b37", "S\xFCd \u0259v\u0259zedicisi \uD83C\uDF7C"),
+      formula: amountMl ? `${tr("dashboard_sud_evezedicisi", "Süd əvəzedicisi")} ${amountMl} ml 🍼` : tr("dashboard_sud_evezedicisi_057b37", "S\xFCd \u0259v\u0259zedicisi \uD83C\uDF7C"),
       solid: foodName ? `${foodName} 🥣` : tr("dashboard_elave_qida_0e11a2", "\u018Flav\u0259 qida \uD83E\uDD63")
     };
     toast({ title: `${typeLabels[type]} ${tr("dashboard_qeyd_edildi", "qeyd edildi!")}` });

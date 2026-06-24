@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { tr } from "@/lib/tr";
 import { supabase } from '@/integrations/supabase/client';
 import { useUserStore } from '@/store/userStore';
 
@@ -283,7 +284,7 @@ export const usePregnancyContentAdmin = () => {
         for (const result of updateResults) {
           if (result.error) {
             results.failed++;
-            results.errors.push(`Gün ${result.pregnancy_day}: ${result.error.message}`);
+            results.errors.push(tr("hooks_pregnancycontent_day_error", "Gün {day}: {error}").replace("{day}", String(result.pregnancy_day)).replace("{error}", result.error.message));
           } else {
             results.success++;
           }

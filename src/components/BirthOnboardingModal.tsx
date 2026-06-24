@@ -90,7 +90,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
         avatar_emoji: gender === 'girl' ? '👧' : '👦',
         is_active: true,
         sort_order: 0,
-        notes: `Doğum çəkisi: ${birthWeight || '-'} ${tr('unit_kg', 'kq')}, Boy: ${birthHeight || '-'} ${tr('unit_cm', 'sm')}, Doğum tipi: ${deliveryType}`
+        notes: tr("birthonboardingmodal_notes_template", "Doğum çəkisi: {weight} {weightUnit}, Boy: {height} {heightUnit}, Doğum tipi: {type}").replace("{weight}", birthWeight || '-').replace("{weightUnit}", tr('unit_kg', 'kq')).replace("{height}", birthHeight || '-').replace("{heightUnit}", tr('unit_cm', 'sm')).replace("{type}", deliveryOptions.find(d => d.value === deliveryType)?.label || deliveryType)
       });
 
       // Ignore if child already exists
@@ -428,7 +428,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
 
               <>
                     <Sparkles className="w-4 h-4 mr-2" />
-                    Tamamla
+                    {tr("common_tamamla", "Tamamla")}
                   </>
               }
               </Button>
