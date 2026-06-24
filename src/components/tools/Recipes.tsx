@@ -32,7 +32,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
   const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   const { data: recipes = [], isLoading: recipesLoading } = useRecipes();
-  const { lifeStage } = useUserStore();
+  const { lifeStage, language } = useUserStore();
   const { isPremium, loading: subscriptionLoading } = useSubscription();
 
   // Dynamic data from database
@@ -54,6 +54,119 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
     return base;
   }, [dbRecipeCategories]);
 
+  // Normalizes any category string (slug, AZ name, EN name) to a standard lowercase slug ID
+  const getNormalizedCategorySlug = useMemo(() => {
+    return (cat: string | undefined | null): string => {
+      if (!cat) return 'all';
+      const normalized = cat.trim().toLowerCase();
+      
+      const match = dbRecipeCategories.find(c => 
+        c.category_id?.toLowerCase() === normalized ||
+        c.name_az?.toLowerCase() === normalized ||
+        c.name_en?.toLowerCase() === normalized ||
+        c.name?.toLowerCase() === normalized
+      );
+      if (match) return match.category_id;
+
+      const slugMap: Record<string, string> = {
+        'səhər yeməyi': 'seher_yemeyi',
+        'seher yemeyi': 'seher_yemeyi',
+        'seher_yemeyi': 'seher_yemeyi',
+        'nahar': 'nahar',
+        'şam yeməyi': 'sam_yemeyi',
+        'sam yemeyi': 'sam_yemeyi',
+        'sam_yemeyi': 'sam_yemeyi',
+        'desertlər': 'desertler',
+        'desertler': 'desertler',
+        'desert': 'desertler',
+        'qəlyanaltılar': 'qelyanaltilar',
+        'qelyanaltilar': 'qelyanaltilar',
+        'qelyanalti': 'qelyanaltilar',
+        'qəlyanaltı': 'qelyanaltilar',
+        'sulu yeməklər': 'sulu_yemekler',
+        'sulu yemekler': 'sulu_yemekler',
+        'sulu_yemekler': 'sulu_yemekler',
+        'körpə qidası': 'korpe_qidasi',
+        'korpe qidasi': 'korpe_qidasi',
+        'korpe_qidasi': 'korpe_qidasi'
+      };
+
+      return slugMap[normalized] || normalized;
+    };
+  }, [dbRecipeCategories]);
+
+  // Robust translated category name helper
+  const getTranslatedCategoryName = useMemo(() => {
+    return (cat: string | undefined | null): string => {
+      if (!cat) return '';
+      
+      const normalized = cat.trim().toLowerCase();
+      
+      // 1. Try to find a match in dbRecipeCategories
+      const match = dbRecipeCategories.find(c => 
+        c.category_id?.toLowerCase() === normalized ||
+        c.name_az?.toLowerCase() === normalized ||
+        c.name_en?.toLowerCase() === normalized ||
+        c.name?.toLowerCase() === normalized
+      );
+      
+      if (match) {
+        return match.name; // This is already translated by mapRowsTranslation
+      }
+
+      // 2. Fallback local dictionary
+      const isEn = language === 'en';
+      const dictionary: Record<string, { en: string; az: string }> = {
+        'seher_yemeyi': { en: 'Breakfast', az: 'Səhər Yeməyi' },
+        'səhər yeməyi': { en: 'Breakfast', az: 'Səhər Yeməyi' },
+        'seher yemeyi': { en: 'Breakfast', az: 'Səhər Yeməyi' },
+        
+        'nahar': { en: 'Lunch', az: 'Nahar' },
+        
+        'sam_yemeyi': { en: 'Dinner', az: 'Şam Yeməyi' },
+        'şam yeməyi': { en: 'Dinner', az: 'Şam Yeməyi' },
+        'sam yemeyi': { en: 'Dinner', az: 'Şam Yeməyi' },
+        
+        'desertler': { en: 'Desserts', az: 'Desertlər' },
+        'desertlər': { en: 'Desserts', az: 'Desertlər' },
+        'desert': { en: 'Dessert', az: 'Desert' },
+        
+        'qelyanaltilar': { en: 'Snacks', az: 'Qəlyanaltılar' },
+        'qəlyanaltılar': { en: 'Snacks', az: 'Qəlyanaltılar' },
+        'qelyanalti': { en: 'Snack', az: 'Qəlyanaltı' },
+        'qəlyanaltı': { en: 'Snack', az: 'Qəlyanaltı' },
+        
+        'sulu_yemekler': { en: 'Soups', az: 'Sulu Yeməklər' },
+        'sulu yeməklər': { en: 'Soups', az: 'Sulu Yeməklər' },
+        'sulu yemekler': { en: 'Soups', az: 'Sulu Yeməklər' },
+        
+        'korpe_qidasi': { en: 'Baby Food', az: 'Körpə Qidası' },
+        'körpə qidası': { en: 'Baby Food', az: 'Körpə Qidası' },
+        'korpe qidasi': { en: 'Baby Food', az: 'Körpə Qidası' },
+        
+        'all': { en: 'All', az: 'Hamısı' },
+        'hamısı': { en: 'All', az: 'Hamısı' },
+        'hamisi': { en: 'All', az: 'Hamısı' }
+      };
+
+      if (dictionary[normalized]) {
+        return isEn ? dictionary[normalized].en : dictionary[normalized].az;
+      }
+
+      // 3. Fallback to capitalization if nothing matches
+      return cat.charAt(0).toUpperCase() + cat.slice(1);
+    };
+  }, [dbRecipeCategories, language]);
+
+  // Robust category matching filter
+  const isCategoryMatch = useMemo(() => {
+    return (recipeCat: string | undefined | null, selectedCat: string): boolean => {
+      if (selectedCat === 'all') return true;
+      if (!recipeCat) return false;
+      return getNormalizedCategorySlug(recipeCat) === getNormalizedCategorySlug(selectedCat);
+    };
+  }, [getNormalizedCategorySlug]);
+
   const toggleFavorite = (recipeId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setFavorites((prev) =>
@@ -63,7 +176,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
 
   // Filter recipes
   const filteredRecipes = recipes.filter((recipe) => {
-    const matchesCategory = recipeCategory === 'all' || recipe.category === recipeCategory;
+    const matchesCategory = isCategoryMatch(recipe.category, recipeCategory);
     const matchesSearch = recipe.title.toLowerCase().includes(recipeSearch.toLowerCase());
     return matchesCategory && matchesSearch;
   });
@@ -73,14 +186,14 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
     const ids = new Set<string>();
     const countPerCategory: Record<string, number> = {};
     for (const recipe of recipes) {
-      const cat = recipe.category || 'all';
-      countPerCategory[cat] = (countPerCategory[cat] || 0) + 1;
-      if (countPerCategory[cat] <= 3) {
+      const normalizedCat = getNormalizedCategorySlug(recipe.category);
+      countPerCategory[normalizedCat] = (countPerCategory[normalizedCat] || 0) + 1;
+      if (countPerCategory[normalizedCat] <= 3) {
         ids.add(recipe.id);
       }
     }
     return ids;
-  }, [recipes]);
+  }, [recipes, getNormalizedCategorySlug]);
 
   const isRecipeFree = (recipe: Recipe) => freeRecipeIds.has(recipe.id);
 
@@ -132,7 +245,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
             </motion.button>
             <div className="flex-1 min-w-0">
               <h1 className="font-semibold text-foreground truncate">{selectedRecipe.title}</h1>
-              <p className="text-xs text-muted-foreground">{recipeCategories.find((c) => c.id === selectedRecipe.category)?.name || selectedRecipe.category}</p>
+              <p className="text-xs text-muted-foreground">{getTranslatedCategoryName(selectedRecipe.category)}</p>
             </div>
             <motion.button
               onClick={(e) => toggleFavorite(selectedRecipe.id, e)}
@@ -478,20 +591,20 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
                     <h3 className="font-bold text-sm text-foreground line-clamp-2 mb-1">{recipe.title}</h3>
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                        {recipe.category}
+                        {getTranslatedCategoryName(recipe.category)}
                       </span>
                       <div className="flex items-center gap-1.5">
                         {!isRecipeFree(recipe) &&
-                    <span className="flex items-center gap-0.5 text-[9px] font-bold text-amber-500">
-                            <Crown className="w-3 h-3" />
-                          </span>
-                    }
+                        <span className="flex items-center gap-0.5 text-[9px] font-bold text-amber-500">
+                          <Crown className="w-3 h-3" />
+                        </span>
+                        }
                         {recipe.servings &&
-                    <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                            <Users className="w-3 h-3" />
-                            {recipe.servings}
-                          </span>
-                    }
+                        <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                          <Users className="w-3 h-3" />
+                          {recipe.servings}
+                        </span>
+                        }
                       </div>
                     </div>
                   </div>
