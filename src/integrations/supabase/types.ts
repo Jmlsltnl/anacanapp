@@ -3734,11 +3734,7 @@ export type Database = {
           is_checked: boolean
           item_id: string
           item_name: string
-          item_name_az: string | null
-          item_name_en: string | null
           notes: string | null
-          notes_az: string | null
-          notes_en: string | null
           priority: number | null
           updated_at: string
           user_id: string
@@ -3751,11 +3747,7 @@ export type Database = {
           is_checked?: boolean
           item_id: string
           item_name: string
-          item_name_az?: string | null
-          item_name_en?: string | null
           notes?: string | null
-          notes_az?: string | null
-          notes_en?: string | null
           priority?: number | null
           updated_at?: string
           user_id: string
@@ -3768,11 +3760,7 @@ export type Database = {
           is_checked?: boolean
           item_id?: string
           item_name?: string
-          item_name_az?: string | null
-          item_name_en?: string | null
           notes?: string | null
-          notes_az?: string | null
-          notes_en?: string | null
           priority?: number | null
           updated_at?: string
           user_id?: string
@@ -3790,8 +3778,6 @@ export type Database = {
           item_name_az: string | null
           item_name_en: string | null
           notes: string | null
-          notes_az: string | null
-          notes_en: string | null
           priority: number | null
           sort_order: number | null
           updated_at: string
@@ -3806,8 +3792,6 @@ export type Database = {
           item_name_az?: string | null
           item_name_en?: string | null
           notes?: string | null
-          notes_az?: string | null
-          notes_en?: string | null
           priority?: number | null
           sort_order?: number | null
           updated_at?: string
@@ -3822,8 +3806,6 @@ export type Database = {
           item_name_az?: string | null
           item_name_en?: string | null
           notes?: string | null
-          notes_az?: string | null
-          notes_en?: string | null
           priority?: number | null
           sort_order?: number | null
           updated_at?: string
