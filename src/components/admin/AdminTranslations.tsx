@@ -606,7 +606,7 @@ const AdminTranslations = () => {
               updatePayload['updated_at'] = new Date().toISOString();
             }
 
-            const { error: updErr } = await supabase
+            const { error: updErr } = await (supabase as any)
               .from(targetTable)
               .update(updatePayload)
               .eq(dbIdColumn, castedIdVal);
