@@ -28,8 +28,8 @@ const MORAL_LESSONS = [
 { value: 'honesty', label: tr("fairytalegenerator_durustluk_3d6ddb", 'Dürüstlük'), emoji: '✨' },
 { value: 'brushing_teeth', label: tr("fairytalegenerator_dis_fircalamaq_da9acc", 'Diş fırçalamaq'), emoji: '🦷' },
 { value: 'eating_vegetables', label: tr("fairytalegenerator_terevez_yemek_888a56", 'Tərəvəz yemək'), emoji: '🥦' },
-{ value: 'sleeping', label: 'Yatmaq', emoji: '😴' },
-{ value: 'friendship', label: 'Dostluq', emoji: '👫' },
+{ value: 'sleeping', label: tr("fairytalegenerator_yatmaq_3c7a2d", "Yatmaq"), emoji: '😴' },
+{ value: 'friendship', label: tr("fairytalegenerator_dostluq_3c7a2d", "Dostluq"), emoji: '👫' },
 { value: 'patience', label: tr("fairytalegenerator_sebir_831276", 'Səbir'), emoji: '🧘' },
 { value: 'gratitude', label: tr("fairytalegenerator_minnetdarliq_31b225", 'Minnətdarlıq'), emoji: '🙏' },
 { value: 'responsibility', label: tr("fairytalegenerator_mesuliyyet_6e6cbe", 'Məsuliyyət'), emoji: '🎯' },
@@ -47,14 +47,14 @@ const HERO_SUGGESTIONS = [
 { emoji: '🦋', label: tr("fairytalegenerator_kepenek_d4da32", 'Kəpənək') },
 { emoji: '🐱', label: tr("fairytalegenerator_pisik_be8848", 'Pişik') },
 { emoji: '🦊', label: tr("fairytalegenerator_tulku_c6f151", 'Tülkü') },
-{ emoji: '🐶', label: 'Bala it' },
-{ emoji: '🌟', label: 'Ulduz' },
+{ emoji: '🐶', label: tr("fairytalegenerator_bala_it_3c7a2d", "Bala it") },
+{ emoji: '🌟', label: tr("fairytalegenerator_ulduz_3c7a2d", "Ulduz") },
 { emoji: '🐢', label: tr("fairytalegenerator_tisbaga_c66f32", 'Tısbağa') },
 { emoji: '🦉', label: tr("fairytalegenerator_bayqus_d690dd", 'Bayquş') },
 { emoji: '🐝', label: tr("fairytalegenerator_ari_b3e5dd", 'Arı') },
-{ emoji: '🦅', label: 'Qartal' },
-{ emoji: '🐿️', label: 'Sincab' },
-{ emoji: '🐬', label: 'Delfin' },
+{ emoji: '🦅', label: tr("fairytalegenerator_qartal_3c7a2d", "Qartal") },
+{ emoji: '🐿️', label: tr("fairytalegenerator_sincab_3c7a2d", "Sincab") },
+{ emoji: '🐬', label: tr("fairytalegenerator_delfin_3c7a2d", "Delfin") },
 { emoji: '🦜', label: tr("fairytalegenerator_tutuqusu_d3f34f", 'Tutuquşu') },
 { emoji: '🐉', label: tr("fairytalegenerator_ejdaha_b4feca", 'Əjdaha') }];
 
@@ -62,16 +62,16 @@ const HERO_SUGGESTIONS = [
 const AGE_RANGES = [
 { value: '0-2', label: tr("fairytalegenerator_0_2_yas_0fca24", '0-2 yaş'), emoji: '👶', desc: tr("fairytalegenerator_cox_sade_fbc365", "\xC7ox sad\u0259") },
 { value: '3-5', label: tr("fairytalegenerator_3_5_yas_023631", '3-5 yaş'), emoji: '🧒', desc: tr("fairytalegenerator_sade_620f92", "Sad\u0259") },
-{ value: '6-9', label: tr("fairytalegenerator_6_9_yas_345fa4", '6-9 yaş'), emoji: '👧', desc: 'Orta' },
+{ value: '6-9', label: tr("fairytalegenerator_6_9_yas_345fa4", '6-9 yaş'), emoji: '👧', desc: tr("fairytalegenerator_orta_3c7a2d", "Orta") },
 { value: '10-12', label: tr("fairytalegenerator_10_12_yas_c393ca", '10-12 yaş'), emoji: '🧑', desc: tr("fairytalegenerator_murekkeb_43a904", "M\xFCr\u0259kk\u0259b") }];
 
 
 const STORY_STYLES = [
-{ value: '', label: 'Klassik', emoji: '📖' },
+{ value: '', label: tr("fairytalegenerator_klassik_3c7a2d", "Klassik"), emoji: '📖' },
 { value: 'funny', label: tr("fairytalegenerator_gulmeli_8f7f56", 'Gülməli'), emoji: '😂' },
 { value: 'adventure', label: tr("fairytalegenerator_macera_bc3bdc", 'Macəra'), emoji: '🗺️' },
 { value: 'educational', label: tr("fairytalegenerator_oyredici_b51c23", 'Öyrədici'), emoji: '🎓' },
-{ value: 'lullaby', label: 'Laylay', emoji: '🌙' }];
+{ value: 'lullaby', label: tr("fairytalegenerator_laylay_3c7a2d", "Laylay"), emoji: '🌙' }];
 
 
 const LANGUAGES = [
@@ -241,7 +241,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
             </Card>
             <Card className="text-center p-3">
               <p className="text-2xl font-bold text-red-500">{favoriteTales.length}</p>
-              <p className="text-xs text-muted-foreground">Sevimli</p>
+              <p className="text-xs text-muted-foreground">{tr("fairytalegenerator_sevimli_3c7a2d", "Sevimli")}</p>
             </Card>
             <Card className="text-center p-3">
               <p className="text-2xl font-bold text-amber-500">

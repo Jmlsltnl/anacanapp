@@ -423,7 +423,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
             disabled={!newReading || addLogMutation.isPending}
             onClick={() => addLogMutation.mutate()}>
             
-              {addLogMutation.isPending ? tr("bloodsugartracker_elave_edilir_3c28b4", "\u018Flav\u0259 edilir...") : 'Qeyd et'}
+              {addLogMutation.isPending ? tr("bloodsugartracker_elave_edilir_3c28b4", "Əlavə edilir...") : tr("bloodsugartracker_qeyd_et_3c7a2d", "Qeyd et")}
             </Button>
           </motion.div>
         </div>

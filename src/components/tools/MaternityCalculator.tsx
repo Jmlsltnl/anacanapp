@@ -83,7 +83,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
             <div className="flex-1">
               <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <Calculator className="w-5 h-5 text-primary" />
-                Dekret Kalkulyatoru
+                {tr("maternitycalculator_title_3c7a2d", "Dekret Kalkulyatoru")}
               </h1>
             </div>
           </div>
@@ -95,7 +95,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
           <TabsList className="w-full grid grid-cols-2 bg-card/95 backdrop-blur-sm shadow-lg rounded-xl p-1">
             <TabsTrigger value="calculator" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Calculator className="w-4 h-4 mr-2" />
-              Hesabla
+              {tr("maternitycalculator_calculate_3c7a2d", "Hesabla")}
             </TabsTrigger>
             <TabsTrigger value="guide" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <FileText className="w-4 h-4 mr-2" />
@@ -200,7 +200,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                 className="w-full h-14 text-lg font-semibold rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500">
                 
                 <Calculator className="w-5 h-5 mr-2" />
-                Hesabla
+                {tr("maternitycalculator_calculate_3c7a2d", "Hesabla")}
               </Button>
             </motion.div>
 

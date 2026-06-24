@@ -56,7 +56,7 @@ interface HealthcareProvider {
 
 const providerTypeLabels: Record<string, {label: string;icon: typeof Stethoscope;}> = {
   hospital: { label: tr("doctorshospitals_xestexana_04539b", 'Xəstəxana'), icon: Building2 },
-  clinic: { label: 'Klinika', icon: Building2 },
+  clinic: { label: tr("doctorshospitals_klinika_3c7a2d", "Klinika"), icon: Building2 },
   doctor: { label: tr("doctorshospitals_hekim_c127f7", 'Həkim'), icon: User }
 };
 

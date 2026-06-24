@@ -31,7 +31,7 @@ const colorLabels: Record<string, {label: string;emoji: string;}> = {
   brown: { label: tr("poopscanner_qehveyi_b14379", 'Qəhvəyi'), emoji: '🟤' },
   yellow: { label: tr("poopscanner_sari_30ba0d", 'Sarı'), emoji: '🟡' },
   green: { label: tr("poopscanner_yasil_b257f4", 'Yaşıl'), emoji: '🟢' },
-  black: { label: 'Qara', emoji: '⚫' },
+  black: { label: tr("poopscanner_qara_3c7a2d", "Qara"), emoji: '⚫' },
   red: { label: tr("poopscanner_qirmizi_ea111d", 'Qırmızı'), emoji: '🔴' },
   white: { label: tr("poopscanner_ag_solgun_984851", 'Ağ/Solğun'), emoji: '⚪' },
   unknown: { label: tr("poopscanner_namelum_134662", 'Naməlum'), emoji: '❓' }
@@ -227,7 +227,7 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
       case 'urgent':return tr("poopscanner_tecili_ab784b", "T\u0259cili");
       case 'warning':return tr("poopscanner_diqqet_764567", "Diqq\u0259t");
       case 'attention':return tr("poopscanner_i_zleyin_54759b", "\u0130zl\u0259yin");
-      default:return 'Normal';
+      default:return tr("common_normal", "Normal");
     }
   };
 
@@ -378,7 +378,7 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
                         'bg-green-500/20 text-green-600' :
                         'bg-red-500/20 text-red-600'}`
                         }>
-                            {analysis.isNormal ? 'Normal' : tr("poopscanner_diqqet_764567", "Diqq\u0259t")}
+                            {analysis.isNormal ? tr("common_normal", "Normal") : tr("poopscanner_diqqet_764567", "Diqqət")}
                           </span>
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -495,7 +495,7 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
                       <span className={`px-2 py-0.5 rounded text-xs ${
                     item.is_normal ? 'bg-green-500/20 text-green-600' : 'bg-red-500/20 text-red-600'}`
                     }>
-                        {item.is_normal ? 'Normal' : tr("poopscanner_diqqet_764567", "Diqq\u0259t")}
+                        {item.is_normal ? tr("common_normal", "Normal") : tr("poopscanner_diqqet_764567", "Diqqət")}
                       </span>
                     </div>);
 

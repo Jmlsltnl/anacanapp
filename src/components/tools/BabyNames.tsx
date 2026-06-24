@@ -119,7 +119,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
         <div className="flex items-center gap-4 mb-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full bg-primary" />
-            {names.length} ad
+            {names.length} {tr("babynames_ad_count_3c7a2d", "ad")}
           </span>
           <span className="flex items-center gap-1">
             <Heart className="w-3 h-3 text-pink-500 fill-pink-500" />
@@ -158,7 +158,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
             {tr("babynames_neticeler_15e2bd", "N\u0259tic\u0259l\u0259r")}
           </h3>
           <span className="text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
-            {filteredNames.length} ad
+            {filteredNames.length} {tr("babynames_ad_count_3c7a2d", "ad")}
           </span>
         </div>
         

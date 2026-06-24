@@ -210,7 +210,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
           </span>
           <span className="flex items-center gap-1">
             <Star className="w-3 h-3 text-amber-500 fill-current" />
-            <strong className="text-foreground">{avgRating}</strong> orta reytinq
+            <strong className="text-foreground">{avgRating}</strong> {tr("momfriendlymap_orta_reytinq_3c7a2d", "orta reytinq")}
           </span>
         </div>
       </div>

@@ -573,7 +573,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                 <Crown className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
-                    Pulsuz: ilk {freeLimits.baby_photoshoot_count} foto
+                    {tr("babyphotoshoot_pulsuz_ilk_foto_3c7a2d", "Pulsuz: ilk")} {freeLimits.baby_photoshoot_count} {tr("babyphotoshoot_foto_suffix_3c7a2d", "foto")}
                   </p>
                   <p className="text-xs text-amber-600 dark:text-amber-300 mt-1">
                     {tr("babyphotoshoot_limitsiz_foto_ucun_premium_a_k_965e5c", "Limitsiz foto \xFC\xE7\xFCn Premium-a ke\xE7in")}

@@ -42,10 +42,10 @@ interface Listing {
 const categories = [
 { id: 'clothing', label: 'Geyim', emoji: '👕', color: 'from-pink-500 to-rose-600' },
 { id: 'toys', label: 'Oyuncaqlar', emoji: '🧸', color: 'from-amber-500 to-orange-600' },
-{ id: 'furniture', label: 'Mebel', emoji: '🛏️', color: 'from-blue-500 to-indigo-600' },
-{ id: 'stroller', label: 'Araba', emoji: '👶', color: 'from-violet-500 to-purple-600' },
-{ id: 'feeding', label: 'Qidalanma', emoji: '🍼', color: 'from-emerald-500 to-green-600' },
-{ id: 'hygiene', label: 'Gigiyena', emoji: '🛁', color: 'from-cyan-500 to-teal-600' },
+{ id: 'furniture', label: tr("secondhandmarket_mebel_3c7a2d", "Mebel"), emoji: '🛏️', color: 'from-blue-500 to-indigo-600' },
+{ id: 'stroller', label: tr("secondhandmarket_araba_3c7a2d", "Araba"), emoji: '👶', color: 'from-violet-500 to-purple-600' },
+{ id: 'feeding', label: tr("secondhandmarket_qidalanma_3c7a2d", "Qidalanma"), emoji: '🍼', color: 'from-emerald-500 to-green-600' },
+{ id: 'hygiene', label: tr("secondhandmarket_gigiyena_3c7a2d", "Gigiyena"), emoji: '🛁', color: 'from-cyan-500 to-teal-600' },
 { id: 'other', label: tr("secondhandmarket_diger_293b3a", 'Digər'), emoji: '📦', color: 'from-gray-500 to-slate-600' }];
 
 
@@ -53,11 +53,11 @@ const conditions = [
 { id: 'new', label: tr("secondhandmarket_yeni", 'Yeni'), color: 'bg-emerald-500', textColor: 'text-emerald-600' },
 { id: 'like_new', label: tr("secondhandmarket_yeni_kimi", 'Yeni kimi'), color: 'bg-green-500', textColor: 'text-green-600' },
 { id: 'good', label: tr("secondhandmarket_yaxsi_9d8595", 'Yaxşı'), color: 'bg-blue-500', textColor: 'text-blue-600' },
-{ id: 'fair', label: 'Normal', color: 'bg-amber-500', textColor: 'text-amber-600' }];
+{ id: 'fair', label: tr("common_normal", "Normal"), color: 'bg-amber-500', textColor: 'text-amber-600' }];
 
 
 const ageRanges = [
-'0-3 ay', '3-6 ay', '6-12 ay', tr("secondhandmarket_1_2_yas_aa6324", "1-2 ya\u015F"), tr("secondhandmarket_2_3_yas_d49317", "2-3 ya\u015F"), tr("secondhandmarket_3_yas_dec51d", "3+ ya\u015F")];
+tr("secondhandmarket_0_3_ay_3c7a2d", "0-3 ay"), tr("secondhandmarket_3_6_ay_3c7a2d", "3-6 ay"), tr("secondhandmarket_6_12_ay_3c7a2d", "6-12 ay"), tr("secondhandmarket_1_2_yas_aa6324", "1-2 ya\u015F"), tr("secondhandmarket_2_3_yas_d49317", "2-3 ya\u015F"), tr("secondhandmarket_3_yas_dec51d", "3+ ya\u015F")];
 
 
 const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
@@ -561,7 +561,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
                 <Plus className="w-4 h-4 text-white" />
               </div>
-              Yeni elan yarat
+              {tr("secondhandmarket_yeni_elan_yarat_3c7a2d", "Yeni elan yarat")}
             </DialogTitle>
           </DialogHeader>
           
@@ -710,7 +710,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                   className={!formData.is_free ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : ''}
                   onClick={() => setFormData({ ...formData, is_free: false })}>
                   
-                  Pullu
+                  {tr("secondhandmarket_pullu_3c7a2d", "Pullu")}
                 </Button>
               </div>
               {!formData.is_free &&

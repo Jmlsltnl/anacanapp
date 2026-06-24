@@ -485,7 +485,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
               className="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700">
               
               <Sparkles className="w-4 h-4 mr-2" />
-              {editingEntry ? tr("babygrowthtracker_yenile_570ce2", "Yenil\u0259") : 'Yadda saxla'}
+              {editingEntry ? tr("babygrowthtracker_yenile_570ce2", "Yenilə") : tr("babygrowthtracker_yadda_saxla_3c7a2d", "Yadda saxla")}
             </Button>
           </div>
         </DialogContent>

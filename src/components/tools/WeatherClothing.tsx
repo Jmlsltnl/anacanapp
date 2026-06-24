@@ -200,7 +200,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                     <div>
                       <p className="text-sm font-medium">{tr("weatherclothing_korpenin_yasi_1dfff9", "Körpənin yaşı")}</p>
                       <p className="text-xs text-muted-foreground">
-                        {userContext.babyAgeMonths} ay ({userContext.babyAgeDays} {tr("weatherclothing_gun_4835dd", "g\xFCn)")}
+                        {userContext.babyAgeMonths} {tr("weatherclothing_ay_suffix_3c7a2d", "ay")} ({userContext.babyAgeDays} {tr("weatherclothing_gun_4835dd", "g\xFCn)")}
                       </p>
                     </div>
                   </> :

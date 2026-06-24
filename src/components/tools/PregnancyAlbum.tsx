@@ -270,7 +270,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-muted-foreground">{tr("pregnancyalbum_hal_hazirda_b78349", "Hal-hazırda")}</p>
-              <p className="text-xl font-bold">{currentMonth}-ci ay</p>
+              <p className="text-xl font-bold">{monthLabels[currentMonth - 1]?.label || `${currentMonth}-ci ay`}</p>
               <p className="text-xs text-muted-foreground">{currentWeek}{tr("pregnancyalbum_hefte_459cfe", ". h\u0259ft\u0259")}</p>
             </div>
             <div className="text-4xl">{monthLabels[currentMonth - 1]?.emoji}</div>
@@ -449,7 +449,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                   style={{ width: `${Math.min(100, currentMonth / 6 * 100)}%` }} />
                 
                 </div>
-                <span className="text-[11px] font-semibold text-muted-foreground">{currentMonth}/6 ay</span>
+                <span className="text-[11px] font-semibold text-muted-foreground">{currentMonth}/6 {tr("pregnancyalbum_ay_suffix_3c7a2d", "ay")}</span>
               </div>
             </div>
           </div>

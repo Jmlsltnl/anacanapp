@@ -36,8 +36,8 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
     if (!dbMoods || dbMoods.length === 0) {
       return [
       { value: 1, emoji: '😢', label: tr("mooddiary_cox_pis_e041c5", 'Çox pis'), color: 'bg-red-100 border-red-300' },
-      { value: 2, emoji: '😔', label: 'Pis', color: 'bg-orange-100 border-orange-300' },
-      { value: 3, emoji: '😐', label: 'Normal', color: 'bg-yellow-100 border-yellow-300' },
+      { value: 2, emoji: '😔', label: tr("mooddiary_pis_3c7a2d", "Pis"), color: 'bg-orange-100 border-orange-300' },
+      { value: 3, emoji: '😐', label: tr("common_normal", "Normal"), color: 'bg-yellow-100 border-yellow-300' },
       { value: 4, emoji: '🙂', label: tr("mooddiary_yaxsi_9d8595", 'Yaxşı'), color: 'bg-lime-100 border-lime-300' },
       { value: 5, emoji: '😊', label: tr("mooddiary_ela_720a0e", 'Əla'), color: 'bg-green-100 border-green-300' }];
 

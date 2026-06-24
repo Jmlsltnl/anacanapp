@@ -465,7 +465,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center mb-3 shadow-lg">
               <Brain className="w-6 h-6 text-white" />
             </div>
-            <h3 className="font-bold text-foreground">EPDS Testi</h3>
+            <h3 className="font-bold text-foreground">{tr("mentalhealthtracker_epds_testi_3c7a2d", "EPDS Testi")}</h3>
             <p className="text-xs text-muted-foreground mt-1">{tr("mentalhealthtracker_depressiya_riski_qiymetlendirme_2729fe", "Depressiya riski qiymətləndirmə")}</p>
           </motion.button>
         </div>
@@ -571,7 +571,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 <Button size="sm" variant="outline" className="rounded-xl" asChild>
                         <a href={resource.website} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="w-3.5 h-3.5 mr-1" />
-                          Sayt
+                          {tr("mentalhealthtracker_sayt_3c7a2d", "Sayt")}
                         </a>
                       </Button>
                 }
@@ -644,7 +644,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 
                   <span className="text-white text-2xl font-bold">
                     {breathingPhase === 'inhale' ? tr("mentalhealthtracker_nefes_al_50ff18", "Nəfəs al") :
-                  breathingPhase === 'hold' ? 'Saxla' : 'Burax'}
+                  breathingPhase === 'hold' ? tr("mentalhealthtracker_saxla_3c7a2d", "Saxla") : tr("mentalhealthtracker_burax_3c7a2d", "Burax")}
                   </span>
                 </motion.div>
                 <p className="mt-8 text-xl font-bold text-foreground">

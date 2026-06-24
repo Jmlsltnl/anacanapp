@@ -424,7 +424,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
             onClick={handleSaveToggle}>
             
             <Heart className={`w-5 h-5 mr-2 ${isSaved ? 'fill-red-500 text-red-500' : ''}`} />
-            {isSaved ? tr("affiliateproductdetail_saxlanildi_66ffe7", "Saxlan\u0131ld\u0131") : 'Saxla'}
+            {isSaved ? tr("affiliateproductdetail_saxlanildi_66ffe7", "Saxlanıldı") : tr("affiliateproductdetail_saxla_3c7a2d", "Saxla")}
           </Button>
           <Button
             className="flex-[2] h-12 rounded-xl font-semibold shadow-lg"

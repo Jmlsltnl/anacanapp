@@ -559,7 +559,7 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
 
                   <Button onClick={resetAnalysis} variant="outline" className="w-full">
                     <Mic className="w-4 h-4 mr-2" />
-                    Yeni analiz
+                    {tr("crytranslator_yeni_analiz_3c7a2d", "Yeni analiz")}
                   </Button>
                 </CardContent>
               </Card>
