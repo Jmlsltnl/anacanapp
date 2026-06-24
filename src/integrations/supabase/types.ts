@@ -93,6 +93,7 @@ export type Database = {
           category_az: string | null
           category_en: string | null
           cons: string[] | null
+          cons_en: string[] | null
           created_at: string | null
           currency: string | null
           description: string | null
@@ -112,6 +113,7 @@ export type Database = {
           price: number | null
           price_updated_at: string | null
           pros: string[] | null
+          pros_en: string[] | null
           rating: number | null
           review_count: number | null
           review_summary: string | null
@@ -121,6 +123,7 @@ export type Database = {
           specifications: Json | null
           store_logo_url: string | null
           store_name: string | null
+          store_name_en: string | null
           tags: string[] | null
           updated_at: string | null
           video_url: string | null
@@ -131,6 +134,7 @@ export type Database = {
           category_az?: string | null
           category_en?: string | null
           cons?: string[] | null
+          cons_en?: string[] | null
           created_at?: string | null
           currency?: string | null
           description?: string | null
@@ -150,6 +154,7 @@ export type Database = {
           price?: number | null
           price_updated_at?: string | null
           pros?: string[] | null
+          pros_en?: string[] | null
           rating?: number | null
           review_count?: number | null
           review_summary?: string | null
@@ -159,6 +164,7 @@ export type Database = {
           specifications?: Json | null
           store_logo_url?: string | null
           store_name?: string | null
+          store_name_en?: string | null
           tags?: string[] | null
           updated_at?: string | null
           video_url?: string | null
@@ -169,6 +175,7 @@ export type Database = {
           category_az?: string | null
           category_en?: string | null
           cons?: string[] | null
+          cons_en?: string[] | null
           created_at?: string | null
           currency?: string | null
           description?: string | null
@@ -188,6 +195,7 @@ export type Database = {
           price?: number | null
           price_updated_at?: string | null
           pros?: string[] | null
+          pros_en?: string[] | null
           rating?: number | null
           review_count?: number | null
           review_summary?: string | null
@@ -197,6 +205,7 @@ export type Database = {
           specifications?: Json | null
           store_logo_url?: string | null
           store_name?: string | null
+          store_name_en?: string | null
           tags?: string[] | null
           updated_at?: string | null
           video_url?: string | null
@@ -997,6 +1006,7 @@ export type Database = {
           meaning_en: string | null
           name: string
           origin: string | null
+          origin_en: string | null
           popularity: number | null
         }
         Insert: {
@@ -1009,6 +1019,7 @@ export type Database = {
           meaning_en?: string | null
           name: string
           origin?: string | null
+          origin_en?: string | null
           popularity?: number | null
         }
         Update: {
@@ -1021,6 +1032,7 @@ export type Database = {
           meaning_en?: string | null
           name?: string
           origin?: string | null
+          origin_en?: string | null
           popularity?: number | null
         }
         Relationships: []
@@ -1957,6 +1969,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           description: string | null
+          description_en: string | null
           group_type: string
           icon_emoji: string | null
           id: string
@@ -1964,6 +1977,7 @@ export type Database = {
           is_auto_join: boolean | null
           member_count: number | null
           name: string
+          name_en: string | null
           updated_at: string
         }
         Insert: {
@@ -1972,6 +1986,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           description?: string | null
+          description_en?: string | null
           group_type?: string
           icon_emoji?: string | null
           id?: string
@@ -1979,6 +1994,7 @@ export type Database = {
           is_auto_join?: boolean | null
           member_count?: number | null
           name: string
+          name_en?: string | null
           updated_at?: string
         }
         Update: {
@@ -1987,6 +2003,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           description?: string | null
+          description_en?: string | null
           group_type?: string
           icon_emoji?: string | null
           id?: string
@@ -1994,6 +2011,7 @@ export type Database = {
           is_auto_join?: boolean | null
           member_count?: number | null
           name?: string
+          name_en?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -2198,6 +2216,7 @@ export type Database = {
           code: string
           created_at: string | null
           description: string | null
+          description_en: string | null
           discount_type: string
           discount_value: number
           expires_at: string | null
@@ -2214,6 +2233,7 @@ export type Database = {
           code: string
           created_at?: string | null
           description?: string | null
+          description_en?: string | null
           discount_type?: string
           discount_value?: number
           expires_at?: string | null
@@ -2230,6 +2250,7 @@ export type Database = {
           code?: string
           created_at?: string | null
           description?: string | null
+          description_en?: string | null
           discount_type?: string
           discount_value?: number
           expires_at?: string | null
@@ -2818,6 +2839,7 @@ export type Database = {
           calories: number
           created_at: string | null
           description: string | null
+          description_en: string | null
           duration_minutes: number
           icon: string | null
           id: string
@@ -2835,6 +2857,7 @@ export type Database = {
           calories?: number
           created_at?: string | null
           description?: string | null
+          description_en?: string | null
           duration_minutes?: number
           icon?: string | null
           id?: string
@@ -2852,6 +2875,7 @@ export type Database = {
           calories?: number
           created_at?: string | null
           description?: string | null
+          description_en?: string | null
           duration_minutes?: number
           icon?: string | null
           id?: string
@@ -3778,6 +3802,7 @@ export type Database = {
           item_name_az: string | null
           item_name_en: string | null
           notes: string | null
+          notes_en: string | null
           priority: number | null
           sort_order: number | null
           updated_at: string
@@ -3792,6 +3817,7 @@ export type Database = {
           item_name_az?: string | null
           item_name_en?: string | null
           notes?: string | null
+          notes_en?: string | null
           priority?: number | null
           sort_order?: number | null
           updated_at?: string
@@ -3806,6 +3832,7 @@ export type Database = {
           item_name_az?: string | null
           item_name_en?: string | null
           notes?: string | null
+          notes_en?: string | null
           priority?: number | null
           sort_order?: number | null
           updated_at?: string
@@ -5418,6 +5445,7 @@ export type Database = {
           surprise_id: string
           surprise_points: number
           surprise_title: string
+          surprise_title_en: string | null
           updated_at: string
           user_id: string
         }
@@ -5433,6 +5461,7 @@ export type Database = {
           surprise_id: string
           surprise_points?: number
           surprise_title: string
+          surprise_title_en?: string | null
           updated_at?: string
           user_id: string
         }
@@ -5448,6 +5477,7 @@ export type Database = {
           surprise_id?: string
           surprise_points?: number
           surprise_title?: string
+          surprise_title_en?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -5492,15 +5522,21 @@ export type Database = {
       partner_venues: {
         Row: {
           address: string | null
+          address_en: string | null
           category_key: string
           city: string | null
+          city_en: string | null
           cover_url: string | null
           created_at: string
           description: string | null
+          description_en: string | null
           discount_label: string
+          discount_label_en: string | null
           discount_terms: string | null
+          discount_terms_en: string | null
           discount_value: number | null
           district: string | null
+          district_en: string | null
           gallery_urls: string[] | null
           id: string
           instagram: string | null
@@ -5510,6 +5546,7 @@ export type Database = {
           logo_url: string | null
           longitude: number | null
           name: string
+          name_en: string | null
           phone: string | null
           pin_hash: string
           qr_ttl_seconds: number
@@ -5523,15 +5560,21 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          address_en?: string | null
           category_key: string
           city?: string | null
+          city_en?: string | null
           cover_url?: string | null
           created_at?: string
           description?: string | null
+          description_en?: string | null
           discount_label: string
+          discount_label_en?: string | null
           discount_terms?: string | null
+          discount_terms_en?: string | null
           discount_value?: number | null
           district?: string | null
+          district_en?: string | null
           gallery_urls?: string[] | null
           id?: string
           instagram?: string | null
@@ -5541,6 +5584,7 @@ export type Database = {
           logo_url?: string | null
           longitude?: number | null
           name: string
+          name_en?: string | null
           phone?: string | null
           pin_hash: string
           qr_ttl_seconds?: number
@@ -5554,15 +5598,21 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          address_en?: string | null
           category_key?: string
           city?: string | null
+          city_en?: string | null
           cover_url?: string | null
           created_at?: string
           description?: string | null
+          description_en?: string | null
           discount_label?: string
+          discount_label_en?: string | null
           discount_terms?: string | null
+          discount_terms_en?: string | null
           discount_value?: number | null
           district?: string | null
+          district_en?: string | null
           gallery_urls?: string[] | null
           id?: string
           instagram?: string | null
@@ -5572,6 +5622,7 @@ export type Database = {
           logo_url?: string | null
           longitude?: number | null
           name?: string
+          name_en?: string | null
           phone?: string | null
           pin_hash?: string
           qr_ttl_seconds?: number
@@ -6596,14 +6647,18 @@ export type Database = {
           day_number: number | null
           days_until_birth: number | null
           doctor_visit_tip: string | null
+          doctor_visit_tip_en: string | null
           emotional_tip: string | null
+          emotional_tip_en: string | null
           exercise_tip: string | null
           exercise_tip_en: string | null
           foods_to_avoid: string[] | null
+          foods_to_avoid_en: string[] | null
           id: string
           image_url: string | null
           is_active: boolean | null
           mother_symptoms: string[] | null
+          mother_symptoms_en: string[] | null
           mother_tips: string | null
           mother_tips_en: string | null
           mother_warnings: string | null
@@ -6611,10 +6666,14 @@ export type Database = {
           nutrition_tip: string | null
           nutrition_tip_en: string | null
           partner_tip: string | null
+          partner_tip_en: string | null
           pregnancy_day: number | null
           recommended_exercises: string[] | null
+          recommended_exercises_en: string[] | null
           recommended_foods: string[] | null
+          recommended_foods_en: string[] | null
           tests_to_do: string[] | null
+          tests_to_do_en: string[] | null
           updated_at: string
           video_url: string | null
           week_number: number
@@ -6636,14 +6695,18 @@ export type Database = {
           day_number?: number | null
           days_until_birth?: number | null
           doctor_visit_tip?: string | null
+          doctor_visit_tip_en?: string | null
           emotional_tip?: string | null
+          emotional_tip_en?: string | null
           exercise_tip?: string | null
           exercise_tip_en?: string | null
           foods_to_avoid?: string[] | null
+          foods_to_avoid_en?: string[] | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
           mother_symptoms?: string[] | null
+          mother_symptoms_en?: string[] | null
           mother_tips?: string | null
           mother_tips_en?: string | null
           mother_warnings?: string | null
@@ -6651,10 +6714,14 @@ export type Database = {
           nutrition_tip?: string | null
           nutrition_tip_en?: string | null
           partner_tip?: string | null
+          partner_tip_en?: string | null
           pregnancy_day?: number | null
           recommended_exercises?: string[] | null
+          recommended_exercises_en?: string[] | null
           recommended_foods?: string[] | null
+          recommended_foods_en?: string[] | null
           tests_to_do?: string[] | null
+          tests_to_do_en?: string[] | null
           updated_at?: string
           video_url?: string | null
           week_number: number
@@ -6676,14 +6743,18 @@ export type Database = {
           day_number?: number | null
           days_until_birth?: number | null
           doctor_visit_tip?: string | null
+          doctor_visit_tip_en?: string | null
           emotional_tip?: string | null
+          emotional_tip_en?: string | null
           exercise_tip?: string | null
           exercise_tip_en?: string | null
           foods_to_avoid?: string[] | null
+          foods_to_avoid_en?: string[] | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
           mother_symptoms?: string[] | null
+          mother_symptoms_en?: string[] | null
           mother_tips?: string | null
           mother_tips_en?: string | null
           mother_warnings?: string | null
@@ -6691,10 +6762,14 @@ export type Database = {
           nutrition_tip?: string | null
           nutrition_tip_en?: string | null
           partner_tip?: string | null
+          partner_tip_en?: string | null
           pregnancy_day?: number | null
           recommended_exercises?: string[] | null
+          recommended_exercises_en?: string[] | null
           recommended_foods?: string[] | null
+          recommended_foods_en?: string[] | null
           tests_to_do?: string[] | null
+          tests_to_do_en?: string[] | null
           updated_at?: string
           video_url?: string | null
           week_number?: number
@@ -6905,12 +6980,15 @@ export type Database = {
       products: {
         Row: {
           category: string
+          category_en: string | null
           created_at: string
           description: string | null
+          description_en: string | null
           id: string
           image_url: string | null
           is_active: boolean | null
           name: string
+          name_en: string | null
           original_price: number | null
           price: number
           rating: number | null
@@ -6919,12 +6997,15 @@ export type Database = {
         }
         Insert: {
           category: string
+          category_en?: string | null
           created_at?: string
           description?: string | null
+          description_en?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
           name: string
+          name_en?: string | null
           original_price?: number | null
           price?: number
           rating?: number | null
@@ -6933,12 +7014,15 @@ export type Database = {
         }
         Update: {
           category?: string
+          category_en?: string | null
           created_at?: string
           description?: string | null
+          description_en?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
           name?: string
+          name_en?: string | null
           original_price?: number | null
           price?: number
           rating?: number | null
@@ -7303,6 +7387,7 @@ export type Database = {
           name_az: string | null
           name_en: string | null
           notes: string | null
+          notes_en: string | null
           safety_level: string
           trimester_notes: Json | null
           updated_at: string
@@ -7321,6 +7406,7 @@ export type Database = {
           name_az?: string | null
           name_en?: string | null
           notes?: string | null
+          notes_en?: string | null
           safety_level?: string
           trimester_notes?: Json | null
           updated_at?: string
@@ -7339,6 +7425,7 @@ export type Database = {
           name_az?: string | null
           name_en?: string | null
           notes?: string | null
+          notes_en?: string | null
           safety_level?: string
           trimester_notes?: Json | null
           updated_at?: string
@@ -7788,6 +7875,7 @@ export type Database = {
           description_az: string | null
           description_en: string | null
           difficulty: string | null
+          difficulty_en: string | null
           emoji: string | null
           icon: string | null
           id: string
@@ -7806,6 +7894,7 @@ export type Database = {
           description_az?: string | null
           description_en?: string | null
           difficulty?: string | null
+          difficulty_en?: string | null
           emoji?: string | null
           icon?: string | null
           id?: string
@@ -7824,6 +7913,7 @@ export type Database = {
           description_az?: string | null
           description_en?: string | null
           difficulty?: string | null
+          difficulty_en?: string | null
           emoji?: string | null
           icon?: string | null
           id?: string
@@ -7940,6 +8030,7 @@ export type Database = {
           relief_tips_az: string[] | null
           relief_tips_en: string | null
           severity: string | null
+          severity_en: string | null
           sort_order: number | null
         }
         Insert: {
@@ -7957,6 +8048,7 @@ export type Database = {
           relief_tips_az?: string[] | null
           relief_tips_en?: string | null
           severity?: string | null
+          severity_en?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -7974,6 +8066,7 @@ export type Database = {
           relief_tips_az?: string[] | null
           relief_tips_en?: string | null
           severity?: string | null
+          severity_en?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -8077,9 +8170,11 @@ export type Database = {
           flow_locked: boolean | null
           flow_order: number | null
           hero_badge: string | null
+          hero_badge_en: string | null
           hero_gradient: string | null
           hero_order: number | null
           hero_subtitle: string | null
+          hero_subtitle_en: string | null
           icon: string
           id: string
           is_active: boolean | null
@@ -8126,9 +8221,11 @@ export type Database = {
           flow_locked?: boolean | null
           flow_order?: number | null
           hero_badge?: string | null
+          hero_badge_en?: string | null
           hero_gradient?: string | null
           hero_order?: number | null
           hero_subtitle?: string | null
+          hero_subtitle_en?: string | null
           icon?: string
           id?: string
           is_active?: boolean | null
@@ -8175,9 +8272,11 @@ export type Database = {
           flow_locked?: boolean | null
           flow_order?: number | null
           hero_badge?: string | null
+          hero_badge_en?: string | null
           hero_gradient?: string | null
           hero_order?: number | null
           hero_subtitle?: string | null
+          hero_subtitle_en?: string | null
           icon?: string
           id?: string
           is_active?: boolean | null
@@ -8946,15 +9045,19 @@ export type Database = {
       vitamins: {
         Row: {
           benefits: string[] | null
+          benefits_en: string[] | null
           created_at: string
           description: string | null
           description_az: string | null
           description_en: string | null
           dosage: string | null
+          dosage_en: string | null
           food_sources: string[] | null
+          food_sources_en: string[] | null
           icon_emoji: string | null
           id: string
           importance: string | null
+          importance_en: string | null
           is_active: boolean | null
           life_stage: string | null
           name: string
@@ -8968,15 +9071,19 @@ export type Database = {
         }
         Insert: {
           benefits?: string[] | null
+          benefits_en?: string[] | null
           created_at?: string
           description?: string | null
           description_az?: string | null
           description_en?: string | null
           dosage?: string | null
+          dosage_en?: string | null
           food_sources?: string[] | null
+          food_sources_en?: string[] | null
           icon_emoji?: string | null
           id?: string
           importance?: string | null
+          importance_en?: string | null
           is_active?: boolean | null
           life_stage?: string | null
           name: string
@@ -8990,15 +9097,19 @@ export type Database = {
         }
         Update: {
           benefits?: string[] | null
+          benefits_en?: string[] | null
           created_at?: string
           description?: string | null
           description_az?: string | null
           description_en?: string | null
           dosage?: string | null
+          dosage_en?: string | null
           food_sources?: string[] | null
+          food_sources_en?: string[] | null
           icon_emoji?: string | null
           id?: string
           importance?: string | null
+          importance_en?: string | null
           is_active?: boolean | null
           life_stage?: string | null
           name?: string
