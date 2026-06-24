@@ -382,6 +382,44 @@ const AdminTranslations = () => {
       return;
     }
 
+    const castFieldValue = (valStr: string, dbCol?: { data_type: string }) => {
+      const trimmed = valStr.trim();
+      if (dbCol) {
+        const type = dbCol.data_type.toLowerCase();
+        if (type.includes('int') || type.includes('num') || type.includes('double') || type.includes('real')) {
+          return trimmed === '' ? null : Number(trimmed);
+        } else if (type.includes('bool')) {
+          return trimmed === '' ? null : (trimmed.toLowerCase() === 'true' || trimmed === '1');
+        } else if (type.includes('array') || type.includes('[]') || type.startsWith('_')) {
+          try {
+            return trimmed === '' ? null : JSON.parse(trimmed);
+          } catch (e) {
+            return trimmed === '' ? null : trimmed.split(',').map(s => s.trim());
+          }
+        } else {
+          if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+            try {
+              return JSON.parse(trimmed);
+            } catch (e) {
+              return trimmed;
+            }
+          }
+          return trimmed;
+        }
+      } else {
+        if (trimmed.toLowerCase() === 'true') return true;
+        if (trimmed.toLowerCase() === 'false') return false;
+        if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+          try {
+            return JSON.parse(trimmed);
+          } catch (e) {
+            return trimmed;
+          }
+        }
+        return trimmed;
+      }
+    };
+
     const targetTable = uploadTable === 'custom' ? customTable.trim() : uploadTable;
     if (!targetTable) {
       toast.error('Zəhmət olmasa hədəf cədvəl adını daxil edin');
@@ -462,25 +500,9 @@ const AdminTranslations = () => {
           const fields: Record<string, any> = {};
           selectedUpdateColumns.forEach(col => {
             if (item[col] !== undefined) {
-              const valStr = item[col].trim();
-              
-              // Find database column type if available
+              const valStr = item[col];
               const dbCol = dbColumns.find(c => c.column_name === col);
-              if (dbCol) {
-                const type = dbCol.data_type.toLowerCase();
-                if (type.includes('int') || type.includes('num') || type.includes('double') || type.includes('real')) {
-                  fields[col] = valStr === '' ? null : Number(valStr);
-                } else if (type.includes('bool')) {
-                  fields[col] = valStr === '' ? null : (valStr.toLowerCase() === 'true' || valStr === '1');
-                } else {
-                  fields[col] = valStr;
-                }
-              } else {
-                // Fallback: guess type
-                if (valStr.toLowerCase() === 'true') fields[col] = true;
-                else if (valStr.toLowerCase() === 'false') fields[col] = false;
-                else fields[col] = valStr;
-              }
+              fields[col] = castFieldValue(valStr, dbCol);
             }
           });
 
@@ -537,24 +559,9 @@ const AdminTranslations = () => {
               if (insertFields[csvCol] !== undefined) return; // already set
               if (dbColNames.length > 0 && !dbColNames.includes(csvCol)) return; // not in DB
 
-              const val = (item[csvCol] || '').trim();
-              if (!val) return;
-
-              // Cast the value based on DB column type
+              const val = item[csvCol];
               const dbCol = dbColumns.find(c => c.column_name === csvCol);
-              if (dbCol) {
-                const type = dbCol.data_type.toLowerCase();
-                if (type.includes('int') || type.includes('num') || type.includes('double') || type.includes('real')) {
-                  const numVal = Number(val);
-                  if (!isNaN(numVal)) insertFields[csvCol] = numVal;
-                } else if (type.includes('bool')) {
-                  insertFields[csvCol] = val.toLowerCase() === 'true' || val === '1';
-                } else {
-                  insertFields[csvCol] = val;
-                }
-              } else {
-                insertFields[csvCol] = val;
-              }
+              insertFields[csvCol] = castFieldValue(val, dbCol);
             });
 
             // Set default is_active if column exists in schema
