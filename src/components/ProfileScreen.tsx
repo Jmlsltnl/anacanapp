@@ -566,7 +566,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
             </div>
             <div className="flex gap-2">
               <Button onClick={editingChild ? handleEditChild : handleAddChild} className="flex-1">
-                {editingChild ? 'Yadda saxla' : tr("profilescreen_elave_et_6e1b9b", "\u018Flav\u0259 et")}
+                {editingChild ? tr("childselector_save", "Yadda saxla") : tr("profilescreen_elave_et_6e1b9b", "\u018Flav\u0259 et")}
               </Button>
               {editingChild &&
               <Button

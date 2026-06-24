@@ -1,4 +1,5 @@
-import { tr } from "@/lib/tr";import { useState } from 'react';
+import { tr, getPersistedLanguage } from "@/lib/tr";
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Search, MapPin, Sparkles, Crown, Lock, Phone, Globe, Instagram, ChevronRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -74,15 +75,19 @@ export default function PartnersScreen({ onBack }: Props) {
 
         <div className="flex gap-2 px-3 pb-3 overflow-x-auto scrollbar-hide">
           <CategoryPill active={category === 'all'} onClick={() => setCategory('all')} label={tr("partnersscreen_hamisi_c73c4d", "Ham\u0131s\u0131")} />
-          {categories?.map((c) =>
-          <CategoryPill key={c.key} active={category === c.key} onClick={() => setCategory(c.key)} label={c.label_az} />
-          )}
+          {categories?.map((c) => {
+            const lang = getPersistedLanguage();
+            const label = lang === 'en' ? (c.label_en || c.label_az) : c.label_az;
+            return (
+              <CategoryPill key={c.key} active={category === c.key} onClick={() => setCategory(c.key)} label={label} />
+            );
+          })}
         </div>
       </div>
 
       <div className="p-3 space-y-3">
         {isLoading &&
-        <div className="py-10 flex justify-center">
+          <div className="py-10 flex justify-center">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
         }

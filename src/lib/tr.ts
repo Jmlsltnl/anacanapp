@@ -46,7 +46,7 @@ export function mapRowTranslation<T extends Record<string, any>>(
     if (language === 'az') {
       val = row[`${field}_az`] ?? row[field];
     } else {
-      val = row[`${field}_${language}`] ?? row[`${field}_az`] ?? row[field];
+      val = row[`${field}_${language}`] ?? row[field] ?? row[`${field}_az`];
     }
 
     // Safely parse array fields if the translation is stored as a JSON string

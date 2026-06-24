@@ -45,7 +45,7 @@ const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
   },
   {
     id: 'system',
-    label: 'Sistem',
+    label: tr("appearancescreen_sistem_label", "Sistem"),
     description: tr("appearancescreen_cihazinizin_ayarina_uygun_9b4fa7", 'Cihazınızın ayarına uyğun'),
     icon: Monitor,
     preview: 'bg-gradient-to-r from-amber-100 via-slate-300 to-slate-800'
@@ -171,8 +171,8 @@ const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
           
           <p className="text-sm text-muted-foreground text-center">
             {theme === 'system' ?
-            `Hal-hazırda sistem teması (${currentTheme === 'dark' ? tr("appearancescreen_qaranliq_affa8e", "qaranl\u0131q") : tr("appearancescreen_aciq_79bf9c", "a\xE7\u0131q")}) istifadə olunur.` :
-            `${theme === 'dark' ? tr("appearancescreen_qaranliq_34c5e3", "Qaranl\u0131q") : tr("appearancescreen_aciq_306cc4", "A\xE7\u0131q")} rejim aktiv edilib.`
+            tr("appearancescreen_system_theme_in_use", "Hal-hazırda sistem teması ({theme}) istifadə olunur.").replace("{theme}", currentTheme === 'dark' ? tr("appearancescreen_qaranliq_affa8e", "qaranlıq") : tr("appearancescreen_aciq_79bf9c", "açıq")) :
+            tr("appearancescreen_theme_activated", "{theme} rejim aktiv edilib.").replace("{theme}", theme === 'dark' ? tr("appearancescreen_qaranliq_34c5e3", "Qaranlıq") : tr("appearancescreen_aciq_306cc4", "Açıq"))
             }
           </p>
         </motion.div>

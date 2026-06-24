@@ -33,6 +33,7 @@ export interface PartnerCategory {
   id: string;
   key: string;
   label_az: string;
+  label_en: string | null;
   icon: string;
   sort_order: number;
 }

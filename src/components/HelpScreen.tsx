@@ -45,10 +45,9 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
     }
   }, [replies]);
 
-  // Map support categories to the format expected by the UI
   const ticketCategories = supportCategories?.map((cat) => ({
     id: cat.category_key,
-    label: cat.name_az || cat.name,
+    label: cat.name,
     emoji: cat.emoji
   })) || [
   { id: 'general', label: tr("helpscreen_umumi_sual_e1c5ee", 'Ümumi sual'), emoji: '❓' }];
@@ -330,15 +329,15 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                     {(faqs || []).map((faq, index) =>
                 <AccordionItem key={faq.id} value={`item-${index}`} className="border-none">
                         <AccordionTrigger className="text-left text-sm font-medium text-foreground hover:no-underline py-3 px-3 rounded-xl hover:bg-muted/50 data-[state=open]:bg-primary/5">
-                          {faq.question_az || faq.question}
+                          {faq.question}
                         </AccordionTrigger>
                         <AccordionContent className="text-sm text-muted-foreground px-3 pb-3">
-                          {faq.answer_az || faq.answer}
+                          {faq.answer}
                         </AccordionContent>
                       </AccordionItem>
                 )}
                   </Accordion>
-              }
+                }
               </div>
             </motion.div>
           }
