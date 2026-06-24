@@ -168,7 +168,11 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
                 </div>
               </div>
             </button>
+          </div>
+        }
+
         <div className="space-y-2.5 mb-5">
+
           {[tr("paywallstep_butun_aletlere_sinirsiz_giris_2d0db2", "B\xFCt\xFCn al\u0259tl\u0259r\u0259 s\u0131n\u0131rs\u0131z giri\u015F"),
 
           '24/7 AI Asistan', tr("paywallstep_yuxu_sesleri_meditasiya_fb635f", "Yuxu S\u0259sl\u0259ri & Meditasiya"), tr("paywallstep_ferdi_heftelik_hesabatlar_4ab67b", "F\u0259rdi h\u0259ft\u0259lik hesabatlar"), tr("paywallstep_reklamsiz_tecrube_2e4fa4", "Reklams\u0131z t\u0259cr\xFCb\u0259")].

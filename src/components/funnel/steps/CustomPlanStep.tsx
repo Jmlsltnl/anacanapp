@@ -29,7 +29,7 @@ export default function CustomPlanStep({ userName, milestones, onContinue }: Cus
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.2 }}
             className="relative mb-8 last:mb-0">
-            
+
               {/* Dot */}
               <div className={`absolute -left-8 top-1 w-7 h-7 rounded-full flex items-center justify-center ${
             i === 0 ? 'bg-primary text-primary-foreground' : 'bg-primary/20 text-primary'}`
@@ -41,17 +41,10 @@ export default function CustomPlanStep({ userName, milestones, onContinue }: Cus
                 <p className="text-xs font-semibold text-primary mb-1">{m.week}</p>
                 <p className="text-sm text-foreground font-medium">{m.label}</p>
               </div>
-            }>
-                <span className="text-xs font-bold">{i + 1}</span>
-              </div>
-
-              <div className="bg-card rounded-2xl border border-border p-4">
-                <p className="text-xs font-semibold text-primary mb-1">{m.week}</p>
-                <p className="text-sm text-foreground font-medium">{m.label}</p>
-              </div>
             </motion.div>
           )}
         </div>
+
 
         {/* Progress visualization */}
         <div className="mt-8 bg-card rounded-2xl border border-border p-4">

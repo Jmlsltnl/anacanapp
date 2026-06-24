@@ -417,12 +417,13 @@ const AdminTranslations = () => {
 
     try {
       // 1. Fetch existing rows (selecting ID and update columns to optimize)
-      let query = supabase.from(targetTable).select([dbIdColumn, ...selectedUpdateColumns].join(', '));
+      let query: any = (supabase as any).from(targetTable).select([dbIdColumn, ...selectedUpdateColumns].join(', '));
       
       // If translations table, filter by language to prevent getting too many rows
       if (targetTable === 'translations') {
         query = query.eq('lang', uploadLang);
       }
+
 
       const { data: dbData, error: dbErr } = await query;
       
@@ -572,7 +573,7 @@ const AdminTranslations = () => {
 
         // Execute inserts in batch
         if (toInsert.length > 0) {
-          const { error: insErr } = await supabase.from(targetTable).insert(toInsert);
+          const { error: insErr } = await (supabase as any).from(targetTable).insert(toInsert);
           if (insErr) {
             failed += toInsert.length;
             errors.push(`Insert xətası: ${insErr.message}`);
@@ -605,7 +606,7 @@ const AdminTranslations = () => {
               updatePayload['updated_at'] = new Date().toISOString();
             }
 
-            const { error: updErr } = await supabase
+            const { error: updErr } = await (supabase as any)
               .from(targetTable)
               .update(updatePayload)
               .eq(dbIdColumn, castedIdVal);
