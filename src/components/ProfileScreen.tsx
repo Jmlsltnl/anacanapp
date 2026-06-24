@@ -432,7 +432,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
                 {/* Privacy note */}
                 <div className="p-4 bg-primary/5 rounded-2xl border border-primary/20">
                   <p className="text-sm text-muted-foreground">
-                    🔒 <strong className="text-foreground">Gizlilik:</strong> {tr("profilescreen_partnyor_sizin_sexsi_qeydlerin_3abbaa", "Partnyor sizin \u015F\u0259xsi qeydl\u0259rinizi, g\xFCnd\u0259lik mesajlar\u0131n\u0131z\u0131 v\u0259 ya AI s\xF6hb\u0259tl\u0259rinizi g\xF6r\u0259 bilm\u0259z.")}
+                    🔒 <strong className="text-foreground">{tr("profilescreen_gizlilik", "Gizlilik")}:</strong> {tr("profilescreen_partnyor_sizin_sexsi_qeydlerin_3abbaa", "Partnyor sizin \u015F\u0259xsi qeydl\u0259rinizi, g\xFCnd\u0259lik mesajlar\u0131n\u0131z\u0131 v\u0259 ya AI s\xF6hb\u0259tl\u0259rinizi g\xF6r\u0259 bilm\u0259z.")}
                   </p>
                 </div>
               </div>
