@@ -1,4 +1,4 @@
-import { tr } from "@/lib/tr";import { useMemo, useState } from 'react';
+import { tr, getPersistedLanguage } from "@/lib/tr";import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft, Syringe, CheckCircle2, Clock, AlertTriangle, Ban,
@@ -30,11 +30,11 @@ interface Props {
 type TabKey = 'upcoming' | 'all' | 'done';
 
 const STATUS = {
-  done: { label: 'Vuruldu', icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50', ring: 'ring-emerald-200' },
-  pending: { label: tr("vaccinecalendar_gozlemede_80f70e", "G\xF6zl\u0259m\u0259d\u0259"), icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50', ring: 'ring-amber-200' },
-  overdue: { label: 'Gecikdi', icon: AlertTriangle, color: 'text-red-600', bg: 'bg-red-50', ring: 'ring-red-200' },
-  skipped: { label: tr("vaccinecalendar_buraxildi_61c6a0", "Burax\u0131ld\u0131"), icon: Ban, color: 'text-muted-foreground', bg: 'bg-muted', ring: 'ring-gray-200' },
-  future: { label: tr("vaccinecalendar_novbede_b7ecbc", "N\xF6vb\u0259d\u0259"), icon: Clock, color: 'text-blue-600', bg: 'bg-blue-50', ring: 'ring-blue-200' }
+  done: { label: () => tr("vaccinecalendar_vuruldu", "Vuruldu"), icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50', ring: 'ring-emerald-200' },
+  pending: { label: () => tr("vaccinecalendar_gozlemede_80f70e", "G\xF6zl\u0259m\u0259d\u0259"), icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50', ring: 'ring-amber-200' },
+  overdue: { label: () => tr("vaccinecalendar_gecikdi", "Gecikdi"), icon: AlertTriangle, color: 'text-red-600', bg: 'bg-red-50', ring: 'ring-red-200' },
+  skipped: { label: () => tr("vaccinecalendar_buraxildi_61c6a0", "Burax\u0131ld\u0131"), icon: Ban, color: 'text-muted-foreground', bg: 'bg-muted', ring: 'ring-gray-200' },
+  future: { label: () => tr("vaccinecalendar_novbede_b7ecbc", "N\xF6vb\u0259d\u0259"), icon: Clock, color: 'text-blue-600', bg: 'bg-blue-50', ring: 'ring-blue-200' }
 } as const;
 
 type StatusKey = keyof typeof STATUS;
@@ -46,9 +46,41 @@ const dayDiffFromBirth = (birthDate: string) => {
   return Math.floor((today.getTime() - b.getTime()) / 86400000);
 };
 
-const formatDateAz = (iso: string) => {
+const formatVaccineDate = (iso: string) => {
   const d = new Date(iso);
-  return d.toLocaleDateString('az-AZ', { day: '2-digit', month: 'long', year: 'numeric' });
+  const lang = getPersistedLanguage();
+  const locale = lang === 'en' ? 'en-US' : 'az-AZ';
+  return d.toLocaleDateString(locale, { day: '2-digit', month: 'long', year: 'numeric' });
+};
+
+const translateVaccineLabel = (text: string | undefined | null, lang: string): string => {
+  if (!text) return '';
+  if (lang !== 'en') return text;
+
+  const dict: Record<string, string> = {
+    // Ages
+    "Doğulanda": "At birth",
+    "2 aylıq": "2 months",
+    "3 aylıq": "3 months",
+    "4 aylıq": "4 months",
+    "6 aylıq": "6 months",
+    "12 aylıq": "12 months",
+    "18 aylıq": "18 months",
+    "24 aylıq": "24 months",
+    "6 yaş": "6 years",
+    
+    // Doses
+    "1-ci doza": "1st dose",
+    "2-ci doza": "2nd dose",
+    "3-cü doza": "3rd dose",
+    "4-cü doza": "4th dose",
+    "Bustər": "Booster",
+    "Bustər (revaksinasiya)": "Booster (revaccination)",
+    "İkinci bustər": "Second booster",
+    "1-ci doza (doğulanda)": "1st dose (at birth)",
+  };
+
+  return dict[text] || text;
 };
 
 const computeStatus = (row: VaccineScheduleRow, ageDays: number, log?: ChildVaccination | null): StatusKey => {
@@ -60,12 +92,13 @@ const computeStatus = (row: VaccineScheduleRow, ageDays: number, log?: ChildVacc
   return 'future';
 };
 
-const groupByAge = (rows: VaccineScheduleRow[]) => {
+const groupByAge = (rows: VaccineScheduleRow[], lang: string) => {
   const groups = new Map<string, {label: string;days: number;rows: VaccineScheduleRow[];}>();
   rows.forEach((r) => {
     const key = r.age_label || '';
-    if (!groups.has(key)) groups.set(key, { label: key, days: r.recommended_age_days, rows: [] });
-    groups.get(key)!.rows.push(r);
+    const translatedKey = translateVaccineLabel(key, lang);
+    if (!groups.has(translatedKey)) groups.set(translatedKey, { label: translatedKey, days: r.recommended_age_days, rows: [] });
+    groups.get(translatedKey)!.rows.push(r);
   });
   return Array.from(groups.values()).sort((a, b) => a.days - b.days);
 };
@@ -75,6 +108,7 @@ export default function VaccineCalendar({ onBack }: Props) {
   const { data: countries = [] } = useVaccineCountries();
   const { toast } = useToast();
   const qc = useQueryClient();
+  const lang = useUserStore((state) => state.language);
 
   const childCountry = (selectedChild as any)?.country_code || 'AZ';
   const [countryCode, setCountryCode] = useState<string>(childCountry);
@@ -118,7 +152,7 @@ export default function VaccineCalendar({ onBack }: Props) {
   filter((x) => x.status === 'done').
   sort((a, b) => (b.log?.administered_at || '').localeCompare(a.log?.administered_at || ''));
 
-  const groupedAll = groupByAge(schedule);
+  const groupedAll = useMemo(() => groupByAge(schedule, lang), [schedule, lang]);
   const country = countries.find((c) => c.code === effectiveCountry);
 
   const handleChangeCountry = async (code: string) => {
@@ -135,7 +169,7 @@ export default function VaccineCalendar({ onBack }: Props) {
     return (
       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${meta.bg} ${meta.color}`}>
         <Icon className="w-3 h-3" />
-        {meta.label}
+        {meta.label()}
       </span>);
 
   };
@@ -165,12 +199,12 @@ export default function VaccineCalendar({ onBack }: Props) {
               }
             </div>
             <p className="text-[11px] text-muted-foreground mt-0.5">
-              {row.age_label} • {row.dose_label}
+              {translateVaccineLabel(row.age_label, lang)} • {translateVaccineLabel(row.dose_label, lang)}
             </p>
             <div className="flex items-center justify-between mt-1.5">
               {renderStatusBadge(status)}
               {log?.administered_at &&
-              <span className="text-[10px] text-muted-foreground">{formatDateAz(log.administered_at)}</span>
+              <span className="text-[10px] text-muted-foreground">{formatVaccineDate(log.administered_at)}</span>
               }
             </div>
           </div>
@@ -268,7 +302,7 @@ export default function VaccineCalendar({ onBack }: Props) {
         <div className="flex bg-card rounded-full border border-border p-0.5 shadow-sm">
           {([
           { k: 'upcoming', l: tr("vaccinecalendar_yaxinlasan_773e16", "Yax\u0131nla\u015Fan") },
-          { k: 'all', l: 'Tam qrafik' },
+          { k: 'all', l: tr("vaccinecalendar_tam_qrafik", "Tam qrafik") },
           { k: 'done', l: tr("vaccinecalendar_tamamlanmis_e36252", "Tamamlanm\u0131\u015F") }] as
           {k: TabKey;l: string;}[]).map((t) =>
           <button
@@ -302,7 +336,7 @@ export default function VaccineCalendar({ onBack }: Props) {
         doneRows.map(renderCard))
         }
         {tab === 'all' && groupedAll.map((g) => {
-          const groupRows = rowsWithStatus.filter((x) => x.row.age_label === g.label);
+          const groupRows = rowsWithStatus.filter((x) => translateVaccineLabel(x.row.age_label, lang) === g.label);
           return (
             <div key={g.label} className="mt-3 first:mt-0">
               <div className="flex items-center gap-2 mb-1.5 px-1">
@@ -326,7 +360,12 @@ export default function VaccineCalendar({ onBack }: Props) {
           className="flex items-center gap-1.5 justify-center text-[10px] text-muted-foreground hover:text-foreground">
           
             <Info className="w-3 h-3" />
-            <span>{tr("vaccinecalendar_menbe_87d8be", "M\u0259nb\u0259:")} {country.source_label || country.source_url}</span>
+            <span>
+              {tr("vaccinecalendar_menbe_87d8be", "M\u0259nb\u0259:")}{" "}
+              {lang === 'en' && (country.source_label || '').includes('Səhiyyə Nazirliyi')
+                ? 'Ministry of Health of the Republic of Azerbaijan — National Immunization Schedule'
+                : country.source_label || country.source_url}
+            </span>
             <ExternalLink className="w-2.5 h-2.5" />
           </a>
         </div>
@@ -347,7 +386,7 @@ export default function VaccineCalendar({ onBack }: Props) {
                   </div>
                   <div className="flex-1 text-left">
                     <SheetTitle className="text-base">{detailRow.vaccine.name}</SheetTitle>
-                    <p className="text-[11px] text-muted-foreground">{detailRow.age_label} • {detailRow.dose_label}</p>
+                    <p className="text-[11px] text-muted-foreground">{translateVaccineLabel(detailRow.age_label, lang)} • {translateVaccineLabel(detailRow.dose_label, lang)}</p>
                   </div>
                 </div>
               </SheetHeader>
@@ -384,7 +423,7 @@ export default function VaccineCalendar({ onBack }: Props) {
                   className="bg-emerald-500 hover:bg-emerald-600"
                   onClick={() => {setActionRow(detailRow);setActionMode('done');setDetailRow(null);}}>
                   
-                    <CheckCircle2 className="w-4 h-4 mr-1" /> Vuruldu
+                    <CheckCircle2 className="w-4 h-4 mr-1" /> {tr("vaccinecalendar_vuruldu", "Vuruldu")}
                   </Button>
                   <Button
                   size="sm"
@@ -494,7 +533,7 @@ function ActionDialog({
             {mode === 'done' ? tr("vaccinecalendar_peyvend_vuruldu_22c2e5", "Peyv\u0259nd vuruldu") : tr("vaccinecalendar_peyvendi_buraxildi_kimi_qeyd_e_64265a", "Peyv\u0259ndi burax\u0131ld\u0131 kimi qeyd et")}
           </DialogTitle>
         </DialogHeader>
-        {row && <p className="text-xs text-muted-foreground -mt-2">{row.vaccine.name} • {row.dose_label}</p>}
+        {row && <p className="text-xs text-muted-foreground -mt-2">{row.vaccine.name} • {translateVaccineLabel(row.dose_label, lang)}</p>}
         {mode === 'done' ?
           <div className="space-y-3 mt-2">
             <div>
