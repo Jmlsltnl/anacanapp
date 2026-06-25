@@ -297,7 +297,7 @@ Deno.serve(async (req) => {
 
     // Stage 2: Analyze poop
     console.log('Stage 2: Analyzing poop...');
-    const response = await analyzePoop(imageBase64, undefined, userContext);
+    const response = await analyzePoop(imageBase64, undefined, userContext, language);
 
     if (!response) {
       throw new Error('AI analysis failed - all models exhausted');
