@@ -108,7 +108,7 @@ export default function VaccineCalendar({ onBack }: Props) {
   const { data: countries = [] } = useVaccineCountries();
   const { toast } = useToast();
   const qc = useQueryClient();
-  const lang = useUserStore((state) => state.language);
+  const lang = getPersistedLanguage();
 
   const childCountry = (selectedChild as any)?.country_code || 'AZ';
   const [countryCode, setCountryCode] = useState<string>(childCountry);
