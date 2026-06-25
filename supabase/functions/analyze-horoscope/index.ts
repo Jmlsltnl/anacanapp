@@ -15,6 +15,7 @@ interface HoroscopeRequest {
   baby_birth_date?: string;
   baby_birth_time?: string;
   baby_due_date?: string;
+  language?: string;
 }
 
 interface ZodiacInfo {
