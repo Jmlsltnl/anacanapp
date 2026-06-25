@@ -7418,5 +7418,13 @@
   "whitenoise_ses_seviyyesi_7296d5": "Volume level",
   "whitenoise_tebiet_effekti_45e038": "Nature sounds",
   "whitenoise_yungul_yagis_ve_yarpaq_xisiltisi_kimi_d5aea8": "Like light rain and leaves rustling",
-  "whitenoise_yuxu_sesleri_4b518b": "Sleep Sounds"
+  "whitenoise_yuxu_sesleri_4b518b": "Sleep Sounds",
+  "postcard_tercume_edilir": "Translating...",
+  "postcard_orijinali_goster": "Show original",
+  "postcard_tercume_et_ai": "Translate *",
+  "postcard_tercume_xetasi": "Translation failed.",
+  "commentreply_tercume_edilir": "Translating...",
+  "commentreply_orijinali_goster": "Show original",
+  "commentreply_tercume_et_ai": "Translate *",
+  "commentreply_tercume_xetasi": "Translation failed."
 }

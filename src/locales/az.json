@@ -5902,5 +5902,13 @@
   "whitenoise_ses_seviyyesi_7296d5": "Səs səviyyəsi",
   "whitenoise_tebiet_effekti_45e038": "Təbiət effekti",
   "whitenoise_yungul_yagis_ve_yarpaq_xisiltisi_kimi_d5aea8": "Yüngül yağış və yarpaq xışıltısı kimi",
-  "whitenoise_yuxu_sesleri_4b518b": "Yuxu Səsləri"
+  "whitenoise_yuxu_sesleri_4b518b": "Yuxu Səsləri",
+  "postcard_tercume_edilir": "Tərcümə edilir...",
+  "postcard_orijinali_goster": "Orijinalı göstər",
+  "postcard_tercume_et_ai": "Tərcümə et *",
+  "postcard_tercume_xetasi": "Tərcümə edilə bilmədi.",
+  "commentreply_tercume_edilir": "Tərcümə edilir...",
+  "commentreply_orijinali_goster": "Orijinalı göstər",
+  "commentreply_tercume_et_ai": "Tərcümə et *",
+  "commentreply_tercume_xetasi": "Tərcümə edilə bilmədi."
 }
