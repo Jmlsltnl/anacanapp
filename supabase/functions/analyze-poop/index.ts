@@ -10,6 +10,7 @@ const corsHeaders = {
 
 interface PoopAnalysisRequest {
   imageBase64: string;
+  language?: string;
   userContext?: {
     babyName?: string;
     babyAgeMonths?: number;
