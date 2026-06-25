@@ -209,7 +209,7 @@ CAVAB FORMATI (STRICT JSON):
   "doctorUrgency": "none|soon|today|immediate"
 }
 
-XƏBƏRDARLIQ: Ağ, qara və ya qırmızı rəng gördükdə "urgent" səviyyəsi VER!`
+XƏBƏRDARLIQ: Ağ, qara və ya qırmızı rəng gördükdə "urgent" səviyyəsi VER!${language === 'en' ? '\n\nIMPORTANT: Write "colorNameAz", "explanation" and all "recommendations" entries in ENGLISH. Despite the field name "colorNameAz", put the English color name there. Keep JSON keys and enum values exactly as shown.' : ''}`
           }
         ]
       }],
