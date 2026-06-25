@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
     const weatherData = await weatherResponse.json();
 
     // Get city name from reverse geocoding
-    const geoUrl = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=az`;
+    const geoUrl = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=${language === 'en' ? 'en' : 'az'}`;
     let cityName = 'Naməlum';
     try {
       const geoResponse = await fetch(geoUrl, {
