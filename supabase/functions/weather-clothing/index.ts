@@ -193,7 +193,7 @@ CAVAB FORMATI (STRICT JSON):
   "outdoorAdvice": "Bayırda gəzmə tövsiyəsi",
   "safeToGoOut": true,
   "alertLevel": "safe|caution|warning|danger"
-}`;
+}${language === 'en' ? '\n\nIMPORTANT: Write ALL output text fields (weatherDescription, clothingAdvice, clothingItems, indoorClothingAdvice, indoorClothingItems, roomTemperatureAdvice, warnings, pollenWarning, uvWarning, outdoorAdvice) in ENGLISH. Keep JSON keys, numeric values and enum values exactly as shown.' : ''}`;
 
     const models = ['gemini-2.5-flash-lite', 'gemini-2.5-flash'];
     let geminiResponse: Response | null = null;
