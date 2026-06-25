@@ -316,7 +316,17 @@ Deno.serve(async (req) => {
         throw new Error('No JSON found');
       }
     } catch {
-      analysisResult = {
+      analysisResult = language === 'en' ? {
+        colorDetected: 'unknown',
+        colorNameAz: 'Unknown',
+        consistency: 'normal',
+        isNormal: true,
+        concernLevel: 'normal',
+        explanation: 'The image was analyzed. Try taking a clearer picture.',
+        recommendations: ["Monitor the baby's general condition", 'Consult a doctor if you have any concerns'],
+        shouldSeeDoctor: false,
+        doctorUrgency: 'none'
+      } : {
         colorDetected: 'unknown',
         colorNameAz: 'Naməlum',
         consistency: 'normal',
