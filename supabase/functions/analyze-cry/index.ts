@@ -344,15 +344,19 @@ Deno.serve(async (req) => {
     // STAGE 2: Crying confirmed, now classify the type
     let analysisResult;
     try {
-      analysisResult = await classifyCryType(audioBase64, undefined, userContext);
+      analysisResult = await classifyCryType(audioBase64, undefined, userContext, language);
       analysisResult.isCryDetected = true;
     } catch (classifyError) {
       console.error('Classification error:', classifyError);
       analysisResult = {
         cryType: 'discomfort',
         confidence: 70,
-        explanation: 'Körpə ağlaması aşkar edildi, lakin dəqiq növü müəyyən edilə bilmədi.',
-        recommendations: ['Körpənin vəziyyətini yoxlayın', 'Bezini yoxlayın', 'Ac olub-olmadığını yoxlayın'],
+        explanation: language === 'en'
+          ? 'Baby crying was detected, but the exact type could not be determined.'
+          : 'Körpə ağlaması aşkar edildi, lakin dəqiq növü müəyyən edilə bilmədi.',
+        recommendations: language === 'en'
+          ? ["Check the baby's overall condition", 'Check the diaper', 'Check if the baby is hungry']
+          : ['Körpənin vəziyyətini yoxlayın', 'Bezini yoxlayın', 'Ac olub-olmadığını yoxlayın'],
         urgency: 'medium',
         isCryDetected: true
       };
