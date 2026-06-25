@@ -86,7 +86,7 @@ Deno.serve(async (req) => {
 
     const systemPrompt = (isWeightAnalysis
       ? `Sən çəki məsləhətçisisən. QAYDALAR: Salamlama yoxdur. "Canım", "əzizim", "balacam" kimi ifadələr İSTİFADƏ ETMƏ. Disclaimer/xəbərdarlıq yoxdur. Birbaşa 1-2 cümlə ilə praktik məsləhət ver. ${language === "en" ? "Reply ONLY in English." : "Yalnız Azərbaycan dilində."}`
-      : getSystemPrompt(resolvedLifeStage, pregnancyWeek, isPartner, userProfile, cyclePhase, cycleDay)) + langInstruction;
+      : getSystemPrompt(resolvedLifeStage, pregnancyWeek, isPartner, userProfile, cyclePhase, cycleDay, language)) + langInstruction;
 
     // Convert OpenAI-style messages to Gemini format
     const geminiContents = messages.map((msg: ChatMessage) => ({
