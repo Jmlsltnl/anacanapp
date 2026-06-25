@@ -25,13 +25,13 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
 
   const filteredNames = names.filter((name) => {
     const matchesSearch = name.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (name.meaning_az || name.meaning || '').toLowerCase().includes(searchQuery.toLowerCase());
+    (name.meaning || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchesGender = genderFilter === 'all' || name.gender === genderFilter || name.gender === 'unisex';
     return matchesSearch && matchesGender;
   }).sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
 
   const handleToggleFavorite = (name: any) => {
-    toggleFavorite(name.name, name.gender, name.meaning_az || name.meaning, name.origin);
+    toggleFavorite(name.name, name.gender, name.meaning, name.origin);
   };
 
   const getRandomName = () => {
@@ -194,7 +194,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
                 <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                 }
                 </div>
-                <p className="text-xs text-muted-foreground truncate">{name.meaning_az || name.meaning}</p>
+                <p className="text-xs text-muted-foreground truncate">{name.meaning}</p>
               </div>
 
               {/* Popularity Bar */}
@@ -301,7 +301,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
                 {/* Meaning */}
                 <div className="mb-4">
                   <p className="text-xs text-muted-foreground mb-1">{tr("babynames_menasi_83a157", "Mənası")}</p>
-                  <p className="text-base font-medium text-foreground">{selectedName.meaning_az || selectedName.meaning || tr("babynames_melumat_yoxdur_a3e271", "M\u0259lumat yoxdur")}</p>
+                  <p className="text-base font-medium text-foreground">{selectedName.meaning || tr("babynames_melumat_yoxdur_a3e271", "M\u0259lumat yoxdur")}</p>
                 </div>
 
                 {/* Popularity */}

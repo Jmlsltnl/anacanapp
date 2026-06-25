@@ -45,7 +45,7 @@ const NameVotingScreen: React.FC<NameVotingScreenProps> = ({ onBack }) => {
       arr.push({
         name: n.name,
         gender: n.gender,
-        meaning: n.meaning_az || n.meaning,
+        meaning: n.meaning,
         origin: n.origin
       });
     }
