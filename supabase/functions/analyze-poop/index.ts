@@ -268,7 +268,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { imageBase64, userContext } = await req.json() as PoopAnalysisRequest;
+    const { imageBase64, userContext, language = 'az' } = await req.json() as PoopAnalysisRequest;
 
     if (!imageBase64) {
       throw new Error('Image data is required');
