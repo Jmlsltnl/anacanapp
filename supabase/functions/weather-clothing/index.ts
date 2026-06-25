@@ -18,6 +18,7 @@ interface UserContext {
 interface WeatherRequest {
   lat: number;
   lng: number;
+  language?: string;
   userContext?: UserContext;
 }
 
