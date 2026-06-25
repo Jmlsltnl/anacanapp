@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { lat, lng, userContext } = await req.json() as WeatherRequest;
+    const { lat, lng, userContext, language = 'az' } = await req.json() as WeatherRequest;
 
     if (!lat || !lng) {
       throw new Error('Location coordinates required');
