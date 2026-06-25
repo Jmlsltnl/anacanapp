@@ -225,7 +225,8 @@ serve(async (req) => {
       dad_birth_time, 
       baby_birth_date, 
       baby_birth_time, 
-      baby_due_date 
+      baby_due_date,
+      language = 'az'
     } = await req.json() as HoroscopeRequest;
 
     // AI handled by callGeminiSmart
