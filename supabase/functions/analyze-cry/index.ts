@@ -256,7 +256,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { audioBase64, audioDuration, userContext } = await req.json() as CryAnalysisRequest;
+    const { audioBase64, audioDuration, userContext, language = 'az' } = await req.json() as CryAnalysisRequest;
 
     if (!audioBase64) {
       throw new Error('Audio data is required');
