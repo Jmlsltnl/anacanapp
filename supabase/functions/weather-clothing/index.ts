@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
       });
       if (geoResponse.ok) {
         const geoData = await geoResponse.json();
-        cityName = geoData.address?.city || geoData.address?.town || geoData.address?.state || 'Naməlum';
+        cityName = geoData.address?.city || geoData.address?.town || geoData.address?.state || (language === 'en' ? 'Unknown' : 'Naməlum');
       }
     } catch {
       console.log('Geocoding failed, using default');
