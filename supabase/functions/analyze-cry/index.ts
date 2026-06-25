@@ -137,7 +137,7 @@ Return ONLY this JSON (no markdown, no extra keys):
 }
 
 // Classify cry type only if crying is confirmed
-async function classifyCryType(audioBase64: string, _apiKey?: string, userContext?: CryAnalysisRequest['userContext']): Promise<any> {
+async function classifyCryType(audioBase64: string, _apiKey?: string, userContext?: CryAnalysisRequest['userContext'], language: string = 'az'): Promise<any> {
   // Build age context for prompt
   let ageContext = '';
   if (userContext?.babyAgeMonths !== undefined) {
