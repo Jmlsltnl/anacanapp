@@ -269,8 +269,12 @@ Deno.serve(async (req) => {
         analysis: {
           cryType: 'no_cry_detected',
           confidence: 0,
-          explanation: 'Səs çox qısadır. Daha dəqiq analiz üçün minimum 3 saniyə səs lazımdır.',
-          recommendations: ['Minimum 3 saniyə səs yazın', 'Körpənin ağlamasını yaxından yazın'],
+          explanation: language === 'en'
+            ? 'The recording is too short. At least 3 seconds of audio is needed for an accurate analysis.'
+            : 'Səs çox qısadır. Daha dəqiq analiz üçün minimum 3 saniyə səs lazımdır.',
+          recommendations: language === 'en'
+            ? ['Record at least 3 seconds of audio', 'Hold the microphone close to the baby']
+            : ['Minimum 3 saniyə səs yazın', 'Körpənin ağlamasını yaxından yazın'],
           urgency: 'low',
           isCryDetected: false
         }
