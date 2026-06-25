@@ -6,6 +6,7 @@ import { useBabyNames } from '@/hooks/useDynamicContent';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
+import { useUserStore } from '@/store/userStore';
 
 interface BabyNamesProps {
   onBack: () => void;
@@ -15,6 +16,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
   useScrollToTop();
   useScreenAnalytics('BabyNames', 'Tools');
 
+  const language = useUserStore((state) => state.language);
   const [searchQuery, setSearchQuery] = useState('');
   const [genderFilter, setGenderFilter] = useState<'all' | 'boy' | 'girl'>('all');
   const [selectedName, setSelectedName] = useState<any | null>(null);
@@ -126,8 +128,8 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
             {favorites.length} {tr("babynames_secilmis_b067fa", "se\xE7ilmi\u015F")}
           </span>
           <span className="flex items-center gap-1">
-            <span className="text-xs">🇦🇿</span>
-            {tr("babynames_azerbaycan_733e93", "Az\u0259rbaycan")}
+            <span className="text-xs">{language === 'en' ? '🇬🇧' : '🇦🇿'}</span>
+            {language === 'en' ? 'English' : tr("babynames_azerbaycan_733e93", "Az\u0259rbaycan")}
           </span>
         </div>
 
@@ -290,7 +292,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
                     {selectedName.gender === 'boy' ? tr("babynames_oglan_e9715e", "O\u011Flan") : selectedName.gender === 'girl' ? tr("babynames_qiz_79bf6b", "Q\u0131z") : 'Unisex'}
                   </span>
                   <span className="px-2 py-0.5 rounded-full bg-white/20 text-white text-xs font-medium">
-                    {selectedName.origin || tr("babynames_azerbaycan_733e93", "Az\u0259rbaycan")}
+                    {selectedName.origin || (language === 'en' ? 'Azerbaijan' : tr("babynames_azerbaycan_733e93", "Az\u0259rbaycan"))}
                   </span>
                 </div>
               </div>
