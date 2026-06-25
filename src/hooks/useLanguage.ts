@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserStore } from '@/store/userStore';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { loadTranslations, clearTranslationCache } from '@/lib/i18n';
 
 export function useLanguage() {
@@ -35,11 +35,20 @@ export function useLanguage() {
     clearTranslationCache();
     setLanguage(lang);
   }, [language, setLanguage]);
+
+  // Extract disabled_tools for the current language
+  const disabledTools: string[] = useMemo(() => {
+    const currentLang = languages.find((l: any) => l.code === language);
+    if (!currentLang) return [];
+    const dt = (currentLang as any).disabled_tools;
+    return Array.isArray(dt) ? dt : [];
+  }, [languages, language]);
   
   return {
     language,
     languages,
     isLoading,
     changeLanguage,
+    disabledTools,
   };
 }

@@ -84,6 +84,7 @@ const AdminLanguages = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-languages'] });
+      queryClient.invalidateQueries({ queryKey: ['app-languages'] });
       setEditingId(null);
       toast.success(tr("adminlanguages_dil_yenilendi_e29903", "Dil yenil\u0259ndi"));
     }
@@ -193,11 +194,52 @@ const AdminLanguages = () => {
                         </span>
                     }
                     </div>
-                    {(lang.disabled_tools as string[])?.length > 0 &&
-                  <div className="text-xs text-orange-600 mt-1">
-                        {tr("adminlanguages_deaktiv_aletler_539f1d", "Deaktiv al\u0259tl\u0259r:")} {(lang.disabled_tools as string[]).join(', ')}
+                    {/* Disabled tools display / inline edit */}
+                    {editingId === lang.id ? (
+                      <div className="flex items-center gap-2 mt-2">
+                        <Input
+                          value={editForm[lang.id] ?? (lang.disabled_tools as string[])?.join(', ') ?? ''}
+                          onChange={(e) => setEditForm(prev => ({ ...prev, [lang.id]: e.target.value }))}
+                          placeholder="cakes, maternity, ..."
+                          className="h-8 text-xs flex-1"
+                        />
+                        <Button
+                          size="sm"
+                          className="h-8"
+                          onClick={() => {
+                            const raw = editForm[lang.id] ?? '';
+                            const tools = raw.split(',').map((t: string) => t.trim()).filter(Boolean);
+                            updateLanguage.mutate({
+                              id: lang.id,
+                              disabled_tools: tools as any,
+                            });
+                          }}
+                        >
+                          <Save className="w-3 h-3 mr-1" /> Saxla
+                        </Button>
+                        <Button variant="ghost" size="sm" className="h-8" onClick={() => setEditingId(null)}>
+                          ×
+                        </Button>
                       </div>
-                  }
+                    ) : (
+                      <div className="flex items-center gap-2 mt-1">
+                        {(lang.disabled_tools as string[])?.length > 0 ? (
+                          <span className="text-xs text-orange-600">
+                            {tr("adminlanguages_deaktiv_aletler_539f1d", "Deaktiv al\u0259tl\u0259r:")} {(lang.disabled_tools as string[]).join(', ')}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">{tr("adminlanguages_deaktiv_alet_yoxdur", "Deaktiv alət yoxdur")}</span>
+                        )}
+                        {lang.code !== 'az' && (
+                          <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => {
+                            setEditingId(lang.id);
+                            setEditForm(prev => ({ ...prev, [lang.id]: (lang.disabled_tools as string[])?.join(', ') ?? '' }));
+                          }}>
+                            ✏️
+                          </Button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">

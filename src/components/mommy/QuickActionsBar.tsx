@@ -12,6 +12,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { useUserStore } from '@/store/userStore';
 import { tr } from '@/lib/tr';
 import { PremiumModal } from '@/components/PremiumModal';
+import { useDisabledTools } from '@/hooks/useDisabledTools';
 
 const ICON_MAP: Record<string, LucideIcon> = {
   Baby, Thermometer, Music, AlertCircle, Sparkles, BookOpen, Camera, Stethoscope, Heart, Star
@@ -33,6 +34,10 @@ const QuickActionsBar = ({ onNavigateToTool }: QuickActionsBarProps) => {
   const ageGroup = ageInMonths < 3 ? 'newborn' : 'older';
   
   const { data: dbActions = [], isLoading } = useQuickActions('mommy', ageGroup);
+  const { disabledTools } = useDisabledTools();
+
+  // Filter out actions for disabled tools
+  const filteredActions = dbActions.filter(a => !disabledTools.includes(a.tool_key));
 
   const isToolPremium = (toolKey: string): boolean => {
     const config = toolConfigs.find(t => t.tool_id === toolKey);
@@ -88,7 +93,7 @@ const QuickActionsBar = ({ onNavigateToTool }: QuickActionsBarProps) => {
           {ageGroup === 'newborn' ? tr('quickactionsbar_for_newborn', 'Yenidoğan üçün') : tr('quickactionsbar_quick_access', 'Sürətli keçid')}
         </p>
         <div className="grid grid-cols-4 gap-2">
-          {dbActions.map((action, idx) => {
+          {filteredActions.map((action, idx) => {
             const IconComponent = ICON_MAP[action.icon] || Star;
             const needsPremium = !isPremium && isToolPremium(action.tool_key);
             return (

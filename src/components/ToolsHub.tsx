@@ -108,6 +108,7 @@ const iconMap: Record<string, LucideIcon> = {
 // Import Calculator icon
 import { Calculator } from 'lucide-react';
 import { tr } from "@/lib/tr";
+import { useDisabledTools } from '@/hooks/useDisabledTools';
 
 interface ToolsHubProps {
   initialTool?: string | null;
@@ -146,12 +147,16 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   // Build tools from DB configs
   const language = useUserStore((state) => state.language);
   const isNonAz = language !== 'az';
+  const { disabledTools, isToolDisabled } = useDisabledTools();
   const tools: Tool[] = useMemo(() => {
     if (toolConfigs.length === 0) {
       return [];
     }
 
-    return toolConfigs.map((config) => {
+    // Filter out tools disabled for the current language
+    const activeConfigs = toolConfigs.filter((config) => !disabledTools.includes(config.tool_id));
+
+    return activeConfigs.map((config) => {
       const name = hasPartner && config.requires_partner && config.partner_name ?
       config.partner_name :
       (config as any).display_name || config.name;
@@ -176,7 +181,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         isLocked: getLockedStatus(config)
       };
     });
-  }, [toolConfigs, hasPartner, lifeStage, language, isNonAz]);
+  }, [toolConfigs, hasPartner, lifeStage, language, isNonAz, disabledTools]);
 
   // Set initial tool from props on mount
   useEffect(() => {
@@ -263,7 +268,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     bgColor: 'pink',
     stages: ['bump', 'mommy']
   };
-  const showCakes = (lifeStage === 'bump' || lifeStage === 'mommy' || isAdmin) && (
+  const showCakes = !isToolDisabled('cakes') && (lifeStage === 'bump' || lifeStage === 'mommy' || isAdmin) && (
   cakesVirtual.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
   cakesVirtual.description.toLowerCase().includes(searchQuery.toLowerCase()));
   const displayedTools: Tool[] = showCakes ? [cakesVirtual, ...filteredTools] : filteredTools;
@@ -384,7 +389,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         {/* Hero Tools - DB driven */}
         {(() => {
           const heroTools = toolConfigs.
-          filter((t) => t.is_hero).
+          filter((t) => t.is_hero && !disabledTools.includes(t.tool_id)).
           sort((a, b) => (a.hero_order || 0) - (b.hero_order || 0));
 
           return heroTools.map((hero, idx) => {

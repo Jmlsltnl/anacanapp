@@ -67,6 +67,7 @@ import FetusMonth7 from '@/assets/fetus/month-7.svg';
 import FetusMonth8 from '@/assets/fetus/month-8.svg';
 import FetusMonth9 from '@/assets/fetus/month-9.svg';
 import { tr } from "@/lib/tr";
+import { useDisabledTools } from '@/hooks/useDisabledTools';
 
 const FETUS_IMAGES: {[key: number]: string;} = {
   1: FetusMonth1,
@@ -767,6 +768,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
   const { unlockAchievement, getTotalPoints } = useAchievements();
   const { activeTimers, startTimer, stopTimer, getElapsedSeconds, getActiveTimer } = useTimerStore();
   const { todayLogs, addLog, getTodayStats, refetch } = useBabyLogs();
+  const { isToolDisabled } = useDisabledTools();
 
   const { children, selectedChild, hasChildren, hasMultipleChildren, getChildAge } = useChildren();
 
@@ -1149,8 +1151,8 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
       {/* Quick Actions Bar */}
       <QuickActionsBar onNavigateToTool={onNavigateToTool} />
 
-      {/* Cakes Widget - navigate to cakes tab, hide after 12 months */}
-      {babyData.ageInMonths < 12 &&
+      {/* Cakes Widget - navigate to cakes tab, hide after 12 months, hide if disabled for language */}
+      {!isToolDisabled('cakes') && babyData.ageInMonths < 12 &&
       <motion.div
         className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl p-4 border border-primary/20 shadow-card cursor-pointer"
         initial={{ y: 20, opacity: 0 }}

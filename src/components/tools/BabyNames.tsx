@@ -25,7 +25,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
 
   const filteredNames = names.filter((name) => {
     const matchesSearch = name.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (name.meaning || '').toLowerCase().includes(searchQuery.toLowerCase());
+      (name.meaning || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchesGender = genderFilter === 'all' || name.gender === genderFilter || name.gender === 'unisex';
     return matchesSearch && matchesGender;
   }).sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
@@ -59,7 +59,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
               onClick={onBack}
               className="w-9 h-9 rounded-xl bg-muted/60 flex items-center justify-center"
               whileTap={{ scale: 0.95 }}>
-              
+
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </motion.button>
             <div className="flex-1">
@@ -71,7 +71,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
               whileHover={{ rotate: 180 }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.3 }}>
-              
+
               <Shuffle className="w-4 h-4 text-primary" />
             </motion.button>
           </div>
@@ -85,33 +85,32 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full h-10 pl-10 pr-4 rounded-xl bg-muted/50 text-foreground placeholder:text-muted-foreground text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
-            
+
           </div>
 
           {/* Gender Filter Pills */}
           <div className="flex gap-2">
             {[
-            { id: 'all', label: tr("babynames_hamisi_c73c4d", 'Hamısı'), color: 'primary' },
-            { id: 'boy', label: tr("babynames_oglan_e9715e", 'Oğlan'), color: 'blue' },
-            { id: 'girl', label: tr("babynames_qiz_79bf6b", 'Qız'), color: 'pink' }].
-            map((filter) =>
-            <motion.button
-              key={filter.id}
-              onClick={() => setGenderFilter(filter.id as any)}
-              className={`flex-1 py-2 rounded-xl text-sm font-medium transition-all ${
-              genderFilter === filter.id ?
-              filter.color === 'primary' ?
-              'bg-primary text-primary-foreground' :
-              filter.color === 'blue' ?
-              'bg-blue-500 text-white' :
-              'bg-pink-500 text-white' :
-              'bg-muted/50 text-muted-foreground'}`
-              }
-              whileTap={{ scale: 0.98 }}>
-              
-                {filter.label}
-              </motion.button>
-            )}
+              { id: 'all', label: tr("babynames_hamisi_c73c4d", 'Hamısı'), color: 'primary' },
+              { id: 'boy', label: tr("babynames_oglan_e9715e", 'Oğlan'), color: 'blue' },
+              { id: 'girl', label: tr("babynames_qiz_79bf6b", 'Qız'), color: 'pink' }].
+              map((filter) =>
+                <motion.button
+                  key={filter.id}
+                  onClick={() => setGenderFilter(filter.id as any)}
+                  className={`flex-1 py-2 rounded-xl text-sm font-medium transition-all ${genderFilter === filter.id ?
+                      filter.color === 'primary' ?
+                        'bg-primary text-primary-foreground' :
+                        filter.color === 'blue' ?
+                          'bg-blue-500 text-white' :
+                          'bg-pink-500 text-white' :
+                      'bg-muted/50 text-muted-foreground'}`
+                  }
+                  whileTap={{ scale: 0.98 }}>
+
+                  {filter.label}
+                </motion.button>
+              )}
           </div>
         </div>
       </div>
@@ -135,21 +134,21 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
 
         {/* Favorites Section - Horizontal Scroll */}
         {favorites.length > 0 &&
-        <div className="mb-5">
+          <div className="mb-5">
             <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
               <Heart className="w-4 h-4 text-pink-500 fill-pink-500" />
               {tr("babynames_secilmisler_cc04b8", "Se\xE7ilmi\u015Fl\u0259r")}
             </h3>
             <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
               {favorites.map((fav) =>
-            <motion.span
-              key={fav.id}
-              className="px-3 py-1.5 rounded-full bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400 font-medium text-sm whitespace-nowrap border border-pink-200 dark:border-pink-800"
-              whileTap={{ scale: 0.95 }}>
-              
+                <motion.span
+                  key={fav.id}
+                  className="px-3 py-1.5 rounded-full bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400 font-medium text-sm whitespace-nowrap border border-pink-200 dark:border-pink-800"
+                  whileTap={{ scale: 0.95 }}>
+
                   {fav.name}
                 </motion.span>
-            )}
+              )}
             </div>
           </div>
         }
@@ -163,26 +162,25 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
             {filteredNames.length} {tr("babynames_ad_count_3c7a2d", "ad")}
           </span>
         </div>
-        
+
         {/* Names List */}
         <div className="space-y-2">
           {filteredNames.map((name, index) =>
-          <motion.button
-            key={name.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: Math.min(index * 0.02, 0.2) }}
-            onClick={() => setSelectedName(name)}
-            className="w-full bg-card rounded-xl p-3 border border-border/40 text-left flex items-center gap-3 hover:bg-muted/30 transition-colors active:scale-[0.99]">
-            
+            <motion.button
+              key={name.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: Math.min(index * 0.02, 0.2) }}
+              onClick={() => setSelectedName(name)}
+              className="w-full bg-card rounded-xl p-3 border border-border/40 text-left flex items-center gap-3 hover:bg-muted/30 transition-colors active:scale-[0.99]">
+
               {/* Gender Indicator */}
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
-            name.gender === 'boy' ?
-            'bg-blue-100 dark:bg-blue-900/30' :
-            name.gender === 'girl' ?
-            'bg-pink-100 dark:bg-pink-900/30' :
-            'bg-violet-100 dark:bg-violet-900/30'}`
-            }>
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${name.gender === 'boy' ?
+                  'bg-blue-100 dark:bg-blue-900/30' :
+                  name.gender === 'girl' ?
+                    'bg-pink-100 dark:bg-pink-900/30' :
+                    'bg-violet-100 dark:bg-violet-900/30'}`
+              }>
                 {name.gender === 'boy' ? '👦' : name.gender === 'girl' ? '👧' : '✨'}
               </div>
 
@@ -191,8 +189,8 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
                 <div className="flex items-center gap-2">
                   <h3 className="font-semibold text-foreground">{name.name}</h3>
                   {(name.popularity || 0) >= 80 &&
-                <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                }
+                    <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                  }
                 </div>
                 <p className="text-xs text-muted-foreground truncate">{name.meaning}</p>
               </div>
@@ -201,39 +199,37 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
               <div className="flex items-center gap-2">
                 <div className="w-12 h-1.5 bg-muted rounded-full overflow-hidden">
                   <div
-                  className={`h-full rounded-full ${
-                  name.gender === 'boy' ? 'bg-blue-500' : name.gender === 'girl' ? 'bg-pink-500' : 'bg-violet-500'}`
-                  }
-                  style={{ width: `${name.popularity || 0}%` }} />
-                
+                    className={`h-full rounded-full ${name.gender === 'boy' ? 'bg-blue-500' : name.gender === 'girl' ? 'bg-pink-500' : 'bg-violet-500'}`
+                    }
+                    style={{ width: `${name.popularity || 0}%` }} />
+
                 </div>
                 <span className="text-[10px] text-muted-foreground w-7">{name.popularity || 0}%</span>
               </div>
 
               {/* Favorite Button */}
               <motion.button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleToggleFavorite(name);
-              }}
-              className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
-              isFavorite(name.name) ?
-              'bg-pink-100 dark:bg-pink-900/30' :
-              'bg-muted/50 hover:bg-muted'}`
-              }
-              whileTap={{ scale: 0.85 }}>
-              
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggleFavorite(name);
+                }}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${isFavorite(name.name) ?
+                    'bg-pink-100 dark:bg-pink-900/30' :
+                    'bg-muted/50 hover:bg-muted'}`
+                }
+                whileTap={{ scale: 0.85 }}>
+
                 <Heart className={`w-4 h-4 ${isFavorite(name.name) ? 'text-pink-500 fill-pink-500' : 'text-muted-foreground'}`} />
               </motion.button>
             </motion.button>
           )}
 
           {filteredNames.length === 0 &&
-          <motion.div
-            className="text-center py-16"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}>
-            
+            <motion.div
+              className="text-center py-16"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}>
+
               <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-3">
                 <Search className="w-7 h-7 text-muted-foreground/50" />
               </div>
@@ -247,45 +243,44 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
       {/* Name Detail Modal */}
       <AnimatePresence>
         {selectedName &&
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={() => setSelectedName(null)}>
-          
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setSelectedName(null)}>
+
             <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ type: 'spring', damping: 25 }}
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-sm bg-card rounded-2xl overflow-hidden shadow-xl">
-            
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm bg-card rounded-2xl overflow-hidden shadow-xl">
+
               {/* Modal Header */}
-              <div className={`p-6 text-center relative ${
-            selectedName.gender === 'boy' ?
-            'bg-gradient-to-br from-blue-500 to-cyan-500' :
-            selectedName.gender === 'girl' ?
-            'bg-gradient-to-br from-pink-500 to-rose-500' :
-            'bg-gradient-to-br from-violet-500 to-purple-500'}`
-            }>
+              <div className={`p-6 text-center relative ${selectedName.gender === 'boy' ?
+                  'bg-gradient-to-br from-blue-500 to-cyan-500' :
+                  selectedName.gender === 'girl' ?
+                    'bg-gradient-to-br from-pink-500 to-rose-500' :
+                    'bg-gradient-to-br from-violet-500 to-purple-500'}`
+              }>
                 <button
-                onClick={() => setSelectedName(null)}
-                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                
+                  onClick={() => setSelectedName(null)}
+                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+
                   <X className="w-4 h-4 text-white" />
                 </button>
-                
+
                 <motion.div
-                className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-3xl mx-auto mb-3"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', delay: 0.1 }}>
-                
+                  className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-3xl mx-auto mb-3"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', delay: 0.1 }}>
+
                   {selectedName.gender === 'boy' ? '👦' : selectedName.gender === 'girl' ? '👧' : '✨'}
                 </motion.div>
-                
+
                 <h2 className="text-2xl font-bold text-white mb-1">{selectedName.name}</h2>
                 <div className="flex items-center justify-center gap-2">
                   <span className="px-2 py-0.5 rounded-full bg-white/20 text-white text-xs font-medium">
@@ -310,13 +305,12 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
                   <div className="flex items-center gap-2">
                     <div className="w-20 h-2 bg-muted rounded-full overflow-hidden">
                       <motion.div
-                      className={`h-full rounded-full ${
-                      selectedName.gender === 'boy' ? 'bg-blue-500' : selectedName.gender === 'girl' ? 'bg-pink-500' : 'bg-violet-500'}`
-                      }
-                      initial={{ width: 0 }}
-                      animate={{ width: `${selectedName.popularity || 0}%` }}
-                      transition={{ duration: 0.5, delay: 0.2 }} />
-                    
+                        className={`h-full rounded-full ${selectedName.gender === 'boy' ? 'bg-blue-500' : selectedName.gender === 'girl' ? 'bg-pink-500' : 'bg-violet-500'}`
+                        }
+                        initial={{ width: 0 }}
+                        animate={{ width: `${selectedName.popularity || 0}%` }}
+                        transition={{ duration: 0.5, delay: 0.2 }} />
+
                     </div>
                     <span className="font-semibold text-foreground text-sm">{selectedName.popularity || 0}%</span>
                   </div>
@@ -324,23 +318,21 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
 
                 {/* Add to Favorites Button */}
                 <motion.button
-                onClick={() => {
-                  handleToggleFavorite(selectedName);
-                  setSelectedName(null);
-                }}
-                className={`w-full h-12 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all ${
-                isFavorite(selectedName.name) ?
-                'bg-muted text-muted-foreground' :
-                `${
-                selectedName.gender === 'boy' ?
-                'bg-blue-500' :
-                selectedName.gender === 'girl' ?
-                'bg-pink-500' :
-                'bg-violet-500'} text-white`}`
+                  onClick={() => {
+                    handleToggleFavorite(selectedName);
+                    setSelectedName(null);
+                  }}
+                  className={`w-full h-12 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all ${isFavorite(selectedName.name) ?
+                      'bg-muted text-muted-foreground' :
+                      `${selectedName.gender === 'boy' ?
+                        'bg-blue-500' :
+                        selectedName.gender === 'girl' ?
+                          'bg-pink-500' :
+                          'bg-violet-500'} text-white`}`
 
-                }
-                whileTap={{ scale: 0.98 }}>
-                
+                  }
+                  whileTap={{ scale: 0.98 }}>
+
                   <Heart className={`w-4 h-4 ${isFavorite(selectedName.name) ? '' : 'fill-current'}`} />
                   {isFavorite(selectedName.name) ? tr("babynames_secilmislerden_cixar_69b878", "Se\xE7ilmi\u015Fl\u0259rd\u0259n \xE7\u0131xar") : tr("babynames_secilmislere_elave_et_d53f1e", "Se\xE7ilmi\u015Fl\u0259r\u0259 \u0259lav\u0259 et")}
                 </motion.button>
