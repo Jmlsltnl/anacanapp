@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { requestMicrophonePermission } from '@/lib/permissions';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
-import { tr } from "@/lib/tr";
+import { tr, getPersistedLanguage } from "@/lib/tr";
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface CryTranslatorProps {
@@ -234,7 +234,8 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
           body: {
             audioBase64: base64Audio,
             audioDuration: recordingTime,
-            userContext: babyContext
+            userContext: babyContext,
+            language: getPersistedLanguage()
           }
         });
 

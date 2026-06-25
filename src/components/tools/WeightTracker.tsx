@@ -11,7 +11,7 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDateAz, formatTimeAz } from '@/lib/date-utils';
-import { tr } from "@/lib/tr";
+import { tr, getPersistedLanguage } from "@/lib/tr";
 
 interface WeightTrackerProps {
   onBack: () => void;
@@ -70,7 +70,8 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
               role: 'user',
               content: `${tr("weighttracker_ai_prompt_prefix", "Çəki analizi:")} ${currentWeek} ${tr("weighttracker_ai_prompt_week", "həftə")}, ${tr("weighttracker_ai_prompt_start", "başlanğıc:")} ${startWeight}kg, ${tr("weighttracker_ai_prompt_now", "indi:")} ${currentWeight}kg, ${tr("weighttracker_ai_prompt_gain", "artım:")} ${totalGain}kg (${tr("weighttracker_ai_prompt_rec", "tövsiyə:")} ${recommended.min}-${recommended.max}kg). ${tr("weighttracker_ai_prompt_status", "Status:")} ${status.text}. ${tr("weighttracker_ai_prompt_rules", "QAYDALAR: 1) Salamlama yoxdur, birbaşa məsələyə keç. 2) Maksimum 1-2 cümlə. 3) Disclaimer/xəbərdarlıq yoxdur. 4) Yalnız praktik qısa məsləhət.")}`
             }],
-            isWeightAnalysis: true
+            isWeightAnalysis: true,
+            language: getPersistedLanguage()
           }
         });
 

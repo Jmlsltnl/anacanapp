@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { takePhoto, pickFromGallery, requestCameraPermission } from '@/lib/permissions';
 import { Capacitor } from '@capacitor/core';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
-import { tr } from "@/lib/tr";
+import { tr, getPersistedLanguage } from "@/lib/tr";
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface PoopScannerProps {
@@ -168,7 +168,8 @@ const PoopScanner = ({ onBack }: PoopScannerProps) => {
       const { data, error } = await supabase.functions.invoke('analyze-poop', {
         body: {
           imageBase64: base64Image,
-          userContext: babyContext
+          userContext: babyContext,
+          language: getPersistedLanguage()
         }
       });
 

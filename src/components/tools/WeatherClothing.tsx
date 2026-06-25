@@ -14,7 +14,7 @@ import { useUserStore } from '@/store/userStore';
 import { differenceInMonths, differenceInDays } from 'date-fns';
 import { getPregnancyWeek } from '@/lib/pregnancy-utils';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
-import { tr } from "@/lib/tr";
+import { tr, getPersistedLanguage } from "@/lib/tr";
 
 interface WeatherClothingProps {
   onBack: () => void;
@@ -116,7 +116,8 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
         body: {
           lat: latitude,
           lng: longitude,
-          userContext
+          userContext,
+          language: getPersistedLanguage()
         }
       });
 

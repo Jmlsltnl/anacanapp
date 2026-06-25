@@ -16,7 +16,7 @@ import { format } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { cn } from '@/lib/utils';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
-import { tr } from "@/lib/tr";
+import { tr, getPersistedLanguage } from "@/lib/tr";
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface HoroscopeCompatibilityProps {
@@ -175,7 +175,10 @@ const HoroscopeCompatibility = ({ onBack }: HoroscopeCompatibilityProps) => {
       }
 
       const { data, error } = await supabase.functions.invoke('analyze-horoscope', {
-        body: payload
+        body: {
+          ...payload,
+          language: getPersistedLanguage()
+        }
       });
 
       clearInterval(stepInterval);

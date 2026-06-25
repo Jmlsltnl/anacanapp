@@ -104,7 +104,7 @@ export const useGenerateFairyTale = () => {
             theme: params.theme,
             hero: params.hero,
             moralLesson: params.moral_lesson,
-            language: params.language || 'az',
+            language: params.language || useUserStore.getState().language || 'az',
             ageRange: params.age_range,
             storyStyle: params.story_style,
             customPrompt: params.custom_prompt

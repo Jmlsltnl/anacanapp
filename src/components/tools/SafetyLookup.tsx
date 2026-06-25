@@ -9,7 +9,7 @@ import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
-import { tr } from "@/lib/tr";
+import { tr, getPersistedLanguage } from "@/lib/tr";
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface SafetyLookupProps {
@@ -77,7 +77,7 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
     setAiLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('safety-ai-lookup', {
-        body: { query: searchQuery.trim(), category: activeCategory !== 'all' ? activeCategory : undefined, userContext }
+        body: { query: searchQuery.trim(), category: activeCategory !== 'all' ? activeCategory : undefined, userContext, language: getPersistedLanguage() }
       });
       if (error) throw error;
       if (data?.success && data?.item) {
