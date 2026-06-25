@@ -108,7 +108,7 @@ export default function VaccineCalendar({ onBack }: Props) {
   const { data: countries = [] } = useVaccineCountries();
   const { toast } = useToast();
   const qc = useQueryClient();
-  const lang = useUserStore((state) => state.language);
+  const lang = getPersistedLanguage();
 
   const childCountry = (selectedChild as any)?.country_code || 'AZ';
   const [countryCode, setCountryCode] = useState<string>(childCountry);
@@ -533,7 +533,7 @@ function ActionDialog({
             {mode === 'done' ? tr("vaccinecalendar_peyvend_vuruldu_22c2e5", "Peyv\u0259nd vuruldu") : tr("vaccinecalendar_peyvendi_buraxildi_kimi_qeyd_e_64265a", "Peyv\u0259ndi burax\u0131ld\u0131 kimi qeyd et")}
           </DialogTitle>
         </DialogHeader>
-        {row && <p className="text-xs text-muted-foreground -mt-2">{row.vaccine.name} • {translateVaccineLabel(row.dose_label, lang)}</p>}
+        {row && <p className="text-xs text-muted-foreground -mt-2">{row.vaccine.name} • {translateVaccineLabel(row.dose_label, getPersistedLanguage())}</p>}
         {mode === 'done' ?
           <div className="space-y-3 mt-2">
             <div>

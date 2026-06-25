@@ -18,6 +18,7 @@ interface UserContext {
 interface WeatherRequest {
   lat: number;
   lng: number;
+  language?: string;
   userContext?: UserContext;
 }
 
@@ -51,7 +52,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { lat, lng, userContext } = await req.json() as WeatherRequest;
+    const { lat, lng, userContext, language = 'az' } = await req.json() as WeatherRequest;
 
     if (!lat || !lng) {
       throw new Error('Location coordinates required');
@@ -67,15 +68,15 @@ Deno.serve(async (req) => {
     const weatherData = await weatherResponse.json();
 
     // Get city name from reverse geocoding
-    const geoUrl = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=az`;
-    let cityName = 'Naməlum';
+    const geoUrl = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=${language === 'en' ? 'en' : 'az'}`;
+    let cityName = language === 'en' ? 'Unknown' : 'Naməlum';
     try {
       const geoResponse = await fetch(geoUrl, {
         headers: { 'User-Agent': 'AnacanApp/1.0' }
       });
       if (geoResponse.ok) {
         const geoData = await geoResponse.json();
-        cityName = geoData.address?.city || geoData.address?.town || geoData.address?.state || 'Naməlum';
+        cityName = geoData.address?.city || geoData.address?.town || geoData.address?.state || (language === 'en' ? 'Unknown' : 'Naməlum');
       }
     } catch {
       console.log('Geocoding failed, using default');
@@ -192,7 +193,7 @@ CAVAB FORMATI (STRICT JSON):
   "outdoorAdvice": "Bayırda gəzmə tövsiyəsi",
   "safeToGoOut": true,
   "alertLevel": "safe|caution|warning|danger"
-}`;
+}${language === 'en' ? '\n\nIMPORTANT: Write ALL output text fields (weatherDescription, clothingAdvice, clothingItems, indoorClothingAdvice, indoorClothingItems, roomTemperatureAdvice, warnings, pollenWarning, uvWarning, outdoorAdvice) in ENGLISH. Keep JSON keys, numeric values and enum values exactly as shown.' : ''}`;
 
     const models = ['gemini-2.5-flash-lite', 'gemini-2.5-flash'];
     let geminiResponse: Response | null = null;

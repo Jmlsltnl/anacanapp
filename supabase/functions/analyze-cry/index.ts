@@ -11,6 +11,7 @@ const corsHeaders = {
 interface CryAnalysisRequest {
   audioBase64: string;
   audioDuration: number;
+  language?: string;
   userContext?: {
     babyName?: string;
     babyAgeMonths?: number;
@@ -137,7 +138,7 @@ Return ONLY this JSON (no markdown, no extra keys):
 }
 
 // Classify cry type only if crying is confirmed
-async function classifyCryType(audioBase64: string, _apiKey?: string, userContext?: CryAnalysisRequest['userContext']): Promise<any> {
+async function classifyCryType(audioBase64: string, _apiKey?: string, userContext?: CryAnalysisRequest['userContext'], language: string = 'az'): Promise<any> {
   // Build age context for prompt
   let ageContext = '';
   if (userContext?.babyAgeMonths !== undefined) {
@@ -198,7 +199,7 @@ JSON CAVAB:
   "explanation": "Azərbaycan dilində izahat${userContext?.babyName ? ` (${userContext.babyName} adını istifadə et)` : ''}",
   "recommendations": ["tövsiyə 1", "tövsiyə 2", "tövsiyə 3"],
   "urgency": "low|medium|high"
-}`
+}${language === 'en' ? '\n\nIMPORTANT: Write the "explanation" and all "recommendations" entries in ENGLISH. Keep JSON keys and enum values exactly as shown.' : ''}`
         }
       ]
     }],
@@ -255,7 +256,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { audioBase64, audioDuration, userContext } = await req.json() as CryAnalysisRequest;
+    const { audioBase64, audioDuration, userContext, language = 'az' } = await req.json() as CryAnalysisRequest;
 
     if (!audioBase64) {
       throw new Error('Audio data is required');
@@ -268,8 +269,12 @@ Deno.serve(async (req) => {
         analysis: {
           cryType: 'no_cry_detected',
           confidence: 0,
-          explanation: 'Səs çox qısadır. Daha dəqiq analiz üçün minimum 3 saniyə səs lazımdır.',
-          recommendations: ['Minimum 3 saniyə səs yazın', 'Körpənin ağlamasını yaxından yazın'],
+          explanation: language === 'en'
+            ? 'The recording is too short. At least 3 seconds of audio is needed for an accurate analysis.'
+            : 'Səs çox qısadır. Daha dəqiq analiz üçün minimum 3 saniyə səs lazımdır.',
+          recommendations: language === 'en'
+            ? ['Record at least 3 seconds of audio', 'Hold the microphone close to the baby']
+            : ['Minimum 3 saniyə səs yazın', 'Körpənin ağlamasını yaxından yazın'],
           urgency: 'low',
           isCryDetected: false
         }
@@ -287,7 +292,7 @@ Deno.serve(async (req) => {
 
     // If no crying detected, return immediately
     if (!detection.isCrying) {
-      const soundTypeMessages: Record<string, string> = {
+      const soundTypeMessagesAz: Record<string, string> = {
         'cough': 'Bu səs öskürəkdir, körpə ağlaması deyil.',
         'sneeze': 'Bu səs asqırmadır, körpə ağlaması deyil.',
         'adult_voice': 'Bu səs böyük insana aiddir, körpə ağlaması deyil.',
@@ -300,8 +305,21 @@ Deno.serve(async (req) => {
         'baby_cooing': 'Körpə xoşbəxt səslər çıxarır, ağlamır.',
         'unknown': 'Körpə ağlaması aşkar edilmədi.'
       };
-
-      const explanation = soundTypeMessages[detection.soundType] || soundTypeMessages['unknown'];
+      const soundTypeMessagesEn: Record<string, string> = {
+        'cough': 'This is a cough, not a baby cry.',
+        'sneeze': 'This is a sneeze, not a baby cry.',
+        'adult_voice': 'This sounds like an adult voice, not a baby cry.',
+        'scream': 'This is a scream or loud sound, not classified as baby crying.',
+        'bang': 'This is a bang or impact sound, not a baby cry.',
+        'music_tv': 'This is TV/music or media audio, not a baby cry.',
+        'animal': 'This may be an animal sound, not a baby cry.',
+        'silence': 'The audio is mostly silent.',
+        'noise': 'This is environmental noise, not a baby cry.',
+        'baby_cooing': 'The baby is making happy sounds, not crying.',
+        'unknown': 'No baby crying was detected.'
+      };
+      const messages = language === 'en' ? soundTypeMessagesEn : soundTypeMessagesAz;
+      const explanation = messages[detection.soundType] || messages['unknown'];
 
       return new Response(JSON.stringify({
         success: true,
@@ -309,11 +327,9 @@ Deno.serve(async (req) => {
           cryType: 'no_cry_detected',
           confidence: detection.confidence,
           explanation: explanation,
-          recommendations: [
-            'Körpə ağladıqda yenidən cəhd edin',
-            'Mikrofonu körpəyə yaxınlaşdırın',
-            'Ətraf səsləri minimuma endirin'
-          ],
+          recommendations: language === 'en'
+            ? ['Try again when the baby is crying', 'Move the microphone closer to the baby', 'Minimize background noise']
+            : ['Körpə ağladıqda yenidən cəhd edin', 'Mikrofonu körpəyə yaxınlaşdırın', 'Ətraf səsləri minimuma endirin'],
           urgency: 'low',
           isCryDetected: false,
           detectedSound: detection.soundType
@@ -328,15 +344,19 @@ Deno.serve(async (req) => {
     // STAGE 2: Crying confirmed, now classify the type
     let analysisResult;
     try {
-      analysisResult = await classifyCryType(audioBase64, undefined, userContext);
+      analysisResult = await classifyCryType(audioBase64, undefined, userContext, language);
       analysisResult.isCryDetected = true;
     } catch (classifyError) {
       console.error('Classification error:', classifyError);
       analysisResult = {
         cryType: 'discomfort',
         confidence: 70,
-        explanation: 'Körpə ağlaması aşkar edildi, lakin dəqiq növü müəyyən edilə bilmədi.',
-        recommendations: ['Körpənin vəziyyətini yoxlayın', 'Bezini yoxlayın', 'Ac olub-olmadığını yoxlayın'],
+        explanation: language === 'en'
+          ? 'Baby crying was detected, but the exact type could not be determined.'
+          : 'Körpə ağlaması aşkar edildi, lakin dəqiq növü müəyyən edilə bilmədi.',
+        recommendations: language === 'en'
+          ? ["Check the baby's overall condition", 'Check the diaper', 'Check if the baby is hungry']
+          : ['Körpənin vəziyyətini yoxlayın', 'Bezini yoxlayın', 'Ac olub-olmadığını yoxlayın'],
         urgency: 'medium',
         isCryDetected: true
       };

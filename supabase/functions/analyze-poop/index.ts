@@ -10,6 +10,7 @@ const corsHeaders = {
 
 interface PoopAnalysisRequest {
   imageBase64: string;
+  language?: string;
   userContext?: {
     babyName?: string;
     babyAgeMonths?: number;
@@ -135,7 +136,7 @@ CAVAB FORMATI (STRICT JSON, heç bir əlavə mətn yoxdur):
 }
 
 // Stage 2: Analyze the poop
-async function analyzePoop(imageBase64: string, _apiKey?: string, userContext?: PoopAnalysisRequest['userContext']): Promise<Response | null> {
+async function analyzePoop(imageBase64: string, _apiKey?: string, userContext?: PoopAnalysisRequest['userContext'], language: string = 'az'): Promise<Response | null> {
   const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
   
   // Build age context for prompt
@@ -208,7 +209,7 @@ CAVAB FORMATI (STRICT JSON):
   "doctorUrgency": "none|soon|today|immediate"
 }
 
-XƏBƏRDARLIQ: Ağ, qara və ya qırmızı rəng gördükdə "urgent" səviyyəsi VER!`
+XƏBƏRDARLIQ: Ağ, qara və ya qırmızı rəng gördükdə "urgent" səviyyəsi VER!${language === 'en' ? '\n\nIMPORTANT: Write "colorNameAz", "explanation" and all "recommendations" entries in ENGLISH. Despite the field name "colorNameAz", put the English color name there. Keep JSON keys and enum values exactly as shown.' : ''}`
           }
         ]
       }],
@@ -267,7 +268,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { imageBase64, userContext } = await req.json() as PoopAnalysisRequest;
+    const { imageBase64, userContext, language = 'az' } = await req.json() as PoopAnalysisRequest;
 
     if (!imageBase64) {
       throw new Error('Image data is required');
@@ -296,7 +297,7 @@ Deno.serve(async (req) => {
 
     // Stage 2: Analyze poop
     console.log('Stage 2: Analyzing poop...');
-    const response = await analyzePoop(imageBase64, undefined, userContext);
+    const response = await analyzePoop(imageBase64, undefined, userContext, language);
 
     if (!response) {
       throw new Error('AI analysis failed - all models exhausted');
@@ -315,7 +316,17 @@ Deno.serve(async (req) => {
         throw new Error('No JSON found');
       }
     } catch {
-      analysisResult = {
+      analysisResult = language === 'en' ? {
+        colorDetected: 'unknown',
+        colorNameAz: 'Unknown',
+        consistency: 'normal',
+        isNormal: true,
+        concernLevel: 'normal',
+        explanation: 'The image was analyzed. Try taking a clearer picture.',
+        recommendations: ["Monitor the baby's general condition", 'Consult a doctor if you have any concerns'],
+        shouldSeeDoctor: false,
+        doctorUrgency: 'none'
+      } : {
         colorDetected: 'unknown',
         colorNameAz: 'Naməlum',
         consistency: 'normal',

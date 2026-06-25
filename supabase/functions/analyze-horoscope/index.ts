@@ -15,6 +15,7 @@ interface HoroscopeRequest {
   baby_birth_date?: string;
   baby_birth_time?: string;
   baby_due_date?: string;
+  language?: string;
 }
 
 interface ZodiacInfo {
@@ -224,7 +225,8 @@ serve(async (req) => {
       dad_birth_time, 
       baby_birth_date, 
       baby_birth_time, 
-      baby_due_date 
+      baby_due_date,
+      language = 'az'
     } = await req.json() as HoroscopeRequest;
 
     // AI handled by callGeminiSmart
@@ -334,7 +336,7 @@ ${dadSun ? `[Ana (${momSun.signAz}) və ata (${dadSun.signAz}) arasındakı kosm
 [3 rəqəm, bürclərin numeroloji dəyərlərinə əsasən]
 
 ## QEYDLƏR:
-- Cavabı YALNIZ Azərbaycan dilində yaz
+- ${language === 'en' ? 'Write all SECTION CONTENT in ENGLISH. Keep the Azerbaijani section header keys (### ÜMUMI_UYĞUNLUQ_BALI, ### AÇAR_SÖZLƏR, ### ANA_ANALİZİ, etc.) EXACTLY as shown so the parser can read them. Only the body text under each header should be in English.' : 'Cavabı YALNIZ Azərbaycan dilində yaz'}
 - Pozitiv, dəstəkləyici və konstruktiv ton saxla
 - Dərəcələr mühümdür - 0-10° bürcün başlanğıcı, 20-30° bürcün sonu
 - Ay bürcü emosional xarakter üçün çox vacibdir
