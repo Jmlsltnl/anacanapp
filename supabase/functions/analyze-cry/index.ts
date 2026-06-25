@@ -199,7 +199,7 @@ JSON CAVAB:
   "explanation": "Azərbaycan dilində izahat${userContext?.babyName ? ` (${userContext.babyName} adını istifadə et)` : ''}",
   "recommendations": ["tövsiyə 1", "tövsiyə 2", "tövsiyə 3"],
   "urgency": "low|medium|high"
-}`
+}${language === 'en' ? '\n\nIMPORTANT: Write the "explanation" and all "recommendations" entries in ENGLISH. Keep JSON keys and enum values exactly as shown.' : ''}`
         }
       ]
     }],
