@@ -11,6 +11,7 @@ const corsHeaders = {
 interface CryAnalysisRequest {
   audioBase64: string;
   audioDuration: number;
+  language?: string;
   userContext?: {
     babyName?: string;
     babyAgeMonths?: number;
